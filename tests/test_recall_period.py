@@ -664,3 +664,324 @@ class TestDelivered:
                       waves=["1991-92", "2016-17"])
         assert list(info.value.unavailable) == ["1991-92"]
         assert info.value.convertible == ["2016-17"]
+
+    def test_burkina_2014_quantity_is_the_passage_1_week(self):
+        """Red team r1, R1.  Only passage 1 of four fields the quantity grid
+        (Burkina_Faso/_/CONTENTS.org), so the served quantity IS one 7-day
+        ask: a week of it is the passage-1 sum of food_acquired, x 7/7.  It
+        was served x 7/28 = 0.25."""
+        fa = self._get("Burkina_Faso", "food_acquired", waves=["2014"])
+        out = self._get("Burkina_Faso", "food_quantities", waves=["2014"],
+                        units="units", period="week")
+        p1 = fa[fa.index.get_level_values("visit") == 1]["Quantity"]
+        want = p1.groupby(level="i").sum(min_count=1).dropna() * (7 / 7)
+        got = out["Quantity"].groupby(level="i").sum(min_count=1).dropna()
+        assert got.index.sort_values().equals(want.index.sort_values())
+        np.testing.assert_allclose(got.sort_index().to_numpy(),
+                                   want.sort_index().to_numpy(), rtol=1e-12)
+        rec = out.attrs["period"]["Burkina_Faso"]["waves"]["2014"]
+        assert (rec["exposure_days"], rec["n_asks"], rec["n_asks_source"]) == (
+            7.0, 1, "n_asks_by_column")
+
+    def test_burkina_2014_expenditure_is_still_28_days(self):
+        """...while spending is asked at all four passages: unchanged from
+        Phase II's first cut, x 7/28."""
+        base = self._get("Burkina_Faso", "food_expenditures", waves=["2014"])
+        out = self._get("Burkina_Faso", "food_expenditures", waves=["2014"],
+                        period="week")
+        assert out.index.equals(base.index)
+        np.testing.assert_array_equal(out["Expenditure"].to_numpy(),
+                                      base["Expenditure"].to_numpy() * 0.25)
+        assert out.attrs["period"]["Burkina_Faso"]["waves"]["2014"][
+            "exposure_days"] == 28.0
+
+    @pytest.mark.parametrize("table,kw,col", [
+        ("food_expenditures", {}, "Expenditure"),
+        ("food_quantities", {"units": "units"}, "Quantity"),
+    ])
+    def test_mali_2014_15_week_is_half_the_served_two_passage_total(
+            self, table, kw, col):
+        """Red team r1, R2.  The served 2014-15 row is passage 1 + passage 2
+        of one panel, so its exposure is recall_days x n_asks = 7 x 2 = 14
+        days, and period='week' multiplies by 7 / 14 = 0.5.  It was served
+        x 7 / (7 x 1) = 1."""
+        base = self._get("Mali", table, waves=["2014-15"], **kw)
+        out = self._get("Mali", table, waves=["2014-15"], period="week", **kw)
+        assert out.index.equals(base.index)
+        np.testing.assert_array_equal(out[col].to_numpy(),
+                                      base[col].to_numpy() * (7 / (7 * 2)))
+        rec = out.attrs["period"]["Mali"]["waves"]["2014-15"]
+        assert (rec["recall_days"], rec["n_asks"], rec["exposure_days"],
+                rec["factor"], rec["ask_count_basis"]) == (
+            7.0, 2, 14.0, 0.5, "measured")
+
+
+@pytest.mark.requires_s3
+@pytest.mark.slow
+class TestDeliveredFeature:
+    """Red team r1, R3, on the warm corpus: for a DEGRADED country, the rows
+    Feature keeps under period= are the unconverted Feature rows for those
+    waves times each wave's factor -- EXACTLY (bit-for-bit), including under
+    food_quantities' default units='kgs', whose kg inference pools over the
+    waves read (the reason a waves= re-call moved them: Mali +2.90% kg).
+
+    Exact because both sides are the same unconverted read multiplied by the
+    same float; no argument tried here breaks linearity (labels= re-sums
+    within t, market= re-keys keeping t, the kg inference runs before)."""
+
+    @pytest.mark.parametrize("country,table,kw", [
+        ("Mali", "food_quantities", {}),
+        ("Uganda", "food_quantities",
+         {"units": "kgs", "labels": "Aggregate", "market": "Region"}),
+    ])
+    def test_kept_rows_are_the_unconverted_rows_times_the_factor(
+            self, country, table, kw):
+        import lsms_library as ll
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                base = ll.Feature(table)([country], **kw)
+                out = ll.Feature(table)([country], period="week", **kw)
+        except Exception as e:                    # pragma: no cover
+            pytest.skip(f"{country} {table} not buildable here: {e}")
+        if base.empty:                            # pragma: no cover
+            pytest.skip(f"{country} {table} empty here")
+        unavailable = out.attrs["period_unavailable"][country]
+        assert unavailable, "this test needs a degraded country"
+        waves = out.attrs["period"][country]["waves"]
+        t = base.index.get_level_values("t").astype(str)
+        kept = base[t.isin(list(waves))]
+        assert out.index.equals(kept.index)
+        factor = (out.index.get_level_values("t").astype(str)
+                  .map(lambda w: waves[w]["factor"]).to_numpy(dtype=float))
+        col = R.PERIOD_TABLES[table][0]
+        np.testing.assert_array_equal(out[col].to_numpy(),
+                                      kept[col].to_numpy() * factor)
+        for other in [c for c in out.columns if c != col]:
+            pd.testing.assert_series_equal(out[other], kept[other])
+        assert not set(unavailable) & set(out.index.get_level_values("t")
+                                          .astype(str))
+
+
+# ---------------------------------------------------------------------------
+# delivered exposure: does each convertible record count the asks its sources
+# actually deliver into the served column?  (red team r1, verdict §5.4)
+# ---------------------------------------------------------------------------
+#
+# period= divides by the record's exposure, so a record that miscounts the
+# asks feeding a column serves a wrong number with full confidence.  Both r1
+# refutations were exactly that: Burkina Faso 2014's quantity grid is in
+# passage 1 of 4 (R1), and Mali 2014-15 sums two passages of one panel (R2).
+# Neither is visible in the record alone; both are visible in the sources.
+#
+# Every convertible cell is put in ONE delivery class, and each class has a
+# check against data:
+#
+# * `visit-level` -- the country declares `visit` in food_acquired's index,
+#   so the delivered table shows the asks: per FLOW column, the number of
+#   visits carrying a value must equal `n_asks_for(column)`.  GENERIC.
+# * `declared-visit` -- a YAML wave whose food_acquired names a `visit`
+#   idxvar or lists several source files, but whose served table has no
+#   `visit` level (a hook dropped it).  The asks are counted in the SOURCES:
+#   the most distinct visits any household has.  GENERIC for the YAML path;
+#   config tier: several files must mean that many asks.
+# * `one-ask-by-inspection` -- a script-path wave with no visit level.  No
+#   generic signal exists here (the script, not config, decides what it
+#   reads), so these are TABLE-DRIVEN: listed by hand, each with the source
+#   it reads, and pinned to n_asks == 1.
+#
+# A cell in no class fails, so a record promoted from `not-recorded` cannot
+# convert until someone has said how its asks are delivered.
+
+#: Script-path cells whose food_acquired reads ONE food-consumption source
+#: per `t`, asked once.  Swept by red team r1 (2026-10-19) and re-read for
+#: this table; the source named is what the wave script reads.
+ONE_ASK_BY_INSPECTION = {
+    **{("Ethiopia", w): f"Ethiopia/{w}/_/food_acquired.py reads one section "
+                        f"5A/6A file"
+       for w in ("2011-12", "2013-14", "2015-16", "2018-19", "2021-22")},
+    ("Guatemala", "2000"): "2000/_/food_acquired.py reads ECV13G12.DTA, "
+                           "the 15-day variables only",
+    **{("Nigeria", w): "post-planting and post-harvest are separate `t`, "
+                       "each read from its own round file "
+                       "(sect7b_planting / sect10b_harvest)"
+       for w in ("2010Q3", "2011Q1", "2012Q3", "2013Q1", "2015Q3", "2016Q1")},
+    ("Panama", "1997"): "1997/_/food_acquired.py reads GAST-A.DTA, 15-day vars",
+    ("Panama", "2003"): "2003/_/food_acquired.py reads E03GA10B.DTA, 15-day vars",
+    ("Panama", "2008"): "2008/_/food_acquired.py reads 05alimentos.dta, 15-day vars",
+    ("Serbia", "2007"): "2007/_/food_acquired.py reads m5_1_diary.dta",
+    **{("Tanzania", w): "2008-15/_/food_acquired.py reads upd4_hh_j1.dta; "
+                        "its `round` column is the wave `t` "
+                        "(wave_folder_map), one ask per round"
+       for w in ("2008-09", "2010-11", "2012-13", "2014-15")},
+    ("Tanzania", "2019-20"): "2019-20/_/food_acquired.py reads HH_SEC_J1.dta",
+    ("Tanzania", "2020-21"): "2020-21/_/food_acquired.py reads hh_sec_j1.dta",
+    ("Uganda", "2019-20"): "2019-20/_/food_acquired.py reads HH/gsec15b.dta",
+}
+
+
+def _convertible_cells():
+    return [(c, w, r) for c, w, r in _all_cells()
+            if R.unavailable_reason(r) is None]
+
+
+def _declares_visit_level(country):
+    from lsms_library.paths import countries_root
+    from lsms_library.yaml_utils import load_yaml
+    scheme = load_yaml(Path(countries_root()) / country / "_"
+                       / "data_scheme.yml") or {}
+    entry = (scheme.get("Data Scheme") or {}).get("food_acquired") or {}
+    index = entry.get("index", "") if isinstance(entry, dict) else ""
+    return "visit" in re.findall(r"\w+", str(index))
+
+
+def _yaml_food_acquired(country, wave):
+    """``(files, i_columns, visit_column)`` of a YAML-path food_acquired, or
+    None where the wave builds it with a script."""
+    from lsms_library.paths import countries_root
+    from lsms_library.yaml_utils import load_yaml
+    path = Path(countries_root()) / country / wave / "_" / "data_info.yml"
+    if not path.exists():
+        return None
+    block = (load_yaml(path) or {}).get("food_acquired")
+    if not isinstance(block, dict) or "file" not in block:
+        return None
+    raw = block["file"]
+    files = []
+    for f in (raw if isinstance(raw, list) else [raw]):
+        files.extend(f if isinstance(f, dict) else [f])
+    idx = block.get("idxvars") or {}
+    i_cols = idx.get("i")
+    i_cols = [x for x in (i_cols if isinstance(i_cols, list) else [i_cols])
+              if isinstance(x, str)]
+    visit = idx.get("visit")
+    visit = visit if isinstance(visit, str) else None
+    return [str(f) for f in files], i_cols, visit
+
+
+def _delivery_class(country, wave):
+    if _declares_visit_level(country):
+        return "visit-level"
+    if (country, wave) in ONE_ASK_BY_INSPECTION:
+        return "one-ask-by-inspection"
+    yaml = _yaml_food_acquired(country, wave)
+    if yaml is not None and (yaml[2] is not None or len(yaml[0]) > 1):
+        return "declared-visit"
+    return None
+
+
+class TestDeliveredExposureConfig:
+    """Config tier -- runs in CI, no data."""
+
+    def test_every_convertible_cell_has_a_delivery_class(self):
+        missing = [(c, w) for c, w, _ in _convertible_cells()
+                   if _delivery_class(c, w) is None]
+        assert not missing, (
+            f"{missing} convert under period= but nothing checks how their "
+            f"asks are delivered.  Add each to ONE_ASK_BY_INSPECTION with the "
+            f"source its script reads (if it is asked once), or give the "
+            f"country a `visit` level -- see this section's comment.")
+
+    def test_the_hand_list_is_live_and_says_one_ask(self):
+        live = {(c, w): r for c, w, r in _convertible_cells()}
+        stale = sorted(set(ONE_ASK_BY_INSPECTION) - set(live))
+        assert not stale, f"ONE_ASK_BY_INSPECTION lists non-convertible {stale}"
+        for cell in ONE_ASK_BY_INSPECTION:
+            r = live[cell]
+            assert not _declares_visit_level(cell[0]), cell
+            assert r.n_asks == 1 and not r.n_asks_by_column, (
+                f"{cell} is listed as one ask by inspection but its record "
+                f"says n_asks={r.n_asks}, by column {r.n_asks_by_column}")
+
+    def test_several_source_files_mean_that_many_asks(self):
+        """R2's shape, caught without data: Mali 2014-15 lists EACIALI_p1 and
+        EACIALI_p2, so the record must count two asks."""
+        checked = []
+        for c, w, r in _convertible_cells():
+            if _delivery_class(c, w) != "declared-visit":
+                continue
+            files, _, _ = _yaml_food_acquired(c, w)
+            if len(files) > 1:
+                checked.append((c, w))
+                assert {r.n_asks_for(col) for col in R.FLOW_COLUMNS} == {
+                    len(files)}, (c, w, files, r.n_asks, r.n_asks_by_column)
+        assert ("Mali", "2014-15") in checked
+
+    def test_the_classes_are_the_ones_measured(self):
+        """Pin today's partition so a change to it is a reviewed diff."""
+        got = {}
+        for c, w, _ in _convertible_cells():
+            got.setdefault(_delivery_class(c, w), set()).add((c, w))
+        assert got["declared-visit"] == {("Mali", "2014-15"), ("Togo", "2018")}
+        assert {c for c, _ in got["visit-level"]} == {"Burkina_Faso", "GhanaLSS"}
+        assert len(got["one-ask-by-inspection"]) == 23
+
+
+def _source_visit_counts(country, wave, monkeypatch):
+    """Per household: how many distinct visits the declared sources carry
+    for it.  A file without a `visit` column counts as its own visit."""
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    files, i_cols, visit = _yaml_food_acquired(country, wave)
+    monkeypatch.chdir(Path(countries_root()) / country / wave / "_")
+    parts = []
+    for k, f in enumerate(files):
+        df = get_dataframe(str(Path("..") / "Data" / f))
+        cols = {c: df[c].astype(str) for c in i_cols}
+        cols["_visit"] = (df[visit].astype(str) if visit and visit in df
+                          else pd.Series(str(k), index=df.index))
+        parts.append(pd.DataFrame(cols).drop_duplicates())
+    both = pd.concat(parts, ignore_index=True).drop_duplicates()
+    return both.groupby(i_cols)["_visit"].nunique()
+
+
+@pytest.mark.requires_s3
+@pytest.mark.slow
+class TestDeliveredExposure:
+    """Data tier: the record's per-column ask count against the delivered
+    table (visit-level) or the declared sources (declared-visit).  These
+    are the two tests that fail on the r1 records: Burkina Faso 2014
+    Quantity (record 4, delivered 1) and Mali 2014-15 (record 1, sources 2).
+    Skipped when the cache is cold."""
+
+    @pytest.mark.parametrize("country,wave", sorted(
+        (c, w) for c, w, _ in _convertible_cells()
+        if _delivery_class(c, w) == "visit-level"))
+    def test_visits_carrying_each_column_equal_its_ask_count(self, country, wave):
+        import lsms_library as ll
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                fa = ll.Country(country).food_acquired(waves=[wave])
+        except Exception as e:                    # pragma: no cover
+            pytest.skip(f"{country} food_acquired not buildable here: {e}")
+        rec = R.recall_records(country)[wave]
+        visits = fa.index.get_level_values("visit")
+        for col in R.FLOW_COLUMNS:
+            if col not in fa.columns:
+                continue
+            v = pd.to_numeric(fa[col], errors="coerce")
+            carrying = visits[(v.notna() & (v != 0)).to_numpy()].unique()
+            assert len(carrying) == rec.n_asks_for(col), (
+                f"{country} {wave} {col}: delivered by visits "
+                f"{sorted(carrying)}, but the record counts "
+                f"{rec.n_asks_for(col)} ask(s)")
+
+    @pytest.mark.parametrize("country,wave", sorted(
+        (c, w) for c, w, _ in _convertible_cells()
+        if _delivery_class(c, w) == "declared-visit"))
+    def test_the_sources_ask_each_household_n_asks_times(
+            self, country, wave, monkeypatch):
+        rec = R.recall_records(country)[wave]
+        assert not rec.n_asks_by_column, (
+            "a per-column count on a declared-visit cell cannot be checked "
+            "from the sources generically -- extend this test")
+        try:
+            per_household = _source_visit_counts(country, wave, monkeypatch)
+        except Exception as e:                    # pragma: no cover
+            pytest.skip(f"{country} {wave} sources not readable here: {e}")
+        assert per_household.max() == rec.n_asks, (
+            f"{country} {wave}: households are asked up to "
+            f"{per_household.max()} time(s) in the sources "
+            f"({per_household.value_counts().to_dict()}), but the record "
+            f"says n_asks={rec.n_asks}")
