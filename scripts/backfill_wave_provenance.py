@@ -91,7 +91,6 @@ from lsms_library.data_access import (
 from lsms_library.paths import countries_root
 from lsms_library.provenance import (
     SOURCE_EXTERNAL,
-    SOURCE_UNKNOWN,
     SOURCE_WORLDBANK,
     VALIDATION_CATALOG_ONLY,
     VALIDATION_CONTENT,
