@@ -634,6 +634,22 @@ missing-unit sentinel below runs through, so this is not a cosmetic
 staleness: a reader who believed the old sentence would look for the
 relabel in the wrong place.
 
+*The =u= table's KEY is declared, not positional (GH #928, 2026-10-19).*
+The table carries both =Original Label= (the key) and a =Code= column
+beside it, so which one is the key is a real choice -- the only
+dual-column =u= table in the corpus that keys on the label.  It now says
+so with =#+key: Original Label= on the line ABOVE its =#+name: u= (below
+it, Org would attach the name to the keyword and leave the table unnamed),
+which the
+read-time callers (=_apply_categorical_mappings=, the global =u.org=
+merge, =_unit_kg_factors=) honour through
+=country._categorical_key_column=.  The build-time readers in =niger.py=
+already pass =idxvars='Original Label'= explicitly, so the declaration
+pins the existing choice and moved no served mapping (census:
+=slurm_logs/gh928_key_resolver/=).  Do not move =Code= in front of
+=Original Label= expecting the declaration to be cosmetic: it is what
+keeps a reordered table keyed correctly.
+
 The 2018-19 wave required a per-wave mojibake fix in
 =2018-19/_/mapping.py=; the 2021-22 wave does not (its .dta value
 labels are already correctly UTF-8 / Latin-1 round-trippable):
@@ -1012,6 +1028,15 @@ Latin-1 (double-decoded; =_decode_mojibake= does a latin-1 -> utf-8 round
 trip, see "Unit handling" above), while the =s01= roster file stores
 cp1252 bytes that get read as Latin-1 (=_decode_cp1252= does a latin-1 ->
 cp1252 round trip).  Neither helper repairs the other's file.
+
+*Moved to the reader, 2026-10-19 (GH #805).*  =get_dataframe= now re-decodes
+the cp1252 strings of a pre-118 =.dta= itself (value labels and str columns;
+=local_tools._redecode_cp1252=), so this label arrives as =Frère, sœur= and
+the wave-level =_decode_cp1252= (and its =_fix_relationship= re-titling -- =.title()= of the decoded label already gives =Frère, Sœur=) is retired.  Measured: the served
+=household_roster= is identical before and after (121,956 rows), i.e. the reader
+reproduces the hook exactly.  The decision is per file and refuses DOS code
+pages and UTF-8 double encodings; see the block comment above =_C1_RE= in
+=local_tools.py=.
 
 Same defect and same fix in Senegal 2018-19, Benin 2018-19 and Togo 2018 (all format-115 cp1252 EHCVM-1
 roster files).  See GH #801 and the #797 vocabulary sweep

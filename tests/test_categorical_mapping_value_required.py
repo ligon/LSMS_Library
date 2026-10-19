@@ -16,7 +16,8 @@ import textwrap
 import pandas as pd
 import pytest
 
-from lsms_library.local_tools import code_label_map, get_categorical_mapping
+from lsms_library.local_tools import (EmptyCategoricalTableError,
+                                      code_label_map, get_categorical_mapping)
 
 ORG = textwrap.dedent(
     """\
@@ -102,10 +103,14 @@ def test_global_only_name_bare_raises(tmp_path):
 
 def test_zero_row_table_is_a_separate_case(level):
     # A declared-but-empty table is not a missing-argument error: with a value
-    # column it never reaches the TypeError branch (it fails resolution, as
-    # before -- df_data_grabber treats a zero-row table as absent).
-    with pytest.raises(KeyError):
+    # column it never reaches the TypeError branch.  Until GH #1036 it failed
+    # resolution with KeyError (df_data_grabber treated a zero-row table as
+    # absent, so the cascade fell through); it now raises its own error,
+    # which is NOT a KeyError, so no rung loop can mistake it for "absent".
+    # tests/test_categorical_mapping_empty_table.py pins the rest.
+    with pytest.raises(EmptyCategoricalTableError) as e:
         get_categorical_mapping(tablename="empty", dirs=level, Label="Label")
+    assert not isinstance(e.value, KeyError)
 
 
 def test_dta_form_unchanged(tmp_path):

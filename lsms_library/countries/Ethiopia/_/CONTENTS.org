@@ -1340,6 +1340,54 @@ that report use without a kg; NaN for seed rows).  NO =nitrogen_kg= /
   - =Ethiopia/_/categorical_mapping.org= -- =harmonize_input= (input
     taxonomy), =harmonize_crop= (crop =j= for seed/pesticide rows).
 
+** 2026-10-19 -- =transformations.nitrogen_kg= credits NPS at 0.19 (GH #867)
+
+Ruling (@ligon, 2026-10-18): NPS gets a CITED share; organic inputs a
+documented refusal.  What that means for this country:
+
+  - *NPS = 0.19 kg N / kg*, grade 19-38-0+7S -- IFDC & AFAP for AGRA,
+    /Assessment of Fertilizer Distribution Systems and Opportunities for
+    Developing Fertilizer Blends: Ethiopia/ (June 2018), Table 1, report
+    p. 3; the WB panel uses the same 0.19 (=ETH_ESS3.do:896= /
+    =ETH_ESS4.do:918= / =ETH_ESS5.do:984=).  The same table lists NPS+B,
+    NPS+Zn and NPS+Zn+B at 17.7-18.9% N, and NPS+B was the largest seller
+    in 2016-17.  The ESS has ONE NPS question per wave (=pp_s3q20a_*= in W3,
+    =s3q23*= in W4/W5), so the label =NPS= here cannot say which of the
+    four a household applied; 0.19 is the base grade (plain NPS), and NPS+B
+    at 18.9% was the largest seller by volume (377,527 t against plain
+    NPS's 238,191 t in 2016-17).  IFDC's /Fertilizer Statistics Overview
+    Ethiopia 2010-2022/ (2023 Edition, p. 12; IMPORT volumes) has NPS+B
+    above plain NPS in every year 2017-2022, plain NPS at 14-25% of the four
+    grades.  The volume-weighted mean N of the four is 18.8% in 2016-17 and
+    18.7-18.9% in each year 2017-2022, so 0.19 is at most ~1.4% (relative)
+    high.
+  - *Served =nitrogen_kg= moved* (5,264 NPS rows matched; total 445,471.0 ->
+    500,847.2 kg N).  Per wave, and the W5 jump is the "NPS displaces DAP"
+    drift recorded above:
+
+    | wave    | kg N before | kg N after | plots before | plots after |
+    |---------+-------------+------------+--------------+-------------|
+    | 2011-12 |    31,661.7 |   31,661.7 |        4,325 |       4,325 |
+    | 2013-14 |    81,761.9 |   81,761.9 |        5,515 |       5,515 |
+    | 2015-16 |   202,250.7 |  214,700.7 |        5,195 |       5,816 |
+    | 2018-19 |    94,546.8 |  114,331.3 |        3,259 |       3,854 |
+    | 2021-22 |    35,249.9 |   58,391.5 |        2,269 |       2,948 |
+
+  - *Organic rows are refused a share and cost nothing here*: the 34,207
+    =Manure= / =Compost= / =Other Organic= rows carry NO quantity (the
+    =Applied= dummy only, per Columns above), so no share could have moved a
+    number.  They are named in =NutrientCoverageWarning= as a refusal and
+    counted on =attrs['nitrogen_input_match']['refused_organic_labels']=.
+    =Other Organic= was never named before (no stem matched it).
+  - *=fertilizer_rate(Ethiopia)= needs =on='plot'=.*  The default
+    =on='parcel'= returns an EMPTY frame (it warns =PlotGrainMismatchWarning=):
+    =_parcel_from_feature_plot= cuts =plot_features.plot_id=
+    ={holder}_{parcel}_{field}= at the first =_=, leaving the holder id,
+    while the =plot_inputs= side keeps the whole key.  The two features
+    share the literal key (see the top of this section), and =on='plot'=
+    returns 21,786 rows.  Measured 2026-10-19, before and after #867 alike;
+    not fixed here.
+
 * Files in Ethiopia/<SOMEYEAR>/_/
 ** DONE household_characteristics.py
 CLOSED: [2023-03-03 Fri 11:26]

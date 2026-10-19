@@ -2959,3 +2959,105 @@ under ruling 5).  Measured at this head: 49 =Unknown= rows carry a
 rows where =23A=/=23B= may mean TINA (2013-14, own-produced Chicken and
 Other poultry; served =Unknown= as OTHER (SPECIFY) with no text) stay as
 they are, recorded as a residual.
+
+* 2026-10-19 -- plot_inputs: fertilizer nitrogen shares (GH #867)
+
+=plot_inputs.input= comes from =harmonize_input= in =categorical_mapping.org=:
+Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
+=CAN=, =Urea=, =D Compound=, =Other=, each written =... Fertilizer=), and code
+20 is a synthetic =Organic Fertilizer= for the =ag_d36= used? flag.  What
+=transformations.nitrogen_kg= does with them:
+
+  - *=D Compound Fertilizer= = 0.08 kg N / kg* (ruling @ligon 2026-10-18:
+    a CITED share).  The Malawi documents agree on the N and not on the
+    P/K/S:
+    - IFDC with the Department of Agricultural Research Services, Ministry
+      of Agriculture, for the Government of Malawi, /Proposed Fertilizer
+      Regulations, 2003/ (Appendix C, under the Proposed Fertilizer Act,
+      2003; WIPO Lex MW022, "Other Texts") -- an IFDC-prepared DRAFT, and
+      the grade is a worked penalty example, not a registered-grade
+      schedule: Schedule B, A. "Investigational Allowances -- Penalty
+      Rates", example 2, printed p. 31 (PDF p. 23) ('A "D" compound
+      (8-14-7-6.5S) fertilizer was guaranteed as 8% N').
+    - IFDC & AFAP for AGRA, /Assessment of Fertilizer Distribution Systems
+      and Opportunities for Developing Fertilizer Blends: Malawi/ (June
+      2018), Table 1, report p. 5 (=8:18:15+6S+0.1B= "Compound D/Super D",
+      tobacco, paprika, flowers) -- and the next row is =NPK 10:24:20 + 6S
+      + 0.1B= "Super D", a different product at ~10% N.  IFDC's /Fertilizer
+      Statistics Overview Malawi/ (2022 Edition draft 1, p. 7; 2024
+      Edition, p. 8) names 8-18-15+6S+0.1B+0.1Zn "Compound D" beside
+      10-24-20 "Super D".
+    - Independent of IFDC: Ministry of Agriculture, /Guide to Agriculture
+      Production and Natural Resources Management in Malawi/ (revised
+      2020), Table 54 (tobacco fertilizers), printed p. 232 (PDF p. 254):
+      "Compound D 8 18 15 4 0.1", beside "Super D 10.5 24 20 6 0.15".
+    *Idiosyncrasy: the IHS has no Super D code.*  IHS3 =ag_d39a= carries six
+    labels (=23:21:0+4S/CHITOWE=, =dap=, =can=, =urea=, =D COMPOUND=,
+    =OTHER FERTILIZER (SPECIFY)=), so a household's Super D lands under code
+    5 or 6; any under 5 makes 0.08 slightly low, unmeasurably.
+    *The WB harmonised panel uses 0.07* (=MWI_IHPS1.do:804= and IHPS2-4,
+    uncited); a 7% grade is in print for Malawi only in FAO & GoM (Omuto &
+    Vargas), /Soil nutrient loss assessment in Malawi/ (2018), p. IX
+    ("Compound D (a local term that refers to an NPK blend of 7-14-7)"),
+    attributed to the Government of Malawi with no source note -- and
+    7-14-7 is Zimbabwe's Compound D grade.  That report cites IFDC's 2013
+    /Malawi fertilizer assessment/ (fn 34), but for crop yields, not for
+    the grade.  *EPAR uses 0.10* (=EPAR_UW_Malawi_IHS_W1.do:2204-2208=,
+    "D COMPOUND - 10-20-10"), Zambia's Compound D grade.  On the 65,298.5
+    kg of D Compound product 0.08 and 0.07 give 5,223.9 vs 4,570.9 kg N.  Served
+    =nitrogen_kg= moved 835,011.9 -> 840,235.8 kg N (726 rows; 33,113 ->
+    33,466 plots); per wave 2010-11 48,956.4 -> 49,195.1, 2013-14 187,342.9
+    -> 188,848.4, 2016-17 333,857.4 -> 334,896.5, 2019-20 264,855.3 ->
+    267,295.8.
+  - *=NPK Fertilizer= is served at the shared map's 0.17 (NPK 17-17-17), and
+    that is probably wrong for this country -- NOT changed here.*  Malawi's
+    basal NPK is the 23:21:0+4S blend ("Chitowe"), and the survey says so
+    itself: the IHS3 source label of type code 1 is =23:21:0+4S/CHITOWE=
+    (=ag_d39a=, 7,717 of 11,364 slot-1 rows), which =harmonize_input= serves
+    as =NPK Fertilizer=.  The same proposed Regulations' penalty example 3
+    (printed p. 31) is "A 23-21-0 + 4S compound ... guaranteed as 23% N",
+    IFDC/AFAP 2018 Table 1 lists =NPK 23:21:00 +4S= for maize, FAO & GoM
+    2018 p. IX has "23:21:0+4S (also known as Chitowe)", and both the WB
+    panel and EPAR credit code 1 at 0.23.  On 1,600,479 kg of NPK product,
+    0.17 gives 272,081.4 kg N and 0.23 would give 368,110.2.  The map has no
+    country axis, so this is a design decision, drafted as a new issue.
+  - *=Organic Fertilizer= (11,075 rows) is refused a share* by the same
+    ruling, and is named in =NutrientCoverageWarning= as a refusal.  *The
+    served =Quantity= of those rows is 0.0, not NA.*  =_organic_block= writes
+    NA by design (Module D records no organic quantity), but
+    =assemble_plot_inputs= consolidates duplicate lines with
+    =agg({'Quantity': 'sum'})=, and an all-NA group sums to 0.0 (the
+    neighbouring =Quantity_purchased= aggregation already uses
+    =min_count=1=).  So 11,075 rows report a measured zero that the survey
+    never recorded.  No =nitrogen_kg= number depends on it (organic rows get
+    no share), but it is a fabricated value; residual, not fixed here,
+    because editing =malawi.py= moves every Malawi cache hash.
+  - *=fertilizer_rate(Malawi)= depends on =on=.*  The default =on='parcel'=
+    gives 11,622 plots (median 0.10 kg N/ha), =on='plot'= 33,402 (median
+    26.25).  The 2016-17 / 2019-20 garden-plot keys (=RG01_R01=) are cut to
+    the garden (=RG01=) on the =plot_features= side only.  This contradicts
+    =fertilizer_rate='s docstring, which says the parcel step is a measured
+    no-op on Malawi.  Measured 2026-10-19 with the #867 shares (before
+    them the default gave 11,551 plots); the mismatch itself predates #867.
+  - *The applied-fertilizer UNIT is probably misread -- found while
+    drafting the #867 residuals, NOT changed here.*  =_MWI_FERT_UNIT_LABELS=
+    (=malawi.py=) reads the applied-amount unit (=ag_d39e= / =ag_d39j=)
+    with the acquired-amount code set (=ag_d39c=: 1 = gram, 2 = kilogram,
+    ...), so code 1 is served as =u = 'Gram'=.  But in the IHS3 and IHPS
+    2013 =.dta= the applied unit carries NO value labels (it reads as
+    float64 even with =convert_categoricals=True=), while the labelled
+    acquired unit is overwhelmingly =kilogram= (IHS3 7,329 vs 253 =gram=;
+    2013-14 2,296 vs 162).  IHS3 slot 1 has 5,098 code-1 rows with median
+    quantity 50, and codes 1-4 have medians of 30-50 in both waves --
+    which reads like kilograms or 50 kg bags, not grams.  EPAR
+    (=EPAR_UW_Malawi_IHS_W1.do:2123=, =ren ag_d39d qtyinorg1 //already in
+    kgs=, unit set to kg unconditionally) and the WB panel both treat the
+    applied amount as kg.  Measured 2026-10-19 on the served
+    =plot_inputs=: 13,302 inorganic-fertilizer rows are =u = 'Gram'=
+    (median 50) and carry 203.8 kg N.  Read as kg they would carry
+    203,843.6 kg N, against Malawi's 840,235.8 total.  A further 17,044
+    rows have a NULL =u=: applied codes outside the map (0, 8-12; IHS3 code
+    12 alone is 4,764 slot-1 rows), a blank code, and slot 2 in 2016-17 /
+    2019-20, whose unit column is not read (=unit2=None=).  Under the
+    #1041 ruling a missing unit is =Unknown=, not NULL.  Drafted as a
+    residual.

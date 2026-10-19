@@ -46,7 +46,7 @@ def _label_map(tablename):
         return tools.get_categorical_mapping(
             tablename=tablename, idxvars='Original Label',
             **{'Preferred Label': 'Preferred Label'})
-    except Exception:
+    except (FileNotFoundError, KeyError):   # absent only, as CotedIvoire/Togo (GH #1036 r1)
         return {}
 
 

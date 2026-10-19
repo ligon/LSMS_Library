@@ -23,12 +23,18 @@ def _unit_canonicalizer():
     `u` table (categorical_mapping.org, the canonical
     Code|Preferred Label|<per-wave> unit table), mirroring the by-name
     auto-application of that table the EHCVM waves get on their `u`
-    index level.  `Code` is the first non-Preferred-Label column (the
-    raw source label).  Best-effort: returns an identity (empty) map if
-    the org file or table is unavailable, so the melt never crashes on
-    it.  Unmatched unit labels pass through unchanged, exactly as
-    `.replace()` does.
+    index level.  The key column comes from the library's one resolver
+    (`country._categorical_key_column`, GH #928): the table's `#+key:`
+    if it declares one, else the first column that is neither
+    `Preferred Label` nor another reserved curation column -- today
+    `Code` (the raw source label).  Best-effort: returns an identity
+    (empty) map if the org file or table is unavailable, so the melt
+    never crashes on it -- but a malformed `#+key:` declaration is NOT
+    unavailability and raises.  Unmatched unit labels pass through
+    unchanged, exactly as `.replace()` does.
     '''
+    from lsms_library.country import _categorical_key_column
+
     org = os.path.join(os.path.dirname(__file__), '..', '..', '_',
                        'categorical_mapping.org')
     try:
@@ -40,10 +46,10 @@ def _unit_canonicalizer():
         tbl = tables.get('unit')
     if tbl is None or 'Preferred Label' not in tbl.columns:
         return {}
-    src = [c for c in tbl.columns if c != 'Preferred Label']
-    if not src:
+    key = _categorical_key_column(tbl)
+    if key is None:
         return {}
-    return (tbl.set_index(src[0])['Preferred Label']
+    return (tbl.set_index(key)['Preferred Label']
             .astype(str).str.strip().to_dict())
 
 
@@ -113,16 +119,8 @@ def food_acquired(df):
     return out
 
 
-def Int_t(value):
-    '''
-    Formatting interview date
-    ''' 
-    # date = f'{value[0]}-{value[1]}-{value[2]}'
-    date = f'{int(value.iloc[0])}-{int(value.iloc[1])}-{int(value.iloc[2])}'
-    return pd.to_datetime(date, format='%Y-%m-%d', errors='coerce').date()
-
 def interview_date(df):
+    # Int_t arrives already parsed (GH #1045: `datetime:` spec in data_info.yml).
     df['visit'] = df.groupby(level='i')['Int_t'].rank(method='first').astype(int).astype(str)
     df = df.set_index('visit', append=True)
-    df['Int_t'] = pd.to_datetime(df['Int_t'])
     return df
