@@ -1,0 +1,102 @@
+# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+#
+# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
+# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
+# wave of `Country('Tanzania').waves`?  The design fields are #793's curation
+# and are not written yet; their absence here is "not curated", not "not
+# found".
+#
+# Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
+# {wave-scoped, redefined, mixed} makes a `Country('Tanzania')` frame that
+# carries `v` across that boundary warn (`ClusterIdentityWarning`); nothing is
+# ever dropped or rewritten.  The first wave (2008-09) has no preceding wave
+# and so no entry.
+#
+# Note the two orthogonal facts (DESIGN.org Q2): 2019-20 -> 2020-21 is a
+# HOUSEHOLD refresh by design (the Extended and Refresh sub-panels are
+# disjoint, .claude/skills/tanzania-panel-design.md), while 2014-15 -> 2019-20
+# is a CLUSTER-ID change for households that were tracked.
+
+Sampling:
+
+  '2010-11':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        UPD4 `clusterid` both rounds.  Measured: 3,077 of 3,077 linked
+        households keep `v` (409 clusters, one-to-one).
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Tanzania rows); re-measured 2026-10-19 through Country("Tanzania").sample()'
+
+  '2012-13':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: wave-scoped
+      cluster_id_note: |-
+        UPD4 round 3 RENUMBERS 82 of the 409 clusters, whole clusters at a
+        time, 81 of them in the last digit only (17113001 -> 17113000).
+        Measured 2026-10-19: 591 of 2,904 linked households change `v`, in
+        82 one-to-one cluster pairs; no renumbered round-2 id occurs in round
+        3 and no new round-3 id occurs in round 2.  Confirmed in the raw
+        upd4_hh_a.dta (1,565 of 7,082 tracking lines; 83 distinct pairs; one
+        of 409 round-2 clusters maps to more than one round-3 cluster), so it
+        is the survey file, not our script.  This is NOT mover tracking, which
+        DESIGN.org §2 (and 2008-15/_/sample.py) read it as; see CONTENTS.org.
+        Partial: the other 327 clusters keep their id.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: 'lsms_library/countries/Tanzania/2008-15/Data/upd4_hh_a.dta'
+      locator: 'clusterid by (UPHI, round), round 2 vs round 3; CONTENTS.org "Cluster id renumbering at round 3 (GH #942)"'
+
+  '2014-15':
+    panel:
+      household_continuity: rotating-panel
+      cluster_id_continuity: wave-scoped
+      cluster_id_note: |-
+        Partial, and partly the round-3 renumbering undone: of the 82
+        clusters renumbered in round 3, 12 return to their round-2 id here
+        (58 households) and 6 keep the round-3 id.  Measured: 413 of 556
+        linked households keep `v`; a further 35 link to refresh-sample
+        cluster ids, a linkage that is itself unverified because rounds 3 and
+        4 reuse 1,857 r_hhid strings.  This wave pools the Extended Panel
+        (tracked) with a newly drawn Refresh sample.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: null
+      locator: 're-measured 2026-10-19 through Country("Tanzania").sample(); CONTENTS.org "Cluster id renumbering at round 3 (GH #942)"'
+
+  '2019-20':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: wave-scoped
+      cluster_id_note: |-
+        NPS-SDD writes `clusterid` in its own 9-character RR D WWW EEE layout
+        (the 2008-15 extended panel uses 8-character RR D WW EEE), so the
+        tracked Extended-Panel households keep none of their `v`: 0 of 907
+        linked households.  NOT a bijection -- over 337 cluster pairs, 131
+        cluster ids map to more than one id on the other side, because
+        tracked households genuinely moved -- so no crosswalk is recoverable
+        here even in principle.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'CONTENTS.org, "The cluster key of cluster_features" (scheme table); slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2.5; re-measured 2026-10-19 through Country("Tanzania").sample()'
+
+  '2020-21':
+    panel:
+      household_continuity: refresh
+      cluster_id_continuity: unobservable
+      cluster_id_note: |-
+        Zero households in common with 2019-20, by design: 2020-21 follows the
+        Refresh Panel drawn in 2014-15 (plus an urban booster), 2019-20 the
+        Extended Panel.  With no shared household, `v` cannot be compared
+        across this boundary.  (The Refresh households DO link back to
+        2014-15, a non-adjacent wave; a frame holding both crosses the
+        2019-20 boundary and is warned about it.)
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: '.claude/skills/tanzania-panel-design.md ("2019-20 and 2020-21 have zero household overlap"); CONTENTS.org "2020-21: Refresh Panel plus an explicit URBAN OVERSAMPLE"'

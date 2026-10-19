@@ -77,11 +77,17 @@ is in ``_build_registry._EXCLUDED_CALLABLES``.
 
 from __future__ import annotations
 
+import contextvars
+import functools
 import json
+import os
 import warnings
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping
+
+import numpy as np
+import pandas as pd
 
 from .paths import countries_root
 from .yaml_utils import load_yaml
@@ -96,12 +102,21 @@ __all__ = [
     "DOCUMENTATION_STATUSES",
     "OVERSAMPLE_STATUSES",
     "UNRECORDED_TAG",
+    "HOUSEHOLD_CONTINUITY",
+    "CLUSTER_ID_CONTINUITY",
+    "INCOMPARABLE_CLUSTER_IDS",
+    "ClusterIdentityWarning",
+    "ClusterIdentityError",
     "SamplingRecord",
     "sampling_records",
     "attach",
     "records_for_frame",
     "merge_attrs",
     "records_from_attrs",
+    "outermost_call",
+    "audit_cluster_identity",
+    "check_cluster_identity",
+    "sampling_reports",
 ]
 
 #: ``df.attrs`` key holding ``{country: {wave: record}}``.
@@ -168,7 +183,53 @@ _SELECTION_FIELDS: frozenset[str] = frozenset({"psu", "ssu", "pps", "_status"})
 _OVERSAMPLE_FIELDS: frozenset[str] = frozenset({
     "what", "status", "treatment", "_status",
 })
-_PANEL_FIELDS: frozenset[str] = frozenset({"role", "rotation"})
+#: ``role`` / ``rotation`` are the exemplar's (GH #793); the rest are the
+#: per-boundary continuity declaration of GH #942 (DESIGN.org §3.3, accepted
+#: as drafted 2026-10-18): two orthogonal fields plus their own provenance.
+_PANEL_FIELDS: frozenset[str] = frozenset({
+    "role", "rotation",
+    "household_continuity", "cluster_id_continuity", "cluster_id_note",
+    "source_type", "confidence", "source_file", "locator",
+})
+
+# ---------------------------------------------------------------------------
+# GH #942 -- is `v` the same cluster id across a wave boundary?
+# ---------------------------------------------------------------------------
+#
+# The `panel:` block of wave W describes W's relation to the wave that
+# PRECEDES it in `Country.waves` -- the unit of declaration is the BOUNDARY,
+# not the country (DESIGN Q1: a single per-country tag is wrong for all five
+# countries where the question can be answered).  Two fields, because they are
+# orthogonal facts (Q2): refresh-by-design is a fact about HOUSEHOLDS,
+# renumbering is a fact about CLUSTER IDS, and Tanzania has both at different
+# boundaries.
+
+#: Is the household sample of W continuous with the preceding wave's?
+HOUSEHOLD_CONTINUITY: frozenset[str] = frozenset({
+    "panel",            # the same households, re-interviewed
+    "rotating-panel",   # part retained, part replaced
+    "refresh",          # no household carried over BY DESIGN (Tanzania 2020-21)
+    "independent",      # a separate draw (Ethiopia 2018-19 starts Panel II)
+    "unknown",
+})
+
+#: Does `v` denote the same cluster across the boundary?
+CLUSTER_ID_CONTINUITY: frozenset[str] = frozenset({
+    "stable",        # the same EA keeps its id
+    "wave-scoped",   # renumbered; a crosswalk is meaningful
+    "redefined",     # `v` denotes a different KIND of unit (EA -> parish)
+    "mixed",         # some of the boundary's `v` are synthetic, not clusters
+    "unobservable",  # no verified linkage; cannot be determined
+})
+
+#: The values on which a cross-wave `v` is NOT comparable -- what the
+#: Country-level warning fires on.  Deliberately NOT `unobservable`: GhanaLSS
+#: 1991-92 onward are genuinely different EAs with no linkage, so grouping on
+#: `v` across them is CORRECT, and warning there would teach the reader to
+#: ignore the warning (DESIGN §4.2).
+INCOMPARABLE_CLUSTER_IDS: frozenset[str] = frozenset({
+    "wave-scoped", "redefined", "mixed",
+})
 
 
 # ---------------------------------------------------------------------------
@@ -323,6 +384,17 @@ class SamplingRecord(dict):
         """
         return self.get("source_type") in DOCUMENTED_SOURCE_TYPES
 
+    @property
+    def cluster_id_continuity(self) -> str | None:
+        """``panel.cluster_id_continuity`` -- whether ``v`` denotes the same
+        cluster as in the preceding wave (GH #942) -- or ``None``."""
+        return (self.get("panel") or {}).get("cluster_id_continuity")
+
+    @property
+    def household_continuity(self) -> str | None:
+        """``panel.household_continuity`` (GH #942), or ``None``."""
+        return (self.get("panel") or {}).get("household_continuity")
+
     def __repr__(self) -> str:
         inner = ", ".join(f"{k}={self[k]!r}" for k in self._FIELDS if k in self)
         return f"SamplingRecord({inner})"
@@ -381,6 +453,15 @@ class SamplingRecord(dict):
         if not block:
             raise ValueError(f"{where}: empty sampling record")
 
+        # A PANEL-ONLY entry -- the `panel:` block and nothing else -- is a
+        # record too (GH #942 ruling, option A: "land the panel: block now"),
+        # so the design triple is required iff any DESIGN field is present.
+        # The panel block then carries its own provenance; see _check_panel.
+        is_design = bool(set(block) - {"panel"})
+        _check_panel(where, block.get("panel"), panel_only=not is_design)
+        if not is_design:
+            return cls._finish(country, wave, block)
+
         missing = [k for k in cls._DESIGN_TRIPLE if not block.get(k)]
         if missing:
             raise ValueError(
@@ -409,7 +490,6 @@ class SamplingRecord(dict):
                       _STRATIFICATION_FIELDS)
         _check_nested(where, "selection", block.get("selection"),
                       _SELECTION_FIELDS)
-        _check_nested(where, "panel", block.get("panel"), _PANEL_FIELDS)
         oversamples = block.get("oversamples")
         if oversamples is not None:
             if not isinstance(oversamples, list):
@@ -420,7 +500,12 @@ class SamplingRecord(dict):
                 if entry.get("status") is not None:
                     _check_vocab(where, f"oversamples[{i}].status",
                                  entry["status"], OVERSAMPLE_STATUSES)
+        return cls._finish(country, wave, block)
 
+    @classmethod
+    def _finish(cls, country: str, wave: str,
+                block: Mapping[str, Any]) -> "SamplingRecord":
+        where = f"{country}/{wave}"
         try:
             json.dumps(dict(block), allow_nan=False)
         except (TypeError, ValueError) as exc:
@@ -475,6 +560,64 @@ def _check_nested(where: str, name: str, block: Any,
             f"{where}: unknown field(s) {unknown} in {name}. The vocabulary is "
             f"frozen (GH #793); known fields are {sorted(allowed)}"
         )
+
+
+def _check_panel(where: str, panel: Any, *, panel_only: bool) -> None:
+    """Validate a ``panel:`` block (GH #793 fields + the GH #942 declaration).
+
+    * Field names are frozen, as everywhere.
+    * ``household_continuity`` and ``cluster_id_continuity`` come TOGETHER
+      (the two orthogonal facts of one boundary; ``unknown`` /
+      ``unobservable`` exist so neither has to be omitted).
+    * A continuity declaration carries its OWN ``source_type`` and
+      ``confidence`` -- the record's design triple describes the design
+      statement, not this reading -- and a ``locator`` unless the source is
+      ``not-found`` (DESIGN §3.3: "source_type / confidence / locator,
+      refused if absent").  A panel-only entry needs its own pair even
+      without continuity, since nothing else vouches for it.
+    * Every ``cluster_id_continuity`` but ``stable`` needs a
+      ``cluster_id_note`` -- "``unobservable`` is a recorded verdict with a
+      reason, not an exemption" (DESIGN §4), and the note is what the warning
+      quotes.
+    """
+    if panel is None:
+        if panel_only:
+            raise ValueError(f"{where}: empty sampling record")
+        return
+    _check_nested(where, "panel", panel, _PANEL_FIELDS)
+    hh = panel.get("household_continuity")
+    cl = panel.get("cluster_id_continuity")
+    if (hh is None) != (cl is None):
+        raise ValueError(
+            f"{where}: panel declares only one of household_continuity / "
+            "cluster_id_continuity. They are the two orthogonal facts of one "
+            "wave boundary (GH #942): declare both, using 'unknown' / "
+            "'unobservable' where a fact cannot be determined.")
+    if hh is not None:
+        _check_vocab(where, "panel.household_continuity", hh,
+                     HOUSEHOLD_CONTINUITY)
+        _check_vocab(where, "panel.cluster_id_continuity", cl,
+                     CLUSTER_ID_CONTINUITY)
+    if hh is not None or panel_only:
+        missing = [k for k in ("source_type", "confidence") if not panel.get(k)]
+        if missing:
+            raise ValueError(
+                f"{where}: panel block is missing {missing}. A continuity "
+                "reading travels with its own provenance and confidence -- "
+                "the design triple describes the design statement, not this.")
+    for field, allowed in (("source_type", SOURCE_TYPES),
+                           ("confidence", CONFIDENCE_LEVELS)):
+        if panel.get(field) is not None:
+            _check_vocab(where, f"panel.{field}", panel[field], allowed)
+    if hh is not None and panel.get("source_type") != "not-found" \
+            and not panel.get("locator"):
+        raise ValueError(
+            f"{where}: a continuity declaration needs a panel.locator (where "
+            "the statement or the measurement can be found).")
+    if cl is not None and cl != "stable" and not panel.get("cluster_id_note"):
+        raise ValueError(
+            f"{where}: cluster_id_continuity={cl!r} needs a cluster_id_note "
+            "saying why -- it is what the Country-level warning quotes.")
 
 
 # ---------------------------------------------------------------------------
@@ -623,3 +766,261 @@ def records_from_attrs(df) -> list[SamplingRecord]:
             kwargs["wave"] = wave
             out.append(SamplingRecord(**kwargs))
     return out
+
+
+# ---------------------------------------------------------------------------
+# GH #942: the Country-level warning
+# ---------------------------------------------------------------------------
+#
+# WHY AT `Country`, NOT AT `Feature`.  `PopulationHeterogeneityWarning` fires at
+# `Feature()` because its hazard -- pooling different universes -- needs two
+# countries.  This hazard needs two WAVES of ONE country: #942's own
+# reproduction is `Country('GhanaLSS').household_characteristics(waves=[
+# '1987-88', '1988-89'])`.  Copying population's placement would put the
+# warning exactly where the bug is not (DESIGN §4.1; ruling 2026-10-18).
+#
+# WARN, NEVER FENCE, NEVER REWRITE.  Not one row, index value or column of any
+# returned frame changes under any setting; the opt-in strict lever raises
+# instead of warning.  No default `droplevel('v')` (a default that silently
+# drops data -- what @ligon declined in #603), no crosswalk (out of scope by
+# the same ruling), and NO ALLOWLIST: `unobservable` is a recorded verdict
+# with a reason, not an exemption.
+#
+# WHICH BOUNDARIES COUNT.  A frame holding waves S is compared across every
+# boundary from min(S) to max(S) in `Country.waves` order -- not only between
+# adjacent members of S.  `waves=['1987-88', '1991-92']` crosses GLSS2's
+# renumbering even though 1988-89 is not in the frame, and a per-boundary
+# record cannot vouch for a pair of waves it does not describe.  The message
+# says when a flagged boundary's endpoints are not both in the frame.
+#
+# ONCE PER CALL.  `_finalize_result` re-enters itself: the v-join
+# (`_join_v_from_sample`) fetches `sample()` for ALL waves, and
+# `_market_lookup` / `_valuation_geo` / `_location_lookup` fetch other tables.
+# Those internal frames are not what the caller asked for, so a warning from
+# them would name boundaries outside the request.  `outermost_call` wraps every
+# generated table method and tracks the nesting depth in a ContextVar; only a
+# `_finalize_result` running at depth 1 (or outside any table method) reports,
+# and at most once per `(country, flagged boundaries)` per outermost call --
+# which also dedupes the food-derived path (`food_acquired`, then the derived
+# table, both finalised inside one `food_expenditures()` call).
+
+_CLUSTER_STRICT_ENV = "LSMS_CLUSTER_STRICT"
+
+#: First sentence of a note, capped -- the full record is on df.attrs.
+_NOTE_CHARS = 240
+
+
+class ClusterIdentityWarning(UserWarning):
+    """A frame carries ``v`` across a wave boundary where ``v`` is not the
+    same cluster id (GH #942).
+
+    Its own class so callers, tests and CI can target it:
+    ``warnings.simplefilter("error", ClusterIdentityWarning)``.  Advisory:
+    nothing was dropped or rewritten.
+    """
+
+
+class ClusterIdentityError(Exception):
+    """Raised instead of :class:`ClusterIdentityWarning` under
+    ``LSMS_CLUSTER_STRICT=1``.
+
+    Deliberately NOT a ``RuntimeError`` / ``ValueError`` / ``KeyError``: the
+    derived-table paths in ``Country.__getattr__`` catch exactly those and
+    fall back to a legacy build, which would turn a strict refusal into a
+    silent second attempt.  Its own lever, not ``LSMS_GRAIN_STRICT`` /
+    ``LSMS_READ_STRICT`` / ``LSMS_QUANTITY_STRICT``: a destroyed row, an empty
+    column, an impossible value and an incomparable key are four concerns and
+    ratchet separately.
+    """
+
+
+def _cluster_strict() -> bool:
+    return os.environ.get(_CLUSTER_STRICT_ENV, "").lower() in {"1", "true", "yes"}
+
+
+# (depth, keys already reported in this outermost call) or None outside any
+# generated table method.
+_CALL_STATE: contextvars.ContextVar = contextvars.ContextVar(
+    "lsms_sampling_call_state", default=None)
+
+
+def outermost_call(fn):
+    """Wrap a generated ``Country`` table method so nested table fetches made
+    while serving it are recognised as internal (see the note above)."""
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        state = _CALL_STATE.get()
+        token = _CALL_STATE.set(
+            (1, set()) if state is None else (state[0] + 1, state[1]))
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            _CALL_STATE.reset(token)
+    return wrapper
+
+
+def _frame_waves(df) -> set[str] | None:
+    """Distinct ``t`` values, read off the MultiIndex codes when possible
+    (no materialisation of a multi-million-row level)."""
+    idx = df.index
+    names = list(idx.names)
+    if isinstance(idx, pd.MultiIndex) and "t" in names:
+        n = names.index("t")
+        codes = np.asarray(idx.codes[n])
+        used = np.unique(codes[codes >= 0])
+        return {str(idx.levels[n][c]) for c in used}
+    labels = _wave_labels(df)
+    return None if labels is None else set(labels)
+
+
+def _first_sentence(text: Any) -> str:
+    if not text:
+        return ""
+    flat = " ".join(str(text).split())
+    cut = flat.find(". ")
+    flat = flat if cut < 0 else flat[:cut + 1]
+    return flat if len(flat) <= _NOTE_CHARS else flat[:_NOTE_CHARS - 3] + "..."
+
+
+def audit_cluster_identity(df: Any, *, country: str, table: str,
+                           waves: list[str]) -> dict[str, Any] | None:
+    """The boundaries a frame's ``v`` crosses where ``v`` is not comparable.
+
+    ``None`` -- the overwhelmingly common case -- when the country has no
+    ``sampling.yml``, the frame carries no ``v`` (index level or column), it
+    holds fewer than two waves of ``waves`` (the country's ``Country.waves``,
+    in order), or no boundary between its first and last wave is declared
+    ``wave-scoped`` / ``redefined`` / ``mixed``.
+    """
+    recs = sampling_records(country)
+    if not recs or not isinstance(df, pd.DataFrame) or df.empty:
+        return None
+    if "v" not in list(df.index.names) and "v" not in df.columns:
+        return None
+    present = _frame_waves(df)
+    if not present or len(present) < 2:
+        return None
+    order = [str(w) for w in waves]
+    pos = sorted(i for i, w in enumerate(order) if w in present)
+    if len(pos) < 2:
+        return None
+    flagged = []
+    for j in range(pos[0] + 1, pos[-1] + 1):
+        rec = recs.get(order[j])
+        if rec is None or rec.cluster_id_continuity not in INCOMPARABLE_CLUSTER_IDS:
+            continue
+        panel = rec.get("panel") or {}
+        flagged.append({
+            "from": order[j - 1],
+            "to": order[j],
+            "cluster_id_continuity": rec.cluster_id_continuity,
+            "household_continuity": rec.household_continuity,
+            "source_type": panel.get("source_type"),
+            "confidence": panel.get("confidence"),
+            "locator": panel.get("locator"),
+            "note": panel.get("cluster_id_note"),
+            "in_frame": order[j - 1] in present and order[j] in present,
+        })
+    if not flagged:
+        return None
+    return {
+        "country": country,
+        "table": table,
+        "waves": [order[i] for i in pos],
+        "boundaries": flagged,
+    }
+
+
+def _format_cluster_report(report: dict[str, Any]) -> str:
+    c = report["country"]
+    lines = [
+        f"{c}/{report['table']}: `v` is not a comparable cluster id across "
+        f"{len(report['boundaries'])} wave boundary(ies) in this frame "
+        f"(waves {report['waves'][0]} .. {report['waves'][-1]}):"]
+    for b in report["boundaries"]:
+        src = b["source_type"]
+        how = (f"{src}, confidence {b['confidence']}" if src in
+               DOCUMENTED_SOURCE_TYPES else
+               f"{src}: MEASURED, not documented; confidence {b['confidence']}")
+        where = "" if b["in_frame"] else (
+            "; this boundary lies BETWEEN the waves you asked for")
+        lines.append(
+            f"  {b['from']} -> {b['to']}: cluster_id_continuity="
+            f"{b['cluster_id_continuity']} (household_continuity="
+            f"{b['household_continuity']}; {how}{where}) -- "
+            f"{_first_sentence(b['note'])}")
+    lines.append(
+        "Rows are returned unchanged -- nothing was dropped or rewritten. "
+        "Group on `v` within a wave, or `.droplevel('v')` before a cross-wave "
+        "reshape, groupby or join; do not cluster standard errors on `v` "
+        "across these waves. Declared in "
+        f"{c}/_/sampling.yml (Country({c!r}).sampling[wave]['panel']). "
+        f"Set {_CLUSTER_STRICT_ENV}=1 to make this fatal.")
+    return "\n".join(lines)
+
+
+# Reports filed during this process, keyed by (country, table).  A ledger, not
+# `attrs`, for the reason GH #323 gives: attrs do not survive every operation.
+_CLUSTER_LEDGER: dict[tuple[str, str], list[dict[str, Any]]] = {}
+
+
+def check_cluster_identity(df: Any, *, country: str, table: str,
+                           waves: list[str]) -> Any:
+    """Warn (or, strict, raise) when *df*'s ``v`` crosses an incomparable
+    boundary.  Returns *df* unchanged -- always, by contract.
+
+    Called from ``Country._finalize_result``, which is in
+    ``_build_registry._EXCLUDED_CALLABLES``; this function and
+    :func:`audit_cluster_identity` are excluded too, so a re-worded warning
+    never moves a build fingerprint.
+    """
+    state = _CALL_STATE.get()
+    if state is not None and state[0] > 1:
+        return df                     # an internal fetch, not the caller's frame
+    try:
+        report = audit_cluster_identity(df, country=country, table=table,
+                                        waves=waves)
+    except Exception as exc:                                   # noqa: BLE001
+        warnings.warn(
+            f"{country}/{table}: the cluster-identity audit could not run "
+            f"({type(exc).__name__}: {exc}). The table itself is unaffected, "
+            "but `v` is NOT known to be comparable across its waves.",
+            ClusterIdentityWarning, stacklevel=2)
+        return df
+    if report is None:
+        return df
+    key = (country, tuple((b["from"], b["to"]) for b in report["boundaries"]))
+    if state is not None:
+        if key in state[1]:
+            return df
+        state[1].add(key)
+    filed = _CLUSTER_LEDGER.setdefault((country, table), [])
+    if report not in filed:
+        filed.append(report)
+    msg = _format_cluster_report(report)
+    if _cluster_strict():
+        raise ClusterIdentityError(msg)
+    warnings.warn(msg, ClusterIdentityWarning, stacklevel=2)
+    return df
+
+
+def sampling_reports(country: str | None = None,
+                     table: str | None = None) -> list[dict]:
+    """Cluster-identity reports filed during this process (GH #942).
+
+    The twin of ``null_read_reports()`` / ``quantity_reports()``: for tests,
+    ``bench/feature_audit``, and anyone who silenced the warning.
+    """
+    out: list[dict[str, Any]] = []
+    for (c, t), reports in _CLUSTER_LEDGER.items():
+        if country is not None and c != country:
+            continue
+        if table is not None and t != table:
+            continue
+        out.extend(reports)
+    return out
+
+
+def _clear_sampling_reports() -> None:
+    """For tests only -- the ledger is process-wide."""
+    _CLUSTER_LEDGER.clear()

@@ -382,6 +382,19 @@ Waves 2-3 use =ea_id2= (the wave-2 re-identified EA), while waves
 1, 4, and 5 use =ea_id=. The EA ID format is a long numeric string
 (e.g., "010101088801601") encoding region/zone/woreda/town/EA.
 
+*The two code spaces are disjoint* (GH #942, measured 2026-10-19 through
+=Country('Ethiopia').sample()=): none of the 3,776 panel households linked
+across 2011-12 -> 2013-14 keeps its =v=, yet their 333 cluster pairs are a
+*complete bijection* -- every W1 EA maps to exactly one W2 EA, no violation.
+So =v= is renumbered, not redrawn, at that boundary, and
+=Ethiopia/_/sampling.yml= declares it =cluster_id_continuity: wave-scoped=: a
+=Country('Ethiopia')= frame carrying =v= across 2011-12 -> 2013-14 raises a
+=ClusterIdentityWarning= (rows unchanged).  2013-14 -> 2015-16 (=ea_id2= both
+sides) keeps all 4,887; 2018-19 starts Panel II and links to nothing.
+Unverified, and the first thing to check before deriving a crosswalk:
+=Pub_ETH_HouseholdGeovars_Y2= is listed below as carrying both =ea_id= and
+=ea_id2=, i.e. the survey may ship the crosswalk itself.
+
 ** Sampling Weights
 *** Weight variables per wave
 

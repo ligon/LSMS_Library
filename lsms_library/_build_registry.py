@@ -206,6 +206,13 @@ _EXCLUDED_CALLABLES = frozenset({
     # warns; provably returns its input unchanged.
     "lsms_library.null_index_audit.check_index_levels",
     "lsms_library.null_index_audit.audit_index_levels",
+    # The cluster-identity warning (sampling, GH #942): the same argument.
+    # Reads `sampling.yml` and the frame's `t`/`v`, warns, and returns its
+    # input unchanged.  Reached only from the excluded `_finalize_result`
+    # today; listed so a future call site cannot cold-rebuild the corpus by
+    # re-wording the warning.
+    "lsms_library.sampling.check_cluster_identity",
+    "lsms_library.sampling.audit_cluster_identity",
     # GH #803: pure reporting of an in-tree parquet artefact.  Never reads the
     # file, never changes what a build writes; reached from grab_data and
     # run_make_target, so without this exclusion re-wording the warning would
@@ -250,7 +257,7 @@ _EXCLUDED_CALLABLES = frozenset({
 # some other tagged module would otherwise fold it under that module's prefix.
 _EXCLUDED_CONSTANTS = frozenset(
     {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER",
-     "_NULL_INDEX_LEDGER",
+     "_NULL_INDEX_LEDGER", "_CLUSTER_LEDGER", "_CALL_STATE",
      # GH #675: process-local logs / memos, same argument.
      "_BUILD_DROP_LEDGER", "_DEGRADED_ATTEMPTED", "_SOURCE_PROBES"})
 

@@ -70,7 +70,8 @@ from .null_index_audit import check_index_levels
 from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
-from .sampling import attach as attach_sampling, sampling_records
+from .sampling import (attach as attach_sampling, check_cluster_identity,
+                       outermost_call, sampling_records)
 from .recall import attach as attach_recall, recall_records
 from .derivations import (attach as attach_derivations, records_for as _derivation_records_for,
                           call_inputs as _call_derivation_inputs,
@@ -3897,6 +3898,20 @@ class Country:
                 df, _index_levels,
                 country=self.name, table=str(method_name or "?"))
 
+            # Is `v` the same cluster across the waves in this frame (GH #942)?
+            # Declared per wave BOUNDARY in `sampling.yml`'s `panel:` block;
+            # warns (never rewrites) when the frame crosses one declared
+            # `wave-scoped` / `redefined` / `mixed`.  At `Country`, not
+            # `Feature`, because the hazard is pooling WAVES of one country.
+            # Here for the reasons SITE B gives: runs on every read, and
+            # `_finalize_result` is in `_EXCLUDED_CALLABLES`, so it moves no
+            # cache hash.  Reports once per outermost table call; see
+            # `sampling.outermost_call`.
+            if sampling_records(self.name):
+                check_cluster_identity(
+                    df, country=self.name, table=str(method_name or "?"),
+                    waves=self.waves)
+
         return df
 
     def _table_cache_hash(self, method_name: str, waves: list[str]) -> str | None:
@@ -6045,6 +6060,11 @@ class Country:
             method.__name__ = name
             method.__qualname__ = f"Country.{name}"
             method.__module__ = self.__class__.__module__
+            # Mark the call depth (GH #942) so the tables this method fetches
+            # INTERNALLY -- the v-join's `sample()`, the market / location /
+            # valuation lookups -- do not report on waves the caller did not
+            # ask for.  `functools.wraps` carries the name and doc set above.
+            method = outermost_call(method)
             # Cache on the instance so repeated lookups return the same object
             # and IPython's pinfo can find it reliably.
             try:

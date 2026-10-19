@@ -60,6 +60,29 @@ from numeric EA codes to parish names occurred around 2015-16 as
 the sampling frame evolved from strict EA boundaries to parish-level
 clusters to accommodate split-off households.
 
+*** =v= across waves: three different defects (GH #942)
+
+=v= is not one identifier across Uganda's waves, and the reasons differ by
+boundary -- recorded per boundary in =Uganda/_/sampling.yml='s =panel:=
+blocks, which drive the =ClusterIdentityWarning= on any =Country('Uganda')=
+frame carrying =v= across them:
+
+1. *Two renderings of =comm= (a LIBRARY defect).*  =comm= is served 8-digit in
+   2005-06 and 2011-12 but 7-digit in 2009-10 and 2010-11 (uniform widths).
+   Across 2010-11 -> 2011-12 (both map =v: comm=), 0 of 2,510 linked
+   households keep =v=: for 272 of the 322 cluster pairs the 8-digit form is
+   the 7-digit form with one digit inserted at position 3 (=1020001 ->
+   10210001=); the other 50 are district recodes.  2005-06 and 2011-12 share
+   321 of their 322 / 321 =v= verbatim.  Not a survey fact, so it is NOT
+   declared =wave-scoped=: 2011-12 is =unobservable= (provisional) until the
+   rendering is fixed, which needs the 322-pair table, not a digit rule.
+   Filed separately (DESIGN.org Q5, ruling 2026-10-18).
+2. *Synthetic =@lat,lon= bins in 2009-10* (see the next-but-one subsection):
+   339 of that wave's 656 =v= are 0.05-degree GPS bins, not clusters, so its
+   two boundaries are declared =mixed=.
+3. *A change of KIND*: EA (=comm=) -> parish code (2013-14) -> =DISTRICT/PARISH=
+   name composite (2018-19).  Declared =redefined=; no crosswalk can exist.
+
 *** Why 2018-19 / 2019-20 =v= is a =DISTRICT/PARISH= composite (GH #323)
 
 Those two waves have no usable parish /code/ — =parish_code= carries

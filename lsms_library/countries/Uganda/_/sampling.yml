@@ -139,6 +139,19 @@ Sampling:
     panel:
       role: panel-baseline
       rotation: null
+      household_continuity: panel
+      cluster_id_continuity: mixed
+      cluster_id_note: |-
+        339 of this wave's 656 `v` values are synthetic 0.05-degree GPS bins
+        ('@lat,lon'), not clusters: movers and split-offs whose `comm` is blank get a
+        `coalesce_coord_bin` label (CONTENTS.org, "Hybrid v in 2009-10").  The rest
+        are the 2005-06 frame EA, but `comm` is rendered 7-digit here and 8-digit in
+        2005-06 -- a library rendering defect, not a survey fact, filed on its own
+        (DESIGN.org Q5).  Measured: 0 of 2,607 linked households keep `v`.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -184,6 +197,18 @@ Sampling:
     panel:
       role: panel
       rotation: null
+      household_continuity: panel
+      cluster_id_continuity: mixed
+      cluster_id_note: |-
+        The 2009-10 side of this boundary is mixed: its 339 synthetic GPS-bin `v`
+        resolve here to the household's original-sample EA `comm`, which 2010-11
+        populates for every household (CONTENTS.org, "Hybrid v in 2009-10").
+        Measured: 1,819 of 2,647 linked households (68.7%) keep `v`; both waves
+        render `comm` 7-digit.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -223,6 +248,20 @@ Sampling:
     panel:
       role: panel
       rotation: null
+      household_continuity: panel
+      cluster_id_continuity: unobservable
+      cluster_id_note: |-
+        PROVISIONAL, and not a survey fact: both waves map `v: comm`, but 2010-11
+        renders it 7-digit and 2011-12 8-digit, so 0 of 2,510 linked households keep
+        `v` -- 272 of the 322 cluster pairs differ only by one digit inserted at
+        position 3 and 50 are district recodes.  That is a library rendering defect
+        (DESIGN.org §2.3a), filed as its own issue (DESIGN.org Q5, ruling
+        2026-10-18); declaring it `wave-scoped` would record our bug as the survey's
+        design, so it stays `unobservable` (no warning) until the rendering is fixed.
+      source_type: derived-from-data
+      confidence: low
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -265,6 +304,17 @@ Sampling:
         (2013-14, 2015-16).  Continuing households receive a longitudinal
         (panel) weight; refreshment households receive a cross-sectional
         weight and no panel weight.
+      household_continuity: rotating-panel
+      cluster_id_continuity: redefined
+      cluster_id_note: |-
+        `v` changes KIND here: the EA code `comm` through 2011-12, the parish code
+        `h1aq4a` from 2013-14 (CONTENTS.org, "Cluster (PSU) identifier").  A parish
+        is not an EA, so no crosswalk can exist.  Measured: 0 of 1,717 linked
+        households keep `v`.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -309,6 +359,17 @@ Sampling:
     panel:
       role: rotating-panel
       rotation: 'one third refreshed each wave; `rotate` present in GSEC1 for this wave'
+      household_continuity: rotating-panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        Parish code both sides (`h1aq4a` 2013-14, `parish_code` 2015-16).  Measured:
+        2,537 of 2,872 linked households (88.3%) keep `v`; the 334 that change are
+        spread over 286 cluster pairs of one or two households each -- household-level
+        moves or recodes, not a renumbering of clusters.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -345,6 +406,18 @@ Sampling:
     panel:
       role: rotating-panel
       rotation: 'one third refreshed each wave; no `rotate` variable in this wave'
+      household_continuity: rotating-panel
+      cluster_id_continuity: redefined
+      cluster_id_note: |-
+        `v` changes KIND again: the numeric parish code through 2015-16, the
+        `DISTRICT/PARISH` name composite from 2018-19 (the 2018-19 `parish_code`
+        carries only 19 distinct values; CONTENTS.org, "Why 2018-19 / 2019-20 v is a
+        DISTRICT/PARISH composite").  Measured: 0 of 2,973 linked households keep
+        `v`.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -383,6 +456,17 @@ Sampling:
     panel:
       role: rotating-panel
       rotation: 'one third refreshed each wave'
+      household_continuity: rotating-panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        The `DISTRICT/PARISH` composite both sides.  Measured: 2,812 of 2,986 linked
+        households (94.2%) keep `v`; the changes are single households, among them
+        district re-creation (Kwania carved from Apac) and parish-name spellings
+        (`NICU PARISH` / `NICU`) -- not a renumbering of clusters.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable

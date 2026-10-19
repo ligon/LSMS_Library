@@ -1,0 +1,71 @@
+# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+#
+# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
+# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
+# wave of `Country('Ethiopia').waves`?  The design fields are #793's curation
+# and are not written yet; their absence here is "not curated", not "not
+# found".
+#
+# Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
+# {wave-scoped, redefined, mixed} makes a `Country('Ethiopia')` frame that
+# carries `v` across that boundary warn (`ClusterIdentityWarning`); nothing is
+# ever dropped or rewritten.  The first wave (2011-12) has no preceding wave
+# and so no entry.  Vocabulary and field names: see sampling.py.
+
+Sampling:
+
+  '2013-14':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: wave-scoped
+      cluster_id_note: |-
+        `v` is `ea_id` in 2011-12 and `ea_id2`, the wave-2 re-identified EA,
+        in 2013-14 -- two disjoint code spaces for the same EAs.  Measured: 0
+        of 3,776 linked panel households keep `v`, and their 333 cluster pairs
+        are a COMPLETE bijection (every W1 EA maps to exactly one W2 EA, zero
+        violations), so a crosswalk is derivable; the ESS may ship it directly
+        in Pub_ETH_HouseholdGeovars_Y2 (unverified, DESIGN.org Q6).  The 100
+        large-town EAs added this wave are new and have no W1 antecedent.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (ea_id vs ea_id2); slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2.4; re-measured 2026-10-19 through Country("Ethiopia").sample()'
+
+  '2015-16':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        `ea_id2` both waves.  Measured: 4,887 of 4,887 linked households keep
+        `v` (432 cluster pairs, all one-to-one).
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Ethiopia rows); re-measured 2026-10-19 through Country("Ethiopia").sample()'
+
+  '2018-19':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: unobservable
+      cluster_id_note: |-
+        ESS4 is a NEW panel ("Panel II"), "not a follow-up of the previous ESS
+        waves": no household links to 2015-16 (0 shared `i`), so `v` cannot be
+        compared across this boundary, and `ea_id` here is a fresh draw's EA.
+      source_type: wb-catalog
+      confidence: high
+      source_file: null
+      locator: 'WB catalog 3823, series_info (quoted in CONTENTS.org, "ESS4 is a NEW panel -- Panel I and Panel II do not link")'
+
+  '2021-22':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        `ea_id` both waves (Panel II).  Measured: 4,849 of 4,849 linked
+        households keep `v`.  But the household id embeds the EA id here, so a
+        household that moved EA could not appear in the linked set at all:
+        movers are UNOBSERVABLE by this measurement.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Ethiopia rows, F2); re-measured 2026-10-19 through Country("Ethiopia").sample()'

@@ -1744,6 +1744,41 @@ Longitude are therefore NOT emitted.
 - =Tanzania/2019-20/_/plot_features.py=, =Tanzania/2020-21/_/plot_features.py= :: per-wave scripts.
 - =Tanzania/_/plot_features.py= :: country concatenator (concat + id_walk).
 
+* Cluster id renumbering at round 3 (GH #942)
+
+*UPD4 round 3 (2012-13) renumbers 82 of the 409 NPS clusters, whole clusters
+at a time.*  Measured 2026-10-19 in the raw =2008-15/Data/upd4_hh_a.dta=, by
+tracking line (=UPHI=): 1,565 of the 7,082 lines present in both round 2 and
+round 3 change =clusterid=, but they collapse to only *83* distinct
+(round-2, round-3) id pairs, *81 of which differ in the last digit only*
+(=17113001 -> 17113000=, =17302007 -> 17302008=); just one of the 409 round-2
+clusters maps to more than one round-3 cluster.  No renumbered round-2 id
+occurs in round 3 and no new round-3 id occurs in round 2.  The affected
+clusters are in region codes 17--21 and 51--55 (Zanzibar).  Through the API
+(=Country('Tanzania').sample()=, which reads =clusterid= verbatim): 591 of the
+2,904 households linked across 2010-11 -> 2012-13 change =v=, in 82 one-to-one
+pairs.  At round 4 (2014-15) the change is partly undone: 12 of the 82 return
+to their round-2 id (58 households) and 6 keep the round-3 id.
+
+So the 20% of linked households whose =v= changes at 2010-11 -> 2012-13 are
+*not movers*.  Two existing readings say they are, and both are contradicted:
+
+- =2008-15/_/sample.py=: "the NPS TRACKS movers, and 1,607 of the 8,359 panel
+  lines seen in more than one round change clusterid over their life."  At the
+  round-2 -> round-3 step, 1,565 of those changes are this renumbering.
+- =slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org= §2, Tanzania
+  2010-11 -> 2012-13: "panel-stable; 20% are /movers/".  A mover does not take
+  its whole cluster with it; a bijection of whole clusters is a renumbering.
+
+Why it matters: grouping on =v= across 2010-11 and 2012-13 (or clustering
+standard errors on it) splits each of the 82 clusters in two.
+=Tanzania/_/sampling.yml= therefore declares the 2012-13 and 2014-15 boundaries
+=cluster_id_continuity: wave-scoped= (partial), and a =Country('Tanzania')=
+frame carrying =v= across them raises a =ClusterIdentityWarning=; nothing
+served changes.  The cause (a correction of mis-coded EA serials? a re-listing?)
+is not documented in anything the repository holds.  A crosswalk is derivable
+for this boundary (it is a bijection) but is out of scope (GH #942 ruling).
+
 * The cluster key of =cluster_features= (GH #323, Site 2)
 
 ** The defect, and why it is a key defect

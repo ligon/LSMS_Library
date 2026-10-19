@@ -301,6 +301,23 @@ page's own =cluster= column (={lga}-{ea}=) is 1:1 with the composite key on
 the 518 real clusters; it has no state component and all movers share
 ={lga}-0=, so it is a cross-check, not a key.
 
+*** Whole EAs whose LGA code changes between waves (GH #942)
+
+Because =v= embeds the LGA code, an EA the survey re-assigns to a different
+LGA gets a new =v= even though it is the same EA.  Measured 2026-10-19 in the
+raw cover pages (=secta_plantingw4.dta= vs =secta_plantingw5.dta=, joined on
+=hhid=): Kebbi EA 260 is GWANDU (2111) in W4 and JEGA (2112) in W5, EA 442
+JEGA -> KALGO, EAs 548 and 926 MAIYAMA -> NGASKI, EAs 3956 and 3992 SURU ->
+DANKO WASAGU, Osun EA 220 EJIGBO -> EGBEDORE, and so on: *12 whole EAs (112
+households)* across 2019Q1 -> 2023Q3, plus *one* (=16/1624/136 ->
+16/1622/136=, 10 households) across 2016Q1 -> 2018Q3.  Every other changed
+=v= at a PH -> PP boundary is a mover's =moved-{hhid}= singleton.
+=Nigeria/_/sampling.yml= declares those two boundaries
+=cluster_id_continuity: wave-scoped= (partial), so a =Country('Nigeria')= frame
+carrying =v= across them raises a =ClusterIdentityWarning=; every other
+boundary is =stable=.  A 13-entry alias table would make them stable again, but
+it would change served =v= values and is not done here.
+
 *** Wave 5 geovariables await acquisition of WB v02 (GH #841 / #978)
 
 The acquired =NGA_2023_GHSP-W5_v01_M= extract recorded in =SOURCE.org=
