@@ -2370,7 +2370,7 @@ class Country:
         path = Path(countries_root()) / self.name / "_" / "no_kg_factor.yml"
         if not path.exists():
             return ()
-        with open(path) as fh:
+        with open(path, encoding="utf-8") as fh:
             doc = yaml.safe_load(fh) or {}
         entries = doc.get('no_kg_factor') or []
         cells: list[tuple[str, str | None]] = []

@@ -453,7 +453,15 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #: on unit code 0 price like one bird and are now served on 'Single', so they
 #: get the (Chicken, Single) item_unit factor (1.07 kg) and re-enter the kg
 #: modes as 188 (t, i, j) cells; kgprice 188,864 -> 189,052 likewise.
-GHANALSS_FOOD_PRICES_ROWS = 568_027
+#: Moved again 2026-10-18 by the GH #1042 rulings: 568,027 -> 560,023
+#: (-8,004).  Egg rows on a count unit are declared no-kg
+#: (GhanaLSS/_/no_kg_factor.yml) -- their inferred 0.50 kg/egg, 0.030 kg/crate,
+#: ... came from a per-kg baseline built from counts mislabelled as kilograms
+#: -- so they have no per-kg price: -8,012 cells (Single 6,383, Crate 1,111,
+#: Piece 418, Ball 69, Dozen 30, Pair 1).  Own-produced fresh coconut on unit
+#: code 0 is now 'Single' (1.0 kg): +8 cells.  kgprice 189,052 -> 187,096;
+#: unitvalue/unitprice and food_acquired rows/Expenditure are unchanged.
+GHANALSS_FOOD_PRICES_ROWS = 560_023
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
 
