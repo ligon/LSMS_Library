@@ -830,6 +830,67 @@ def to_country_food_labels(df, wave, level='j'):
     return out
 
 
+# GH #1042 follow-up (@ligon, 2026-10-18): count units.  Section 8H's unit
+# code 0 ('None') is served as the missing-unit sentinel (``unit_labels.org``:
+# None -> Unknown).  For the (wave, item) cells below, and ONLY those, the
+# 'None' rows price like one counted item -- the median farmgate price of the
+# 'None' rows is within 0.8x-1.2x of the same wave's 'Single' rows and >= 94%
+# of them sit within [0.5x, 2x] of it.  So they are served on the count unit,
+# spelled as the corpus already spells it ('Single'; GLSS6 prints 'Single 37',
+# GLSS5 has it only as data value label 37), and pool with the genuine count
+# rows:
+#   * Chicken -- the (Chicken, Single) factor is then ~1.07 kg, a plausible
+#     dressed bird;
+#   * Egg (ruling 1a) -- served WITHOUT kilograms: every egg count unit is
+#     declared in ``_/no_kg_factor.yml``, because the (t, Egg) per-kg baseline
+#     is built from counts mislabelled as kilograms (0.50 kg per egg);
+#   * Coconut (fresh) (ruling 3) -- (Coconut (fresh), Single) infers ~1.0 kg.
+#
+# Deliberately NOT here, on measurement (see CONTENTS.org, GH #1042 entries):
+#   * 1998-99 -- GLSS4 serves no 'Single' for chicken, egg or coconut, so a
+#     relabel has nothing to pool with (8 chicken, 4 egg rows).
+#   * Goat / Other Domestic Poultry -- pass the price test in 2012-13, but the
+#     (item, Single) kg the ladder would serve is implausible (Goat 4.54 kg,
+#     a goat is ~20-30 kg; poultry 0.79 kg, below a live bird).
+COUNT_UNIT = 'Single'
+UNRECORDED_UNIT_IS_COUNT = {
+    '2005-06': ('Chicken', 'Egg', 'Coconut (fresh)'),
+    '2012-13': ('Chicken', 'Egg', 'Coconut (fresh)'),
+}
+
+
+def unrecorded_unit_to_count(df, wave):
+    """Serve 8H own-produce rows whose unit is the missing-unit sentinel on the
+    count unit, for the items :data:`UNRECORDED_UNIT_IS_COUNT` names for *wave*.
+
+    Runs on the COUNTRY ``j`` axis (after :func:`to_country_food_labels`) and
+    on the canonical ``u`` (after ``unit_labels.org``).  Pure relabel of the
+    ``u`` level; nothing is summed or dropped, and the index must stay unique
+    (CONTENTS.org Trap 9: a duplicate makes core SUM and re-derive ``Price``
+    table-wide), which is asserted rather than trusted.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+
+    items = UNRECORDED_UNIT_IS_COUNT.get(wave, ())
+    if not items:
+        return df
+    idx = df.index.to_frame(index=False)
+    hit = (idx['u'].eq(U_UNKNOWN) & idx['s'].eq('produced')
+           & idx['j'].isin(items)).to_numpy()
+    if not hit.any():
+        return df
+    idx.loc[hit, 'u'] = COUNT_UNIT
+    out = df.copy()
+    out.index = pd.MultiIndex.from_frame(idx)
+    if out.index.duplicated().any():
+        raise AssertionError(
+            f'GhanaLSS {wave}: relabelling {int(hit.sum())} unrecorded-unit rows '
+            f'of {items} to {COUNT_UNIT!r} collided with an existing row on '
+            f'{list(out.index.names)} -- resolve it in the wave script, not in core '
+            f'(CONTENTS.org Trap 9)')
+    return out
+
+
 _ADDITIVE_MEASURES = ('Expenditure',)
 
 

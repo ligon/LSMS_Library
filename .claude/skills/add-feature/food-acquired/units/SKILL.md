@@ -127,7 +127,25 @@ a NaN `u` and the spellings in `transformations._U_SENTINELS`
 | metric / stated size (`Kg`, `Sack (50 kgs)`) | `metric` | yes |
 | native or count unit, **or accepted residual code** | `item_unit` / `item_unit_tight` / `unit` / `none` | yes, where a rung serves it |
 | missing-unit sentinel (NaN, `_U_SENTINELS`) | `none` (or `survey_kg`) | only via `survey_kg` |
+| declared in `_/no_kg_factor.yml` (an `(item, unit)` cell) | `none` (or `survey_kg` / `metric`) | only via those |
 | `Value` | `none` | no |
+
+**Item-level "no kg factor" (GH #1042).** When an item's own kg-labelled
+rows are wrong, every inferred rung for that item divides by a corrupt
+`(t, j)` baseline and no gate notices -- GhanaLSS eggs: the egg `Kilogram`
+rows price at the per-egg price, so `(Egg, Single)` was 0.50 kg per egg and
+`(Egg, Crate)` 0.030 kg. Declare the cells in `countries/{C}/_/no_kg_factor.yml`
+(`item`, optional `units` list -- absent means every unit -- and a required
+`reason`); labels are the ones the wave scripts write (before
+`_finalize_result`). `Country._no_kg_factor_cells` reads it at read time and
+the derived food tables pass it to `food_kg_factors(no_kg=...)`, which treats
+the rows exactly like sentinel rows and reports them in
+`attrs['kg_factor_declared_none']` (`rows_matched`, `rows_refused`, per
+cell). The `.yml` moves no cache hash. Use it for an item whose inference is
+*known* wrong, with the measured factors in `reason`; it is not a tolerance
+knob. A country script that calls `food_quantities_from_acquired` itself
+(GhanaLSS `nutrition.py`) does not get the declaration unless it passes
+`no_kg=`.
 
 **`_U_SENTINELS` is a closed vocabulary.** A *new* spelling of "no unit"
 (`'None'`, `'N/A'`, `''`, `'---'`) is NOT recognised: it is treated as a

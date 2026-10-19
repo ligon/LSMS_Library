@@ -198,12 +198,22 @@ housing:
                 "9. Ceramic / marble tiles": Ceramic/Marble Tiles
                 "10. Others": Other
 
+# interview_date (GH #1038).  '##N/A##' is the Survey Solutions export
+# placeholder for an unrecorded timestamp, not a date: 112 of 1,596 rows
+# (107 households) carry it.  Mapped to null here rather than left as a
+# string the datetime cast has to reject (GH #798).  Note the source: the
+# HOUSEHOLD cover (sect_cover_hh_w5.dta) ships no interview date in this
+# wave, so this reads the POST-HARVEST agriculture cover -- holder-grain,
+# 1,581 of 4,959 households; see CONTENTS.org.
 interview_date:
     file: sect_cover_ph_w5.dta
     idxvars:
         i: household_id
     myvars:
-        int_t: InterviewDate
+        int_t:
+            - InterviewDate
+            - mapping:
+                '##N/A##': null
 
 food_security:
     # FAO FIES 8-item experience scale.  ESS §8 file sect8_hh_w5.dta
