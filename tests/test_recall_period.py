@@ -183,9 +183,31 @@ class TestToPeriod:
         assert record["columns"] == ["Expenditure"]
         assert record["waves"]["w30"] == {
             "exposure_days": 30.0, "factor": 365.25 / 30, "recall_days": 5.0,
-            "n_asks": 6, "basis": "config-comment",
+            "n_asks": 6, "n_asks_source": "n_asks", "basis": "config-comment",
             "ask_count_basis": "measured"}
         json.dumps(out.attrs)
+
+    def test_a_per_column_ask_count_sets_that_columns_exposure(self):
+        """GH #851 r1, R1: Burkina Faso 2014 asks spending at four 7-day
+        passages and quantity at one.  One per-wave exposure divided its
+        quantity by 28 days instead of 7 -- served 4x too low."""
+        recs = {"w": rec("w", recall_days=7, n_asks=4, basis="config-comment",
+                         evidence="CONTENTS.org:844",
+                         n_asks_by_column={"Quantity": 1})}
+        q = R.to_period(frame(["w"], col="Quantity", values=[70.0]),
+                        "Someland", "week", table="food_quantities",
+                        records=recs)
+        e = R.to_period(frame(["w"], values=[280.0]), "Someland", "week",
+                        table="food_expenditures", records=recs)
+        assert q["Quantity"].iloc[0] == 70.0           # 7 days -> a week: x1
+        assert e["Expenditure"].iloc[0] == 70.0        # 28 days -> a week
+        wq = q.attrs["period"]["Someland"]["waves"]["w"]
+        we = e.attrs["period"]["Someland"]["waves"]["w"]
+        assert (wq["exposure_days"], wq["n_asks"], wq["n_asks_source"]) == (
+            7.0, 1, "n_asks_by_column")
+        assert (we["exposure_days"], we["n_asks"], we["n_asks_source"]) == (
+            28.0, 4, "n_asks")
+        json.dumps(q.attrs)
 
     def test_it_commutes_with_a_resum_over_items(self):
         """Linear and per-t: scaling then re-summing (labels= reaggregate)

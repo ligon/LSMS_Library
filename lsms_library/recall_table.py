@@ -18,8 +18,8 @@ from .recall import recall_records
 
 __all__ = ["recall"]
 
-COLUMNS = ["country", "wave", "recall_days", "n_asks", "total_exposure_days",
-           "ask_count_basis", "basis", "within_wave_variation",
+COLUMNS = ["country", "wave", "recall_days", "n_asks", "n_asks_by_column",
+           "total_exposure_days", "ask_count_basis", "basis", "within_wave_variation",
            "n_items_delivered", "recall_verbatim", "evidence", "notes"]
 
 
@@ -39,7 +39,11 @@ def recall(country: str | list[str] | None = None,
     Notes
     -----
     ``total_exposure_days`` is ``recall_days * n_asks`` and is null wherever
-    either is unknown.  ``n_asks`` counts ASKS, not interviewer visits.  A cell
+    either is unknown.  ``n_asks`` counts ASKS, not interviewer visits.
+    ``n_asks_by_column`` (a ``{column: n}`` dict, else null) names a flow
+    column asked a different number of times -- Burkina Faso 2014's
+    ``{'Quantity': 1}`` against ``n_asks`` 4 -- whose exposure is then
+    ``recall_days * n``, not ``total_exposure_days``.  A cell
     with ``within_wave_variation`` set carries no numbers at all -- its window
     genuinely differs inside the wave, and one value would misreport it.
 
@@ -61,6 +65,8 @@ def recall(country: str | list[str] | None = None,
             rows.append({
                 "country": name, "wave": wave,
                 "recall_days": r.recall_days, "n_asks": r.n_asks,
+                "n_asks_by_column": (dict(r.n_asks_by_column)
+                                     if r.n_asks_by_column else None),
                 "total_exposure_days": r.total_exposure_days,
                 "ask_count_basis": r.ask_count_basis, "basis": r.basis,
                 "within_wave_variation": r.within_wave_variation,

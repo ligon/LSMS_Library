@@ -18,7 +18,11 @@ launders a bad row is worse than no generated file:
   * a rung outside the ladder;
   * a cell with `within_wave_variation` that also carries a single number;
   * `basis: not-recorded` that nonetheless asserts a window;
-  * a non-numeric ask count on a cell with no variation axis to explain it.
+  * a non-numeric ask count on a cell with no variation axis to explain it;
+  * an `n_asks_by_column` override (`Quantity=1;...`) that is malformed,
+    names a column `period=` never scales, or sits on a cell that could not
+    carry the count it refines (a varying cell, a weak rung, no `n_visits`,
+    no `evidence`).
 
 Usage:  python scripts/promote_recall_records.py [--check]
         --check  validates and reports without writing (for CI / a test).
@@ -37,7 +41,7 @@ COUNTRIES = REPO / "lsms_library" / "countries"
 
 sys.path.insert(0, str(REPO))
 from lsms_library.recall import (  # noqa: E402
-    ASK_COUNT_BASES, BASIS_LADDER, VARIATION_AXES, WEAK_BASES,
+    ASK_COUNT_BASES, BASIS_LADDER, FLOW_COLUMNS, VARIATION_AXES, WEAK_BASES,
 )
 
 HEADER = """\
@@ -93,6 +97,23 @@ def _num(v: str, cast):
         return None
 
 
+def parse_by_column(raw: str | None) -> dict[str, int]:
+    """``'Quantity=1;Expenditure=4'`` -> ``{'Quantity': 1, 'Expenditure': 4}``.
+
+    ``ValueError`` on anything malformed; the empty string is ``{}``.  Column
+    names are checked by :func:`validate`, against ``FLOW_COLUMNS``.
+    """
+    out: dict[str, int] = {}
+    for part in filter(None, (p.strip() for p in _clean(raw).split(";"))):
+        col, sep, n = (x.strip() for x in part.partition("="))
+        if not sep or not col or not n.isdigit() or int(n) < 1:
+            raise ValueError(f"{part!r} is not COLUMN=N with N a positive integer")
+        if col in out:
+            raise ValueError(f"{col!r} appears twice")
+        out[col] = int(n)
+    return out
+
+
 def validate(rows: list[dict]) -> list[str]:
     """Every reason this CSV may not be promoted."""
     errs: list[str] = []
@@ -116,6 +137,27 @@ def validate(rows: list[dict]) -> list[str]:
             errs.append(
                 f"{cell}: n_visits={asks_raw!r} is not an integer and no "
                 f"within_wave_variation explains why")
+        # The per-column override: same refusals as RecallRecord._validate,
+        # so a CSV the loader would refuse is never promoted.
+        try:
+            by_col = parse_by_column(r.get("n_asks_by_column"))
+        except ValueError as e:
+            errs.append(f"{cell}: n_asks_by_column: {e}")
+            by_col = {}
+        if by_col:
+            unknown = sorted(set(by_col) - set(FLOW_COLUMNS))
+            if unknown:
+                errs.append(f"{cell}: n_asks_by_column names {unknown}; "
+                            f"period= scales only {list(FLOW_COLUMNS)}")
+            if var:
+                errs.append(f"{cell}: n_asks_by_column on a cell that varies "
+                            f"by {var!r}")
+            if basis in WEAK_BASES:
+                errs.append(f"{cell}: n_asks_by_column on weak basis {basis!r}")
+            if asks is None:
+                errs.append(f"{cell}: n_asks_by_column with no n_visits to refine")
+            if not _clean(r.get("evidence")):
+                errs.append(f"{cell}: n_asks_by_column with no evidence")
     return errs
 
 
@@ -154,6 +196,11 @@ def render(country: str, rows: list[dict], has_visit: bool, header: str) -> str:
             out.append(f"    recall_days: {days:g}\n")
         if asks is not None:
             out.append(f"    n_asks: {asks}\n")
+        by_col = {} if var else parse_by_column(r.get("n_asks_by_column"))
+        if by_col:
+            out.append("    n_asks_by_column:\n")
+            for col, n in sorted(by_col.items()):
+                out.append(f"      {col}: {n}\n")
         if var:
             out.append(f"    within_wave_variation: {var}\n")
         for key, src in (("recall_verbatim", "recall_verbatim"),
@@ -172,6 +219,28 @@ def _scalar(v: str) -> str:
     return "'" + v.replace("'", "''") + "'"
 
 
+def generate(rows: list[dict]) -> dict[str, str]:
+    """``{country: recall.yml text}`` for every country in *rows*.
+
+    Pure -- no filesystem -- so a test can compare it with the committed
+    files and catch a hand edit (or a CSV edit nobody promoted).
+    """
+    q, stated = basis_counts(rows)
+    header = HEADER.format(questionnaire=q, stated=stated)
+    by_country: dict[str, list[dict]] = defaultdict(list)
+    for r in rows:
+        by_country[r["country"]].append(r)
+    out: dict[str, str] = {}
+    for country, crows in sorted(by_country.items()):
+        # Parenthesised (GH #851 r1): it read `_num(...) or 0 > 1`, i.e.
+        # `_num(...) or False`, so any numeric n_visits counted.  Same output
+        # on today's CSV -- `ask_count_basis` also requires `asks > 1`.
+        has_visit = any((_num(_clean(r.get("n_visits")), int) or 0) > 1
+                        for r in crows) or country in _VISIT_LEVEL_COUNTRIES
+        out[country] = render(country, crows, has_visit, header)
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true",
@@ -186,22 +255,12 @@ def main() -> int:
             print("  " + e)
         return 1
 
-    q, stated = basis_counts(rows)
-    header = HEADER.format(questionnaire=q, stated=stated)
-
-    by_country: dict[str, list[dict]] = defaultdict(list)
-    for r in rows:
-        by_country[r["country"]].append(r)
-
     written = 0
-    for country, crows in sorted(by_country.items()):
+    for country, text in generate(rows).items():
         cdir = COUNTRIES / country / "_"
         if not cdir.is_dir():
             print(f"  skip {country}: no {cdir}")
             continue
-        has_visit = any(_num(_clean(r.get("n_visits")), int) or 0 > 1
-                        for r in crows) or country in _VISIT_LEVEL_COUNTRIES
-        text = render(country, crows, has_visit, header)
         if not args.check:
             (cdir / "recall.yml").write_text(text)
         written += 1

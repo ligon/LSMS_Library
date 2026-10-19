@@ -141,6 +141,144 @@ class TestConstructionRefusesContradictions:
                          recall_days=7)
 
 
+class TestAskCountByColumn:
+    """``n_asks_by_column`` (GH #851 r1, R1): a flow column asked a different
+    number of times than the module -- Burkina Faso 2014's quantity grid is
+    in passage 1 of 4.  Held to the evidence standard of the count it
+    refines, and refused outright where it would silently do nothing."""
+
+    GOOD = dict(country="X", wave="1", recall_days=7, n_asks=4,
+                basis="config-comment", evidence="CONTENTS.org:844")
+
+    def test_accepted_and_applied_per_column(self):
+        r = RecallRecord(**self.GOOD, n_asks_by_column={"Quantity": 1})
+        assert dict(r.n_asks_by_column) == {"Quantity": 1}
+        assert r.n_asks_for("Quantity") == 1 and r.n_asks_for("Expenditure") == 4
+        assert r.exposure_days("Quantity") == 7
+        assert r.exposure_days("Expenditure") == 28 == r.total_exposure_days
+
+    def test_absent_or_empty_is_no_override(self):
+        for value in (None, {}):
+            r = RecallRecord(**self.GOOD, n_asks_by_column=value)
+            assert r.n_asks_by_column is None and "n_asks_by_column" not in r
+            assert r.exposure_days("Quantity") == 28
+
+    def test_an_unknown_column_is_refused(self):
+        """An override naming a column period= never scales would be inert --
+        exactly the defect it exists to prevent, so it may not be written."""
+        with pytest.raises(ValueError, match="never scales"):
+            RecallRecord(**self.GOOD, n_asks_by_column={"Quantity_kg": 1})
+
+    @pytest.mark.parametrize("bad", [0, -1, 1.5, "two", True])
+    def test_a_non_positive_integer_count_is_refused(self, bad):
+        with pytest.raises(ValueError, match="positive integer"):
+            RecallRecord(**self.GOOD, n_asks_by_column={"Quantity": bad})
+
+    def test_a_non_mapping_is_refused(self):
+        with pytest.raises(TypeError, match="mapping"):
+            RecallRecord(**self.GOOD, n_asks_by_column=[("Quantity", 1)])
+
+    @pytest.mark.parametrize("change,needle", [
+        (dict(basis="not-recorded", recall_days=None), "weak rung"),
+        (dict(basis="filename"), "weak rung"),
+        (dict(evidence=None), "no evidence"),
+        (dict(n_asks=None), "record the count first"),
+        (dict(within_wave_variation="by-column", recall_days=None, n_asks=None),
+         "varies inside the wave"),
+    ])
+    def test_keeps_the_basis_and_evidence_requirements(self, change, needle):
+        with pytest.raises(ValueError, match=needle):
+            RecallRecord(**{**self.GOOD, **change},
+                         n_asks_by_column={"Quantity": 1})
+
+    def test_the_nested_mapping_is_immutable_hashable_and_json(self):
+        import copy
+        import json
+        import pickle
+        r = RecallRecord(**self.GOOD, n_asks_by_column={"Quantity": 1})
+        with pytest.raises(TypeError, match="immutable"):
+            r.n_asks_by_column["Quantity"] = 4
+        hash(r)
+        assert copy.deepcopy(r) == r == pickle.loads(pickle.dumps(r))
+        assert json.loads(json.dumps(r))["n_asks_by_column"] == {"Quantity": 1}
+
+    def test_from_config_reads_the_yaml_mapping(self):
+        r = RecallRecord.from_config("X", "1", {
+            "basis": "config-comment", "recall_days": 7, "n_asks": 4,
+            "evidence": "e", "n_asks_by_column": {"Quantity": 1}})
+        assert r.exposure_days("Quantity") == 7
+
+    def test_the_live_records_carry_it_where_r1_measured_it(self):
+        bf = recall_records("Burkina_Faso")["2014"]
+        assert dict(bf.n_asks_by_column) == {"Quantity": 1}
+        assert (bf.exposure_days("Quantity"), bf.exposure_days("Expenditure")) \
+            == (7, 28)
+        mali = recall_records("Mali")["2014-15"]
+        assert (mali.n_asks, mali.ask_count_basis, mali.total_exposure_days) \
+            == (2, "measured", 14)
+
+
+def _promotion_script():
+    """``scripts/promote_recall_records.py`` as a module, or skip (it is
+    source-checkout only, like the CSV it reads)."""
+    import importlib.util
+    path = (Path(__file__).resolve().parent.parent
+            / "scripts" / "promote_recall_records.py")
+    if not path.exists():
+        pytest.skip("scripts/ is source-checkout only")
+    spec = importlib.util.spec_from_file_location("_promote_recall", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    if not mod.CSV.exists():
+        pytest.skip("evidence CSV is source-checkout only")
+    return mod
+
+
+class TestPromotion:
+    """The CSV -> recall.yml step refuses what the loader refuses, and the
+    committed YAML is exactly what the CSV generates (no hand edits)."""
+
+    def test_parse_by_column(self):
+        m = _promotion_script()
+        assert m.parse_by_column("") == {}
+        assert m.parse_by_column("Quantity=1") == {"Quantity": 1}
+        assert m.parse_by_column(" Quantity = 1 ; Expenditure=4 ") == {
+            "Quantity": 1, "Expenditure": 4}
+        for bad in ("Quantity", "Quantity=0", "Quantity=x", "=1",
+                    "Quantity=1;Quantity=2"):
+            with pytest.raises(ValueError):
+                m.parse_by_column(bad)
+
+    @pytest.mark.parametrize("change,needle", [
+        (dict(n_asks_by_column="Quantity_kg=1"), "period= scales only"),
+        (dict(n_asks_by_column="Quantity=one"), "positive integer"),
+        (dict(basis="filename"), "weak basis"),
+        (dict(evidence=""), "no evidence"),
+        (dict(n_visits=""), "no n_visits"),
+    ])
+    def test_validate_refuses_a_bad_override(self, change, needle):
+        m = _promotion_script()
+        row = {"country": "X", "wave": "1", "recall_days": "7",
+               "n_visits": "4", "basis": "config-comment", "evidence": "e",
+               "within_wave_variation": "", "n_asks_by_column": "Quantity=1"}
+        assert m.validate([row]) == []
+        errs = m.validate([{**row, **change}])
+        assert any(needle in e for e in errs), errs
+
+    def test_the_committed_yaml_is_what_the_csv_generates(self):
+        m = _promotion_script()
+        rows = list(csv.DictReader(m.CSV.open()))
+        assert m.validate(rows) == []
+        drift = []
+        for country, text in m.generate(rows).items():
+            path = Path(countries_root()) / country / "_" / "recall.yml"
+            if path.parent.is_dir() and path.read_text() != text:
+                drift.append(country)
+        assert not drift, (
+            f"recall.yml differs from what food_recall.csv generates for "
+            f"{drift}; edit the CSV and run scripts/promote_recall_records.py")
+
+
 class TestCoverage:
     """Completeness against the evidence base, and the size of the gap."""
 

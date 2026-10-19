@@ -2,8 +2,10 @@
 
 ``food_expenditures`` returns a number whose reference period was, until this
 module, recorded nowhere.  Most of the corpus is **7 days asked once**; GhanaLSS
-delivers **30 days** of coverage (six 5-day asks), Burkina Faso 2014 **28** (four
-quarterly 7-day passages), Guatemala and Panama **15**.  Pooling GhanaLSS with
+delivers **30 days** of coverage (six 5-day asks), Burkina Faso 2014 **28** of
+spending (four quarterly 7-day passages) but **7** of quantity (only passage 1
+fields the quantity grid), Mali 2014-15 **14** (the module asked at both EACI
+passages, summed), Guatemala and Panama **15**.  Pooling GhanaLSS with
 Ethiopia therefore compares a 30-day figure with a 7-day one, and nothing said
 so.  GH #851.
 
@@ -37,15 +39,20 @@ The four facts, and why each is separate
     GLSS7 fields seven visits and asks food at six of them (visit 1 is intake),
     so ``recall_days * n_asks`` = 6 * 5 = 30 days of coverage, where 7 * 5 = 35
     is merely the fieldwork cycle.  Getting this wrong makes the product column
-    mean two different things in one country.
+    mean two different things in one country.  ``n_asks_by_column`` overrides
+    it for a named flow column that is asked a different number of times
+    (Burkina Faso 2014: ``{Quantity: 1}`` against ``n_asks: 4``); it may name
+    only a column ``period=`` scales, and needs the same evidence the count
+    does.
 ``within_wave_variation``
-    The axis the window varies on *inside* one wave, when it does.  Nine cells
-    across five countries have no single window: GhanaLSS 1991-92 varies by
-    stratum (urban 3-day x 10 asks, rural 2-day x 7), GhanaLSS 2005-06 and
-    Nigeria W4 by acquisition source ``s``, Burkina Faso 2021-22 across two
-    unmarked periods, Guatemala and Panama by column.  Such a record carries the
-    AXIS and leaves the numbers null -- filling either would be the error the
-    record exists to flag.
+    The axis the window varies on *inside* one wave, when it does -- and no
+    single number, or per-column override, describes it.  Three live cells
+    carry one: GhanaLSS 1991-92 by stratum (urban 3-day x 10 asks, rural
+    2-day x 7) and Nigeria 2018Q3 / 2019Q1 by acquisition source ``s``.  Such
+    a record carries the AXIS and leaves the numbers null -- filling either
+    would be the error the record exists to flag.  (Phase I also flagged
+    GhanaLSS 2005-06, Burkina Faso 2021-22, Guatemala and Panama; each was
+    resolved by reading the instrument or the build, and the records say how.)
 ``basis``
     The evidence rung, and the reason this is not just a number.  Same ladder as
     :mod:`lsms_library.capability`, for the same reason: a weak source must not
@@ -96,7 +103,7 @@ __all__ = [
     "merge_attrs",
     "BASIS_LADDER", "VARIATION_AXES", "ASK_COUNT_BASES",
     # Phase II (GH #851): the one conversion the record licenses.
-    "PERIOD_ATTRS_KEY", "PERIOD_DAYS", "PERIOD_TABLES",
+    "PERIOD_ATTRS_KEY", "PERIOD_DAYS", "PERIOD_TABLES", "FLOW_COLUMNS",
     "period_days", "period_refusal", "unavailable_reason", "to_period",
     "merge_period_attrs",
 ]
@@ -123,6 +130,77 @@ VARIATION_AXES = ("stratum", "by-s", "by-column", "by-item", "two-periods")
 
 #: Whether ``n_asks`` was observed in the data or taken from the schedule.
 ASK_COUNT_BASES = ("measured", "declared", "unknown")
+
+
+class _AskCounts(dict):
+    """``n_asks_by_column`` as a record stores it: ``{column: int}``, immutable.
+
+    A ``dict`` subclass for the reason :class:`RecallRecord` is one (it rides
+    on ``df.attrs``, which ``to_parquet`` serialises with a bare
+    ``json.dumps``), and frozen for the reason it is frozen: a record comes
+    from an ``lru_cache``d loader, so a mutable nested mapping would let one
+    caller rewrite every later caller's ask count.
+    """
+
+    __slots__ = ()
+
+    def _immutable(self, *args: Any, **kwargs: Any):
+        raise TypeError(
+            "n_asks_by_column is immutable (it belongs to a cached "
+            "RecallRecord); build a new record instead.")
+
+    __setitem__ = _immutable
+    __delitem__ = _immutable
+    update = _immutable
+    setdefault = _immutable
+    pop = _immutable
+    popitem = _immutable
+    clear = _immutable
+    __ior__ = _immutable
+
+    def __hash__(self) -> int:                     # dict sets this to None
+        return hash(tuple(sorted(self.items())))
+
+    def __reduce__(self):
+        return (self.__class__, (dict(self),))
+
+
+def _by_column(value: Any, cell: str) -> "_AskCounts | None":
+    """Normalise an ``n_asks_by_column`` value; refuse a malformed one.
+
+    ``None`` or an empty mapping is "no override".  Every key must be a flow
+    column :data:`PERIOD_TABLES` scales (:data:`FLOW_COLUMNS`) -- an unknown
+    name is refused rather than ignored, because an override that silently
+    does nothing is the R1 defect again -- and every value a positive
+    integer.
+    """
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise TypeError(
+            f"{cell}: n_asks_by_column must be a mapping {{column: n}}; got "
+            f"{type(value).__name__} {value!r}")
+    if not value:
+        return None
+    unknown = sorted(str(k) for k in value if k not in FLOW_COLUMNS)
+    if unknown:
+        raise ValueError(
+            f"{cell}: n_asks_by_column names {unknown}, which period= never "
+            f"scales; known flow columns are {list(FLOW_COLUMNS)}")
+    out: dict[str, int] = {}
+    for k, v in value.items():
+        if isinstance(v, bool) or not isinstance(v, (int, float, str)):
+            raise ValueError(f"{cell}: n_asks_by_column[{k!r}]={v!r} is not "
+                             f"a positive integer")
+        try:
+            n = int(v)
+        except (TypeError, ValueError):
+            n = None
+        if n is None or n < 1 or float(v) != n:
+            raise ValueError(f"{cell}: n_asks_by_column[{k!r}]={v!r} is not "
+                             f"a positive integer")
+        out[str(k)] = n
+    return _AskCounts(out)
 
 
 class RecallRecord(dict):
@@ -170,14 +248,15 @@ class RecallRecord(dict):
 
     #: Every field, in declaration order.  The one reading of the schema.
     _FIELDS: tuple[str, ...] = (
-        "country", "wave", "recall_days", "n_asks", "ask_count_basis", "basis",
+        "country", "wave", "recall_days", "n_asks", "n_asks_by_column",
+        "ask_count_basis", "basis",
         "recall_verbatim", "evidence", "within_wave_variation",
         "n_items_delivered", "notes",
     )
     #: Values a field takes when the constructor is not given one.  ``None``
     #: means "absent"; the two strings are real rungs and are always stored.
     _DEFAULTS: dict[str, Any] = {
-        "recall_days": None, "n_asks": None,
+        "recall_days": None, "n_asks": None, "n_asks_by_column": None,
         "ask_count_basis": "unknown", "basis": "not-recorded",
         "recall_verbatim": None, "evidence": None,
         "within_wave_variation": None, "n_items_delivered": None,
@@ -200,6 +279,8 @@ class RecallRecord(dict):
         if missing:
             raise TypeError(f"RecallRecord is missing required field(s) {missing}")
         data = {**self._DEFAULTS, **given}
+        data["n_asks_by_column"] = _by_column(
+            data["n_asks_by_column"], f"{data['country']} {data['wave']}")
         # Defaults apply BEFORE validation: a record built with no ``basis``
         # is validated as ``not-recorded``, exactly as the dataclass did.
         self._validate(data)
@@ -241,6 +322,33 @@ class RecallRecord(dict):
                 f"{country} {wave}: basis='not-recorded' with "
                 f"recall_days={recall_days!r}.  'Nobody has looked' and "
                 f"'the window is N days' cannot both be true.")
+        # A per-column ask count (GH #851 r1: Burkina Faso 2014 asks
+        # Expenditure at four passages, Quantity at one) is a claim about
+        # the instrument, so it is held to the same standard as the numbers
+        # it overrides -- and it overrides a count, so the count must exist.
+        by_column = d["n_asks_by_column"]
+        if by_column:
+            if variation:
+                raise ValueError(
+                    f"{country} {wave}: n_asks_by_column={dict(by_column)!r} "
+                    f"on a cell with within_wave_variation={variation!r}.  A "
+                    f"cell that varies inside the wave carries no numbers.")
+            if basis in WEAK_BASES:
+                raise ValueError(
+                    f"{country} {wave}: n_asks_by_column="
+                    f"{dict(by_column)!r} on basis={basis!r}.  A per-column "
+                    f"ask count needs the same evidence as the window it "
+                    f"refines; a weak rung cannot carry one.")
+            if d["n_asks"] is None:
+                raise ValueError(
+                    f"{country} {wave}: n_asks_by_column="
+                    f"{dict(by_column)!r} with no n_asks.  The override "
+                    f"refines a count; record the count first.")
+            if not d["evidence"]:
+                raise ValueError(
+                    f"{country} {wave}: n_asks_by_column="
+                    f"{dict(by_column)!r} with no evidence.  Cite where the "
+                    f"per-column ask count comes from.")
 
     # -- attribute access ----------------------------------------------------
     def __getattr__(self, name: str) -> Any:
@@ -296,11 +404,29 @@ class RecallRecord(dict):
         """``recall_days * n_asks``, or None where either is unknown.
 
         Deliberately a property rather than a stored field: it is arithmetic on
-        the other two, and storing it invites the three drifting apart.
+        the other two, and storing it invites the three drifting apart.  It is
+        the exposure of a column WITHOUT an ``n_asks_by_column`` override;
+        :meth:`exposure_days` gives a named column's.
         """
         if self.recall_days is None or self.n_asks is None:
             return None
         return self.recall_days * self.n_asks
+
+    def n_asks_for(self, column: str) -> int | None:
+        """How many times *column* is asked: its override, else ``n_asks``."""
+        return (self.n_asks_by_column or {}).get(column, self.n_asks)
+
+    def exposure_days(self, column: str) -> float | None:
+        """``recall_days * n_asks_for(column)``, or None where either is unknown.
+
+        Burkina Faso 2014 is the case that needs it: four 7-day passages ask
+        for spending, only the first fields the quantity grid, so its
+        ``Expenditure`` covers 28 days and its ``Quantity`` 7.
+        """
+        n = self.n_asks_for(column)
+        if self.recall_days is None or n is None:
+            return None
+        return self.recall_days * n
 
     @property
     def is_recorded(self) -> bool:
@@ -331,6 +457,7 @@ class RecallRecord(dict):
             wave=wave,
             recall_days=_num("recall_days", float),
             n_asks=_num("n_asks", int),
+            n_asks_by_column=data.get("n_asks_by_column") or None,
             ask_count_basis=data.get("ask_count_basis") or "unknown",
             basis=data.get("basis") or "not-recorded",
             recall_verbatim=data.get("recall_verbatim") or None,
@@ -435,12 +562,20 @@ def merge_attrs(frames) -> dict[str, dict[str, RecallRecord]]:
 # ``food_quantities`` under Contract B -- a typed raise from ``Country()``, a
 # degrade plus warning from ``Feature()`` -- and refuse it on ``food_prices``.
 #
-# What it does is one division per wave: the derived tables sum ``visit``
-# away, so a row's value covers the cell's TOTAL exposure, ``recall_days *
-# n_asks`` (30 days for GLSS7's six five-day asks, 28 for Burkina Faso 2014's
-# four 7-day passages, 7 for a single 7-day ask), and
+# What it does is one division per (wave, column): the derived tables sum
+# ``visit`` away, so a row's value covers every ask of its column in the
+# wave, ``recall_days * n_asks_for(column)`` (30 days for GLSS7's six
+# five-day asks; 28 for Burkina Faso 2014's spending over four 7-day
+# passages but 7 for its quantity, which only passage 1 asks; 14 for Mali
+# 2014-15's two summed passages; 7 for a single 7-day ask), and
 #
-#     value_in_period = value * PERIOD_DAYS[period] / total_exposure_days
+#     value_in_period = value * PERIOD_DAYS[period] / exposure_days(column)
+#
+# The exposure is the one the SOURCES DELIVER into the served column, and the
+# record is the only place that says so: Burkina Faso's quantity was divided
+# by 28 and Mali's totals by 7 until red team r1 measured both (GH #851).
+# ``tests/test_recall_period.py::TestDeliveredExposure*`` now checks every
+# convertible cell's count against its sources.
 #
 # That is NOT the division the module docstring refutes.  The refuted move
 # divides by the REALISED interval between visits, which injects fieldwork
@@ -478,6 +613,12 @@ PERIOD_TABLES: dict[str, tuple[str, ...]] = {
     "food_expenditures": ("Expenditure",),
     "food_quantities": ("Quantity",),
 }
+
+#: Every column :data:`PERIOD_TABLES` scales -- the names
+#: ``RecallRecord.n_asks_by_column`` may override.  One flow column per
+#: table, so a table's ``attrs['period']`` describes exactly one column.
+FLOW_COLUMNS: tuple[str, ...] = tuple(sorted(
+    {c for cols in PERIOD_TABLES.values() for c in cols}))
 
 
 def period_days(period: str) -> float:
@@ -552,9 +693,12 @@ def to_period(df, country: str, period: str, *, table: str,
 
     Each row's flow column (``Expenditure`` / ``Quantity``, per
     :data:`PERIOD_TABLES`) is multiplied by ``PERIOD_DAYS[period] /
-    total_exposure_days`` of its own wave ``t``.  Linear and per-``t``, so it
-    commutes with the ``labels=`` re-aggregation, ``market=`` and
-    ``numeraire=`` post-steps; the caller applies it before them.
+    exposure_days(column)`` of its own wave ``t`` -- ``recall_days *
+    n_asks``, or the column's ``n_asks_by_column`` override.  Linear and
+    per-``t``, so it commutes with the ``labels=`` re-aggregation,
+    ``market=`` and ``numeraire=`` post-steps: ``Country`` applies it before
+    them, ``Feature``'s wave-grain degrade applies it after them to a slice of
+    the unconverted frame, and the two agree.
 
     Strict, by contract: if ANY wave in *df* has no established window
     (:func:`unavailable_reason`), nothing is converted and
@@ -562,14 +706,17 @@ def to_period(df, country: str, period: str, *, table: str,
     every such wave and the convertible ones.  Converting the known waves and
     leaving the rest unscaled would return one column on two clocks; filling
     the unknown ones with NA would read as zero under ``sum()`` (GH #828).
-    ``Feature`` degrades over the error at the wave grain.
+    ``Feature`` degrades over the error at the wave grain: it reads the
+    table without ``period=``, keeps the rows of ``.convertible`` waves and
+    converts those with this function.
 
     Returns a COPY carrying ``attrs[PERIOD_ATTRS_KEY] = {country: {...}}``:
-    the target, its length in days, the scaled columns and, per wave, the
-    exposure, factor, ``recall_days``, ``n_asks`` and both rungs -- so a
-    ``config-comment`` window is visibly weaker than a ``questionnaire`` one
-    on the frame itself.  Plain dicts and numbers only (``df.to_parquet``
-    serialises ``attrs`` with a bare ``json.dumps``).
+    the target, its length in days, the scaled column and, per wave, the
+    column's exposure, factor, ``recall_days``, ``n_asks``, where that count
+    came from (``n_asks_source``: ``'n_asks'`` or ``'n_asks_by_column'``) and
+    both rungs -- so a ``config-comment`` window is visibly weaker than a
+    ``questionnaire`` one on the frame itself.  Plain dicts and numbers only
+    (``df.to_parquet`` serialises ``attrs`` with a bare ``json.dumps``).
 
     *records* defaults to :func:`recall_records` for *country*; tests pass
     their own.
@@ -599,6 +746,11 @@ def to_period(df, country: str, period: str, *, table: str,
     # and a categorical or nullable-string level must look up the same way.
     t_str = (df.index.get_level_values("t").astype("string")
              .to_numpy(dtype=object, na_value=pd.NA))
+    # One flow column per table (FLOW_COLUMNS), so ``col`` is the column the
+    # factor -- and the attrs record -- describe.  Its exposure is the
+    # record's, unless ``n_asks_by_column`` names it (Burkina Faso 2014's
+    # Quantity: one ask of four).
+    col = cols[0]
     factors: dict[str, float] = {}
     unavailable: dict[str, str] = {}
     for w in pd.unique(t_str):
@@ -610,7 +762,7 @@ def to_period(df, country: str, period: str, *, table: str,
         if why is not None:
             unavailable[str(w)] = why
         else:
-            factors[str(w)] = target / rec.total_exposure_days
+            factors[str(w)] = target / rec.exposure_days(col)
     if unavailable:
         raise PeriodUnavailableError(
             country=country, period=period, table=table,
@@ -618,24 +770,26 @@ def to_period(df, country: str, period: str, *, table: str,
 
     out = df.copy()
     factor = pd.Series(t_str).map(factors).to_numpy(dtype=float)
-    for c in cols:
-        out[c] = out[c] * factor
+    out[col] = out[col] * factor
     out.attrs = dict(df.attrs)
+
+    def _wave(rec: RecallRecord) -> dict[str, Any]:
+        overridden = col in (rec.n_asks_by_column or {})
+        return {
+            "exposure_days": float(rec.exposure_days(col)),
+            "factor": target / rec.exposure_days(col),
+            "recall_days": float(rec.recall_days),
+            "n_asks": int(rec.n_asks_for(col)),
+            "n_asks_source": "n_asks_by_column" if overridden else "n_asks",
+            "basis": rec.basis,
+            "ask_count_basis": rec.ask_count_basis,
+        }
+
     record = {
         "period": period,
         "period_days": target,
         "columns": cols,
-        "waves": {
-            w: {
-                "exposure_days": float(records[w].total_exposure_days),
-                "factor": factors[w],
-                "recall_days": float(records[w].recall_days),
-                "n_asks": int(records[w].n_asks),
-                "basis": records[w].basis,
-                "ask_count_basis": records[w].ask_count_basis,
-            }
-            for w in sorted(factors)
-        },
+        "waves": {w: _wave(records[w]) for w in sorted(factors)},
     }
     existing = out.attrs.get(PERIOD_ATTRS_KEY)
     merged = dict(existing) if isinstance(existing, dict) else {}
