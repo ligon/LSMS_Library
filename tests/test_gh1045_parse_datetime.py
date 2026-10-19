@@ -1014,3 +1014,33 @@ def test_real_l2_country_stamp_is_written_and_replayed_warm(country):
     assert all("replayed" in d["msg"] for d in warm["dated"])
     if country == "Tanzania":
         assert warm["dated"][0]["report"]["out_of_range"] == 1
+
+
+# ---------------------------------------------------------------------------
+# 12. The audit harness does not flag the provenance column (r1 §3): the
+#     feature-audit scan relays diagnostics.is_this_feature_sane, whose
+#     no_constant_columns check graded Tanzania's interview_date `warn` for a
+#     Derivation column holding one key on 1 of 22,428 rows.
+# ---------------------------------------------------------------------------
+
+def _constant_check(df):
+    from lsms_library.diagnostics import is_this_feature_sane
+    (chk,) = [c for c in is_this_feature_sane(df, "Tanzania", "interview_date").checks
+              if c.name == "no_constant_columns"]
+    return chk
+
+
+def test_derivation_column_is_not_a_constant_column():
+    idx = pd.MultiIndex.from_tuples([("2010-11", f"h{k}") for k in range(5)], names=["t", "i"])
+    df = pd.DataFrame({
+        "Int_t": pd.to_datetime(["2010-11-01", "2010-11-03", "2010-11-04",
+                                 "2010-11-05", "2010-11-09"]).astype("datetime64[us]"),
+        "Derivation": pd.array([derivation_key("imputed_day", "interview_date")]
+                               + [pd.NA] * 4, dtype="string"),
+    }, index=idx)
+    assert _constant_check(df).status == "pass"
+
+    # Exempt by NAME: a genuinely constant column beside it is still reported,
+    # and the provenance column is not named in the report.
+    chk = _constant_check(df.assign(Rural="Rural"))
+    assert chk.status == "warn" and "'Rural'" in chk.message and "Derivation" not in chk.message
