@@ -65,3 +65,39 @@ class UnitsUnavailableError(ValueError):
         """The same error, naming *country* (raised by ``Country``)."""
         return type(self)(units=self.units, missing=self.missing,
                           country=country, table=self.table)
+
+
+class UnregisteredCountryError(ValueError):
+    """``Country(name)`` named a directory that is not a registered country.
+
+    A country is REGISTERED when its directory under ``countries_root()``
+    carries a ``_/data_scheme.yml`` -- exactly the set
+    :func:`lsms_library.countries` returns.  A directory without one is staged
+    microdata nobody has wired up yet (Bulgaria, Nicaragua, ... -- GH #915): it
+    declares no tables, so a ``Country`` built on it could only fail later and
+    further from the cause.  ``Country()`` therefore refuses it here, by
+    decision (@ligon, 2026-10-18).
+
+    Code that legitimately operates on a directory *being built* --
+    acquisition (``data_access.discover_waves``), provenance stamping
+    (``scripts/backfill_wave_provenance.py``), cache maintenance and other
+    scaffolding -- passes ``Country(name, allow_unregistered=True)``.
+
+    Subclasses :class:`ValueError` -- what ``Country()`` raises for a name with
+    no directory at all -- so existing ``except ValueError`` handlers keep
+    catching it.  Attributes: ``country`` (the name) and ``path`` (the
+    directory, whose ``_/data_scheme.yml`` is missing).
+    """
+
+    def __init__(self, country: str, path):
+        self.country = country
+        self.path = path
+        super().__init__(
+            f"{country!r} is a directory under {path.parent} but not a "
+            f"registered country: it has no _/data_scheme.yml, so it declares "
+            f"no tables and is not in lsms_library.countries().  (Staged "
+            f"microdata that has not been wired up yet; see the add-feature "
+            f"skill.)  Code operating on a directory being built -- "
+            f"acquisition, provenance stamping, scaffolding -- may pass "
+            f"Country({country!r}, allow_unregistered=True)."
+        )

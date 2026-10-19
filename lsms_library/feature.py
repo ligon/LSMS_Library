@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import os
 import warnings
 from pathlib import Path
 from typing import Any, Callable, Mapping, NamedTuple
@@ -25,6 +26,7 @@ from importlib.resources import files
 from .yaml_utils import load_yaml
 from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
+from .catalog import _is_registered
 from .errors import LabelUnavailableError, UnitsUnavailableError
 from . import population as _population
 # NOT `from . import recall` / `from . import derivations`: the package binds
@@ -753,21 +755,21 @@ def _discover_countries_for_table(table_name: str) -> list[str]:
     # If this is a derived table, look for its source instead
     lookup_name = _DERIVED_SOURCE.get(table_name, table_name)
 
-    countries_dir = countries_root()
+    countries_dir = Path(countries_root())
+    entries = os.listdir(countries_dir)
     result = []
-    for entry in sorted(Path(countries_dir).iterdir()):
-        if not entry.is_dir() or entry.name.startswith("."):
+    for name in sorted(entries):
+        # The registration predicate countries() and Country() share (GH #915).
+        if not _is_registered(countries_dir, name, entries):
             continue
-        scheme_path = entry / "_" / "data_scheme.yml"
-        if not scheme_path.exists():
-            continue
+        scheme_path = countries_dir / name / "_" / "data_scheme.yml"
         with open(scheme_path, "r", encoding="utf-8") as f:
             data = load_yaml(f)
         if not isinstance(data, dict):
             continue
         scheme = data.get("Data Scheme", {})
         if isinstance(scheme, dict) and (table_name in scheme or lookup_name in scheme):
-            result.append(entry.name)
+            result.append(name)
     return result
 
 

@@ -103,7 +103,10 @@ class TestCountryProvenance:
     def test_provenance_handles_empty_waves(self):
         """A country with no registered waves returns an empty
         DataFrame with the right shape."""
-        afg = ll.Country("Afghanistan")
+        # Afghanistan has no _/data_scheme.yml, so since GH #915 Country()
+        # refuses it unless opted in -- and neither of its waves has a
+        # Documentation/SOURCE.org, which is why .waves is empty.
+        afg = ll.Country("Afghanistan", allow_unregistered=True)
         if afg.waves:
             pytest.skip("Afghanistan unexpectedly has waves")
         df = afg.provenance()
