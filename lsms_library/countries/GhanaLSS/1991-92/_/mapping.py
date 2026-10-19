@@ -11,7 +11,8 @@ def _code_label_map(tablename, dirs):
     '''Read a Code -> Label org table into a {int code: label} dict.
 
     Delegates to ``tools.code_label_map`` (CONTENTS.org Trap 1: a bare
-    ``get_categorical_mapping`` returns an EMPTY dict), keeping this module's
+    ``get_categorical_mapping`` used to return an EMPTY dict; since GH #674 it
+    raises TypeError), keeping this module's
     int-keyed contract: non-numeric codes (e.g. the country table's '.' None
     row) are skipped.  Used to be a private copy of the cascade that read only
     ``categorical_mapping.org`` at each rung, so it could not see a level's
