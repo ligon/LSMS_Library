@@ -125,3 +125,85 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
     unit.
   contents: Nigeria/_/CONTENTS.org, "The C8 SIZE field" (GH #834)
   since: '2026-09-13'
+
+# GH #1035 (rulings @ligon 2026-10-18, amended 2026-10-19 after red team r1).
+# A served Quantity_kg the survey did not record: the W1-PH food module's
+# sized unit codes are the agriculture production-unit card, which states
+# each container's weight, and a row recording a FRACTION of one container is
+# given that weight times the fraction.  The `u` label stays weightless, so
+# the stated weight is never served to a row of one or more containers.
+Nigeria::food_acquired::w1-card-weight:
+  waves: ['2010-11']
+  columns: [Quantity_kg]
+  rows: {t: '2011Q1'}
+  rule: >-
+    Quantity_kg = Quantity x card_kg, on 2011Q1 (W1 post-harvest) rows whose
+    unit is a sized container with a stated MASS (codes 11-83 of the
+    value-label set SP10BQ2B: Sack/Bag, Basket, Basin, Bunch, Tuber of yam,
+    Bundle, Wheelbarrow, Pick-up van; 3 to 2,500 kg) and whose served
+    Quantity satisfies 0 < Quantity < 1.  card_kg is the weight the label
+    states ('11 Sack/Bag: Small (20 kg)'); for the three Bundle codes, whose
+    labels Stata truncated at 60 characters, it is the survey's own
+    w1agnsconversion.csv (15 / 25 / 40 kg, one value for every crop).  Every
+    other row -- Quantity >= 1, which includes every row whose quantity
+    equals its card weight, and the jerry-can / keg codes 91-95, which state
+    LITRES -- keeps Quantity_kg NA and is served by the price-ratio
+    inference under its weightless `u` label.  The rule reads the served
+    Quantity, after the build's duplicate-key collapse (2011Q1 has no
+    duplicate key on a sized code).
+  function: lsms_library.countries.Nigeria.2010-11._.mapping:derive_w1_card_weight_kg
+  inputs: lsms_library.countries.Nigeria.2010-11._.mapping:inputs_food_acquired_w1_card_weight
+  raw_variables: [hhid, item_cd, s10bq3a, s10bq3b, s10bq4, s10bq5a, s10bq5b,
+                  s10bq6a, s10bq6b]
+  assumptions:
+    - text: >-
+        the sized codes in the W1-PH food unit fields mean the containers of
+        the agriculture production-unit card, at the card's stated weight.
+        The food page of the printed questionnaire lists only codes 1-4 (Kg,
+        g, l, ml); the sized codes reach the food file through the .dta
+        value-label set SP10BQ2B, which is the card the harvest unit sa3q6b
+        also uses.  The codes respect container meaning item by item (yam on
+        tuber codes 89 of 95 purchased rows, plantain on bunch codes 50 of
+        55, palm oil and bottled drinks on jerry-can codes).
+      basis: variable-label
+      evidence: >-
+        sect10b_harvestw1.dta, value-label set SP10BQ2B, attached to s10bq2b,
+        s10bq3b, s10bq5b and s10bq6b; 2010-11/Data/w1agnsconversion.csv
+        (min = max = the label weight for every nscode); W1-PH household
+        questionnaire Section 10B (codes 1-4 only); GH #1035 red team r1, R2
+        and R3.
+    - text: >-
+        the stated weight applies only where the row records a FRACTION of a
+        container (0 < Quantity < 1).  A quantity of one or more containers
+        reads as a COUNT of a local unit that the card's weight does not
+        describe, and a quantity equal to the card weight as a kilogram
+        figure keyed into the quantity field; both keep the price-ratio
+        inference.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-10-19 on GH #1035, on red team r1's split of the
+        2,574 priced purchased 2011Q1 rows on sized codes, each row's
+        stated-weight Naira/kg against its item's own Kg-row median price:
+        Quantity < 1 (1,838 rows) median ratio 0.65 -- bread at 0.05 of a
+        20 kg sack is a 1 kg loaf; Quantity >= 1 (736 rows) median 0.032,
+        carrying 95% of the kilograms an unconditional card weight adds; 165
+        rows (all sources) record a Quantity equal to the card weight.
+    - text: >-
+        the jerry-can / keg / rubber-of-palm-oil codes 91-95 state a VOLUME
+        and are not converted: a Quantity_kg built from litres would assert
+        1 l = 1 kg as a survey figure that volume_as_mass=False cannot
+        decline, and would carry that density into the price-per-kg
+        baseline the inference keeps volumes out of.
+      basis: modelling-choice
+      evidence: >-
+        transformations._BASELINE_UNIT_CONVERSION (no litre, ml or cl);
+        Nigeria/_/CONTENTS.org, GH #1035 section.
+  validated_against: >-
+    the expenditure each derived purchased row records: the derived kilograms
+    imply a Naira/kg price near the item's own Kg-row median (red team r1:
+    median ratio 0.65 over the Quantity < 1 rows), where the same weight on
+    the Quantity >= 1 rows implies a median 0.032.
+  contents: >-
+    Nigeria/_/CONTENTS.org, "W1 post-harvest units: the stated container
+    weight serves a fraction of a container only" (GH #1035)
+  since: '2026-10-19'
