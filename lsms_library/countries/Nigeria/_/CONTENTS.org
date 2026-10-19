@@ -72,6 +72,20 @@ one row each out of ~600k.  65 and 103 are *item* codes ("65. FRUITS: CANNED",
 label --- the same treatment as the residual codes noted below.  (Sanity checks
 pass: =no_float_stringified_index= only inspects id levels.)
 
+/GH #1047 (2026-10-18): the kept raw code is now read through =format_id=./
+The CSV unit columns are float, so the one such code that reaches the served
+table was =u = '65.0'= (2015Q3 =purchased=, 1 row); it is now ='65'=.  Census
+of every WIRED source unit column against its wave's =u= column: exactly two
+unlisted codes, 65 (2015Q3 =s7bq3b=) and 58 (2012Q3 =s7bq7b=, on a row with
+no quantity, so =_finalize_canonical_food_acquired= never keeps it).  103 sits
+in W3 =q5b=, which no source reads.  Every other =food_acquired= row is
+byte-identical, and =food_quantities(units='kgs')= is unchanged
+(1,482,720.76 kg).  A latent hazard worth knowing: the API-time =u= mapping
+registers ='5'= and ='5.0'= alike (=_augment_numeric_code_keys=), so an
+unlisted code that IS in the table's =Code= column (say a W3 =5=, which the
+=2015-16= column marks =---=) would be served the Preferred Label anyway ---
+the #607 cross-wave error, by another route.  No such code occurs today.
+
 *** =u = 'None'= is a missing-unit spelling the kg ladder does not know (GH #962)
 
 /Resolved 2026-10-18 by GH #1041 (PR #1046): the fill is now =U_UNKNOWN=, so
@@ -1315,6 +1329,34 @@ rows* and both the "reported purchase price" and "own-consumption
 valuation" sources are empty for this country.  Wiring =sa3q18= (as, say,
 =Value_if_sold=) would give Nigeria a farmgate valuation on ~2.8x more rows
 than its sales data, and is recorded here as a gap rather than guessed at.
+* crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
+
+=u= is a *column* here (the declared index is =(t, i, plot_id, crop)=), and
+=crop_production_for_wave= used to serve NaN wherever =_canon_unit= returned
+NA: 13,138 rows (2011Q1 3,053 / 2013Q1 3,009 / 2016Q1 1,694 / 2019Q1 3,467 /
+2024Q1 1,915).  Census on the raw files: all but 12 have a *blank* raw unit
+code, and almost all of those also have no harvest quantity (2011Q1: 51 blank-
+unit rows carry a positive quantity, 2013Q1 1, 2016Q1 4, W4/W5 0).  The other
+12 are 2011Q1 codes with no value label (=5.0= x11, =0.0= x1).  Since
+2026-10-18 every such row is =U_UNKNOWN= (='Unknown'=), the #1041 ruling on
+the crop side; no row is dropped and nothing else in the table changes
+(byte-identical after =fillna('Unknown')=).
+
+*Why the 12 unlabelled codes do not keep their raw code, as an unlisted food
+code does (#607).*  Crop =u= is a LABEL space (=_canon_unit='s base labels),
+and the API-time automatic mapping applies the country's =u= table --- keyed
+on FOOD unit codes --- to this column too.  Measured: a kept ='5'= was served
+as ='mudu'= (code 5's Preferred Label, the W2 food meaning), 11 rows.
+
+What it does and does not move: =Feature('crop_production')= already filled
+the NaN with ='Unknown'= (=missing_level_sentinels=, when it promotes the =u=
+column into the index), so =Country(...)= and =Feature(...)= now agree.  Site I
+(=null_index_reports=) never saw these rows --- it audits declared index
+LEVELS, and =u= is a column --- so its Nigeria =crop_production= report is
+the same before and after (=v=, 86 NaN in 2013Q1, the v-join's own
+sparsity).  Site Q's 2011Q1 report is the same four Maize rows (1,800 / 500 /
+200 / 200 against a p90 of 1.2), now printed =u=Unknown= instead of =u=nan=.
+
 * crop_production: the per-row Kg/L conversion factor (=KgFactor=, GH #859)
 
 Added 2026-09-09.  The GHS-Panel harvest form asks a *Kg/L conversion factor*
@@ -1539,6 +1581,46 @@ fully exposed --- =crop_production=, =plot_inputs=, =livestock=, =plot_labor=,
 =people_last7days= --- and the other 19 are exposed to the weaker form of the
 same failure, since no rule lists =_/nigeria.py= or =_/data_scheme.yml= as a
 prerequisite even though both are in the cache hash.
+
+* interview_date: each wave records the date differently (GH #1037)
+
+The cover page (=secta_{planting,harvest}wN=) is the source in every wave,
+but the date is stored three ways:
+
+| wave | variables | as read by =df_data_grabber= |
+|-+-+-|
+| W1, W2 | =saq13d/m/y= | numeric day / month / year |
+| W3 | =saq13d/m/y= (+ =saq13= =ddmmyyyy= text, PH only) | *month is the Stata LABEL* (='9. SEPTEMBER'=) |
+| W4 | =InterviewStart= | =datetime64[ms]=, time of day included |
+
+*W4 (fixed 2026-10-18).*  The script stored =pd.to_datetime(x).date= without
+the call --- the text of a bound method --- so every W4 row parsed to NaT at
+read time and =dropna(how='all')= deleted both rounds.  It now stores the
+timestamp itself (=datetime64=; the time of day is kept, which W1-W3 cannot
+supply).  Served rows 2018Q3 0 -> 5,224, 2019Q1 0 -> 5,012; the 52 rows whose
+=InterviewStart= is blank at source are dropped like every wave's blank
+dates; =DatetimeCoercionWarning= 10,288 -> none.
+
+*All four scripts used to write the household id as =j=* (the canonical item
+level) and were served =(t, i)= only through =local_tools.map_index='s legacy
+j->i swap.  They now write =i=, as =data_scheme.yml= declares; W1/W2's served
+rows are byte-identical.
+
+The country-level =_/interview_date.py= only concatenates the four wave
+parquets, which the framework also does --- a GH #788 retirement candidate,
+not touched here.
+
+** TODO W3 (2015Q3 / 2016Q1) serves NO rows: its month arrives as label text
+
+=pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')= cannot read
+='9. SEPTEMBER'=, so all 9,288 W3 rows are NaT and dropped.  Reading the
+numeric code (=convert_categoricals=False=, or the label's leading integer)
+recovers 4,672 of 4,696 (2015Q3) and 4,590 of 4,592 (2016Q1), measured
+2026-10-18 on the source files.  GH #1037's "9,494 genuine nulls" are these
+9,288 plus 206 blank W1/W2 dates; only the 206 (and W3's 26) are genuine.
+Not fixed under #1037; drafted as its own residual.  Note also that 20
+2015Q3 (post-planting) interviews are dated March (10) / April (10) 2016 ---
+survey-reported, unexamined.
 
 * nonfood_expenditures (sect8a-e / sect11a-e) -- long since GH #817
 
