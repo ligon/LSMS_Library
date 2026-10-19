@@ -619,6 +619,25 @@ is NaN on every obtained-only row.  In the raw data =p12a10b= equals the
 reference unit =umr= on 80.8% of obtained rows, so =cnlib= (umr->lbs) is applied
 directly with an implicit obtained equivalence of 1.
 
+* Kinship: degeneracies that are the instrument, not bugs (GH #698)
+
+ENCOVI 2000's roster serves thirteen relationship labels (=jefe (a)=,
+=esposo (a) o compaÑero (a)=, =hijo (a)=, =nieto (a)=, =padre - madre=,
+=suegro (a)=, =yerno - nuera=, =hermano (a)=, =cuÑado (a)=, =otro pariente=,
+=otro no pariente=, =empleada domestica=, =pensionista - huesped=).  There is
+no grandparent, uncle/aunt, nephew/niece or cousin code, so the served
+decomposition is narrow BY CONSTRUCTION -- measured 2026-10-19:
+
+- =Distance= is 0 (36,703), 1 (472: =hermano (a)= and =cuÑado (a)=) or NA
+  (596, =otro pariente=, [null, null, null] -- the ENNIV manual's definition,
+  see =kinship.yml= and GH #698).  Never 2.
+- =Generation= runs -2 .. +1 only (plus the 596 NA).
+
+Do not "fix" either: the codes are not there.  Unlike Peru's =Padre/Suegro=,
+ENCOVI asks parent (=padre - madre=) and parent-in-law (=suegro (a)=)
+separately, so no Guatemalan code falls under the 2026-10-18 affinity-only
+ruling and no Guatemalan number moved with it.
+
 * Known data issues
 
 ** interview_date — not available (2026-06-06)
