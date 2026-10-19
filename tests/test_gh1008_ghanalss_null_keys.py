@@ -350,6 +350,14 @@ def fa1617(monkeypatch):
     d = countries_root() / "GhanaLSS" / "2016-17" / "_"
     monkeypatch.chdir(d)
     monkeypatch.setattr(sys, "path", list(sys.path))   # undo its sys.path.append
+    # The script reaches its country module through the RELATIVE entry
+    # '../../_'.  Python caches a finder per sys.path string, resolved against
+    # the cwd of whoever first used it, so in a shared xdist worker an earlier
+    # test sitting in another country's wave dir makes '../../_' mean THAT
+    # country's _/ (reproduced: ModuleNotFoundError: ghanalss).  Put the
+    # absolute GhanaLSS/_ first and drop the stale finder.
+    monkeypatch.delitem(sys.path_importer_cache, "../../_", raising=False)
+    monkeypatch.syspath_prepend(str(d.parent.parent / "_"))
     spec = importlib.util.spec_from_file_location("_gh1008_food_acquired_1617", d / "food_acquired.py")
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
