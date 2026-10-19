@@ -361,3 +361,69 @@ def test_gh915_cli_cache_clear_all_opts_in_and_covers_staged_dirs(monkeypatch):
     assert set(_unregistered_dirs()) <= set(seen)
     assert set(ll.countries()) <= set(seen)
     assert all(seen.values())
+
+
+# ---------------------------------------------------------------------------
+# CLI `--country`: a name Country() refuses prints the refusal (stderr, exit
+# 1), not a traceback.  `cache list --country <staged dir>` is maintenance,
+# like `cache clear --country`, and opts in.  Run under every root form.
+# ---------------------------------------------------------------------------
+
+def _cli(*args):
+    import typer.testing
+    from lsms_library import cli as lsms_cli
+    return typer.testing.CliRunner().invoke(lsms_cli.app, list(args))
+
+
+def _refused_cleanly(result, needle):
+    assert result.exit_code == 1, result.output
+    # An uncaught exception ALSO exits 1 under CliRunner: require that the
+    # only thing that escaped is the deliberate exit.
+    assert (result.exception is None
+            or isinstance(result.exception, SystemExit)), repr(result.exception)
+    assert needle in result.output
+    assert "Traceback" not in result.output
+
+
+@pytest.mark.parametrize("cmd", ["waves", "tables"])
+def test_gh915_cli_country_refusal_is_a_message_not_a_traceback(
+        synthetic_root, cmd):
+    """On 457cba3e2 each of these escaped as an exception (a traceback at the
+    shell); `waves --country Bare` was rc 0 with empty output on ddd79800c."""
+    _refused_cleanly(_cli(cmd, "--country", "Bare"),
+                     "Country('Bare', allow_unregistered=True)")
+    _refused_cleanly(_cli(cmd, "--country", "Nope"), "No such country 'Nope'")
+    _refused_cleanly(_cli(cmd, "--country", ".hidden"), "No such country")
+    _refused_cleanly(_cli(cmd, "--country", ".."), "path traversal")
+
+
+def test_gh915_cli_waves_country_still_lists_a_registered_country(synthetic_root):
+    result = _cli("waves", "--country", "Alpha")
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == ""               # Alpha has no SOURCE.org
+
+
+def test_gh915_cli_cache_list_country_opts_in_for_a_staged_dir(
+        synthetic_root, tmp_path, monkeypatch):
+    """A staged directory's cache is listed, not refused -- consistent with
+    `cache clear --country`.  ddd79800c printed the same line; 457cba3e2
+    raised UnregisteredCountryError.  A name that is not a directory entry
+    is refused with its message (it was silently skipped, rc 0, before)."""
+    monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "data"))
+    for name in ["Bare", "Staged", "Alpha"]:
+        result = _cli("cache", "list", "--country", name)
+        assert result.exit_code == 0, result.output
+        assert result.output.strip() == f"{name}: <no cache>"
+    _refused_cleanly(_cli("cache", "list", "--country", "Nope"),
+                     "No such country 'Nope'")
+    _refused_cleanly(_cli("cache", "list", "--country", ".hidden"),
+                     "No such country")
+
+
+def test_gh915_cli_cache_list_all_lists_exactly_countries(
+        synthetic_root, tmp_path, monkeypatch):
+    monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "data"))
+    result = _cli("cache", "list")
+    assert result.exit_code == 0, result.output
+    assert result.output.strip().splitlines() == [
+        f"{c}: <no cache>" for c in ll.countries()] == ["Alpha: <no cache>"]

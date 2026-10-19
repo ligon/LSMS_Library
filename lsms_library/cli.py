@@ -258,6 +258,19 @@ def _registered_country_dirs() -> List[str]:
     return sorted(n for n in entries if _is_registered(root, n, entries))
 
 
+def _country_or_exit(name: str, **kwargs) -> Country:
+    """``Country(name, preload_panel_ids=False, **kwargs)`` for a ``--country``
+    option, or the refusal printed to stderr and exit 1 -- the message, not a
+    traceback.  Catches what ``Country()`` raises for a name it does not accept
+    (no such country, an unregistered directory, path traversal: all
+    ``ValueError``, GH #915); nothing past construction is guarded."""
+    try:
+        return Country(name, preload_panel_ids=False, **kwargs)
+    except ValueError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1)
+
+
 def _print_list(items: Sequence[str], as_csv: bool) -> None:
     if as_csv:
         print(",".join(items))
@@ -318,10 +331,15 @@ def cache_list(
     country: Optional[str] = typer.Option(None, "--country", help="Country name to inspect."),
 ) -> None:
     """List cached datasets."""
-    countries = [country] if country else _registered_country_dirs()
-    countries = [c for c in countries if (_countries_root() / c).exists()]
-    for name in countries:
-        country_obj = Country(name, preload_panel_ids=False)
+    if country:
+        # One directory's cache is maintenance, like `cache clear --country`:
+        # a staged directory with no _/data_scheme.yml is listed (GH #915).
+        country_objs = [_country_or_exit(country, allow_unregistered=True)]
+    else:
+        country_objs = (Country(name, preload_panel_ids=False)
+                        for name in _registered_country_dirs())
+    for country_obj in country_objs:
+        name = country_obj.name
         datasets = country_obj.cached_datasets()
         if datasets:
             print(f"{name}: {', '.join(sorted(datasets))}")
@@ -809,7 +827,7 @@ def waves(
             pairs.extend(f"{name},{wave}" for wave in waves)
         _print_list(pairs, as_csv)
     else:
-        country_obj = Country(country, preload_panel_ids=False)  # type: ignore[arg-type]
+        country_obj = _country_or_exit(country)  # type: ignore[arg-type]
         _print_list(country_obj.waves, as_csv)
 
 
@@ -843,7 +861,7 @@ def tables(
             pairs.extend(f"{name},{table}" for table in tables)
         _print_list(pairs, as_csv)
     else:
-        country_obj = Country(country, preload_panel_ids=False)  # type: ignore[arg-type]
+        country_obj = _country_or_exit(country)  # type: ignore[arg-type]
         tables = country_obj.data_scheme
         if not tables:
             _log_issue(country, "tables", None, ValueError("No tables defined in data scheme"))
