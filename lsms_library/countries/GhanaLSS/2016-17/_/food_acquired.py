@@ -57,6 +57,7 @@ import pandas as pd
 from lsms_library.local_tools import (df_from_orgfile, get_categorical_mapping,
                                        get_dataframe, format_id, _to_numeric,
                                        to_parquet)
+from lsms_library.transformations import U_UNKNOWN
 
 # The country's own helpers, imported RELATIVE to this script (the house
 # pattern).  Deliberately not `from lsms_library.countries.GhanaLSS._.ghanalss
@@ -231,6 +232,19 @@ if 'Expenditure' in df.columns:
     value_only = df['Quantity'].isna() & df['u'].isna() & df['Expenditure'].notna()
     df.loc[value_only, 'u'] = 'Value'
     df.loc[value_only, 'Quantity'] = df.loc[value_only, 'Expenditure']
+
+# A row with NO unit code is served on the missing-unit sentinel U_UNKNOWN
+# ('Unknown'), never on a NaN `u` (GH #1008; the #1041 rule).  Census of the
+# 13,380 served rows this reaches: every one has a BLANK raw code (s9bq{n}c /
+# s8hq{n}u is missing) -- none is an unlabelled code or an unmapped label, so
+# there is nothing to decode.  12,958 are 8H produced rows (12,925 carry only a
+# selling price; 12,813 of those are the visit-2 per-item constant prices on
+# Cassava/Pepper/Tomato/Okra documented in CONTENTS.org), 422 are 9B purchases
+# with a quantity and an amount.  A NaN `u` was deleted by every downstream
+# groupby (Feature assembly, the derived food tables) while Country served it;
+# the sentinel keeps the row in both and the kg ladder serves it `none`.
+# AFTER the value-only rescue above, which tests `u.isna()`.
+df['u'] = df['u'].fillna(U_UNKNOWN)
 
 df['t'] = t
 
