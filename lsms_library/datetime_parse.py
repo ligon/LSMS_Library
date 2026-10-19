@@ -309,6 +309,22 @@ def replay_datetime_audit(reports: Any, country: str, table: str,
         _record_datetime_report(report)
 
 
+def partial_date_inputs() -> pd.DataFrame:
+    """``inputs`` callable of the two partial-date derivations
+    (``lsms_library/derivations.yml``): one row per (country, table, wave,
+    column) report filed in this process that padded at least one date, with
+    the counts.  The raw component values themselves are the variables the
+    report's column spec names; the parse of a built table files these reports
+    (cold) or replays them from the parquet's stamp (warm), so call this after
+    reading the table."""
+    rows = [{k: r.get(k) for k in ("country", "table", "wave", "column", "n",
+                                   "imputed_day", "imputed_month")}
+            for r in datetime_reports()
+            if int(r.get("imputed_day") or 0) or int(r.get("imputed_month") or 0)]
+    return pd.DataFrame(rows, columns=["country", "table", "wave", "column", "n",
+                                       "imputed_day", "imputed_month"])
+
+
 def wave_datetime_audit(country: str, table: str, wave: str | None) -> list[dict] | None:
     """The reports THIS process's build of one wave folder filed, for stamping
     into that wave's L2 parquet.  Filtered on ``wave_folder`` (so a multi-round
