@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import sys
 sys.path.append('../../../_/')
-from lsms_library.local_tools import df_data_grabber, to_parquet
+from lsms_library.local_tools import (df_data_grabber, to_parquet,
+                                     assign_datetime, datetime_reports)
 
 # Round-to-wave mapping matches the convention in 2008-15/_/shocks.py
 # and 2008-15/_/sample.py: each integer round becomes the corresponding
@@ -15,25 +16,11 @@ round_match = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
 idxvars = dict(i='r_hhid',
                 t=('round', lambda x: round_match.get(x, x)))
 
-
-myvars = dict(year=('ha_18_3', lambda x: pd.to_numeric(x, errors='coerce')),
-                month='ha_18_2',
-                day=('ha_18_1',lambda x: pd.to_numeric(x, errors='coerce')))
+# Raw components: ha_18_3 year (float), ha_18_2 month NAME ('DECEMBER'),
+# ha_18_1 day (float).
+myvars = dict(year='ha_18_3', month='ha_18_2', day='ha_18_1')
 
 df = df_data_grabber('../Data/upd4_hh_a.dta',idxvars,**myvars)
-
-# Convert month names to month numbers, handling missing months by mapping to NaN
-months_dict = {'JANUARY': 1, 'FEBRUARY': 2, 'MARCH': 3, 'APRIL': 4, 'MAY': 5, 'JUNE': 6,
-               'JULY': 7, 'AUGUST': 8, 'SEPTEMBER': 9, 'OCTOBER': 10, 'NOVEMBER': 11, 'DECEMBER': 12, None: pd.NA}
-
-df['month'] = df['month'].map(months_dict)
-# Emit `int_t` (lowercase) to match the 2019-20 / 2020-21 waves, whose
-# data_info.yml maps `int_t: hh_a18`.  The framework canonicalizes
-# `int_t` -> `Int_t` (datetime) once on concat; emitting capital `Int_t`
-# here instead would leave the two spellings side-by-side and the
-# canonicalization would then collide into a duplicate column (GH #325).
-df['int_t'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
-df=df.drop(columns=['year','month','day'])
 
 # GH #323 -- make the dedup DECLARED and VERIFIED, not a silent framework
 # groupby().first().
@@ -50,9 +37,31 @@ df=df.drop(columns=['year','month','day'])
 # 0 groups with >1 distinct ha_18_1/2/3, in every one of the four rounds).  So
 # dedup, but ASSERT the invariant that makes it safe: if a future wave ever
 # breaks it, this fails LOUDLY instead of returning an arbitrary date.
-assert df.groupby(level=['i', 't'])['int_t'].nunique(dropna=False).max() <= 1, \
-    'interview_date: int_t varies within (i, t) -- the dedup below would pick ' \
+assert df.groupby(level=['i', 't'])[['year', 'month', 'day']].nunique(dropna=False).max().max() <= 1, \
+    'interview_date: the date varies within (i, t) -- the dedup below would pick ' \
     'an arbitrary date (GH #323)'
 df = df[~df.index.duplicated(keep='first')]
 
-to_parquet(df,'interview_date.parquet')
+# GH #1045: one build-time parser, run AFTER the dedup so its counts are
+# served households, not replicated panel lines.  Reports are per ROUND (the frame's `t`
+# level), not per folder: one folder, four rounds.  A month and year with no
+# day is served as the 1st and keyed `::::date-day-imputed` (a registered
+# derivation, lsms_library/derivations.yml) -- it used to be NaT, and the
+# all-null row was then deleted.
+#
+# Emit `int_t` (lowercase) to match the 2019-20 / 2020-21 waves, whose
+# data_info.yml specs write `int_t`.  The framework canonicalizes
+# `int_t` -> `Int_t` (datetime) once on concat; emitting capital `Int_t`
+# here instead would leave the two spellings side-by-side and the
+# canonicalization would then collide into a duplicate column (GH #325).
+df = assign_datetime(df.drop(columns=['year', 'month', 'day']), 'int_t',
+                     df[['year', 'month', 'day']].rename(
+                         columns={'year': 'y', 'month': 'm', 'day': 'd'}),
+                     calendar='gregorian', country='Tanzania',
+                     table='interview_date', wave_folder='2008-15')
+
+
+# GH #1045: this script runs in a `make` subprocess, so its parse report
+# reaches the parent -- and every later warm read -- only through the stamp.
+to_parquet(df, 'interview_date.parquet',
+           datetime_audit=datetime_reports('Tanzania', 'interview_date'))
