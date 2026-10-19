@@ -4053,8 +4053,12 @@ class Country:
             # `known_waves`: most curated countries leave their first wave
             # uncurated, and a one-wave frame of it must resolve `exact` (an
             # `unrecorded` placeholder), not fall back to every other wave's
-            # record (red team r1, GH #793).
-            attach_sampling(df, self.name, known_waves=self.waves)
+            # record (red team r1, GH #793).  Read only for a curated country,
+            # the same gate as the cluster-identity check below: an uncurated
+            # one pays one lru_cache lookup, and never touches `self.waves`.
+            attach_sampling(
+                df, self.name,
+                known_waves=self.waves if sampling_records(self.name) else None)
 
             # Attach what reference period the food numbers COVER, per wave
             # (GH #851).  Same placement and the same two reasons as the
