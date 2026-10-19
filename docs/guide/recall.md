@@ -145,6 +145,24 @@ exists to compare — and would keep 17 of the 32 convertible cells instead of
 32. A degraded country is re-called with `waves=` set to its convertible waves;
 on the full corpus that costs 150 s against 111 s for the unconverted call.
 
+Two consequences of the re-call, both properties of any `waves=` subset rather
+than of `period=`:
+
+- **The kept rows equal `Country(c).<table>(waves=convertible, period=p)`** —
+  the same call the error tells a single-country user to make — not the
+  all-waves table sliced afterwards. For `food_expenditures` and for
+  `food_quantities(units='units')` those are identical. For
+  `food_quantities(units='kgs')` they differ slightly, because the inferred kg
+  factors pool across the waves requested (GH #850: "`t` lives inside the
+  estimator"). Measured on Nigeria's six convertible waves: 18,659 of 425,547
+  rows (4.4%) get a different factor, total 1,017,505.51 → 1,017,240.96 kg
+  (−0.026%).
+- **Under `LSMS_NO_CACHE`** the wave manifest is not consulted, so the subset
+  re-call rebuilds `food_acquired` for the subset — a second cold build — and,
+  as for any subset request in that mode, can shrink the coverage of a warm
+  parquet (CLAUDE.md, "Wave coverage is carried by a manifest"); the next
+  ordinary request rebuilds once.
+
 ## Coverage today: **32 of 67** cells convert
 
 Measured 2026-10-19 on a warm corpus at `ddd79800c`:

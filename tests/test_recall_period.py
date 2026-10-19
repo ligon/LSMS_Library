@@ -545,9 +545,12 @@ class TestCoverage:
         """`docs/guide/recall.md` states how many cells convert.  A promoted
         (or demoted) record must update it in the same change -- the count
         drifting from 28 (the issue) to 32 (2026-10-19) unnoticed is why."""
+        guide_path = REPO / "docs" / "guide" / "recall.md"
+        if not guide_path.exists():
+            pytest.skip("docs/ is source-checkout only")
         cells = list(_all_cells())
         n = sum(R.unavailable_reason(r) is None for _, _, r in cells)
-        guide = (REPO / "docs" / "guide" / "recall.md").read_text()
+        guide = guide_path.read_text()
         assert f"**{n} of {len(cells)}**" in guide, (
             f"docs/guide/recall.md does not state the live coverage "
             f"'**{n} of {len(cells)}**' -- update its coverage section")
