@@ -34,7 +34,7 @@ The library maintains three independent caches, all rooted under
 | Tier | Path | Content | Populated by | Read by |
 |---|---|---|---|---|
 | **L2-country (parquet)** | `~/.local/share/lsms_library/{Country}/var/{table}.parquet` | Per-country, per-table harmonized output (waves concatenated, ready for analysis) | `Country.{table}()` after building from waves | The v0.7.0 top-of-function cache read in `load_dataframe_with_dvc`, delegated since GH #908 to the read gate `Country._read_l2_country_cache` (hash-gated since v0.8.0) |
-| **L2-wave (parquet)** | `~/.local/share/lsms_library/{Country}/{wave}/_/{table}.parquet` | Per-wave harmonized output (one wave's portion of the table) | `Wave.grab_data()` on first call (YAML path, since 2026-04-15) or `_/{table}.py` scripts via `to_parquet()` (script path, always) | `Wave.grab_data()` on subsequent calls; `run_make_target` for script-path tables |
+| **L2-wave (parquet)** | `~/.local/share/lsms_library/{Country}/{wave}/_/{table}.parquet` | Per-wave harmonized output (one wave's portion of the table) | `Wave.grab_data()` on first call (YAML path, since 2026-04-15) or `_/{table}.py` scripts via `to_parquet()` (script path, always) | `Wave.grab_data()` on subsequent calls, through the read gates `Wave._read_l2_wave_cache` (YAML path) and `Wave._fresh_script_parquet` (script path), since GH #1040; `run_make_target` for script-path tables |
 | **L1 (DVC blobs)** | `~/.local/share/lsms_library/dvc-cache/{md5[:2]}/{md5[2:]}` | Content-addressed copies of the raw `.dta` files (and other DVC-tracked sources) | `_ensure_dvc_pulled()` in `local_tools.py` downloads the blob **directly from S3** (sidecar md5 + the active DVC remote's fsspec backend) on first read, bypassing the DVC CLI / `Repo.fetch` (v0.7.3) | `DVCFS.open()` via `DataFileSystem._get_fs_path`'s `typ == "cache"` branch |
 
 All three tiers live under the same root, so a single `LSMS_DATA_DIR`
@@ -51,7 +51,8 @@ in ~0.5 s regardless of how many raw files the country has.
 
 When L2-country is cold (e.g. after editing a `data_info.yml` and clearing
 the parquet cache), the library re-runs wave aggregation. For each wave
-in turn, `Wave.grab_data()` checks L2-wave first and reads it directly
+in turn, `Wave.grab_data()` checks L2-wave first (the read gate
+`Wave._read_l2_wave_cache`, since GH #1040) and reads it directly
 on a hit. On an L2-wave miss the wave script calls `get_dataframe()` for
 its raw `.dta` files; on an L1 hit the file is served from the local
 blob cache via `DVCFS.open()`, on an L1 miss `_ensure_dvc_pulled`
