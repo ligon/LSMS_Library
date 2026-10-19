@@ -1061,6 +1061,23 @@ default =outer= those orphans arrive with a null =v= and collapse into
 one phantom cluster -- W2 gained a spurious 434th EA
 (=030412088800105=) exactly this way.
 
+** 2021-22 holds ESPS-5 release =v02_M=, not the catalog's =v03_M= (GH #600)
+
+=2021-22/Documentation/SOURCE.org= records =#+CATALOG_IDNO: ETH_2021_ESPS-W5_v02_M=,
+and that is the release on disk.  WB catalog 6161 now reports =v03_M=, whose
+=version_notes= say only: "Version 03: 'ETH_PlotGeovariables_Y5.dta' replaced
+with 'Pub_ETH_PlotGeovariables_Y5.dta'".  Our 68 sidecars match the v03 file
+list in every file but that one -- we hold =Data/eth_plotgeovariables_y5.dta=,
+the pre-v03 name -- and the acquisition commit =14b6de1dc= (2026-03-31) names
+=ETH_2021_ESPS-W5_v02_M=.  The catalog's own dates (v03 =version_date=
+2023-07-20) do not fit an acquisition of v02 in 2026; trust the file names.
+
+The provenance backfill (=scripts/backfill_wave_provenance.py=) therefore lists
+this wave as =release-changed= and leaves the record intact, until v03 is
+acquired or decided against.  The changed file is the PLOT geovariables, whose
+coordinates are =**CONFIDENTIAL**= anyway (see "GPS redaction"), so the content
+change may not matter; the release recorded must still be the one held.
+
 ** Area and the local-unit gap
 
 Area is GPS square-metres / 10000 -> hectares where present
