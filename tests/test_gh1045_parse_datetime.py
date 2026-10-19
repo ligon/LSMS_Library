@@ -557,7 +557,12 @@ def _env(tmp_path):
                LSMS_DATA_DIR=str(tmp_path / "data"),
                LSMS_ISSUES_LOG=str(tmp_path / "issues.log"),
                PYTHONPATH=str(REPO) + os.pathsep + env.get("PYTHONPATH", ""),
-               LSMS_BUILD_WORKERS="1")
+               LSMS_BUILD_WORKERS="1",
+               # The synthetic countries here write a sidecar-less raw source
+               # (`Data/cover.csv`) into a tmp config tree -- exactly the
+               # "new data awaiting `dvc add`" case GH #831 refuses unless
+               # opted in (the same opt-in #805/#831 gave its four fixtures).
+               LSMS_ALLOW_INTREE_SOURCES="1")
     env.pop("LSMS_NO_CACHE", None)
     env.pop("LSMS_DATE_STRICT", None)
     return env
