@@ -1995,9 +1995,9 @@ tiers (the country parquet stored =large_string= before).
 null raw dates are still dropped".*  Parsed from the source components, the
 six are not all null: *4* are blank in every component, *1* is a recorded
 =2009/FEBRUARY/31= (2008-09; now =out_of_range=, still =NaT=, and reported
-on every read as a =DatetimeParseWarning=), and *1* records a year and month
+on every read of 2008-09 as a =DatetimeParseWarning=), and *1* records a year and month
 with no day (2010-11, =i=08010060090321=), which is now served as
-2010-11-01 with =Derivation= =::::date-day-imputed=.  Served rows 22,427 ->
+2010-11-01 with =Derivation= =::interview_date::date-day-imputed=.  Served rows 22,427 ->
 22,428; 0 value differences on the 22,427 common rows (measured against a
 base-commit build in a separate data root).
 
