@@ -178,6 +178,8 @@ The tuple values are panel linkage info `(cover_file, old_id_col, new_id_col)`. 
 
 Not all countries have a `Waves` dict. If the file doesn't exist or lacks a `Waves`/`waves` variable, the `Country` class falls back to scanning for directories with `Documentation/SOURCE.org` -- no registration step needed.
 
+For a **new country** (or a staged directory) whose `_/data_scheme.yml` does not exist yet, `ll.Country(name)` raises `UnregisteredCountryError` (GH #915); check its waves with `ll.Country(name, allow_unregistered=True).waves` until the data scheme lands, and never leave that opt-in in analysis code.
+
 ### Step 4: Write feature configs
 
 Now load the `add-feature` skill to write `data_info.yml` for the new wave. The raw `.dta` files are on disk (and in S3); you need to map their variable names to the country's schema.

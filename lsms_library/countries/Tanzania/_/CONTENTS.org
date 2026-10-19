@@ -1532,6 +1532,30 @@ not match on a native-unit key.  Any consumer comparing the two tables at
 the fix that looks obvious (registering the sentinel) is the one the config
 already rules out.
 
+*** =community_prices= carries the SOURCE item code as =variety= (GH #840, 2026-10-19)
+
+=j= on this table is the =harmonize_community_price= Preferred Label, which
+deliberately LUMPS source item codes so it can join =food_acquired.j=: 6
+MILLET (GRAIN) + 7 SORGHUM (GRAIN) -> "Millet & Sorghum (grain)", 16 COCOYAMS
++ 17 YAMS -> "Yams/Cocoyams", 25-27 carrots / tomatoes / onions ->
+"Vegetables (fresh)", and so on.  The lumped codes are priced separately and
+at different prices, so the =(t, v, j, u)= grain held several rows per cell
+and =community_prices_for_wave= kept the first: 261 of 2,769 cells in 2019-20
+and 1,281 of 13,062 in 2020-21, of which 243 / 1,149 disagreed on Price
+(cluster =01-06-47-85=, 2020-21: millet 2,000 TSh/kg, sorghum 16,000).
+
+That function's GH #637 comment concluded "no additional index level is
+available that would not break the shared =j= vocabulary".  That is not so:
+the source code is finer than =j= and leaves =j= untouched.  Ruling @ligon
+2026-10-18 (#840): the index is now =(t, v, j, u, variety)=, =variety= the
+=item_id= code as a string ('1'..'52'), the file's own label in a new
+=Description= column -- upper-case in 2019-20, partly lower-case and partly
+English-for-Swahili in 2020-21 (MAHARAGE -> beans, KUNDE -> peas), which is
+why the code and not the label is the level.  Served rows 15,831 -> 17,699
+(3,076 + 14,623); the survey prices each code once per cluster (#637: zero
+repeats), so nothing is selected; the old choice was the lowest code, which
+reproduces the pre-#840 table on 15,831 of 15,831 cells.
+
 *** =CONTENTS.org= WAS a build input here --- RESOLVED by retiring the script (GH #836, 2026-10-17)
 
 =Tanzania/_/food_acquired.py= used to read its item-label table out of *this

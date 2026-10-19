@@ -223,7 +223,9 @@ def _declared_waves(country: str) -> set[str] | None:
     """
     try:
         import lsms_library as ll
-        c = ll.Country(country)
+        # Provenance stamping walks every wave dir, including countries with
+        # no _/data_scheme.yml yet -- the scaffold opt-in (GH #915).
+        c = ll.Country(country, allow_unregistered=True)
         declared = set(c.waves)                   # sets wave_folder_map as a side effect
         folder_map = getattr(c, "wave_folder_map", None) or {}
         declared |= {str(v) for v in folder_map.values()}
