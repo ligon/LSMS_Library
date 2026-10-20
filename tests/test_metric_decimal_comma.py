@@ -246,3 +246,31 @@ def test_every_shipped_comma_label_reads_its_stated_size(where, label):
     expected = _parse_explicit_metric(dotted)
     assert expected is not None, (where, label, dotted)
     assert _parse_explicit_metric(label) == pytest.approx(expected), (where, label)
+
+
+# ---------------------------------------------------------------------------
+# cache cost: the new symbols stay off every build fingerprint
+# ---------------------------------------------------------------------------
+
+def test_new_parser_symbols_reach_no_build_fingerprint():
+    """Twin of ``test_build_transform_hash.py::
+    test_no_transformations_symbol_reaches_any_fingerprint`` for the symbols
+    this fix adds.  Measured by stash-probe: the change moves 0 of 35
+    ``build_transforms_fingerprint`` values.  (It DOES move every GhanaLSS
+    L2-country and L2-wave hash, through ``GhanaLSS/_/nutrition.py``'s import
+    of ``food_quantities_from_acquired`` and ``framework_imports_fingerprint``
+    -- a one-country re-warm, not a corpus one.)"""
+    from lsms_library import _build_registry as R
+    seen = set()
+    for _qn, (fn, _tables) in sorted(R._BUILD_TRANSFORMS.items()):
+        R._closure_parts(fn, seen)
+    new = {f"lsms_library.transformations.{n}" for n in
+           ('_metric_scalar', '_metric_number', '_METRIC_NUMBER',
+            '_DECIMAL_COMMA', '_THOUSANDS_COMMA')}
+    assert not (new & seen), sorted(new & seen)
+    # positive control: the closure walk does see them from the import that
+    # GhanaLSS's nutrition script makes -- which is the one-country cost.
+    from lsms_library.transformations import food_quantities_from_acquired
+    via_import = set()
+    R._closure_parts(food_quantities_from_acquired, via_import)
+    assert 'lsms_library.transformations._metric_scalar' in via_import
