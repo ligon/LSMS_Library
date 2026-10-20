@@ -3,19 +3,31 @@
   "base": "976fc840d",
   "tests": {
     "baseline": {
-      "failed": 4,
-      "passed": 11
+      "failed": 5,
+      "passed": 14
     },
     "routing_cache_dvc": {
       "passed": 136,
       "skipped": 10,
-      "seconds": 31.49
+      "seconds": 31.49,
+      "validated_at": "7117f5b68"
     },
     "fingerprint_schema_api": {
       "passed": 352,
-      "seconds": 75.38
+      "seconds": 75.38,
+      "validated_at": "7117f5b68"
     },
-    "total_passed": 488
+    "review_fix": {
+      "passed": 180,
+      "skipped": 10,
+      "seconds": 68.34,
+      "includes": "routing/cache/DVC plus build-transform-hash tests"
+    },
+    "distinct_passed_across_focused_selections": 492,
+    "no_make_negative_control_7117f5b68": {
+      "failed": 1,
+      "passed": 3
+    }
   },
   "hash_impact": {
     "build_transforms": {
@@ -119,6 +131,7 @@
   ],
   "residuals": [
     "Existing country-builder wrong-wave fallback unchanged by authorized scope",
-    "Combined final-head suite belongs to integration validation"
+    "Combined final-head suite belongs to integration validation",
+    "Other wide schema/API checks passed before the final no-make boundary repair; relevant build-hash checks repeated after it."
   ]
 }

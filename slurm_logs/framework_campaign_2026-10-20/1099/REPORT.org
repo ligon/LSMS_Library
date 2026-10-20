@@ -15,8 +15,8 @@ Prior art and authorized boundary: .coder/ledger/1099-empty-subset.md, sections 
 
 * Verification
 
-- New regressions ::15 cases, covering both backends and cold/all-wave/partial/stale/no-cache states, exact empty-frame equality, byte-preservation of any existing country parquet, and unchanged error controls.
-- Before/after :: Replaying the pre-fix aggregation method from git 976fc840d in an isolated pytest process gives 4 failures and 11 passes; the four failures are cold, partial-coverage, stale and no-cache default-backend cases. Current code passes all 15.
+- New regressions ::19 cases, covering both backends and cold/all-wave/partial/stale/no-cache states, exact empty-frame equality, byte-preservation of any existing country parquet, and unchanged error controls.
+- Before/after :: Replaying the pre-fix aggregation method from git 976fc840d in an isolated pytest process gives 5 failures and 14 passes; the failures cover cold, partial-coverage, stale, no-cache and no-Makefile/no-make default-backend absence cases. Current code passes all 19.
 - Cache/routing suite ::136 passed, 10 skipped in 31.49s across test_gh1039_make_backend_no_country_rule.py, test_gh1040_wave_read_gates.py, test_gh866_stale_country_parquet_not_laundered.py test_gh891_wave_subset_cache.py and test_dvc_caching.py. The 10 skips are existing warm-cache mutation tests whose real-country cache is deliberately absent from the private test root.
 - Real survey :: Senegal livestock(waves=['2021-22']) returns0 x 3, index (i,t,animal), three Float64 columns, in cold, 2018-only cache coverage, full-cache coverage and LSMS_NO_CACHE states. Each pre-existing parquet is byte-identical after the call. =real-probe.json= records only aggregate results.
 - Hash impact ::4/4 probed build fingerprints,11/11 country hashes and58/58 wave hashes move. A corpus re-warm is expected; no existing shared L2 cache was touched by this work.
@@ -55,3 +55,14 @@ Two new tests demonstrated that regression for ordinary and assumed-fresh covere
 The final implementation keeps declaration inspection behind the cache-hit opportunities and ahead of miss reconstruction/write, preserving the warm path.
 The regular hash check's existing config inspection is unchanged; the new tests pin that already-computed hash to discriminate additional traversal.
 The existing country-builder helper documentation now records its default-backend miss caller too.
+
+* Missing-make boundary repair
+
+Independent review of7117f5b68 found that the reused builder helper returns False when make is unavailable, which does not prove that a country Make rule is absent.
+The new default guard now declines the empty shortcut when a country Makefile exists but make cannot inspect it.
+The shared builder helper and existing make-backend behavior are unchanged; a country without a Makefile remains provably absent and returns its declared empty result.
+Four backend/Makefile combinations produced1 failure and3 passes against7117f5b68; all four pass after the repair.
+The final routing/cache/DVC/build-fingerprint selection passed180 tests, with10 existing private-root skips, in68.34s.
+The earlier352-case schema/API/hash guard run preceded this boundary repair; its relevant40 build-fingerprint cases were included again in the final180-case selection.
+Across the focused selections492 distinct test cases passed; this is not a claim of a complete final-head corpus suite.
+The final hash probe still moves4/4 build fingerprints,11/11 country hashes and58/58 wave hashes.

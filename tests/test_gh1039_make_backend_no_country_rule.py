@@ -394,6 +394,40 @@ def test_covered_subset_cache_hit_does_not_construct_waves(
     pd.testing.assert_frame_equal(result, expected)
 
 
+@pytest.mark.parametrize("backend", ["dvc", "make"])
+@pytest.mark.parametrize("country_makefile", [False, True])
+def test_absent_subset_without_make_preserves_unknown_country_rules(
+        fakeland2, monkeypatch, backend, country_makefile):
+    """No make cannot prove a rule absent; no Makefile can (GH #1099 review).
+
+    The make backend keeps its existing no-executable-builder policy, while
+    the new default-backend guard must preserve an uninspectable country rule.
+    """
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", backend)
+    c = fakeland2.build(
+        makefile=_MAKEFILE_MULTI_TARGET if country_makefile else None,
+        maker=country_makefile,
+    )
+    real_which, real_run = C.shutil.which, C.subprocess.run
+
+    def no_make(command, *args, **kwargs):
+        return None if command == "make" else real_which(command, *args, **kwargs)
+
+    def run_without_make(command, *args, **kwargs):
+        if isinstance(command, list) and command and command[0] == "make":
+            raise FileNotFoundError("make is unavailable")
+        return real_run(command, *args, **kwargs)
+
+    monkeypatch.setattr(C.shutil, "which", no_make)
+    monkeypatch.setattr(C.subprocess, "run", run_without_make)
+    if country_makefile and backend == "dvc":
+        with pytest.raises(RuntimeError, match="Could not materialize"):
+            _barren(c)
+    else:
+        _assert_empty_and_shaped(_barren(c))
+    assert not fakeland2.var.exists()
+
+
 def test_empty_declared_frame_has_the_declared_shape():
     entry = {"index": "(t, v, i)", "x": "float", "y": {"type": "str", "optional": True},
              "materialize": "make"}

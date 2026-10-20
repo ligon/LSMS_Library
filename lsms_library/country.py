@@ -5004,9 +5004,17 @@ class Country:
                     and method_name in self.data_scheme
                     and method_name not in JSON_CACHE_METHODS
                     and isinstance(scheme_entry, dict)
-                    and all(method_name not in self[w].data_scheme for w in waves)
-                    and not self._has_country_builder(method_name)):
-                return _empty_declared_frame(scheme_entry)
+                    and all(method_name not in self[w].data_scheme for w in waves)):
+                # _has_country_builder also returns False when make is absent:
+                # that is the make backend's existing executable-builder
+                # policy, not proof that a configured country rule is absent.
+                # Keep the ordinary failure path when its Makefile cannot be
+                # inspected; no Makefile needs no tool to establish absence.
+                if ((self.file_path / "_" / "Makefile").exists()
+                        and not shutil.which("make", path=_script_subprocess_env().get("PATH"))):
+                    return None
+                if not self._has_country_builder(method_name):
+                    return _empty_declared_frame(scheme_entry)
             return None
 
         # The `assume_cache_fresh` short-circuit: a READ GATE in its own method,
