@@ -5743,7 +5743,7 @@ GhanaLSS food assembly is deleted any more; the remaining reduction
 (5,340,606 -> 1,718,320) is visit aggregation alone, and =math.fsum= is
 conserved across it.
 
-**** Accounting, the 8H screener gate =s8hq1 != 2= (private cold rebuilds; before = the table above's "after", i.e. the sentinel with no gate, re-measured by red-team r2 at =64790d3b1=; after = this branch, the =!= 2= gate + the narrowed sentinel, re-measured 2026-10-20 in a private cold rebuild beside a base =1485a1484= rebuild (= =238a4c15d= + a test-only PR); identical on every row to red-team r2's =!= 2= build)
+**** Accounting, the 8H screener gate =s8hq1 != 2= (private cold rebuilds; before = the table above's "after", i.e. the sentinel with no gate, re-measured by red-team r2 at =64790d3b1=; after = this branch, the =!= 2= gate + the narrowed sentinel, re-measured 2026-10-20 in a private cold rebuild of this branch beside a base =1485a1484= root (= =238a4c15d= + a test-only PR) whose GhanaLSS parquets graded fresh and were served warm; identical on every row to red-team r2's =!= 2= build)
 
 Every number in the "before" column reproduced the table above exactly
 (red-team r2).  The narrowed sentinel moves nothing on its own (no served
@@ -5788,8 +5788,8 @@ spelling; it was false, and is gone.)  =sample=, =household_roster= and
 every table other than =food_acquired= and its derivations are untouched
 by the gate.
 
-*Net, base =1485a1484= -> this branch* (the two tables composed; private
-cold rebuilds, 2026-10-20): =food_acquired= 5,340,606 -> 5,328,568 rows,
+*Net, base =1485a1484= -> this branch* (the two tables composed; this
+branch cold, the base root fresh-graded, 2026-10-20): =food_acquired= 5,340,606 -> 5,328,568 rows,
 sums Q / E unchanged at Country; 2016-17 =u= NaN 13,380 -> 0, =Unknown=
 0 -> 1,342; =v= NaN 92 -> 0; =sample= 1987-88 3,147 -> 3,149, 1988-89
 3,194 -> 3,196; =Feature('food_acquired')(['GhanaLSS'])= 1,704,880 ->
