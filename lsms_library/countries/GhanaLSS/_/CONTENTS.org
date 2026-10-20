@@ -5743,7 +5743,7 @@ GhanaLSS food assembly is deleted any more; the remaining reduction
 (5,340,606 -> 1,718,320) is visit aggregation alone, and =math.fsum= is
 conserved across it.
 
-**** Accounting, the 8H screener gate =s8hq1 != 2= (private cold rebuilds; before = the table above's "after", i.e. the sentinel with no gate, re-measured by red-team r2 at =64790d3b1=; after = the =!= 2= gate + the narrowed sentinel, measured against base =238a4c15d=)
+**** Accounting, the 8H screener gate =s8hq1 != 2= (private cold rebuilds; before = the table above's "after", i.e. the sentinel with no gate, re-measured by red-team r2 at =64790d3b1=; after = this branch, the =!= 2= gate + the narrowed sentinel, re-measured 2026-10-20 in a private cold rebuild beside a base =1485a1484= rebuild (= =238a4c15d= + a test-only PR); identical on every row to red-team r2's =!= 2= build)
 
 Every number in the "before" column reproduced the table above exactly
 (red-team r2).  The narrowed sentinel moves nothing on its own (no served
@@ -5777,7 +5777,8 @@ exactly the blank-screener rows the GH #1140 ruling keeps.
 Under =!= 2= the gate removes no row that carries a kg factor, so no
 =(j, u)= factor is re-estimated: =nutrition= (34,798 rows, every column
 sum) and the per-wave kilograms of =food_quantities(units='kgs')= are
-byte-identical to the "before" column -- measured, not inferred.  (The
+byte-identical to the "before" column AND to the base =1485a1484= build --
+measured on 2026-10-20 (=math.fsum= per column and per wave), not inferred.  (The
 === 1= spelling was not so contained: red-team r2 found that removing the
 39 blank-screener rows moved two factors that are pooled across waves --
 the u-pooled =American Tin= and =(Rice (local), Bowl)= -- and with them
@@ -5786,6 +5787,20 @@ earlier version of this entry said "every other wave untouched" of that
 spelling; it was false, and is gone.)  =sample=, =household_roster= and
 every table other than =food_acquired= and its derivations are untouched
 by the gate.
+
+*Net, base =1485a1484= -> this branch* (the two tables composed; private
+cold rebuilds, 2026-10-20): =food_acquired= 5,340,606 -> 5,328,568 rows,
+sums Q / E unchanged at Country; 2016-17 =u= NaN 13,380 -> 0, =Unknown=
+0 -> 1,342; =v= NaN 92 -> 0; =sample= 1987-88 3,147 -> 3,149, 1988-89
+3,194 -> 3,196; =Feature('food_acquired')(['GhanaLSS'])= 1,704,880 ->
+1,706,282 rows with =nan_key_rows= 13,472 -> none, and its sums Q / E now
+equal Country's to the last digit (15,658,023,356.44 -> 15,658,040,288.26;
+19,059,879,328.34 -> 19,059,899,600.91); =food_prices= =unitvalue=
+1,676,093 -> 1,676,514 and =unitprice= 189,656 -> 190,575 (919 2016-17
+=Unknown= rows), =kgvalue= 560,023 and =kgprice= 187,096 unchanged;
+=food_quantities= =kgs= rows 1,623,253 -> 1,623,676 with the kilograms
+unchanged, =units= 1,694,623 -> 1,695,046; =food_expenditures= and
+=nutrition= unchanged; GhanaLSS =null_index_reports()= four findings -> none.
 
 *Still open, and NOT this issue*: 1991-92 =household_roster= has 142 rows
 (29 households) with a NaN =v=.  Same class, different file, measured but
