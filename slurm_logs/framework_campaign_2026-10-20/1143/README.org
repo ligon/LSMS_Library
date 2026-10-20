@@ -4,12 +4,14 @@
 
 * Change and prior art
 
-The metric parser reads the entire numeric token, using decimal commas with one or two fractional digits, leading-zero decimal commas at any precision, and three-digit thousands groups without a leading zero.
+The metric parser reads the entire numeric token, using decimal commas with one or two fractional digits, leading-zero decimal commas at any precision, and three-digit thousands groups unless the token starts with the literal =0,=.
 Thus =1,5 L= is 1.5 kg-equivalent under the existing volume-as-mass option, =0,125 kg= is 0.125 kg, and =1,500 kg= is 1500 kg.
 Malformed separators and numeric suffixes decline; fractions, SI scales, unit word boundaries, existing range endpoints, numbered survey labels and existing inner sizes in multiplier labels are preserved.
 
 Work reuses the previously unpublished implementation =0020cfdac= and tests =15d2d567f=, recovered without rewriting their attribution.
 The earlier implementation refused =0,125= and accepted some malformed suffixes; this branch extends it and runs the existing tests alongside new regressions.
+Independent review also caught zero-padded grouped tokens (=01,500=, =001,500=, =000,500=): the issue's rule reads these as 1500, 1500 and 500, while =0,500= remains decimal 0.5.
+Unsupported exponent-like fragments with repeated signs or embedded whitespace now decline without changing existing range endpoints.
 The ledger =.coder/ledger/1143-decimal-comma.md= records the source rules and recovery.
 
 * Measured food effects
@@ -42,11 +44,12 @@ The CotedIvoire notes also record the observable contradiction between their old
 
 * Verification and cache cost
 
-- Final focused run :: 359 passed in 89.85 seconds across =test_metric_decimal_comma=, =test_metric_fraction_parse=, =test_volume_as_mass_kwarg=, =test_food_kg_inference=, =test_crop_kg_factor=, =test_gh838_stated_vs_inferred=, =test_gh919_country_qualified_units= and =test_build_transform_hash=.
+- Final focused run :: 370 passed in 192.41 seconds across =test_metric_decimal_comma=, =test_metric_fraction_parse=, =test_volume_as_mass_kwarg=, =test_food_kg_inference=, =test_crop_kg_factor=, =test_gh838_stated_vs_inferred=, =test_gh919_country_qualified_units= and =test_build_transform_hash=.
 - Discriminating regressions :: 16 failures against the recovered prior implementation before this extension, covering leading-zero decimals, denominator commas and malformed-token suffixes.
 - Actual fingerprints :: 22 of 549 L2-country hashes and 154 of 2,139 L2-wave hashes change, all GhanaLSS; zero of 39 tagged build fingerprints change; no hash-probe errors.
 - Interpretation :: the food derivations execute at read time, but GhanaLSS's nutrition-script import reaches this parser, so GhanaLSS's country and wave caches require a rebuild.
 - Existing warnings :: the measured build retains existing grain/cluster/unit warnings; this patch changes no source wiring or missing-unit policy.
+- Review invariance :: =review-live-invariance.json= records unchanged quantity/price outputs for all three countries after the zero-padded grouping and unsupported-exponent corrections; String-index NA policy is normalized on both sides because parquet serialization uses NaN missing-value semantics.
 
 Individual snapshots and full logs remain private at =/local/job40255479/1143-private/=.
 Tracked JSON files contain aggregates only.

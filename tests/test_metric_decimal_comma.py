@@ -23,7 +23,7 @@ of a self-describing label and asserts the result as a measurement.
 The rule (``transformations._metric_scalar``):
 
 - ``\\d+,\\d{1,2}`` is a decimal comma (``1,25`` -> 1.25);
-- ``[1-9]\\d{0,2}(,\\d{3})+`` is a thousands separator (``10,000`` -> 10000);
+- ``\\d{1,3}(,\\d{3})+`` is grouped thousands unless it starts ``0,``;
 - a leading-zero decimal comma accepts additional places (``0,125`` -> 0.125);
 - anything else with a comma (``1,5000``, ``1,50,000``, the mixed
   ``1,500.5``) is ambiguous and the label declines (``None``), so the row falls
@@ -87,6 +87,9 @@ def test_decimal_comma_is_read_as_a_decimal(label, expected):
 
 @pytest.mark.parametrize("label,expected", [
     ('1,500 kg', 1500.0),
+    ('01,500 kg', 1500.0),
+    ('001,500 kg', 1500.0),
+    ('000,500 kg', 500.0),
     ('10,000 g', 10.0),
     ('1,000,000 g', 1000.0),
     ('1500 kg', 1500.0),
@@ -113,6 +116,11 @@ def test_thousands_separator_and_plain_integers(label, expected):
     '1e3 kg',
     '1e-3 kg',
     '1e+3 kg',
+    '1e--3 kg',
+    '1e++3 kg',
+    '1e -3 kg',
+    '1e+ 3 kg',
+    '1e + 3 kg',
     '1 500 kg',
 ])
 def test_an_ambiguous_number_declines_rather_than_being_partly_read(label):
@@ -133,6 +141,7 @@ def test_volume_as_mass_false_still_declines_a_comma_volume():
     ('1,5', 1.5), ('0,9', 0.9), ('12,5', 12.5), ('1,25', 1.25),
     ('0,125', 0.125), ('0,500', 0.5),
     ('1,500', 1500.0), ('10,000', 10000.0), ('1,000,000', 1e6),
+    ('01,500', 1500.0), ('001,500', 1500.0), ('000,500', 500.0),
     ('50', 50.0), ('0.5', 0.5),
 ])
 def test_metric_scalar_grammar(token, expected):

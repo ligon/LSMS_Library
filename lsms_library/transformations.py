@@ -1642,7 +1642,7 @@ _EXPLICIT_METRIC_PATTERNS = (
 # ``0,125`` (ledger 1143-decimal-comma §3). A token that is neither (``1,5000``,
 # ``1,50,000``) is ambiguous and is refused, never guessed.
 _DECIMAL_COMMA = re.compile(r'(?:\d+,\d{1,2}|0,\d+)')
-_THOUSANDS_COMMA = re.compile(r'[1-9]\d{0,2}(?:,\d{3})+')
+_THOUSANDS_COMMA = re.compile(r'(?!0,)\d{1,3}(?:,\d{3})+')
 
 
 def _metric_scalar(text):
@@ -1775,7 +1775,7 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
             # Refuse numeric suffixes after whitespace / exponent notation,
             # preserving numbered labels ("1001. 12,5 cl") and the existing
             # inner size in multiplier labels ("2x500g") (ledger §3/§4).
-            if re.search(r'(?:[\d,]\s+|\d[eE][+-]?)$', s[:m.start()]):
+            if re.search(r'(?:[\d,]\s+|\d[eE][\s+-]*)$', s[:m.start()]):
                 return None
             try:
                 return _metric_number(m.group(1)) * scale
