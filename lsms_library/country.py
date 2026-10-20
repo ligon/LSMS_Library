@@ -1053,8 +1053,8 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
     The declared index levels (``str``, as a built index's are) as its index
     and every declared column, required and ``optional: true``, as an object
     column for ``_finalize_result``'s canonical dtypes to coerce.  It answers
-    a request whose waves all lack the table on the make backend's no-builder
-    route: 0 rows, as the default backend serves from a warm cache, shaped so
+    a request whose waves all lack the table on a no-builder route
+    (GH #1039/#1099): 0 rows, as a warm cache would serve, shaped so
     that ``Country._assert_built_required_columns`` reads it as a well-formed
     empty table rather than as a build that lost its columns.
     """
@@ -4888,8 +4888,9 @@ class Country:
         True when the country ships a ``_/{table}.py`` script (``try_script``
         runs it; the ``%.parquet: %.py`` catch-alls match it too), or when its
         ``_/Makefile`` has a rule for ``$(VAR_DIR)/{table}.parquet``.  Asked
-        only under ``LSMS_BUILD_BACKEND=make``, for a ``materialize: make``
-        table: that route used to go straight to ``run_make_target`` at the
+        under ``LSMS_BUILD_BACKEND=make``, for a ``materialize: make`` table,
+        and after a cache miss for an absent-wave subset (GH #1099).  The
+        former route used to go straight to ``run_make_target`` at the
         country level, so a table with wave scripts and NO country rule --
         Tanzania ``food_acquired`` since #836 deleted its dead concatenator,
         and 71 more cells measured on 2026-10-19 -- could not be built at all
@@ -4991,6 +4992,32 @@ class Country:
             backend_value = scheme_entry.get("materialize")
             if isinstance(backend_value, str):
                 materialize_backend = backend_value.lower()
+
+        def absent_subset_frame():
+            # GH #1099: no wave declaration AND no country builder means an
+            # empty answer, not a failed source build.  Asked only after the
+            # cache-hit opportunities: covered hits need no extra declaration
+            # inspection beyond their existing hash validation.
+            # Keep full/unknown requests and genuine country builders on their
+            # normal paths, and never infer absence from a source exception.
+            requested_waves = {str(w) for w in waves}
+            if (requested_waves
+                    and requested_waves < {str(w) for w in self.waves}
+                    and method_name in self.data_scheme
+                    and method_name not in JSON_CACHE_METHODS
+                    and isinstance(scheme_entry, dict)
+                    and all(method_name not in self[w].data_scheme for w in waves)):
+                # _has_country_builder also returns False when make is absent:
+                # that is the make backend's existing executable-builder
+                # policy, not proof that a configured country rule is absent.
+                # Keep the ordinary failure path when its Makefile cannot be
+                # inspected; no Makefile needs no tool to establish absence.
+                if ((self.file_path / "_" / "Makefile").exists()
+                        and not shutil.which("make", path=_script_subprocess_env().get("PATH"))):
+                    return None
+                if not self._has_country_builder(method_name):
+                    return _empty_declared_frame(scheme_entry)
+            return None
 
         # The `assume_cache_fresh` short-circuit: a READ GATE in its own method,
         # excluded from the build fingerprint (GH #1040).
@@ -5212,6 +5239,9 @@ class Country:
             return df_local
 
         def load_from_waves(waves, *, evict_country_cache=False, country_builder=True):
+            empty = absent_subset_frame()
+            if empty is not None:
+                return empty
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
@@ -5461,6 +5491,13 @@ class Country:
                 method_name, cache_path, waves)
             if miss_reason is None:
                 return cached_df
+            # A coverage-short or bypassed cache may hold valid other-wave
+            # rows.  Return proven absence BEFORE the union/rebuild/write
+            # descent, so an empty subset cannot replace those rows or shrink
+            # their coverage manifest (GH #1099).
+            empty = absent_subset_frame()
+            if empty is not None:
+                return empty
             cache_exists = cache_path.exists()
 
             # GH #891: single-wave and all-wave requests share this one path, so

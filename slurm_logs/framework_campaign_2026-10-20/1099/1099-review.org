@@ -1,0 +1,51 @@
+#+title: Independent review of GH #1099
+#+author: Sue
+#+date: 2026-10-20
+
+* Verdict
+
+FAIL pending one boundary repair, reviewed at =7117f5b683d5c98812027277de88b5d9d7a8536a=.
+No source changes were made by this reviewer.
+All reviewer subprocesses have completed; the owning worker may now update the candidate worktree.
+
+* P1: missing make is not proof of absent country-level builder
+
+Location: =country.py:5008= invokes =_has_country_builder= as a definitive absence test.
+Its existing branch at =country.py:4939-4940= returns False when make is not on PATH.
+The new default-backend route therefore turns inability to inspect a genuine country Make rule into a successful empty answer.
+This violates ledger sections 1, 3 and 4: genuine country-level builders and build failures retain their prior route.
+
+Reproduced independently in a synthetic private country and data root, comparing the exact baseline aggregation method from =976fc840d= against the frozen candidate:
+
+- Country declaration :: Fakeland, waves 2001/2002, table build_me with index (t,i), x float, materialize make.
+- Wave declarations :: 2001/_/build_me.py exists; 2002 has no table declaration.
+- Genuine country builder :: _/Makefile contains $(VAR_DIR)/build_me.parquet: maker.py; maker.py exists, but there is no _/build_me.py.
+- Environment :: default/dvc backend, cold private cache; mock shutil.which('make') to None and subprocess.run make commands to raise FileNotFoundError, preserving every other tool/subprocess.
+- Call :: Country('Fakeland').build_me(waves=['2002']).
+- Exact baseline :: RuntimeError, "Could not materialize Fakeland/build_me: no wave-level build succeeded and no cached parquet was found ...".
+- Candidate :: zero-row DataFrame; _has_country_builder('build_me') returns False.
+
+Preserve the original route when a Makefile exists but make is unavailable, rather than declaring the builder absent.
+Add a discriminating rule-only country-builder/default-backend/strict-subset/no-make test.
+The worker can reuse its existing multi-target Fakeland fixture with a country maker and no same-named table script.
+No broader country-builder policy change is necessary to close this newly exposed default-route regression.
+
+* Checks that passed
+
+The final guard is lazy: ordinary and assumed-fresh covered cache hits precede it, and tests reject additional wave traversal.
+The guard distinguishes actual wave declarations from source failures; unknown/full/JSON requests do not meet its absence condition.
+The schema-driven empty helper and normal finalizer are reused.
+The cold/full/partial/stale/no-cache matrix compares actual bytes, so preservation also covers manifests.
+The old-method negative control's four failures and eleven passes are consistent with a real missing boundary rather than implementation-mirroring tests.
+
+Independently reran the routing/cache/DVC five-file selection with exact package/config identity assertions, private LSMS_DATA_DIR, BLAS/OMP/MKL and build workers pinned to one, CPU20-23, xdist four workers/loadfile.
+Result: 136 passed, 10 skipped, 22 warnings in 36.82 seconds.
+Those green tests do not cover the no-make rule-only builder case above.
+Candidate real source probe was inspected but not rerun, because it writes real-probe.json inside the candidate worktree.
+
+Senegal CONTENTS was read before country-source assessment, including TODO and live caveats.
+Relevant idiosyncrasy: no attested universe statement exists for 2021-22; its 2018-19 universe must not be inherited, and seasonal vagues partition EA households.
+An empty configured-wave answer makes no questionnaire-not-asked claim.
+Existing country sample/empty-metadata warning behavior was not identified as a regression in this bounded review.
+
+-- Sue
