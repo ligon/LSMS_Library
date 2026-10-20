@@ -5476,13 +5476,15 @@ this note changes neither identifiers nor measures.
 never fixes the index" -- 2016-17's null =u= becomes the =Unknown= sentinel,
 and the GLSS1/GLSS2 null-=v= households are investigated in =sample=.
 2026-10-19, after red-team r1: gate 2016-17's Section 8H on its screener,
-=s8hq1 == 1=, the questionnaire's own skip logic (subsection below).
+the questionnaire's own skip logic (subsection below).  2026-10-19, on GH
+#1140 after red-team r2: the gate is =s8hq1 != 2= -- drop only "No"; a
+blank-screener row that carries real answers is kept.
 Feature's null-key policy (decision D2, delete-and-report) is unchanged, and
 =tests/test_gh1008_ghanalss_null_keys.py= pins that it is.
 
 **** 2016-17: every null =u= is a BLANK raw unit code
 
-Census of the 13,380 served rows (served before the 8H screener gate; 1,325
+Census of the 13,380 served rows (served before the 8H screener gate; 1,342
 after it -- see the next subsection) (raw read, before the wave script's
 collapse; 13,382 source rows): *every one has a missing unit code* --
 =s9bq{n}c= in =g7sec9b_small.dta= or =s8hq{n}u= in =g7sec8h.dta= is blank.
@@ -5537,23 +5539,27 @@ ruling authorised the sentinel, not a deletion): =food_prices(units=
 and Price all NA (=Feature= re-derives =Price= as =Expenditure / Quantity=).
 The 2026-10-19 ruling removes the screener-"No" ones -- next subsection.
 
-**** 2016-17: Section 8H is served only where its screener =s8hq1 == 1= (ruling 2026-10-19)
+**** 2016-17: Section 8H drops only its screener-"No" rows, =s8hq1 != 2= (rulings 2026-10-19; GH #1140)
 
 =s8hq1= ("did the household consume [item] from own production?") is asked
 *per (household, item) row* -- 8,468 of 14,009 households answer "Yes" for
 some items and "No" for others -- and the questionnaire skips the visit
-columns on "No".  =2016-17/_/food_acquired.py= (=screen_8h=) now keeps a
-source row only where =s8hq1 == 1=, before the visit stack.  That is the
-ruling's spelling, and what 1998-99 (=== 1=), 2005-06 and 2012-13
-(=== 'yes'=) already did; 2016-17 was the only multi-visit round without it.
+columns on "No".  =2016-17/_/food_acquired.py= (=screen_8h=) now drops a
+source row where =s8hq1 == 2= and keeps every other row, before the visit
+stack.  The first ruling was spelled =s8hq1 == 1=, which is what 1998-99
+(=== 1=), 2005-06 and 2012-13 (=== 'yes'=) do; red-team r2 measured that it
+also dropped 39 blank-screener rows carrying real consumption, and the
+ruling on GH #1140 (@ligon, 2026-10-19) fixed the gate at =!= 2=: drop only
+"No".  The sibling waves still drop their blank screeners; measuring them
+is GH #1145.  2016-17 was the only multi-visit round without any gate.
 
-Census of =g7sec8h.dta= (934,584 rows), what the gate removes:
+Census of =g7sec8h.dta= (934,584 rows), what the gate removes and keeps:
 
 | =s8hq1=   | rows    | any value | a quantity | a price, no quantity at any visit | a unit | kept? |
 |-----------+---------+-----------+------------+-----------------------------------+--------+-------|
 | 1 "Yes"   |  65,609 |    46,967 |     46,963 |                                 4 | 46,945 | yes   |
 | 2 "No"    | 868,255 |    12,038 |        *0* |                            12,038 |    *0* | *no*  |
-| blank     |     720 |        48 |         39 |                                 9 |     39 | *no*  |
+| blank     |     720 |        48 |         39 |                                 9 |     39 | *yes* (#1140) |
 
 (Rows are (household, item) source records; a row can carry values at
 several visits.  The 865 visit-2 fills on "Yes" rows sit on rows that DO
@@ -5581,33 +5587,45 @@ price-only throughout.)
 called the visits-3..7 price-only class (112 rows) "genuine"; 104 of those
 112 are these screener-"No" constants, i.e. the same fill, so the ruling's
 expectation that "the ~112 genuine price-only rows stay" does not hold under
-the gate (5 are on "Yes" rows and stay; 3 are on blank screeners and go).
-The blank-screener price-only cells are the same constants again (visit 2
-Cassava 2 x5, Tomato 3 x1; visit 5 item 30 at 2.5; visit 6 item 51 at 3;
-visit 7 item 21 at 5): the fill is per (visit, item), independent of the
-screener.
+the gate (5 are on "Yes" rows and 3 on blank screeners; all 8 stay under
+=!= 2=).  The 9 blank-screener source rows that are price-only throughout
+carry the same constants again (visit 2 Cassava 2 x5, Tomato 3 x1; visit 5
+item 30 at 2.5; visit 6 item 51 at 3; visit 7 item 21 at 5): the fill is
+per (visit, item), independent of the screener.
 
-*Cost of the literal gate, measured -- the decision point.*  A blank
+*What =!= 2= keeps that === 1= dropped -- the GH #1140 decision.*  A blank
 screener is not a "No", and 39 blank-screener rows in 11 households carry
 real consumption -- 109 quantity cells with units and prices, every one with
 =s8hq2= (months consumed) answered: (clust, nh) = (70567, 3), (70567, 6),
 (70567, 8), (70567, 12), (70785, 8) x11, (70821, 2) x2, (70821, 4) x3,
-(70821, 12), (70842, 3) x9, (70842, 4) x8, (70922, 5).  =s8hq1 == 1= drops
-them, as the sibling waves drop theirs; =s8hq1 != 2= would keep them and
-drop exactly the 12,038 "No" fills.  Red-team r1's "removes exactly the
-11,934 fills and nothing measured" was true of =!= 2=, not of === 1=.
-Taken as ruled; =test_ghanalss_2016_17_screener_gate_keeps_only_yes= pins
-the spelling, so a flip is a deliberate edit (and a second GhanaLSS
-re-warm).
+(70821, 12), (70842, 3) x9, (70842, 4) x8, (70922, 5).  They are coherent
+multi-visit consumption (70785/08 Yam 15/6/5/10/4 Tubers; 70842/03 Pepper
+1/1/0.5/5/0.5 Heap; 70842/03 Eggs 6 Single): sum Q 285.0, derived sum E
+1,009.05 (red-team r2, R2).  === 1= dropped them, as the sibling waves drop
+theirs; =!= 2= serves them and drops exactly the 12,038 "No" fills.
+Red-team r1's "removes exactly the 11,934 fills and nothing measured" was
+true of =!= 2=, not of === 1=.  Ruled =!= 2= on GH #1140 (@ligon,
+2026-10-19); =test_ghanalss_2016_17_screener_gate_drops_only_no= pins the
+spelling and fails under === 1= and under no gate.
 
-*What stays on =u='Unknown'=* (1,325 served rows): 422 blank-unit
-purchases (quantity + amount) and 903 produced rows -- the 865 visit-2 fills
-on screener-"Yes" rows (Cassava 100, Tomato 143, Pepper 307, Okra 315; a
-"constant = fill" rule would be a judgement, not the questionnaire's, and
-these rows report real consumption at other visits), 5 later-visit
-price-only rows (Yam at 3 and at 5, visit 3; Maize flour at 3 x3, visit 5)
-and 33 rows with a quantity (32 with a price).  Served-row accounting:
-/Accounting, the 8H screener gate/ below.
+*A fact of the ruling: 17 blank-screener price-only cells are served on
+=u='Unknown'=.*  14 are the visit-2 constants (Cassava 2 x5, Tomato 3 x3,
+Pepper 2 x3, Okra 7 x3) and 3 are later-visit ones (Cowpea 5 at visit 7,
+Oil (coconut) 2.5 at visit 5, Onion 3 at visit 6) -- the same per-(visit,
+item) constants as the "No" fills, 9 of them on source rows that are
+price-only throughout and 8 on rows that report a quantity at another
+visit.  "Drop only No" keeps them, exactly as it keeps the 865 such fills on
+"Yes" rows: a "constant = fill" rule would be a judgement the questionnaire
+does not make.  Recorded, not relitigated.
+
+*What stays on =u='Unknown'=* (1,342 served rows): 422 blank-unit
+purchases (quantity + amount) and 920 produced rows -- the 879 visit-2 fills
+on screener-"Yes" and blank rows (Cassava 105, Tomato 146, Pepper 310, Okra
+318; 865 "Yes" + 14 blank; the "Yes" rows report real consumption at other
+visits), 8 later-visit price-only rows (on "Yes" rows: Yam at 3 and at 5,
+visit 3; Maize flour at 3 x3, visit 5; plus the 3 blank-screener ones
+above) and 33 rows with a quantity (32 with a price).  Served-row
+accounting: /Accounting, the 8H screener gate/ below.
 
 **** GLSS1/GLSS2: four interviewed households are missing from the cover page
 
@@ -5638,7 +5656,11 @@ The evidence that the cluster is *recorded*, not inferred:
 - the survey's own control and aggregate files count them.  1988-89
   =Y00B.DAT= (section interview control) has 220629 with =CLUST= 2206,
   =NH= 29, =RESULT1= 1 (completed), and the 3,194-row =Y00C.DAT= cover
-  section carries 220629 too.  GSS's =EXPEND.DAT= aggregate includes 104838
+  section carries 220629 too -- in place of 260605: =Y00A= and =Y00C= differ
+  by exactly one household each way (=Y00A= - =Y00C= = {260605}, =Y00C= -
+  =Y00A= = {220629}; cluster 2206 holds 31 households in =Y00A= and 32 in
+  =Y00C=, cluster 2606 17 and 16), and =Y00B= likewise has 220629 and not
+  260605.  GSS's =EXPEND.DAT= aggregate includes 104838
   and 114519 (1987-88; the only two of its households absent from =Y00A=) and 220629
   (1988-89, with =CLUST= blank there -- merged from the same deficient
   cover).  1987-88 ships no =Y00B= / =Y00C=;
@@ -5683,7 +5705,16 @@ same cluster 1145* (cover: interviewed 11/2/88, =REPLACES= 7), so it may be
 114519's own cover record mis-keyed by one -- in which case =sample= 1987-88
 now holds that household twice, once as a data-less phantom.  It does not
 move =v= (both rows are 1145) or any food row, and the synthesised weight
-is 1.0 either way; not resolved here (GH #1008 residual).
+is 1.0 either way; not resolved here (GH #1139).  *260605 has the same shape
+in 1988-89*: it is the one data-less row of =Y00A= and the one household
+=Y00C= lacks, while =Y00C= and =Y00B= both carry the recovered 220629 that
+=Y00A= lacks -- a one-for-one swap between the two cover files.  260605's
+cover row is blank on =RELIGION= / =LANGHD= / =LANGR= / =INTRPRET= and is
+dated 23/3/89 beside its neighbours' 21/3 and 22/3; =Y00B= dates 220629
+30/3/89.  So 260605 may be 220629's own cover record mis-keyed, in which
+case =sample= 1988-89 holds that household twice too.  A household count
+only: =v= differs (2606 vs 2206) but the weight is 1.0 and no food row is
+involved.  Not resolved here (GH #1139).
 
 **** Accounting (private cold rebuild; before = =200e504a3=, after = this change)
 
@@ -5712,37 +5743,49 @@ GhanaLSS food assembly is deleted any more; the remaining reduction
 (5,340,606 -> 1,718,320) is visit aggregation alone, and =math.fsum= is
 conserved across it.
 
-**** Accounting, the 8H screener gate (private cold rebuilds; before = the table above's "after", re-measured at =64790d3b1=; after = the gate + the narrowed sentinel)
+**** Accounting, the 8H screener gate =s8hq1 != 2= (private cold rebuilds; before = the table above's "after", i.e. the sentinel with no gate, re-measured by red-team r2 at =64790d3b1=; after = the =!= 2= gate + the narrowed sentinel, measured against base =238a4c15d=)
 
-Every number in the "before" column reproduced the table above exactly.  The
-narrowed sentinel moves nothing on its own (no served unit code fails to
-decode); every movement below is the gate.
+Every number in the "before" column reproduced the table above exactly
+(red-team r2).  The narrowed sentinel moves nothing on its own (no served
+unit code fails to decode); every movement below is the gate, and every
+removed row is a screener-"No" price-only fill.  The superseded === 1=
+spelling (branch head =86ec36a29=, red-team r2's measurement) is shown for
+the record: the difference between its column and the "after" column is
+exactly the blank-screener rows the GH #1140 ruling keeps.
 
-| measure                                                    | before            | after             | change    |
-|------------------------------------------------------------+-------------------+-------------------+-----------|
-| =food_acquired= rows (Country)                             | 5,340,606         | 5,328,442         | -12,164   |
-| ... 2016-17 =produced=                                     | 151,721           | 139,557           | -12,164   |
-| ... of which =u='Unknown'= price-only fills                | 12,925            | 870               | -12,055   |
-| ... of which blank-screener rows with a quantity           | 109               | 0                 | -109      |
-| 2016-17 =u= NaN / =Unknown= (produced + purchased)         | 0 / 13,380 (12,958 + 422) | 0 / 1,325 (903 + 422) | |
-| visit-2 fills served (Cassava 2 / Tomato 3 / Pepper 2 / Okra 7) | 12,813       | 865 (100 / 143 / 307 / 315) | -11,948 |
-| =food_acquired= sums Q / E                                 | 15,658,040,288.26 / 19,059,899,600.91 | 15,658,040,003.26 / 19,059,898,591.86 | -285.0 / -1,009.05 |
-| =Feature('food_acquired')(['GhanaLSS'])= rows              | 1,718,320         | 1,706,220         | -12,100   |
-| =Feature= rows with Q, E, Price all NA                     | 23,269 (2016-17 12,926) | 11,214 (2016-17 871) | -12,055 |
-| =Feature= =nan_key_rows= / sums                            | none; = Country   | none; = Country   |           |
-| =kg_factor_sources= (=food_prices= / =food_quantities=)    | item_unit 993,954; unit 605,938; none 3,583,886 | 993,881; 605,903; 3,571,830 | -73; -35; -12,056 |
-| =food_prices()= rows: =kgvalue= / =kgprice=                | 560,023 / 187,096 | 559,980 / 187,053 | -43 / -43 |
-| =food_prices()= rows: =unitvalue= / =unitprice=            | 1,676,514 / 202,613 | 1,676,470 / 190,514 | -44 / -12,099 |
-| =food_quantities(units='kgs')= rows; kilograms             | 1,623,676; 11,007,391.86 | 1,623,637; 11,007,314.38 | -39; -77.48 |
-| =food_quantities(units='units')= rows                      | 1,695,046         | 1,695,001         | -45       |
-| =food_expenditures()= rows; total (=basis='purchased'=)    | 1,406,099; 15,637,502,177.88 | unchanged | 0 |
-| =nutrition= rows; Energy                                   | 34,798; 18,256,924,922.06 | 34,798; 18,256,809,497.31 | 0; -115,424.75 |
-| =no_kg_factor.yml= egg rows declared =none= (GH #1042)     | 16,633 (Egg/Single 14,114) | 16,632 (14,113) | -1 |
+| measure                                                    | before            | === 1= (superseded) | after (=!= 2=)    | change    |
+|------------------------------------------------------------+-------------------+---------------------+-------------------+-----------|
+| =food_acquired= rows (Country)                             | 5,340,606         | 5,328,442           | 5,328,568         | -12,038   |
+| ... 2016-17 =produced=                                     | 151,721           | 139,557             | 139,683           | -12,038   |
+| ... of which =u='Unknown'= price-only fills                | 12,925            | 870                 | 887               | -12,038   |
+| ... of which blank-screener rows with a quantity           | 109               | 0                   | 109               | 0         |
+| 2016-17 =u= NaN / =Unknown= (produced + purchased)         | 0 / 13,380 (12,958 + 422) | 0 / 1,325 (903 + 422) | 0 / 1,342 (920 + 422) | |
+| visit-2 fills served (Cassava 2 / Tomato 3 / Pepper 2 / Okra 7) | 12,813       | 865 (100 / 143 / 307 / 315) | 879 (105 / 146 / 310 / 318) | -11,934 |
+| =food_acquired= sums Q / E                                 | 15,658,040,288.26 / 19,059,899,600.91 | -285.0 / -1,009.05 | unchanged | 0 / 0 |
+| =Feature('food_acquired')(['GhanaLSS'])= rows              | 1,718,320         | 1,706,220           | 1,706,282         | -12,038   |
+| =Feature= rows with Q, E, Price all NA                     | 23,269 (2016-17 12,926) | 11,214 (2016-17 871) | 11,231 (2016-17 888) | -12,038 |
+| =Feature= =nan_key_rows= / sums                            | none; = Country   | none; = Country     | none; = Country   |           |
+| =kg_factor_sources= (=food_prices= / =food_quantities=)    | item_unit 993,954; unit 605,938; none 3,583,886 | 993,881; 605,903; 3,571,830 | 993,954; 605,938; 3,571,848 | 0; 0; -12,038 |
+| =food_prices()= rows: =kgvalue= / =kgprice=                | 560,023 / 187,096 | 559,980 / 187,053   | 560,023 / 187,096 | 0 / 0     |
+| =food_prices()= rows: =unitvalue= / =unitprice=            | 1,676,514 / 202,613 | 1,676,470 / 190,514 | 1,676,514 / 190,575 | 0 / -12,038 |
+| =food_quantities(units='kgs')= rows; kilograms             | 1,623,676; 11,007,391.86 | 1,623,637; 11,007,314.38 | 1,623,676; 11,007,391.86 | 0; 0 |
+| =food_quantities(units='units')= rows                      | 1,695,046         | 1,695,001           | 1,695,046         | 0         |
+| =food_expenditures()= rows; total (=basis='purchased'=)    | 1,406,099; 15,637,502,177.88 | unchanged  | unchanged         | 0         |
+| =nutrition= rows; every column sum                         | 34,798; Energy 18,256,924,922.06 | Energy -115,424.75 | byte-identical | 0 |
+| =no_kg_factor.yml= egg rows declared =none= (GH #1042)     | 16,633 (Egg/Single 14,114) | 16,632 (14,113) | 16,633 (14,114) | 0 |
 
-=nutrition='s column sums all move by under 0.01% (Carbohydrate *rises*
-106,442: removing 39 rows of evidence re-estimates a few =(t, j, u)= kg
-factors that other rows use).  =sample=, =household_roster= and every
-other wave are untouched.
+Under =!= 2= the gate removes no row that carries a kg factor, so no
+=(j, u)= factor is re-estimated: =nutrition= (34,798 rows, every column
+sum) and the per-wave kilograms of =food_quantities(units='kgs')= are
+byte-identical to the "before" column -- measured, not inferred.  (The
+=== 1= spelling was not so contained: red-team r2 found that removing the
+39 blank-screener rows moved two factors that are pooled across waves --
+the u-pooled =American Tin= and =(Rice (local), Bowl)= -- and with them
+=nutrition= and the kilograms of every food wave, by under 0.01%.  An
+earlier version of this entry said "every other wave untouched" of that
+spelling; it was false, and is gone.)  =sample=, =household_roster= and
+every table other than =food_acquired= and its derivations are untouched
+by the gate.
 
 *Still open, and NOT this issue*: 1991-92 =household_roster= has 142 rows
 (29 households) with a NaN =v=.  Same class, different file, measured but
@@ -5766,10 +5809,11 @@ served an inferred kg factor (=item_unit= 1,745, =unit= 653,
 *Not established* -- the questionnaires were not checked -- so it is recorded
 as unverified and left untouched.  Separately, 13,380 rows carry a NaN =u=
 (already a sentinel: served =none=).  /Since GH #1008 (2026-10-19) none of
-those 13,380 2016-17 rows is served with a NaN =u=: 1,325 are served
-=u='Unknown'=, and the other 12,055 (price-only fills on rows the Section 8H
-screener skips) are removed by the 8H screener gate; see the GH #1008 entry
-under /Feature assembly drops null-key food rows/./
+those 13,380 2016-17 rows is served with a NaN =u=: 1,342 are served
+=u='Unknown'=, and the other 12,038 (price-only fills on rows whose Section
+8H screener says "No") are removed by the 8H screener gate =s8hq1 != 2=
+(GH #1140); see the GH #1008 entry under /Feature assembly drops null-key
+food rows/./
 
 *Superseded (GH #1042, 2026-10-18).*  Verified against the GLSS4/5/6
 questionnaires: =None= is code 0, the instrument's "nothing / not applicable"
