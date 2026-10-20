@@ -3,11 +3,13 @@ SOURCE
 https://microdata.worldbank.org/index.php/catalog/6161
 
 #+CATALOG_ID: 6161
-#+CATALOG_IDNO: ETH_2021_ESPS-W5_v02_M
+#+CATALOG_IDNO: ETH_2021_ESPS-W5_v03_M
 #+CATALOG_TITLE: Socio-Economic Panel Survey 2021-2022
 #+CATALOG_YEARS: 2021-2022
 #+CATALOG_REPOSITORY: lsms
 #+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6161
 #+PROVENANCE_SOURCE: worldbank
-#+PROVENANCE_METHOD: source-url
-#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-10-19
+#+PROVENANCE_NOTE: v03_M acquired 2026-10-19 (GH #1127): Stata zip holds the 68 files the catalog lists; 67 byte-identical to the v02_M blobs, eth_plotgeovariables_y5.dta (v02, a byte-copy of eth_householdgeovariables_y5.dta) replaced by Pub_ETH_PlotGeovariables_Y5.dta. The catalog tags this study NODOI.

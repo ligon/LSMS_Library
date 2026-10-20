@@ -1222,12 +1222,27 @@ NGA_W5 = {"id": "6410", "idno": "NGA_2023_GHSP-W5_v01_M",
 NGA_W5_V02 = dict(NGA_W5, idno="NGA_2023_GHSP-W5_v02_M",
                   doi="https://doi.org/10.48529/90ec-pv69")
 
-# Catalog 6161 as the shipped Ethiopia/2021-22 record describes it (no DOI).
+# Catalog 6161 as the v02_M Ethiopia/2021-22 record describes it (no DOI).
 ETH_W5 = {"id": "6161", "idno": "ETH_2021_ESPS-W5_v02_M",
           "title": "Socio-Economic Panel Survey 2021-2022",
           "year_start": 2021, "year_end": 2022, "repository": "lsms",
           "doi": "",
           "url": "https://microdata.worldbank.org/index.php/catalog/6161"}
+# Ethiopia/2021-22's SOURCE.org verbatim as shipped while the tree held v02_M
+# (2026-07-12 .. GH #1127).  v03_M is held now and the shipped record says so,
+# so the tests that need a v02 record carry their own copy of it.
+ETH_W5_V02_SOURCE = (
+    "SOURCE\n\n"
+    "https://microdata.worldbank.org/index.php/catalog/6161\n\n"
+    "#+CATALOG_ID: 6161\n"
+    "#+CATALOG_IDNO: ETH_2021_ESPS-W5_v02_M\n"
+    "#+CATALOG_TITLE: Socio-Economic Panel Survey 2021-2022\n"
+    "#+CATALOG_YEARS: 2021-2022\n"
+    "#+CATALOG_REPOSITORY: lsms\n"
+    "#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6161\n"
+    "#+PROVENANCE_SOURCE: worldbank\n"
+    "#+PROVENANCE_METHOD: source-url\n"
+    "#+PROVENANCE_RECORDED: 2026-07-12\n")
 
 
 class TestReleaseChangeIsNotAReStamp:
@@ -1274,9 +1289,10 @@ class TestReleaseChangeIsNotAReStamp:
 
     def test_ethiopia_w5_idno_change_is_refused(
             self, bf, countries, monkeypatch, tmp_path):
-        """The held tree is <= v02 (``Data/eth_plotgeovariables_y5.dta``; v03
-        renamed it ``Pub_ETH_PlotGeovariables_Y5.dta``)."""
-        text = _shipped("Ethiopia", "2021-22")
+        """A tree holding v02 (``Data/eth_plotgeovariables_y5.dta``; v03
+        replaced it with ``Pub_ETH_PlotGeovariables_Y5.dta``), as the shipped
+        tree did until GH #1127."""
+        text = ETH_W5_V02_SOURCE
         _write_source(countries, "Ethiopia", "2021-22", text)
         _catalog(monkeypatch, bf, [dict(ETH_W5,
                                         idno="ETH_2021_ESPS-W5_v03_M")])
@@ -1294,8 +1310,7 @@ class TestReleaseChangeIsNotAReStamp:
             self, bf, countries, monkeypatch, tmp_path):
         """Only a CHANGE is refused.  Ethiopia/2021-22 records no DOI; the
         catalog supplying one at the SAME idno is written, and listed."""
-        _write_source(countries, "Ethiopia", "2021-22",
-                      _shipped("Ethiopia", "2021-22"))
+        _write_source(countries, "Ethiopia", "2021-22", ETH_W5_V02_SOURCE)
         doi = "https://doi.org/10.48529/xxxx-yyyy"
         _catalog(monkeypatch, bf, [dict(ETH_W5, doi=doi)])
         review = tmp_path / "review.org"
@@ -1307,6 +1322,28 @@ class TestReleaseChangeIsNotAReStamp:
         assert _unresolved(review) == {}
         assert _changed(review) == [
             ("Ethiopia", "2021-22", "CATALOG_DOI", None, doi)]
+
+    def test_ethiopia_w5_shipped_record_names_v03_and_the_catalog_confirms_it(
+            self, bf, countries, monkeypatch, tmp_path):
+        """GH #1127: v03_M was acquired, so the shipped record names it, and a
+        re-stamp against the catalog's v03 row writes nothing.  The record
+        keeps how it was established (``add-wave``, content-validated)."""
+        text = _shipped("Ethiopia", "2021-22")
+        assert "#+CATALOG_IDNO: ETH_2021_ESPS-W5_v03_M" in text
+        _write_source(countries, "Ethiopia", "2021-22", text)
+        _catalog(monkeypatch, bf, [dict(ETH_W5,
+                                        idno="ETH_2021_ESPS-W5_v03_M")])
+        review = tmp_path / "review.org"
+        assert bf.main(["--country", "Ethiopia",
+                        "--review-file", str(review)]) == 0   # write mode
+
+        assert pv.source_org_path(countries, "Ethiopia", "2021-22") \
+            .read_text() == text
+        assert _unresolved(review) == {}
+        assert _changed(review) == []
+        prov = pv.read_provenance(countries, "Ethiopia", "2021-22")
+        assert (prov.method, prov.validation, prov.doi) == (
+            "add-wave", pv.VALIDATION_CONTENT, None)
 
     def test_a_doi_spelled_differently_is_not_a_change(self):
         bf = _load_backfill()
