@@ -1606,10 +1606,11 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
 # CAPTURES a comma token; :func:`_metric_number` decides what it means
 # (decimal or thousands) and refuses anything else, so the parser returns
 # ``None`` rather than reading a part of a number it cannot read whole.  The
-# two lookbehinds enforce the same rule from the other side: a match may not
-# START inside a number (after a digit, or after a digit and a separator), so
-# a token the grammar refuses cannot be re-read from its trailing digits.
-_METRIC_NUMBER = r'(?<!\d)(?<!\d[.,])(\d+(?:,\d+)*(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)'
+# token captures separators even when malformed: validation belongs to
+# _metric_number, and must see the whole token rather than a suffix after a
+# repeated comma, slash or whitespace (ledger 1143-decimal-comma §3/§4).
+# The left boundary forbids beginning at a digit or punctuation suffix.
+_METRIC_NUMBER = r'(?<![\d.,])(\d[\d.,]*(?:\s*/+\s*[\d.,]*)*)'
 
 _EXPLICIT_METRIC_PATTERNS = (
     (re.compile(_METRIC_NUMBER + r'\s*(?:kilogrammes?|kilograms?|kgs?)\b',
@@ -1637,9 +1638,10 @@ _EXPLICIT_METRIC_PATTERNS = (
 # The two comma grammars (GH #1143).  Disjoint by construction: a decimal
 # comma has exactly one comma and one or two digits after it; a thousands
 # separator has every group after a comma exactly three digits long and no
-# leading ``0,``.  A comma token that is neither (``0,500``, ``1,5000``,
+# leading ``0,``.  A leading-zero comma is decimal at any precision, as in
+# ``0,125`` (ledger 1143-decimal-comma §3). A token that is neither (``1,5000``,
 # ``1,50,000``) is ambiguous and is refused, never guessed.
-_DECIMAL_COMMA = re.compile(r'\d+,\d{1,2}')
+_DECIMAL_COMMA = re.compile(r'(?:\d+,\d{1,2}|0,\d+)')
 _THOUSANDS_COMMA = re.compile(r'[1-9]\d{0,2}(?:,\d{3})+')
 
 
@@ -1651,9 +1653,7 @@ def _metric_scalar(text):
     >>> _metric_scalar('1,500'), _metric_scalar('10,000')
     (1500.0, 10000.0)
     >>> _metric_scalar('0,500')
-    Traceback (most recent call last):
-        ...
-    ValueError: ambiguous comma in metric number '0,500'
+    0.5
     """
     t = str(text).strip()
     if ',' not in t:
@@ -1762,8 +1762,8 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
 
     >>> _parse_explicit_metric('1,500 kg')
     1500.0
-    >>> _parse_explicit_metric('0,500 kg') is None
-    True
+    >>> _parse_explicit_metric('0,125 kg')
+    0.125
     """
     if not isinstance(s, str):
         return None
@@ -1772,6 +1772,11 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
             continue
         m = pattern.search(s)
         if m:
+            # Refuse numeric suffixes after whitespace / exponent notation,
+            # preserving numbered labels ("1001. 12,5 cl") and the existing
+            # inner size in multiplier labels ("2x500g") (ledger §3/§4).
+            if re.search(r'(?:[\d,]\s+|\d[eE][+-]?)$', s[:m.start()]):
+                return None
             try:
                 return _metric_number(m.group(1)) * scale
             except (ValueError, IndexError, ZeroDivisionError, TypeError):

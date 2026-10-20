@@ -1,6 +1,13 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* Decimal-comma metric labels (GH #1143, measured 2026-10-20)
+
+The shared parser now reads the entire numeric token in =Bidon de 1,5 L= (120 rows), =Bidon de 0,5 L= (3 rows) and =Sac (2,5 Kg)= (3 rows), instead of serving 5 kg per unit for all three.
+The factors are now 1.5, 0.5 and 2.5 respectively; litre labels retain the existing =volume_as_mass=True= assumption and decline under =False=.
+Private cold builds measure 126 changed quantity rows, 68 changed =food_prices()= rows and 353.37 fewer kilograms, with =food_acquired= exactly unchanged.
+No unit mapping was edited; aggregate evidence is in =slurm_logs/framework_campaign_2026-10-20/1143/=.
+
 * Overview
 
 Benin EHCVM (Enquête Harmonisée sur les Conditions de Vie des

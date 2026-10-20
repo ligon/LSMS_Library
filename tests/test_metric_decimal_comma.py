@@ -24,7 +24,8 @@ The rule (``transformations._metric_scalar``):
 
 - ``\\d+,\\d{1,2}`` is a decimal comma (``1,25`` -> 1.25);
 - ``[1-9]\\d{0,2}(,\\d{3})+`` is a thousands separator (``10,000`` -> 10000);
-- anything else with a comma (``0,500``, ``1,5000``, ``1,50,000``, the mixed
+- a leading-zero decimal comma accepts additional places (``0,125`` -> 0.125);
+- anything else with a comma (``1,5000``, ``1,50,000``, the mixed
   ``1,500.5``) is ambiguous and the label declines (``None``), so the row falls
   to the inference ladder rather than being served a guess.
 """
@@ -59,6 +60,8 @@ from lsms_library.transformations import (
     ('2,5 Kg', 2.5),
     ('12,5 cl', 0.125),
     ('1,25 kg', 1.25),
+    ('0,125 kg', 0.125),
+    ('0,500 kg', 0.5),
     # the corpus spellings, verbatim (served and org-table labels)
     ('Bouteille de 1,5 L', 1.5),               # Senegal, served
     ('993. Bouteille de 1,5 litre', 1.5),      # Senegal 2021-22, served
@@ -95,11 +98,22 @@ def test_thousands_separator_and_plain_integers(label, expected):
 
 
 @pytest.mark.parametrize("label", [
-    '0,500 kg',      # neither grammar: 3 decimals, or a thousands group led by 0
     '1,5000 kg',     # a 4-digit group
     '1,50,000 g',    # lakh grouping: not three-digit groups
     '1,500.5 kg',    # mixed separators
     '1.5.2 kg',      # a match may not start inside a number
+    '1,,5 kg',
+    '1, 5 kg',
+    '1/2/3 kg',
+    '1 / / 2 kg',
+    '1//2 kg',
+    '0,125,000 kg',
+    '.5 kg',
+    ',5 kg',
+    '1e3 kg',
+    '1e-3 kg',
+    '1e+3 kg',
+    '1 500 kg',
 ])
 def test_an_ambiguous_number_declines_rather_than_being_partly_read(label):
     """The pre-fix failure was reading the TRAILING digits of a number the
@@ -117,6 +131,7 @@ def test_volume_as_mass_false_still_declines_a_comma_volume():
 
 @pytest.mark.parametrize("token,expected", [
     ('1,5', 1.5), ('0,9', 0.9), ('12,5', 12.5), ('1,25', 1.25),
+    ('0,125', 0.125), ('0,500', 0.5),
     ('1,500', 1500.0), ('10,000', 10000.0), ('1,000,000', 1e6),
     ('50', 50.0), ('0.5', 0.5),
 ])
@@ -124,7 +139,7 @@ def test_metric_scalar_grammar(token, expected):
     assert _metric_scalar(token) == pytest.approx(expected)
 
 
-@pytest.mark.parametrize("token", ['0,500', '1,5000', '1,50,000', '1,500.5', ',5', '1,'])
+@pytest.mark.parametrize("token", ['1,5000', '1,50,000', '1,500.5', ',5', '1,'])
 def test_metric_scalar_refuses_an_ambiguous_comma(token):
     with pytest.raises(ValueError):
         _metric_scalar(token)
@@ -134,6 +149,16 @@ def test_metric_number_reads_comma_fraction_parts():
     assert _metric_number('1,5') == pytest.approx(1.5)
     assert _metric_number('1/2') == pytest.approx(0.5)
     assert _metric_number('3 / 1,5') == pytest.approx(2.0)
+
+
+@pytest.mark.parametrize('label, expected', [
+    ('3 / 1,5 kg', 2.0), ('0,5 / 2 kg', 0.25),
+    ('2 x 0,5 L', 0.5), ('2x0,5 L', 0.5), ('Bottle0,5L', 0.5),
+    ('0,125 tonne', 125.0),
+    ('0,125 g', 0.000125), ('12,5 millilitres', 0.0125),
+])
+def test_comma_fraction_parts_and_unit_scales(label, expected):
+    assert _parse_explicit_metric(label) == pytest.approx(expected)
 
 
 # ---------------------------------------------------------------------------
