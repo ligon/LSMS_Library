@@ -3,12 +3,14 @@ SOURCE
 https://microdata.worldbank.org/index.php/catalog/6410
 
 #+CATALOG_ID: 6410
-#+CATALOG_IDNO: NGA_2023_GHSP-W5_v01_M
+#+CATALOG_IDNO: NGA_2023_GHSP-W5_v02_M
 #+CATALOG_TITLE: General Household Survey, Panel 2023-2024
 #+CATALOG_YEARS: 2023-2024
 #+CATALOG_REPOSITORY: lsms
-#+CATALOG_DOI: https://doi.org/10.48529/zd5s-tj25
+#+CATALOG_DOI: https://doi.org/10.48529/90ec-pv69
 #+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6410
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
-#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-10-19
+#+PROVENANCE_NOTE: GH #978: refreshed v01_M -> v02_M from the WB Stata zip NGA_2023_GHSP-W5_v02_M_Stata.zip (108 .dta; zip md5 3e8f64ae9b4150bfa67e4c12110c0a04). Against the v01 sidecars: 104 byte-identical, 2 revised (Post Harvest Wave 5/Household/sect2b_harvestw5.dta, sect3d_harvestw5.dta), 2 new (nga_householdgeovariables_y5.dta, totcons_final.dta), 0 removed. Previous record: NGA_2023_GHSP-W5_v01_M, https://doi.org/10.48529/zd5s-tj25.

@@ -88,12 +88,20 @@ ROUNDS = [
 # Every wave declares cluster_features (W5 since GH #841).
 CF_ROUNDS = ROUNDS
 CF_QUARTERS = [q for pair in CF_ROUNDS for q in pair]
-# Waves with acquired and wired household geovariables. W5 is still the
-# v01 extract: WB v02 supplies NGA_HouseholdGeovariables_Y5.dta, queued for
-# acquisition and wiring under GH #978. Its coordinates remain missing here.
-GEO_ROUNDS = ROUNDS[:4]
+# Waves with acquired and wired household geovariables: all five since GH #978
+# acquired WB v02_M for W5, whose nga_householdgeovariables_y5.dta is wired as
+# cluster_features' df_geo on hhid, as W4's is.
+GEO_ROUNDS = ROUNDS
 GEO_QUARTERS = [q for pair in GEO_ROUNDS for q in pair]
-NO_GEO_QUARTERS = [q for pair in ROUNDS[4:] for q in pair]
+W5_QUARTERS = list(ROUNDS[4])
+# W5's composite clusters (see Nigeria/_/CONTENTS.org, "Cluster (PSU)
+# identifier"): 518 real EAs, 8 of which conflict kept interviewers out of
+# (BID pp. 32-33; the catalog names Zamfara, Katsina, Kebbi and Sokoto), plus
+# 393 `moved-{hhid}` singletons.  The geovariables cover the 4,883 households
+# with an interview, so measured on v02_M: 510 = 518 - 8 real clusters carry a
+# coordinate, and 376 of the 393 movers (the other 17 were not interviewed).
+W5_REAL_CLUSTERS, W5_UNVISITED_EAS = 518, 8
+W5_MOVERS, W5_MOVERS_WITH_GEO = 393, 376
 
 # community_prices comes from the COMMUNITY questionnaire's Section C8, which is
 # administered in the post-harvest round only.  Verified structurally: across all
@@ -158,19 +166,32 @@ def test_every_wave_has_coordinates_in_every_round(cf, t):
     assert wave['Longitude'].notna().any(), f'{t}: no Longitude at all'
 
 
-@pytest.mark.parametrize('t', NO_GEO_QUARTERS)
-def test_w5_has_geography_but_no_coordinates_in_either_round(cf, t):
-    """GH #841: W5 declares cluster_features from the cover page alone.  Wave 5
-    v01 lacks the geovariables file supplied in WB v02 (GH #978), so
-    Latitude/Longitude remain all-NaN while Region/District/Rural are
-    populated. Retire this assertion and extend GEO_QUARTERS when the v02
-    file is acquired and wired as df_geo on hhid, as W4 does."""
+@pytest.mark.parametrize('t', W5_QUARTERS)
+def test_w5_coordinates_cover_every_visited_cluster(cf, t):
+    """GH #841 declared W5's cluster_features from the cover page alone, and
+    the v01 extract shipped no geovariables, so Latitude/Longitude were all-NaN
+    in both quarters (911 of 911 clusters).  GH #978 acquired v02_M and wired
+    its geovariables as df_geo on hhid: every cluster with an interviewed
+    household now carries a coordinate, and the only clusters without one are
+    the 8 EAs conflict kept unvisited plus the 17 non-interviewed movers.
+    Region/District/Rural stay fully populated."""
     wave = cf.loc[t]
-    assert len(wave) > 0, f'{t} missing from cluster_features'
+    assert len(wave) == W5_REAL_CLUSTERS + W5_MOVERS, f'{t}: {len(wave)} clusters'
     for col in ['Region', 'District', 'Rural']:
         assert wave[col].notna().all(), f'{t}: {col} has nulls'
-    assert wave['Latitude'].isna().all(), f'{t}: unexpected Latitude -- W5 geovars acquired?'
-    assert wave['Longitude'].isna().all(), f'{t}: unexpected Longitude -- W5 geovars acquired?'
+    moved = wave.index.get_level_values('v').astype(str).str.startswith('moved-')
+    for col in ['Latitude', 'Longitude']:
+        real_n = int(wave.loc[~moved, col].notna().sum())
+        moved_n = int(wave.loc[moved, col].notna().sum())
+        assert real_n == W5_REAL_CLUSTERS - W5_UNVISITED_EAS, (
+            f'{t}: {real_n} real clusters carry {col}; expected '
+            f'{W5_REAL_CLUSTERS - W5_UNVISITED_EAS} (pre-#978: 0)')
+        assert moved_n == W5_MOVERS_WITH_GEO, (
+            f'{t}: {moved_n} moved singletons carry {col}; expected '
+            f'{W5_MOVERS_WITH_GEO} (pre-#978: 0)')
+    # Nigeria's coordinates are national: inside the country's bounding box.
+    assert wave['Latitude'].dropna().between(4, 14).all()
+    assert wave['Longitude'].dropna().between(2.5, 15).all()
 
 
 @pytest.mark.parametrize('t', ['2010Q3', '2011Q1'])

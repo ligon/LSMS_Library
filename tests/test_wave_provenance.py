@@ -437,6 +437,9 @@ class TestEveryDeclaredWaveIsResolved:
 
     @pytest.mark.parametrize("country,wave,catalog_id,validation", [
         ("Nigeria", "2018-19", "3557", pv.VALIDATION_CONTENT),
+        # GH #978: the v02_M Stata zip was compared file by file against the
+        # held tree (104 identical, 2 revised, 2 new) before it was recorded.
+        ("Nigeria", "2023-24", "6410", pv.VALIDATION_CONTENT),
         ("Niger", "2011-12", "2050", pv.VALIDATION_CONTENT),
         ("Senegal", "2021-22", "6278", pv.VALIDATION_CONTENT),
         # Provenance known, data absent -- two different facts, kept distinct.
@@ -1212,15 +1215,32 @@ def _changed(review):
             for r in df.to_dict("records")]
 
 
-# Catalog 6410 as the shipped Nigeria/2023-24 record describes it (v01_M) ...
+# Catalog 6410 at the release Nigeria/2023-24 held until GH #978 (v01_M) ...
 NGA_W5 = {"id": "6410", "idno": "NGA_2023_GHSP-W5_v01_M",
           "title": "General Household Survey, Panel 2023-2024",
           "year_start": 2023, "year_end": 2024, "repository": "lsms",
           "doi": "https://doi.org/10.48529/zd5s-tj25",
           "url": "https://microdata.worldbank.org/index.php/catalog/6410"}
-# ... and as the live catalog reports it since 2026-09-16 (v02_M, new DOI).
+# ... and as the live catalog reports it since 2026-09-16 (v02_M, new DOI),
+# which is the release the shipped record names since GH #978 acquired it.
 NGA_W5_V02 = dict(NGA_W5, idno="NGA_2023_GHSP-W5_v02_M",
                   doi="https://doi.org/10.48529/90ec-pv69")
+# The Nigeria/2023-24 SOURCE.org as shipped BEFORE GH #978, byte for byte.
+# Frozen here because the shipped file now records v02_M: the refusal below is
+# about a held v01_M record meeting a v02_M catalog, and that record no longer
+# exists anywhere but in this literal.
+NGA_W5_V01_RECORD = (
+    "SOURCE\n\nhttps://microdata.worldbank.org/index.php/catalog/6410\n\n"
+    "#+CATALOG_ID: 6410\n"
+    "#+CATALOG_IDNO: NGA_2023_GHSP-W5_v01_M\n"
+    "#+CATALOG_TITLE: General Household Survey, Panel 2023-2024\n"
+    "#+CATALOG_YEARS: 2023-2024\n"
+    "#+CATALOG_REPOSITORY: lsms\n"
+    "#+CATALOG_DOI: https://doi.org/10.48529/zd5s-tj25\n"
+    "#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6410\n"
+    "#+PROVENANCE_SOURCE: worldbank\n"
+    "#+PROVENANCE_METHOD: source-url\n"
+    "#+PROVENANCE_RECORDED: 2026-07-12\n")
 
 # Catalog 6161 as the shipped Ethiopia/2021-22 record describes it (no DOI).
 ETH_W5 = {"id": "6161", "idno": "ETH_2021_ESPS-W5_v02_M",
@@ -1233,15 +1253,16 @@ ETH_W5 = {"id": "6161", "idno": "ETH_2021_ESPS-W5_v02_M",
 class TestReleaseChangeIsNotAReStamp:
     """``CATALOG_IDNO`` / ``CATALOG_DOI`` name the release a directory HOLDS.
 
-    The catalog reports its latest.  Nigeria/2023-24 holds v01_M -- 106
-    files, no household geovariables (``Nigeria/_/CONTENTS.org``, "Wave 5
-    geovariables await acquisition of WB v02") -- and the catalog moved to
+    The catalog reports its latest.  Until GH #978, Nigeria/2023-24 held
+    v01_M -- 106 files, no household geovariables -- and the catalog moved to
     v02_M on 2026-09-16.  A re-stamp would have recorded v02_M over v01_M
-    files.  Now it is refused and listed, and the file is untouched."""
+    files.  Now it is refused and listed, and the file is untouched.  (GH #978
+    then acquired v02_M, so the shipped record names it; the v01_M case is
+    pinned on the frozen pre-#978 record, ``NGA_W5_V01_RECORD``.)"""
 
     def test_nigeria_w5_v02_in_the_catalog_leaves_v01_record_intact(
             self, bf, countries, monkeypatch, tmp_path):
-        text = _shipped("Nigeria", "2023-24")
+        text = NGA_W5_V01_RECORD
         assert "NGA_2023_GHSP-W5_v01_M" in text
         _write_source(countries, "Nigeria", "2023-24", text)
         _catalog(monkeypatch, bf, NGA_ROWS + [NGA_W5_V02])
@@ -1260,10 +1281,13 @@ class TestReleaseChangeIsNotAReStamp:
 
     def test_the_release_on_record_is_still_confirmed_unchanged(
             self, bf, countries, monkeypatch, tmp_path):
-        """Control: the same row at the release we hold -> nothing to do."""
+        """Control: the same row at the release we hold -> nothing to do.
+        Since GH #978 the shipped record holds v02_M, which is what the
+        catalog reports."""
         text = _shipped("Nigeria", "2023-24")
+        assert "NGA_2023_GHSP-W5_v02_M" in text
         _write_source(countries, "Nigeria", "2023-24", text)
-        _catalog(monkeypatch, bf, NGA_ROWS + [NGA_W5])
+        _catalog(monkeypatch, bf, NGA_ROWS + [NGA_W5_V02])
         review = tmp_path / "review.org"
         bf.main(["--country", "Nigeria", "--review-file", str(review)])
 
