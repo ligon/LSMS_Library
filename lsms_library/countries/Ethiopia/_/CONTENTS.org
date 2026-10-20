@@ -993,6 +993,11 @@ We therefore DEFER Latitude/Longitude -- they are NOT emitted.  Note
 the GPS-*measured field area* (square metres; =pp_s3q05_a= W1-W3,
 =s3q08= W4-W5) is NOT redacted and is the primary Area source.
 
+The redaction is the World Bank's, by design: the survey's LICENSE
+(=2021-22/Documentation/LICENSE=) lists "GPS-based dwelling and agricultural
+field locations" among the confidential variables, and "this information is
+not included in the ESS public use data".
+
 This applies to =plot_features= ONLY.  The HOUSEHOLD geovariables
 files are a different release and DO carry usable (offset) coordinates
 -- see the next section.  Do not conflate the two.
@@ -1074,22 +1079,62 @@ default =outer= those orphans arrive with a null =v= and collapse into
 one phantom cluster -- W2 gained a spurious 434th EA
 (=030412088800105=) exactly this way.
 
-** 2021-22 holds ESPS-5 release =v02_M=, not the catalog's =v03_M= (GH #600)
+** 2021-22 holds ESPS-5 release =v03_M= (GH #600, #1127)
 
-=2021-22/Documentation/SOURCE.org= records =#+CATALOG_IDNO: ETH_2021_ESPS-W5_v02_M=,
-and that is the release on disk.  WB catalog 6161 now reports =v03_M=, whose
-=version_notes= say only: "Version 03: 'ETH_PlotGeovariables_Y5.dta' replaced
-with 'Pub_ETH_PlotGeovariables_Y5.dta'".  Our 68 sidecars match the v03 file
-list in every file but that one -- we hold =Data/eth_plotgeovariables_y5.dta=,
-the pre-v03 name -- and the acquisition commit =14b6de1dc= (2026-03-31) names
-=ETH_2021_ESPS-W5_v02_M=.  The catalog's own dates (v03 =version_date=
-2023-07-20) do not fit an acquisition of v02 in 2026; trust the file names.
+=2021-22/Documentation/SOURCE.org= records =#+CATALOG_IDNO: ETH_2021_ESPS-W5_v03_M=
+(=PROVENANCE_METHOD: add-wave=, =content-validated=).  WB catalog 6161 is tagged
+=NODOI=, so no =CATALOG_DOI= is recorded.  The release history, from the
+catalog's own metadata: v02 "included" financial-services data (the four zip
+members dated 2025-04-14 are =sect5a/5b_hh_w5= -- "Banking and financial
+inclusion", "Digital financial services" -- and =sect15a/15b_hh_w5=, credit);
+v03 is "Version 03 (September 2026).  'ETH_PlotGeovariables_Y5.dta' replaced
+with 'Pub_ETH_PlotGeovariables_Y5.dta'" (=doc_desc.version_statement=; the
+zip's Stata resource changed 2026-09-14).  So v02 was the current release
+when we acquired it on 2026-03-31, and v03 came six months later.  The =study_desc= =version_date= of
+2023-07-20 was never updated and dates neither release -- do not reason from it.
 
-The provenance backfill (=scripts/backfill_wave_provenance.py=) therefore lists
-this wave as =release-changed= and leaves the record intact, until v03 is
-acquired or decided against.  The changed file is the PLOT geovariables, whose
-coordinates are =**CONFIDENTIAL**= anyway (see "GPS redaction"), so the content
-change may not matter; the release recorded must still be the one held.
+*What v03 changed, measured file by file (2026-10-19).*  The v03 Stata zip
+holds exactly the 68 files the catalog's =data_files= list names.  67 are
+byte-identical (md5) to the v02 blobs our sidecars name.  One is removed and
+one added:
+
+| | file | md5 | grain | rows x cols |
+|-+------+-----+-------+-------------|
+| v02, removed | =eth_plotgeovariables_y5.dta= | =329854352aeab5196ff48a7535bfe92f= | HOUSEHOLD | 4,890 x 52 |
+| v03, added | =Pub_ETH_PlotGeovariables_Y5.dta= | =55db84c92cc63b053275a83dc830b710= | FIELD | 14,399 x 9 |
+
+*The v02 "plot" file was the household file.*  Its md5 and size (813,299 B)
+equal =eth_householdgeovariables_y5.dta='s: household rows, =lat_dd_mod= /
+=lon_dd_mod=, no holder, parcel or field key.  This was the World Bank's v02,
+not our acquisition: a Wayback snapshot of the catalog's own v02 data
+dictionary (2025-11-20, four months before our acquisition commit =14b6de1dc=
+of 2026-03-31) lists file F65 =eth_plotgeovariables_y5.dta= "Plot
+geo-variables" with *4,890 cases and 52 variables* -- the household file's
+counts.  v03's =data_files= list drops F65 and adds F69.  The catalog's
+counts are the proof; that the v02 *bytes* were the household file's is
+inferred from them plus our blob.  If the old sidecar is still in =Data/=, do
+not read it as plot data.
+
+*The v03 plot file* =Pub_ETH_PlotGeovariables_Y5.dta= has W4's
+=ETH_PlotGeovariables_Y4.dta= content under new key names:
+=holder_id=, =household_id=, =parcelroster_id=, =fieldroster_id= (W4:
+=parcel_id=, =field_id=), plus a row counter =id=, and =plot_twi=,
+=plot_srtm=, =plot_srtmslp=, =dist_household= (a STRING, as in W4; 16 blank).
+=(holder_id, parcelroster_id, fieldroster_id)= is unique.  It carries *no
+coordinates* -- neither does W4's.  Join to =plot_features= on
+=plot_id = format_id(holder)_format_id(parcel)_format_id(field)=: 14,311 of its
+14,399 plots (99.4%) match, covering 14,311 of the 14,878 W5 fields (96.2%);
+the 88 unmatched plots belong to 15 holders, 14 of whom do not occur in
+=sect3_pp_w5= at all.  1,871 of its 1,907 households are in =sample()=
+2021-22.  *No build reads it yet* (=rg -i plotgeovar= over Ethiopia finds only sidecars);
+wiring it into =plot_features= is a separate change and an Ethiopia re-warm.
+
+/History./  2026-07-12 (GH #600): recorded =v02_M=, the release then held.
+2026-10-19 (GH #1127): this section used to say the changed file's
+coordinates "are =**CONFIDENTIAL**= anyway (see "GPS redaction"), so the
+content change may not matter".  That was wrong twice: the redaction is the
+plot-roster GPS in =sect3_pp_w5.dta=, not anything in a geovariables file, and
+the held v02 file was not plot data at all.  v03 acquired the same day.
 
 ** Area and the local-unit gap
 
