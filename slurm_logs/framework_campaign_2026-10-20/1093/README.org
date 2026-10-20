@@ -1,0 +1,66 @@
+#+title: GH #1093 declared unit masses: validation
+#+author: Sue
+#+date: 2026-10-20
+
+* Result
+
+Implementation =63fb32477= completes the declared-mass propagation approved under GH #1093.
+It reuses =_declared_kg_factors= for seed, nitrogen and sold-quantity valuation, attaches the existing per-country =unit_kg= record to plot_inputs and preserves the existing Feature carrier.
+The harvest ladder and its audit columns stay intact; yield forwarding is pinned without changing its implementation.
+No Country loader is imported into transformations, no shipped-factor loader runs implicitly, and no fertilizer shares or valuation source are chosen.
+
+* Tests
+
+- New targeted regressions :: 27 passed, covering explicit/attrs maps, empty overrides, country identity, index/column units, metric fallback and override, missing units, invalid factors, exactly 100 kg seed / 46 kg N, sold-price denominator, explicit kg_qty, metadata pooling and yield forwarding.
+- Combined focused selection :: 241 passed in 78.28 seconds; no S3/slow tests selected.
+- Negative control :: six selected regressions fail against exact detached baseline =976fc840d= (four argument/attrs/index/column conversions, sold-price pool and Country input declaration); 21 deselected.
+
+Focused command, from the implementation checkout:
+#+begin_example
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries" LSMS_DATA_DIR=/local/job40255479/1093-patched-data taskset -c 24-27 /local/job40255479/venv_img/bin/python -m pytest -q -n 4 --dist=loadfile -m 'not requires_s3 and not slow' tests/test_gh1093_declared_unit_consumers.py tests/test_crop_kg_factor.py tests/test_median_price_valuation.py tests/test_feature_attrs_carriers.py tests/test_867_nitrogen_content.py tests/test_gh919_country_qualified_units.py tests/test_build_transform_hash.py
+#+end_example
+
+* Independent cold source comparison
+
+=probe.py= was run in separate processes from exact detached baseline =/local/job40255479/worktrees/baseline-976fc840d= and the implementation checkout.
+Both PYTHONPATH and LSMS_COUNTRIES_ROOT matched the active checkout and the probe asserted real import identity.
+Each data root started without L2 parquets; only its dvc-cache link shared content-addressed L1.
+Final roots were =/local/job40255479/1093-base-data-v2= and =/local/job40255479/1093-patched-data-v2=.
+The first attempt completed its builds but hit an aggregate-probe ndarray/string accessor error; that probe-only error was corrected and both builds were repeated from new empty roots.
+No shared L2 was read, written or cleared.
+
+Ethiopia CONTENTS was read before examining country source.
+Its relevant idiosyncrasies are the declared 100 kg quintal, no implicit shipped-table use, native kg input quantities, organic use records without amounts, and the separate parcel/plot join caveat.
+The cold source frames have identical value/index fingerprints: crop_production 85,519 rows; plot_inputs 180,900.
+The added plot_inputs metadata carries the declared quintal; there are no Quintal input quantities today, so seed/N values and per-wave row counts are identical.
+
+The crop sale price pool grows from 1,698 to 2,404 usable observations, including 706 newly usable Quintal sales.
+There are 710 positive-quantity Quintal sale rows: four have nonpositive Value_sold and correctly remain outside the positive-price pool.
+Rows receiving an imputed price grow from 81,567 to 84,328.
+The aggregate probe passes the same harvested-kg quantity into both valuations and compares the existing default national median keyed by j; it does not supply farmgate prices or a new imputation method.
+
+The existing default median pool spans the supplied waves, so adding observations can alter prices in an unchanged-unit wave such as W1.
+A separate per-wave control gives W1 exactly 6,031 priced rows before/after and zero changed prices, as required by its lack of Quintal observations.
+The before/after per-wave controls and all other aggregates are in =comparison.json=.
+This diagnoses unit-conversion coverage, not the scientific suitability of pooling nominal prices across time.
+
+* Measured cache reach
+
+Compared the actual complete country hashes for all 549 registered country/table pairs and wave hashes for all 2,139 country/wave/table cells.
+ZERO hashes move, including GhanaLSS: the symbols changed here are outside its food/nutrition import closure.
+No cache schema bump or country re-warm is required by these source changes.
+Cold builds above were nevertheless used to establish independent unchanged source tables.
+The source loaded by the patch probe was still dirty at ledger HEAD =8999b0ecc=; =comparison.json= records SHA256s verified byte-identical to the later implementation commit =63fb32477=.
+
+To reproduce, from each checkout set matching PYTHONPATH/LSMS_COUNTRIES_ROOT, pin BLAS/OMP/MKL and LSMS_BUILD_WORKERS=1, choose a new private LSMS_DATA_DIR with only an L1 dvc-cache link, then run this implementation checkout's absolute =probe.py --out <aggregate.json>=.
+The script checks that L2 starts empty and writes only hashes/schema-independent totals, never household identifiers or rows.
+The committed comparison keeps all aggregate results; full baseline/patched hash snapshots and runtime logs remain local alongside it.
+
+* Scope boundary
+
+The inherited seed/nitrogen reducers group by t/i/plot_id and omit country, so identical local identifiers from different countries can aggregate on pooled Feature input.
+This patch resolves each row's declared mass by its country, preserving the existing output grain.
+The residual title/body in =comparison.json= records that separate contract question for the dispatcher; no aggregation or valuation policy was silently broadened.
+Existing Ethiopia warning classes and counts are identical before/after.
+
+-- Sue
