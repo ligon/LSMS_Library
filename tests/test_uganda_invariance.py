@@ -21,6 +21,11 @@ debt marker -- ``generate_baseline.py`` never writes one, so a regeneration
 run clears it.  No entry currently carries a null: the two that did (GH #772)
 were regenerated once data access was available.  The mechanism is kept for
 the next fix that lands without it.
+
+A parquet whose ``lsms_cache_waves`` manifest does not cover the waves its
+baseline entry was taken over is skipped, not compared (GH #1113): it is a
+correct partial build left by a subset request (GH #891), and under xdist
+another test file's single-wave call can write one before this file runs.
 """
 
 import hashlib
@@ -123,14 +128,54 @@ def uganda_root():
     return UGANDA_ROOT
 
 
+@pytest.fixture(scope="module")
+def uganda_waves():
+    from lsms_library import Country
+    return [str(w) for w in Country("Uganda").waves]
+
+
+def _expected_coverage(rel_path: str, uganda_waves: list[str]) -> list[str]:
+    """The waves a baseline entry was taken over: every Uganda wave for a
+    ``var/`` (L2-country) entry, the entry's own wave for ``{wave}/_/``."""
+    head = rel_path.split("/", 1)[0]
+    return list(uganda_waves) if head == "var" else [head]
+
+
+def _coverage_skip_reason(rel_path, manifest, expected):
+    """Why a parquet cannot be compared, or ``None`` when it can (GH #1113).
+
+    Since GH #891 a subset request on a cold cache writes ``var/<t>.parquet``
+    holding only the waves it asked for, and records them in the
+    ``lsms_cache_waves`` manifest.  Such a parquet is a correct partial build,
+    not a regression, so comparing it to a full-coverage baseline is
+    meaningless.  Skip ONLY when a manifest is present and short: a parquet
+    with no manifest (every wave-tier parquet, and the Makefile-written
+    ``var/`` tables such as ``fct`` and ``earnings``) is compared as before,
+    since its coverage cannot be read and must not be guessed from ``t``.
+    """
+    if manifest is None:
+        return None
+    missing = sorted(set(expected) - set(manifest))
+    if not missing:
+        return None
+    return (
+        f"{rel_path}: partial build, not compared -- its lsms_cache_waves "
+        f"manifest covers {sorted(manifest)}, the baseline was taken over "
+        f"{sorted(expected)} (missing {missing}).  A subset request built "
+        f"this parquet (GH #891); see GH #1113."
+    )
+
+
 def _parquet_ids():
     """Generate test IDs from baseline keys."""
     return sorted(BASELINE.keys())
 
 
 @pytest.mark.parametrize("rel_path", _parquet_ids())
-def test_parquet_matches_baseline(uganda_root, rel_path):
+def test_parquet_matches_baseline(uganda_root, uganda_waves, rel_path):
     """Each parquet must exactly match its baseline fingerprint."""
+    from lsms_library.local_tools import read_parquet_cache_waves
+
     baseline_entry = BASELINE[rel_path]
 
     if "error" in baseline_entry:
@@ -147,7 +192,18 @@ def test_parquet_matches_baseline(uganda_root, rel_path):
     if not parquet_path.exists():
         pytest.skip(f"Parquet not built: {rel_path}")
 
+    # The manifest is read again after the data: writes are atomic renames,
+    # so a concurrent rebuild can swap the file between the two reads.
+    expected = _expected_coverage(rel_path, uganda_waves)
+    reason = _coverage_skip_reason(
+        rel_path, read_parquet_cache_waves(parquet_path), expected)
+    if reason:
+        pytest.skip(reason)
     df = pd.read_parquet(parquet_path, engine="pyarrow")
+    reason = _coverage_skip_reason(
+        rel_path, read_parquet_cache_waves(parquet_path), expected)
+    if reason:
+        pytest.skip(reason)
     actual = _fingerprint(df)
 
     # Check shape
