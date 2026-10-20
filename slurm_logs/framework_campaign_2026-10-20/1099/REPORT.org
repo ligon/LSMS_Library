@@ -1,0 +1,57 @@
+#+title: GH #1099 absent-wave subset answers
+#+date: 2026-10-20
+#+author: Sue
+
+* Result
+
+A country-declared DataFrame table requested for a nonempty strict subset of known waves now returns a declared, finalized empty frame when none of those waves declares the table and no genuine country-level builder exists.
+Both existing cache-hit gates return before any new wave-declaration inspection.
+On a cache miss this happens before cache reconstruction, so cold, fresh, coverage-short, stale and LSMS_NO_CACHE cases answer consistently without replacing another wave's parquet or coverage manifest.
+The existing =_empty_declared_frame= and =_finalize_result= supply shape, index and dtypes; neither received broader dtype behavior.
+The implementation is limited to country.py's aggregation route plus a clarifying helper docstring.
+
+Issue: https://github.com/ligon/LSMS_Library/issues/1099 .
+Prior art and authorized boundary: .coder/ledger/1099-empty-subset.md, sections 2-5.
+
+* Verification
+
+- New regressions ::15 cases, covering both backends and cold/all-wave/partial/stale/no-cache states, exact empty-frame equality, byte-preservation of any existing country parquet, and unchanged error controls.
+- Before/after :: Replaying the pre-fix aggregation method from git 976fc840d in an isolated pytest process gives 4 failures and 11 passes; the four failures are cold, partial-coverage, stale and no-cache default-backend cases. Current code passes all 15.
+- Cache/routing suite ::136 passed, 10 skipped in 31.49s across test_gh1039_make_backend_no_country_rule.py, test_gh1040_wave_read_gates.py, test_gh866_stale_country_parquet_not_laundered.py test_gh891_wave_subset_cache.py and test_dvc_caching.py. The 10 skips are existing warm-cache mutation tests whose real-country cache is deliberately absent from the private test root.
+- Real survey :: Senegal livestock(waves=['2021-22']) returns0 x 3, index (i,t,animal), three Float64 columns, in cold, 2018-only cache coverage, full-cache coverage and LSMS_NO_CACHE states. Each pre-existing parquet is byte-identical after the call. =real-probe.json= records only aggregate results.
+- Hash impact ::4/4 probed build fingerprints,11/11 country hashes and58/58 wave hashes move. A corpus re-warm is expected; no existing shared L2 cache was touched by this work.
+- Warm-hit regression guards :: Two covered strict-subset tests pin the existing computed hash and reject additional __getitem__ calls, for ordinary and assume_cache_fresh hits; both caught the provisional early placement and pass after moving the check behind the cache-hit opportunities.
+- Fingerprint/schema/API guards :: 352 passed in 75.38s after the final lazy placement, covering test_build_transform_hash.py, test_cache_hash_invalidation.py, test_schema_consistency.py and test_api_discoverability.py.
+- Full combined suite :: Left to the dispatcher's final integration validation; the focused suites here are not described as a complete corpus pass.
+
+All runs used the mounted image, an asserted import path in this worktree, private LSMS_DATA_DIR, BLAS/OMP/MKL = 1, LSMS_BUILD_WORKERS1 and CPU 20-23.
+The real source-build probe linked only the shared L1 blob cache.
+The required source failure stays FileNotFoundError; unknown wave stays KeyError; unknown table method stays AttributeError; failed full-country build stays RuntimeError.
+Existing real country builders retain their prior route, including the independently tracked wrong-wave country-fallback surface; no blanket empty-on-failure rule was added.
+
+* Reproduce
+
+Run from the 1099-empty-subset worktree with PYTHONPATH and LSMS_COUNTRIES_ROOT pointing to it.
+Use /local/job40255479/venv_img/bin/python, set LSMS_SKIP_AUTH=1, OPENBLAS_NUM_THREADS=1, OMP_NUM_THREADS=1, MKL_NUM_THREADS=1, LSMS_BUILD_WORKERS=1 and LSMS_MAKE_JOBS=1; set LSMS_DATA_DIR to a private directory.
+
+- Regression matrix :: python -m pytest -q tests/test_gh1039_make_backend_no_country_rule.py -k absent_subset
+- Baseline matrix :: Add this report directory to PYTHONPATH and run the same command with -p baseline_plugin; the plugin compiles only the original aggregation method from git 976fc840d, never rewrites a worktree file, and should return the four stated failures.
+- Real source probe :: python slurm_logs/framework_campaign_2026-10-20/1099/real_probe.py; it creates its own private root and records only empty-result shape/dtypes and cache-preservation flags.
+- Hash probe :: python slurm_logs/framework_campaign_2026-10-20/1099/hash_probe.py /tmp/1099-hashes.json; compare with the baseline probe made before code changed.
+
+* Country guidance and remaining scope
+
+Albania's scheme records unwired shocks as TODO rather than proof that the instrument lacks a shocks module; returning an empty configured-wave answer makes no questionnaire absence claim.
+Albania CONTENTS excludes 1996 because it is EWS rather than LSMS; valid country waves remain authoritative.
+Senegal's livestock scheme deliberately omits v and disables the sample join; the real probe preserves that design.
+No country wiring, source rows or documentation facts were changed.
+
+The implementation does not alter #1071 corruption policy, country-builder authority, or unrelated source-failure recovery.
+
+* Independent review adjustment
+
+The dispatcher's review identified that the first provisional placement inspected requested-wave declarations before both cache gates.
+Two new tests demonstrated that regression for ordinary and assumed-fresh covered subsets.
+The final implementation keeps declaration inspection behind the cache-hit opportunities and ahead of miss reconstruction/write, preserving the warm path.
+The regular hash check's existing config inspection is unchanged; the new tests pin that already-computed hash to discriminate additional traversal.
+The existing country-builder helper documentation now records its default-backend miss caller too.

@@ -1,0 +1,124 @@
+{
+  "issue": 1099,
+  "base": "976fc840d",
+  "tests": {
+    "baseline": {
+      "failed": 4,
+      "passed": 11
+    },
+    "routing_cache_dvc": {
+      "passed": 136,
+      "skipped": 10,
+      "seconds": 31.49
+    },
+    "fingerprint_schema_api": {
+      "passed": 352,
+      "seconds": 75.38
+    },
+    "total_passed": 488
+  },
+  "hash_impact": {
+    "build_transforms": {
+      "changed": 4,
+      "probed": 4
+    },
+    "country": {
+      "changed": 11,
+      "probed": 11
+    },
+    "wave": {
+      "changed": 58,
+      "probed": 58
+    }
+  },
+  "real_probe": [
+    {
+      "state": "cold",
+      "shape": [
+        0,
+        3
+      ],
+      "index": [
+        "i",
+        "t",
+        "animal"
+      ],
+      "dtypes": {
+        "HeadCount": "Float64",
+        "HeadAcquired": "Float64",
+        "HeadSold": "Float64"
+      },
+      "cached_waves": null,
+      "cache_preserved": true
+    },
+    {
+      "state": "partial",
+      "shape": [
+        0,
+        3
+      ],
+      "index": [
+        "i",
+        "t",
+        "animal"
+      ],
+      "dtypes": {
+        "HeadCount": "Float64",
+        "HeadAcquired": "Float64",
+        "HeadSold": "Float64"
+      },
+      "cached_waves": [
+        "2018-19"
+      ],
+      "cache_preserved": true
+    },
+    {
+      "state": "all",
+      "shape": [
+        0,
+        3
+      ],
+      "index": [
+        "i",
+        "t",
+        "animal"
+      ],
+      "dtypes": {
+        "HeadCount": "Float64",
+        "HeadAcquired": "Float64",
+        "HeadSold": "Float64"
+      },
+      "cached_waves": [
+        "2018-19",
+        "2021-22"
+      ],
+      "cache_preserved": true
+    },
+    {
+      "state": "no_cache",
+      "shape": [
+        0,
+        3
+      ],
+      "index": [
+        "i",
+        "t",
+        "animal"
+      ],
+      "dtypes": {
+        "HeadCount": "Float64",
+        "HeadAcquired": "Float64",
+        "HeadSold": "Float64"
+      },
+      "cached_waves": [
+        "2018-19",
+        "2021-22"
+      ],
+      "cache_preserved": true
+    }
+  ],
+  "residuals": [
+    "Existing country-builder wrong-wave fallback unchanged by authorized scope",
+    "Combined final-head suite belongs to integration validation"
+  ]
+}
