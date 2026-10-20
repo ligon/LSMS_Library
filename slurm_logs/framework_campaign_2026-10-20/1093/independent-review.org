@@ -1,0 +1,34 @@
+#+title: Independent review of GH #1093
+#+author: Sue
+#+date: 2026-10-20
+
+* Verdict
+
+PASS, with the documented inherited pooling limitations retained as separate scope.
+Reviewed implementation =63fb32477= and aggregate evidence at =0aef965cd= against baseline =976fc840d=.
+The reviewer did not author the implementation.
+
+* Checks
+
+The code extends the existing declaration resolver at the three missing consumers and preserves harvest's independent factor layers.
+Explicit empty declarations suppress attrs, invalid declarations fall through to the existing metric conversion, missing-unit sentinels receive no declared mass, and explicit sold =kg_qty= remains authoritative.
+The existing per-country Feature carrier is reused; the added =plot_inputs= stamp occurs in the excluded post-read finalizer.
+No transform-side Country loader, nitrogen-product rule, valuation source or output grouping policy is introduced.
+
+The reviewer independently reran all 27 new regressions in the implementation checkout with an explicit private data root, exact PYTHONPATH/countries root, single BLAS/build workers and CPU affinity 28-29.
+Result: 27 passed in 4.21 seconds.
+The producer's separate broader selection has 241 passes and six selected negative controls fail against the untouched baseline.
+
+The cold comparison and runnable probe explain the 710 positive-quantity Quintal rows as 706 usable positive-price observations and four nonpositive sale values.
+Source value/index fingerprints and existing seed/N totals agree; =plot_inputs= metadata changes as intended.
+The review distinguishes the default cross-wave national price pool from the per-wave control: W1's per-wave prices remain identical.
+The producer's complete hash census reports zero changed hashes across 549 country and 2,139 wave cases; this is compatible with the changed call sites being outside the tagged/imported build closures.
+
+* Limits and follow-up
+
+The reviewer reran the synthetic regressions and inspected the recorded cold evidence; it did not repeat the two complete cold Ethiopia builds.
+The current seed/N reducers omit the country axis and the default national price pool follows caller-supplied keys.
+These inherited semantics remain explicitly described in =comparison.json=; this review does not approve a new scientific pooling convention.
+The final combined-source suite and Feature audit remain necessary integration checks.
+
+-- Sue
