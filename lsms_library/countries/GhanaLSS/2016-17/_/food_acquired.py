@@ -211,24 +211,30 @@ DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
 
 
 def screen_8h(num8h, cat8h):
-    """Keep the 8H rows whose screener ``s8hq1`` is 1 ("1. Yes").
+    """Drop the 8H rows whose screener ``s8hq1`` is 2 ("2. No").
 
-    GH #1008, ruling @ligon 2026-10-19: serve own produce only where the
-    screener says the household consumed this item from own production -- the
-    questionnaire's own skip logic, and what 1998-99, 2005-06 and 2012-13
-    already do.  ``s8hq1`` is asked per (household, item) row.  Applied BEFORE
-    the visit stack, by position on both views (they are the same source rows
-    in the same order).
+    GH #1008 / #1140, ruling @ligon 2026-10-19 (#1140): the gate is
+    ``s8hq1 != 2`` -- drop only "No".  A row whose screener is BLANK but
+    carries real answers is kept; the questionnaire's skip logic removes the
+    households that said they consumed none of this item from own production,
+    and nothing else.  ``s8hq1`` is asked per (household, item) row.  Applied
+    BEFORE the visit stack, by position on both views (they are the same source
+    rows in the same order).
 
-    It removes 868,975 of 934,584 source rows: 868,255 "2. No" and 720 blank.
-    None of the "No" rows carries a quantity or a unit at any visit; 12,038
-    carry a price only, and each is one constant per (visit, item) -- 11,934 at
-    visit 2 (Cassava 2, Tomato 3, Pepper 2, Okra 7) and 104 at visits 3..7 -- a
-    fill, not an answer.  Of the 720 blank screeners, 39 rows (11 households)
-    DO carry quantities; they go too, as in the sibling waves.  Census and
-    costs: ``_/CONTENTS.org``.
+    It removes 868,255 of 934,584 source rows -- every "2. No" -- and keeps the
+    65,609 "1. Yes" rows and the 720 blank ones.  None of the "No" rows carries
+    a quantity or a unit at any visit; 12,038 carry a price only, and each is
+    one constant per (visit, item) -- 11,934 at visit 2 (Cassava 2, Tomato 3,
+    Pepper 2, Okra 7) and 104 at visits 3..7 -- a fill, not an answer.  Of the
+    720 blank screeners, 39 rows (11 households, 109 quantity cells) DO carry
+    quantities with units and prices, every one with ``s8hq2`` answered: those
+    are the rows ``!= 2`` keeps and ``== 1`` (the first ruling's spelling, and
+    what 1998-99 / 2005-06 / 2012-13 do) would have dropped.  The 17 blank
+    rows that carry only a per-(visit, item) constant price are kept too, on
+    ``u='Unknown'``, exactly as the 865 such fills on "Yes" rows are.  Census
+    and costs: ``_/CONTENTS.org``.
     """
-    keep = num8h['s8hq1'].eq(1).to_numpy()
+    keep = num8h['s8hq1'].ne(2).to_numpy()
     return (num8h[keep].reset_index(drop=True),
             cat8h[keep].reset_index(drop=True))
 
