@@ -1,0 +1,55 @@
+{
+  "reviewer": "Sue",
+  "verdict": "PASS",
+  "reviewed_head": "94e82dfa3ff3f31c96d5a1c1db2865914d3ff144",
+  "prior_review": "1099-review.json: FAIL at 7117f5b68, retained as history",
+  "findings": [],
+  "prior_finding_disposition": {
+    "missing_make_with_genuine_rule": "Resolved narrowly in absent_subset_frame: a country Makefile without an inspectable make executable returns None to preserve existing dispatch/failure behavior. _has_country_builder itself is unchanged.",
+    "independent_original_repro": "Exact baseline and repaired candidate both raise expected RuntimeError for Fakeland/build_me, strict absent-wave subset, true rule-only country builder and make unavailable.",
+    "four_nomake_controls": {
+      "dvc_with_Makefile": "RuntimeError",
+      "dvc_without_Makefile": "typed empty",
+      "make_with_Makefile": "typed empty, existing operational-helper policy",
+      "make_without_Makefile": "typed empty"
+    }
+  },
+  "independent_tests": {
+    "passed": 180,
+    "skipped": 10,
+    "warnings": 22,
+    "seconds": 79.89,
+    "files": [
+      "test_gh1039_make_backend_no_country_rule.py",
+      "test_gh1040_wave_read_gates.py",
+      "test_gh866_stale_country_parquet_not_laundered.py",
+      "test_gh891_wave_subset_cache.py",
+      "test_dvc_caching.py",
+      "test_build_transform_hash.py"
+    ],
+    "exact_package_and_countries_identity_asserted": true,
+    "private_data_root": "/local/job40255479/1099-independent-review-round2",
+    "cpus": "20-23",
+    "xdist": "4 --dist=loadfile",
+    "OPENBLAS_NUM_THREADS": 1,
+    "OMP_NUM_THREADS": 1,
+    "MKL_NUM_THREADS": 1,
+    "LSMS_BUILD_WORKERS": 1
+  },
+  "verified_boundaries": [
+    "Cold/all/partial/stale/LSMS_NO_CACHE empty schema and cache byte preservation across default/make backends",
+    "Ordinary and assumed-fresh covered strict-subset hits avoid added __getitem__ traversal",
+    "Existing country-level script/rule builders retain their former route",
+    "Unknown table/wave, full-country build failure and declared source FileNotFoundError remain errors",
+    "Absence uses configuration declarations, never a swallowed source exception",
+    "JSON and unsupported/full/empty request boundaries remain outside guard",
+    "Inherited _has_country_builder no-make operational semantics remain unchanged"
+  ],
+  "evidence_limits": [
+    "Reviewer independently reproduced synthetic no-make failure preservation and reran the six-file suite; producer Senegal source probe and complete corpus cold build were not repeated in this review.",
+    "Producer reports 5 failed/14 passed negative controls against original method; reviewer inspected their construction but independently reran only the original specific no-make failure against baseline and patch in round two.",
+    "Routing remains in tagged _aggregate_wave_data: broad cache invalidation is intentional. Producer sampled hash-impact evidence is retained, not independently regenerated here."
+  ],
+  "country_context": "Senegal CONTENTS read in round one and unchanged relevant to review: population/seasonal-vague and mojibake caveats are separate from configured absence; no new country fact or mapping is introduced.",
+  "process_status": "All reviewer verifier processes completed successfully before this report. No source edits, commits, GitHub writes or shared L2 changes."
+}

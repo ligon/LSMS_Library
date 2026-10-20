@@ -1,0 +1,59 @@
+{
+  "reviewer": "Sue",
+  "verdict": "FAIL",
+  "reviewed_head": "7117f5b683d5c98812027277de88b5d9d7a8536a",
+  "scope": "GH #1099 absent-wave subset routing",
+  "findings": [
+    {
+      "priority": "P1",
+      "title": "A missing make executable is treated as proof that a genuine country Make builder does not exist",
+      "location": "lsms_library/country.py:5008",
+      "supporting_location": "lsms_library/country.py:4939",
+      "ledger_contract": "1099-empty-subset.md sections 1, 3 and 4: preserve genuine country-level builders and failed-source errors; absence is not inferred from inability to build/probe.",
+      "reproduction": {
+        "country": "Synthetic Fakeland",
+        "waves": [
+          "2001",
+          "2002"
+        ],
+        "country_scheme": "build_me: index (t,i), x float, materialize make",
+        "wave_declarations": "2001/_/build_me.py exists; 2002 lacks the table.",
+        "country_builder": "_/Makefile has $(VAR_DIR)/build_me.parquet: maker.py; maker.py exists, but _/build_me.py does not.",
+        "request": "Country('Fakeland').build_me(waves=['2002'])",
+        "backend": "dvc/default",
+        "cache": "cold private LSMS_DATA_DIR",
+        "environment": "shutil.which(make) returns None and subprocess.run([make,...]) raises FileNotFoundError; other tools/subprocesses remain real.",
+        "baseline_exact_976fc840d": "RuntimeError: Could not materialize Fakeland/build_me: no wave-level build succeeded and no cached parquet was found ...",
+        "candidate_7117f5b68": "0-row DataFrame; _has_country_builder(build_me) returns False."
+      },
+      "reason": "The existing helper returns False when make is not on PATH. This patch newly uses that result as scientific absence evidence on the default backend, bypassing an existing rule and converting a build-tool failure into a successful empty answer.",
+      "requested_fix": "Conservatively retain the original route when a country Makefile exists but its rules cannot be inspected because make is unavailable. Distinguish unknown builder authority from proven absence; do not infer no-country-builder from missing tooling. Add a default-backend strict-subset regression with a genuine rule-only builder and make absent."
+    }
+  ],
+  "independent_tests": {
+    "selection": [
+      "test_gh1039_make_backend_no_country_rule.py",
+      "test_gh1040_wave_read_gates.py",
+      "test_gh866_stale_country_parquet_not_laundered.py",
+      "test_gh891_wave_subset_cache.py",
+      "test_dvc_caching.py"
+    ],
+    "passed": 136,
+    "skipped": 10,
+    "warnings": 22,
+    "seconds": 36.82,
+    "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 LSMS_SKIP_AUTH=1 PYTHONPATH=$PWD LSMS_COUNTRIES_ROOT=$PWD/lsms_library/countries LSMS_DATA_DIR=/local/job40255479/1099-independent-review taskset -c 20-23 /local/job40255479/venv_img/bin/python -c <assert exact package/countries identity; pytest.main([-q, files..., -n,4,--dist=loadfile])>",
+    "import_and_country_identity_asserted": true
+  },
+  "other_review_checks": {
+    "covered_ordinary_and_assumed_hits_remain_before_new_guard": true,
+    "config_declared_source_error_is_not_caught_as_absence": true,
+    "unknown_full_json_requests_excluded_from_guard": true,
+    "empty_helper_and_finalizer_reused": true,
+    "bytes_manifest_preservation_matrix_meaningful": true,
+    "baseline_negative_controls_meaningful": true,
+    "real_probe_not_rerun": "Candidate script writes its worktree real-probe.json, so reviewer did not execute it. Author aggregate evidence inspected only."
+  },
+  "country_guidance": "Senegal CONTENTS read before country-source assessment: 2021-22 has no attested universe statement, do not inherit 2018-19 claims; seasonal vagues partition EA households. Configuration absence is not a claim that the questionnaire did not ask a module. TODO food items/conversion and mojibake crosswalk caveats remain unrelated.",
+  "mutation_status": "Reviewer changed no candidate source, committed no files and wrote no GitHub/shared L2 state. All reviewer subprocesses completed before this report; candidate worktree may now be updated by its owner."
+}
