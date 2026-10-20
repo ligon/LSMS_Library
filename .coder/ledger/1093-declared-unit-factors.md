@@ -73,10 +73,21 @@ Measure all actual country-table hashes at base/patch in separate processes; rep
 ## Section 6 / §6 Open questions surfaced to the parent
 
 No human semantic decision is required within approved scope.
-Interpretation to confirm before implementation: "loader fallback" means reuse Country._unit_kg_factors metadata composition plus existing _kg_factor_series fallback, not implicitly importing/loading a Country when attrs is absent; #931 ledger explicitly names that as a hazard.
+Parent-confirmed interpretation: "loader fallback" means reuse Country._unit_kg_factors metadata composition plus existing _kg_factor_series fallback, not implicitly importing/loading a Country when attrs is absent; #931 ledger explicitly names that as a hazard.
 The proposed shared composition helper will keep harvest audit/layer behavior unchanged; no product-identity or valuation-source choice is made.
-Await parent authorization after it surfaces this ledger.
+Parent surfaced/reviewed the ledger and authorized implementation; no remaining semantic question blocks the approved scope.
 
 ### Phase 3 -- verification
 
-Pending implementation and tests; no source change made yet.
+- `_kg_factor_series_with_declared` -- OK (sections 2-4): composes the existing fallback, resolver and sentinel refusal; no duplicate unit-mass lookup or Country import.
+- `seed_kg` / `nitrogen_kg` -- OK (sections 3-5): explicit/attrs/empty override and country-qualified factors pinned; input units as index/column, invalid declarations and missing-unit refusal covered; exact 100 kg seed / 46 kg N synthetic case passes.
+- `median_price_valuation` -- OK (sections 3-4): declared sold-kg conversion restores 706 usable Ethiopia Quintal price observations; four of 710 positive-sold rows correctly remain excluded because Value_sold is nonpositive; explicit kg_qty remains authoritative.
+- Country/Feature metadata -- OK (section 2): real finalize path stamps the pre-existing carrier on plot_inputs; carrier assembly and two distinct country maps are tested.
+- `yield_kg` -- OK (section 2): implementation reused unchanged; both attrs default and explicit/empty argument forwarding covered.
+- No-declaration behavior -- OK (section 4): metric/missing synthetic controls pass and independently cold-built Ethiopia source frames, seed and N totals are identical.
+- Cache reach -- OK (section 4): 0 of 549 actual country hashes and 0 of 2,139 actual wave hashes move, including GhanaLSS.
+- Tests -- 27 new regressions and 241 combined focused tests pass; six selected tests fail on untouched baseline as a negative control.
+- Inherited country-omitting reduction keys -- outside approved unit-propagation scope (section 4); residual drafted in validation comparison.json. No new pooling policy adopted.
+
+Evidence: `slurm_logs/framework_campaign_2026-10-20/1093/README.org`, `comparison.json` and runnable `probe.py`.
+Implementation commit: `63fb32477`; this verification ledger update is committed separately.
