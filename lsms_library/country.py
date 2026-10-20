@@ -81,6 +81,8 @@ from .null_index_audit import check_index_levels
 from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
+from .sampling import (attach as attach_sampling, check_cluster_identity,
+                       outermost_call, sampling_records)
 from .recall import attach as attach_recall, recall_records
 from .derivations import (attach as attach_derivations, records_for as _derivation_records_for,
                           call_inputs as _call_derivation_inputs,
@@ -2785,6 +2787,24 @@ class Country:
         """
         return population_records(self.name)
 
+    @property
+    def sampling(self) -> dict[str, "SamplingRecord"]:
+        """``{wave: SamplingRecord}`` -- how each wave's sample was DRAWN.
+
+        The sibling of :attr:`population` (what the sample REPRESENTS): stages,
+        PSU, stratification, selection, oversamples and panel role, per wave,
+        read from ``{country}/_/sampling.yml``; see
+        :mod:`lsms_library.sampling` (GH #793).
+
+        ``design_tag`` is an EDITORIAL reading and travels with ``source_type``
+        and ``confidence``; ``rec.documented`` is ``False`` for a record that
+        was inferred from data rather than read in a document.
+
+        Empty for a country nobody has curated -- an absence of information,
+        not a finding.
+        """
+        return sampling_records(self.name)
+
     def derivations(self, table: str | None = None) -> dict:
         """``{key: DerivationRecord}`` -- served numbers that are NOT survey answers.
 
@@ -4025,6 +4045,21 @@ class Country:
             # here costs no cache invalidation.  MEASURED, not assumed.
             attach_population(df, self.name)
 
+            # Attach how each wave's sample was DRAWN (GH #793) -- the sibling
+            # of the population record above, with the same placement for the
+            # same two reasons: `_finalize_result` re-runs on every read (warm
+            # cache included), and it is in `_build_registry._EXCLUDED_CALLABLES`,
+            # so attaching here costs no cache invalidation.  Metadata only.
+            # `known_waves`: most curated countries leave their first wave
+            # uncurated, and a one-wave frame of it must resolve `exact` (an
+            # `unrecorded` placeholder), not fall back to every other wave's
+            # record (red team r1, GH #793).  Read only for a curated country,
+            # the same gate as the cluster-identity check below: an uncurated
+            # one pays one lru_cache lookup, and never touches `self.waves`.
+            attach_sampling(
+                df, self.name,
+                known_waves=self.waves if sampling_records(self.name) else None)
+
             # Attach what reference period the food numbers COVER, per wave
             # (GH #851).  Same placement and the same two reasons as the
             # population record above: `_finalize_result` re-runs on every read,
@@ -4127,6 +4162,20 @@ class Country:
             check_index_levels(
                 df, _index_levels,
                 country=self.name, table=str(method_name or "?"))
+
+            # Is `v` the same cluster across the waves in this frame (GH #942)?
+            # Declared per wave BOUNDARY in `sampling.yml`'s `panel:` block;
+            # warns (never rewrites) when the frame crosses one declared
+            # `wave-scoped` / `redefined` / `mixed`.  At `Country`, not
+            # `Feature`, because the hazard is pooling WAVES of one country.
+            # Here for the reasons SITE B gives: runs on every read, and
+            # `_finalize_result` is in `_EXCLUDED_CALLABLES`, so it moves no
+            # cache hash.  Reports once per outermost table call; see
+            # `sampling.outermost_call`.
+            if sampling_records(self.name):
+                check_cluster_identity(
+                    df, country=self.name, table=str(method_name or "?"),
+                    waves=self.waves)
 
         return df
 
@@ -6442,6 +6491,11 @@ class Country:
             method.__name__ = name
             method.__qualname__ = f"Country.{name}"
             method.__module__ = self.__class__.__module__
+            # Mark the call depth (GH #942) so the tables this method fetches
+            # INTERNALLY -- the v-join's `sample()`, the market / location /
+            # valuation lookups -- do not report on waves the caller did not
+            # ask for.  `functools.wraps` carries the name and doc set above.
+            method = outermost_call(method)
             # Cache on the instance so repeated lookups return the same object
             # and IPython's pinfo can find it reliably.
             try:

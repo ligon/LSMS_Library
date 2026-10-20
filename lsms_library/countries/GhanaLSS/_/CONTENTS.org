@@ -387,7 +387,7 @@ as an artefact of it.
 | Rounds    | Cluster ID range | Notes                             |
 |-----------+------------------+-----------------------------------|
 | GLSS1     | 1xxx             | 200 EAs from 1984 census frame    |
-| GLSS2     | 2xxx             | 200 EAs, fresh draw               |
+| GLSS2     | 2xxx             | ~170 EAs: ~half retained GLSS1 workloads (RENUMBERED), ~half from master-sample replicate 6 |
 | GLSS3     | 3xxx             |                                   |
 | GLSS4     | 4xxx             |                                   |
 | GLSS5     | 5xxxx            | 5-digit codes                     |
@@ -396,6 +396,26 @@ as an artefact of it.
 
 The changing prefix makes cross-wave cluster linkage impossible
 without an explicit mapping file.
+
+*GLSS2 is not a fresh draw* (corrected 2026-10-19, GH #942; this row used to
+say "200 EAs, fresh draw" -- see /Tensions/ s2 below, now resolved).  Half of
+GLSS1's workloads were retained for GLSS2 and renumbered into the 2xxx scheme,
+half came from master-sample replicate 6 (G3report.pdf, Appendix 1, printed
+p. 110).  Measured through =Country('GhanaLSS').sample()=: 712 households link
+GLSS1 to GLSS2 and *none* keeps its =v=; they fall in 79 cluster pairs, a clean
+bijection (=1003 -> 2009=, =1013 -> 2049=, ...) with =Region= and =Rural=
+agreeing 79/79.  176 GLSS1 and 170 GLSS2 clusters, so 97 / 91 are unpaired and
+are genuinely different EAs.  The 79 is a *lower bound* on the retained
+workloads (half of 176 is ~88): either some retained workloads yielded no
+re-interview, or "workload" is not exactly "EA".
+
+This is now machine-readable: =GhanaLSS/_/sampling.yml= declares the 1988-89
+boundary =cluster_id_continuity: wave-scoped=, so any =Country('GhanaLSS')=
+frame carrying =v= across 1987-88 -> 1988-89 raises a
+=ClusterIdentityWarning= (rows unchanged).  GLSS3 onward are declared
+=unobservable=: no household links across those boundaries, so grouping on
+=v= across them groups genuinely different EAs and is not warned on.  No
+crosswalk is built (GH #942 ruling, 2026-10-18).
 
 ** Urban/Rural (=Rural=)
 
@@ -1075,7 +1095,9 @@ Consequences a user must not miss:
 Flagged, both sides quoted.  *s1 is now resolved in place* (2026-08-24) --- the
 two assertions it contradicted have been qualified where they stand, rather
 than left to be found 700 lines later; the tension is kept below with both
-quotes intact.  s2--s4 remain *unresolved*.
+quotes intact.  *s2 is resolved in place too* (2026-10-19, GH #942): the
+cluster-numbering row now reads "~half retained ... ~half from replicate 6".
+s3--s4 remain *unresolved*.
 
 *** 1. "no rotating panel or refreshment sample mechanism"
 
@@ -1106,7 +1128,11 @@ this was *not* an accident of fieldwork: it was the stated design.  The
 "Despite being designed as..." framing in that section is contradicted by GSS's
 own documentation.
 
-*** 2. "GLSS2 | 2xxx | 200 EAs, fresh draw"
+*** 2. "GLSS2 | 2xxx | 200 EAs, fresh draw" --- RESOLVED 2026-10-19 (GH #942)
+
+The row has been corrected where it stands (see =Cluster (PSU) variable=); the
+original wording is kept in the quote below, with the reasoning, so the
+correction can be audited.
 
 The cluster-numbering table in =Sampling Design= says:
 
