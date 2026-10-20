@@ -16,8 +16,9 @@ The ruling (@ligon, 2026-10-18) keeps the core policy and fixes the index
 country-side: "core never fixes the index".  On the base the cohort was 13,472
 rows -- 2016-17 ``u`` NaN 13,380, 1987-88 ``v`` NaN 54, 1988-89 ``v`` NaN 38.
 A second ruling (@ligon, 2026-10-19, after red-team r1) gates 2016-17's
-Section 8H on its screener ``s8hq1 == 1``: 12,055 of the 13,380 were
-price-only fills on rows the screener skips.
+Section 8H on its screener, and the #1140 ruling (same day, after r2) fixes
+the gate at ``s8hq1 != 2`` -- drop only "No": 12,038 of the 13,380 were
+price-only fills on rows whose screener says "No".
 
 ===========================================  =================================
 claim                                        test
@@ -28,11 +29,11 @@ additive conservation over the retained      ``test_additive_conservation_*``
 rows, kept apart from the visit reduction
 a sentinel ``u`` brings a row back into      ``test_sentinel_u_rejoins_the_sum``
 the sum; a null ``v`` is still deleted
-2016-17: no NaN ``u``; 1,325 ``Unknown``,    ``test_ghanalss_2016_17_*``
+2016-17: no NaN ``u``; 1,342 ``Unknown``,    ``test_ghanalss_2016_17_*``
 all served ``none`` by the kg ladder; the    (cache-gated)
-screener-skipped fills are gone
+screener-"No" fills are gone
 2016-17 wave script on a synthetic frame:    ``test_ghanalss_2016_17_*``
-8H served only where ``s8hq1 == 1``; only a  (no cache, no microdata)
+8H dropped only where ``s8hq1 == 2``; only a (no cache, no microdata)
 BLANK raw unit code is ``Unknown``
 GLSS1/2: the four cover-page gaps have a     ``test_ghanalss_glss12_*``
 ``sample`` row and a ``v``; both waves'      (cache-gated / synthetic)
@@ -194,12 +195,13 @@ def test_ghanalss_2016_17_unit_is_never_null(ghana_food):
     w = np.asarray(t == "2016-17")
     assert int(pd.isna(u[w]).sum()) == 0
     unknown = w & np.asarray(pd.Series(u).astype("string").eq(U_UNKNOWN).fillna(False))
-    # After the screener gate: 903 produced (870 price-only) + 422 purchased.
-    # Before it (r1): 12,958 produced (12,925 price-only) + 422 purchased.
-    assert int(unknown.sum()) == 1325
-    assert int((unknown & np.asarray(s == "produced")).sum()) == 903
+    # After the screener gate (s8hq1 != 2, #1140): 920 produced (887
+    # price-only) + 422 purchased.  Under the first spelling (== 1): 903
+    # (870) + 422.  Before any gate (r1): 12,958 (12,925) + 422.
+    assert int(unknown.sum()) == 1342
+    assert int((unknown & np.asarray(s == "produced")).sum()) == 920
     sub = ghana_food[unknown]
-    assert int((sub["Quantity"].isna() & sub["Price"].notna()).sum()) == 870
+    assert int((sub["Quantity"].isna() & sub["Price"].notna()).sum()) == 887
 
 
 #: The visit-2 per-item constant "prices" of Section 8H (CONTENTS.org).
@@ -207,18 +209,18 @@ FILLS = {("Cassava", 2.0), ("Tomato (fresh)", 3.0), ("Pepper", 2.0), ("Okra", 7.
 
 
 def test_ghanalss_2016_17_screener_skipped_fills_are_not_served(ghana_food):
-    """Ruling (@ligon, 2026-10-19): 8H only where ``s8hq1 == 1``.
+    """Ruling (@ligon, 2026-10-19, #1140): 8H drops only ``s8hq1 == 2``.
 
-    Of the 12,813 visit-2 fills, 11,934 sat on "No" rows and 14 on blank
-    screeners; the 865 on "Yes" rows stay.  The 104 + 3 later-visit fills go
-    too.  So the 2016-17 produced side loses exactly 12,164 rows
-    (151,721 -> 139,557): 12,055 price-only ``Unknown`` fills and the 109
-    rows of the 39 blank-screener records that carried quantities.
+    Of the 12,813 visit-2 fills, 11,934 sat on "No" rows and go; the 865 on
+    "Yes" rows and the 14 on blank screeners stay (879).  The 104 later-visit
+    "No" fills go too.  So the 2016-17 produced side loses exactly the 12,038
+    "No" price-only ``Unknown`` fills (151,721 -> 139,683); the 109 rows of
+    the 39 blank-screener records that carry quantities are served.
     """
     lv = ghana_food.index.get_level_values
     w = np.asarray(lv("t") == "2016-17")
     prod = w & np.asarray(lv("s") == "produced")
-    assert int(prod.sum()) == 139557
+    assert int(prod.sum()) == 139683
     unknown = prod & np.asarray(pd.Series(lv("u")).astype("string").eq(U_UNKNOWN).fillna(False))
     sub = ghana_food[unknown]
     price_only = (sub["Quantity"].isna() & sub["Price"].notna()).to_numpy()
@@ -226,7 +228,7 @@ def test_ghanalss_2016_17_screener_skipped_fills_are_not_served(ghana_food):
                sub.index.get_level_values("visit")[price_only],
                sub["Price"].to_numpy(dtype=float, na_value=np.nan)[price_only])
     fills = sum(1 for j, visit, p in keys if int(visit) == 2 and (str(j), p) in FILLS)
-    assert fills == 865
+    assert fills == 879
 
 
 def test_ghanalss_2016_17_unknown_rows_get_no_inferred_kilograms(ghana_food):
@@ -393,7 +395,7 @@ def _synthetic_1617():
              s8hq5q=1.0, s8hq5u=48.0),                  # visit 4: unmapped label
         dict(clust=1, nh=1, foodcd=53, s8hq1=1, s8hq2=3, s8hq3p=7.0),   # Yes-row fill: kept
         dict(clust=1, nh=2, foodcd=10, s8hq1=2, s8hq3p=2.0),            # "No" fill: gated
-        dict(clust=1, nh=3, foodcd=53, s8hq1=np.nan, s8hq2=1,           # blank screener: gated
+        dict(clust=1, nh=3, foodcd=53, s8hq1=np.nan, s8hq2=1,           # blank screener: KEPT (#1140)
              s8hq4q=1.0, s8hq4u=7.0, s8hq4p=5.0),
     ]
     num8h = _frame(rows8, c8)
@@ -409,26 +411,34 @@ def _row(df, *key):
     return df.xs(("2016-17",) + key, level=["t", "i", "j", "u", "s", "visit"])
 
 
-def test_ghanalss_2016_17_screener_gate_keeps_only_yes(fa1617):
-    """Ruling (@ligon, 2026-10-19): 8H is served only where ``s8hq1 == 1``.
+def test_ghanalss_2016_17_screener_gate_drops_only_no(fa1617):
+    """Ruling on #1140 (@ligon, 2026-10-19): 8H drops only ``s8hq1 == 2``.
 
-    A "2. No" row goes, AND a blank screener goes -- the literal ruling and
-    what 1998-99 / 2005-06 / 2012-13 already do -- even where, as in 39 real
-    2016-17 rows, the blank-screener row carries a quantity.  ``s8hq1 != 2``
-    would keep those; flipping to it is a decision, so it must fail here.
+    A "2. No" row goes; a BLANK screener that carries real answers is SERVED
+    (39 real 2016-17 rows in 11 households carry quantities, units and
+    prices).  The first spelling, ``s8hq1 == 1`` -- what 1998-99 / 2005-06 /
+    2012-13 still do (GH #1145) -- dropped them; it must fail here, as must
+    removing the gate.
     """
     num9b, num8h, cat8h = _synthetic_1617()
     n, c = fa1617.screen_8h(num8h, cat8h)
-    assert list(n["nh"]) == [1, 1] and list(n["foodcd"]) == [10, 53]
+    assert list(n["nh"]) == [1, 1, 3] and list(n["foodcd"]) == [10, 53, 53]
     # The two views stay aligned row for row (the units come from cat8h).
-    assert list(c["s8hq3u"].astype("string").fillna("")) == ["7. Bowl", ""]
+    assert list(c["s8hq3u"].astype("string").fillna("")) == ["7. Bowl", "", ""]
 
     out = fa1617.build(num9b, num8h, cat8h)
     hh = set(out.index.get_level_values("i"))
     assert "1/02" not in hh, "a screener-No row was served"
-    assert "1/03" not in hh, "a blank-screener row was served"
+    assert "1/03" in hh, "a blank-screener row with answers was dropped"
     prod = out.xs("produced", level="s")
-    assert set(prod.index.get_level_values("i")) == {"1/01"}
+    assert set(prod.index.get_level_values("i")) == {"1/01", "1/03"}
+    # The kept blank-screener row is served as recorded: its unit decoded,
+    # its quantity and farmgate price intact, at its calendar visit.
+    kept = _row(out, "1/03", "Okra", "Bowl", "produced", 3)
+    assert len(kept) == 1
+    assert kept["Quantity"].iloc[0] == 1.0 and kept["Price"].iloc[0] == 5.0
+    # And nothing of the "No" row's fill survives anywhere.
+    assert not (out.index.get_level_values("i") == "1/02").any()
 
 
 def test_ghanalss_2016_17_only_a_blank_code_is_unknown(fa1617):
