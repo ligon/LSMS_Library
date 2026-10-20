@@ -1,0 +1,98 @@
+# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+#
+# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
+# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
+# wave of `Country('GhanaLSS').waves`?  The design fields (stages, strata,
+# selection, oversamples) are #793's curation and are not written yet; their
+# absence here is "not curated", not "not found".
+#
+# Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
+# {wave-scoped, redefined, mixed} makes a `Country('GhanaLSS')` frame that
+# carries `v` across that boundary warn (`ClusterIdentityWarning`); nothing is
+# ever dropped or rewritten.  The first wave (1987-88) has no preceding wave
+# and so no entry.  Vocabulary and field names: see sampling.py.
+
+Sampling:
+
+  '1988-89':
+    panel:
+      household_continuity: rotating-panel
+      cluster_id_continuity: wave-scoped
+      cluster_id_note: |-
+        GLSS2 renumbers the retained GLSS1 EAs under the 2xxx scheme (GLSS1 is
+        1xxx), so a retained cluster carries a different `v` in each round.
+        Half of GLSS1's workloads were retained and half drawn from
+        master-sample replicate 6 (G3report.pdf).  Measured: 0 of 712 linked
+        households keep `v`; they fall in 79 cluster pairs, a clean bijection
+        with Region and Rural agreeing 79/79 (GH #942).  The 79 is a LOWER
+        BOUND on the retained clusters (half of 176 is ~88), and the other 97
+        GLSS1 / 91 GLSS2 clusters are genuinely different EAs.
+      source_type: local-documentation
+      confidence: high
+      source_file: 'lsms_library/countries/GhanaLSS/1991-92/Documentation/pdf/G3report.pdf'
+      locator: 'Appendix 1, "Sample design for GLSS1 and GLSS2", printed page 110 (quoted in CONTENTS.org, "GLSS1 -> GLSS2: a rotating panel with a half-retained sub-sample")'
+
+  '1991-92':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: unobservable
+      cluster_id_note: |-
+        The rotation was abandoned at GLSS3 ("it was decided that GLSS3 would
+        differ substantially from GLSS1 and GLSS2 ... a larger and more
+        widespread sample was required").  No 1991-92 household is linked to
+        1988-89 (0 shared `i`), and the 3xxx keyspace shares nothing with 2xxx,
+        so grouping on `v` across this boundary groups genuinely different
+        EAs -- correct, and deliberately not warned on.
+      source_type: local-documentation
+      confidence: high
+      source_file: 'lsms_library/countries/GhanaLSS/1991-92/Documentation/pdf/G3report.pdf'
+      locator: 'Appendix 1, printed page 110 (quoted in CONTENTS.org, "GLSS3: the design breaks with GLSS1/GLSS2")'
+
+  '1998-99':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: unobservable
+      cluster_id_note: |-
+        No household is linked across this boundary (0 shared `i`) and the
+        4xxx keyspace shares nothing with 3xxx: separate cross-sections, so
+        `v` cannot be compared and need not be.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (iv); re-measured 2026-10-19 through Country("GhanaLSS").sample()'
+
+  '2005-06':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: unobservable
+      cluster_id_note: |-
+        No household is linked across this boundary (0 shared `i`); GLSS5
+        moves to 5-digit 5xxxx cluster codes.  Separate cross-sections.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (iv); re-measured 2026-10-19 through Country("GhanaLSS").sample()'
+
+  '2012-13':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: unobservable
+      cluster_id_note: |-
+        No household is linked across this boundary (0 shared `i`); 6xxxx
+        cluster codes.  Separate cross-sections.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (iv); re-measured 2026-10-19 through Country("GhanaLSS").sample()'
+
+  '2016-17':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: unobservable
+      cluster_id_note: |-
+        No household is linked across this boundary (0 shared `i`); 7xxxx
+        cluster codes.  Separate cross-sections.
+      source_type: derived-from-data
+      confidence: medium
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (iv); re-measured 2026-10-19 through Country("GhanaLSS").sample()'
