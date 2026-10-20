@@ -1,0 +1,54 @@
+#+title: Framework campaign checkpoint, 2026-10-20
+#+author: Sue
+
+* Scope
+
+The maintainer requested synchronization with GitHub development, a repair of the Windows CI failure, and an evaluation of additional framework work before attempting v0.16.0.
+No release has been requested at this checkpoint.
+
+* Source and environment
+
+- Baseline :: GitHub development =976fc840d12ba40f1602b7dff58b81548632b2a9=, fetched and fast-forwarded from =3e3bd26ee=; published to filesystem origin with =git push origin development=.
+- Working clone :: =/local/job40255479/mirrors/LSMS_Library=.
+- Allocation :: Job 40255479, =n0071.savio3=, 32 cores, 93 GiB RAM, approximately 72 hours remaining at start.
+- Environment :: The shared squashfs image was extracted to =/local/job40255479/venv_img= with =unsquashfs -f -processors 8= after FUSE returned =Operation not permitted=.
+  No shared environment was modified and the pre-existing local =.venv= directory was left intact.
+- Python :: =/local/job40255479/venv_img/bin/python=; pandas 3.0.6, numpy 2.4.6, pyarrow 25.0.1, ligonlibrary 0.2.3, fooddatacentral 1.0.13, pytest 8.4.2.
+- Import identity :: =PYTHONPATH= names the executing checkout; imports were asserted against its real top-level path.
+- Account checkpoint :: =check_usage.sh -a fc_jevons= reported 66,351 SUs used of 1,500,000 on 2026-10-20 at 23:24 UTC.
+
+* Concurrent work
+
+- Windows :: =/local/job40255479/worktrees/windows-ci=, branch =fix/windows-shocks-digest-20261020=; private cold builds and exact encoding-delta accounting before any expected-digest change.
+- Reliability :: =/local/job40255479/worktrees/framework-reliability=, branch =review/framework-reliability-20261020=; reconcile cache, build, CI, provenance, and acquisition issues against merged work and human rulings.
+- Contracts :: =/local/job40255479/worktrees/framework-contracts=, branch =review/framework-contracts-20261020=; reconcile API, units, sampling, coverage, and audit-harness issues.
+- Full suite :: Baseline source with 16 loadfile workers, one build worker and one BLAS/OMP/MKL thread per worker, CPU affinity 0-15, nice 15.
+  Output is captured directly in =/local/job40255479/control/framework-campaign/full-suite.log= and =full-suite.xml=.
+
+* Cache isolation
+
+The suite uses =/local/job40255479/framework-validation-data=, a physical copy of the completed bundle corpus rather than a shared writable L2.
+All 1,519 copied files have matching SHA256 and distinct physical identities; 341,473,975 bytes total.
+Only the L1 blob cache is linked to the shared cache.
+The complete copy manifest is [[file:validation/private-copy.json][validation/private-copy.json]].
+
+* Initial findings
+
+Uganda's =CONTENTS.org= documents GH #805 changing =HowCoped0/1/2= in 862, 756, and 394 cells from U+0085 to U+2026, retaining all 14,457 rows.
+The old Windows expected digest predates that change.
+The current Linux cold build independently reproduces the Windows digest =0ab2ea4c79dd=; exact counterfactual accounting is still being verified.
+
+The active development ruleset requires only =unit-tests= and has no merge-queue rule.
+The merged #932 workflow therefore does not yet enforce credentialed tests before every development merge.
+The nightly schedule also awaits the workflow reaching the default branch, master.
+These are release-readiness gaps, distinct from the Windows mismatch.
+
+* Next actions
+
+Complete the exact Windows digest accounting, review the minimal patch, and open a PR with credentialed Windows validation.
+Reconcile the full-suite outcome and both independent backlog evaluations before recommending v0.16.0 scope.
+Routine PRs remain for human merge under the backlog-workflow skill.
+
+* Attribution
+
+Sue, GPT-6.
