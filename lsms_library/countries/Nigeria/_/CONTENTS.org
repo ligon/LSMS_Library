@@ -366,7 +366,9 @@ v01 sidecars' md5s): *104 byte-identical*, *0 removed*, and
   62: =food_own*= / =food_purch*= by group, non-food, =totcons_adj=,
   =popw=, =reg_def_mean=).  Its Stata file label is mis-set to "PH HH Section
   A - Cover".  *Not wired*: no Nigeria table reads a consumption aggregate in
-  any wave, so there is nothing for it to join.
+  any wave, so there is nothing for it to join -- and every earlier wave
+  already holds one, equally unwired (=cons_agg_wave{1,2,3}_visit{1,2}= for
+  W1--W3, =totcons_final.dta= for W4).
 
 *The geovariables file is not what #978 named.*  The issue (and the v01-era
 text of this section) called it =NGA_HouseholdGeovariables_Y5.dta= with
