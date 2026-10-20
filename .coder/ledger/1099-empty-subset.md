@@ -59,4 +59,10 @@ Finalization must be measured on empty frames: if the existing helper/finalizer 
 
 ### Phase 3 -- verification
 
-Pending implementation authorization and tests.
+- `absent_subset_frame` -- OK (sections2,4,5): reuses declaration and country-builder machinery; called only after existing cache-hit opportunities or at a wave-build descent. It never turns a source exception into absence.
+- Existing `_empty_declared_frame` / `_finalize_result` -- OK (sections2,5): reused without changing dtype behavior; real Senegal result is0x3 with the existing Float64 schema and `(i,t,animal)` index.
+- Cache preservation -- OK (section4): cold/all/partial/stale/no-cache matrix checks bytes; real2018-only and all-wave manifests survive a2021-22 empty request.
+- Warm read path -- OK (sections2,4): independent review caught a provisional eager guard; two new tests reject additional wave declaration inspection on ordinary and assumed-fresh covered strict-subset hits. The guard is now lazy and both pass.
+- Error boundaries -- OK (section4): source failure stays FileNotFoundError; invalid wave stays KeyError; unknown method stays AttributeError; full build with no source stays RuntimeError; real country-builder control unchanged.
+- Regressions -- OK (section4):15 new cases; original aggregation replay4 failures /11 passes; final code15 passes. Routing/cache/DVC group136 passed /10 cold-root skips. Fingerprint/schema/API guard group 352 passed after the final lazy placement.
+- Cache impact -- OK (section4):4/4 build fingerprints,11/11 country hashes,58/58 wave hashes move. Corpus re-warm is expected; no shared L2 was cleared or rebuilt.
