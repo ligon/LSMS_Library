@@ -2550,11 +2550,13 @@ class Country:
         whose raw labels are already canonical (Ethiopia serves ``Quintal``)
         resolves without needing a ``u`` row for it.
 
-        Two consumers.  The FOOD ladder is handed this dict as ``unit_kg`` by
+        The FOOD ladder is handed this dict as ``unit_kg`` by
         ``food_prices`` / ``food_quantities``; the CROP ladder
         (``transformations.harvest_kg_factors``, GH #931) reads it off
         ``crop_production.attrs['unit_kg']``, stamped as ``{country: dict}``
-        by ``_finalize_result``.
+        by ``_finalize_result``.  The same record on ``plot_inputs`` serves
+        ``seed_kg`` / ``nitrogen_kg``; crop sale valuation reads it too
+        (GH #1093).
         """
         maps = self.categorical_mapping
         table = maps.get('u_kg')
@@ -4025,7 +4027,7 @@ class Country:
             # population record's two reasons: this re-runs on every read, and
             # `_finalize_result` is in `_build_registry._EXCLUDED_CALLABLES`, so
             # it costs no cache invalidation.  Metadata only.
-            if method_name == 'crop_production':
+            if method_name in {'crop_production', 'plot_inputs'}:
                 try:
                     df.attrs[UNIT_KG_ATTRS_KEY] = {self.name: self._unit_kg_factors()}
                 except Exception as exc:
@@ -4033,7 +4035,7 @@ class Country:
                         f"{self.name}: could not attach the declared unit "
                         f"masses (attrs[{UNIT_KG_ATTRS_KEY!r}]; "
                         f"{type(exc).__name__}: {exc}).  The table is "
-                        f"unaffected, but harvest_kg will apply no u_kg "
+                        f"unaffected, but crop/input transforms will apply no u_kg "
                         f"declaration to it.")
 
             # Attach what this survey's documentation says the sample

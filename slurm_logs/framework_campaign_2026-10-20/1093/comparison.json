@@ -1,0 +1,265 @@
+{
+  "baseline_commit": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "baseline_probe_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "cold_comparison": {
+    "baseline": {
+      "crop_production": {
+        "declaration": {
+          "Ethiopia": {
+            "quintal": 100.0
+          }
+        },
+        "fingerprint": "74f8795772129a6da0e586bd3b0ab161099674d49dca94c2a101bb593fc39921",
+        "rows": 85519
+      },
+      "nitrogen": {
+        "2011-12": {
+          "Nitrogen_kg": 31661.71955802818,
+          "rows": 4325
+        },
+        "2013-14": {
+          "Nitrogen_kg": 81761.90559985818,
+          "rows": 5515
+        },
+        "2015-16": {
+          "Nitrogen_kg": 214700.745700081,
+          "rows": 5816
+        },
+        "2018-19": {
+          "Nitrogen_kg": 114331.31,
+          "rows": 3854
+        },
+        "2021-22": {
+          "Nitrogen_kg": 58391.54,
+          "rows": 2948
+        }
+      },
+      "plot_inputs": {
+        "declaration": null,
+        "fingerprint": "5693e9e9c08628dd58047565d1973df182a3641acccbc2a1a0a2f81417308878",
+        "rows": 180900
+      },
+      "positive_sold_quintal_rows": 710,
+      "price_pool_quintal_rows": 0,
+      "price_pool_rows": 1698,
+      "priced_rows": 81567,
+      "seed": {
+        "2011-12": {
+          "Seed_kg": 170577.07,
+          "rows": 13514
+        },
+        "2013-14": {
+          "Seed_kg": 308772.54000000004,
+          "rows": 15232
+        },
+        "2015-16": {
+          "Seed_kg": 257892.919,
+          "rows": 14334
+        },
+        "2018-19": {
+          "Seed_kg": 210133.46400000004,
+          "rows": 10050
+        },
+        "2021-22": {
+          "Seed_kg": 108090.894,
+          "rows": 7400
+        }
+      },
+      "valuation": {
+        "2011-12": {
+          "Value": 4581240.635341602,
+          "_unit_price": 96114.81824498477,
+          "rows": 7744
+        },
+        "2013-14": {
+          "Value": 32780915.585966043,
+          "_unit_price": 516206.5573604495,
+          "rows": 26159
+        },
+        "2015-16": {
+          "Value": 26787002.10909804,
+          "_unit_price": 552632.3417043709,
+          "rows": 25920
+        },
+        "2018-19": {
+          "Value": 26181786.54365382,
+          "_unit_price": 307163.07737203117,
+          "rows": 14092
+        },
+        "2021-22": {
+          "Value": 18754374.14750817,
+          "_unit_price": 293572.97362290224,
+          "rows": 11604
+        }
+      },
+      "warnings": {
+        "ClusterIdentityWarning": 2,
+        "GrainCollapseWarning": 4,
+        "NullIndexKeyWarning": 2,
+        "NutrientCoverageWarning": 1,
+        "QuantityImplausibleWarning": 3
+      }
+    },
+    "baseline_root": "/local/job40255479/1093-base-data-v2",
+    "patched": {
+      "crop_production": {
+        "declaration": {
+          "Ethiopia": {
+            "quintal": 100.0
+          }
+        },
+        "fingerprint": "74f8795772129a6da0e586bd3b0ab161099674d49dca94c2a101bb593fc39921",
+        "rows": 85519
+      },
+      "nitrogen": {
+        "2011-12": {
+          "Nitrogen_kg": 31661.71955802818,
+          "rows": 4325
+        },
+        "2013-14": {
+          "Nitrogen_kg": 81761.90559985818,
+          "rows": 5515
+        },
+        "2015-16": {
+          "Nitrogen_kg": 214700.745700081,
+          "rows": 5816
+        },
+        "2018-19": {
+          "Nitrogen_kg": 114331.31,
+          "rows": 3854
+        },
+        "2021-22": {
+          "Nitrogen_kg": 58391.54,
+          "rows": 2948
+        }
+      },
+      "plot_inputs": {
+        "declaration": {
+          "Ethiopia": {
+            "quintal": 100.0
+          }
+        },
+        "fingerprint": "5693e9e9c08628dd58047565d1973df182a3641acccbc2a1a0a2f81417308878",
+        "rows": 180900
+      },
+      "positive_sold_quintal_rows": 710,
+      "price_pool_quintal_rows": 706,
+      "price_pool_rows": 2404,
+      "priced_rows": 84328,
+      "seed": {
+        "2011-12": {
+          "Seed_kg": 170577.07,
+          "rows": 13514
+        },
+        "2013-14": {
+          "Seed_kg": 308772.54000000004,
+          "rows": 15232
+        },
+        "2015-16": {
+          "Seed_kg": 257892.919,
+          "rows": 14334
+        },
+        "2018-19": {
+          "Seed_kg": 210133.46400000004,
+          "rows": 10050
+        },
+        "2021-22": {
+          "Seed_kg": 108090.894,
+          "rows": 7400
+        }
+      },
+      "valuation": {
+        "2011-12": {
+          "Value": 4764865.615531406,
+          "_unit_price": 91195.70805692395,
+          "rows": 7744
+        },
+        "2013-14": {
+          "Value": 31116307.51781227,
+          "_unit_price": 464712.1483397579,
+          "rows": 26159
+        },
+        "2015-16": {
+          "Value": 23751150.984979168,
+          "_unit_price": 495097.3835748788,
+          "rows": 25920
+        },
+        "2018-19": {
+          "Value": 22728468.96502463,
+          "_unit_price": 277214.0866022941,
+          "rows": 14092
+        },
+        "2021-22": {
+          "Value": 16532885.929555582,
+          "_unit_price": 264890.643368435,
+          "rows": 11604
+        }
+      },
+      "warnings": {
+        "ClusterIdentityWarning": 2,
+        "GrainCollapseWarning": 4,
+        "NullIndexKeyWarning": 2,
+        "NutrientCoverageWarning": 1,
+        "QuantityImplausibleWarning": 3
+      }
+    },
+    "patched_root": "/local/job40255479/1093-patched-data-v2"
+  },
+  "hash_impact": {
+    "country_hashes": [],
+    "country_pairs_compared": 549,
+    "wave_cells_compared": 2139,
+    "wave_hashes": []
+  },
+  "implementation_commit": "63fb32477",
+  "patched_probe_head": "8999b0ecce6bda5c0bd273536a436dab7eae8775",
+  "patched_source_was_dirty_at_probe": "The probe loaded the exact source later committed as 63fb32477; SHA256s below match that commit.",
+  "per_wave_control": {
+    "2011-12": {
+      "changed_price_rows": 0,
+      "priced_after": 6031,
+      "priced_before": 6031
+    },
+    "2013-14": {
+      "changed_price_rows": 0,
+      "priced_after": 16375,
+      "priced_before": 16375
+    },
+    "2015-16": {
+      "changed_price_rows": 4641,
+      "priced_after": 13835,
+      "priced_before": 13835
+    },
+    "2018-19": {
+      "changed_price_rows": 10128,
+      "priced_after": 13703,
+      "priced_before": 10729
+    },
+    "2021-22": {
+      "changed_price_rows": 8829,
+      "priced_after": 11133,
+      "priced_before": 10657
+    }
+  },
+  "residual": {
+    "body": "Pre-existing: seed_kg and nitrogen_kg group by t/i/plot_id and do not preserve country on pooled Feature input. This issue applies country-qualified unit masses per row but does not change the existing output grain. Investigate countries whose household/plot identifiers collide before choosing a country-preserving output contract; valuation default item_keys=(j,) likewise does not fence waves/countries unless caller supplies those keys. No new scientific pooling rule is selected by #1093.",
+    "title": "Crop input transforms omit the country axis from reduction keys"
+  },
+  "sale_pool_partition": {
+    "missing_sale_value": 0,
+    "positive_sold_quintal_rows": 710,
+    "usable_positive_price_rows_recovered": 706,
+    "zero_or_negative_sale_value": 4
+  },
+  "source_sha256": {
+    "lsms_library/country.py": "8a13e98fef6c0c3bf719d79c53f48690b270ac99128ca72d8288690c3274b1b1",
+    "lsms_library/transformations.py": "8d6c3232afa7bcc1cc7be3bd63d9a588a4142d1a46d51f1a89ba054589ef6965",
+    "tests/test_gh1093_declared_unit_consumers.py": "fa8d2448d9c5a35102f4b9858eec9a2eb9f6d6046a88121c8d6f5f4226975b4e"
+  },
+  "tests": {
+    "baseline_selected_failures_expected": 6,
+    "focused_seconds": 78.28,
+    "focused_selection": 241,
+    "new_regressions": 27
+  }
+}
