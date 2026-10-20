@@ -3,6 +3,14 @@
 **Search tier used:** ripgrep + git (floor), GitHub issue body/comments; base
 `976fc840d12ba40f1602b7dff58b81548632b2a9`. Inherits `STANDING.md`.
 
+Existing unpublished prior art discovered when the ledger commit's publish
+collided with `origin/fix/1143-decimal-comma`: commits `0020cfdac` (parser),
+`15d2d567f` (tests), `7393a3074` (country notes), based on `238a4c15d`.
+Parent preserved that branch, renamed this branch with the job suffix, and
+cherry-picked only the parser/tests as `3e49c4bea` / `a91ae9107`, preserving
+their attribution. Extend this existing implementation rather than duplicate
+it; historical country notes are evidence to verify, not current measurements.
+
 ## §1 Task, restated
 
 Correct `_parse_explicit_metric` so the metric rung reads an entire numeric
@@ -17,6 +25,7 @@ cache-fingerprint reach before landing.
 |---|---|---|---|
 | `_EXPLICIT_METRIC_PATTERNS` | `lsms_library/transformations.py:1601` | mass/volume patterns and scales; `tests/test_metric_fraction_parse.py`, `tests/test_volume_as_mass_kwarg.py` | extend number token and left boundary |
 | `_metric_number` | `lsms_library/transformations.py:1625` | decimal point / fraction, zero-denominator error; `tests/test_metric_fraction_parse.py:73` | extend comma interpretation, reuse division |
+| `_METRIC_NUMBER`, `_metric_scalar`, comma grammars | prior `0020cfdac`, now `3e49c4bea` | shared comma implementation; `tests/test_metric_decimal_comma.py` from `15d2d567f` | reuse and correct leading-zero/malformed-token gaps |
 | `_parse_explicit_metric` | `lsms_library/transformations.py:1645` | first pattern's number times scale; catches invalid/zero denominator; doctests and tests above | reuse |
 | `_seeded_kg_factors` | `lsms_library/transformations.py:1714` | declarations/known units outrank parser; positive finite factors; `tests/test_gh919_country_qualified_units.py` | reuse |
 | `food_kg_factors` | `lsms_library/transformations.py:1959` | food factor ladder; `tests/test_food_kg_inference.py` | reuse |
@@ -78,8 +87,8 @@ cache-fingerprint reach before landing.
 ## §6 Open questions for the human
 
 None requiring another user decision. Parent has confirmed the issue's comma
-rule and preserving existing range endpoints. Await parent surfacing this
-ledger before implementation. Mixed-separator/malformed strings decline;
+rule and preserving existing range endpoints. Parent surfaced and approved
+this ledger and the prior-branch recovery on 2026-10-20. Mixed-separator/malformed strings decline;
 changing broader multi-quantity/range semantics is out of scope.
 
 ### Phase 3 - verification
