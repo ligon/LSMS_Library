@@ -202,7 +202,12 @@ Nigeria::food_acquired::w1-card-weight:
     the expenditure each derived purchased row records: the derived kilograms
     imply a Naira/kg price near the item's own Kg-row median (red team r1:
     median ratio 0.65 over the Quantity < 1 rows), where the same weight on
-    the Quantity >= 1 rows implies a median 0.032.
+    the Quantity >= 1 rows implies a median 0.032.  Measured 2026-10-19 on
+    the 2,574 priced purchased sized rows: expenditure-implied 5,514 kg;
+    base 19,374; card weight on every row 46,600; this rule 10,517.  The
+    inputs callable joins 1:1 to all 1,856 derived rows and reproduces their
+    Quantity_kg; each derived row's served Quantity is its single raw answer
+    (no duplicate-key sum).
   contents: >-
     Nigeria/_/CONTENTS.org, "W1 post-harvest units: the stated container
     weight serves a fraction of a container only" (GH #1035)
