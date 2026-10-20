@@ -102,7 +102,12 @@ changing broader multi-quantity/range semantics is out of scope.
   grouping follows the issue; zero-prefix precision follows parent ruling;
   malformed tokens decline without breaking pinned range/fraction cases.
 - Food/crop consumers: **OK (anchored on §2/§5)**. Reuse existing factor ladders
-  and API derivations; 359 focused tests passed. No duplicate conversion path.
+  and API derivations; 370 focused tests passed after independent review.
+  No duplicate conversion path. Review corrected zero-padded first groups to
+  the literal issue rule and refused unsupported exponent-like fragments with
+  repeated signs/whitespace; all six live quantity/price frames remain equal
+  to the reviewed snapshots (String-index NA policy normalized on both sides
+  to account for parquet serialization).
 - Live evidence: **OK (anchored on §4)**. Private exact-base/current cold builds
   affect 783 Senegal + 126 Benin + 36 CotedIvoire quantity rows (945 total).
   All source frames and native quantities are unchanged; 692/68/23 default
