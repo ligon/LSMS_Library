@@ -4092,7 +4092,8 @@ def _shipped_factor_lookup(df, shipped_factors):
 #: ``population`` / ``recall`` / ``derivations`` records are, so a pooled
 #: ``Feature`` frame's record is the plain union of its countries' records
 #: (``feature._ATTRS_CARRIERS``) and each row can be served its OWN country's
-#: table.  Written by ``Country._finalize_result`` on ``crop_production`` from
+#: table.  Written by ``Country._finalize_result`` on ``crop_production`` and
+#: ``plot_inputs`` from
 #: ``Country._unit_kg_factors`` -- the country's merged ``u`` and ``u_kg``
 #: categorical tables, the same composition the food ladder is handed -- and
 #: read by :func:`harvest_kg_factors` when its ``unit_kg`` is left ``None``.
@@ -4171,7 +4172,7 @@ def _declared_kg_factors(df, unit_kg):
             table = next(iter(tables.values()))
         else:
             warnings.warn(
-                f"harvest_kg_factors: the declared unit_kg record names "
+                f"the declared unit_kg record names "
                 f"{sorted(tables)} but the frame has no 'country' level or "
                 f"column and no attrs['country'] among them, so no row can be "
                 f"matched to its country's table and NONE is applied.  Keep "
@@ -4186,6 +4187,23 @@ def _declared_kg_factors(df, unit_kg):
         if rows.any():
             out[rows] = _as_float(units[rows].map(table))
     return _valid_factor(out), origin
+
+
+def _kg_factor_series_with_declared(df, *, volume_as_mass=True, unit_kg=None):
+    """Existing unit-factor fallback, overlaid with each row's declaration.
+
+    Reuses the resolver and precedence of the crop ladder (GH #1093,
+    ledger ``1093-declared-unit-factors.md`` sections 2-4).  Kept separate
+    from ``_kg_factor_series`` because ``harvest_kg_factors`` needs that
+    unmodified fallback to construct its own reported/shipped/audit layers.
+    ``None`` reads attrs; an explicit empty mapping suppresses that record.
+    A declaration never supplies a unit to a missing-unit sentinel.
+    """
+    fallback = _kg_factor_series(df, volume_as_mass=volume_as_mass)
+    declared, _ = _declared_kg_factors(df, unit_kg)
+    declared = np.where(_unit_sentinel_mask(df), np.nan, declared)
+    return pd.Series(np.where(np.isnan(declared), fallback.to_numpy(), declared),
+                     index=df.index, dtype='float64')
 
 
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
@@ -5330,7 +5348,8 @@ def _warn_nitrogen_coverage(tally, total_mass, n_rows):
             NutrientCoverageWarning, stacklevel=3)
 
 
-def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
+def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
+                unit_kg=None):
     """Kilograms of nitrogen applied per plot (WB ``nitrogen_kg``).
 
     MECHANICAL reduction (GAP 2).  For each fertilizer input row, convert
@@ -5348,6 +5367,11 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
         product).  Defaults to :data:`_NITROGEN_CONTENT`.
     volume_as_mass : bool, default True
         Forwarded to the unit→kg conversion.
+    unit_kg : mapping, optional
+        Declared unit masses, overriding metric/inferred unit factors.
+        Defaults to ``plot_inputs.attrs['unit_kg']``; an explicit empty
+        mapping disables declarations.  Accepts per-country records as in
+        :func:`harvest_kg_factors`.
 
     Returns
     -------
@@ -5417,17 +5441,10 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     n_share, _match_tally = _nitrogen_shares(inp, content)
     n_share.index = df.index
 
-    # Resolve a kg quantity.  Uganda keeps the unit in a *column* ``u``; the
-    # shared factor machinery wants ``u`` in the index, so temporarily
-    # promote it when needed.
-    if 'u' in (df.index.names or []):
-        kg_per_unit = _kg_factor_series(df, volume_as_mass=volume_as_mass)
-    elif 'u' in df.columns:
-        tmp = df.set_index('u', append=True)
-        kg_per_unit = _kg_factor_series(tmp, volume_as_mass=volume_as_mass)
-        kg_per_unit.index = df.index
-    else:
+    if 'u' not in (df.index.names or []) and 'u' not in df.columns:
         raise ValueError("plot_inputs must carry a 'u' unit level or column")
+    kg_per_unit = _kg_factor_series_with_declared(
+        df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     qty = pd.to_numeric(df['Quantity'], errors='coerce')
     n_kg = qty * kg_per_unit * n_share
@@ -5450,7 +5467,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     return res
 
 
-def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
+def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True, unit_kg=None):
     """Kilograms of seed applied per plot (WB ``seed_kg``).
 
     MECHANICAL reduction (GAP 2).  Filters ``plot_inputs`` to seed rows,
@@ -5467,6 +5484,9 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
         Preferred Label).
     volume_as_mass : bool, default True
         Forwarded to the unit→kg conversion.
+    unit_kg : mapping, optional
+        Declared unit masses, as in :func:`nitrogen_kg`.  ``None`` reads
+        ``plot_inputs.attrs['unit_kg']``; ``{}`` disables declarations.
 
     Returns
     -------
@@ -5492,14 +5512,10 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
         raise ValueError("plot_inputs must have an 'input' level or column")
 
     seed = seed.copy()
-    if 'u' in (seed.index.names or []):
-        kg_per_unit = _kg_factor_series(seed, volume_as_mass=volume_as_mass)
-    elif 'u' in seed.columns:
-        tmp = seed.set_index('u', append=True)
-        kg_per_unit = _kg_factor_series(tmp, volume_as_mass=volume_as_mass)
-        kg_per_unit.index = seed.index
-    else:
+    if 'u' not in (seed.index.names or []) and 'u' not in seed.columns:
         raise ValueError("plot_inputs must carry a 'u' unit level or column")
+    kg_per_unit = _kg_factor_series_with_declared(
+        seed, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     qty = pd.to_numeric(seed['Quantity'], errors='coerce')
     kg = qty * kg_per_unit
@@ -7075,6 +7091,7 @@ def median_price_valuation(item_df, geo_levels, *,
                            threshold=10,
                            weight_col=None,
                            volume_as_mass=True,
+                           unit_kg=None,
                            price_col='_unit_price',
                            out_col='Value'):
     """Value item rows at a geography-ladder *median unit price* (WB valuation).
@@ -7195,6 +7212,11 @@ def median_price_valuation(item_df, geo_levels, *,
         ``tests/test_median_price_valuation.py``.  See :func:`_weighted_median`.
     volume_as_mass : bool, default True
         Forwarded to the kg conversion of ``qty_col`` when ``kg_qty`` is None.
+    unit_kg : mapping, optional
+        Declared unit masses for converting ``qty_col`` when ``kg_qty`` is
+        None, as in :func:`harvest_kg_factors`.  Defaults to
+        ``item_df.attrs['unit_kg']``; ``{}`` suppresses that record.
+        An explicit ``kg_qty`` remains authoritative and ignores this option.
     price_col : str, default '_unit_price'
         Name for the imputed-price column added to the returned frame.
     out_col : str, default 'Value'
@@ -7268,8 +7290,8 @@ def median_price_valuation(item_df, geo_levels, *,
             raise ValueError(f"item_df must have a {qty_col!r} column "
                              "(or pass kg_qty)")
         sold_native = pd.to_numeric(df[qty_col], errors='coerce')
-        sold_kg = sold_native * _kg_factor_series(
-            df, volume_as_mass=volume_as_mass)
+        sold_kg = sold_native * _kg_factor_series_with_declared(
+            df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     # Step 1: observed unit price; zero/inf priced rows excluded from the pool.
     with np.errstate(divide='ignore', invalid='ignore'):
