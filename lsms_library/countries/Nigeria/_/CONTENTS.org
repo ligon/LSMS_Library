@@ -332,36 +332,94 @@ carrying =v= across them raises a =ClusterIdentityWarning=; every other
 boundary is =stable=.  A 13-entry alias table would make them stable again, but
 it would change served =v= values and is not done here.
 
-*** Wave 5 geovariables await acquisition of WB v02 (GH #841 / #978)
+*** Wave 5 geovariables: acquired with WB v02_M (GH #841 / #978)
 
-The acquired =NGA_2023_GHSP-W5_v01_M= extract recorded in =SOURCE.org=
-contains 106 files and no household geovariables file; the cover page
-=secta_plantingw5.dta= carries no lat/lon. This is an acquisition gap,
-not a claim that the survey did not collect coordinates. WB catalog 6410
-version =v02_M= (changed 2026-09-16) adds =NGA_HouseholdGeovariables_Y5.dta=
-(4,883 households, 55 variables) and =totcons_final.dta=, and revises
-=sect2b_harvestw5.dta= and =sect3d_harvestw5.dta=. Existing GH #978 tracks
-that refresh and the coordinate wiring; it needs no duplicate issue.  =cluster_features=
-for 2023-24 is therefore declared from the cover page alone (=df_key= +
-=df_main=, no =df_geo=, unlike W1--W4): =Region= / =District= / =Rural= are
-fully populated for 2023Q3 and 2024Q1 (911 clusters each), and =Latitude= /
-=Longitude= are 100% NaN there pending the v02 acquisition.  The Site B
-null-content guard warns for exactly those two waves on every
-=cluster_features()= read; that is the known country-grain =optional:=
-mismatch (CLAUDE.md) and must NOT be silenced with =optional: true= in
-=data_scheme.yml=, which would disarm W1--W4 as well.  A side effect of having
-no coordinates: the Site 2 household -> cluster collapse is lossless for W5
-(no =GrainCollapseWarning= fires for 2023Q3 / 2024Q1).  Measured 2026-10-14
-on the cover page + geovariables of W2 / W3 / W4, per column, over the real
-(non-=moved=) composite clusters: =zone= / =state= / =sector= take more than
-one value in *0* clusters in every wave, while =Latitude= / =Longitude= do in
-5 / 24 / 50 clusters (the same 5 / 24 / 50 recorded in =data_scheme.yml=) --
-tracked households that kept their original real =ea= in the frame but now
-report different coordinates (NOT the =ea == 0= movers, which are singletons
-and cannot disagree with anyone).  The audit's larger "conflicting tuples"
-counts (70 / 78 / 129) include households with NO coordinate beside ones
-with one, which a whole-row comparison counts as a disagreement.  So the only
-columns that ever made this collapse lossy are exactly the two W5 lacks.
+*History.*  The =NGA_2023_GHSP-W5_v01_M= extract this repo first held (106
+files) carried no household geovariables, and the cover page
+=secta_plantingw5.dta= carries no lat/lon, so GH #841 declared W5's
+=cluster_features= from the cover page alone and =Latitude= / =Longitude=
+were 100% NaN in 2023Q3 and 2024Q1 (911 of 911 clusters each; the Site B
+null-content guard warned on every read).  That was an acquisition gap, not a
+survey gap: WB catalog 6410 moved to =v02_M= on 2026-09-16, and GH #978
+acquired it on 2026-10-19 (=Documentation/SOURCE.org= now records =v02_M=,
+DOI =10.48529/90ec-pv69=; the =v01_M= DOI was =zd5s-tj25=).
+
+*What v02_M changed, file by file* (its Stata zip, 108 =.dta=, against the
+v01 sidecars' md5s): *104 byte-identical*, *0 removed*, and
+
+| file (under =2023-24/Data/=)                      | change  | feeds a library table? |
+|---------------------------------------------------+---------+------------------------|
+| =nga_householdgeovariables_y5.dta=                | new     | =cluster_features= (=df_geo=) |
+| =totcons_final.dta=                               | new     | no (see below)         |
+| =Post Harvest Wave 5/Household/sect2b_harvestw5.dta= | revised | no                  |
+| =Post Harvest Wave 5/Household/sect3d_harvestw5.dta= | revised | no                  |
+
+- =sect2b= (early child development): same 25,662 =(hhid, indiv)= rows and
+  33 columns; only =s2bq0= ("who in the household is responding for
+  [NAME]?") changed -- all 1,986 non-null values differ, and v02 codes
+  include values like =5101= / =5102= (218 values > 100) where v01 held
+  small integers (and 469 zeros).  A respondent-id recode.
+- =sect3d= (women's dietary diversity): same rows, two columns added,
+  =rselected_person= and =sec3c_wdd= (selection flags for the module; they
+  agree on 22,751 of 25,662 rows).  No other value differs.
+- =totcons_final.dta= is the WB's consumption aggregate (4,715 households x
+  62: =food_own*= / =food_purch*= by group, non-food, =totcons_adj=,
+  =popw=, =reg_def_mean=).  Its Stata file label is mis-set to "PH HH Section
+  A - Cover".  *Not wired*: no Nigeria table reads a consumption aggregate in
+  any wave, so there is nothing for it to join.
+
+*The geovariables file is not what #978 named.*  The issue (and the v01-era
+text of this section) called it =NGA_HouseholdGeovariables_Y5.dta= with
+W4's =lat_dd_mod= / =lon_dd_mod=.  The shipped file is
+=nga_householdgeovariables_y5.dta=, at the *root* of the zip (not under
+=Post Planting Wave 5/=), "Written by R", 4,883 x 55, =hhid= int32 and
+unique, and its coordinates are =lat_mod= / =lon_mod=.  Like W4's it has no
+=ea=, so it joins on =i= (=hhid=); merging on =v= would be the GH #323
+site-4 cartesian.  All 4,883 geo households are on the 5,067-household cover
+page; the other 184 were not interviewed (=interview_result= 4/5/6/7/8, no
+=wt_cross_wave5=), 17 of them =ea == 0= movers.
+
+*Coverage, cold, per quarter (2023Q3 and 2024Q1 identical)*:
+
+|                     | clusters | with coordinates, v01 | with coordinates, v02 |
+|---------------------+----------+-----------------------+-----------------------|
+| real composite EAs  |      518 |                     0 |                   510 |
+| =moved-{hhid}=      |      393 |                     0 |                   376 |
+| total               |      911 |                     0 |                   886 |
+
+The 8 real clusters without a coordinate are exactly the EAs conflict kept
+unvisited ([[*Exclusion: eight EAs unvisited for conflict]]): none of their 80
+cover-page households was interviewed, and they lie in Katsina (3), Kebbi
+(2), Zamfara (2) and Sokoto (1) -- the four states the catalog names.  (The
+BID's "157 long panel EAs and 354 refresh EAs" visited sums to 511, not
+518 - 8 = 510; recorded, not resolved.)
+
+*Site 2 (GH #161), re-measured for W5 on v02.*  Over the 518 real composite
+clusters, per column: =zone= / =state= / =sector= take more than one value in
+*0* clusters, while =lat_mod= / =lon_mod= do in *34* (at most 3 distinct
+coordinate pairs in one cluster; the farthest household from its cluster's
+median coordinate is a median 15.2 km away, p90 74.1 km, max 169.4 km).
+Another 70 clusters mix households with and without a coordinate.  The
+collapse audit reports *787 of 5,067 rows destroyed, 99 conflicting
+(t, v) tuples*, per quarter, so a =GrainCollapseWarning= now fires for 2023Q3
+and 2024Q1 as it does for W2--W4 (5 / 24 / 50 coordinate-disagreeing clusters;
+the audit's 70 / 78 / 129 conflicting tuples).  As before, the coordinates
+are the only columns that make the collapse lossy -- tracked households that
+kept their original real =ea= in the frame but report different coordinates
+(=ea == 0= movers are singletons and cannot disagree with anyone).
+
+*Before the dispatcher's push the new file has no =.dvc= sidecar*, so a read
+of it from the config tree raises =InTreeSourceError= (GH #831) unless
+=LSMS_ALLOW_INTREE_SOURCES=1=; measured, the error propagates (it is not a
+soft =dfs:= drop).  In a checkout with neither the file nor a sidecar, the
+reader's World Bank fallback downloads it into =data_root()= for a user with a
+WB API key (measured: same md5).
+
+*Still not in v02_M*: a W5 *plot* geovariables file (W1--W4 ship
+=nga_plotgeovariables_y*=, which =plot_features= reads for =PlotSlope=).
+And v02 revised two documents this repo does not hold -- the BID v2
+(=ghs_panel_wave_5_basic_information_document_v2.pdf=) and the PH household
+questionnaire (changed 2026-09-15); =Documentation/= still has the BID v1.
 
 ** Strata
 
@@ -1030,8 +1088,9 @@ not always 100%: three clusters (2 in 2013Q1, 1 in 2016Q1; 87 price rows)
 appear in the community file with no household-side cluster.  The 2024Q1 row
 used to read =0 (0%)= in the =cluster_features= column because the table was
 not declared for W5 at all; it is since GH #841 (declared without
-coordinates, see [[*Wave 5 ships NO household geovariables file (GH #841)]]),
-and all 27,318 2024Q1 price rows now join a =Region= / =District= / =Rural=.
+coordinates; coordinates since GH #978, see
+[[*Wave 5 geovariables: acquired with WB v02_M (GH #841 / #978)]]), and all
+27,318 2024Q1 price rows now join a =Region= / =District= / =Rural=.
 
 ** Item labels (j) -- the community-price arm of label unification
 
