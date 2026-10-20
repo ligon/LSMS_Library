@@ -29,6 +29,7 @@ from .paths import countries_root
 from .catalog import _is_registered
 from .errors import LabelUnavailableError, UnitsUnavailableError
 from . import population as _population
+from . import sampling as _sampling
 # NOT `from . import recall` / `from . import derivations`: the package binds
 # PUBLIC CALLABLES over both submodule names (`ll.recall(...)` from
 # `recall_table`, `ll.derivations(...)` = `derivations_table`), and
@@ -141,6 +142,15 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         "unit_kg",
         (_UNIT_KG_ATTRS_KEY,),
         _merge_into(_UNIT_KG_ATTRS_KEY, _unit_kg_merge_attrs),
+    ),
+    # GH #793: how each wave's sample was DRAWN -- the sibling of population,
+    # keyed `{country: {wave: record}}` like it, and re-attached through the
+    # sampling module's own merge_attrs.  Registered in the same change that
+    # wrote the merge, so it is never a merge_attrs with no caller (#873).
+    _AttrsCarrier(
+        "sampling",
+        (_sampling.ATTRS_KEY, _sampling.ATTRS_RESOLUTION_KEY),
+        _sampling.merge_attrs,
     ),
 )
 

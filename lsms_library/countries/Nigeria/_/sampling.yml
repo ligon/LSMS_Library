@@ -1,0 +1,146 @@
+# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+#
+# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
+# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
+# wave of `Country('Nigeria').waves`?  The design fields are #793's curation
+# and are not written yet; their absence here is "not curated", not "not
+# found".
+#
+# Keys are the API wave labels, which for Nigeria are the post-planting /
+# post-harvest ROUNDS (2010Q3, 2011Q1, ...): a PP -> PH boundary is a revisit
+# of the same households within one wave directory.  The first round (2010Q3)
+# has no preceding wave and so no entry.
+#
+# `v` is the composite `state/lga/ea` built from raw codes (CONTENTS.org,
+# "Cluster (PSU) identifier"), and a real EA keeps it -- EXCEPT where the raw
+# LGA code of a whole EA changes between waves (1 EA at 2018Q3, 12 at 2023Q3;
+# measured 2026-10-19, see those entries), which renumbers that cluster's
+# composite `v` and is declared `wave-scoped` (partial).  Otherwise what
+# changes across a PH -> PP boundary is the households that MOVED:
+# the survey records them with `ea == 0`, and the library gives each its own
+# singleton `v = moved-{hhid}` rather than a fake pooled cluster.  So a mover
+# has a different `v` in each round by design, not because an EA was
+# renumbered.  (Whether a mover's DESIGN cluster is its original EA -- the
+# BID pins its weight there -- is DESIGN.org Q7, `cluster_reference`, not
+# decided.)
+
+Sampling:
+
+  '2011Q1':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        Post-harvest revisit of the 2010Q3 households.  Measured: 5,000 of
+        5,000 linked households keep `v` (500 EAs, one-to-one).
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Nigeria rows); re-measured 2026-10-19 through Country("Nigeria").sample()'
+
+  '2012Q3':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        Measured: 4,707 of 4,859 linked households (96.9%) keep `v`; the rest
+        are tracked movers given a singleton `moved-{hhid}` (152 in W2), not
+        renumbered EAs.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel); re-measured 2026-10-19 through Country("Nigeria").sample()'
+
+  '2013Q1':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        Post-harvest revisit.  Measured: 4,859 of 4,859 linked households keep
+        `v`.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+
+  '2015Q3':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        Measured: 4,437 of 4,597 linked households (96.5%) keep `v`; the rest
+        are tracked movers given a singleton `moved-{hhid}` (306 in W3).
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel); re-measured 2026-10-19 through Country("Nigeria").sample()'
+
+  '2016Q1':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        Post-harvest revisit.  Measured: 4,696 of 4,696 linked households keep
+        `v`.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+
+  '2018Q3':
+    panel:
+      household_continuity: rotating-panel
+      cluster_id_continuity: wave-scoped
+      cluster_id_note: |-
+        Partial: ONE long-panel EA (10 households) has its raw LGA code
+        changed, so its composite `v` changes (16/1624/136 -> 16/1622/136,
+        neither id occurring in the other wave); every other EA keeps its id.
+        W4 is a partial refresh: 360 new EAs plus a 159-EA "long panel" of the
+        2010 sample (BID, quoted in CONTENTS.org).  Measured over the
+        long-panel households: 1,414 of 1,493 (94.7%) keep `v`; of the 79 that
+        change, 69 are movers' `moved-{hhid}` singletons and 10 are that EA.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'CONTENTS.org, "Sub-samples: refresh and long panel"; re-measured 2026-10-19 through Country("Nigeria").sample()'
+
+  '2019Q1':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        Post-harvest revisit.  Measured: 5,263 of 5,263 linked households keep
+        `v`.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+
+  '2023Q3':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: wave-scoped
+      cluster_id_note: |-
+        Partial: 12 EAs (112 households) have their raw LGA code changed, so
+        their composite `v` changes whole (21/2111/260 -> 21/2112/260,
+        5/509/1064 -> 5/508/1064, ...; no old id occurs in W5 and no new id in
+        W4); every other EA keeps its id.  W5 revisits both W4 sub-samples
+        (long panel and refresh).  Measured: 4,724 of 5,067 linked households
+        (93.2%) keep `v`; of the 343 that change, 231 are movers'
+        `moved-{hhid}` singletons and 112 are those 12 EAs.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'CONTENTS.org, "Sub-samples: long panel (1,590 -> 1,376) and refresh"; re-measured 2026-10-19 through Country("Nigeria").sample()'
+
+  '2024Q1':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        Post-harvest revisit.  Measured: 5,067 of 5,067 linked households keep
+        `v`.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
