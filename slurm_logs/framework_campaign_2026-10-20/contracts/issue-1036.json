@@ -1,0 +1,41 @@
+{
+  "body": "**Tier:** DECISION. Split from #674 via PR #1024 (the zero-row case is pre-existing and was pinned, not changed, there).\n\n**Mechanism.** `df_data_grabber` raises `KeyError('No table ...')` for an org table that is declared (`#+name:` present) but has 0 data rows. `get_categorical_mapping`'s rung loop catches `(FileNotFoundError, KeyError)` as \"this level lacks the table\". So an empty wave- or country-level table is indistinguishable from an absent one, and resolution continues to the next level, including the cross-country level appended by #953. The caller gets the global (or country) table with no signal, although the local level *declared* the name. `code_label_map` inherits this.\n\n**Why it matters.** The #953 rule is that a local level overrides the shared table *whole-table*. An author who empties a local table (e.g. to disable a mapping, or by a botched edit that leaves only the header) gets the shared table instead, silently. That is the same \"silent resolution\" class as #674.\n\n**Evidence.** Pinned by `tests/test_categorical_mapping_value_required.py::test_zero_row_table_is_a_separate_case` (PR #1024): with a value column, an empty local table raises `KeyError` when nothing lower holds it, i.e. it is treated as absent. No corpus census of empty declared tables has been run.\n\n**Options (decision needed).**\n- (a) An empty declared table raises a distinct error, e.g. `EmptyCategoricalTableError`, which the rung loop does not catch.\n- (b) An empty declared table resolves to an empty mapping at that level and stops the cascade.\n- (c) Keep the fall-through but warn.\n\nA census of `#+name:` tables with 0 rows across `countries/**/categorical_mapping*` should come first, so the cost of (a) is known. Related: #953, #928.\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdRaouA",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Census first (`#+name:` tables with 0 data rows across `countries/**/categorical_mapping*`), then option (a): an empty declared table raises a distinct error the rung loop does not catch. Silent fall-through is the #674 class.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-10-19T04:03:53Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/1036#issuecomment-6259386552",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdixVQQ",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Fixed on `development` by PR #1105, the corpus bundle (merge `e87a551e8`). Left open until the release merge to `master`.",
+      "createdAt": "2026-10-19T21:21:16Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/1036#issuecomment-6277584193",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [],
+  "number": 1036,
+  "state": "OPEN",
+  "title": "categorical-mapping cascade: a declared-but-EMPTY org table silently falls through to a lower level",
+  "updatedAt": "2026-10-19T21:21:16Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1036"
+}

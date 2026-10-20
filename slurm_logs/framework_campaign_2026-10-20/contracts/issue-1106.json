@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #867 (`fix/867-nitrogen`); red-team r1 confirmed R1-R5, and R6 was found while drafting.\n\nTier: **DECISION** (then B).\n- Malawi `plot_inputs` code 1 is served as `NPK Fertilizer` and gets `_NITROGEN_CONTENT['npk'] = 0.17`.\n- The survey's own source label for code 1 is `23:21:0+4S/CHITOWE` (IHS3 `ag_d39a`, 7,717 of 11,364 slot-1 rows, read via `get_dataframe`).\n- Every Malawi source gives 23% N:\n  - IFDC's proposed regulations (2003), penalty example 3, \"guaranteed as 23% N\", printed p. 31;\n  - IFDC/AFAP 2018, Table 1, `NPK 23:21:00 +4S` (maize);\n  - FAO & GoM 2018, p. IX: \"23:21:0+4S (also known as Chitowe)\";\n  - the WB panel (`MWI_IHPS1.do:776`, `NPK_kg * 0.23`, \"* Chitowe\") and EPAR (`0.23*(itemcode==1)`).\n- On 1,600,479.0 kg of product: 272,081.4 kg N at 0.17 vs 368,110.2 at 0.23, so **+96,028.8 kg N, about 11% of Malawi's 840,235.8**.\n- Two ways to fix it, a decision either way:\n  - (a) Relabel code 1 country-side in Malawi `harmonize_input` (e.g. `23:21:0+4S Fertilizer`) and key that product at 0.23. Product identity then lives in the label and the map needs no country axis. Cost: `categorical_mapping.org` is a build input, so one Malawi re-warm.\n  - (b) Give `_NITROGEN_CONTENT` a country axis.\n\n  I recommend (a).\n",
+  "comments": [],
+  "labels": [],
+  "number": 1106,
+  "state": "OPEN",
+  "title": "Malawi `NPK Fertilizer` is Chitowe 23:21:0+4S but is served at the shared map's NPK 17-17-17 (0.17 vs 0.23 N)",
+  "updatedAt": "2026-10-19T21:29:52Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1106"
+}

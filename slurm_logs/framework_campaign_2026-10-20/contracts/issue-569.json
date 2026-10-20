@@ -1,0 +1,69 @@
+{
+  "body": "Resolved so far: `crop_production` canonical assembly landed in `88175a6d` / implementation `75935507f` (#775), and `plot_id` became the canonical plot-axis name in `a79af45b` / implementation `ff9c1787c`. See the [September progress report](https://github.com/ligon/LSMS_Library/issues/569#issuecomment-5621059475). These changes are present on development/master at `ab41e389ea010195b647f4e5345f914c707e57c2`.\n\nThis issue now owns only the remaining cross-country assembly decisions and registration for **plot_labor** and **plot_inputs**.\n\n## Already implemented\n\n- `crop_production` is registered as `(t, v, i, plot_id, j, u, condition, season)`.\n- Shared `level_aliases` and `missing_level_sentinels` support canonical alignment, including `plot -> plot_id` and `crop -> j` for crop production. Reuse this machinery; do not repeat the old corpus-wide renaming proposal.\n- Country-native detail remains on Country results. Canonical registration must retain `v` where required by the API-time sample join.\n\n## Remaining decisions and implementation\n\n1. **plot_labor:** choose a canonical grain that preserves the distinctions actually collected. GhanaSPS carries `season` and `stage`; the September review found that dropping stage collapses 60,607 rows (a historical measurement, not a new count). Current GhanaLSS declares `(t, i, plot_id, stage, source, worker)`, so the inventory must also consider worker detail and the meaning of its plot key. Do not simply reuse the old `(t, v, i, plot, source)` proposal.\n2. **plot_inputs:** decide how to represent genuinely different grains. Seven EHCVM countries in the September review supplied household/input/crop/unit records without a plot level (116,084 rows in that review). A sentinel is not permission to present household records as observed plots. Reconcile the treatment with the coarse-table decision in #512; retain units and survey-supported season/crop distinctions.\n3. After those decisions, register the two features and their justified aliases/sentinels. Only rename axes that have the same meaning; a shared name does not establish shared identifier vocabulary. Preserve Country's survey-specific detail.\n\n## Acceptance\n\n- Refresh the declaring-country/index inventory at the implementation revision, including later GhanaLSS additions. Read each affected country's CONTENTS, including caveats, before choosing a grain.\n- Document treatment of missing dimensions and coarse tables; report any country exclusions explicitly.\n- Use discriminating assembly tests for stage/season/worker distinctions, null keys and unit differences. Check row participation and additive conservation separately from any deliberately authorized aggregation; do not use a universal row-count equality for tables whose contract aggregates.\n- Re-run the relevant `bench/feature_audit` checks and existing crop-production canonical-index tests. Verify that unrelated features and Country-native output remain unchanged.\n\nEvidence: [canonical schema](https://github.com/ligon/LSMS_Library/blob/ab41e389ea010195b647f4e5345f914c707e57c2/lsms_library/data_info.yml), `tests/test_feature_canonical_index.py`, `.claude/skills/cross-country-features/SKILL.md`, and `slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_feature_canonical.org` item 9.\n\nTier: framework schema/design decision, followed by implementation. The completed `crop_production` work is not a blocker or an outstanding task here.\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABTwqPkw",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Progress on `development` (ships in 0.11.2), from two merges:\n\n- `88175a6d` (fix/feature-canonical-index-crop-production, #775): `crop_production` IS now registered in `index_info`, with two declarative maps in `data_info.yml` -- `level_aliases` and `missing_level_sentinels` -- so a country's frame is aligned to the canonical index at assembly (alias a level name; promote a same-named column; add a missing level as its documented sentinel, never NA; a promotion that produces duplicates goes through the audited collapse). `Feature('crop_production')` went from 8 countries / 255,137 rows to 14 / 608,570.\n- `a79af45b` (refactor/crop-production-plot-id, @ligon's ruling 2026-09-10): the plot axis is `plot_id` everywhere -- canonical index, `level_aliases` (`plot -> plot_id`), every country's `crop_production` / `plot_labor` / `plot_inputs` declaration and script (11 countries, 204 occurrences), and the transforms now emit `plot_id`. 274 hashes moved; the 12 affected countries were cleared and re-warmed (274 tables, 0 failures). So one of the two name divergences this issue names is gone; `crop -> j` remains an alias.\n\nStill open, and the reason this stays open: `plot_labor` and `plot_inputs` are not registered. The mechanism is general, but each needs a config decision, not a one-liner -- `plot_labor` needs a `stage` sentinel (GhanaSPS keys on stage, 60,607 rows collapse without it), and seven EHCVM `plot_inputs` declare `(t, i, input, crop, u)` with no plot level at all (116,084 rows), so registering `plot_id` there would fabricate a level the survey does not have, contradicting the EthiopiaRHS decision (#512). Red-team: `slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_feature_canonical.org` item 9.",
+      "createdAt": "2026-09-10T15:20:33Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/569#issuecomment-5621059475",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdRaZ7Q",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: (1) `plot_labor` keeps `stage` and `worker` as index levels, with a sentinel where a country lacks them. (2) The seven EHCVM `plot_inputs` tables with no plot level are registered with a household-grain sentinel on `plot_id` through `missing_level_sentinels`, not excluded. Then register both tables in Index Info.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-10-19T04:03:33Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/569#issuecomment-6259382765",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdkYYbQ",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Fixed on `development` by PR #1126. Left open until the release merge to `master`; follow-ups are #1118-#1125.",
+      "createdAt": "2026-10-19T23:03:54Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/569#issuecomment-6279272557",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAABnEiGdw",
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 569,
+  "state": "OPEN",
+  "title": "Register plot_labor and plot_inputs in Feature after resolving their remaining grain differences",
+  "updatedAt": "2026-10-19T23:03:54Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/569"
+}

@@ -1,0 +1,147 @@
+#+title: Framework reliability reconciliation before v0.16.0
+#+date: 2026-10-20
+#+author: Sue
+
+* Result
+
+Read against development 976fc840d; GitHub issue bodies, every returned comment and merged PRs reconciled with current source/tests.
+No tracked code changed, no commits or GitHub writes, no shared parquet-cache writes.
+=records.json= contains the issue-by-issue dispositions, source anchors, and draft narrowing text for partials.
+=api-audit.log= passes all15 skill entries; Poetry auto-created an empty ignored worktree .venv while running the required make target; all probes/tests explicitly used the mounted image.
+
+The headline cache/reader work is implemented and awaits release, including #675, #908, #1040, #1070, #1001, #1031, #1002, #1039, #600, #836 and #790.
+Do not dispatch those again because their issues remain open.
+#1114's held-release ruling is implemented; #680's dependency floor and Savio image update are done.
+
+* CI enforcement remains unfinished
+
+#932's code landed in PR #1049, but the active development ruleset25124452 requires only =unit-tests=, has no merge-queue rule, and allows repository-role5 bypass always.
+The only other listed ruleset is9389899, No deletions.
+The legacy protection endpoint returns404 because rulesets govern.
+Thus current development merges are not required to wait for credentialed data-tests; the PR's promise needs repository protection configuration.
+The new nightly cron exists only on development and activates after the release carries the workflow to default-branch master.
+This is an external configuration action for the root/human to review, not an unimplemented parser fix.
+The credentialed pre-release workflow_dispatch should be mandatory evidence before promoting0.16.0, even if queue configuration waits.
+
+* Recommended additional work, ranked
+
+** 1. #1099: stable empty answer for genuinely absent-wave subsets
+
+A strict subset requesting waves that do not declare the table should return the declared empty frame on the default backend in cold, warm and LSMS_NO_CACHE states.
+The make backend already does this; the default's =load_from_waves= defaults =country_builder=True= (country.py:5212), so it misses the no-builder empty route at5360.
+The existing test at tests/test_gh1039_make_backend_no_country_rule.py:255 covers the default only with a planted var parquet and explicitly documents its accidental success.
+The private synthetic cold probe reproduces RuntimeError.
+Reuse =_empty_declared_frame= (country.py:1050); preserve real country builders, full-build failures and failures in waves that declare the table.
+Expected effort: small-to-medium framework patch plus hermetic3-state tests and a real absent-subset matrix.
+Expected cache impact: one corpus rebuild because _aggregate_wave_data changes; compute cost is acceptable under the user's instruction.
+Completion: cold/warm/no-cache results frame-equal and shaped, full unavailable builds still raise, country-builder controls unchanged, corpus audit has no new failures.
+Concurrency: separate from provenance/acquisition; serialize integration with any other country.py patches and full-suite checkpoints.
+
+** 2. #778: missing-file race plus the remaining mutating tests
+
+=Country._read_assumed_fresh_cache= checks exists then reads (country.py:4656-4688); a disappearing file propagates FileNotFoundError rather than taking the ordinary path.
+The deterministic private probe injects concurrent eviction at get_dataframe and reproduces it.
+Catch only disappearance, retaining #1071's intentionally unresolved corruption behavior.
+Guyana explicitly deletes warm caches (tests/test_guyana_index_uniqueness.py:107-128); India cold employment and Togo's gh866 wave-produced control also use the shared root.
+First measure which cells actually delete var, then use the private-root pattern already in #1030.
+The issue's GhanaLSS interview_date, both visit-derivation cells, and synthetic dfs merge entries are stale: their fixtures already set private LSMS_DATA_DIR.
+Expected effort: small runtime patch plus focused test-isolation review.
+Expected cache impact: none for the read gate, which is excluded; tests only otherwise.
+Completion: deterministic disappearing full/subset reads fall through, ordinary build succeeds, corruption policy unchanged, shared-file before/after hashes unaffected under concurrent tests.
+Concurrency: independent test work; runtime gate touches country.py and can conflict with Windows verifier work only if that worker changes runtime behavior.
+
+** 3. #1115 + #1128: lossless provenance and durable newer-release queue
+
+This pair already has explicit GO; #1128's newest ruling adds release-unknown rather than inventing a held release.
+=provenance.py:286= scans a URL anywhere;328 stores unknown keys;332's renderer never emits those keys;135's boilerplate misses its own no-URL placeholder.
+A synthetic record reproduces key loss and secondary-to-primary URL promotion.
+Implement together because both edit parse/render; retain arbitrary notes/unknown repeated metadata and stable render-parse-render behavior.
+Keep CATALOG_IDNO as held; latest idno/date are separate; acquisition alone writes held and clears latest metadata after actual success.
+Expected effort: medium, with fully synthetic tests plus lossless round-trip census of shipped SOURCE.org; no live catalog write/backfill is necessary.
+Expected cache impact: probably zero; verify fingerprints rather than assuming provenance stays unreachable.
+Completion: all shipped facts survive, supplied URL scope correct, missing held release remains absent with release-unknown review, stale metadata clear/update semantics tested, no country-wave discovery changes.
+Concurrency: one branch for both; keep separate from #1149 until the provenance/acquisition boundary is agreed.
+
+** 4. #1149: staged acquisition preserves existing nested paths
+
+OptionC is explicitly ruled.
+=data_access.py:1144= extracts flat and skips existing raw paths;2126 lists only top-level files;2375 is the bulk extractor call site.
+Stage before placing, map existing sidecars recursively by case-insensitive basename, refuse ambiguous matches, preserve zip-relative paths for new files, compare content and report recursive removed members without deleting.
+Tests can be entirely synthetic: flat/nested zips, basename collisions, and release member-list fixtures for the two already-performed acquisitions.
+Expected effort: medium-to-large because provenance must only record a successfully acquired release and acquisition failure/partial push semantics must remain clear.
+Expected cache impact: code-only likely zero until actual data acquisition; measure hash reachability.
+Completion: optionC tests plus confirm/push compatibility, no overwrite before comparison, no source retirement by default; add-wave skill updated.
+Concurrency: shares data_access.py and acquisition semantics with #1128, so integrate after provenance or coordinate a shared boundary; no need for additional live acquisition before release.
+
+** 5. #218: remove dangling retired-food build routes
+
+PR #1021 completed Phase2 scripts and fully fixed #790, but dangling grouped rules remain at Togo Makefile:14, CotedIvoire:17, Afghanistan:14; Malawi retains derived registrations at data_scheme.yml:488.
+The obsolete core allow-list entry remains at country.py:4979.
+Remove the unused var entries/rules and registrations, old dispatch allowance, and stale contributor guidance; preserve history that explains prior retirement.
+Expected effort: small cleanup plus Make dry-runs and API frame comparisons.
+Expected cache impact: affected countries rebuild; core dispatch change may move corpus hashes and must be measured.
+Completion: no reachable rule calls a retired script, canonical API frames stay equal, derived tables remain auto-discovered, exact issue residual exhausted.
+Concurrency: config changes independent; core allow-list patch can conflict mechanically with #1099 but is easy to sequence.
+
+* Defer or decide
+
+- #1071 :: LSMS_NO_CACHE spelling and corrupt cache policy have measurements but no ruling; do not change found behavior under the guise of extraction.
+- #1032 :: Real read-only wheel DVC failure; no supported DVC tmp override, options require a human choice.
+- #1064 :: Legacy credential permission reporting disagrees with the reader; choose reader/writer rung policy.
+- #1116 :: Note/validation authority for overrides; writes already appear in review artifact, zero shipped divergences.
+- #1051 :: Connection outage handling is a tractable candidate, but original residual report finds zero live instances and B-E need narrower design/reproduction; lower priority than three reproduced defects above.
+- #637 :: Eleven-site audit tail remains, not eleven confirmed bugs; broad key-soundness research should not delay release once exact residual is recorded.
+- #650 :: Three documentation stubs remain and add_wave still fetches only data; minimum artifact standard plus download policy and backfill is a separate acquisition/documentation scope.
+- #920 :: Only GhanaLSS warm-read profiling remains; warning and repeat-detector work is implemented.
+- #381 :: Warning noise can use existing builder detection after route-level repro, but blanket warning suppression would hide #866's evidence and should not be bundled casually.
+
+* Verification and country guidance
+
+The selected hermetic reader/read-gate/make-routing suite passed112 tests in15.80s with2 xdist workers, loadfile distribution, BLAS/OMP/MKL1, LSMS_BUILD_WORKERS1 and a private data root.
+=probe-results.json= records #1099, #778 and synthetic #1115 outcomes; =probe.py= is runnable from this worktree with the mounted interpreter and PYTHONPATH set here.
+All library import paths were asserted against this worktree's real top level before probing.
+These are local Linux checks; they neither validate Windows nor replace the parent's final combined suite.
+
+Read country CONTENTS before inspecting #218's country configuration.
+Relevant recorded idiosyncrasies: Togo grappe is visited in exactly one vague, so the household key excludes vague (CONTENTS:12); CotedIvoire early DAT/DCT waves are readable, unlike an old false diagnosis (CONTENTS:82), and its legacy food scripts use retired lsms.tools (258); Malawi explicitly says food derivations now use the framework and the country script was retired on2026-05-05 (1653); Afghanistan's surveys have no World Bank ALCS catalog fallback (CONTENTS:20).
+These support removing dead routes while retaining canonical survey-specific builders; none authorizes a country grain rewrite.
+No contradiction with those decisions was treated as stale documentation.
+
+* Concrete protection proposal, unapplied
+
+The read-only repository API identifies owner.type=User and visibility=public.
+GitHub's documented merge queue availability is public organization-owned repositories or private organization repositories with Enterprise Cloud; present ownership therefore prevents the queue route assumed by PR #1049.
+Official source: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue .
+
+Minimal available route, for human approval:
+1. Change the =data-tests= job condition in ci.yml:427 to also run on =github.event_name == 'pull_request' && github.base_ref == 'development'=.
+2. Keep the existing credential-gate assertion, so missing credentials are a failure rather than a green skip.
+3. Add =data-tests= to ruleset25124452's required checks after observing a genuine successful PR-triggered run.
+
+=ruleset-change.json= is the exact one-entry JSON Patch against the captured current state.
+=proposed-development-ruleset.json= is the complete proposed PUT payload, preserving name, target, enforcement, conditions, deletion/non-fast-forward rules, existing unit-tests requirement, strict=false, do_not_enforce_on_create=false and the role5 always-bypass.
+No GitHub protection settings were changed; permission/protection changes need explicit human approval.
+The proposal generator is runnable and makes no API calls.
+Refresh the captured ruleset before any approved application to avoid overwriting a concurrent administrator edit.
+
+Simply requiring the current skipped =data-tests= job does not close #932: GitHub accepts skipped required jobs as success.
+Official source: https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-jobs-with-conditions .
+With PR execution enabled, same-repository development PRs obtain credentialed checks; fork PRs receive no secrets and must fail the credential assertion until a maintainer reviews and imports the exact changes into a trusted same-repository PR branch.
+Do not bypass this by executing untrusted fork code with secrets under pull_request_target.
+A manual workflow_dispatch remains useful release evidence but does not satisfy a PR required check under GitHub's documented eligible-event rule.
+Official source: https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks .
+
+Preserving strict=false and administrator bypass means the proposal does not prohibit every direct/bypass merge or guarantee testing against the newest base.
+Requiring up-to-date branches, removing bypass, requiring PRs or moving repository ownership would be separate permission/policy decisions.
+Before0.16.0, the exact final integration head should still receive the credentialed full run and Windows cold build.
+
+* Source links
+
+- Reproduced absent-subset defect :: https://github.com/ligon/LSMS_Library/issues/1099
+- Reproduced disappearance race :: https://github.com/ligon/LSMS_Library/issues/778
+- Provenance loss and explicit-GO queue :: https://github.com/ligon/LSMS_Library/issues/1115 and https://github.com/ligon/LSMS_Library/issues/1128
+- Acquisition optionC ruling :: https://github.com/ligon/LSMS_Library/issues/1149
+- Dangling retired references :: https://github.com/ligon/LSMS_Library/issues/218
+- Protection implementation and missing enforcement :: https://github.com/ligon/LSMS_Library/pull/1049 and https://github.com/ligon/LSMS_Library/rules/25124452
+- Corpus bundle already landed :: https://github.com/ligon/LSMS_Library/pull/1105
+- Dead unit writer retirement already landed :: https://github.com/ligon/LSMS_Library/pull/1021

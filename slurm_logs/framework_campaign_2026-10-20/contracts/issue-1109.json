@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #867 (`fix/867-nitrogen`); red-team r1 confirmed R1-R5, and R6 was found while drafting.\n\nTier: **A** (mechanical; costs one Malawi re-warm).\n- `_organic_block` (`malawi.py:3007`) writes NA, because Module D records no organic quantity.\n- `assemble_plot_inputs` (`malawi.py:3223-3229`) then aggregates `{'Quantity': 'sum', \u2026}`, and an all-NA group sums to 0.0. So **11,075 of 11,075** `Organic Fertilizer` rows serve `Quantity == 0.0`, a measured zero the survey never recorded.\n- The neighbouring `Quantity_purchased` aggregation (`:3142`) already uses `min_count=1`.\n- Fix: `'Quantity': lambda s: s.sum(min_count=1)`, or the cython `min_count=1` form.\n- No `nitrogen_kg` number depends on it, since organic rows get no share. Editing `malawi.py` moves every Malawi hash, so bundle it with R6.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1109,
+  "state": "OPEN",
+  "title": "Malawi organic-fertilizer `Quantity` is a fabricated 0.0 (`'Quantity': 'sum'` without `min_count`)",
+  "updatedAt": "2026-10-19T21:29:56Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1109"
+}

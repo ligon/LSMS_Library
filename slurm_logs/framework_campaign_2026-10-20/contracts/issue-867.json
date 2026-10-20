@@ -1,0 +1,54 @@
+{
+  "body": "Split out of the GH #863 red-team pass (`slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_863_transforms.org` item 4). The *label-matching* half of that finding is fixed on `feat/863-transforms` (`_normalise_input_label`, commit `01b81d4c`): `nitrogen_kg` now resolves `Urea Fertilizer` -> `urea`, which moved Malawi from 331 plots / **0 kg N** to 33,113 plots / **835,012 kg N**. This issue is the half that is a *content* decision and was deliberately left alone.\n\n## The gap\n\n`_NITROGEN_CONTENT` (`lsms_library/transformations.py`) carries a nutrient-class vocabulary plus eight product names. Measured over the 11 warm `plot_inputs` tables (2026-09-09), these fertilizer-labelled inputs resolve to **no share at all** and therefore contribute nothing to `nitrogen_kg` / `fertilizer_rate`:\n\n| label | country | rows | note |\n|---|---|---|---|\n| `NPS` | Ethiopia | 5,264 | a real nitrogen fertilizer (nominally ~19% N); not in the map |\n| `Manure` / `Compost` / `Other Organic` | Ethiopia | 27,261 / 4,295 / 2,651 | organic |\n| `Organic Fertilizer` | Malawi, Tanzania | 11,075 / 727 | organic |\n| `D Compound Fertilizer` | Malawi | 726 | a real Malawi blend; not in the map |\n| `Organic manure` / `Organic compost` | Benin, Burkina Faso, CotedIvoire, Niger, Senegal, Togo | ~13,000 combined | organic |\n| `Manure` / `Compost` / `Other organic` | Mali | 11,148 / 2,673 / 1,189 | organic |\n| every label | Guinea-Bissau | 5,534 | Portuguese vocabulary; `Adubos inorg\u00e2nicos - ureia` (190 rows) is real urea. `nitrogen_kg(Guinea-Bissau)` returns **0 rows** |\n\nThey are now *visible*: `nitrogen_kg` stamps `attrs['nitrogen_input_match']` (matched/unmatched rows and labels, the twin of `harvest_kg_factors`'s `shipped_matched`) and raises `NutrientCoverageWarning` naming the fertilizer-shaped labels that got no share. Visible is not fixed.\n\n## Why it was not fixed in that PR\n\nEach entry is an assertion about a nutrient content, not a spelling:\n\n- **NPS** and **D Compound** need a sourced nominal N share, on the same footing as the map's existing citations (urea 46%, DAP 18%, NPK 17-17-17). Guessing one would be the thing `harvest_kg`'s \"reported, never constructed\" rule exists to prevent.\n- **Organic inputs** are the harder call. Manure and compost *do* carry nitrogen (~0.5%, highly variable by source and moisture), so `0.0` is as much an invented number as any other. The alternative -- leaving them unmatched and loud -- at least does not put a fabricated figure into a published total. Whichever way it goes, it should be decided once and written down, not left to the accident of which labels happen to be keys.\n- **Guinea-Bissau** needs its Portuguese vocabulary mapped (or a country-side harmonisation onto the canonical `input` labels), which is a config question, not a transform one.\n\n## Suggested shape\n\n1. Decide the organic policy explicitly (a sourced nominal share, or a documented refusal) and record it in `_NITROGEN_CONTENT`'s comment with its citation, as the inorganic entries already are.\n2. Add `nps` and `d compound` with sourced shares.\n3. Harmonise Guinea-Bissau's `input` labels country-side, or add its spellings.\n4. Until then, the `NutrientCoverageWarning` is the work queue -- do not silence it with a 0.0 that asserts something nobody checked.\n\nCallers can already override per-country today: `nitrogen_kg(plot_inputs, nitrogen_content={...})`.",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdRajNA",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: NPS and Malawi D Compound get CITED N shares (source in the code comment and the test). Organic inputs (manure, compost, organic fertilizer) get a documented refusal: they stay unmatched and loud (`NutrientCoverageWarning`), with no nominal share.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-10-19T04:03:46Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/867#issuecomment-6259385140",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdjcM0Q",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Fixed on `development` by PR #1112. Left open until the release merge to `master`; residuals are #1106-#1111.",
+      "createdAt": "2026-10-19T21:57:34Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/867#issuecomment-6278286545",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAABnEiGcA",
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 867,
+  "state": "OPEN",
+  "title": "_NITROGEN_CONTENT has no entry for NPS, D Compound or any organic input, so those fertilizer rows contribute 0 kg N silently",
+  "updatedAt": "2026-10-19T21:57:34Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/867"
+}

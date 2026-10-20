@@ -1,4 +1,33 @@
-#+title: Handoff -- v0.15.0 released 2026-10-15
+#+title: Handoff -- framework campaign, 2026-10-20
+
+* Current -- 2026-10-20 framework campaign (Sue / GPT-6, job 40255479, n0071.savio3)
+
+The maintainer requested GitHub development synchronization, green Windows CI, then an assessment of additional framework fixes before v0.16.0.
+The clone and filesystem origin development are synchronized to GitHub =976fc840d=.
+The maintainer subsequently approved #1143, #1093, #1099, #1124 and #1125; no release has been requested yet.
+
+Windows PR [[https://github.com/ligon/LSMS_Library/pull/1153][#1153]], branch =fix/windows-shocks-digest-20261020= at =1d3e8dfdf=, updates the expected shocks digest after GH #805.
+Two private Linux cold builds and an independent review account exactly for the 2,012 changed label cells; native Windows and credentialed Linux CI are running as [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][39515878586]].
+The original baseline full suite is running against a physical private L2 copy with 16 loadfile workers and single BLAS/build threads.
+
+Active implementation worktrees under =/local/job40255479/worktrees/= are =1143-decimal-comma=, =1093-declared-unit-factors= and =1099-empty-subset=.
+The #1143 worker found an unpublished existing implementation in filesystem origin =fix/1143-decimal-comma@7393a3074=.
+Its implementation/tests were reused on the unique new branch =fix/1143-decimal-comma-40255479=, preserving the old branch; zero-prefix and malformed-token cases still need review and repair.
+The other two origin branch tips are this session's own ledger commits, not earlier work.
+An exact, detached source baseline for read-only comparisons is =/local/job40255479/worktrees/baseline-976fc840d=.
+
+Use =/local/job40255479/venv_img/bin/python= directly: the shared squashfs image was extracted there after FUSE failed; the launcher's local =.venv= directory was left intact.
+Set =PYTHONPATH= and =LSMS_COUNTRIES_ROOT= to the executing worktree, assert real import identity, and use separate private data roots with shared L1 links only.
+Do not run builds or tests against the shared L2 or edit the durable mirror's working tree.
+
+The #932 protection premise needs correction: this personal-account repository cannot use GitHub's organization-only merge queue.
+Current development rules require only =unit-tests=; no protection changes have been applied.
+The reliability report drafts an alternative for approval; #851 also has substantial existing unlanded work and is outside the five approved issues.
+
+Campaign details and aggregate evidence: [[file:../slurm_logs/framework_campaign_2026-10-20/STATUS.org][STATUS.org]].
+The main checkout is on the documentation branch =docs/framework-campaign-20261020=; commits publish through the origin hook.
+Next: finish Windows CI, all five fixes and independent reviews; validate their combined source; present concrete PRs for human merge under backlog-workflow.
+Older checkpoints below are historical and may have been superseded by the October 18-20 development campaign.
 
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.

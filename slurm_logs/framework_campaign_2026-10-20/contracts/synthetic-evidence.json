@@ -1,0 +1,32 @@
+{
+  "head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "import": "/local/job40255479/worktrees/framework-contracts/lsms_library/__init__.py",
+  "metric_parser": {
+    "1,5 L": 5.0,
+    "0,9 kg": 9.0,
+    "12,5 cl": 0.05,
+    "2,5 Kg": 5.0,
+    "1,500 kg": 500.0,
+    "0,125 kg": 125.0,
+    "1/2 kg": 0.5,
+    "3/4 kg": 0.75,
+    "20gallon drum": null
+  },
+  "declared_plot_inputs": {
+    "seed_rows": 0,
+    "nitrogen_rows": 0,
+    "warnings": [
+      "nitrogen_kg resolved a nitrogen share for 1 row(s) but the result is empty -- every fertilizer label either went unmatched or carries a nominal share of 0. Unmatched fertilizer-shaped labels -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): none. This has the right SHAPE and no content: len() > 0, finite and >= 0 all pass on a column of zeros. Check attrs['nitrogen_input_match'] and pass nitrogen_content= with this country's own labels."
+    ],
+    "expected_seed_kg": 100,
+    "expected_nitrogen_kg": 46
+  },
+  "audit_exclusion": {
+    "built": {
+      "A": 2,
+      "B": 7
+    },
+    "assembled": 2,
+    "checks": []
+  }
+}

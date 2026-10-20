@@ -1,0 +1,10 @@
+{
+  "body": "From the #569 follow-up (`fix/569-plot-registration`, plot_labor/plot_inputs registration).\n\n**Hashed build inputs** (bundle these with the next re-warm of each country):\n- `GhanaLSS/1987-88/_/plot_labor.py:14` and `GhanaLSS/1988-89/_/plot_labor.py:14` (\"``plot_labor`` has no canonical ``index_info``\").\n- `GhanaSPS/_/data_scheme.yml:609` (\"it is absent from `index_info`\").\n\n**Measure the cost first:** `lsms_library/transformations.py:5816-5818` (\"``index_info`` does not yet register the plot-level ag features\"). `GhanaLSS/_/nutrition.py` imports from `transformations`, and `framework_imports_fingerprint` folds that closure into GhanaLSS's hashes. Whether a *comment* edit moves them is unmeasured. The `transformations.py:3481` / `:5650` citations in my first-run report are now `:5817` only; the `:3478` text is true.\n\n**Not hashed (zero cost; dispatcher's call, all outside this element's named paths):**\n- `GhanaLSS/_/CONTENTS.org:5220` (\"=plot_labor= has no canonical =index_info= \u2026 entry (GH #569)\").\n- `GhanaLSS/_/CONTENTS.org:5313-5314` (\"They predate this convention; aligning them is a separate question\"). Now half-true: `Feature()` aligns the EHCVM plot_inputs, `Country()` does not.\n- `.claude/skills/cross-country-features/SKILL.md:40` (\"landed for `crop_production`\").\n- CLAUDE.md's plot-axis paragraph, which is duplicated and names only crop_production as registered.\n- The docstrings of `tests/test_gh1047_nigeria_unit_codes.py:207-210` / `:302-303`, which state the Country-path reason. They are true of `Country()` today and should move with the NEW ISSUE above.\n\n**Tier:** A.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1122,
+  "state": "OPEN",
+  "title": "#569 residual E: stale \"plot_labor / plot-level features not registered in index_info\" comments",
+  "updatedAt": "2026-10-19T22:38:37Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1122"
+}

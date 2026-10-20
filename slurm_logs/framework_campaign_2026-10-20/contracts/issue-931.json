@@ -1,0 +1,48 @@
+{
+  "body": "Resolved so far: the reviewed development landings and source commits are recorded in [the v0.15.0 issue reconciliation](https://github.com/ligon/LSMS_Library/blob/8d7a5e55914e700c69ae1a195f96cc2282b6ce64/slurm_logs/release_landing_2026-10-14/RELEASE_ISSUES.org) (PR #998). This issue remains open for the scope below.\n\nThe crop/food declared-unit asymmetry is now documented and pinned by a regression. harvest_kg_factors intentionally remains blind to declared unit_kg; food uses it.\n\nRemaining: decide whether crop conversion should consume u_kg. If yes, re-express Ethiopia's external shipped-quintal check in the same change so it cannot become a tautology. No new factor behavior was adopted in this documentation increment.\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdRalhw",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Yes. `harvest_kg_factors` reads the declared `u_kg` (where a country ships a conversion table, use it). In the same PR, re-express `tests/test_ethiopia_shipped_factors.py`'s quintal check against an external answer key.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-10-19T04:03:49Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/931#issuecomment-6259385735",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdegrpA",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Fixed on `development` by PR #1092 (merge `870dc4179`). Left open until the release merge to `master`. Follow-up: #1093.",
+      "createdAt": "2026-10-19T17:25:45Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/931#issuecomment-6273117092",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 931,
+  "state": "OPEN",
+  "title": "Decide whether crop conversion should use declared unit_kg",
+  "updatedAt": "2026-10-19T17:25:45Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/931"
+}

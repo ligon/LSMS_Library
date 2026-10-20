@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #867 (`fix/867-nitrogen`); red-team r1 confirmed R1-R5, and R6 was found while drafting.\n\nTier: **DECISION**.\n- GhanaLSS `plot_inputs` records only `Fertilizer` (1,091 rows, all with a quantity).\n- No product means no cited share, so `nitrogen_kg(GhanaLSS)` is empty: 0 matched of 11,282 rows. It is named as a gap in `NutrientCoverageWarning`.\n- Decide either a documented refusal like the organic one (stays loud), or a nominal \"inorganic fertilizer\" class share with a citation, as Uganda's class vocabulary has.\n- Check first what the quantity measures (unit and kind) in `GhanaLSS/_/CONTENTS.org`.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1108,
+  "state": "OPEN",
+  "title": "GhanaLSS `Fertilizer` (1,091 rows with a quantity) has no product identity, so it gets no N share",
+  "updatedAt": "2026-10-19T21:29:55Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1108"
+}

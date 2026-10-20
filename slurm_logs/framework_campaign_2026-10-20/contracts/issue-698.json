@@ -1,0 +1,93 @@
+{
+  "body": "> **Narrowed 2026-10-14 (Sue).** An open issue describes exactly the remaining work (backlog-workflow rule).\n>\n> **Resolved so far:** item 1 landed in 3069ef80 (pinned by tests/test_kinship_other_relative.py); the two tuples the original body contrasts no longer exist.\n>\n> **Remaining (this issue):** the partial-null policy (item 2), which is 24x larger than the body states: ~13 class-C/D keys -> [G, D, null] (Guyana triple -> [null, null, null]), tests extended, and a 'degeneracies that are the instrument' note in Peru/_/CONTENTS.org and Guatemala/_/CONTENTS.org.\n>\n> **Decision for @ligon:** Extend the header's conflation rule to the Affinity slot alone -- [G, D, null] for every 'X of head or spouse' and 'X or X-in-law' label (36,632 people, Affinity only): yes/no?\n\n---\n*Original text, kept for the evidence:*\n\nkinship: `Otro Pariente` is undetermined by the instrument \u2014 the corpus files it three different ways\n\nSplit out of #684 / PR #691, where it was found and where the immediate fix landed.\n\n## The finding\n\n`Peru/1994/Documentation/m-encues.pdf`, \"Pregunta N\u00ba 1: Parentesco o relaci\u00f3n con el jefe\", defines B01 code 7 verbatim:\n\n> Otro pariente (c\u00f3digo 7) comprende a los parientes consangu\u00edneos y de matrimonio con el jefe: hermano, t\u00edo, primo, consuegro, bisnieto, abuelo, cu\u00f1ado, bisabuelo, sobrino.\n\nBrother, uncle, cousin, co-parent-in-law, great-grandchild, grandfather, brother-in-law, great-grandfather, nephew. That single survey code spans **Generation \u22123..+3, Distance 0..2, and both affinities**.\n\n`kinship.yml` filed `\"Otro Pariente\": [0, 0, consanguineal]` \u2014 \"same generation, lineal, blood\", which is Kroeber's cell for *ego itself*. That is not merely uninformative; it is **refuted by a document this repository ships**.\n\nAffected: **884 Peruvian** people (4.58% of the roster, 474 households) and **596 Guatemalan** (1.58% of 37,771).\n\n## What PR #691 did\n\nChanged it to `[null, null, null]` \u2014 an explicit unknown \u2014 with the quotation above in a comment. Verified: a null tuple needs **no framework change** (`_load_kinship_map` does `tuple(vals)`; `_expand_kinship._component` returns `x[i]` for any tuple; `pd.array(..., Int64Dtype())` turns `None` into `pd.NA`), and because the key still *matches*, **no \"unknown relationship labels\" warning fires** \u2014 which matters, since such a warning's own text invites the next reader to supply a fresh guess.\n\nMeasured before/after, cold:\n\n| | Generation nulls | Distance nulls | Affinity nulls |\n|---|---|---|---|\n| Peru before | 0 | 0 | 0 |\n| Peru after | 884 | 884 | 884 |\n| Guatemala before | 0 | 0 | 0 |\n| Guatemala after | 596 | 596 | 596 |\n\nNo other value in either country changed. Guatemala's `Distance` still spans {0, 1}.\n\n## What is left for this issue\n\n**1. The canonical file is self-inconsistent on this exact concept.** Three filings of the same semantics:\n\n| key | tuple | line |\n|---|---|---|\n| `Other relative of head or spouse` | `[0, 0, consanguineal]` | kinship.yml:282 |\n| `Other relative of head` | `[0, 2, consanguineal]` | kinship.yml:631 |\n| `Otro Pariente` | `[null, null, null]` | (now) |\n\nPick one policy and apply it to all \"other relative\" labels across the corpus. My view is that the null is right wherever the instrument conflates, but that should be a deliberate corpus-wide decision, not three accidents.\n\n**2. Decide the general rule.** `Padre/Suegro` (Peru, 279 people) and Guyana's `Father/Mother/T-In-Law/M-In-Law` conflate exactly two tuples that differ only in `Affinity`. Is a partial null (`[1, 0, null]`) the right filing? That is expressible today and strictly more informative than either guess. Nothing in the corpus uses a partial null yet.\n\n**3. Note the degeneracy that is *not* a bug.** Peru's `Distance` is 0 for every non-null person because ENNIV's ten codes contain no sibling or cousin category at all. Across the 33 countries with a cached roster, Peru is one of only three whose `Distance` is constant (with GhanaSPS and Serbia-and-Montenegro). That is the instrument, not the mapping \u2014 worth recording so nobody \"fixes\" it.\n\n## Why this is filed rather than done\n\nChanging a shared canonical entry is a cross-country decision. The Peru PR changed the one entry its own source refutes and measured the blast radius; the corpus-wide policy needs an owner.\n\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABS-ZoSg",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Another instance from the #797 corpus sweep: **EthiopiaRHS 1989** serves its 66 raw `Other` rows as a definite `[0, 0, unrelated]`. The table's own header (`EthiopiaRHS/_/categorical_mapping.org`) calls that a judgment call, and all five sibling waves carry grandchild / in-law / other-relative at 1.2-4.8% against 0.4% unrelated -- so the bucket is mostly kin. Candidate for the null tuple, on the precedent set here. Not changed; a cross-country policy call. -- Sue",
+      "createdAt": "2026-09-07T09:17:26Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-5568358474",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABTBXs4g",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Policy decided for the 'other relative' class (with @ligon, 2026-09-07) and landed in `3069ef80`: a plain 'other relative' label is `[null, null, consanguineal]` (a blood relative, generation and distance unrecorded -- these 15 keys had been sitting on Head's cell, 54,251 people in 25 countries); a label naming the spouse's relatives too ('of head or spouse', EHCVM 'autres parents du CM ou du conjoint') is `[null, null, null]` like `Otro pariente` (45,993 people, 7 countries). Head and Cousin untouched; `Other relative of head` leaves the cousin cell. Pinned by `tests/test_kinship_other_relative.py`. Still open here: the partial-null question for `Padre/Suegro` / GhanaLSS `Parent` (GLSS5-7) -- same shape, `[1, 0, null]`. -- Sue",
+      "createdAt": "2026-09-07T13:37:57Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-5571472610",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABVa6a5Q",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Three corrections to this issue, measured on `github/development` at `3cf124ca3`** while adjudicating #813. Two of its premises have expired, and the decision it names is much smaller than the decision it actually implies.\n\n## 1. The two tuples this issue contrasts no longer exist\n\nIt tabulates `Other relative of head or spouse` \u2192 `[0, 0, consanguineal]` and `Other relative of head` \u2192 `[0, 2, consanguineal]` as evidence that the file is self-inconsistent. **Neither tuple is in `kinship.yml` today.** The null policy this issue argued for has already been written into the file's header and applied consistently \u2014 to **74,339 + 44,930** people. So item 1 is substantially done; what is left is narrower than the body reads.\n\n## 2. \"Nothing in the corpus uses a partial null yet\" is false\n\n`Adopted/Foster/Stepchild: [-1, 0, null]` serves **2,081** people. The partial null is not a hypothetical to be introduced; it is an existing pattern, and the question is whether to extend it, not whether to invent it.\n\n## 3. The decision is ~24\u00d7 bigger than the class this issue names\n\nThis issue frames the residual around blood-\u222a-in-law conflations (`Padre/Suegro`, Guyana's `Father/Mother/T-In-Law/M-In-Law`). Measured, that class governs **1,318** people \u2014 and note **903 of them are Serbia-and-Montenegro's**, which the issue does not mention.\n\nThe far larger class is *determinate generation and distance, conflated affinity* \u2014 `Sister/Brother of head or spouse` and its kin:\n\n| country | people |\n|---|---|\n| Uganda | 20,959 |\n| Serbia and Montenegro | 11,094 |\n| CotedIvoire | 3,161 |\n| **total** | **35,314** |\n\nA fully consistent partial-null policy therefore has a maximum blast radius of **37,170 people, in the `Affinity` slot only** \u2014 generation and distance do not move. That is the number to decide against, not 1,318.\n\nNo tuple was changed; this is measurement only. The itemised basis is in the #813 adjudication comment and in `slurm_logs/2026-09-18_kinship_813/ADJUDICATION.org`.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n\nhttps://claude.ai/code/session_01P7B5HqvWkYVZu7g9oSZVgB\n",
+      "createdAt": "2026-09-18T15:46:59Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-5732473573",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdRabkA",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Yes. \"X of head or spouse\" and \"X or X-in-law\" labels become `[G, D, null]`, Affinity only; the Guyana triple becomes `[null, null, null]`. This is the same null-component rule as 2026-09-07.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-10-19T04:03:35Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-6259383184",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdiWUgg",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "The `kinship.yml` part is on `development` (PR #1104). This issue stays OPEN: the Ghana relabels upstream of `kinship.yml` remain, tracked as #1100 and #1101. Also filed: #1102 (DECISION), #1103.",
+      "createdAt": "2026-10-19T20:56:25Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-6277141634",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 698,
+  "state": "OPEN",
+  "title": "DECISION: kinship -- extend the conflation rule to the Affinity slot alone ([G, D, null]) for 'X of head or spouse' / 'X or X-in-law' labels",
+  "updatedAt": "2026-10-19T20:56:25Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/698"
+}

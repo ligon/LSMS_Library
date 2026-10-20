@@ -45,8 +45,24 @@ These are release-readiness gaps, distinct from the Windows mismatch.
 
 * Next actions
 
-Complete the exact Windows digest accounting, review the minimal patch, and open a PR with credentialed Windows validation.
-Reconcile the full-suite outcome and both independent backlog evaluations before recommending v0.16.0 scope.
+Windows exact counterfactual accounting and independent review passed; PR [[https://github.com/ligon/LSMS_Library/pull/1153][#1153]] contains the minimal expectation correction at =1d3e8dfdf=.
+Manual CI [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][39515878586]] runs credentialed native Windows and Linux data tests on that branch.
+The initial PR checks are a separate run, =39515882178=.
+
+The maintainer approved implementing #1143, #1093, #1099, #1124 and #1125 before v0.16.0.
+Separate worktrees are =1143-decimal-comma=, =1093-declared-unit-factors= and =1099-empty-subset= under =/local/job40255479/worktrees/=, each starting at =976fc840d=.
+Grounding ledgers are reviewed and surfaced before implementation; #1124/#1125 will follow as their own harness worktree when an implementation slot frees.
+
+The complete initial evaluations are [[file:contracts/REPORT.org][contracts/REPORT.org]] (46 dispositions) and [[file:reliability/REPORT.org][reliability/REPORT.org]] (30 dispositions).
+These groups overlap, so their counts must not be summed into a unique issue total.
+Existing unlanded =fix/851-recall-period@8288cd112= is separate from the approved five-issue scope; do not rewrite its substantial implementation from scratch.
+
+GitHub's merge queue is available to organization-owned repositories, while the repository API identifies this public repository's owner as =User=.
+The #932 workflow's queue premise is therefore unavailable under present ownership, not merely unconfigured.
+The reliability report includes an unapplied alternative: credentialed tests on development PRs, followed by a required =data-tests= check after actual successful execution.
+Repository-protection changes require explicit approval; none has been applied.
+
+Complete native CI, the baseline full suite and all approved fix/review streams, then validate the final combined source and update issue dispositions.
 Routine PRs remain for human merge under the backlog-workflow skill.
 
 * Attribution

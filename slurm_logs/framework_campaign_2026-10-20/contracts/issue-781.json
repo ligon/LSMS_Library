@@ -1,0 +1,78 @@
+{
+  "body": "## Summary\n\nThe coverage matrix has a tier for *\"empty when it should not be\"* and a verdict vocabulary for *\"absent when it should not be\"*, but **no way to record that a cell is correctly empty**. A wave whose survey deliberately elicited something the feature cannot compute is graded with the tier whose own docstring calls it a bug class:\n\n```\ndropped   source declared for the wave but the wave is missing /\n          empty in the built table (the silent-drop bug class)\n```\n(`coverage_matrix.py:38-39`)\n\n`VERDICTS = {\"todo\", \"asked-not-distributed\", \"not-asked\", \"unsure\"}` (`coverage_matrix.py:129`) and `load_verdicts` adjudicates **`absent`** cells only. Nothing adjudicates `dropped`.\n\n## The concrete case that exposes it\n\nGH #770: GhanaLSS's early waves elicited food **expenditure without quantity** (`u='Value'`, measured `Quantity == Expenditure` in 100.0% of 3,492,915 rows). Once the fabricated kg factor is removed, `food_prices` has no denominator for those rows and `_drop_unpriceable` removes them, so **six of seven `GhanaLSS,food_prices` cells go `sane \u2192 dropped`**.\n\nThat is the *correct* outcome \u2014 an honest empty beats a constant `2.035038` \u2014 but the matrix will then assert, permanently and with no way to annotate it, that a deliberate fix is an instance of \"the silent-drop bug class\". The next person to run `make matrix` sees six new red-ish cells and no reason.\n\nThis is not GhanaLSS-specific. Any wave that measures value but not quantity produces the same shape, and the corpus has more of them: 2005-06 alone is 966,373 such rows, and Panama carries 17,821.\n\n## What is missing\n\nA verdict vocabulary for `dropped` \u2014 the direct analogue of what `absent_verdicts.csv` already does \u2014 distinguishing:\n\n| meaning | closes? |\n|---|---|\n| **correctly empty** \u2014 the instrument does not support this feature for this wave (value without quantity; a module that asks a different question) | yes |\n| **empty pending machinery** \u2014 computable in principle, not yet implemented (e.g. #562 phase 3b's price\u2192quantity imputation would repopulate these very cells) | no \u2014 stays visible |\n| **genuinely dropped** \u2014 the silent-drop bug the tier was named for | no \u2014 a defect |\n\nThe third is what the tier means today; the first two are indistinguishable from it, and the first is arguably not a gap at all.\n\n## Why it matters beyond tidiness\n\nThe repository's stated position is that a tier which cannot express a legitimate state gets discredited \u2014 the same argument that produced `undeclared` in #724/#725 (*\"a denominator that omits the work you have not started is not a denominator\"*) and the `not-asked` / `asked-not-distributed` split for `absent`. `dropped` is now in the position `absent` was in before verdicts existed: one label doing three jobs.\n\nThere is also an evidence-discipline point. `absent_verdicts.csv` **refuses a closing verdict without evidence** (`load_verdicts`), precisely because an unevidenced negative is unfalsifiable. Whatever is built for `dropped` should inherit that rule \u2014 \"correctly empty\" is exactly the kind of claim that would otherwise be asserted rather than shown.\n\n## Suggested direction\n\nEither extend `absent_verdicts.csv` to adjudicate `dropped` as well (one file, one loader, one evidence rule \u2014 the cell's tier disambiguates), or add a sibling file. The former looks cheaper and avoids a second convention.\n\nInterim, if #770 lands before this: record the reasoning in `GhanaLSS/_/CONTENTS.org` so the six cells are at least explicable to a human, even though the matrix cannot express it.\n\nFound while red-teaming #770. Refs #724, #725, #770, #562.\n\n\u2014 Sue\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABTc9EkQ",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Six fresh instances of exactly this gap from today's corpus regrade (2026-09-09, `development` `d2729e81`): GhanaLSS `food_prices` 1987-88, 1988-89, 1991-92, 1998-99, 2005-06 and 2012-13 moved `sane` -> `dropped`. They are CORRECTLY empty: GLSS1-6 elicit food purchases by value only (currency-denominated `u` on 100 / 100 / 54 / 82 / 87 / 88 % of `food_acquired` rows by wave), and #770 (`71b6ce92`) stopped inferring a kg factor for those units, so the currency-per-currency \"prices\" that had graded `sane` are no longer fabricated -- `food_prices()` now serves 2016-17 (407,478 rows) alone. `dropped` is the wrong word for a cell that is empty because the instrument recorded no quantities; a verdict vocabulary for \"correctly empty\" (`not-asked` at the derived-table level, or a `dropped-by-design`) is what these six need. Until then they sit in the silent-drop queue looking like a defect.",
+      "createdAt": "2026-09-09T10:29:43Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/781#issuecomment-5600396433",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdRadBA",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Yes. Add `correctly-empty` (closing, evidence required as for `not-asked`) and `empty-pending-machinery` (not closing) to the verdict vocabulary, keyed by tier. A fix agent may write the three GhanaLSS GLSS1-3 rows into `.coder/coverage/absent_verdicts.csv`, with evidence.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-10-19T04:03:37Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/781#issuecomment-6259383556",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdkgy5g",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Fixed on `development` by PR #1132. Left open until the release merge to `master`; follow-ups are #1129-#1131.",
+      "createdAt": "2026-10-19T23:13:05Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/781#issuecomment-6279410406",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdm3ubA",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**RULING (@ligon, 2026-10-19):** keep the GhanaLSS GLSS1/2 (1987-88, 1988-89) `food_prices` verdicts as `correctly-empty`, as merged in PR #1132.\n- Neither survey records a household price, only amounts.\n- An imputed price of Expenditure \u00f7 community price would re-serve `community_prices`.\n- #562 3b as specified fills `food_quantities`, not `food_acquired`.\n\nGLSS3 (1991-92) stays `empty-pending-machinery` (#1130).",
+      "createdAt": "2026-10-20T02:25:27Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/781#issuecomment-6281883244",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 781,
+  "state": "OPEN",
+  "title": "No verdict vocabulary for `dropped`: a correctly-empty cell is graded as \"the silent-drop bug class\" with no way to say otherwise",
+  "updatedAt": "2026-10-20T02:25:28Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/781"
+}

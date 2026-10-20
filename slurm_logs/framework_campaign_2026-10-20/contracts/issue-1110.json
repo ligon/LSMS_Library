@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #867 (`fix/867-nitrogen`); red-team r1 confirmed R1-R5, and R6 was found while drafting.\n\nTier: **B/DECISION**.\n- Measured by r1 on the branch and on base, so it predates #867:\n  - Ethiopia `on='parcel'` gives 0 rows plus `PlotGrainMismatchWarning`; `on='plot'` gives 21,786 rows.\n  - Malawi `on='parcel'` gives 11,622 plots at median **0.10** kg N/ha; `on='plot'` gives 33,402 at median 26.25.\n- The 2016-17 / 2019-20 garden-plot keys (`RG01_R01`) are cut to the garden (`RG01`) on the `plot_features` side only, by `_parcel_from_feature_plot` (`transformations.py:4786`).\n- The docstring at `transformations.py:6708-6711` (\"Measured no-op on Malawi \u2026 99.9%\") is false today.\n- Fix: make the parcel reduction symmetric, or choose `on` per country. Then correct the docstring.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1110,
+  "state": "OPEN",
+  "title": "`fertilizer_rate`'s default `on='parcel'` mis-joins Malawi and empties Ethiopia; its docstring's \"measured no-op on Malawi\" is false",
+  "updatedAt": "2026-10-19T21:29:57Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1110"
+}

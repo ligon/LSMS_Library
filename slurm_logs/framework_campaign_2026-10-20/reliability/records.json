@@ -1,0 +1,479 @@
+{
+  "head": "976fc840d",
+  "date": "2026-10-20",
+  "records": [
+    {
+      "issue": 675,
+      "title": "A degraded build caches as fresh: parquet missing a required column still carries a valid content hash",
+      "url": "https://github.com/ligon/LSMS_Library/issues/675",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1052
+      ],
+      "evidence": [
+        "country.py:7959 _drop_record",
+        "country.py:8063 _degraded_cache_verdict",
+        "tests/test_gh675_degraded_build.py:347"
+      ],
+      "residual": "Follow-ups split into #1051; do not reopen the implemented original defect."
+    },
+    {
+      "issue": 1051,
+      "title": "Degraded-build grading (#675) residuals: outage crashes the build, single-file probe, read-only L1 never heals, offline probe cost, precursor drops",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1051",
+      "github_state": "OPEN",
+      "classification": "open_tractable_defect",
+      "merged_prs": [],
+      "evidence": [
+        "country.py:1936 fallback tuple",
+        "country.py:7959 one file per drop",
+        "local_tools.py:569 source_fetchable_fast"
+      ],
+      "residual": "A: connection failures abort optional-subframe builds. B: single-file provenance. C: read-only L1 healing unmeasured. D: offline retry cost. E: precursor-only drops. Original report says zero live instances; A is the near-term defect, B-E need focused design/reproduction."
+    },
+    {
+      "issue": 778,
+      "title": "Tests that rebuild in the SHARED root under LSMS_NO_CACHE still open the #866 delete-then-rebuild window; assume_cache_fresh has an exists()-then-read race",
+      "url": "https://github.com/ligon/LSMS_Library/issues/778",
+      "github_state": "OPEN",
+      "classification": "partial",
+      "merged_prs": [
+        1030
+      ],
+      "evidence": [
+        "country.py:4656 exists before reads",
+        "tests/test_guyana_index_uniqueness.py:107 explicit unlink",
+        "tests/test_gh866_stale_country_parquet_not_laundered.py:293",
+        "tests/test_india_employment_activity_index.py:100"
+      ],
+      "residual": "Resolved: #1030 isolates poison/destamp tests and makes raw test readers race-tolerant. Subsequently GhanaLSS interview_date (fixture line69), visit derivations (201/252), and synthetic dfs merge (270) already use private roots. Remaining: make assume_cache_fresh fall through on FileNotFoundError only; audit/isolate Guyana cache deletion, India cold employment and Togo control. Do not change corrupt-file policy (#1071), introduce writer locks, or revive disproven partial-aggregate theory.",
+      "residual_title": "Isolate remaining mutating real-country tests and tolerate cache disappearance in assume_cache_fresh",
+      "residual_body": "Resolved: #1030 isolates poison/destamp tests and makes raw test readers race-tolerant. Subsequently GhanaLSS interview_date (fixture line69), visit derivations (201/252), and synthetic dfs merge (270) already use private roots. Remaining: make assume_cache_fresh fall through on FileNotFoundError only; audit/isolate Guyana cache deletion, India cold employment and Togo control. Do not change corrupt-file policy (#1071), introduce writer locks, or revive disproven partial-aggregate theory."
+    },
+    {
+      "issue": 908,
+      "title": "Cache mechanism code is inside the content fingerprint: one comment in load_dataframe_with_dvc cold-rebuilds the corpus",
+      "url": "https://github.com/ligon/LSMS_Library/issues/908",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1027
+      ],
+      "evidence": [
+        "country.py:4436 _read_l2_country_cache",
+        "tests/test_build_transform_hash.py"
+      ],
+      "residual": "Original one-comment premise corrected by maintainer: AST-normalized comment edits never moved hashes; logic edits did."
+    },
+    {
+      "issue": 1040,
+      "title": "Wave-tier cache read gates are still inside the build fingerprint (Wave.grab_data, run_make_target, assume_cache_fresh serve)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1040",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1105
+      ],
+      "evidence": [
+        "country.py:1680 _read_l2_wave_cache",
+        "country.py:1743 _fresh_script_parquet",
+        "country.py:4635 _read_assumed_fresh_cache",
+        "tests/test_gh1040_wave_read_gates.py"
+      ],
+      "residual": "Behavior questions intentionally split as #1071; corruption admission fixed as #1070."
+    },
+    {
+      "issue": 1070,
+      "title": "get_dataframe serves a non-parquet .parquet as an empty CSV frame; under assume_cache_fresh that becomes the served table",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1070",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1105
+      ],
+      "evidence": [
+        "local_tools.py:1793 ParquetFormatError",
+        "tests/test_reader_sniff.py:260"
+      ],
+      "residual": "No residual here; corrupted-read recovery policy remains #1071."
+    },
+    {
+      "issue": 1071,
+      "title": "DECISION: the wave and country cache tiers disagree on LSMS_NO_CACHE spelling and on corrupt-file handling",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1071",
+      "github_state": "OPEN",
+      "classification": "blocked_new_decision",
+      "merged_prs": [],
+      "evidence": [
+        "country.py:1705 truthiness",
+        "country.py:4497 explicit truth set",
+        "tests/test_gh1040_wave_read_gates.py:147",
+        "tests/test_gh1040_wave_read_gates.py:329"
+      ],
+      "residual": "No human behavior ruling in complete comments. Choose LSMS_NO_CACHE spelling and cache-corruption recovery per route before editing pinned found behavior. Can fix missing-file race #778 independently."
+    },
+    {
+      "issue": 932,
+      "title": "247 requires_s3 tests skip on every PR and on development, so a red suite reports green",
+      "url": "https://github.com/ligon/LSMS_Library/issues/932",
+      "github_state": "OPEN",
+      "classification": "partial",
+      "merged_prs": [
+        1049
+      ],
+      "evidence": [
+        ".github/workflows/ci.yml:24 merge_group",
+        ".github/workflows/ci.yml:25 schedule",
+        ".github/workflows/ci.yml:404 data-tests",
+        "development-ruleset.json",
+        "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue"
+      ],
+      "residual": "Code landed: merge_group data-tests, nightly development checkout, unit-tests skipped-count summary. External enforcement remains: active development ruleset 25124452 requires only unit-tests and has no merge_queue rule. No other applicable queue ruleset exists in inventory. Repository role5 can bypass always. Configure intended protected merge workflow with required data-tests; verify merge-group blocking. Nightly cron activates only after workflow reaches default branch master. Do not claim current green development pushes exercised data tests. Ownership check: owner.type=User, public; official GitHub docs exclude personal repos from merge queue. Viable minimal proposal is credentialed pull_request data-tests on development plus requiring the check, preserving current rules and bypass. Forks fail closed until a reviewed internal PR; manual workflow_dispatch does not satisfy PR required checks.",
+      "residual_title": "Run and require credentialed PR data-tests under personal-repository constraints; activate nightly after release",
+      "residual_body": "Code landed: merge_group data-tests, nightly development checkout, unit-tests skipped-count summary. External enforcement remains: active development ruleset 25124452 requires only unit-tests and has no merge_queue rule. No other applicable queue ruleset exists in inventory. Repository role5 can bypass always. Configure intended protected merge workflow with required data-tests; verify merge-group blocking. Nightly cron activates only after workflow reaches default branch master. Do not claim current green development pushes exercised data tests. Ownership check: owner.type=User, public; official GitHub docs exclude personal repos from merge queue. Viable minimal proposal is credentialed pull_request data-tests on development plus requiring the check, preserving current rules and bypass. Forks fail closed until a reviewed internal PR; manual workflow_dispatch does not satisfy PR required checks."
+    },
+    {
+      "issue": 907,
+      "title": "80% of CI's skipped tests take the expensive skip path: 56 files reach a skip via a network timeout instead of a requires_s3 mark",
+      "url": "https://github.com/ligon/LSMS_Library/issues/907",
+      "github_state": "CLOSED",
+      "classification": "implemented_closed",
+      "merged_prs": [],
+      "evidence": [
+        "Issue closed; #932 text and PR1049 describe completed requires_s3 marking sweep",
+        "tests/conftest.py:1"
+      ],
+      "residual": "Historical skip count247 is obsolete; recent PR1049 reports approximately4250 data-gated tests."
+    },
+    {
+      "issue": 1001,
+      "title": "Remove runtime credential writes into the installed countries tree",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1001",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1022
+      ],
+      "evidence": [
+        "tests/test_gh1001_no_intree_credential_write.py",
+        "tests/conftest.py:57"
+      ],
+      "residual": "CI migration #1031 is also done. Library legacy permission rungs #1064 and DVC btime #1032 are separate."
+    },
+    {
+      "issue": 1031,
+      "title": "CI writes S3 reader credentials into the countries tree (ci.yml:248, :390), so the user-config-only path is never tested end to end",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1031",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1065
+      ],
+      "evidence": [
+        ".github/workflows/ci.yml:273",
+        ".github/workflows/ci.yml:446",
+        ".github/workflows/ci.yml:472"
+      ],
+      "residual": "Credentialed workflow_dispatch39259408940 supplied end-to-end evidence; no in-tree reader credential file permitted."
+    },
+    {
+      "issue": 1002,
+      "title": "Keep unreadable non-DTA binaries out of text fallback",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1002",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1019
+      ],
+      "evidence": [
+        "local_tools.py:1637 SPSS admission",
+        "local_tools.py:1884 text admission",
+        "tests/test_reader_sniff.py:409",
+        "tests/test_reader_sniff.py:454"
+      ],
+      "residual": "Stale issue has no fixed comment but merged PR and source/tests implement all requested paths; hermetic selection passes."
+    },
+    {
+      "issue": 1039,
+      "title": "DECISION: LSMS_BUILD_BACKEND=make cannot build a materialize: make table that has wave scripts but no country rule (Tanzania food_acquired)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1039",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1105
+      ],
+      "evidence": [
+        "country.py:4883 _has_country_builder",
+        "country.py:5360 no-builder empty route",
+        "country.py:5776 make routing",
+        "tests/test_gh1039_make_backend_no_country_rule.py:255"
+      ],
+      "residual": "Default-backend barren subset inconsistency split as #1099. Existing country-builder stale-output route is separate; do not weaken authority policy."
+    },
+    {
+      "issue": 1099,
+      "title": "Default backend: a barren-subset request (a wave that does not declare the table) serves 0 rows warm but raises 'Could not materialize' cold",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1099",
+      "github_state": "OPEN",
+      "classification": "open_tractable_defect",
+      "merged_prs": [],
+      "evidence": [
+        "country.py:5212 country_builder=True",
+        "country.py:5360 empty only when not country_builder",
+        "tests/test_gh1039_make_backend_no_country_rule.py:255 existing warm-only default control",
+        "probe-results.json"
+      ],
+      "residual": "Cold absent-table subset raises while warm returns0. Reuse _empty_declared_frame; empty only truly absent requested wave declarations, preserving failed/full builds and real country builders."
+    },
+    {
+      "issue": 600,
+      "title": "Preserve existing provenance when a catalog backfill cannot resolve its source",
+      "url": "https://github.com/ligon/LSMS_Library/issues/600",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1117
+      ],
+      "evidence": [
+        "scripts/backfill_wave_provenance.py:345 resolve",
+        "scripts/backfill_wave_provenance.py:532 dropped_by_write",
+        "tests/test_wave_provenance.py:921"
+      ],
+      "residual": "Failed catalog resolution preserves record and reports separately; held-release and hand-recorded value gates implemented. Follow-ups #1114/#1115/#1116/#1128 are separate."
+    },
+    {
+      "issue": 1114,
+      "title": "DECISION: does `#+CATALOG_IDNO:` / `#+CATALOG_DOI:` record the release we HOLD, or the catalog's latest?",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1114",
+      "github_state": "OPEN",
+      "classification": "implemented_decision_pending_release",
+      "merged_prs": [
+        1117
+      ],
+      "evidence": [
+        "Complete issue ruling2026-10-19T22:45:14Z: held optionA",
+        "scripts/backfill_wave_provenance.py:571 release_changed"
+      ],
+      "residual": "Held-release decision implemented. Acquisition tasks #978/#1127 separate; latest-release durable queue #1128 explicitlyGO later."
+    },
+    {
+      "issue": 1115,
+      "title": "provenance.py: a SOURCE.org round-trip drops unknown `#+KEY:` lines, takes the URL from any line, and re-ingests its own placeholder as prose",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1115",
+      "github_state": "OPEN",
+      "classification": "open_tractable_defect",
+      "merged_prs": [],
+      "evidence": [
+        "provenance.py:135 _BOILERPLATE_RE",
+        "provenance.py:142 preserved_prose",
+        "provenance.py:286 fallback URL",
+        "provenance.py:328 extra",
+        "provenance.py:332 renderer",
+        "probe-results.json"
+      ],
+      "residual": "Lossless unknown keys/notes, body-only fallback URL, placeholder idempotence. Must coordinate with #1128 in one branch."
+    },
+    {
+      "issue": 1116,
+      "title": "#600 residual: override records take their note and validation from `_OVERRIDES`, over a hand edit to the file",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1116",
+      "github_state": "OPEN",
+      "classification": "blocked_new_decision",
+      "merged_prs": [],
+      "evidence": [
+        "scripts/backfill_wave_provenance.py:345 override resolution",
+        "scripts/backfill_wave_provenance.py:478 _resolve_not_wb"
+      ],
+      "residual": "Choose authoritative note/validation copy for overrides and not-WB inferred notes. Already appears in review changed table, zero shipped divergences; defer."
+    },
+    {
+      "issue": 1128,
+      "title": "provenance: record the catalog's newer release as #+CATALOG_LATEST_IDNO beside the held one, so stale releases form an acquisition queue (#1114 ruling)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1128",
+      "github_state": "OPEN",
+      "classification": "decision_ruled_unimplemented",
+      "merged_prs": [],
+      "evidence": [
+        "IssueGO2026-10-20T02:33:39Z",
+        "Ruling2026-10-20T10:27:47Z release-unknown",
+        "provenance.py:303 known fields omit latest",
+        "data_access.py:1973 add_wave"
+      ],
+      "residual": "Record latest idno/date independently of held. Never infer held release from catalog for missing-idno record; review release-unknown. Acquisition clears latest pair only once new held release actually acquired."
+    },
+    {
+      "issue": 650,
+      "title": "Documentation/ should not be optional: 3 waves carry only a provenance stub, and add_wave() never fetches the real thing",
+      "url": "https://github.com/ligon/LSMS_Library/issues/650",
+      "github_state": "OPEN",
+      "classification": "blocked_new_decision",
+      "merged_prs": [],
+      "evidence": [
+        "data_access.py:1973 add_wave docstring",
+        "data_access.py:2120 data-only download",
+        "three Documentation/ inventories still only stubs"
+      ],
+      "residual": "Minimum documentation standard plus download mechanism and backfill remain unimplemented. Source acquisition is human-directed TierD; formulate minimum standard, then fetch only published artifacts; do not mistake provenance for documentation."
+    },
+    {
+      "issue": 1149,
+      "title": "add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1149",
+      "github_state": "OPEN",
+      "classification": "decision_ruled_unimplemented",
+      "merged_prs": [],
+      "evidence": [
+        "data_access.py:1144 flat extraction",
+        "data_access.py:2126 top-level listing",
+        "data_access.py:2375 extractor caller"
+      ],
+      "residual": "OptionC ruled: stage; match existing sidecars recursively by case-insensitive basename; refuse collisions; retain zip paths for new members; diff blobs; report recursive leftovers; preserve confirm/push. No live acquisition needed to implement/tests."
+    },
+    {
+      "issue": 637,
+      "title": "Complete the remaining first/last aggregation key-soundness audit after the merged reviews",
+      "url": "https://github.com/ligon/LSMS_Library/issues/637",
+      "github_state": "OPEN",
+      "classification": "partial",
+      "merged_prs": [
+        638,
+        646,
+        649,
+        651,
+        653
+      ],
+      "evidence": [
+        "Issue current11-site residual inventory",
+        "tests/test_gh637_malawi_first_sites.py",
+        "SkunkWorks/grain_aggregation_policy.org"
+      ],
+      "residual": "Completed historical review blocks and #871 core policy are settled. Remaining11 first/last tail entries need current-source/test reconciliation and per-wave entity/key review; only demonstrated broken keys warrant fixes. No blanket skipna rewrite or inference of sound keys from zero duplicates.",
+      "residual_title": "Complete remaining11-site first/last key-soundness audit against current source and tests",
+      "residual_body": "Completed historical review blocks and #871 core policy are settled. Remaining11 first/last tail entries need current-source/test reconciliation and per-wave entity/key review; only demonstrated broken keys warrant fixes. No blanket skipna rewrite or inference of sound keys from zero duplicates."
+    },
+    {
+      "issue": 790,
+      "title": "Five country modules still write unitlabels.csv into _/ as a side effect (ghanasps, ghanalss, ethiopia, togo, tanzania); two readers have no callers",
+      "url": "https://github.com/ligon/LSMS_Library/issues/790",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1021
+      ],
+      "evidence": [
+        "PR1021 removes five prices_and_units writers and two harmonized_unit_labels readers",
+        "repo symbol search finds no target definitions"
+      ],
+      "residual": "Issue body stale. Keep tracked GhanaLSS unit_labels.csv and live Uganda reader."
+    },
+    {
+      "issue": 218,
+      "title": "Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/218",
+      "github_state": "OPEN",
+      "classification": "partial",
+      "merged_prs": [
+        1021
+      ],
+      "evidence": [
+        "countries/Togo/_/Makefile:14",
+        "countries/CotedIvoire/_/Makefile:17",
+        "countries/Afghanistan/_/Makefile:14",
+        "countries/Malawi/_/data_scheme.yml:488",
+        "country.py:4979"
+      ],
+      "residual": "Phase2 scripts retired. Remaining dangling grouped Make rules/var lists in Togo,CotedIvoire,Afghanistan; Malawi derived registrations; core allow-list/comment; stale contributor docs and unitlabels gitignore exception. Preserve historical explanatory mentions. Compare API food frames before/after and Make dry-runs.",
+      "residual_title": "Remove residual retired-food Make rules, Malawi registrations and obsolete dispatch allowance",
+      "residual_body": "Phase2 scripts retired. Remaining dangling grouped Make rules/var lists in Togo,CotedIvoire,Afghanistan; Malawi derived registrations; core allow-list/comment; stale contributor docs and unitlabels gitignore exception. Preserve historical explanatory mentions. Compare API food frames before/after and Make dry-runs."
+    },
+    {
+      "issue": 836,
+      "title": "Tanzania/_/food_acquired.py reads a build table out of CONTENTS.org, which the cache hash deliberately skips",
+      "url": "https://github.com/ligon/LSMS_Library/issues/836",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1026
+      ],
+      "evidence": [
+        "PR1026 dead country reader removed; _ORG_HASH_SKIP guard",
+        "Related #1039 merged #1105"
+      ],
+      "residual": "No live CONTENTS build-reader defect remains."
+    },
+    {
+      "issue": 680,
+      "title": "bug: fooddatacentral ships a broken top-level `tests` package that shadows ours \u2014 kills the whole suite at collection in CI",
+      "url": "https://github.com/ligon/LSMS_Library/issues/680",
+      "github_state": "OPEN",
+      "classification": "implemented_pending_release",
+      "merged_prs": [
+        1097
+      ],
+      "evidence": [
+        "pyproject.toml fooddatacentral>=1.0.13",
+        "Issue comment2026-10-19T22:17:04Z image generation20261019T221223Z"
+      ],
+      "residual": "Resolved dependency floor and image update; old mounted jobs retain old generation until remount."
+    },
+    {
+      "issue": 920,
+      "title": "Cache-miss rebuild is silent on a git checkout (DECISION: info vs warning); profile the per-call read-path transforms on GhanaLSS",
+      "url": "https://github.com/ligon/LSMS_Library/issues/920",
+      "github_state": "OPEN",
+      "classification": "partial",
+      "merged_prs": [
+        1027
+      ],
+      "evidence": [
+        "country.py:7450 CacheRebuildWarning",
+        "tests/test_gh920_rebuild_reason.py",
+        "Issue current text partb"
+      ],
+      "residual": "Rebuild warnings for pip and git installs plus repeat detector are implemented; only GhanaLSS5.3M-row read-path profile remains. Narrow title to profiling; reuse profiling skill, report O(rows) transforms and optimization choices before changing behavior.",
+      "residual_title": "Profile GhanaLSS warm read transforms after implemented cache-rebuild warnings",
+      "residual_body": "Rebuild warnings for pip and git installs plus repeat detector are implemented; only GhanaLSS5.3M-row read-path profile remains. Narrow title to profiling; reuse profiling skill, report O(rows) transforms and optimization choices before changing behavior."
+    },
+    {
+      "issue": 381,
+      "title": "food-derivation: noisy 'No rule to make target \u2026food_acquired.parquet' for YAML-path / no-data countries",
+      "url": "https://github.com/ligon/LSMS_Library/issues/381",
+      "github_state": "OPEN",
+      "classification": "open_tractable_defect",
+      "merged_prs": [],
+      "evidence": [
+        "country.py:5150 Make failure warnings",
+        "country.py:4883 existing builder predicate"
+      ],
+      "residual": "Repeated nonexistent-target warnings remain possible; scope exact route before adapting builder predicate. Do not suppress #866 evidence-bearing failure warnings or real Make build failures; not a release blocker."
+    },
+    {
+      "issue": 1032,
+      "title": "DVC writes countries_root()/.dvc/tmp/btime when the DVCFileSystem is built: the last runtime write into the config tree",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1032",
+      "github_state": "OPEN",
+      "classification": "blocked_new_decision",
+      "merged_prs": [],
+      "evidence": [
+        "Issuecomment2026-10-19T13:21:39Z fresh archive read-only read failure",
+        "local_tools.py _build_dvcfs"
+      ],
+      "residual": "Read-only wheel source reads fail on DVC tmp/btime; import-only test insufficient. DVC3.67.1 has no supported tmp override. Human choice: ship btime, fragile internals override, or documented limitation plus loud import."
+    },
+    {
+      "issue": 1064,
+      "title": "DECISION: data_access still accepts the in-tree countries/.dvc/s3_creds as a credential fallback (reader rung reports 'read' on a file DVCFileSystem never uses)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1064",
+      "github_state": "OPEN",
+      "classification": "blocked_new_decision",
+      "merged_prs": [],
+      "evidence": [
+        "data_access.py:640 reader fallback",
+        "data_access.py:664 writer fallback",
+        "data_access.py:1235 write resolver"
+      ],
+      "residual": "permissions() can report read via stale in-tree credentials DVCFS ignores. Decide removal of reader rung and whether writer rungs remain acquisition exception; no ruling yet."
+    }
+  ]
+}
