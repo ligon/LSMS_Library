@@ -59,6 +59,10 @@ cache-fingerprint reach before landing.
   `tests/test_volume_as_mass_kwarg.py`.
 - No mixed-separator or malformed-grouping convention is established by the
   issue; decline these rather than silently extracting trailing digits.
+- Preserve numbered vocabulary prefixes (`1001. 12,5 cl`) and dual fraction
+  labels (`Packet(1/4lt / 1/4kg)`); the recovered tests pin them. Refuse malformed
+  scientific/whitespace suffixes while preserving existing inner container
+  sizes in multiplier labels (`2x500g`), per the extended parser tests.
 - Country documentation read first, including TODO/WAITING/LOGBOOK entries:
   Senegal's food crosswalk intentionally keys on mojibake strings; changing
   its keys without its reader loses rows (`Senegal/_/CONTENTS.org`, unit
@@ -93,4 +97,19 @@ changing broader multi-quantity/range semantics is out of scope.
 
 ### Phase 3 - verification
 
-Pending implementation and measured before/after evidence.
+- `_METRIC_NUMBER` / `_metric_scalar` / `_metric_number` / parser prefix guard:
+  **OK (anchored on §2/§3/§4)**. Extend recovered, tested machinery; comma
+  grouping follows the issue; zero-prefix precision follows parent ruling;
+  malformed tokens decline without breaking pinned range/fraction cases.
+- Food/crop consumers: **OK (anchored on §2/§5)**. Reuse existing factor ladders
+  and API derivations; 359 focused tests passed. No duplicate conversion path.
+- Live evidence: **OK (anchored on §4)**. Private exact-base/current cold builds
+  affect 783 Senegal + 126 Benin + 36 CotedIvoire quantity rows (945 total).
+  All source frames and native quantities are unchanged; 692/68/23 default
+  price rows change. See `slurm_logs/framework_campaign_2026-10-20/1143/`.
+- Cache reach: **OK (anchored on §2/§4)**. Actual hashes move for 22 country
+  tables and 154 wave cells, all GhanaLSS; zero tagged build fingerprints move.
+  Do not describe this as a zero-cost read-time change.
+- Country docs: **OK (anchored on §4)**. Record Senegal's 624 latent Demi
+  walatt rows and the observable stale CotedIvoire no-u-table statement with
+  evidence; no country mapping changes.
