@@ -65,21 +65,25 @@ sample:
         - t
         - i
 
-# GH #841.  Same cover page as `sample`, same composite key, same shape as
-# W4's block -- MINUS df_geo. The acquired v01 extract lacks household
-# geovariables; WB catalog 6410 v02 (2026-09-16) adds
-# NGA_HouseholdGeovariables_Y5.dta. GH #978 tracks acquisition and wiring.
-# Pending that work, Latitude / Longitude are absent for 2023Q3 / 2024Q1:
-# the framework fills them NaN in
-# the cross-wave concat and the Site B null-content guard warns per wave
-# (the known country-grain `optional:` mismatch, CLAUDE.md).  Do not add an
-# `optional: true` for them in data_scheme.yml -- that would silence W1-W4 too.
-# Both quarters (2023Q3 / 2024Q1) read this block via wave_folder_map, as in
-# every other wave.
+# GH #841 / #978.  Same cover page as `sample`, same composite key, same shape
+# as W4's block, df_geo included.  The v01 extract (106 files) shipped no
+# household geovariables; WB catalog 6410 v02_M (2026-09-16, acquired GH #978)
+# adds them at the ROOT of the Stata zip as `nga_householdgeovariables_y5.dta`
+# (lowercase -- not `NGA_HouseholdGeovariables_Y5.dta` as #978 spelled it), and
+# its coordinates are `lat_mod` / `lon_mod`, NOT W4's `lat_dd_mod` /
+# `lon_dd_mod`.  Like W4's file it has NO `ea` (hhid + 54 geovariables), so it
+# joins on `i` -- merging on `v` would be the GH #323 site-4 cartesian.  hhid
+# is unique in both frames and every geo household is on the cover page
+# (4,883 of 5,067; the 184 without coordinates were not interviewed --
+# interview_result != 1, no cross-section weight), so the default outer merge
+# manufactures no row.  Both quarters (2023Q3 / 2024Q1) read this block via
+# wave_folder_map, as in every other wave, so the coordinates are the same in
+# both rounds.
 cluster_features:
     dfs:
         - df_key
         - df_main
+        - df_geo
     df_key:
         file: Post Planting Wave 5/Household/secta_plantingw5.dta
         converted_categoricals: true
@@ -107,6 +111,13 @@ cluster_features:
                     urban: Urban
                     Urban: Urban
                     URBAN: Urban
+    df_geo:
+        file: nga_householdgeovariables_y5.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Latitude: lat_mod
+            Longitude: lon_mod
     merge_on:
         - i
     final_index:
