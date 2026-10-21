@@ -57,10 +57,18 @@ Repair test coverage in `test_food_prices_dtype.py`, `test_panel_attrition.py` a
 | Legacy fallback assertion | Move its nonempty/i/j assertions into the already-covered food-expenditure default case; retire misleading name | Actual recursion coverage exists in test_wave_getattr; a derived call is not a fallback proof |
 | Cache cleanup | Remove unused backup/unlink helpers; private external validation roots and proven restoration pattern | No test needs to remove a derived or ambient cache |
 
-## §6 Approved boundary and open questions
+## §6 Verification and remaining limits
 
-Root approved the concrete three-file test-only proposal and validation matrix in the task-private PROPOSAL.md on 2026-10-21. Specifically: retire the two obsolete derived-parquet dtype tests in favor of canonical API cases plus ten pure controls; replace default-m/xfail debt with default-v and explicit Region cases; preserve both attrition bodies and the scientific baseline; merge the redundant fallback assertions into the stronger existing food-expenditure case and remove unused deletion helpers. No global conftest/shared fixture change is proposed.
+Root approved the private diagnosis/proposal on 2026-10-21 before implementation; the initial ledger was committed separately first. Runtime verification is pinned to `1eb9bb377157c78f74962c7a9de59807d446b239`.
 
-The prior-art-ledger skill's Phase 1 says "Then stop and surface the ledger to the user before implementing" (`/global/home/users/ligon/.sucoder/skills/prior-art-ledger/SKILL.md`); the root also explicitly requested this approval boundary. The read-only diagnosis surfaced this ledger and stopped; root approval satisfies that handshake. No further boundary question remains before the approved implementation.
+- **OK (sections 2-3):** reuse the public runtime-derived dispatch, existing float predicate, source-cache paths and market conversion. The changed selection executes 25 cases (15 real API and ten pure dtype controls), with zero skips/failures. No derived parquet is created; readiness never depends on one.
+- **OK (sections 2-4):** all five attrition helper/numerical bodies are AST-identical to f8, including threshold 50, adjacent overlap and both positive-diagonal loops. Both actual matrices are exact to the private f8 references; six matrix faults still fail.
+- **OK (sections 3-4):** default v and explicit Region are exercised. Eight key/duplication/dtype/value faults fail the tracked helpers. The actual Region exclusions remain 36/37/31/67 for prices/quantities/expenditures/HC; no universal row-count equality is imposed. HC's existing columns-axis name difference is reported separately.
+- **OK (sections 2-4):** six malformed canonical dtype cases fail and four float64/Float64 positives pass. Four injected API errors propagate after source readiness, rather than becoming skips.
+- **OK (sections 2-4):** bounded existing units, Wave recursion, market deduplication and Uganda 2009 market fallback regressions give 41 passes, zero skips/failures. The existing 2,975 HC and at-least-2,929 food household coverage assertions remain unchanged and execute.
+- **OK (section 4):** nine fresh-process full frames and attrs match f8 exactly, with no path or metadata normalization. Empty and credentialless runs each give ten pure passes and 15 data skips. Four environment-presence/success/exception restoration controls preserve the original root and clear its memoized value.
+- **OK (section 4):** all original tracked files outside the three tests, including production/library/config and every fixture, remain byte-identical. All 170 physical prerequisite parquets and 581 raw L1 copies still match their quiescent sources; no source acquisition, shared-cache write, cache bypass, in-tree file or derived parquet was introduced.
+
+Safe report, aggregate validation and reproducible commands live under `slurm_logs/isa_backlog_2026-10-21/1006-Uganda/`. Full frames, source keys, warnings and logs remain task-private. This is held-prerequisite API/test verification, not a full-country source rebuild or a full-suite run. The schema/Region/unit documentation contradictions in section 3 remain reported limits outside this test-only task. No approval question remains before independent review.
 
 -- Sue
