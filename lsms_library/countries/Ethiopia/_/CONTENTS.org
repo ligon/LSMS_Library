@@ -1384,6 +1384,27 @@ All source-use keys, non-unit values, row multiplicities and attributes remain u
 The section5 holder/crop purchase join still attaches only to a unique plot; this normalization does not resolve ambiguous purchase allocation.
 See =.coder/ledger/1118-ethiopia-plot-input-units.md= and the safe aggregate report under =slurm_logs/isa_backlog_2026-10-21/1118-Ethiopia/=.
 
+** Seed-purchase missing-answer caveats (GH #1183 / #1184)
+
+Independent held-source review on 2026-10-21 found two pre-existing purchase-payload behaviors, unchanged by the #1118 unit normalization.
+These require separate source-routing diagnosis before changing eligibility or interpreting an absent answer as No.
+
+For #1183, =_yesno_bool= maps a missing section5 purchase answer to False through nullable masks.
+The caller's =pqty.mask(purch == False, 0)= then supplies zero; changing only the decoder would still zero an unknown condition at that caller.
+The held W1/W2 files have 4,433 / 90 missing purchase flags, all with missing source amounts; later waves have none.
+After existing joins, labels and deduplication, 4,426 W1 and 60 W2 served Seed records have the False/zero effect.
+The earlier 4,421 W1 count described a stricter single-raw-crop control subset, not the complete output.
+A private diagnostic preserving unknown flags and avoiding caller zeroing removes 371 W1 records retained solely through that purchase payload.
+This is a retention question to diagnose, not permission to delete those records.
+The held dictionaries establish 1=Yes / 2=No but do not establish skip/routing meaning.
+
+For #1184, leave that decoder/caller unchanged and examine the W2 holder/crop sum separately.
+There are 265 groups with all purchased amounts missing; ordinary sum supplies zero.
+A grouping-only =sum(min_count=1)= diagnostic changes 187 attached Seed amounts from zero to missing, without changing another Seed value or losing a row: all 187 have =Purchased=True=.
+The existing unique-plot attachment restriction must remain; ambiguous holder/crop amounts must not fan out across plots.
+Changing the decoder/caller as well alters the grouping census and can affect three further W2 purchase-only records, so the two boundaries must not be conflated.
+No purchase policy, amount, flag or row-retention change is included in #1118.
+
 ** 2026-10-19 -- =transformations.nitrogen_kg= credits NPS at 0.19 (GH #867)
 
 Ruling (@ligon, 2026-10-18): NPS gets a CITED share; organic inputs a
