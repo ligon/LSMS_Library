@@ -57,3 +57,26 @@ None within root's approved four-label scope. Source labels, code161's absence f
 Evidence: slurm_logs/isa_backlog_2026-10-21/1034/REPORT.org and validation.json.
 
 Sue
+
+## Follow-up test boundary, 2026-10-21 (before test edit)
+
+The wider #1144 run included the real-data GH #1035 ladder test that was not
+in the original53-test #1034 selection. At unchanged frozen6f, it fails
+`set(t[sized]) == {'2011Q1'}` because source-backed #1034 now exposes shared
+container names in2015Q3 too. This is a test-scope defect, not new evidence
+that the W3 records use W1's card. The original runtime/source review remains
+preserved; PR1172 is temporarily draft pending this amendment and review.
+
+Amend only `test_kg_ladder_on_the_sized_labels`: apply W1 mass fraction/whole
+card assertions to2011Q1; retain every numeric, litre and metric protection;
+require actual later shared-label rows and assert they receive neither
+`survey_kg` nor this W1 card's Derivation KEY. Do not require unrelated future
+derivations to be absent. No runtime/config, raw input, fixture, baseline or
+conversion factor changes. All existing runtime hashes must remain identical.
+
+Grounding: original implementation/review at6f; existing GH #1035 test and
+source proof recorded above; task standing baseline remains authoritative.
+Baseline failing log and proposed patch are private in
+`control/isa-backlog-20261021/east/1144/`. Apply on a separate branch based at6f,
+verify the relevant complete tests against its unchanged held data and freeze
+for independent review before updating the public PR head.
