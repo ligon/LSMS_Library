@@ -1,5 +1,20 @@
 #+title: Handoff -- v0.16.0 release, 2026-10-21
 
+* Local release suite and platform jobs PASS; Linux gate pending -- 2026-10-21
+
+Actual make release at master097 passed: 8,851/276skip/9xfail/1non-strictXPASS; zero failures/errors and zero changes among all 9,137 outcome/reason records versus532.
+All16 worker identities passed, numerical/build threads are1, and no in-tree country parquet was produced.
+The adapter is waiting on exact master CI39604418333 after shutting down xdist; do not rerun the suite.
+Local proof: =slurm_logs/release_v0.16.0_2026-10-21/local-final/=.
+
+All platform jobs passed at actual097: unit4,685/4,452skip; Windows smoke327/1skip; credentialed native Windows shocks/assets match approved dimensions and digests; DVC reachability/lock and documentation deploy PASS.
+Linux credentials/gate and Uganda prerequisite build passed; its full suite is running.
+All48 accepted issue closures and all77 retained OPEN scopes were independently verified, with no mismatch.
+Safe evidence: =master-ci-platform/= and =postmerge-issues/= under the release report directory.
+No tag or publication exists yet; keep executable master frozen and continue observing Linux CI.
+
+Sue
+
 * Release merged; final gates active -- 2026-10-21 06:02 PDT
 
 Preparation PR 1167 merged as =ee97d80aab8874e71e89dcdd5f93f18715fab935=.

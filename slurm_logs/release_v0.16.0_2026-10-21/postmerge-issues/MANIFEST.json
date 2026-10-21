@@ -1,0 +1,45 @@
+{
+  "body_or_comment_fields_requested": false,
+  "safe_status_only_files": {
+    "COPYLIST.txt": {
+      "bytes": 182,
+      "sha256": "0ccecfa07a8437dc71d4608999ea109e97b69f7f968d7034e8ed28778bf09157"
+    },
+    "REPORT.org": {
+      "bytes": 1568,
+      "sha256": "a169ad6417c2b0974a06cc17f5d593ed3639d85eb49337024cb063fea3e09bcc"
+    },
+    "annotate_commit_closure.py": {
+      "bytes": 3053,
+      "sha256": "db437d9dde9b3c7d91470cd0fed23c4472bb91bd92093a4be1978e38612ce2f8"
+    },
+    "query-1.graphql": {
+      "bytes": 8040,
+      "sha256": "82a2d7dd91e635ae562cc6c7b96942eacd8eec638b8f2b3f22afa8f9b96a5e77"
+    },
+    "query-2.graphql": {
+      "bytes": 7937,
+      "sha256": "2ea2ff018d4953c43e3ef93a200155e1b80d5153b31aa861bca324c6c70fe2a0"
+    },
+    "query-3.graphql": {
+      "bytes": 7955,
+      "sha256": "d3509c9e1a948c4f0e92321d1c37293a615e121dce004199342989b5d9a044bf"
+    },
+    "query-4.graphql": {
+      "bytes": 7955,
+      "sha256": "fc654d7df683c0ac233ee9b078b2b4a62ca896eebe8df33e3226aa840f9fee08"
+    },
+    "query-5.graphql": {
+      "bytes": 7955,
+      "sha256": "d8a89ddc4c1eb5d17746521ecd9f708dcf312e62b6d5790c99f5c3e8aa21c910"
+    },
+    "verification.json": {
+      "bytes": 97483,
+      "sha256": "c5cbd35265d63f5d53c7ae7616ff8c5496f8f8a20a47bf4e565c3a6f21731319"
+    },
+    "verify_statuses.py": {
+      "bytes": 6778,
+      "sha256": "064cc96f631bb043bd5766934ab47b491d1a1dc0deb788459681fe940715926d"
+    }
+  }
+}
