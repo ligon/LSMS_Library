@@ -31,7 +31,7 @@ The October 15 maintainer decision at `CONTENTS.org:3306-3327` lifts the histori
 - Only nutrition receives an optional exact variant, f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6.
 - Fixed exact-852 operands under SkylakeX -> Haswell -> SkylakeX reproduce primary -> variant -> primary. One 2019-20 row has eight changed float64 cells, at most two ULPs / 3.637978807091713e-12 absolute / 2.888772476871367e-16 relative; all structure/order/input hashes unchanged.
 - CI's selected hardware kernel was not logged and no raw artifact exists. Exact local reproduction establishes the bounded alternate, not a blanket numerical-equality claim or direct observation of CI hardware.
-- Future unmeasured CPU/kernel outputs still fail. No broad tolerance, rounding, primary replacement or kernel forcing.
+- Future unmeasured fingerprints still fail. No broad tolerance, rounding, primary replacement or kernel forcing.
 - Optional variant acceptance must not bypass structural or coverage gates, accept arbitrary hashes, or leak to unrelated entries.
 - Production source, data, Windows digest expectations and build fingerprints remain unchanged.
 
@@ -50,4 +50,4 @@ None: parent explicitly authorized this finite, evidence-backed optional variant
 - Numerical counterfactual - OK (section 4): exact primary -> alternate -> primary replay on fixed operands, unchanged structure/order/input hashes, maximum two ULPs. Both real full parquets pass; a deliberately changed value is rejected under both kernels. Exact852 code passes the primary and fails the alternate.
 - Production/cache inputs - OK (section 4): no production arithmetic/config change; 549 country, 2,139 wave and 39 tagged fingerprints unchanged. Additive country note preserves approval and #788 policy.
 - Reinvention search - none: existing fingerprint and complete invariance test reused; no duplicate reader, reducer, tolerance or hash generator.
-- Scope limit - future unmeasured kernels still fail. CI kernel is inferred by exact counterfactual, not directly observed. Aggregates/scripts: `slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org`.
+- Scope limit - future unmeasured fingerprints still fail. CI kernel is inferred by exact counterfactual, not directly observed. Aggregates/scripts: `slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org`.
