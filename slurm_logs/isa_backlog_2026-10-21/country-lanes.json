@@ -312,7 +312,9 @@
           "reviewed1062": 0
         },
         "all_FCT_food_write_inputs_outputs_correct": true
-      }
+      },
+      "active_precode_ledger": "695b57970",
+      "active_ledger_review": "Rootread complete ledger; approved private actual origin, meaningful memory/parquet route distinctions, unchanged public DataFrame/fullattrs/legitimate reducer, explicit broad hash measurement and scoped ordinary healing."
     }
   },
   "shared_lanes": {
@@ -371,14 +373,16 @@
       "ci": "success; run39685546468"
     },
     "1135": {
-      "status": "read-only-diagnosis-active",
+      "status": "read-only-Nigeria-counts-followup",
       "owner": "niger_lane",
-      "path": "/local/job40255479/worktrees/isa-framework-1135",
-      "branch": "diagnose/1135-cluster-warning-size-20261021",
+      "path": "/local/job40255479/worktrees/isa-Nigeria-1135",
+      "branch": "diagnose/1135-nigeria-boundary-counts-20261021",
       "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
-      "private_evidence": "/local/job40255479/control/isa-backlog-20261021/framework1135-diagnosis",
+      "private_evidence": "/local/job40255479/control/isa-backlog-20261021/framework1135-Nigeria-counts",
       "private_context": "/local/job40255479/control/isa-backlog-20261021/framework1135-live-context.json",
-      "scope": "Settled H2SPAN/noH3threshold. First line: each flagged boundary clusters-renumbered count and linked-household change share net of movers. No implementation; schema/provenance/hash scope diagnosis."
+      "scope": "Rootread fullproposal, chose narrow two Nigeria boundaries source-backed N/R/K diagnosis with current held sample/panel caches and declared covers. No implementation/source build/acquisition, actual movement completeness and cluster relation must be proved. Other10 residuals explicit;SPAN/no threshold settled.",
+      "diagnosis_status": "COMPLETE97synthetic tests/7explicit data deselections/4expected baseline failures+1preservation;119synthetic policies exact; no data calls/builds/source changes, quiescent",
+      "diagnosis_limits": "Historical12exactN/prefix-onlyP, no structuredK and no all-moverR. Underlying blobs not censused, not claimed absent. No empty all-unavailable mechanism implementation approved."
     }
   },
   "integration": {
@@ -537,6 +541,8 @@
       "immutable_prior_evidence_roots": 6,
       "consumers_remaining": 0,
       "evidence": "integration/burkina-fifteen-review/"
-    }
+    },
+    "Ethiopia_prerequisite_status": "COMPLETE actual15 staging:20heldL1 receipts,4normal emptyL2 table builds,24current companions(4country/fullcoverage,10YAML current,10hashless sample/food). New source checkout unchanged, zero consumers, fresh warm0writes; original18missing gate and sample-vs-HC expectation stop preserved. Complete60file review gate rerun pending.",
+    "Ethiopia_prerequisite_path": "/local/job40255479/control/isa-backlog-20261021/integration/framework-sixteen-Ethiopia-prereq"
   }
 }

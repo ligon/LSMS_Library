@@ -1,0 +1,72 @@
+{
+  "result": "DIAGNOSIS_COMPLETE_NO_IMPLEMENTATION",
+  "source_pin": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "policy": {
+    "SPAN": "preserved",
+    "threshold": "none preserved",
+    "data_values": "unchanged; no implementation"
+  },
+  "existing_sampling_tests": {
+    "passed": 97,
+    "failed": 0,
+    "skipped": 0,
+    "requires_s3_deselected": 7
+  },
+  "proposed_contract_negative_baseline": {
+    "expected_failed": 4,
+    "passed_preservation_control": 1
+  },
+  "synthetic_policy_replay": {
+    "pairs": 119,
+    "SPAN_warnings": 77,
+    "ADJ_endpoint_matches": 12,
+    "matches_historical": 119
+  },
+  "schema_storage_probe": {
+    "nested_null_integer_json_parquet_frame_fullattrs_exact": true,
+    "immutable": true,
+    "config_currently_rejects_new_field": true
+  },
+  "historical_counts": {
+    "boundaries": 12,
+    "exact_linked_and_ex_moved_prefix_counts_held": 12,
+    "structured_cluster_counts_held": 0,
+    "all_mover_adjusted_current_boundaries_verified": 0,
+    "receipt_reverified_copies": 5
+  },
+  "current_survey_Country_calls": 0,
+  "raw_source_builds": 0,
+  "shared_cache_reads_or_writes": 0,
+  "runtime_changes": 0,
+  "GitHub_writes": 0,
+  "candidate_hash_scope_measured": false,
+  "anticipated_scope": {
+    "hash_change_expectation": 0,
+    "framework_change_expectation": 0,
+    "qualification": "grounded static YAML/closure assessment; actual candidate549/39 required only after implementation approval"
+  },
+  "guard": {
+    "network_namespace": "unshare -rn",
+    "active_socket_guards": true,
+    "private_write_guard": true,
+    "outside_root_writes_denied": 3,
+    "numerical_build_make_threads": 1,
+    "checkout_metadata_exception": false
+  },
+  "blockers": [
+    "Historical prefix-only exclusion does not establish all-mover exclusion for Tanzania/Uganda",
+    "No structured cluster-renumbering counts or exact pair/movement classifications in retained H2/H3 artifacts",
+    "Current source/cache results not prepared or measured; no availability absence claim made"
+  ],
+  "safe_reports": [
+    "DIAGNOSIS.md",
+    "PROPOSAL.md",
+    "ledger-DRAFT.md",
+    "REPRODUCE.md",
+    "source-pins.json",
+    "probe-safe.json",
+    "freeze-proof.json"
+  ],
+  "reviewer": "Sue (GPT-6)",
+  "quiescent": true
+}
