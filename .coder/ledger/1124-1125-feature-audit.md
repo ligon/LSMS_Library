@@ -39,6 +39,13 @@ The baseline Feature audit must distinguish an entire positive-row country's exc
 - A missing country axis in a nonempty malformed result already has structural findings; do not guess attribution of surviving rows to countries.
 - Kwarg variants retain their current ContractB handling; no new ClassB country exclusion under labels/unit/market/period variants.
 - Crop warm check reads only countries whose country parquet exists, fails by name if any such read raises, compares the exact positive-built participation set, and rejects row loss within retained crop countries.
+- Review-bounded crop exception: EthiopiaRHS is deliberately household-crop
+  grain without a plot axis (`feature-canonical-crop-production.md:113` and
+  cross-country skill section2). The warm test expects its exclusion ONLY
+  while the returned frame's index/columns carry neither `plot` nor `plot_id`.
+  It must still read RHS and fail any read error; participation is required
+  immediately when plot grain appears. Every other positive country remains
+  strict. The scanner's ClassB warning is NEVER exempted.
 - No production `Feature`, Country, schema, country config or cache mechanism changes; expected fingerprint/cache impact is zero, measured rather than assumed.
 
 ## §5 Reuse decision
@@ -59,4 +66,27 @@ The issue wording says currency=index on the helper read, but current `_warm_ass
 
 ### Phase3 -- verification
 
-Pending surfaced-ledger authorization.
+Parent surfaced/authorized the ledger, then explicitly authorized the bounded
+coarse-RHS warm-test expectation after independent review and a live corpus
+reproduction. Initial strict crop warm check failed solely for this documented
+case; two plot warm checks passed. New synthetics pin the allowance's expiry,
+another country's loss, and named RHS read failures.
+
+Runtime/config/schema paths remain unchanged. Actual hash comparison against
+exact976fc840d: 0/549 country, 0/2139 wave, 0/39 tagged fingerprints changed.
+Private physical-copy farm scan: 16/15/14 countries, 344 warning records,
+no errors/failures, one visible RHS country-exclusion warning for17,523 rows.
+Final combined producer run: 91 passed, one fixture-only pandas3 positional
+`rename_axis` failure; all three actual warm farm checks passed. After the
+explicit `index=` fixture repair, all 13 focused scanner/alias controls pass.
+Independent review: 88 synthetic passes plus the same fixture failure, all
+three live warm checks pass on a separate physical copy, and six additional
+production-Feature policy probes pass. Runtime/library tree unchanged.
+
+- `_assembly_invariants`: OK anchored on sections3-4; separate positive-country
+  warnings, no attribution from malformed missing-country axes, baseline scope.
+- Canonical feature list: OK anchored on sections1-2; adds registered farm tables.
+- `_warm_assembly` and crop acceptance: OK anchored on sections3-4; shared
+  hash-checked helper, currency alignment, named failures, exact participation
+  with the narrowly expiring documented RHS expectation.
+- No duplicate production assembly logic, schema or cache implementation added.
