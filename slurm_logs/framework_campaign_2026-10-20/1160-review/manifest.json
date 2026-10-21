@@ -1,0 +1,24 @@
+{
+  "target_head": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "runtime_commit": "5125d0faa3e8074c289c5dd839cf1690d3e7a570",
+  "verdict": "PASS",
+  "files": {
+    "REVIEW.org": "c294596780b805af527579c2aa8aa53662b6d0d6806df821306ed60a1f801755",
+    "review.json": "29a4a35f723f60b680a2cfea6326254acdcf57f170aba601bcb630bb76bd9636",
+    "STATIC.org": "79c87dbbe616e96befb03495e35fb753b80780c92e6c858a5ec8c7c425f7743c",
+    "live-controls.json": "90159b532c426e781f710f5137024fcb087a530870b76b5df81d65dc34d0b75a",
+    "live-copy.json": "609541e360183af740780d401b462d720e7f8504e1a3473d27b2938f4080f9da",
+    "cache-control.json": "7a328f79f396b58c5030468d8fd72710efc0fe720a1bb0c86e900670a775ce10",
+    "hash-impact.json": "a6b7666c0498d737144b877270fe00118cd3e041a1e8b46b1e4503c26e09a47e",
+    "focused-identity.json": "b5b555b48e9b271f5dd01a4bf6b623c3dd5b248afdc4a861eb47c97a73c3fd9f",
+    "baseline-identity.json": "b84b82bf92c11dd9e2fc0fc3ad906f7790b5664d35a2ab01d4b180a313f0ba1d",
+    "test_independent_rate.py": "9fe8417c8c9c81df4f848a69a2efaf643b6d64858fb198342d07a623865a2825",
+    "live_rate.py": "72dfe4f4f4ac519997718999ccfe041b1dab27d65d9331e97e0f1e0958d8ec8d",
+    "run_checks.py": "6e7d77943e6cc5116f791ac564d2574ce67b216fc640e462d750be02fa0c0664",
+    "aggregate_review.py": "a930bd808b592ef7c46f08f5fc769a3a18da73e638a61dcd864d7adab0aa182c"
+  },
+  "raw_logs_xml_warnings_identifiers_microdata_included": false,
+  "all_review_readers_verifiers_stopped": true,
+  "source_unchanged": true,
+  "reproduction_context": "Scripts record this allocation paths and private-root guards; use the provided existing roots for direct rerun in this job. All raw cache/operand data remain private."
+}

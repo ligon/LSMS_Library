@@ -1,0 +1,182 @@
+{
+  "head": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "runtime_commit": "5125d0faa3e8074c289c5dd839cf1690d3e7a570",
+  "package": "/local/job40255479/worktrees/1160-pooled-rate/lsms_library/__init__.py",
+  "countries_root": "/local/job40255479/worktrees/1160-pooled-rate/lsms_library/countries",
+  "data_root": "/local/job40255479/control/framework-campaign/review-1160/live-data",
+  "input_rows": {
+    "plot_inputs": 264400,
+    "plot_features": 111180
+  },
+  "cases": {
+    "N/plot": {
+      "rows": 33402,
+      "index_names": [
+        "country",
+        "t",
+        "i",
+        "plot_id"
+      ],
+      "by_country_rows": {
+        "Malawi": 33402,
+        "Uganda": 0
+      },
+      "separate_labeled_Feature_calls_exact": true,
+      "reverse_rows_exact": true,
+      "country_columns_exact": true,
+      "rate_column_sum_checksum_by_country": {
+        "Malawi": 6037915.436187806,
+        "Uganda": 0.0
+      }
+    },
+    "N/parcel": {
+      "rows": 12131,
+      "index_names": [
+        "country",
+        "t",
+        "i",
+        "parcel"
+      ],
+      "by_country_rows": {
+        "Malawi": 11622,
+        "Uganda": 509
+      },
+      "separate_labeled_Feature_calls_exact": true,
+      "reverse_rows_exact": true,
+      "country_columns_exact": true,
+      "rate_column_sum_checksum_by_country": {
+        "Malawi": 1763224.2473475444,
+        "Uganda": 8711.840573755828
+      }
+    },
+    "product/plot": {
+      "rows": 33402,
+      "index_names": [
+        "country",
+        "t",
+        "i",
+        "plot_id"
+      ],
+      "by_country_rows": {
+        "Malawi": 33402,
+        "Uganda": 0
+      },
+      "separate_labeled_Feature_calls_exact": true,
+      "reverse_rows_exact": true,
+      "country_columns_exact": true,
+      "rate_column_sum_checksum_by_country": {
+        "Malawi": 27615459.502484918,
+        "Uganda": 0.0
+      }
+    },
+    "product/parcel": {
+      "rows": 12131,
+      "index_names": [
+        "country",
+        "t",
+        "i",
+        "parcel"
+      ],
+      "by_country_rows": {
+        "Malawi": 11622,
+        "Uganda": 509
+      },
+      "separate_labeled_Feature_calls_exact": true,
+      "reverse_rows_exact": true,
+      "country_columns_exact": true,
+      "rate_column_sum_checksum_by_country": {
+        "Malawi": 7206512.035282657,
+        "Uganda": 44439.68776662128
+      }
+    }
+  },
+  "ordinary_Country_calls": {
+    "Malawi/N/plot": {
+      "rows": 33402,
+      "index_names": [
+        "t",
+        "i",
+        "plot_id"
+      ],
+      "old4cab_function_exact": true
+    },
+    "Uganda/N/plot": {
+      "rows": 0,
+      "index_names": [
+        "t",
+        "i",
+        "plot_id"
+      ],
+      "old4cab_function_exact": true
+    },
+    "Malawi/N/parcel": {
+      "rows": 11622,
+      "index_names": [
+        "t",
+        "i",
+        "parcel"
+      ],
+      "old4cab_function_exact": true
+    },
+    "Uganda/N/parcel": {
+      "rows": 509,
+      "index_names": [
+        "t",
+        "i",
+        "parcel"
+      ],
+      "old4cab_function_exact": true
+    },
+    "Malawi/product/plot": {
+      "rows": 33402,
+      "index_names": [
+        "t",
+        "i",
+        "plot_id"
+      ],
+      "old4cab_function_exact": true
+    },
+    "Uganda/product/plot": {
+      "rows": 0,
+      "index_names": [
+        "t",
+        "i",
+        "plot_id"
+      ],
+      "old4cab_function_exact": true
+    },
+    "Malawi/product/parcel": {
+      "rows": 11622,
+      "index_names": [
+        "t",
+        "i",
+        "parcel"
+      ],
+      "old4cab_function_exact": true
+    },
+    "Uganda/product/parcel": {
+      "rows": 509,
+      "index_names": [
+        "t",
+        "i",
+        "parcel"
+      ],
+      "old4cab_function_exact": true
+    }
+  },
+  "warnings_by_category": {
+    "NullReadWarning": 24,
+    "NullIndexKeyWarning": 9,
+    "ClusterIdentityWarning": 6,
+    "UserWarning": 3,
+    "PopulationHeterogeneityWarning": 4,
+    "QuantityImplausibleWarning": 15,
+    "NutrientCoverageWarning": 36,
+    "PlotGrainMismatchWarning": 6
+  },
+  "country_guidance": {
+    "Uganda": "Agricultural plot keys carry household-parcel-plot while area keys carry parcel_suffix; plot-mode emptiness is inherited and not waived. Existing WAITING/TODO caveats retained.",
+    "Malawi": "Real plot identifiers align; documented historical null-plot drop is distinct from a true duplicate-plot collision. Conversion/FCT TODOs retained."
+  },
+  "raw_warning_messages_and_identifiers_private": true
+}

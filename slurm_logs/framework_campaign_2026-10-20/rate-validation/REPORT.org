@@ -1,0 +1,37 @@
+#+title: Final country-preserving rate candidate validation
+#+author: Sue
+#+date: 2026-10-20
+
+* Result and source
+
+Exact =532d58700fa46e52a0b390198604eca1dc4de00e= passes the combined local suite:8851 passed,276 skipped,nine expected failures,one non-strict unexpected pass,1222 warnings,zero failures/errors or credential skips in736.35seconds.
+All16 loadfile workers reported; HEAD and tracked source remained unchanged, and no in-tree country parquet exists.
+This source is the frozen4cab batch plus the independently reviewed #1160 rate fix and its ledger/report.
+No release, merge, tag, protection or shared-cache promotion is implied.
+
+* Case accounting
+
+The exact4cab baseline has9050 cases and the final candidate9137.
+Independent XML comparison finds87 new passing cases,zero removed cases,and zero outcome or reason changes among all9050 existing cases.
+Direct report metadata identifies the same non-strict Pakistan cluster-grain XPASS on both sides; older852 evidence still lacks its exact XPASS identity and is not retroactively relabeled.
+All276 plain skips and nine expected-failure identities/reasons are unchanged; no credential skip reason appears.
+The nineteen corpus source/wiring errors and five tenure findings remain in their original scope.
+No performance claim follows from the measured wall-time difference.
+See [[file:suite-summary.json]] and [[file:suite-reconciliation.json]].
+
+* Isolation and reproduction
+
+=run_suite.py= reuses the completed follow-up controller, changing only baseline-XPASS reporting to use the4cab plugin's captured identity.
+It takes explicit source/data/output/manifest/baseline arguments and asserts cwd, package, countries and data realpaths in the same process before pytest.
+The run uses16 loadfile workers on CPUs0-7,20-27,600-second thread timeouts,BLAS/OMP/MKL/build/make workers one,and an unpiped private logfile/XML/events.
+The new private L2 copy has1519 files/341221428 bytes,all manifest hashes equal and inodes distinct; only L1 is linked.
+It was physically copied from the quiescent completed farm root whose bytes already matched immutable852; no original corpus is used through the API.
+Raw logs/XML/events remain private under =control/framework-campaign/rate-validation/=.
+
+* Other gates
+
+Independent #1160 review passes387 tests with explicit skipped/deselected cases,and actual Malawi/Uganda pooled/separate controls; see [[file:../1160-review/REPORT.org]].
+Parcel-policy differences under #1110 remain explicit,including the existing Malawi no-op docstring contradiction.
+Final-source packaging passes with all11753 tracked package files byte-identical in wheel/sdist and installed config-only smoke; see [[file:../rate-packaging/REPORT.org]].
+Unit,Windows smoke and credentialed native Windows pass in GitHub run39533863014; [[file:windows-native-summary.json]] records exact native digests.
+Credentialed Linux CI is still running,and the separate earlier4cab data run remains its own exact control.

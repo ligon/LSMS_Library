@@ -1,0 +1,30 @@
+#+title: Static independent review, GH #1160
+#+author: Sue
+#+date: 2026-10-20
+
+* Target and verdict
+
+Immutable implementation/test/guide commit =5125d0faa3e8074c289c5dd839cf1690d3e7a570= against frozen =4cab5f0db7d375ad543e652f61f43bd28fa94ecd=.
+The transformation blob SHA256 is =cb973473420759f35b2046e0da618fdbddc278c78708038792b0e85856e1b4d0=; new regression file SHA256 =7d71f22e824f64930f40e75b74e9f0a0102f17586605d51f92ead45919671c7d=.
+Read with git-show only while the producer finishes ledger/report writes.
+No blocking static finding; this is not an executable-validation pass.
+No candidate package import or validator was run.
+
+* Anchored checks
+
+- OK, ledger sections2-4: paired actual-axis/column country presence is checked before reduction; only-one-side labels are refused. Area null labels are checked before area filtering, while the reused nitrogen helper rejects numerator null labels before its item/unit filtering.
+- OK, sections2-5: both N and product paths reuse nitrogen_kg; share matching/refusal, declared factors and product's forced-one existing policy are unchanged.
+- OK, section4: country joins the common key list before both numerator/positive-area reductions, survives the inner merge, and leads the emitted plot/parcel index. Neither side can lend area across a different country label.
+- OK, section4: area local keys remain columns when supplied that way; the implementation avoids applying the mass helper's index-key restriction to the denominator. Only a redundant country column is dropped on a new frame when its index is authoritative.
+- OK, section4: empty numerator land-key cast occurs only with actual country presence, preserving the scoped empty output path and leaving country-less behavior unchanged.
+- OK, section5: the pooled no-match diagnostic names country/land keys and does not tell the caller that switching plot/parcel mode fixes unmatched country labels. Country-less diagnostic text is preserved.
+- OK, sections3-5: public guide describes paired presence, null refusal, index precedence, one-country/empty shape and metadata-only limits; no parcel-policy or scientific change is claimed.
+
+* Deferred executable checks
+
+After the parent's whole-final-HEAD/all-writers-stopped signal, run independent arithmetic fixtures and a typed-key matrix, rather than only replaying the producer's 87 cases.
+Priority probes: categorical/nullable country labels and shaped empty axes; different country key dtypes; multirow duplicate-local-key math; country A with numerator but only B's positive area; all-column denominator; index-authoritative redundant columns; explicit country factors; inorganic/organic refusal and volume gating; N/product x plot/parcel; unchanged ordinary outputs and attrs.
+The existing parcel helpers and source-science assumptions remain outside this identity fix.
+Any newly found failure will be reported before any modification and readers will stop before producer repairs.
+
+Sue

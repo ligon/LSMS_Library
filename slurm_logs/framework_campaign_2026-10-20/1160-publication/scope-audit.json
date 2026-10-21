@@ -1,0 +1,19 @@
+{
+  "pr": 1165,
+  "base": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "head": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "paths": [
+    ".coder/ledger/1160-pooled-rate.md",
+    "docs/guide/feature.md",
+    "lsms_library/transformations.py",
+    "slurm_logs/framework_campaign_2026-10-20/1160/REPORT.org",
+    "slurm_logs/framework_campaign_2026-10-20/1160/negative_control.py",
+    "slurm_logs/framework_campaign_2026-10-20/1160/reproduce.py",
+    "slurm_logs/framework_campaign_2026-10-20/1160/run.sh",
+    "slurm_logs/framework_campaign_2026-10-20/1160/verification.json",
+    "tests/test_gh1160_pooled_fertilizer_rate.py"
+  ],
+  "all_github_file_blobs_equal_reviewed": true,
+  "files": 9,
+  "verdict": "PASS"
+}

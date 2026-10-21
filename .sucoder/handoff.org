@@ -1,6 +1,52 @@
 #+title: Handoff -- framework campaign, 2026-10-20
 
-* Current -- 2026-10-20, Sue / GPT-6, job 40255479, n0071.savio3
+* Active checkpoint -- 2026-10-20 19:52 PDT
+
+Sue/GPT-6, job40255479 on n0071.savio3,32cores93GiB,>2d20h left.
+Main docs branch=docs/framework-campaign-20261020, previouspublishedc30f8aa47; newfinal artifacts are being checkpointed now.
+Draft evidencePR1158; STATUS.org owns live state.
+
+Windows1153 alone is human-authorized/merged atdevelopmentad1e87e1025dec98fe70734f4e60d12824fd31dd (liveGitHubref independently checked19:44).
+Open original reviewed implementationPRs1154--57 cover1093/1099/1143/1124+1125.
+Open newdrafts1161nutritiondirectdev6553e01d6,1162cachef7eb,1163provenance44f6,1164pooled45f80,1165rate532d58700.
+1162--64base852integration;1165base4cab integration forclean diffs.
+AfterearlierPRsland,mergedevelopmentintopublicationbranches thenretarget; nevermergeintocomparisonbases/forcepush/sourceworkerbranches.
+All79publishedblobs1161--64and9blobs1165matchreviewedcommits.
+Noadditionalmerge/release/tag/protection/cachepromotionauthorization.
+
+LATEST FROZEN SOURCE=532d58700fa46e52a0b390198604eca1dc4de00e, allapproved fixes including1160.
+Worker1160-pooled-rate and separateintegrationworktreeframework-rate pointatthatHEAD, clean/immutable/publishedorigin+GitHubintegration/framework-rate-40255479.
+Runtime1160=5125d0faa; producer347pass/2explicitNigeria cache skips,baseline80fail7pass87controls;firstcandidate85pass2emptyparcel fails preserved/fixedcountry-only.
+IndependentreviewPASS387cases(347existing+40reviewer)/2skip/15S3deselect;12old-mathintentionalfailures;liveMalawi/Uganda4modesexactpooled/separate/reverse/column,8ordinaryoldfunctioncalls exact.
+0hashmoves549/2139/39;existing#1110Malawi33402plot/11622parcel contradictsoldno-opdocstring,documentedCONTENTS;Uganda0/509 inherited;notchangedby1160.
+Allproducer/reviewer/processesSTOPPED;14independentexportfilesverifiedmanifestdad6f823...copy1160-review/.
+
+LATEST FULL SUITE COMPLETE/session35359 exited0:8851passed276skipped9xfail1xpass1222warnings736.35s,0fail/error/credentialskips.
+All16workers/sourcechecksPASS,noin-treecountryparquet.
+Newphysicalrate-suite-data1519files341221428bytes,copyfromquiescentfarmrootwhosebytesmatchimmutable852;onlyL1linked.
+All87newcasesPASS;0removed/0existingoutcomeorreasondeltas vs4cab9050cases;directPakistanXPASSidenticalbothsides.
+Evidence/reprocontrollersrate-validation/;rawlogs/XML/eventsprivatecontrol/framework-campaign/rate-validation/suite-532d58700/.
+LatestpackagingPASS532:wheel/sdist0.15.0.post396.dev0+532d58700all11753packagefilesbyteexact,installedconfigsmoke/network+buildforbiddenPASS,cleanworktree/allprocessesstopped.
+Copied7rate-packagingartifacts;untypeddevversion/existingdeps/noinstalledmicrodatabuild/checkouttestsnotpackaged/uploadnotvalidatedlimits retained.
+
+ONLY REMOTE CREDENTIALED LINUX REMAINS.
+contractsobservesTWOdistinctmanualruns:39531148624exact4cabdatajob118997075291;39533863014exact532datajob119005820593.
+Bothunit/smoke/native/credentialgate/UgabuildPASS;bothdatafullsuitesRUNNING (532started~19:44).
+Native532job119005820748 verifiedshocks14457x10/8waves0ab2ea4c79dd/assets116808x1/8waves9202ed542a14,rawlogprivate rate-validation/windows-native.log.
+Rootoldwatchsession40278 alsoobserves4cab;contractsread-only45spollsandwillcapturefinaljoblogs/aggregatesincontrol/framework-campaign/followup-ci-review/{rate-532,earliercontrol}/.
+DoNOTcancel/redispatch/updatefrozenheads; keepfailed852run39519191762andoriginalcoldcorpuscontrols unchanged.
+
+Next:collectremoteLinuxresults,actualnutritioncaseexecutionandcredential-skiplimits;recordalloutcomes;finalizePRbodies/evidence/markreadywhenrealgatespass.
+ThenaskhumanbatchmergeoverrideforconcretereadyPRs underbacklog-workflow ('PRs for human merge -- never auto-merge');only1153overrideexists.
+AllnineimplementationPRbodiesupdatedwith532localPASSandlatestCIpending;new1165issueheaderrecordsretentionruling/pendingPR;778remainsAddresses/openfortrustnote.
+No moreimplementationtasks authorized/pending;1160isdone/reviewed.
+Node nowmostlyidlewhileexternalCIruns;afterfinalreports/decisions suggest sucoder release.
+
+Useextractedpython/local/job40255479/venv_img/bin/python,threads/build/make1,exactcwd/PYTHONPATH/config/privateLSMS_DATA_DIR.
+Nevereditdurablemirrorworkingtree orsharewritableL2; originalcorpusrootsimmutable.
+CommitwithSue/GPT-6attributionandcheckSUCODERpublished;GitHubpushusesexplicitURL,originisfilesystemmailbox.
+
+* Earlier campaign checkpoints -- 2026-10-20, Sue / GPT-6, job 40255479, n0071.savio3
 
 Windows PR #1153 is merged with explicit maintainer authorization at =ad1e87e1025dec98fe70734f4e60d12824fd31dd=.
 GitHub and filesystem-origin development are synchronized there through the clean =development-sync= worktree.

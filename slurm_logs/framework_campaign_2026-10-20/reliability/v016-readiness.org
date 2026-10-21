@@ -17,7 +17,7 @@ Then reconcile the eventual development-to-master contents and exact issue closu
 
 The strongest newly identified correctness follow-up is [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]]: fertilizer_rate discards country again after the repaired nitrogen reducer.
 It is independently reproduced on unchanged852 and1159, so the two-reducer fix does not establish pooled fertilizer-rate correctness.
-The maintainer has now approved that bounded follow-up before0.16.0; it is delegated in a separate4cab-based worktree. Its implementation and validation remain pending and do not alter the frozen4cab evidence.
+The maintainer has now approved that bounded follow-up before0.16.0; it is implemented and independently reviewed at532d58700 in draftPR #1165. The final532 local suite passes8851/276skipped/9xfail/1xpass with zero failures/errors or credential skips; all87 new cases pass and all9050 prior outcomes/reasons match. Packaging and native Windows pass; credentialed Linux remains running. The frozen4cab evidence remains a separate earlier-batch control. The existing Malawi parcel/docstring contradiction under #1110 remains explicit in the new review.
 #932 is an enforcement choice beyond the completed manual validation, not an automatically authorized repository-setting change.
 #1149 staged acquisition follows the provenance repair; #1134/#1135 are bounded already-ruled sampling improvements; #218 retired routes and the substantial existing #851 period branch can remain separate work.
 The nineteen source/wiring errors, tenure vocabulary findings and source/scientific decisions below remain visible.

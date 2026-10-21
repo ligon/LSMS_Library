@@ -1,0 +1,21 @@
+{
+  "independent_matches_producer_before_and_after": true,
+  "maps": {
+    "country": {
+      "entries": 549,
+      "changed": 0,
+      "existing_none_values": 0
+    },
+    "wave": {
+      "entries": 2139,
+      "changed": 0,
+      "existing_none_values": 30
+    },
+    "tagged": {
+      "entries": 39,
+      "changed": 0,
+      "existing_none_values": 0
+    }
+  },
+  "errors": {}
+}

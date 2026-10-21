@@ -5,6 +5,9 @@
 
 The maintainer approved Windows CI repair and five additional framework issues: #1143, #1093, #1099, #1124 and #1125.
 All five implementations passed independent review and are combined at frozen =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+Subsequent approved cache, provenance, pooled-reducer and fertilizer-rate work is also implemented and independently reviewed.
+The latest frozen combined source is =532d58700fa46e52a0b390198604eca1dc4de00e=; its local full suite, independent review, packaging and native Windows pass; credentialed GitHub Linux remains running.
+Implementation PRs #1154--#1157 and #1161--#1165 are open; Windows #1153 alone has explicit merge authorization and is merged.
 No release has been requested or attempted.
 
 Windows [[https://github.com/ligon/LSMS_Library/pull/1153][PR #1153]] was merged with explicit maintainer authorization at =ad1e87e1025dec98fe70734f4e60d12824fd31dd=.
@@ -192,7 +195,20 @@ framework_reliability owns the new isolated =/local/job40255479/worktrees/1160-p
 Country must remain in both numerator and area/output identity, with explicit refusal for mismatched country-axis presence and null labels; country-less behavior, nutrient shares and parcel policy stay unchanged.
 The agent must reuse existing reducers/key helpers, pin both nutrient/land modes and column/index/collision/empty controls, provide untouched-base failures, measure complete hash impact and stop all writers before independent review.
 windows_ci will independently review the final frozen worker source; no executable review starts before that freeze.
-No #1160 implementation or final validation result is claimed yet, and the4cab evidence remains an exact earlier-batch control.
+#1160 implementation is frozen and clean at =532d58700fa46e52a0b390198604eca1dc4de00e=, runtime =5125d0faa=.
+The producer's347 focused tests pass with two explicit Nigeria private-cache skips; untouched4cab has80 failures/seven passes across87 new controls.
+A first candidate's two empty pooled parcel dtype failures were fixed and retained in the report.
+All549 country/2139 wave/39 tagged hashes are unchanged; strict API audit passes.
+Independent review is complete and PASS:387 cases, two explicit Nigeria warm-cache skips, fifteen S3 deselections; twelve new mathematical controls fail on unchanged4cab.
+Real Malawi/Uganda comparisons match separate Feature calls, reversed rows and country-column forms for all four nutrient/land combinations; eight ordinary calls match the old function exactly.
+Every549/2139/39 fingerprint and the private physical cache/source identities remain unchanged.
+[[file:1160-review/REPORT.org][Independent review]] (fourteen artifacts, all manifest hashes verified).
+Existing #1110 is explicitly retained: Malawi's33402 plot/11622 parcel results contradict the old function docstring's no-op claim, as already documented in CONTENTS; Uganda remains0/509. Both functions reproduce the counts.
+Draft [[https://github.com/ligon/LSMS_Library/pull/1165][PR #1165]] uses frozen4cab as its comparison base, with all nine published file blobs verified against reviewed532. After the earlier PRs land, update from development and retarget; do not merge into the comparison base.
+A separate immutable =framework-rate= integration worktree points at that same532 source for parallel full-suite validation, with a new1519-file physical L2 copy and sixteen pinned loadfile workers. The final run passes8851/276skipped/9xfail/1xpass,1222warnings,zero failures/errors or credential skips in736.35seconds. All87 added cases pass; all9050 existing outcomes/reasons match4cab exactly, including the directly observed Pakistan XPASS. Source stays clean with no in-tree country parquet. [[file:rate-validation/REPORT.org][Final full-suite report]].
+New [[https://github.com/ligon/LSMS_Library/actions/runs/39533863014][manual CI39533863014]] runs exact532: unit, Windows smoke, native Windows, credential gate and Uganda build pass; credentialed Linux remains running. Native digests and row/wave counts match; [[file:rate-validation/windows-native-summary.json][native evidence]].
+The4cab evidence and run39531148624 remain an exact earlier-batch control, never a claim about the later rate fix.
+The final-source packaging dry-run passes: both archives contain all11753 tracked package files with exact bytes, version0.15.0.post396.dev0+532d58700, and installed config discovery passes with network/data builds forbidden. All processes stopped and worktree clean. [[file:rate-packaging/REPORT.org][Final-source packaging]]. No release/tag/shared environment change.
 No further merge or release authorization has arrived.
 
 * Environment and reproducibility

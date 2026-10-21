@@ -1,0 +1,14 @@
+{
+  "head": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "root": "/local/job40255479/worktrees/1160-pooled-rate",
+  "package": "/local/job40255479/worktrees/1160-pooled-rate/lsms_library/__init__.py",
+  "countries_root": "/local/job40255479/worktrees/1160-pooled-rate/lsms_library/countries",
+  "data_root": "/local/job40255479/control/framework-campaign/review-1160/hermetic-data",
+  "source_sha256": "cb973473420759f35b2046e0da618fdbddc278c78708038792b0e85856e1b4d0",
+  "affinity": [
+    16,
+    17,
+    18,
+    19
+  ]
+}

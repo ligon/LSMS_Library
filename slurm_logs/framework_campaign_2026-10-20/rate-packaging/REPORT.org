@@ -1,0 +1,57 @@
+#+TITLE: Final-rate source packaging dry-run
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Result
+
+PASS for the requested archive and installed-config scope at =532d58700fa46e52a0b390198604eca1dc4de00e=.
+The separate detached worktree =/local/job40255479/worktrees/packaging-rate-532d587= is clean after building.
+The frozen #1160 worker, main and integration sources were not edited.
+All build, archive-inspection, installation and smoke processes exited successfully and are stopped.
+No dependency installation/upgrade, tag, version bump, publish, release, GitHub action or shared-venv mutation was performed.
+
+Both wheel and sdist resolve the nonzero untagged development version =0.15.0.post396.dev0+532d58700=.
+The existing PEP517 frontend built the wheel from this freshly generated sdist.
+This validates the final source's dynamic-version path, not a tagged 0.16.0 artifact.
+The build restored the original pyproject placeholder and section arrangement; its final tracked state is clean.
+
+* Payload and installed smoke
+
+Both archives contain all 11,753 git-tracked files beneath =lsms_library/=, with zero missing files and zero byte differences against the exact clean source checkout.
+The tracked package tree has no symlinks skipped by the comparison.
+The console entrypoint =lsms-library= maps to =lsms_library.cli:main=.
+No .dta, .sav, .parquet or .pkl payload is present in either archive.
+The wheel has 11,758 files and the sdist 11,757; sizes and exact SHA256s are in [[file:archive-inspection.json]].
+
+The wheel was installed offline with =pip --no-index --no-deps --no-compile --target= into a fresh private target.
+The smoke ran outside every checkout with PYTHONPATH naming only that target and LSMS_COUNTRIES_ROOT unset.
+Exact package/config/data root identities and installed metadata/version agreement pass.
+With socket/urllib network access and Country data builds forbidden, metadata discovery finds 38 registered countries, eight Uganda waves, 28 Uganda table declarations and 37 roster-declaring countries.
+No Country/Feature data method was called, no survey value was assessed and no parquet was produced.
+This is installed config discovery, not a full installed-data test.
+
+* Isolation and reuse
+
+The existing completed =packaging-review/{reproduce.sh,inspect_archives.py,installed_smoke.py}= controls were adapted only for the new source/version/private paths and CPU affinity.
+The successful prior 4cab packaging scope is unchanged.
+The existing private =packaging-review/build-tools= backend and pipx build frontend were reused read-only, with backend bytecode writing disabled.
+No dependency was fetched or added; the wheel installation used the extracted image's existing runtime dependencies.
+Pip, Poetry and XDG cache paths, archive output, installed target, installed cwd and smoke data all name this new private report directory.
+Build affinity was CPUs 8-11, with BLAS/OMP/MKL and LSMS_BUILD_WORKERS set to one.
+The source build's temporary pyproject substitution was confined to the new detached packaging worktree and automatically restored.
+
+* Limits
+
+Checkout-only tests, including =tests/fixtures/uganda_baseline.json=, remain absent from both archives under the existing package-only inclusion policy.
+No inclusion policy was changed, and this report does not claim that the sdist contains the checkout test suite.
+This run does not validate fresh dependency resolution, all optional imports, a full installed microdata build, remote upload or a tagged release version.
+Parent's final full-suite, independent #1160 review and exact-head credentialed/native CI remain separate gates.
+
+* Artifacts
+
+The private raw archives and build log remain under =/local/job40255479/control/framework-campaign/rate-packaging/= and must not be copied into the reports repository.
+Copy only REPORT.org, verification.json, archive-inspection.json, installed-smoke.json, reproduce.sh, inspect_archives.py and installed_smoke.py.
+The aggregate files contain no raw survey rows or credential values.
+Reproduction uses a new private detached source worktree and fresh dist/installation paths; the recorded script names this completed run's paths and must be adapted before repeating to avoid reusing its target.
+
+Sue
