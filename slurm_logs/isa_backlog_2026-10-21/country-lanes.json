@@ -44,7 +44,10 @@
       "active_scope": "Approved optional positional Float64 Latitude/Longitude projection from the 2021 q46 columns only; preserve all rows, old payloads, axes, ID walking and other waves",
       "diagnosis_worktree": "/local/job40255479/worktrees/isa-Burkina_Faso-1058",
       "diagnosis_verdict": "COMPLETE; 4180 coordinate pairs on 7350 retained parcels, not 8467 raw rows; 1117 null parcel placeholders excluded; no coordinate headers in held Mali/Niger/Senegal extracts",
-      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058-fix"
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058-fix",
+      "active_precode_ledger": "b5ced85c571bc4d5b430371d1f92ace336c24a3f",
+      "active_runtime_head": "7eee549b1",
+      "active_author_status": "Baseline15newtests:12fail/3pass; existing13+fullcold/warm baseline/hash inventory exact; candidate final cold verification active after preserved private native-vs-union-column proof mismatch"
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
@@ -115,7 +118,7 @@
       "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1193",
       "active_pr_base": "fix/1109-malawi-organic-quantity-v2-20261021",
       "active_dependency_pr": 1175,
-      "active_ci": "in_progress; run39678420581",
+      "active_ci": "success; run39678420581",
       "composition_evidence": "/local/job40255479/control/isa-backlog-20261021/review-1111-Malawi-composition",
       "composition_capture_limit": "First cold public Feature was not serialized after private currency-argument expectation mismatch; all persisted cold raw frames and passed Country preserved, full default post-cold capture and fresh-process warm proof exact"
     },
@@ -208,7 +211,7 @@
       "active_author_tests": 60,
       "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1192",
       "active_ci": "success; run39676834859",
-      "combined_review": "Active at 5dde66645a444b025aa69682838cdf7c033a6e88 against actual global12 head55ec"
+      "combined_review": "PASS at5dde against actual55ec:60tests,5228source gains, full old frames/attrs, unchanged Niger1088, all6scanner records, zero writes across27files/root"
     },
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
@@ -300,7 +303,7 @@
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "5dde66645a444b025aa69682838cdf7c033a6e88",
+    "head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
     "included_prs": [
       1172,
       1173,
@@ -314,9 +317,10 @@
       1186,
       1189,
       1191,
-      1192
+      1192,
+      1193
     ],
-    "status": "Thirteen reviewed PRs integrated; bounded Nigeria coexistence review active; do not mutate frozen head",
+    "status": "Fourteen reviewed PRs integrated cleanly; bounded Malawi coexistence review active; do not mutate frozen head",
     "public_prs_merged": false,
     "unit_session": 28550,
     "unit_exit_code": 0,
@@ -334,7 +338,7 @@
     "cohort_excluded_all_country_cases": 2,
     "api_review_completed": true,
     "api_review_verdict": "PASS: nine Country calls and four Features exactly match complete frozen corrected reference frames/attrs; fresh-process warm writes zero of1519parquets",
-    "source_head_frozen": "5dde66645a444b025aa69682838cdf7c033a6e88",
+    "source_head_frozen": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
     "cohort_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "api_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "current_head_validation_completed": false,
@@ -357,8 +361,8 @@
     "six_cohort_session": 23070,
     "six_cohort_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
     "current_head_validation_owner": "review_nigeria_1034",
-    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/nigeria-thirteen-review",
-    "current_head_validation_status": "Active; actual global12 baseline and global13 Country cold/warm checks already pass, Feature/oracle/final proof pending",
+    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/malawi-fourteen-review",
+    "current_head_validation_status": "Active against actual global13 baseline; exact two reviewed driver blobs and preserved organic helper root-verified before dispatch",
     "eleven_increment": {
       "head": "7886f7ece49767b2357a2f559c474e0eb710561f",
       "verdict": "PASS",
@@ -389,6 +393,20 @@
       "tracked_paths_unchanged": 14992,
       "evidence": "integration/uganda-twelve-review/"
     },
-    "public_branch_head": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25"
+    "public_branch_head": "5dde66645a444b025aa69682838cdf7c033a6e88",
+    "thirteen_increment": {
+      "head": "5dde66645a444b025aa69682838cdf7c033a6e88",
+      "control": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
+      "verdict": "PASS",
+      "focused_tests": 60,
+      "skipped": 0,
+      "source_gains": 5228,
+      "all_old_native_raw_Country_Feature_payload_and_attrs_exact": true,
+      "Niger_current_1088_frames_and_cache_bytes_exact": true,
+      "scanner_records_matched": 6,
+      "fresh_process_new_instance_writes": 0,
+      "private_data_root_files_checked_per_root": 27,
+      "evidence": "integration/nigeria-thirteen-review/"
+    }
   }
 }

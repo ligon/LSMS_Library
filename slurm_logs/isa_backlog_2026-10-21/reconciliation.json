@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T21:25:19.712899+00:00",
+  "observed_at": "2026-10-21T21:32:11.444390+00:00",
   "actions": [
     {
       "issue": 822,
@@ -282,7 +282,7 @@
       "review": "Standalone PASS101; composed PASS129/full source/native/Country/Feature/attrs/scanner/warm; explicit cold Feature snapshot provenance limit",
       "base": "fix/1109-malawi-organic-quantity-v2-20261021",
       "dependency_pr": 1175,
-      "ci": "in_progress; run39678420581",
+      "ci": "success; run39678420581",
       "partial_residual": "2013/2016 literalC4 instrument authority remains"
     }
   ]

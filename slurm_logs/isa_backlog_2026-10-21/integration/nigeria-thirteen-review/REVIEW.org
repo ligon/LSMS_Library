@@ -1,0 +1,106 @@
+#+TITLE: Nigeria combined13 coexistence review
+#+DATE: 2026-10-21
+#+AUTHOR: Sue (GPT-6)
+
+* Verdict
+PASS for the bounded coexistence check at frozen global13 =5dde66645a444b025aa69682838cdf7c033a6e88= against actual global12 =55ec81b5f04aed8239128d8453aa7dd5ee0f2d25=.
+No blocking finding was found.
+The previously reviewed partial #1095 patch adds exactly 5,228 source cells and preserves every old community-prices payload and full attrs at helper, native-wave, raw-country, Country and both Feature currency variants.
+No checkout, tracked file, Git ref or earlier evidence file was changed.
+
+* Country contracts and contradictory historical claims
+Nigeria CONTENTS was read first, including TODO, WAITING and LOGBOOK entries.
+C8 is PH-only; its cluster key is composite state/LGA/EA and its =i==v= shim protects =j= through framework mapping.
+W1/W2 use fixed item units, W3 uses text sizes, and W4/W5 use coded sizes.
+Existing metric rescue, first-row reduction and intentional unrecorded-size deletions remain in force.
+The earlier #1034 unit-label and #1144 actual-quarter food changes remain present; the no-argument item resolver used by crop/community is preserved.
+
+The overview still says "124,539 priced rows" (Nigeria CONTENTS:1211), which contradicts the measured fresh global12 total 131,338.
+The explicit qualification at CONTENTS:1321 records this discrepancy; the historical count was not substituted for source evidence.
+The W5 size table says quantity/factor "agree with it and are a cross-check" (CONTENTS:1352).
+Held-source coverage is only 54 quantity and 5,167 factor values among 5,339 metric-size rows, with 258 quantity values among all 56,388 source rows.
+CONTENTS:1329-1330 explicitly qualifies that claim; these fields cannot independently check every coded size.
+
+Niger's prices are for Quantity units, and variety/visit/obs retain repeated observations; the separate duplicate-entry and unwired 2018 source caveats remain open.
+Niger CONTENTS:1307-1309 records #1088's exact nominal 9999.9 / stored 9999.900390625 Quantity sentinel, without extending its Price filter or claiming new questionnaire confirmation.
+The current comparator retains all 46,043 rows, including the reviewed 76 Quantity-to-NA corrections.
+
+* Composition and preparation
+The incremental diff contains exactly the eight reviewed #1095 paths.
+Its runtime added/removed payload and changed existing function bodies match the standalone reviewed patch; all other global12 Nigeria functions are preserved.
+Nigeria #1034/#1144 curation and Niger #1088 runtime/curation blobs are unchanged.
+This is not a new 549-hash/39-framework-fingerprint census; the authorized bounded static composition proof is in =composition.json=.
+
+Preparation completed before dependent probes, into two new physical private data roots with empty Nigeria/Niger L2.
+Each root received 13 verified held sources (28,426,011 bytes), including both panel-ID cover dependencies and source Stata counterparts.
+Original/private SHA256 and DVC identity receipts match.
+The two CRLF CSVs retain their original bytes; their text-key identities were verified through the existing md5-dos2unix reader.
+No raw acquisition, DVC CLI, read-gate bypass, assumed-fresh serve or manual hash stamp was used.
+
+* Complete frame and independent source proof
+Actual global12 and global13 normal cold Country builds produce the following PH counts.
+
+| PH round | global12 | global13 | gained | intentional size drops | metric derivations |
+|----------+----------+----------+--------+------------------------+--------------------|
+| 2011Q1   |    27104 |    27104 |      0 |                      0 |                  0 |
+| 2013Q1   |    27079 |    27079 |      0 |                      0 |                  0 |
+| 2016Q1   |    20562 |    20562 |      0 |                  14603 |                  1 |
+| 2019Q1   |    29275 |    31757 |   2482 |                      0 |               5393 |
+| 2024Q1   |    27318 |    30064 |   2746 |                    133 |               5339 |
+| Total    |   131338 |   136566 |   5228 |                        |                    |
+
+The independent source-recovery oracle from the completed standalone review was replayed against these actual combined control/candidate builds.
+It derives eligible keys and native prices from held raw sources and established Preferred labels, without using the candidate alias function or candidate-traced stages as the recovery oracle.
+Every gained cell has its exact raw source Price and no fabricated Derivation; collision and fanout counts are zero.
+The two ordinal SMALL Bottle/Can gains remain package prices.
+The complete intentional drop masks, metric derivation counts and all old values, missing masks, dtypes, keys, axis metadata and full attrs are exact at every inspected layer.
+W1-W3 are exact.
+
+The current Niger native-wave, raw-country and Country frames, including full attrs, match exactly at 46,043 rows.
+Its three cache parquet files match byte for byte between private roots.
+Both actual Feature variants (currency=None and default) grow 177,381 to 182,609 and preserve every old row and full attrs; their Niger portions are exact.
+
+The previous f8 captures were tested separately and were not used as whole-global12 truth.
+Nigeria's f8 community-prices frames are exact to actual global12.
+Niger and both old Feature variants differ only by the reviewed 76 #1088 Quantity sentinels becoming NA; every other field, key, dtype and full attrs is exact (=reference-differences.json=).
+
+* Tests, scanner and warm serves
+The meaningful combined-context selection passed 60 tests, zero failures and zero skips, with two loadfile workers.
+It covers actual community-builder aliases; unchanged harvest-unit scope and default reporter; unknown, malformed, blank and bare-code controls; metric rescue before reporting; ordinal/nonmetric/invalid sizes; ONE SIZE ONLY; missing-size exclusions; and other eligibility exclusions.
+Three unrelated unstaged built food/crop/input cases were explicitly excluded, as in the standalone review.
+
+The existing scanner's complete six-record multisets are exact after normalizing only checkout/private-data paths.
+They comprise two intentional cluster-table has_household_index warnings, two ClusterIdentityWarning records, one UserWarning and one PopulationHeterogeneityWarning.
+Every record's safe classification and normalized full-record hash is retained in =final-proof.json=.
+There are zero failure, error or skip records.
+The community-prices scanner has no phase-2 keyword grid; no such coverage is claimed.
+
+Each cold build carries the genuine current country hash and complete wave-coverage manifest.
+Fresh-process warm probes, followed by four new default Country objects and four new Feature objects per root, returned complete frame/attrs matches.
+All 27 data-root files in each root, including L1, L2 and companion metadata, retained exact bytes, modes and mtimes.
+
+* Isolation, frozen state and release
+Every runtime ran from its exact frozen checkout using the mounted image Python, asserted package/config/data realpaths, private data/site/config/cache directories, active socket guards and =unshare -rn=.
+Numerical, build and Make threads were one.
+There were zero network attempts and zero unauthorized mutations.
+The only checkout-path exception is the root-prepared ignored baseline DVC tmp symlink resolving inside this review root.
+The candidate's pre-existing exclusive btime creates raised FileExistsError without writing; the ignored candidate tmp receipt is unchanged.
+Early guard development rejected 36 /dev/null sink opens without writes; the final guard permits only opening that device and routes matplotlib/XDG state privately.
+Those rejected historical attempts remain in private logs rather than being erased.
+
+Before/after full tracked byte/mode/HEAD/clean snapshots are exact for global13 (14,998 tracked files), global12 (14,992) and the standalone reviewed b8 tree (14,886).
+All 149 earlier independent-review evidence/source/reference file receipts, the root metadata preparation receipt and ignored tmp linkage are exact.
+No in-tree parquet exists in these frozen checkouts.
+All probe processes completed; no review data consumer remains active.
+Same-UID command lines were checked; ten unrelated process environments were inaccessible and their command lines contain no review path.
+The private roots are released quiescent and global13 remains frozen at 5dde666.
+
+* Limits and residual
+This is a bounded coexistence check, not a repeat full test suite, food/crop/input/nutrition cohort, 549/39 census or the standalone 23 extra fault groups.
+Only already held local sources were used; no new instrument acquisition was attempted.
+#1095 remains partial: otherwise eligible future unplaced labels are warned and then dropped under the existing policy.
+Literal raw-native retention remains the explicit Tier C residual, not a claim of this change.
+Safe aggregate proofs are in =proof.json= and =verdict.json=; executed commands are in =commands.sh=.
+Full frames, IDs, warnings and detailed logs remain private under this review root.
+
+Sue

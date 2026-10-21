@@ -1,0 +1,368 @@
+{
+  "scope": "bounded Nigeria community-prices global12/global13 coexistence",
+  "reviewer": "Sue (GPT-6)",
+  "finished_utc": "2026-10-21T21:28:19.952029+00:00",
+  "immutable_composition": {
+    "global12": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
+    "global13": "5dde66645a444b025aa69682838cdf7c033a6e88",
+    "incremental_paths_exact_reviewed_eight": [
+      ".coder/ledger/1095-nigeria-community-units.md",
+      "lsms_library/countries/Nigeria/_/CONTENTS.org",
+      "lsms_library/countries/Nigeria/_/nigeria.py",
+      "slurm_logs/isa_backlog_2026-10-21/Nigeria/1095/DRAFT-RESIDUAL.md",
+      "slurm_logs/isa_backlog_2026-10-21/Nigeria/1095/REPORT.org",
+      "slurm_logs/isa_backlog_2026-10-21/Nigeria/1095/REPRODUCE.sh",
+      "slurm_logs/isa_backlog_2026-10-21/Nigeria/1095/validation.json",
+      "tests/test_nigeria_community_units.py"
+    ],
+    "incremental_runtime_added_removed_payload_exact_to_reviewed_patch": true,
+    "existing_changed_function_bodies_exact_to_reviewed_versions": [
+      "UnplacedUnitLabelWarning",
+      "_canon_units",
+      "community_prices_for_wave"
+    ],
+    "all_other_global12_Nigeria_functions_preserved": true,
+    "prior1034_1144_Nigeria_curation_blob_preserved": true,
+    "Niger1088_runtime_and_curation_blobs_preserved": true
+  },
+  "preparation": {
+    "status": "COMPLETE_BEFORE_PROBES",
+    "sources_per_root": 13,
+    "bytes_per_root": 28426011,
+    "all_original_and_private_sha256_exact": true,
+    "sidecar_DVC_identity_verified": true,
+    "CRLF_CSVs_preserved_with_existing_md5_dos2unix_reader": 2,
+    "two_panel_cover_dependencies_present": true,
+    "country_L2_absent_both_roots": true,
+    "quiescent_source_review_verdict_and_proof_receipts_match": true
+  },
+  "cold_global12": {
+    "revision": "baseline",
+    "mode": "cold",
+    "package": "/local/job40255479/worktrees/isa-baseline-twelve-cp/lsms_library/__init__.py",
+    "config": "/local/job40255479/worktrees/isa-baseline-twelve-cp/lsms_library/countries",
+    "countries": {
+      "Nigeria": {
+        "rows": 131338,
+        "round_rows": {
+          "2011Q1": 27104,
+          "2013Q1": 27079,
+          "2016Q1": 20562,
+          "2019Q1": 29275,
+          "2024Q1": 27318
+        },
+        "warning_classes": {
+          "ClusterIdentityWarning": 1
+        },
+        "hash_fresh": true,
+        "coverage_complete": true
+      },
+      "Niger": {
+        "rows": 46043,
+        "round_rows": {
+          "2011-12": 32352,
+          "2014-15": 13691
+        },
+        "warning_classes": {},
+        "hash_fresh": true,
+        "coverage_complete": true
+      }
+    }
+  },
+  "cold_global13": {
+    "revision": "candidate",
+    "mode": "cold",
+    "package": "/local/job40255479/worktrees/isa-integration/lsms_library/__init__.py",
+    "config": "/local/job40255479/worktrees/isa-integration/lsms_library/countries",
+    "countries": {
+      "Nigeria": {
+        "rows": 136566,
+        "round_rows": {
+          "2011Q1": 27104,
+          "2013Q1": 27079,
+          "2016Q1": 20562,
+          "2019Q1": 31757,
+          "2024Q1": 30064
+        },
+        "warning_classes": {
+          "ClusterIdentityWarning": 1
+        },
+        "hash_fresh": true,
+        "coverage_complete": true
+      },
+      "Niger": {
+        "rows": 46043,
+        "round_rows": {
+          "2011-12": 32352,
+          "2014-15": 13691
+        },
+        "warning_classes": {},
+        "hash_fresh": true,
+        "coverage_complete": true
+      }
+    }
+  },
+  "independent_source_oracle": {
+    "rounds": {
+      "2011Q1": {
+        "old_rows": 27104,
+        "new_rows": 27104,
+        "gained": 0,
+        "intentional_drop_rows": 0,
+        "drop_masks_exact": true,
+        "derived_rows": 0,
+        "full_old_payload_and_attrs_exact": true
+      },
+      "2013Q1": {
+        "old_rows": 27079,
+        "new_rows": 27079,
+        "gained": 0,
+        "intentional_drop_rows": 0,
+        "drop_masks_exact": true,
+        "derived_rows": 0,
+        "full_old_payload_and_attrs_exact": true
+      },
+      "2016Q1": {
+        "old_rows": 20562,
+        "new_rows": 20562,
+        "gained": 0,
+        "intentional_drop_rows": 14603,
+        "drop_masks_exact": true,
+        "derived_rows": 1,
+        "full_old_payload_and_attrs_exact": true
+      },
+      "2019Q1": {
+        "old_rows": 29275,
+        "new_rows": 31757,
+        "gained": 2482,
+        "intentional_drop_rows": 0,
+        "drop_masks_exact": true,
+        "derived_rows": 5393,
+        "full_old_payload_and_attrs_exact": true,
+        "source_oracle_gains_exact": true,
+        "source_rows": 57387,
+        "gains_by_unit": {
+          "Crate": 133,
+          "Cube": 112,
+          "Loaf": 513,
+          "Metric Cup": 240,
+          "Slice": 175,
+          "Table Spoon": 12,
+          "Tea Spoon": 1,
+          "Whole Animal": 793,
+          "Wrap": 503
+        },
+        "gained_source_rows": 2482,
+        "collisions": 0,
+        "fanout": 0
+      },
+      "2024Q1": {
+        "old_rows": 27318,
+        "new_rows": 30064,
+        "gained": 2746,
+        "intentional_drop_rows": 133,
+        "drop_masks_exact": true,
+        "derived_rows": 5339,
+        "full_old_payload_and_attrs_exact": true,
+        "source_oracle_gains_exact": true,
+        "source_rows": 56388,
+        "gains_by_unit": {
+          "Bottle/Can": 2,
+          "Crate": 56,
+          "Cube": 139,
+          "Loaf": 500,
+          "Metric Cup": 316,
+          "Slice": 203,
+          "Whole Animal": 636,
+          "Wrap": 894
+        },
+        "gained_source_rows": 2746,
+        "collisions": 0,
+        "fanout": 0,
+        "metric_crosscheck_coverage": {
+          "all_source_quantity_populated": 258,
+          "metric_rows": 5339,
+          "metric_rows_quantity_populated": 54,
+          "metric_rows_factor_populated": 5167
+        }
+      }
+    },
+    "shared_functions_AST_exact": true,
+    "all_old_helper_wave_rawcountry_Country_fields_null_masks_dtypes_axis_metadata_attrs_exact": true,
+    "healthy_Niger_payload_attrs_exact": true
+  },
+  "old_f8_reference_differences_grounded_separately": {
+    "Nigeria-Country": {
+      "f8_to_actual_global12": "complete frame/attrs exact",
+      "rows": 131338
+    },
+    "Nigeria-country-raw": {
+      "f8_to_actual_global12": "complete frame/attrs exact",
+      "rows": 131338
+    },
+    "Niger-Country": {
+      "f8_to_actual_global12": "exactly reviewed Niger1088 quantity sentinel correction; all else and attrs exact",
+      "Quantity_to_NA": 76,
+      "rows": 46043
+    },
+    "Niger-country-raw": {
+      "f8_to_actual_global12": "exactly reviewed Niger1088 quantity sentinel correction; all else and attrs exact",
+      "Quantity_to_NA": 76,
+      "rows": 46043
+    },
+    "Feature": {
+      "f8_to_actual_global12": "exactly reviewed Niger1088 quantity sentinel correction; all else and attrs exact",
+      "Quantity_to_NA": 76,
+      "rows": 177381
+    },
+    "Feature-default": {
+      "f8_to_actual_global12": "exactly reviewed Niger1088 quantity sentinel correction; all else and attrs exact",
+      "Quantity_to_NA": 76,
+      "rows": 177381
+    }
+  },
+  "Feature_scanner_comparator_and_isolation": {
+    "Features": {
+      "Feature": {
+        "global12_rows": 177381,
+        "global13_rows": 182609,
+        "all_old_values_masks_dtypes_keys_axis_metadata_full_attrs_exact": true,
+        "Niger_rows": 46043
+      },
+      "Feature-default": {
+        "global12_rows": 177381,
+        "global13_rows": 182609,
+        "all_old_values_masks_dtypes_keys_axis_metadata_full_attrs_exact": true,
+        "Niger_rows": 46043
+      }
+    },
+    "scanner": {
+      "full_multiset_exact": true,
+      "normalization": "checkout/private-data paths only",
+      "records": [
+        {
+          "phase": "1a-sanity",
+          "check": "has_household_index",
+          "country": "Niger",
+          "classification": "intentional cluster-level no-i",
+          "status": "warn",
+          "normalized_record_sha256": "d0b5e49cdef7deec0ad8a085c29dd40eccb322fb968940e70220825520e489b7"
+        },
+        {
+          "phase": "1a-sanity",
+          "check": "runtime_warning",
+          "country": null,
+          "classification": "ClusterIdentityWarning",
+          "status": "warn",
+          "normalized_record_sha256": "09d799d52ea5831eb9beaa8493c7e8d8e6a89eb2cc56045806a5c05b71d02f30"
+        },
+        {
+          "phase": "1a-sanity",
+          "check": "has_household_index",
+          "country": "Nigeria",
+          "classification": "intentional cluster-level no-i",
+          "status": "warn",
+          "normalized_record_sha256": "60c746ac34393b6b0d17aa7733970d26aa31e060179554f879d88a790b214649"
+        },
+        {
+          "phase": "1b-assembly",
+          "check": "runtime_warning",
+          "country": null,
+          "classification": "ClusterIdentityWarning",
+          "status": "warn",
+          "normalized_record_sha256": "ee1f03e2ec45fe776c223f002ba708b91c0ec7f2de6135bf4bd2ad1989c1e2f8"
+        },
+        {
+          "phase": "1b-assembly",
+          "check": "runtime_warning",
+          "country": null,
+          "classification": "UserWarning",
+          "status": "warn",
+          "normalized_record_sha256": "809f10058006d8ceb8681570a1d25ace30de8e5c5433d9d677b00b5bd1a11771"
+        },
+        {
+          "phase": "1b-assembly",
+          "check": "runtime_warning",
+          "country": null,
+          "classification": "PopulationHeterogeneityWarning",
+          "status": "warn",
+          "normalized_record_sha256": "1efab37eaaff39b9b8f458fb9155cb188be219fed5de63bbf462d157bd856dbf"
+        }
+      ],
+      "phase2_grid": false
+    },
+    "Niger_all_three_cache_files_byte_exact": true,
+    "all_13_source_receipts_unchanged_both_roots": true,
+    "network_attempts": 0,
+    "guard_existing_checkout_create_attempts_without_write": 2,
+    "guard_historical_rejected_null_sink_opens": 36,
+    "guard_unauthorized_mutations": 0,
+    "warm_country_Feature_new_objects_private_hash_modes_mtimes_exact": true
+  },
+  "strict_fresh_process_warm_global12": {
+    "tag": "baseline",
+    "fresh_process": true,
+    "new_default_Country_objects": 4,
+    "new_Feature_objects": 4,
+    "current_country_hashes_and_full_wave_manifests": true,
+    "all_data_root_files_compared": 27,
+    "all_L1_L2_companion_bytes_modes_mtimes_exact": true
+  },
+  "strict_fresh_process_warm_global13": {
+    "tag": "candidate",
+    "fresh_process": true,
+    "new_default_Country_objects": 4,
+    "new_Feature_objects": 4,
+    "current_country_hashes_and_full_wave_manifests": true,
+    "all_data_root_files_compared": 27,
+    "all_L1_L2_companion_bytes_modes_mtimes_exact": true
+  },
+  "focused_tests": {
+    "passed": 60,
+    "failed": 0,
+    "skipped": 0,
+    "loadfile_workers": 2,
+    "explicit_exclusions": [
+      "test_no_food_unit_is_float_stringified",
+      "test_no_crop_row_has_a_nan_unit",
+      "test_no_plot_input_has_a_nan_unit"
+    ]
+  },
+  "protected_tree_and_reference_before_after_exact": true,
+  "frozen_tree_summary": {
+    "global13": {
+      "head": "5dde66645a444b025aa69682838cdf7c033a6e88",
+      "clean": true,
+      "tracked_files": 14998
+    },
+    "global12": {
+      "head": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
+      "clean": true,
+      "tracked_files": 14992
+    },
+    "standalone": {
+      "head": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "clean": true,
+      "tracked_files": 14886
+    },
+    "reference_files": 149,
+    "mode": "after"
+  },
+  "private_before_snapshot_sha256": "c2b289180d5186fac4b1bd804fadebd418c5a1161be97a1dc9092db3755b8247",
+  "quiescence": {
+    "quiescent_private_data_consumers": true,
+    "active_matching_consumers": 0,
+    "process_environments_checked": 7,
+    "same_uid_command_lines_checked": 17,
+    "other_uid_processes_excluded": 573,
+    "zombie_processes_without_running_consumers": 0,
+    "exited_processes": 0,
+    "unreadable_same_uid_environments_with_nonreview_command_lines": 10
+  },
+  "not_repeated": [
+    "full 549-country-hash/39-framework-fingerprint census",
+    "standalone 23 extra fault groups",
+    "full test suite",
+    "food/crop/input/nutrition cohorts"
+  ]
+}
