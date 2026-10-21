@@ -12,11 +12,11 @@ Keep Applied=True, organic-only keyed sum(min_count=1), optional-field compatibi
 
 | symbol | path | existing behavior and verification | decision |
 |---|---|---|---|
-| `_organic_block` | `lsms_library/countries/Malawi/_/malawi.py:3007` | Discards amount/unit, preserves affirmative use; `tests/test_1109_malawi_input_quantity.py` exercises helper/finalizer | extend |
-| `_fertilizer_block` | same file `:2967` | Nullable numeric read via pd.to_numeric(errors='coerce').astype('Float64'); regression numeric/missing/zero controls | reuse numeric idiom only |
-| `_int_codes` | same file `:2946` | Existing nullable integer normalization for Module D codes | reuse |
-| `assemble_plot_inputs` | same file `:3150` | Organic-only full-key min_count overlay; all other reducers unchanged | reuse unchanged |
-| four wave callers | `Malawi/{2010-11,2013-14,2016-17,2019-20}/_/plot_inputs.py` | All delegate organic block; 2016 Cross_Sectional `_D_USECOLS` omits both fields | extend whitelist only |
+| `_organic_block` | `lsms_library/countries/Malawi/_/malawi.py:3019` | Reads reported amount/own unit dictionary and preserves affirmative use; `tests/test_1109_malawi_input_quantity.py` exercises helper/finalizer | extend |
+| `_fertilizer_block` | same file `:2977` | Nullable numeric read via pd.to_numeric(errors='coerce').astype('Float64'); regression numeric/missing/zero controls | reuse numeric idiom only |
+| `_int_codes` | same file `:2957` | Existing nullable integer normalization for Module D codes | reuse |
+| `assemble_plot_inputs` | same file `:3178` | Organic-only full-key min_count overlay; all other reducers unchanged | reuse unchanged |
+| four wave callers | `Malawi/{2010-11,2013-14,2016-17,2019-20}/_/plot_inputs.py` | All delegate organic block; 2016 Cross_Sectional `_D_USECOLS` now includes both fields | extend whitelist only |
 | physical labels | `Malawi/_/categorical_mapping.org:446,566,693,704` | Existing Kilogramme, Bucket, Ox-Cart; source Wheelbarrow and Other (Specify) remain recorded labels | reuse spellings; own organic codebook |
 | `U_UNKNOWN` | `lsms_library/transformations.py`; `lsms_library/data_info.yml:16-39` | Canonical missing-unit sentinel under #1041; not a conversion unit | reuse |
 | `Country._finalize_result` | `lsms_library/country.py:3961-3981` | Applied preserves missing-amount affirmative rows through all-null payload filter | preserve unchanged |
@@ -24,7 +24,7 @@ Keep Applied=True, organic-only keyed sum(min_count=1), optional-field compatibi
 
 ## §3 Definitions and conventions in force
 
-- **CONTRADICTION, 2026-10-21:** `Malawi/_/CONTENTS.org:3027-3028` says "Module D records no organic quantity".
+- **CONTRADICTION, 2026-10-21:** `Malawi/_/CONTENTS.org:3027-3028` at c08 said "Module D records no organic quantity".
   The initial ledger inherited that false claim.
   All seven held Module D headers label ag_d37a quantity applied and ag_d37b unit.
   Six sources actually loaded contain 11,075 affirmative rows, 11,068 positive amounts, seven missing amounts and 11,067 observed units.
@@ -69,7 +69,25 @@ Update #1118 organic amount/unit denominators in report only; do not claim the w
 
 ## Phase 3 - verification
 
-c08 negative control: 15 failures / 12 passes; first amendment: 71 targeted/warm/declaration tests pass, exact nonorganic/nitrogen and pooled preservation.
-Public per-row accounting rejected literal numeric fallback because unrelated food aliases reinterpret six units.
-Pending source-qualified fallback, actual Country regression and final source/public accounting.
-Earlier c08 checks established mechanical preservation under a false source premise; this amendment supersedes that interpretation.
+OK against sections 2-4 at implementation commit `d4fc6434c2eaa1b107a5c065606406505a053187`.
+The source-backed correction supersedes the inherited no-quantity interpretation, and the source-qualified fallback supersedes the rejected bare-numeric public collision.
+
+- Before production edits, c08 runtime: 15 failures / 12 passes across the then-27-case source regression.
+  The actual Country fallback regression additionally fails bare 1/3 alias reinterpretation before passing the final source-qualified representation.
+- Final targeted run: 72 passed, zero skips; Ethiopia warm case excluded from this private Malawi seed.
+  Reuses existing helper/finalizer, nitrogen and canonical plot tests; final new regression has 28 cases.
+- Independent metadata/row accounting: all seven source dictionaries checked; six loaded sources, 11,075 organic records; every quantity/unit/Applied answer exact at wave and finalized public keys.
+  Final amounts: 11,068 positive, seven missing, zero observed source zeros; tests retain synthetic observed zero.
+  Final units: 5,518 Kilogramme, 2,155 Ox-Cart, 1,451 Bucket, 1,204 Other (Specify), 733 Wheelbarrow, eight Unknown, five Organic unit code 1 and one Organic unit code 3.
+  The six source-qualified unlabelled codes have no inferred kg factor.
+- Private cold output retains 180,184 rows; all 169,109 nonorganic records/index/order/values/dtypes exact, including the 437 residual records.
+  Other organic fields/index parts are exact modulo reported Quantity/unit restoration.
+  Nitrogen frame and input-match/refusal tally are exact: 33,466 plots, 840,235.7795800001 kg N, all 11,075 organic inputs still refused a nominal share.
+- Warm and pooled Malawi/Uganda checks retain 264,400 rows; Uganda exact.
+  Scanner identities/statuses exact: 15 warnings, zero failures/errors; only two null-unit warning details move from 28,724 to 17,649.
+- All 22 measured Malawi source-table hashes change, zero of 24 Uganda hashes change: one Malawi rewarm.
+  Existing L1 physically copied, fresh private L2, no acquisition/shared cache mutation or promotion.
+
+Safe aggregate evidence and runnable commands: `slurm_logs/isa_campaign_2026-10-21/1109/REPORT.md`, `REPRODUCTION.md`, source-amended-*.json.
+The 437 nonorganic diagnosis and remaining 17,649 native null units remain separately drafted; original #1109 organic scope is implemented pending independent review.
+No reinvention or remaining definition contradiction was found against this corrected ledger.
