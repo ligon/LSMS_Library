@@ -1,0 +1,47 @@
+#+title: Independent review of Windows Uganda digest correction
+#+author: Sue
+#+date: 2026-10-20
+
+* Verdict
+
+PASS, no blocking findings.
+Reviewed the finalized four-file proposal against development =976fc840d12ba40f1602b7dff58b81548632b2a9= using the code-reviewer skill.
+The exact file hashes and checks are in =windows-review.json=; the contracts evaluation remains frozen.
+
+* Country context
+
+Read Uganda =_/CONTENTS.org= including TODO/WAITING caveats before assessing the change.
+Relevant idiosyncrasy: the encoding section (=CONTENTS.org:3572=) records pre-118 Stata cp1252 bytes formerly served as latin-1 C1 controls, and precisely 862/756/394 =HowCoped0/1/2= cell corrections from U+0085 to U+2026.
+The existing Uganda 2005-06 single null Shock key is served with a warning and remains unchanged; unrelated nutrition-baseline approval history and incomplete-cache invariance caveats do not authorize a wholesale baseline refresh.
+
+* Independent verification
+
+Ran the finalized =verify_decode_delta.py= from the Windows worktree with its own PYTHONPATH/countries root, private =/local/job40255479/windows-ci-data=, BLAS/OMP/MKL and build workers pinned to one, and taskset cores 16-19.
+Exit status was zero.
+It reproduced =shocks= 14,457 x 10 with current digest =0ab2ea4c79dd= and inverse-decoding digest =64a53fa7af55=.
+Only the documented 2,012 cells changed (862/756/394); index values/order, column names/order, dtypes and every other value were asserted identical.
+Forward decoding returned the exact current frame via =assert_frame_equal(check_exact=True)=.
+=assets= remained 116,808 x 1, digest =9202ed542a14=.
+All printed aggregate results, including normalized SHA256 hashes, match the proposed =decode-delta.json=.
+
+This is reversible counterfactual label accounting, not a separately cold-built historical pre-#805 frame comparison.
+README.org explicitly distinguishes those claims at lines 13-15.
+The 48-bit CI digest is the existing regression checksum; it cannot by itself establish collision-proof historical frame equality.
+The accounting argument is appropriately bounded by the documented substitution, exact roundtrip and matching prior checksum.
+
+* Scope, regression strength and artifacts
+
+The tracked workflow diff changes only shocks' expected digest and explanatory comments (=ci.yml:204= and =:251=).
+The assets expectation, row-count checks, installed-wheel identity, packaged-config identity, conda make/sh/find checks, private cold-build directory and job trigger/secret rules remain intact.
+No runtime source, compiler, test logic, test filter or other baseline is changed.
+The verifier normalizes data exactly as =scripts/windows_build_check.py= does.
+
+The only proposed evidence files are README.org, decode-delta.json and verify_decode_delta.py.
+They contain schemas, per-wave/per-column counts, digests and environment paths; no household identifiers, index values, row records, source extracts or credentials are recorded.
+The rerun used private L2 and only the shared content-addressed L1 link.
+
+Inspected author logs: separate cold caches show old expectation fails only shocks, corrected expectation passes both tables, and focused reader/Windows tests report 69 passed.
+Those author test logs were reviewed, not independently rerun.
+Actual Windows installed-wheel/conda CI remains the platform verification step after publishing the reviewed branch.
+
+-- Sue

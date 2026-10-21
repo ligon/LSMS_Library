@@ -201,8 +201,10 @@ jobs:
   # PATH and make/sh/find are asserted to resolve inside the conda env, so
   # this measures what a user with only that environment gets.  Cold-builds
   # two Uganda script-path tables and checks them against the Linux build:
-  #   Uganda:shocks rows=14457 waves=8 digest=64a53fa7af55
+  #   Uganda:shocks rows=14457 waves=8 digest=0ab2ea4c79dd
   #   Uganda:assets rows=116808 waves=8 digest=9202ed542a14
+  # GH #805: 2,012 HowCoped cells now decode U+0085 as U+2026; the
+  # aggregate-only proof is in slurm_logs/framework_campaign_2026-10-20/windows/.
   # Secrets are restricted to integration pushes or an explicit maintainer
   # dispatch; pull requests (including forks) never execute this job.
   windows-script-build:
@@ -246,7 +248,7 @@ jobs:
           PROBE_STRIP: '\Git\,mingw64,chocolatey'
           REQUIRE_CONDA_TOOLS: "1"
           REQUIRE_INSTALLED_LIBRARY: "1"
-          EXPECT: "Uganda:shocks=14457:64a53fa7af55,Uganda:assets=116808:9202ed542a14"
+          EXPECT: "Uganda:shocks=14457:0ab2ea4c79dd,Uganda:assets=116808:9202ed542a14"
           LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
           LSMS_BUILD_WORKERS: "1"
           PYTHONUNBUFFERED: "1"
