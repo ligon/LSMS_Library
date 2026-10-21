@@ -42,6 +42,7 @@ This extends reduction identity only, with no unit-factor, nitrogen-share, missi
 - Grouping keys for valid country-labeled plot inputs become `(country, t, i, plot_id)`; country is first even when supplied as a column or in another index position.
 - The same shape applies to one labeled country, no matching item rows, unknown-unit refusal, explicitly disabled declarations and empty input carrying those axes.
 - Keep country-less outputs, missing quantities, missing local-key behavior, supported plot aliases and existing diagnostics unchanged.
+- Promoting country must not turn the existing no-local-group-key error into a country-only sum; country alone is not a plot key.
 - Country-column promotion must happen before filtering/conversion; reattaching by `.loc` after filtering would duplicate colliding index rows and is prohibited.
 - Do not import Country or build data inside a reducer, change shared factor machinery, or apply a country-wide numeric factor to another country's rows.
 - A reducer's new country axis does not cure `fertilizer_rate`'s separate country-omitting area join; pooled rate acceptance is outside the live issue's two-function scope.
@@ -74,4 +75,14 @@ Present but null country labels must raise an actionable ValueError before filte
 
 ### Phase 3 -- verification
 
-Pending implementation and anchored verification after parent review of this ledger.
+- `_plot_input_country_index` -- OK (sections 2-4): reuses the existing column-promotion pattern and index-before-column precedence. It adds no axis from attrs, refuses null country labels before filtering, and preserves the old error when no local grouping index exists.
+- `seed_kg` / `nitrogen_kg` -- OK (sections 3-5): country participates in reduction identity for index/column inputs, one country and empty paths. Local-ID collision and reversed-order controls now equal separate Country-shaped calls. Plot aliases, local missing-key behavior and input immutability remain pinned.
+- Declaration and nutrient machinery -- OK (sections 2-4): no resolver, conversion, nitrogen-share, organic-refusal or tally implementation changed. Explicit/attrs/flat factor maps, explicit-empty refusal and real Feature assembly with colliding IDs pass.
+- Documentation -- OK (section 3): both reducer docstrings and the Feature guide state the presence-based output contract. The inherited nitrogen docstring's claim that all-unconvertible plots sum to zero contradicted its existing dropna path; prose now describes existing empty behavior without changing missing-quantity policy.
+- Negative proof -- OK (section 5): final regressions run against an exact source-verified untouched 852 runtime give 71 failures and 18 passes; 26 unrelated existing factor cases are deselected. Candidate selection gives 260 passes, two private-cache-gated Nigeria skips and 15 requires_s3 deselections.
+- Downstream compatibility -- OK within scoped section 4: ordinary country-less fertilizer-rate tests pass unchanged. Old/new synthetic pooled rate remains 0.276, with separate A=0.46/B=0.23; its independent country-omitting area join remains an inherited residual and is not changed here.
+- Cache reach -- OK (section 4): actual before/after census has zero changes among 549 country-table, 2,139 wave and 39 tagged hashes, with no census errors. Recorded source SHA256 values match untouched 852 and committed implementation exactly.
+
+Implementation: `da84c7c790c1b1e040aca5ec3ff4d46649eb1317`, published by the post-commit hook.
+Aggregate/reproducible evidence: `slurm_logs/framework_campaign_2026-10-20/1159/README.org`, `comparison.json`, `CONTRACT-REVIEW.md` and scripts.
+No real-country microdata or new scientific premise was required.
