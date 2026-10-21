@@ -1,5 +1,28 @@
 #+title: Handoff -- v0.16.0 release, 2026-10-21
 
+* Release merged; final gates active -- 2026-10-21 06:02 PDT
+
+Preparation PR 1167 merged as =ee97d80aab8874e71e89dcdd5f93f18715fab935=.
+Release PR 1168 merged development to master with a MERGE COMMIT as =097283459f80016b0f00a51b814a0cb964a42789=; GitHub parsed all 48 issue closures.
+GitHub, tracking, local and filesystem-origin master agree at that commit.
+All 12,421 non-report tracked inputs (11,753 package files) exactly match validated 532 in Git mode/type/blob; =execution/master-source-identity.json= records the proof.
+
+The actual Makefile release target is running in frozen =/local/job40255479/worktrees/release-v016-master=, process session 41992.
+It collected 9,137 cases and all 16 worker identities passed.
+The private full log is =/local/job40255479/control/release-v016/make-release-final.log=.
+Automatic exact-master CI =39604418333= runs alongside it, including credentialed Linux, native Windows and documentation deployment.
+The adapter waits for local outcome/reason parity and that exact CI SUCCESS before returning zero; make then creates the annotated v0.16.0 tag.
+No tag, GitHub Release or PyPI publication has happened at this checkpoint.
+
+Keep master checkout and refs frozen until the Makefile tag line finishes.
+Do not run tests again while the adapter waits on CI; inspect its private summary and job observers instead.
+The contracts agent checks 48 closures and 77 retained scopes; windows_ci verifies platform jobs; framework_reliability observes the Linux data job.
+All observer outputs remain private until reviewed and copied as safe aggregates.
+Root owns tag push, GitHub Release, publish.yml observation, published-artifact verification and final durable records.
+The completion worktree/branch is separate so recording this checkpoint does not mutate the executable checkout.
+
+Sue
+
 * Release authorized and preparation in progress -- 2026-10-21
 
 The maintainer instructed "Okay, let's get 0.16.0 out".
