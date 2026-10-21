@@ -1,4 +1,4 @@
-# Prior-Art Ledger - GH822 Mali community-price readings 
+# Prior-Art Ledger - GH822 Mali community-price readings
 
 Search tier: ripgrep/git floor, direct file and AST-aware source review.
 The read-only diagnosis preceded the approved implementation brief.
