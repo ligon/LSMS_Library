@@ -1,0 +1,554 @@
+FFFFFFF..FFFF.FF                                                         [100%]
+=================================== FAILURES ===================================
+_ TestOverrideCorrectionThroughMain.test_a_stamped_primary_correction_requires_acquisition _
+
+self = <tests.test_wave_provenance.TestOverrideCorrectionThroughMain object at 0x14a905384350>
+bf = <module 'backfill_600' from '/local/job40255479/worktrees/1115-1128-provenance/scripts/backfill_wave_provenance.py'>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_a_stamped_primary_correct0/countries')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a9053a2fd0>
+tmp_path = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_a_stamped_primary_correct0')
+
+    def test_a_stamped_primary_correction_requires_acquisition(
+            self, bf, countries, monkeypatch, tmp_path):
+        """A catalog override cannot establish another entry's held release.
+        Preserve the complete stamped record rather than invent an IDNO."""
+        lss = next(r for r in NGA_ROWS if r["id"] == "3827")
+        wrong = pv.render_source_org(bf._from_entry(
+            "Nigeria", "2018-19", lss, "source-url", "2026-07-12"))
+        assert "NGA_2018_LSS_v01_M" in wrong
+        _write_source(countries, "Nigeria", "2018-19", wrong)
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+    
+>       assert pv.source_org_path(countries, "Nigeria", "2018-19").read_text() == wrong
+E       AssertionError: assert 'SOURCE\n\nht..., W5=6410).\n' == 'SOURCE\n\nht... 2026-07-12\n'
+E         
+E         Skipping 49 identical leading characters in diff, use -v to show
+E         - /catalog/3827
+E         ?           ^^
+E         + /catalog/3557
+E         ?           ^^
+E           ...
+E         
+E         ...Full output truncated (26 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:1583: AssertionError
+----------------------------- Captured stdout call -----------------------------
+  Nigeria/2018-19  override    3557 NGA_2018_GHSP-W4_v03_M
+
+Done
+  wave dirs scanned : 1
+  resolved          : 1
+      override      : 1
+      written         : 1
+      unchanged       : 0  (content identical; not rewritten)
+      stale release   : 0  (catalog has a newer release; held keys kept, #+CATALOG_LATEST_* recorded)
+  unresolved        : 0  (LEFT INTACT -- see the review artifact)
+  skipped           : 0  (not declared waves; stamping would create one -- see _may_write)
+
+Review artifact: /local/job40255479/tmp/pytest-of-ligon/pytest-46/test_a_stamped_primary_correct0/review.org
+_ TestPrimarySourceRouting.test_secondary_catalog_link_is_never_acquisition_routing[metadata] _
+
+self = <tests.test_wave_provenance.TestPrimarySourceRouting object at 0x14a9053b9290>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_secondary_catalog_link_is0/countries')
+region = 'metadata'
+
+    @pytest.mark.parametrize('region', ['metadata', 'notes'])
+    def test_secondary_catalog_link_is_never_acquisition_routing(self, countries, region):
+        from lsms_library import data_access as da
+        text = ('SOURCE\n\n(source URL not recorded)\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if region == 'notes':
+            text += f'\n{pv.NOTES_HEADING}\n'
+        text += '#+SECONDARY_SOURCE: https://microdata.worldbank.org/catalog/6410\n'
+        _write_source(countries, 'Example', '2020', text)
+        assert pv.parse_source_org(text, 'Example', '2020').url is None
+>       assert da._read_source_url('Example', '2020') is None
+E       AssertionError: assert 'https://microdata.worldbank.org/catalog/6410' is None
+E        +  where 'https://microdata.worldbank.org/catalog/6410' = <function _read_source_url at 0x14a90689c4a0>('Example', '2020')
+E        +    where <function _read_source_url at 0x14a90689c4a0> = <module 'lsms_library.data_access' from '/local/job40255479/worktrees/1115-1128-provenance/lsms_library/data_access.py'>._read_source_url
+
+tests/test_wave_provenance.py:2440: AssertionError
+_ TestPrimarySourceRouting.test_secondary_catalog_link_is_never_acquisition_routing[notes] _
+
+self = <tests.test_wave_provenance.TestPrimarySourceRouting object at 0x14a9053b9510>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_secondary_catalog_link_is1/countries')
+region = 'notes'
+
+    @pytest.mark.parametrize('region', ['metadata', 'notes'])
+    def test_secondary_catalog_link_is_never_acquisition_routing(self, countries, region):
+        from lsms_library import data_access as da
+        text = ('SOURCE\n\n(source URL not recorded)\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if region == 'notes':
+            text += f'\n{pv.NOTES_HEADING}\n'
+        text += '#+SECONDARY_SOURCE: https://microdata.worldbank.org/catalog/6410\n'
+        _write_source(countries, 'Example', '2020', text)
+        assert pv.parse_source_org(text, 'Example', '2020').url is None
+>       assert da._read_source_url('Example', '2020') is None
+E       AssertionError: assert 'https://microdata.worldbank.org/catalog/6410' is None
+E        +  where 'https://microdata.worldbank.org/catalog/6410' = <function _read_source_url at 0x14a9067f3ec0>('Example', '2020')
+E        +    where <function _read_source_url at 0x14a9067f3ec0> = <module 'lsms_library.data_access' from '/local/job40255479/worktrees/1115-1128-provenance/lsms_library/data_access.py'>._read_source_url
+
+tests/test_wave_provenance.py:2440: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_push_must_confirm_every_requested_file[add_wave-failed] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053bba50>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_push_must_confirm_every_r0/countries')
+wb = {'fail': False, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa7\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a9053baa50>
+receipt = 'failed', entrypoint = 'add_wave'
+
+    @pytest.mark.parametrize('receipt', ['failed', 'partial', 'duplicate', 'exception'])
+    @pytest.mark.parametrize('entrypoint', ['add_wave', 'populate_and_push'])
+    def test_push_must_confirm_every_requested_file(
+            self, countries, wb, monkeypatch, receipt, entrypoint):
+        from lsms_library import data_access as da
+        before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        def push(paths, remote=None, dvc_add=True):
+            if receipt == 'exception':
+                raise RuntimeError('simulated push failure')
+            if receipt == 'failed':
+                return []
+            if receipt == 'partial':
+                return list(paths)[:1]
+            return [paths[0], paths[0]]
+        monkeypatch.setattr(da, 'push_to_cache_batch', push)
+        def acquire():
+            if entrypoint == 'add_wave':
+                return da.add_wave('Nigeria', '6410', wave='2023-24',
+                                   push=True, confirm=False, verbose=False)
+            return da.populate_and_push('Nigeria', '2023-24')
+        if receipt == 'exception':
+            with pytest.raises(RuntimeError, match='simulated push failure'):
+                acquire()
+        else:
+            acquire()
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht... (GH #978).\n' == 'SOURCE\n\nht... (GH #978).\n'
+E         
+E         Skipping 108 identical leading characters in diff, use -v to show
+E         - GHSP-W5_v01_M
+E         ?           ^
+E         + GHSP-W5_v02_M
+E         ?           ^
+E           #+CATALOG_TITLE: General Household Survey, Panel 2023-2024...
+E         
+E         ...Full output truncated (20 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2478: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_push_must_confirm_every_requested_file[add_wave-partial] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053bbcd0>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_push_must_confirm_every_r1/countries')
+wb = {'fail': False, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa7\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a9052f9890>
+receipt = 'partial', entrypoint = 'add_wave'
+
+    @pytest.mark.parametrize('receipt', ['failed', 'partial', 'duplicate', 'exception'])
+    @pytest.mark.parametrize('entrypoint', ['add_wave', 'populate_and_push'])
+    def test_push_must_confirm_every_requested_file(
+            self, countries, wb, monkeypatch, receipt, entrypoint):
+        from lsms_library import data_access as da
+        before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        def push(paths, remote=None, dvc_add=True):
+            if receipt == 'exception':
+                raise RuntimeError('simulated push failure')
+            if receipt == 'failed':
+                return []
+            if receipt == 'partial':
+                return list(paths)[:1]
+            return [paths[0], paths[0]]
+        monkeypatch.setattr(da, 'push_to_cache_batch', push)
+        def acquire():
+            if entrypoint == 'add_wave':
+                return da.add_wave('Nigeria', '6410', wave='2023-24',
+                                   push=True, confirm=False, verbose=False)
+            return da.populate_and_push('Nigeria', '2023-24')
+        if receipt == 'exception':
+            with pytest.raises(RuntimeError, match='simulated push failure'):
+                acquire()
+        else:
+            acquire()
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht... (GH #978).\n' == 'SOURCE\n\nht... (GH #978).\n'
+E         
+E         Skipping 108 identical leading characters in diff, use -v to show
+E         - GHSP-W5_v01_M
+E         ?           ^
+E         + GHSP-W5_v02_M
+E         ?           ^
+E           #+CATALOG_TITLE: General Household Survey, Panel 2023-2024...
+E         
+E         ...Full output truncated (20 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2478: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_push_must_confirm_every_requested_file[add_wave-duplicate] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053bbf50>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_push_must_confirm_every_r2/countries')
+wb = {'fail': False, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa7\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a904e1f950>
+receipt = 'duplicate', entrypoint = 'add_wave'
+
+    @pytest.mark.parametrize('receipt', ['failed', 'partial', 'duplicate', 'exception'])
+    @pytest.mark.parametrize('entrypoint', ['add_wave', 'populate_and_push'])
+    def test_push_must_confirm_every_requested_file(
+            self, countries, wb, monkeypatch, receipt, entrypoint):
+        from lsms_library import data_access as da
+        before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        def push(paths, remote=None, dvc_add=True):
+            if receipt == 'exception':
+                raise RuntimeError('simulated push failure')
+            if receipt == 'failed':
+                return []
+            if receipt == 'partial':
+                return list(paths)[:1]
+            return [paths[0], paths[0]]
+        monkeypatch.setattr(da, 'push_to_cache_batch', push)
+        def acquire():
+            if entrypoint == 'add_wave':
+                return da.add_wave('Nigeria', '6410', wave='2023-24',
+                                   push=True, confirm=False, verbose=False)
+            return da.populate_and_push('Nigeria', '2023-24')
+        if receipt == 'exception':
+            with pytest.raises(RuntimeError, match='simulated push failure'):
+                acquire()
+        else:
+            acquire()
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht... (GH #978).\n' == 'SOURCE\n\nht... (GH #978).\n'
+E         
+E         Skipping 108 identical leading characters in diff, use -v to show
+E         - GHSP-W5_v01_M
+E         ?           ^
+E         + GHSP-W5_v02_M
+E         ?           ^
+E           #+CATALOG_TITLE: General Household Survey, Panel 2023-2024...
+E         
+E         ...Full output truncated (20 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2478: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_push_must_confirm_every_requested_file[add_wave-exception] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053c0210>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_push_must_confirm_every_r3/countries')
+wb = {'fail': False, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa7\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a905d6ee90>
+receipt = 'exception', entrypoint = 'add_wave'
+
+    @pytest.mark.parametrize('receipt', ['failed', 'partial', 'duplicate', 'exception'])
+    @pytest.mark.parametrize('entrypoint', ['add_wave', 'populate_and_push'])
+    def test_push_must_confirm_every_requested_file(
+            self, countries, wb, monkeypatch, receipt, entrypoint):
+        from lsms_library import data_access as da
+        before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        def push(paths, remote=None, dvc_add=True):
+            if receipt == 'exception':
+                raise RuntimeError('simulated push failure')
+            if receipt == 'failed':
+                return []
+            if receipt == 'partial':
+                return list(paths)[:1]
+            return [paths[0], paths[0]]
+        monkeypatch.setattr(da, 'push_to_cache_batch', push)
+        def acquire():
+            if entrypoint == 'add_wave':
+                return da.add_wave('Nigeria', '6410', wave='2023-24',
+                                   push=True, confirm=False, verbose=False)
+            return da.populate_and_push('Nigeria', '2023-24')
+        if receipt == 'exception':
+            with pytest.raises(RuntimeError, match='simulated push failure'):
+                acquire()
+        else:
+            acquire()
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht... (GH #978).\n' == 'SOURCE\n\nht... (GH #978).\n'
+E         
+E         Skipping 108 identical leading characters in diff, use -v to show
+E         - GHSP-W5_v01_M
+E         ?           ^
+E         + GHSP-W5_v02_M
+E         ?           ^
+E           #+CATALOG_TITLE: General Household Survey, Panel 2023-2024...
+E         
+E         ...Full output truncated (20 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2478: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_push_must_confirm_every_requested_file[populate_and_push-duplicate] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053c0a50>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_push_must_confirm_every_r6/countries')
+wb = {'fail': False, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa7\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a9068d0350>
+receipt = 'duplicate', entrypoint = 'populate_and_push'
+
+    @pytest.mark.parametrize('receipt', ['failed', 'partial', 'duplicate', 'exception'])
+    @pytest.mark.parametrize('entrypoint', ['add_wave', 'populate_and_push'])
+    def test_push_must_confirm_every_requested_file(
+            self, countries, wb, monkeypatch, receipt, entrypoint):
+        from lsms_library import data_access as da
+        before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        def push(paths, remote=None, dvc_add=True):
+            if receipt == 'exception':
+                raise RuntimeError('simulated push failure')
+            if receipt == 'failed':
+                return []
+            if receipt == 'partial':
+                return list(paths)[:1]
+            return [paths[0], paths[0]]
+        monkeypatch.setattr(da, 'push_to_cache_batch', push)
+        def acquire():
+            if entrypoint == 'add_wave':
+                return da.add_wave('Nigeria', '6410', wave='2023-24',
+                                   push=True, confirm=False, verbose=False)
+            return da.populate_and_push('Nigeria', '2023-24')
+        if receipt == 'exception':
+            with pytest.raises(RuntimeError, match='simulated push failure'):
+                acquire()
+        else:
+            acquire()
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht... (GH #978).\n' == 'SOURCE\n\nht... (GH #978).\n'
+E         
+E         Skipping 108 identical leading characters in diff, use -v to show
+E         - GHSP-W5_v01_M
+E         ?           ^
+E         + GHSP-W5_v02_M
+E         ?           ^
+E           #+CATALOG_TITLE: General Household Survey, Panel 2023-2024...
+E         
+E         ...Full output truncated (20 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2478: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_push_must_confirm_every_requested_file[populate_and_push-exception] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053c0d50>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_push_must_confirm_every_r7/countries')
+wb = {'fail': False, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa7\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a905d52790>
+receipt = 'exception', entrypoint = 'populate_and_push'
+
+    @pytest.mark.parametrize('receipt', ['failed', 'partial', 'duplicate', 'exception'])
+    @pytest.mark.parametrize('entrypoint', ['add_wave', 'populate_and_push'])
+    def test_push_must_confirm_every_requested_file(
+            self, countries, wb, monkeypatch, receipt, entrypoint):
+        from lsms_library import data_access as da
+        before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        def push(paths, remote=None, dvc_add=True):
+            if receipt == 'exception':
+                raise RuntimeError('simulated push failure')
+            if receipt == 'failed':
+                return []
+            if receipt == 'partial':
+                return list(paths)[:1]
+            return [paths[0], paths[0]]
+        monkeypatch.setattr(da, 'push_to_cache_batch', push)
+        def acquire():
+            if entrypoint == 'add_wave':
+                return da.add_wave('Nigeria', '6410', wave='2023-24',
+                                   push=True, confirm=False, verbose=False)
+            return da.populate_and_push('Nigeria', '2023-24')
+        if receipt == 'exception':
+            with pytest.raises(RuntimeError, match='simulated push failure'):
+                acquire()
+        else:
+            acquire()
+        assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+>       assert ('Nigeria', '2023-24') not in da._ACQUIRED_RELEASES
+E       AssertionError: assert ('Nigeria', '2023-24') not in {('Nigeria', '2023-24'): _AcquiredRelease(catalog_id='6410', idno='NGA_2023_GHSP-W5_v02_M', extracted=(PosixPath('/loc...st-of-ligon/pytest-46/test_push_must_confirm_every_r7/countries/Nigeria/2023-24/Data/b.dta')), skipped=(), error=None)}
+E        +  where {('Nigeria', '2023-24'): _AcquiredRelease(catalog_id='6410', idno='NGA_2023_GHSP-W5_v02_M', extracted=(PosixPath('/loc...st-of-ligon/pytest-46/test_push_must_confirm_every_r7/countries/Nigeria/2023-24/Data/b.dta')), skipped=(), error=None)} = <module 'lsms_library.data_access' from '/local/job40255479/worktrees/1115-1128-provenance/lsms_library/data_access.py'>._ACQUIRED_RELEASES
+
+tests/test_wave_provenance.py:2479: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_successful_push_records_only_after_the_push[False] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053c1a50>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_successful_push_records_o0/countries')
+wb = {'fail': False, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa7\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a90533d5d0>
+absolute_receipt = False
+
+    @pytest.mark.parametrize('absolute_receipt', [False, True])
+    def test_successful_push_records_only_after_the_push(
+            self, countries, wb, monkeypatch, absolute_receipt):
+        from lsms_library import data_access as da
+        before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        def push(paths, remote=None, dvc_add=True):
+            assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+            return [countries / p for p in paths] if absolute_receipt else list(paths)
+        monkeypatch.setattr(da, 'push_to_cache_batch', push)
+>       da.add_wave('Nigeria', '6410', wave='2023-24', push=True,
+                    confirm=False, verbose=False)
+
+tests/test_wave_provenance.py:2491: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+lsms_library/data_access.py:134: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+<613611578:lsms_library/data_access.py:add_wave>:2344: in add_wave
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+paths = [PosixPath('Nigeria/2023-24/Data/a.dta'), PosixPath('Nigeria/2023-24/Data/b.dta')]
+remote = None, dvc_add = True
+
+    def push(paths, remote=None, dvc_add=True):
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht... (GH #978).\n' == 'SOURCE\n\nht... (GH #978).\n'
+E         
+E         Skipping 108 identical leading characters in diff, use -v to show
+E         - GHSP-W5_v01_M
+E         ?           ^
+E         + GHSP-W5_v02_M
+E         ?           ^
+E           #+CATALOG_TITLE: General Household Survey, Panel 2023-2024...
+E         
+E         ...Full output truncated (20 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2488: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_successful_push_records_only_after_the_push[True] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053c1cd0>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_successful_push_records_o1/countries')
+wb = {'fail': False, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa7\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14a904f5c9d0>
+absolute_receipt = True
+
+    @pytest.mark.parametrize('absolute_receipt', [False, True])
+    def test_successful_push_records_only_after_the_push(
+            self, countries, wb, monkeypatch, absolute_receipt):
+        from lsms_library import data_access as da
+        before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        def push(paths, remote=None, dvc_add=True):
+            assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+            return [countries / p for p in paths] if absolute_receipt else list(paths)
+        monkeypatch.setattr(da, 'push_to_cache_batch', push)
+>       da.add_wave('Nigeria', '6410', wave='2023-24', push=True,
+                    confirm=False, verbose=False)
+
+tests/test_wave_provenance.py:2491: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+lsms_library/data_access.py:134: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+<613611578:lsms_library/data_access.py:add_wave>:2344: in add_wave
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+paths = [PosixPath('Nigeria/2023-24/Data/a.dta'), PosixPath('Nigeria/2023-24/Data/b.dta')]
+remote = None, dvc_add = True
+
+    def push(paths, remote=None, dvc_add=True):
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht... (GH #978).\n' == 'SOURCE\n\nht... (GH #978).\n'
+E         
+E         Skipping 108 identical leading characters in diff, use -v to show
+E         - GHSP-W5_v01_M
+E         ?           ^
+E         + GHSP-W5_v02_M
+E         ?           ^
+E           #+CATALOG_TITLE: General Household Survey, Panel 2023-2024...
+E         
+E         ...Full output truncated (20 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2488: AssertionError
+_ TestAcquisitionCompletionBoundaries.test_failed_cross_entry_acquisition_preserves_existing_record[different-held-entry] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053c25d0>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_failed_cross_entry_acquis0/countries')
+wb = {'fail': True, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa8\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x0...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+prior_kind = 'different-held-entry'
+
+    @pytest.mark.parametrize('prior_kind', ['different-held-entry', 'unknown'])
+    def test_failed_cross_entry_acquisition_preserves_existing_record(
+            self, countries, wb, prior_kind):
+        from lsms_library import data_access as da
+        if prior_kind == 'different-held-entry':
+            before = _record('Nigeria', '2023-24', **dict(NGA_W4_HELD_V03,
+                             extra={'PARTNER_NOTE': ['retained fact']}))
+        else:
+            before = pv.render_source_org(pv.WaveProvenance(
+                country='Nigeria', wave='2023-24', source=pv.SOURCE_UNKNOWN,
+                note='Hand recorded fact', extra={'PARTNER_NOTE': ['retained fact']}))
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        wb['fail'] = True
+        assert da.add_wave('Nigeria', '6410', wave='2023-24', push=False,
+                           confirm=False, verbose=False) == []
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht...tained fact\n' == 'SOURCE\n\nht...tained fact\n'
+E         
+E         Skipping 48 identical leading characters in diff, use -v to show
+E         - p/catalog/3557
+E         + p/catalog/6410
+E           
+E         - #+CATALOG_ID: 3557
+E         ?               ^^^^...
+E         
+E         ...Full output truncated (33 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2525: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    lsms_library.data_access:data_access.py:1196 Full zip download/extract failed: <urlopen error simulated outage>
+WARNING  lsms_library.data_access:data_access.py:add_wave>:2327 No data files found in /local/job40255479/tmp/pytest-of-ligon/pytest-46/test_failed_cross_entry_acquis0/countries/Nigeria/2023-24/Data
+_ TestAcquisitionCompletionBoundaries.test_failed_cross_entry_acquisition_preserves_existing_record[unknown] _
+
+self = <tests.test_wave_provenance.TestAcquisitionCompletionBoundaries object at 0x14a9053c2710>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-46/test_failed_cross_entry_acquis1/countries')
+wb = {'fail': True, 'zip': b'PK\x03\x04\x14\x00\x00\x00\x00\x00\xa8\x94T]q\xbaA\xcf\t\x00\x00\x00\t\x00\x00\x00"\x00\x00\x0...0NGA_2023_GHSP-W5_v02_M_Stata/b.dtaPK\x05\x06\x00\x00\x00\x00\x02\x00\x02\x00\xa0\x00\x00\x00\x92\x00\x00\x00\x00\x00'}
+prior_kind = 'unknown'
+
+    @pytest.mark.parametrize('prior_kind', ['different-held-entry', 'unknown'])
+    def test_failed_cross_entry_acquisition_preserves_existing_record(
+            self, countries, wb, prior_kind):
+        from lsms_library import data_access as da
+        if prior_kind == 'different-held-entry':
+            before = _record('Nigeria', '2023-24', **dict(NGA_W4_HELD_V03,
+                             extra={'PARTNER_NOTE': ['retained fact']}))
+        else:
+            before = pv.render_source_org(pv.WaveProvenance(
+                country='Nigeria', wave='2023-24', source=pv.SOURCE_UNKNOWN,
+                note='Hand recorded fact', extra={'PARTNER_NOTE': ['retained fact']}))
+        _write_source(countries, 'Nigeria', '2023-24', before)
+        wb['fail'] = True
+        assert da.add_wave('Nigeria', '6410', wave='2023-24', push=False,
+                           confirm=False, verbose=False) == []
+>       assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
+E       AssertionError: assert 'SOURCE\n\nht...tained fact\n' == 'SOURCE\n\n(s...tained fact\n'
+E         
+E           SOURCE
+E           
+E         - (source URL not recorded)
+E         + https://microdata.worldbank.org/index.php/catalog/6410
+E           
+E         - #+CATALOG_ID: unknown...
+E         
+E         ...Full output truncated (13 lines hidden), use '-vv' to show
+
+tests/test_wave_provenance.py:2525: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    lsms_library.data_access:data_access.py:1196 Full zip download/extract failed: <urlopen error simulated outage>
+WARNING  lsms_library.data_access:data_access.py:add_wave>:2327 No data files found in /local/job40255479/tmp/pytest-of-ligon/pytest-46/test_failed_cross_entry_acquis1/countries/Nigeria/2023-24/Data
+=========================== short test summary info ============================
+FAILED tests/test_wave_provenance.py::TestOverrideCorrectionThroughMain::test_a_stamped_primary_correction_requires_acquisition
+FAILED tests/test_wave_provenance.py::TestPrimarySourceRouting::test_secondary_catalog_link_is_never_acquisition_routing[metadata]
+FAILED tests/test_wave_provenance.py::TestPrimarySourceRouting::test_secondary_catalog_link_is_never_acquisition_routing[notes]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-failed]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-partial]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-duplicate]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-exception]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-duplicate]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-exception]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_successful_push_records_only_after_the_push[False]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_successful_push_records_only_after_the_push[True]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_failed_cross_entry_acquisition_preserves_existing_record[different-held-entry]
+FAILED tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_failed_cross_entry_acquisition_preserves_existing_record[unknown]
+13 failed, 3 passed, 138 deselected in 3.11s

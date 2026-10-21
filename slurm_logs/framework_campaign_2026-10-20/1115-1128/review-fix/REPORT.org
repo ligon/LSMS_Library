@@ -1,0 +1,74 @@
+#+TITLE: Provenance independent-review correction
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Result and scope
+Runtime correction: =dbae899fa2d9193c17010bb5f3838dd326d815fd=, published by the SuCoder hook.
+Previous reviewed pin: =13beb2fa5dd709521efcd4f9ff63bf889fe3bac7=.
+The executable change is seven lines in =lsms_library/provenance.py:500= plus three targeted repository controls in =tests/test_wave_provenance.py:2364=.
+No country, fixture, source data, dependency, acquisition procedure or catalog default changes.
+All validators stopped before the runtime commit and remained stopped during evidence finalization.
+Independent approval of this new pin remains pending.
+
+* Counterexample and correction
+The reviewer supplied repeated =PROVENANCE_SOURCE= lines, =worldbank= followed by =external=, beside =CATALOG_ID: 987654321= and =CATALOG_IDNO: held-release=.
+Parsing retained the held catalog ID, IDNO and both source occurrences.
+Rendering nevertheless used the last-value source accessor and emitted =CATALOG_ID: none=, silently losing held catalog identity.
+This violated the approved preserve-or-explicitly-refuse contract even though the repeated scalar lines themselves survived.
+
+Rendering now raises ValueError whenever catalog holdings or coverage cannot be represented with a consistent World Bank primary entry.
+It neither chooses a source declaration nor discards catalog identity.
+The check runs before writing SOURCE bytes, so a conflicting write leaves the previous file intact.
+Identical repeated World Bank declarations continue to round-trip normally.
+The same guard refuses otherwise-dropped =CATALOG_COVERS= facts without an applicable primary entry.
+No alternate source-default rule was introduced.
+
+* Before/after evidence
+On the exact unchanged previous pin, the reviewer-owned two-case identity control yielded one failure and one pass.
+See [[file:before-independent.log]].
+On the corrected working source, the entire unchanged reviewer-owned file yielded 20 passed, including its forbidden-unmocked-network fixture.
+See [[file:after-independent.log]].
+These are producer reruns of independent-authored controls; they do not substitute for the reviewer's final approval.
+The reviewer artifacts were not modified.
+
+The expanded eight-module related suite yielded 347 passed and one expected mocked credential warning.
+See [[file:related.log]].
+The three added repository cases pin valid duplicate declarations, refusal of conflicting source declarations without changing SOURCE bytes, and refusal of otherwise-lost catalog coverage.
+The prior 344+23 completed checks and interrupted optional coverage run remain separately recorded in [[file:../REPORT.org]].
+No broad/full-suite or served-corpus check was added for this guard.
+
+* Census and cache impact
+The full read-only shipped SOURCE census remains 130 records: 104 World Bank and 26 external.
+Its input SHA256 map exactly matches the original untouched base; input bytes, size and mtime remain unchanged during the probe.
+No information occurrences are lost, no parsed record drifts, and no canonical rendering is unstable.
+See [[file:source-census.json]].
+
+The full hash probe still moves zero of 549 country hashes, 2139 wave hashes and 40 table-plus-aggregate build fingerprints against untouched852.
+See [[file:verification.json]] and [[file:hash-patched.json]].
+No table was built and the hash/census private data root contains no parquet.
+The render guard is provenance-only and does not enter a build transform closure.
+
+* Reproduction and identity
+Interpreter: =/local/job40255479/venv_img/bin/python=.
+Cwd/PYTHONPATH: =/local/job40255479/worktrees/1115-1128-provenance=.
+Config root: that worktree's =lsms_library/countries=.
+All runs use BLAS/OMP/MKL/build workers 1, private LSMS_DATA_DIR, and CPU affinity 12-15, at most four processes.
+The related suite uses two workers with =--dist=loadfile=.
+The census/hash scripts are the existing [[file:../source_census.py]] and [[file:../hash_probe.py]].
+Their reported git HEAD is 13beb while the narrow source correction was dirty; the SHA256 manifest in =verification.json= ties the exact corrected runtime files to dbae899.
+
+#+begin_src sh
+export PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_DATA_DIR=/local/job40255479/1115-1128-review-fix-private
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+# Use the exact final frozen HEAD supplied with this report.
+export REVIEW_FROZEN_HEAD="$(git rev-parse HEAD)"
+taskset -c 15 /local/job40255479/venv_img/bin/python -m pytest -q \
+ /local/job40255479/control/framework-campaign/review-provenance/test_independent_provenance.py
+#+end_src
+
+The completed related selection is =test_wave_provenance.py test_acquisition_source_validation.py test_capability.py test_catalog.py test_data_access.py test_provenance.py test_repository_discovery.py test_build_transform_hash.py=.
+No API/build/test replay was performed against the immutable corpora or shared cache.
+No raw household rows or credentials are included here.
+
+Sue

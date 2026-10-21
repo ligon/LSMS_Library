@@ -1,0 +1,56 @@
+{
+  "after_independent_file": {
+    "exit": 0,
+    "passed": 20,
+    "producer_rerun_of_independent_authored_controls": true
+  },
+  "all_verifiers_stopped": true,
+  "before_independent_pair": {
+    "exit": 1,
+    "failed": 1,
+    "passed": 1
+  },
+  "hash_impact": {
+    "build_fingerprints": {
+      "changed": [],
+      "count": 40
+    },
+    "country_hashes": {
+      "changed": [],
+      "count": 549
+    },
+    "wave_hashes": {
+      "changed": [],
+      "count": 2139
+    }
+  },
+  "no_builds_or_data_api_calls": true,
+  "no_github_writes": true,
+  "previous_pin": "13beb2fa5dd709521efcd4f9ff63bf889fe3bac7",
+  "related_suite": {
+    "exit": 0,
+    "passed": 347,
+    "warnings": 1
+  },
+  "reviewer_artifacts_modified": false,
+  "reviewer_source_sha256": "0b2fe2aa74a5d0d39ce8b83ca398cd13dd8b2292bbbc74542ea26390b6e80a46",
+  "runtime_correction_commit": "dbae899fa2d9193c17010bb5f3838dd326d815fd",
+  "runtime_files_sha256": {
+    "lsms_library/provenance.py": "aeba0ff3e925579bd023b1549039de1e807f6e83dac84ab05a5669a3bd3bf1d6",
+    "tests/test_wave_provenance.py": "bd7fd68dd823fb341b1032eb9d6fa09ba64579feef1104066bcb0dc143dbe488"
+  },
+  "shipped_country_file_changes": [],
+  "source_census": {
+    "all_input_hashes_equal_to_base": true,
+    "files": 130,
+    "inputs_unchanged": true,
+    "lost_information_occurrences": 0,
+    "parsed_record_drift": 0,
+    "source_counts": {
+      "external": 26,
+      "worldbank": 104
+    },
+    "unstable": 0
+  },
+  "status": "READY_FOR_INDEPENDENT_REREVIEW"
+}

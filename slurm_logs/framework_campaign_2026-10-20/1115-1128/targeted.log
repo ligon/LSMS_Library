@@ -1,0 +1,327 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 48%]
+.........F........................................FFFFF..F.............. [ 96%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+_ TestOverrideCorrectionThroughMain.test_a_stamped_primary_correction_requires_acquisition _
+[gw0] linux -- Python 3.11.6 /local/job40255479/venv_img/bin/python
+
+self = <tests.test_wave_provenance.TestOverrideCorrectionThroughMain object at 0x145dad633490>
+bf = <module 'backfill_600' from '/local/job40255479/worktrees/1115-1128-provenance/scripts/backfill_wave_provenance.py'>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-36/popen-gw0/test_a_stamped_primary_correct0/countries')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x145dad4bdc50>
+tmp_path = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-36/popen-gw0/test_a_stamped_primary_correct0')
+
+    def test_a_stamped_primary_correction_requires_acquisition(
+            self, bf, countries, monkeypatch, tmp_path):
+        """A catalog override cannot establish another entry's held release.
+        Preserve the complete stamped record rather than invent an IDNO."""
+        lss = next(r for r in NGA_ROWS if r["id"] == "3827")
+        wrong = pv.render_source_org(bf._from_entry(
+            "Nigeria", "2018-19", lss, "source-url", "2026-07-12"))
+        assert "NGA_2018_LSS_v01_M" in wrong
+        _write_source(countries, "Nigeria", "2018-19", wrong)
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+    
+        assert pv.source_org_path(countries, "Nigeria", "2018-19").read_text() == wrong
+>       assert _unresolved(review) == {
+            ("Nigeria", "2018-19"): "held-release-correction"}
+E       AssertionError: assert {('Nigeria', ... '3827', ...}} == {('Nigeria', ...e-correction'}
+E         
+E         Differing items:
+E         {('Nigeria', '2018-19'): {'Country': 'Nigeria', 'Kind': 'held-release-correction', 'Reason': 'Correcting the primary c...Acquire or explicitly curate the held release first; SOURCE.org was left intact.', 'Recorded CATALOG_ID': '3827', ...}} != {('Nigeria', '2018-19'): 'held-release-correction'}
+E         Use -v to get more diff
+
+tests/test_wave_provenance.py:1584: AssertionError
+----------------------------- Captured stdout call -----------------------------
+  Nigeria/2018-19  unresolved  Correcting the primary catalog entry would replace a
+
+Done
+  wave dirs scanned : 1
+  resolved          : 0
+      written         : 0
+      unchanged       : 0  (content identical; not rewritten)
+      stale release   : 0  (catalog has a newer release; held keys kept, #+CATALOG_LATEST_* recorded)
+  unresolved        : 1  (LEFT INTACT -- see the review artifact)
+  skipped           : 0  (not declared waves; stamping would create one -- see _may_write)
+
+Review artifact: /local/job40255479/tmp/pytest-of-ligon/pytest-36/popen-gw0/test_a_stamped_primary_correct0/review.org
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values0] _
+[gw0] linux -- Python 3.11.6 /local/job40255479/venv_img/bin/python
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x145dad648110>
+key = 'PROVENANCE_NOTE', values = ['first fact', 'second fact']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+        assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+>       assert pv.parse_source_org(rendered, 'Example', '2020') == rec
+E       AssertionError: assert WaveProvenanc...econd fact']}) == WaveProvenanc...econd fact']})
+E         
+E         Omitting 22 identical items, use -vv to show
+E         Differing attributes:
+E         ['recorded']
+E         
+E         Drill down into differing attribute recorded:
+E           recorded: '2026-10-20' != None
+
+tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values1] _
+[gw0] linux -- Python 3.11.6 /local/job40255479/venv_img/bin/python
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x145dad6473d0>
+key = 'PROVENANCE_NOTE', values = ['same fact', 'same fact']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+        assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+>       assert pv.parse_source_org(rendered, 'Example', '2020') == rec
+E       AssertionError: assert WaveProvenanc...'same fact']}) == WaveProvenanc...'same fact']})
+E         
+E         Omitting 22 identical items, use -vv to show
+E         Differing attributes:
+E         ['recorded']
+E         
+E         Drill down into differing attribute recorded:
+E           recorded: '2026-10-20' != None
+
+tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values2] _
+[gw0] linux -- Python 3.11.6 /local/job40255479/venv_img/bin/python
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x145dad646950>
+key = 'PROVENANCE_NOTE', values = ['first fact', '']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+>       rendered = pv.render_source_org(rec)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_wave_provenance.py:2375: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+prov = WaveProvenance(country='Example', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, ...overs=[], latest_idno=None, latest_doi=None, latest_seen=None, scalar_keywords={'PROVENANCE_NOTE': ['first fact', '']})
+
+    def render_source_org(prov: WaveProvenance) -> str:
+        """Render a :class:`WaveProvenance` as ``SOURCE.org`` text.
+    
+        The recorded URL is emitted as the first ``http(s)://`` in the file so the
+        legacy reader (``data_access._read_source_url``) keeps finding it.
+    
+        Lossless with :func:`parse_source_org` (GH #1115): every key the record
+        holds is emitted -- ``extra`` after the known keys, every occurrence of a
+        repeated one, an empty value as a bare ``#+KEY:`` -- and the notes are
+        carried as parsed.
+        """
+        body = prov.url if prov.url else URL_PLACEHOLDER
+        lines = ["SOURCE", "", body, ""]
+    
+        if prov.is_worldbank:
+            cat_id = ", ".join(prov.catalog_ids)
+        elif prov.source == SOURCE_EXTERNAL:
+            cat_id = _ID_NONE
+        else:
+            cat_id = _ID_UNKNOWN
+        lines.append(f"#+CATALOG_ID: {cat_id}")
+    
+        # Entries this release SUBSUMES but whose files we do not hold.  Emitted
+        # only for a WB record: "covers" without a holding is meaningless.
+        if prov.is_worldbank and prov.covers:
+            lines.append(f"#+CATALOG_COVERS: {', '.join(prov.covers)}")
+    
+        for key, val in (("CATALOG_IDNO", prov.idno),
+                         ("CATALOG_TITLE", prov.title),
+                         ("CATALOG_YEARS", prov.years),
+                         ("CATALOG_REPOSITORY", prov.repository),
+                         ("CATALOG_DOI", prov.doi),
+                         ("CATALOG_URL", prov.url),
+                         ("CATALOG_LATEST_IDNO", prov.latest_idno),
+                         ("CATALOG_LATEST_DOI", prov.latest_doi),
+                         ("CATALOG_LATEST_SEEN", prov.latest_seen)):
+            if val:
+                lines.append(f"#+{key}: {val}")
+    
+        lines.append(f"#+PROVENANCE_SOURCE: {prov.source}")
+        if prov.method:
+            lines.append(f"#+PROVENANCE_METHOD: {prov.method}")
+        if prov.validation:
+            lines.append(f"#+PROVENANCE_VALIDATION: {prov.validation}")
+        recorded = prov.recorded or _dt.date.today().isoformat()
+        lines.append(f"#+PROVENANCE_RECORDED: {recorded}")
+        # A superseded URL equal to the current one carries no information and
+        # would mask the URL it was meant to record.  Drop it.
+        if prov.superseded_url and (prov.superseded_url.rstrip("/")
+                                    != (prov.url or "").rstrip("/")):
+            lines.append(f"#+PROVENANCE_SUPERSEDED_URL: {prov.superseded_url}")
+        if prov.note:
+            lines.append(f"#+PROVENANCE_NOTE: {prov.note}")
+        for key, values in prov.scalar_keywords.items():
+            field_name = _SCALAR_FIELDS.get(key)
+            if field_name is None or not values:
+                raise ValueError(f"Invalid preserved scalar keyword: {key}")
+            current = getattr(prov, field_name) or ""
+            last = values[-1]
+            if key == "PROVENANCE_SOURCE":
+                current, last = current.lower(), last.lower()
+            if current != last:
+>               raise ValueError(
+                    f"Cannot rewrite repeated or empty #+{key}: without "
+                    "explicit provenance curation")
+E               ValueError: Cannot rewrite repeated or empty #+PROVENANCE_NOTE: without explicit provenance curation
+
+lsms_library/provenance.py:529: ValueError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_IDNO-values3] _
+[gw0] linux -- Python 3.11.6 /local/job40255479/venv_img/bin/python
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x145dad646550>
+key = 'CATALOG_IDNO', values = ['held-one', 'held-two']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+        assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+>       assert pv.parse_source_org(rendered, 'Example', '2020') == rec
+E       AssertionError: assert WaveProvenanc... 'held-two']}) == WaveProvenanc... 'held-two']})
+E         
+E         Omitting 22 identical items, use -vv to show
+E         Differing attributes:
+E         ['recorded']
+E         
+E         Drill down into differing attribute recorded:
+E           recorded: '2026-10-20' != None
+
+tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_TITLE-values4] _
+[gw0] linux -- Python 3.11.6 /local/job40255479/venv_img/bin/python
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x145dad650410>
+key = 'CATALOG_TITLE', values = ['']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+        assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+>       assert pv.parse_source_org(rendered, 'Example', '2020') == rec
+E       AssertionError: assert WaveProvenanc...TITLE': ['']}) == WaveProvenanc...TITLE': ['']})
+E         
+E         Omitting 22 identical items, use -vv to show
+E         Differing attributes:
+E         ['recorded']
+E         
+E         Drill down into differing attribute recorded:
+E           recorded: '2026-10-20' != None
+
+tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_backfill_refuses_a_scalar_reconstruction_that_loses_facts _
+[gw0] linux -- Python 3.11.6 /local/job40255479/venv_img/bin/python
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x145dad651410>
+bf = <module 'backfill_600' from '/local/job40255479/worktrees/1115-1128-provenance/scripts/backfill_wave_provenance.py'>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-36/popen-gw0/test_backfill_refuses_a_scalar0/countries')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x145dad65df10>
+tmp_path = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-36/popen-gw0/test_backfill_refuses_a_scalar0')
+
+    def test_backfill_refuses_a_scalar_reconstruction_that_loses_facts(
+            self, bf, countries, monkeypatch, tmp_path):
+        text = _record('Nigeria', '2023-24', **NGA_W5_HELD_V01)
+        text += '#+PROVENANCE_NOTE: first\n#+PROVENANCE_NOTE: second\n'
+        _write_source(countries, 'Nigeria', '2023-24', text)
+        _catalog(monkeypatch, bf, NGA_ROWS + [NGA_W5_V02])
+        review = tmp_path / 'review.org'
+        bf.main(['--country', 'Nigeria', '--review-file', str(review)])
+        assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == text
+>       assert _unresolved(review) == {('Nigeria', '2023-24'): 'restamp-would-delete'}
+E       AssertionError: assert {('Nigeria', ... '6410', ...}} == {('Nigeria', ...would-delete'}
+E         
+E         Differing items:
+E         {('Nigeria', '2023-24'): {'Country': 'Nigeria', 'Kind': 'restamp-would-delete', 'Reason': 'Resolved (source-url), but the record written would delete #+PROVENANCE_NOTE x1 from SOURCE.org.', 'Recorded CATALOG_ID': '6410', ...}} != {('Nigeria', '2023-24'): 'restamp-would-delete'}
+E         Use -v to get more diff
+
+tests/test_wave_provenance.py:2401: AssertionError
+----------------------------- Captured stdout call -----------------------------
+  Nigeria/2023-24  unresolved  Resolved (source-url), but the record written would 
+
+Done
+  wave dirs scanned : 1
+  resolved          : 0
+      written         : 0
+      unchanged       : 0  (content identical; not rewritten)
+      stale release   : 0  (catalog has a newer release; held keys kept, #+CATALOG_LATEST_* recorded)
+  unresolved        : 1  (LEFT INTACT -- see the review artifact)
+  skipped           : 0  (not declared waves; stamping would create one -- see _may_write)
+
+Review artifact: /local/job40255479/tmp/pytest-of-ligon/pytest-36/popen-gw0/test_backfill_refuses_a_scalar0/review.org
+=========================== short test summary info ============================
+FAILED tests/test_wave_provenance.py::TestOverrideCorrectionThroughMain::test_a_stamped_primary_correction_requires_acquisition
+FAILED tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values0]
+FAILED tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values1]
+FAILED tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values2]
+FAILED tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_IDNO-values3]
+FAILED tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_TITLE-values4]
+FAILED tests/test_wave_provenance.py::TestPreservedKnownScalars::test_backfill_refuses_a_scalar_reconstruction_that_loses_facts
+7 failed, 142 passed in 6.34s
