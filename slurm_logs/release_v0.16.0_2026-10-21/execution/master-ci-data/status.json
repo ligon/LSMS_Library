@@ -1,0 +1,82 @@
+{
+  "all_87_rate_cases_execution_proven": false,
+  "all_skip_reasons_enumerated": false,
+  "credential_failure_log_indicators_evaluated": false,
+  "duplicate_run_is_release_gate": false,
+  "github_job_cancelled": false,
+  "job_conclusion": null,
+  "job_id": 119236827295,
+  "job_status": "in_progress",
+  "job_url": "https://github.com/ligon/LSMS_Library/actions/runs/39604418333/job/119236827295",
+  "last_remote_observation_utc": "2026-10-21T14:01:49.310313+00:00",
+  "no_project_import_test_or_data_api": true,
+  "no_source_cache_or_github_mutations": true,
+  "nutrition_case_execution_proven": false,
+  "observer_stop_reason": "Parent requested final status-only handoff after publication",
+  "observer_stopped_utc": "2026-10-21T14:04:00.363461+00:00",
+  "owned_controller_exit_codes": {
+    "observe.py": 143,
+    "progress.py": 143
+  },
+  "owned_controller_pids": [
+    3711698,
+    3712489
+  ],
+  "owned_controllers_remaining": [],
+  "prior_credentialed_evidence": {
+    "basis": "Existing completed evidence reused by parent; not counts from the pending duplicate run",
+    "counts": {
+      "errors": 0,
+      "failed": 0,
+      "passed": 6388,
+      "skipped": 2744,
+      "xfailed": 4,
+      "xpassed": 1
+    },
+    "exact_source_identity_evidence": "../master-source-identity.json",
+    "release_decision": "../RELEASE_DECISION.json",
+    "release_decision_sha256": "8e280ffdaaa1dee47836193d798b9920243b556cb76b13fb61eab23eb08e55d8",
+    "run_id": 39533863014,
+    "run_url": "https://github.com/ligon/LSMS_Library/actions/runs/39533863014",
+    "validated_source": "532d58700fa46e52a0b390198604eca1dc4de00e"
+  },
+  "private_snapshot_sha256": {
+    "data-job-private.json": "40efc1502013cf5a66a8ed643853a49cfa239d4dbc0ffefd56fa9c3415921af0",
+    "jobs-private.json": "c3941f56f0999ddf755e461e8509041e51772a3e6813801dd1f0978275e0d3d6",
+    "latest.json": "6bfd9811d97a2aacb289ee15d08b16d5c32ea399416a186c482abd5610362713",
+    "observations-private.jsonl": "ef10a6148e0f60834d25d58fcfb89af3a134ea66ea1552671c6b17e12e6521f3",
+    "run-private.json": "e1e4864afabdd98d8f037b764956d3599742ae3c95fd278acf378244531e5de1"
+  },
+  "run_id": 39604418333,
+  "run_url": "https://github.com/ligon/LSMS_Library/actions/runs/39604418333",
+  "source_identity_basis": "GitHub run metadata; full checkout-log extraction not performed",
+  "source_sha": "097283459f80016b0f00a51b814a0cb964a42789",
+  "steps": {
+    "Assert the requires_s3 gate is open": {
+      "conclusion": "success",
+      "status": "completed"
+    },
+    "Build Uganda tables": {
+      "conclusion": "success",
+      "status": "completed"
+    },
+    "Configure S3 read credentials": {
+      "conclusion": "success",
+      "status": "completed"
+    },
+    "Run actions/checkout@v4": {
+      "conclusion": "success",
+      "status": "completed"
+    },
+    "Run full test suite": {
+      "conclusion": null,
+      "status": "in_progress"
+    }
+  },
+  "terminal_log_fetched": false,
+  "terminal_pytest_counts": null,
+  "verdict": "PENDING_TERMINAL_PROOF_UNAVAILABLE",
+  "wait_cell_386_terminated": true,
+  "workflow_conclusion": null,
+  "workflow_status": "in_progress"
+}

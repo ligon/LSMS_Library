@@ -1,0 +1,17 @@
+{
+  "version": "0.16.0",
+  "assertions_enabled": true,
+  "required_floors_match_tagged_pyproject": true,
+  "artifacts": {
+    "lsms_library-0.16.0-py3-none-any.whl": {
+      "requires_python": ">=3.11, <4.0",
+      "fooddatacentral": "fooddatacentral<2.0.0,>=1.0.13",
+      "pandas": "pandas>=3.0"
+    },
+    "lsms_library-0.16.0.tar.gz": {
+      "requires_python": ">=3.11, <4.0",
+      "fooddatacentral": "fooddatacentral<2.0.0,>=1.0.13",
+      "pandas": "pandas>=3.0"
+    }
+  }
+}

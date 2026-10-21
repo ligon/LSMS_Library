@@ -1,0 +1,32 @@
+{
+  "executed_controller_sha256": {
+    "check_published_requirements.py": "0d142ade9e06000d9d041b4f5bda54744ed2aa2fb17f19645c1d44b6234b5635",
+    "run_published_once.py": "e9b8db9bfa8e3927c86fd06a6cb5b6ac0e3db958ebc584b0e116050f672c2524",
+    "verification-prep-seed1519/installed_smoke.py": "143e7fc07bd50c68ea3bbff8ccf68d878365a1e39627fe0877b6d4bd1a11f904",
+    "verification-prep-seed1519/verify_published.py": "abbd27f844fea9268974d6a66b0196561b3762e71ac2badfce20837179b32e83"
+  },
+  "files": {
+    "COPYLIST.txt": {
+      "bytes": 107,
+      "sha256": "9b384932cb93b720dd6806418bac9b7e5cc1fe22a90bbd0d953024c328bae169"
+    },
+    "REPORT.md": {
+      "bytes": 3101,
+      "sha256": "96edaf6fe0918cd5da1505475153b85c04d555d1788e32bf32d52059e917525a"
+    },
+    "installed-smoke.json": {
+      "bytes": 824,
+      "sha256": "3f1a57aa8d69f014b67eb7952084c45349dd745b9bec38c2e2322121ee11d0c9"
+    },
+    "requirements-verification.json": {
+      "bytes": 483,
+      "sha256": "ef5c6775d0604825dccd17e77a8688cd7e6f5be2018904d0ac8160e6994b6b2e"
+    },
+    "verification.json": {
+      "bytes": 2282,
+      "sha256": "b4910852f915a18e01e1f7e2d67312e6e776dc59e85d56e729f23c8f4b3c40e4"
+    }
+  },
+  "source_sha": "097283459f80016b0f00a51b814a0cb964a42789",
+  "tag": "v0.16.0"
+}

@@ -1,5 +1,28 @@
 #+title: Handoff -- v0.16.0 release, 2026-10-21
 
+* v0.16.0 published and verified -- 2026-10-21
+
+Release and PyPI0.16.0 are live at master097283459f80016b0f00a51b814a0cb964a42789.
+Annotated tagcaf9be7baefb83cee2b9bcdc9717f69fba5e97fd agrees across local/filesystem-origin/GitHub.
+Publisher39612460165 succeeded automatically from the release event.
+Actual wheel/sdist bytes match all11,753 tagged package files and PyPI digests; versions, requirements, entrypoint and offline installed-config smoke PASS.
+Final local suite8851/276skip/9xfail/1non-strictXPASS has zero failures/errors and zero9137-outcome/reason changes.
+All12,421 non-report source inputs match completed credentialed6388-pass candidate532; actual master native Windows/unit/smoke/DVC/docs also PASS.
+All48 accepted issues closed; all77 retained references were OPEN at the post-merge check.
+
+The extra duplicate-master wait was retired explicitly; see execution/RELEASE_DECISION.json.
+Do not relabel the old pending extra-gate summary as passed: the local tests passed, the waiting adapter was stopped, and the remaining tag command was executed explicitly using completed exact-code evidence.
+Duplicate master Linux39604418333 continues independently with no terminal verdict recorded here; fetching its eventual log is supplementary, not a reason to repeat the completed release.
+All owned local observers/controllers/writers are stopped, and the node can be released.
+
+Final notes: =docs/releases/v0.16.0.md=; migration: =docs/migration/v0.16.0.md=.
+Final safe evidence: =slurm_logs/release_v0.16.0_2026-10-21/STATUS.org= and =COMPLETED.json=.
+Completion records originate on =docs/v0.16.0-completion=, based on the released master commit, for normal merge into development and history synchronization.
+Query the live development ref rather than assuming this record's commit is its latest tip.
+No additional tag, publication, CI protection change or cache promotion is needed.
+
+Sue
+
 * Tag and GitHub Release published; PyPI upload active -- 2026-10-21
 
 The maintainer challenged idle waiting on the duplicate GitHub Linux job.
