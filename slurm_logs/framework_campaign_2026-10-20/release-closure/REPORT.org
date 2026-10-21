@@ -1,0 +1,110 @@
+#+TITLE: Conditional v0.16 release-closure audit
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Result and limits
+
+The 32 issues below are eligible AFTER the proposed merges, final validation and an authorized release merge to master: 23 already landed, the original five fixes, and #1115/#1128/#1159/#1160.
+#778 explicitly stays OPEN; #932 remains an enforcement/permission decision.
+This is closure preparation, not a release or permission to close issues now.
+
+The 76 prior reliability/contracts dispositions cover 75 unique issues.
+This pass refreshed full current bodies and every paginated comment for all32 candidates plus #778/#932, and refreshed their supporting PR metadata.
+It checked the cached37 post-tag PR inventory plus release-completion docs PR1016 and newer Windows PR1153.
+Other issue mentions are potential-outside-scope.json, explicitly NOT additional approved closures.
+This is not an exhaustive audit of every repository issue or every PR since v0.15.0.
+
+* Source identities
+
+Annotated tag object =d4ff03d28ab417c5d98f8e1e7c94d1261b8331bc= was tagged =2026-10-15T15:37:21Z= and resolves to =cb44e3522a2426ba03431ca9a218cc63fe03f6c9=.
+Live GitHub master still points to that v0.15.0 commit; development is =ad1e87e1025dec98fe70734f4e60d12824fd31dd=.
+The frozen reviewed candidate is =532d58700fa46e52a0b390198604eca1dc4de00e=.
+Every supporting merge for the23 landed issues is present in development/candidate and absent from the v0.15.0 ancestry.
+Some earlier parts of these long-lived issues WERE already released; closure-table.json distinguishes those from the remaining scope now resolved.
+
+Country runtime/config/script files are unchanged from the previously reviewed976 tree; only four CONTENTS documents differ (Benin, CotedIvoire, Senegal, Uganda).
+No country values, source data or country-specific runtime claims are re-assessed here.
+
+* Exact conditional closure list
+
+Every row means fully resolved within the current maintainer-ruled scope, with separate follow-ups retained.
+closure-table.json records full PR/head/merge SHA, source anchors, current-body/comment fingerprints, acceptance evidence, uncertainty and residual issue links.
+
+| Issue | Supporting PR | Merge/head | State |
+|-------+---------------+------------+-------|
+| [[https://github.com/ligon/LSMS_Library/issues/569][#569]] | [[https://github.com/ligon/LSMS_Library/pull/1126][#1126]] | =095eab691= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/600][#600]] | [[https://github.com/ligon/LSMS_Library/pull/1117][#1117]] | =2070823cf= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/674][#674]] | [[https://github.com/ligon/LSMS_Library/pull/1024][#1024]] | =e10a6a823= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/675][#675]] | [[https://github.com/ligon/LSMS_Library/pull/1052][#1052]] | =ddd79800c= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/680][#680]] | [[https://github.com/ligon/LSMS_Library/pull/1097][#1097]] | =805f84dd4= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/781][#781]] | [[https://github.com/ligon/LSMS_Library/pull/1132][#1132]] | =4c630652c= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/790][#790]] | [[https://github.com/ligon/LSMS_Library/pull/1021][#1021]] | =5b64a7796= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/793][#793]] | [[https://github.com/ligon/LSMS_Library/pull/1137][#1137]] | =238a4c15d= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/836][#836]] | [[https://github.com/ligon/LSMS_Library/pull/1026][#1026]] | =32f8bb237= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/867][#867]] | [[https://github.com/ligon/LSMS_Library/pull/1112][#1112]] | =931934b12= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/908][#908]] | [[https://github.com/ligon/LSMS_Library/pull/1027][#1027]] | =6ca9c4db7= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/915][#915]] | [[https://github.com/ligon/LSMS_Library/pull/1098][#1098]] | =92631d56b= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/928][#928]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] | =e87a551e8= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/931][#931]] | [[https://github.com/ligon/LSMS_Library/pull/1092][#1092]] | =870dc4179= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/942][#942]] | [[https://github.com/ligon/LSMS_Library/pull/1137][#1137]] | =238a4c15d= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1001][#1001]] | [[https://github.com/ligon/LSMS_Library/pull/1022][#1022]] | =5525e6924= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1002][#1002]] | [[https://github.com/ligon/LSMS_Library/pull/1019][#1019]] | =ba3e58e9a= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1031][#1031]] | [[https://github.com/ligon/LSMS_Library/pull/1065][#1065]] | =12f48d830= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1036][#1036]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] | =e87a551e8= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1039][#1039]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] | =e87a551e8= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1040][#1040]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] | =e87a551e8= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1070][#1070]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] | =e87a551e8= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1093][#1093]] | [[https://github.com/ligon/LSMS_Library/pull/1154][#1154]] | =eaf7b9913= | OPEN; merge required |
+| [[https://github.com/ligon/LSMS_Library/issues/1099][#1099]] | [[https://github.com/ligon/LSMS_Library/pull/1155][#1155]] | =f9871610f= | OPEN; merge required |
+| [[https://github.com/ligon/LSMS_Library/issues/1114][#1114]] | [[https://github.com/ligon/LSMS_Library/pull/1117][#1117]] | =2070823cf= | landed; pending master release |
+| [[https://github.com/ligon/LSMS_Library/issues/1115][#1115]] | [[https://github.com/ligon/LSMS_Library/pull/1163][#1163]] | =44f6cd2e7= | OPEN; merge required |
+| [[https://github.com/ligon/LSMS_Library/issues/1124][#1124]] | [[https://github.com/ligon/LSMS_Library/pull/1157][#1157]] | =d84061818= | OPEN; merge required |
+| [[https://github.com/ligon/LSMS_Library/issues/1125][#1125]] | [[https://github.com/ligon/LSMS_Library/pull/1157][#1157]] | =d84061818= | OPEN; merge required |
+| [[https://github.com/ligon/LSMS_Library/issues/1128][#1128]] | [[https://github.com/ligon/LSMS_Library/pull/1163][#1163]] | =44f6cd2e7= | OPEN; merge required |
+| [[https://github.com/ligon/LSMS_Library/issues/1143][#1143]] | [[https://github.com/ligon/LSMS_Library/pull/1156][#1156]] | =1070a4d03= | OPEN; merge required |
+| [[https://github.com/ligon/LSMS_Library/issues/1159][#1159]] | [[https://github.com/ligon/LSMS_Library/pull/1164][#1164]] | =45f80dcb5= | OPEN; merge required |
+| [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]] | [[https://github.com/ligon/LSMS_Library/pull/1165][#1165]] | =532d58700= | OPEN; merge required |
+
+* Publication and validation boundaries
+
+All nine approved PRs1154-1157 and1161-1165 remain OPEN in the snapshot.
+PR1161 repairs the nutrition test without a standalone closure issue; PR1162 uses Addresses #778 and does not close it.
+PR1162-1164 target the852 comparison branch; PR1165 targets the4cab comparison branch.
+After prerequisites land, update from development and retarget; do not merge into temporary comparison bases.
+
+PR1157's later documentation tip is not an ancestor: six implementation/test/ledger/evidence paths match candidate and four later review-only reports differ/are absent.
+All17 files of the replayed development-based PR1161 match candidate byte-for-byte.
+Other approved implementation heads are candidate ancestors.
+The exact equivalence results are in nonancestor-publication-equivalence.json.
+
+The reviewed PR bodies report successful exact532 local full-suite/native-Windows/packaging evidence; this audit does not rerun those gates.
+Credentialed Linux [[https://github.com/ligon/LSMS_Library/actions/runs/39533863014][39533863014]] is still in_progress without a conclusion in the snapshot.
+Earlier4cab success is separate evidence and does not substitute for final532.
+Reverify the eventual merged source and obtain the maintainer's separate release instruction.
+No tag, publication or release merge is performed or authorized here.
+
+* Residuals and draft wording
+
+retained-residuals.org contains exact proposed narrowing for #778/#932 and the accepted-increment boundaries for #569/#600/#781/#793/#942/#928/#867 and provenance/acquisition.
+#942 closes the explicitly fixed two-field/Country-warning increment, not complete worldwide panel curation, a crosswalk or scan warning-drain rollout.
+#928 closes ruledP1/P2; deferredP3/P4 and per-country migrations remain separate.
+#1115/#1128 code-only metadata/queue fixes do not acquire newer releases or prove configuration-vintage replacement; #978/#1127/#1116/#1149 remain.
+#1159/#1160 fix country identity, preserving #1110 land-grain/scientific policy and its known documentation tension.
+The EthiopiaRHS coarse crop exclusion stays visible as ClassB; harness repairs do not assert semantic green.
+
+The refreshed active development ruleset requires only unit-tests, strict=false, with role5 always-bypass.
+The workflow still skips PR-event data-tests; fork fail-closed/import policy and required-check event eligibility are explicit in the #932 draft.
+No workflow or permission setting changed.
+
+closing-keywords.txt is a DRAFT for an eventual authorized development-to-master release PR, with one keyword per issue and no #778 keyword.
+Other previously reviewed partial umbrellas remain outside this closure list; their full bodies were not all refreshed, so this is not a new exhaustive disposition.
+
+* Artifacts and operations
+
+COPYLIST.txt names safe aggregate/reproduction artifacts.
+Raw public GitHub snapshots remain private; aggregate fingerprints bind the actual reviewed issue/comment text.
+REPRO.org, gather.py and verify_ancestry.py contain read-only commands.
+No production/source/git/GitHub mutation, test, Country/Feature/data API, cache read/build/write or source-data access occurred.
+All audit subprocesses/readers and report writers are stopped after final handoff.
+
+Sue

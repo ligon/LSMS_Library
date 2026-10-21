@@ -1,0 +1,46 @@
+{
+  "1157": {
+    "pr_head": "d84061818b0b430e8b00fa26b5b6d19e4694eb96",
+    "merge_base": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "total_changed_paths": 10,
+    "byte_identical_to_candidate": [
+      ".coder/ledger/1124-1125-feature-audit.md",
+      "bench/feature_audit/scan.py",
+      "slurm_logs/framework_campaign_2026-10-20/1124-1125/README.org",
+      "slurm_logs/framework_campaign_2026-10-20/1124-1125/audit-summary.json",
+      "tests/test_feature_audit_participation.py",
+      "tests/test_feature_canonical_index.py"
+    ],
+    "different_or_absent": [
+      "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.json",
+      "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.org",
+      "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.json",
+      "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.org"
+    ]
+  },
+  "1161": {
+    "pr_head": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+    "merge_base": "ad1e87e1025dec98fe70734f4e60d12824fd31dd",
+    "total_changed_paths": 17,
+    "byte_identical_to_candidate": [
+      ".coder/ledger/uganda-nutrition-cpu-hash.md",
+      "lsms_library/countries/Uganda/_/CONTENTS.org",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/baseline_plugin.py",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/blas-comparison.json",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/compare_blas.py",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/hash-impact.json",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/immutability.json",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/probe.py",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-Haswell.json",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-SkylakeX.json",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real_control.py",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/verification.json",
+      "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/warm-reconstruction.json",
+      "tests/fixtures/uganda_baseline.json",
+      "tests/test_uganda_invariance.py",
+      "tests/test_uganda_invariance_hash_variants.py"
+    ],
+    "different_or_absent": []
+  }
+}

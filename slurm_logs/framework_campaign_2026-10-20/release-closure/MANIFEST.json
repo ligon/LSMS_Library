@@ -1,0 +1,12 @@
+{
+  "REPORT.org": "aad709b71580e1e01037e84a7a66c5e3817404eb1378d10f6ad8873d94f56809",
+  "closure-table.json": "9aee0216b6917e0305be8c880e1e669e01c61ad9b4854de8a944f054b2a6b430",
+  "retained-residuals.org": "12d5b1f9bb609e32b2d84d1449c6a0f34b5547767782652bad0bf2ac653a4883",
+  "potential-outside-scope.json": "df400a0a7430163363db94db1bfae0e728003afff08dd2120dc94bd3f2e7a91d",
+  "pr-ancestry.json": "7311f2b943a405d0633f0133b6c55a6fb5ef79f76b2523d2b0254baf42189f69",
+  "nonancestor-publication-equivalence.json": "ab93ebd3b5da2ce28581df7297da931c7e541e7f86166b94c8afe838a79a774f",
+  "closing-keywords.txt": "43785b1e2988f7a96d95ec3c0780823beef1d18f538c1b44693a83ae72353a81",
+  "REPRO.org": "33057db83d28e14e0694a0ff191b30a52ca346347992b9693a3d7413ca8b7c47",
+  "gather.py": "cb83fa0a509f606f568ccdfad3b0e44a60722799cadc2fb58e64a7deb127d008",
+  "verify_ancestry.py": "59fac9c0a225092603bd75b98b86b42d8f5a9478569d72409f8d55f33eb5fcf3"
+}

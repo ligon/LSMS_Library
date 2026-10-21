@@ -2,6 +2,14 @@
 #+author: Sue
 #+date: 2026-10-20
 
+
+* Latest approved increment -- 2026-10-20
+
+The follow-up work and #1160 are implemented, independently reviewed and locally validated at frozen532d58700; its final credentialed Linux run remains pending.
+The newer [[file:../release-closure/REPORT.org][full-body closure audit]] supersedes the earlier28-issue candidate list below:32 scoped issues are eligible only after the proposed merges and an authorized master release merge.
+#778 remains partial and #932 remains an unapplied enforcement decision.
+The original dispositions below remain historical supporting analysis.
+
 * Current checkpoint -- 2026-10-20 19:13 PDT
 
 The originally recommended follow-up is now implemented and independently reviewed: #778, #1115/#1128 and country-preserving #1159.

@@ -223,7 +223,11 @@ These results cover4cab, before #1160; the distinct final532 credentialed run re
 
 [[file:release-drafts/RELEASE_NOTES_DRAFT.md][Draft release notes]] and [[file:release-drafts/MIGRATION_DRAFT.md][migration notes]] cover only the approved increment, not the entire history sincev0.15.0 or a release announcement.
 The migration note records country-axis changes, explicit invalid-input refusals, automatic harmonized-cache rewarming and decimal-comma interpretation.
-The release-closure audit is checking full current issue bodies/comments against the actualv0.15.0 tag, development and the proposed batch; #778's remaining trust-policy note is retained.
+The [[file:release-closure/REPORT.org][completed release-closure audit]] refreshed all32 candidate issue bodies and every comment, plus #778/#932, and verified the actualv0.15.0 tag and supporting source ancestry.
+Thirty-two issues are conditionally eligible after landing and an authorized release merge:23 already on development plus nine issue fixes in the proposed batch.
+This is a scoped audit, not every repository issue; the exact list and retained follow-ups are recorded.
+#778 remains OPEN for its trust-mode note; #932 remains OPEN for enforcement.
+[[file:release-closure/closing-keywords.txt][Prepared closing keywords]] are only a draft for an eventual authorized release PR; no issue has been closed.
 The [[file:reliability/policy-current.json][fresh read-only protection snapshot]] confirms only unit-tests is required on development; #932 remains unapplied.
 No further merge, release, tag, protection or shared-cache promotion action is authorized.
 
