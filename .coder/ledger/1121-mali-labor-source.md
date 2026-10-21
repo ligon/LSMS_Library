@@ -59,7 +59,7 @@ PersonDays and Wage are reported item-level quantities, not the WB collapsed tot
 | source grouping / Feature alignment | reuse unchanged | registered levels already preserve grain; value case is the defect |
 | global harmonize_labor_source design | defer | Tier C needs a separate human decision; no Ghana change |
 
-## §6 Open questions / proposed review boundary
+## §6 Open questions / approved review boundary
 
 None. The dispatcher approved the three Preferred Label edits, narrow schema-comment correction, country idiosyncrasy note and focused tests on this fresh f8-based checkout. The #822 branch and its code remain independent.
 No missing source or acquisition blocks this boundary.
@@ -72,3 +72,16 @@ Actual Country lower-case family/hired selection raises KeyError today; a pure i
 These are pre-implementation controls. Verification below will compare complete source builds to this saved baseline, with exact PersonDays/Wage values and attributes.
 
 Sue
+
+### Phase 3 - verification
+
+- Curation boundary - **OK (§2/§3)**: exactly three Preferred Label cells change; exact Code eligibility remains. No helper, driver or framework edits.
+- Source frames - **OK (§4)**: both native wave frames and complete public cold/fresh-process warm frames equal the saved f8 baseline after only the source-case projection. All 52,057 rows and Country attrs are exact.
+- Amounts and selectors - **OK (§4)**: PersonDays 11,544,571.100000001, Wage 214,685,819 FCFA; complete total-labor output unchanged. Family/hired outputs match baseline source selections, totaling 7,867,691.5 / 1,197,091.3 person-days.
+- Feature - **OK (§3/§4)**: 105,098 rows with fresh Niger 53,041-row comparator; full case-only frame and every attr exact. No row/grain/category merge.
+- Regressions - **OK (§2/§4)**: 335 focused tests pass, no skips; new 10-test file is 7 fail / 3 pass at baseline. Real table/resolver/finalizer and existing selectors exercised. API audit clean.
+- Scanner - **OK (§4)**: complete phases 1/2 finding multisets: eight pre-existing warnings exact after path/timing normalization, zero errors/failures.
+- Hash scope - **OK (§4)**: actual census of 549 pairs moves only 24 Mali hashes; 525 other pairs and all 39 tagged fingerprints remain unchanged. No output claim is made for other unbuilt Mali features.
+- Wider taxonomy - **DEFERRED (§5)**: GhanaSPS/GhanaLSS category design remains Tier C under #1121.
+
+Detailed private verification is under `/local/job40255479/control/isa-backlog-20261021/Mali/1121`; source-safe aggregates and exact commands are in the task report.
