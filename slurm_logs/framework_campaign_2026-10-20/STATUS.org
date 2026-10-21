@@ -42,36 +42,36 @@ Initial clone =3e3bd26ee= was fast-forwarded to that GitHub head and published t
 | Cold corpus successes / requests | 530/549 | 530/549 |
 | Explicit cold corpus errors | 19 | 19 |
 
-The suite ran with 16 loadfile workers, BLAS/OMP/MKL/build/make workers one,600-second per-test thread timeout, explicit package/config/data identity and separate physical L2 copies.
+The suite ran with 16 loadfile workers, BLAS/OMP/MKL/build/make workers one, with a 600-second per-test thread timeout, explicit package/config/data identity and separate physical L2 copies.
 The combined run enables the suite's own =LSMS_EXPECTED_ROOT= assertion.
 Two hundred added cases pass; one obsolete warm-only #1039 case is replaced.
 Eight Uganda wave-invariance cases skipped for missing parquet files, while two prior skips now execute: exact import identity and GhanaLSS nutrition poison-cache recovery.
-All277 shared ordinary skips and all nine expected-failure identities/reasons are unchanged.
+All 277 shared ordinary skips and all nine expected-failure identities/reasons are unchanged.
 The non-strict unexpected-pass count matches, but its exact identity is unavailable from these nonverbose artifacts.
 
 A separate private-copy supplement recreated all eight Uganda wave files through sanctioned APIs, then passed the exact eight existing invariance checks with zero skips and no fixture/baseline/source changes.
-The original full-suite285-skip count remains unchanged.
+The original full-suite count of 285 skips remains unchanged.
 All three actual farm warm checks ran and passed in the full suite.
 Evidence: [[file:validation/combined-suite-summary.json][suite summary]], [[file:reliability/independent-review.org][independent reconciliation]], [[file:reliability/uganda-wave-supplement.json][eight-case supplement]].
 
-The matched cold corpus covers every declared pair across38 countries.
+The matched cold corpus covers every declared pair across 38 countries.
 All nineteen error classes and full messages match after replacing only exact source/data-root prefixes: two Armenia, eleven Nepal, six Peru requests.
 The driver retains its nonzero error exit; this is not a blanket green corpus.
 There are no status, row-count, schema, wave-count, null-count, warning-category-count or cache-metadata changes.
 Six food quantity/price tables change as intended; four roster fingerprints differ only in order in paired cache and warm-API checks.
 Unchanged-baseline Benin cold builds under seeds1/3 reproduce both original fingerprints exactly.
 Mali's MonthsSpent cold-object/warm-string difference occurs on both sources and remains an explicit separate limit; unavailable original cold served frames are not claimed to have been directly compared.
-All549 expected country hashes and1183 observed wave hashes move through the tagged #1099 build closure; this observed-file count is not the complete2139-wave hash census.
+All 549 expected country hashes and 1,183 observed wave hashes move through the tagged #1099 build closure; this observed-file count is not the complete census of 2,139 wave hashes.
 Evidence: [[file:contracts/corpus-review.org][independent corpus review]], [[file:contracts/corpus-comparison.json][all measured differences]].
 
-Native Windows passes on exact combined852: shocks14,457 rows/10 columns/eight waves, digest0ab2ea4c79dd; assets116,808 rows/one column/eight waves, digest9202ed542a14.
-The Windows repair is an expected-digest correction after GH #805: reversing only2,012 cp1252-corrected cells recovers the old digest, with exact indices/dtypes/other values retained.
+Native Windows passes on exact combined =852=: shocks: 14,457 rows/10 columns/eight waves, digest =0ab2ea4c79dd=; assets: 116,808 rows/one column/eight waves, digest =9202ed542a14=.
+The Windows repair is an expected-digest correction after GH #805: reversing only 2,012 cp1252-corrected cells recovers the old digest, with exact indices/dtypes/other values retained.
 Evidence: [[file:validation/combined-windows-native-summary.json][combined native results]] and PR #1153's exact encoding-delta accounting.
 
 * Verification still running
 
-- Exact-head GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], source852; native Windows, unit and smoke pass, credentialed Linux data job still runs.
-- Canonical Feature audit :: Same strengthened scanner against baseline976 and combined852, all16 canonical features, phases1/2, default documented exclusions recorded, separate physical L2 roots under =/local/job40255479/canonical-audit-compare/=.
+- Exact-head GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], source =852=; native Windows, unit and smoke pass, credentialed Linux data job still runs.
+- Canonical Feature audit :: Same strengthened scanner against baseline =976= and combined =852=, all 16 canonical features, phases1/2, default documented exclusions recorded, separate physical L2 roots under =/local/job40255479/canonical-audit-compare/=.
   Six audit worker processes use CPUs0--7 with numerical/build threads one; full paired comparison awaits both completion manifests.
 
 Do not change integration HEAD or its source while these validators run.
@@ -79,25 +79,25 @@ No source fix was made for the pre-existing roster ordering or Mali dtype behavi
 
 * Changes and remaining decisions
 
-#1093 restores706 usable Ethiopia Quintal price-pool observations; the other four positive sold-quantity rows have nonpositive sale values and remain correctly excluded.
+#1093 restores 706 usable Ethiopia Quintal price-pool observations; the other four positive sold-quantity rows have nonpositive sale values and remain correctly excluded.
 Raw crop/input tables and existing seed/nitrogen totals are unchanged; declared factors now reach all three missing consumers.
-#1143 corrects945 quantity rows and783 price rows across Senegal, Benin and CotedIvoire, preserving raw food tables, axes and dtypes.
+#1143 corrects 945 quantity rows and 783 price rows across Senegal, Benin and CotedIvoire, preserving raw food tables, axes and dtypes.
 #1099 keeps typed empty strict subsets consistent across cache states without masking real builders or source failures; a corpus re-warm is intentional.
 #1124/#1125 detect whole-country loss independently of retained-row collapse and add all three farm tables to the canonical sweep.
-The documented17,523-row EthiopiaRHS coarse crop exclusion remains a visible Class B audit warning; the warm-test allowance expires if plot/plot_id appears and never masks read failures or another lost country.
+The documented exclusion of 17,523 coarse EthiopiaRHS crop rows remains a visible Class B audit warning; the warm-test allowance expires if plot/plot_id appears and never masks read failures or another lost country.
 
 New independently verified [[https://github.com/ligon/LSMS_Library/issues/1159][#1159]] tracks inherited cross-country plot-key collisions in seed/nitrogen reducers.
-It reproduces with metric units at both976 and852; the maintainer must choose country-preserving pooled results or explicit pooled-input refusal.
+It reproduces with metric units at both =976= and =852=; the maintainer must choose country-preserving pooled results or explicit pooled-input refusal.
 It is linked from PR #1154 and is outside the five approved implementations; no remedy was silently chosen.
 
 Recommend keeping this candidate bounded while final gates finish.
 Afterward, the next reproduced correctness priority is #778's assumed-fresh disappearance race and cache-mutating tests, followed by provenance #1115/#1128 and staged acquisition #1149.
 The existing substantial #851 period branch needs recovery/integration/disclosure/review rather than duplicate implementation, and is a separate feature increment.
-The [[file:reliability/v016-readiness.org][readiness assessment]] lists28 potential release-closure issues from the reviewed scope, supporting PRs and retained residuals; this is not an exhaustive release closure audit.
+The [[file:reliability/v016-readiness.org][readiness assessment]] lists 28 potential release-closure issues from the reviewed scope, supporting PRs and retained residuals; this is not an exhaustive release closure audit.
 
 #932 enforcement remains unapplied: current development protections require only unit-tests; a personal-account repository cannot use the assumed organization merge queue.
 The proposed route runs data-tests on every development PR, fails the credential gate for forks until reviewed trusted import, then requires the genuinely executed PR-event check.
-Skipped jobs must not become the required gate; strict=false and role5 bypass remain separate explicit policy choices.
+Skipped jobs must not become the required gate; =strict=false= and role 5 bypass remain separate explicit policy choices.
 No protection/permission change was made.
 The nightly schedule becomes active only after reaching default master.
 Official eligibility and required-check sources are linked in the readiness assessment.
@@ -106,15 +106,15 @@ Official eligibility and required-check sources are linked in the readiness asse
 
 Working clone =/local/job40255479/mirrors/LSMS_Library=; durable origin =/global/home/users/ligon/mirrors/LSMS_Library=.
 The durable working tree was never edited by hand.
-Allocation40255479 on n0071.savio3 has32 cores/93GiB RAM and a72-hour initial limit.
+Allocation 40255479 on n0071.savio3 has 32 cores and 93 GiB RAM, with a 72-hour initial limit.
 The shared squashfs image was extracted with unsquashfs after FUSE returned Operation not permitted; no shared environment was changed and the launcher .venv directory was left intact.
-Interpreter =/local/job40255479/venv_img/bin/python=; pandas3.0.6, numpy2.4.6, pyarrow25.0.1, ligonlibrary0.2.3, fooddatacentral1.0.13, pytest8.4.2.
+Interpreter =/local/job40255479/venv_img/bin/python=; pandas 3.0.6, numpy 2.4.6, pyarrow 25.0.1, ligonlibrary 0.2.3, fooddatacentral 1.0.13, pytest 8.4.2.
 All API/test processes assert executing package/config identity and own private writable L2 roots; only content-addressed L1 is shared.
-The original physical-copy manifest is [[file:validation/private-copy.json][private-copy.json]]; the combined suite used another1,519-file copy with matching bytes/distinct physical identities.
+The original physical-copy manifest is [[file:validation/private-copy.json][private-copy.json]]; the combined suite used another 1,519-file copy with matching bytes/distinct physical identities.
 Raw logs/XML/frame snapshots remain private; aggregate report files include their identities and runnable scripts.
 The existing October14 corpus validator/fingerprint is reused through [[file:validation/run_corpus.py][run_corpus.py]].
 
-Detailed reconciliation: [[file:contracts/REPORT.org][contracts]] and [[file:reliability/REPORT.org][reliability]] overlap (46+30 dispositions,75 unique issues before #1159); do not sum them into76 distinct issues.
+Detailed reconciliation: [[file:contracts/REPORT.org][contracts]] and [[file:reliability/REPORT.org][reliability]] overlap (46 + 30 dispositions covering 75 unique issues before #1159); do not sum them into 76 distinct issues.
 No new estimator, data source, scientific default, release tag or shared-cache promotion was introduced.
 
 Sue, GPT-6.
