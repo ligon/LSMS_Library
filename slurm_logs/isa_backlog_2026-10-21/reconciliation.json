@@ -18,14 +18,26 @@
     {
       "issue": 1062,
       "action": "narrowed to Uganda implementation and completed current census; Ethiopia split1171, known dangling nonISA recipes218; PR1173 independently reviewed"
+    },
+    {
+      "issue": 822,
+      "action": "corrected native-vs-Feature index distinction: Country has no obs; add native slots1-3, Feature currently supplies alignment sentinel1"
+    },
+    {
+      "issue": 1109,
+      "action": "corrected false no-quantity source premise after independent raw-header/loaded-source review; narrowed to organic quantity/unit recovery and protected public finalization; no final fix claim yet"
+    },
+    {
+      "issue": 1088,
+      "action": "corrected nominal9999.9 vs stored-double/float32-promoted representation; exact76currentservedrows confirmed, quantity-only fix pending"
     }
   ],
   "verified_issue_metadata": [
     {
       "number": 822,
       "state": "OPEN",
-      "title": "Mali 2014-15 community_prices: restore readings 1-2 on the existing obs axis",
-      "updatedAt": "2026-10-21T15:56:36Z",
+      "title": "Mali 2014-15 community_prices: restore readings 1-2 and declare native observation slots",
+      "updatedAt": "2026-10-21; corrected after source inspection",
       "url": "https://github.com/ligon/LSMS_Library/issues/822"
     },
     {
@@ -57,7 +69,7 @@
       "issue": 1062,
       "head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
       "review": "PASS after amendment",
-      "ci": "pending"
+      "ci": "success; no credentialed data rebuild"
     }
   ]
 }

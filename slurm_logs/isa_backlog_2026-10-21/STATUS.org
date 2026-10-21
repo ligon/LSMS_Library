@@ -9,7 +9,8 @@ The scope is Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania and 
 The verified release foundation and clean development baseline are =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
 The initial inventory classified all 156 open issues exactly once: 97 reference ISA countries, including overlapping umbrellas, and 59 are outside this campaign.
 The 37 partial records carry exact residual titles and bodies in =triage.json=; their old counts are historical unless measured again.
-=summary.json= records the tier and dependency ordering; enhancements and acquisition remain human dispositions.
+=summary.json= records the tier and dependency ordering; unresolved enhancement/acquisition choices are reported for the maintainer.
+Existing rulings in issues such as #851, #894 and #1134 are binding implementation context, not unanswered questions to ask again.
 
 * Country lanes and review
 
