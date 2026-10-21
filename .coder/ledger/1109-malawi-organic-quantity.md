@@ -71,4 +71,9 @@ Plot declaration/harmonization/permutation checks: 21 pass.
 Private offline cold source builds: baseline 180,184 rows / 11,075 organic zeros; reducer-only candidate 168,672 rows / zero organic rows.
 This fails section 4 row preservation and cannot be accepted.
 Nitrogen sum is unchanged, but 14 zero-only plots and the organic refusal warning disappear.
-A country-side presence carrier and a new finalization regression are required before revalidation.
+The accepted organic-only overlay plus raw Applied carrier passes final private cold and warm verification: all 180,184 rows and original index/order/dtypes retained; 11,075 organic zeros become NA with Applied true; other measures and nitrogen output are exact.
+Final targeted tests: 36 passed; existing plot assembly checks: 21 passed; base negative control: six failures and five compatibility passes.
+Pooled Malawi/Uganda retains 264,400 rows; scanner has the same 15 warning checks, no failures/errors, with Applied added only to the expected constant-column detail.
+Measured hash impact is 22 Malawi changes and zero of 24 Uganda changes.
+OK against sections 2-4; no reinvention or definition contradiction remains in the accepted patch.
+Independent review is pending.
