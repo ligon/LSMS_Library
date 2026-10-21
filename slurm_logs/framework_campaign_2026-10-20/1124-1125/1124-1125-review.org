@@ -1,0 +1,67 @@
+#+title: Independent review of GH #1124/#1125
+#+author: Sue
+#+date: 2026-10-20
+
+* Verdict
+
+FAIL pending one expectation-boundary repair.
+Reviewed the frozen scanner/canonical-test diff against976fc840d, including the untracked test_feature_audit_participation.py and the task ledger.
+Source hashes in the companion JSON are unchanged across the review.
+All reviewer subprocesses have stopped; the producer may revise the candidate now.
+No candidate source, commits, GitHub state or shared L2 cache was changed by this reviewer.
+
+* P1: known coarse EthiopiaRHS exclusion makes the new crop warm test fail
+
+Location: tests/test_feature_canonical_index.py:571 requires every positive warm country in the assembled result.
+That contradicts an existing explicit decision, rather than exposing a new Feature defect:
+
+- .claude/skills/cross-country-features/SKILL.md:69-71 says EthiopiaRHS crop_production is coarse household-level and remains excluded because it has no plot_id.
+- .coder/ledger/feature-canonical-crop-production.md:113-117 rejects fabricating its plot grain and says it stays excluded.
+- The same prior ledger:170 records17,523 Country rows and0 Feature rows by design.
+
+A synthetic reproduction using the REAL production Feature assembly builds four warm countries: three canonical plot-grain frames and an EthiopiaRHS frame indexed(t,v,i,j,u), with currency=index passed normally.
+All four Country reads succeed; Feature keeps the three canonical countries and correctly excludes the coarse RHS frame.
+The new test then raises AssertionError ['EthiopiaRHS'] at its exact-set check.
+The producer's real private farm run independently encountered this existing boundary; its raw survey build was not duplicated here.
+
+Required repair: retain the scanner's ClassB country_exclusion finding, which is a triage signal rather than an automatic corruption verdict.
+Narrow only the crop warm test's expected participation for this documented EthiopiaRHS no-plot grain.
+The allowance must expire if that country's frame gains plot/plot_id grain; do not broadly skip RHS or weaken any other country.
+Keep named warm read failures, exact participation for every other positive warm country, and per-kept-country row counts.
+Pin both the current coarse allowance and its expiry with synthetic controls.
+Update the task ledger's unconditional all-positive statement to inherit the existing crop-grain decision.
+No production Feature change or new survey-grain decision is necessary.
+
+* Checks that passed
+
+Independently reran the two focused synthetic files with exact package/config identity asserted, private LSMS_DATA_DIR, mounted image, BLAS/OMP/MKL1, LSMS_BUILD_WORKERS1, CPU24-27 and four loadfile workers.
+Result:83 passed in115.09s; requires_s3/slow tests excluded from this run.
+Those green synthetic tests do not cover the documented coarse-country boundary above.
+
+A2/B7 exclusion is separately attributed to B with7 dropped rows, while retained A2-to-A1 collapse reports only1 row for triage.
+Retained additive collapse stays a warning, never a whole-country exclusion.
+An entirely empty DataFrame reports absent positive countries plus assembly_nonempty; a zero-row expected country is not reported as a positive-country exclusion.
+A nonempty frame without a country axis gets the structural missing_country_level finding and no guessed country attribution.
+The canonical sweep includes crop_production, plot_labor and plot_inputs.
+
+An additional independent probe exercised REAL Feature ContractB through the scanner's phase2 path: baseline A2+B7 gives9 rows, labels=Aggregate correctly excludes unavailable B and returns2 rows with labels_unavailable=['B'].
+No country_exclusion or row_conservation finding is emitted for that intentional kwargs variant.
+Existing semantic cardinality/total findings remain available for triage.
+
+Independent warm-helper probes verify that a cold D is never read; a warm empty D is read but is not expected as a positive participant; and a warm D RuntimeError fails by name even when three other warm countries survive.
+Every tested Country read receives currency=index, matching Feature's default monetary representation.
+Crop now reuses the hardened helper and removes the old trust_cache/broad-swallow loop.
+
+* Guidance and limits
+
+EthiopiaRHS CONTENTS was read before country-source assessment, including its WAITING wrong-wave caveat.
+Relevant idiosyncrasy: ERHS is a distinct IFPRI rural household survey, and2004/2009 ship household aggregate modules without item-level food/person rosters; it must not be inferred to share ESS plot grain.
+The specific crop exclusion policy comes from the cross-country skill and prior crop ledger cited above.
+No country source files or mappings were changed or investigated for rewiring.
+
+No full farm/corpus build was duplicated; the producer owns the live farm-copy sweep.
+The complete code diff changes the scanner and tests only; production Feature, Country, schema and cache machinery remain untouched.
+Zero cache invalidation is expected from that scope, but this reviewer did not run an independent hash mutation probe.
+The companion JSON contains the exact source hashes, synthetic aggregate outcomes, finding and test selection.
+
+-- Sue
