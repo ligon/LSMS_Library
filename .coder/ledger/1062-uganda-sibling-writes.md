@@ -35,10 +35,12 @@ Uganda `CONTENTS.org:1917-2050` documents two builders and coupled output metada
 
 - **Reuse** nutrition/FCT existing operand construction/product; add only requested-output selection.
 - **Reuse** normal Country sibling builders and sanctioned raw reader; **extend** income orchestration without new numeric transform.
-- **Extend** Make rules to select outputs and remove raw compiler prerequisites; retain historical scripts/tests.
+- **Extend** Make rules to select outputs and remove raw compiler prerequisites; retain historical scripts/tests. Keep earnings/enterprise listed var targets as thin existing-Country-API recipes, pinning LSMS_BUILD_BACKEND=dvc in that subprocess. Removing targets broke make-all reachability and retained-script fallback under make backend; root explicitly approved the wrapper adjustment.
 - **New** actual-script IO-boundary regression tests, needed because existing GH772 tests do not detect companion writes or ensure framework materialization precedes raw reads.
 - **Reuse** content-hash inventory and Feature audit scripts for verification; no cache-hash mechanism change.
 
 ## 6. Open questions and contradictions
 
-No scientific decision required within the concrete boundary. Documented historical authority-open statements are superseded by the explicit #788 ruling, not silently dismissed. If exact private baseline/candidate values differ, stop and report before changing arithmetic. Cross-country analogous consumers and #1078 remain separately reported residuals.
+No scientific decision required within the concrete boundary. Documented historical authority-open statements are superseded by the explicit #788 ruling, not silently dismissed. Exact paired private builds establish raw and served values agree, including household IDs: 14 frame comparisons across seven tables, plus unchanged final candidate raw frames after 13 order controls. Cross-country analogous consumers and #1078 remain separately reported residuals.
+
+Anchored verification: **OK (sections 2/4)** original nutrition and income arithmetic reused; all 19 focused tests pass, seven initial controls fail on baseline. **OK (sections 3/4)** 13 candidate fresh-process orders preserve sibling bytes/mtime/hash/coverage, including make backend and subset serves. **OK (section 3)** 549-country-table inventory moves only 28 Uganda hashes and no build fingerprint. **OK (section 5)** no replacement numeric transform or new frame reducer; existing helpers remain the implementation. Feature audit retains the same 11 pre-existing warnings. Source census and exact residual drafts are in `slurm_logs/isa_backlog_2026-10-21/1062/`; no other country was changed.
