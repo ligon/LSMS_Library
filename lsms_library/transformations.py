@@ -5421,6 +5421,28 @@ def _warn_nitrogen_coverage(tally, total_mass, n_rows):
             NutrientCoverageWarning, stacklevel=3)
 
 
+def _plot_input_country_index(df):
+    """Keep country identity before plot-input filtering (GH #1159).
+
+    Reuses the column-promotion pattern of ``_with_u_in_index`` and the
+    index-before-column convention of ``_declared_kg_factors``; see ledger
+    ``1159-pooled-reducers.md`` sections 2-4.  Metadata alone adds no axis.
+    """
+    country = _level_or_column(df, 'country')
+    if country is not None:
+        if pd.isna(country).any():
+            raise ValueError(
+                "plot_inputs country labels must be non-null; supply each "
+                "row's country or split into country-less frames")
+        if not any(name in df.index.names for name in ('t', 'i', *_PLOT_LEVELS)):
+            raise ValueError(
+                "plot_inputs must carry local plot identity in its index "
+                "('t', 'i', or 'plot_id'); country alone is not a plot key")
+        if 'country' not in df.index.names:
+            return df.set_index('country', append=True)
+    return df
+
+
 def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
                 unit_kg=None):
     """Kilograms of nitrogen applied per plot (WB ``nitrogen_kg``).
@@ -5449,9 +5471,13 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
     Returns
     -------
     pd.DataFrame
-        One ``Nitrogen_kg`` column indexed by ``(t, i, plot_id)``.  Plots with
-        fertilizer input but no convertible-unit row sum to 0; plots with no
-        fertilizer at all are absent.  ``attrs['nitrogen_input_match']``
+        One ``Nitrogen_kg`` column indexed by ``(t, i, plot_id)``.  If the
+        input carries ``country`` as an index level or column, the index is
+        ``(country, t, i, plot_id)``, including for one country or an empty
+        result.  Country labels must be non-null; country metadata alone
+        does not add an axis.  Rows without a convertible quantity do not
+        contribute; plots with no contributing fertilizer rows are absent.
+        ``attrs['nitrogen_input_match']``
         carries the label-join tally -- ``matched_rows`` /
         ``unmatched_rows`` / ``matched_labels`` / ``unmatched_labels``
         (label -> row count, descending), and ``refused_organic_rows`` /
@@ -5496,7 +5522,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
     explicit ``nitrogen_content`` to reproduce a particular country's table.
     """
     content = _NITROGEN_CONTENT if nitrogen_content is None else nitrogen_content
-    df = plot_inputs.copy()
+    df = _plot_input_country_index(plot_inputs.copy())
     if 'Quantity' not in df.columns:
         raise ValueError("plot_inputs must have a 'Quantity' column")
 
@@ -5527,7 +5553,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
 
     out = pd.DataFrame({'Nitrogen_kg': n_kg}).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level]
+    group_by = [n for n in ['country', 't', 'i', plot_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
     res = _canonicalise_plot_level(res, plot_level)
@@ -5564,7 +5590,11 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True, unit_kg=None
     Returns
     -------
     pd.DataFrame
-        One ``Seed_kg`` column indexed by ``(t, i, plot_id)``.
+        One ``Seed_kg`` column indexed by ``(t, i, plot_id)``.  If the
+        input carries ``country`` as an index level or column, the index is
+        ``(country, t, i, plot_id)``, including for one country or an empty
+        result.  Country labels must be non-null; country metadata alone
+        does not add an axis.
 
     Notes
     -----
@@ -5573,7 +5603,7 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True, unit_kg=None
     matching the WB ``seed_kg`` which is also NaN there.  Otherwise shares
     the metric-unit conversion caveat of :func:`harvest_kg`.
     """
-    df = plot_inputs
+    df = _plot_input_country_index(plot_inputs)
     if 'Quantity' not in df.columns:
         raise ValueError("plot_inputs must have a 'Quantity' column")
     if 'input' in (df.index.names or []):
@@ -5594,7 +5624,7 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True, unit_kg=None
     kg = qty * kg_per_unit
     out = pd.DataFrame({'Seed_kg': kg}).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level]
+    group_by = [n for n in ['country', 't', 'i', plot_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
     res = _canonicalise_plot_level(res, plot_level)

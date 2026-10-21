@@ -154,7 +154,8 @@ def test_yield_forwards_explicit_and_attrs_declarations():
     assert T.yield_kg(cp, pf, on='plot', unit_kg={}).empty
 
 
-def test_country_finalize_attaches_input_declaration_and_feature_keeps_it(monkeypatch):
+@pytest.mark.parametrize('shared_household', [False, True])
+def test_country_finalize_attaches_input_declaration_and_feature_keeps_it(monkeypatch, shared_household):
     F = importlib.import_module('lsms_library.feature')
     records = {'Liberia': {'quintal': 100.}, 'Benin': {'quintal': 45.36}}
 
@@ -170,7 +171,8 @@ def test_country_finalize_attaches_input_declaration_and_feature_keeps_it(monkey
             self._finalize_result = Country._finalize_result.__get__(self)
 
         def plot_inputs(self):
-            return self._finalize_result(_inputs(household=self.name), None,
+            household = 'h1' if shared_household else self.name
+            return self._finalize_result(_inputs(household=household), None,
                                           method_name='plot_inputs')
 
     for name in records:
@@ -182,3 +184,6 @@ def test_country_finalize_attaches_input_declaration_and_feature_keeps_it(monkey
         pooled = feature(['Liberia', 'Benin'], currency=None)
     assert pooled.attrs['unit_kg'] == records
     assert T.seed_kg(pooled)['Seed_kg'].sort_values().tolist() == [45.36, 100.]
+    assert T.nitrogen_kg(pooled)['Nitrogen_kg'].sort_values().tolist() == pytest.approx([45.36 * .46, 46.])
+    for fn in [T.seed_kg, T.nitrogen_kg]:
+        assert fn(pooled).index.get_level_values('country').tolist() == ['Benin', 'Liberia']
