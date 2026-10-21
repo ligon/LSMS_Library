@@ -1301,6 +1301,39 @@ recorded, not missing: the =#1041= ruling's
 270, Metric Cup 280, Wrap 290, Crate 310, Slice 320, Whole Animal 330, Tea
 Spoon 301, Table Spoon 302).  Drafted as a residual.
 
+*** Recorded C8 units restored; future unplaced-label retention remains open (GH #1095)
+
+Measured from held C8 sources and normal cold builds, 2026-10-21.
+The ten labels above now use a COMMUNITY-only extension of =_canon_unit=; the shared harvest decoder, food decoding and input extension are unchanged.
+Existing metric-size rescue runs before unplaced-label reporting: it already rescues 3,368 W4 and 3,267 W5 rows whose original unit label the shared decoder cannot place.
+Reporting those rows before rescue would falsely call them unplaced.
+No positive recorded label remains unplaced in the held W3-W5 sources after the ten aliases.
+
+| PH round | baseline rows | restored rows | served rows |
+|----------+---------------+---------------+-------------|
+| 2011Q1   |        27,104 |             0 |      27,104 |
+| 2013Q1   |        27,079 |             0 |      27,079 |
+| 2016Q1   |        20,562 |             0 |      20,562 |
+| 2019Q1   |        29,275 |         2,482 |      31,757 |
+| 2024Q1   |        27,318 |         2,746 |      30,064 |
+| total    |       131,338 |         5,228 |     136,566 |
+
+The overview's historical "124,539 priced rows" does not match the fresh 131,338-row baseline; both counts are recorded rather than assuming that the historical claim describes this source/build state.
+All 131,338 baseline rows retain their keys, Price, Derivation, null masks and dtypes exactly.
+The 5,228 restored source cells have unique keys, no collision with a served cell, their exact reported native-unit Price, and no Derivation.
+The existing first-row reducer, composite state/LGA/EA identity, PH-only coverage and =i==v= shim remain in force.
+So do the 14,603 W3 and 133 W5 intentional metric-size exclusions and the older size-collapsing caveat below.
+
+The two restored W5 =Bottle/Can= rows carry =c8aq2_c = '0. SMALL'=.
+That is an ordinal size, not a metric volume: their native Bottle/Can price is retained without inventing a cl or l factor.
+The size table below says =c8aq2_a= and =c8aq2_cvn= "agree with it and are a cross-check"; fresh source coverage limits that claim: on the 5,339 W5 metric-size rows, only 54 record =c8aq2_a= and 5,167 record =c8aq2_cvn= (258 quantity values in all 56,388 source rows).
+They are not a complete independent cross-check of every size code.
+This work reuses the existing #834 coded-size rule and recorded questionnaire evidence; it neither acquires a new PDF nor changes that rule.
+
+This is partial work on #1095.
+A future positive-priced recorded label still unplaced AFTER size rescue raises =UnplacedUnitLabelWarning= with its label/count and the accurate disposition "dropped after metric-size rescue"; the existing NA/drop policy remains.
+The issue's literal "report anything still unplaced instead of dropping it" requires a separate retention/fallback decision, including source identity and collision handling, and is not fulfilled by warning before a drop.
+
 *** The C8 SIZE field -- READ since GH #834 (2026-09-13), and what the fix does and does not repair
 
 Found 2026-09-08 while comparing =community_prices= against the household

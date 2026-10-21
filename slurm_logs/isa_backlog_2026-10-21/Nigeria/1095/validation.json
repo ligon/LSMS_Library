@@ -1,0 +1,333 @@
+{
+  "scope": "PARTIAL GH1095: ten community-only aliases and accurate deferred reporting; literal retention remains Tier C residual",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "ledger_first": "f4d17e5d5",
+  "final_isolated_root": "/local/job40255479/control/isa-backlog-20261021/Nigeria/1095/implementation/final-verification",
+  "hash_census_and_tests_origin_unchanged_runtime": "/local/job40255479/control/isa-backlog-20261021/Nigeria/1095/implementation",
+  "isolated_rerun_complete_frames_attrs_exact_to_first_results": 24,
+  "tests": {
+    "focused_passed": 60,
+    "deselected_unstaged_built_tables": 3,
+    "skipped": 0,
+    "baseline_expected_failures": 10,
+    "baseline_deselected": 35,
+    "api_audit": "PASS"
+  },
+  "native_source_accounting": {
+    "rounds": {
+      "2011Q1": {
+        "old_rows": 27104,
+        "new_rows": 27104,
+        "gained": 0,
+        "gained_units": {},
+        "source_rows": 46471,
+        "positive_price_rows": 31095,
+        "eligible_pre_first": 30628,
+        "first_extras": 3524,
+        "intentional_metric_drop": 0,
+        "exact_old_metric_drop_source_masks_preserved": true,
+        "all_old_native_payload_exact": true,
+        "remaining_positive_recorded_unplaced": 0
+      },
+      "2013Q1": {
+        "old_rows": 27079,
+        "new_rows": 27079,
+        "gained": 0,
+        "gained_units": {},
+        "source_rows": 45456,
+        "positive_price_rows": 32997,
+        "eligible_pre_first": 31239,
+        "first_extras": 4160,
+        "intentional_metric_drop": 0,
+        "exact_old_metric_drop_source_masks_preserved": true,
+        "all_old_native_payload_exact": true,
+        "remaining_positive_recorded_unplaced": 0
+      },
+      "2016Q1": {
+        "old_rows": 20562,
+        "new_rows": 20562,
+        "gained": 0,
+        "gained_units": {},
+        "source_rows": 37756,
+        "positive_price_rows": 37756,
+        "eligible_pre_first": 23153,
+        "first_extras": 2591,
+        "intentional_metric_drop": 14603,
+        "exact_old_metric_drop_source_masks_preserved": true,
+        "all_old_native_payload_exact": true,
+        "remaining_positive_recorded_unplaced": 0
+      },
+      "2019Q1": {
+        "old_rows": 29275,
+        "new_rows": 31757,
+        "gained": 2482,
+        "gained_units": {
+          "Crate": 133,
+          "Loaf": 513,
+          "Whole Animal": 793,
+          "Wrap": 503,
+          "Cube": 112,
+          "Slice": 175,
+          "Metric Cup": 240,
+          "Table Spoon": 12,
+          "Tea Spoon": 1
+        },
+        "source_rows": 57387,
+        "positive_price_rows": 31757,
+        "eligible_pre_first": 31757,
+        "first_extras": 0,
+        "intentional_metric_drop": 0,
+        "exact_old_metric_drop_source_masks_preserved": true,
+        "all_old_native_payload_exact": true,
+        "remaining_positive_recorded_unplaced": 0,
+        "source_named_unplaced_before_size": 5850,
+        "rescued_before_reporting": 3368,
+        "source_recovery_keys_values_nulls_exact": true,
+        "collisions": 0
+      },
+      "2024Q1": {
+        "old_rows": 27318,
+        "new_rows": 30064,
+        "gained": 2746,
+        "gained_units": {
+          "Loaf": 500,
+          "Wrap": 894,
+          "Slice": 203,
+          "Whole Animal": 636,
+          "Cube": 139,
+          "Crate": 56,
+          "Metric Cup": 316,
+          "Bottle/Can": 2
+        },
+        "source_rows": 56388,
+        "positive_price_rows": 30197,
+        "eligible_pre_first": 30064,
+        "first_extras": 0,
+        "intentional_metric_drop": 133,
+        "exact_old_metric_drop_source_masks_preserved": true,
+        "all_old_native_payload_exact": true,
+        "remaining_positive_recorded_unplaced": 0,
+        "source_named_unplaced_before_size": 6013,
+        "rescued_before_reporting": 3267,
+        "source_recovery_keys_values_nulls_exact": true,
+        "collisions": 0
+      }
+    },
+    "all_existing_native_wave_rawcountry_Country_values_dtypes_attrs_exact": true,
+    "healthy_Niger_all_wave_rawcountry_Country_values_dtypes_attrs_exact": true,
+    "all_helper_native_rounds_equal_actual_Country_after_existing_dtype_coercion": true,
+    "shared_unit_size_functions_AST_unchanged": true,
+    "Nigeria_before": 131338,
+    "Nigeria_after": 136566,
+    "recovered": 5228
+  },
+  "candidate_complete_checks": {
+    "tag": "candidate",
+    "Feature_before": 177381,
+    "Feature_after": 182609,
+    "Feature_all_old_full_payload_dtypes_attrs_exact": true,
+    "Feature_attrs_exact": true,
+    "Niger_all_Feature_rows_attrs_and_cache_bytes_exact": true,
+    "Niger_cache_files": 3,
+    "scanner_full_finding_multiset_exact": 6,
+    "scanner_classification": [
+      {
+        "phase": "1a-sanity",
+        "check": "has_household_index",
+        "country": "Niger",
+        "classification": "Cluster table deliberately has no household i",
+        "status": "warn"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "ClusterIdentityWarning",
+        "status": "warn"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "has_household_index",
+        "country": "Nigeria",
+        "classification": "Cluster table deliberately has no household i",
+        "status": "warn"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "ClusterIdentityWarning",
+        "status": "warn"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "UserWarning",
+        "status": "warn"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "PopulationHeterogeneityWarning",
+        "status": "warn"
+      }
+    ],
+    "fresh_warm_Country_Feature_all_L2_bytes_mtimes_including_JSON_exact": true,
+    "all_private_country_file_count": 20,
+    "L2_cache_file_count": 14,
+    "source_receipts_verified_per_root": 13,
+    "bytes_per_source_root": 28426011,
+    "fresh_data_connect_attempts": 0,
+    "country_hashes_checked": 549,
+    "Nigeria_hashes_moved": 24,
+    "other_country_hashes_unchanged": 525,
+    "tagged_fingerprints_checked_unchanged": 39,
+    "moved_hash_cells": [
+      "Nigeria/sample",
+      "Nigeria/cluster_features",
+      "Nigeria/shocks",
+      "Nigeria/food_acquired",
+      "Nigeria/household_roster",
+      "Nigeria/individual_education",
+      "Nigeria/panel_ids",
+      "Nigeria/assets",
+      "Nigeria/interview_date",
+      "Nigeria/housing",
+      "Nigeria/plot_features",
+      "Nigeria/crop_production",
+      "Nigeria/plot_inputs",
+      "Nigeria/food_coping",
+      "Nigeria/livestock",
+      "Nigeria/anthropometry",
+      "Nigeria/plot_labor",
+      "Nigeria/people_last7days",
+      "Nigeria/community_prices",
+      "Nigeria/nonfood_expenditures",
+      "Nigeria/food_expenditures",
+      "Nigeria/food_prices",
+      "Nigeria/food_quantities",
+      "Nigeria/household_characteristics"
+    ]
+  },
+  "baseline_complete_checks": {
+    "tag": "baseline",
+    "Feature_before": 177381,
+    "Feature_after": 182609,
+    "Feature_all_old_full_payload_dtypes_attrs_exact": true,
+    "Feature_attrs_exact": true,
+    "Niger_all_Feature_rows_attrs_and_cache_bytes_exact": true,
+    "Niger_cache_files": 3,
+    "scanner_full_finding_multiset_exact": 6,
+    "scanner_classification": [
+      {
+        "phase": "1a-sanity",
+        "check": "has_household_index",
+        "country": "Niger",
+        "classification": "Cluster table deliberately has no household i",
+        "status": "warn"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "ClusterIdentityWarning",
+        "status": "warn"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "has_household_index",
+        "country": "Nigeria",
+        "classification": "Cluster table deliberately has no household i",
+        "status": "warn"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "ClusterIdentityWarning",
+        "status": "warn"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "UserWarning",
+        "status": "warn"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "PopulationHeterogeneityWarning",
+        "status": "warn"
+      }
+    ],
+    "fresh_warm_Country_Feature_all_L2_bytes_mtimes_including_JSON_exact": true,
+    "all_private_country_file_count": 14,
+    "L2_cache_file_count": 14,
+    "source_receipts_verified_per_root": 13,
+    "bytes_per_source_root": 28426011,
+    "fresh_data_connect_attempts": 0,
+    "country_hashes_checked": 549,
+    "Nigeria_hashes_moved": 24,
+    "other_country_hashes_unchanged": 525,
+    "tagged_fingerprints_checked_unchanged": 39,
+    "moved_hash_cells": [
+      "Nigeria/sample",
+      "Nigeria/cluster_features",
+      "Nigeria/shocks",
+      "Nigeria/food_acquired",
+      "Nigeria/household_roster",
+      "Nigeria/individual_education",
+      "Nigeria/panel_ids",
+      "Nigeria/assets",
+      "Nigeria/interview_date",
+      "Nigeria/housing",
+      "Nigeria/plot_features",
+      "Nigeria/crop_production",
+      "Nigeria/plot_inputs",
+      "Nigeria/food_coping",
+      "Nigeria/livestock",
+      "Nigeria/anthropometry",
+      "Nigeria/plot_labor",
+      "Nigeria/people_last7days",
+      "Nigeria/community_prices",
+      "Nigeria/nonfood_expenditures",
+      "Nigeria/food_expenditures",
+      "Nigeria/food_prices",
+      "Nigeria/food_quantities",
+      "Nigeria/household_characteristics"
+    ]
+  },
+  "source_receipts": {
+    "held_blobs_per_private_root": 13,
+    "bytes_per_root": 28426011,
+    "manifest_sha256": "d2f6c9dd20a4c0350ed14426f6b537729778ee8f7b72aa67fbac1fa2fc4fc1e7",
+    "physical_original_bytes_sha256_and_DVC_keys_verified": true,
+    "CSV_text_normalized_hash_verification_without_byte_rewrite": 2
+  },
+  "runtime_module_sha256": "f7ab6739326af25c66bc91d8c30ffcfd0139df96fcd559da7757ebb678eb61e2",
+  "private_artifact_sha256": {
+    "prepare.py": "2f1b141483bf05b76f1ebcf3ea77d50e7c6b8f2638b973bb3d4d07fc6e8a686b",
+    "build.py": "8fd7c03d374f84eae6b04c3e1abd941e4af87a33f819cbd9d0bf4c1f45b2b5e4",
+    "source_inventory.py": "752ae7382fe45ef9c646db3048eb5cff1534f0d89a992d663e97fa5156dcf269",
+    "native_and_compare.py": "9c8d6fdcb9678745cea0fa9079b9f749c624a93f7c43a5ddeadd2c93e60ce585",
+    "feature_probe.py": "4f94ba31037297ac686807f5468f0a051fbeff923596aae9f4e3560982aedcbc",
+    "complete_checks.py": "98b2a142d31e489936ee8be1a8af83e6442bc228cb02c4e8ce61239970bea688",
+    "hash_inventory.py": "b1b736668b6561fd15c6cea0682c5be5413a02eb1b42be571ab4676a154cefa5",
+    "run.sh": "1f54a6350912c955a8b67a47110023646e55a8ee26c21f0131e0b4b9ef9f01df",
+    "offline/sitecustomize.py": "ec32b8fff270ab06bcf64c5d9bc26b5ffa1bfe7de2566a88ad536707f0718f45",
+    "candidate-hashes.json": "69272b0c9e48e39fcd3f818c647155676bcf7e059614d4750c131e1d5eb176f3",
+    "baseline-hashes.json": "beebfd5841612ed29da663b82f4b4a1843188df4bb6dc0b66b5ad3153a4e2128",
+    "source-manifest.json": "d2f6c9dd20a4c0350ed14426f6b537729778ee8f7b72aa67fbac1fa2fc4fc1e7",
+    "freeze.py": "3f3c49005c7ca42a1ec7146f5e85eb34fd65c5fcdebe54eb488f0988f1e8a665",
+    "quiescence.py": "ada6516e20552628dbeb1642e5419687fe46e43872f0835a766937706836e951"
+  },
+  "original_test_logs_sha256": {
+    "tests-focused.log": "d6aeb514757ea493abd7afcbcbfd7d50815d2211d7f07d5cf3eafef458824fb2",
+    "baseline-ten-controls-repeat.log": "f527be3c712ee9391b629b6b3e4907c3510c2c3ab57b284bfd105984941f3e56",
+    "api-audit-final.log": "5b8e33759e13c51a62e9bb3be00dac56421d7698f6690a21afb1dc3ea28bb0cd"
+  }
+}
