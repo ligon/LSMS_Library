@@ -58,3 +58,23 @@ exact old reading3 keep/drop sets. The129classified entries remain excluded,
 with a separate diagnosis-first residual drafted in the evidence directory.
 Mali-only shared test expectation updates are authorized; Niger regions stay
 unchanged. The implementation follows DESIGN.md in the same task evidence.
+
+## Phase 3 - anchored verification
+
+- OK (sections2-4): actual wave-script controls preserve all native slots,
+  quote-varying Description, unknown-unit exclusion, zero/missing weights and
+  duplicate-key refusal. Baseline14failed/1passed; candidate expanded controls
+  plus declaration/assembly tests33passed; real Mali built controls6passed.
+- OK (sections3-4): actual cold and fresh-process warm Country frames match
+  exactly, including index/column dtypes. Candidate obs3 is exactly the old
+  public frame. All155931eligible source readings reconcile by passage/slot.
+- OK (sections2-5): the runtime unit dictionary equals held Stata metadata
+  exactly; no new mapping policy, reducer or transform was introduced.
+- OK (section4): all549country/table hashes were compared; only24Mali values
+  moved. The525other-country hashes and39framework fingerprints did not.
+- OK (sections3-4): paired Mali/Niger Feature audits add no finding; the neutral
+  Mali obs-filler warning disappears. Existing no-household-i warnings remain
+  on both native cluster tables. Mali2014-15regrades sane at155931rows.
+
+No contradiction or reinvention found against this ledger. Scientific
+interpretation of unresolved unit errors remains in the separate residual.

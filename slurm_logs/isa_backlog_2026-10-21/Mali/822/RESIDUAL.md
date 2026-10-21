@@ -13,7 +13,7 @@ GH822 preserves today's resolvable-item/unit, positive-price filter and weight
 sentinel rules. Nineteen of these entries were already excluded in reading3;
 the remaining110 are in newly wired readings1/2. The exact old keep/drop sets
 remain invariants. The missing-label issue is distinct: p2 q03/q06 lack Stata
-unit labels, but the same common1–14/99dictionary is present on all p1 slots
+unit labels, but the same common1-14/99dictionary is present on all p1 slots
 and p2 q09. Correctly restoring it does not adjudicate out-of-dictionary codes.
 
 Read the instrument and producer metadata, classify missing/nonanswer versus
