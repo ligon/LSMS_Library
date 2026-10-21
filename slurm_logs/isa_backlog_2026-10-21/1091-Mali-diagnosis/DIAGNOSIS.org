@@ -1,0 +1,141 @@
+#+title: GH1091 Mali country builder retirement diagnosis
+#+date: 2026-10-21
+#+author: Sue
+
+* Result and exact source
+DIAGNOSIS COMPLETE at =aba2badfe2f701a8b3793f1243fd8ed4fce18a53=, reviewed #822/PR1180.
+Checkout: =/local/job40255479/worktrees/isa-Mali-1091=, branch =diagnose/1091-mali-community-builder-20261021=.
+There is no candidate patch, implementation approval, new PR, issue write or measured postchange hash result.
+The minimal production proposal is to delete Mali's country concatenator and remove only its country var rule/recipe, retaining the existing wave builder and framework authority.
+The wrong-wave Make behavior and the exact attrs difference below must be explicit intended changes, not forced preservation equivalence.
+
+* Country grounding and contradictions
+I read the full current 1,268-line CONTENTS including its TODO vocabulary and all headings/history; no task or LOGBOOK drawer was omitted.
+SHA256: =870ddeaacac34b2eddd1c074100c86b21fce1ca16072ab3091f9c8b9ac5fb451=.
+AGENTS.md and CLAUDE.md are exact to the previously read immutable f8 guidance (SHA256 c1205513db01fb743ec3c8b8c0ec69615a2bfcd9521fb7ed2d3195bd1a7e20dd).
+Standing ledger,822ledger/design/report, cross-country/backlog/audit skills and1021/1026/808 precedent were read or source-verified.
+
+Actual idiosyncrasies: 2014-15/2017-18 are EAC-I, while2018-19/2021-22 are EHCVM;2014-15 rural observations are agricultural holdings rather than urban households.
+The current community feature is only the2014-15 grappe-level questionnaire, with no household i.
+Its native parquet deliberately carries an i==v compatibility shim before j; the framework drops it to seven public levels.
+Variety uses the s04q02 CODE because four descriptions differ only in quotation marks between passages.
+Passage is visit1/2, and native obs1/2/3 denotes each reported Unit/Poids/Prix triple.
+Passage2's q03/q06 omit value-label dictionaries; the unchanged wave script restores only their evidenced common COMMUNITY codebook.
+Quantity is the lot's recorded Poids(KG), Price is its FCFA quote; no quantity inference or new PDF read occurred.
+The129positive-price unresolved-unit entries stay excluded under the unchanged822policy; this diagnosis does not resolve their meaning or wire2018-19 #821.
+
+The Overview's "Mali EHCVM ... Four waves are configured" conflicts with its later correction that only2018-19/2021-22 are EHCVM.
+The historical price section says "reads only relevé3" and later "is now indexed =(t,v,j,u,variety,visit)="; the dated822section explicitly supersedes these with all three readings and native obs.
+Neither40218nor the old neutral Feature obs=1 is the present preservation baseline.
+The Makefile currently says EHCVM waves price only at region x milieu "(no grappe key)"; current scheme lines343-347 and CONTENTS record unwired2018-19 s05_co_mli2018.dta at grappe grain.
+CONTENTS' earlier statement that the scheme comment "is half wrong" is also historical: the CURRENT scheme already distinguishes2018-19 from2021-22; that does not repair the separate current Makefile wording.
+These contradictions are reported, not dismissed as stale or used to authorize new source wiring.
+
+* Settled authority and exact route/caller analysis
+Root's immutable live issue context records #1091 open with zero comments.
+Binding #788 comments6244122374 and6259387154 settle "the framework is authoritative" and one country re-warm per retirement; #840/merged1086 accepted the variety/visit/obs grain.
+Neither ruling is reopened.
+
+Mali/_/community_prices.py:21-39 loops four wave parquet paths, catches missing/unreadable wave exceptions, concatenates successful frames, asserts uniqueness and writes var/community_prices.parquet.
+It adds no scientific measure, mapping, identifier transformation, reducer or selection to the already-built wave payload.
+Current Mali/_/Makefile:105-106 calls it from the explicit country var rule, whose only generated prerequisite is2014-15's wave parquet.
+Lines102-103 are the separate retained wave pattern/recipe.
+No other Mali target consumes the community var target; =all= has only committed panel_ids.json.
+An exhaustive tracked git-grep is private; historical ledgers/reports and generic dispatch are distinguished from live callers.
+
+Default Country route: country.py:5478cache gate -> load_from_waves:5249 -> Wave.grab_data -> retained wave Make/script -> normalization/id_walk -> pre-finalize COUNTRY cache -> _finalize_result.
+Make route for this materialize:make table: country.py:5813consults _has_country_builder:4893, currently True because the script exists, and goes directly to run_make_target(country):5077.
+That country Make target executes the old concatenator and may ignore requested waves.
+Actual subprocess observation keeps command arguments/results unchanged: supported default invokes the2014-15 wave target, while Make invokes the country var target.
+Deleting only the script leaves the country rule/predicate; deleting only the rule leaves the script/predicate. Both must retire.
+
+The actual _has_country_builder result is True; an independent GNU make -n probe under a genuinely fresh empty root also succeeds and shows both retained wave and country recipes, without creating a target.
+The generic existing no-country-builder branch already selects load_from_waves and typed absent_subset_frame; no framework edit is needed.
+Existing1039 test_barren_subset_with_a_country_builder_keeps_the_legacy_fallback explains why a country-scoped retirement, rather than weakening the generic behavior, is the right boundary.
+
+Generic entrypoints: lsms_library/Makefile:53build delegates to the country default (=all=, no community target); :60materialize delegates to cli.py:materialize -> _materialize -> _load_table -> Country method.
+The existing Python fallback runs the wave script if GNU make is unavailable; preserving the wave script/rule preserves it and the script-path required-column gate.
+No new var recipe or second CLI concatenator is proposed.
+Direct requests to the retired country var target should fail honestly with no rule; use Country/CLI materialize for country aggregation.
+DVC persist/register is not invoked in this diagnosis.
+
+* Held-source gate and actual normal builds
+Both declared EACIS04_p1/p2 blobs were held in immutable822storage.
+Before any decode or dependent API, both passed sidecar MD5, copy SHA256,15,169,453total bytes, size/mode/mtime/inode/single-link gates.
+Twenty-six physical copies populate13private roots; target L2 starts empty.
+The separate prep root decodes only those same sources through sanctioned get_dataframe; no additional raw companion is declared or needed.
+Sources and frame references have frozen provenance;822runtime/config blobs are byte-exact to implementation70f6ff81d under the current reviewed head.
+No acquisition, source rewrite, DVC CLI, shared-cache mutation or in-tree payload occurred.
+
+Twelve normal cold requests use separate roots for default/Make and all/supported/three separate unsupported/combined-unsupported cases.
+Six fresh processes create new objects for supported/all/combined-subset warm requests.
+All 18 native eight-level frames and their full attrs/order/axes/dtypes/nulls are exact to the immutable822native frame.
+All 18 raw COUNTRY frames match their explicitly identified baseline layer oracle; they are NOT all the same shape/attrs across routes.
+All applicable public payloads preserve every155,931 source row exactly, including obs1=66699, obs2=49014, obs3=40218 and passage1=66159/passage2=89772.
+No public comparison sorts, rekeys, drops a level, strips attrs, rounds or normalizes values.
+
+| Requested waves | default cold rows | Make cold rows | Interpretation |
+|-----------------+-------------------+----------------+----------------|
+| default/all |155931|155931|supported payload exact822|
+|2014-15 |155931|155931|supported payload exact822|
+|2017-18 |0|155931|Make returns unrelated2014-15|
+|2018-19 |0|155931|Make returns unrelated2014-15|
+|2021-22 |0|155931|Make returns unrelated2014-15|
+|all three unsupported |0|155931|same defect; fresh warm reproduces|
+
+Default unsupported COLD calls nevertheless build all2014-15 raw COUNTRY rows before filtering them away.
+Those raw caches retain the eight-level shim and attrs{}, hold155931actual2014-15 rows, have the current country hash, and record ONLY the requested unsupported wave(s) as their manifest.
+The requested-only coverage/actual-row-wave mismatch is an exact baseline finding, not an accepted subset product or inferred full coverage.
+The framework-authoritative future requirement is the existing declared empty frame for unsupported requests, with no accidental2014-15 retention/build.
+
+* Exact attrs, raw metadata and warm behavior
+Supported DEFAULT public attrs are fully exact to822: id_converted=True plus country, population, population_resolution and recall.
+Supported MAKE public output lacks ONLY id_converted=True; every common key/value and recursively checked Python type is exact.
+That difference triggered the original strict stop, whose script/log/frame remains preserved.
+The completed cold API payload was then inspected read-only; no failed equality was reclassified as complete equivalence.
+Proposed authoritative future Make attrs are the full DEFAULT attrs; explicitly adding id_converted=True is an intended route effect.
+
+Supported/default COUNTRY raw: seven declared levels, attrs{id_converted:True}, genuine current hash and requested/full manifest.
+Old Make COUNTRY raw: eight shim levels, attrs{}, hashless/no coverage, exactly the full native frame.
+Native wave: eight levels, attrs{}, legitimate hashless script companion under both backends.
+A separately labelled raw projection check shows only the redundant i differs in payload structure; it is NOT used to declare the complete raw frames equal.
+Future Make's framework wave route should create no COUNTRY cache, while default should retain a genuine current COUNTRY cache.
+The Make backend remains normal wave cache IO, not a bypass.
+
+Fresh-process supported/all/combined-subset public full frames/fullattrs match their OWN cold result under each backend.
+Default warm calls change zero cache bytes/size/modes/mtimes.
+Old Make warm calls rewrite both wave and country caches; that is measured baseline behavior, not a zero-write claim.
+Both actual Feature calls (default currency and explicit currency=None) preserve155931rows and all payload/order/dtypes/nulls across backends; common attrs and recursive types are exact, with the same sole id_converted difference visible.
+The default Feature includes currency; explicit None does not, with separate complete references.
+Actual CLI _load_table controls preserve the complete supported/default frame and reproduce the wrong unsupported/Make155931-row frame, including FULLattrs.
+
+* Minimal allowlist, tests, hash cost and residuals
+Production allowlist: delete =lsms_library/countries/Mali/_/community_prices.py=; remove only the explicit country var rule/recipe and revise its adjacent bounded comments in =Mali/_/Makefile=.
+Keep materialize:make, data_scheme, wave script/rule, finalizer, units, grain, id_walk behavior and framework source unchanged.
+Additional proposed files are the task ledger FIRST, Mali CONTENTS note, a focused country-builder test and safe task reports.
+PROPOSAL.md and TARGETED-TEST-PLAN.md give non-vacuous actual Make/predicate, source/helper, strict-subset, schema/fallback/CLI, complete-frame and independent-review gates.
+No tracked test exists yet and no candidate-test pass is claimed.
+The existing general absent-subset test is not weakened;866 selection is four relevant source guards only, not unrelated data-poison cases.
+Strict current API audit passes.
+
+Twenty-four actual baseline Mali country hashes are recorded.
+Country._table_cache_hash includes the country Makefile and local Python inputs as whole files, so this proposed local retirement predicts a one-time24-table Mali country re-warm; CONTENTS is excluded.
+There is NO working patch and NO measured postchange hash bill.
+Actual549country hashes/39framework fingerprints are a later implementation/review gate (expected24Mali/525other/39unchanged), with no unbuilt-output claim.
+
+GH1091 remains open with Niger/Tanzania as separate country residuals.
+PROPOSAL.md supplies a conditional post-Mali-PR narrowing title/body/TierA-B, not an issue write or a claim that Mali proves either other country's source semantics.
+After root approves a separate writer based on actual1180, an independent reviewer must use a new physical root and immutable source pin; composition must compare actual parent provenance, prior fixes, supported/unsupported backends, full attrs and scoped Feature findings.
+No further scientific decision is needed for the settled authority/grain, but implementation boundary approval is still pending.
+
+* Isolation, immutable receipts and limits
+Each process asserts mounted image/exact cwd, package/config/countries/data paths, LSMS_EXPECTED_ROOT, HEAD and clean status.
+Socket/write guards plus unshare -rn are active; numerical/build/Make threads are one and each data root has one consumer.
+The only source-tree metadata write exception resolves the root-prepared ignored .dvc/tmp symlink to its exact owner-only private target.
+All detailed frames, warnings, source rows and command logs stay private; this report exports safe aggregates only.
+No new focused pytest, healthy other-country source rebuild, complete scanner run, fullsuite or549/39census is claimed in this diagnosis; those discriminating candidate gates are specified for the approved next phase.
+Source/head/mode/clean and entire822reference before/after receipts, copy integrity and zero consumers are in proof.json.
+The original strict attrs stop is preserved; no data discrepancy was normalized away.
+The final release applies only to this read-only diagnosis and grants no implementation or publication approval.
+
+Sue

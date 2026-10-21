@@ -178,3 +178,15 @@ Sue
 The final #1078 author head =d46795c303e2409ddb8ed5e4c62efca4e87ca347= is clean, published and quiescent; root independently verified library/test Git trees and modes exactly equal runtimea4. Independent source review has begun; no final verdict or PR yet.
 Uganda #849 is a separate read-only five-wave source diagnosis with private factor-only colmap counterfactuals and2018control; parents967/972 are verified merged. No configuration promotion is approved.
 The seventh owner-only archive =quiescent-followup-23h10.tar.gz= contains741verified files from completed global16/Nigeria1135counts,99705731bytes, SHA256 =67ec653ac78f5bcfbf90f92835e3289d71190fcfbed45cf3e224812e6d97308b=. Every member and source-after receipt verified; safe receipt =private-evidence-durability-seventh.json=.
+
+* Latest Mali approval -- 2026-10-21 23:13 UTC
+
+The #1091 read-only diagnosis is complete:12cold/6freshwarm requests preserve155931native readings, while old Make serves155931unrelated2014-15 rows for each unsupported subset and omits only the default id_converted attr.
+Root read the complete concrete proposal, ledger, test plan and proof and approved an isolated writer based on reviewed822 at =isa-Mali-1091-fix=.
+Its production boundary removes only the country concatenator and explicit country Make rule/recipe, revising adjacent comments while retaining wave builders, scheme, finalizer and framework.
+Correct unsupported empty frames, authoritative full attrs and Make COUNTRY-cache absence are explicit intended route changes.
+Targeted negative controls, complete source/default/Make/subset/CLI/Feature/scanner checks and actual549/39hash scope must pass before independent review.
+The predicted24-table Mali re-warm remains unmeasured until the patch exists.
+Safe frozen diagnosis is in =1091-Mali-diagnosis/=; no candidate PASS or PR exists yet, and Niger/Tanzania remain separate #1091 residuals.
+
+Sue

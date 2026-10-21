@@ -134,7 +134,7 @@
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
       "branch": "isa/Mali-20261021",
-      "status": "read-only-1091-builder-retirement-diagnosis",
+      "status": "approved-country-only-builder-retirement-underway",
       "owner": "mali_lane",
       "initial_issue": 822,
       "frozen_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
@@ -165,12 +165,31 @@
       },
       "active_issue": 1091,
       "active_owner": "mali_lane",
-      "active_path": "/local/job40255479/worktrees/isa-Mali-1091",
-      "active_branch": "diagnose/1091-mali-community-builder-20261021",
+      "active_path": "/local/job40255479/worktrees/isa-Mali-1091-fix",
+      "active_branch": "fix/1091-mali-community-builder-20261021",
       "active_baseline": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
-      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Mali/1091",
-      "active_scope": "Read-only source/cold/default/Make/subset diagnosis of Mali country concatenator retirement under settled788 and accepted1086grain;retain reviewed822155931prices. No code approved yet;Niger/Tanzania residuals explicit.",
-      "active_interim_result": "Both source-backed baseline backends preserve155931prices. Strict fullframe comparison stops only because Make lacks id_converted=True attr; raw Make country has legacy8level i==v shim/hashless/no manifest versus authoritative7level/current/fullcoverage. Original stop preserved, unsupported subsets being probed."
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Mali/1091-fix",
+      "active_scope": "Root FULLread concreteproposal/ledger/tests/proof;approvedledgerFIRST thenonlyremoveMali countryconcat+explicitvarrule/recipe/adjacentcomments;retainwavepattern,scheme,finalizer,framework. Newmeaningfultests/fullsource/subset/attrs/Feature/scanner/actual549/39scope gates before independent review. No code/PRPASS yet.",
+      "active_interim_result": "Both source-backed baseline backends preserve155931prices. Strict fullframe comparison stops only because Make lacks id_converted=True attr; raw Make country has legacy8level i==v shim/hashless/no manifest versus authoritative7level/current/fullcoverage. Original stop preserved, unsupported subsets being probed.",
+      "diagnosis_1091": {
+        "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+        "status": "COMPLETE/frozen/quiescent",
+        "cold_requests": 12,
+        "freshwarm_requests": 6,
+        "supported_native_readings": 155931,
+        "Make_wrong_wave_rows_per_unsupported_request": 155931,
+        "sole_supported_public_attrs_delta": "id_converted=True absent in oldMake",
+        "all_source_references_copies_tracked_exact": true,
+        "postchange_hash_or_implementation_claimed": false,
+        "evidence": "1091-Mali-diagnosis/"
+      },
+      "active_approved_intended_changes": [
+        "Unsupported Make subsets return declaredempty, not155931wrong2014rows",
+        "Make public fullattrs equal authoritativeDEFAULT inclid_converted=True",
+        "Make frameworkwave route writes noCOUNTRYparquet"
+      ],
+      "active_predicted_hash_scope_not_yet_measured": "24Mali/525otherunchanged/39frameworkunchanged; mustmeasurebefore sourcebuild",
+      "active_future_PR_base": "fix/822-mali-community-readings-20261021 (PR1180); rootwillopenafterindependentPASS; no publicmerge"
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
