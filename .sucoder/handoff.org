@@ -861,3 +861,20 @@ LIVE1135 follow-up appended23:23:23UTC with direct primary links, original rulin
 No root running exec sessions at this checkpoint.
 
 Sue
+
+* Checkpoint -- 2026-10-21 23:50 UTC
+
+#1078 standalone independent review and bounded addendum PASS; source branch d46795c303e2409ddb8ed5e4c62efca4e87ca347 pushed to GitHub.
+Author7, independent14 and new addendum safe exports are committed with this checkpoint; root publication gates record explicit exact-value checks and full failed-suite qualifications.
+Next: open the reviewed PR with all549/39/1362 invalidation cost, nine guarded timestamp failures/separate private-operand pass, pre-existing Niger dtype residual and no1062/global16 composition claim.
+Deduplicate/file the precise Niger cold/warm u StringDtype owner using the public evidence; keep it separate from1078.
+
+Mali1091 writer final9e8ebeabb0e996684d325d05987763a8c3581cc8 is frozen; runtime fdadc0698efcd300f5f09c21b60c30f570f96621 on822aba.
+111 targeted tests pass; new baseline controls24fail4pass. Independent reviewer niger_lane now owns review-Mali-1091 in separate candidate/base checkouts; root prepared exact DVC tmp targets.
+Agent review_nigeria_1034 owns read-only Niger1091 at reviewed1088 d602, with all/singleton/unsupported default/Make source probes in progress.
+Agent mali_lane owns new Uganda849 artifact-only exact addendum; original344files and all source roots remain frozen.
+849 source-grain carrier repair must preserve actual observation identity and survive Feature assembly before12factor mappings are promoted.
+Tanzania1091 checkout e75be9c56fa6c318ce32cea5a8be6d448578bed1 and private root are prepared, but no diagnosis has begun.
+No public implementation PR has been merged. Goal remains active.
+
+Sue

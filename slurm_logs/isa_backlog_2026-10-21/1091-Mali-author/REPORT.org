@@ -1,0 +1,133 @@
+#+TITLE: Mali GH1091 bounded country-builder retirement
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Review status and exact boundary
+
+READY for independent review; this is the author's evidence, not an independent PASS.
+Base is reviewed GH822 / PR1180 at =aba2badfe2f701a8b3793f1243fd8ed4fce18a53=, not the earlier 40218-row f8 result.
+Ledger FIRST =337f8432193902c0d6f3d6251ff911606d0955b6=; runtime/tests = fdadc0698efcd300f5f09c21b60c30f570f96621.
+Both ordinary commits printed =SUCODER: published=; Sue is author with the GPT-6 trailer.
+The final evidence-only descendant and clean release receipts are pinned in the private =freeze-proof.json=.
+
+Production changes delete Mali's concatenate-only =_/community_prices.py= and remove only its explicit country var target/recipe.
+The adjacent Make comment and dated CONTENTS note explain the existing framework authority and actual survey caveats.
+The exact wave Make pattern/recipe, 2014-15 wave script, scheme =materialize: make=, finalizer, driver, measurements, unit/eligibility rules, grain, IDs and core framework remain unchanged.
+One focused 28-case test file, the task ledger and safe evidence complete the allowlist.
+There is no second concatenator or generic var recipe.
+
+GH788 framework authority and GH840/merged1086 variety/visit/obs grain are settled.
+This is the Mali portion only; Niger/Tanzania remain conditional residual scopes of GH1091.
+No GitHub writes, public PR, integration change or issue closure occurred.
+Root will arrange independent review and any stacked PR on the actual PR1180 branch.
+
+* Country grounding and contradictions
+
+The full Mali CONTENTS, including tasks/history, was read before diagnosis and carried into this writer only after exact SHA256 =870ddeaacac34b2eddd1c074100c86b21fce1ca16072ab3091f9c8b9ac5fb451= verification.
+Mali mixes EAC-I 2014-15/2017-18 with EHCVM 2018-19/2021-22; the overview's blanket EHCVM account is contradicted by the dated correction.
+The 2014-15 community grid has two passages and three Unit/Poids/Prix slots.
+Variety CODE remains the key because passage Description labels differ in quoting; the native wave carries deliberate i==v compatibility, which framework aggregation drops to the seven declared public levels.
+Quantity remains the recorded questionnaire's Poids(KG); Price remains the lot quote.
+The 822 fresh-PDF gap and its 129 positive-priced unresolved-unit exclusions remain unchanged, not silently reinterpreted here.
+
+The retired Make comment said EHCVM files have "no grappe key".
+CONTENTS instead records the unwired 2018-19 grappe-grain s05 module and the 2021-22 region x milieu file.
+Its historical section says "The =data_scheme.yml= comment on =community_prices= is half wrong"; the current scheme already distinguishes those cases.
+Historical reading-3/six-level descriptions likewise coexist with the dated 822 native obs1/2/3 correction.
+These contradictions are quoted and bounded; no historical claim is silently discarded.
+The new dated country note records actual wrong-wave/manifest and attrs differences plus empty-output consequences.
+GH821 remains separate; this task wires no new source.
+
+Full Niger CONTENTS was also read before comparator access (SHA256 =b1bf5794b242c794437995eb76742db763951397d8dfdb691d064af569ef67ee=).
+Relevant idiosyncrasies include pre-EHCVM variety CODE, 134 exact duplicate slot repeats removed, 30 nonidentical repeats retained as obs4-6, and a 2014 GRAPPE/MENAGE/EXTENSION identity with split-off/new-household caveats.
+Its older 15423-row observation is historical; the held current comparator has 46043 rows.
+No Niger source-cold or broader country-science claim is made.
+
+* Source preparation and normal runtime evidence
+
+All raw sources remain private.
+Two held EACIS04 p1/p2 blobs were copied physically into 21 separate candidate roots (42 copies), gated by sidecar MD5, SHA256, size, mode, mtime, distinct inode, no symlink and nlink=1 before decoding or APIs.
+MD5s are =d8ef05e89059993a76b082481feb3942= and =ca8ed4d483fa9714c3cf3a4fb1519b96=.
+No acquisition, DVC CLI, shared-cache mutation, hash stamp, assume-fresh, NO_CACHE, in-tree payload or read-gate bypass was used.
+The only permitted source-metadata write resolves the root-prepared ignored DVC tmp link into this task's exact private target.
+Every process asserted image interpreter/package/cwd/countries/config/data realpaths, active socket/write guard and an unshared network namespace.
+All numeric/build/Make threads were one; pytest used two loadfile workers.
+
+Actual normal empty-target builds and fresh-process/new-object warm calls cover both backends: all waves, supported 2014-15, each unsupported 2017-18/2018-19/2021-22, and their combined strict subset.
+Unsupported cases are exercised in both empty and naturally populated states; the latter use 16 physical copies of actual current-hash/full-coverage country/native outputs after the successful source build.
+There are 20 initial stages and 20 fresh-process warm stages.
+The eight supported stages preserve all 155931 rows, exact native/public values, axes, order, dtypes, null masks and recursively typed attrs against separate reviewed-822 layer oracles.
+Obs counts remain 66699 / 49014 / 40218; passage counts remain 66159 / 89772.
+The 32 unsupported stages return zero declared rows, build no community source, return no unrelated 2014 rows, and write/remove no cache files.
+
+Actual parent Make returned all 155931 unrelated 2014-15 rows for each unsupported request, including the combination.
+Parent DEFAULT returned zero but its cold path still built the full 2014-15 raw native country table, stamped with requested-only unsupported coverage.
+The raw COUNTRY row-wave/manifest mismatch is retained privately as defect evidence.
+Those parent frames are not acceptance or equality targets for unsupported output.
+
+Supported public output now has the authoritative DEFAULT full attrs, including id_converted=True.
+Parent Make lacked only that attr; the intended addition is explicit.
+The native file remains an eight-level hashless script companion; default COUNTRY is seven-level with genuine current hash and coverage.
+Make's new framework wave route creates no COUNTRY cache.
+DEFAULT fresh warm calls change zero cache bytes/modes/mtimes.
+The two supported Make fresh warm calls naturally rebuild the hashless native wave cache: bytes/size/mode stay exact, mtime changes; no COUNTRY cache is created.
+This is ordinary wave-cache behavior, not a cache bypass or a zero-write Make claim.
+Harmless Make probes of existing committed panel_ids/updated_ids JSON sources remain visible in private call logs.
+
+* CLI and serialization stages
+
+Actual callable and Typer CLI controls forward repeated --wave arguments.
+Supported DEFAULT/Make pre-write API frames are exact to parent DEFAULT API, including complete recursively typed attrs.
+Their post-read artifacts are independently exact to actual parent DEFAULT post-read artifact frames, typed attrs, Arrow schema and full footer metadata under identical args.
+API-to-artifact typed attrs are not declared identical: the unchanged generic writer's JSON attrs serialization changes some Python container types.
+The strict stop and pre-write frame remain private evidence.
+
+Unsupported candidate DEFAULT/Make API frames match the actual existing _empty_declared_frame plus _finalize_result contract exactly, with full typed attrs.
+Candidate backends match one another at callable/pre-write/post-read stages and in full Arrow schema/footer metadata.
+The parent DEFAULT zero-row artifact is explicitly structurally different: visit/obs retain int64 after filtering the full table, while the existing declared-empty contract gives str levels.
+Candidate Description is object before writing and StringDtype after reading.
+Each of the three artifacts exactly matches an independent call to the actual unchanged writer on its saved pre-write frame; source SHA256 =e697a53f93279add6268c011b87dd3784c6245a588563223176d1c32db9009a3= is identical across heads.
+Parent/candidate empty attrs match, but their APIs/artifacts are not called complete-frame equivalent.
+No attrs stripping, dtype normalization or framework/writer correction was used.
+
+* Tests, Feature and hash scope
+
+The complete focused selection passes 111 tests, zero errors/skips.
+Its seven groups are new Mali retirement (28), restored-reading/finalizer (20), declaration/assembly (12), no-country-rule framework (42), script-path schema gate (5), and four stale-country fallback source guards.
+The single explicitly deselected requires_s3-marked original 822 public test function was separately invoked unmodified against held sources and passed; no credentials or acquisition gate was loosened.
+The exact physically copied new test file on untouched aba produces 24 meaningful failures and four passes, zero fixture errors/skips.
+Failure accounting is 18 retired-country-builder reaches, four unwanted unsupported builds, one present script, and one fresh var rule.
+Actual fresh-empty make -n confirms the removed var target fails honestly; retained wave and all routes remain available.
+Required Price/Quantity checks remain loud and _is_script_path remains true.
+Strict API audit also passes on the committed runtime head.
+The seven pytest warnings are four same-process synthetic repeat-build warnings, one intentionally missing Fakeland builder and two intentionally unavailable Fakeland Make targets.
+All 40 actual runtime stages and paired Feature/CLI calls report zero Python warnings; scanner findings are accounted for separately below.
+
+Actual paired Country Mali (155931) and healthy Niger (46043), plus Feature default currency and explicit currency=None, yield 201974 rows per argument variant.
+All four complete frames match parent values, axes, order, dtypes, masks and recursively typed attrs without normalization.
+Niger is a physically copied, verified current-hash/full-four-wave L2 comparator, SHA256 =bf47a8949709044659b3f914813e55324b457fc210280c64bf7660589248f284=; bytes/modes/mtimes remain exact.
+Default-currency and currency=None references are separate; neither is substituted for the other.
+
+Scoped scanner phases 1/2 produce exactly two WARN records per head, byte-for-byte equal as unmodified JSONL and full finding multisets.
+They are Mali and Niger has_household_index: native cluster-price tables have no household i level.
+There are zero ERROR/FAIL records and no invented phase-2 kwargs grid for this feature.
+No source-supported finding is hidden or normalized.
+
+Actual all-country hash inventory was measured before rebuilding: 24 Mali cells change; 525 other-country cells and 39 tagged framework fingerprints remain exact.
+Whole-file Make/script hashing causes that bounded cost.
+This does not claim rebuilt outputs for Mali's other 23 hashed tables, nor a corpus rebuild/full-suite run.
+
+* Preserved stops and remaining review
+
+Private original failed runs remain available: fixture cwd, nullable empty-dtype expectation, synthetic parent mkdir, over-strict observer of metadata-only Make JSON targets, CLI harness syntax/missing instrumentation, and strict artifact dtype/typed-attrs comparisons.
+Each was corrected as a harness expectation or instrumented control, with terminal source-backed results separate; none became a product workaround or an accepted failed test.
+Detailed frames, coordinates/IDs if present in attrs, full warnings/logs and original scanner messages stay private; only aggregates are exported.
+Three protected prior trees (diagnosis, original 822 lane and f8) remain exact in tracked contents/modes/HEAD/clean state.
+All 398 diagnosis and 81 original 822 evidence files remain exact in bytes/modes/mtimes.
+Final release requires clean published source, exact runtime/test blobs in the evidence descendant, private receipts and zero active task consumers.
+
+Independent review must use a separate physical private root and immutable checkout, verify source/copy provenance before APIs, rerun discriminating backend/subset/full-attrs controls and reconcile complete scanner records.
+Composition after that should compare the actual integration parent, preserve other reviewed patches, verify current cache provenance and repeat only the bounded Mali/backend/subset/Feature checks justified by the union.
+No public merge is authorized here.
+
+Sue

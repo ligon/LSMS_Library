@@ -1,0 +1,15 @@
+{
+  "source_ready_sha256": "6f5aec4b421521330fcacd49626d01d7a8a6b968f539bc4e32f867eecd98e8d8",
+  "files_sha256": {
+    "ADDENDUM.org": "c65a79d3a23d1d2ea76db7c3b3ba1961a0c8a1d1a57fa5cb804bdf260ac4e1fc",
+    "verdict.json": "aefeab1780723bc0ef964d5c4b174f575f490e2668b53a589efd63111e61ad09",
+    "attribution-proof.json": "bd06b1b95a310434b933a26aa0a63cec490cef670a64d6828c0af804780f782f",
+    "exact-artifact-proof.json": "d8f480c2439a5e2d9d96a7dab54bd330d144e5025f17d7592c5a42feef17e630",
+    "freeze-proof.json": "2b1ff5b1ca1ba1f1763996da42d4ae29f2b060a6d14aeddbefc9b4ff2d789d86",
+    "guard-policy-proof.json": "e0aeba2936bff672cce06cecf0687abe95f3fec8d54947f939dc51174f45b1e5",
+    "REPRODUCE.md": "fe7133e65b73c73ddf62d1b2f426b136646e850cdef41d9ad27e44935ec6da99",
+    "exact_artifacts.py": "27885c7fa967e37ce6a5adc6deb03f5d44b284865a4b2a1556908579a45eeb46",
+    "attribute_and_compare.py": "f8f3c81438519eb9082a4b8bf36f46d0660b6b03c37dae20a7296959f8d0eeb1"
+  },
+  "all_exports_exact": true
+}

@@ -30,10 +30,10 @@ PR [[https://github.com/ligon/LSMS_Library/pull/1182][1182]] at =780f67986= adds
 | Nigeria | #1034 PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]] at =3e6582987= passed 78 tests and CI. #1144 PR [[https://github.com/ligon/LSMS_Library/pull/1178][1178]] at =a1ba246f5= passed independent review (116 tests) plus documentation confirmation. It is stacked on #1172; CI passed. #1095 PR [[https://github.com/ligon/LSMS_Library/pull/1192][1192]] at =b8b03e448= passed independent 60-test source/cold/warm/Feature/hash review and CI. All 5,228 prices return with old payloads and attrs exact. Future unresolved-label retention remains Tier C; global thirteen-change coexistence review passed against actual global12 with full frames and attrs exact. |
 | Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. #1006 PR [[https://github.com/ligon/LSMS_Library/pull/1191][1191]] at =2b6cf4ccb= passed independent 25 scoped plus 41 supporting tests, exact nine-frame/two-matrix and fault/cleanup/absence controls; CI passed (run 39669180447). The completed #1078 diagnosis confirms an actual eviction/existence-check writer race; isolated runtimea4 naturally heals the nine-cell corruption and is under independent framework review. Broad hash cost and original historical-interleaving limit remain explicit. |
 | Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. #1111 now implements only questionnaire-covered 2010/2019 unit declarations, preserving existing kg amounts before unchanged aggregation. Its 235 coalescences preserve source sums; runtime head =9b883974a= passed 101 author tests; initial independent review found three assertions pinning the known organic defect. Test-only descendant =a9356f2c5= removes them and independently passes 101 tests; production is unchanged. Composed =fd2356ee9= preserves organic PR1175 and independently passes 129 tests, full source/frames/attrs/scanner checks and warm zero writes. Partial PR [[https://github.com/ligon/LSMS_Library/pull/1193][1193]] is stacked on #1175, with CI passed. 2013/2016 literal C4 gaps remain; seed purchase-unit routing is #1190. |
-| Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. |
+| Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. A separate #1091 diagnosis now measures the country community-price builder and supported singleton requests on that reviewed base. |
 | Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report; #851 integration remains pending. #1123 PR [[https://github.com/ligon/LSMS_Library/pull/1189][1189]] at =cfd078276= passed independent source/cold/warm/Feature/hash review, 13 focused plus eight adversarial tests and CI. All 183 lost native lines return. Documentation-only qualification passed root review. Code21 authority is #1187; gift/purchase field routing is #1188. #1058 diagnosis verifies 4,180 pairs on 7,350 retained parcels, excluding 1,117 null-key placeholders from 8,467 raw rows; held Mali/Niger/Senegal extracts have no coordinate headers. PR [[https://github.com/ligon/LSMS_Library/pull/1194][1194]] at =20a554186= independently passes44tests and full source/native/walked/public/Feature/warm/scanner/hash proofs. CI passed(run39683305731); bounded global15 coexistence with prior1123 PASSED57tests and fullframes/warm/scanner metadata checks. |
 | Ethiopia | #1118 independent review passed 58 focused tests and six reviewer controls, source/cold/warm/Feature conservation and full fingerprint checks. PR [[https://github.com/ligon/LSMS_Library/pull/1181][1181]] at =1bce11cc8= preserves 180,900 rows and normalizes 37,370 units; the separately reviewed source-caveat documentation moves no hashes. Latest CI passed. #1171 remains the nutrition follow-up. |
-| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI passed. Residual #1179 owns unresolved units. #1121 PR [[https://github.com/ligon/LSMS_Library/pull/1186][1186]] at =6e97eaeb4= independently passes 335 tests, exact 52,057-row casing-only conservation and CI. Its Ghana taxonomy residual remains separate. Read-only #1091 now diagnoses legacy country-builder retirement on reviewed822, preserving155931prices; Make omits the default id_converted attr and unsupported subsets remain under test. |
+| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI passed. Residual #1179 owns unresolved units. #1121 PR [[https://github.com/ligon/LSMS_Library/pull/1186][1186]] at =6e97eaeb4= independently passes 335 tests, exact 52,057-row casing-only conservation and CI. Its Ghana taxonomy residual remains separate. The #1091 Mali retirement is READY at =9e8ebeabb=, based on reviewed822: 111 focused tests pass; 40 runtime stages preserve 155931 supported records and return declared empty unsupported requests. Independent review is active in separate physical roots; no PR exists yet. |
 | Tanzania | #1118 independently passed 246 tests and full source/cold/warm/Feature/hash checks. PR [[https://github.com/ligon/LSMS_Library/pull/1185][1185]] at =e75be9c56= retains 9,698 rows and normalizes 408 units; documentation-only corrections passed narrow review and CI passed. All 11 scanner findings are matched, with only the alignment detail changing 408 to 0. |
 
 * Evidence that changed the fixes
@@ -208,5 +208,35 @@ Three match the exact declared DVC MD5s: W4 household questionnaire, W5 househol
 Both manuals relate the nonmoving answer to the previous-wave/listing dwelling; that supports the flag interpretation but leaves exact address-round alignment,20unknown statuses and physical-cluster identity unresolved.
 The live #1135 follow-up links those documents; frozen held-source evidence remains unchanged.
 Safe documentation and receipts are in =1135-public-instruments/=; PDFs, full extracted text and the private reader remain outside Git.
+
+Sue
+
+* Review checkpoint -- 2026-10-21 23:50 UTC
+
+The standalone #1078 source review and its bounded publication addendum pass.
+The final author head =d46795c303e2409ddb8ed5e4c62efca4e87ca347= is clean and pushed to GitHub; its library/test trees and modes equal the tested runtime.
+The original frozen review is in =review-1078/=; the additive proof and explicit execution qualifications are in =review-1078-addendum/=.
+Root read the complete exact comparator, source-backed denial attribution and release receipts, then independently verified all 9151 JUnit identity/outcome occurrences against the original run.
+The full selection remains failed with 4689 passes, 4453 skips and nine protected timestamp failures; the separate unchanged nine-case private-operand pass remains separate.
+All 24 new denials are explained, without retroactively identifying the original six metadata-free events.
+Exact artifact checks cover 195 immutable inputs and preserve the pre-existing Niger unit-index dtype mismatch.
+The measured all-country invalidation cost and the need for a coordinated rebuild window must be prominent in the eventual PR.
+No #1062/global16 composition or whole-corpus rebuild is claimed.
+
+Mali's #1091 writer is frozen at =9e8ebeabb0e996684d325d05987763a8c3581cc8=; runtime/tests are =fdadc0698efcd300f5f09c21b60c30f570f96621=.
+Its safe author evidence is in =1091-Mali-author/=.
+The actual 549/39 census finds 24 Mali table hashes changed, with 525 other-country hashes and 39 framework fingerprints exact.
+Independent review has started on distinct candidate/base checkouts with private physical source and cache copies.
+Niger's separate diagnosis uses reviewed #1088 as its base; Tanzania has a prepared isolated checkout awaiting its own brief.
+
+Uganda's #849 source diagnosis is complete and frozen.
+The old blocking parents are merged, but a new concrete defect prevents safe factor-only promotion: the current reducer combines quantities while keeping the first factor, losing each native production record's pairing.
+Native production IDs or actual form slots distinguish the eligible 2011/2013/2015/2018/2019 observations; 2010 needs an explicitly constructed and documented observation identity if no stronger key exists.
+An additional Country-only index would be dropped again by current Feature assembly, so a lossless implementation needs a declared assembly contract.
+A new artifact-only exactness addendum is checking the saved diagnosis frames; the frozen original used default pandas float tolerances for some preservation comparisons.
+No factor mapping, index change, scalar reducer or public-grain implementation is approved by that diagnosis.
+
+The allocation has more than 47 hours left and no deadline warning at this checkpoint.
+Country work and independent reviews remain active; no PR is merged automatically.
 
 Sue
