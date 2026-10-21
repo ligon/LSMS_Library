@@ -30,7 +30,7 @@ GhanaLSS interview_date, GhanaLSS visit derivations and the synthetic dfs-merge 
 | Final 17 controls with only the old 852 gate bound in memory | 6 failed, 11 passed, 31 deselected |
 | Candidate entire 1040 read-gate file | 48 passed in 4.77s |
 | Candidate focused eight-file suite, 4 loadfile workers | 190 passed, 0 skipped, 0 failures/errors, 33 warnings in 68.77s |
-| Original three force-build controls on an expendable physical copy | 3 passed; 15 outer parquet unlinks, 16 byte changes, 19 file replacements |
+| Original three force-build controls on an expendable physical copy | 3 passed; 15 outer parquet unlinks, 16 byte changes, 18 file replacements |
 | Isolated candidate three controls on a separate physical copy | 3 passed; 0 outer unlinks, 0 byte changes, 0 file replacements |
 | Guyana/India controls starting with empty outer L2 | 2 passed; 0 outer mutations |
 | Physical seed verification | 67 files identical SHA256, distinct inodes |

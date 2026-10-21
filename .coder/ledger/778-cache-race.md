@@ -69,7 +69,7 @@ The initial unchanged-source proof was5 failures/10 passes; the final17 controls
 
 - Whole1040 read-gate file:48 passed.
 - Focused eight-file suite with4 loadfile workers:190 passed,0 skipped/failures/errors,33 warnings in68.77s.
-- Three original force-build controls on an expendable private copy:3 passed but15 outer parquet unlinks,16 byte changes and19 file replacements.
+- Three original force-build controls on an expendable private copy:3 passed but15 outer parquet unlinks,16 byte changes and18 file replacements.
 - Candidate physical-copy controls:3 passed with zero outer mutation;67 seed files SHA-identical with distinct inodes, and immutable original source bytes/inodes/mtimes unchanged.
 - Cold Guyana/India controls:2 passed starting with empty outer L2, without introducing warm-only skips.
 - Actual complete inventories:549 country hashes,2139 wave entries (30 existing None) and39 table transform fingerprints identical before/after.
