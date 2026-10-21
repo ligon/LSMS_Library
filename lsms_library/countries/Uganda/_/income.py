@@ -6,6 +6,7 @@ Combine income from different sources to make 'total' household income.
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
 import lsms_library as ll
+import os
 import pandas as pd
 import numpy as np
 
@@ -17,7 +18,17 @@ income = None
 for source,cols in income_sources:
     # GH #1062: materialize through the authoritative builder, then retain
     # the raw pre-finalize operands (ledger sections 2/4).
-    getattr(uga, source)()
+    # Existing Make targets may be valid subset caches; only the ordinary
+    # cache path checks and expands their wave coverage.
+    original_backend = os.environ.get('LSMS_BUILD_BACKEND')
+    try:
+        os.environ['LSMS_BUILD_BACKEND'] = 'dvc'
+        getattr(uga, source)()
+    finally:
+        if original_backend is None:
+            os.environ.pop('LSMS_BUILD_BACKEND', None)
+        else:
+            os.environ['LSMS_BUILD_BACKEND'] = original_backend
     per_source = get_dataframe(f'../var/{source}.parquet')[cols].sum(axis=1)
     # Collapse duplicate (t, i) rows: source tables carry per-activity rows
     # (multiple enterprises or labor activities per household).  Income is

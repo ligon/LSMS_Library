@@ -189,3 +189,130 @@ def test_make_all_keeps_framework_sibling_targets_reachable(tmp_path):
     assert any(".Country('Uganda').enterprise_income()" in line for line in lines)
     assert 'python earnings.py' not in lines
     assert 'python enterprise_income.py' not in lines
+
+
+@pytest.mark.parametrize('original', ['make', '', None])
+@pytest.mark.parametrize('fail_on', [None, 'earnings', 'enterprise_income'])
+def test_income_pins_sibling_backend_and_restores_environment(original, fail_on, monkeypatch):
+    import os
+    import lsms_library as ll
+    import lsms_library.local_tools as lt
+
+    if original is None:
+        monkeypatch.delenv('LSMS_BUILD_BACKEND', raising=False)
+    else:
+        monkeypatch.setenv('LSMS_BUILD_BACKEND', original)
+    monkeypatch.setenv('LSMS_NO_CACHE', 'preserve-this-value')
+    idx = pd.MultiIndex.from_tuples([('2020', 'h1')], names=['t', 'i'])
+    seen = []
+
+    class Country:
+        def __init__(self, name):
+            assert name == 'Uganda'
+        def __getattr__(self, table):
+            def materialize():
+                seen.append(table)
+                assert os.environ['LSMS_BUILD_BACKEND'] == 'dvc'
+                assert os.environ['LSMS_NO_CACHE'] == 'preserve-this-value'
+                if table == fail_on:
+                    raise RuntimeError('source unavailable')
+            return materialize
+
+    def read(fn):
+        # The original backend must already be restored before the raw read.
+        assert os.environ.get('LSMS_BUILD_BACKEND') == original
+        col = 'Earnings' if Path(fn).stem == 'earnings' else 'profits'
+        return pd.DataFrame({col: [2.]}, index=idx)
+
+    monkeypatch.setattr(ll, 'Country', Country)
+    monkeypatch.setattr(lt, 'get_dataframe', read)
+    monkeypatch.setattr(lt, 'to_parquet', lambda *a, **k: None)
+    if fail_on:
+        with pytest.raises(RuntimeError, match='source unavailable'):
+            _exec_script('income.py')
+    else:
+        _exec_script('income.py')
+        assert seen == ['earnings', 'enterprise_income']
+    assert os.environ.get('LSMS_BUILD_BACKEND') == original
+    assert ('LSMS_BUILD_BACKEND' in os.environ) == (original is not None)
+    assert os.environ['LSMS_NO_CACHE'] == 'preserve-this-value'
+
+
+def test_income_make_backend_expands_valid_subset_sibling_caches(tmp_path):
+    """Exercise actual public cache coverage and Make routing, without data access.
+
+    Both sibling parquets already exist with valid hashes/one-wave manifests.
+    Their thin Make wrappers therefore cannot repair coverage by themselves.
+    """
+    if not shutil.which('make'):
+        pytest.skip('make is unavailable')
+    import json
+    import os
+
+    config = tmp_path / 'countries'
+    scripts = config / 'Uganda' / '_'
+    scripts.mkdir(parents=True)
+    shutil.copyfile(UGANDA / 'income.py', scripts / 'income.py')
+    shutil.copyfile(UGANDA / 'Makefile', scripts / 'Makefile')
+    for name in ['panel_ids.json', 'updated_ids.json']:
+        (scripts / name).write_text('{}')
+    (scripts / 'data_scheme.yml').write_text("""Waves: ['2020-21', '2021-22']
+Data Scheme:
+  earnings:
+    materialize: make
+    index: (t, i)
+    Earnings: float
+  enterprise_income:
+    materialize: make
+    index: (t, i)
+    profits: float
+  income:
+    materialize: make
+    index: (t, i)
+    income: float
+""")
+    for wave, earnings, profits in [('2020-21', 10, 1), ('2021-22', 20, 2)]:
+        wave_dir = scripts.parent / wave
+        (wave_dir / '_').mkdir(parents=True)
+        (wave_dir / 'Data').mkdir()
+        (wave_dir / 'Data' / 'sources.csv').write_text(f'hid,earnings,profits\nh1,{earnings},{profits}\n')
+        (wave_dir / '_' / 'data_info.yml').write_text("""earnings:
+  file: ../Data/sources.csv
+  idxvars: {i: hid}
+  myvars: {Earnings: earnings}
+enterprise_income:
+  file: ../Data/sources.csv
+  idxvars: {i: hid}
+  myvars: {profits: profits}
+""")
+    env = {**os.environ, 'LSMS_COUNTRIES_ROOT': str(config),
+           'PYTHONPATH': str(Path(__file__).resolve().parents[1]),
+           'LSMS_BUILD_WORKERS': '1', 'LSMS_DATA_DIR': str(tmp_path / 'data'),
+           'LSMS_ALLOW_INTREE_SOURCES': '1'}
+    env.pop('LSMS_NO_CACHE', None)
+    code = """
+import json, os
+import lsms_library as ll
+from lsms_library.paths import data_root
+from lsms_library.local_tools import read_parquet_cache_hash, read_parquet_cache_waves
+c = ll.Country('Uganda', preload_panel_ids=False)
+os.environ['LSMS_BUILD_BACKEND'] = 'dvc'
+for table in ['earnings', 'enterprise_income']:
+    getattr(c, table)(waves=['2020-21'])
+    path = data_root('Uganda') / 'var' / (table + '.parquet')
+    assert read_parquet_cache_waves(path) == ['2020-21']
+    assert read_parquet_cache_hash(path) == c._table_cache_hash(table, c.waves)
+os.environ['LSMS_BUILD_BACKEND'] = 'make'
+answer = c.income()
+assert set(answer.index.get_level_values('t')) == set(c.waves), 'all-wave income reused valid partial siblings'
+assert answer['income'].tolist() == [11., 22.]
+for table in ['earnings', 'enterprise_income']:
+    path = data_root('Uganda') / 'var' / (table + '.parquet')
+    assert set(read_parquet_cache_waves(path)) == set(c.waves)
+    assert read_parquet_cache_hash(path) == c._table_cache_hash(table, c.waves)
+print(json.dumps({'income': answer['income'].tolist(), 'waves': c.waves}))
+"""
+    proc = subprocess.run([sys.executable, '-c', code], cwd=tmp_path, env=env,
+                          capture_output=True, text=True, timeout=120)
+    assert proc.returncode == 0, proc.stderr[-5000:]
+    assert json.loads(proc.stdout.splitlines()[-1])['income'] == [11., 22.]

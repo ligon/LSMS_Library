@@ -1,0 +1,55 @@
+#+TITLE: GH #1062 amendment -- valid partial inputs under inherited make
+#+AUTHOR: Sue
+
+* Review finding and correction
+
+The independent reviewer found a gap at =58ccfc2ca=: seed valid =earnings= and =enterprise_income= country caches for 2011-12, then request all-wave income under =LSMS_BUILD_BACKEND=make=.
+Because the sibling target files already exist, Make skips their thin wrapper recipes and the API's make route bypasses ordinary wave-coverage checks.
+Income then serves 1,810 rows from one wave instead of 14,740 rows from eight.
+The original absent-file/make controls did not cover this state.
+
+The approved amendment is confined to =Uganda/_/income.py=.
+Each existing public sibling-materialization call temporarily selects the dvc backend; a local =try/finally= restores the exact original backend string or absent key before the existing raw read, including exceptions.
+The raw pre-finalize operands and every arithmetic operation remain unchanged.
+No LSMS_NO_CACHE override, framework helper, cache policy, dependency, fixture or baseline change is introduced.
+The design and prior-art ledger were amended and committed as =47e2477e5= before runtime changes.
+
+* Regression and real-data evidence
+
+All ten new controls fail before the patch and all *29 focused tests pass* after it, retaining the previous nineteen controls.
+The new natural regression uses actual Country methods, valid content hashes, one-wave manifests and existing Make target files in a data-free synthetic country.
+The other nine controls cover original backend =make=, empty string and absent key, on success and exceptions from either sibling; they also assert LSMS_NO_CACHE remains unchanged.
+The synthetic subprocess explicitly selects its checkout and private config/data roots and acquires no survey data.
+
+The real Uganda case was independently reproduced in this lane with a physical private L2 copy and the already-held private L1 seed.
+Before amendment, both source caches have current hashes but remain 2011-12-only and income is 1,810 x 1.
+After amendment, both source manifests expand to all eight waves and verify their current hashes; income is *14,740 x 1* over all eight waves.
+Both source raw frames and the raw/served income frames compare exactly to the original full-wave reference, including values, identifiers/order, index, columns and dtypes.
+Only aggregates and footer evidence are retained in =before-subset-make.json= and =after-subset-make.json=; no raw frame is committed.
+
+Eight affected fresh-process order checks cover warm/default/make income, forced default/make income and source rebuilds, a trailing ordinary full read and a proper subset serve.
+Every step preserves all watched unrequested sibling bytes, mtimes, hash and coverage metadata; all three raw source/income frames and every requested served frame retain exact reference values.
+See =income-order-summary.json=.
+Explicit make income's own output may remain hashless under the existing backend contract; the verifier requires source coverage and exact frames rather than inventing a new stamping policy.
+The verifier initially assumed that own-output manifest existed, then was corrected to that unchanged contract before completing the remaining order checks.
+
+The amendment moves exactly the *28 Uganda country-table hashes* across the 549-table inventory and zero of the 39 framework fingerprints.
+The other 521 country-table hashes remain identical.
+The affected Feature audit (=earnings enterprise_income income=, Uganda) retains the same six pre-existing warnings and no differential finding.
+Nutrition/FCT runtime and scientific inputs are untouched; their original evidence remains separate from this income coverage amendment.
+
+* Reproduction
+
+Run the focused selection from the canonical checkout with its PYTHONPATH and LSMS_COUNTRIES_ROOT, a private LSMS_DATA_DIR and one numeric/build thread:
+#+begin_src sh
+python -m pytest tests/test_gh1062_uganda_sibling_writes.py \
+  tests/test_gh772_uganda_earnings_shape.py -q
+#+end_src
+
+For the real case, =subset_make.py= takes =EVIDENCE_OUT= and =REFERENCE_EVIDENCE= (the original private full-wave snapshot directory).
+Its data root must start without country earnings/enterprise/income outputs so the initial one-wave calls create actual one-wave manifests; other L2 data must be physically private and only L1 may be seeded jointly.
+=verify_income_orders.py= uses those same variables, preserves forced outputs in its private evidence directory and checks the exact original raw/served references.
+=START_STEP= supports resuming the evidence run; leave it unset for all eight checks.
+The interpreter for this allocation is =/local/job40255479/venv_img/bin/python=; imports/config realpaths are asserted against the canonical checkout.
+
+No frozen review tree, shared cache, other country, acquisition flow, scientific number or GitHub record was changed.

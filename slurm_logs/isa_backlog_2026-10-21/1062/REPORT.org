@@ -1,6 +1,12 @@
 #+TITLE: GH #1062 -- Uganda country builds preserve sibling caches
 #+AUTHOR: Sue
 
+* Independent-review amendment
+
+The validation below describes the initial candidate at =58ccfc2ca=.
+Independent review found a valid-partial-cache gap under inherited make; the local income backend pin, stronger regression and new exact private checks are recorded in [[file:amendment/REPORT.org][the amendment report]].
+Current country ownership is branch =isa/Uganda-20261021=.
+
 * Change and boundary
 
 Baseline =f8d236694=; working branch =fix/1062-uganda-sibling-writes-20261021=.

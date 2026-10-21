@@ -2059,6 +2059,9 @@ Both retain the existing food intersection and nutrient matrix; neither rewrites
 Their separate Make targets no longer run the legacy country =food_acquired= compiler as a prerequisite, because quantities already come from the normal Country API.
 
 =income.py= first asks the framework to materialize =earnings= and =enterprise_income=, then reads their verified raw country parquets with =get_dataframe=.
+Each sibling call temporarily selects =LSMS_BUILD_BACKEND=dvc= so that valid existing one-wave caches expand to the requested all-wave coverage even when income inherits the make backend.
+The exact original backend value (or absent key) is restored with =try/finally= before the raw read, including when materialization raises.
+Independent review found that pinning only the Make wrapper was insufficient: Make skips a valid partial target that already exists, serving 1,810 rows of 2011-12 as the all-wave income table instead of 14,740 rows over eight waves.
 Its original source sums, duplicate-key aggregation and household-union arithmetic remain unchanged; the finalized API return is deliberately not an operand.
 The Make targets for those two inputs are thin API calls with =LSMS_BUILD_BACKEND=dvc= pinned in the subprocess, so a make-backend request cannot recurse into itself.
 The historical concatenation scripts and their regression tests remain as reference; normal Make rules no longer run them.
