@@ -1,0 +1,33 @@
+{
+  "Benin": {
+    "prices": {
+      "index_values_columns_dtypes_data_exactly_unchanged": true,
+      "rows": 132811
+    },
+    "quantities": {
+      "index_values_columns_dtypes_data_exactly_unchanged": true,
+      "rows": 187338
+    }
+  },
+  "CotedIvoire": {
+    "prices": {
+      "index_values_columns_dtypes_data_exactly_unchanged": true,
+      "rows": 182891
+    },
+    "quantities": {
+      "index_values_columns_dtypes_data_exactly_unchanged": true,
+      "rows": 296945
+    }
+  },
+  "Senegal": {
+    "prices": {
+      "index_values_columns_dtypes_data_exactly_unchanged": true,
+      "rows": 319730
+    },
+    "quantities": {
+      "index_values_columns_dtypes_data_exactly_unchanged": true,
+      "rows": 436348
+    }
+  },
+  "snapshot_note": "String index NA policy normalized to pd.NA on both sides; parquet roundtrip records na_value=nan."
+}

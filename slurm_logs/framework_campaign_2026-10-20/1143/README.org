@@ -1,0 +1,76 @@
+#+title: GH #1143 decimal-comma parsing evidence
+#+author: Sue
+#+date: 2026-10-20
+
+* Change and prior art
+
+The metric parser reads the entire numeric token, using decimal commas with one or two fractional digits, leading-zero decimal commas at any precision, and three-digit thousands groups unless the token starts with the literal =0,=.
+Thus =1,5 L= is 1.5 kg-equivalent under the existing volume-as-mass option, =0,125 kg= is 0.125 kg, and =1,500 kg= is 1500 kg.
+Malformed separators and numeric suffixes decline; fractions, SI scales, unit word boundaries, existing range endpoints, numbered survey labels and existing inner sizes in multiplier labels are preserved.
+
+Work reuses the previously unpublished implementation =0020cfdac= and tests =15d2d567f=, recovered without rewriting their attribution.
+The earlier implementation refused =0,125= and accepted some malformed suffixes; this branch extends it and runs the existing tests alongside new regressions.
+Independent review also caught zero-padded grouped tokens (=01,500=, =001,500=, =000,500=): the issue's rule reads these as 1500, 1500 and 500, while =0,500= remains decimal 0.5.
+Unsupported exponent-like fragments with repeated signs or embedded whitespace now decline without changing existing range endpoints.
+The ledger =.coder/ledger/1143-decimal-comma.md= records the source rules and recovery.
+
+* Measured food effects
+
+Before is a private cold build of exact =976fc840d12ba40f1602b7dff58b81548632b2a9=.
+After is a separate private cold build of this branch's final parser.
+Only content-addressed L1 blobs are shared; no shared L2 parquet was read, written or cleared.
+Import identity and config root are asserted in the measurement scripts.
+
+| country | changed quantities | changed default prices | kilograms before | kilograms after | kg delta |
+|---------+--------------------+------------------------+------------------+-----------------+----------|
+| Senegal | 783 | 692 | 767739.9104147101 | 761459.0754147101 | -6280.835 |
+| Benin | 126 | 68 | 159860.6098289145 | 159507.2398289145 | -353.37 |
+| CotedIvoire | 36 | 23 | 353069.34422069835 | 352840.11422069836 | -229.23 |
+
+These are 945 affected factor/quantity rows in total.
+GH #1143's bottle row has a counting typo: Senegal has 782 =Bouteille de 1,5 L= rows (385 + 397), plus one =Filet (2,5 kg)= row, making 783 affected Senegal rows.
+Benin has 120 =Bidon de 1,5 L=, three =Bidon de 0,5 L= and three =Sac (2,5 Kg)= rows; CotedIvoire has 36 =Sac (0,9 Kg)= rows.
+=comparison.json= records these counts per wave and label.
+
+All three =food_acquired= frames are exactly unchanged, including their index, columns, dtypes and every value.
+Quantity and price output row counts, index values/order, columns and dtypes are unchanged; native-unit quantities and factor-source partitions are unchanged.
+Senegal prices change by 10/3 on 691 rows and by 2 on one row; Benin by 10/3 on 64, 10 on three and 2 on one; CotedIvoire by 10 on 23.
+Per-wave price medians are unchanged.
+Senegal's two known extreme prices dominate the 2018-19 sum, so the separately summed row deltas in =comparison.json= retain a price change its rounded aggregate sum cannot show.
+
+Senegal's 624 =Demi walatt= rows (248 + 376) remain latent: the raw keys state 12.5 cl but the Preferred Label omits the size.
+This is recorded in its =CONTENTS.org= without changing the mapping or declaring a factor.
+The CotedIvoire notes also record the observable contradiction between their older "No u table is wired" text and the current named =u= table; no mapping was changed.
+
+* Verification and cache cost
+
+- Final focused run :: 370 passed in 192.41 seconds across =test_metric_decimal_comma=, =test_metric_fraction_parse=, =test_volume_as_mass_kwarg=, =test_food_kg_inference=, =test_crop_kg_factor=, =test_gh838_stated_vs_inferred=, =test_gh919_country_qualified_units= and =test_build_transform_hash=.
+- Discriminating regressions :: 16 failures against the recovered prior implementation before this extension, covering leading-zero decimals, denominator commas and malformed-token suffixes.
+- Actual fingerprints :: 22 of 549 L2-country hashes and 154 of 2,139 L2-wave hashes change, all GhanaLSS; zero of 39 tagged build fingerprints change; no hash-probe errors.
+- Interpretation :: the food derivations execute at read time, but GhanaLSS's nutrition-script import reaches this parser, so GhanaLSS's country and wave caches require a rebuild.
+- Existing warnings :: the measured build retains existing grain/cluster/unit warnings; this patch changes no source wiring or missing-unit policy.
+- Review invariance :: =review-live-invariance.json= records unchanged quantity/price outputs for all three countries after the zero-padded grouping and unsupported-exponent corrections; String-index NA policy is normalized on both sides because parquet serialization uses NaN missing-value semantics.
+
+Individual snapshots and full logs remain private at =/local/job40255479/1143-private/=.
+Tracked JSON files contain aggregates only.
+
+* Reproduce
+
+Use the mounted environment with BLAS threads and =LSMS_BUILD_WORKERS= set to one.
+For each phase set =PYTHONPATH= and =LSMS_COUNTRIES_ROOT= to that checkout, change into it, and use a new private =LSMS_DATA_DIR= with only its =dvc-cache= linked to shared L1.
+Run =measure_food.py COUNTRY PHASE OUTPUT_DIRECTORY= for Senegal, Benin and CotedIvoire.
+Run =hash_reach.py OUTPUT_JSON= once per checkout; it reads config/sidecars and computes actual hashes without building data.
+
+On this allocation, the baseline checkout is =/local/job40255479/worktrees/baseline-976fc840d=, current checkout is =/local/job40255479/worktrees/1143-decimal-comma=, Python is =/local/job40255479/venv_img/bin/python=, and private roots are =1143-private/before-COUNTRY= and =1143-private/final-COUNTRY= under =/local/job40255479/=.
+The exact comparison can be replayed with the current checkout selected:
+
+#+begin_example
+python slurm_logs/framework_campaign_2026-10-20/1143/compare_food.py \
+  /local/job40255479/1143-private \
+  /tmp/1143-comparison.json
+python -m pytest -q tests/test_metric_decimal_comma.py \
+  tests/test_metric_fraction_parse.py tests/test_volume_as_mass_kwarg.py \
+  tests/test_food_kg_inference.py tests/test_crop_kg_factor.py \
+  tests/test_gh838_stated_vs_inferred.py tests/test_gh919_country_qualified_units.py \
+  tests/test_build_transform_hash.py
+#+end_example
