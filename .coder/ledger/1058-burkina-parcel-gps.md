@@ -70,7 +70,25 @@ is immutable; all writer evidence belongs to the separate 1058-fix root.
 
 ### Phase 3 - verification
 
-Pending actual paired private cold/warm/source/Feature/test/hash evidence.
-The diagnosis observed 24 Burkina country hashes depending on the helper
-and scheme, with 525 other cells and 39 framework tags unaffected; actual
-candidate hashes will be measured after implementation.
+Verified at runtime commit 7eee549b15cacbe1e86b60a925b0899dc85d49e6,
+following ledger-first commit b5ced85c571bc4d5b430371d1f92ace336c24a3f.
+The 15 new cases pass; their baseline counterfactual has 12 failures and
+3 passes. All 21 existing supporting cases pass, with no skips or errors.
+
+Physically separate, MD5-verified held sources supported normal baseline
+and candidate cold builds with no Burkina L2 inputs. Each fresh-process
+warm replay compares 13 complete frames and logical attrs and changes no
+cache bytes, modes or mtimes. Original six-column payloads, keys, order,
+nulls, dtypes and attrs are exact; 2018 native waves remain six-column,
+while the country union adds missing optional coordinates. The source-key
+projection accounts for all 4,180 pairs and 3,170 missing pairs. Public
+rows remain 19,784; Feature with Senegal remains 33,608. Existing seven-row
+2018 exclusion, unsupported 2014 subset and zero collisions/orphans persist.
+
+Measured all 549 country cells and 39 framework tags: exactly 24 Burkina
+hashes move; 525 other cells and all 39 tags are exact. Senegal's complete
+frames and six comparator parquet receipts are unchanged. The full scanner
+finding multiset is exact (13 warnings); plot_features has no phase-2 grid.
+API audit passes. No source acquisition, shared-cache mutation or read-gate
+bypass was used. See the safe report, validation and commands under
+slurm_logs/isa_backlog_2026-10-21/1058-Burkina_Faso/.
