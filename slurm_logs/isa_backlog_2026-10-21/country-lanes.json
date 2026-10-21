@@ -247,7 +247,7 @@
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
       "branch": "isa/Uganda-20261021",
-      "status": "read-only-cache-writer-diagnosis",
+      "status": "framework-repair-underway-after-country-diagnosis",
       "owner": "triage_panel",
       "frozen_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
       "review_path": "/local/job40255479/worktrees/isa-review-1062-v2",
@@ -281,15 +281,38 @@
       },
       "active_issue": 1078,
       "active_owner": "review_nigeria_1034",
-      "active_path": "/local/job40255479/worktrees/isa-Uganda-1078",
-      "active_branch": "diagnose/1078-uganda-cache-writer-20261021",
+      "active_path": "/local/job40255479/worktrees/isa-framework-1078-fix",
+      "active_branch": "fix/1078-food-producer-provenance-20261021",
       "active_control_with_1062": "/local/job40255479/worktrees/isa-Uganda-1078-with1062",
       "active_control_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
-      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Uganda/1078",
-      "active_scope": "Read-only historical signature and actual writer/timing attribution underf8 vs reviewed1062; normal warm persistence confirmed; final proposal/FCT controls/freeze pending",
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/framework1078-fix",
+      "active_scope": "Root approved actual private per-result producer provenance/default public DataFrame contract, unchanged legitimate non-parquet aggregation/eviction/science, food-scoped tag plus actual broad grab_data hash-scope measurement and normal-gate healing; independent review pending",
       "active_historical_delta": "Independent historical comparison confirms exact sixQuantity and threeExpenditure NaN-to-zero cells,2011-12 only; allotherfullframes/attrs exact, same storeded5c69e8hash",
       "active_reproduced_mechanism": "Confirmed controlled unchanged-code race underboth f8 and reviewed1062: two existing tests PASS; actual normal hashless-wave eviction makes separately observed external parquet absent, triggering legacy sum. Final last writer produces exact historical9NaN-to-zero cells/current expected hash/full8wavecoverage. Ordinary fresh warm reads persist corruption with0writes/57privatefiles per root. Original historical full-suite interleaving unidentified.",
-      "active_cache_healing_concern": "Wave.food_acquired untagged and absent from actual current build closures. A repair confined to that method would not heal already-corrupt current-hash caches. Grounded proposal/versioning scope pending; no implementation approved."
+      "active_cache_healing_concern": "Root approved proper versioning and normal-gate healing. grab_data is tagged for all tables, so private origin plumbing may invalidate broadly; actual full hash inventory required before broader rebuild. No whole corpus rebuild authorized.",
+      "diagnosis_1078": {
+        "status": "COMPLETE controlled writer mechanism; historical original interleaving unresolved",
+        "source_pins": [
+          "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+          "4ef24fb72421e0573841aeb63b8c19b93a4f97d8"
+        ],
+        "tests_passed": 12,
+        "skipped": 0,
+        "physical_source_copies": 341,
+        "declared_held_sources": 31,
+        "quiescent": true,
+        "evidence": "1078-Uganda-diagnosis/",
+        "source_oracle": "All9 original operand sets missing; positive counterpart retains each row",
+        "FCT_food_writes": {
+          "baseline": 6,
+          "reviewed1062": 1
+        },
+        "hashless_FCT_food_writes": {
+          "baseline": 3,
+          "reviewed1062": 0
+        },
+        "all_FCT_food_write_inputs_outputs_correct": true
+      }
     }
   },
   "shared_lanes": {

@@ -1,0 +1,152 @@
+{
+  "frozen_sources_and_prior_evidence": {
+    "mode": "after",
+    "trees": {
+      "baseline": {
+        "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "clean": true,
+        "tracked_files": 14880
+      },
+      "with1062": {
+        "HEAD": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+        "clean": true,
+        "tracked_files": 14905
+      }
+    },
+    "all_tracked_bytes_modes_HEAD_clean_exact": true,
+    "prior_campaign_evidence_counts": {
+      "global13-evidence": 169,
+      "global14-evidence": 646
+    },
+    "prior_evidence_original_history_copies_and_metadata_receipts_exact": true
+  },
+  "source_gates_and_final_receipts": {
+    "status": "DIAGNOSIS_COMPLETE_NO_IMPLEMENTATION",
+    "tests": {
+      "passed": 12,
+      "skipped": 0,
+      "failed": 0
+    },
+    "physical_private_source_copies": 341,
+    "all_source_originals_copies_SHA_MD5_mode_mtime_exact": true,
+    "distinct_copy_inodes_nlink1_no_symlinks": true,
+    "declared_held_raw_sources": 31,
+    "complete_terminal_source_gates_before_API": true,
+    "network_attempts": 0,
+    "FDC_fallback_attempts": 0,
+    "active_traced_consumers": [],
+    "quiescent": true,
+    "no_production_git_or_cache_gate_changes": true,
+    "historical_interleaving_and_original_writer_remain_unidentified": true
+  },
+  "actual_writer_proof": {
+    "baseline": {
+      "real_read_then_normal_eviction_then_real_false_then_legacy_groupby": true,
+      "A_writer_input_and_actual_output_exact_entire_historic_bad": true,
+      "B_writer_input_and_output_exact_own_correct_cold": true,
+      "A_final_actual_bytes_equal_served_cache": true,
+      "A_B_normal_current_hash_and_full_coverage": true,
+      "actual_function_data_Path_exists_and_write_arguments_unchanged": true,
+      "writer_A_pid": 1053009,
+      "writer_B_pid": 1055681,
+      "A_null_counts": {
+        "Quantity": 21,
+        "Expenditure": 31,
+        "Price": 29755
+      },
+      "B_null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "current_hash": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba"
+    },
+    "with1062": {
+      "real_read_then_normal_eviction_then_real_false_then_legacy_groupby": true,
+      "A_writer_input_and_actual_output_exact_entire_historic_bad": true,
+      "B_writer_input_and_output_exact_own_correct_cold": true,
+      "A_final_actual_bytes_equal_served_cache": true,
+      "A_B_normal_current_hash_and_full_coverage": true,
+      "actual_function_data_Path_exists_and_write_arguments_unchanged": true,
+      "writer_A_pid": 1055671,
+      "writer_B_pid": 1058986,
+      "A_null_counts": {
+        "Quantity": 21,
+        "Expenditure": 31,
+        "Price": 29755
+      },
+      "B_null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "current_hash": "ae9480ac317d124b6a2461743c745c1e0316954267f00a28b18fe63c202bfdb8"
+    }
+  },
+  "source_oracle": {
+    "source_relative": "Uganda/2011-12/Data/GSEC15B.dta",
+    "source_md5": "f4b5885a98654c12d5c9960d1a3586ff",
+    "raw_rows": 38743,
+    "historical_nine_cells_all_original_source_operands_missing": 9,
+    "positive_counterpart_preserves_every_affected_row": true,
+    "independent_direct_DTA_selection_no_food_transform_used": true,
+    "Quantity_cells": 6,
+    "Expenditure_cells": 3,
+    "source_rows_per_cell": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "normal_order_controls": [
+    {
+      "revision": "baseline",
+      "scenario": "market-then-currency",
+      "whole_frame_full_attrs_exact": true
+    },
+    {
+      "revision": "baseline",
+      "scenario": "currency-then-market",
+      "whole_frame_full_attrs_exact": true
+    },
+    {
+      "revision": "with1062",
+      "scenario": "market-then-currency",
+      "whole_frame_full_attrs_exact": true
+    },
+    {
+      "revision": "with1062",
+      "scenario": "currency-then-market",
+      "whole_frame_full_attrs_exact": true
+    }
+  ],
+  "nutrition_FCT_aggregate": {
+    "baseline": {
+      "normal_nonempty_API_calls": 4,
+      "food_country_writes_observed": 6,
+      "hashless_food_country_writes": 3,
+      "every_actual_food_write_input_and_output_full_frame_attrs_exact": true,
+      "FDC_fallback_attempts": 0
+    },
+    "with1062": {
+      "normal_nonempty_API_calls": 4,
+      "food_country_writes_observed": 1,
+      "hashless_food_country_writes": 0,
+      "every_actual_food_write_input_and_output_full_frame_attrs_exact": true,
+      "FDC_fallback_attempts": 0
+    }
+  },
+  "limits": [
+    "Original historical writer and schedule remain unidentified.",
+    "Controlled timing does not estimate uncoordinated/full-suite reproduction frequency.",
+    "No full suite, Feature sweep, production patch, source rewrite or cache-versioning change.",
+    "Legitimate non-parquet aggregation and measured healing/version scope require approved implementation work."
+  ],
+  "private_payloads_exported": false
+}
