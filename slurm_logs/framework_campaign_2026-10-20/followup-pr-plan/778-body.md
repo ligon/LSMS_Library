@@ -1,0 +1,11 @@
+When an assumed-fresh country parquet disappears between the existence/footer check and its data read, the loader now falls through to the ordinary cache/build path. Only `FileNotFoundError` from the two data reads is handled; corruption, permission, mapping and genuine source errors retain their existing behavior.
+
+The remaining Guyana and India cold-build controls and Togo forced-build control now use physical private L2 copies with only L1 linked. Existing already-private GhanaLSS and synthetic controls are unchanged. Original corpus bytes remain unchanged, and cold Guyana/India execution still works without a warm source cache.
+
+Validation: 190 focused tests passed; independent review passed 67 controls. The final old-gate negative control produces six failures and eleven passing error controls. Complete cache inventories show no changes across 549 country hashes, 2,139 wave entries and 39 table fingerprints. Aggregate evidence and runnable probes are in `slurm_logs/framework_campaign_2026-10-20/778/`.
+
+Addresses #778's two actionable remaining items. Its carried note about trusting unstamped country-script output is unchanged and remains separate from this disappearance fix. The corruption/`LSMS_NO_CACHE` policy decision in #1071 is also unchanged; the disproven partial-aggregate theory is not revived.
+
+Dependency: this draft targets `integration/framework-v016-40255479` at `852ac2bfc` so the original fixes in #1154–#1157 do not appear in its diff. After those land, update this publication branch from development and retarget the PR. Do not merge into the temporary comparison base.
+
+Final combined source including the separate #1160 fix is `532d58700fa46e52a0b390198604eca1dc4de00e`: **8,851 passed, 276 skipped, nine expected failures, one non-strict unexpected pass; zero failures/errors or credential skips**, in 736.35 seconds. All 87 new cases pass and every existing outcome/reason matches the prior 4cab run. Unit, Windows smoke and credentialed native Windows also pass at that exact head. Credentialed Linux [run 39533863014](https://github.com/ligon/LSMS_Library/actions/runs/39533863014) remains **PENDING**; the earlier 4cab run is preserved separately. Final-source packaging and installed config smoke pass within their documented limits. No pending/skipped data job is represented as a pass, and no release is proposed.

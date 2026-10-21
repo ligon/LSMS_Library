@@ -1,0 +1,315 @@
+{
+  "not_additional_approved_closures": true,
+  "records": [
+    {
+      "issue": 218,
+      "url": "https://github.com/ligon/LSMS_Library/issues/218",
+      "supporting_merged_pr_mentions": [
+        1021
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 607,
+      "url": "https://github.com/ligon/LSMS_Library/issues/607",
+      "supporting_merged_pr_mentions": [
+        1023
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 698,
+      "url": "https://github.com/ligon/LSMS_Library/issues/698",
+      "supporting_merged_pr_mentions": [
+        1104
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 778,
+      "url": "https://github.com/ligon/LSMS_Library/issues/778",
+      "supporting_merged_pr_mentions": [
+        1030
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 787,
+      "url": "https://github.com/ligon/LSMS_Library/issues/787",
+      "supporting_merged_pr_mentions": [
+        1029
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 798,
+      "url": "https://github.com/ligon/LSMS_Library/issues/798",
+      "supporting_merged_pr_mentions": [
+        1025
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 805,
+      "url": "https://github.com/ligon/LSMS_Library/issues/805",
+      "supporting_merged_pr_mentions": [
+        1105
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 828,
+      "url": "https://github.com/ligon/LSMS_Library/issues/828",
+      "supporting_merged_pr_mentions": [
+        1029
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 831,
+      "url": "https://github.com/ligon/LSMS_Library/issues/831",
+      "supporting_merged_pr_mentions": [
+        1105
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 840,
+      "url": "https://github.com/ligon/LSMS_Library/issues/840",
+      "supporting_merged_pr_mentions": [
+        1086
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 845,
+      "url": "https://github.com/ligon/LSMS_Library/issues/845",
+      "supporting_merged_pr_mentions": [
+        1029
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 920,
+      "url": "https://github.com/ligon/LSMS_Library/issues/920",
+      "supporting_merged_pr_mentions": [
+        1027
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 932,
+      "url": "https://github.com/ligon/LSMS_Library/issues/932",
+      "supporting_merged_pr_mentions": [
+        1049
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 953,
+      "url": "https://github.com/ligon/LSMS_Library/issues/953",
+      "supporting_merged_pr_mentions": [
+        1018
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 958,
+      "url": "https://github.com/ligon/LSMS_Library/issues/958",
+      "supporting_merged_pr_mentions": [
+        1017
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 960,
+      "url": "https://github.com/ligon/LSMS_Library/issues/960",
+      "supporting_merged_pr_mentions": [
+        1017
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 962,
+      "url": "https://github.com/ligon/LSMS_Library/issues/962",
+      "supporting_merged_pr_mentions": [
+        1028
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 974,
+      "url": "https://github.com/ligon/LSMS_Library/issues/974",
+      "supporting_merged_pr_mentions": [
+        1020
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1008,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1008",
+      "supporting_merged_pr_mentions": [
+        1151
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1035,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1035",
+      "supporting_merged_pr_mentions": [
+        1152
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1037,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1037",
+      "supporting_merged_pr_mentions": [
+        1094
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1038,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1038",
+      "supporting_merged_pr_mentions": [
+        1053
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1041,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1041",
+      "supporting_merged_pr_mentions": [
+        1046
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1042,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1042",
+      "supporting_merged_pr_mentions": [
+        1076
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1044,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1044",
+      "supporting_merged_pr_mentions": [
+        1067
+      ],
+      "classification": "previously_reviewed_partial_not_a_closure",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1045,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1045",
+      "supporting_merged_pr_mentions": [
+        1105
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1047,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1047",
+      "supporting_merged_pr_mentions": [
+        1094
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1050,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1050",
+      "supporting_merged_pr_mentions": [
+        1054
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1066,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1066",
+      "supporting_merged_pr_mentions": [
+        1105
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1113,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1113",
+      "supporting_merged_pr_mentions": [
+        1147
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    },
+    {
+      "issue": 1140,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1140",
+      "supporting_merged_pr_mentions": [
+        1151
+      ],
+      "classification": "potential_additional_closure_not_audited",
+      "closure_eligible_in_this_report": false,
+      "reason": "Not in assigned32; no new full issue/ruling/source acceptance audit. A PR title/reference is insufficient."
+    }
+  ]
+}

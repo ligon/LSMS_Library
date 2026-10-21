@@ -1,0 +1,33 @@
+{
+  "body": "## The failure mode\n\n`local_tools.get_categorical_mapping(tablename=X)` called **without a value-column keyword returns an empty dict**. It passes `idxvars='Code'` and no myvars, so `df_data_grabber` drops the Label column and the subsequent `.squeeze()` yields nothing.\n\n**Nothing raises.** Every lookup against the empty dict misses, returns `pd.NA`, and the affected column ships **100% null** while the build reports success. There is no signal anywhere \u2014 not a warning, not a log line.\n\n## Why this needs fixing rather than documenting\n\nThis is the **third** recurrence in a single country:\n\n| GH | what died | fixed for |\n|---|---|---|\n| #372 / #377 | `region_dict` \u2192 Region/Birthplace all NA | 1991-92 only |\n| #348 | the 1991-92 `units` decode | 1991-92 |\n| PR #673 | region/rural/relationship in the other three GhanaLSS waves | all |\n\nEach earlier fix was applied to **one wave**, via a local copy of the workaround, leaving the pattern live everywhere else. The most recent instance had been shipping since before #372: `cluster_features` dead in three of seven waves, and `household_roster` carrying `Generation`/`Distance`/`Affinity` \u2014 **required** columns per `data_info.yml` \u2014 100% null for **56,817 people**.\n\nIt stayed invisible because the coverage matrix cannot see it: the wave-slice exemption added in `8dcd2bcb` (correctly) exempts columns populated *somewhere* country-wide, and those columns are populated in the other four waves. Every affected `household_roster` cell graded `sane` throughout.\n\n## Current state\n\nAn AST sweep of all `get_categorical_mapping` call sites under `lsms_library/countries/` (a line-based grep is misleading \u2014 most calls pass their value column on a continuation line):\n\n| | count |\n|---|---|\n| total call sites | 77 |\n| pass a value column explicitly | 1 |\n| pass one via the `**{value: value}` idiom | 69 |\n| **pass none \u2192 return `{}` by construction** | **7** |\n\nAfter PR #673 all 7 are fixed, so **zero bare callers remain**. But the function is unchanged, so the next person to call the bare form gets the same silent 100%-null column.\n\n## Proposal\n\nMake `get_categorical_mapping` **warn or raise** when it is about to return an empty mapping *because no value column was requested*. The bare form is never useful \u2014 it cannot return anything but `{}` \u2014 so this should be a pure improvement.\n\nOpen questions for whoever takes it:\n\n- **Warn or raise?** Raising is the repo's \"known-bad stays loud\" ethos and this call can only be a bug. But it is a library-function behaviour change with 70 call sites across 15 countries, so a `DeprecationWarning` \u2192 raise path may be safer.\n- Distinguish \"empty because no value column was requested\" (always a bug) from \"empty because the table legitimately has no rows\" (possible, and should stay quiet or warn differently).\n- `asdict=False` callers get a DataFrame/Series; the guard should be consistent for them.\n\nPR #673 added `local_tools.code_label_map` as the safe helper (passes the value column, and keys the result by **both** the string and int form of each code \u2014 both historical bugs were partly key-type mismatches, since `df_data_grabber` stringifies the Code index via `format_id` while callers look up with `int(value)` or `str(value)`). That helper is the recommended replacement; this issue is about closing the footgun itself.\n\n## A second-order lesson worth capturing\n\nReviving a dead decode does **not** restore data \u2014 it starts *trusting* a mapping table that nobody has had reason to validate, precisely because while the decode was dead its contents could not be observed. PR #673's own fix activated a latent error in GhanaLSS's GLSS4 `region` table (codes 9 and 10 swapped against the questionnaire), turning 2,056 people from honest NAs into wrongly-labelled Upper East \u2194 Upper West. Any fix of this shape should re-verify the table against a primary source, not merely make it non-empty. Worth a line in whatever guard lands here.\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdE6NyQ",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "PR #1024 (`fix/674-empty-mapping`, `58c394155`) resolves this issue (`Closes #674`, fires on release). The pre-existing zero-row case (a declared-but-empty org table silently falls through the cascade) is a different decision and is split out as #1036.",
+      "createdAt": "2026-10-18T05:51:25Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/674#issuecomment-6246272457",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 674,
+  "state": "OPEN",
+  "title": "get_categorical_mapping returns {} silently when no value column is requested \u2014 third recurrence",
+  "updatedAt": "2026-10-18T05:51:26Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/674"
+}

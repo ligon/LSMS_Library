@@ -1,0 +1,43 @@
+#+title: Country reduction residual red team -- filing only
+#+author: Sue
+#+date: 2026-10-20
+
+* Result
+
+Verified inherited silent-acceptance bug; no matching standalone issue found.
+The remedy contract is an explicit API choice: preserve country identity in accepted pooled frames, or refuse pooled inputs clearly.
+The numerical collision is not a new scientific decision and not a #1093 regression.
+No implementation or GitHub write was performed.
+
+Proposed title: seed_kg and nitrogen_kg silently merge countries with colliding plot IDs
+
+Exact issue body and acceptance criteria: =country-reduction-issue.md=.
+Runnable metric-only reproduction: =country-reduction-repro.py=.
+Machine-readable review and additional controls: =country-reduction-review.json= and =country-reduction-controls.json=.
+
+* Evidence
+
+Independently reran the supplied synthetic proof at976fc840d and852ac2bfc, with exact import identity and separate private data roots, one pinned CPU per process and BLAS/build workers1.
+No real country data or country source was read and no cache was rebuilt.
+A/B share(t,i,plot_id), but A's seed1kg/B's2kg collapse into one country-less3kg plot; separate nitrogen0.46/0.92kg collapse into1.38kg.
+Already-metric Kg and absent declaration metadata isolate reduction keys from #1093's declared-factor propagation.
+A distinct-household control keeps two rows, explaining why current per-country factor tests miss the collision.
+Country-column form also merges at852.
+
+Source: nitrogen keys transformations.py:5530 and seed keys:5597 omit country before sum.
+Docstrings at5452/5567 state(t,i,plot_id) results, with no group_by option, no explicit pooled-output identity promise and no explicit multi-country refusal.
+Thus describing existing docs as an unconditional promise of pooled output would overstate them.
+However Feature's prepended country axis is documented; the declared-factor resolver:4195 intentionally accepts country levels/columns; and new1093 tests:86/:157 explicitly exercise pooled conversion/actual Feature assembly using distinct household IDs.
+Silent cross-country aggregation is neither documented nor prevented.
+The1093 ledger:54/:90 deliberately leaves this inherited grouping defect outside its approved scope.
+
+* Dedup and boundary
+
+Read current issues867,863,1093,1107 and513 with every returned comment.
+867 resolves shares/refusal,1107 labels,863 the closed transform umbrella,1093 declaration propagation,513 within-country source/id-walk collisions.
+All-state searches for seed_kg/nitrogen_kg, country-axis/reduction, pooled plot inputs and cross-country seed/nitrogen found no matching standalone issue.
+The structured report records exact queries and exclusions.
+No magnitude claim about real countries is made.
+Price-pooling defaults are caller-selected and remain a separate issue/design surface.
+
+-- Sue

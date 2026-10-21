@@ -1,0 +1,172 @@
+{
+  "actual_ci_kernel_logged": false,
+  "all_verifiers_stopped": true,
+  "candidate_clean": true,
+  "counterfactual_not_direct_ci_hardware_observation": true,
+  "existing_manifest_fields_unchanged": true,
+  "findings": [],
+  "fingerprint_dtype_coverage_helper_ast_unchanged": true,
+  "hermetic_independent_controls": {
+    "passed": 14,
+    "skipped": 0,
+    "warning_type": "PytestUnknownMarkWarning from standalone external test root only",
+    "warnings": 14
+  },
+  "manifest_changes": [
+    {
+      "entry": "var/nutrition.parquet",
+      "field": "content_hash_variants",
+      "new": [
+        "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6"
+      ],
+      "old": null
+    }
+  ],
+  "no_country_api_or_build": true,
+  "no_github_or_git_mutations": true,
+  "no_raw_values_in_evidence": true,
+  "no_source_data_or_shared_cache_mutations": true,
+  "producer_controls_rerun": {
+    "exit": 0,
+    "passed": 15
+  },
+  "production_changes_only_docs": [
+    "lsms_library/countries/Uganda/_/CONTENTS.org"
+  ],
+  "real_controls": {
+    "Haswell": {
+      "actual_invariance_passed": true,
+      "blas": [
+        {
+          "architecture": "Haswell",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas",
+          "threading_layer": "pthreads",
+          "user_api": "blas",
+          "version": "0.3.31.188.0"
+        },
+        {
+          "internal_api": "openmp",
+          "num_threads": 1,
+          "prefix": "libgomp",
+          "user_api": "openmp",
+          "version": null
+        },
+        {
+          "architecture": "Haswell",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas",
+          "threading_layer": "pthreads",
+          "user_api": "blas",
+          "version": "0.3.30"
+        }
+      ],
+      "changed_cells": 8,
+      "changed_rows": 1,
+      "countries_root": "/local/job40255479/worktrees/uganda-nutrition-cpu-hash/lsms_library/countries",
+      "exact_hash": "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6",
+      "input_hashes": {
+        "raw.pkl": "d07310769d3d9ec51d18f7e200b1a83f1e4e952f077b77e32eb0afd6281c183f",
+        "x.pkl": "2b3765485f20c5c7243594a47f00ffc4428aaccf5629214308786067c1f601b4",
+        "y.pkl": "2da7c5eac66cc42b520e60b12e23a5c51a6d7eca3451894b90a7855a7a3d658d"
+      },
+      "max_abs": 3.637978807091713e-12,
+      "max_ulps": 2,
+      "no_country_api_or_build": true,
+      "package": "/local/job40255479/worktrees/uganda-nutrition-cpu-hash/lsms_library/__init__.py",
+      "private_root": "/local/job40255479/nutrition-repair-review-haswell",
+      "requested_kernel": "Haswell",
+      "same_columns": true,
+      "same_dtypes": true,
+      "same_index": true,
+      "shape": [
+        23777,
+        15
+      ],
+      "source_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+      "unmeasured_plus_one_rejected": true,
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "3.0.6"
+      }
+    },
+    "SkylakeX": {
+      "actual_invariance_passed": true,
+      "blas": [
+        {
+          "architecture": "SkylakeX",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas",
+          "threading_layer": "pthreads",
+          "user_api": "blas",
+          "version": "0.3.30"
+        },
+        {
+          "architecture": "SkylakeX",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas",
+          "threading_layer": "pthreads",
+          "user_api": "blas",
+          "version": "0.3.31.188.0"
+        },
+        {
+          "internal_api": "openmp",
+          "num_threads": 1,
+          "prefix": "libgomp",
+          "user_api": "openmp",
+          "version": null
+        }
+      ],
+      "changed_cells": 0,
+      "changed_rows": 0,
+      "countries_root": "/local/job40255479/worktrees/uganda-nutrition-cpu-hash/lsms_library/countries",
+      "exact_hash": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "input_hashes": {
+        "raw.pkl": "d07310769d3d9ec51d18f7e200b1a83f1e4e952f077b77e32eb0afd6281c183f",
+        "x.pkl": "2b3765485f20c5c7243594a47f00ffc4428aaccf5629214308786067c1f601b4",
+        "y.pkl": "2da7c5eac66cc42b520e60b12e23a5c51a6d7eca3451894b90a7855a7a3d658d"
+      },
+      "max_abs": 0.0,
+      "max_ulps": 0,
+      "no_country_api_or_build": true,
+      "package": "/local/job40255479/worktrees/uganda-nutrition-cpu-hash/lsms_library/__init__.py",
+      "private_root": "/local/job40255479/nutrition-repair-review-skylakex",
+      "requested_kernel": "SkylakeX",
+      "same_columns": true,
+      "same_dtypes": true,
+      "same_index": true,
+      "shape": [
+        23777,
+        15
+      ],
+      "source_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+      "unmeasured_plus_one_rejected": true,
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "3.0.6"
+      }
+    }
+  },
+  "reviewed_full_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+  "reviewed_producer_hash_changes": {
+    "country": {
+      "changed": 0,
+      "count": 549
+    },
+    "tagged_table": {
+      "changed": 0,
+      "count": 39
+    },
+    "wave": {
+      "changed": 0,
+      "count": 2139
+    }
+  },
+  "runtime_commit": "5f571dcc4",
+  "source_mutations": false,
+  "verdict": "PASS"
+}

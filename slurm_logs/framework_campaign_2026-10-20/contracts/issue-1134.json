@@ -1,0 +1,26 @@
+{
+  "body": "From the #793/#942 follow-up (`fix/793-942-sampling`).\n\n**Tier:** DECISION (@ligon). Residual of #793. The loader, `Country.sampling`, the attrs carrier and the vocabulary freeze landed on `fix/793-942-sampling`.\n\n#### What blocks curation\n\nPer the 2026-10-18 ruling (\"Freeze the Uganda exemplar vocabulary as-is\"), `lsms_library/sampling.py` freezes `DESIGN_TAGS` to the two values Uganda uses:\n\n```\ntwo-stage-stratified-cluster                 # Uganda 2005-06 .. 2011-12\ntwo-stage-stratified-cluster-rotating-panel  # Uganda 2013-14 onward\n```\n\n`SamplingRecord.from_config` treats the triple (`design_tag`, `source_type`, `confidence`) as required **iff any design field is present**, and it refuses a `design_tag` outside that set. So for any other wave there are only two legal records:\n\n- (i) assert a two-stage stratified cluster design; or\n- (ii) write a `panel:`-only entry with no design fields at all. That is what GhanaLSS, Ethiopia, Tanzania and Nigeria carry today.\n\nThat leaves no way to record any of these:\n\n- **A design looked for and not found.** The population sweep found no statement for 7 of 124 waves (`source_type: not-found`). For population, `universe_tag` has a `not-stated` value for exactly this; `design_tag` has no analogue.\n- **A design read off the data** (`source_type: derived-from-data`). The tag would have to claim \"two-stage stratified\", which the data cannot show. In `.coder/sampling/fingerprint.csv`, 24 of 104 waves (14 countries) have no strata column at all, so even \"stratified\" is uncorroborated there.\n- **A single-stage, unstratified or self-weighting design**, or anything other than the two Uganda shapes. GhanaLSS GLSS1\u20133 are self-weighting by design (CLAUDE.md, GH #713).\n\nWriting (i) where it is not known would launder an editorial reading into a fact. That is exactly what the triple discipline exists to prevent. So, in practice, **no non-Uganda design record can be written** until the vocabulary is widened.\n\n#### Options\n\n- **A. Add a `not-stated` sentinel tag**, valid only with `source_type: not-found` or `derived-from-data`. This mirrors `population.UNIVERSE_TAGS`. Smallest change; it unblocks recording \"looked, nothing found\".\n- **B. Widen to a small structural vocabulary**, e.g. `single-stage-cluster`, `two-stage-cluster` (unstratified), `two-stage-stratified-cluster[-rotating-panel]`, `stratified-random`, plus A's `not-stated`. Each addition carries a reason in `sampling.py`, per the module's own rule.\n- **C. Make `design_tag` optional when `source_type` is `not-found`.** The triple then travels as (`null`, `not-found`, `low`). This loosens the \"never travels alone\" invariant.\n\nWhichever option is chosen, `tests/test_sampling.py::TestTheVocabularyIsFrozenFromUganda` pins the freeze **in both directions**: every frozen value must be used by a shipped file. So a widened value must ship with at least one record that uses it.\n\n#### After the decision (tier C)\n\n1. Probe the NADA per-study DDI endpoint (`study_desc.method.data_collection.sampling_procedure`) from an environment with WB egress, for the ~90 waves whose catalog id `provenance.py` records.\n2. Curate the issue's `evidence.csv` per country, richest-documented first.\n3. Wire the missing `strata` columns: Albania, Burkina Faso, GhanaLSS, Mali, Niger and Tajikistan have waves with `n_strata = 0`; Kazakhstan, Kosovo, China, Azerbaijan, Senegal and Pakistan have none at all.\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdm6iSw",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**RULING (@ligon, 2026-10-19): option A now, then B one tag at a time.**\n- **Now:** add the `not-stated` sentinel `design_tag`. It is valid only with `source_type: not-found` or `derived-from-data`, mirroring `population.UNIVERSE_TAGS`.\n- **Then:** add each structural tag (`single-stage-cluster`, unstratified `two-stage-cluster`, `stratified-random`, self-weighting, ...) only together with the first evidenced record that uses it, with its reason written in `sampling.py`. The freeze test's both-directions rule stays: every allowed tag is used by a shipped record.\n- **Not C:** `design_tag` never travels without its `source_type` / `confidence`.\n\nThe likely first B addition is GhanaLSS GLSS1-3 (self-weighting, #713).",
+      "createdAt": "2026-10-20T02:29:17Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/1134#issuecomment-6281929291",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [],
+  "number": 1134,
+  "state": "OPEN",
+  "title": "DECISION (#793 residual): the frozen `DESIGN_TAGS` (2 values) cannot express an undocumented or single-stage design, so no non-Uganda design record can be written until it is widened",
+  "updatedAt": "2026-10-20T02:29:17Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1134"
+}

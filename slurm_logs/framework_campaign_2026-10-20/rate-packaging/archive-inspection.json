@@ -1,0 +1,31 @@
+{
+  "CLI_entrypoint_present": true,
+  "dynamic_version_placeholder_restored": true,
+  "missing_package_files_in_sdist": [],
+  "missing_package_files_in_wheel": [],
+  "nonzero_dynamic_version": true,
+  "private_worktree_clean": true,
+  "raw_binary_data_in_sdist": [],
+  "raw_binary_data_in_wheel": [],
+  "scope": "All tracked lsms_library runtime/config/script/provenance/sidecar files. Checkout-only tests/fixtures are not distributed by current packaging policy.",
+  "sdist": {
+    "bytes": 5651959,
+    "filename": "lsms_library-0.15.0.post396.dev0+532d58700.tar.gz",
+    "files": 11757,
+    "sha256": "3c48c2a4ea585c5c554ba048687be7496e8af9dfa55fa2410b20a7667ef43d67",
+    "wheel_built_from_this_sdist": true
+  },
+  "sdist_package_byte_differences": [],
+  "source_sha": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "test_fixture_in_sdist": false,
+  "test_fixture_in_wheel": false,
+  "tracked_package_files": 11753,
+  "version": "0.15.0.post396.dev0+532d58700",
+  "wheel": {
+    "bytes": 9075009,
+    "filename": "lsms_library-0.15.0.post396.dev0+532d58700-py3-none-any.whl",
+    "files": 11758,
+    "sha256": "b0518709cb3445fbc54fcfd06bc688c87ed783fe4e852c4fcb92cdd527172379"
+  },
+  "wheel_package_byte_differences": []
+}

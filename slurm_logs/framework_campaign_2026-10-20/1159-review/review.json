@@ -1,0 +1,338 @@
+{
+  "verdict": "PASS",
+  "reviewer": "Sue / GPT-6, parent independent reviewer",
+  "frozen_head": "45f80dcb50da189b7864034b1d92863dca68de09",
+  "runtime_commit": "da84c7c790c1b1e040aca5ec3ff4d46649eb1317",
+  "focused_summary": "260 passed, 2 skipped, 15 deselected, 2 warnings in 8.67s",
+  "junit_summary": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "262",
+    "time": "8.667",
+    "timestamp": "2026-10-20T18:29:40.847635-07:00",
+    "hostname": "n0071.savio3"
+  },
+  "focused_log_sha256": "8e3c30487e9c8ca81988309b794c173fb83ecb245ced5f4f99f371ce0e06a914",
+  "additional_controls": {
+    "source_sha": "45f80dcb50da189b7864034b1d92863dca68de09",
+    "import_path": "/local/job40255479/worktrees/1159-pooled-reducers/lsms_library/__init__.py",
+    "controls": [
+      {
+        "form": "categorical_index",
+        "unit_column": false,
+        "reducer": "seed_kg",
+        "passed": true
+      },
+      {
+        "form": "categorical_index",
+        "unit_column": false,
+        "reducer": "nitrogen_kg",
+        "passed": true
+      },
+      {
+        "form": "categorical_index",
+        "unit_column": true,
+        "reducer": "seed_kg",
+        "passed": true
+      },
+      {
+        "form": "categorical_index",
+        "unit_column": true,
+        "reducer": "nitrogen_kg",
+        "passed": true
+      },
+      {
+        "form": "categorical_column",
+        "unit_column": false,
+        "reducer": "seed_kg",
+        "passed": true
+      },
+      {
+        "form": "categorical_column",
+        "unit_column": false,
+        "reducer": "nitrogen_kg",
+        "passed": true
+      },
+      {
+        "form": "categorical_column",
+        "unit_column": true,
+        "reducer": "seed_kg",
+        "passed": true
+      },
+      {
+        "form": "categorical_column",
+        "unit_column": true,
+        "reducer": "nitrogen_kg",
+        "passed": true
+      },
+      {
+        "form": "string_index",
+        "unit_column": false,
+        "reducer": "seed_kg",
+        "passed": true
+      },
+      {
+        "form": "string_index",
+        "unit_column": false,
+        "reducer": "nitrogen_kg",
+        "passed": true
+      },
+      {
+        "form": "string_index",
+        "unit_column": true,
+        "reducer": "seed_kg",
+        "passed": true
+      },
+      {
+        "form": "string_index",
+        "unit_column": true,
+        "reducer": "nitrogen_kg",
+        "passed": true
+      },
+      {
+        "form": "index_precedence",
+        "unit_column": false,
+        "reducer": "seed_kg",
+        "passed": true
+      },
+      {
+        "form": "index_precedence",
+        "unit_column": false,
+        "reducer": "nitrogen_kg",
+        "passed": true
+      },
+      {
+        "form": "index_precedence",
+        "unit_column": true,
+        "reducer": "seed_kg",
+        "passed": true
+      },
+      {
+        "form": "index_precedence",
+        "unit_column": true,
+        "reducer": "nitrogen_kg",
+        "passed": true
+      }
+    ],
+    "passed": 16
+  },
+  "hash_maps_rechecked_equal": {
+    "country": 549,
+    "wave": 2139,
+    "tagged": 39
+  },
+  "before_after_runtime_source_hashes_verified": true,
+  "real_country_data_built": false,
+  "residual": "fertilizer_rate independently drops country in numerator/area grouping; inherited, unchanged, outside two-reducer scope",
+  "independent_downstream_probes": {
+    "before": {
+      "countries_root": "/local/job40255479/worktrees/framework-integration/lsms_library/countries",
+      "data_root": "/local/job40255479/control/framework-campaign/review-1159/before-data",
+      "downstream": {
+        "A": {
+          "column_totals": {
+            "Nitrogen_kg_per_ha": 0.46
+          },
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "rows": 1
+        },
+        "B": {
+          "column_totals": {
+            "Nitrogen_kg_per_ha": 0.23
+          },
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "rows": 1
+        },
+        "pooled_fertilizer_rate": {
+          "column_totals": {
+            "Nitrogen_kg_per_ha": 0.276
+          },
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "rows": 1
+        }
+      },
+      "head": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+      "package": "/local/job40255479/worktrees/framework-integration/lsms_library/__init__.py",
+      "reducers": {
+        "column": {
+          "nitrogen_kg": {
+            "column_totals": {
+              "Nitrogen_kg": 1.3800000000000001
+            },
+            "index_names": [
+              "t",
+              "i",
+              "plot_id"
+            ],
+            "rows": 1
+          },
+          "seed_kg": {
+            "column_totals": {
+              "Seed_kg": 3.0
+            },
+            "index_names": [
+              "t",
+              "i",
+              "plot_id"
+            ],
+            "rows": 1
+          }
+        },
+        "index": {
+          "nitrogen_kg": {
+            "column_totals": {
+              "Nitrogen_kg": 1.3800000000000001
+            },
+            "index_names": [
+              "t",
+              "i",
+              "plot_id"
+            ],
+            "rows": 1
+          },
+          "seed_kg": {
+            "column_totals": {
+              "Seed_kg": 3.0
+            },
+            "index_names": [
+              "t",
+              "i",
+              "plot_id"
+            ],
+            "rows": 1
+          }
+        }
+      },
+      "synthetic_data_only": true,
+      "transformations_sha256": "4322d523a71852f45f7bb3c24032f9963b7e19afdf442d15b2f4d4fe1f30ac7b"
+    },
+    "after": {
+      "countries_root": "/local/job40255479/worktrees/1159-pooled-reducers/lsms_library/countries",
+      "data_root": "/local/job40255479/control/framework-campaign/review-1159/after-data",
+      "downstream": {
+        "A": {
+          "column_totals": {
+            "Nitrogen_kg_per_ha": 0.46
+          },
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "rows": 1
+        },
+        "B": {
+          "column_totals": {
+            "Nitrogen_kg_per_ha": 0.23
+          },
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "rows": 1
+        },
+        "pooled_fertilizer_rate": {
+          "column_totals": {
+            "Nitrogen_kg_per_ha": 0.276
+          },
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "rows": 1
+        }
+      },
+      "head": "45f80dcb50da189b7864034b1d92863dca68de09",
+      "package": "/local/job40255479/worktrees/1159-pooled-reducers/lsms_library/__init__.py",
+      "reducers": {
+        "column": {
+          "nitrogen_kg": {
+            "by_country": {
+              "A": 0.46,
+              "B": 0.92
+            },
+            "column_totals": {
+              "Nitrogen_kg": 1.3800000000000001
+            },
+            "index_names": [
+              "country",
+              "t",
+              "i",
+              "plot_id"
+            ],
+            "rows": 2
+          },
+          "seed_kg": {
+            "by_country": {
+              "A": 1.0,
+              "B": 2.0
+            },
+            "column_totals": {
+              "Seed_kg": 3.0
+            },
+            "index_names": [
+              "country",
+              "t",
+              "i",
+              "plot_id"
+            ],
+            "rows": 2
+          }
+        },
+        "index": {
+          "nitrogen_kg": {
+            "by_country": {
+              "A": 0.46,
+              "B": 0.92
+            },
+            "column_totals": {
+              "Nitrogen_kg": 1.3800000000000001
+            },
+            "index_names": [
+              "country",
+              "t",
+              "i",
+              "plot_id"
+            ],
+            "rows": 2
+          },
+          "seed_kg": {
+            "by_country": {
+              "A": 1.0,
+              "B": 2.0
+            },
+            "column_totals": {
+              "Seed_kg": 3.0
+            },
+            "index_names": [
+              "country",
+              "t",
+              "i",
+              "plot_id"
+            ],
+            "rows": 2
+          }
+        }
+      },
+      "synthetic_data_only": true,
+      "transformations_sha256": "7296587e5bf141e08236da16c29c08f971d24641ea6678ca1673456fc0572394"
+    }
+  },
+  "residual_issue": "https://github.com/ligon/LSMS_Library/issues/1160"
+}

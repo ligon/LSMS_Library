@@ -1,0 +1,98 @@
+#+TITLE: Independent combined framework corpus comparison
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Assessment
+The frozen integration at =852ac2bfcd5f798533f56e7efa1f77db80c0138f= adds no corpus failures relative to =976fc840d12ba40f1602b7dff58b81548632b2a9=.
+Both completed runs contain all 549 declared country/table pairs across 38 countries: 530 successes and 19 errors.
+The nineteen failures remain explicit errors and retain nonzero country/run exit policy; this is not a green corpus run.
+The six changed food summaries match the approved metric-parser scope.
+Four additional roster fingerprints differ only in row order in the paired private cache and warm API comparisons; the precise Benin cold fingerprints were independently reproduced on unchanged baseline by varying the hash seed.
+There is a separate existing Mali cold/warm dtype limitation, recorded below without treating it as intended behavior.
+
+* Strict validity
+=compare_corpus.py= requires both completion manifests, exact source/package/config identities, all unique expected keys, completed country statuses, no in-tree parquets, no missing measurements, and no measurement errors.
+All gates passed.
+Every results JSONL remained byte-identical to its recorded review SHA256 at the final check.
+The integration working tree remained clean.
+No measured parquet changed during its metadata read.
+
+Both runs have 424 fresh country caches, 582 fresh YAML wave caches, and 601 legacy/hashless script wave caches.
+No cache presence, row count, coverage manifest, freshness grade, or stable-read flag differs between the runs.
+All 549 expected country hashes and all 1183 observed wave-cache expected hashes changed.
+That broad invalidation is expected from the changed tagged =Country._aggregate_wave_data= build closure: see =.coder/ledger/1099-empty-subset.md:42,68= and =lsms_library/_build_registry.py:32=.
+The 1183 observed files do not replace the separate complete 2139-wave hash census.
+
+* All served differences
+
+| Country | Table | Classification |
+|---------+-------+----------------|
+| Benin | food_quantities | Intended #1143 parser correction |
+| Benin | food_prices | Intended #1143 inferred-price correction |
+| CotedIvoire | food_quantities | Intended #1143 parser correction |
+| CotedIvoire | food_prices | Intended #1143 inferred-price correction |
+| Senegal | food_quantities | Intended #1143 parser correction |
+| Senegal | food_prices | Intended #1143 inferred-price correction |
+| Benin | household_roster | Row order; unchanged-baseline seed control reproduces both exact cold fingerprints |
+| Burkina_Faso | household_roster | Row order in paired private caches and warm served frames |
+| Mali | household_roster | Row order in paired private caches and warm served frames; cold/warm dtype limit below |
+| Togo | household_roster | Row order in paired private caches and warm served frames |
+
+The other 520 successful served summaries are identical.
+No table changes status, shape, column set/dtypes, index names/uniqueness, null counts, or wave row counts in the paired original corpus summaries.
+No warning-category count changes.
+The numeric aggregate changes are confined to the intended food tables; the detailed aggregate deltas and fingerprints are in =corpus-comparison.json=.
+The earlier independent parser review counted exactly 945 changed quantity cells and 783 changed price cells; those counts were not recomputed from the combined corpus's raw frames.
+Original =food_acquired= summaries remain unchanged.
+
+* Nineteen retained failures
+The two Armenia, eleven Nepal, and six Peru failures retain their error classes and entire messages after replacing only the exact baseline/integration checkout and private-data root prefixes.
+No other text, timestamps, identifiers, numbers, or exception fragments are normalized.
+All nineteen normalized-message SHA256 values agree.
+The classes remain three =FileNotFoundError= and sixteen =RuntimeError=.
+The exact cell list and hashes are in =corpus-review.json=; no private exception text is copied into the report.
+This establishes matching reported failures, not an independent re-investigation of every upstream source defect.
+
+* Roster order investigation
+The original corpus roots were never used for API calls.
+Direct paired parquet reads established exact equality after sorting rows and columns, including index values/dtypes and cell values, for all four private country caches.
+Original column order was already equal; original row order was different.
+New physical copies of each country's roster/sample caches were used for eight sanctioned =diagnostics.load_feature= API calls under their respective exact source identities.
+The resulting four baseline/candidate warm pairs are exactly equal after sorting.
+Benin, Burkina_Faso, and Togo warm calls also reproduce both original cold corpus fingerprints exactly.
+
+The unchanged baseline source contains =merge_on = list(set('t').union(...))= at =lsms_library/country.py:1895=.
+The two fresh Benin-only baseline builds use hash seeds 1 and 3, producing merge-key orders =[v,i,t]= and =[t,i,v]=.
+Seeds 1 and 2 were pre-inspected but not built: both put v before i once Benin's constant t is ignored, so they are not a discriminating pair.
+With seeds 1 and 3, raw wave, raw country, and post-finalize frames differ at 14,491 row positions and are exactly equal after sorting, including all labels, values, and dtypes.
+Seed 1 exactly reproduces the original baseline served fingerprint; seed 3 exactly reproduces the integration served fingerprint.
+Thus at least the observed Benin cold difference is reproduced without any campaign source change.
+The other three countries have the same unchanged generic merge path and exact paired-cache/warm equality, but were not given additional cold seed builds.
+No ordering source fix was attempted.
+
+** Mali dtype limit
+Both original cold corpus records declare =MonthsSpent: object=.
+Both warm copied-cache API frames declare =MonthsSpent: string= and are exactly equal to one another after sorting.
+Consequently neither warm Mali replay reproduces its own original cold fingerprint.
+This cold/warm coercion exists on both baseline and integration and is a separate follow-up; it is not classified as an intended campaign change or silently normalized away.
+The corpus driver did not preserve the original cold served frames, so this review does not claim a direct exact sorted comparison of those unavailable Mali cold frames.
+
+* Country documentation observed before source inspection
+Benin's documented household identity is =(grappe, menage)= because each grappe belongs to one seasonal vague; the removed =2018-2019= duplicate is not another wave.
+Its roster cp1252 repair moved to the reader in #805 and is documented as preserving 42,343 served rows.
+Burkina Faso's 2014 roster =Frere/s?ur= label contains a literal source question mark, requiring whole-value repair rather than a decoder; the EHCVM waves instead use binary six-month eligibility filters.
+Its live TODOs for food_items, nutrition, and Makefile were read and left untouched.
+Mali's 2018-19 relationship labels are truncated in the source bytes, not mis-decoded; the existing whole-label mapping is required.
+Togo's analogous cp1252 roster repair also moved to the reader and preserves 27,480 rows; no continuous MonthsSpent question exists in its EHCVM wave.
+No new encoding or label contradiction was found in these paired comparisons.
+These recorded details rule out treating a changed fingerprint alone as evidence of a new decoding regression.
+
+* Evidence and limits
+All report artifacts contain aggregates, schemas, fingerprints, and equality outcomes, never household rows.
+Private served/raw snapshots remain only under =/local/job40255479/roster-review-api-copies= and =/local/job40255479/roster-review-seed-{1,3}=.
+The comparator reads existing summaries rather than introducing a new fingerprint definition.
+The existing fingerprint includes index values and row order, but does not separately record index-level dtypes or DataFrame attrs.
+The narrow roster comparisons do check index-level dtypes; the separate #1093 tests/evidence cover declared-unit metadata absent from the corpus fingerprint.
+All review workers and the completion watcher exited; no source edits, shared L2 writes, or GitHub mutations were made.
+
+Sue

@@ -1,0 +1,307 @@
+{
+  "all_review_processes_stopped": true,
+  "assessment": "NO_NEW_CORPUS_FAILURES_WITH_SIX_INTENTIONAL_DATA_CHANGES_AND_FOUR_ORDER_DIFFERENCES",
+  "baseline_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "cache_metadata_changed_cells": 0,
+  "candidate_sha": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "complete_pairs": 549,
+  "country_count": 38,
+  "country_expected_hash_changed_cells": 549,
+  "freshness_each": {
+    "country_fresh": 424,
+    "wave_fresh": 582,
+    "wave_legacy_script_hashless": 601
+  },
+  "hash_classification": "Expected corpus-wide build-closure invalidation from changed tagged Country._aggregate_wave_data (#1099); observed wave count is not the complete2139-wave hash census.",
+  "known_failure_cells": [
+    {
+      "country": "Armenia",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "9e5442e55c1fa53b2f231e79b685098990e697cbc9d0ff7731edce97b6b4b945",
+      "table": "household_characteristics"
+    },
+    {
+      "country": "Armenia",
+      "error_type": "FileNotFoundError",
+      "normalized_message_sha256": "90b2ce85adc66f8b3b255411d26d83f031c416042d3994dd08263db870005694",
+      "table": "household_roster"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "FileNotFoundError",
+      "normalized_message_sha256": "ba48c0a0d956d7828087eb2f23e6628f083ab8f9eae5e9e95da3012c8f752c24",
+      "table": "assets"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "bc8ea4f701a6d7c566435a992e06cd4d3545bc71bb85d66f3e9e5c27a16cec05",
+      "table": "cluster_features"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "dcb53e447dcf4d99f0f27c59b6879355e5225c870b38cda46f10438a469afc3d",
+      "table": "food_acquired"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "526ceec2ca2549db35b0b65d64862da2c6f8e17083c5e8ef11f056321b2c9eda",
+      "table": "food_expenditures"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "d13aa1cd22a12aac44c4422a1504abb93da1af628e03f4b0a8ceb6a7d425724d",
+      "table": "food_prices"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "e0b6acd5cff91123f520b3fb841bb1b846df60195d7b57b8d56d67709203b3b4",
+      "table": "food_quantities"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "5869acb044efca365e4f1dc9a9fe4830a7c42d208a74584c7cae9b7fd4123eff",
+      "table": "household_characteristics"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "85827d0b66e90b55ab5c2878e0f790cf95e74e2f560c17256be0558c6886a4bc",
+      "table": "household_roster"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "34ddb34988d94ae087a5107e9633e4ab71e56785d3fbc56c7791f557be36ef98",
+      "table": "individual_education"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "2340d5e4b5c49cb6efcd640a85a85607bf7a91271b819e818409fd6260e3064b",
+      "table": "interview_date"
+    },
+    {
+      "country": "Nepal",
+      "error_type": "FileNotFoundError",
+      "normalized_message_sha256": "31be6d79bafe8c011dc1b32eb87dcaabb24eec20143ad843e7cade69b236338d",
+      "table": "sample"
+    },
+    {
+      "country": "Peru",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "74aa8305c39e4a6591cab5fda95651cbca229818162351dd615506e1e4d18df2",
+      "table": "food_acquired"
+    },
+    {
+      "country": "Peru",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "c8a9e6d968f2832ba89bd01cc18eead06ad9b27310c9582492db083b4000df6e",
+      "table": "food_expenditures"
+    },
+    {
+      "country": "Peru",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "de929f70e1119840fd0bbb5e1d0226b038f735d5be2d15743f6a1027c7018223",
+      "table": "food_prices"
+    },
+    {
+      "country": "Peru",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "7d60b6d94860a82034bdbdb41c1c71348bb30a48d81e946d2ba0720b7f8f4064",
+      "table": "food_quantities"
+    },
+    {
+      "country": "Peru",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "ed9c506feab64b82aabc16908c29d38b5a9426db535e17570a6710d5dd4f2d1c",
+      "table": "individual_education"
+    },
+    {
+      "country": "Peru",
+      "error_type": "RuntimeError",
+      "normalized_message_sha256": "a4b187c4408c65707235a24b05382f60e40fc3ce97d98bb45d2d7d148091a805",
+      "table": "interview_date"
+    }
+  ],
+  "limits": [
+    "No raw frames read by comparator.",
+    "Served fingerprint includes index values/order; index-level dtypes not recorded separately.",
+    "DataFrame attrs are not included in the corpus fingerprint.",
+    "Observed wave-cache hashes do not enumerate every theoretical wave hash.",
+    "Error messages are compared after replacing only the listed exact source/data root prefixes.",
+    "Matching normalized exception messages do not independently prove every upstream cause.",
+    "No original cold served DataFrames were preserved by the corpus driver; Mali cold-to-warm dtype coercion prevents byte-for-byte reproduction of its cold served fingerprint from warm copies.",
+    "Only Benin received two additional controlled-seed cold builds; other roster diagnoses use exact paired parquet and warm API comparisons.",
+    "Exact945quantity/783price changed-cell counts are the prior independent parser review, not a new combined-corpus raw-frame recount."
+  ],
+  "measurement_error_cells": 0,
+  "new_error_cells": 0,
+  "normalized_error_message_changes": 0,
+  "observed_wave_expected_hash_changed_cells": 1183,
+  "preexisting_followups": [
+    {
+      "Benin_row_position_changes": 14491,
+      "controlled_baseline_seeds": [
+        1,
+        3
+      ],
+      "country_scope": [
+        "Benin",
+        "Burkina_Faso",
+        "Mali",
+        "Togo"
+      ],
+      "exact_original_corpus_fingerprints_reproduced": true,
+      "kind": "hash_seed_dependent_row_order",
+      "merge_keys": {
+        "1": [
+          "v",
+          "i",
+          "t"
+        ],
+        "3": [
+          "t",
+          "i",
+          "v"
+        ]
+      },
+      "source": "lsms_library/country.py:1895; list(set(...)) merge key order",
+      "source_fix_attempted": false
+    },
+    {
+      "canonical_warm_frames_exact_equal": true,
+      "cold_dtype_each": "object",
+      "column": "MonthsSpent",
+      "intended_campaign_change": false,
+      "kind": "Mali_roster_cold_warm_dtype",
+      "source_fix_attempted": false,
+      "warm_dtype_each": "string"
+    }
+  ],
+  "resolved_error_cells": 0,
+  "reviewer": "Sue",
+  "roots_untouched": "Original baseline/combined corpus roots were read only; all API calls used new physical copies, and all controlled builds used distinct new private roots.",
+  "served_or_status_changed_cells": [
+    {
+      "changed_summary_fields": [
+        "served.content_hash",
+        "served.numeric_sums"
+      ],
+      "classification": "intentional_1143_parser_change",
+      "country": "Benin",
+      "evidence": "1143-review-round2.json; prior exact945quantity/783price independent count was not repeated for combined corpus",
+      "table": "food_prices"
+    },
+    {
+      "changed_summary_fields": [
+        "served.content_hash",
+        "served.numeric_sums"
+      ],
+      "classification": "intentional_1143_parser_change",
+      "country": "Benin",
+      "evidence": "1143-review-round2.json; prior exact945quantity/783price independent count was not repeated for combined corpus",
+      "table": "food_quantities"
+    },
+    {
+      "baseline_and_candidate_cold_fingerprints_reproduced_by_warm_copy": true,
+      "baseline_seed_reproduction": "both original cold corpus hashes exactly reproduced on unchanged baseline",
+      "canonical_private_cache_exact_equal": true,
+      "canonical_warm_api_exact_equal": true,
+      "changed_summary_fields": [
+        "served.content_hash"
+      ],
+      "classification": "row_order_only_in_private_cache_and_warm_api",
+      "country": "Benin",
+      "table": "household_roster"
+    },
+    {
+      "baseline_and_candidate_cold_fingerprints_reproduced_by_warm_copy": true,
+      "baseline_seed_reproduction": "same unchanged merge-key code; exact values established from paired private caches and warm API, without a separate cold seed build for this country",
+      "canonical_private_cache_exact_equal": true,
+      "canonical_warm_api_exact_equal": true,
+      "changed_summary_fields": [
+        "served.content_hash"
+      ],
+      "classification": "row_order_only_in_private_cache_and_warm_api",
+      "country": "Burkina_Faso",
+      "table": "household_roster"
+    },
+    {
+      "changed_summary_fields": [
+        "served.content_hash",
+        "served.numeric_sums"
+      ],
+      "classification": "intentional_1143_parser_change",
+      "country": "CotedIvoire",
+      "evidence": "1143-review-round2.json; prior exact945quantity/783price independent count was not repeated for combined corpus",
+      "table": "food_prices"
+    },
+    {
+      "changed_summary_fields": [
+        "served.content_hash",
+        "served.numeric_sums"
+      ],
+      "classification": "intentional_1143_parser_change",
+      "country": "CotedIvoire",
+      "evidence": "1143-review-round2.json; prior exact945quantity/783price independent count was not repeated for combined corpus",
+      "table": "food_quantities"
+    },
+    {
+      "baseline_and_candidate_cold_fingerprints_reproduced_by_warm_copy": false,
+      "baseline_seed_reproduction": "same unchanged merge-key code; exact values established from paired private caches and warm API, without a separate cold seed build for this country",
+      "canonical_private_cache_exact_equal": true,
+      "canonical_warm_api_exact_equal": true,
+      "changed_summary_fields": [
+        "served.content_hash"
+      ],
+      "classification": "row_order_only_in_private_cache_and_warm_api",
+      "country": "Mali",
+      "table": "household_roster"
+    },
+    {
+      "changed_summary_fields": [
+        "served.content_hash"
+      ],
+      "classification": "intentional_1143_parser_change",
+      "country": "Senegal",
+      "evidence": "1143-review-round2.json; prior exact945quantity/783price independent count was not repeated for combined corpus",
+      "table": "food_prices"
+    },
+    {
+      "changed_summary_fields": [
+        "served.content_hash",
+        "served.numeric_sums"
+      ],
+      "classification": "intentional_1143_parser_change",
+      "country": "Senegal",
+      "evidence": "1143-review-round2.json; prior exact945quantity/783price independent count was not repeated for combined corpus",
+      "table": "food_quantities"
+    },
+    {
+      "baseline_and_candidate_cold_fingerprints_reproduced_by_warm_copy": true,
+      "baseline_seed_reproduction": "same unchanged merge-key code; exact values established from paired private caches and warm API, without a separate cold seed build for this country",
+      "canonical_private_cache_exact_equal": true,
+      "canonical_warm_api_exact_equal": true,
+      "changed_summary_fields": [
+        "served.content_hash"
+      ],
+      "classification": "row_order_only_in_private_cache_and_warm_api",
+      "country": "Togo",
+      "table": "household_roster"
+    }
+  ],
+  "shape_columns_dtype_index_names_uniqueness_wave_rows_null_counts_changed_cells": 0,
+  "status_counts_each": {
+    "error": 19,
+    "success": 530
+  },
+  "unchanged_successful_served_summaries": 520,
+  "unstable_measured_files": 0,
+  "warning_count_changed_cells": 0
+}

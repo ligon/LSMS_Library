@@ -1,0 +1,93 @@
+{
+  "countries_root": "/local/job40255479/worktrees/framework-followup/lsms_library/countries",
+  "data_root": "/local/job40255479/followup-farm-data",
+  "package": "/local/job40255479/worktrees/framework-followup/lsms_library/__init__.py",
+  "pooled_rows": 792775,
+  "raw_survey_rows_exported": false,
+  "reductions": {
+    "nitrogen_kg": {
+      "by_country_rows": {
+        "Benin": 1823,
+        "Burkina_Faso": 2469,
+        "CotedIvoire": 1764,
+        "Ethiopia": 22458,
+        "Malawi": 33466,
+        "Mali": 2869,
+        "Niger": 1380,
+        "Nigeria": 4359,
+        "Senegal": 932,
+        "Tanzania": 725,
+        "Togo": 2103,
+        "Uganda": 1436
+      },
+      "column_totals": {
+        "Nitrogen_kg": 5720719.010353439
+      },
+      "country_column_exact": true,
+      "index_names": [
+        "country",
+        "t",
+        "i",
+        "plot_id"
+      ],
+      "reverse_order_exact": true,
+      "rows": 75784,
+      "separate_country_exact": true
+    },
+    "seed_kg": {
+      "by_country_rows": {
+        "Benin": 2215,
+        "Burkina_Faso": 4229,
+        "CotedIvoire": 1122,
+        "Ethiopia": 60530,
+        "Malawi": 64477,
+        "Mali": 31645,
+        "Niger": 1542,
+        "Nigeria": 4888,
+        "Senegal": 2430,
+        "Tanzania": 4379,
+        "Togo": 2584,
+        "Uganda": 20305
+      },
+      "column_totals": {
+        "Seed_kg": 9704272.870545901
+      },
+      "country_column_exact": true,
+      "index_names": [
+        "country",
+        "t",
+        "i",
+        "plot_id"
+      ],
+      "reverse_order_exact": true,
+      "rows": 200346,
+      "separate_country_exact": true
+    }
+  },
+  "source_commit": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "warm_countries": [
+    "Benin",
+    "Burkina_Faso",
+    "CotedIvoire",
+    "Ethiopia",
+    "GhanaLSS",
+    "Guinea-Bissau",
+    "Malawi",
+    "Mali",
+    "Niger",
+    "Nigeria",
+    "Senegal",
+    "Tanzania",
+    "Togo",
+    "Uganda"
+  ],
+  "warnings_by_category": {
+    "ClusterIdentityWarning": 12,
+    "GrainCollapseWarning": 21,
+    "NullIndexKeyWarning": 18,
+    "NullReadWarning": 21,
+    "NutrientCoverageWarning": 17,
+    "PopulationHeterogeneityWarning": 7,
+    "UserWarning": 16
+  }
+}

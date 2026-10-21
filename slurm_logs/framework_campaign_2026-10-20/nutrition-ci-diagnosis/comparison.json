@@ -1,0 +1,122 @@
+{
+  "source": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "outcome": "exact CI hash reproduced by BLAS kernel only; reversible",
+  "shape": [
+    23777,
+    15
+  ],
+  "sequence": [
+    {
+      "requested_kernel": "SkylakeX",
+      "blas": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas",
+          "version": "0.3.31.188.0",
+          "threading_layer": "pthreads",
+          "architecture": "SkylakeX"
+        }
+      ],
+      "digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "same_index": true,
+      "same_columns": true,
+      "same_dtypes": true,
+      "changed_rows": 0,
+      "changed_cells": 0,
+      "columns": {},
+      "changed_wave_counts": {},
+      "max_abs": 0.0,
+      "max_relative": 0.0,
+      "max_ulps": 0,
+      "sorted_digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "finite_all": true,
+      "nonnegative_all": true,
+      "input_file_hashes": {
+        "x.pkl": "2b3765485f20c5c7243594a47f00ffc4428aaccf5629214308786067c1f601b4",
+        "y.pkl": "2da7c5eac66cc42b520e60b12e23a5c51a6d7eca3451894b90a7855a7a3d658d",
+        "raw.pkl": "d07310769d3d9ec51d18f7e200b1a83f1e4e952f077b77e32eb0afd6281c183f"
+      }
+    },
+    {
+      "requested_kernel": "Haswell",
+      "blas": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas",
+          "version": "0.3.31.188.0",
+          "threading_layer": "pthreads",
+          "architecture": "Haswell"
+        }
+      ],
+      "digest": "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6",
+      "same_index": true,
+      "same_columns": true,
+      "same_dtypes": true,
+      "changed_rows": 1,
+      "changed_cells": 8,
+      "columns": {
+        "Energy": 1,
+        "Folate": 1,
+        "Carbohydrate": 1,
+        "Iron": 1,
+        "Niacin": 1,
+        "Riboflavin": 1,
+        "Thiamin": 1,
+        "Vitamin B-12": 1
+      },
+      "changed_wave_counts": {
+        "2019-20": 1
+      },
+      "max_abs": 3.637978807091713e-12,
+      "max_relative": 2.888772476871367e-16,
+      "max_ulps": 2,
+      "sorted_digest": "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6",
+      "finite_all": true,
+      "nonnegative_all": true,
+      "input_file_hashes": {
+        "x.pkl": "2b3765485f20c5c7243594a47f00ffc4428aaccf5629214308786067c1f601b4",
+        "y.pkl": "2da7c5eac66cc42b520e60b12e23a5c51a6d7eca3451894b90a7855a7a3d658d",
+        "raw.pkl": "d07310769d3d9ec51d18f7e200b1a83f1e4e952f077b77e32eb0afd6281c183f"
+      }
+    },
+    {
+      "requested_kernel": "SkylakeX",
+      "blas": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas",
+          "version": "0.3.31.188.0",
+          "threading_layer": "pthreads",
+          "architecture": "SkylakeX"
+        }
+      ],
+      "digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "same_index": true,
+      "same_columns": true,
+      "same_dtypes": true,
+      "changed_rows": 0,
+      "changed_cells": 0,
+      "columns": {},
+      "changed_wave_counts": {},
+      "max_abs": 0.0,
+      "max_relative": 0.0,
+      "max_ulps": 0,
+      "sorted_digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "finite_all": true,
+      "nonnegative_all": true,
+      "input_file_hashes": {
+        "x.pkl": "2b3765485f20c5c7243594a47f00ffc4428aaccf5629214308786067c1f601b4",
+        "y.pkl": "2da7c5eac66cc42b520e60b12e23a5c51a6d7eca3451894b90a7855a7a3d658d",
+        "raw.pkl": "d07310769d3d9ec51d18f7e200b1a83f1e4e952f077b77e32eb0afd6281c183f"
+      }
+    }
+  ],
+  "ci_actual_runner_kernel": "not logged; matching output reconstructed locally, not directly observed on CI",
+  "ci_raw_artifacts_available": false
+}

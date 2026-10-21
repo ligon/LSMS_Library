@@ -1,0 +1,26 @@
+#+TITLE: Read-only closure-audit reproduction
+
+The audit queried 34 current issue bodies and all paginated comments, supporting PR metadata, live development/master refs, the annotated tag, the active required-check ruleset, and the final candidate CI state.
+=gather.py= requires an explicit new private output directory under /local and uses only =gh api= GET requests.
+It reuses the prior80-entry merged-PR inventory, filtered against the actual tag timestamp, rather than asserting a complete new repository sweep.
+
+#+begin_src sh
+# Run from a clone containing the frozen candidate and reviewed PR objects.
+/local/job40255479/venv_img/bin/python gather.py --out /local/job40255479/control/framework-campaign/release-closure-final/replay
+/local/job40255479/venv_img/bin/python verify_ancestry.py --snapshots /local/job40255479/control/framework-campaign/release-closure-final/replay
+
+git show --no-patch --format=fuller v0.15.0
+git rev-parse 'v0.15.0^{}'
+gh api repos/ligon/LSMS_Library/git/ref/heads/development
+gh api repos/ligon/LSMS_Library/git/ref/heads/master
+gh api repos/ligon/LSMS_Library/git/ref/tags/v0.15.0
+#+end_src
+
+For the two nonancestor publication heads, compare each changed path's =git rev-parse <head>:<path>= object against =532d58700fa46e52a0b390198604eca1dc4de00e:<path>=.
+PR1157's six runtime/test/ledger/evidence paths match; four later review-only report paths are absent/different.
+PR1161's seventeen publication paths all match, despite replayed commit identities.
+The exact path results are in nonancestor-publication-equivalence.json.
+
+The issue-body/comment SHA256s in closure-table.json bind the reviewed public text to the private full snapshots.
+The scope/residual fields are a human/Sue reconciliation of that text with current source and the previously completed reviews, not an automated inference from closing keywords.
+No test, Country/Feature/data API or cache is used by this reproduction.

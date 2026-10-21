@@ -1,0 +1,83 @@
+{
+  "actual_CI_blas_kernel_logged": false,
+  "actual_checkout_shas": [
+    "4cab5f0db7d375ad543e652f61f43bd28fa94ecd"
+  ],
+  "all_skip_reasons_enumerated": false,
+  "analyzed_at": "2026-10-21T03:38:53.415717+00:00",
+  "changed_test_assets_since_852": [
+    "M\ttests/fixtures/uganda_baseline.json",
+    "M\ttests/test_gh1040_wave_read_gates.py",
+    "M\ttests/test_gh1093_declared_unit_consumers.py",
+    "A\ttests/test_gh1159_pooled_reducers.py",
+    "M\ttests/test_gh866_stale_country_parquet_not_laundered.py",
+    "M\ttests/test_guyana_index_uniqueness.py",
+    "M\ttests/test_india_employment_activity_index.py",
+    "M\ttests/test_uganda_invariance.py",
+    "A\ttests/test_uganda_invariance_hash_variants.py",
+    "M\ttests/test_wave_provenance.py"
+  ],
+  "collected_delta_vs_852": 193,
+  "collected_items": [
+    9050
+  ],
+  "credential_evidence_limit": "Console does not enumerate all skip reasons. Gate success and absence of credential-skip warnings are observed; do not represent the entire skip population as individually adjudicated.",
+  "credential_gate_passed": true,
+  "credential_skip_evidence_counts": {
+    "NoCredentialsError": 0,
+    "PartialCredentialsError": 0,
+    "Skipped: no S3 credentials": 0,
+    "UnmarkedS3TestWarning": 0,
+    "needs S3 credentials to build country data": 0,
+    "reached a credential-less skip at RUN time": 0
+  },
+  "delta_vs_previous_852": {
+    "failed": -1,
+    "passed": 194,
+    "skipped": 0,
+    "xfailed": 0,
+    "xpassed": 0
+  },
+  "event": "workflow_dispatch",
+  "failed_nodeids": [],
+  "full_suite_step_conclusion": "success",
+  "job_conclusion": "success",
+  "job_id": 118997075291,
+  "log_fetch_saved_once": true,
+  "nutrition_case": {
+    "actually_executed_and_passed": true,
+    "basis": "Serial pytest terminal status markers mapped to sorted _parquet_ids; fingerprint fixture keys unchanged; no collection-reordering hook in pinned source.",
+    "manifest_case_count": 53,
+    "ordered_terminal_group_count": 1,
+    "skipped": false,
+    "sorted_case_position_zero_based": 49,
+    "terminal_marker": "."
+  },
+  "nutrition_kernel_cause_scope": "Exact local controlled counterfactual; no direct observation of CI hardware kernel.",
+  "previous_852": {
+    "collected": 8857,
+    "failed": 1,
+    "passed": 6107,
+    "skipped": 2744,
+    "xfailed": 4,
+    "xpassed": 1
+  },
+  "private_log_bytes": 572174,
+  "private_log_sha256": "36acc2ebadd83b7b4dd4bb920e78d3329d828dbe79b59eaf768a5180758756a2",
+  "pytest_seconds": 5048.88,
+  "pytest_totals": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 6301,
+    "skipped": 2744,
+    "warnings": 1219,
+    "xfailed": 4,
+    "xpassed": 1
+  },
+  "raw_log_never_printed": true,
+  "run_conclusion_at_fetch": "success",
+  "run_head": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "run_id": 39531148624,
+  "run_status_at_fetch": "completed",
+  "uganda_build_passed": true
+}

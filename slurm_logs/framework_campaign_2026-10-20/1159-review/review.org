@@ -1,0 +1,47 @@
+#+title: Independent review of GH #1159 country-preserving reducers
+#+author: Sue
+#+date: 2026-10-20
+
+* Verdict
+
+PASS at frozen =45f80dcb50da189b7864034b1d92863dca68de09=, runtime =da84c7c790c1b1e040aca5ec3ff4d46649eb1317=.
+The parent reviewed the exact code/docs/tests diff independently of its author.
+Both reducers preserve a present country identity without changing unit-factor precedence, nutrient shares or ordinary country-less reductions.
+Column promotion happens before filtering and retains colliding local-row identity; null country labels are explicitly refused rather than dropped by the new group key.
+The Feature guide documents the intentional four-level output for country-labeled inputs, even one country and empty results.
+Metadata alone does not manufacture an axis.
+No actionable defect was found in this scoped review.
+
+* Independent execution
+
+The seven-file focused selection passed 260 tests, with two private-cache skips and fifteen requires_s3 deselections, in 8.67 seconds.
+The skips are the existing Nigeria sold-unit warm checks; this is synthetic/transform validation, not credentialed country validation.
+Sixteen additional controls pass: ordered categorical country labels with an unused category, categorical country columns, nullable-string country indices, index-before-column precedence with a null redundant column, unit index/column forms, repeated local plot rows, custom seed labels and explicit normalized nutrient shares.
+Expected totals use independent fixture quantities and a 1e-14 relative/absolute floating tolerance.
+Input-frame equality is checked after each call.
+The first custom-share probe used an unnormalized mapping key; it was corrected to the existing helper's normalized-key contract before the sixteen-case execution. No runtime fix was made for that fixture error.
+
+The frozen source HEAD, package real path, countries root and private data root are explicitly asserted in the additional-control process.
+All executions use the same frozen cwd/PYTHONPATH/config and the extracted interpreter, CPUs0--3, numerical/build threads one, and a fresh private data root.
+No real-country source was built, shared L2 accessed or production/config edited.
+
+* Evidence checks and limits
+
+Independently verified that both complete private hash maps are byte-identical and match the published digests: 549 country, 2,139 wave and 39 tagged fingerprints, with no hash-census errors.
+Verified baseline transformation bytes against exact852 git content and candidate bytes against the committed implementation; the precommit ledger HEAD in the probes does not substitute for these content checks.
+The author's71-failure baseline negative control remains author-run evidence; this review separately reran the candidate and additional discriminating cases.
+Full-suite and combined-source CI are still separate integration gates.
+
+The inherited fertilizer_rate grouping remains outside this two-reducer fix and must not be advertised as country-safe.
+Its numerator and area are independently grouped without country; parent-run independent synthetic processes at exact 852 and 45f80 reproduce the same pooled 0.276 versus separate A=0.46/B=0.23.
+This inherited residual is now [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]], after all-state deduplication against #1110/#867/#637.
+No scientific rate or parcel policy was changed.
+
+* Reproduction
+
+The focused command is the seven-file selection in the implementation README, with LSMS_DATA_DIR pointing to a new private review root and CPUs0--3.
+=adversarial.py= asserts source identity and implements all sixteen additional controls; run it with matching cwd, PYTHONPATH, LSMS_COUNTRIES_ROOT and LSMS_DATA_DIR using the image Python.
+=review.json= contains exact counts, source identities, log digest and independent controls.
+Raw pytest XML/logs remain private under =/local/job40255479/control/framework-campaign/review-1159/=.
+
+Sue

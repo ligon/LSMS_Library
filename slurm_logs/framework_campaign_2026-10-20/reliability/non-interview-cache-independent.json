@@ -1,0 +1,31 @@
+{
+  "frames_independently_exact_compared_ignoring_row_order": 125,
+  "rows": 16139392,
+  "features": [
+    "cluster_features",
+    "food_acquired",
+    "household_roster",
+    "sample"
+  ],
+  "order_only": [
+    [
+      "Benin",
+      "household_roster"
+    ],
+    [
+      "Burkina_Faso",
+      "household_roster"
+    ],
+    [
+      "CotedIvoire",
+      "household_roster"
+    ],
+    [
+      "Guinea-Bissau",
+      "household_roster"
+    ]
+  ],
+  "seconds": 15.742,
+  "APIs_called": false,
+  "cache_writes": false
+}

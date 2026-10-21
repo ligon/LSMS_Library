@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #698 (`fix/698-kinship-affinity`); red-team r1 verified the counts.\n\n| label | country/wave | people | served | issue |\n|---|---|---|---|---|\n| `Adopted/stepchild` | Timor-Leste 2007-08 | 246 | `[-1, 0, step]` | adoptive is filed `consanguineal` elsewhere in `kinship.yml`; the Ghana precedent `Adopted/Foster/Stepchild` is `[-1, 0, null]` |\n| `Adopted child/Foster child` | Cambodia 2019-20 | 9 | `[-1, 0, foster]` | same precedent suggests `[-1, 0, null]` |\n| `Servant/Employee/Other non-relative` | Guyana 1992 | 81 | `[0, 0, servant]` | servant vs unrelated; the adjudication called it a judgement |\n| bare `Other` | Azerbaijan 1995, Kosovo 2000, Malawi 2004-05, Timor-Leste 2001/2007-08, Uganda 2005-06 | 79 | `[0, 0, unrelated]` | an unevidenced guess |\n",
+  "comments": [],
+  "labels": [],
+  "number": 1102,
+  "state": "OPEN",
+  "title": "DECISION: kinship conflations of the #698 shape outside its wording (Timor-Leste Adopted/stepchild, Cambodia Adopted/Foster, Guyana Servant/Other, bare 'Other')",
+  "updatedAt": "2026-10-19T18:30:35Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1102"
+}

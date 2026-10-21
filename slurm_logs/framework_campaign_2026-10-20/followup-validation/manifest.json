@@ -1,0 +1,26 @@
+{
+  "source_commit": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "baseline_commit": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "files": {
+    "REPORT.org": "4872978abb7ed9a486a5919226273aba74a95d1124af5ebf64dea2dc5a85f416",
+    "classify_farm.py": "4f83c1f2c937837f46961f035829d6fd7481ed1864cb754359d5bba3495ab1c0",
+    "country-guidance.json": "35ca8b5307f89cce5e276faf010b5b90c9517b854d4bddf0e5c88b352c9832d6",
+    "farm-audit-summary.json": "d098fcb4c30e2f4b682c09227e825f0662e8dfeddf2b64aa4149f293550cf52e",
+    "farm-cache-bytes-control.json": "db597c6b1828efaa82720f25bdcf51482876b58c9427a7221744dcbebcc8a41c",
+    "farm-copy.json": "535a797fb7276caa29a4149343e3ca6cad4b95257f5f12f96806e2923d33d920",
+    "farm-live-reducers.json": "2a0cc6a29e84fb5d29e056c99f97be48dd2f26e460ffd4a0de0192ef5fcd5d0a",
+    "farm-participation-and-empty-controls.json": "dc5df05fbc06a566a3ca185e615e2f5a1eecfac6a244d2f7462c8954ebec17c5",
+    "farm-warning-classification.json": "7911fca9cf316371f357070670110f4edde6ff0e322d82dfa5bca9b173ea864f",
+    "live_reducers.py": "3463d00a022b66e35b9beef238264abbc0ec4f10686b9d29ffebd3b34336330d",
+    "prepare_farm.py": "8052c8caec9b735f688cb7ae5fd71719ba84e7a17478b019ee999d6e9c2189f7",
+    "reconcile_suite.py": "0db5ff04bce997e38d8bd4513061cca2ffe3a6a8873691c723b691946feafcf3",
+    "run_farm.py": "64d99124146a4ff8fa5029cc2232ffc5682888157edb9e844d49a89ae0083375",
+    "run_suite.py": "f1ab653326a0db3f5a4e68472a5578bb52674e3966a242c6c1f3ba94289a65f3",
+    "suite-reconciliation.json": "17927d2341c4cf4ac550b8c6772dee8f33b0b221897306c1d5f6b44a747c9ff3",
+    "suite-summary.json": "475bd5c2163a37b4cb15b1eaf1a55d365bb6f898dda8c84311b96b3a63b0f5ec",
+    "summarize_farm.py": "02f97dc99b22e00801d03462fbc811948458e3b82603735f9c1628a2d14eedd8"
+  },
+  "raw_logs_xml_events_microdata_included": false,
+  "all_verifier_processes_exited": true,
+  "copy_policy": "Only the explicit listed aggregates, report and runnable controllers/reconciliation scripts; raw logs/XML/events/full findings remain private."
+}

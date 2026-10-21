@@ -1,0 +1,44 @@
+{
+  "comma_labels": {
+    "Sac (0,9 Kg)": {
+      "kg_factors": [
+        9.0
+      ],
+      "native_quantity_sum": 28.3,
+      "rows": 36,
+      "sources": {
+        "metric": 36
+      }
+    }
+  },
+  "country": "CotedIvoire",
+  "factor_sources": {
+    "item_unit": 97497,
+    "metric": 27081,
+    "none": 6,
+    "unit": 172361
+  },
+  "food_acquired_rows": 296945,
+  "head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "kilograms": {
+    "2018-19": {
+      "finite_sum": 353069.34422069835,
+      "median": 0.5714285714285714,
+      "nonnull": 296939,
+      "rows": 296939
+    }
+  },
+  "package": "/local/job40255479/worktrees/baseline-976fc840d/lsms_library/__init__.py",
+  "phase": "baseline",
+  "price_rows": 182891,
+  "prices": {
+    "2018-19": {
+      "finite_sum": 142965032.78964165,
+      "median": 500.0,
+      "nonnull": 182891,
+      "rows": 182891
+    }
+  },
+  "private_root": "/local/job40255479/canonical-audit-compare/data-baseline",
+  "quantity_rows": 296945
+}

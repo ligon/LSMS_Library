@@ -1,0 +1,79 @@
+{
+  "source": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "controls": {
+    "shared_ids_country_index": {
+      "seed_kg": {
+        "rows": 1,
+        "index_names": [
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "values": [
+          3.0
+        ]
+      },
+      "nitrogen_kg": {
+        "rows": 1,
+        "index_names": [
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "values": [
+          1.3800000000000001
+        ]
+      }
+    },
+    "distinct_households": {
+      "seed_kg": {
+        "rows": 2,
+        "index_names": [
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "values": [
+          1.0,
+          2.0
+        ]
+      },
+      "nitrogen_kg": {
+        "rows": 2,
+        "index_names": [
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "values": [
+          0.46,
+          0.92
+        ]
+      }
+    },
+    "country_column": {
+      "seed_kg": {
+        "rows": 1,
+        "index_names": [
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "values": [
+          3.0
+        ]
+      },
+      "nitrogen_kg": {
+        "rows": 1,
+        "index_names": [
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "values": [
+          1.3800000000000001
+        ]
+      }
+    }
+  }
+}

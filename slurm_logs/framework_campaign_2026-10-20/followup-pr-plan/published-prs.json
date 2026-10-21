@@ -1,0 +1,1413 @@
+{
+  "1161": {
+    "baseRefName": "development",
+    "body": "The Uganda nutrition invariance test now accepts one additional measured exact fingerprint while retaining its approved primary hash and every shape, column, index and dtype assertion. The optional allowance exists only for `var/nutrition.parquet`; unrelated entries and unmeasured hashes still fail. No rounding, tolerance, forced CPU kernel, production arithmetic or fixture regeneration is introduced.\n\nFixed unchanged operands reproduce the approved hash on SkylakeX, the failed CI hash on Haswell, and the approved hash again when restored. The 23,777 × 15 result differs in eight cells of one row, by at most two float64 ULPs. This is an exact counterfactual matching the CI hash; the failed runner did not record its actual BLAS dispatch.\n\nIndependent review passed fourteen hermetic controls and independently reran all fifteen producer controls. Full reconstructed nutrition parquets pass under both measured kernels, while a deliberately changed value fails under each. Every original baseline field remains unchanged; complete country/wave/build hash inventories are unchanged. Aggregate evidence and reproducible controls are in `slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/`.\n\nThis draft targets **development directly**. Its five reviewed nonmerge commits were replayed onto `ad1e87e10`; every touched path had an identical preimage at development and the reviewed `852ac2bfc` base. It has no dependency on #1154–#1157. The historical approved primary result, null-debt semantics and separate #788 cache/source-authority caveat remain intact.\n\nAll seventeen changed publication files are byte-identical to the reviewed increment; fifteen focused controls passed again on this fresh development-based branch. Final combined full-suite and exact-head credentialed CI remain **PENDING**. The separate farm audit and real pooled-reducer checks have completed without new structural findings. The combined candidate run is [39531148624](https://github.com/ligon/LSMS_Library/actions/runs/39531148624) at `4cab5f0db`; unit and Windows smoke checks passed. This PR does not claim that pending data jobs are green and does not propose a release.\n",
+    "files": [
+      {
+        "path": ".coder/ledger/uganda-nutrition-cpu-hash.md",
+        "additions": 53,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "lsms_library/countries/Uganda/_/CONTENTS.org",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org",
+        "additions": 101,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/baseline_plugin.py",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/blas-comparison.json",
+        "additions": 122,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/compare_blas.py",
+        "additions": 33,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/hash-impact.json",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/immutability.json",
+        "additions": 8,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/probe.py",
+        "additions": 78,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-Haswell.json",
+        "additions": 49,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-SkylakeX.json",
+        "additions": 49,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real_control.py",
+        "additions": 27,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/verification.json",
+        "additions": 44,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/warm-reconstruction.json",
+        "additions": 52,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "tests/fixtures/uganda_baseline.json",
+        "additions": 4,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "tests/test_uganda_invariance.py",
+        "additions": 11,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "tests/test_uganda_invariance_hash_variants.py",
+        "additions": 131,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "review/nutrition-cpu-hash-20261020",
+    "headRefOid": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+    "isDraft": true,
+    "number": 1161,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999501567",
+        "name": "unit-tests",
+        "startedAt": "2026-10-21T02:14:26Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999501675",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-21T02:14:26Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:24Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999502778",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-21T02:14:24Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:24Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999503012",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-21T02:14:25Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:24Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999553219",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-21T02:14:35Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:24Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999502816",
+        "name": "docs",
+        "startedAt": "2026-10-21T02:14:24Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:24Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999503072",
+        "name": "data-tests",
+        "startedAt": "2026-10-21T02:14:25Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:24Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999503254",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-21T02:14:25Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ],
+    "title": "Accept the measured Uganda nutrition fingerprint without weakening invariance checks",
+    "url": "https://github.com/ligon/LSMS_Library/pull/1161",
+    "api_files": [
+      {
+        "filename": ".coder/ledger/uganda-nutrition-cpu-hash.md",
+        "sha": "1cb5b6299819e7b8025dc3033bfba62b8f88bc5a",
+        "status": "added",
+        "additions": 53,
+        "deletions": 0
+      },
+      {
+        "filename": "lsms_library/countries/Uganda/_/CONTENTS.org",
+        "sha": "6bad560bef33eb6b2b9decaf6f96c901f67bf67b",
+        "status": "modified",
+        "additions": 20,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org",
+        "sha": "1122615fcf99a110709e4d56086a971d5b864b6d",
+        "status": "added",
+        "additions": 101,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/baseline_plugin.py",
+        "sha": "6ef113a7eaad18c91e5c06b32e7b715d11c4db0d",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/blas-comparison.json",
+        "sha": "7808d52cf3cb03855ca1d4747771f3779cd3c66b",
+        "status": "added",
+        "additions": 122,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/compare_blas.py",
+        "sha": "b675d5ccdcc1e197db0e8f5abf24eaa643aab290",
+        "status": "added",
+        "additions": 33,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/hash-impact.json",
+        "sha": "7309c0b1b16483b7819c9a14c66b59b92161a6fb",
+        "status": "added",
+        "additions": 19,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/immutability.json",
+        "sha": "f4827a4f6368bf7e076ec6563f67fafd87b4022d",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/probe.py",
+        "sha": "2f8f109a450b33f17b633f4c2b9327316587cfaa",
+        "status": "added",
+        "additions": 78,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-Haswell.json",
+        "sha": "5a123996aae95bd11f7dd150e2c2608480ab82b2",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-SkylakeX.json",
+        "sha": "532a1db6077cb239cd163c27aa34084d76fc4ae9",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real_control.py",
+        "sha": "c98d761cb7572aa8bed40c9d1c496f92a0d7c63e",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/verification.json",
+        "sha": "3fa201176a5749c2c2015e4f3136f526d15abc71",
+        "status": "added",
+        "additions": 44,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/warm-reconstruction.json",
+        "sha": "3c893bb72bd5e4cdfc168b09e8a1542b0bff85c3",
+        "status": "added",
+        "additions": 52,
+        "deletions": 0
+      },
+      {
+        "filename": "tests/fixtures/uganda_baseline.json",
+        "sha": "fbd0320e926bd64729609a707c73b7486e4c9461",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 1
+      },
+      {
+        "filename": "tests/test_uganda_invariance.py",
+        "sha": "42f3d1dac904f5df6136f539d0c753ecf467c4de",
+        "status": "modified",
+        "additions": 11,
+        "deletions": 2
+      },
+      {
+        "filename": "tests/test_uganda_invariance_hash_variants.py",
+        "sha": "8cd26055ef52be9905a31fa769187ad3c21c12d2",
+        "status": "added",
+        "additions": 131,
+        "deletions": 0
+      }
+    ]
+  },
+  "1162": {
+    "baseRefName": "integration/framework-v016-40255479",
+    "body": "When an assumed-fresh country parquet disappears between the existence/footer check and its data read, the loader now falls through to the ordinary cache/build path. Only `FileNotFoundError` from the two data reads is handled; corruption, permission, mapping and genuine source errors retain their existing behavior.\n\nThe remaining Guyana and India cold-build controls and Togo forced-build control now use physical private L2 copies with only L1 linked. Existing already-private GhanaLSS and synthetic controls are unchanged. Original corpus bytes remain unchanged, and cold Guyana/India execution still works without a warm source cache.\n\nValidation: 190 focused tests passed; independent review passed 67 controls. The final old-gate negative control produces six failures and eleven passing error controls. Complete cache inventories show no changes across 549 country hashes, 2,139 wave entries and 39 table fingerprints. Aggregate evidence and runnable probes are in `slurm_logs/framework_campaign_2026-10-20/778/`.\n\nAddresses #778's two actionable remaining items. Its carried note about trusting unstamped country-script output is unchanged and remains separate from this disappearance fix. The corruption/`LSMS_NO_CACHE` policy decision in #1071 is also unchanged; the disproven partial-aggregate theory is not revived.\n\nDependency: this draft targets `integration/framework-v016-40255479` at `852ac2bfc` so the original fixes in #1154–#1157 do not appear in its diff. After those land, update this publication branch from development and retarget the PR. Do not merge into the temporary comparison base.\n\nFinal combined full-suite validation and exact-head credentialed CI are **PENDING**; the separate farm audit and real pooled-reducer checks have completed without new structural findings. The candidate CI run is [39531148624](https://github.com/ligon/LSMS_Library/actions/runs/39531148624) at `4cab5f0db`; its unit and Windows smoke checks passed. PR checks or skipped data jobs do not substitute for completed data validation. No release is proposed.\n",
+    "files": [
+      {
+        "path": ".coder/ledger/778-cache-race.md",
+        "additions": 83,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "lsms_library/country.py",
+        "additions": 10,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/REPORT.org",
+        "additions": 103,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/baseline_gate_probe.py",
+        "additions": 31,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/hash_probe.py",
+        "additions": 27,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/isolation_probe.py",
+        "additions": 95,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/verification.json",
+        "additions": 84,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "tests/test_gh1040_wave_read_gates.py",
+        "additions": 125,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "tests/test_gh866_stale_country_parquet_not_laundered.py",
+        "additions": 3,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "tests/test_guyana_index_uniqueness.py",
+        "additions": 24,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "tests/test_india_employment_activity_index.py",
+        "additions": 26,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "headRefName": "review/778-cache-race-20261020",
+    "headRefOid": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+    "isDraft": true,
+    "number": 1162,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999533998",
+        "name": "unit-tests",
+        "startedAt": "2026-10-21T02:14:32Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999534407",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-21T02:14:33Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:30Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535633",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-21T02:14:31Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:30Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535699",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-21T02:14:31Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:30Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535541",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-21T02:14:31Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:30Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535212",
+        "name": "docs",
+        "startedAt": "2026-10-21T02:14:31Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:30Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535597",
+        "name": "data-tests",
+        "startedAt": "2026-10-21T02:14:31Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:30Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535879",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-21T02:14:31Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ],
+    "title": "Recover disappearing assumed-fresh caches and isolate forced rebuild tests",
+    "url": "https://github.com/ligon/LSMS_Library/pull/1162",
+    "api_files": [
+      {
+        "filename": ".coder/ledger/778-cache-race.md",
+        "sha": "73734ce182445447c3b24f998d1329e16186b2a9",
+        "status": "added",
+        "additions": 83,
+        "deletions": 0
+      },
+      {
+        "filename": "lsms_library/country.py",
+        "sha": "c233eb731b10954b2963ba6d3b193b39e6714ff0",
+        "status": "modified",
+        "additions": 10,
+        "deletions": 2
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/778/REPORT.org",
+        "sha": "74c79865141b96279d6fb303d2a05594a55a5b82",
+        "status": "added",
+        "additions": 103,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/778/baseline_gate_probe.py",
+        "sha": "8d30982229608f1f584a53e992d62d7559bf6c46",
+        "status": "added",
+        "additions": 31,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/778/hash_probe.py",
+        "sha": "1b5044ac83d83b6187fa5e93043d6f2e23f9283e",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/778/isolation_probe.py",
+        "sha": "8e491a141a5c4af37de9561556ebe8deb46f54a9",
+        "status": "added",
+        "additions": 95,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/778/verification.json",
+        "sha": "6be5a330658a7e209f0b44eaf87b92d8d85d0b27",
+        "status": "added",
+        "additions": 84,
+        "deletions": 0
+      },
+      {
+        "filename": "tests/test_gh1040_wave_read_gates.py",
+        "sha": "fea1d7789d7ba9a8e6a2cd61c95f856f96ff9585",
+        "status": "modified",
+        "additions": 125,
+        "deletions": 0
+      },
+      {
+        "filename": "tests/test_gh866_stale_country_parquet_not_laundered.py",
+        "sha": "7ee7f6fba0062e4d5bd584db74d9c1df2b72e5ed",
+        "status": "modified",
+        "additions": 3,
+        "deletions": 10
+      },
+      {
+        "filename": "tests/test_guyana_index_uniqueness.py",
+        "sha": "4d5e3943bbc87b57f713b3982b97a77c5b091a44",
+        "status": "modified",
+        "additions": 24,
+        "deletions": 1
+      },
+      {
+        "filename": "tests/test_india_employment_activity_index.py",
+        "sha": "c7790a1638b53ae66d704662e480acc546547401",
+        "status": "modified",
+        "additions": 26,
+        "deletions": 1
+      }
+    ]
+  },
+  "1163": {
+    "baseRefName": "integration/framework-v016-40255479",
+    "body": "SOURCE round-trips now retain unknown, repeated and empty metadata occurrences and keyword-looking notes. Primary acquisition URLs come only from explicit `CATALOG_URL` or the pre-metadata body. Contradictory source/holding metadata and unsafe scalar rewrites refuse explicitly before changing destination bytes.\n\nBackfill preserves the held release, records separate latest-release/first-seen observations, and never fills an absent held IDNO from catalog metadata. Stamped primary-entry corrections require acquisition or explicit curation. Failed cross-entry downloads leave existing SOURCE bytes intact. A requested push must confirm every downloaded path before release stamping; explicit `push=False` still supports a complete local download.\n\nIndependent review passed 370 repository tests and 30 reviewer controls. Its first round caught a catalog-identity loss; the narrow refusal guard and destination-byte regressions repair it. A fresh 130-file SOURCE census shows unchanged inputs and zero information loss/drift; all 549 country, 2,139 wave and 40 table-plus-aggregate fingerprints remain unchanged. Producer evidence is in `slurm_logs/framework_campaign_2026-10-20/1115-1128/`, including `review-fix/`.\n\nFixes #1115.\nFixes #1128.\n\nCode only: no shipped SOURCE/CONTENTS backfill, catalog acquisition or queue stamping. Nested replacement, staging, retirement and raw-file/sidecar rollback remain #1149; these metadata guards do not prove served country configurations switched vintages.\n\nDependency: this draft targets `integration/framework-v016-40255479` at `852ac2bfc` to keep #1154–#1157 out of the diff. After those land, update this publication branch from development and retarget the PR. Do not merge into the temporary comparison base.\n\nFinal combined full-suite validation and exact-head credentialed CI are **PENDING**; the separate farm audit and real pooled-reducer checks have completed without new structural findings ([candidate run 39531148624](https://github.com/ligon/LSMS_Library/actions/runs/39531148624), `4cab5f0db`; unit and Windows smoke checks passed). The interrupted optional producer coverage run is not counted as a passing check. No release is proposed.\n",
+    "files": [
+      {
+        "path": ".claude/skills/add-wave/SKILL.md",
+        "additions": 15,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": ".coder/ledger/1115-1128-provenance.md",
+        "additions": 114,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "AGENTS.md",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "lsms_library/data_access.py",
+        "additions": 273,
+        "deletions": 43,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "lsms_library/provenance.py",
+        "additions": 284,
+        "deletions": 33,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "scripts/backfill_wave_provenance.py",
+        "additions": 234,
+        "deletions": 46,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/REPORT.org",
+        "additions": 132,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/api-audit.log",
+        "additions": 57,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/coverage-policy-interrupted.log",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-base.json",
+        "additions": 2738,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-base.log",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-comparison.json",
+        "additions": 23,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-patched.json",
+        "additions": 2738,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-patched.log",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash_probe.py",
+        "additions": 35,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative-base.log",
+        "additions": 414,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative-prior.log",
+        "additions": 554,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative_controls.py",
+        "additions": 74,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/optional-private-cache.json",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/policy-controls.log",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/related-final.log",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/related.log",
+        "additions": 119,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/reproduce.sh",
+        "additions": 47,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/REPORT.org",
+        "additions": 74,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/after-independent.log",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/before-independent.log",
+        "additions": 24,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/census.log",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/hash-patched.json",
+        "additions": 2738,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/hash.log",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/related.log",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/source-census.json",
+        "additions": 154,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/verification.json",
+        "additions": 56,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-base.json",
+        "additions": 158,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-patched.json",
+        "additions": 154,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-patched.log",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source_census.py",
+        "additions": 42,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/targeted.log",
+        "additions": 327,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/verification.json",
+        "additions": 130,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "tests/test_wave_provenance.py",
+        "additions": 1138,
+        "deletions": 55,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "headRefName": "review/1115-1128-provenance-20261020",
+    "headRefOid": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+    "isDraft": true,
+    "number": 1163,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999563694",
+        "name": "unit-tests",
+        "startedAt": "2026-10-21T02:14:38Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999563902",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-21T02:14:38Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:36Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999614836",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-21T02:14:47Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:36Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999564801",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-21T02:14:37Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:36Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999565101",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-21T02:14:37Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:36Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999564989",
+        "name": "docs",
+        "startedAt": "2026-10-21T02:14:37Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:36Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999565007",
+        "name": "data-tests",
+        "startedAt": "2026-10-21T02:14:37Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:37Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999565093",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-21T02:14:37Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ],
+    "title": "Preserve SOURCE facts and separate held releases from latest observations",
+    "url": "https://github.com/ligon/LSMS_Library/pull/1163",
+    "api_files": [
+      {
+        "filename": ".claude/skills/add-wave/SKILL.md",
+        "sha": "afcac9d906eabcea7b375ad8111cb63082730cb1",
+        "status": "modified",
+        "additions": 15,
+        "deletions": 3
+      },
+      {
+        "filename": ".coder/ledger/1115-1128-provenance.md",
+        "sha": "faac51dd498ea18df937913ebc39d03736fa46c1",
+        "status": "added",
+        "additions": 114,
+        "deletions": 0
+      },
+      {
+        "filename": "AGENTS.md",
+        "sha": "8e88d7eacebadfb44ce6387e5ec15e44e63fb756",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "filename": "lsms_library/data_access.py",
+        "sha": "ec8656145c13fc051063d3a08e559a86e2f780b9",
+        "status": "modified",
+        "additions": 273,
+        "deletions": 43
+      },
+      {
+        "filename": "lsms_library/provenance.py",
+        "sha": "54a771d690597e0779c46388f1695adc2cbe78b2",
+        "status": "modified",
+        "additions": 284,
+        "deletions": 33
+      },
+      {
+        "filename": "scripts/backfill_wave_provenance.py",
+        "sha": "f217f0a6446412acef95218d88d27102fcb23c0e",
+        "status": "modified",
+        "additions": 234,
+        "deletions": 46
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/REPORT.org",
+        "sha": "9646d6f5e52b0917b910b8fb2e6f5d83eb42765c",
+        "status": "added",
+        "additions": 132,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/api-audit.log",
+        "sha": "2c8bb94e5e8ec52bbaadcf7260ee654333e061b2",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/coverage-policy-interrupted.log",
+        "sha": "085d38f54adeb6ee185f0c21df4475e3f6148605",
+        "status": "added",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-base.json",
+        "sha": "ce5143026b364ed669896814c705cbe132c77839",
+        "status": "added",
+        "additions": 2738,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-base.log",
+        "sha": "d39d758c5e840c5de645fded35b980cc3bfdd359",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-comparison.json",
+        "sha": "7c1572c403cf05a8c3bead5f24a59d17201b7c7b",
+        "status": "added",
+        "additions": 23,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-patched.json",
+        "sha": "0071664ee29c2e86221c9812ccbb2439235b4ff4",
+        "status": "added",
+        "additions": 2738,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-patched.log",
+        "sha": "d39d758c5e840c5de645fded35b980cc3bfdd359",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash_probe.py",
+        "sha": "a0703805b13bf0e10edd7faeb4aaa28aa3ef5ef1",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative-base.log",
+        "sha": "c979a7e0dec0c8a4338efec943f81c58fbb3c28f",
+        "status": "added",
+        "additions": 414,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative-prior.log",
+        "sha": "9f5ee36ee6a234022a7de52a6c9afbfc3cb1ae3c",
+        "status": "added",
+        "additions": 554,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative_controls.py",
+        "sha": "1a9ec42f24e7bc23d363913d4878d2e54629a765",
+        "status": "added",
+        "additions": 74,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/optional-private-cache.json",
+        "sha": "02521b96207d01eefe3269d5f7f60e84fe598fad",
+        "status": "added",
+        "additions": 13,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/policy-controls.log",
+        "sha": "ed402b97e4aad53aa823d93fd72793cc9abc0747",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/related-final.log",
+        "sha": "b14bd1082cab8c59a7a62da826bcb85c53202127",
+        "status": "added",
+        "additions": 19,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/related.log",
+        "sha": "339f57d63c5173206376a9e8511f46e60a4acc0c",
+        "status": "added",
+        "additions": 119,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/reproduce.sh",
+        "sha": "cbbfb33cbeed550c13e022d2665ceab3fb019947",
+        "status": "added",
+        "additions": 47,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/REPORT.org",
+        "sha": "64b87ebce239581bd510ffd87f18915e1ce0b122",
+        "status": "added",
+        "additions": 74,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/after-independent.log",
+        "sha": "61e7ae73b46ef589f2ef3cb41709a06bd996fdbb",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/before-independent.log",
+        "sha": "3f3560279d18dfe66a590a378bab7758dd9e2e99",
+        "status": "added",
+        "additions": 24,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/census.log",
+        "sha": "5b8c579f724fc8f294921b62ca3bb1b4bc9e460a",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/hash-patched.json",
+        "sha": "0d97dac30f56195e6ba76a8c31314cbdda42e344",
+        "status": "added",
+        "additions": 2738,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/hash.log",
+        "sha": "d39d758c5e840c5de645fded35b980cc3bfdd359",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/related.log",
+        "sha": "c44cc577fda0dbae0c2e235fa256f26e8b6d7bbc",
+        "status": "added",
+        "additions": 19,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/source-census.json",
+        "sha": "c30952c623ec899a8eb361b4697f76888ff9172d",
+        "status": "added",
+        "additions": 154,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/verification.json",
+        "sha": "4c0006d3788fdcf7d01afcae9653969989b2a9f2",
+        "status": "added",
+        "additions": 56,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-base.json",
+        "sha": "09101ff5ab172c69adf82c3ff29f591bc06adb63",
+        "status": "added",
+        "additions": 158,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-patched.json",
+        "sha": "b1d4cd7c142d838557f76c736e4913d12e24790a",
+        "status": "added",
+        "additions": 154,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-patched.log",
+        "sha": "c8d5fdb4941c43bb09c812180daeae6ab1e559e2",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source_census.py",
+        "sha": "a9f61e6926a4a14eda9211272d5b585d7aed6b64",
+        "status": "added",
+        "additions": 42,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/targeted.log",
+        "sha": "cd4009d9a1a2f72dca0ff35c1c78803f74d83c17",
+        "status": "added",
+        "additions": 327,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1115-1128/verification.json",
+        "sha": "0ef965ffd1517414ea23f1ad8ff40231768f5b29",
+        "status": "added",
+        "additions": 130,
+        "deletions": 0
+      },
+      {
+        "filename": "tests/test_wave_provenance.py",
+        "sha": "8442ae9f9c3c37dbc04ed2aa752baa10416d628b",
+        "status": "modified",
+        "additions": 1138,
+        "deletions": 55
+      }
+    ]
+  },
+  "1164": {
+    "baseRefName": "integration/framework-v016-40255479",
+    "body": "`seed_kg` and `nitrogen_kg` now retain country as part of plot identity whenever it is an input index level or column. Colliding local plot IDs therefore return distinct country-keyed results: the metric example gives A/B seed 1/2 kg and nitrogen 0.46/0.92 kg, rather than one country-less sum.\n\nThe documented contract also covers one labeled country and empty results. Null country labels are refused before filtering; metadata alone adds no axis. Existing country-less output, declared-factor precedence, explicit-empty overrides, unit refusal, nutrient shares and diagnostics remain unchanged.\n\nIndependent review reran the focused selection: 260 passed (two existing private-cache skips and fifteen data-test deselections) and passed sixteen additional adversarial controls. The author’s untouched-base control has 71 failures. Complete inventories retain all 549 country, 2,139 wave and 39 table fingerprints. Aggregate evidence is in `slurm_logs/framework_campaign_2026-10-20/1159/`.\n\nFixes #1159.\n\nThe inherited downstream `fertilizer_rate` numerator/area country loss remains #1160. This PR does not make that rate country-safe or change parcel/plot or nutrient-share policy. The paired rate control is unchanged before/after.\n\nDependency: this draft targets `integration/framework-v016-40255479` at `852ac2bfc`, which contains the declared-unit fix from #1154 and the other original candidate fixes. After #1154–#1157 land, update this publication branch from development and retarget the PR. Do not merge into the temporary comparison base.\n\nFinal combined full-suite validation and exact-head credentialed CI are **PENDING**; the separate farm audit and real pooled-reducer checks have completed without new structural findings ([candidate run 39531148624](https://github.com/ligon/LSMS_Library/actions/runs/39531148624), `4cab5f0db`; unit and Windows smoke checks passed). No release is proposed.\n",
+    "files": [
+      {
+        "path": ".coder/ledger/1159-pooled-reducers.md",
+        "additions": 88,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "docs/guide/feature.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "lsms_library/transformations.py",
+        "additions": 38,
+        "deletions": 8,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/CONTRACT-REVIEW.md",
+        "additions": 49,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/README.org",
+        "additions": 83,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/compare.py",
+        "additions": 50,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/comparison.json",
+        "additions": 239,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/hash_reach.py",
+        "additions": 38,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/negative_control.py",
+        "additions": 32,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/probe.py",
+        "additions": 54,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "tests/test_gh1093_declared_unit_consumers.py",
+        "additions": 7,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "tests/test_gh1159_pooled_reducers.py",
+        "additions": 187,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "review/1159-pooled-reducers-20261020",
+    "headRefOid": "45f80dcb50da189b7864034b1d92863dca68de09",
+    "isDraft": true,
+    "number": 1164,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999582980",
+        "name": "unit-tests",
+        "startedAt": "2026-10-21T02:14:42Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999583405",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-21T02:14:42Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:40Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584471",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-21T02:14:41Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:40Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584414",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-21T02:14:41Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:40Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584436",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-21T02:14:41Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:40Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584374",
+        "name": "docs",
+        "startedAt": "2026-10-21T02:14:41Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:40Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584488",
+        "name": "data-tests",
+        "startedAt": "2026-10-21T02:14:41Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-21T02:14:40Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584439",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-21T02:14:41Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ],
+    "title": "Preserve country identity in seed and nitrogen plot reductions",
+    "url": "https://github.com/ligon/LSMS_Library/pull/1164",
+    "api_files": [
+      {
+        "filename": ".coder/ledger/1159-pooled-reducers.md",
+        "sha": "f4bf7796794230dafe4ee7d6be833e57af071ea9",
+        "status": "added",
+        "additions": 88,
+        "deletions": 0
+      },
+      {
+        "filename": "docs/guide/feature.md",
+        "sha": "e7b7725e54b11b395271da26f6fa21c611080755",
+        "status": "modified",
+        "additions": 9,
+        "deletions": 0
+      },
+      {
+        "filename": "lsms_library/transformations.py",
+        "sha": "8d87b462247f50e22a5c3ffff4b87feb018dfed4",
+        "status": "modified",
+        "additions": 38,
+        "deletions": 8
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1159/CONTRACT-REVIEW.md",
+        "sha": "89665567efb5db17d0f54f8a8eb96b5b6e4f31aa",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1159/README.org",
+        "sha": "41d08f8efcb47c0bda34df7e2455bfd3ab5dffb8",
+        "status": "added",
+        "additions": 83,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1159/compare.py",
+        "sha": "ac1479acf6ab483eddce53eeab5d0ebfebf7d567",
+        "status": "added",
+        "additions": 50,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1159/comparison.json",
+        "sha": "b0a5823182f911a57e46c2bb2154864237bc8918",
+        "status": "added",
+        "additions": 239,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1159/hash_reach.py",
+        "sha": "ee2093e961cd6e5e521e68c6d9a9602bdbaceabc",
+        "status": "added",
+        "additions": 38,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1159/negative_control.py",
+        "sha": "13094ee45581cc90e7c53fb9d2bb576697287d41",
+        "status": "added",
+        "additions": 32,
+        "deletions": 0
+      },
+      {
+        "filename": "slurm_logs/framework_campaign_2026-10-20/1159/probe.py",
+        "sha": "7ad791fcac66764eb2d7c8deeb4c887c231aa10b",
+        "status": "added",
+        "additions": 54,
+        "deletions": 0
+      },
+      {
+        "filename": "tests/test_gh1093_declared_unit_consumers.py",
+        "sha": "a3c35a6067fc278a9e032042be282987190eed00",
+        "status": "modified",
+        "additions": 7,
+        "deletions": 2
+      },
+      {
+        "filename": "tests/test_gh1159_pooled_reducers.py",
+        "sha": "ec74485cbce1c9bcc72d74740ee9f99a42bd0977",
+        "status": "added",
+        "additions": 187,
+        "deletions": 0
+      }
+    ]
+  }
+}

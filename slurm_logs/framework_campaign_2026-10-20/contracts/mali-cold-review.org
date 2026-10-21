@@ -1,0 +1,52 @@
+#+TITLE: Mali roster cold/warm supplement
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Result
+Two new Mali =household_roster= cold builds, one at exact baseline =976fc840d12ba40f1602b7dff58b81548632b2a9= and one at frozen integration =852ac2bfcd5f798533f56e7efa1f77db80c0138f=, return exactly equal 220,732-row, seven-column frames under fixed =PYTHONHASHSEED=1=.
+Both the original-order and sorted =assert_frame_equal(check_exact=True)= comparisons pass, including column/index dtypes, index values, labels, and cell values.
+Fresh-process warm reads also return exactly equal frames across the two sources, in original and sorted order.
+This strengthens the earlier review with newly captured cold frames; it does not directly compare the unavailable original corpus cold returned frames or claim all four original roster hashes were directly compared.
+
+* Existing cold/warm behavior
+On each source separately, =MonthsSpent= has dtype =object= on the new cold return and =string= on the subsequent warm return.
+The cold scalar-type counts are identical across sources: 137,543 floats, 46,014 integers, 36,825 strings and 350 NAType values.
+The warm scalar-type counts are identical across sources: 176,909 strings and 43,823 NAType values.
+The float category includes missing floating values; these type counts are not nonmissing observation counts.
+Missingness is exactly equal before/after, and explicit string representations are equal.
+That representation comparison is reported separately and is not used to normalize either frame for the exact baseline/candidate cold comparison.
+All other columns, index labels, dtypes, and values are exactly equal within each cold/warm pair after sorting; original index and column order is also retained.
+The existing typing change remains a separate inherited limitation, not an intended campaign behavior or a source fix.
+No scientific interpretation of MonthsSpent was added.
+
+* Scope and isolation
+Only the roster was requested through the existing =diagnostics.load_feature= helper.
+The roster and its intrinsic =sample= dependency were the only parquet tables materialized.
+The baseline root is =/local/job40255479/mali-cold-review-baseline= and the integration root is =/local/job40255479/mali-cold-review-combined=.
+Each started with no parquets; each shares only the content-addressed L1 link.
+No API was invoked against either original corpus root.
+Each cold call preserved a deep copy of its returned frame privately before external serialization; the private pickle round-trip was independently checked with exact frame equality and the existing fingerprint.
+The warm call runs in a separate fresh process on that source's new root and leaves country-cache bytes and mtime unchanged.
+Package real path, countries root, cwd, source SHA, data root, and fixed hash seed are asserted in every API process.
+Processes use CPUs 20--23, numerical/build threads one, and at most two API processes concurrently.
+
+* Country guidance
+Mali's =CONTENTS.org:421= documents that four 2018-19 Relationship labels are truncated in the published source bytes; it explicitly says this is "NOT a reader-encoding problem".
+The existing whole-label mapping and its order after the title-case formatter were retained.
+No label/decoder change, source/config edit, fixture update, or contradiction with that note was introduced.
+The previously read live country documentation remains applicable.
+
+* Evidence and reproduction
+=mali_cold_probe.py= implements cold/warm capture using the existing sanctioned loader and =tests/generate_baseline.py:fingerprint=.
+=compare_mali_cold.py= compares the four private snapshots without introducing another fingerprint definition.
+=mali-cold-review.json= records the exact source identities, fingerprints, dtype/type counts, and equality outcomes.
+Raw private frames and detailed logs remain only below the two new private data roots.
+To rerun, create distinct fresh private roots with the same required =mali-cold-review-= name fragment and L1 link, invoke the probe once in =--mode cold= and once in =--mode warm= for each exact checkout, then point the comparator at those private roots.
+Keep cwd, PYTHONPATH, LSMS_COUNTRIES_ROOT and LSMS_DATA_DIR aligned with each source and root; set PYTHONHASHSEED=1, numerical/build threads one, and CPU affinity 20--23.
+A cold probe intentionally refuses a root containing parquets.
+
+All four API processes and the final comparator exited successfully and have stopped.
+Earlier =corpus-review= and roster evidence files remain unchanged.
+No source/fixture edit, shared L2 write, Git mutation, or GitHub mutation was made.
+
+Sue

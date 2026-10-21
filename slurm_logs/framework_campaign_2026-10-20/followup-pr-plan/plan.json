@@ -1,0 +1,425 @@
+{
+  "PRs": [
+    {
+      "base_branch": "development",
+      "body_file": "nutrition-body.md",
+      "branch": "review/nutrition-cpu-hash-20261020",
+      "current_PR_checks": [
+        {
+          "conclusion": "",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999501567",
+          "name": "unit-tests",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "conclusion": "",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999501675",
+          "name": "windows-smoke",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999502778",
+          "name": "windows-script-build",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999503012",
+          "name": "dvc-remote-reachability",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999553219",
+          "name": "dvc-lock-check",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999502816",
+          "name": "docs",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999503072",
+          "name": "data-tests",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531900062/job/118999503254",
+          "name": "refresh-dvc-locks",
+          "status": "COMPLETED"
+        }
+      ],
+      "depends_on_original_PRs": [],
+      "draft": true,
+      "expected_paths": [
+        ".coder/ledger/uganda-nutrition-cpu-hash.md",
+        "lsms_library/countries/Uganda/_/CONTENTS.org",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/baseline_plugin.py",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/blas-comparison.json",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/compare_blas.py",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/hash-impact.json",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/immutability.json",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/probe.py",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-Haswell.json",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-SkylakeX.json",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real_control.py",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/verification.json",
+        "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/warm-reconstruction.json",
+        "tests/fixtures/uganda_baseline.json",
+        "tests/test_uganda_invariance.py",
+        "tests/test_uganda_invariance_hash_variants.py"
+      ],
+      "head": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+      "intended_closure": "No issue closure",
+      "nonmerge_source_commits_in_order": [
+        "66416b61bcfeeb1904419445102c28eca61d6eb1",
+        "5f571dcc476b7eee89f2c7a2628bde945aa03837",
+        "dd745136013d8670e2897af046bf7ddaeac2710b",
+        "6b400aeea2e9676e461d760f83980ebb8f223eea",
+        "98822ed1ab3a2106b3be4c3d90aa086076e32ef0"
+      ],
+      "number": 1161,
+      "source_worker_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+      "state": "PUBLISHED_DRAFT",
+      "title": "Accept the measured Uganda nutrition fingerprint without weakening invariance checks",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1161"
+    },
+    {
+      "base_branch": "integration/framework-v016-40255479",
+      "body_file": "778-body.md",
+      "branch": "review/778-cache-race-20261020",
+      "current_PR_checks": [
+        {
+          "conclusion": "",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999533998",
+          "name": "unit-tests",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "conclusion": "",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999534407",
+          "name": "windows-smoke",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535633",
+          "name": "windows-script-build",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535699",
+          "name": "dvc-remote-reachability",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535541",
+          "name": "dvc-lock-check",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535212",
+          "name": "docs",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535597",
+          "name": "data-tests",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531909421/job/118999535879",
+          "name": "refresh-dvc-locks",
+          "status": "COMPLETED"
+        }
+      ],
+      "depends_on_original_PRs": [
+        1154,
+        1155,
+        1156,
+        1157
+      ],
+      "draft": true,
+      "expected_paths": [
+        ".coder/ledger/778-cache-race.md",
+        "lsms_library/country.py",
+        "slurm_logs/framework_campaign_2026-10-20/778/REPORT.org",
+        "slurm_logs/framework_campaign_2026-10-20/778/baseline_gate_probe.py",
+        "slurm_logs/framework_campaign_2026-10-20/778/hash_probe.py",
+        "slurm_logs/framework_campaign_2026-10-20/778/isolation_probe.py",
+        "slurm_logs/framework_campaign_2026-10-20/778/verification.json",
+        "tests/test_gh1040_wave_read_gates.py",
+        "tests/test_gh866_stale_country_parquet_not_laundered.py",
+        "tests/test_guyana_index_uniqueness.py",
+        "tests/test_india_employment_activity_index.py"
+      ],
+      "head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+      "intended_closure": "Addresses #778; carried trust-mode note unchanged; narrowing required before intended Fixes wording",
+      "nonmerge_source_commits_in_order": [
+        "e08b7f337c3f4a539b314876d9598e552641fd33",
+        "2aef1c2ac80cac9ae9de6137067f0ed7dcbd8bc0",
+        "3c97f20db8ca30c18f80a6aed681c76fc0a82aa3",
+        "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb"
+      ],
+      "number": 1162,
+      "source_worker_head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+      "state": "PUBLISHED_DRAFT",
+      "title": "Recover disappearing assumed-fresh caches and isolate forced rebuild tests",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1162"
+    },
+    {
+      "base_branch": "integration/framework-v016-40255479",
+      "body_file": "provenance-body.md",
+      "branch": "review/1115-1128-provenance-20261020",
+      "current_PR_checks": [
+        {
+          "conclusion": "",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999563694",
+          "name": "unit-tests",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "conclusion": "",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999563902",
+          "name": "windows-smoke",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999614836",
+          "name": "windows-script-build",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999564801",
+          "name": "dvc-remote-reachability",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999565101",
+          "name": "dvc-lock-check",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999564989",
+          "name": "docs",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999565007",
+          "name": "data-tests",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531918181/job/118999565093",
+          "name": "refresh-dvc-locks",
+          "status": "COMPLETED"
+        }
+      ],
+      "depends_on_original_PRs": [
+        1154,
+        1155,
+        1156,
+        1157
+      ],
+      "draft": true,
+      "expected_paths": [
+        ".claude/skills/add-wave/SKILL.md",
+        ".coder/ledger/1115-1128-provenance.md",
+        "AGENTS.md",
+        "lsms_library/data_access.py",
+        "lsms_library/provenance.py",
+        "scripts/backfill_wave_provenance.py",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/REPORT.org",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/api-audit.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/coverage-policy-interrupted.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-base.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-base.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-comparison.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-patched.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-patched.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash_probe.py",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative-base.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative-prior.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative_controls.py",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/optional-private-cache.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/policy-controls.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/related-final.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/related.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/reproduce.sh",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/REPORT.org",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/after-independent.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/before-independent.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/census.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/hash-patched.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/hash.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/related.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/source-census.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/verification.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-base.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-patched.json",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-patched.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/source_census.py",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/targeted.log",
+        "slurm_logs/framework_campaign_2026-10-20/1115-1128/verification.json",
+        "tests/test_wave_provenance.py"
+      ],
+      "head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+      "intended_closure": "Fixes #1115; Fixes #1128; default-branch automation caveat applies",
+      "nonmerge_source_commits_in_order": [
+        "4f7394ce90c2c31822934a9495fc5aa8cf1b4739",
+        "519437658beab58471b2d754a2a7fc7abb236218",
+        "ee11667f5fb6cc11380fe9392a65cd4e5f403b12",
+        "13beb2fa5dd709521efcd4f9ff63bf889fe3bac7",
+        "dbae899fa2d9193c17010bb5f3838dd326d815fd",
+        "44f6cd2e7d3665622d2119fe4725e5a7604a56fa"
+      ],
+      "number": 1163,
+      "source_worker_head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+      "state": "PUBLISHED_DRAFT",
+      "title": "Preserve SOURCE facts and separate held releases from latest observations",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1163"
+    },
+    {
+      "base_branch": "integration/framework-v016-40255479",
+      "body_file": "1159-body.md",
+      "branch": "review/1159-pooled-reducers-20261020",
+      "current_PR_checks": [
+        {
+          "conclusion": "",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999582980",
+          "name": "unit-tests",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "conclusion": "",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999583405",
+          "name": "windows-smoke",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584471",
+          "name": "windows-script-build",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584414",
+          "name": "dvc-remote-reachability",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584436",
+          "name": "dvc-lock-check",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584374",
+          "name": "docs",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584488",
+          "name": "data-tests",
+          "status": "COMPLETED"
+        },
+        {
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/39531923827/job/118999584439",
+          "name": "refresh-dvc-locks",
+          "status": "COMPLETED"
+        }
+      ],
+      "depends_on_original_PRs": [
+        1154,
+        1155,
+        1156,
+        1157
+      ],
+      "draft": true,
+      "expected_paths": [
+        ".coder/ledger/1159-pooled-reducers.md",
+        "docs/guide/feature.md",
+        "lsms_library/transformations.py",
+        "slurm_logs/framework_campaign_2026-10-20/1159/CONTRACT-REVIEW.md",
+        "slurm_logs/framework_campaign_2026-10-20/1159/README.org",
+        "slurm_logs/framework_campaign_2026-10-20/1159/compare.py",
+        "slurm_logs/framework_campaign_2026-10-20/1159/comparison.json",
+        "slurm_logs/framework_campaign_2026-10-20/1159/hash_reach.py",
+        "slurm_logs/framework_campaign_2026-10-20/1159/negative_control.py",
+        "slurm_logs/framework_campaign_2026-10-20/1159/probe.py",
+        "tests/test_gh1093_declared_unit_consumers.py",
+        "tests/test_gh1159_pooled_reducers.py"
+      ],
+      "head": "45f80dcb50da189b7864034b1d92863dca68de09",
+      "intended_closure": "Fixes #1159; #1160 remains outside scope; default-branch automation caveat applies",
+      "nonmerge_source_commits_in_order": [
+        "eeffc88163a0f453ed60b9beecd00d534358d42d",
+        "da84c7c790c1b1e040aca5ec3ff4d46649eb1317",
+        "45f80dcb50da189b7864034b1d92863dca68de09"
+      ],
+      "number": 1164,
+      "source_worker_head": "45f80dcb50da189b7864034b1d92863dca68de09",
+      "state": "PUBLISHED_DRAFT",
+      "title": "Preserve country identity in seed and nitrogen plot reductions",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1164"
+    }
+  ],
+  "closing_keyword_default_branch_caveat": "Default ismaster; integration/development-targeted PR descriptions do not auto-close issues",
+  "comparison_base": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "comparison_branch": "integration/framework-v016-40255479",
+  "created_utc": "2026-10-21T02:18:09.386175+00:00",
+  "default_branch": "master",
+  "farm_checks": "COMPLETE; no new structural findings reported by parent",
+  "fresh_nutrition_publication": {
+    "all17_files_byte_equal_to_worker": true,
+    "focused_controls_passed": 15,
+    "parent_reported": true
+  },
+  "frozen_combined_candidate": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "landing_order": [
+    "Complete validation; nutrition1161 may land directly development when approved",
+    "Land original1154-1157;1153 already landed",
+    "Merge currentdevelopment into each1162/1163/1164 publication branch; no worker edits/force push",
+    "Verify target ancestor and incremental paths/source; retarget those3PRs todevelopment; check finalheads",
+    "Land reviewed followups normally; update campaign/closure bookkeeping; no release authorized"
+  ],
+  "live_development": "ad1e87e1025dec98fe70734f4e60d12824fd31dd",
+  "local_combined_full_suite": "PENDING",
+  "manual_combined_CI": {
+    "credentialed_data_suite": "PENDING",
+    "native_windows_build": "PENDING",
+    "run": 39531148624,
+    "unit_tests": "SUCCESS",
+    "windows_smoke": "SUCCESS"
+  },
+  "planner_mutations": {
+    "GitHub": false,
+    "git": false,
+    "new_worktrees_or_code": false,
+    "tracked_source": false
+  },
+  "publication_scope_audit": "PASS; all79file blobs and path sets match reviewed workers",
+  "repo": "ligon/LSMS_Library",
+  "source_graph_mutations_by_parent_are_separate": true
+}

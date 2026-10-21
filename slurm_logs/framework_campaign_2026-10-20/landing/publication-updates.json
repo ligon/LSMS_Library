@@ -1,0 +1,354 @@
+[
+  {
+    "pr": 1162,
+    "old_head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+    "head": "dffb0760406c74cea677f360f76be52cbed27975",
+    "base": "development",
+    "development_ancestor": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+    "worktree": "/local/job40255479/worktrees/land-1162",
+    "scope_count": 11,
+    "all_reviewed_blobs_preserved": true,
+    "github_diff_verified": true,
+    "blobs": [
+      {
+        "path": ".coder/ledger/778-cache-race.md",
+        "reviewed_blob": "73734ce182445447c3b24f998d1329e16186b2a9",
+        "merged_blob": "73734ce182445447c3b24f998d1329e16186b2a9"
+      },
+      {
+        "path": "lsms_library/country.py",
+        "reviewed_blob": "c233eb731b10954b2963ba6d3b193b39e6714ff0",
+        "merged_blob": "c233eb731b10954b2963ba6d3b193b39e6714ff0"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/REPORT.org",
+        "reviewed_blob": "74c79865141b96279d6fb303d2a05594a55a5b82",
+        "merged_blob": "74c79865141b96279d6fb303d2a05594a55a5b82"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/baseline_gate_probe.py",
+        "reviewed_blob": "8d30982229608f1f584a53e992d62d7559bf6c46",
+        "merged_blob": "8d30982229608f1f584a53e992d62d7559bf6c46"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/hash_probe.py",
+        "reviewed_blob": "1b5044ac83d83b6187fa5e93043d6f2e23f9283e",
+        "merged_blob": "1b5044ac83d83b6187fa5e93043d6f2e23f9283e"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/isolation_probe.py",
+        "reviewed_blob": "8e491a141a5c4af37de9561556ebe8deb46f54a9",
+        "merged_blob": "8e491a141a5c4af37de9561556ebe8deb46f54a9"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/778/verification.json",
+        "reviewed_blob": "6be5a330658a7e209f0b44eaf87b92d8d85d0b27",
+        "merged_blob": "6be5a330658a7e209f0b44eaf87b92d8d85d0b27"
+      },
+      {
+        "path": "tests/test_gh1040_wave_read_gates.py",
+        "reviewed_blob": "fea1d7789d7ba9a8e6a2cd61c95f856f96ff9585",
+        "merged_blob": "fea1d7789d7ba9a8e6a2cd61c95f856f96ff9585"
+      },
+      {
+        "path": "tests/test_gh866_stale_country_parquet_not_laundered.py",
+        "reviewed_blob": "7ee7f6fba0062e4d5bd584db74d9c1df2b72e5ed",
+        "merged_blob": "7ee7f6fba0062e4d5bd584db74d9c1df2b72e5ed"
+      },
+      {
+        "path": "tests/test_guyana_index_uniqueness.py",
+        "reviewed_blob": "4d5e3943bbc87b57f713b3982b97a77c5b091a44",
+        "merged_blob": "4d5e3943bbc87b57f713b3982b97a77c5b091a44"
+      },
+      {
+        "path": "tests/test_india_employment_activity_index.py",
+        "reviewed_blob": "c7790a1638b53ae66d704662e480acc546547401",
+        "merged_blob": "c7790a1638b53ae66d704662e480acc546547401"
+      }
+    ],
+    "at": "2026-10-21T04:56:24.347962+00:00"
+  },
+  {
+    "pr": 1163,
+    "old_head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+    "head": "124c2436d7e1a279c72f4d8f650d250eab6c7d67",
+    "base": "development",
+    "development_ancestor": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+    "worktree": "/local/job40255479/worktrees/land-1163",
+    "scope_count": 39,
+    "all_reviewed_blobs_preserved": true,
+    "github_diff_verified": true,
+    "blobs": [
+      {
+        "path": ".claude/skills/add-wave/SKILL.md",
+        "reviewed_blob": "afcac9d906eabcea7b375ad8111cb63082730cb1",
+        "merged_blob": "afcac9d906eabcea7b375ad8111cb63082730cb1"
+      },
+      {
+        "path": ".coder/ledger/1115-1128-provenance.md",
+        "reviewed_blob": "faac51dd498ea18df937913ebc39d03736fa46c1",
+        "merged_blob": "faac51dd498ea18df937913ebc39d03736fa46c1"
+      },
+      {
+        "path": "AGENTS.md",
+        "reviewed_blob": "8e88d7eacebadfb44ce6387e5ec15e44e63fb756",
+        "merged_blob": "8e88d7eacebadfb44ce6387e5ec15e44e63fb756"
+      },
+      {
+        "path": "lsms_library/data_access.py",
+        "reviewed_blob": "ec8656145c13fc051063d3a08e559a86e2f780b9",
+        "merged_blob": "ec8656145c13fc051063d3a08e559a86e2f780b9"
+      },
+      {
+        "path": "lsms_library/provenance.py",
+        "reviewed_blob": "54a771d690597e0779c46388f1695adc2cbe78b2",
+        "merged_blob": "54a771d690597e0779c46388f1695adc2cbe78b2"
+      },
+      {
+        "path": "scripts/backfill_wave_provenance.py",
+        "reviewed_blob": "f217f0a6446412acef95218d88d27102fcb23c0e",
+        "merged_blob": "f217f0a6446412acef95218d88d27102fcb23c0e"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/REPORT.org",
+        "reviewed_blob": "9646d6f5e52b0917b910b8fb2e6f5d83eb42765c",
+        "merged_blob": "9646d6f5e52b0917b910b8fb2e6f5d83eb42765c"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/api-audit.log",
+        "reviewed_blob": "2c8bb94e5e8ec52bbaadcf7260ee654333e061b2",
+        "merged_blob": "2c8bb94e5e8ec52bbaadcf7260ee654333e061b2"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/coverage-policy-interrupted.log",
+        "reviewed_blob": "085d38f54adeb6ee185f0c21df4475e3f6148605",
+        "merged_blob": "085d38f54adeb6ee185f0c21df4475e3f6148605"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-base.json",
+        "reviewed_blob": "ce5143026b364ed669896814c705cbe132c77839",
+        "merged_blob": "ce5143026b364ed669896814c705cbe132c77839"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-base.log",
+        "reviewed_blob": "d39d758c5e840c5de645fded35b980cc3bfdd359",
+        "merged_blob": "d39d758c5e840c5de645fded35b980cc3bfdd359"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-comparison.json",
+        "reviewed_blob": "7c1572c403cf05a8c3bead5f24a59d17201b7c7b",
+        "merged_blob": "7c1572c403cf05a8c3bead5f24a59d17201b7c7b"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-patched.json",
+        "reviewed_blob": "0071664ee29c2e86221c9812ccbb2439235b4ff4",
+        "merged_blob": "0071664ee29c2e86221c9812ccbb2439235b4ff4"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash-patched.log",
+        "reviewed_blob": "d39d758c5e840c5de645fded35b980cc3bfdd359",
+        "merged_blob": "d39d758c5e840c5de645fded35b980cc3bfdd359"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/hash_probe.py",
+        "reviewed_blob": "a0703805b13bf0e10edd7faeb4aaa28aa3ef5ef1",
+        "merged_blob": "a0703805b13bf0e10edd7faeb4aaa28aa3ef5ef1"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative-base.log",
+        "reviewed_blob": "c979a7e0dec0c8a4338efec943f81c58fbb3c28f",
+        "merged_blob": "c979a7e0dec0c8a4338efec943f81c58fbb3c28f"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative-prior.log",
+        "reviewed_blob": "9f5ee36ee6a234022a7de52a6c9afbfc3cb1ae3c",
+        "merged_blob": "9f5ee36ee6a234022a7de52a6c9afbfc3cb1ae3c"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/negative_controls.py",
+        "reviewed_blob": "1a9ec42f24e7bc23d363913d4878d2e54629a765",
+        "merged_blob": "1a9ec42f24e7bc23d363913d4878d2e54629a765"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/optional-private-cache.json",
+        "reviewed_blob": "02521b96207d01eefe3269d5f7f60e84fe598fad",
+        "merged_blob": "02521b96207d01eefe3269d5f7f60e84fe598fad"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/policy-controls.log",
+        "reviewed_blob": "ed402b97e4aad53aa823d93fd72793cc9abc0747",
+        "merged_blob": "ed402b97e4aad53aa823d93fd72793cc9abc0747"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/related-final.log",
+        "reviewed_blob": "b14bd1082cab8c59a7a62da826bcb85c53202127",
+        "merged_blob": "b14bd1082cab8c59a7a62da826bcb85c53202127"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/related.log",
+        "reviewed_blob": "339f57d63c5173206376a9e8511f46e60a4acc0c",
+        "merged_blob": "339f57d63c5173206376a9e8511f46e60a4acc0c"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/reproduce.sh",
+        "reviewed_blob": "cbbfb33cbeed550c13e022d2665ceab3fb019947",
+        "merged_blob": "cbbfb33cbeed550c13e022d2665ceab3fb019947"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/REPORT.org",
+        "reviewed_blob": "64b87ebce239581bd510ffd87f18915e1ce0b122",
+        "merged_blob": "64b87ebce239581bd510ffd87f18915e1ce0b122"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/after-independent.log",
+        "reviewed_blob": "61e7ae73b46ef589f2ef3cb41709a06bd996fdbb",
+        "merged_blob": "61e7ae73b46ef589f2ef3cb41709a06bd996fdbb"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/before-independent.log",
+        "reviewed_blob": "3f3560279d18dfe66a590a378bab7758dd9e2e99",
+        "merged_blob": "3f3560279d18dfe66a590a378bab7758dd9e2e99"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/census.log",
+        "reviewed_blob": "5b8c579f724fc8f294921b62ca3bb1b4bc9e460a",
+        "merged_blob": "5b8c579f724fc8f294921b62ca3bb1b4bc9e460a"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/hash-patched.json",
+        "reviewed_blob": "0d97dac30f56195e6ba76a8c31314cbdda42e344",
+        "merged_blob": "0d97dac30f56195e6ba76a8c31314cbdda42e344"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/hash.log",
+        "reviewed_blob": "d39d758c5e840c5de645fded35b980cc3bfdd359",
+        "merged_blob": "d39d758c5e840c5de645fded35b980cc3bfdd359"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/related.log",
+        "reviewed_blob": "c44cc577fda0dbae0c2e235fa256f26e8b6d7bbc",
+        "merged_blob": "c44cc577fda0dbae0c2e235fa256f26e8b6d7bbc"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/source-census.json",
+        "reviewed_blob": "c30952c623ec899a8eb361b4697f76888ff9172d",
+        "merged_blob": "c30952c623ec899a8eb361b4697f76888ff9172d"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/verification.json",
+        "reviewed_blob": "4c0006d3788fdcf7d01afcae9653969989b2a9f2",
+        "merged_blob": "4c0006d3788fdcf7d01afcae9653969989b2a9f2"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-base.json",
+        "reviewed_blob": "09101ff5ab172c69adf82c3ff29f591bc06adb63",
+        "merged_blob": "09101ff5ab172c69adf82c3ff29f591bc06adb63"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-patched.json",
+        "reviewed_blob": "b1d4cd7c142d838557f76c736e4913d12e24790a",
+        "merged_blob": "b1d4cd7c142d838557f76c736e4913d12e24790a"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source-census-patched.log",
+        "reviewed_blob": "c8d5fdb4941c43bb09c812180daeae6ab1e559e2",
+        "merged_blob": "c8d5fdb4941c43bb09c812180daeae6ab1e559e2"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/source_census.py",
+        "reviewed_blob": "a9f61e6926a4a14eda9211272d5b585d7aed6b64",
+        "merged_blob": "a9f61e6926a4a14eda9211272d5b585d7aed6b64"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/targeted.log",
+        "reviewed_blob": "cd4009d9a1a2f72dca0ff35c1c78803f74d83c17",
+        "merged_blob": "cd4009d9a1a2f72dca0ff35c1c78803f74d83c17"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1115-1128/verification.json",
+        "reviewed_blob": "0ef965ffd1517414ea23f1ad8ff40231768f5b29",
+        "merged_blob": "0ef965ffd1517414ea23f1ad8ff40231768f5b29"
+      },
+      {
+        "path": "tests/test_wave_provenance.py",
+        "reviewed_blob": "8442ae9f9c3c37dbc04ed2aa752baa10416d628b",
+        "merged_blob": "8442ae9f9c3c37dbc04ed2aa752baa10416d628b"
+      }
+    ],
+    "at": "2026-10-21T04:56:34.450092+00:00"
+  },
+  {
+    "pr": 1164,
+    "old_head": "45f80dcb50da189b7864034b1d92863dca68de09",
+    "head": "d124c0df70db2e04dceb4a8c19eb0d40df14dbee",
+    "base": "development",
+    "development_ancestor": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+    "worktree": "/local/job40255479/worktrees/land-1164",
+    "scope_count": 12,
+    "all_reviewed_blobs_preserved": true,
+    "github_diff_verified": true,
+    "blobs": [
+      {
+        "path": ".coder/ledger/1159-pooled-reducers.md",
+        "reviewed_blob": "f4bf7796794230dafe4ee7d6be833e57af071ea9",
+        "merged_blob": "f4bf7796794230dafe4ee7d6be833e57af071ea9"
+      },
+      {
+        "path": "docs/guide/feature.md",
+        "reviewed_blob": "e7b7725e54b11b395271da26f6fa21c611080755",
+        "merged_blob": "e7b7725e54b11b395271da26f6fa21c611080755"
+      },
+      {
+        "path": "lsms_library/transformations.py",
+        "reviewed_blob": "8d87b462247f50e22a5c3ffff4b87feb018dfed4",
+        "merged_blob": "8d87b462247f50e22a5c3ffff4b87feb018dfed4"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/CONTRACT-REVIEW.md",
+        "reviewed_blob": "89665567efb5db17d0f54f8a8eb96b5b6e4f31aa",
+        "merged_blob": "89665567efb5db17d0f54f8a8eb96b5b6e4f31aa"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/README.org",
+        "reviewed_blob": "41d08f8efcb47c0bda34df7e2455bfd3ab5dffb8",
+        "merged_blob": "41d08f8efcb47c0bda34df7e2455bfd3ab5dffb8"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/compare.py",
+        "reviewed_blob": "ac1479acf6ab483eddce53eeab5d0ebfebf7d567",
+        "merged_blob": "ac1479acf6ab483eddce53eeab5d0ebfebf7d567"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/comparison.json",
+        "reviewed_blob": "b0a5823182f911a57e46c2bb2154864237bc8918",
+        "merged_blob": "b0a5823182f911a57e46c2bb2154864237bc8918"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/hash_reach.py",
+        "reviewed_blob": "ee2093e961cd6e5e521e68c6d9a9602bdbaceabc",
+        "merged_blob": "ee2093e961cd6e5e521e68c6d9a9602bdbaceabc"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/negative_control.py",
+        "reviewed_blob": "13094ee45581cc90e7c53fb9d2bb576697287d41",
+        "merged_blob": "13094ee45581cc90e7c53fb9d2bb576697287d41"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1159/probe.py",
+        "reviewed_blob": "7ad791fcac66764eb2d7c8deeb4c887c231aa10b",
+        "merged_blob": "7ad791fcac66764eb2d7c8deeb4c887c231aa10b"
+      },
+      {
+        "path": "tests/test_gh1093_declared_unit_consumers.py",
+        "reviewed_blob": "a3c35a6067fc278a9e032042be282987190eed00",
+        "merged_blob": "a3c35a6067fc278a9e032042be282987190eed00"
+      },
+      {
+        "path": "tests/test_gh1159_pooled_reducers.py",
+        "reviewed_blob": "ec74485cbce1c9bcc72d74740ee9f99a42bd0977",
+        "merged_blob": "ec74485cbce1c9bcc72d74740ee9f99a42bd0977"
+      }
+    ],
+    "at": "2026-10-21T04:56:43.358432+00:00"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "body": "From the #569 follow-up (`fix/569-plot-registration`, plot_labor/plot_inputs registration).\n\n- `tests/test_feature_canonical_index.py::test_warm_corpus_assembly_loses_no_rows` still uses `trust_cache=True` and `except Exception: continue`. That is the defect r1 named for `_warm_assembly`, which is now fixed.\n- A warm crop_production country that starts raising drops out of \"loses no rows\" silently, as long as three others stay warm.\n- Fix: reuse `_warm_assembly(\"crop_production\")`, with the `currency=\"index\"` read it uses.\n- **Tier:** A (test only, zero cache cost). It was left alone here because the task named only `_warm_assembly`.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1125,
+  "state": "OPEN",
+  "title": "#569 residual H: the crop_production warm-assembly test still swallows per-country exceptions",
+  "updatedAt": "2026-10-19T22:38:41Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1125"
+}

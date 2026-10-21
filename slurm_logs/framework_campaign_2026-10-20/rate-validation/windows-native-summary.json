@@ -1,0 +1,13 @@
+{
+  "workflow_run": 39533863014,
+  "source_sha": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "job_id": 119005820748,
+  "job_conclusion": "success",
+  "native_results": [
+    "RESULT Uganda:shocks rows=14457 cols=10 waves=8 digest=0ab2ea4c79dd (41s)",
+    "RESULT Uganda:assets rows=116808 cols=1 waves=8 digest=9202ed542a14 (34s)"
+  ],
+  "log_sha256": "c5d8e4663d590a2defda87b14520860aec76eb22e2cfe672b8df03dd5ba5118e",
+  "log_private_path": "/local/job40255479/control/framework-campaign/rate-validation/windows-native.log",
+  "linux_data_job": "running; no pass claim"
+}

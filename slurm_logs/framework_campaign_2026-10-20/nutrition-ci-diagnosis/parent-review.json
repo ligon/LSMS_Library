@@ -1,0 +1,24 @@
+{
+  "independent_parent_replay": "PASS",
+  "source": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "producer_and_parent_aggregate_exactly_equal": true,
+  "known_kernel_sequence": [
+    "SkylakeX",
+    "Haswell",
+    "SkylakeX"
+  ],
+  "exact_hash_sequence": [
+    "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+    "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6",
+    "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a"
+  ],
+  "changed_cells": 8,
+  "max_ulps": 2,
+  "max_absolute": 3.637978807091713e-12,
+  "input_hashes_unchanged": true,
+  "comparison_sha256": "ae35e66073f2271beede75c4915955e434646e5e54850e9dd68e0cd12f25dc82",
+  "private_log_sha256": "ae35e66073f2271beede75c4915955e434646e5e54850e9dd68e0cd12f25dc82",
+  "original_approved_primary_hash_retained": true,
+  "actual_ci_kernel": "not logged; local exact counterfactual only",
+  "repair_state": "optional exact nutrition-only variant in development; not yet reviewed/integrated"
+}

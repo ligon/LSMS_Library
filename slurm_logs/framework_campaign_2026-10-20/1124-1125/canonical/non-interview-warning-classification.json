@@ -1,0 +1,410 @@
+{
+  "added_families": {
+    "categorical_mapping_warning": {
+      "both_runtime_cold_message_matches": 46,
+      "count": 46,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "CotedIvoire",
+        "Ethiopia",
+        "Malawi",
+        "Nigeria",
+        "Tajikistan",
+        "Timor-Leste",
+        "Uganda"
+      ],
+      "feature_counts": {
+        "cluster_features": 14,
+        "household_characteristics": 1,
+        "household_roster": 8,
+        "individual_education": 5,
+        "sample": 17,
+        "shocks": 1
+      },
+      "same_runtime_cold_message_matches": 46,
+      "severity_counts": {
+        "C": 46
+      }
+    },
+    "cluster_missing_key_exclusion": {
+      "both_runtime_cold_message_matches": 4,
+      "count": 4,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Uganda"
+      ],
+      "feature_counts": {
+        "cluster_features": 4
+      },
+      "same_runtime_cold_message_matches": 4,
+      "severity_counts": {
+        "C": 4
+      }
+    },
+    "documented_guyana_weight_only_exclusion": {
+      "both_runtime_cold_message_matches": 1,
+      "count": 1,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Guyana"
+      ],
+      "feature_counts": {
+        "sample": 1
+      },
+      "same_runtime_cold_message_matches": 1,
+      "severity_counts": {
+        "C": 1
+      }
+    },
+    "documented_peru_cluster_projection": {
+      "both_runtime_cold_message_matches": 1,
+      "count": 1,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Peru"
+      ],
+      "feature_counts": {
+        "cluster_features": 1
+      },
+      "same_runtime_cold_message_matches": 1,
+      "severity_counts": {
+        "C": 1
+      }
+    },
+    "documented_peru_person_id_repair": {
+      "both_runtime_cold_message_matches": 1,
+      "count": 1,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Peru"
+      ],
+      "feature_counts": {
+        "household_roster": 1
+      },
+      "same_runtime_cold_message_matches": 1,
+      "severity_counts": {
+        "B": 1
+      }
+    },
+    "documented_tanzania_cluster_design": {
+      "both_runtime_cold_message_matches": 2,
+      "count": 2,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Tanzania"
+      ],
+      "feature_counts": {
+        "cluster_features": 2
+      },
+      "same_runtime_cold_message_matches": 2,
+      "severity_counts": {
+        "C": 2
+      }
+    },
+    "existing_reaggregation_total_warning": {
+      "both_runtime_cold_message_matches": 0,
+      "count": 1,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [],
+      "feature_counts": {
+        "food_quantities": 1
+      },
+      "same_runtime_cold_message_matches": 0,
+      "severity_counts": {
+        "C": 1
+      }
+    },
+    "expected_stale_cache_rebuild_notice": {
+      "both_runtime_cold_message_matches": 0,
+      "count": 284,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Albania",
+        "Azerbaijan",
+        "Benin",
+        "Burkina_Faso",
+        "Cambodia",
+        "China",
+        "CotedIvoire",
+        "Ethiopia",
+        "EthiopiaRHS",
+        "GhanaAHIES",
+        "GhanaLSS",
+        "GhanaSPS",
+        "Guatemala",
+        "Guinea-Bissau",
+        "Guyana",
+        "India",
+        "Iraq",
+        "Kazakhstan",
+        "Kosovo",
+        "Liberia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Pakistan",
+        "Panama",
+        "Peru",
+        "Senegal",
+        "Serbia",
+        "Serbia and Montenegro",
+        "South Africa",
+        "Tajikistan",
+        "Tanzania",
+        "Timor-Leste",
+        "Togo",
+        "Uganda"
+      ],
+      "feature_counts": {
+        "assets": 23,
+        "cluster_features": 32,
+        "crop_production": 14,
+        "food_acquired": 18,
+        "food_expenditures": 9,
+        "food_prices": 9,
+        "household_characteristics": 20,
+        "household_roster": 41,
+        "individual_education": 28,
+        "plot_features": 21,
+        "plot_inputs": 12,
+        "plot_labor": 13,
+        "sample": 28,
+        "shocks": 16
+      },
+      "same_runtime_cold_message_matches": 0,
+      "severity_counts": {
+        "C": 284
+      }
+    },
+    "makefile_missing_fallback_warning": {
+      "both_runtime_cold_message_matches": 36,
+      "count": 36,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Albania",
+        "Benin",
+        "Guinea-Bissau",
+        "India",
+        "Iraq",
+        "Kazakhstan",
+        "Kosovo",
+        "Pakistan",
+        "Tajikistan"
+      ],
+      "feature_counts": {
+        "assets": 4,
+        "cluster_features": 5,
+        "crop_production": 2,
+        "household_characteristics": 6,
+        "household_roster": 6,
+        "plot_features": 8,
+        "plot_inputs": 2,
+        "plot_labor": 2,
+        "shocks": 1
+      },
+      "same_runtime_cold_message_matches": 36,
+      "severity_counts": {
+        "C": 36
+      }
+    },
+    "rhs_acquisition_source_exclusion": {
+      "both_runtime_cold_message_matches": 1,
+      "count": 1,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "EthiopiaRHS"
+      ],
+      "feature_counts": {
+        "food_acquired": 1
+      },
+      "same_runtime_cold_message_matches": 1,
+      "severity_counts": {
+        "C": 1
+      }
+    },
+    "source_grain_conflict": {
+      "both_runtime_cold_message_matches": 8,
+      "count": 8,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Uganda"
+      ],
+      "feature_counts": {
+        "cluster_features": 8
+      },
+      "same_runtime_cold_message_matches": 8,
+      "severity_counts": {
+        "C": 8
+      }
+    },
+    "stata_utf8_fallback_warning": {
+      "both_runtime_cold_message_matches": 259,
+      "count": 259,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "GhanaSPS",
+        "Mali"
+      ],
+      "feature_counts": {
+        "cluster_features": 22,
+        "household_characteristics": 48,
+        "household_roster": 60,
+        "individual_education": 25,
+        "sample": 22,
+        "shocks": 82
+      },
+      "same_runtime_cold_message_matches": 259,
+      "severity_counts": {
+        "C": 259
+      }
+    },
+    "stated_metric_inference_conflict": {
+      "both_runtime_cold_message_matches": 0,
+      "count": 30,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Benin",
+        "CotedIvoire",
+        "Senegal"
+      ],
+      "feature_counts": {
+        "food_prices": 15,
+        "food_quantities": 15
+      },
+      "same_runtime_cold_message_matches": 30,
+      "severity_counts": {
+        "C": 30
+      }
+    }
+  },
+  "all_local_control_values_equal_ignoring_row_order": true,
+  "baseline_only_make_failure_warning_control": {
+    "cause_not_inferred": true,
+    "count": 1,
+    "country": "Nigeria",
+    "dependency": "food_acquired",
+    "eventual_local_food_acquired_frames_exactly_equal": true,
+    "feature": "food_expenditures",
+    "warning_removed_from_candidate": true
+  },
+  "cached_grain_warning_replay_control": {
+    "added_source_grain_conflict_messages": 8,
+    "country": "Uganda",
+    "feature": "cluster_features",
+    "local_frames_exactly_equal": true,
+    "removed_replay_messages": 8,
+    "replay_implementation": "lsms_library/country.py:7784"
+  },
+  "country_matching_caveat": "Unscoped runtime messages can match more than one cold country; lists are possible exact-message controls, not inferred row-level attribution.",
+  "local_cache_control_frames": 125,
+  "local_cache_control_rows": 16139392,
+  "messages_not_matched_to_same_runtime_cold_control": [],
+  "non_interview_exact_message_added": 674,
+  "non_interview_exact_message_removed": 41,
+  "non_interview_net_warning_increase": 633,
+  "one_added_class_b_runtime_warning": {
+    "count": 1,
+    "country": "Peru",
+    "documentation": "lsms_library/countries/Peru/_/CONTENTS.org:830-848",
+    "family": "documented_peru_person_id_repair",
+    "feature": "household_roster",
+    "same_message_in_both_independent_cold_corpus_controls": true
+  },
+  "quantity_reaggregation_warning": {
+    "aggregate_total_unchanged": true,
+    "delta_accounts_for_three_parser_countries": true,
+    "existing_warning_retained": true,
+    "feature_baseline_quantity_delta": -6863.434999465942,
+    "measured_food_quantity_delta": -6863.435,
+    "metrics": {
+      "baseline": {
+        "baseline": 15796030028.17163,
+        "column": "Quantity",
+        "got": 15755304920.681292,
+        "rel_drift": 0.002578186254249173
+      },
+      "combined": {
+        "baseline": 15796023164.736631,
+        "column": "Quantity",
+        "got": 15755304920.681292,
+        "rel_drift": 0.002577752870497181
+      }
+    }
+  },
+  "raw_messages_and_identifiers_private": true,
+  "removed_families": {
+    "baseline_only_make_failure_warning": {
+      "both_runtime_cold_message_matches": 0,
+      "count": 1,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [],
+      "feature_counts": {
+        "food_expenditures": 1
+      },
+      "same_runtime_cold_message_matches": 0,
+      "severity_counts": {
+        "C": 1
+      }
+    },
+    "cached_grain_warning_replay": {
+      "both_runtime_cold_message_matches": 0,
+      "count": 8,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [],
+      "feature_counts": {
+        "cluster_features": 8
+      },
+      "same_runtime_cold_message_matches": 0,
+      "severity_counts": {
+        "C": 8
+      }
+    },
+    "existing_reaggregation_total_warning": {
+      "both_runtime_cold_message_matches": 0,
+      "count": 1,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [],
+      "feature_counts": {
+        "food_quantities": 1
+      },
+      "same_runtime_cold_message_matches": 0,
+      "severity_counts": {
+        "C": 1
+      }
+    },
+    "expected_stale_cache_rebuild_notice": {
+      "both_runtime_cold_message_matches": 0,
+      "count": 1,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "GhanaLSS"
+      ],
+      "feature_counts": {
+        "household_roster": 1
+      },
+      "same_runtime_cold_message_matches": 0,
+      "severity_counts": {
+        "C": 1
+      }
+    },
+    "stated_metric_inference_conflict": {
+      "both_runtime_cold_message_matches": 0,
+      "count": 30,
+      "countries": null,
+      "countries_matching_cold_message_or_cache_notice": [
+        "Benin",
+        "CotedIvoire",
+        "Senegal"
+      ],
+      "feature_counts": {
+        "food_prices": 15,
+        "food_quantities": 15
+      },
+      "same_runtime_cold_message_matches": 30,
+      "severity_counts": {
+        "C": 30
+      }
+    }
+  }
+}

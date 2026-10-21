@@ -1,0 +1,22 @@
+{
+  "baseline": {
+    "destination": "/local/job40255479/canonical-audit-compare/data-baseline",
+    "hardlinks": false,
+    "parquets": 1519,
+    "physical_copies": true,
+    "shared_symlinks": [
+      "dvc-cache"
+    ],
+    "source": "/global/scratch/fsa/fc_jevons/ligon/cache/.rewarm-bundle-94624fd6f/data"
+  },
+  "combined": {
+    "destination": "/local/job40255479/canonical-audit-compare/data-combined",
+    "hardlinks": false,
+    "parquets": 1519,
+    "physical_copies": true,
+    "shared_symlinks": [
+      "dvc-cache"
+    ],
+    "source": "/global/scratch/fsa/fc_jevons/ligon/cache/.rewarm-bundle-94624fd6f/data"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "body": "Follow-up of #931. Since `fix/931-crop-u-kg`, `harvest_kg_factors` reads a country's declared `u_kg` (`attrs['unit_kg']`). Three other crop transforms still do not:\n- `median_price_valuation`'s sold-kg path: `transformations.py` ~6989, `_kg_factor_series` without the declaration.\n- `seed_kg` (~5143) and `nitrogen_kg` (~5215) over `plot_inputs`.\n\n**Live surface (red-team r1 on #931):** Ethiopia `crop_production` has **710 `Quintal` rows with a positive `Quantity_sold`**. Their sold kg is NaN, so they drop out of the price pool, while `harvest_kg` on the same frame now converts them. One frame, two answers. Ethiopia `plot_inputs` has 0 `Quintal` rows today.\n\n**Fix.** Apply the same per-row `_declared_kg_factors` overlay at the three sites, and stamp `attrs['unit_kg']` on `plot_inputs` in `Country._finalize_result`. Expected cache cost: none (read-time).\n\n**Also from that review:** `yield_kg`'s `unit_kg` pass-through is a one-line forward with no test. Add a synthetic test that `yield_kg(cp, pf, unit_kg={...})` and the attrs default reach `harvest_kg`. Tier A.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1093,
+  "state": "OPEN",
+  "title": "median_price_valuation (sold kg), seed_kg and nitrogen_kg are blind to a country's declared u_kg (Ethiopia: 710 Quintal rows with Quantity_sold drop from the price pool)",
+  "updatedAt": "2026-10-19T16:57:09Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1093"
+}

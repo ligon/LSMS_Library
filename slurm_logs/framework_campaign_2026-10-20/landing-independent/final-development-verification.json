@@ -1,0 +1,192 @@
+{
+  "all_nine_prs_merged_to_development_with_reviewed_heads_and_ancestor_merge_commits": true,
+  "candidate_and_publication_are_final_development_ancestors": true,
+  "candidate_paths": 14437,
+  "candidate_to_final_development_full_tree_differences": [
+    {
+      "candidate": null,
+      "classification": "same previously reviewed PR1157 historical report-only addition",
+      "final_development": {
+        "mode": "100644",
+        "oid": "70f3ebaa57e7ed57d29f7623d00a72153978fba5",
+        "type": "blob"
+      },
+      "path": "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.json"
+    },
+    {
+      "candidate": null,
+      "classification": "same previously reviewed PR1157 historical report-only addition",
+      "final_development": {
+        "mode": "100644",
+        "oid": "84f1d7848382bf91677c54b7f0225eab50b4245c",
+        "type": "blob"
+      },
+      "path": "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.org"
+    },
+    {
+      "candidate": null,
+      "classification": "same previously reviewed PR1157 historical report-only addition",
+      "final_development": {
+        "mode": "100644",
+        "oid": "f1ffc22cc5aa40130aaba4c1501690e53c96226b",
+        "type": "blob"
+      },
+      "path": "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.json"
+    },
+    {
+      "candidate": null,
+      "classification": "same previously reviewed PR1157 historical report-only addition",
+      "final_development": {
+        "mode": "100644",
+        "oid": "b7b5988bc4f6a11578cb1e29f3b4bbed5f9f577e",
+        "type": "blob"
+      },
+      "path": "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.org"
+    }
+  ],
+  "candidate_tree": "af2bd9968ee0fb98e8daa73727d098aaf2ee135b",
+  "development_pins": {
+    "filesystem_origin": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+    "github": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+    "local": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+    "local_origin_tracking": "1933434b84de82ac72b3921a7fd8fe5c00154754"
+  },
+  "final_development": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+  "final_development_parents": [
+    "f50611161e9e58bf0676de5d771d4d6f07d0d8a3",
+    "23c1e2d52801bf206a15ec5900bca5d62e7f850f"
+  ],
+  "final_development_paths": 14441,
+  "final_development_tree": "b8edd351ff9af9be2fcbd69096f12ead4dc067c3",
+  "limitations": [
+    "No source modules or tests executed; no builds, survey data, cache access or catalog requests",
+    "No runtime environment or dynamic commit-derived version equivalence claim",
+    "This pin precedes the later evidence-only PR1158 merge; that later SHA is not yet covered",
+    "No claim of a clean semantic audit or PR-event data gate"
+  ],
+  "merged_prs": [
+    {
+      "base_ref": "development",
+      "expected_head_sha": "eaf7b9913b37e04e924bd05a17e691e0263ecb4e",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "eaf7b9913b37e04e924bd05a17e691e0263ecb4e",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "047d1ff514aefc0dd7536b4a366d2cdc087b48b7",
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:04Z",
+      "number": 1154
+    },
+    {
+      "base_ref": "development",
+      "expected_head_sha": "f9871610f02bca8d1f82a352c4925353439cb6bc",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "f9871610f02bca8d1f82a352c4925353439cb6bc",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "f46dc011f766197156236f0b293986156dae03a0",
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:08Z",
+      "number": 1155
+    },
+    {
+      "base_ref": "development",
+      "expected_head_sha": "1070a4d03e764ec8e3b0e61d4f825bc793eeeae7",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "1070a4d03e764ec8e3b0e61d4f825bc793eeeae7",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "064a7fb465b98c4a4cfa951235bd903a81a68d87",
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:12Z",
+      "number": 1156
+    },
+    {
+      "base_ref": "development",
+      "expected_head_sha": "d84061818b0b430e8b00fa26b5b6d19e4694eb96",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "d84061818b0b430e8b00fa26b5b6d19e4694eb96",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:17Z",
+      "number": 1157
+    },
+    {
+      "base_ref": "development",
+      "expected_head_sha": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "ac6de755e99fa53bae7677042df92b654eef2b13",
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:00Z",
+      "number": 1161
+    },
+    {
+      "base_ref": "development",
+      "expected_head_sha": "dffb0760406c74cea677f360f76be52cbed27975",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "dffb0760406c74cea677f360f76be52cbed27975",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "5519de059aa1a33359af3a34a887658271879ed1",
+      "merged": true,
+      "merged_at": "2026-10-21T05:03:00Z",
+      "number": 1162
+    },
+    {
+      "base_ref": "development",
+      "expected_head_sha": "124c2436d7e1a279c72f4d8f650d250eab6c7d67",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "124c2436d7e1a279c72f4d8f650d250eab6c7d67",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "5bd1a5834e1957aab464f1aa99a0544ce93c6a25",
+      "merged": true,
+      "merged_at": "2026-10-21T05:03:04Z",
+      "number": 1163
+    },
+    {
+      "base_ref": "development",
+      "expected_head_sha": "d124c0df70db2e04dceb4a8c19eb0d40df14dbee",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "d124c0df70db2e04dceb4a8c19eb0d40df14dbee",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "f50611161e9e58bf0676de5d771d4d6f07d0d8a3",
+      "merged": true,
+      "merged_at": "2026-10-21T05:03:09Z",
+      "number": 1164
+    },
+    {
+      "base_ref": "development",
+      "expected_head_sha": "23c1e2d52801bf206a15ec5900bca5d62e7f850f",
+      "head_is_ancestor_of_final_development": true,
+      "head_matches_reviewed_publication": true,
+      "head_sha": "23c1e2d52801bf206a15ec5900bca5d62e7f850f",
+      "merge_commit_is_ancestor_of_final_development": true,
+      "merge_commit_sha": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+      "merged": true,
+      "merged_at": "2026-10-21T05:09:02Z",
+      "number": 1165
+    }
+  ],
+  "mutations": "Only these new private aggregate report/reproduction files",
+  "observed_at": "2026-10-21T05:10:20.581351+00:00",
+  "prior_frozen_artifact_sha256_unchanged": {
+    "compare_publication.py": "c53f9292e4d6b5156887846e013ccceeae955630c652680c065579f129c4f004",
+    "publication-review.org": "c3cb219aa52334fe83d635dbd9281428b04cf1d52657f312b034c968dc30a822",
+    "publication-verification.json": "761987fd0c50b1e89a07fda566b654b374460b0a88d07fed3400b1e2010e4c86"
+  },
+  "publication_to_final_development_full_tree_identical": true,
+  "publication_tree": "b8edd351ff9af9be2fcbd69096f12ead4dc067c3",
+  "reviewed_candidate": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "reviewed_publication": "23c1e2d52801bf206a15ec5900bca5d62e7f850f",
+  "reviewer": "Sue / GPT-6",
+  "runtime_tests_build_config_audit_and_all_other_common_paths_identical_to_candidate": true,
+  "scope": "Immutable static tree, reference, GitHub GET, and ancestry supplement only",
+  "status": "PASS"
+}

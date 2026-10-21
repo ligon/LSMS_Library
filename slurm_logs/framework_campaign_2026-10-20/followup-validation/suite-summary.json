@@ -1,0 +1,2799 @@
+{
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+  ],
+  "baseline": {
+    "counts": {
+      "errors": 0,
+      "failures": 0,
+      "passed": 8562,
+      "skipped": 285,
+      "xfailed": 9,
+      "xpassed": 1
+    },
+    "junit_sha256": "209bc73e3e32f318cbe045e9e2092a9b2a8c2e7c9a533c9df5d76c5803470186",
+    "source_commit": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+    "summary_sha256": "d011e3e1e28d79bff0793db47979ec6e328ce63b7cc40463746f63b81e18711c"
+  },
+  "baseline_xpass_identity_limit": "Baseline terminal count is one non-strict XPASS, but JUnit encodes it as PASS and its node identity was not retained; no exact baseline XPASS identity comparison is claimed.",
+  "blas": [
+    {
+      "architecture": "SkylakeX",
+      "filepath": "/local/job40255479/venv_img/lib/python3.11/site-packages/numpy.libs/libscipy_openblas64_-32a4b2a6.so",
+      "internal_api": "openblas",
+      "num_threads": 1,
+      "prefix": "libscipy_openblas",
+      "threading_layer": "pthreads",
+      "user_api": "blas",
+      "version": "0.3.31.188.0"
+    },
+    {
+      "filepath": "/local/job40255479/venv_img/lib/python3.11/site-packages/scikit_learn.libs/libgomp-e985bcbb.so.1.0.0",
+      "internal_api": "openmp",
+      "num_threads": 1,
+      "prefix": "libgomp",
+      "user_api": "openmp",
+      "version": null
+    },
+    {
+      "architecture": "SkylakeX",
+      "filepath": "/local/job40255479/venv_img/lib/python3.11/site-packages/scipy.libs/libscipy_openblas-6cdc3b4a.so",
+      "internal_api": "openblas",
+      "num_threads": 1,
+      "prefix": "libscipy_openblas",
+      "threading_layer": "pthreads",
+      "user_api": "blas",
+      "version": "0.3.30"
+    }
+  ],
+  "candidate_xpass_cases": [
+    "tests/test_pakistan_cluster_features.py::test_extraction_is_cluster_grain"
+  ],
+  "countries_root": "/local/job40255479/worktrees/framework-followup/lsms_library/countries",
+  "counts": {
+    "exitstatus": 0,
+    "terminal_counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 8764,
+      "skipped": 276,
+      "warnings": 1222,
+      "xfailed": 9,
+      "xpassed": 1
+    }
+  },
+  "cwd": "/local/job40255479/worktrees/framework-followup",
+  "data_root": "/local/job40255479/followup-suite-data",
+  "distribution": "loadfile",
+  "head_unchanged_after": true,
+  "interpreter": "/local/job40255479/venv_img/bin/python",
+  "junit_sha256": "3d273e1721967022343d861cb392ca0b6ef8f218a74a03be54779b0f1dbe80e9",
+  "manifest_sha256": "c54c8efa4a64da4d7eca8d24d4b5f838b2cbb1d9c7b8413b794e427a27de2e1d",
+  "package": "/local/job40255479/worktrees/framework-followup/lsms_library/__init__.py",
+  "prepared_files": 1519,
+  "seconds": 767.1865059947595,
+  "skip_reasons": {
+    "Armenia: no microdata (CLAUDE.md \u00a7Countries Without Microdata)": 2,
+    "Azerbaijan has 0 expansion-scale wave(s); nothing to compare": 1,
+    "Benin has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Cambodia has 1 expansion-scale wave(s); nothing to compare": 1,
+    "CotedIvoire has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Ethiopia/nutrition has no declared columns": 1,
+    "Ethiopia/nutrition has no declared index": 1,
+    "EthiopiaRHS has 0 expansion-scale wave(s); nothing to compare": 1,
+    "EthiopiaRHS/panel_ids has no declared columns": 1,
+    "EthiopiaRHS/panel_ids has no declared index": 1,
+    "GhanaLSS/nutrition has no declared columns": 1,
+    "GhanaLSS/nutrition has no declared index": 1,
+    "GhanaLSS/panel_ids has no declared columns": 1,
+    "GhanaLSS/panel_ids has no declared index": 1,
+    "GhanaSPS has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Guatemala has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Guinea-Bissau has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Guyana has 1 expansion-scale wave(s); nothing to compare": 1,
+    "India has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Kosovo has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Liberia has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Malawi/food_expenditures has no declared columns": 1,
+    "Malawi/food_expenditures has no declared index": 1,
+    "Malawi/food_prices has no declared columns": 1,
+    "Malawi/food_prices has no declared index": 1,
+    "Mali/panel_ids has no declared columns": 1,
+    "Mali/panel_ids has no declared index": 1,
+    "Nepal: microdata not available (see CLAUDE.md)": 16,
+    "Nepal: no microdata (CLAUDE.md \u00a7Countries Without Microdata)": 2,
+    "Niger/panel_ids has no declared columns": 1,
+    "Niger/panel_ids has no declared index": 1,
+    "Requires cached Uganda household_characteristics (data build needed)": 1,
+    "Requires cached Uganda household_characteristics and income (data build needed)": 1,
+    "Senegal/panel_ids has no declared columns": 1,
+    "Senegal/panel_ids has no declared index": 1,
+    "Serbia has 1 expansion-scale wave(s); nothing to compare": 1,
+    "South Africa has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Tanzania/panel_ids has no declared columns": 1,
+    "Tanzania/panel_ids has no declared index": 1,
+    "Togo has 1 expansion-scale wave(s); nothing to compare": 1,
+    "Uganda replication dir not found; set LSMS_UGANDA_REPLICATION_DIR or install the replication package at /global/home/users/ligon/Projects/RiskSharing_Replication/external_data/LSMS_Library/lsms_library/countries/Uganda/var": 15,
+    "Uganda/assets has no declared columns": 1,
+    "Uganda/assets has no declared index": 1,
+    "Uganda/enterprise_income has no declared columns": 1,
+    "Uganda/fct has no declared columns": 1,
+    "Uganda/fct has no declared index": 1,
+    "Uganda/food_expenditures not cached (requires data build)": 2,
+    "Uganda/food_prices not cached (requires data build)": 1,
+    "Uganda/food_quantities not cached (requires data build)": 1,
+    "Uganda/household_characteristics not cached (requires data build)": 1,
+    "Uganda/interview_date has no declared columns": 1,
+    "Uganda/interview_date has no declared index": 1,
+    "Uganda/nutrition has no declared columns": 1,
+    "Uganda/nutrition has no declared index": 1,
+    "Uganda/panel_ids has no declared columns": 1,
+    "Uganda/panel_ids has no declared index": 1,
+    "Uganda/shocks has no declared columns": 1,
+    "Uganda/shocks has no declared index": 1,
+    "case is for Benin": 1,
+    "case is for Togo": 1,
+    "food_prices.parquet not in cache (absent, or mid-rebuild)": 1,
+    "food_quantities.parquet not in cache (absent, or mid-rebuild)": 1,
+    "household_characteristics parquet not cached (requires data build)": 1,
+    "need both weight columns": 10,
+    "need weight and Rural": 7,
+    "no cache for Armenia/household_roster at data_root()": 6,
+    "no cache for Burkina_Faso/panel_ids at data_root()": 6,
+    "no cache for Ethiopia/panel_ids at data_root()": 6,
+    "no cache for EthiopiaRHS/panel_ids at data_root()": 4,
+    "no cache for GhanaLSS/panel_ids at data_root()": 4,
+    "no cache for Malawi/food_expenditures at data_root()": 4,
+    "no cache for Malawi/food_prices at data_root()": 4,
+    "no cache for Malawi/panel_ids at data_root()": 6,
+    "no cache for Mali/panel_ids at data_root()": 4,
+    "no cache for Nepal/assets at data_root()": 6,
+    "no cache for Nepal/cluster_features at data_root()": 6,
+    "no cache for Nepal/food_acquired at data_root()": 6,
+    "no cache for Nepal/household_roster at data_root()": 6,
+    "no cache for Nepal/individual_education at data_root()": 6,
+    "no cache for Nepal/interview_date at data_root()": 6,
+    "no cache for Nepal/sample at data_root()": 6,
+    "no cache for Niger/panel_ids at data_root()": 4,
+    "no cache for Nigeria/panel_ids at data_root()": 6,
+    "no cache for Peru/food_acquired at data_root()": 6,
+    "no cache for Peru/individual_education at data_root()": 6,
+    "no cache for Peru/interview_date at data_root()": 6,
+    "no cache for Senegal/panel_ids at data_root()": 4,
+    "no cache for Tanzania/panel_ids at data_root()": 4,
+    "no cache for Uganda/panel_ids at data_root()": 4,
+    "no non-null weights in any wave": 4,
+    "no pinned totals for GhanaLSS": 1,
+    "no raw sample parquet to read (cold data root?)": 8,
+    "no refreshment-sample households identified": 21,
+    "no weight column": 4
+  },
+  "source_commit": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "state": "passed",
+  "timeout_method": "thread",
+  "timeout_seconds": 600,
+  "tracked_source_unchanged_after": true,
+  "transition_count": 212,
+  "transitions": [
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearance_can_serve_an_ordinary_cache_hit",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.022186207585036755,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearance_can_serve_an_ordinary_cache_hit"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearance_does_not_hide_ordinary_source_error",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019230392761528492,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearance_does_not_hide_ordinary_source_error"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_before_footer_falls_through[False]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.022826175205409527,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_before_footer_falls_through[False]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_before_footer_falls_through[True]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02147526014596224,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_before_footer_falls_through[True]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_data_read_falls_through[covered-full]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.024509691633284092,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_data_read_falls_through[covered-full]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_data_read_falls_through[covered-subset]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.020000725984573364,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_data_read_falls_through[covered-subset]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_data_read_falls_through[legacy-full]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019863327965140343,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_disappearing_data_read_falls_through[legacy-full]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_missing_file_error_outside_data_read_still_raises[False]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.025170362554490566,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_missing_file_error_outside_data_read_still_raises[False]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_missing_file_error_outside_data_read_still_raises[True]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02452659886330366,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_missing_file_error_outside_data_read_still_raises[True]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[False-error0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.020226174034178257,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[False-error0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[False-error1]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.021507821045815945,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[False-error1]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[False-error2]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02134514506906271,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[False-error2]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[False-error3]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019459259696304798,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[False-error3]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[True-error0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01921316422522068,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[True-error0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[True-error1]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.020711954683065414,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[True-error1]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[True-error2]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019600210711359978,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[True-error2]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[True-error3]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.020209411159157753,
+        "worker": "gw14"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1040_wave_read_gates.py::test_site3_other_data_read_errors_still_raise[True-error3]"
+    },
+    {
+      "after": null,
+      "before": {
+        "outcome": "passed_or_nonstrict_xpass",
+        "reason": ""
+      },
+      "nodeid": "tests/test_gh1093_declared_unit_consumers.py::test_country_finalize_attaches_input_declaration_and_feature_keeps_it"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1093_declared_unit_consumers.py::test_country_finalize_attaches_input_declaration_and_feature_keeps_it[False]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.7728311270475388,
+        "worker": "gw15"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1093_declared_unit_consumers.py::test_country_finalize_attaches_input_declaration_and_feature_keeps_it[False]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1093_declared_unit_consumers.py::test_country_finalize_attaches_input_declaration_and_feature_keeps_it[True]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.7613255865871906,
+        "worker": "gw15"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1093_declared_unit_consumers.py::test_country_finalize_attaches_input_declaration_and_feature_keeps_it[True]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_alone_does_not_legalize_missing_local_index[column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.010184338316321373,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_alone_does_not_legalize_missing_local_index[column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_alone_does_not_legalize_missing_local_index[column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0102387061342597,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_alone_does_not_legalize_missing_local_index[column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_alone_does_not_legalize_missing_local_index[index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01175615657120943,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_alone_does_not_legalize_missing_local_index[index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_alone_does_not_legalize_missing_local_index[index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.010521900840103626,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_alone_does_not_legalize_missing_local_index[index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_attrs_without_axis_keep_ordinary_shape[nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01575773674994707,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_attrs_without_axis_keep_ordinary_shape[nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_attrs_without_axis_keep_ordinary_shape[seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.013553913682699203,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_attrs_without_axis_keep_ordinary_shape[seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_position_plot_alias_and_unit_column[plot-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019195041619241238,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_position_plot_alias_and_unit_column[plot-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_position_plot_alias_and_unit_column[plot-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.018017725087702274,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_position_plot_alias_and_unit_column[plot-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_position_plot_alias_and_unit_column[plot_id-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019306437112390995,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_position_plot_alias_and_unit_column[plot_id-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_position_plot_alias_and_unit_column[plot_id-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01749633625149727,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_country_position_plot_alias_and_unit_column[plot_id-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019631560891866684,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.017575768753886223,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.014529397711157799,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.012781910598278046,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-none-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0141978170722723,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-none-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-none-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.013501911424100399,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[explicit_empty-none-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.016815862618386745,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.015487759374082088,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01323525607585907,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.013983998447656631,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-none-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0122208958491683,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-none-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-none-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.012040702626109123,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[input_empty-none-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019023158587515354,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.017394088208675385,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01465468667447567,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.012236077338457108,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-none-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.013951368629932404,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-none-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-none-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.012628425844013691,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[missing_quantity-none-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02014926914125681,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0175423389300704,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.016021006740629673,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.013367388397455215,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-none-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01521334983408451,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-none-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-none-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.013202481903135777,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[no_item-none-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02365973684936762,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02190957497805357,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019586244598031044,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01761528942734003,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-none-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.018219011835753918,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-none-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-none-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.016559410840272903,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_empty_results_keep_the_input_country_shape[unknown_unit-none-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_existing_missing_local_key_behavior_is_unchanged[nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.027671827003359795,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_existing_missing_local_key_behavior_is_unchanged[nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_existing_missing_local_key_behavior_is_unchanged[seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02291872724890709,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_existing_missing_local_key_behavior_is_unchanged[seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[None-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.011108512990176678,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[None-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[None-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008664770983159542,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[None-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[None-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01261953916400671,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[None-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[None-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.012181311845779419,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[None-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[missing2-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.009173441678285599,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[missing2-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[missing2-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.009642249904572964,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[missing2-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[missing2-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.012175166979432106,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[missing2-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[missing2-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.011996535584330559,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[missing2-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[nan-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00917937234044075,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[nan-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[nan-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008926586247980595,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[nan-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[nan-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.011992858722805977,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[nan-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[nan-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.011680538766086102,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_missing_country_is_refused_before_item_filtering[nan-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_nitrogen_matching_and_organic_refusal_are_preserved",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.028003803454339504,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_nitrogen_matching_and_organic_refusal_are_preserved"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_one_labeled_country_keeps_its_identity[column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019341603852808475,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_one_labeled_country_keeps_its_identity[column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_one_labeled_country_keeps_its_identity[column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.017736289650201797,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_one_labeled_country_keeps_its_identity[column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_one_labeled_country_keeps_its_identity[index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.015476534143090248,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_one_labeled_country_keeps_its_identity[index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_one_labeled_country_keeps_its_identity[index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.013210277073085308,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_one_labeled_country_keeps_its_identity[index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-False-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.04878655634820461,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-False-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-False-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.037134651094675064,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-False-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-False-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03691245336085558,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-False-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-False-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03567881416529417,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-False-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-True-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.042323737405240536,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-True-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-True-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03713911771774292,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-True-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-True-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03389351349323988,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-True-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-True-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.028467507101595402,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries0-True-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-False-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.04301409423351288,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-False-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-False-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.037366886623203754,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-False-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-False-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03611510619521141,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-False-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-False-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03049486316740513,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-False-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-True-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.05350534711033106,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-True-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-True-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.04813214857131243,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-True-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-True-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03439509402960539,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-True-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-True-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.029133371077477932,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_pooled_metric_plots_equal_separate_country_calls[countries1-True-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[argument-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03173748403787613,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[argument-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[argument-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.022679799236357212,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[argument-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[argument-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019179267808794975,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[argument-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[argument-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.017225460149347782,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[argument-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[attrs-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02478214167058468,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[attrs-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[attrs-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.022493048571050167,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[attrs-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[attrs-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.019118650816380978,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[attrs-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[attrs-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.017104643397033215,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[attrs-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[flat_argument-column-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02283629309386015,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[flat_argument-column-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[flat_argument-column-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.022328821942210197,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[flat_argument-column-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[flat_argument-index-nitrogen_kg-Nitrogen_kg-0.46]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.016951732337474823,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[flat_argument-index-nitrogen_kg-Nitrogen_kg-0.46]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[flat_argument-index-seed_kg-Seed_kg-1.0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.015594224445521832,
+        "worker": "gw7"
+      },
+      "before": null,
+      "nodeid": "tests/test_gh1159_pooled_reducers.py::test_shared_local_ids_use_each_rows_declared_mass[flat_argument-index-seed_kg-Seed_kg-1.0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_gh866_stale_country_parquet_not_laundered.py::test_a_poisoned_country_parquet_is_REBUILT_not_served[Nigeria/plot_inputs]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 91.54894164390862,
+        "worker": "gw4"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Nigeria/plot_inputs not warm"
+      },
+      "nodeid": "tests/test_gh866_stale_country_parquet_not_laundered.py::test_a_poisoned_country_parquet_is_REBUILT_not_served[Nigeria/plot_inputs]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2005-06/_/food_acquired.parquet]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.031705280765891075,
+        "worker": "gw14"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Parquet not built: 2005-06/_/food_acquired.parquet"
+      },
+      "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2005-06/_/food_acquired.parquet]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2009-10/_/food_acquired.parquet]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.02436913177371025,
+        "worker": "gw14"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Parquet not built: 2009-10/_/food_acquired.parquet"
+      },
+      "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2009-10/_/food_acquired.parquet]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2010-11/_/food_acquired.parquet]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.023838291876018047,
+        "worker": "gw14"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Parquet not built: 2010-11/_/food_acquired.parquet"
+      },
+      "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2010-11/_/food_acquired.parquet]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2011-12/_/food_acquired.parquet]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.026963593438267708,
+        "worker": "gw14"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Parquet not built: 2011-12/_/food_acquired.parquet"
+      },
+      "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2011-12/_/food_acquired.parquet]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2013-14/_/food_acquired.parquet]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03035272192209959,
+        "worker": "gw14"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Parquet not built: 2013-14/_/food_acquired.parquet"
+      },
+      "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2013-14/_/food_acquired.parquet]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2015-16/_/food_acquired.parquet]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.028562447987496853,
+        "worker": "gw14"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Parquet not built: 2015-16/_/food_acquired.parquet"
+      },
+      "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2015-16/_/food_acquired.parquet]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2018-19/_/food_acquired.parquet]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03140935022383928,
+        "worker": "gw14"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Parquet not built: 2018-19/_/food_acquired.parquet"
+      },
+      "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2018-19/_/food_acquired.parquet]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2019-20/_/food_acquired.parquet]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.029650836251676083,
+        "worker": "gw14"
+      },
+      "before": {
+        "outcome": "skipped",
+        "reason": "Parquet not built: 2019-20/_/food_acquired.parquet"
+      },
+      "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2019-20/_/food_acquired.parquet]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_deliberately_changed_values_fail_real_parquet_fingerprint",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007099535316228867,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_deliberately_changed_values_fail_real_parquet_fingerprint"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_nutrition_hash_does_not_apply_to_another_entry",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007690166123211384,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_nutrition_hash_does_not_apply_to_another_entry"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_variant_cannot_bypass_structure[columns-wrong1-column mismatch]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008311080746352673,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_variant_cannot_bypass_structure[columns-wrong1-column mismatch]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_variant_cannot_bypass_structure[dtypes-wrong3-dtype mismatch]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0079702353104949,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_variant_cannot_bypass_structure[dtypes-wrong3-dtype mismatch]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_variant_cannot_bypass_structure[index_names-wrong2-index names mismatch]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007719609886407852,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_variant_cannot_bypass_structure[index_names-wrong2-index names mismatch]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_variant_cannot_bypass_structure[shape-wrong0-shape mismatch]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008124184794723988,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_known_variant_cannot_bypass_structure[shape-wrong0-shape mismatch]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_measured_exact_hashes_pass_actual_invariance_test[12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008833060972392559,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_measured_exact_hashes_pass_actual_invariance_test[12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_measured_exact_hashes_pass_actual_invariance_test[f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007862052880227566,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_measured_exact_hashes_pass_actual_invariance_test[f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_null_hash_does_not_unpin_structure",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0069759441539645195,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_null_hash_does_not_unpin_structure"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_null_primary_remains_explicitly_unpinned[False]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007229188457131386,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_null_primary_remains_explicitly_unpinned[False]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_null_primary_remains_explicitly_unpinned[True]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.006350703537464142,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_null_primary_remains_explicitly_unpinned[True]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_primary_hash_remains_sufficient_without_variants[None]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007445340044796467,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_primary_hash_remains_sufficient_without_variants[None]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_primary_hash_remains_sufficient_without_variants[variants1]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007385379634797573,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_primary_hash_remains_sufficient_without_variants[variants1]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_shipped_manifest_keeps_primary_and_limits_variants_to_nutrition",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0014361366629600525,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_shipped_manifest_keeps_primary_and_limits_variants_to_nutrition"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_unmeasured_hash_still_fails",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008102568797767162,
+        "worker": "gw11"
+      },
+      "before": null,
+      "nodeid": "tests/test_uganda_invariance_hash_variants.py::test_unmeasured_hash_still_fails"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_a_held_release_is_not_listed",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.004681224934756756,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_a_held_release_is_not_listed"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_a_routing_record_gets_no_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0073919231072068214,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_a_routing_record_gets_no_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_a_second_run_still_supplies_none",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0077383918687701225,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_a_second_run_still_supplies_none"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_an_acquisition_still_writes_the_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.010455429553985596,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_an_acquisition_still_writes_the_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_no_shipped_worldbank_record_lacks_a_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.033561292104423046,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAReStampNeverSuppliesAHeldRelease::test_no_shipped_worldbank_record_lacks_a_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquiredRelease::test_another_entry_keeps_only_the_prose_and_the_old_url",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00025802943855524063,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquiredRelease::test_another_entry_keeps_only_the_prose_and_the_old_url"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquiredRelease::test_doi_comes_from_the_queue_when_the_queued_release_is_acquired",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0003285761922597885,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquiredRelease::test_doi_comes_from_the_queue_when_the_queued_release_is_acquired"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_failed_cross_entry_acquisition_preserves_existing_record[different-held-entry]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0011617904528975487,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_failed_cross_entry_acquisition_preserves_existing_record[different-held-entry]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_failed_cross_entry_acquisition_preserves_existing_record[unknown]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0013980995863676071,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_failed_cross_entry_acquisition_preserves_existing_record[unknown]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_no_push_records_after_a_complete_download",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.006217198446393013,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_no_push_records_after_a_complete_download"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_partial_extraction_cannot_record_a_complete_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008175029419362545,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_partial_extraction_cannot_record_a_complete_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-duplicate]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.005698876455426216,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-duplicate]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-exception]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.015153898857533932,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-exception]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-failed]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007744176313281059,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-failed]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-partial]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.005428312346339226,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[add_wave-partial]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-duplicate]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.005691844969987869,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-duplicate]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-exception]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.004561206325888634,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-exception]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-failed]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.005519498139619827,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-failed]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-partial]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.005955246277153492,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_push_must_confirm_every_requested_file[populate_and_push-partial]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_successful_cross_entry_acquisition_records_actual_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.011078448966145515,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_successful_cross_entry_acquisition_records_actual_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_successful_push_records_only_after_the_push[False]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0063562458381056786,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_successful_push_records_only_after_the_push[False]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_successful_push_records_only_after_the_push[True]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.005579788237810135,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionCompletionBoundaries::test_successful_push_records_only_after_the_push[True]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_a_failed_download_leaves_the_record_as_it_was",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0019259937107563019,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_a_failed_download_leaves_the_record_as_it_was"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_a_file_already_in_data_is_not_recorded_as_the_new_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01657203398644924,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_a_file_already_in_data_is_not_recorded_as_the_new_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_a_file_the_release_does_not_ship_is_named_not_gating",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.006520658731460571,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_a_file_the_release_does_not_ship_is_named_not_gating"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_add_wave_on_a_new_directory",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.024882878176867962,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_add_wave_on_a_new_directory"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_add_wave_reacquisition_moves_the_held_keys",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.012882002629339695,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_add_wave_reacquisition_moves_the_held_keys"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_add_wave_whose_download_fails_records_no_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0012147361412644386,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_add_wave_whose_download_fails_records_no_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_populate_and_push_acquires_the_queued_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008542660623788834,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestAcquisitionWritesTheHeldRelease::test_populate_and_push_acquires_the_queued_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestOverrideCorrectionThroughMain::test_a_stamped_primary_correction_requires_acquisition",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.005642162635922432,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestOverrideCorrectionThroughMain::test_a_stamped_primary_correction_requires_acquisition"
+    },
+    {
+      "after": null,
+      "before": {
+        "outcome": "passed_or_nonstrict_xpass",
+        "reason": ""
+      },
+      "nodeid": "tests/test_wave_provenance.py::TestOverrideCorrectionThroughMain::test_a_stamped_wrong_entry_is_corrected_idno_and_all"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_backfill_refuses_a_scalar_reconstruction_that_loses_facts",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.008308841846883297,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_backfill_refuses_a_scalar_reconstruction_that_loses_facts"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_inconsistent_source_cannot_erase_catalog_coverage",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0002545183524489403,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_inconsistent_source_cannot_erase_catalog_coverage"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_IDNO-values3]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0003716619685292244,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_IDNO-values3]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_TITLE-values4]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00032565928995609283,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_TITLE-values4]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0006708558648824692,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values1]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00036066677421331406,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values1]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values2]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0003619343042373657,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values2]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_RECORDED-values5]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0003471728414297104,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_RECORDED-values5]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_source_occurrences_cannot_erase_held_catalog_identity[sources0]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00048165395855903625,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_source_occurrences_cannot_erase_held_catalog_identity[sources0]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_source_occurrences_cannot_erase_held_catalog_identity[sources1]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0006516249850392342,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_source_occurrences_cannot_erase_held_catalog_identity[sources1]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_unsafe_scalar_rewrite_is_explicit_and_does_not_touch_file",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.000623662956058979,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPreservedKnownScalars::test_unsafe_scalar_rewrite_is_explicit_and_does_not_touch_file"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_additional_bare_body_urls_are_preserved_as_notes[https://example.org/primary]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00039621442556381226,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_additional_bare_body_urls_are_preserved_as_notes[https://example.org/primary]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_additional_bare_body_urls_are_preserved_as_notes[https://example.org/secondary]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0003986768424510956,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_additional_bare_body_urls_are_preserved_as_notes[https://example.org/secondary]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_explicit_primary_does_not_discard_a_different_body_url",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0003003980964422226,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_explicit_primary_does_not_discard_a_different_body_url"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_explicit_source_override_requires_acquisition_context[False]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0005073966458439827,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_explicit_source_override_requires_acquisition_context[False]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_explicit_source_override_requires_acquisition_context[True]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0002687908709049225,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_explicit_source_override_requires_acquisition_context[True]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_secondary_catalog_link_is_never_acquisition_routing[metadata]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0005157636478543282,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_secondary_catalog_link_is_never_acquisition_routing[metadata]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_secondary_catalog_link_is_never_acquisition_routing[notes]",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0005115950480103493,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestPrimarySourceRouting::test_secondary_catalog_link_is_never_acquisition_routing[notes]"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestQueueFactsSurviveMissingCatalogMetadata::test_same_queued_release_keeps_a_doi_temporarily_missing_from_catalog",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00298323854804039,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestQueueFactsSurviveMissingCatalogMetadata::test_same_queued_release_keeps_a_doi_temporarily_missing_from_catalog"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestQueueFactsSurviveMissingCatalogMetadata::test_unknown_held_release_does_not_erase_existing_observation",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.006387820467352867,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestQueueFactsSurviveMissingCatalogMetadata::test_unknown_held_release_does_not_erase_existing_observation"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_a_doi_changed_at_the_same_idno_is_refused",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.006453908979892731,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_a_doi_changed_at_the_same_idno_is_refused"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_a_doi_the_catalog_reports_for_a_newer_release_is_not_held",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.003166366368532181,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_a_doi_the_catalog_reports_for_a_newer_release_is_not_held"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_a_newer_latest_replaces_the_queued_one",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0033404072746634483,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_a_newer_latest_replaces_the_queued_one"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_a_recorded_latest_release_is_not_rewritten_but_still_listed",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007873809896409512,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_a_recorded_latest_release_is_not_rewritten_but_still_listed"
+    },
+    {
+      "after": null,
+      "before": {
+        "outcome": "passed_or_nonstrict_xpass",
+        "reason": ""
+      },
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_an_override_rerun_at_the_same_id_is_checked_too"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_an_override_rerun_at_the_same_id_is_held_too",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.005281628109514713,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_an_override_rerun_at_the_same_id_is_held_too"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_dry_run_lists_the_queue_and_writes_nothing",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.006525697186589241,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_dry_run_lists_the_queue_and_writes_nothing"
+    },
+    {
+      "after": null,
+      "before": {
+        "outcome": "passed_or_nonstrict_xpass",
+        "reason": ""
+      },
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_ethiopia_w5_idno_change_is_refused"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_ethiopia_w5_v03_is_recorded_beside_the_held_v02",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.004544607363641262,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_ethiopia_w5_v03_is_recorded_beside_the_held_v02"
+    },
+    {
+      "after": null,
+      "before": {
+        "outcome": "passed_or_nonstrict_xpass",
+        "reason": ""
+      },
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_nigeria_w5_v02_in_the_catalog_leaves_v01_record_intact"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_nigeria_w5_v02_is_recorded_beside_the_held_v01",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.011429991573095322,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_nigeria_w5_v02_is_recorded_beside_the_held_v01"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_the_latest_keys_go_when_the_catalog_matches_the_held_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.009622412733733654,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_the_latest_keys_go_when_the_catalog_matches_the_held_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_a_repeated_unknown_key_keeps_every_line",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00033946894109249115,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_a_repeated_unknown_key_keeps_every_line"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_a_wb_restamp_carries_unknown_record_keys",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.004235880449414253,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_a_wb_restamp_carries_unknown_record_keys"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_an_empty_valued_key_does_not_swallow_the_next_line",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0002638092264533043,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_an_empty_valued_key_does_not_swallow_the_next_line"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_dropped_by_write_refuses_a_lost_duplicate_or_empty_key",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.007819167338311672,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_dropped_by_write_refuses_a_lost_duplicate_or_empty_key"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_every_shipped_source_org_round_trips_losslessly",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.03786626737564802,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_every_shipped_source_org_round_trips_losslessly"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_ghanasps_2017_18_is_no_longer_refused",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.004517045803368092,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_ghanasps_2017_18_is_no_longer_refused"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_keyword_lines_in_the_notes_stay_where_they_were_written",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.000217498280107975,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_keyword_lines_in_the_notes_stay_where_they_were_written"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_the_placeholder_is_not_reingested",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0002454705536365509,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_the_placeholder_is_not_reingested"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_the_url_comes_from_the_body_only",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00025113392621278763,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_the_url_comes_from_the_body_only"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_unknown_keys_in_the_record_are_rendered",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.00029695499688386917,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestRoundTripIsLossless::test_unknown_keys_in_the_record_are_rendered"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestShippedRecordsSayWhatWeMeasured::test_every_queued_release_differs_from_the_one_held",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0364933917298913,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestShippedRecordsSayWhatWeMeasured::test_every_queued_release_differs_from_the_one_held"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestStaleReleaseIsASixthState::test_every_row_carries_held_idnos",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0002744430676102638,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestStaleReleaseIsASixthState::test_every_row_carries_held_idnos"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestStaleReleaseIsASixthState::test_nigeria_w5_held_at_v01_with_the_catalog_at_v02",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0011335061863064766,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestStaleReleaseIsASixthState::test_nigeria_w5_held_at_v01_with_the_catalog_at_v02"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestStaleReleaseIsASixthState::test_no_recorded_release_cannot_be_judged_stale",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0017352886497974396,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestStaleReleaseIsASixthState::test_no_recorded_release_cannot_be_judged_stale"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestStaleReleaseIsASixthState::test_the_release_held_is_the_latest_is_yes",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.0010880036279559135,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestStaleReleaseIsASixthState::test_the_release_held_is_the_latest_is_yes"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestTheRecordFollowsThePush::test_a_failed_push_records_no_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.012899840250611305,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestTheRecordFollowsThePush::test_a_failed_push_records_no_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestTheRecordFollowsThePush::test_a_partial_push_records_no_release",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.01665730495005846,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestTheRecordFollowsThePush::test_a_partial_push_records_no_release"
+    },
+    {
+      "after": {
+        "nodeid": "tests/test_wave_provenance.py::TestTheRecordFollowsThePush::test_the_leftover_scan_is_recursive",
+        "outcome": "passed",
+        "phase": "call",
+        "reason": "",
+        "seconds": 0.006246883422136307,
+        "worker": "gw4"
+      },
+      "before": null,
+      "nodeid": "tests/test_wave_provenance.py::TestTheRecordFollowsThePush::test_the_leftover_scan_is_recursive"
+    }
+  ],
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "pytest": "8.4.2"
+  },
+  "warnings_by_category": {
+    "CacheRebuildWarning": 28,
+    "ClusterIdentityWarning": 139,
+    "DatetimeParseWarning": 3,
+    "GrainCollapseWarning": 135,
+    "LabelPassThroughWarning": 9,
+    "NullIndexKeyWarning": 110,
+    "NullReadWarning": 236,
+    "NutrientCoverageWarning": 4,
+    "Pandas4Warning": 22,
+    "PopulationHeterogeneityWarning": 3,
+    "PytestDeprecationWarning": 1,
+    "QuantityImplausibleWarning": 430,
+    "RuntimeWarning": 27,
+    "StatedVsInferredKgWarning": 29,
+    "UnpriceableRowsWarning": 3,
+    "UserWarning": 43
+  },
+  "workers": 16,
+  "workers_reporting": [
+    "gw0",
+    "gw1",
+    "gw10",
+    "gw11",
+    "gw12",
+    "gw13",
+    "gw14",
+    "gw15",
+    "gw2",
+    "gw3",
+    "gw4",
+    "gw5",
+    "gw6",
+    "gw7",
+    "gw8",
+    "gw9"
+  ],
+  "xfail_reasons": {
+    "China source data has no sampling weights (genuine data limitation, not a library bug)": 1,
+    "GH #602: Albania/plot_features ships unharmonized tenure labels: Tenure: 12358/16013 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'privatised' (12358); TenureSystem: 15961/16013 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'deed' (14809), 'sales_receipt' (419), 'none' (391), 'usufruct' (178), 'will' (140), +1 more": 1,
+    "GH #602: Cambodia/plot_features ships unharmonized tenure labels: Tenure: 2951/2951 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'BY INHERITANCE OF GIFT FROM RELATIVES' (1440), 'BOUGHT IT FROM A NON-RELATIVE' (628), 'GIVEN BY THE GOVERNMENT OR LOCAL AUTHORITY' (373), 'BOUGHT IT FROM A RELATIVE' (207), 'CLEARED LAND/OCCUPIED FOR FREE' (117), +4 more; TenureSystem: 2951/2951 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'PRIVATE' (2871), 'STATE PUBLIC' (45), 'STATE PRIVATE' (12), 'INDIGENOUS' (12), 'COMMON PROPERTY' (7), +1 more": 1,
+    "GH #602: Kosovo/plot_features ships unharmonized tenure labels: Tenure: 6469/6469 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'Owned' (6419), 'Rented' (26), 'Borrowed' (24); TenureSystem: 50/50 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'No payment' (24), 'Rent' (24), 'Sharecropped' (2)": 1,
+    "GH #602: Tajikistan/plot_features ships unharmonized tenure labels: TenureSystem: 3683/3683 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'CERTIFICATE' (2137), 'ACT (SEALED DOCUMENT)' (1196), 'NO DOCUMENTS' (238), 'SALES RECEIPT' (85), 'OTHER' (27)": 1,
+    "GH #602: Timor-Leste/plot_features ships unharmonized tenure labels: Tenure: 6308/6308 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'Part owner' (5099), 'Owner' (874), 'Public land' (127), 'Private land' (115), 'Other' (52), +2 more": 1,
+    "Kazakhstan source data has no sampling weights (genuine data limitation, not a library bug)": 1,
+    "Pakistan source data has no sampling weights (genuine data limitation, not a library bug)": 1,
+    "Peru source data has no sampling weights (genuine data limitation, not a library bug)": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "verdict": "FAIL",
+  "head": "13beb2fa5dd709521efcd4f9ff63bf889fe3bac7",
+  "runtime": "519437658beab58471b2d754a2a7fc7abb236218",
+  "independent_tests": {"passed": 19, "failed": 1, "skipped": 0, "seconds": 2.63},
+  "findings": [{
+    "id": "R1",
+    "priority": "P2",
+    "file": "lsms_library/provenance.py",
+    "line": 504,
+    "summary": "Conflicting repeated PROVENANCE_SOURCE preserves both source lines but silently replaces retained CATALOG_ID with none",
+    "shipped_occurrence_claimed": false,
+    "safe_completion": "Preserve identity or explicitly refuse unsafe rewrite before changing destination bytes"
+  }],
+  "reviewer_mutations": {"candidate_source": false, "git": false, "github": false, "shared_cache": false},
+  "all_reviewers_readers_stopped": true,
+  "related_suite_independently_executed": false,
+  "producer_optional_interrupted_check_counted_as_pass": false
+}

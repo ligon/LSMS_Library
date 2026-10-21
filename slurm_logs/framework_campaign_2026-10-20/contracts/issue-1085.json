@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #915 (`fix/915-country-dirs`; red-team r1 verified it).\n\n`Country.__init__` keeps its pre-#915 traversal check, `(root / name).resolve().is_relative_to(root)`. Meanwhile `catalog._country_dirs` admits a symlinked entry, because `is_dir()` follows the link. So for a root whose country entries are symlinks to directories elsewhere (a plausible worktree or override trick), `countries()` is a strict superset of the accepted set. Observed 2026-10-19 when a scratch copy symlinked `countries/`: every `Country()` raised `ValueError: Invalid country name ...: path traversal not allowed`.\n\n**Decide:**\n- (a) the shared predicate refuses entries whose resolved path escapes the root, so `countries()` omits them;\n- (b) the traversal check becomes lexical (a single-component name cannot traverse), and symlinked entries are accepted.\n\nNo real tree is affected today (`find lsms_library/countries -maxdepth 1 -type l` is empty). The other half, a relative or symlinked `LSMS_COUNTRIES_ROOT` refusing every country, is being fixed on the #915 branch by resolving the root in the comparison. Tier: DECISION, then C.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1085,
+  "state": "OPEN",
+  "title": "DECISION: a country entry that is a symlink escaping countries_root() is listed by countries() but refused by Country() as path traversal",
+  "updatedAt": "2026-10-19T16:12:11Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1085"
+}

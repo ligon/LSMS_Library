@@ -1,0 +1,15 @@
+`fertilizer_rate` now retains country through its fertilizer numerator, positive-area aggregation, inner join and output index. Two countries sharing local plot IDs return their own rates: the regression example gives A/B **0.46/0.23 kg N per ha**, instead of one country-less 0.276; product rates give **1/0.5 kg per ha**.
+
+Both country index levels and columns are supported, including one-country and empty results. Country on only one input or null labels is refused before filtering. Index labels take precedence over a redundant column, and area frames can still supply local keys as columns. Existing country-less behavior, unit conversion, nitrogen shares, positive-area sums and parcel policy remain unchanged.
+
+Producer validation: 347 passed and two explicit private Nigeria warm-cache skips. The untouched source fails 80 of the 87 new controls; the seven compatibility controls pass. Complete 549-country-table / 2,139-wave / 39-tagged fingerprints are unchanged, and the strict API audit passes. Evidence: `slurm_logs/framework_campaign_2026-10-20/1160/`.
+
+Independent review passed 387 cases, with two explicit Nigeria warm-cache skips and fifteen credentialed deselections; twelve new mathematical controls fail on unchanged 4cab. Real Malawi/Uganda pooled results exactly match separate Feature calls, reversed inputs and country-column forms for both nutrient and land modes. Eight existing ordinary Country calculations match the old function exactly. The reviewer independently confirms every cache fingerprint and unchanged physical source-cache bytes.
+
+Existing #1110 remains visible: Malawi's current 33,402 plot-mode versus 11,622 parcel-mode results contradict the old docstring's no-op claim, as already documented in its CONTENTS; Uganda remains 0 versus 509. Both old/new code reproduce these counts. This PR preserves those land-grain policies; their scientific disposition remains separate.
+
+Fixes #1160. This is the downstream identity fix after #1159 / #1164; it does not resolve #1110's country-specific parcel bridge or change #867 nutrient shares.
+
+Dependency: this draft targets `integration/framework-followup-40255479` at `4cab5f0db` for a focused nine-file diff. After #1154–#1157 and #1161–#1164 land, update this publication branch from development and retarget. **Do not merge into the temporary comparison base.**
+
+Final combined source including the separate #1160 fix is `532d58700fa46e52a0b390198604eca1dc4de00e`: **8,851 passed, 276 skipped, nine expected failures, one non-strict unexpected pass; zero failures/errors or credential skips**, in 736.35 seconds. All 87 new cases pass and every existing outcome/reason matches the prior 4cab run. Unit, Windows smoke and credentialed native Windows also pass at that exact head. Credentialed Linux [run 39533863014](https://github.com/ligon/LSMS_Library/actions/runs/39533863014) remains **PENDING**; the earlier 4cab run is preserved separately. Final-source packaging and installed config smoke pass within their documented limits. No pending/skipped data job is represented as a pass, and no release is proposed.

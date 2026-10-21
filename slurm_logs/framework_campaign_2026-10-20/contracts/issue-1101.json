@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #698 (`fix/698-kinship-affinity`); red-team r1 verified the counts.\n\n- **Where.** GhanaLSS 1991-92 (1,211) and 1998-99 (1,766).\n- **The defect.** The wave decode tables (`GhanaLSS/1991-92/_/categorical_mapping.org`, `1998-99/_/\u2026`) map code 6 to `Other relative`. Under the 2026-09-07 rule, a \"relative of head OR SPOUSE\" label is `[null, null, null]`.\n- **The fix.** A distinct decoded label, plus harmonization-table and kinship rows. This interacts with the Comparable view, where GLSS3+ `Other relative` absorbs siblings.\n- **Cost.** Wave `.org` edits move those waves' hashes and every GhanaLSS L2-country hash.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1101,
+  "state": "OPEN",
+  "title": "GhanaLSS GLSS3/4 code 6 'Relative of head or head's spouse' is served [null, null, consanguineal] (2,977 people)",
+  "updatedAt": "2026-10-19T18:30:34Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1101"
+}

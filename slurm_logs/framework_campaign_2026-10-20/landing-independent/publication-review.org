@@ -1,0 +1,56 @@
+#+TITLE: Independent static landing identity review
+#+AUTHOR: Sue
+
+* Publication verdict
+PASS for immutable publication =23c1e2d52801bf206a15ec5900bca5d62e7f850f= against fully validated candidate =532d58700fa46e52a0b390198604eca1dc4de00e=.
+This is a static object, tree, reference and ancestry review.
+No repository code, tests, builds, survey data, cache or live catalog requests were executed.
+The main worktree and its in-progress handoff were not used as immutable evidence.
+
+* Complete tree comparison
+All 14,437 candidate paths have identical Git object IDs, types and modes in publication.
+Publication has 14,441 paths: precisely four additional existing review reports, totaling 370 lines.
+There are no modified, deleted, renamed, type-changed or mode-changed paths.
+
+| Namespace | Candidate paths | Publication paths | Identical | Different |
+|-----------+-----------------+-------------------+-----------+-----------|
+| bench_and_audit | 14 | 14 | 14 | 0 |
+| github_workflows_and_configuration | 2 | 2 | 2 | 0 |
+| other_build_dependency_and_test_configuration | 3 | 3 | 3 | 0 |
+| other_tracked_documents_and_files | 2400 | 2404 | 2400 | 4 |
+| package_runtime_and_country_configuration | 11753 | 11753 | 11753 | 0 |
+| scripts_bin_tools | 17 | 17 | 17 | 0 |
+| tests_and_fixtures | 248 | 248 | 248 | 0 |
+
+Every runtime/package/country configuration path, test and fixture, script/bin/tool, bench/audit path, workflow and build/dependency file is byte-identical.
+The full-tree comparison covers other tracked files too, rather than relying only on a selected extension list.
+
+* All four differences
+- Added =slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.json= (98 lines, mode100644); identical to PR1157 head and already present on merged development f506.
+- Added =slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.org= (77 lines, mode100644); identical to PR1157 head and already present on merged development f506.
+- Added =slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.json= (128 lines, mode100644); identical to PR1157 head and already present on merged development f506.
+- Added =slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.org= (67 lines, mode100644); identical to PR1157 head and already present on merged development f506.
+
+The first-round FAIL files preserve historical review; the round-two PASS files explicitly resolve that finding and retain the earlier history.
+They concern the documented coarse EthiopiaRHS expectation boundary and do not add a production exception.
+All three source SHA256 values in the round-two report match the candidate and publication blobs.
+The reports contain aggregate/synthetic evidence and commands; this review executed none of those commands.
+
+* Ancestry and original references
+Publication parents are exactly candidate532 and pre-publication merged development f506.
+Both parents and all nine original task tips are ancestors of publication.
+All 13 original worker/integration/Windows reference pins match in local heads, local origin-tracking refs, and filesystem origin.
+Eight also have matching same-named GitHub branches.
+Five origin-only follow-up worker names return404 from direct GitHub GET; their separate published review branches match their expected publication tips in all four locations.
+This does not claim that those original worker names were ever published to GitHub.
+The companion JSON lists every exact SHA and location; reference expectations are grounded in prior reviewed freezes and immutable STATUS at78e25dff.
+
+* Reproduction and limits
+Run the standalone =compare_publication.py= with the mounted image Python.
+It uses only Git object/reference reads and GitHub GET requests, and writes aggregate JSON under this private report directory.
+No repository modules are imported.
+This review does not rerun executable validation, reproduce a runtime environment, establish PR-event data-check eligibility, or establish a clean semantic audit.
+Git commit count and dynamic untagged package version may differ even when package/build file blobs match.
+Final merged development identity and ancestry remain pending the parent-supplied immutable SHA.
+
+-- Sue

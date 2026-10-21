@@ -1,0 +1,63 @@
+{
+  "body": "## Summary\n\nThe `v` index level is supposed to identify a sampling cluster. For some\ncountries it is **wave-scoped**: the same enumeration area carries a different\n`v` in each round, with no crosswalk and no warning. A caller who groups or\njoins on `v` across waves silently splits one cluster into several.\n\nFound while building a two-wave GLSS panel for a workshop: every panel reshape\nneeds a `.droplevel('v')` first, which is what prompted the check.\n\n## Evidence\n\nMeasured on `lsms_library` 0.14.0, GhanaLSS GLSS1/GLSS2, over the 712\nhouseholds the household crosswalk links across `1987-88` and `1988-89`:\n\n| check | result |\n|---|---|\n| households keeping the same `v` | **0 of 712** |\n| first character of `v`, 1987-88 | always `1` |\n| first character of `v`, 1988-89 | always `2` |\n| match after stripping the first character | 2 of 712 |\n| distinct `(v87, v88)` cluster pairs | 79 |\n| a `v87` mapping to more than one `v88` | 0 |\n| a `v88` mapping to more than one `v87` | 0 |\n| paired clusters agreeing on `Region` | **79 of 79** |\n| paired clusters agreeing on `Rural` | **79 of 79** |\n\nSo it is not a prefix and it is not noise. It is a clean **bijection between 79\nGLSS1 clusters and 79 GLSS2 clusters**, and the paired clusters are the same\nplaces: `1003 -> 2009`, both `Western`/`Rural`; `1013 -> 2049`, both\n`Greater Accra`/`Rural`. Every household in 1003 moves to 2009 together.\n\nThis is faithful passthrough, not an invention: `GhanaLSS/1987-88/_/data_info.yml`\nmaps `v: CLUST`, and GLSS renumbered its clusters between rounds. The defect is\nthat a wave-scoped code is served on an index level whose purpose is to identify\na cluster, with nothing to say so.\n\n## It is not consistent across the corpus\n\nHouseholds observed in three consecutive waves, share keeping the same `v`:\n\n| country | waves | households | same `v` throughout |\n|---|---|---|---|\n| GhanaLSS | 1987-88, 1988-89 (2 waves) | 712 | **0 (0%)** |\n| Uganda | 2009-10, 2010-11, 2011-12 | 2,440 | **0 (0%)** |\n| Tanzania | 2008-09, 2010-11, 2012-13 | 2,895 | 2,305 (80%) |\n\nTanzania is the interesting row: `v` *is* stable there for most panel\nhouseholds, so the intended semantics appears to be that a household which does\nnot move keeps its cluster. Ghana and Uganda do not honour that, and a caller\nhas no way to tell which regime a country is in.\n\n(GhanaLSS also carries a literal `Mover` sentinel in `v`, so movers are modelled\nexplicitly there -- which makes the wholesale renumbering harder to read as\nintentional.)\n\n## Why it matters beyond ergonomics\n\n1. **Inference.** `v` is the natural level to cluster standard errors on. In a\n   panel, clustering on `v` as served treats one EA observed twice as two\n   independent clusters, overstating the number of clusters and understating\n   standard errors. Nothing warns you.\n2. **Silent joins.** `groupby('v')`, or a merge of cluster-level covariates onto\n   a panel, splits each EA per wave and produces plausible-looking wrong answers.\n3. **Reshapes.** Any `unstack('t')` on a table carrying `v` needs `droplevel('v')`\n   first or it yields one row per household-wave rather than per household.\n\n## Reproduction\n\n```python\nimport lsms_library as ll, pandas as pd\ng  = ll.Country(\"GhanaLSS\")\nhc = g.household_characteristics(waves=[\"1987-88\", \"1988-89\"])\nidx  = hc.index.to_frame(index=False)[[\"t\", \"v\", \"i\"]].drop_duplicates()\nwide = idx.pivot_table(index=\"i\", columns=\"t\", values=\"v\", aggfunc=\"first\").dropna()\nprint(len(wide), (wide[\"1987-88\"].astype(str) == wide[\"1988-89\"].astype(str)).sum())\n# 712 0\n\npairs = wide.drop_duplicates()\nprint(len(pairs), pairs.groupby(\"1987-88\")[\"1988-89\"].nunique().gt(1).sum())\n# 79 0   -- a bijection\n\ncf = g.cluster_features(waves=[\"1987-88\", \"1988-89\"]).reset_index()\n# Region and Rural agree for all 79 pairs\n```\n\n## Possible resolutions\n\nNot a request for a particular one:\n\n- A **cluster crosswalk** analogous to `panel_ids`, giving a stable cluster\n  identity across waves. For GLSS1/GLSS2 it is recoverable exactly as above --\n  the household crosswalk already determines the 79 pairs -- so it need not be\n  hand-built.\n- Failing that, **declare the regime**: something in `data_scheme` saying whether\n  a country's `v` is wave-scoped or panel-stable, and warn on a cross-wave\n  `groupby`/join when it is wave-scoped. The `null_read_audit` / `quantity_audit`\n  machinery is the obvious model.\n- At minimum, **document it**, so that `droplevel('v')` is a known step rather\n  than something each caller rediscovers.\n\nChecked GhanaLSS, Uganda, Tanzania and Malawi only; the other declared panel\ncountries are unexamined.\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABVaFk-A",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Diagnosis and design done; **no crosswalk built, and the recommendation is not to build one under this issue.** Full note committed at `slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org` (with the measurement scripts beside it). Headlines, because several of them change this issue's premises.\n\n## The blocking contradiction is settled\n\n`GhanaLSS/_/CONTENTS.org:390` calls GLSS2 a \"fresh draw\"; this issue measures a clean 79\u219479 bijection with GLSS1. **GLSS2 is not a fresh draw** \u2014 it is a half-retained rotating panel. GSS's own `G3report.pdf` (Appendix 1, printed p.110), already quoted at `CONTENTS.org:927`, says half of GLSS1's workloads were retained for GLSS2 and the other half drawn from master-sample replicate 6. The warm cache realises exactly that: 176 and 170 clusters, 79 paired, 97 and 91 unpaired. `CONTENTS.org:1109` already flags the table as wrong and records the tension as **unresolved**.\n\nTwo caveats for anyone deriving a crosswalk: the 79 is a **lower bound** (half of 176 is ~88, so either nine retained workloads yielded no re-interview or \"workload\" \u2260 \"EA\"), and it is **complete for what it can be** \u2014 the unpaired clusters are genuinely different EAs, not missing linkage.\n\n## Two instances this issue did not have\n\n- **Ethiopia 2011-12 \u2192 2013-14 is a cleaner case than GhanaLSS**: `ea_id` \u2192 `ea_id2`, disjoint code spaces, 3,776 panel households, 0% agreement, and a **complete 333\u2192433 bijection with zero violations**. The survey itself calls `ea_id2` a re-identification. And the ESS may ship the crosswalk directly \u2014 `CONTENTS.org:978` lists `Pub_ETH_HouseholdGeovars_Y2` as carrying both id generations. Unverified; it is the one bounded check to run before writing any derivation code.\n- **CotedIvoire's CILSS (1985-89) is a same-era rotating half-panel that KEPT its cluster numbers** \u2014 100 PSUs, `nA = nB = 100` every year, zero violations. So GLSS's renumbering is a choice GSS made, not a property of 1980s LSMS rotation.\n\n## Three corrections\n\n1. **Tanzania.** The 0% cell is the **extended panel** at 2014-15 \u2192 2019-20 (849 tracked households, 310 pairs, **131 non-bijective** \u2014 a crosswalk is not recoverable there even in principle). The 2019-20 \u2192 2020-21 refresh has *zero* shared households and therefore says nothing about `v` at all. Two different boundaries, two different facts.\n2. **The `Mover` sentinel is not reproduced.** It occurs zero times in GhanaLSS `sample`/`cluster_features`, and `grep -rn Mover lsms_library/countries/` returns nothing. It is `transformations.py:507`, a library-wide default for a NaN `v`, applied to every country. The reading that it makes GLSS renumbering \"harder to read as intentional\" does not stand \u2014 the sentinel is ours.\n3. **Uganda is three defects and only the third is this issue**, so it must not be folded in: (a) two *renderings* of the same `comm` variable \u2014 272 of 322 pairs differ by one digit inserted at position 3, 50 are genuine district recodes, so the 0% at two boundaries is **ours, not GSS's**; (b) `coalesce_coord_bin` making **339 of 656** 2009-10 \"clusters\" 0.05\u00b0 GPS bins; (c) a genuine EA \u2192 parish \u2192 name-composite meaning change, which admits no crosswalk.\n\n## Method caveat worth carrying\n\nHousehold-`i` overlap lies two ways: countries whose `i` restarts 1..N each wave manufacture spurious linkage (Tajikistan, Panama \u2014 neither has any `panel_ids` config, and the WB documentation says outright they are not panels), and countries whose `i` embeds `v` cannot show a mover. **Only five countries yield independent evidence**: GhanaLSS, Ethiopia, Nigeria, Tanzania, Uganda.\n\n## Design, in one line each\n\nDeclare per **wave boundary**, not per country (a single tag is wrong for all five informative countries). **Two orthogonal fields** \u2014 `household_continuity` and `cluster_id_continuity` \u2014 because refresh-by-design is a household fact and renumbering is a cluster fact, and Tanzania is both at different boundaries; the one-dimensional enum in \"Possible resolutions\" cannot express that. Put it in the `panel:` block of a `sampling.yml` sibling (#793), landing only that block now so #942 does not wait on #793's full curation. Placement cost measured off `country.py:706, 921, 3546, 3558`: a new `.yml` sibling moves **no** hash; a block inside `data_scheme.yml` invalidates **every** L2-country parquet of that country.\n\n**Warn at `Country`, not at `Feature`** \u2014 this issue's own reproduction is a single-country two-wave call, so copying the population precedent's placement would put the warning exactly where the bug is not. Nothing served changes under any setting except an opt-in `LSMS_CLUSTER_STRICT=1`.\n\n**The crosswalk is out of scope**: it is derivable at exactly two boundaries in the whole corpus (GhanaLSS 1987-88\u21921988-89 as a floor, Ethiopia 2011-12\u21922013-14 complete), and a crosswalk built on this issue's method would be read as covering a class it does not cover.\n\nSeven decisions are stated as questions at the end of the note, with options and consequences \u2014 including whether Uganda's rendering defect becomes its own issue and whether `CONTENTS.org:390` is corrected here or separately.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n\nhttps://claude.ai/code/session_01P7B5HqvWkYVZu7g9oSZVgB\n",
+      "createdAt": "2026-09-18T14:39:50Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/942#issuecomment-5731607800",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdRafbw",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Accept DESIGN.org Q1-Q7 as drafted: a per-boundary two-field declaration in `sampling.yml`'s `panel:` block, a warning at `Country` (not `Feature`), and no crosswalk. Q5: file Uganda's v-rendering defect (272 of 322 pairs) as its own tier-B issue. Depends on #793.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-10-19T04:03:40Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/942#issuecomment-6259384175",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdmvyDA",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Fixed on `development` by PR #1137. Left open until the release merge to `master`; follow-ups are #1133-#1136.",
+      "createdAt": "2026-10-20T02:14:54Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/942#issuecomment-6281753100",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 942,
+  "state": "OPEN",
+  "title": "v is wave-scoped in some countries: the same cluster gets a new id each round, with no crosswalk",
+  "updatedAt": "2026-10-20T02:14:54Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/942"
+}

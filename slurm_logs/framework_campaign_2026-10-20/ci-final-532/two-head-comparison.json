@@ -1,0 +1,54 @@
+{
+  "collected_delta_532_minus_4cab": 87,
+  "count_deltas_532_minus_4cab": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 87,
+    "skipped": 0,
+    "warnings": 0,
+    "xfailed": 0,
+    "xpassed": 0
+  },
+  "credential_gate_passed": {
+    "4cab": true,
+    "532": true
+  },
+  "heads": {
+    "4cab": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+    "532": "532d58700fa46e52a0b390198604eca1dc4de00e"
+  },
+  "job_conclusions": {
+    "4cab": "success",
+    "532": "success"
+  },
+  "nutrition_executed_and_passed": {
+    "4cab": true,
+    "532": true
+  },
+  "pytest_totals": {
+    "4cab": {
+      "errors": 0,
+      "failed": 0,
+      "passed": 6301,
+      "skipped": 2744,
+      "warnings": 1219,
+      "xfailed": 4,
+      "xpassed": 1
+    },
+    "532": {
+      "errors": 0,
+      "failed": 0,
+      "passed": 6388,
+      "skipped": 2744,
+      "warnings": 1219,
+      "xfailed": 4,
+      "xpassed": 1
+    }
+  },
+  "run_ids": {
+    "4cab": 39531148624,
+    "532": 39533863014
+  },
+  "scope": "Independent exact-head manual runs, kept separate; no PR-check eligibility claim",
+  "separate_readiness_limits": "19 source/wiring errors and five tenure findings retained; no semantic-audit clearance implied"
+}

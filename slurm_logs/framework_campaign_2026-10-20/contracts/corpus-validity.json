@@ -1,0 +1,48 @@
+{
+  "baseline": {
+    "freshness": {
+      "country": {
+        "fresh": 424
+      },
+      "wave": {
+        "fresh": 582,
+        "legacy": 601
+      }
+    },
+    "unstable_files": [],
+    "measurement_error_cells": [],
+    "error_types": {
+      "RuntimeError": 16,
+      "FileNotFoundError": 3
+    },
+    "failed_country_processes": [
+      "Armenia",
+      "Nepal",
+      "Peru"
+    ],
+    "completion_exit_policy": "nonzero: known errors retained"
+  },
+  "combined": {
+    "freshness": {
+      "country": {
+        "fresh": 424
+      },
+      "wave": {
+        "fresh": 582,
+        "legacy": 601
+      }
+    },
+    "unstable_files": [],
+    "measurement_error_cells": [],
+    "error_types": {
+      "RuntimeError": 16,
+      "FileNotFoundError": 3
+    },
+    "failed_country_processes": [
+      "Armenia",
+      "Nepal",
+      "Peru"
+    ],
+    "completion_exit_policy": "nonzero: known errors retained"
+  }
+}

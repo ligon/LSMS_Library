@@ -1,0 +1,281 @@
+#+title: Framework campaign status, 2026-10-20
+#+author: Sue
+
+* Current landing -- 2026-10-20
+
+The maintainer explicitly authorized the reviewed batch and all nine implementation PRs are merged:1154--1157 and1161--1165.
+Development is =1933434b84de82ac72b3921a7fd8fe5c00154754=, synchronized across GitHub/local/filesystem origin.
+All runtime/configuration/test/audit/build files are byte-identical to validated532; only four review reports differ.
+The candidate passed8,851 local tests and6,388 credentialed Linux tests, plus native Windows, with no failures/errors.
+All87 new fertilizer-rate cases and Uganda nutrition actually executed and passed.
+[[file:landing/REPORT.org][Landing record]], [[file:landing/source-equivalence.json][source identity]].
+
+Evidence PR1158 is authorized and being updated/merged; final development CI is observed after that merge.
+Its durable PR description will record the actual final merge SHA/run/conclusion; the report below preserves earlier dated verification snapshots.
+All32 scoped closure candidates are implemented pending a separately authorized master release merge;778 and932 stay open for retained scope.
+Draft release notes cover the approved increment, not the entire history sincev0.15.0.
+No release/tag, protection change, shared-cache promotion or issue closure is included.
+
+* Earlier candidate outcome before landing
+
+The maintainer approved Windows CI repair and five additional framework issues: #1143, #1093, #1099, #1124 and #1125.
+All five implementations passed independent review and are combined at frozen =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+Subsequent approved cache, provenance, pooled-reducer and fertilizer-rate work is also implemented and independently reviewed.
+The latest frozen combined source is =532d58700fa46e52a0b390198604eca1dc4de00e=; its local full suite, independent review, packaging, native Windows and credentialed GitHub Linux all pass.
+Implementation PRs #1154--#1157 and #1161--#1165 are open; Windows #1153 alone has explicit merge authorization and is merged.
+No release has been requested or attempted.
+
+Windows [[https://github.com/ligon/LSMS_Library/pull/1153][PR #1153]] was merged with explicit maintainer authorization at =ad1e87e1025dec98fe70734f4e60d12824fd31dd=.
+GitHub and filesystem-origin development are synchronized there; the separate local =development-sync= worktree is clean.
+Its [[https://github.com/ligon/LSMS_Library/actions/runs/39522182800][development push CI]] passed, including native Windows.
+The earlier [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][complete Windows-fix run]] also passed credentialed Linux data tests: 5,911 passed, 2,742 skipped, four expected failures and one non-strict unexpected pass, with the credential gate open.
+
+The original four implementation PRs are open, with green PR unit and Windows smoke checks:
+
+| PR | Approved issues | Head |
+|----+-----------------+------|
+| [[https://github.com/ligon/LSMS_Library/pull/1154][1154]] | #1093 declared unit-factor propagation | eaf7b9913 |
+| [[https://github.com/ligon/LSMS_Library/pull/1155][1155]] | #1099 typed empty wave-subset parity | f9871610f |
+| [[https://github.com/ligon/LSMS_Library/pull/1156][1156]] | #1143 whole decimal-comma metric tokens | 1070a4d03 |
+| [[https://github.com/ligon/LSMS_Library/pull/1157][1157]] | #1124/#1125 audit and warm-test participation | d84061818 |
+
+The harness PR's final review documents follow implementation =ca5bb83ca=, which is already integrated; production/test/audit files match the frozen candidate.
+Consolidated evidence is [[https://github.com/ligon/LSMS_Library/pull/1158][draft PR #1158]].
+All nine subsequent fix PRs remain for human merge under the backlog-workflow rule; the explicit Windows override covers only #1153.
+
+* Verification completed
+
+Baseline source is the exact pre-fix development =976fc840d12ba40f1602b7dff58b81548632b2a9=.
+Initial clone =3e3bd26ee= was fast-forwarded to that GitHub head and published to filesystem origin before work began.
+
+| Check | Baseline 976 | Combined 852 |
+|-------+--------------+--------------|
+| Full suite passed | 8369 | 8562 |
+| Plain skipped | 279 | 285 |
+| Expected failures | 9 | 9 |
+| Non-strict unexpected passes | 1 | 1 |
+| Failures/errors | 0/0 | 0/0 |
+| Credential skips | 0 | 0 |
+| Seconds | 893.14 | 1158.04 |
+| Cold corpus successes / requests | 530/549 | 530/549 |
+| Explicit cold corpus errors | 19 | 19 |
+
+The suite ran with 16 loadfile workers, BLAS/OMP/MKL/build/make workers one, with a 600-second per-test thread timeout, explicit package/config/data identity and separate physical L2 copies.
+The combined run enables the suite's own =LSMS_EXPECTED_ROOT= assertion.
+Two hundred added cases pass; one obsolete warm-only #1039 case is replaced.
+Eight Uganda wave-invariance cases skipped for missing parquet files, while two prior skips now execute: exact import identity and GhanaLSS nutrition poison-cache recovery.
+All 277 shared ordinary skips and all nine expected-failure identities/reasons are unchanged.
+The non-strict unexpected-pass count matches, but its exact identity is unavailable from these nonverbose artifacts.
+
+A separate private-copy supplement recreated all eight Uganda wave files through sanctioned APIs, then passed the exact eight existing invariance checks with zero skips and no fixture/baseline/source changes.
+The original full-suite count of 285 skips remains unchanged.
+All three actual farm warm checks ran and passed in the full suite.
+Evidence: [[file:validation/combined-suite-summary.json][suite summary]], [[file:reliability/independent-review.org][independent reconciliation]], [[file:reliability/uganda-wave-supplement.json][eight-case supplement]].
+
+The matched cold corpus covers every declared pair across 38 countries.
+All nineteen error classes and full messages match after replacing only exact source/data-root prefixes: two Armenia, eleven Nepal, six Peru requests.
+The driver retains its nonzero error exit; this is not a blanket green corpus.
+There are no status, row-count, schema, wave-count, null-count, warning-category-count or cache-metadata changes.
+Six food quantity/price tables change as intended; four roster fingerprints differ only in order in paired cache and warm-API checks.
+Unchanged-baseline Benin cold builds under seeds1/3 reproduce both original fingerprints exactly.
+A separate fixed-seed Mali supplement captures new cold and warm returns: both sources match exactly in original order, including all 220,732 rows, seven columns, indices, dtypes and values.
+Both reproduce the existing MonthsSpent cold-object/warm-string difference; unavailable original corpus cold served frames are not claimed to have been directly compared.
+Evidence: [[file:contracts/mali-cold-review.org][fresh Mali cold/warm supplement]].
+All 549 expected country hashes and 1,183 observed wave hashes move through the tagged #1099 build closure; this observed-file count is not the complete census of 2,139 wave hashes.
+Evidence: [[file:contracts/corpus-review.org][independent corpus review]], [[file:contracts/corpus-comparison.json][all measured differences]].
+
+Native Windows passes on exact combined =852=: shocks: 14,457 rows/10 columns/eight waves, digest =0ab2ea4c79dd=; assets: 116,808 rows/one column/eight waves, digest =9202ed542a14=.
+The Windows repair is an expected-digest correction after GH #805: reversing only 2,012 cp1252-corrected cells recovers the old digest, with exact indices/dtypes/other values retained.
+Evidence: [[file:validation/combined-windows-native-summary.json][combined native results]] and PR #1153's exact encoding-delta accounting.
+
+The paired sixteen-feature canonical scans completed with the same scanner on both sources.
+Both retain six Peru build errors, five #602 tenure-vocabulary failures, five passes and thirteen identical documented source skips.
+There are no new assembly findings or error/failure pairs; these retained failures remain real findings.
+Warnings increase from 3,256 to 11,987: all 8,098 added interview-date records and the other 633 net additions are classified.
+The extra Class B roster warning is Peru's documented person-id repair and matches both cold controls.
+Rebuild exposure accounts for repeated parsing/source warnings; the existing reaggregation warning's quantity change equals the measured parser delta.
+Independent interview review verifies complete non-runtime records and 27 exact date frames covering 690,030 rows; independent review also accepts the remaining 633-warning accounting with its explicit limits.
+Another 125 local frame comparisons cover 16,139,392 rows with equal index/cell values and four order-only roster differences.
+The audit's order-only country set differs from the serialized cold corpus set and is recorded separately.
+Evidence: [[file:1124-1125/canonical/README.org][paired canonical report and reproduction]], [[file:reliability/interview-delta-independent-review.org][independent interview review]], [[file:reliability/non-interview-delta-independent-review.org][independent remaining-warning review]].
+
+* GitHub validation hold
+
+- Exact-head GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], source =852=; native Windows, unit and smoke pass. Credentialed Linux completed with one failure, 6,107 passes, 2,744 skips, four expected failures and one non-strict unexpected pass in 5,374.11 seconds. The credential gate passed.
+- Failure :: Uganda raw =var/nutrition.parquet= shape/columns/index/dtypes match, but content hash =f3d3c34d...89fd6= differs from approved =12d25f6e...50e3a=. The local cold raw frame retains the approved hash. Both GitHub runs have matching installed dependency versions; no raw CI parquet artifact exists.
+  Fixed operands reproduce the exact failed hash under Haswell and the approved hash under SkylakeX, reversibly, with only eight cells/two ULPs changed. Parent independently reproduced the complete sequence.
+  The isolated test-only repair is independently reviewed at =98822ed1a=: preserve primary12d25 and accept only the measured exact nutrition variant, retaining all structural/other-entry checks. Fourteen independent controls, fifteen producer controls, both measured full-size kernel outputs and rejection of changed data passed. No production arithmetic changes or full baseline regeneration. [[file:nutrition-repair-review/REPORT.org][Independent repair review]]. [[file:nutrition-ci-diagnosis/REPORT.org][Diagnosis]], [[file:nutrition-ci-diagnosis/parent-review.json][parent replay]]. [[file:validation/combined-linux-data-summary.json][Exact failure summary]].
+
+Preserve integration852 as the exact diagnosis control; new work is isolated on the follow-up branch.
+No source fix was made for the pre-existing roster ordering or Mali dtype behavior.
+
+* Changes and remaining decisions
+
+#1093 restores 706 usable Ethiopia Quintal price-pool observations; the other four positive sold-quantity rows have nonpositive sale values and remain correctly excluded.
+Raw crop/input tables and existing seed/nitrogen totals are unchanged; declared factors now reach all three missing consumers.
+#1143 corrects 945 quantity rows and 783 price rows across Senegal, Benin and CotedIvoire, preserving raw food tables, axes and dtypes.
+#1099 keeps typed empty strict subsets consistent across cache states without masking real builders or source failures; a corpus re-warm is intentional.
+#1124/#1125 detect whole-country loss independently of retained-row collapse and add all three farm tables to the canonical sweep.
+The documented exclusion of 17,523 coarse EthiopiaRHS crop rows remains a visible Class B audit warning; the warm-test allowance expires if plot/plot_id appears and never masks read failures or another lost country.
+
+New independently verified [[https://github.com/ligon/LSMS_Library/issues/1159][#1159]] tracks inherited cross-country plot-key collisions in seed/nitrogen reducers.
+It reproduces with metric units at both =976= and =852= and is linked from PR #1154 as outside the first five implementations.
+The maintainer has now explicitly chosen country-preserving pooled results and authorized the separate follow-up implementation described below.
+
+Recommend keeping this candidate bounded while final gates finish.
+That follow-up pass, including #778, #1159 and provenance #1115/#1128, is now implemented, independently reviewed and integrated; #1160 follows the same country-preserving rule.
+Staged acquisition #1149 follows the provenance pair; sampling #1134/#1135 is another bounded already-ruled increment.
+The existing substantial #851 period branch needs recovery/integration/disclosure/review rather than duplicate implementation, and is a separate feature increment.
+The [[file:reliability/v016-readiness.org][readiness assessment]] lists 28 potential release-closure issues from the reviewed scope, supporting PRs and retained residuals; this is not an exhaustive release closure audit.
+
+#932 enforcement remains unapplied: current development protections require only unit-tests; a personal-account repository cannot use the assumed organization merge queue.
+The proposed route runs data-tests on every development PR, fails the credential gate for forks until reviewed trusted import, then requires the genuinely executed PR-event check.
+Skipped jobs must not become the required gate; =strict=false= and role 5 bypass remain separate explicit policy choices.
+No protection/permission change was made.
+The nightly schedule becomes active only after reaching default master.
+Official eligibility and required-check sources are linked in the readiness assessment.
+
+* Parallel follow-up authorized, 2026-10-20
+
+After the release-priority discussion, the maintainer asked to delegate the next work now.
+Three isolated worktrees start from the unchanged frozen852 candidate:
+
+| Track | Worktree | Agent | CPU range |
+|-------+----------+-------+-----------|
+| #778 remaining cache race / mutating tests | /local/job40255479/worktrees/778-cache-race | framework_reliability | 8--11 |
+| #1115/#1128 provenance | /local/job40255479/worktrees/1115-1128-provenance | framework_contracts | 12--15 |
+| #1159 pooled reducers | /local/job40255479/worktrees/1159-pooled-reducers | windows_ci | 16--19 |
+
+The maintainer explicitly chose retaining country identity in pooled seed/nitrogen results for #1159.
+That ruling permits the reducer implementation; no nutrient-share or price-pooling choice is included.
+The provenance agent must reuse and finish the existing unlanded =origin/fix/1128-1115-provenance-latest= branch, including the newest release-unknown ruling, rather than duplicate it.
+All three agents must test their changes, measure cache impact, commit durably and undergo independent review before PR/landing.
+They may edit only their own new worktree; the original852 integration and its completed evidence remain frozen.
+No GitHub PR merge, release or protection change is authorized by the dispatch.
+
+Follow-up checkpoint:
+
+- #1159 :: Frozen =45f80dcb5= (runtime =da84c7c79=), producer 260 focused passes and 71 baseline failures; parent independent review passes the same 260 plus sixteen additional controls. All 549/2139/39 hashes are unchanged. [[file:1159-review/review.org][Independent review]].
+- #778 :: Frozen =f7eb194d7= (runtime =2aef1c2ac=), 190 focused passes and six final baseline failures; independent review passes 67 checks. The report replacement count is corrected from 19 to measured 18 without runtime changes. All 549/2139/39 hashes are unchanged. [[file:778-review/review.org][Independent review]].
+- #1115/#1128 :: Final frozen =44f6cd2e7= passed independent review: 370 repository tests and thirty reviewer controls. Round one found a repeated-source metadata-loss case; the narrow explicit-refusal guard fixes it while preserving source bytes. All 130 SOURCE records and 549/2139/40 table-plus-aggregate fingerprints are unchanged. One reviewer assertion was corrected from forbidding legitimate canonical metadata to checking occurrence preservation; that failed combined review invocation is retained separately from the passing rerun. The optional broader producer matrix was interrupted and is not counted as passed. [[file:provenance-review/REPORT.org][Independent review]].
+- Nutrition CI repair :: Final frozen =98822ed1a= passed independent review; only the measured nutrition fingerprint variant is added. Existing primary hashes and structural checks remain enforced. [[file:nutrition-repair-review/REPORT.org][Independent review]].
+
+All four follow-up increments are integrated and frozen at =4cab5f0db7d375ad543e652f61f43bd28fa94ecd= on =integration/framework-followup-40255479=, published to GitHub and filesystem origin.
+The new physical 1,519-file copy of the frozen852 corpus is assigned to the sixteen-worker full suite, with a separate physical copy for scoped farm audit and pooled-reducer checks.
+The exact4cab full suite and scoped farm checks have completed successfully; aggregate evidence is linked below.
+GitHub [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][manual run39531148624]] runs that exact head: unit, Windows smoke and native Windows pass; credentialed Linux also passed (6,301 passed, 2,744 skipped, four expected failures and one non-strict unexpected pass).
+Original integration852 and its failed CI evidence remain unchanged.
+
+The exact4cab local suite passes:8764 passed,276 skipped,nine expected failures,one non-strict unexpected pass,1222 warnings,zero failures/errors or credential skips in765.96seconds.
+All16 workers reported and source stayed unchanged.
+Independent parent XML comparison confirms198 new passing cases,five replaced/renamed prior passing cases,nine skip-to-pass transitions,and no other outcome change; all expected-failure identities remain the same.
+No new skip or changed remaining skip/xfail reason appears.
+The candidate XPASS is directly observed as Pakistan cluster-grain; its exact baseline XPASS identity remains unavailable from the old JUnit.
+All18 exported artifacts pass manifest verification; raw logs/XML/events/findings remain private.
+[[file:followup-validation/REPORT.org][Full follow-up validation]], [[file:followup-validation/parent-case-reconciliation.json][independent parent case accounting]].
+
+Follow-up review PRs are published as drafts:
+
+| PR | Work | Base | Head |
+|----+------+------+------|
+| [[https://github.com/ligon/LSMS_Library/pull/1161][1161]] | Exact measured nutrition fingerprint allowance | development | 6553e01d6 |
+| [[https://github.com/ligon/LSMS_Library/pull/1162][1162]] | #778 cache disappearance / private build controls | integration/framework-v016-40255479 | f7eb194d7 |
+| [[https://github.com/ligon/LSMS_Library/pull/1163][1163]] | #1115/#1128 lossless provenance / held-latest separation | integration/framework-v016-40255479 | 44f6cd2e7 |
+| [[https://github.com/ligon/LSMS_Library/pull/1164][1164]] | #1159 country-preserving seed/nitrogen results | integration/framework-v016-40255479 | 45f80dcb5 |
+
+The last three use the frozen852 comparison base for focused diffs and must be updated from development and retargeted after #1154--#1157 land; do not merge into the comparison base.
+Nutrition is directly development-based: all seventeen changed files are byte-identical to the reviewed source, and fifteen focused controls passed again there.
+No new PR merge is authorized.
+
+Exact4cab unit, Windows smoke, native Windows and credentialed Linux checks all pass in run39531148624.
+Native shocks/assets retain the exact expected digests; [[file:validation/followup-windows-native-summary.json][native evidence]].
+The scoped three-feature farm audit retains all76 non-runtime records/metrics and all29 Class B findings, with zero new structural/error/failure pairs.
+Sixty removed runtime warnings are classified45 cache-rebuild, six Make fallback and nine baseline Nigeria candidate-failure messages; the latter cause is not inferred.
+All1519 private farm L2 files remain byte-identical to the frozen852 seed.
+Three live warm checks pass; fourteen-country plot inputs yield200346 seed rows and75784 nitrogen rows exactly matching separate-country, reversed-order and country-column controls.
+GhanaLSS and Guinea-Bissau yield empty usable outputs under both separate and pooled reducers; no broader coverage claim is made.
+
+Packaging dry-run passes at exact4cab: wheel and sdist resolve0.15.0.post392.dev0+4cab5f0db and contain all11753 tracked package files with exact bytes.
+An installed-wheel, network/build-forbidden config smoke discovers38 countries and Uganda's eight waves/twenty-eight tables.
+This is an untagged development artifact with existing image dependencies, not a tagged release or installed microdata-build test; checkout-only tests are outside the current archive policy.
+[[file:packaging-review/REPORT.org][Packaging evidence]].
+
+The reducer review separately reproduces inherited [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]]: fertilizer_rate discards country again in its numerator/area grouping.
+It produces the same erroneous pooled rate on both old/new sources; no rate implementation was included in the approved two-reducer fix.
+
+* Additional approved correctness fix -- #1160
+
+After the independent rate counterexample, the maintainer explicitly approved fixing #1160 before0.16.0 using the same country-preserving rule.
+framework_reliability owns the new isolated =/local/job40255479/worktrees/1160-pooled-rate=, branch =fix/1160-pooled-rate-40255479=, based on frozen4cab.
+Country must remain in both numerator and area/output identity, with explicit refusal for mismatched country-axis presence and null labels; country-less behavior, nutrient shares and parcel policy stay unchanged.
+The agent must reuse existing reducers/key helpers, pin both nutrient/land modes and column/index/collision/empty controls, provide untouched-base failures, measure complete hash impact and stop all writers before independent review.
+windows_ci will independently review the final frozen worker source; no executable review starts before that freeze.
+#1160 implementation is frozen and clean at =532d58700fa46e52a0b390198604eca1dc4de00e=, runtime =5125d0faa=.
+The producer's347 focused tests pass with two explicit Nigeria private-cache skips; untouched4cab has80 failures/seven passes across87 new controls.
+A first candidate's two empty pooled parcel dtype failures were fixed and retained in the report.
+All549 country/2139 wave/39 tagged hashes are unchanged; strict API audit passes.
+Independent review is complete and PASS:387 cases, two explicit Nigeria warm-cache skips, fifteen S3 deselections; twelve new mathematical controls fail on unchanged4cab.
+Real Malawi/Uganda comparisons match separate Feature calls, reversed rows and country-column forms for all four nutrient/land combinations; eight ordinary calls match the old function exactly.
+Every549/2139/39 fingerprint and the private physical cache/source identities remain unchanged.
+[[file:1160-review/REVIEW.org][Independent review]] (fourteen artifacts, all manifest hashes verified).
+Existing #1110 is explicitly retained: Malawi's33402 plot/11622 parcel results contradict the old function docstring's no-op claim, as already documented in CONTENTS; Uganda remains0/509. Both functions reproduce the counts.
+Draft [[https://github.com/ligon/LSMS_Library/pull/1165][PR #1165]] uses frozen4cab as its comparison base, with all nine published file blobs verified against reviewed532. After the earlier PRs land, update from development and retarget; do not merge into the comparison base.
+A separate immutable =framework-rate= integration worktree points at that same532 source for parallel full-suite validation, with a new1519-file physical L2 copy and sixteen pinned loadfile workers. The final run passes8851/276skipped/9xfail/1xpass,1222warnings,zero failures/errors or credential skips in736.35seconds. All87 added cases pass; all9050 existing outcomes/reasons match4cab exactly, including the directly observed Pakistan XPASS. Source stays clean with no in-tree country parquet. [[file:rate-validation/REPORT.org][Final full-suite report]].
+New [[https://github.com/ligon/LSMS_Library/actions/runs/39533863014][manual CI39533863014]] runs exact532: unit, Windows smoke, native Windows, credential gate, Uganda build and credentialed Linux full suite all pass. Native digests and row/wave counts match; [[file:rate-validation/windows-native-summary.json][native evidence]].
+The4cab evidence and run39531148624 remain an exact earlier-batch control, never a claim about the later rate fix.
+The final-source packaging dry-run passes: both archives contain all11753 tracked package files with exact bytes, version0.15.0.post396.dev0+532d58700, and installed config discovery passes with network/data builds forbidden. All processes stopped and worktree clean. [[file:rate-packaging/REPORT.org][Final-source packaging]]. No release/tag/shared environment change.
+No further merge or release authorization has arrived.
+
+* Completed earlier remote gate and release preparation
+
+The exact4cab [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][credentialed GitHub run]] completed successfully: 6,301 passed, 2,744 skipped, four expected failures, one non-strict unexpected pass, zero failures/errors, 1,219 warnings in 5,048.88 seconds; 9,050 collected cases.
+The data-job checkout SHA is verified; Uganda nutrition actually executed and passed, rather than skipping.
+The credential gate and Uganda build passed; no runtime credential-failure/skip indicator was emitted.
+Remote console output does not enumerate every skip reason, so the entire remote skip population is not claimed individually adjudicated.
+The actual runner BLAS kernel remains unobserved.
+[[file:ci-followup-4cab/REPORT.org][Exact-head reconciliation]], [[file:ci-followup-4cab/verification.json][aggregate evidence and private-log identity]].
+These results cover4cab, before #1160; the distinct final532 credentialed run also passes, with its own evidence below.
+
+[[file:release-drafts/RELEASE_NOTES_DRAFT.md][Draft release notes]] and [[file:release-drafts/MIGRATION_DRAFT.md][migration notes]] cover only the approved increment, not the entire history sincev0.15.0 or a release announcement.
+The migration note records country-axis changes, explicit invalid-input refusals, automatic harmonized-cache rewarming and decimal-comma interpretation.
+The [[file:release-closure/REPORT.org][completed release-closure audit]] refreshed all32 candidate issue bodies and every comment, plus #778/#932, and verified the actualv0.15.0 tag and supporting source ancestry.
+Thirty-two issues are conditionally eligible after landing and an authorized release merge:23 already on development plus nine issue fixes in the proposed batch.
+This is a scoped audit, not every repository issue; the exact list and retained follow-ups are recorded.
+#778 remains OPEN for its trust-mode note; #932 remains OPEN for enforcement.
+[[file:release-closure/closing-keywords.txt][Prepared closing keywords]] are only a draft for an eventual authorized release PR; no issue has been closed.
+The [[file:reliability/policy-current.json][fresh read-only protection snapshot]] confirms only unit-tests is required on development; #932 remains unapplied.
+No further merge, release, tag, protection or shared-cache promotion action is authorized.
+
+* Final exact-source remote gate complete
+
+The final [[https://github.com/ligon/LSMS_Library/actions/runs/39533863014][run39533863014]] at =532d58700fa46e52a0b390198604eca1dc4de00e= completed SUCCESS.
+Actual data-job checkout is verified; unit, Windows smoke, native Windows and credentialed Linux jobs pass.
+The final remote suite reports6,388 passed,2,744 skipped,four expected failures,one non-strict unexpected pass,zero failures/errors,1,219 warnings in5,484.84seconds;9,137 collected cases.
+Uganda nutrition actually executes and passes; its terminal marker is a pass at the unique expected49/53 fixture position.
+All87 new rate cases execute and pass in their unique terminal group; the pass/collection count rises87 versus the earlier4cab run, with every other summary count unchanged.
+The credential gate and Uganda build pass, and all six runtime credential-failure/skip indicator counts are zero.
+The remote console does not enumerate every skip reason; individual adjudication of all2,744 skips and observation of the actual BLAS kernel are not claimed.
+[[file:ci-final-532/REPORT.org][Final exact-head reconciliation]], [[file:ci-final-532/verification.json][verification]], [[file:ci-final-532/two-head-comparison.json][separate-head comparison]].
+
+All approved implementation and validation work is complete; no further framework increment is recommended for this bounded candidate.
+Next: obtain a single explicit batch merge override for PRs1154--1157 and1161--1165 plus evidence1158, land in dependency order after retargeting the stacked publication branches, verify merged runtime/test/build/audit bytes against532 and observe development CI.
+The backlog-workflow requires human merge; the existing override covers1153 alone.
+No merge, release/tag, protection change or shared-cache promotion is performed by this checkpoint.
+Release preparation still requires an authorized development-to-master merge and final release instruction; draft notes cover only the approved increment.
+
+* Environment and reproducibility
+
+Working clone =/local/job40255479/mirrors/LSMS_Library=; durable origin =/global/home/users/ligon/mirrors/LSMS_Library=.
+The durable working tree was never edited by hand.
+Allocation 40255479 on n0071.savio3 has 32 cores and 93 GiB RAM, with a 72-hour initial limit.
+The shared squashfs image was extracted with unsquashfs after FUSE returned Operation not permitted; no shared environment was changed and the launcher .venv directory was left intact.
+Interpreter =/local/job40255479/venv_img/bin/python=; pandas 3.0.6, numpy 2.4.6, pyarrow 25.0.1, ligonlibrary 0.2.3, fooddatacentral 1.0.13, pytest 8.4.2.
+All API/test processes assert executing package/config identity and own private writable L2 roots; only content-addressed L1 is shared.
+The original physical-copy manifest is [[file:validation/private-copy.json][private-copy.json]]; the combined suite used another 1,519-file copy with matching bytes/distinct physical identities.
+Raw logs/XML/frame snapshots remain private; aggregate report files include their identities and runnable scripts.
+The existing October14 corpus validator/fingerprint is reused through [[file:validation/run_corpus.py][run_corpus.py]].
+
+Detailed reconciliation: [[file:contracts/REPORT.org][contracts]] and [[file:reliability/REPORT.org][reliability]] overlap (46 + 30 dispositions covering 75 unique issues before #1159); do not sum them into 76 distinct issues.
+No new estimator, data source, scientific default, release tag or shared-cache promotion was introduced.
+
+Sue, GPT-6.

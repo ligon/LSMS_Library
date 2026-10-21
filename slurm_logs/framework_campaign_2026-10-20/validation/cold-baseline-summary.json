@@ -1,0 +1,112 @@
+{
+  "source_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "declared_requests": 549,
+  "countries": 38,
+  "status_counts": {
+    "success": 530,
+    "error": 19
+  },
+  "driver_exit_code": 1,
+  "note": "Known source/wiring errors remain nonzero, not a blanket pass. Combined exact-head comparison is still pending.",
+  "error_cells": [
+    {
+      "country": "Armenia",
+      "table": "household_characteristics",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Armenia",
+      "table": "household_roster",
+      "exception_type": "FileNotFoundError"
+    },
+    {
+      "country": "Nepal",
+      "table": "assets",
+      "exception_type": "FileNotFoundError"
+    },
+    {
+      "country": "Nepal",
+      "table": "cluster_features",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_acquired",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_expenditures",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_prices",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_quantities",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "household_characteristics",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "household_roster",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "individual_education",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "interview_date",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "sample",
+      "exception_type": "FileNotFoundError"
+    },
+    {
+      "country": "Peru",
+      "table": "food_acquired",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "food_expenditures",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "food_prices",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "food_quantities",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "individual_education",
+      "exception_type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "interview_date",
+      "exception_type": "RuntimeError"
+    }
+  ],
+  "measurement_error_cells": [],
+  "inventory_sha256": "e5fc6494c52abb522f24633955600cba0847b0a257fbcf2b29f2a1a77502e765",
+  "completion_sha256": "2c2aa29b0e3a9c80e6a1c9d946603a23348b876a3b91741b2ffcd25fb60162d2",
+  "private_output": "/local/job40255479/corpus-baseline-out"
+}

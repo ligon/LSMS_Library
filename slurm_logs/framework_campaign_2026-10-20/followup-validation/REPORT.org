@@ -1,0 +1,79 @@
+#+title: Framework follow-up validation
+#+author: Sue
+#+date: 2026-10-20
+
+* Frozen source and scope
+
+Validate exact =4cab5f0db7d375ad543e652f61f43bd28fa94ecd= in =worktrees/framework-followup= against the completed exact-852 local suite and canonical audit.
+The parent independently reviewed source identity; the integration combines country-preserving seed/nitrogen reducers, the assumed-fresh missing-file recovery, provenance controls and the bounded Uganda nutrition CPU fingerprint allowance.
+No source, test, fixture, branch or GitHub state was changed during validation.
+The controller asserts exact cwd, package import, countries root and private data root in the same process before =pytest.main=.
+It records versions, selected BLAS runtime, SHA, affinity and the prepared copy manifest.
+
+The suite uses 16 =loadfile= workers on CPUs 0-7,20-27, a 600-second thread timeout, and BLAS/OMP/MKL/build/make counts of one.
+The farm lane uses CPUs 28-31 and a different writable physical L2 copy.
+Both copies start from the immutable exact-852 corpus through the prepared private seed: 1,519 files / 341,221,428 bytes, checked hashes and distinct L2 inodes.
+Only content-addressed L1 is linked.
+The suite may mutate its own cache; original corpus roots and the farm lane are isolated from those test mutations.
+
+* Full suite
+
+The completed suite passes: 8,764 passed, 276 skipped, nine xfailed, one non-strict xpassed, 1,222 warnings, and zero failures/errors in 765.96 seconds.
+All 16 workers reported; final HEAD and tracked source remain unchanged.
+The exact-852 suite had 8,562 passed, 285 skipped, nine xfailed and one xpassed over 8,857 cases; the follow-up has 9,050 cases.
+There are 198 new passing node IDs and five replaced/renamed old IDs, a net increase of 193 cases.
+One existing declared-factor Feature test expands to two colliding/distinct-household cases, while four provenance tests are renamed/reworked around the approved held-versus-queued release and acquisition-only correction contracts.
+
+All nine removed skips now pass: the eight Uganda raw food_acquired wave invariance cases and the Nigeria plot_inputs poisoned-cache rebuild control.
+There are no new skips, changed remaining skip reasons, or credential skips.
+Cache seed state and test ordering differ from the earlier suite, so these transitions are not attributed causally to a specific fix without a controlled experiment.
+The pass increase reconciles exactly: 198 new passing IDs minus five old IDs plus nine former skips equals 202 additional passes.
+All nine xfails retain the same node IDs and reasons: five existing #602 tenure-vocabulary cases and four countries whose source lacks sampling weights.
+
+The candidate directly records the one XPASS as Pakistan's test_extraction_is_cluster_grain.
+Its existing non-strict marker remains: the check covers the wave artifact's existence, absence of household i, 300-row cluster grain and unique index, not broader source correctness or cross-wave cluster identity.
+The old JUnit encodes non-strict XPASS as PASS, so exact baseline XPASS node identity is not claimed.
+The separate expected-checkout import-identity test is an ordinary PASS with LSMS_EXPECTED_ROOT set.
+The warning count changes from 1,388 to 1,222; no general scientific or performance claim is inferred from that count.
+Raw pytest log, XML, per-case events and warning messages remain private.
+
+* Farm audit and actual warm APIs
+
+Three canonical features, phases 1 and 2, produce 322 warnings and no errors or failures.
+All 76 non-runtime records, including metrics, exactly match the earlier exact-852 canonical scan.
+All 29 Class B warnings remain visible, including the documented EthiopiaRHS crop exclusion while its frame lacks plot grain.
+No new assembly finding or error/fail pair appears.
+
+The audit has 60 fewer runtime warning records: 45 cache rebuild notices, six missing-Makefile fallbacks, and nine baseline-only Makefile candidate failure messages naming Nigeria.
+There are no added exact warning records after normalizing checkout/cache paths.
+The earlier Nigeria candidate subprocess failure cause was not established and is not inferred here.
+The present scan's private cache matches all 1,519 prepared immutable-852 files byte for byte; this is a direct cache-state control, not a scientific reinterpretation of the warnings.
+The existing warnings remain findings for their original scopes.
+
+All three actual warm participation checks pass in 87.39 seconds.
+The actual pooled plot_inputs Feature contains 792,775 rows across 14 warm countries.
+Both reducers exactly equal concatenated separate single-country Feature reductions, reversed country order, and a country-column representation.
+Seed output has 200,346 rows; nitrogen output has 75,784 rows.
+Both use =(country, t, i, plot_id)=.
+GhanaLSS and Guinea-Bissau produce empty output under both the separate and pooled reductions; the other 12 countries have nonempty output.
+Country identity is preserved for surviving rows; the contract does not manufacture rows after existing filtering or nonconvertible-unit paths.
+No broader claim of scientific coverage or completeness follows from these checks.
+
+Before assessing farm findings, country CONTENTS documentation was read, including live caveats and LOGBOOK entries.
+=country-guidance.json= records document hashes and named idiosyncrasies.
+The EthiopiaRHS wrong-wave WAITING note appears in prose, not a TODO heading; it was read explicitly.
+No country-source contradiction was resolved by assuming that guidance stale.
+
+* Reproduction and evidence boundaries
+
+=run_suite.py= requires an explicit final SHA and verifies the untouched prepared physical copy against the manifest before pytest.
+Its XML and JSONL event metadata are private; =report.wasxfail= records candidate non-strict XPASS identity directly.
+The baseline JUnit treats a non-strict XPASS as PASS, and the baseline terminal log counts one XPASS without an explicit per-test outcome record, so exact baseline XPASS identity is not asserted.
+A candidate XPASS remains an expected-failure marker that happened to pass; it does not certify the associated issue resolved.
+
+=prepare_farm.py= copies from the untouched private suite seed before the suite launches, never from a live mutable original corpus.
+=run_farm.py= runs the scanner, three warm tests and =live_reducers.py= sequentially on that separate root.
+=summarize_farm.py= and =classify_farm.py= retain the RHS exclusion and classify warning changes without exporting raw messages.
+All raw findings, survey identifiers, full logs and private operand files remain outside tracked evidence.
+The separate provenance roundtrip census is supplied by its independent validator.
+Zero build fingerprint movement does not require another duplicate full cold corpus; the existing exact-852 corpus is the controlled seed.

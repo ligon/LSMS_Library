@@ -1,0 +1,10 @@
+{
+  "body": "Found by red-team r1 of #1035 (`fix/1035-nigeria-w1-kg`), live on `development`.\n\n`transformations._parse_explicit_metric` reads the number in a unit label with a pattern that does not understand a comma. It reads `1,500 kg` as 500, which is why #1035's Nigeria spellings carry no thousands separator. The same pattern also misreads a **decimal comma**, the French-style spelling the EHCVM countries use. That is live today in served food numbers, all on the `metric` rung, with no declared `unit_kg` overriding any of them:\n\n| country | label | served kg per unit | should be | rows |\n|---|---|---|---|---|\n| Senegal | `Bouteille de 1,5 L` | 5.0 | 1.5 | 783 (385 in 2018-19, 397 in 2021-22); 8,974 kg served |\n| Senegal | `Filet (2,5 kg)` | 5.0 | 2.5 | 1 |\n| Benin | `Bidon de 1,5 L` | 5.0 | 1.5 | 120 |\n| Benin | `Bidon de 0,5 L` | 5.0 | 0.5 | 3 |\n| Benin | `Sac (2,5 Kg)` | 5.0 | 2.5 | 3 |\n| C\u00f4te d'Ivoire | `Sac (0,9 Kg)` | **9.0** | 0.9 | 36 |\n\nFurther latent spellings: `12,5 cl` reads as 0.05 (`Senegal/_/units.org`, `lsms_library/categorical_mapping/ehcvm_units.org`, Senegal `categorical_mapping.org`).\n\n**Fix.** Make the number token in `_EXPLICIT_METRIC_PATTERNS` comma-aware:\n- `\\d+,\\d{1,2}\\b` is a decimal;\n- `\\d{1,3}(,\\d{3})+` is a thousands separator, unless it starts with `0,`.\n\nAdd doctests or tests for `1,5 L`, `0,9 kg`, `12,5 cl`, `2,5 Kg` and `1,500 kg`, and give before/after `food_quantities(units='kgs')` and `food_prices` for Senegal, Benin and C\u00f4te d'Ivoire.\n\n**Cache cost.** The derived food tables are read-time, so the food side costs no re-warm. But `transformations.py` reaches every GhanaLSS L2-country hash through `nutrition.py`'s import. Stash-probe it before landing.\n\nTier A. A served-number defect with an exact, mechanical fix.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1143,
+  "state": "OPEN",
+  "title": "_parse_explicit_metric misreads decimal commas: Senegal 'Bouteille de 1,5 L' served 5.0 kg, C\u00f4te d'Ivoire 'Sac (0,9 Kg)' 9.0 kg (945 served rows)",
+  "updatedAt": "2026-10-19T22:58:04Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1143"
+}

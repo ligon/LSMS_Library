@@ -1,4 +1,211 @@
-#+title: Handoff -- v0.15.0 released 2026-10-15
+#+title: Handoff -- framework campaign, 2026-10-20
+
+* Latest landing checkpoint -- all nine fixes merged
+
+Maintainer explicitly authorized1154--57+1161--65+evidence1158. No further merge approval needed for that batch.
+AllnineimplementationPRsMERGED; development1933434b84de82ac72b3921a7fd8fe5c00154754 synchronizedGitHub/local/origin.
+All14,437candidate532pathsretainmode/type/blob; onlyfourlater1157reviewreportsadded. Full193tree=23c1publicationtree.
+Source532/runtimeworkerrefsremainfrozen; privateandpubliclanding/source-equivalence.json holdsrootproof; independentcontractsSTATICPASScomplete; sixfrozenartifactslanding-independent/.
+RetargetedPRs11/39/12/9taskblobsunchanged;latestunit/windowssmokepassedbeforemerges. No failures.
+Updated778/1159/1160existingstatusheadersonly; allissuesOPEN.32implementedreleaseclosurecandidatesawaitauthorizedmasterrelease;778partial/932enforcementretained.
+Evidence1158isbeingupdatedfromdevelopment/authorizedformergebutnotyetlandedatthissnapshot.
+ImplementationpushCI39547934263at193pending/inprogress. Afterevidencemerge, observeFINALdevelopmentpushunit/smoke/native, recordactualmergeSHA/run/conclusioninPR1158body (durableliveoutcome), and reportfinish.
+ThefinaldocumentationsnapshotdoesnotclaimfutureCIpass; retrieveGHcurrentHEADandPR1158bodyforcompletedstatus.
+No needrepeatfullsuiteifruntime/test/build/auditfilesremainbyteidentical532; manualcandidateCI6388passes/local8851/nativePASS alreadycomplete.
+Nextfinish1158only, verifyfinalruntimeidentityanddevelopmentCI; noadditionalframeworkimplementationorpermissionquestion.
+No release/tag/protection/cachepromotionauthorization; releaseassessment/completehistorynotes/mastermerge remainseparate.
+Allnodeheavyworkdone; nodebilled/idle, suggest sucoder release whenpausing.
+
+* Earlier active landing -- maintainer authorized the batch, 2026-10-20 21:52 PDT
+
+Human explicitly said yes/go to merging1154--57+1161--65 and evidence1158 into development in dependency order. No repeat permission needed for that batch.
+Merged1161ac6de755e,1154047d1ff51,1155f46dc011f,1156064a7fb46,115709a413ab4; live/source/origin development09a413ab4.
+Retargeted/ready1162head dffb07604,1163head124c2436d,1164head d124c0df7 aftermergingdevelopmentintoisolatedpublicationworktreesland-{1162,1163,1164}.
+All11/39/12reviewedtaskblobsandGitHubfocuseddiffsverifiedunchanged;newunit/WindowsPRchecksrunningparallel.
+No sourceworker/ref mutations; original532 candidate frozen.
+Landingcontrollers/journalprivate control/framework-campaign/landing/; update_publications.py reproducibleandpublication-updates.json capturesheads/blobs.
+FirstAPImerge attemptwithcoder@sucoder.dev rejectedbeforeanymerge; retriedusingauthenticatedGitHubidentity+GPT-6trailer.
+Firstpublicationhelperstoppedaftercommitbecausehooksuccesslinearrivesstderr; independentlyverifiedoriginrefdffbpublished/resumedwithoutrecommit. No productionfailure orlostwork.
+Nextwait1162--64latestchecks,mergeexactheads,fetch/syncdevelopment;updateretarget1165fromlatestdev,verifyall9blobsunchanged,waitchecks/merge.
+Thenverifyallruntime/test/build/auditbytesagainst532,updatedocs1158fromdev/reportlanding+handoff,mergeauthorizedevidencePRandwatchfinaldevelopmentCI. Onlythenfinish.
+No release/tag/protection/cachepromotionauthorization; don'tclose32releasecandidatesbeforeauthorizedmasterrelease.
+
+* Earlier final validation checkpoint -- 2026-10-20 21:18 PDT
+
+Final frozen532 run39533863014 SUCCESS at exactactualcheckout; unit/smoke/native/dataallPASS.
+Data119005820593:6388passed2744skipped4xfail1xpass1219warnings5484.84s,9137collected,zero failures/errors.
+Nutritionuniquepassmarker49/53;all87ratecasesuniqueall-dotgroup;parentverifiedrawlogSHA433f75da9a8442a7ff43ad17670c83af80d4c71ed8235dfc7ae57aacc7dfc585.
+Credentialgate/UgabuildPASS/all6runtimecredentialindicatorcounts0;allremoteskipreasonsnotenumerated/kernelunobserved.
+Old4cabalsoPASS6301/2744/4/1;finaladds87passes/collectedandnoothersummarydelta.
+Alllocalimplementation/review/validation/packaging/releaseprepCOMPLETE;source532immutableandallwritersstopped.
+CurrentpublicreportsSTATUS.org/rate-validation/ci-final-532/release-closure/release-drafts.
+Closure32conditionalafterlanding+authorizedmasterrelease;778partial/932enforcementOPEN. Noissuesclosed.
+AllninefixPRbodies+evidenceupdated/readbackverified;markingready1161+1158;1162--65remainstackeddraftuntilretargetafterprerequisites.
+Noadditionalmerge/releaseauthorizationhasarrived. NextaskONEbatchmergeoverridefor1154--57,1161--65andevidence1158;quote/linkbacklogskillrule88.
+Afterapproval:1161then1154--57;mergedevintoseparatepublicationbranches/retarget1162--64;checkbyteequivalenceandchecks/merge;repeat1165;finalmergedruntimebytesmustmatch532,observeactualdevpushCI.
+Nevermergeintointegrationcomparisonbases/forcepush/mutatefrozenworkerheads. EvidencePRlastifincludedapproval.
+Noextrafullsuiteifruntime/test/build/auditbytesidentical;release/tag/protection/cachepromotionstillseparate.
+Allnodeheavyworkdone;allocationbilled/idle, suggest sucoder release whenpausingafterreportsdurable.
+
+* Earlier remote checkpoint -- 2026-10-20 20:46 PDT
+
+Main docs branch unchanged; final source532 immutable.
+Earlier exact4cab remote run39531148624 COMPLETED SUCCESS:6301passed2744skipped4xfail1xpass1219warnings5048.88s,9050collected.
+Actualcheckout verified; nutritioncase executesPASS(marker. at49/53); credentialgate/UgabuildPASS, credentialindicatorcounts0; allremote skipreasonsnotenumerated.
+Public aggregate/controller export=ci-followup-4cab/, distinctfrompending532.
+Final532run39533863014/data119005820593 remainsrunning; unit/smoke/nativePASS, gate/buildPASS.
+contracts owns read-only45sobserver39231; keepallsourcefrozen/noresubmission.
+Draftrelease/migrationnotes exportedrelease-drafts/ (scopeapprovedincrementonly, Linuxpendingtimestamp; fourmanifestsourcepathscorrectedbyparent).
+reliabilityfinalreleaseclosureaudit pending;23post-v0.15alreadylanded+9approvedfixissuecandidates=32potentialafterlanding,778partialstaysopen. Verifyfinalreportbeforeclaim.
+Noadditionalmerge/release/protectionauthorization; nextfinish532CI/evidence, thenonebatchmergeoverridequestionwithskillquote.
+
+* Earlier active checkpoint -- 2026-10-20 19:52 PDT
+
+Sue/GPT-6, job40255479 on n0071.savio3,32cores93GiB,>2d20h left.
+Main docs branch=docs/framework-campaign-20261020, previouspublishedc30f8aa47; newfinal artifacts are being checkpointed now.
+Draft evidencePR1158; STATUS.org owns live state.
+
+Windows1153 alone is human-authorized/merged atdevelopmentad1e87e1025dec98fe70734f4e60d12824fd31dd (liveGitHubref independently checked19:44).
+Open original reviewed implementationPRs1154--57 cover1093/1099/1143/1124+1125.
+Open newdrafts1161nutritiondirectdev6553e01d6,1162cachef7eb,1163provenance44f6,1164pooled45f80,1165rate532d58700.
+1162--64base852integration;1165base4cab integration forclean diffs.
+AfterearlierPRsland,mergedevelopmentintopublicationbranches thenretarget; nevermergeintocomparisonbases/forcepush/sourceworkerbranches.
+All79publishedblobs1161--64and9blobs1165matchreviewedcommits.
+Noadditionalmerge/release/tag/protection/cachepromotionauthorization.
+
+LATEST FROZEN SOURCE=532d58700fa46e52a0b390198604eca1dc4de00e, allapproved fixes including1160.
+Worker1160-pooled-rate and separateintegrationworktreeframework-rate pointatthatHEAD, clean/immutable/publishedorigin+GitHubintegration/framework-rate-40255479.
+Runtime1160=5125d0faa; producer347pass/2explicitNigeria cache skips,baseline80fail7pass87controls;firstcandidate85pass2emptyparcel fails preserved/fixedcountry-only.
+IndependentreviewPASS387cases(347existing+40reviewer)/2skip/15S3deselect;12old-mathintentionalfailures;liveMalawi/Uganda4modesexactpooled/separate/reverse/column,8ordinaryoldfunctioncalls exact.
+0hashmoves549/2139/39;existing#1110Malawi33402plot/11622parcel contradictsoldno-opdocstring,documentedCONTENTS;Uganda0/509 inherited;notchangedby1160.
+Allproducer/reviewer/processesSTOPPED;14independentexportfilesverifiedmanifestdad6f823...copy1160-review/.
+
+LATEST FULL SUITE COMPLETE/session35359 exited0:8851passed276skipped9xfail1xpass1222warnings736.35s,0fail/error/credentialskips.
+All16workers/sourcechecksPASS,noin-treecountryparquet.
+Newphysicalrate-suite-data1519files341221428bytes,copyfromquiescentfarmrootwhosebytesmatchimmutable852;onlyL1linked.
+All87newcasesPASS;0removed/0existingoutcomeorreasondeltas vs4cab9050cases;directPakistanXPASSidenticalbothsides.
+Evidence/reprocontrollersrate-validation/;rawlogs/XML/eventsprivatecontrol/framework-campaign/rate-validation/suite-532d58700/.
+LatestpackagingPASS532:wheel/sdist0.15.0.post396.dev0+532d58700all11753packagefilesbyteexact,installedconfigsmoke/network+buildforbiddenPASS,cleanworktree/allprocessesstopped.
+Copied7rate-packagingartifacts;untypeddevversion/existingdeps/noinstalledmicrodatabuild/checkouttestsnotpackaged/uploadnotvalidatedlimits retained.
+
+ONLY REMOTE CREDENTIALED LINUX REMAINS.
+contractsobservesTWOdistinctmanualruns:39531148624exact4cabdatajob118997075291;39533863014exact532datajob119005820593.
+Bothunit/smoke/native/credentialgate/UgabuildPASS;bothdatafullsuitesRUNNING (532started~19:44).
+Native532job119005820748 verifiedshocks14457x10/8waves0ab2ea4c79dd/assets116808x1/8waves9202ed542a14,rawlogprivate rate-validation/windows-native.log.
+Rootoldwatchsession40278 alsoobserves4cab;contractsread-only45spollsandwillcapturefinaljoblogs/aggregatesincontrol/framework-campaign/followup-ci-review/{rate-532,earliercontrol}/.
+DoNOTcancel/redispatch/updatefrozenheads; keepfailed852run39519191762andoriginalcoldcorpuscontrols unchanged.
+
+Next:collectremoteLinuxresults,actualnutritioncaseexecutionandcredential-skiplimits;recordalloutcomes;finalizePRbodies/evidence/markreadywhenrealgatespass.
+ThenaskhumanbatchmergeoverrideforconcretereadyPRs underbacklog-workflow ('PRs for human merge -- never auto-merge');only1153overrideexists.
+AllnineimplementationPRbodiesupdatedwith532localPASSandlatestCIpending;new1165issueheaderrecordsretentionruling/pendingPR;778remainsAddresses/openfortrustnote.
+No moreimplementationtasks authorized/pending;1160isdone/reviewed.
+Node nowmostlyidlewhileexternalCIruns;afterfinalreports/decisions suggest sucoder release.
+
+Useextractedpython/local/job40255479/venv_img/bin/python,threads/build/make1,exactcwd/PYTHONPATH/config/privateLSMS_DATA_DIR.
+Nevereditdurablemirrorworkingtree orsharewritableL2; originalcorpusrootsimmutable.
+CommitwithSue/GPT-6attributionandcheckSUCODERpublished;GitHubpushusesexplicitURL,originisfilesystemmailbox.
+
+* Earlier campaign checkpoints -- 2026-10-20, Sue / GPT-6, job 40255479, n0071.savio3
+
+Windows PR #1153 is merged with explicit maintainer authorization at =ad1e87e1025dec98fe70734f4e60d12824fd31dd=.
+GitHub and filesystem-origin development are synchronized there through the clean =development-sync= worktree.
+Development push CI =39522182800= and the complete Windows-branch manual run =39515878586= both passed, including native Windows.
+The manual run also passed credentialed Linux data tests.
+
+Approved issues #1093, #1099, #1143, #1124 and #1125 are independently reviewed and in open PRs #1154--#1157.
+No merge authorization for those PRs has arrived.
+Frozen combined source =852ac2bfcd5f798533f56e7efa1f77db80c0138f= is published on GitHub/origin branch =integration/framework-v016-40255479=.
+Do not move that branch or edit its source while the remaining validators run.
+The main checkout is =docs/framework-campaign-20261020=, draft evidence PR #1158, and is safe for documentation updates.
+
+The combined full suite passed: 8,562 passed, 285 skipped, nine expected failures, one non-strict unexpected pass, zero failures/errors or credential skips, in 1,158.04 seconds.
+Independent reconciliation accounts for every skip difference; eight newly skipped Uganda wave-invariance cases passed separately after sanctioned API population in a new physical cache.
+All three farm warm checks passed.
+Exact unexpected-pass identity and the exact concurrent wave-file remover are not proved.
+
+Both exact 976/852 cold corpora completed all 549 requests: 530 successes and the same 19 normalized full error messages.
+Six intended food quantity/price tables change.
+Four roster hashes differ only by row order in paired cache and warm-API comparisons; Benin seeds 1/3 reproduce both original fingerprints on unchanged baseline.
+There are no schema, row-count, wave-count, null-count, cache-metadata or warning-category count deltas.
+A separate fresh fixed-seed Mali cold/warm supplement matches both sources exactly in original order, while preserving the inherited MonthsSpent cold-object/warm-string difference.
+Reports and runnable scripts are committed under =slurm_logs/framework_campaign_2026-10-20/=.
+
+Remaining validators:
+
+- Exact-head GitHub run =39519191762= completed FAILURE: one Uganda rawnutrition fingerprint failure,6107passes/2744skips/4xfail/1xpass in5374.11s; credential gate passed, unit/smoke/native Windows passed.
+- Paired 16-feature canonical audits, phases 1/2, run under =/local/job40255479/canonical-audit-compare/=.
+  Agent =windows_ci= owns them, with three workers per audit on CPUs 0--3 / 4--7, private physical caches and shared L1 only.
+  Both scans and all warning classification have completed; six Peru errors, five tenure failures and thirteen source skips remain identical.
+  All8,731 warning additions are accounted for; framework_reliability independently accepted both interview and remaining633 classifications with explicit limits.
+  Aggregate evidence and28 verified artifact hashes are copied into1124-1125/canonical/.
+  Do not restart the validators or mutate their preserved cache/source evidence.
+
+Full-suite exec 30937 and corpus execs 19447/23742 have finished.
+Raw evidence remains private under =control/framework-campaign/= and =corpus-{baseline,combined}-out= in this job's local root.
+
+Use =/local/job40255479/venv_img/bin/python= directly: the squashfs image was extracted after FUSE failed; never use the writable master environment.
+Always assert the exact PYTHONPATH, countries root, cwd and private LSMS_DATA_DIR; pin BLAS/build workers to one.
+Never edit the shared mirror's working tree.
+Original corpus roots are immutable; every replay uses a new physical copy.
+
+New independently verified issue #1159 tracks pooled seed/nitrogen reducers dropping country identity and summing colliding local plot IDs on both sources.
+The maintainer subsequently chose COUNTRY-PRESERVING pooled results and authorized delegation of the next pass; implementation is now assigned in a separate worktree.
+The #932 protection proposal remains unapplied; this personal-account repository cannot use the assumed organization merge queue.
+Requiring genuine PR-event data checks needs separate permission.
+#851 has substantial existing unlanded work; do not reimplement it.
+No release was requested or attempted.
+
+Next: finish paired audits and exact-head GitHub data CI; classify every delta; commit aggregate evidence; finalize STATUS/handoff; update PR validation bodies and ready evidence PR #1158.
+Implementation PRs #1154--#1157 remain for human merge under backlog-workflow unless the maintainer overrides that rule.
+Release/tag/publish, protection changes and shared-cache promotion are outside the authorized work.
+
+Campaign details: [[file:../slurm_logs/framework_campaign_2026-10-20/STATUS.org][STATUS.org]].
+Older checkpoints below are historical.
+
+** Newly authorized parallel follow-up
+
+The maintainer asked to delegate the next work now and ruled #1159: retain country in pooled results.
+All three worktrees are based on unchanged852; original integration stays frozen.
+
+- framework_reliability: =/local/job40255479/worktrees/778-cache-race=, branch =fix/778-cache-race-40255479=, CPUs8--11; implement remaining #778 only, preserving corruption policy.
+- framework_contracts: =/local/job40255479/worktrees/1115-1128-provenance=, branch =fix/1115-1128-provenance-40255479=, CPUs12--15; reuse existing unlanded613611578 and apply all newest rulings, code-only without live catalog/acquisition writes.
+- windows_ci: =/local/job40255479/worktrees/1159-pooled-reducers=, branch =review/1159-pooled-reducers-40255479=, CPUs16--19; implement country-preserving seed/nitrogen reduction identity, no unrelated scientific changes.
+
+Each uses the extracted interpreter, exact import/config identity, private writable L2, numerical/build threads one and <=4 loadfile pytest workers.
+They commit with attribution and verify origin publication; no GitHub push/PR/merge until parent coordinates independent review and dependencies.
+Next: finish original candidate CI/evidence, review and validate each new increment, then integrate/test the follow-up candidate. No release or protection changes.
+
+Follow-up checkpoint: #1159 frozen45f80dcb5/runtime da84c7c79 independently passes260 focused plus16 added controls. #778 frozenf7eb194d7/runtime2aef1c2ac independently passes67 controls; doc-only replacement count is corrected18. Reviewed increments are merged into new integration/framework-followup-40255479 at2ff4bc737, original852 unchanged.
+Provenance runtime519437658 is frozen for immutable-commit static review by framework_reliability; final ledger/evidence HEAD is still being prepared. Completed344 related +23 policy tests, API audit,130 SOURCE unchanged, zero549/2139/40 table-plus-aggregate hashes. Optional broad matrix interrupted exit2 after45 tests, two private wave parquets only, child group stopped; not a passed check. Wait for final HEAD/full stop before verifier execution.
+windows_ci is preparing combined follow-up validation and waiting for parent's final frozen integration pin. Prepared physical L2 root/followup-suite-data has1519 equal-hash/distinct-inode files from immutable852 corpus; source unchanged. Full suite planned16loadfile workers, CPUs0--7/20--31, BLAS/build/make1,600s thread timeout, exact same-process import/config/data assertions, logfile/XML. No execution yet.
+New inherited fertilizer_rate pooling residual is filed as #1160 with independent old/new synthetic proof; no implementation authorized.
+Original exact852 GitHub run39519191762 FAILED one raw Uganda nutrition hash check: actualf3d3...89fd6 vs approved12d25...50e3a; shape/schema/index/dtypes pass. Monitor242 completed; combined_ci_final is stored. No raw CI artifacts. windows_ci owns focused private nutrition/order/float/call-order diagnosis; contracts independently verified192matching package versions, same runner/image/Python/thread pins, and no Uganda/workflow/fixture/lock source delta between passing1d3 and852. Exact cause is now proven by fixed-input BLAS counterfactual, independently rerun by parent:SkylakeX12d25→Haswellf3d3→SkylakeX12d25,8cells/max2ULP. ActualCIkernel unlogged; no CI artifacts. Isolated repair worktree=uganda-nutrition-cpu-hash, branchfix/uganda-nutrition-cpu-hash-40255479 at852; windows_ci implementing optional exact nutrition-only variant while preserving primaryhash, allotherstructural/hashchecks, productionarithmetic. framework_contracts prepared independentreview, awaiting frozenSHA. Parent independent diagnosispublicartifacts committednextunder nutrition-ci-diagnosis/. Provenance round-one review found repeated PROVENANCE_SOURCE conflict canrender heldCATALOG_ID asnone; producer guardfix dbae899fa, revisedFULLFREEZE44f6cd2e7, allreadersstoppedbeforefix. framework_reliability round2 nowrunning:20 unchangedindependentcontrolsPASS; newcanonicalmetadata controlfailurebeingadjudicatedbeforeverdict. Producersuite347PASS,130SOURCE and549/2139/40hashesunchanged. Do not mutate44f6 duringreview. Follow-up full suite has NOT run; integration remains2ff4bc737 pending provenance review and nutrition diagnosis.
+
+** Follow-up final freeze -- 2026-10-20 19:07 PDT
+
+Provenance44f6cd2e7 independently PASS:370 repository +30 reviewer controls,130 SOURCE unchanged and zero549/2139/40 hash movements. Reviewer canonical-key assertion correction is disclosed, not hidden. Aggregate evidence copied to provenance-review/.
+Nutrition test repair98822ed1a independently PASS:14 reviewer +15 producer controls; actual full23777x15 Haswell/SkylakeX outputs accepted, +1.0 mutation rejected under both. Primary and all other manifest fields unchanged. Aggregate evidence copied to nutrition-repair-review/.
+All four follow-up increments are integrated at frozen4cab5f0db7d375ad543e652f61f43bd28fa94ecd, branchintegration/framework-followup-40255479, published origin/GitHub. No further source edits while validators run.
+windows_ci is authorized GO fullsuite16loadfile CPU0-7,20-27 plus separate physical farmcopy CPUs28-31; exact import/config/cwd/data assertions,threads/build/make1. Private followup-suite-data prepared1519files. Pending, no pass claim.
+GitHub fullmanualCI39531148624 queued on exact4cab, nativeWindows enabled. Root monitors; preserve original852failedrun39519191762.
+framework_reliability prepares reviewable incremental PR plan/bodies without GitHub mutations. framework_contracts performs private packaging dry-run without release/tag/publish/sharedvenv changes. No merge authorization beyond1153.
+
+** Published follow-up drafts -- 2026-10-20 19:19 PDT
+
+New drafts:1161 nutritiondirectdevelopment@6553e01d6,1162cache@f7eb194d7,1163provenance@44f6cd2e7,1164pooledreducers@45f80dcb5. Lastthreebaseintegration852forfocusedreviews; do notmergeintothatbase. Afteroriginal1154--57land, mergelivedevelopmentintoeachpublicationbranch, verifydiff/runtimebytes, retargetdevelopmentwithoutforce. Worker/sourcebranchesremainfrozen. All79GitHubfileblobSHAsacross4newPRsmatchreviewedheads;scopeauditPASS.
+Nutritionpublicationisfreshad1+fivecherrypicks;all17filesmatchreviewed98822,15authfreecontrolsPASSagain. No runtime dependencyontheoriginalfivefixes. AllcommitsDurablypublishedorigin/GitHub.
+Final4cabunit,smoke,nativeWindowsSUCCESS;datafullsuiterunning(job118997075291/run39531148624). Native shocks0ab2ea4c79dd/assets9202ed542a14,row/wavecountsunchanged. framework_contractsownsfinalCIobservation/aggregatereconciliation;rootwatchsession40278isrunningtoo. No newdispatchneeded.
+Scopedfarmcomplete:322warnings,0errors/fails;all76nonruntimefullrecords/metricsand29ClassBfindingsmatch852.60removedruntimewarningsfullyclassified45rebuild+6fallback+9NigeriaMakecandidatefailures(causenotinferred).1519farmcachebytesunchanged.3warmchecksPASS.14countries792775pooledinputrows:200346seed/75784Nresultrowsexactseparate/reverse/countrycolumn. GhanaLSS/Guinea-Bissauemptybothroutes,notbroadercoverageclaim. windows_ciownsfullsuite+finalcaseaccounting;stillrunningtailcasesat19:19,no passclaimyet.
+PackagingPASSexact4cabwheel+sdist0.15.0.post392.dev0+4cab5f0db;all11753packagefilesbyteidentical;installedconfigsmokePASSwithoutnetwork/data builds. Allpackagingprocessesstopped/worktreeclean. Evidencecopiedpackaging-review/. Notataggedreleaseorcleannewdependencyresolver/fullinstalleddata test.
+Rootupdatedoriginal1154--57bodieswithtruthfulcompleted852evidence/knownsingleCIfailure/1161repair/finalCIpending. Draft1158stillpendingfinalvalidation.
+Optionalquestionpending:implement#1160before0.16usingcountry-preservingruleorDeferdocumentedlimitation. Noanswer/authorizationyet; noimplementation. Do nottreatelapsedtime/preselectionasapproval. #932rulesetstillunappliedanduser-ownedrepoqueueunavailable;#851originnewercf117notoldGitHub8288.
+
+** Local4cab validation complete; #1160 approved -- 2026-10-20 19:25 PDT
+
+Localexact4cabPASS8764/276skip/9xfail/1xpass/1222warnings765.96s,0fail/error/credentialskips;all16workersexited0/sourceunchanged. Export18artifactsverifiedmanifest55fbf514...copyfollowup-validation/. RootindependentXMLcaseaccountPASS8857→9050,198newpass−5oldpass+9unskip,nootheroutcomechange;xfailIDsunchanged;baselineXPASSidentityunclaimed.
+Publicationplan/scopeauditcopiedfollowup-pr-plan/;all79GitHubfileblobsverifiedagainstworkerheads. AllfournewdraftPRunit/smokechecksPASS. Theirbodiesnowrecordlocal4cabPASSandremotecredentialedLinuxpending. #1159issuebodyrecordsretentionruling/pending1164;#778bodyrecordspending1162/unchangedtrustnote/Addressesnotclosure.
+USERANSWER:fix#1160before0.16country-preserving. reliabilityassignednewworktree1160-pooled-rate at4cab,CPU8-11,focusedimplementation+baselinecontrols/hashimpact/ledger/attributedcommits. NoGHwritesbyworker. windows_ciownsindependentreviewCPU16-19afterFINALwholeworkerfreeze/allwritersstopped. Rootmustnotlabel4cabCIastestoflater1160code. contractsownsremoteCI39531148624observation/datajob118997075291;currentunit/smoke/nativePASS,credentialgate/UgabuildPASS,datafullsuiteactive.
+Next:finish1160implementation/review,integratenewfrozenhead,appropriatefinalvalidation+PR;finish4cabCIwithoutdiscardingitsresult;humanmergepermissionstillneededunderbacklogskill. Neverautomergeorrelease.
 
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.

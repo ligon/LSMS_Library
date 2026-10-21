@@ -1,0 +1,71 @@
+#+TITLE: Prerelease packaging dry-run
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Result
+PASS for the requested packaging/config-smoke scope at =4cab5f0db7d375ad543e652f61f43bd28fa94ecd=.
+A separate detached worktree, =/local/job40255479/worktrees/packaging-4cab5f0=, remains clean.
+The frozen framework-followup worktree was not edited.
+All build, inspection, install and smoke subprocesses have exited.
+No tag, version bump, publish, GitHub operation or shared-venv installation was performed.
+
+Both wheel and sdist resolve the nonzero dynamic version =0.15.0.post392.dev0+4cab5f0db=.
+This is an untagged development build392 commits after v0.15.0, not a tagged0.16.0 release artifact.
+The wheel was built from the freshly generated sdist by the existing PEP517 build frontend.
+See [[file:build.log]] and [[file:archive-inspection.json]].
+
+* Payload verification
+Both archives contain all11753 git-tracked files beneath =lsms_library/=, with no missing files or byte differences against the exact source worktree.
+This covers the complete runtime code, country modules/configs/scripts, food/FCT tables, provenance documents, DVC sidecars and explicitly included DVC configuration assets.
+No =.dta=, =.sav=, =.parquet= or =.pkl= payload appears in either archive.
+The console-script entrypoint =lsms-library= maps to =lsms_library.cli:main=.
+The dynamic-version plugin restored the original pyproject sections and placeholder after the build; the worktree is clean.
+Archive byte sizes and SHA256s are recorded in =archive-inspection.json=.
+
+Checkout-only tests and =tests/fixtures/uganda_baseline.json= are absent from both archives under the existing package-only inclusion policy.
+They are CI regression assets, not runtime inputs; this dry-run does not claim that the source archive contains the repository's test suite.
+No include/exclude policy was changed.
+
+* Installed-wheel smoke
+The wheel was installed with =pip --no-deps --no-compile --target= into a new private directory, using dependencies already available in the extracted image.
+The smoke process ran outside every checkout, with PYTHONPATH naming only that installed target and LSMS_COUNTRIES_ROOT unset.
+It asserts the exact imported package file and the default installed country-config root.
+Installed distribution metadata and =ll.__version__= agree with the archive version.
+See [[file:installed-smoke.json]], [[file:installed-smoke.log]] and [[file:installed_smoke.py]].
+
+With urllib/socket networking and Country data builds explicitly forbidden, config-only operations report:
+-38 registered countries;
+-Uganda's8 declared waves and28 declared tables;
+-37 countries declaring household_roster through Feature config discovery;
+-the expected global roster required-column declarations.
+
+No Country/Feature data method is called and no parquet is produced.
+The wheel's =Country('Uganda', preload_panel_ids=False)= and =Feature('household_roster')= metadata paths use the installed package/configs successfully.
+Uganda CONTENTS was already read in the nutrition review, including the relevant coupled FCT/nutrition-write idiosyncrasy and the dated #967 approval; no country values or decisions are reconsidered here.
+
+* Tools and isolation
+The extracted image had runtime dependencies but no build frontend/backend.
+Existing pipx Poetry2.4.1 supplied read-only =build1.5.0= and =poetry-core2.4.0=.
+Only the missing backend and its small dependencies were installed into a private =build-tools/= directory:
+-poetry-dynamic-versioning1.10.1;
+-dunamai1.26.3;
+-Jinja2 3.1.6;
+-MarkupSafe3.0.4;
+-tomlkit0.15.2;
+-packaging26.3.
+
+PEP517 uses that declared dynamic-version backend directly through private PYTHONPATH; no Poetry self/plugin installation or shared/image venv mutation was needed.
+Pip, Poetry and XDG cache paths all name this private review directory.
+BLAS/OMP/MKL/build workers are1 and affinity is restricted to CPUs12-15.
+No catalog/API request, raw-data fetch or data build was performed.
+
+* Limits and next release step
+This is a local archive build and installed config smoke, using existing image dependencies rather than a clean dependency-resolution environment.
+It does not validate a full installed microdata build, all optional runtime paths, remote artifact upload or a tagged0.16.0 version.
+The normal release skill still requires an authorized release tag and the publishing workflow's nonzero-version check; no release action was attempted here.
+
+Artifacts remain private at =/local/job40255479/control/framework-campaign/packaging-review/dist/=.
+Runnable commands are in [[file:reproduce.sh]]; archive and installed-smoke scripts are adjacent.
+No raw household rows or credential values are copied into these report artifacts.
+
+Sue

@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #698 (`fix/698-kinship-affinity`); red-team r1 verified the counts.\n\n- `Other re` (71 people) is filed `[0, 0, unrelated]`. As an 8-character truncation its most plausible expansion is \"Other relative\", which would be `[null, null, consanguineal]`.\n- `Niece/Ne` (455 people) is filed `[-1, 2, consanguineal]`. Every other niece/nephew key in the file is Distance 1, so either the full label adds cousins or the Distance is a typo.\n- Kosovo has no in-law code at all, which is plausible for the questionnaire but unverified.\n- Both need the Kosovo 2000 questionnaire or the full `.dta` value labels.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1103,
+  "state": "OPEN",
+  "title": "Kosovo 2000 kinship: truncated labels 'Other re' (71) and 'Niece/Ne' (455) need the code list",
+  "updatedAt": "2026-10-19T18:30:36Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1103"
+}

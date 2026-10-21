@@ -1,0 +1,31 @@
+{
+  "countries_root": "/local/job40255479/control/framework-campaign/rate-packaging/installed-target/lsms_library/countries",
+  "data_builds_forbidden": true,
+  "data_root": "/local/job40255479/control/framework-campaign/rate-packaging/installed-smoke-data",
+  "network_forbidden": true,
+  "no_parquet_produced": true,
+  "package_file": "/local/job40255479/control/framework-campaign/rate-packaging/installed-target/lsms_library/__init__.py",
+  "registered_countries": 38,
+  "roster_declaring_countries": 37,
+  "roster_required_columns": [
+    "Sex",
+    "Age",
+    "Relationship",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "scope": "Installed wheel config discovery only; no installed data build",
+  "uganda_declared_table_count": 28,
+  "uganda_waves": [
+    "2005-06",
+    "2009-10",
+    "2010-11",
+    "2011-12",
+    "2013-14",
+    "2015-16",
+    "2018-19",
+    "2019-20"
+  ],
+  "version": "0.15.0.post396.dev0+532d58700"
+}

@@ -1,0 +1,10 @@
+{
+  "body": "From the #781 follow-up (`fix/781-dropped-verdicts`).\n\n*(Corrected from the first run: for 1988-89, reading the PDF re-checks GLSS1's form, not GLSS2's.)*\n\n**What.** Both rows say \"C4 could not run\" because `\u2026/GHA_198{7,8}_GLSS_\u2026Questionnaire_EN.pdf` are CCITT-fax scans with no text layer. The pages *are* legible when extracted as images (pypdf, as used for the #781 `food_prices` verdicts).\n\n**But** the 1988-89 PDF is GLSS1's scan republished: all 78 page images are identical to GLSS1's (stream bytes and decoded pixels), and the cover is one filled-in household (\"CLUSTER 03 HOUSEHOLD 07\"). See `GhanaLSS/_/CONTENTS.org`, \"Two facts\".\n\n**Do.**\n- 1987-88: read the 78 page images for any food-adequacy item, and close the row (`not-asked`) or keep it on evidence.\n- 1988-89: the same reading reaches GLSS2 only through the joint BID. Its 1988-89 edition, `GHA_1988_GLSS_Basicinfo_EN.pdf`, says on p.3 that the household questionnaire was \"repeated\", and lists the 1988-89-only sections: 0B/0C (survey summary and observations) and 17A-C (cognitive tests).\n  - State that chain in the evidence, or keep `unsure` if the BID's section list is not judged sufficient C4 for a wave whose own form is not shipped.\n  - The latter would make it a candidate for `asked-not-distributed`-style acquisition of the real GLSS2 form.\n\n**Tier:** B.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1131,
+  "state": "OPEN",
+  "title": "Re-check the GhanaLSS `food_security` 1987-88 and 1988-89 `unsure` verdicts: the GLSS1 questionnaire scans are readable as images",
+  "updatedAt": "2026-10-19T22:48:38Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1131"
+}

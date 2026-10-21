@@ -1,0 +1,80 @@
+#+title: Independent remaining canonical warning-delta review
+#+author: Sue
+#+date: 2026-10-20
+
+* Acceptance
+
+Accept the remaining633-warning classification at frozen852ac2bfc versus976fc840d.
+No unexplained added semantic or assembly finding is exposed by these paired artifacts.
+This closes the scope deferred by the interview-date review; it does not declare the audit semantically green.
+No library API calls, tests/builds, cache writes, source/git/GitHub mutations.
+All reviewer processes have stopped.
+
+* Accounting independently verified
+
+Complete normalized warning-record multisets reproduce674 additions and41 removals, net633:632 Class C and1 Class B, with no added Class A.
+This includes context and metrics, not only coarse warning fingerprints.
+Public reports/reproducers are byte-identical to their private counterparts.
+Every exported family/count and cold-message witness count reproduces against the private raw records.
+
+| Family | Add | Remove |
+|--------+-----+--------|
+| Explicit STALE stored-hash mismatch notices | 284 | 1 |
+| UTF8 decoding fallback | 259 | 0 |
+| Categorical mapping | 46 | 0 |
+| Missing Makefile fallback | 36 | 0 |
+| Source grain conflicts / cached replay representation | 8 | 8 |
+| Missing cluster-key exclusions | 4 | 0 |
+| Tanzania cluster-design warnings | 2 | 0 |
+| Peru cluster projection | 1 | 0 |
+| Peru person-id repair, Class B | 1 | 0 |
+| Guyana weight-only exclusion | 1 | 0 |
+| EthiopiaRHS acquisition-source exclusion | 1 | 0 |
+| Metric/inference conflict message changes | 30 | 30 |
+| Existing quantity reaggregation warning changes | 1 | 1 |
+| Baseline-only Nigeria Make warning | 0 | 1 |
+| Total | 674 | 41 |
+
+All284 added and the one removed rebuild notice explicitly state stored-hash mismatch; the family name was not accepted on a generic cache-miss prefix alone.
+Thirty metric/inference messages change on each side and match their own runtime's cold controls, consistent with the separately verified parser quantities.
+Warning emission volume and runtime cost are real changes, not waved away as identical behavior.
+
+* The added Class B finding
+
+The exact serialized warning is the existing Peru household_roster person-id repair.
+It appears once with category RuntimeWarning in EACH independently cold976 and852 control.
+Peru mapping.py is byte-identical at both heads.
+CONTENTS was read before country assessment, including the TODO/WAITING/LOGBOOK search; the relevant idiosyncrasy at830-848 is the unique roster numbering defect corroborated by three other modules, guarded repair, and warn-on-every-build policy.
+The document explicitly says future duplicates failing that precondition are dropped with warning, not silently first()-collapsed.
+This classification confirms existing warning exposure, not a new person-id policy or an independent re-adjudication of the cross-module source evidence.
+The exact local Peru roster is unchanged.
+
+* Stronger value and diagnostic controls
+
+Independently compared all125 listed local cache frames:16,139,392 rows across cluster_features,sample,household_roster,food_acquired.
+Index, column, dtype and cell values match exactly after allowing only row-order differences in four rosters: Benin,Burkina_Faso,CotedIvoire,Guinea-Bissau.
+Every producer order-only flag reproduces.
+Uganda cluster_features, Peru household_roster and Nigeria food_acquired compare exactly without sorting.
+All8 Uganda cluster grain-audit footer reports also compare exactly, supporting the8 warm-replay to8 source-build warning representation changes.
+No grain conflict is called resolved by the changed warning text.
+
+The quantity reaggregation remains a Class C warning at BOTH heads.
+Its baseline-total change is-6,863.434999465942, matching the independently serialized three-country parser quantity delta-6,863.435 within5.34e-7; its Aggregate got value is exactly unchanged.
+The warning is retained, not converted to a pass.
+Complete serialized nonpassing assembly findings, including details and metrics, are identical.
+Six Peru build errors, five real tenure-label failures and13 explicit no-source scope exclusions remain visible as previously reconciled.
+
+* Limits retained
+
+Cold-message matches are witnesses, not a causal trace or equal warning multiplicity claim.
+67 additions match cold controls through dependency-table fallback; the producer correctly labels their country lists as possible matching controls rather than inferred per-record origins.
+The removed baseline-only Nigeria Make warning's root cause remains unknown.
+Identical eventual Nigeria food values do not prove that operational warning is fixed.
+
+The125 comparisons cover four materialized tables, not every served Feature/kwargs result or questionnaire meaning.
+Other cache-footer hashes intentionally change, and warning suppression was not used.
+Together with the separate interview review, the full+8,731 warning increase is accounted for as emitted records:8,098 interview +633 other.
+Process completion, paired consistency and retained findings do not establish that every source label, key or survey interpretation is correct.
+Raw diagnostic rows/messages remain private; aggregate evidence and artifact hashes are in the companion JSON.
+
+-- Sue

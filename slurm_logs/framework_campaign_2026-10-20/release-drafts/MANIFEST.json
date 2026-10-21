@@ -1,0 +1,62 @@
+{
+  "scope": "Approved framework increment only; not full history since v0.15.0",
+  "source_sha": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "draft_as_of_utc": "2026-10-21T03:40:37Z",
+  "linux_data_ci": {
+    "run": 39533863014,
+    "status": "completed",
+    "url": "https://github.com/ligon/LSMS_Library/actions/runs/39533863014",
+    "conclusion": "success",
+    "passed": 6388,
+    "skipped": 2744
+  },
+  "local_suite": {
+    "passed": 8851,
+    "skipped": 276,
+    "xfailed": 9,
+    "xpassed": 1,
+    "failed": 0,
+    "errors": 0,
+    "seconds": 736.35
+  },
+  "source_evidence": [
+    "slurm_logs/framework_campaign_2026-10-20/STATUS.org (main report checkout)",
+    "slurm_logs/framework_campaign_2026-10-20/rate-validation/REPORT.org (main report checkout)",
+    "slurm_logs/framework_campaign_2026-10-20/rate-packaging/REPORT.org (main report checkout)",
+    "slurm_logs/framework_campaign_2026-10-20/contracts/corpus-review.org",
+    "slurm_logs/framework_campaign_2026-10-20/contracts/corpus-review.org",
+    "slurm_logs/framework_campaign_2026-10-20/provenance-review/REPORT.org",
+    "slurm_logs/framework_campaign_2026-10-20/nutrition-repair-review/REPORT.org",
+    "slurm_logs/framework_campaign_2026-10-20/1160-review/REVIEW.org",
+    "docs/releases/v0.15.0.md (style template)",
+    ".claude/skills/release/SKILL.md (release boundaries)"
+  ],
+  "pr_numbers": [
+    1153,
+    1154,
+    1155,
+    1156,
+    1157,
+    1161,
+    1162,
+    1163,
+    1164,
+    1165
+  ],
+  "copy_files": [
+    {
+      "path": "RELEASE_NOTES_DRAFT.md",
+      "bytes": 5056,
+      "sha256": "baa9b533d3d6e693fa34cad23a72df0b5497b063c3769244893609dc1590ecd2"
+    },
+    {
+      "path": "MIGRATION_DRAFT.md",
+      "bytes": 2783,
+      "sha256": "f90d3fc3244eaa56a41c68ec452587233a49cb034881c3e73908dc0589b7e9b3"
+    }
+  ],
+  "parent_review": "Corrected four nonexistent producer-report paths to committed independent evidence; draft text hashes unchanged. Final release draft updated after exact532 remote success; original producer draft remains in git history.",
+  "parent_finalization_utc": "2026-10-21T05:11:19.285555+00:00",
+  "landed_implementation_sha": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+  "all_listed_implementation_prs_merged": true
+}

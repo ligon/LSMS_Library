@@ -1,0 +1,18 @@
+{
+  "workflow_run": 39519191762,
+  "source_sha": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "workflow_conclusion": "failure",
+  "data_job": 118958593664,
+  "data_job_conclusion": "failure",
+  "credential_gate_assertion": "passed",
+  "pytest_summary": "= 1 failed, 6107 passed, 2744 skipped, 4 xfailed, 1 xpassed, 1217 warnings in 5374.11s (1:29:34) =",
+  "failed_node": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]",
+  "actual_raw_content_hash": "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6",
+  "expected_approved_content_hash": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+  "other_baseline_fields": "shape, columns, index names and dtypes passed before hash comparison",
+  "native_windows_unit_smoke": "all passed",
+  "log_sha256": "2dc4962de5263d2e89a7bcfceb7748c50ffcb741f30413f4eb2f17d4597d1278",
+  "log_private_path": "/local/job40255479/control/framework-campaign/combined-linux-data.log",
+  "ci_raw_parquet_artifacts": 0,
+  "diagnosis": "in progress; no baseline or runtime change authorized by this observation"
+}

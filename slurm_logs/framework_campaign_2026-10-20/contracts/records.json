@@ -1,0 +1,605 @@
+[
+  {
+    "number": 1036,
+    "title": "categorical-mapping cascade: a declared-but-EMPTY org table silently falls through to a lower level",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1036",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1036.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Census first (`#+name:` tables with 0 data rows across `countries/**/categorical_mapping*`), then option (a): an empty declared table raises a distinct error the rung loop does not catch. Silent fall-through is the #674 class.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1105,
+    "note": "Declared empty table distinct error landed in bundle."
+  },
+  {
+    "number": 1085,
+    "title": "DECISION: a country entry that is a symlink escaping countries_root() is listed by countries() but refused by Country() as path traversal",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1085",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1085.json",
+    "human_rulings": [],
+    "classification": "needs_decision",
+    "dedup_status": "open",
+    "note": "Existing symlink traversal refusal mismatches countries listing; policy decision required."
+  },
+  {
+    "number": 1093,
+    "title": "median_price_valuation (sold kg), seed_kg and nitrogen_kg are blind to a country's declared u_kg (Ethiopia: 710 Quintal rows with Quantity_sold drop from the price pool)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1093",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1093.json",
+    "human_rulings": [],
+    "classification": "open_tractable_defect",
+    "dedup_status": "open",
+    "note": "Confirmed seed_kg/nitrogen_kg ignore declared unit_kg attrs. median_price_valuation sold kg also omits overlay, Country stamps attrs on crop_production only. Reuse _declared_kg_factors."
+  },
+  {
+    "number": 1100,
+    "title": "Ghana: parent-or-parent-in-law code is served Parent [1, 0, consanguineal] (2,962 people) -- the #698 'X or X-in-law' form, relabelled upstream",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1100",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1100.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Upstream Ghana relabel erases parent/in-law conflation before kinship; Comparable Parent policy still pinned by tests, so coordinate decision."
+  },
+  {
+    "number": 1101,
+    "title": "GhanaLSS GLSS3/4 code 6 'Relative of head or head's spouse' is served [null, null, consanguineal] (2,977 people)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1101",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1101.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "GLSS3/4 relative-of-head-or-spouse label is collapsed upstream; preserve distinct label and null kinship, reconcile Comparable view."
+  },
+  {
+    "number": 1102,
+    "title": "DECISION: kinship conflations of the #698 shape outside its wording (Timor-Leste Adopted/stepchild, Cambodia Adopted/Foster, Guyana Servant/Other, bare 'Other')",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1102",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1102.json",
+    "human_rulings": [],
+    "classification": "needs_decision",
+    "dedup_status": "open",
+    "note": "Decision beyond wording of #698: adopted/foster/step, servant/other, bare Other. No change licensed by existing blood/in-law ruling."
+  },
+  {
+    "number": 1103,
+    "title": "Kosovo 2000 kinship: truncated labels 'Other re' (71) and 'Niece/Ne' (455) need the code list",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1103",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1103.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Needs full Kosovo code list for truncated labels; cannot recover intended generation/distance by likely expansion."
+  },
+  {
+    "number": 1106,
+    "title": "Malawi `NPK Fertilizer` is Chitowe 23:21:0+4S but is served at the shared map's NPK 17-17-17 (0.17 vs 0.23 N)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1106",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1106.json",
+    "human_rulings": [],
+    "classification": "needs_decision",
+    "dedup_status": "open",
+    "note": "Decision: relabel Malawi Chitowe to explicit 23% product versus country-axis nitrogen map. Not safe to change global NPK share."
+  },
+  {
+    "number": 1107,
+    "title": "Guinea-Bissau `nitrogen_kg` returns 0 rows \u2014 its four Portuguese inorganic labels are keyed to nothing",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1107",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1107.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Country labels need translation to canonical fertilizer classes; mixed DAP-and-other bucket cannot safely receive DAP share."
+  },
+  {
+    "number": 1108,
+    "title": "GhanaLSS `Fertilizer` (1,091 rows with a quantity) has no product identity, so it gets no N share",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1108",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1108.json",
+    "human_rulings": [],
+    "classification": "needs_decision",
+    "dedup_status": "open",
+    "note": "Decision: unidentified Fertilizer share refusal versus nominal generic class. Existing warning is truthful."
+  },
+  {
+    "number": 1109,
+    "title": "Malawi organic-fertilizer `Quantity` is a fabricated 0.0 (`'Quantity': 'sum'` without `min_count`)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1109",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1109.json",
+    "human_rulings": [],
+    "classification": "open_tractable_defect",
+    "dedup_status": "open",
+    "note": "Mechanical Malawi all-NA organic Quantity sum becomes fabricated zero; use sum(min_count=1). Independent of nitrogen shares; Malawi rewarm."
+  },
+  {
+    "number": 1110,
+    "title": "`fertilizer_rate`'s default `on='parcel'` mis-joins Malawi and empties Ethiopia; its docstring's \"measured no-op on Malawi\" is false",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1110",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1110.json",
+    "human_rulings": [],
+    "classification": "needs_decision",
+    "dedup_status": "open",
+    "note": "Parcel reduction asymmetry and Ethiopia empty default remain; decide symmetric parcel reduction versus country-specific join key. Cannot infer meaning from shared plot_id name."
+  },
+  {
+    "number": 1111,
+    "title": "Malawi applied-fertilizer unit `ag_d39e`/`ag_d39j` probably misread \u2014 13,302 rows served as grams carry 203.8 kg N that would be 203,843.6 kg as kilograms; 17,044 rows NULL `u`",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1111",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1111.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Needs Module D Q39 code list before changing applied units; separate deterministic missing-unit Unknown fill from unverified grams-versus-kg interpretation."
+  },
+  {
+    "number": 1118,
+    "title": "`Country(...).plot_inputs()` serves `u` NA on 122,900 rows in six countries, where `Feature('plot_inputs')` serves `'Unknown'` \u2014 contradicting the #1041 ruling",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1118",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1118.json",
+    "human_rulings": [],
+    "classification": "open_tractable_defect",
+    "dedup_status": "open",
+    "note": "Open amount-without-unit defect plus no-amount class. Amount class already ruled Unknown under #1041; Nigeria fill versus dropping not-input rows is a separate choice. Six-country build scope."
+  },
+  {
+    "number": 1119,
+    "title": "#569 residual A: the \"not crop-specific\" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1119",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1119.json",
+    "human_rulings": [],
+    "classification": "needs_decision",
+    "dedup_status": "open",
+    "note": "Crop marker unification needs semantic decision; BF/Senegal seed-crop spelling and Guinea-Bissau extraction are independent country defects. Do not homogenize farm-grain into observed plots."
+  },
+  {
+    "number": 1120,
+    "title": "#569 residual C: NaN keys on declared plot-table index levels, now all named by Site I; `LSMS_READ_STRICT=1` newly raises on three reads",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1120",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1120.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Open missing plot keys/sample join coverage; strict-mode failures remain after registration. Country-specific diagnosis required; do not fill IDs blindly."
+  },
+  {
+    "number": 1121,
+    "title": "#569 residual D: the `plot_labor.source` vocabulary is not harmonised across countries",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1121",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1121.json",
+    "human_rulings": [],
+    "classification": "open_tractable_defect",
+    "dedup_status": "open",
+    "note": "Mali Family/Hired/Other case harmonization tractable; full GhanaSPS source vocabulary requires decision."
+  },
+  {
+    "number": 1122,
+    "title": "#569 residual E: stale \"plot_labor / plot-level features not registered in index_info\" comments",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1122",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1122.json",
+    "human_rulings": [],
+    "classification": "open_tractable_defect",
+    "dedup_status": "open",
+    "note": "Stale docs/comments after #1126; docs-only subset safe; hashed inputs can join next country batch."
+  },
+  {
+    "number": 1123,
+    "title": "#569 residual F: wave-level destructive collapses in EHCVM `plot_inputs` (Country path, pre-existing)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1123",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1123.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Destructive source-level collapse remains in BF/Senegal/CotedIvoire/Niger; diagnose injectivity and overlap with #637/#614."
+  },
+  {
+    "number": 1124,
+    "title": "#569 residual G: `bench/feature_audit/scan.py` row-conservation is blind to modal exclusion",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1124",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1124.json",
+    "human_rulings": [],
+    "classification": "open_tractable_defect",
+    "dedup_status": "open",
+    "note": "Confirmed data-free: all built-country counts A=2/B=7, assembled A=2 only returns no findings. Also canonical feature list omits crop_production/plot_labor/plot_inputs."
+  },
+  {
+    "number": 1125,
+    "title": "#569 residual H: the crop_production warm-assembly test still swallows per-country exceptions",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1125",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1125.json",
+    "human_rulings": [],
+    "classification": "open_tractable_defect",
+    "dedup_status": "open",
+    "note": "Confirmed source: crop warm test catches all country exceptions and only checks countries present in result; reuse hardened _warm_assembly and compare participation."
+  },
+  {
+    "number": 1129,
+    "title": "`food_prices(units='unitvalue')` serves exactly 1.0 for every `u='Value'` row: 1,107,464 GhanaLSS rows across all seven waves",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1129",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1129.json",
+    "human_rulings": [],
+    "classification": "needs_decision",
+    "dedup_status": "open",
+    "note": "Decision required: drop currency-denominated unitvalue rows versus keep/document cedi-per-cedi=1. Do not infer ruling from kgvalue precedent."
+  },
+  {
+    "number": 1130,
+    "title": "GhanaLSS 1991-92 own-produce valuation: decide the `All` unit, then extend `8h-farmgate` to GLSS3",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1130",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1130.json",
+    "human_rulings": [],
+    "classification": "needs_decision",
+    "dedup_status": "open",
+    "note": "Decision/evidence on GLSS3 All unit, then extend existing 8h-farmgate derivation; GLSS3 verdict remains empty-pending-machinery."
+  },
+  {
+    "number": 1131,
+    "title": "Re-check the GhanaLSS `food_security` 1987-88 and 1988-89 `unsure` verdicts: the GLSS1 questionnaire scans are readable as images",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1131",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1131.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Read scan images and assess GLSS2 joint-BID inference; no automatic verdict closure."
+  },
+  {
+    "number": 1133,
+    "title": "Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1133",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1133.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Uganda comm harmonization is 322-pair lookup, not digit insertion. Separate from true cluster meaning changes. Existing warning records deliberately declare current mismatch."
+  },
+  {
+    "number": 1134,
+    "title": "DECISION (#793 residual): the frozen `DESIGN_TAGS` (2 values) cannot express an undocumented or single-stage design, so no non-Uganda design record can be written until it is widened",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1134",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1134.json",
+    "human_rulings": [
+      "**RULING (@ligon, 2026-10-19): option A now, then B one tag at a time.**\n- **Now:** add the `not-stated` sentinel `design_tag`. It is valid only with `source_type: not-found` or `derived-from-data`, mirroring `population.UNIVERSE_TAGS`.\n- **Then:** add each structural tag (`single-stage-cluster`, unstratified `two-stage-cluster`, `stratified-random`, self-weighting, ...) only together with the first evidenced record that uses it, with its reason written in `sampling.py`. The freeze test's both-directions rule stays: every allowed tag is used by a shipped record.\n- **Not C:** `design_tag` never travels without its `source_type` / `confidence`.\n\nThe likely first B addition is GhanaLSS GLSS1-3 (self-weighting, #713)."
+    ],
+    "classification": "ruled_but_unimplemented",
+    "dedup_status": "open",
+    "note": "Oct19 ruling A now then B per evidenced first record. DESIGN_TAGS still two Uganda shapes, freeze test exact Uganda set; not-stated sentinel absent."
+  },
+  {
+    "number": 1135,
+    "title": "DECISION (#942): `ClusterIdentityWarning`: which boundaries count (H2: any in span vs adjacent), and whether a partial renumbering needs a size threshold (H3)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1135",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1135.json",
+    "human_rulings": [
+      "**RULING (@ligon, 2026-10-19):**\n- **H2:** keep **SPAN** as built. Every non-stable boundary between the first and last requested wave counts: zero misses, at the cost of 3 over-warnings.\n- **H3:** **no threshold**, but the warning's first line must state the size of the renumbering for each boundary: clusters renumbered and the share of linked households whose `v` changes, net of movers. A reader can then judge a 0.67% boundary (Nigeria 2016Q1 -> 2018Q3) against a 100% one.\n\n**Remaining work (tier A, read-path only, 0 hashes):** carry the measured counts in each boundary's `panel:` record, or compute them at warn time if that is cheap, and put them in the message's first line. Test with Nigeria 2016Q1 -> 2018Q3 and one 100% boundary."
+    ],
+    "classification": "ruled_but_unimplemented",
+    "dedup_status": "open",
+    "note": "Oct19 ruling keeps SPAN/no threshold; requires clusters renumbered and linked-household share net of movers in first warning line. Current report only notes/truncates text."
+  },
+  {
+    "number": 1136,
+    "title": "#793 residual: curate design fields beyond Uganda (NADA DDI probe, per-country evidence, missing strata)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1136",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1136.json",
+    "human_rulings": [],
+    "classification": "open_requires_evidence",
+    "dedup_status": "open",
+    "note": "Broad evidence curation and missing strata wiring, dependent on widened vocabulary; not a small release gate."
+  },
+  {
+    "number": 1143,
+    "title": "_parse_explicit_metric misreads decimal commas: Senegal 'Bouteille de 1,5 L' served 5.0 kg, C\u00f4te d'Ivoire 'Sac (0,9 Kg)' 9.0 kg (945 served rows)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1143",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1143.json",
+    "human_rulings": [],
+    "classification": "open_tractable_defect",
+    "dedup_status": "open",
+    "note": "Confirmed parser wrongly reads decimal commas and thousands separators by matching suffix digits. Mechanical fix, preserve fractions/word boundaries/volume opt-out."
+  },
+  {
+    "number": 1148,
+    "title": "period=: per-household exposure from each passage's interview status (Burkina 2014, GhanaLSS) instead of one declared constant per wave (#851 option B)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1148",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-1148.json",
+    "human_rulings": [],
+    "classification": "open_followup_dependency",
+    "dedup_status": "open",
+    "note": "Approved follow-up B to #851; requires per-passage cover-page interview status, never infer visits from food-row presence. Defer until Phase II A is landed; county builder work and two-country validation."
+  },
+  {
+    "number": 569,
+    "title": "Register plot_labor and plot_inputs in Feature after resolving their remaining grain differences",
+    "url": "https://github.com/ligon/LSMS_Library/issues/569",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-569.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: (1) `plot_labor` keeps `stage` and `worker` as index levels, with a sentinel where a country lacks them. (2) The seven EHCVM `plot_inputs` tables with no plot level are registered with a household-grain sentinel on `plot_id` through `missing_level_sentinels`, not excluded. Then register both tables in Index Info.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1126,
+    "note": "Registering both plot tables, preserving stage/worker and household-grain sentinel, landed. Residuals #1118-#1125 stay separate."
+  },
+  {
+    "number": 674,
+    "title": "get_categorical_mapping returns {} silently when no value column is requested \u2014 third recurrence",
+    "url": "https://github.com/ligon/LSMS_Library/issues/674",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-674.json",
+    "human_rulings": [],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1024,
+    "note": "Bare mapping request raises TypeError; empty-table residual #1036 also landed in #1105."
+  },
+  {
+    "number": 680,
+    "title": "bug: fooddatacentral ships a broken top-level `tests` package that shadows ours \u2014 kills the whole suite at collection in CI",
+    "url": "https://github.com/ligon/LSMS_Library/issues/680",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-680.json",
+    "human_rulings": [],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1097,
+    "note": "fooddatacentral floor 1.0.13 landed; issue comment confirms re-imaged Savio generation 20261019T221223Z."
+  },
+  {
+    "number": 698,
+    "title": "DECISION: kinship -- extend the conflation rule to the Affinity slot alone ([G, D, null]) for 'X of head or spouse' / 'X or X-in-law' labels",
+    "url": "https://github.com/ligon/LSMS_Library/issues/698",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-698.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Yes. \"X of head or spouse\" and \"X or X-in-law\" labels become `[G, D, null]`, Affinity only; the Guyana triple becomes `[null, null, null]`. This is the same null-component rule as 2026-09-07.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "partial_exact_residual",
+    "dedup_status": "partial",
+    "residual_title": "Kinship: preserve Ghana parent/in-law and head/spouse-relative conflations upstream of kinship expansion",
+    "residual_body": "Resolved so far: PR #1104 implements affinity-only partial-null kinship tuples under the Oct18 ruling. Remaining work is upstream Ghana relabeling in #1100/#1101, including the Comparable-label interaction. Keep broader affinity decisions #1102 and Kosovo source verification #1103 separate. Acceptance: distinct served labels preserve null Affinity with original Generation/Distance where justified; preferred/comparable tests explicitly document each view.",
+    "note": "Resolved so far: PR #1104 implements affinity-only partial-null kinship tuples under the Oct18 ruling. Remaining work is upstream Ghana relabeling in #1100/#1101, including the Comparable-label interaction. Keep broader affinity decisions #1102 and Kosovo source verification #1103 separate. Acceptance: distinct served labels preserve null Affinity with original Generation/Distance where justified; preferred/comparable tests explicitly document each view."
+  },
+  {
+    "number": 781,
+    "title": "No verdict vocabulary for `dropped`: a correctly-empty cell is graded as \"the silent-drop bug class\" with no way to say otherwise",
+    "url": "https://github.com/ligon/LSMS_Library/issues/781",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-781.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Yes. Add `correctly-empty` (closing, evidence required as for `not-asked`) and `empty-pending-machinery` (not closing) to the verdict vocabulary, keyed by tier. A fix agent may write the three GhanaLSS GLSS1-3 rows into `.coder/coverage/absent_verdicts.csv`, with evidence.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "**RULING (@ligon, 2026-10-19):** keep the GhanaLSS GLSS1/2 (1987-88, 1988-89) `food_prices` verdicts as `correctly-empty`, as merged in PR #1132.\n- Neither survey records a household price, only amounts.\n- An imputed price of Expenditure \u00f7 community price would re-serve `community_prices`.\n- #562 3b as specified fills `food_quantities`, not `food_acquired`.\n\nGLSS3 (1991-92) stays `empty-pending-machinery` (#1130)."
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1132,
+    "note": "Tier-keyed correctly-empty/empty-pending-machinery verdicts landed. Oct19 ruling retains GLSS1/2 correctly-empty; GLSS3 residual #1130."
+  },
+  {
+    "number": 787,
+    "title": "labels=: resolve ambiguous Preferred Label targets, curate Aggregate variants, fix numeric-target examples",
+    "url": "https://github.com/ligon/LSMS_Library/issues/787",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-787.json",
+    "human_rulings": [],
+    "classification": "partial_exact_residual",
+    "dedup_status": "partial",
+    "residual_title": "labels=: decide ambiguous targets; curate variants and repair stale numeric examples",
+    "residual_body": "Resolved so far: v0.15 normalized Preferred Label and numeric refusal, blank targets are filtered; PR #1029 carries labels_unmatched through Feature. Remaining: choose behavior for multiple distinct nonmissing targets per Preferred Label, curate Aggregate/other variants under Contract B, correct hashed numeric examples in Guatemala/Serbia and contradictory Malawi guide counts. A generic conflict detector must not choose scientific targets by row order.",
+    "note": "Resolved so far: v0.15 normalized Preferred Label and numeric refusal, blank targets are filtered; PR #1029 carries labels_unmatched through Feature. Remaining: choose behavior for multiple distinct nonmissing targets per Preferred Label, curate Aggregate/other variants under Contract B, correct hashed numeric examples in Guatemala/Serbia and contradictory Malawi guide counts. A generic conflict detector must not choose scientific targets by row order."
+  },
+  {
+    "number": 793,
+    "title": "DECISION: sampling.yml -- freeze the Uganda exemplar's vocabulary as-is, then build the loader (SamplingRecord, Country.sampling, attach in _finalize_result)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/793",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-793.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Freeze the Uganda exemplar vocabulary as-is, then build the `sampling.yml` loader mirroring `population.py`. For #942, land the `panel:` block now (option A).\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1137,
+    "note": "Sampling loader, Country.sampling and attrs landed; vocabulary/curation residuals are #1134/#1136."
+  },
+  {
+    "number": 798,
+    "title": "Mali interview_date: rewrite the stale data_scheme.yml:69-73 comment (state the measured collapse loss) and refresh the coverage matrix",
+    "url": "https://github.com/ligon/LSMS_Library/issues/798",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-798.json",
+    "human_rulings": [],
+    "classification": "partial_exact_residual",
+    "dedup_status": "partial",
+    "residual_title": "Datetime follow-up: promote final served coverage and decide read-strict reporting",
+    "residual_body": "Resolved so far: PR #1025 repaired mixed datetime coercion and corrected Mali scheme comment; #1045 build parsing landed in #1105. Remaining: refresh/promote coverage/latest.csv against final served API, distinguishing raw-cache coverage; separately decide whether DatetimeCoercionWarning belongs in LSMS_READ_STRICT with reports accessor. No remaining warm-date-loss implementation is established by this issue.",
+    "note": "Resolved so far: PR #1025 repaired mixed datetime coercion and corrected Mali scheme comment; #1045 build parsing landed in #1105. Remaining: refresh/promote coverage/latest.csv against final served API, distinguishing raw-cache coverage; separately decide whether DatetimeCoercionWarning belongs in LSMS_READ_STRICT with reports accessor. No remaining warm-date-loss implementation is established by this issue."
+  },
+  {
+    "number": 828,
+    "title": "food_expenditures(basis='total') silently equals 'purchased' where a country records no in-kind value; should raise or warn like units= now does",
+    "url": "https://github.com/ligon/LSMS_Library/issues/828",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-828.json",
+    "human_rulings": [],
+    "classification": "partial_exact_residual",
+    "dedup_status": "partial",
+    "residual_title": "basis=total: choose typed refusal or structured coverage warning for missing in-kind expenditure",
+    "residual_body": "Resolved so far: PR #1029 implements typed units unavailability and Feature Contract B. Remaining only: decide basis=total behavior when no own-production/in-kind Expenditure is recorded; implement chosen typed refusal or warning plus attrs; measure GhanaAHIES/Peru/Nepal separately. Do not reimplement units= handling.",
+    "note": "Resolved so far: PR #1029 implements typed units unavailability and Feature Contract B. Remaining only: decide basis=total behavior when no own-production/in-kind Expenditure is recorded; implement chosen typed refusal or warning plus attrs; measure GhanaAHIES/Peru/Nepal separately. Do not reimplement units= handling."
+  },
+  {
+    "number": 845,
+    "title": "Price provenance: is Price elicited or derived for Panama/GhanaLSS/Guatemala/Serbia; explain Uganda's ~5% gap; decide on a read-time diagnostic",
+    "url": "https://github.com/ligon/LSMS_Library/issues/845",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-845.json",
+    "human_rulings": [],
+    "classification": "partial_exact_residual",
+    "dedup_status": "partial",
+    "residual_title": "Price provenance: document remaining countries and decide optional agreement diagnostic",
+    "residual_body": "Resolved so far: PR #1029 documents non-independence of reported Price and unitvalue and Uganda per-wave agreement/source details. Remaining: provenance for Panama/GhanaLSS/Guatemala/Serbia, explanation of Uganda raw disagreement, and yes/no decision for optional agreement diagnostic. Agreement alone does not prove elicitation versus derivation.",
+    "note": "Resolved so far: PR #1029 documents non-independence of reported Price and unitvalue and Uganda per-wave agreement/source details. Remaining: provenance for Panama/GhanaLSS/Guatemala/Serbia, explanation of Uganda raw disagreement, and yes/no decision for optional agreement diagnostic. Agreement alone does not prove elicitation versus derivation."
+  },
+  {
+    "number": 851,
+    "title": "DECISION: recall windows Phase II -- ship period= on food_expenditures/food_quantities with coverage at 28 of 67 cells under Contract B, and refuse period= on food_prices",
+    "url": "https://github.com/ligon/LSMS_Library/issues/851",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-851.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Yes. Ship `period=` on `food_expenditures`/`food_quantities` under Contract B (a typed raise from `Country()`; degrade plus warning from `Feature()`), and refuse `period=` on `food_prices`. The GLSS3 per-row (stratum-varying) window is out of Phase II scope; file it as its own issue.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "**RULING (@ligon, 2026-10-20): per-household exposure.**\n- **A, in this PR.** Keep the declared, one-constant-per-wave exposure for `period=`. Disclose the shortfall: `attrs['period']` reports, per wave, how many households were asked fewer times than declared, and the implied understatement.\n- **Measured** (r2): Burkina 2014, 9.3% of households, \u22123.94% aggregate under `period=`; GhanaLSS \u2264 ~1%.\n- **B, a follow-up (new issue):** per-household exposure, from each passage's cover-page interview status."
+    ],
+    "classification": "ruled_unlanded_existing_work",
+    "dedup_status": "partial",
+    "residual_title": "Recall Phase II: finish option-A disclosure on existing period branch, update and review it",
+    "residual_body": "Phase I is on development. Existing fix/851-recall-period@8288cd112 has period= conversion, per-column asks, typed errors, Feature wave slicing and tests. It is 17 commits ahead/78 behind current development. Complete Oct20 option-A household-shortfall/understatement disclosure (absent in branch recall.py), integrate current head and independently review real-data arithmetic/coverage before PR. Keep #1148 per-household exposure and GLSS3 stratum windows separate.",
+    "note": "No open PR. Do not duplicate 21-file existing branch; compare-851.json archives diff. Latest A disclosure not present at branch head inspected."
+  },
+  {
+    "number": 867,
+    "title": "_NITROGEN_CONTENT has no entry for NPS, D Compound or any organic input, so those fertilizer rows contribute 0 kg N silently",
+    "url": "https://github.com/ligon/LSMS_Library/issues/867",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-867.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: NPS and Malawi D Compound get CITED N shares (source in the code comment and the test). Organic inputs (manure, compost, organic fertilizer) get a documented refusal: they stay unmatched and loud (`NutrientCoverageWarning`), with no nominal share.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1112,
+    "note": "Cited NPS/D Compound shares and loud organic refusal landed. Six residuals #1106-#1111 remain."
+  },
+  {
+    "number": 915,
+    "title": "Decide whether Country rejects existing unregistered directories",
+    "url": "https://github.com/ligon/LSMS_Library/issues/915",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-915.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: `Country()` refuses an existing directory with no `_/data_scheme.yml`. Acquisition and scaffold code gets an explicit, documented opt-in. Reconcile both docstrings so the accepted set equals `countries()`.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1098,
+    "note": "Directory-without-scheme rejected, acquisition allow_unregistered opt-in implemented. Symlink-policy residual #1085 remains."
+  },
+  {
+    "number": 928,
+    "title": "DECISION: categorical_mapping.org -- accept P1 (#+key:) + P2 (one key resolver for the four callers) as the first increment, deferring P3/P4",
+    "url": "https://github.com/ligon/LSMS_Library/issues/928",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-928.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Yes to P1 (`#+key:`) and P2 (one key resolver for all callers) as the first increment; P3 and P4 are deferred. P1 is corpus-invalidating, so it goes in the single re-warm bundle.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1105,
+    "note": "Approved P1 key metadata and P2 shared resolver landed; P3/P4 were explicitly deferred."
+  },
+  {
+    "number": 931,
+    "title": "Decide whether crop conversion should use declared unit_kg",
+    "url": "https://github.com/ligon/LSMS_Library/issues/931",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-931.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Yes. `harvest_kg_factors` reads the declared `u_kg` (where a country ships a conversion table, use it). In the same PR, re-express `tests/test_ethiopia_shipped_factors.py`'s quintal check against an external answer key.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1092,
+    "note": "harvest_kg_factors reads declared u_kg and external Ethiopia answer key retained; residual #1093 separate."
+  },
+  {
+    "number": 942,
+    "title": "v is wave-scoped in some countries: the same cluster gets a new id each round, with no crosswalk",
+    "url": "https://github.com/ligon/LSMS_Library/issues/942",
+    "github_state": "OPEN",
+    "reviewed_at_head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "evidence_file": "issue-942.json",
+    "human_rulings": [
+      "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: Accept DESIGN.org Q1-Q7 as drafted: a per-boundary two-field declaration in `sampling.yml`'s `panel:` block, a warning at `Country` (not `Feature`), and no crosswalk. Q5: file Uganda's v-rendering defect (272 of 322 pairs) as its own tier-B issue. Depends on #793.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)"
+    ],
+    "classification": "implemented_pending_release",
+    "dedup_status": "implemented",
+    "merged_pr": 1137,
+    "note": "Per-boundary two-field declarations and Country warning landed; #1133/#1135 remain."
+  }
+]

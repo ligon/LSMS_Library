@@ -1,0 +1,83 @@
+{
+  "baseline_file_sha256": "036e63aa73fc781d1f7aff4046ee62d1301edacd0301ef962ac328ddcfa07eb6",
+  "candidate_file_sha256": "fc83a08a7b12ded788dd01349f1121a922bde610813c11ef891f6a8fda9ace9c",
+  "baseline": {
+    "records": 382,
+    "status_counts": {
+      "warn": 382
+    },
+    "severity_counts": {
+      "C": 353,
+      "B": 29
+    },
+    "families": {
+      "crop_production|runtime_warning|C|warn": 169,
+      "crop_production|index_levels_match_scheme|C|warn": 16,
+      "crop_production|no_null_index_levels|C|warn": 2,
+      "crop_production|no_constant_columns|C|warn": 8,
+      "crop_production|runtime_warning|B|warn": 14,
+      "crop_production|null_content|C|warn": 10,
+      "crop_production|scale|C|warn": 2,
+      "crop_production|country_exclusion|B|warn": 1,
+      "plot_labor|runtime_warning|C|warn": 54,
+      "plot_labor|index_levels_match_scheme|C|warn": 15,
+      "plot_inputs|runtime_warning|C|warn": 55,
+      "plot_inputs|index_levels_match_scheme|C|warn": 14,
+      "plot_inputs|runtime_warning|B|warn": 14,
+      "plot_inputs|no_constant_columns|C|warn": 2,
+      "plot_inputs|null_content|C|warn": 3,
+      "plot_inputs|no_null_index_levels|C|warn": 3
+    },
+    "error_fail_pairs": [],
+    "assembly_findings": [
+      [
+        "crop_production",
+        "EthiopiaRHS",
+        "country_exclusion",
+        "warn",
+        "{}"
+      ]
+    ]
+  },
+  "candidate": {
+    "records": 322,
+    "status_counts": {
+      "warn": 322
+    },
+    "severity_counts": {
+      "C": 293,
+      "B": 29
+    },
+    "families": {
+      "plot_labor|index_levels_match_scheme|C|warn": 15,
+      "plot_labor|runtime_warning|C|warn": 34,
+      "plot_inputs|index_levels_match_scheme|C|warn": 14,
+      "plot_inputs|runtime_warning|B|warn": 14,
+      "plot_inputs|runtime_warning|C|warn": 36,
+      "plot_inputs|no_constant_columns|C|warn": 2,
+      "plot_inputs|null_content|C|warn": 3,
+      "plot_inputs|no_null_index_levels|C|warn": 3,
+      "crop_production|runtime_warning|C|warn": 148,
+      "crop_production|index_levels_match_scheme|C|warn": 16,
+      "crop_production|no_null_index_levels|C|warn": 2,
+      "crop_production|no_constant_columns|C|warn": 8,
+      "crop_production|runtime_warning|B|warn": 14,
+      "crop_production|null_content|C|warn": 10,
+      "crop_production|scale|C|warn": 2,
+      "crop_production|country_exclusion|B|warn": 1
+    },
+    "error_fail_pairs": [],
+    "assembly_findings": [
+      [
+        "crop_production",
+        "EthiopiaRHS",
+        "country_exclusion",
+        "warn",
+        "{}"
+      ]
+    ]
+  },
+  "new_structural_or_error_fail_pairs": [],
+  "verdict": "no new structural/error/fail pairs; retained warnings require classification",
+  "raw_messages_exported": false
+}

@@ -1,0 +1,48 @@
+{
+  "body": "Resolved so far: the reviewed development landings and source commits are recorded in [the v0.15.0 issue reconciliation](https://github.com/ligon/LSMS_Library/blob/8d7a5e55914e700c69ae1a195f96cc2282b6ce64/slurm_logs/release_landing_2026-10-14/RELEASE_ISSUES.org) (PR #998). This issue remains open for the scope below.\n\nNames without a directory now raise ValueError immediately with near-miss suggestions. The first half is covered by tests and the fixture repairs preserve that behavior.\n\nRemaining: existing directories without a Data Scheme still construct. Decide whether the accepted set must exactly match countries(), including acquisition/scaffold use cases, and reconcile both API docstrings with that decision. Raising for Ghana is not proof that .dvc or a bare scaffold is refused.\n",
+  "comments": [
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdRakDA",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "**Ruling (@ligon, 2026-10-18)**, from the framework-backlog decision sheet: `Country()` refuses an existing directory with no `_/data_scheme.yml`. Acquisition and scaffold code gets an explicit, documented opt-in. Reconcile both docstrings so the accepted set equals `countries()`.\n\nScheduled for the overnight 2026-10-18 sweep.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-10-19T04:03:47Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/915#issuecomment-6259385356",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDOL4CfUs8AAAABdfE0Sw",
+      "author": {
+        "login": "ligon"
+      },
+      "authorAssociation": "OWNER",
+      "body": "Fixed on `development` by PR #1098. Left open until the release merge to `master`. Residual: #1085 (DECISION).",
+      "createdAt": "2026-10-19T17:56:27Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ligon/LSMS_Library/issues/915#issuecomment-6273709131",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 915,
+  "state": "OPEN",
+  "title": "Decide whether Country rejects existing unregistered directories",
+  "updatedAt": "2026-10-19T17:56:27Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/915"
+}

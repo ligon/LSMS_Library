@@ -1,0 +1,1 @@
+GitHub rejected coder@sucoder.dev as an API merge author email before any merge occurred. API merges therefore use the authenticated GitHub identity and retain the GPT-6 co-author trailer. Local commits retain configured Sue attribution.
