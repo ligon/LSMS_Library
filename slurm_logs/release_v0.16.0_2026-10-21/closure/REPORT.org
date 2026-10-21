@@ -1,0 +1,71 @@
+#+TITLE: Final v0.16.0 closure and contents audit
+#+AUTHOR: Sue
+
+* Result
+PASS at development =acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c= against unchanged master/v0.15.0 =cb44e3522a2426ba03431ca9a218cc63fe03f6c9=.
+The final safe closure list has 48 issues: the previous 32 plus 16 additional proposals explicitly accepted by the parent after source/test review.
+Every closing-keyword export uses a separate Closes keyword for every issue.
+All 48 are currently OPEN and each remaining-scope supporting fix is merged after the tag and in actual development ancestry.
+
+* Fresh scope and inventory coverage
+Connected GitHub refreshed 130 issue bodies plus the already-merged PR 917 reference, including every available comment; metadata comment counts agree for every record.
+All 32 prior issue comment sets and 30 bodies are unchanged; 1159/1160 body updates record the already-approved contracts and merged implementation.
+All 50 actual post-tag PRs are covered and their merged states were independently refreshed.
+Git ancestry identifies 49 standard Merge-pull-request messages; 1153 uses a custom Merge-PR message and is separately verified by its exact GitHub merge SHA.
+The fresh 200-PR input is a repository inventory, not a keyword-based declaration that every mentioned issue is resolved.
+Existing partial work already in v0.15 is distinguished from post-tag remaining-scope fixes in the prior audit; every cited remaining-fix merge is absent from v0.15.
+
+* Additional 16, now accepted
+| Issue | Fix PR | Accepted remaining scope |
+|-------+--------+--------------------------|
+| 1008 | 1151 | Repair GhanaLSS null keys country-side, recover cover-page sample gaps without guessing, retain honest missing-unit sentinels, and apply the final screener ruling while preserving Feature delete-and-report policy. |
+| 1035 | 1152 | Apply W1-PH stated mass only to positive fractional container quantities; whole-container quantities remain inferred and volume policy remains unchanged. |
+| 1037 | 1094 | Recover Nigeria W4 interview timestamps and correct its declared household level without serializing a bound date method; W3 month codes also restored. |
+| 1038 | 1053 | Map source ##N/A## interview-time placeholders to null at their wave read; other date/visit scientific questions stay separate. |
+| 1041 | 1046 | Replace Nigeria's missing raw food-unit literal None with U_UNKNOWN and retire that exact minted-spelling ledger entry; quantities/acquisitions remain native. |
+| 1042 | 1076 | Implement questionnaire-backed GhanaLSS/Malawi unit corrections and all six subsequent rulings; retain authoritative survey-kg values and explicitly separate unresolved nutrition/unit decisions. |
+| 1047 | 1094 | Normalize retained raw Nigerian unit codes, fill absent crop/input unit identity with Unknown at the correct stage, and preserve labelled paths. |
+| 1050 | 1054 | Wire the actual 2018-19 Burkina Faso GPS fields, remove the impossible 2014 sub-source, retain optionality only for waves without coordinates, and preserve geographic attributes. |
+| 1113 | 1147 | Skip raw Uganda country-parquet invariance comparison when its coverage manifest is partial, preserving the full-coverage baseline test and structural checks. |
+| 1140 | 1151 | Drop only explicit No in GhanaLSS 2016-17 own-production screener; retain blank-screener real answers. Sibling-wave measurement is separate. |
+| 607 | 1023 | Wave-aware Nigerian food-unit decoding, with the corrected W2 centilitre interpretation; residual size/rare-code/stated-weight tasks are separate. |
+| 805 | 1105 | Accepted narrowed per-file cp1252 verdict for pre-118 Stata with no explicit encoding; UTF-8 double encodings, DOS files and format118 remain outside the accepted correction. |
+| 831 | 1105 | Refuse sidecar-less in-tree survey sources unless an acquisition context or explicit environment opt-in authorizes them. |
+| 840 | 1086 | Preserve community-price variety, visit and observation axes under the amended three-level ruling; retain conflicting source observations and remove only exact repeats. |
+| 962 | 1028 | Food-country unit vocabulary inventory, discriminatory missing-spelling/minted-spelling guards, and the documented accepted residual-code inference contract; no inference-policy change. |
+| 974 | 1020 | Fold the four reachable case-collision groups into their actual strip/title lookup forms without changing tuples or reached coverage. Punctuation/whitespace normalization is a separate policy choice. |
+
+Each proposal record includes the complete body hash, all comment hashes/URLs, exact merged PR ancestry, runtime blob hashes, source symbol/line anchors and named test lines.
+No raw issue/comment excerpts, survey record examples or identifiers are included in the safe exports.
+Already-closed 953/958/960 require no new closing keyword.
+
+* Retained scope and scientific boundaries
+The retained-residuals JSON enumerates 77 refreshed referenced OPEN scopes; this is not the complete repository backlog.
+Keep 778,932,1044,1045,1066,1110 and1149 open.
+The generic fixed comment on 1066 does not implement its explicit assumed-fresh replay residual: Country._read_assumed_fresh_cache still omits the grain replay (country.py:4678).
+The narrow 805 ruling leaves DOS/format118 classes outside that accepted correction; its named 805-a/805-b residuals remain disclosed.
+Kinship 974 folds current case lookup collisions; broader punctuation/whitespace normalization is a separate decision.
+Country guidance was respected: Nigeria units vary by wave and W1-PH card weights have a quantity-mode rule; GhanaLSS screener No differs from missing; Malawi Unknown may retain authoritative survey kilograms; Burkina 2014 measurement/area fields are not coordinates; community-price variety/visit/observation meanings differ by survey.
+The current Uganda nutrition approval is not an ongoing historical hold; the bounded numerical variant repair does not settle FCT/scientific questions.
+No new survey measurement, source acquisition, scientific inference or cache build was performed.
+
+* Commit closing-keyword audit
+All full commit messages in the exact v0.15.0..acbd ancestry were scanned, including merged side histories.
+Four closing-keyword occurrences refer only to 1099 (verified closure) and 917/1028 (already-merged PRs, not issues).
+No unverified issue closure keyword was found; none targets 778/932/1149/1110.
+Conventional fix(#N) scopes are not GitHub closing keywords.
+The release PR must use the explicit 48-line export; partial umbrellas are not promoted by their appearance in older PR descriptions.
+
+* Static contents and limits
+Only 333 tracked evidence/handoff paths differ from validated 532; the JSON enumerates every difference.
+All common runtime/package/country configurations, tests/fixtures, scripts/bin/tools, bench/audit, workflows and build/dependency blobs/types/modes are identical.
+v0.15 and validated 532 are development ancestors; source was read only through immutable Git objects.
+This does not rerun tests or packaging, reproduce a runtime environment, or establish a tagged package version or enforced PR-event credentialed job.
+Later release-note/tag/master changes require their own exact pin; this audit performs none of them.
+
+* Reproduction and privacy
+See REPRO.org and COPYLIST.txt.
+Private connected issue/PR snapshots are prerequisites for replay and are deliberately excluded from the safe copy list.
+The raw private issue snapshots must never be copied into the release evidence directory.
+
+-- Sue

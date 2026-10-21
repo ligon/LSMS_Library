@@ -1,0 +1,32 @@
+{
+  "commit_count": 450,
+  "matches": [
+    {
+      "classification": "verified closure",
+      "commit": "94e82dfa3ff3f31c96d5a1c1db2865914d3ff144",
+      "keyword": "Fix",
+      "number": 1099
+    },
+    {
+      "classification": "verified closure",
+      "commit": "7117f5b683d5c98812027277de88b5d9d7a8536a",
+      "keyword": "Fix",
+      "number": 1099
+    },
+    {
+      "classification": "already merged pull request, not an issue",
+      "commit": "740b716a3b27b2b7ba998fdf126b12622356edc8",
+      "keyword": "fixed",
+      "number": 917
+    },
+    {
+      "classification": "already merged pull request, not an issue",
+      "commit": "602faa98a182611ae6de84489ac85958fd31c92f",
+      "keyword": "resolved",
+      "number": 1028
+    }
+  ],
+  "none_for_retained_778_932_1149_1110": true,
+  "scope": "All full commit messages in exact v0.15.0..acbd ancestry, including merged side histories; conventional fix(#N) scopes are not closing keywords.",
+  "unverified_issue_keyword_count": 0
+}

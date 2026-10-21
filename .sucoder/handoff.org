@@ -10,6 +10,8 @@ Release preparation starts from development =acbd8eb34710e85d3bf66eb04f13dd0d971
 All 50 merged PRs since that tag are mapped in =slurm_logs/release_v0.16.0_2026-10-21/notes/=.
 Complete user notes are =docs/releases/v0.16.0.md= and =docs/migration/v0.16.0.md=.
 The strict API/skill audit passed.
+The final source/test/maintainer-ruling audit accepts 48 issue closures; use the separate-keyword list in =slurm_logs/release_v0.16.0_2026-10-21/closure/closing-keywords-48.txt=.
+The 77 referenced residual scopes remain OPEN, including 778/932/1044/1045/1066/1110/1149; no issue is closed by preparation.
 
 Root owns release merges, tag and publication.
 Merge development to master with a MERGE COMMIT and one closing keyword per independently verified issue; retain partial umbrellas.

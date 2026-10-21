@@ -1,0 +1,22 @@
+#+TITLE: Read-only release closure reproduction
+#+AUTHOR: Sue
+
+The snapshot source is immutable development acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c.
+The previous release is annotated v0.15.0 peeled to cb44e3522a2426ba03431ca9a218cc63fe03f6c9.
+The validated executable source is532d58700fa46e52a0b390198604eca1dc4de00e.
+
+Connected GitHub fetch_issue and fetch_issue_comments supplied every body and every comment, with count equality checked.
+Connected get_pr_info independently refreshed all50 actual post-tag PRs.
+The parent supplied the fresh200 merged-PR inventory; ancestry and every matching merge SHA were checked locally.
+All provider snapshots remain in private-issues/ and private-prs/, mode0600, and are not safe publication artifacts.
+
+Run the mounted image Python on reconcile.py, then finalize.py from this private report directory.
+These controllers import only standard-library modules and use Git object reads; they never import repository code or execute tests/builds/data access.
+reconcile.py expects the private snapshots and the unchanged source/reference pins; later issue closures or moving release refs require a separately named snapshot rather than rewriting this frozen evidence.
+finalize.py records the parent's already-given acceptance of the16 additions; it does not request or infer a new approval.
+
+For an independent GET-only refresh outside connected tools, gh api issues/N and gh api --paginate issues/N/comments provide the corresponding REST metadata.
+Preserve all pages and normalize provider field names before replay; no new data source or country API is involved.
+Never copy those raw responses into the public evidence directory.
+
+This audit performs no repository/GitHub/cache mutation, release/tag, acquisition, or publish action.

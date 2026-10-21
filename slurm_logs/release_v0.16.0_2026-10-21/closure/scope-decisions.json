@@ -1,0 +1,281 @@
+{
+  "additional_proposals": {
+    "1008": {
+      "authority": "Current country-side ruling and its amendment match merged PR1151; the PR reports zero remaining null-key rows and exact Country/Feature additive conservation.",
+      "pr": 1151,
+      "residuals": [
+        1138,
+        1139,
+        1141,
+        1142,
+        1145
+      ],
+      "runtime": [
+        "lsms_library/countries/GhanaLSS/_/ghanalss.py",
+        "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py"
+      ],
+      "scope": "Repair GhanaLSS null keys country-side, recover cover-page sample gaps without guessing, retain honest missing-unit sentinels, and apply the final screener ruling while preserving Feature delete-and-report policy.",
+      "tests": [
+        "tests/test_gh1008_ghanalss_null_keys.py"
+      ]
+    },
+    "1035": {
+      "authority": "The later quantity-aware maintainer ruling supersedes the earlier label-weight proposal; merged PR and controls follow the amendment.",
+      "pr": 1152,
+      "residuals": [
+        1144
+      ],
+      "runtime": [
+        "lsms_library/countries/Nigeria/2010-11/_/food_acquired.py"
+      ],
+      "scope": "Apply W1-PH stated mass only to positive fractional container quantities; whole-container quantities remain inferred and volume policy remains unchanged.",
+      "tests": [
+        "tests/test_gh1035_nigeria_w1_stated_weights.py"
+      ]
+    },
+    "1037": {
+      "authority": "Final maintainer comment explicitly marks PR1094 fixed and names separate timestamp/grain follow-ups.",
+      "pr": 1094,
+      "residuals": [
+        1095,
+        1096,
+        1045
+      ],
+      "runtime": [
+        "lsms_library/countries/Nigeria/2018-19/_/interview_date.py"
+      ],
+      "scope": "Recover Nigeria W4 interview timestamps and correct its declared household level without serializing a bound date method; W3 month codes also restored.",
+      "tests": [
+        "tests/test_gh1037_nigeria_interview_date.py"
+      ]
+    },
+    "1038": {
+      "authority": "Current requested placeholder mapping, source-content investigation and final fixed-on-development comment align with the merged PR.",
+      "pr": 1053,
+      "residuals": [
+        1055,
+        1056
+      ],
+      "runtime": [
+        "lsms_library/countries/Ethiopia/2018-19/_/data_info.yml",
+        "lsms_library/countries/Ethiopia/2021-22/_/data_info.yml"
+      ],
+      "scope": "Map source ##N/A## interview-time placeholders to null at their wave read; other date/visit scientific questions stay separate.",
+      "tests": [
+        "tests/test_gh1038_ethiopia_interview_date_na.py"
+      ]
+    },
+    "1041": {
+      "authority": "The entire issue is the single Nigerian food fill site plus ledger cleanup; merged implementation and discriminating blank-unit/kg controls cover that scope.",
+      "pr": 1046,
+      "residuals": [],
+      "runtime": [
+        "lsms_library/countries/Nigeria/_/nigeria.py"
+      ],
+      "scope": "Replace Nigeria's missing raw food-unit literal None with U_UNKNOWN and retire that exact minted-spelling ledger entry; quantities/acquisitions remain native.",
+      "tests": [
+        "tests/test_gh1041_nigeria_missing_unit.py",
+        "tests/test_962_unit_sentinel.py"
+      ]
+    },
+    "1042": {
+      "authority": "Final maintainer comment says fixed after three red-team rounds and the six rulings, with all remaining work filed separately.",
+      "pr": 1076,
+      "residuals": [
+        1072,
+        1073,
+        1074,
+        1075
+      ],
+      "runtime": [
+        "lsms_library/countries/GhanaLSS/_/ghanalss.py",
+        "lsms_library/countries/GhanaLSS/_/unit_labels.org",
+        "lsms_library/countries/Malawi/_/malawi.py"
+      ],
+      "scope": "Implement questionnaire-backed GhanaLSS/Malawi unit corrections and all six subsequent rulings; retain authoritative survey-kg values and explicitly separate unresolved nutrition/unit decisions.",
+      "tests": [
+        "tests/test_gh1042_missing_unit_spellings.py"
+      ]
+    },
+    "1047": {
+      "authority": "Both requested defect classes are covered by merged PR1094 and named negative controls; final maintainer comment explicitly marks fixed.",
+      "pr": 1094,
+      "residuals": [
+        1095,
+        1096,
+        1045
+      ],
+      "runtime": [
+        "lsms_library/countries/Nigeria/_/nigeria.py"
+      ],
+      "scope": "Normalize retained raw Nigerian unit codes, fill absent crop/input unit identity with Unknown at the correct stage, and preserve labelled paths.",
+      "tests": [
+        "tests/test_gh1047_nigeria_unit_codes.py"
+      ]
+    },
+    "1050": {
+      "authority": "Final maintainer comment explicitly marks fixed; source metadata distinguishes parcel measurement/area from actual coordinates and the PR records red-team corrections.",
+      "pr": 1054,
+      "residuals": [
+        1057,
+        1058,
+        1059,
+        1060
+      ],
+      "runtime": [
+        "lsms_library/countries/Burkina_Faso/2018-19/_/data_info.yml",
+        "lsms_library/countries/Burkina_Faso/2014/_/data_info.yml"
+      ],
+      "scope": "Wire the actual 2018-19 Burkina Faso GPS fields, remove the impossible 2014 sub-source, retain optionality only for waves without coordinates, and preserve geographic attributes.",
+      "tests": [
+        "tests/test_burkina_faso_cluster_gps.py"
+      ]
+    },
+    "1113": {
+      "authority": "Final maintainer comment explicitly marks PR1147 fixed; _coverage_skip_reason supplies the requested footer-only guard.",
+      "pr": 1147,
+      "residuals": [
+        1146
+      ],
+      "runtime": [
+        "tests/test_uganda_invariance.py"
+      ],
+      "scope": "Skip raw Uganda country-parquet invariance comparison when its coverage manifest is partial, preserving the full-coverage baseline test and structural checks.",
+      "tests": [
+        "tests/test_uganda_invariance.py"
+      ]
+    },
+    "1140": {
+      "authority": "Explicit final maintainer !=2 ruling is implemented in screen_8h and pinned by the discriminating drop-only-No test.",
+      "pr": 1151,
+      "residuals": [
+        1145
+      ],
+      "runtime": [
+        "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py"
+      ],
+      "scope": "Drop only explicit No in GhanaLSS 2016-17 own-production screener; retain blank-screener real answers. Sibling-wave measurement is separate.",
+      "tests": [
+        "tests/test_gh1008_ghanalss_null_keys.py"
+      ]
+    },
+    "607": {
+      "authority": "Maintainer comment explicitly says PR1023 resolves the collision and corrects the original counts.",
+      "pr": 1023,
+      "residuals": [
+        1033,
+        1034
+      ],
+      "runtime": [
+        "lsms_library/countries/Nigeria/_/nigeria.py"
+      ],
+      "scope": "Wave-aware Nigerian food-unit decoding, with the corrected W2 centilitre interpretation; residual size/rare-code/stated-weight tasks are separate.",
+      "tests": [
+        "tests/test_nigeria_food_unit_decode.py"
+      ]
+    },
+    "805": {
+      "authority": "Two maintainer rulings narrow the implementation; the final comment explicitly marks this issue fixed pending release.",
+      "pr": 1105,
+      "residuals": [],
+      "runtime": [
+        "lsms_library/local_tools.py"
+      ],
+      "scope": "Accepted narrowed per-file cp1252 verdict for pre-118 Stata with no explicit encoding; UTF-8 double encodings, DOS files and format118 remain outside the accepted correction.",
+      "tests": [
+        "tests/test_gh805_cp1252_reader.py"
+      ],
+      "unfiled_residuals": [
+        "805-a DOS-code-page class",
+        "805-b format118 class"
+      ]
+    },
+    "831": {
+      "authority": "Current remaining-policy body plus explicit option(b) ruling and final fixed-on-development comment.",
+      "pr": 1105,
+      "residuals": [],
+      "runtime": [
+        "lsms_library/local_tools.py"
+      ],
+      "scope": "Refuse sidecar-less in-tree survey sources unless an acquisition context or explicit environment opt-in authorizes them.",
+      "tests": [
+        "tests/test_gh831_intree_source_policy.py",
+        "tests/test_gh831_cache_clear_intree_sources.py"
+      ]
+    },
+    "840": {
+      "authority": "Amended maintainer ruling accepts finer grain and disclosed sentinel meanings; final comment explicitly marks fixed with separate residuals.",
+      "pr": 1086,
+      "residuals": [
+        1087,
+        1088,
+        1089,
+        1090,
+        1091
+      ],
+      "runtime": [
+        "lsms_library/data_info.yml",
+        "lsms_library/countries/Mali/_/mali.py",
+        "lsms_library/countries/Niger/_/niger.py",
+        "lsms_library/countries/Tanzania/_/tanzania.py"
+      ],
+      "scope": "Preserve community-price variety, visit and observation axes under the amended three-level ruling; retain conflicting source observations and remove only exact repeats.",
+      "tests": [
+        "tests/test_community_prices_variety.py"
+      ]
+    },
+    "962": {
+      "authority": "Maintainer comment explicitly says PR1028 delivers all three completion criteria and assigns live discoveries to separate issues.",
+      "pr": 1028,
+      "residuals": [
+        1043,
+        1044,
+        1148
+      ],
+      "runtime": [
+        "lsms_library/transformations.py"
+      ],
+      "scope": "Food-country unit vocabulary inventory, discriminatory missing-spelling/minted-spelling guards, and the documented accepted residual-code inference contract; no inference-policy change.",
+      "tests": [
+        "tests/test_962_unit_sentinel.py",
+        "tests/test_food_kg_inference.py",
+        "tests/test_u_code_leak.py"
+      ]
+    },
+    "974": {
+      "authority": "Current remaining-body contract is canonical reachable spelling forms; merged PR documents lookup precedence, identical per-country served values and the negative guard.",
+      "pr": 1020,
+      "residuals": [],
+      "runtime": [
+        "lsms_library/categorical_mapping/kinship.yml",
+        "lsms_library/country.py"
+      ],
+      "scope": "Fold the four reachable case-collision groups into their actual strip/title lookup forms without changing tuples or reached coverage. Punctuation/whitespace normalization is a separate policy choice.",
+      "tests": [
+        "tests/test_kinship_yml_hygiene.py"
+      ],
+      "unfiled_residuals": [
+        "Broader punctuation/whitespace lookup normalization remains a separate decision"
+      ]
+    }
+  },
+  "primary_open_residuals": {
+    "1044": "1989 EthiopiaRHS unit-code decoding/data-entry hypothesis remains; the integer/missing-unit partial correction is not completion.",
+    "1045": "Runs2+, calendar phases2-4 and the timestamp time-of-day decision remain.",
+    "1066": "Original no-DVC grain stamp is fixed, but the issue's explicit assumed-fresh grain replay residual remains; Country._read_assumed_fresh_cache still intentionally omits replay.",
+    "1110": "Parcel/plot land-grain symmetry and scientific/default policy remain separate from country identity fixes.",
+    "1149": "Nested archive layout, staging, sidecar placement and reviewed retirement remain; provenance safeguards are not a staging/rollback implementation.",
+    "218": "Remaining retired-family Makefile/registration references remain after selected script retirement.",
+    "637": "Remaining first/last country-site key-soundness inventory, with source/subprocess measurement rather than duplicate counts.",
+    "650": "Documentation minimum standard, automatic acquisition and missing-document backfill remain.",
+    "698": "Latest maintainer comment explicitly keeps OPEN for upstream Ghana relabels1100/1101 and separate1102/1103.",
+    "778": "Trust-mode admission of a complete unstamped script output at the final path remains a policy/timing contract; disappearance/private-test fixes do not settle it.",
+    "787": "Read-path label/quantity contract retains current broader remaining scope after the labels_unmatched increment.",
+    "798": "Remaining datetime read-path/rebuild semantics retain the current narrowed issue; build-time migration is not complete.",
+    "828": "basis=total still needs the missing in-kind coverage warning/decision; units-unavailable handling alone does not complete it.",
+    "845": "Remaining per-country Price provenance and diagnostic decisions remain after general docstring clarification.",
+    "851": "Recall-period PhaseII/exposure work remains in the existing unlanded cf117 lineage, outside actual dev ancestry.",
+    "920": "Rebuild notice level and remaining warm read-path profiling remain after the fingerprint/read-gate repair.",
+    "932": "Real development-PR data execution/enforcement remains absent; nightly/manual/merge_group definitions do not establish a personal-repository merge queue or eligible required PR check."
+  }
+}
