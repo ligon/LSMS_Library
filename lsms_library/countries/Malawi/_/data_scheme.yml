@@ -289,8 +289,10 @@ Data Scheme:
     # several seed crops or a fertilizer in several units.  Reported item
     # columns only: Quantity, native u, Purchased (bool, True where a
     # purchased seed quantity is attached), Quantity_purchased, Improved
-    # (bool, seed rows).  Aggregates (seed_kg, nitrogen_kg,
-    # inorganic/organic/pesticide any-flags) are transformations, NOT
+    # (bool, seed rows).  Applied is the reported organic-use flag (ag_d36),
+    # True on organic rows and missing for other input types.
+    # Aggregates (seed_kg, nitrogen_kg,
+    # household inorganic/organic/pesticide any-flags) are transformations, NOT
     # stored columns.  2004-05 (IHS2) deferred: household-level aggregated
     # ag file, no plot-input roster.  See _/malawi.py:assemble_plot_inputs.
     index: (t, i, plot_id, input, crop, u)
@@ -298,6 +300,9 @@ Data Scheme:
     Purchased: bool
     Quantity_purchased: float
     Improved: bool
+    Applied:
+      type: bool
+      optional: true
     materialize: make
   livestock:
     # Item-level (t, i, animal) livestock-roster feature for the four

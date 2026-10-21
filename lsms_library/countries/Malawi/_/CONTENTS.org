@@ -3030,8 +3030,15 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
     neighbouring =Quantity_purchased= aggregation already uses
     =min_count=1=).  So 11,075 rows report a measured zero that the survey
     never recorded.  No =nitrogen_kg= number depends on it (organic rows get
-    no share), but it is a fabricated value; residual, not fixed here,
-    because editing =malawi.py= moves every Malawi cache hash.
+    no share), but it is a fabricated value.
+    *Fixed 2026-10-21 (GH #1109)*: organic Quantity groups use =sum(min_count=1)=, aligned on the complete existing key.
+    The raw affirmative =ag_d36= answer is carried as =Applied=True=, following Ethiopia's quantity-free organic-use records; this preserves the records through the framework's all-null-row filter.
+    All-missing organic groups retain NA, and reported zero and numeric sums retain their meanings.
+    Other input types receive =Applied= NA and keep their existing Quantity reducer.
+    The source unit and non-crop index markers are unchanged; their residuals remain GH #1118 / #1119.
+    Editing =malawi.py= and =data_scheme.yml= moves every Malawi cache hash, so this requires one country re-warm.
+    *Separate residual, measured by the rejected global =min_count=1= patch*: 437 nonorganic records have no other payload (390 Seed, 24 NPK, 11 Urea, 6 DAP, 4 Herbicide, 1 Fungicide, 1 Insecticide).
+    Changing their Quantity to NA deletes them at finalization; their source-presence semantics need their own investigation, and this organic correction preserves their existing values.
   - *=fertilizer_rate(Malawi)= depends on =on=.*  The default =on='parcel'=
     gives 11,622 plots (median 0.10 kg N/ha), =on='plot'= 33,402 (median
     26.25).  The 2016-17 / 2019-20 garden-plot keys (=RG01_R01=) are cut to

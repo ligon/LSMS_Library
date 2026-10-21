@@ -3006,11 +3006,11 @@ def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
 
 def _organic_block(df, *, hhid, plotkey, flag, t):
     """One row per plot where organic fertilizer was reported applied
-    (ag_d36 == 1/Yes).  Presence is the reported item; Quantity / u are NA
-    (Module D records no organic-fertilizer quantity)."""
+    (ag_d36 == 1/Yes).  Applied carries that reported answer; Quantity / u
+    are NA (Module D records no organic-fertilizer quantity)."""
     if flag is None or flag not in df.columns:
         return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
-                                     'Quantity', 'u', 'Improved'])
+                                     'Quantity', 'u', 'Improved', 'Applied'])
     used = _int_codes(df[flag]) == 1
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
@@ -3020,6 +3020,7 @@ def _organic_block(df, *, hhid, plotkey, flag, t):
         'Quantity':    pd.array([pd.NA] * len(df), dtype='Float64'),
         'u':           pd.array([pd.NA] * len(df), dtype='string'),
         'Improved':    pd.array([pd.NA] * len(df), dtype='boolean'),
+        'Applied':     used.astype('boolean').values,
     })
     return out[used.values]
 
@@ -3163,7 +3164,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     Returns
     -------
     pd.DataFrame indexed (t, i, plot, input) with columns Quantity, u,
-    Purchased, Quantity_purchased, Improved, crop.  Item-level reported
+    Purchased, Quantity_purchased, Improved, Applied, crop.  Item-level reported
     values only.
     """
     df = pd.concat([p for p in input_pieces if p is not None and len(p)],
@@ -3172,6 +3173,9 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     df['input'] = _input_labels(df['_input_code'])
     # An input row needs a resolved input label to land on the index.
     df = df[df['input'].notna()]
+    if 'Applied' not in df.columns:
+        df['Applied'] = pd.array([pd.NA] * len(df), dtype='boolean')
+    df['Applied'] = df['Applied'].astype('boolean')
 
     # Seed-purchase merge (household-crop grain -> single-plot seed rows).
     df['Quantity_purchased'] = pd.array([pd.NA] * len(df), dtype='Float64')
@@ -3220,12 +3224,13 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # NaN) are not silently dropped.
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
-    grp = df.groupby(['t', 'i', 'plot_id', 'input', 'crop', 'u'],
-                     as_index=False, dropna=False).agg({
+    keys = ['t', 'i', 'plot_id', 'input', 'crop', 'u']
+    grp = df.groupby(keys, as_index=False, dropna=False).agg({
         'Quantity':           'sum',
         'Quantity_purchased': 'first',
         'Purchased':          'first',
         'Improved':           'first',
+        'Applied':            'max',
     })
 
     # The natural per-input-line grain is (t, i, plot, input, crop, u): a
@@ -3235,7 +3240,17 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # index to keep it unique; both are NaN for the inputs that don't carry
     # them (fertilizer/pesticide have NaN crop; organic-fertilizer rows have
     # NaN u as well).  dropna=False above keeps those NaN-keyed rows.
-    grp = grp.set_index(['t', 'i', 'plot_id', 'input', 'crop', 'u'])
+    grp = grp.set_index(keys)
+    # GH #1109 (ledger sections 2-4): organic use is reported in Applied,
+    # not as a measured zero quantity.  Keep its missingness without changing
+    # the existing nonorganic reducer; those all-missing records need their
+    # own source-presence review.  Align on every key, including null crop/u.
+    organic = df['input'].eq('Organic Fertilizer')
+    if organic.any():
+        quantities = (df.loc[organic].groupby(keys, dropna=False)['Quantity']
+                      .sum(min_count=1))
+        target = grp.index.get_level_values('input') == 'Organic Fertilizer'
+        grp.loc[target, 'Quantity'] = quantities.reindex(grp.index[target]).array
     return grp
 
 
