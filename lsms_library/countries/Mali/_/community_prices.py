@@ -1,7 +1,7 @@
 """Concatenate wave-level community_prices for Mali (GAP C; parity loop).
 
 Each EACI wave's ``Mali/<wave>/_/community_prices.py`` writes a parquet
-indexed by ``(t, v, j, u, variety, visit)`` (GH #840) with the reported
+indexed by ``(t, v, j, u, variety, visit, obs)`` (GH #840/#822) with the reported
 item-level community price columns (Price, Quantity, Description).  The
 community price questionnaire lives in the 2014-15 EACI wave ONLY
 (EACIS04_p1/p2); the 2017-18 EACI wave dropped the community questionnaire,
@@ -34,6 +34,6 @@ assert pieces, "community_prices: no wave-level parquets found"
 
 p = pd.concat(pieces)
 
-assert p.index.is_unique, "Non-unique (t, v, j, u, variety, visit) after concat"
+assert p.index.is_unique, "Non-unique (t, v, j, u, variety, visit, obs) after concat"
 
 to_parquet(p, '../var/community_prices.parquet')

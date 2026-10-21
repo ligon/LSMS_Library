@@ -718,7 +718,7 @@ cette quantite ... achete", populated on 13.7% / 13.9% of rows) and have *no*
 market comparison from the consumption module.  Do not file this as a config
 gap; it is =not-asked=, and the questionnaire is the evidence.
 
-** community_prices reads ONE of the survey's THREE price readings
+** community_prices reads ONE of the survey's THREE price readings (historical, before GH #822)
 
 The community questionnaire's price block (=EACI2014_COM_P2_11082014.pdf=,
 "SECTION 4. RELEVE DES PRIX A LA CONSOMMATION", columns 4.03-4.11) is *three
@@ -745,7 +745,7 @@ relevés 1 and 3 share a unit and a weight (n = 31,408), the median
 log(P3/P1) is exactly 0.000 with an IQR of 0.000 -- the readings are the same
 number recorded again.  A fix would take relevé 1 (the best-populated) with the
 others as fallback, or carry an =obs= level as GhanaLSS does.  Reported, not
-fixed: it changes what =community_prices()= serves for every consumer.
+fixed at the time of this measurement; GH #822 restores the readings as recorded below.
 
 ** The (t, v, j, u) key collapses the VARIETY axis, and varieties differ
 
@@ -795,8 +795,8 @@ decided the encoding:
 =mali.py='s pre-#840 comment called the colliding prices "near-identical
 (median max/min ratio ~1.13)"; the tomato-paste instance above (125 vs 600
 FCFA for the 60 g and 220 g Aicha tins) is the counter-example, and the
-comment is gone.  Still NOT read: relevés 1 and 2 (the section above) -- when
-they are, they belong on an =obs= level, which is why this table has none.
+comment is gone.  At GH #840 releves 1 and 2 were still unread, with no native =obs= level.
+GH #822 restores those readings on native =obs=1/2/3=, as recorded below.
 
 ** =community_prices.Quantity= is a WEIGHT IN KG, not a count of units
 
@@ -1244,3 +1244,25 @@ Two further facts about this table, both pre-existing and unchanged:
   =(t, v, i, j, u, s)= collapse (passage dropped) sums to 1,534.  That minted
   spelling is the class the #1041 ruling forbids (a missing unit is
   =U_UNKNOWN=, ='Unknown'=); drafted as its own issue, not fixed here.
+
+* 2026-10-21 -- 2014-15 all three price readings and missing passage-2 unit labels (GH #822)
+
+The native Country table now has =(t, v, j, u, variety, visit, obs)= and reads all three Unit/Poids/Prix triples.
+The native integer =obs= is the questionnaire slot 1/2/3; every previously served reading-3 row now carries =obs=3=.
+Before this change the Country table had no =obs=, and =Feature()= added neutral =obs=1= as alignment metadata.
+
+The two held =EACIS04_p{1,2}.dta= files have identical Unit/Poids/Prix variable labels for all three slots, but passage 2's =s04q03= and =s04q06= lack their Stata unit value-label dictionaries.
+Passage 1's three unit dictionaries and passage 2's =s04q09= dictionary are identical: codes 1--14 name the same units and 99 is =Manquant=.
+Reading the unlabelled passage-2 fields as labels would discard all 66,434 positive-price slots in readings 1/2.
+The wave script restores those missing labels from this community grid's common unit dictionary before applying the existing country unit-label mapper; no household-food unit codebook is involved.
+
+With that label restoration and the current item/unit/price filter, the census is 155,931 rows: 66,699 in reading 1, 49,014 in reading 2 and the exact 40,218 reading-3 rows served today.
+All seven-level keys are unique and non-null; every old price cell survives.
+The 129 positive-price entries with unresolved units remain outside that filter: 49 code 99, 19 code 0, 58 other integer codes and 3 fractional codes.
+Their weights include 79 positive values, 22 zeros, 15 sentinel-999 values and 13 missing values; these masks establish no repair for the unresolved unit.
+The old reading-3 keep and full drop sets are unchanged exactly, including its 19 positive-price unresolved-unit entries.
+
+The =Poids (KG)= definition above remains the recorded questionnaire evidence for Quantity, and Price remains the price of that lot.
+This diagnosis freshly checked Stata labels and held data, but did not newly read the questionnaire PDF, whose blob was not held; no acquisition was performed.
+The separate 2018-19 community-module gap remains GH #821.
+The per-task design and source-safe evidence are in =slurm_logs/isa_backlog_2026-10-21/Mali/822/=.
