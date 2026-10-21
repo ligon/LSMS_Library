@@ -1,0 +1,8 @@
+{
+  "base": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "production_files_changed": [],
+  "all_existing_manifest_fields_identical": true,
+  "added_variant_only_for": "var/nutrition.parquet",
+  "baseline_generator_invoked": false,
+  "no_runtime_or_config_hash_inputs_changed": true
+}

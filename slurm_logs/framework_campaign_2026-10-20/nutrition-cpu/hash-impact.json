@@ -1,0 +1,19 @@
+{
+  "comparison_baseline": "852ac2bfcd5f798533f56e7efa1f77db80c0138f runtime; ledger-only1159 head metadata eeffc88163a0f453ed60b9beecd00d534358d42d",
+  "candidate_head": "66416b61bcfeeb1904419445102c28eca61d6eb1",
+  "changes": {
+    "country": {
+      "entries": 549,
+      "changed": []
+    },
+    "wave": {
+      "entries": 2139,
+      "changed": []
+    },
+    "tagged": {
+      "entries": 39,
+      "changed": []
+    }
+  },
+  "errors": {}
+}
