@@ -70,6 +70,10 @@ Each uses the extracted interpreter, exact import/config identity, private writa
 They commit with attribution and verify origin publication; no GitHub push/PR/merge until parent coordinates independent review and dependencies.
 Next: finish original candidate CI/evidence, review and validate each new increment, then integrate/test the follow-up candidate. No release or protection changes.
 
+Follow-up checkpoint: #1159 is frozen45f80dcb5 (runtime da84c7c79), independently accepted by parent with260 focused passes plus16 added controls; evidence1159-review/. #778 is frozen3c97f20db (runtime2aef1c2ac),190 passes, under windows_ci independent review. Both have zero549/2139/39 hash changes. Provenance341 related tests pass; one additional bare-URL preservation control is being finished, source not yet frozen. framework_reliability is prepared for independent review and must receive the frozen SHA before candidate verification.
+New inherited fertilizer_rate pooling residual is filed as #1160 with independent old/new synthetic proof; no implementation authorized.
+The original exact852 GitHub run39519191762 is still running; monitor exec cell242 checks it every45seconds and stores combined_ci_final on completion. Wait on that cell rather than starting another monitor.
+
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.
   Fixes #958 (all five defects) and #960 (docs).  #957 closed (done 2026-09-22).
