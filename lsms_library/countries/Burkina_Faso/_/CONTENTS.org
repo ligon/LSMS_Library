@@ -740,8 +740,9 @@ Parcel-level lasting characteristics from the EHCVM agriculture module
 uses a different instrument and is out of scope.
 
 - Index =(t, i, plot_id)= with =plot_id = "{field_no}_{parcel_no}"=
-  (=s16aq02= _ =s16aq03=); =i= is the EHCVM composite =(grappe, menage)=
-  built with Burkina's =i()= formatter so it matches =sample().i=.
+  (=s16aq02= _ =s16aq03=); the native household key is =(grappe, menage)=.
+  The 2018-19 script passes =ehcvm_i=, while 2021-22 passes =_old_i=
+  wrapping country =i()=, matching each wave's sample namespace.
 - Columns: =Area= (hectares; GPS =s16aq47= where measured, else farmer
   estimate =s16aq09a= converted via =s16aq09b= 1=ha/2=m²), =AreaUnit=
   ('hectares'), =Tenure= (=s16aq10=), =TenureSystem= (=s16aq13=),
@@ -750,8 +751,9 @@ uses a different instrument and is out of scope.
   =harmonize_water=, =harmonize_tenure_system= live in
   =categorical_mapping.org=, keyed on the integer s16a codes.
 - Placeholder rows (no field/parcel number) for non-farming households
-  are dropped.  Latitude / Longitude deferred (no decimal-degree parcel
-  GPS in EHCVM s16a).
+  are dropped.
+- =Latitude= / =Longitude= carry the recorded 2021-22 parcel position;
+  2018-19 has no coordinate source and is missing in the country table.
 
 CORRECTION (2026-10-18, GH #1050).  "no decimal-degree parcel GPS in EHCVM
 s16a" holds for 2018-19 only.  =s16a_me_bfa2021.dta= carries
@@ -759,7 +761,35 @@ s16a" holds for 2018-19 only.  =s16a_me_bfa2021.dta= carries
 =s16aq46__latitude= / =s16aq46__longitude= « Coordonnées GPS de la parcelle »,
 populated for 4,180 of 8,467 parcels (lat 9.85-13.99, lon -5.35-0.35).
 =s16a_me_bfa2018.dta= has =s16aq45= and the area =s16aq47= but no =s16aq46=.
-The 2021-22 parcel coordinates are not wired into =plot_features=.
+At that date the 2021-22 parcel coordinates were not wired into =plot_features=.
+
+** Parcel coordinates and key layers (GH #1058, 2026-10-21)
+
+The 2021-22 loader now binds =s16aq46__latitude= and =s16aq46__longitude= through the existing retained-source helper as independent nullable floats.
+The earlier helper/scheme claim "EHCVM s16a has no decimal-degree parcel GPS" contradicted the dated correction above and the held variable labels; those comments are corrected with this mapping.
+The 8,467 source rows contain 7,350 native parcels and 1,117 placeholders with both field and parcel number missing.
+All 4,180 paired positions occur on retained parcels; 3,170 retained parcels lack both coordinates and none has only one axis.
+Of 4,190 retained parcels answering Yes to GPS measurement, ten record area but no position; their positions remain missing.
+Neither the measurement flag nor the GPS area =s16aq47= supplies a missing coordinate.
+No coordinate-based row filter, plausibility screen or interpolation is applied.
+The 2018-19 wave retains its six-column output; country concatenation supplies missing coordinate columns for that wave.
+The different 2014 EMC instrument remains unsupported by this plot recipe.
+
+Native script identity and country/API identity are distinct layers.
+The country concatenator says "Cached parquets store pre-transformation data" and does not itself call =id_walk=.
+The default framework =load_from_waves= route nevertheless applies the existing tested =id_walk= before writing its country parquet, which carries =id_converted=True=.
+This mapping preserves that route, both wave-specific native formatters and the attrs flag.
+Measured before/after: 19,784 public rows (12,434 in 2018-19 and 7,350 in 2021-22), with all old keys and six payload columns unchanged.
+Seven 2018-19 raw-country rows whose six old payload columns are all missing remain excluded by the existing public finalizer.
+There are no native or walked parcel-key collisions and no public plot-household orphans against =sample()= in either wave.
+
+The issue also requested a held-source check of Mali, Niger and Senegal 2021-22 =s16a=.
+Their files contain 9,924, 5,729 and 6,112 rows respectively; header and variable-label searches find the measurement flag =s16aq45= and area =s16aq47=, but no latitude, longitude, coordinate or =s16aq46= field.
+This is a finding about those held distributions, not an inference from Burkina's instrument or a claim about unpublished sources.
+No other country's code is changed.
+
+The helper and country declaration are whole-file build inputs, so all 24 Burkina country hashes move; supporting sample caches rebuild normally.
+This does not change sample, panel, universe, area, tenure, soil or irrigation policy.
 
 * =2018-19= / =2021-22= =food_acquired.py= are DEAD CODE, and their =encoding== is a trap
 
