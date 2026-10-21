@@ -70,3 +70,27 @@ Before freeze, validate235 desired-contract/supporting cases, unchanged generic/
 No candidate behavior/hash scope is claimed before those checks.
 
 Sue (GPT-6).
+
+## Phase 3 - verification
+
+OK against sections2-5 at runtime commit `ca3e5cc119896983b49f50a6b9dade6a5f825131`.
+The ledger-first commit `12346145ab715c28b604f3cc8cdfba7d82db7072` and runtime commit were both filesystem-published by the hook.
+The exact production diff is three imports and two bare re-raise clauses (nine added lines); UnitsUnavailableError's complete handler is byte-identical.
+All73 new cases plus162 existing cases pass (235 total, zero skips/errors/failures).
+The immutable original f8 negative is42fail/31pass; the new test bodies and parametrizations are AST-exact to that actual73-case baseline.
+All166 desired generated-handler probes pass, including Python exception context as well as args/cause/notes/custom context; five valuation controls retain their intended behavior.
+Six synthetic Feature cases on each source preserve kept healthy data, full frames/attrs and the existing warning/drop policy; only the categorical warning now exposes its original typed cause.
+The actual measured hash footprint is0/549 changed API hashes and0/39 changed framework fingerprints in separate exact-source processes.
+
+Sixty manifest-pinned release L2 prerequisites were physically copied into each private root (120 copies, distinct inodes and original SHA256/size/mode/mtime).
+Normal f8/candidate reads and fresh-process warm repeats compare17 complete Ethiopia/Uganda public frames per stage/source (68 comparisons), preserving full order, axis metadata, dtypes, null masks and attrs.
+All60 parquets per root remain byte/size/mode/mtime exact; no derived parquet is manufactured and no L1/source-cold claim is made.
+Feature default currency and explicit currency=None are separate references.
+Actual Ethiopia Aggregate/recorded-unit-price refusals remain typed; the older CONTENTS claim that unitprice returns an empty frame is contradicted on f8 as well as candidate and is recorded in the report, not silently repaired here.
+
+All original f8 source/test/fixture/schema/dependency blobs except the approved country.py edit remain exact.
+The original diagnosis tree, private evidence and42fail/31pass receipts remain immutable.
+No parser/country configuration/global conftest/read-gate/GitHub/shared-cache/acquisition change occurred.
+Safe report/validation/reproduction/residual: `slurm_logs/isa_backlog_2026-10-21/framework1081/`.
+Full private evidence and final clean filesystem-publication proof: `/local/job40255479/control/isa-backlog-20261021/framework1081-fix/`.
+Independent review remains required after the documentation-only freeze. Sue (GPT-6).
