@@ -82,8 +82,9 @@ removed.  ``rg CATALOG_LATEST_IDNO lsms_library/countries`` is the acquisition
 queue; only an acquisition (``data_access.add_wave`` / ``populate_and_push``)
 moves the held keys, and it clears the trio.  Before this a newer release was
 refused (kind ``release-changed``) and listed only in the per-run review
-artifact.  An override that *corrects* the id is exempt: a different entry
-has a different idno by construction.
+artifact.  An override may correct an unstamped primary id, but it cannot
+establish another entry's held release: a primary correction with recorded
+held IDNO or DOI is refused before these release helpers run.
 
 The review artifact is an org file, written **outside** ``countries_root()``
 (the config tree is read-only at runtime; see CLAUDE.md), by default to
@@ -629,10 +630,11 @@ def latest_release(old_text: str, new: WaveProvenance,
       date this latest release was first seen, else today;
     * the same idno -> *new* without the latest-seen keys (removed if present).
 
-    Anything else -- a corrected primary id (an override), a file recording no
-    idno (see :func:`release_unknown`: a stamp never adds one), a catalog row
-    with none -- is *new* as it is.  Entry-level fields (title, years, repository) follow the catalog as
-    they always have; only the release keys are held.
+    Anything else is returned as built. The caller first refuses a corrected
+    primary id with recorded held IDNO or DOI; :func:`release_unknown` then
+    removes a catalog-supplied release where no held idno was recorded.
+    Entry-level fields (title, years, repository) follow the catalog as they
+    always have; only the release keys are held.
     """
     old = parse_source_org(old_text, new.country, new.wave)
     if (old.catalog_id != new.catalog_id or not old.idno or not new.idno):
@@ -664,9 +666,9 @@ def release_unknown(old_text: str | None, new: WaveProvenance) -> WaveProvenance
     does carry is a release fact a human wrote, and is kept.
 
     Not applied when the old record holds an idno: :func:`latest_release`
-    governs that, and an override correcting the primary id still takes the
-    corrected entry's release (its old idno named another entry; decision
-    recorded in the r1 follow-up report).
+    governs that under the same primary entry. The caller refuses a primary
+    correction with held IDNO or DOI before reaching either helper, leaving
+    SOURCE intact until acquisition or explicit curation resolves it.
     """
     old = (parse_source_org(old_text, new.country, new.wave)
            if old_text is not None else None)
