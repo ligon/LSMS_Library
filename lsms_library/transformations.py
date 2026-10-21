@@ -6838,6 +6838,11 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         One column -- ``Nitrogen_kg_per_ha`` or ``Fertilizer_kg_per_ha``,
         named for the numerator so the basis cannot be lost -- indexed by
         ``(t, i, plot_id)`` (or ``(t, i, parcel)`` for ``on='parcel'``).
+        If both inputs carry a ``country`` index level or column, country
+        is retained as the first grouping, joining and output level, even
+        for one country or empty results. Country labels must be non-null;
+        country on only one input is refused. Index labels take precedence
+        over a redundant column; attrs alone do not supply country.
 
     Notes
     -----
@@ -6869,6 +6874,19 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         raise ValueError(
             f"fertilizer_rate on= must be 'plot' or 'parcel', got {on!r}")
 
+    # GH #1160 / ledger sections 2-4: country is part of both land keys.
+    # Validate identity before nutrient or positive-area filtering. The
+    # numerator's existing helper validates its own non-null country labels.
+    input_country = _level_or_column(plot_inputs, 'country')
+    area_country = _level_or_column(plot_features, 'country')
+    if (input_country is None) != (area_country is None):
+        raise ValueError(
+            "fertilizer_rate: country labels must be present on both "
+            "plot_inputs and plot_features, or absent from both")
+    if area_country is not None and pd.isna(area_country).any():
+        raise ValueError(
+            "fertilizer_rate: plot_features country labels must be non-null")
+
     if nutrient == 'N':
         num = nitrogen_kg(plot_inputs, volume_as_mass=volume_as_mass)
         num_col, out_col = 'Nitrogen_kg', 'Nitrogen_kg_per_ha'
@@ -6889,7 +6907,12 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
             "fertilizer_rate: the fertilizer numerator has no 'plot_id' level "
             "to join area on")
 
-    pf = plot_features.reset_index()
+    # Preserve accepted area keys in columns. Only remove a redundant
+    # country column when the index is the authoritative identity source.
+    pf = plot_features
+    if 'country' in pf.index.names and 'country' in pf.columns:
+        pf = pf.drop(columns='country')
+    pf = pf.reset_index()
     plot_key = _resolve_plot_level(pf.columns)
     if plot_key is None:
         raise ValueError(
@@ -6897,7 +6920,8 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     if area_col not in pf.columns:
         raise ValueError(f"plot_features must have a {area_col!r} column")
 
-    base = [k for k in ['t', 'i'] if k in num.columns and k in pf.columns]
+    base = [k for k in ['country', 't', 'i']
+            if k in num.columns and k in pf.columns]
 
     if on == 'parcel':
         num['_land'] = [
@@ -6911,6 +6935,12 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         num['_land'] = num[num_key].astype(str)
         pf['_land'] = pf[plot_key].astype(str)
 
+    # An empty parcel comprehension otherwise infers float, unlike the
+    # string keys returned by both parcel helpers. Preserve the pooled
+    # empty-result contract without changing country-less behavior.
+    if input_country is not None and num.empty:
+        num['_land'] = num['_land'].astype(str)
+
     keys = base + ['_land']
     fert = num.groupby(keys, dropna=False)[num_col].sum().reset_index()
 
@@ -6923,17 +6953,27 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         # Silent emptiness is the failure this guard exists for: both sides
         # have rows, the inner merge matched none, and the result is a
         # correctly-shaped frame with nothing in it.
-        warnings.warn(
-            f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer land "
-            f"key(s) and the {len(area):,} area land key(s) have NO value in "
-            "common, so the result is empty. The two features use different "
-            "plot vocabularies -- e.g. Uganda's ag modules key plots "
-            "'{hhid}-{parcel}-{plot}' while plot_features keys them "
-            f"'{{parcel}}_{{suffix}}'. Examples -- fertilizer: "
-            f"{sorted(map(str, fert['_land'].unique()))[:3]}; area: "
-            f"{sorted(map(str, area['_land'].unique()))[:3]}. Try "
-            f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
-            PlotGrainMismatchWarning, stacklevel=2)
+        if 'country' in base:
+            warnings.warn(
+                f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer "
+                f"country/land key(s) and the {len(area):,} area country/land "
+                "key(s) have NO value in common, so the result is empty. "
+                "Check both country labels and land vocabularies. Examples "
+                f"-- fertilizer: {list(fert[keys].head(3).itertuples(index=False, name=None))}; "
+                f"area: {list(area[keys].head(3).itertuples(index=False, name=None))}.",
+                PlotGrainMismatchWarning, stacklevel=2)
+        else:
+            warnings.warn(
+                f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer land "
+                f"key(s) and the {len(area):,} area land key(s) have NO value in "
+                "common, so the result is empty. The two features use different "
+                "plot vocabularies -- e.g. Uganda's ag modules key plots "
+                "'{hhid}-{parcel}-{plot}' while plot_features keys them "
+                f"'{{parcel}}_{{suffix}}'. Examples -- fertilizer: "
+                f"{sorted(map(str, fert['_land'].unique()))[:3]}; area: "
+                f"{sorted(map(str, area['_land'].unique()))[:3]}. Try "
+                f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
+                PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged[out_col] = merged[num_col] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=[out_col])
