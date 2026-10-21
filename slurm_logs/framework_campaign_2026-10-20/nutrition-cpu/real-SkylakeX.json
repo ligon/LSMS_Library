@@ -1,0 +1,49 @@
+{
+  "runtime_head": "66416b61bcfeeb1904419445102c28eca61d6eb1",
+  "package": "/local/job40255479/worktrees/uganda-nutrition-cpu-hash/lsms_library/__init__.py",
+  "cwd": "/local/job40255479/worktrees/uganda-nutrition-cpu-hash",
+  "countries_root": "/local/job40255479/worktrees/uganda-nutrition-cpu-hash/lsms_library/countries",
+  "private_data_root": "/local/job40255479/nutrition-cpu-repair-real",
+  "coretype": "SkylakeX",
+  "blas": [
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "num_threads": 1,
+      "prefix": "libscipy_openblas",
+      "version": "0.3.31.188.0",
+      "threading_layer": "pthreads",
+      "architecture": "SkylakeX"
+    },
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "num_threads": 1,
+      "prefix": "libscipy_openblas",
+      "version": "0.3.30",
+      "threading_layer": "pthreads",
+      "architecture": "SkylakeX"
+    },
+    {
+      "user_api": "openmp",
+      "internal_api": "openmp",
+      "num_threads": 1,
+      "prefix": "libgomp",
+      "version": null
+    }
+  ],
+  "exact_hash": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+  "real_invariance_passed": true,
+  "deliberately_changed_value_rejected": true,
+  "same_index": true,
+  "same_columns": true,
+  "same_dtypes": true,
+  "changed_cells_vs_primary": 0,
+  "changed_rows_vs_primary": 0,
+  "max_abs_vs_primary": 0.0,
+  "input_sha256": {
+    "x.pkl": "2b3765485f20c5c7243594a47f00ffc4428aaccf5629214308786067c1f601b4",
+    "y.pkl": "2da7c5eac66cc42b520e60b12e23a5c51a6d7eca3451894b90a7855a7a3d658d",
+    "raw.pkl": "d07310769d3d9ec51d18f7e200b1a83f1e4e952f077b77e32eb0afd6281c183f"
+  }
+}

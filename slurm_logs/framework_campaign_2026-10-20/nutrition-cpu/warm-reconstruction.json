@@ -1,0 +1,52 @@
+{
+  "source": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1"
+  },
+  "raw": {
+    "shape": [
+      23777,
+      15
+    ],
+    "digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+    "index": [
+      "i",
+      "t"
+    ]
+  },
+  "reconstruction": {
+    "digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+    "shape": [
+      23777,
+      15
+    ],
+    "same_index": true,
+    "same_columns": true,
+    "changed_cells": 0,
+    "max_abs": 0.0
+  },
+  "variants": {
+    "CC": {
+      "digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "changed_cells": 0,
+      "max_abs": 0.0
+    },
+    "CF": {
+      "digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "changed_cells": 0,
+      "max_abs": 0.0
+    },
+    "FC": {
+      "digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "changed_cells": 0,
+      "max_abs": 0.0
+    },
+    "FF": {
+      "digest": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "changed_cells": 0,
+      "max_abs": 0.0
+    }
+  }
+}
