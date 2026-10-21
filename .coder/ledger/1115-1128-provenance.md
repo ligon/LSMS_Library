@@ -99,3 +99,16 @@ Acceptance limits: canonical whitespace/key ordering and list-id membership norm
 Evidence and runnable commands: `slurm_logs/framework_campaign_2026-10-20/1115-1128/REPORT.org`, `verification.json`, `reproduce.sh`.
 Prior r1 findings addressed: repeated unknown/empty regex loss, tests tied to shipped queue state, missing-held-IDNO invention, push-before-certification, stamped primary correction, recursive leftover visibility and cross-entry pre-download SOURCE mutation.
 Nested layout/staging, rollback and secondary-entry release metadata are documented residuals; no live acquisition/backfill was run.
+
+
+### Independent-review correction (2026-10-20)
+
+The first frozen evidence tip13beb failed an independent counterexample: repeated PROVENANCE_SOURCE worldbank then external retained both scalar lines but rendered held CATALOG_ID987654321 as none.
+This exposed a dependent-field loss not covered by the initial scalar-occurrence tests.
+The parent authorized a narrow explicit refusal, with no source-default decision.
+Runtime correction `dbae899fa2d9193c17010bb5f3838dd326d815fd` refuses rendering catalog holdings/coverage without a consistent World Bank primary entry; a failed write leaves SOURCE bytes intact.
+Two duplicate/conflicting source cases and an otherwise-lost catalog-coverage case are now pinned in the repository tests.
+Exact13beb before proof: the reviewer identity pair1failed/1passed; corrected source: all20 independent-authored controls passed in the producer rerun, plus347 related tests.
+The complete130SOURCE census remains lossless and unchanged, with0/549 country,0/2139 wave and0/40 build-fingerprint movement.
+The former519/13beb checkpoint and its optional incomplete coverage check remain historical evidence; current correction evidence is `slurm_logs/framework_campaign_2026-10-20/1115-1128/review-fix/REPORT.org` and `verification.json`.
+All validators stopped before freezing; independent re-review remains pending.

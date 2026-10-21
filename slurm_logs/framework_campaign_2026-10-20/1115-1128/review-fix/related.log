@@ -1,0 +1,19 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 20%]
+........................................................................ [ 41%]
+........................................................................ [ 62%]
+........................................................................ [ 82%]
+...........................................................              [100%]
+=============================== warnings summary ===============================
+tests/test_data_access.py::TestAutoUnlockS3::test_returns_false_on_bad_gpg_file
+  /local/job40255479/worktrees/1115-1128-provenance/tests/test_data_access.py:310: RuntimeWarning: LSMS_Library: your World Bank API key validated, but unlocking the S3 read cache failed.
+    Falling back to direct World Bank downloads -- slower, but functional; nothing is blocked.
+    Tried: s3_reader_creds.enc (MISSING, needs the `cryptography` package) and s3_reader_creds.gpg (present, needs the `gpg` binary).
+    If `cryptography` is missing, `pip install cryptography` restores the fast path.
+    See https://github.com/ligon/LSMS_Library/issues/741
+    assert _auto_unlock_s3(dvc_dir) is False
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+347 passed, 1 warning in 70.63s (0:01:10)
