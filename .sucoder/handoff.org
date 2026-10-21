@@ -1,56 +1,43 @@
 #+title: Handoff -- framework campaign, 2026-10-20
 
-* Current -- 2026-10-20 framework campaign (Sue / GPT-6, job 40255479, n0071.savio3)
+* Current -- 2026-10-20, Sue / GPT-6, job40255479, n0071.savio3
 
-The maintainer requested GitHub development synchronization, green Windows CI, then an assessment of additional framework fixes before v0.16.0.
-The clone and filesystem origin development are synchronized to GitHub =976fc840d=.
-The maintainer subsequently approved #1143, #1093, #1099, #1124 and #1125; no release has been requested yet.
+Windows PR1153 is MERGED with explicit maintainer override atad1e87e1025dec98fe70734f4e60d12824fd31dd.
+GitHub and filesystem-origin development are synchronized there through the clean development-sync worktree.
+Development push CI39522182800 and complete Windows-branch manualCI39515878586 bothPASS, including nativeWindows; the latter also passed credentialedLinux data tests.
 
-Windows PR [[https://github.com/ligon/LSMS_Library/pull/1153][#1153]], branch =fix/windows-shocks-digest-20261020= at =1d3e8dfdf=, updates the expected shocks digest after GH #805.
-Two private Linux cold builds and an independent review account exactly for the 2,012 changed label cells; native Windows and credentialed Linux CI are running as [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][39515878586]].
-The original baseline full suite is running against a physical private L2 copy with 16 loadfile workers and single BLAS/build threads.
+Approved issues1093/1099/1143/1124/1125 are independently reviewed and in OPEN PRs1154--1157; no merge override for these has arrived.
+Frozen combined source852ac2bfcd5f798533f56e7efa1f77db80c0138f is published on GitHub/origin branchintegration/framework-v016-40255479.
+Do not move that branch/source while remaining validators run.
+Main checkout is docs/framework-campaign-20261020, draft evidencePR1158, safe for documentation updates.
 
-Active implementation worktrees under =/local/job40255479/worktrees/= are =1143-decimal-comma=, =1093-declared-unit-factors= and =1099-empty-subset=.
-The #1143 worker found an unpublished existing implementation in filesystem origin =fix/1143-decimal-comma@7393a3074=.
-Its implementation/tests were reused on the unique new branch =fix/1143-decimal-comma-40255479=, preserving the old branch; zero-prefix and malformed-token cases still need review and repair.
-The other two origin branch tips are this session's own ledger commits, not earlier work.
-An exact, detached source baseline for read-only comparisons is =/local/job40255479/worktrees/baseline-976fc840d=.
+Full combined suitePASS:8562passed/285skip/9xfail/1nonstrictxpass,0failures/errors/credentialskips,1158.04s.
+Independent reconciliation accounts for all skip differences; eight newly skipped Uganda wave invariance cases separatelyPASS after sanctioned API population in a new physical cache.
+All3 farm warm checksPASS. Exact XPASS identity and exact concurrent wave-cache remover are not proved.
+Cold exact976/852 corpora complete549requests each:530success+same19normalized full errors.
+Six intended food quantity/price tables change; four roster hashes differ only by order in paired cache/warm comparisons; Benin seeds1/3 reproduce both original fingerprints on unchanged baseline.
+No schema/rowcount/wave/null/cachemetadata/warningcategory deltas. Mali existing coldobject/warmstring MonthsSpent limit remains explicit.
+Reports and reproducible scripts are committed under slurm_logs/framework_campaign_2026-10-20/.
 
-Use =/local/job40255479/venv_img/bin/python= directly: the shared squashfs image was extracted there after FUSE failed; the launcher's local =.venv= directory was left intact.
-Set =PYTHONPATH= and =LSMS_COUNTRIES_ROOT= to the executing worktree, assert real import identity, and use separate private data roots with shared L1 links only.
-Do not run builds or tests against the shared L2 or edit the durable mirror's working tree.
+Remaining validators: exact852 manualGitHubCI39519191762 datajob stillrunning (unit/smoke/nativeWindowsPASS); paired16-feature canonicalaudits phases1/2 under /local/job40255479/canonical-audit-compare/.
+Agent windows_ci owns paired audit; worker pool3each onCPUs0--3/4--7, private physical caches, onlyL1shared.
+Baseline audit nearlydone; combined stillprocessing heavier food grids. Do not restart or mutate its controller/source.
+Full suite exec30937 and corpus exec19447/23742 have finished; raw evidence private under control/framework-campaign and corpus-{baseline,combined}-out.
 
-The #932 protection premise needs correction: this personal-account repository cannot use GitHub's organization-only merge queue.
-Current development rules require only =unit-tests=; no protection changes have been applied.
-The reliability report drafts an alternative for approval; #851 also has substantial existing unlanded work and is outside the five approved issues.
+Use /local/job40255479/venv_img/bin/python directly; extracted squashfs image, no writable-master use.
+Always exactPYTHONPATH/countries root/cwd assertions and own privateLSMS_DATA_DIR, BLAS/build1. Shared mirror working tree must never be edited.
+All original corpus roots are immutable; any replay uses new physical copies.
 
-Campaign details and aggregate evidence: [[file:../slurm_logs/framework_campaign_2026-10-20/STATUS.org][STATUS.org]].
-The main checkout is on the documentation branch =docs/framework-campaign-20261020=; commits publish through the origin hook.
-Next: finish Windows CI, all five fixes and independent reviews; validate their combined source; present concrete PRs for human merge under backlog-workflow.
-Older checkpoints below are historical and may have been superseded by the October 18-20 development campaign.
+New independently verified follow-up1159: pooledseed/nitrogen reducers can dropcountry and sum colliding local plot IDs on bothbaseline/current; maintainer mustchoose preserve-country or explicit pooledrefusal. No implementation was added.
+#932 protection proposal remains unapplied, user-account repo cannotuse organizationmergequeue; requiring genuine PR-event data checks needs separate permission.
+#851 has substantial existing unlanded work; do not reimplement it. No release requested or attempted.
 
+Next: finish pairedaudits and exact-head GitHub dataCI, classify all deltas, commit aggregate evidence, rewrite finalSTATUS/handoff, update PR validation bodies and ready evidencePR1158.
+ImplementationPRs1154--1157 remain for humanmerge under backlog-workflow unless maintainer overrides.
+No release/tag/publish/protection/sharedcachepromotion is authorized.
 
-** 17:05 PDT continuation
-
-Baseline full suite passed: 8369/279skip/9xfail/1pre-existingxpass, no failures/errors or credential skips.
-Windows native CI is green; manual run39515878586 Linux data job is still running.
-PRs1153 Windows,1154 unit factors,1155 empty subsets are open for human merge; no merge override has arrived.
-Parser dc7e3db91 is under round-two independent review; harness RHS bounded test correction is under review.
-Internal integration/framework-v016-40255479 at2970c8886 contains the first three reviewed fixes.
-Cold baseline corpus uses frozen baseline-976fc840d, /local/job40255479/corpus-baseline-data and corpus-baseline-out, exec23742.
-Once all remaining fixes pass review, merge them into integration with --no-commit then ordinary attributed commit (plain git merge does not trigger publish hook), freeze source, run combined cold corpus and full suite against independent L2 roots.
-Main untracked validation wrapper and baseline summary are included in this checkpoint commit.
-
-
-** Frozen final verification -- 17:08 PDT
-
-All five approved issues independently reviewed; PRs1153--1157 open, no merges authorized.
-Integration source852ac2bfcd5f798533f56e7efa1f77db80c0138f is FROZEN and on GitHub/origin.
-Final fullsuite exec30937 (CPUs16--31, combined-suite-data); finalcoldcorpus exec19447 (CPUs8--15, corpus-combined-data/out).
-Existing baselinecoldcorpus exec23742 continues on0--7. Once complete, paired canonicalFeatureaudits use0--7 and separate physicalroots under canonical-audit-compare.
-ManualCI39519191762 runs credentialed data/nativeWindows on exact852head; Windows-onlybranch manual39515878586 data job still pending atcheckpoint.
-Do not change integrationHEAD or source during validators. Main docs branch remains safe to update.
-Next: finish all validators, independentcorpuscomparison, aggregateevidence/status, finalrelease-scopeassessment; humanmergeapprovalstillpending.
+Campaign details: [[file:../slurm_logs/framework_campaign_2026-10-20/STATUS.org][STATUS.org]].
+Older checkpoints below are historical.
 
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.

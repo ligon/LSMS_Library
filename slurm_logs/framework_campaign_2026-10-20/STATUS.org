@@ -1,127 +1,120 @@
-#+title: Framework campaign checkpoint, 2026-10-20
+#+title: Framework campaign status, 2026-10-20
 #+author: Sue
 
-* Scope
+* Current outcome
 
-The maintainer requested synchronization with GitHub development, a repair of the Windows CI failure, and an evaluation of additional framework work before attempting v0.16.0.
-The maintainer approved implementing #1143, #1093, #1099, #1124 and #1125; no release has been requested.
+The maintainer approved Windows CI repair and five additional framework issues: #1143, #1093, #1099, #1124 and #1125.
+All five implementations passed independent review and are combined at frozen =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+No release has been requested or attempted.
 
-* Source and environment
+Windows [[https://github.com/ligon/LSMS_Library/pull/1153][PR #1153]] was merged with explicit maintainer authorization at =ad1e87e1025dec98fe70734f4e60d12824fd31dd=.
+GitHub and filesystem-origin development are synchronized there; the separate local =development-sync= worktree is clean.
+Its [[https://github.com/ligon/LSMS_Library/actions/runs/39522182800][development push CI]] passed, including native Windows.
+The earlier [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][complete Windows-fix run]] also passed credentialed Linux data tests: 5,911 passed, 2,742 skipped, four expected failures and one non-strict unexpected pass, with the credential gate open.
 
-- Baseline :: GitHub development =976fc840d12ba40f1602b7dff58b81548632b2a9=, fetched and fast-forwarded from =3e3bd26ee=; published to filesystem origin with =git push origin development=.
-- Working clone :: =/local/job40255479/mirrors/LSMS_Library=.
-- Allocation :: Job 40255479, =n0071.savio3=, 32 cores, 93 GiB RAM, approximately 72 hours remaining at start.
-- Environment :: The shared squashfs image was extracted to =/local/job40255479/venv_img= with =unsquashfs -f -processors 8= after FUSE returned =Operation not permitted=.
-  No shared environment was modified and the pre-existing local =.venv= directory was left intact.
-- Python :: =/local/job40255479/venv_img/bin/python=; pandas 3.0.6, numpy 2.4.6, pyarrow 25.0.1, ligonlibrary 0.2.3, fooddatacentral 1.0.13, pytest 8.4.2.
-- Import identity :: =PYTHONPATH= names the executing checkout; imports were asserted against its real top-level path.
-- Account checkpoint :: =check_usage.sh -a fc_jevons= reported 66,351 SUs used of 1,500,000 on 2026-10-20 at 23:24 UTC.
+The four remaining implementation PRs are open, with green PR unit and Windows smoke checks:
 
-* Concurrent work
+| PR | Approved issues | Head |
+|----+-----------------+------|
+| [[https://github.com/ligon/LSMS_Library/pull/1154][1154]] | #1093 declared unit-factor propagation | eaf7b9913 |
+| [[https://github.com/ligon/LSMS_Library/pull/1155][1155]] | #1099 typed empty wave-subset parity | f9871610f |
+| [[https://github.com/ligon/LSMS_Library/pull/1156][1156]] | #1143 whole decimal-comma metric tokens | 1070a4d03 |
+| [[https://github.com/ligon/LSMS_Library/pull/1157][1157]] | #1124/#1125 audit and warm-test participation | d84061818 |
 
-- Windows :: =/local/job40255479/worktrees/windows-ci=, branch =fix/windows-shocks-digest-20261020=; private cold builds and exact encoding-delta accounting before any expected-digest change.
-- Reliability :: =/local/job40255479/worktrees/framework-reliability=, branch =review/framework-reliability-20261020=; reconcile cache, build, CI, provenance, and acquisition issues against merged work and human rulings.
-- Contracts :: =/local/job40255479/worktrees/framework-contracts=, branch =review/framework-contracts-20261020=; reconcile API, units, sampling, coverage, and audit-harness issues.
-- Full suite :: Baseline source with 16 loadfile workers, one build worker and one BLAS/OMP/MKL thread per worker, CPU affinity 0-15, nice 15.
-  Output is captured directly in =/local/job40255479/control/framework-campaign/full-suite.log= and =full-suite.xml=.
+The harness PR's final review documents follow implementation =ca5bb83ca=, which is already integrated; production/test/audit files match the frozen candidate.
+Consolidated evidence is [[https://github.com/ligon/LSMS_Library/pull/1158][draft PR #1158]].
+These PRs remain for human merge under the backlog-workflow rule; the explicit Windows override does not merge the other four.
 
-* Cache isolation
+* Verification completed
 
-The suite uses =/local/job40255479/framework-validation-data=, a physical copy of the completed bundle corpus rather than a shared writable L2.
-All 1,519 copied files have matching SHA256 and distinct physical identities; 341,473,975 bytes total.
-Only the L1 blob cache is linked to the shared cache.
-The complete copy manifest is [[file:validation/private-copy.json][validation/private-copy.json]].
+Baseline source is the exact pre-fix development =976fc840d12ba40f1602b7dff58b81548632b2a9=.
+Initial clone =3e3bd26ee= was fast-forwarded to that GitHub head and published to filesystem origin before work began.
 
-* Initial findings
+| Check | Baseline 976 | Combined 852 |
+|-------+--------------+--------------|
+| Full suite passed | 8369 | 8562 |
+| Plain skipped | 279 | 285 |
+| Expected failures | 9 | 9 |
+| Non-strict unexpected passes | 1 | 1 |
+| Failures/errors | 0/0 | 0/0 |
+| Credential skips | 0 | 0 |
+| Seconds | 893.14 | 1158.04 |
+| Cold corpus successes / requests | 530/549 | 530/549 |
+| Explicit cold corpus errors | 19 | 19 |
 
-Uganda's =CONTENTS.org= documents GH #805 changing =HowCoped0/1/2= in 862, 756, and 394 cells from U+0085 to U+2026, retaining all 14,457 rows.
-The old Windows expected digest predates that change.
-Two Linux cold builds reproduce =0ab2ea4c79dd=; independent exact counterfactual accounting verifies that reversing only those 2,012 label cells recovers the old digest.
+The suite ran with 16 loadfile workers, BLAS/OMP/MKL/build/make workers one,600-second per-test thread timeout, explicit package/config/data identity and separate physical L2 copies.
+The combined run enables the suite's own =LSMS_EXPECTED_ROOT= assertion.
+Two hundred added cases pass; one obsolete warm-only #1039 case is replaced.
+Eight Uganda wave-invariance cases skipped for missing parquet files, while two prior skips now execute: exact import identity and GhanaLSS nutrition poison-cache recovery.
+All277 shared ordinary skips and all nine expected-failure identities/reasons are unchanged.
+The non-strict unexpected-pass count matches, but its exact identity is unavailable from these nonverbose artifacts.
 
-The active development ruleset requires only =unit-tests= and has no merge-queue rule.
-The merged #932 workflow therefore does not yet enforce credentialed tests before every development merge.
-The nightly schedule also awaits the workflow reaching the default branch, master.
-These are release-readiness gaps, distinct from the Windows mismatch.
+A separate private-copy supplement recreated all eight Uganda wave files through sanctioned APIs, then passed the exact eight existing invariance checks with zero skips and no fixture/baseline/source changes.
+The original full-suite285-skip count remains unchanged.
+All three actual farm warm checks ran and passed in the full suite.
+Evidence: [[file:validation/combined-suite-summary.json][suite summary]], [[file:reliability/independent-review.org][independent reconciliation]], [[file:reliability/uganda-wave-supplement.json][eight-case supplement]].
 
-* Next actions
+The matched cold corpus covers every declared pair across38 countries.
+All nineteen error classes and full messages match after replacing only exact source/data-root prefixes: two Armenia, eleven Nepal, six Peru requests.
+The driver retains its nonzero error exit; this is not a blanket green corpus.
+There are no status, row-count, schema, wave-count, null-count, warning-category-count or cache-metadata changes.
+Six food quantity/price tables change as intended; four roster fingerprints differ only in order in paired cache and warm-API checks.
+Unchanged-baseline Benin cold builds under seeds1/3 reproduce both original fingerprints exactly.
+Mali's MonthsSpent cold-object/warm-string difference occurs on both sources and remains an explicit separate limit; unavailable original cold served frames are not claimed to have been directly compared.
+All549 expected country hashes and1183 observed wave hashes move through the tagged #1099 build closure; this observed-file count is not the complete2139-wave hash census.
+Evidence: [[file:contracts/corpus-review.org][independent corpus review]], [[file:contracts/corpus-comparison.json][all measured differences]].
 
-Windows exact counterfactual accounting and independent review passed; PR [[https://github.com/ligon/LSMS_Library/pull/1153][#1153]] contains the minimal expectation correction at =1d3e8dfdf=.
-Manual CI [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][39515878586]] runs credentialed native Windows and Linux data tests on that branch.
-The initial PR checks are a separate run, =39515882178=.
+Native Windows passes on exact combined852: shocks14,457 rows/10 columns/eight waves, digest0ab2ea4c79dd; assets116,808 rows/one column/eight waves, digest9202ed542a14.
+The Windows repair is an expected-digest correction after GH #805: reversing only2,012 cp1252-corrected cells recovers the old digest, with exact indices/dtypes/other values retained.
+Evidence: [[file:validation/combined-windows-native-summary.json][combined native results]] and PR #1153's exact encoding-delta accounting.
 
-The maintainer approved implementing #1143, #1093, #1099, #1124 and #1125 before v0.16.0.
-Separate worktrees are =1143-decimal-comma=, =1093-declared-unit-factors= and =1099-empty-subset= under =/local/job40255479/worktrees/=, each starting at =976fc840d=.
-Grounding ledgers are reviewed and surfaced before implementation; #1124/#1125 will follow as their own harness worktree when an implementation slot frees.
+* Verification still running
 
-The complete initial evaluations are [[file:contracts/REPORT.org][contracts/REPORT.org]] (46 dispositions) and [[file:reliability/REPORT.org][reliability/REPORT.org]] (30 dispositions).
-These groups overlap, so their counts must not be summed into a unique issue total.
-Existing unlanded =fix/851-recall-period@8288cd112= is separate from the approved five-issue scope; do not rewrite its substantial implementation from scratch.
+- Exact-head GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], source852; native Windows, unit and smoke pass, credentialed Linux data job still runs.
+- Canonical Feature audit :: Same strengthened scanner against baseline976 and combined852, all16 canonical features, phases1/2, default documented exclusions recorded, separate physical L2 roots under =/local/job40255479/canonical-audit-compare/=.
+  Six audit worker processes use CPUs0--7 with numerical/build threads one; full paired comparison awaits both completion manifests.
 
-GitHub's merge queue is available to organization-owned repositories, while the repository API identifies this public repository's owner as =User=.
-The #932 workflow's queue premise is therefore unavailable under present ownership, not merely unconfigured.
-The reliability report includes an unapplied alternative: credentialed tests on development PRs, followed by a required =data-tests= check after actual successful execution.
-Repository-protection changes require explicit approval; none has been applied.
+Do not change integration HEAD or its source while these validators run.
+No source fix was made for the pre-existing roster ordering or Mali dtype behavior.
 
-Complete native CI, the baseline full suite and all approved fix/review streams, then validate the final combined source and update issue dispositions.
-Routine PRs remain for human merge under the backlog-workflow skill.
+* Changes and remaining decisions
 
-* Attribution
+#1093 restores706 usable Ethiopia Quintal price-pool observations; the other four positive sold-quantity rows have nonpositive sale values and remain correctly excluded.
+Raw crop/input tables and existing seed/nitrogen totals are unchanged; declared factors now reach all three missing consumers.
+#1143 corrects945 quantity rows and783 price rows across Senegal, Benin and CotedIvoire, preserving raw food tables, axes and dtypes.
+#1099 keeps typed empty strict subsets consistent across cache states without masking real builders or source failures; a corpus re-warm is intentional.
+#1124/#1125 detect whole-country loss independently of retained-row collapse and add all three farm tables to the canonical sweep.
+The documented17,523-row EthiopiaRHS coarse crop exclusion remains a visible Class B audit warning; the warm-test allowance expires if plot/plot_id appears and never masks read failures or another lost country.
+
+New independently verified [[https://github.com/ligon/LSMS_Library/issues/1159][#1159]] tracks inherited cross-country plot-key collisions in seed/nitrogen reducers.
+It reproduces with metric units at both976 and852; the maintainer must choose country-preserving pooled results or explicit pooled-input refusal.
+It is linked from PR #1154 and is outside the five approved implementations; no remedy was silently chosen.
+
+Recommend keeping this candidate bounded while final gates finish.
+Afterward, the next reproduced correctness priority is #778's assumed-fresh disappearance race and cache-mutating tests, followed by provenance #1115/#1128 and staged acquisition #1149.
+The existing substantial #851 period branch needs recovery/integration/disclosure/review rather than duplicate implementation, and is a separate feature increment.
+The [[file:reliability/v016-readiness.org][readiness assessment]] lists28 potential release-closure issues from the reviewed scope, supporting PRs and retained residuals; this is not an exhaustive release closure audit.
+
+#932 enforcement remains unapplied: current development protections require only unit-tests; a personal-account repository cannot use the assumed organization merge queue.
+The proposed route runs data-tests on every development PR, fails the credential gate for forks until reviewed trusted import, then requires the genuinely executed PR-event check.
+Skipped jobs must not become the required gate; strict=false and role5 bypass remain separate explicit policy choices.
+No protection/permission change was made.
+The nightly schedule becomes active only after reaching default master.
+Official eligibility and required-check sources are linked in the readiness assessment.
+
+* Environment and reproducibility
+
+Working clone =/local/job40255479/mirrors/LSMS_Library=; durable origin =/global/home/users/ligon/mirrors/LSMS_Library=.
+The durable working tree was never edited by hand.
+Allocation40255479 on n0071.savio3 has32 cores/93GiB RAM and a72-hour initial limit.
+The shared squashfs image was extracted with unsquashfs after FUSE returned Operation not permitted; no shared environment was changed and the launcher .venv directory was left intact.
+Interpreter =/local/job40255479/venv_img/bin/python=; pandas3.0.6, numpy2.4.6, pyarrow25.0.1, ligonlibrary0.2.3, fooddatacentral1.0.13, pytest8.4.2.
+All API/test processes assert executing package/config identity and own private writable L2 roots; only content-addressed L1 is shared.
+The original physical-copy manifest is [[file:validation/private-copy.json][private-copy.json]]; the combined suite used another1,519-file copy with matching bytes/distinct physical identities.
+Raw logs/XML/frame snapshots remain private; aggregate report files include their identities and runnable scripts.
+The existing October14 corpus validator/fingerprint is reused through [[file:validation/run_corpus.py][run_corpus.py]].
+
+Detailed reconciliation: [[file:contracts/REPORT.org][contracts]] and [[file:reliability/REPORT.org][reliability]] overlap (46+30 dispositions,75 unique issues before #1159); do not sum them into76 distinct issues.
+No new estimator, data source, scientific default, release tag or shared-cache promotion was introduced.
 
 Sue, GPT-6.
-
-* Implementation checkpoint -- 17:05 PDT
-
-Native credentialed Windows, unit tests and Windows smoke passed in =39515878586=; its separate Linux data job remains running.
-PR #1153 remains open; an explicit maintainer override was requested for the backlog skill's human-merge rule and has not yet arrived.
-
-Baseline full suite completed: 8,369 passed, 279 skipped, nine expected failures, one pre-existing non-strict unexpected pass, zero failures/errors in 893.14 seconds.
-No credential-gate skip occurred; [[file:validation/baseline-summary.json][the aggregate summary]] records skip categories and private log/XML identities.
-This is the exact pre-fix development baseline, not combined-candidate validation.
-
-#1093 is independently reviewed and open as [[https://github.com/ligon/LSMS_Library/pull/1154][PR #1154]], head =eaf7b9913=.
-It recovers 706 usable Ethiopia Quintal sales in the price pool, preserves raw crop/input tables and seed/nitrogen results, and does not invalidate cache hashes.
-#1099 passed independent round-two review after preserving both cache-hit traversal and unavailable-make behavior; [[https://github.com/ligon/LSMS_Library/pull/1155][PR #1155]] is at =f9871610f=.
-Its tagged aggregation edit invalidates country/wave hashes and intentionally requires a corpus re-warm.
-
-#1143 reused the prior unpublished implementation, then repaired token boundaries and the issue's precise zero-prefix grouping grammar.
-Producer head =dc7e3db91= is frozen for independent round-two review: 370 focused cases pass and the six measured live quantity/price outputs remain invariant after the two review corrections.
-The measured correction changes 945 quantity rows and 783 price rows across Senegal, Benin and CotedIvoire, preserving source tables, axes and dtypes.
-
-#1124/#1125 now audit crop_production, plot_labor and plot_inputs and report whole-country exclusions separately from row collapse.
-The 344-record farm audit has no errors; it retains the 17,523-row EthiopiaRHS coarse-grain exclusion as a Class B signal plus existing warnings.
-The warm crop test is being corrected to respect that documented exclusion only while RHS has no plot/plot_id axis or column; all other positive warm countries remain mandatory and RHS read failures remain fatal.
-No production assembly behavior changes in this harness patch.
-
-Internal integration branch =integration/framework-v016-40255479= at =2970c8886= contains Windows, #1093 and #1099; parser/harness will follow after independent reviews.
-The final combined source will be frozen before validation.
-An independent, completely cold 549-request baseline corpus is running through the existing October 14 validator with explicit paths and bounded country processes, using [[file:validation/run_corpus.py][the wrapper]].
-Detailed data fingerprints and logs remain in private node scratch; only aggregate results are committed.
-
-* Frozen combined candidate -- 17:08 PDT
-
-All approved issues have independent PASS reviews and open PRs:
-
-| PR | Scope | Head |
-|----+-------+------|
-| [[https://github.com/ligon/LSMS_Library/pull/1153][1153]] | Windows expectation after verified cp1252 repair | 1d3e8dfdf |
-| [[https://github.com/ligon/LSMS_Library/pull/1154][1154]] | #1093 declared unit-factor propagation | eaf7b9913 |
-| [[https://github.com/ligon/LSMS_Library/pull/1155][1155]] | #1099 absent-subset empty parity | f9871610f |
-| [[https://github.com/ligon/LSMS_Library/pull/1156][1156]] | #1143 whole decimal-comma metric tokens | 1070a4d03 |
-| [[https://github.com/ligon/LSMS_Library/pull/1157][1157]] | #1124/#1125 audit/test participation | d84061818 |
-
-Integration source is frozen at =852ac2bfcd5f798533f56e7efa1f77db80c0138f=, published to origin and GitHub branch =integration/framework-v016-40255479=.
-The final harness PR adds independent review documents after the implementation tip =ca5bb83ca= already integrated here; production, tests and audit code are identical.
-An integration smoke passed 188 parser/declared-factor tests in 5.48 seconds before the harness merge.
-
-Final combined checks are running independently:
-
-- Cold corpus :: =corpus-combined-data= and =corpus-combined-out= under /local/job40255479, eight country processes on CPUs8--15; exec19447.
-- Full suite :: =combined-suite-data=, a separate verified physical 1,519-file copy of the frozen corpus with shared L1 only, 16 loadfile workers on CPUs16--31; exec30937.
-  BLAS/OMP/MKL, build and make workers are one; each test has600-second thread timeout.
-  Import/config identity is explicit and LSMS_EXPECTED_ROOT enables the suite's own identity assertion.
-- GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], exact integration head, credentialed Linux data tests plus native Windows build.
-- Feature audit :: Same strengthened canonical scanner against baseline976 and combined852 runtime in separate physical L2 copies, phases1/2.
-  Starts on CPUs0--7 after the independent baseline corpus completes; no shared writable L2.
-
-Do not move the integration branch while any verifier is running: the corpus driver asserts its exact source SHA.
-No PR has been merged and no release or repository-protection change has been made.
