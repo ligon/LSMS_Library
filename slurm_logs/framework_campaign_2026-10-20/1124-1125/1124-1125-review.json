@@ -1,0 +1,128 @@
+{
+  "status": "frozen",
+  "source_hashes": {
+    "bench/feature_audit/scan.py": "7380a8faf1cc3de87954d776d8592e05a505a2697443b3c9c52181a06bd041b4",
+    "tests/test_feature_canonical_index.py": "aab7f48dc2b1bafac2efeef1483f82460281610575168396a0b6e74edf18c299",
+    "tests/test_feature_audit_participation.py": "8045e92463188622a11c7d944988e809b9fa8664e192ab1e443a27640488d049"
+  },
+  "independent_probes": {
+    "actual_contract_b": {
+      "baseline_rows": 9,
+      "variant_rows": 2,
+      "labels_unavailable": [
+        "B"
+      ],
+      "checks": [
+        "runtime_warning",
+        "kwarg_changes_rowcount",
+        "reaggregate_conservation",
+        "reaggregate_conservation"
+      ]
+    },
+    "cold_country": {
+      "read_countries": [
+        "A",
+        "B",
+        "C"
+      ],
+      "built": [
+        "A",
+        "B",
+        "C"
+      ],
+      "kwargs": [
+        {
+          "currency": "index"
+        },
+        {
+          "currency": "index"
+        },
+        {
+          "currency": "index"
+        }
+      ]
+    },
+    "warm_empty_country": {
+      "reads": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "built": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    "warm_read_failure": "warm crop_production countries raised: {'D': 'RuntimeError: warm read failed'}"
+  },
+  "coarse_crop_boundary": {
+    "built": [
+      "A",
+      "B",
+      "C",
+      "EthiopiaRHS"
+    ],
+    "kept": [
+      "A",
+      "B",
+      "C"
+    ],
+    "false_positive": "['EthiopiaRHS']",
+    "source": "existing documented no-plot grain; synthetic source rows only"
+  },
+  "verdict": "FAIL",
+  "reviewer": "Sue",
+  "reviewed_base": "976fc840d",
+  "reviewed_head": "b1c10d42b plus frozen uncommitted scanner/test changes",
+  "source_unchanged_during_review": true,
+  "verifiers_stopped": true,
+  "findings": [
+    {
+      "priority": "P1",
+      "title": "Exact-all-positive crop warm participation rejects documented EthiopiaRHS coarse-table exclusion",
+      "location": "tests/test_feature_canonical_index.py:571",
+      "evidence": [
+        ".claude/skills/cross-country-features/SKILL.md:69-71",
+        ".coder/ledger/feature-canonical-crop-production.md:113-117",
+        ".coder/ledger/feature-canonical-crop-production.md:170"
+      ],
+      "reproduction": {
+        "built": [
+          "A",
+          "B",
+          "C",
+          "EthiopiaRHS"
+        ],
+        "kept": [
+          "A",
+          "B",
+          "C"
+        ],
+        "false_positive": "['EthiopiaRHS']",
+        "source": "existing documented no-plot grain; synthetic source rows only"
+      },
+      "requested_fix": "Keep scanner ClassB exclusion record. Narrow crop warm expectation only for documented EthiopiaRHS coarse no-plot grain; expire that allowance when plot/plot_id grain appears. Keep every other warm positive country strict, preserve named read failure and row-count checks. Add a synthetic coarse allowance/expiry control; no production Feature change."
+    }
+  ],
+  "independent_tests": {
+    "passed": 83,
+    "seconds": 115.09,
+    "marker_filter": "not requires_s3 and not slow",
+    "selection": [
+      "tests/test_feature_audit_participation.py",
+      "tests/test_feature_canonical_index.py"
+    ],
+    "python": "/local/job40255479/venv_img/bin/python",
+    "cpus": "24-27",
+    "xdist": "4 --dist=loadfile",
+    "private_data_root": "/local/job40255479/tmp/1124-1125-independent",
+    "exact_import_and_config_identity_asserted": true
+  },
+  "validation_limits": [
+    "No full farm/corpus source build duplicated; producer owns live private farm sweep.",
+    "Runtime checks exercised only synthetic frames and temporary warm-cache markers.",
+    "Cache cost inferred from complete diff confined to scanner/tests/ledger; no independent hash mutation probe."
+  ]
+}

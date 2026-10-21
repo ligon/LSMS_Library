@@ -563,39 +563,24 @@ class TestFeatureEndToEnd:
 @pytest.mark.requires_s3
 @pytest.mark.slow
 def test_warm_corpus_assembly_loses_no_rows():
-    """Every country kept by `Feature('crop_production')` contributes exactly
-    the rows `Country(name).crop_production()` returns, and nothing is
-    collapsed.  Skips cleanly when the caches are not warm."""
-    import lsms_library as ll
-    from lsms_library.country import grain_reports
-
-    countries = ll.Feature("crop_production").countries
-    built: dict[str, int] = {}
-    for name in countries:
-        try:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                df = ll.Country(name, trust_cache=True).crop_production(
-                    currency="index")
-        except Exception:
-            continue
-        if isinstance(df, pd.DataFrame) and not df.empty:
-            built[name] = len(df)
-    if len(built) < 3:
-        pytest.skip("fewer than three crop_production caches are warm")
-
-    before = len(grain_reports())
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        out = ll.Feature("crop_production", trust_cache=True)(sorted(built))
-
+    """Every expected warm crop country survives, with no row collapse."""
+    built, out, n_grain = _warm_assembly("crop_production")
     assert list(out.index.names)[:1] == ["country"]
     assert out.index.is_unique
     per_country = out.index.get_level_values("country").value_counts().to_dict()
+    expected = set(built)
+    # EthiopiaRHS intentionally serves household-crop data without plot grain
+    # (cross-country-features §2; feature-canonical-crop-production ledger).
+    # Still read it and fail named read errors; expire this expectation as
+    # soon as a plot axis/column appears. The audit retains its Class B signal.
+    rhs = built.get("EthiopiaRHS")
+    if rhs is not None and not ({"plot", "plot_id"} & rhs[1]):
+        expected.remove("EthiopiaRHS")
+    assert set(per_country) == expected, sorted(expected - set(per_country))
     for name, n in per_country.items():
-        assert n == built[name], (
-            f"{name}: Feature() returned {n} rows, Country() returned {built[name]}")
-    assert len(grain_reports()) == before, "the assembly collapsed a grain"
+        assert n == built[name][0], (
+            f"{name}: Feature() returned {n} rows, Country() returned {built[name][0]}")
+    assert n_grain == 0, "the assembly collapsed a grain"
 
 
 def test_unnamed_index_is_left_alone():
@@ -881,7 +866,7 @@ def _warm_assembly(table):
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                df = getattr(ll.Country(name), table)()
+                df = getattr(ll.Country(name), table)(currency="index")
         except Exception as exc:
             raised[name] = f"{type(exc).__name__}: {exc}"[:300]
             continue
@@ -895,6 +880,98 @@ def _warm_assembly(table):
         warnings.simplefilter("ignore")
         out = ll.Feature(table)(sorted(built))
     return built, out, len(grain_reports()) - before
+
+
+def _fake_warm_crop(monkeypatch, tmp_path, *, raises=None, excludes=None, rhs=None):
+    """Four warm countries: one failure cannot hide behind three survivors."""
+    import lsms_library as ll
+    from lsms_library import paths
+
+    names = ['A', 'B', 'C', 'D']
+    frames = {name: _frame(CANONICAL, [tuple(f'{name}{k}' for k in range(len(CANONICAL)))])
+              for name in names}
+    if rhs is not None:
+        names.append('EthiopiaRHS')
+        carried = CANONICAL if rhs == 'plot' else ['t', 'i', 'j', 'u']
+        frames['EthiopiaRHS'] = _frame(carried, [tuple(f'RHS{k}' for k in range(len(carried)))])
+        if rhs == 'plot_column':
+            frames['EthiopiaRHS']['plot_id'] = 'p1'
+        elif rhs == 'plot_alias':
+            frames['EthiopiaRHS'] = frames['EthiopiaRHS'].rename_axis(index={'u': 'plot'})
+    excluded = {excludes} if isinstance(excludes, str) else (excludes or set())
+    reads = []
+    for name in names:
+        cache = tmp_path / name / 'var' / 'crop_production.parquet'
+        cache.parent.mkdir(parents=True)
+        cache.touch()
+
+    class Country:
+        def __init__(self, name, **kwargs):
+            self.name = name
+
+        def crop_production(self, **kwargs):
+            reads.append((self.name, kwargs))
+            if self.name == raises:
+                raise RuntimeError('warm read failed')
+            return frames[self.name]
+
+    class Feature:
+        def __init__(self, table, **kwargs):
+            self.countries = names
+
+        def __call__(self, selected):
+            kept = {name: frames[name] for name in selected if name not in excluded}
+            return pd.concat(kept, names=['country'])
+
+    monkeypatch.setattr(paths, 'data_root', lambda: tmp_path)
+    monkeypatch.setattr(ll, 'Country', Country)
+    monkeypatch.setattr(ll, 'Feature', Feature)
+    return reads
+
+
+def test_warm_crop_guard_names_a_country_read_failure_with_three_survivors(monkeypatch, tmp_path):
+    _fake_warm_crop(monkeypatch, tmp_path, raises='D')
+    with pytest.raises(AssertionError, match='warm crop_production countries raised.*D'):
+        test_warm_corpus_assembly_loses_no_rows()
+
+
+def test_warm_crop_guard_rejects_an_entire_country_exclusion(monkeypatch, tmp_path):
+    _fake_warm_crop(monkeypatch, tmp_path, excludes='B')
+    with pytest.raises(AssertionError, match='B'):
+        test_warm_corpus_assembly_loses_no_rows()
+
+
+def test_warm_assembly_reads_match_feature_default_currency(monkeypatch, tmp_path):
+    reads = _fake_warm_crop(monkeypatch, tmp_path)
+    built, _, _ = _warm_assembly('crop_production')
+    assert set(built) == {'A', 'B', 'C', 'D'}
+    assert reads == [(name, {'currency': 'index'}) for name in ['A', 'B', 'C', 'D']]
+
+
+def test_warm_crop_accepts_only_documented_coarse_rhs_exclusion(monkeypatch, tmp_path):
+    reads = _fake_warm_crop(monkeypatch, tmp_path, rhs='coarse', excludes='EthiopiaRHS')
+    test_warm_corpus_assembly_loses_no_rows()
+    assert ('EthiopiaRHS', {'currency': 'index'}) in reads
+
+
+def test_coarse_rhs_expectation_does_not_hide_another_country_loss(monkeypatch, tmp_path):
+    _fake_warm_crop(monkeypatch, tmp_path, rhs='coarse', excludes={'EthiopiaRHS', 'B'})
+    with pytest.raises(AssertionError, match='B'):
+        test_warm_corpus_assembly_loses_no_rows()
+
+
+@pytest.mark.parametrize('rhs', ['plot', 'plot_alias', 'plot_column'])
+def test_rhs_must_participate_as_soon_as_plot_grain_appears(monkeypatch, tmp_path, rhs):
+    _fake_warm_crop(monkeypatch, tmp_path, rhs=rhs, excludes='EthiopiaRHS')
+    with pytest.raises(AssertionError, match='EthiopiaRHS'):
+        test_warm_corpus_assembly_loses_no_rows()
+
+
+def test_coarse_rhs_warm_read_failure_remains_fatal(monkeypatch, tmp_path):
+    _fake_warm_crop(monkeypatch, tmp_path, rhs='coarse', raises='EthiopiaRHS',
+                    excludes='EthiopiaRHS')
+    with pytest.raises(AssertionError, match='warm crop_production countries raised.*EthiopiaRHS'):
+        test_warm_corpus_assembly_loses_no_rows()
 
 
 @pytest.mark.requires_s3

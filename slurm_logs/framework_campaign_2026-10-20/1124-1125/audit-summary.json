@@ -1,0 +1,65 @@
+{
+  "cache_copy": {
+    "hardlinks": false,
+    "parquets": 1519,
+    "physical_copies": true,
+    "shared_L1_only": true
+  },
+  "crop_production": {
+    "assembly_checks": [
+      {
+        "check": "country_exclusion",
+        "country": "EthiopiaRHS",
+        "metrics": {
+          "country_rows": 17523,
+          "dropped": 17523
+        },
+        "severity": "B",
+        "status": "warn"
+      }
+    ],
+    "records": 212,
+    "severity": {
+      "B": 15,
+      "C": 197
+    },
+    "status": {
+      "warn": 212
+    }
+  },
+  "hashes": {
+    "country": {
+      "changed": 0,
+      "total": 549
+    },
+    "tagged": {
+      "changed": 0,
+      "total": 39
+    },
+    "wave": {
+      "changed": 0,
+      "total": 2139
+    }
+  },
+  "plot_inputs": {
+    "assembly_checks": [],
+    "records": 77,
+    "severity": {
+      "B": 14,
+      "C": 63
+    },
+    "status": {
+      "warn": 77
+    }
+  },
+  "plot_labor": {
+    "assembly_checks": [],
+    "records": 55,
+    "severity": {
+      "C": 55
+    },
+    "status": {
+      "warn": 55
+    }
+  }
+}
