@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T17:39:00Z",
+  "observed_at": "2026-10-21T17:57:00Z",
   "actions": [
     {
       "issue": 822,
@@ -54,6 +54,14 @@
     {
       "issue": 1144,
       "action": "Linked reviewed stacked PR1178 and source-backed W2 corrections; split W4-PH instrument qualifier diagnosis to1177, no merge or nutrition-feature claim"
+    },
+    {
+      "issue": 1148,
+      "action": "Replaced stale shipped-period premise with Phase I/current integration dependency, exact source-status contradictions/unknowns and qualified historical food-row upper-bound percentages; no household exposure chosen"
+    },
+    {
+      "issue": 851,
+      "action": "Retitled as approved Phase II implementation/integration, preserving existing maintainer rulings; no repeat decision request or merge claim"
     }
   ],
   "verified_issue_metadata": [
@@ -117,7 +125,7 @@
       "review": "PASS; 116 tests, zero skips; documentation-only amendment PASS",
       "base": "fix/1034-nigeria-w3-unit-labels-20261021",
       "dependency_pr": 1172,
-      "ci": "in progress"
+      "ci": "success; run39645861519"
     }
   ]
 }

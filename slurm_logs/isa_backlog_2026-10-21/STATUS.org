@@ -18,17 +18,18 @@ Each country owns a persistent worktree and branch under =/local/job40255479/wor
 Focused PR heads are frozen separately, and independent reviewers use immutable detached worktrees.
 The collaboration interface permits three active workers beside the scrum master; countries rotate through those slots.
 Shared framework changes require a separate coordinated lane.
+The #1077 finite numeric-label-key guard is in that lane, leaving country configurations untouched.
 =country-lanes.json= records paths, owners, frozen heads, review verdicts and PRs.
 
 | Country | Current result or next step |
 |---------+-----------------------------|
-| Nigeria | #1034 PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]] at =3e6582987= passed 78 tests and CI. #1144 PR [[https://github.com/ligon/LSMS_Library/pull/1178][1178]] at =a1ba246f5= passed independent review (116 tests) plus documentation confirmation. It is stacked on #1172; CI is running. |
+| Nigeria | #1034 PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]] at =3e6582987= passed 78 tests and CI. #1144 PR [[https://github.com/ligon/LSMS_Library/pull/1178][1178]] at =a1ba246f5= passed independent review (116 tests) plus documentation confirmation. It is stacked on #1172; CI passed. |
 | Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. |
 | Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. |
 | Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. |
-| Burkina_Faso | #1148 source-status diagnosis active. Held status carriers disagree with each other and the survey report; the current API is Phase I, with #851 implementation still pending. |
+| Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report. Exact unknown masks and genuine policy/source questions are documented. Production unchanged; #851 integration remains pending. |
 | Ethiopia | Country-scoped #1118 missing plot-input unit diagnosis active under the existing U_UNKNOWN ruling; #1171 remains the separate nutrition follow-up. |
-| Mali | #822 implementation in cold/warm validation: preserve three native observation slots and both passages; proposed recovery is 115,713 readings. Duplicate #1089 closed. |
+| Mali | #822 frozen =23d338e50=: restores 115,713 readings; owner cold/warm/old-obs3 conservation and 39 tests passed. Independent review active. Duplicate #1089 closed. |
 | Tanzania | Worktree queued; preserve documented UPHI back-casting and live WAITING caveats. |
 
 * Evidence that changed the fixes

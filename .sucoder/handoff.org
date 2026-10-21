@@ -672,12 +672,15 @@ No public PR is merged automatically.
 
 Nigeria #1144 passed independent full review at =1e6111e2b= (116 tests, zero skips).
 The documentation-only correction at =a1ba246f5= passed narrow review.
-Stacked PR #1178 is open against #1172's branch; CI run =39645861519= is in progress.
+Stacked PR #1178 is open against #1172's branch; CI run =39645861519= passed.
 After a human merges #1172, retarget #1178 to development; do not auto-merge.
 The live W4-PH qualifier residual is #1177; preserve the 20 maize and 340 milk rows until instrument adjudication.
-Mali #822 is in actual cold/warm validation, implementing the approved three-reading design in =822-design.md=.
-Burkina_Faso #1148 is read-only source-status diagnosis: retained carriers conflict with each other and the survey report; current baseline has no Phase II period API despite the old issue premise.
+Mali #822 froze at =23d338e50= after cold/warm/old-obs3 conservation and 39 tests; independent reviewer =niger_lane= is active in =isa-review-822=.
+Burkina_Faso #1148 diagnosis is frozen at =a63d26d7f= and merged into this documentation branch only.
+Live #1148/#851 now distinguish source conflicts and unknowns from approved Phase II integration.
+No production denominator or replacement historical percentage was chosen.
 Ethiopia #1118 country-only missing plot-input unit diagnosis is active; Tanzania remains queued.
+Shared #1077 finite numeric-label-key guard is active with =triage_east= at =isa-framework-1077=; precode ledger =3e9b7dd0a=.
 Rotate through three workers beside root; keep each review snapshot immutable.
 
 Private source/frame/log evidence is under =/local/job40255479/control/isa-backlog-20261021/=.

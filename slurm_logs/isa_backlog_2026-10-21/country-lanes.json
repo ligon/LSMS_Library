@@ -6,10 +6,13 @@
     "Burkina_Faso": {
       "path": "/local/job40255479/worktrees/isa-Burkina_Faso",
       "branch": "isa/Burkina_Faso-20261021",
-      "status": "read-only-source-diagnosis",
+      "status": "diagnosis-complete-source-adjudication-pending",
       "owner": "burkina_lane",
       "initial_issue": 1148,
-      "dependency": "Approved #851 Phase II is not implemented at baseline; source-status evidence remains conflicting"
+      "dependency": "Approved #851 Phase II is not implemented at baseline; source-status evidence remains conflicting",
+      "frozen_head": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb",
+      "result": "Source-status evidence contradictions and unknown masks recorded; production unchanged",
+      "next_issue": 1123
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
@@ -41,9 +44,13 @@
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
       "branch": "isa/Mali-20261021",
-      "status": "implementation-validation",
+      "status": "independent-review",
       "owner": "mali_lane",
-      "initial_issue": 822
+      "initial_issue": 822,
+      "frozen_head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+      "review_path": "/local/job40255479/worktrees/isa-review-822",
+      "reviewer": "niger_lane",
+      "review_verdict": "pending"
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -85,7 +92,7 @@
       "runtime_review_head": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
       "next_pr": "https://github.com/ligon/LSMS_Library/pull/1178",
       "next_pr_base": "fix/1034-nigeria-w3-unit-labels-20261021",
-      "next_pr_ci": "in progress; run39645861519",
+      "next_pr_ci": "success; run39645861519",
       "documentation_review": "PASS; runtime and tests unchanged"
     },
     "Tanzania": {
@@ -109,6 +116,16 @@
         "finding": "Valid partial sibling caches bypass income input verification under inherited Make; baseline returns all waves."
       },
       "ci": "GitHub PR CI success on frozen4ef24fb"
+    }
+  },
+  "shared_lanes": {
+    "1077": {
+      "path": "/local/job40255479/worktrees/isa-framework-1077",
+      "branch": "fix/1077-nonfinite-label-keys-20261021",
+      "owner": "triage_east",
+      "status": "implementation",
+      "scope": "Finite numeric-label-key guard; country configuration untouched",
+      "precode_ledger": "3e9b7dd0a"
     }
   }
 }
