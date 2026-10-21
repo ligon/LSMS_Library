@@ -656,93 +656,114 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 
 * 2026-10-21 -- Active LSMS-ISA country backlog campaign
 
-Sue, GPT-6. Report branch =docs/isa-backlog-20261021=; previous report checkpoint =3e5d690fd=.
-Development baseline =f8d236694c26fe9e709c5548f02c70f74ea72c33= remains clean.
-The v0.16.0 release is complete; the eight-country backlog goal is active.
-See =slurm_logs/isa_backlog_2026-10-21/STATUS.org= and =country-lanes.json=.
+Sue, GPT-6. Goal remains ACTIVE; country backlog work continues.
+Report branch =docs/isa-backlog-20261021=; previous checkpoint =77af7dcf6=; current record is committed with this note.
+Main =development= remains clean at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+Campaign draft PR #1170 contains the inventory, exact residual drafts, reconciliation, reviews and source-safe evidence.
+See =slurm_logs/isa_backlog_2026-10-21/STATUS.org= and =country-lanes.json= for current paths and frozen heads.
 
-PR #1170 is the draft campaign evidence.
-Nine independently reviewed country PRs and one shared fix await human merge:
-- Nigeria #1034: PR #1172, head =3e6582987=, 78 focused tests and CI passed; earlier runtime/source snapshot =6fda46bc= remains preserved.
-- Uganda #1062: PR #1173, head =4ef24fb=; partial-cache/Make defect in the first candidate was fixed and independently re-reviewed.
-- Malawi #1109: PR #1175, head =de9c2734b=; 72 original-baseline tests, actual source quantities/units and public-finalizer conservation verified. Residual #1174.
-- Niger #1088: PR #1176, head =d602f8d63=; 67 tests, cold/warm source conservation and scoped Feature audit passed.
-- Mali #822: PR #1180, head =aba2badfe=; independent 39-test/source/old-obs3/cold/warm PASS at runtime =23d338e50=. Residual #1179; CI run =39649319628= passed.
-- Ethiopia #1118: PR #1181, head =1bce11cc8=; independent 58 focused tests plus six controls, source/cold/warm/Feature/hash PASS at runtime =286108cf7=. Both documentation-only descendants confirmed; latest CI =39657028262= passed.
-- Shared #1077: PR #1182, head =780f67986=; independent 230 tests and complete source/Code/Feature/cache PASS at runtime =3f520e09f=. Documentation-only descendant confirmed; CI =39654667663= passed.
-- Tanzania #1118: PR #1185, head =e75be9c56=; independent 246 tests and source/normal-cold/fresh-warm/Feature/hash PASS at runtime =0c8d9645e=. Documentation-only corrections confirmed; CI =39657075627= passed.
-- Mali #1121: PR #1186, head =6e97eaeb4=; independent 335-test/source/cold/warm/Feature/hash PASS at runtime =399005209=; CI =39661144364= passed.
-All ten latest GitHub PR CI runs passed. This does not claim a credentialed corpus rebuild.
+** Twelve reviewed PRs, human merge pending
+
+All twelve latest public CI runs pass; #1191 completed successfully in run39669180447.
 No public PR is merged automatically.
+- #1172 Nigeria1034, =3e6582987=; source/runtime6fda plus test amendment, 78 focused tests.
+- #1173 Uganda1062, =4ef24fb=; corrected partial-sibling/Make routing, 29 focused plus20 restoration controls/eight orders.
+- #1175 Malawi1109, =de9c2734b=; 72 independent tests, source organic quantities/units/Applied conservation; residual1174.
+- #1176 Niger1088, =d602f8d63=; 67 tests, exact sentinel masks, residual module gap823.
+- #1178 Nigeria1144, =a1ba246f5=; 116 tests/source/Feature review, STACKED on #1172 branch.
+- #1180 Mali822, =aba2badfe=; 39 tests/source/old-obs3 conservation, residual1179.
+- #1181 Ethiopia1118, =1bce11cc8=; runtime286108 plus two narrowly reviewed docs descendants, 58 tests/six controls; residuals1183/1184.
+- #1182 shared1077, =780f67986=; runtime3f520 finiteguard plus actual-null source-key filtering, 230 tests and narrowdoc review.
+- #1185 Tanzania1118, =e75be9c56=; runtime0c8d plus doc corrections, 246 tests and all11scannerfindings accounted.
+- #1186 Mali1121, =6e97eaeb4=; runtime399005, 335 tests and exact52,057row case-only projection; Ghana taxonomy remains separate.
+- #1189 Burkina1123, =cfd078276=; runtime69ed4, full independent3848778d, 13focused+8adversarial tests and rootnarrowdocPASS; CI39666499914 success.
+- #1191 Uganda1006, =2b6cf4ccb=; testimplementation1eb9, independent66tests/9frames/2matrices/strongfaults/cleanup/absence/credsPASS; CI39669180447success.
+After a human merges1172, retarget1178 to development; never auto-merge.
+#1189 restores all183 lost native lines, Feature47,212; its source authority1187 and gift/purchase binding1188 remain separate.
+Current Purchased/Quantity_purchased are API names whose existing bindings read gifts;18 recovered lines actually report purchases.
 
-Nigeria #1144 passed independent full review at =1e6111e2b= (116 tests, zero skips).
-The documentation-only correction at =a1ba246f5= passed narrow review.
-Stacked PR #1178 is open against #1172's branch; CI run =39645861519= passed.
-After a human merges #1172, retarget #1178 to development; do not auto-merge.
-The live W4-PH qualifier residual is #1177; preserve the 20 maize and 340 milk rows until instrument adjudication.
-Mali #822 independent review passed; both source runtime and documentation-only descendant are preserved in =review-822/=.
-Burkina_Faso #1148 diagnosis is frozen at =a63d26d7f= and merged into this documentation branch only.
-Live #1148/#851 now distinguish source conflicts and unknowns from approved Phase II integration.
-No production denominator or replacement historical percentage was chosen.
-Ethiopia #1118 review is FINAL PASS at =286108cf7=; report-only =9e698a367= and source-caveat documentation =1bce11cc8= both passed narrow review. PR #1181 is at the latter head.
-Ethiopia source-grounded purchase-answer and all-missing purchase-sum residuals are filed as #1183 and #1184, respectively; they do not block the unit fix.
-Mali #1121 diagnosis proved all 52,057 rows, source semantics and the exact casing defect; root approved only three Preferred Label cells plus narrow comments/docs/tests.
-Writer =mali_lane= finished and stopped in fresh f8 worktree =isa-Mali-1121=, branch =fix/1121-mali-labor-source-20261021=; precode ledger =23b6fde3a=.
-Old #822 country/frozen heads remain unchanged; no implementation dependency exists.
-Author checks passed335tests with exact private cold/warm/Feature conservation and complete eight-warning scanner accounting.
-Frozen head =6e97eaeb488096459d673486c127043f016c4f8d= (runtime =3990052090e2f56049f6d5116a82ff4cfef97aeb=) is clean and published.
-Independent reviewer =burkina_lane= completed PASS in detached =isa-review-1121-Mali=; PR #1186 awaits human merge.
-The live #1121 retains GhanaSPS/GhanaLSS taxonomy as its separate residual.
-Tanzania independent review is complete: all 9,698 rows remain, exactly 408 units change; all 11 scanner findings matched, sole alignment detail408to0.
-Supporting unchanged all-wave sample builds are allowed held-only; no hidden stale-sample bypass.
-The six existing mixed-unit duplicate groups remain unchanged; live #637 now records the independently verified aggregate source evidence.
-The Tanzania documentation descendant corrected the ledger's old rebuild wording, 27-to-26 comparator count, and explicit Feature attrs delta.
-Shared #1077 full review passed at =3f520e09ff2d21501e30d8ac657f7f8ea571152d=; the documentation-only descendant =780f67986= also passed narrow tree/all549hash/all39fingerprint confirmation.
-The corrected Uganda CONTENTS now distinguishes the build decoder from query-time label selection.
-Burkina_Faso #1123 diagnosis proved183lost native line items, not only the historical163conflicting extras; all22,877source keys are unique.
-Root approved exactly three crop-map cells, a pre-write uniqueness guard and narrow docs/tests; the unlabelled2018code21 gets an explicit source-qualified unknown identity while its legacy input=Seed remains unverified.
-Writer =niger_lane= completed and stopped at clean =3848778d0= in fresh f8 checkout =isa-Burkina_Faso-1123=, branch =fix/1123-burkina-input-identity-20261021=; original a63/#1148 lane unchanged.
-Independent reviewer =mali_lane= is active; author runtime =69ed4d202= passed13tests, restores all183lines and gives Feature47,212.
-The private review is =control/isa-backlog-20261021/review-1123-Burkina_Faso/=.
-Normal supporting sample/cluster rebuilds are authorized from held sources; no stale-cache bypass, acquisition or input-classification decision.
-Validation-only integration branch =isa/integration-20261021= at =483b4aa117c2c05ac00bf023adab97e47782df46= combines nine reviewed PRs, including Tanzania and Ethiopia's source-caveat docs.
-The 18-file held-source cohort TERMINAL PASSED656tests,0skips/failures/errors in exec session =62910=, launcher270.243s.
-Launcher =control/isa-backlog-20261021/integration/run_cohort_nine.py=; private output =integration/cohort-nine/=; source head/content/modes/clean status stayed exact.
-Exactly two all-country canonical corpus cases are explicitly deselected; original launcher prose mistakenly said three, corrected in =scope-correction.json= without changing command/result.
-All synthetic canonical guards and the relevant held-source tests remain included; no full corpus claim.
-Reviewer =review_malawi_1109= completed combined normal API PASS in =integration/api-nine-review/= using separate physical cache copies.
-Nine Country calls and four Features exactly match full frozen frames/dtypes/attrs; separate fresh-process repeat makes0byte/mtimechanges across1519parquets.
-Initial reviewer expected-attrs mistake and corrected proof are preserved; source head483 and all reference/source files remained unchanged.
-The tenth reviewed fix #1186 is now integrated at =bbdcf34578085fb90e981184a0cadadc9701a366=; root is preparing incremental Mali labor/price coexistence checks.
-Merge0f65e374e accidentally staged unresolved Org markers after the bare python launcher failed; correctivebbdcf3457 removes only markers, retaining both reviewed source notes. Both commits published; public fix branches remain at reviewed heads.
-Credential-free offline full-suite execution =28550= TERMINAL PASS at the earlier eight-PR head =dd0dddcb052f8ce9b0c7401b281ac60df47933ad=: 4,961 passed / 4,455 skipped / zero failures/errors, 140.842 seconds.
-It used16loadfileworkers and private empty data/config roots; tracked contents/modes, HEAD and clean status stayed unchanged.
-Launcher and private logs/XML: =control/isa-backlog-20261021/integration/unit-eight-prs/=; safe summary/reproduction in the campaign's corresponding report directory.
-Both pytest selections and the separate combined API review are complete.
-Keep integration frozen at bbd during its incremental check.
-Reviewer =review_malawi_1109= is now diagnosing Uganda #1006 in clean f8 =isa-Uganda-1006=, private =control/isa-backlog-20261021/Uganda/1006/=.
-The existing3-filetestselection gives5passes/10skips; two API dtype tests execute no dtype assertions. No tracked edits approved yet.
-Reviewer =burkina_lane= is diagnosing Malawi #1111 from frozen1109 and baseline, private =control/isa-backlog-20261021/Malawi/1111/=.
-Held primary instruments suggest the current nonorganic unit bindings read timing columns; exact per-wave binding/census is pending. No physical-unit or1000x repair is approved.
-A process census observed one shared-home gpg-agent carrying the test environment; its shared homedir failed the private-process termination guard, so it was left running and unmodified.
-The completed 266-test source-backed result below belongs to the preceding six-PR head =5906e8715=; preserve its distinct source pin and scope.
-A physically private 1,519-file L2 and 2,733-blob held ISA L1 were prepared; no acquisition.
-The 11-file cohort selection PASSED266tests with zero skips/failures/errors in corrected exec session =23070= under eight loadfile workers.
-The initial =10257= launcher stopped before tests on an incorrect socket-class assertion; terminal failure evidence is retained.
-Private log/XML under =control/isa-backlog-20261021/integration/=; safe summary committed. Source seed1519file hashes remain exact.
-The #1077 guard has a genuine Uganda build caller: 28 Uganda hashes move; 521 other-country hashes and 39 tagged fingerprints stay unchanged.
-A guard-only candidate invented labels for actual null inputs through missing lookup keys; root approved filtering only actual-null source rows before dictionary construction.
-Keep original nonmissing/literal-string mappings and targets unchanged; verify no fabricated labels before publication.
-The source-grounded Ethiopia residuals have independent synthetic reproductions and exact separate caller/grouping effects; preserve both boundaries when diagnosing future fixes.
-Rotate through three workers beside root; keep each review snapshot immutable.
+** Active workers and next concrete actions
 
-Private source/frame/log evidence is under =/local/job40255479/control/isa-backlog-20261021/=.
-Only source-safe aggregate reports are committed.
-No shared-cache mutation, acquisition or full credentialed corpus validation has been claimed.
-Use image =/local/job40255479/venv_img/bin/python=, generation =20261019T221223Z=, matching checkout/config paths and exact realpath assertions.
-Pin numerical threads and =LSMS_BUILD_WORKERS=1=; use bounded xdist with =--dist=loadfile=.
-Job =40255479= has 32 cores/93 GiB and about 51 hours 40 minutes left at the 19:31 UTC checkpoint; no deadline warning.
-Ordinary commits publish through the hook; merges require explicit publication if no =SUCODER: published= message appears.
-Never edit the durable mirror working tree.
+Three workers beside root; do not dispatch a fourth worker.
+- =niger_lane=: completed Uganda1006 independentPASS and stopped; idle.
+  Detachedreview =/local/job40255479/worktrees/isa-review-1006-Uganda= andwriter =isa-Uganda-1006= remainfrozen at2b6cf4ccb.
+  Rootread allthree testdiffs andindependentreview; publicPR1191opened, live1006prependedreviewed-but-unmergedstatus, CI39669180447success.
+  Private =control/isa-backlog-20261021/review-1006-Uganda/=; aggregateexport =review-1006-Uganda/=.
+- =review_malawi_1109=: active READONLY eleven-fix/Burkina joint API verification atintegration7886f7ece.
+  Private =control/isa-backlog-20261021/integration/api-eleven-review/=, newphysicalprivatecaches fromquiescenttenfixdata plusBFheldL1.
+  Mustcompare Bfplot_inputs/sample/cluster fullframes+attrs to independent384references, Benin/Togo fullframes/cachebytes, Feature47212,13focusedtests/four explicitdeselections andfreshwarm0writes.
+  Initial20fullframereferencesPASS, onlytenBurkina parquets rebuilt and1509otherparquets exact; focusedtests/freshwarm/fullreceipt stillactive.
+  Don't mutate integration head until the final review completes.
+- =burkina_lane=: writer in fresh f8 =/local/job40255479/worktrees/isa-Malawi-1111=, branch =fix/1111-malawi-applied-kg-20261021=; ledgerFIRST63c2c4315.
+  Approved ONLY2010+2019drivers: declare kg for alreadyselected enumerator totals BEFORE unchanged aggregation; no rescale/helper/reducer/eligibility/otherwave/organic/seed/pesticide change.
+  Twelve actual-driver tests pass; unchanged-driver negative10fail/2pass; full cold/warm/source/Feature/hash verification active.
+  Correct measured total180,184baseline179,949candidate;169,109 is NONORGANIC subset, not f8Country total.
+  f8 retains11,075organic zero rows; this branch preserves them. Later composition withde9 must preserve de9's recovered quantities/Applied semantics.
+ 235 same-source application-pair coalescences (51in2010+184in2019) preserve every positive kg contribution; no afteraggregation relabel/selector loss.
+  LiteralC4 excludes2016(noag-questionnaire sidecar) and2013(unheld questionnaire/DDI); no physical-unit change approved there.
+  Actual footprint26MalawiAPI entries=22nonderived+4derived,523other-country hashes and39framework tags exact; wave_/all.py hashing also rebuilds supporting sample.
+  Main/fresh sample frames and six cache frames exact; separate fresh warm paths make zero writes.
+  Fresh f8/candidate sample-only cold warnings match in full and order,18each; main candidate has six events.
+  Ten missing-label-set metadata bindings are a separate source count, not a one-event/one-file attribution.
+  Scope correction is additive in malawi-1111-diagnosis/SCOPE-CORRECTION.org; original receipts retained.
+  Private diagnosis =control/isa-backlog-20261021/Malawi/1111/=; source-safe export =malawi-1111-diagnosis/=.
+  Unknown602trueabsent units plus3observed unlisted seed codes remain1118, seedpurchaseunit issue1190, source-use retention1174 and composition1106 separate.
+  Next collect writerfreeze, dispatch independentreview, then root-owned separate composition validation with1175; do not mutate de9/frozenworktrees.
+- =mali_lane=: READONLY Nigeria1095 diagnosis in =/local/job40255479/worktrees/isa-Nigeria-1095=, f8 branch =fix/1095-nigeria-community-units-20261021=.
+  No fix boundary approved yet. Reproduce source C8unitloss, metricSIZE rescue/exclusions, fullpayload/round/Feature finding accounting and minimal helper scope.
+  Private =control/isa-backlog-20261021/Nigeria/1095/=.
+  Legacy W1/W2C8 CSV DVC keys are md5-dos2unix; keep bytes and rawSHA/rawMD5 plus normalized-key receipts, reuse fobj_md5 not rewritten sources.
+  Initial preparation/cold failures quarantined; require complete verified prep before dependent probes.
+  Normal Country updated_ids also needs held W2/W3 cover pages despite preload_panel_ids=False; source/panel dependencies must be staged normally, no JSON/bypass shortcut.
+  Next read diagnosis/ledger/proposal, approve minimal community-specific correction only after actual scope known.
+
+** Joint validation pins and pending work
+
+Validation-only branch =isa/integration-20261021= currently frozen at =7886f7ece49767b2357a2f559c474e0eb710561f=, eleven reviewed PRs combined.
+Most recent merge1189 was clean, committed via ordinary hook and published.
+Its combined Burkina source/API check has an initial full-reference PASS; focused tests, fresh warm checks and final immutable receipts are still active.
+Do not inherit older pass scope onto the current head.
+Use physically separate inputs from quiescent completed reviews; compare full Burkina Country sample/cluster/plot_inputs and Benin/Togo Feature against independent1123references, normal stale-cache rebuild, freshwarm0writes, and focused13tests.
+It is now dispatched toreview_malawi_1109, the completedAPI9reviewer; root should stayinteractive.
+After itfinishes, integrate1191test-onlyhead andrunits meaningful66case selection againstcombinedproductioncode; do notrelabelolderproofs.
+
+Completed independent source pins:
+- Six-fix5906e8715:266tests/0skip; exec23070; original10257launcher failed beforetests onguard assertion.
+- Eight-fixdd0dddcb0:credential-free full selection4961pass/4455skip/0fail,140.842s; exec28550.
+- Nine-fix483b4aa11:656tests/0skip across18files,270.243s; exec62910; exactlyTWOall-countrycanonical corpus cases deselected, originalthree-case annotation corrected explicitly.
+- Same nine-fix483:independent9Country+4Feature fullframes/dtypes/attrs exact; freshprocess repeats all13 with0byte/mtimechanges across1519parquets.
+- Ten-fixbbdcf3457:incremental31tests/0skip,3Country+1Feature fullrefs exact (Mali labor52057,Nigerlabor53041,Maliprices155931,Feature105098),freshwarm0/1519writes; exec59069terminal0,83.03sincludingcopy.
+The ten-fix run's three initialAPI attempts exposed incomplete private Niger legacy/modernlabor then supporting sample staging; allfailedroots/logs preserved, no externalacquisition.
+Successfulv4 copied1288heldL1+1519L2; verified161Nigerbinarysidecars,134unheld declarations leftabsent.
+Exactscripts and safe results are committed under =integration/mali-ten-increment/=.
+The initial ten-fix Org merge0f65 staged unresolvedmarkers after barepython failed; correctivebbdc removed onlymarkers and retained bothMali notes. Bothpublished; runtimePRbranches unaffected.
+All source contents/modes, heads and clean states remained exact in the completed proofs.
+No full credentialed corpus rebuild is claimed; no tests need repeating without a newchange/failure/concern.
+
+** Scope, decisions and source handling
+
+Initial inventory156openissues,97ISA references includingumbrellas;37partialdrafts,30in-scope; onlyduplicate1089closed.
+C/D designs/acquisition are reported, never automatically implemented; existingapproved rulings851/894/1134 are not unansweredquestions.
+Burkina1148/source-status contradictions remain, frozena63. Foodrowpresence is not interview count; historical9.3%/-3.94% notstatus-basedremeasurement.
+851PhaseIIapproved branchcf117d101 exists, notmerged/noPRfound; don'tre-ask its conversion ruling.
+Keep Ethiopia1183missingpurchaseflags separate from1184allmissingsums; source routing/retention needs diagnosis, no blindfloatcorrection.
+Tanzania's six actual mixed-unit duplicate groups remain637, withfullsource review; no blanketreducer rewrite.
+Mali839falsefoodshapecomment remainsqueued for nextMali configuration edit (e.g821); do not reclassify Tanzania's alreadycorrected note asopen.
+Earlier22Malawitable wording may cover nonderived scope; newactual26API inventory explicitly includes4derived, don't silently reinterpret oldreceipts.
+
+** Runtime, durability and node
+
+Mounted image Python =/local/job40255479/venv_img/bin/python=, generation20261019T221223Z.
+Always exactcwd/PYTHONPATH/config and realpathassert; no editableinstall or writablemastervenv.
+Pin numeric/build/Make threads1, boundpytestloadfileworkers≤4peragent; root/nodebudget32cores93GiB.
+All L1/L2copies private and physical; no sourceacquisition,DVCCLI,sharedcachewrite/clear/promotion,assume-fresh/hashstamp bypass or intreedata.
+Onlysource-safe aggregate evidence entersGit. Fullframes/IDs/logs live under =/local/job40255479/control/isa-backlog-20261021/=.
+Before releasing/turnover, preserve quiescentprivate scripts/logs/frame proofs to a private durable scratch archive excluding duplicateL1/L2caches; this has not been done yet.
+Original1519release manifest sourcefiles remainunchanged;16unmanifestedrawDTAseedextras excluded fromrootcohortstaging.
+A priorunitrun'sgpg-agent has sharedhomedir; private-terminationguard refused it, so leave it unmodified.
+Gitcommit hooks publishFSorigin; verifySUCODERpublished. Merges made with --no-commit thenordinarycommit publish normally.
+Never manually edit durable mirror's worktree or forcepush; publicPRs remainhumanmerge.
+Node n0071.savio3 job40255479, 2-02:56:10remaining at2026-10-21 20:15 UTC.
+Poll actual deadline path /tmp/sucoder-UID/timers/04e4e4181b60b7718407a112/HOST-40255479/slurm-deadline-LSMS_Library.warn; no warning at this checkpoint.
 
 Sue

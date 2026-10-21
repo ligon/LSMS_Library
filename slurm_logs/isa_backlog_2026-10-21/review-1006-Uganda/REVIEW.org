@@ -1,0 +1,139 @@
+#+title: Independent review of Uganda #1006 test-only repair
+#+date: 2026-10-21
+#+author: Sue (GPT-6)
+
+* Verdict
+
+PASS at frozen =2b6cf4ccb474665bfd9ced256371a0fdc5e25c93=.
+I did not write the patch.
+The implementation test blobs are identical to =1eb9bb377157c78f74962c7a9de59807d446b239=.
+All production, library, country configuration, fixtures, scientific baselines and dependencies are identical to immutable =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+There are no blockers within the approved test-only boundary.
+
+* Grounding and exact boundary
+
+I read all 3,604 lines of Uganda's CONTENTS first, including the live TODO, WAITING and LOGBOOK entries.
+I read the applicable guidance, code-reviewer and prior-art-ledger skills, standing/task ledgers, backlog and cross-country skills, root-approved diagnosis/proposal, final tests and safe author evidence.
+The search tier was git, ripgrep and AST.
+
+The diff is exactly three test files plus one task ledger and three safe evidence files.
+The first commit, =cdb6274efe7081f07940cfb6d17f727faf154bd1=, contains only the task ledger.
+No shared conftest, schema, production persistence, fixture/golden, nutrition/FCT, CPU-fingerprint variant or tolerance changes.
+The unused destructive helpers and three unsupported migration xfails are removed.
+The retained registered-table nonempty assertions are AST-identical to f8.
+The five attrition numerical/loader helper and test bodies are AST-identical to f8, excluding decorators and comments: threshold 50, upper triangle, positive adjacent overlaps and both positive-diagonal loops remain exact.
+
+The new readiness checks follow existing Country derived-table memberships and actual food_acquired/household_roster/sample prerequisites.
+Explicit Region also requires cluster_features; registered tables retain their own prerequisites.
+Only data_root paths count: no in-tree fallback or manufactured derived file.
+Actual API errors after readiness are not caught and converted into skips.
+Real-data cases retain requires_s3; ten pure dtype cases run without data or credentials.
+
+* Independent held-prerequisite and API evidence
+
+I physically copied 170 manifest-pinned f8 Uganda prerequisite parquets and 581 held L1 blobs into each of two new private roots.
+Every L1 copy matches its MD5 and SHA256, belongs to the current Uganda sidecar inventory, has a distinct inode and is not linked to a source.
+The six prerequisite country caches are hash-fresh and cover all eight waves before the credentialed selections.
+No derived parquet, nutrition or FCT artifact was staged.
+
+Separate baseline/candidate processes call the normal public API for five defaults and four explicit Region variants.
+All nine complete frames compare exactly to each other and the saved f8 references, including row/index order, labels, dtypes, axis metadata and full logical attrs.
+Both actual attrition matrices also match exactly.
+
+| API mode | Prices | Quantities | Expenditures | Household characteristics | Income |
+|----------+--------+------------+--------------+---------------------------+--------|
+| default  | 348181 | 355487     | 247049       | 24364                     | 14740  |
+| Region   | 348145 | 355450     | 247018       | 24297                     | --     |
+
+Region excludes 36 / 37 / 31 / 67 observations respectively through the existing geography resolution.
+These are observed exclusions, not revised coverage pins or a requirement that all default rows have a market.
+HC's columns.name changes from sex_age to None between modes at both revisions.
+That existing metadata difference is reported rather than repaired or normalized away; each entire mode remains exact to its own f8 reference.
+Default prices expose Price as nullable Float64 and quantities expose Quantity as float64.
+All normal calls, tests and controls leave prerequisite bytes and nanosecond mtimes unchanged and create no derived parquet.
+This is warm normal-API verification using held prerequisites, not a cold raw-survey or full-country rebuild.
+
+* Tests, absence behavior and adversarial controls
+
+| Selection/control | Independent result |
+|-------------------+--------------------|
+| Three changed files, credentialed/source-ready | 25 passed, zero skipped |
+| Existing units, Wave recursion, market deduplication and Uganda 2009 fallback | 41 passed, zero skipped |
+| Immutable f8 three-file counterfactual | 5 passed, 10 skipped |
+| Empty private root | 10 pure passed, 15 source-readiness skips; zero payload files acquired |
+| Credentialless warm private root | 10 pure passed, 15 explicit requires_s3 skips |
+| Required canonical dtype checks | 8 faults rejected: missing/object/string/empty for both fields |
+| Supported float dtypes | float64 and Float64 accepted for both fields, including NA |
+| Default/Region helpers on all four actual tables | 32 index/dtype/measurement faults rejected |
+| Unchanged attrition test bodies | Six injected faults rejected |
+| Exact threshold boundary | 50 accepted; 51 rejected in both zero/large directions |
+| Source-ready API errors | Four propagated through dtype/default/Region/attrition entry points |
+| LSMS_DATA_DIR present/absent x success/exception | Four exact environment/memo/cache restoration controls pass |
+
+The 32 faults cover missing v, default m, ignored market, missing m, duplicated Region rows, changed measurements, changed payload dtypes and newly introduced non-geographic keys.
+The six attrition faults cover lower-triangle pollution, zero adjacent overlap, both zero/large table directions and both positive-diagonal requirements.
+Both real diagonals are positive but non-monotone; no monotonicity promise was added.
+The existing 2,975 HC and at-least-2,929 food household assertions execute unchanged in the 41 supporting passes.
+Both candidate credentialed selections have zero failures, errors, skips or xfails.
+
+I independently drove the old API and cache-read assertions with twelve malformed canonical frames; all twelve incorrectly pass.
+Cache-read interception is in memory and creates no file.
+Tracing the old API assertion bodies on actual canonical API frames reaches zero dtype predicates.
+The candidate's canonical-column presence and floating predicate reject those malformed cases.
+Source-readiness skips in the empty run name the actual missing prerequisites; the credentialless run uses the existing explicit credential mark for all fifteen data cases.
+The four API-error controls raise a distinct runtime exception after prerequisites are available, including a Region-only failure after a successful default call.
+No broad exception-to-skip escape was introduced.
+
+* Country idiosyncrasies, contradictions and future note
+
+Uganda's v spans incompatible EA renderings, 2009 synthetic GPS bins for movers/split-offs and later parish identities.
+It cannot be assumed stable across waves or universally present.
+The rotating/refresh sample also prevents an unsupported monotone-population assertion.
+Food unit handling distinguishes reported-quantity Unknown, expenditure-only Value and accepted unlabelled numeric residuals; none changes here.
+Live country caveats include phantom cluster outer-merge rows, absent GPS, null-key crop losses, the producer-unconfirmed sales scaling correction, panel weights and recall-window gaps.
+
+CONTENTS says sample geography is "complete for every household" but its own later caveat records three missing 2019-20 Regions.
+The unqualified rotation statement is qualified by the DDI quote "This same sample was used for the UNPS 2015/16 (Wave 5)".
+Global data_info.yml still declares household_characteristics =(t, v, i, m)=, while the current default is =(t,v,i)= and explicit Region is =(t,m,i)=.
+The old attrition comment said "monotonically non-decreasing", although its executable loops require only positive diagonals; the candidate corrects only that comment.
+The f8 unit-wave-column statement "unused at runtime" has the separate #1077 build-versus-query qualification and is not overwritten by this f8-based lane.
+These are reported contradictions, not grounds to declare country notes stale or change production schema.
+
+A genuine fact for a future country-note amendment: the historical CONTENTS statement that test_uganda_tables.py "DELETES generated parquets" describes helper functions that have zero calls in the f8 test AST.
+The candidate removes those unused helpers; both actual baseline and candidate runs create/delete zero derived parquets.
+The full current test net now exercises runtime-derived API returns from source prerequisites and does not require derived cache files.
+No country-document edit was made during this read-only review.
+Nutrition/FCT inputs, approvals, historical holds and narrow CPU variants remain untouched and uncalled.
+Separate #1062 and #1077 production/routing work is not imported.
+
+* Reproduction, immutable proof and limits
+
+Every process uses the mounted image, matching cwd/PYTHONPATH/countries-root realpath assertions, private data/config/temp roots, active socket connect/connect_ex guards and unshare -rn.
+Numerical, build and Make threads are one; pytest uses three loadfile workers, below the four-worker cap.
+Frames, IDs, complete warnings, logs and source/cache receipts stay private here.
+
+#+begin_src sh
+P=/local/job40255479/control/isa-backlog-20261021/review-1006-Uganda
+PY=/local/job40255479/venv_img/bin/python
+# Preparation ran once and refuses existing destinations.
+$PY "$P/prepare.py"
+bash "$P/run.sh" candidate "$P/static.py"
+bash "$P/run.sh" baseline "$P/api.py"
+bash "$P/run.sh" candidate "$P/api.py"
+bash "$P/run.sh" baseline "$P/tests.py" scoped
+bash "$P/run.sh" candidate "$P/tests.py" scoped
+bash "$P/run.sh" candidate "$P/tests.py" support
+bash "$P/run.sh" candidate "$P/controls.py"
+bash "$P/run.sh" candidate "$P/tests.py" empty
+bash "$P/run.sh" candidate "$P/tests.py" credentialless
+bash "$P/run.sh" candidate "$P/finish.py"
+#+end_src
+
+The before/after SHA256, mode, HEAD and clean status proofs match all 14,884 review, 14,884 writer and 14,880 baseline tracked entries.
+Every private source/prerequisite copy and its quiescent writer source remains byte/mtime exact.
+All three trees have zero introduced raw-source/parquet files.
+There are no remaining review workers, GitHub writes, git mutations, acquisition/DVC CLI actions, shared-cache writes/clears/promotions, freshness bypasses or manual stamps.
+The full 549-country-hash inventory and a Feature scanner rerun are unnecessary for this boundary: all library/config/fixture blobs and modes are exactly f8, and the actual mode-specific outputs are independently exact.
+No full-suite, full-country source rebuild or unrelated feature-output claim is made.
+
+Sue

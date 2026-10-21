@@ -6,7 +6,7 @@
     "Burkina_Faso": {
       "path": "/local/job40255479/worktrees/isa-Burkina_Faso",
       "branch": "isa/Burkina_Faso-20261021",
-      "status": "independent-review-next-issue",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "niger_lane",
       "initial_issue": 1148,
       "dependency": "Approved #851 Phase II is not implemented at baseline; source-status evidence remains conflicting",
@@ -23,12 +23,18 @@
       "diagnosis_served_rows": 22694,
       "diagnosis_lost_lines": 183,
       "active_owner": "niger_lane",
-      "active_frozen_head": "3848778d0e8676c798883c11ea3e33fc88e8a591",
+      "active_frozen_head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
       "active_runtime_head": "69ed4d2028a6f989a8ac45d117a5cffc60a831fd",
       "active_precode_ledger": "d780445e8",
       "active_reviewer": "mali_lane",
       "active_review_path": "/local/job40255479/control/isa-backlog-20261021/review-1123-Burkina_Faso",
-      "active_author_tests": 13
+      "active_author_tests": 13,
+      "active_full_review_head": "3848778d0e8676c798883c11ea3e33fc88e8a591",
+      "active_review_verdict": "PASS13focused+8independent adversarial; source/cold/freshwarm/Feature/hash; four-prose-filedescendant rootnarrowPASS additional0/549 and0/39",
+      "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1189",
+      "active_ci": "success;run39666499914",
+      "residual_source_authority_issue": 1187,
+      "residual_purchase_binding_issue": 1188
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
@@ -58,7 +64,7 @@
     "Malawi": {
       "path": "/local/job40255479/worktrees/isa-Malawi",
       "branch": "isa/Malawi-20261021",
-      "status": "diagnosis-next-issue",
+      "status": "implementation-next-issue",
       "owner": "triage_west",
       "initial_issue": 1109,
       "frozen_head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
@@ -76,7 +82,14 @@
       "active_issue": 1111,
       "active_owner": "burkina_lane",
       "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Malawi/1111",
-      "previous_issue_status": "1109 reviewedPR1175 awaitinghuman; no new physical-unit repair approved"
+      "previous_issue_status": "1109 reviewed PR1175 awaiting human merge; 1111 only the questionnaire-covered 2010/2019 unit declarations are approved",
+      "active_path": "/local/job40255479/worktrees/isa-Malawi-1111",
+      "active_branch": "fix/1111-malawi-applied-kg-20261021",
+      "active_precode_ledger": "63c2c4315",
+      "approved_boundary": "Only2010+2019drivers: preserve enumerator kg numeric quantities, correct unitbefore unchangedaggregation;235application-pair coalescences; no2013/2016/sharedhelper/organic/seed/pesticide change",
+      "remaining_authority": "LiteralC4 excludes2016missingquestionnaire sidecar and2013unheld questionnaire/DDI",
+      "seed_purchase_unit_residual": 1190,
+      "observed_hash_footprint": "26MalawiAPI entries (22nonderived+4derived),523other-country entries and39framework fingerprints exact; supporting sample must rebuild normally"
     },
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
@@ -124,7 +137,7 @@
     "Nigeria": {
       "path": "/local/job40255479/worktrees/isa-Nigeria",
       "branch": "isa/Nigeria-20261021",
-      "status": "reviewed-pr-awaiting-human",
+      "status": "diagnosis-next-issue",
       "owner": "triage_east",
       "frozen_head": "a1ba246f59d341c331c69471f914d3ca798e6894",
       "review_path": "/local/job40255479/worktrees/isa-review-1144",
@@ -150,7 +163,14 @@
       "next_pr": "https://github.com/ligon/LSMS_Library/pull/1178",
       "next_pr_base": "fix/1034-nigeria-w3-unit-labels-20261021",
       "next_pr_ci": "success; run39645861519",
-      "documentation_review": "PASS; runtime and tests unchanged"
+      "documentation_review": "PASS; runtime and tests unchanged",
+      "active_issue": 1095,
+      "active_owner": "mali_lane",
+      "active_path": "/local/job40255479/worktrees/isa-Nigeria-1095",
+      "active_branch": "fix/1095-nigeria-community-units-20261021",
+      "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Nigeria/1095",
+      "previous_issue_status": "1034PR1172 and1144stackedPR1178 independently reviewed, frozen, CIpassed; humanmerge pending",
+      "active_scope": "Read-only C8loss/units/size exclusions/healthycomparator/actual source and panel prerequisites; no fix approved"
     },
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
@@ -177,7 +197,7 @@
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
       "branch": "isa/Uganda-20261021",
-      "status": "diagnosis-next-issue",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "triage_panel",
       "frozen_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
       "review_path": "/local/job40255479/worktrees/isa-review-1062-v2",
@@ -195,7 +215,17 @@
       "active_branch": "fix/1006-uganda-derived-api-tests-20261021",
       "active_owner": "review_malawi_1109",
       "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Uganda/1006",
-      "previous_issue_status": "1062 reviewedPR1173 awaitinghuman"
+      "previous_issue_status": "1062 reviewedPR1173 awaitinghuman",
+      "active_frozen_head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "active_runtime_head": "1eb9bb377157c78f74962c7a9de59807d446b239",
+      "active_precode_ledger": "cdb6274ef",
+      "active_reviewer": "niger_lane",
+      "active_review_path": "/local/job40255479/worktrees/isa-review-1006-Uganda",
+      "active_author_tests": 66,
+      "active_boundary": "Three test files only plusledger/safeevidence; no production/fixture/cache persistence changes",
+      "active_review_verdict": "PASS66tests0skip; full9frames+2matrices; comprehensivefault/absence/credentials/restoration/immutability controls",
+      "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1191",
+      "active_ci": "success;run39669180447"
     }
   },
   "shared_lanes": {
@@ -221,7 +251,7 @@
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "bbdcf34578085fb90e981184a0cadadc9701a366",
+    "head": "7886f7ece49767b2357a2f559c474e0eb710561f",
     "included_prs": [
       1172,
       1173,
@@ -232,13 +262,11 @@
       1181,
       1182,
       1185,
-      1186
+      1186,
+      1189
     ],
-    "status": "Nine-PR tests/full-frame API PASS at483b4aa; tenth fix integrated atbbdcf3457, incremental verification next",
+    "status": "Eleven reviewed fixes integrated; firstnine fullAPI/testPASS andten-fix incrementalPASS retainpins; newBurkina combinedAPI verification pending",
     "public_prs_merged": false,
-    "test_session": 23070,
-    "completed": true,
-    "last_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
     "unit_session": 28550,
     "unit_exit_code": 0,
     "unit_passed": 4961,
@@ -255,8 +283,30 @@
     "cohort_excluded_all_country_cases": 2,
     "api_review_completed": true,
     "api_review_verdict": "PASS: nine Country calls and four Features exactly match complete frozen corrected reference frames/attrs; fresh-process warm writes zero of1519parquets",
-    "source_head_frozen": "bbdcf34578085fb90e981184a0cadadc9701a366",
+    "source_head_frozen": "7886f7ece49767b2357a2f559c474e0eb710561f",
     "cohort_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
-    "api_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46"
+    "api_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
+    "current_head_validation_completed": false,
+    "incremental_ten": {
+      "head": "bbdcf34578085fb90e981184a0cadadc9701a366",
+      "session": 59069,
+      "exit_code": 0,
+      "passed": 31,
+      "skipped": 0,
+      "Country_calls": 3,
+      "Feature_calls": 1,
+      "full_reference_frames_dtypes_attrs_exact": true,
+      "freshwarm_parquet_writes": 0,
+      "parquets_checked": 1519,
+      "seconds_including_staging": 83.03,
+      "source_head_content_modes_unchanged": true,
+      "evidence": "integration/mali-ten-increment/"
+    },
+    "six_cohort_completed": true,
+    "six_cohort_session": 23070,
+    "six_cohort_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
+    "current_head_validation_owner": "review_malawi_1109",
+    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/api-eleven-review",
+    "current_head_validation_status": "active; head7886f7ece must remainfrozen"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T19:31:07.034569+00:00",
+  "observed_at": "2026-10-21T20:15:02.055512+00:00",
   "actions": [
     {
       "issue": 822,
@@ -114,6 +114,30 @@
     {
       "issue": 1121,
       "action": "Mali source case repair independently PASS335tests and source/fullframe/Feature proof; PR1186 at6e97eaeb4 CI39661144364 success; Ghana taxonomy residual retained without closing umbrella"
+    },
+    {
+      "issue": 1123,
+      "action": "Reviewed BF identity PR1189 awaits humanmerge; all183native lines recovered. Body retains pendinglanding plus othercountrydiagnoses and source-qualified residuals1187/1188."
+    },
+    {
+      "issue": 1187,
+      "action": "Filed TierD2018code21authority; fourexactinstrument sidecar/MD5 gaps recorded; noacquisition and no physicalclass inference."
+    },
+    {
+      "issue": 1188,
+      "action": "Filed separate TierB gift/donation fields bound aspurchases;8297flag/8371quantity differences,193purchase-used unitmismatches; 18recovered lines actually purchased. Identity bindings unchanged."
+    },
+    {
+      "issue": 1111,
+      "action": "Replaced oldunitcode hypothesis with primaryquantity/timing binding evidence; approved onlyquestionnaire-covered2010+2019 beforeaggregation, existingnumericamounts/reducer preserved. LiteralC4 gaps2013/2016remain.235coalescences, no1000x rule."
+    },
+    {
+      "issue": 1190,
+      "action": "Filed seed purchase-unit residual afterdedup:13mixed groups and1066not same singleton unitset, overlapping counts; distinctfromfertilizer/retention/composition."
+    },
+    {
+      "issue": 1006,
+      "action": "Fullindependenttest-onlyPASS; PR1191readyhumanreview, preservewholeissuehistoricalevidence and explicitpendinglanding; no prod/fixture/persistencechange"
     }
   ],
   "verified_issue_metadata": [
@@ -213,6 +237,22 @@
       "head": "6e97eaeb488096459d673486c127043f016c4f8d",
       "review": "PASS335tests/source/normalcold/freshwarm/Feature/hash; exactly3Preferredcasecells",
       "ci": "success;run39661144364"
+    },
+    {
+      "number": 1189,
+      "issue": 1123,
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "runtime": "69ed4d2028a6f989a8ac45d117a5cffc60a831fd",
+      "review": "PASS13focused+8adversarial/source/normalcold/freshwarm/Feature/hash; full384 plusdocdesc rootnarrowPASS",
+      "ci": "success;run39666499914"
+    },
+    {
+      "number": 1191,
+      "issue": 1006,
+      "head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "runtime": "1eb9bb377157c78f74962c7a9de59807d446b239",
+      "review": "PASS25scoped+41support; test-onlyallproduction/fixtureblobs exactf8;9frames+2matrices/strongfaults/cleanup/absence/creds",
+      "ci": "pending;newPR"
     }
   ]
 }

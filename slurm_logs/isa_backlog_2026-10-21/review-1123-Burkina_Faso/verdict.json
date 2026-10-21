@@ -1,0 +1,170 @@
+{
+  "verdict": "PASS",
+  "scope": "Burkina_Faso 2018-19 #1123 source identity only",
+  "reviewer": "Sue (GPT-6), independent of implementation",
+  "frozen_head": "3848778d0e8676c798883c11ea3e33fc88e8a591",
+  "runtime_head": "69ed4d2028a6f989a8ac45d117a5cffc60a831fd",
+  "baseline_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "old_head": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb",
+  "source_and_runtime": {
+    "raw_rows": 22877,
+    "source_applied_rows": 22877,
+    "source_gate_counts": {
+      "1": 22877
+    },
+    "native_key_unique_nonnull": true,
+    "source21_unlabelled_rows": 602,
+    "native_wave_full_payload_exact": true,
+    "public_full_source_payload_exact": true,
+    "baseline_exact_keep_drop_reconstruction": true,
+    "all_retained_public_rows_keys_values_dtypes_attrs_exact_after_key_relabel": true,
+    "lost_rows": 183,
+    "collision_groups": 170,
+    "conflicting_groups": 150,
+    "conflicting_extras": 163,
+    "equal_groups": 20,
+    "equal_extras": 20,
+    "restored_Quantity_kg": 2409.58,
+    "restored21_Quantity_kg": 931.6,
+    "changed_crop_rows": 877,
+    "support_frames_full_attrs_exact": {
+      "sample": 20648,
+      "sample-country-raw": 20648,
+      "2021-22-sample-wave": 3227,
+      "2018-19-sample-wave": 7010,
+      "2014-sample-wave": 10411,
+      "cluster_features": 2035,
+      "cluster_features-country-raw": 2035,
+      "2018-19-cluster_features-wave": 7010,
+      "2021-22-cluster_features-wave": 3227,
+      "2014-cluster_features-wave": 10800
+    },
+    "comparators_full_attrs_exact": true,
+    "household_ids_injective_no_sample_orphans": true,
+    "current_crop_map_consumers": [
+      "2018-19/_/plot_inputs.py"
+    ],
+    "counterparts": {
+      "2014": {
+        "rows": 138242,
+        "null_native_key_rows": 3111,
+        "repeated_native_key_rows": 36,
+        "applied_rows": 35595
+      },
+      "2021-22": {
+        "rows": 70994,
+        "null_native_key_rows": 0,
+        "repeated_native_key_rows": 0,
+        "applied_rows": 12223
+      }
+    }
+  },
+  "actual_script_controls": {
+    "positive": {
+      "rows": 22877,
+      "native_payload_attrs_exact_after_parquet_string_encoding": true,
+      "writes_spied": 1
+    },
+    "two_cell_only": {
+      "duplicate_extras": 98,
+      "writes": 0,
+      "aggregate_only_error": true
+    }
+  },
+  "full_Feature_hash_accounting": {
+    "all_logical_attrs_exact": {
+      "sample": true,
+      "cluster_features": true,
+      "plot_inputs": true,
+      "plot_inputs-country-raw": true,
+      "2018-19-plot_inputs-wave": true,
+      "Feature-full": true
+    },
+    "full_comparator_Feature_values_index_dtypes_attrs_exact": true,
+    "feature_rows": [
+      47029,
+      47212
+    ],
+    "audit_before_after": [
+      8,
+      6
+    ],
+    "audit_common_full_records": 6,
+    "audit_removed_BF_grain_warnings": 2,
+    "audit_added": 0,
+    "audit_failures_errors": 0,
+    "actual_country_hashes": 549,
+    "changed_BF_hashes": 24,
+    "unchanged_other_country_hashes": 525,
+    "unchanged_framework_fingerprints": 39,
+    "no_output_claim_for_21_unbuilt_BF_features": true
+  },
+  "focused_tests": {
+    "passed": 13,
+    "skipped": 0,
+    "deselected": 4
+  },
+  "independent_adversarial_tests": {
+    "passed": 8,
+    "skipped": 0
+  },
+  "negative_f8_control": {
+    "failed": 8,
+    "passed": 1
+  },
+  "api_audit_exit": 0,
+  "warm_both_fresh_processes": {
+    "all_frames_attrs_exact": true,
+    "all_parquet_bytes_mtimes_exact": true
+  },
+  "immutable_proof": {
+    "all_three_trees_head_status_mode_content_exact": true,
+    "private_source_blobs_per_root": 10,
+    "all_source_MD5s_and_physical_copies_exact": true,
+    "all_12_comparator_cache_bytes_each_root_exact": true,
+    "all_cache_bytes_mtimes_since_actual_cold_exact": true,
+    "network_attempts": 0,
+    "in_tree_untracked_source_or_parquet": {
+      "candidate": 0,
+      "baseline": 0,
+      "old": 0
+    },
+    "existing_tracked_curation_CSVs_per_tree": 9,
+    "remaining_task_workers": 0
+  },
+  "residuals": [
+    {
+      "tier": "B",
+      "draft": "PURCHASE-RESIDUAL.md",
+      "summary": "Pre-existing gift/donation columns bound as purchases; 8297 flag differences, 8371 quantity/NA differences, future unit routing must account for 193 purchase/used unit mismatches; frozen implementation unchanged"
+    },
+    {
+      "tier": "D",
+      "summary": "2018 code21 physical meaning and legacy Seed classification unverified; 2021 numeric meaning must not be borrowed"
+    },
+    {
+      "tier": "B/C as existing issue",
+      "summary": "#1119 vocabulary, remaining #1123 country reproductions and other-wave builders remain separate"
+    }
+  ],
+  "documentation_contradictions": {
+    "recorded_sample_rows": [
+      10224,
+      6961,
+      3218
+    ],
+    "actual_fresh_sample_rows": [
+      10411,
+      7010,
+      3227
+    ],
+    "sample_policy_changed": false,
+    "existing_purchase_field_comments_contradict_primary_labels": true
+  },
+  "safe_report": "REVIEW.org",
+  "commands": "REVIEW.org reproduction block; executable scripts remain private",
+  "git_mutations": 0,
+  "GitHub_writes": 0,
+  "source_acquisition": false,
+  "shared_cache_access": false
+}
