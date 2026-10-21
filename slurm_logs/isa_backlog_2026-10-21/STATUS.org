@@ -28,12 +28,12 @@ PR [[https://github.com/ligon/LSMS_Library/pull/1182][1182]] at =780f67986= adds
 | Country | Current result or next step |
 |---------+-----------------------------|
 | Nigeria | #1034 PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]] at =3e6582987= passed 78 tests and CI. #1144 PR [[https://github.com/ligon/LSMS_Library/pull/1178][1178]] at =a1ba246f5= passed independent review (116 tests) plus documentation confirmation. It is stacked on #1172; CI passed. |
-| Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. |
-| Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. |
+| Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. #1006 is diagnosing derived-API test skips and vacuous dtype checks. |
+| Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. #1111 is checking applied fertilizer source-column bindings against held instruments before any repair. |
 | Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. |
-| Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report; #851 integration remains pending. #1123 diagnosis proves 183 lost native lines out of 22,877, including 20 equal-payload extras. A three-cell source-identity repair and pre-write guard are approved and implementing in a fresh f8 checkout. Code21's legacy Seed classification remains unverified. |
+| Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report; #851 integration remains pending. #1123 frozen =3848778d0= recovers all 183 lost native lines out of 22,877, including 20 equal-payload extras. The three source-identity cells and pre-write guard pass 13 author tests; independent review is active. Code21's legacy Seed classification remains unverified. |
 | Ethiopia | #1118 independent review passed 58 focused tests and six reviewer controls, source/cold/warm/Feature conservation and full fingerprint checks. PR [[https://github.com/ligon/LSMS_Library/pull/1181][1181]] at =1bce11cc8= preserves 180,900 rows and normalizes 37,370 units; the separately reviewed source-caveat documentation moves no hashes. Latest CI passed. #1171 remains the nutrition follow-up. |
-| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI passed. Residual #1179 owns unresolved units. #1121 is frozen at =6e97eaeb4= after 335 tests and exact 52,057-row casing-only conservation; independent review is active. |
+| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI passed. Residual #1179 owns unresolved units. #1121 PR [[https://github.com/ligon/LSMS_Library/pull/1186][1186]] at =6e97eaeb4= independently passes 335 tests, exact 52,057-row casing-only conservation and CI. Its Ghana taxonomy residual remains separate. |
 | Tanzania | #1118 independently passed 246 tests and full source/cold/warm/Feature/hash checks. PR [[https://github.com/ligon/LSMS_Library/pull/1185][1185]] at =e75be9c56= retains 9,698 rows and normalizes 408 units; documentation-only corrections passed narrow review and CI passed. All 11 scanner findings are matched, with only the alignment detail changing 408 to 0. |
 
 * Evidence that changed the fixes
@@ -86,7 +86,13 @@ This run used 16 loadfile workers, empty private data/config roots, an active so
 All eight public PR CI runs also passed.
 The ninth reviewed fix, Tanzania PR #1185, and the Ethiopia documentation descendant also passed their latest CI.
 The combined nine-PR source head is =483b4aa117c2c05ac00bf023adab97e47782df46=.
-The 18-file offline held-source cohort passed 656 tests with zero skips/failures/errors at that head; the separate combined normal-API full-frame review is still active.
+The 18-file offline held-source cohort passed 656 tests with zero skips/failures/errors at that head.
+The independent normal-API review also passed: nine Country calls and four Features match complete frozen reference frames, dtypes and attrs exactly.
+A separate fresh process repeated all thirteen calls with zero byte/mtime changes across 1,519 parquets.
+Its initial expected-attrs mistake and corrected proof are preserved in =integration/api-nine-review/=.
+Mali PR #1186 passed CI =39661144364=, making all ten latest public PR checks green.
+The validation-only branch now integrates that tenth fix at =bbdcf34578085fb90e981184a0cadadc9701a366=; its incremental verification is next, and the earlier proofs retain their own source pins.
+An Org append conflict was initially committed with markers after a failed launcher; the corrective commit removes only those markers and retains both reviewed Mali notes.
 Exactly two all-country canonical corpus cases are explicitly outside this ISA cohort, while its synthetic canonical guards remain included.
 The original launcher annotation said three; =integration/cohort-nine/scope-correction.json= records the exact two-case parameterization without changing the command or result.
 

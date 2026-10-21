@@ -1,0 +1,542 @@
+{
+  "verdict": "PASS",
+  "issue": 1121,
+  "review_head": "6e97eaeb488096459d673486c127043f016c4f8d",
+  "baseline_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "822_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "findings": [],
+  "scope": {
+    "changed_paths": [
+      ".coder/ledger/1121-mali-labor-source.md",
+      "lsms_library/countries/Mali/_/CONTENTS.org",
+      "lsms_library/countries/Mali/_/categorical_mapping.org",
+      "lsms_library/countries/Mali/_/data_scheme.yml",
+      "slurm_logs/isa_backlog_2026-10-21/Mali/1121/REPORT.org",
+      "slurm_logs/isa_backlog_2026-10-21/Mali/1121/remaining-issue-body.md",
+      "slurm_logs/isa_backlog_2026-10-21/Mali/1121/validation.json",
+      "tests/test_mali_plot_labor_source.py"
+    ],
+    "runtime_curation_exact_three_cells": true,
+    "drivers_concatenator_makefile_transforms_exact_f8_and_822": [
+      "lsms_library/countries/Mali/2014-15/_/plot_labor.py",
+      "lsms_library/countries/Mali/2017-18/_/plot_labor.py",
+      "lsms_library/countries/Mali/_/plot_labor.py",
+      "lsms_library/countries/Mali/_/Makefile",
+      "lsms_library/transformations.py"
+    ],
+    "helper_function_bodies_exact_f8_and_822": [
+      "_labor_source_labels",
+      "plot_labor_finalize"
+    ],
+    "guidance_byte_identical_previously_read": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".coder/ledger/STANDING.md",
+      ".coder/ledger/README.md",
+      ".claude/skills/cross-country-features/SKILL.md",
+      ".claude/skills/backlog-workflow/SKILL.md"
+    ],
+    "in_tree_parquets": 0
+  },
+  "tests": {
+    "final_scoped": 335,
+    "skipped": 0,
+    "baseline_new_fail": 7,
+    "baseline_new_pass": 3,
+    "workers": 2,
+    "distribution": "loadfile",
+    "api_audit": "pass",
+    "reviewer_initial_identity_skip": "Corrected LSMS_EXPECTED_ROOT and reran complete335-test selection"
+  },
+  "API": {
+    "baseline": {
+      "cold": {
+        "Mali": {
+          "rows": 52057,
+          "by_source": {
+            "Family": 33655,
+            "Hired": 9565,
+            "Other": 8837
+          },
+          "by_wave": {
+            "2014-15": 14843,
+            "2017-18": 37214
+          },
+          "PersonDays": 11544571.100000001,
+          "Wage": 214685819.0,
+          "unique_nonnull_keys": true,
+          "cache_fresh": "fresh",
+          "cache_waves": [
+            "2014-15",
+            "2017-18",
+            "2018-19",
+            "2021-22"
+          ],
+          "warning_classes": {
+            "UnicodeWarning": 22,
+            "NullReadWarning": 1
+          }
+        },
+        "Niger": {
+          "rows": 53041,
+          "by_source": {
+            "family": 24016,
+            "hired": 17154,
+            "other": 11871
+          },
+          "by_wave": {
+            "2011-12": 19643,
+            "2014-15": 15935,
+            "2018-19": 9457,
+            "2021-22": 8006
+          },
+          "PersonDays": 1798429.0,
+          "Wage": 172889043.0,
+          "unique_nonnull_keys": true,
+          "cache_fresh": "fresh",
+          "cache_waves": [
+            "2011-12",
+            "2014-15",
+            "2018-19",
+            "2021-22"
+          ],
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "Feature": {
+          "rows": 105098,
+          "by_country": {
+            "Mali": 52057,
+            "Niger": 53041
+          },
+          "by_source": {
+            "Family": 33655,
+            "Hired": 9565,
+            "Other": 8837,
+            "family": 24016,
+            "hired": 17154,
+            "other": 11871
+          },
+          "warning_classes": {
+            "NullReadWarning": 2,
+            "UserWarning": 1,
+            "PopulationHeterogeneityWarning": 1
+          }
+        }
+      },
+      "warm": {
+        "Mali": {
+          "rows": 52057,
+          "by_source": {
+            "Family": 33655,
+            "Hired": 9565,
+            "Other": 8837
+          },
+          "by_wave": {
+            "2014-15": 14843,
+            "2017-18": 37214
+          },
+          "PersonDays": 11544571.100000001,
+          "Wage": 214685819.0,
+          "unique_nonnull_keys": true,
+          "cache_fresh": "fresh",
+          "cache_waves": [
+            "2014-15",
+            "2017-18",
+            "2018-19",
+            "2021-22"
+          ],
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "Niger": {
+          "rows": 53041,
+          "by_source": {
+            "family": 24016,
+            "hired": 17154,
+            "other": 11871
+          },
+          "by_wave": {
+            "2011-12": 19643,
+            "2014-15": 15935,
+            "2018-19": 9457,
+            "2021-22": 8006
+          },
+          "PersonDays": 1798429.0,
+          "Wage": 172889043.0,
+          "unique_nonnull_keys": true,
+          "cache_fresh": "fresh",
+          "cache_waves": [
+            "2011-12",
+            "2014-15",
+            "2018-19",
+            "2021-22"
+          ],
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "Feature": {
+          "rows": 105098,
+          "by_country": {
+            "Mali": 52057,
+            "Niger": 53041
+          },
+          "by_source": {
+            "Family": 33655,
+            "Hired": 9565,
+            "Other": 8837,
+            "family": 24016,
+            "hired": 17154,
+            "other": 11871
+          },
+          "warning_classes": {
+            "NullReadWarning": 2,
+            "UserWarning": 1,
+            "PopulationHeterogeneityWarning": 1
+          }
+        },
+        "warm_unchanged_parquets": 23
+      }
+    },
+    "review": {
+      "cold": {
+        "Mali": {
+          "rows": 52057,
+          "by_source": {
+            "family": 33655,
+            "hired": 9565,
+            "other": 8837
+          },
+          "by_wave": {
+            "2014-15": 14843,
+            "2017-18": 37214
+          },
+          "PersonDays": 11544571.100000001,
+          "Wage": 214685819.0,
+          "unique_nonnull_keys": true,
+          "cache_fresh": "fresh",
+          "cache_waves": [
+            "2014-15",
+            "2017-18",
+            "2018-19",
+            "2021-22"
+          ],
+          "warning_classes": {
+            "UnicodeWarning": 22,
+            "NullReadWarning": 1
+          }
+        },
+        "Niger": {
+          "rows": 53041,
+          "by_source": {
+            "family": 24016,
+            "hired": 17154,
+            "other": 11871
+          },
+          "by_wave": {
+            "2011-12": 19643,
+            "2014-15": 15935,
+            "2018-19": 9457,
+            "2021-22": 8006
+          },
+          "PersonDays": 1798429.0,
+          "Wage": 172889043.0,
+          "unique_nonnull_keys": true,
+          "cache_fresh": "fresh",
+          "cache_waves": [
+            "2011-12",
+            "2014-15",
+            "2018-19",
+            "2021-22"
+          ],
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "Feature": {
+          "rows": 105098,
+          "by_country": {
+            "Mali": 52057,
+            "Niger": 53041
+          },
+          "by_source": {
+            "family": 57671,
+            "hired": 26719,
+            "other": 20708
+          },
+          "warning_classes": {
+            "NullReadWarning": 2,
+            "UserWarning": 1,
+            "PopulationHeterogeneityWarning": 1
+          }
+        },
+        "complete_source_case_projection_exact": true
+      },
+      "warm": {
+        "Mali": {
+          "rows": 52057,
+          "by_source": {
+            "family": 33655,
+            "hired": 9565,
+            "other": 8837
+          },
+          "by_wave": {
+            "2014-15": 14843,
+            "2017-18": 37214
+          },
+          "PersonDays": 11544571.100000001,
+          "Wage": 214685819.0,
+          "unique_nonnull_keys": true,
+          "cache_fresh": "fresh",
+          "cache_waves": [
+            "2014-15",
+            "2017-18",
+            "2018-19",
+            "2021-22"
+          ],
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "Niger": {
+          "rows": 53041,
+          "by_source": {
+            "family": 24016,
+            "hired": 17154,
+            "other": 11871
+          },
+          "by_wave": {
+            "2011-12": 19643,
+            "2014-15": 15935,
+            "2018-19": 9457,
+            "2021-22": 8006
+          },
+          "PersonDays": 1798429.0,
+          "Wage": 172889043.0,
+          "unique_nonnull_keys": true,
+          "cache_fresh": "fresh",
+          "cache_waves": [
+            "2011-12",
+            "2014-15",
+            "2018-19",
+            "2021-22"
+          ],
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "Feature": {
+          "rows": 105098,
+          "by_country": {
+            "Mali": 52057,
+            "Niger": 53041
+          },
+          "by_source": {
+            "family": 57671,
+            "hired": 26719,
+            "other": 20708
+          },
+          "warning_classes": {
+            "NullReadWarning": 2,
+            "UserWarning": 1,
+            "PopulationHeterogeneityWarning": 1
+          }
+        },
+        "complete_source_case_projection_exact": true,
+        "warm_unchanged_parquets": 23
+      }
+    }
+  },
+  "hashes": {
+    "country_hashes_checked": 549,
+    "changed": [
+      "Mali/sample",
+      "Mali/cluster_features",
+      "Mali/household_roster",
+      "Mali/individual_education",
+      "Mali/subjective_well_being",
+      "Mali/food_security",
+      "Mali/food_acquired",
+      "Mali/interview_date",
+      "Mali/panel_ids",
+      "Mali/assets",
+      "Mali/housing",
+      "Mali/shocks",
+      "Mali/food_coping",
+      "Mali/plot_features",
+      "Mali/crop_production",
+      "Mali/plot_inputs",
+      "Mali/livestock",
+      "Mali/plot_labor",
+      "Mali/people_last7days",
+      "Mali/community_prices",
+      "Mali/food_expenditures",
+      "Mali/food_prices",
+      "Mali/food_quantities",
+      "Mali/household_characteristics"
+    ],
+    "other_pairs_exact": 525,
+    "framework_checked": 39,
+    "framework_changed": []
+  },
+  "scanner": {
+    "before": 8,
+    "after": 8,
+    "unchanged": 8,
+    "added": 0,
+    "removed": 0,
+    "failures": 0,
+    "errors": 0,
+    "normalized_full_record_sha256": "03368c8dd66d9de894946c58f81b2753e247d00e5b9a90f3df04306e2c7f3d81",
+    "findings": [
+      {
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "classification": "Mali sample strata null in three waves"
+      },
+      {
+        "phase": "1a-sanity",
+        "country": "Mali",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "classification": "API sampling-cluster v extends native scheme"
+      },
+      {
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "classification": "Niger sample strata null in three waves"
+      },
+      {
+        "phase": "1a-sanity",
+        "country": "Niger",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "classification": "API sampling-cluster v extends native scheme"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "classification": "Mali sample strata null in three waves"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "classification": "Niger sample strata null in three waves"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "classification": "declared sentinel alignment without row loss"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "classification": "population heterogeneity"
+      }
+    ],
+    "phase2_grid_entries": 0
+  },
+  "demographics": {
+    "2014-15": {
+      "person_day_terms": 27,
+      "hired_wage_terms": 9,
+      "basis_records_verified": 36
+    },
+    "2017-18": {
+      "person_day_terms": 27,
+      "hired_wage_terms": 9,
+      "basis_records_verified": 37
+    },
+    "held_child_2017_PH": {
+      "nonnull_persons_times_days": 383,
+      "positive_persons_times_days": 382,
+      "raw_persons_times_days_sum": 5229.4,
+      "private_rejected_persons_times_wage_sum": 8756650.0
+    },
+    "wage_in_days_mutant_rejected": true
+  },
+  "source_semantics": {
+    "person_day_bindings_verified": 54,
+    "wage_bindings_verified": 18,
+    "basis_records_verified": 73,
+    "family_persondays": 7867691.5,
+    "hired_persondays": 1197091.3,
+    "child2017_labels": {
+      "s7eq13c1": "Rec-Effectif-Main d'oeuvre non-familiale enfants (- de 15 ans)",
+      "s7eq13c2": "Rec-Nbre jours enfants-Main d'oeuvre non-familiale enfants (- de 15 ans)",
+      "s7eq13c3": "Rec-R\u00e9mun\u00e9ration totale-Main d'oeuvre non-familiale enfants (- de 15 ans)"
+    },
+    "source_block_labels": {
+      "2014-15-PP": {
+        "s2bq04": "A utilis\u00e9 la main d'oeuvre familiale sur cette parcelle",
+        "s2bq06": "A utilis\u00e9 la main d'oeuvre non familiale sur cette parcelle",
+        "s2bq08": "A utilis\u00e9 des membres de groupe d'entraide sur cette parcelle"
+      },
+      "2014-15-PH": {
+        "s2fq03": "A utilis\u00e9 une main-d'oeuvre familiale pour le sarclage, d\u00e9sherbage, \u00e9pandage, d\u00e9",
+        "s2fq05": "A utilis\u00e9 une main-d'oeuvre non familiale pour le sarclage, d\u00e9sherbage, \u00e9pandage",
+        "s2fq07": "A utilis\u00e9 des membres de groupe d'entraide pour le sarclage, d\u00e9sherbage, \u00e9pandag",
+        "s2fq09": "A utilis\u00e9 une main-d'oeuvre familiale pour les r\u00e9coltes/battages lors de la camp",
+        "s2fq11": "A utilis\u00e9 une main-d'oeuvre non familiale pour les r\u00e9coltes/battages lors de la",
+        "s2fq13": "A utilis\u00e9 des membres de groupe d'entraide pour les r\u00e9coltes/battages lors de la"
+      },
+      "2017-18-PP": {
+        "s11eq04": "Utilisation de la main-d'oeuvre familiale sur ces parcelles la campagne 2017/18?",
+        "s11eq06": "Utilisation main-d'oeuvre non-familiale sur ces parcelles la campagne 2017/18?",
+        "s11eq08": "Utilisation membres groupe d'entraide sur ces parcelles la campagne 2017/2018?"
+      },
+      "2017-18-PH": {
+        "s7eq04": "Sem-Utilisation main-d'oeuvre familiale sur ces parcelles la campagne 2017/18?",
+        "s7eq06": "Sem-Utilisation main-d'oeuvre non-familiale sur ces parcelles la campagne 17/18?",
+        "s7eq08": "Sem-Utilisation membres groupe d'entraide sur ces parcelles la campagne 17/18?",
+        "s7eq10": "Rec-Utilisation main-d'oeuvre familiale sur ces parcelles la campagne 2017/18?",
+        "s7eq12": "Rec-Utilisation main-d'oeuvre non-familiale sur ces parcelles la campagne 17/18?",
+        "s7eq14": "Rec-Utilisation membres groupe d'entraide sur ces parcelles la campagne 17/18?"
+      }
+    }
+  },
+  "limits": [
+    "Only plot_labor outputs are compared; other Mali tables have hash-only proof",
+    "Niger is an unchanged, complete current-hash held comparator, not a new raw-source rebuild",
+    "No questionnaire PDF was inspected or acquired; meaning verified from held source dictionaries and unchanged block bindings",
+    "Broader Ghana taxonomy remains Tier C; no category/grain policy approved",
+    "Legacy metadata read uses Latin1 with separately retained raw strings and UTF8 variable-label display repair; no source or runtime change"
+  ],
+  "private_source_and_comparator_integrity_exact": true,
+  "immutability": {
+    "review": {
+      "head": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "status": "",
+      "tracked_files": 14885,
+      "content_mode_manifest_sha256": "4251c665de2fa501afef824d348895f4cd591b7be02d71677287d73af199a8c2"
+    },
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "",
+      "tracked_files": 14880,
+      "content_mode_manifest_sha256": "e4a71f106fa300d8b1c55b8a79fc012e26da0ccd6ea9314edd222b3f5a1fac67"
+    },
+    "822": {
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "status": "",
+      "tracked_files": 14891,
+      "content_mode_manifest_sha256": "d5b4dc128962c89fcb4216611e7020e3292120328b3e981cda698503f5409020"
+    }
+  },
+  "all_three_tracked_content_modes_HEAD_status_unchanged": true
+}
