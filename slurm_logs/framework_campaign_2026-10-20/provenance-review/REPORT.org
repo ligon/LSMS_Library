@@ -1,0 +1,13 @@
+#+TITLE: Independent review -- GH #1115 / #1128 provenance
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+PASS at frozen =44f6cd2e7d3665622d2119fe4725e5a7604a56fa= for the approved code-only scope.
+The round 1 catalog-identity loss is repaired by an explicit refusal that preserves destination bytes; the original failing evidence is retained.
+Independent validation: 370 repository tests and 30 reviewer controls passed, 130 shipped SOURCE inputs unchanged with zero information loss/drift, and 549 country/2139 wave/40 transform fingerprint entries unchanged.
+One reviewer-only canonical-metadata assertion was corrected and its 10-case group rerun; the combined run is not claimed as wholly green.
+See [[file:ROUND2.org]] and [[file:round2.json]] for exact execution history, identity and limits; [[file:ROUND1.org]] and [[file:round1.json]] retain the rejected source's counterexample.
+No remaining blocker was found within scope.
+No full-suite, served-corpus, CI or release approval is implied; #1149 staging/nested replacement/retirement/rollback remains separate.
+All review processes/readers stopped; candidate source and tracked tree remain unchanged and clean.
+Sue.

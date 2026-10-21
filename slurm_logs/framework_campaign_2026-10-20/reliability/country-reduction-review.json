@@ -1,0 +1,153 @@
+{
+  "reviewer": "Sue",
+  "observed_utc": "2026-10-21T00:34:56.681518+00:00",
+  "title": "seed_kg and nitrogen_kg silently merge countries with colliding plot IDs",
+  "verdict": "verified_inherited_silent_acceptance_bug; choose_country_preservation_or_explicit_pooled_refusal",
+  "pooled_contract": "Feature input and per-country factor selection supported/exercised; pooled reducer output country identity unspecified in docstrings; no explicit refusal",
+  "baseline": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "candidate": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "independently_repeated_both_sources": true,
+  "metric_only_repro": {
+    "seed_separate": [
+      1.0,
+      2.0
+    ],
+    "seed_pooled": [
+      3.0
+    ],
+    "nitrogen_separate": [
+      0.46,
+      0.92
+    ],
+    "nitrogen_pooled": [
+      1.3800000000000001
+    ],
+    "pooled_index": [
+      "t",
+      "i",
+      "plot_id"
+    ]
+  },
+  "adversarial_controls": {
+    "source": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+    "controls": {
+      "shared_ids_country_index": {
+        "seed_kg": {
+          "rows": 1,
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "values": [
+            3.0
+          ]
+        },
+        "nitrogen_kg": {
+          "rows": 1,
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "values": [
+            1.3800000000000001
+          ]
+        }
+      },
+      "distinct_households": {
+        "seed_kg": {
+          "rows": 2,
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "values": [
+            1.0,
+            2.0
+          ]
+        },
+        "nitrogen_kg": {
+          "rows": 2,
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "values": [
+            0.46,
+            0.92
+          ]
+        }
+      },
+      "country_column": {
+        "seed_kg": {
+          "rows": 1,
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "values": [
+            3.0
+          ]
+        },
+        "nitrogen_kg": {
+          "rows": 1,
+          "index_names": [
+            "t",
+            "i",
+            "plot_id"
+          ],
+          "values": [
+            1.3800000000000001
+          ]
+        }
+      }
+    }
+  },
+  "dedup_issues_read_with_all_comments": [
+    867,
+    863,
+    1093,
+    1107,
+    513
+  ],
+  "dedup_searches": [
+    "seed_kg",
+    "nitrogen_kg",
+    "\"country axis\"",
+    "\"country\" \"reduction\"",
+    "\"pooled\" \"plot_inputs\"",
+    "\"cross-country\" \"seed\"",
+    "\"cross-country\" \"nitrogen\"",
+    "\"countries\" \"plot_id\" \"sum\"",
+    "\"seed_kg\" \"country\"",
+    "\"nitrogen_kg\" \"country\""
+  ],
+  "matching_standalone_issue_found": false,
+  "draft_file": "country-reduction-issue.md",
+  "source_anchors": [
+    "transformations.py:5424 nitrogen docstring",
+    "transformations.py:5452 stated country-less output",
+    "transformations.py:5530 reduction keys",
+    "transformations.py:5543 seed docstring",
+    "transformations.py:5567 stated country-less output",
+    "transformations.py:5597 reduction keys",
+    "transformations.py:4195 country-aware factor resolver",
+    "tests/test_gh1093_declared_unit_consumers.py:86 country factor tests use distinct HHIDs",
+    "tests/test_gh1093_declared_unit_consumers.py:157 actual Feature metadata test uses country-name HHIDs",
+    ".coder/ledger/1093-declared-unit-factors.md:54 scope exclusion",
+    "docs/api/transformations.md:3 standalone library",
+    "docs/guide/feature.md:33 country axis"
+  ],
+  "excluded_scope": [
+    "median_price_valuation caller-selected price-pool keys",
+    "other reducers",
+    "nitrogen share/organic policy",
+    "real-country magnitude census"
+  ],
+  "source_git_GitHub_writes": false,
+  "shared_L2_writes": false
+}

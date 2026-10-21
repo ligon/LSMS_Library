@@ -1,0 +1,59 @@
+#+title: Independent review of country-preserving fertilizer rates, GH #1160
+#+author: Sue
+#+date: 2026-10-20
+
+* Verdict
+
+PASS at full frozen =532d58700fa46e52a0b390198604eca1dc4de00e=, runtime =5125d0faa3e8074c289c5dd839cf1690d3e7a570=, against =4cab5f0db7d375ad543e652f61f43bd28fa94ecd=.
+No blocking finding; source and Git state are unchanged.
+The review is independent of the implementation and anchored on the task ledger sections 2-5, #1159/#1093 ledgers and STANDING.
+No source, test, fixture, GitHub or cache-policy changes were made by the reviewer.
+
+* Evidence
+
+The producer's focused selection and 40 additional adversarial cases pass together: 387 passed, two explicit Nigeria warm-cache skips, zero failures/errors, 10.03 seconds.
+The marker selection excludes 15 requires_s3 cases: 389 selected from 404, independently counted by collection-only metadata.
+The two skipped Nigeria tests name absent warm crop_production in the deliberately fresh hermetic root; neither skips a new #1160 regression.
+The original twelve independent multi-product arithmetic cases fail against exact4cab, with28 unrelated independent controls deselected, in 1.09 seconds.
+Those are intentional baseline failures, not candidate failures.
+
+Independent synthetic cases add different fertilizer mixtures, duplicate area rows, an area-only extra country, category and nullable identities, unused categories, one/both typed empties, incompatible numeric/text country keys, declarations, organic refusal and contradictory redundant columns.
+Expected numeric N rates are A = 1.33 / B = 0.87 / C = 0.46, with corresponding product rates A = 3.5 / B = 2.5 / C = 1.0; no country can borrow another's positive area.
+These are hand-computed controls, not just equality against another call to the candidate.
+
+Actual Malawi/Uganda warm frames run on a separate physical private copy: 287 files, 65,382,116 bytes; only L1 linked.
+All four N/product x plot/parcel combinations exactly match separate labeled Feature calls, reversed input/area row order, and country-column representations.
+Eight ordinary Country controls exactly match the old 4cab rate function bound in memory; every dependency of that function is unchanged in1160.
+This is a scoped function counterfactual, not a claim to have cold-rebuilt a historical package.
+The original source copy and all 287 private files remain byte-identical; source inode/size/mtime also match their initial records.
+Any rate-column sums in the aggregate are numerical checksums, not national fertilizer quantities.
+
+The reviewer independently recomputed all 549 country, 2,139 wave and 39 tagged build fingerprints: every map matches both producer-before and producer-after, with zero errors.
+The 30 existing None wave hashes remain the same; they are not newly computed hashes or failures.
+Package, cwd, countries root, data root, exact HEAD and transformation SHA256 were asserted before executable checks using the extracted Python, CPUs 16-19, four loadfile workers and single-threaded BLAS/build/make.
+
+* Existing limits retained
+
+Malawi CONTENTS.org:3035-3042 explicitly records:
+#+begin_quote
+fertilizer_rate(Malawi) depends on on. ... This contradicts fertilizer_rate's docstring, which says the parcel step is a measured no-op on Malawi.
+#+end_quote
+The review reproduces 33,402 Malawi plot rows versus 11,622 parcel rows in both old and new ordinary calls.
+Uganda retains 0 literal-plot rows versus 509 parcel rows.
+These are inherited #1110 grain-policy limitations, not new #1160 regressions, and no scientific-green claim or parcel-policy correction follows.
+The earlier provisional review-plan phrase describing Malawi as a no-op is superseded by the country guidance and exact measurements.
+Existing #867 shares/refusals and country source/quantity caveats remain unchanged.
+No country idiosyncrasy requiring a new country-document addition was discovered: this discrepancy is already explicitly recorded.
+
+An initial reviewer-only live probe supplied unsupported currency= to nonmonetary Country.plot_features and stopped at its existing TypeError.
+Only that private probe call was corrected before the successful controls; there was no production defect or source edit.
+Raw warnings, logs, full XML, survey identifiers and complete hash/cache manifests remain private.
+
+* Handoff
+
+All reviewer readers/verifier subprocesses have exited.
+The exact-source independent review is complete; full-suite and exact-head GitHub jobs are the parent's separate integration gates.
+Public copy list and SHA256 values are in =export/manifest.json=.
+The private =run_checks.py= runner and independent test/live scripts preserve the replay commands and identity guards for this allocation.
+
+Sue

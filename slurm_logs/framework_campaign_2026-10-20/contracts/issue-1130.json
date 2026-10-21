@@ -1,0 +1,10 @@
+{
+  "body": "From the #781 follow-up (`fix/781-dropped-verdicts`).\n\n*(Repeated from the first run. r1 found no problem with it.)*\n\n**What.** GLSS3 Section 8H (`1991-92/Documentation/pdf/G3QPartB.pdf` p.9) records, per home-produced food:\n- a quantity (\"NO. OF UNITS\", q3-12);\n- a unit code (q13);\n- \"For how much could you sell one unit of \u2026 now?\" (q14).\n\nIn the built `food_acquired` (1991-92, 287,712 produced rows), `Price` is non-null on 287,570, `Quantity` on 80,419, both on 80,277, and `Expenditure` on 0. `food_prices(units='kgprice')` already serves 28,754 rows and `unitprice` 28,757 for the wave. But the default `kgvalue` is empty, because no produced row has an `Expenditure`: `GhanaLSS::food_acquired::8h-farmgate` (Q \u00d7 P, PR #916) serves GLSS4-7 only.\n\n`CONTENTS.org` declines to wire GLSS3 until \"someone reads the GLSS3 form\" on the dominant unit `All` (94,039 rows), which \"reads as 'the whole harvest' rather than a countable quantity\".\n\n**Do.** Read the GLSS3 8H unit codes. Decide what `All` means (a countable unit, or the whole harvest, which is unpriceable per unit). Then extend `8h-farmgate` to 1991-92 for the countable units.\n\n**Then** `tests/test_coverage_matrix.py::test_ghanalss_food_prices_grades_against_its_verdicts` will report 1991-92 as `sane`. Retire the 1991-92 `empty-pending-machinery` row in `absent_verdicts.csv` in the same PR.\n\n**Tier:** DECISION (the `All` unit), then B. Cost: a GhanaLSS re-warm (the derivation lives in a GhanaLSS module).\n",
+  "comments": [],
+  "labels": [],
+  "number": 1130,
+  "state": "OPEN",
+  "title": "GhanaLSS 1991-92 own-produce valuation: decide the `All` unit, then extend `8h-farmgate` to GLSS3",
+  "updatedAt": "2026-10-19T22:48:37Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1130"
+}

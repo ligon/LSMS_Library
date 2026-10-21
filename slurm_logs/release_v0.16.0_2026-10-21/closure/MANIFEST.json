@@ -1,0 +1,74 @@
+{
+  "aggregate_only": true,
+  "excluded_private": [
+    "private-issues/",
+    "private-prs/",
+    "commit-keywords-inventory.json"
+  ],
+  "safe_files": {
+    "COPYLIST.txt": {
+      "bytes": 316,
+      "sha256": "e42ae2d5607e5814c565973088088d9bc63684da6e36c4dc3a6525c722ad8937"
+    },
+    "REPORT.org": {
+      "bytes": 7523,
+      "sha256": "92380b372c17f42d9bb04e390408eeb7515f4fef5619feaa348c5cc1d17e4101"
+    },
+    "REPRO.org": {
+      "bytes": 1775,
+      "sha256": "85c3f2390fa7696c0641206de3fa2ef5218eb11b10e6eabd9b1baa609521f359"
+    },
+    "actual-posttag-pr-inventory.json": {
+      "bytes": 50533,
+      "sha256": "ceef296f3333ff5c2234465fd12eb3e7ec4643c56a813e2c71cb4cb722c63094"
+    },
+    "additional-16-proposals.json": {
+      "bytes": 98355,
+      "sha256": "a6ae5e6134d6972fe61e2103f841529a4cff166273a6ca6f99a807773a8c45e4"
+    },
+    "already-closed.json": {
+      "bytes": 4003,
+      "sha256": "acfc7fc94fcacc1b685614a256af2c480c8297ab546b18c44f033b07dfc3a745"
+    },
+    "closing-keywords-48.txt": {
+      "bytes": 603,
+      "sha256": "c92a0aa18662b6cdd8a89faa109abf0fe8211866011fc2663462bbe8845aa79c"
+    },
+    "commit-keyword-audit.json": {
+      "bytes": 994,
+      "sha256": "47a9fe9efc2b5399e607e706bdb4b4c32d9c3bfe324ad62406e3400657f704f8"
+    },
+    "core-32.json": {
+      "bytes": 56883,
+      "sha256": "8c6c15756ac5f85a24cba5ab55f8c460aa38e263a1e00d2ab065db187d2d4481"
+    },
+    "finalize.py": {
+      "bytes": 11496,
+      "sha256": "4c9df2741e2ff53980aac3fc831eafda30156aee853a1f3c26459223226ad05d"
+    },
+    "reconcile.py": {
+      "bytes": 12303,
+      "sha256": "89cfb264a9d4422ea94e34a3678a604f84a5991adf29c40cc96b7da8b1729477"
+    },
+    "release-pr-body.md": {
+      "bytes": 1901,
+      "sha256": "3c0a6376bfaa8cec37249b3be2a7c4e7f8d9b31293710c40ba1e4d351b413729"
+    },
+    "retained-residuals.json": {
+      "bytes": 60744,
+      "sha256": "03e804f8f5094a41158c386027f7b81c579f031508fb8633ab629dccbd62a54f"
+    },
+    "scope-decisions.json": {
+      "bytes": 12755,
+      "sha256": "279db2c7b4942d83879bc4b2b3bf5486344f870af0c35a36cd3118b6adf4a9f1"
+    },
+    "static-identity.json": {
+      "bytes": 28849,
+      "sha256": "2bfdccd838cc3d1ce2cab8c7cbaf8a507f18f0be1a7a15568d4023b2fa997274"
+    },
+    "summary.json": {
+      "bytes": 2707,
+      "sha256": "27440ceb13afd18caededd03d11968ea32bde5a213eb59c671618a90bd519462"
+    }
+  }
+}

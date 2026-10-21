@@ -1,9 +1,13 @@
 """The categorical-mapping resolution model, pinned (GH #953).
 
-Prose about this model has failed repeatedly -- ``lsms_library/categorical_mapping/``
-exists as a DIRECTORY of per-table ``.org`` files, which the build-time cascade
-``local_tools.get_categorical_mapping`` is structurally unable to read.  These
-tests are the mechanical half of the statement in that function's docstring.
+Prose about this model has failed repeatedly.  These tests are the mechanical
+half of the statement in ``local_tools.get_categorical_mapping``'s docstring.
+
+**A LEVEL has two spellings** (GH #953, @ligon 2026-10-17): a wave's ``_/``, a
+country's ``_/`` and the package root each hold tables in
+``categorical_mapping.org`` and/or ``categorical_mapping/*.org``.  The global
+directory ``lsms_library/categorical_mapping/`` is simply the package root's
+directory spelling, and the cascade appends that level LAST on its own.
 
 Three groups, matching the three things people get wrong:
 
@@ -16,9 +20,8 @@ Three groups, matching the three things people get wrong:
    is WHOLE-TABLE; the read-time merge's override is per ROW.  This is the
    distinction the issue turns on.
 
-Nothing here changes behaviour.  Two tests deliberately pin *defects* rather
-than desired behaviour, and say so: the cross-country rung's absence, and the
-placeholder ``Roof``/``Floor`` tables.  GH #953 holds the repair.
+Group 4 pins the level model itself: the directory spelling resolves in both
+mechanisms, a within-level duplicate raises, and the global level is last.
 """
 from __future__ import annotations
 
@@ -84,11 +87,11 @@ DOC_OF_RECORD_READERS = {
 
 _MECHANISM_HELP = textwrap.dedent("""
     Every .org in lsms_library/categorical_mapping/ must be reached by a named
-    mechanism and registered in GLOBAL_ORG_REGISTRY in this file.  Dropping a
-    file into that directory does NOT wire it up: the build-time cascade
-    (local_tools.get_categorical_mapping) cannot read a directory of per-table
-    files at all, and while Country.categorical_mapping globs the directory,
-    a table nothing names is inert.  Pick one:
+    mechanism and registered in GLOBAL_ORG_REGISTRY in this file.  Both
+    mechanisms now READ that directory (it is the package root's level,
+    GH #953), so every table in it is loaded for every country -- but a table
+    nothing names is still inert, and a stray one shadows nothing until it
+    collides.  Pick one:
 
       additive-merge      -- add the table name to
                              country._ADDITIVE_CATEGORICAL_TABLES (per-row
@@ -305,46 +308,27 @@ def test_cascade_override_is_whole_table(rungs):
         "to be whole-table (GH #953)")
 
 
-def test_cascade_cannot_read_a_directory_of_per_table_files(tmp_path):
-    """The defect in one assertion: a rung of ``<tablename>.org`` files resolves nothing.
-
-    ``fn`` defaults to ``categorical_mapping.org`` and each rung is the single
-    file ``d + fn``, so a directory laid out one-file-per-table -- which is
-    exactly how ``lsms_library/categorical_mapping/`` is laid out -- is
-    invisible to this function.
-    """
-    d = tmp_path / "per_table_rung"
-    d.mkdir()
-    table = {"foo": {"1": "shared", "2": "shared_too"}}
-    (d / "foo.org").write_text(_org(table))
-    with pytest.raises((KeyError, FileNotFoundError)):
-        _resolve("foo", [str(d)])
-    # ...and it resolves as soon as the same table is in the file it looks for.
-    (d / "categorical_mapping.org").write_text(_org(table))
-    assert _resolve("foo", [str(d)]) == {"1": "shared", "2": "shared_too"}
-
-
-def test_default_dirs_is_a_cwd_relative_spelling_of_the_same_three_rungs():
+def test_default_dirs_are_the_cwd_relative_wave_and_country_levels():
     default = inspect.signature(get_categorical_mapping).parameters["dirs"].default
-    assert default == ['./', '../../_/', '../../../_/']
+    # The cross-country level is appended by the resolver, never spelled here.
+    assert default == ['./', '../../_/']
     assert inspect.signature(
         get_categorical_mapping).parameters["fn"].default == 'categorical_mapping.org'
 
 
-def test_cross_country_rung_named_by_wave_modules_is_a_single_file_if_it_exists():
-    """REPORT-ONLY (GH #953): today ``countries/_/`` does not exist.
+def test_the_countries_underscore_rung_is_not_where_shared_tables_live():
+    """``countries/_/`` -- the third rung the wave modules spell -- holds nothing.
 
-    The four GhanaLSS wave ``mapping.py`` modules spell the third rung
-    ``f'{path}/../../_/'``, which resolves to ``countries_root()/'_'``.  If
-    anyone creates it, the cascade can still only read ONE file from it, so it
-    must hold a ``categorical_mapping.org`` -- a directory of per-table files
-    there would be unreachable for the same reason as today.
+    Callers used to spell a third rung, ``countries_root()/'_'``; it never
+    existed, and the spellings were removed when the cascade began appending
+    the package root's level itself (GH #953).  A table put there would be a
+    second home for shared tables -- refuse it.
     """
+    from lsms_library.local_tools import categorical_mapping_files
     rung = countries_root() / "_"
-    if rung.is_dir():
-        assert (rung / "categorical_mapping.org").exists(), (
-            f"{rung} exists but has no categorical_mapping.org, so the cascade "
-            "still reaches nothing there (GH #953).")
+    assert not categorical_mapping_files(rung), (
+        f"{rung} declares categorical tables; shared tables belong in "
+        f"{GLOBAL_CM_DIR} (GH #953).")
 
 
 def test_read_time_merge_overrides_per_row_for_allow_listed_tables():
@@ -395,7 +379,118 @@ def test_wave_rung_of_the_read_time_merge_is_whole_table_even_for_allow_listed_n
     """
     src = inspect.getsource(country_mod.Wave.categorical_mapping.fget)
     assert "_merge_categorical_tables" not in src
-    assert "dic.update(all_dfs_from_orgfile(org_fn))" in src
+    assert "dic.update(load_categorical_level(" in src
+
+
+# --------------------------------------------------------------------------
+# 4. Levels: file and directory are two spellings of one level (GH #953)
+# --------------------------------------------------------------------------
+
+from lsms_library.local_tools import (CategoricalMappingConflictError,  # noqa: E402
+                                      categorical_mapping_files, code_label_map,
+                                      global_categorical_level,
+                                      load_categorical_level)
+
+
+def _write_dir_table(level, filename, tables):
+    d = Path(level) / "categorical_mapping"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / filename).write_text(_org(tables))
+
+
+def test_global_level_is_the_package_root():
+    assert global_categorical_level() == PKG_DIR
+    names = {p.name for p in categorical_mapping_files(PKG_DIR)}
+    assert names == set(GLOBAL_ORG_REGISTRY), (
+        "the package root's level should be exactly the registered global "
+        "files (plus a categorical_mapping.org there, if one is ever added)")
+
+
+def test_directory_spelling_of_a_level_resolves(rungs):
+    dirs = rungs()
+    _write_dir_table(dirs[1], "foo.org", {"foo": {"1": "from_dir", "2": "d2"}})
+    assert _resolve("foo", dirs)["1"] == "from_dir"
+
+
+def test_directory_tables_are_found_by_name_not_by_filename(rungs):
+    """``u_kg`` lives in ``u.org`` globally -- a per-filename lookup would miss it."""
+    dirs = rungs()
+    _write_dir_table(dirs[1], "misc.org", {"foo": {"1": "x", "2": "y"},
+                                           "bar": {"1": "b", "2": "c"}})
+    assert _resolve("bar", dirs) == {"1": "b", "2": "c"}
+
+
+def test_file_and_directory_are_one_level_in_the_resolution_order(rungs):
+    """A wave's DIRECTORY still beats the country's FILE: levels order, not spellings."""
+    dirs = rungs(country={"foo": {"1": "country_file", "2": "c2"}})
+    _write_dir_table(dirs[0], "foo.org", {"foo": {"1": "wave_dir", "2": "w2"}})
+    assert _resolve("foo", dirs)["1"] == "wave_dir"
+
+
+@pytest.mark.parametrize("layout", ["file+dir", "dir+dir"])
+def test_a_level_declaring_a_table_twice_raises(rungs, layout):
+    """Never a precedence rule -- and never a fall-through to the next level."""
+    dirs = rungs(country={"foo": {"1": "lower", "2": "lower2"}})
+    if layout == "file+dir":
+        (Path(dirs[0]) / "categorical_mapping.org").write_text(
+            _org({"foo": {"1": "a", "2": "b"}}))
+        _write_dir_table(dirs[0], "foo.org", {"foo": {"1": "c", "2": "d"}})
+    else:
+        _write_dir_table(dirs[0], "one.org", {"foo": {"1": "a", "2": "b"}})
+        _write_dir_table(dirs[0], "two.org", {"foo": {"1": "c", "2": "d"}})
+    with pytest.raises(CategoricalMappingConflictError, match="foo"):
+        _resolve("foo", dirs)
+    with pytest.raises(CategoricalMappingConflictError, match="foo"):
+        code_label_map("foo", dirs)
+    with pytest.raises(CategoricalMappingConflictError, match="foo"):
+        load_categorical_level(dirs[0])
+
+
+def test_global_level_is_appended_last_automatically(rungs):
+    """No caller spells the cross-country level; it is reached anyway, last."""
+    dirs = rungs(wave={"bar": {"1": "x", "2": "y"}})
+    assert code_label_map("u_kg", dirs, value="Kg", idxvars="Unit") == {"Quintal": 100.0}
+    # ...and a local table of the same name shadows it WHOLE-TABLE (the
+    # cascade's rule, kept by decision 2026-10-17).
+    (Path(dirs[1]) / "categorical_mapping.org").write_text(
+        "#+name: u_kg\n| Unit | Kg |\n|---+---|\n| Arroba | 11.5 |\n")
+    assert code_label_map("u_kg", dirs, value="Kg", idxvars="Unit") == {"Arroba": 11.5}
+
+
+def test_the_global_level_is_searched_once_even_if_named(rungs):
+    dirs = rungs() + [str(PKG_DIR)]
+    with pytest.raises((KeyError, FileNotFoundError)) as excinfo:
+        _resolve("nowhere", dirs)
+    notes = " ".join(getattr(excinfo.value, "__notes__", []))
+    assert notes.count(str(PKG_DIR)) == 1
+
+
+def test_explicit_fn_keeps_single_file_rungs(rungs):
+    """Only the default ``fn`` has levels; an explicit one is read literally."""
+    dirs = rungs()
+    (Path(dirs[0]) / "other.org").write_text(_org({"foo": {"1": "x", "2": "y"}}))
+    _write_dir_table(dirs[0], "foo.org", {"foo": {"1": "dir", "2": "dir2"}})
+    got = get_categorical_mapping(fn="other.org", tablename="foo", dirs=dirs, Label="Label")
+    assert got == {"1": "x", "2": "y"}
+
+
+def test_load_categorical_level_merges_the_two_spellings(tmp_path):
+    level = tmp_path / "_"
+    level.mkdir()
+    (level / "categorical_mapping.org").write_text(_org({"foo": {"1": "a", "2": "b"}}))
+    _write_dir_table(level, "bar.org", {"bar": {"1": "c", "2": "d"}})
+    (level / "categorical_mapping" / "CONTENTS.org").write_text(
+        _org({"foo": {"1": "docs", "2": "only"}}))  # documentation: ignored
+    assert set(load_categorical_level(level)) == {"foo", "bar"}
+
+
+def test_read_time_loaders_use_the_level_reader():
+    """Both read-time loaders read a level, not one file -- so a country or
+    wave that splits its file loses nothing at read time."""
+    csrc = inspect.getsource(country_mod.Country.categorical_mapping.fget)
+    assert "load_categorical_level(" in csrc and "categorical_mapping_files(" in csrc
+    wsrc = inspect.getsource(country_mod.Wave.categorical_mapping.fget)
+    assert "load_categorical_level(" in wsrc
 
 
 # ---------------------------------------------------------------------------
@@ -457,3 +552,14 @@ def test_gh694_index_branch_unchanged_and_attrs_kept():
     out = _apply({"Rural": _RURAL}, df)
     assert out.index.get_level_values("Rural").tolist() == ["Urban", "Rural"]
     assert out.attrs.get("id_converted") is True
+
+
+def test_no_caller_spells_the_countries_underscore_rung():
+    """The dead third rung must not creep back into a ``_dirs`` list (GH #953)."""
+    import re as _re
+    bad = []
+    for py in countries_root().rglob("*.py"):
+        for n, line in enumerate(py.read_text(encoding="utf-8").splitlines(), 1):
+            if _re.match(r"\s*_?dirs\s*=\s*\[", line) and "../../_" in line:
+                bad.append(f"{py.relative_to(countries_root())}:{n}")
+    assert not bad, bad

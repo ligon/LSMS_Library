@@ -1,0 +1,61 @@
+{
+  "GitHub_mutation": false,
+  "PRs": [
+    {
+      "base": "development",
+      "blob_mismatches": [],
+      "every_GitHub_blob_matches_reviewed_worker": true,
+      "expected_path_set_matches_GitHub": true,
+      "extra_paths": [],
+      "files": 17,
+      "head": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+      "missing_paths": [],
+      "number": 1161,
+      "nutrition_preimages_changed_dev_vs852": [],
+      "url": "https://github.com/ligon/LSMS_Library/pull/1161"
+    },
+    {
+      "base": "integration/framework-v016-40255479",
+      "blob_mismatches": [],
+      "every_GitHub_blob_matches_reviewed_worker": true,
+      "expected_path_set_matches_GitHub": true,
+      "extra_paths": [],
+      "files": 11,
+      "head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+      "missing_paths": [],
+      "number": 1162,
+      "nutrition_preimages_changed_dev_vs852": null,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1162"
+    },
+    {
+      "base": "integration/framework-v016-40255479",
+      "blob_mismatches": [],
+      "every_GitHub_blob_matches_reviewed_worker": true,
+      "expected_path_set_matches_GitHub": true,
+      "extra_paths": [],
+      "files": 39,
+      "head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+      "missing_paths": [],
+      "number": 1163,
+      "nutrition_preimages_changed_dev_vs852": null,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1163"
+    },
+    {
+      "base": "integration/framework-v016-40255479",
+      "blob_mismatches": [],
+      "every_GitHub_blob_matches_reviewed_worker": true,
+      "expected_path_set_matches_GitHub": true,
+      "extra_paths": [],
+      "files": 12,
+      "head": "45f80dcb50da189b7864034b1d92863dca68de09",
+      "missing_paths": [],
+      "number": 1164,
+      "nutrition_preimages_changed_dev_vs852": null,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1164"
+    }
+  ],
+  "checked_utc": "2026-10-21T02:18:09.386175+00:00",
+  "tests_run": false,
+  "total_file_blobs": 79,
+  "verdict": "PASS"
+}

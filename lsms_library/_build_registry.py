@@ -121,6 +121,55 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.local_tools.cached_file_hash",
     "lsms_library.country.Wave._input_hash",          # the hash mechanism itself
     "lsms_library.country.Country._table_cache_hash",  # (would self-reference)
+    # The L2-country READ GATE (GH #908): grades the stored hash, checks the
+    # #891 coverage manifest and, on a hit, reads + row-selects the parquet an
+    # EARLIER build wrote.  It decides whether to serve; it writes nothing and
+    # determines no byte of any build output.  It was closure text inside the
+    # tagged _aggregate_wave_data until #908, so the exclusions above were
+    # defeated by where their caller lived and every gate edit cold-rebuilt
+    # the corpus.  Pinned by tests/test_build_transform_hash.py::
+    # test_l2_country_read_gate_is_not_folded_into_any_build_fingerprint.
+    "lsms_library.country.Country._read_l2_country_cache",
+    "lsms_library.country.Country._report_rebuild",
+    # The WAVE-tier read gates (GH #1040), the same argument one tier down:
+    # the YAML-path L2-wave read and the script-path candidate check (both
+    # closure text inside the tagged Wave.grab_data until #1040), and the
+    # assume_cache_fresh serve (inside _aggregate_wave_data).  Each grades or
+    # selects a parquet an EARLIER build wrote; none determines a byte of
+    # what a build writes.  Which paths are candidates stays fingerprinted
+    # (Wave._script_parquet_candidates, called from grab_data).  Pinned by
+    # tests/test_build_transform_hash.py::
+    # test_editing_a_wave_read_gate_moves_no_hash.
+    "lsms_library.country.Wave._read_l2_wave_cache",
+    "lsms_library.country.Wave._fresh_script_parquet",
+    "lsms_library.country.Country._read_assumed_fresh_cache",
+    # GH #675: the degraded-build record.  Filing a drop, grading a stamped
+    # parquet at either read gate, probing whether a dropped source is readable
+    # now, and the warning are all MECHANISM -- they decide whether to serve
+    # and what metadata to stamp, never a byte of frame content.  Reached from
+    # the tagged grab_data / _aggregate_wave_data; without these entries every
+    # later edit to the mechanism would cold-rebuild the corpus.  (The probe
+    # calls get_dataframe; excluding it keeps the walk from descending.)
+    "lsms_library.local_tools.read_parquet_build_drops",
+    # The fast-tier probe seam and the build-time drop classifier (675 follow-
+    # up): availability checks and metadata, never frame content.
+    "lsms_library.local_tools.source_tier",
+    "lsms_library.local_tools.source_fetchable_fast",
+    "lsms_library.country._drop_record",
+    "lsms_library.country._file_wave_drops",
+    "lsms_library.country._optional_scheme_columns",
+    "lsms_library.country._drop_missing",
+    "lsms_library.country._describe_missing",
+    "lsms_library.country._file_build_drop",
+    "lsms_library.country._forget_wave_build_drops",
+    "lsms_library.country._wave_build_drops",
+    "lsms_library.country._stampable_build_drops",
+    "lsms_library.country._degraded_drops",
+    "lsms_library.country._mark_degraded_written",
+    "lsms_library.country._probe_source",
+    "lsms_library.country._degraded_cache_verdict",
+    "lsms_library.country._warn_degraded_serve",
+    "lsms_library.country._replay_build_drops",
     # _finalize_result is READ-path: re-applied on every read AFTER the cache,
     # so an edit surfaces regardless of cache freshness.  It is reached from the
     # tagged orchestrator _aggregate_wave_data; excluding it keeps the build
@@ -134,6 +183,15 @@ _EXCLUDED_CALLABLES = frozenset({
     # fix would otherwise have moved every table's hash a second time.
     "lsms_library.country.Country._assert_built_required_columns",
     "lsms_library.country.Country._is_script_path",
+    # GH #1039: the make-backend ROUTING predicate -- does the country level
+    # have a rule or script for this table, or must it be built from its
+    # waves?  It SELECTS a builder and determines no byte of any hashed
+    # parquet: on the from-waves route the wave frames, and the L2-wave
+    # parquets `grab_data` writes and hash-stamps, are byte-for-byte what the
+    # default backend builds (that code is fingerprinted where it lives), and
+    # the make backend writes no L2-country parquet.  Without this entry a
+    # re-worded log line in it would move every table's hash.
+    "lsms_library.country.Country._has_country_builder",
     # The wave-script RUNNER (GH #968): make if installed, else the wave
     # script directly.  It decides which program executes the script, not
     # what the script writes -- the script text and the country _/Makefile
@@ -169,6 +227,13 @@ _EXCLUDED_CALLABLES = frozenset({
     # warns; provably returns its input unchanged.
     "lsms_library.null_index_audit.check_index_levels",
     "lsms_library.null_index_audit.audit_index_levels",
+    # The cluster-identity warning (sampling, GH #942): the same argument.
+    # Reads `sampling.yml` and the frame's `t`/`v`, warns, and returns its
+    # input unchanged.  Reached only from the excluded `_finalize_result`
+    # today; listed so a future call site cannot cold-rebuild the corpus by
+    # re-wording the warning.
+    "lsms_library.sampling.check_cluster_identity",
+    "lsms_library.sampling.audit_cluster_identity",
     # GH #803: pure reporting of an in-tree parquet artefact.  Never reads the
     # file, never changes what a build writes; reached from grab_data and
     # run_make_target, so without this exclusion re-wording the warning would
@@ -190,6 +255,35 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library._parallel_waves.build_workers",
     "lsms_library._parallel_waves.worker_make_jobs",
     "lsms_library._parallel_waves.group_waves_by_target",
+    "lsms_library._parallel_waves._datetime_ledger",
+    # GH #1045, the build-time calendar parser.  TWO different reasons share
+    # this block, and the difference matters:
+    #
+    # (a) The PARSER entry points DO determine content.  They are excluded
+    #     from RECURSION only: each is also tagged
+    #     ``@build_transform(tables=datetime_parse.CALENDAR_TABLES)``, and
+    #     ``build_transforms_fingerprint`` folds a tagged ROOT directly from
+    #     ``_BUILD_TRANSFORMS`` without consulting this set -- so they are
+    #     versioned for exactly the tables that carry a calendar column.
+    #     Without the exclusion, the ALL-scoped ``Wave.grab_data`` (which calls
+    #     ``apply_datetime_specs``) and ``Wave.column_mapping`` (which calls
+    #     ``spec_source_vars``) would recurse into them and fold the parser into
+    #     EVERY table, so a parser edit would re-warm the corpus (decision 1,
+    #     #1045).  Pinned by tests/test_gh1045_parse_datetime.py, which also
+    #     pins that every table using a spec or a script call is on the list.
+    "lsms_library.datetime_parse.parse_datetime",
+    "lsms_library.datetime_parse.assign_datetime",
+    "lsms_library.datetime_parse.spec_source_vars",
+    "lsms_library.datetime_parse.apply_datetime_specs",
+    "lsms_library.datetime_parse.is_datetime_spec",
+    # (b) Pure REPORTING, like the null-read audit: replay / per-wave filter of
+    #     the parse report and its footer reader.  Return nothing that reaches
+    #     a parquet.
+    "lsms_library.datetime_parse.replay_datetime_audit",
+    "lsms_library.datetime_parse.wave_datetime_audit",
+    "lsms_library.datetime_parse.datetime_reports",
+    "lsms_library.local_tools.read_parquet_datetime_audit",
+    "lsms_library.country._replay_wave_stamp",  # wave-tier replay of the grain + date stamps: reporting only (#1045 r1 F3)
 })
 
 
@@ -213,7 +307,11 @@ _EXCLUDED_CALLABLES = frozenset({
 # some other tagged module would otherwise fold it under that module's prefix.
 _EXCLUDED_CONSTANTS = frozenset(
     {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER",
-     "_NULL_INDEX_LEDGER"})
+     "_NULL_INDEX_LEDGER", "_CLUSTER_LEDGER", "_CALL_STATE",
+     # GH #1045: the build-time date-parse log, same argument.
+     "_DATETIME_LEDGER",
+     # GH #675: process-local logs / memos, same argument.
+     "_BUILD_DROP_LEDGER", "_DEGRADED_ATTEMPTED", "_SOURCE_PROBES"})
 
 
 def _is_build_callable(obj) -> bool:

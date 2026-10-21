@@ -1,0 +1,74 @@
+#+title: Uganda nutrition CI fingerprint diagnosis
+#+author: Sue
+#+date: 2026-10-20
+
+* Finding
+
+The exact failed CI content hash is reproduced by changing only OpenBLAS's CPU kernel on fixed, unchanged nutrition operands.
+The reversible sequence SkylakeX -> Haswell -> SkylakeX gives approved =12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a= -> failed =f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6= -> the approved hash again.
+The 23,777 x 15 frame has identical index, row order, columns and dtypes throughout.
+One 2019-20 row differs in eight floating-point cells: Energy, Folate, Carbohydrate, Iron, Niacin, Riboflavin, Thiamin and Vitamin B-12.
+The maximum absolute difference is 3.637978807091713e-12, maximum relative difference 2.888772476871367e-16, and maximum difference two float64 ULPs.
+Both frames are finite and nonnegative.
+Sorting the already sorted index preserves the failed hash; this is not a row-order difference.
+
+This identifies a numerical-kernel-sensitive exact-hash assertion, rather than a demonstrated scientific or assembly change.
+The failed runner did not log its selected BLAS architecture, and its run has no uploaded artifacts, so its actual hardware selection is inferred from the exact local counterfactual rather than directly observed.
+No inference about its individual household identifiers or source records is needed.
+
+* Source and dependency controls
+
+The reconstruction imports exact source =852ac2bfcd5f798533f56e7efa1f77db80c0138f= from =/local/job40255479/worktrees/framework-integration=, with cwd, PYTHONPATH, LSMS_COUNTRIES_ROOT and LSMS_DATA_DIR identities asserted in the same process.
+A physical private Uganda L2 copy was made at =/local/job40255479/nutrition-ci-warm= from the immutable exact-852 corpus; only L1 is shared.
+The original raw nutrition hash is the approved =12d25...50e3a=.
+The shipped nutrition algebra reconstructed from the same private food quantities and raw FCT reproduces that hash exactly, with zero changed cells.
+All C/F operand memory-layout combinations also reproduce the approved hash on the default SkylakeX kernel.
+No cold build or full-suite replay was needed.
+
+The passing Windows-expectation-only Linux data run =39515878586= tested =1d3e8dfdf264c40cc4ce4eb9a1f77b9d71634ad6=; the failed Linux data run =39519191762= tested exact 852.
+Both logs show Python 3.11.17, NumPy 2.4.6, pandas 3.0.6, pyarrow 25.0.1 and SciPy 1.17.1.
+The local extracted interpreter has the same measured NumPy, pandas and pyarrow versions; its NumPy OpenBLAS version is 0.3.31.188.0.
+The CI logs do not separately identify their NumPy BLAS runtime version or selected kernel.
+Both CI builds execute =nutrition.py= twice before pytest, and both full suites run serially rather than with xdist.
+The passing job reports 5,911 passed, 2,742 skipped, four xfailed, one xpassed; the failing job reports 6,107 passed, 2,744 skipped, four xfailed, one xpassed and this one failure.
+Their different runtimes and test counts are not used as proof of a cache race.
+
+* Country guidance and limits
+
+Read Uganda =_/CONTENTS.org=, including the nutrition history and live TODO/WAITING/LOGBOOK entries.
+Its nutrition-specific idiosyncrasy at lines 2025-2051 is the coupled FCT/nutrition recipe: requesting one writes both siblings, while the framework stamps only the requested table.
+The text states, "Nutrition's frame remains the approved #967 result: 23,777 x 15, content hash =12d25f6e...50e3a=."
+That value claim agrees with the local default-kernel reconstruction, but it is not portable as a bitwise hash across these two BLAS kernels.
+The metadata coupling remains real and is separate from this exact arithmetic counterfactual.
+No source/cache authority decision under #788 has been made here.
+
+The historical #967 hold is explicitly lifted by the October 15 maintainer decision at lines 3306-3327, approving the specific 23,777 x 15 / 12d25 target.
+It does not approve arbitrary fixture regeneration or this newly observed f3d3 target.
+The nominal volume-as-mass assumptions, range endpoints, residual unit codes, and sweet-potato carotenoid provenance limits remain as documented; none is changed by this diagnosis.
+Live missing-2019-20-panel-weight, cluster/strata, unwired-nonfood and item-specific-recall caveats do not explain these eight ULP-scale cells.
+No country documentation, code, test, baseline, original corpus or shared L2 was edited.
+
+* Reproduction and evidence
+
+=probe.py= reconstructs the shipped algebra into private =x.pkl=, =y.pkl= and =raw.pkl= inputs and writes the aggregate =warm-reconstruction.json=.
+Those pickle files contain microdata and must remain private.
+=compare_blas.py= reads those fixed operands in fresh processes, sets the kernel before importing NumPy, checks both exact expected hashes, checks unchanged input SHA256 values, and records the reversible sequence.
+Use the extracted interpreter with BLAS/OMP/MKL/build/make set to one and affinity 16-19:
+
+#+begin_src sh
+/local/job40255479/venv_img/bin/python compare_blas.py \
+  --inputs /local/job40255479/nutrition-ci-warm --out /local/job40255479/control/framework-campaign/nutrition-ci-diagnosis/reversible
+#+end_src
+
+The public-safe evidence consists of this report, =probe.py=, =compare_blas.py=, =warm-reconstruction.json= and =reversible/comparison.json=.
+The six exploratory kernel aggregate JSON files are supplemental; Haswell and requested Zen (which resolves to Haswell) both reproduce the failed hash exactly.
+Private logs and operand files are excluded from the evidence handoff.
+All launched verifier subprocesses have exited.
+
+* Disposition
+
+The assertion compares unrounded float64 row hashes, so a two-ULP arithmetic change fails it even when the scientific inputs and structure are identical.
+Retain this failure evidence and the current approved baseline.
+A repair needs an explicit numerical-regression contract; blindly refreshing the exact hash would merely select another CPU kernel's last bits.
+Forcing SkylakeX on arbitrary runners is not a portable remedy because that kernel may require unsupported CPU instructions.
+No fix was implemented in this read-only diagnosis.

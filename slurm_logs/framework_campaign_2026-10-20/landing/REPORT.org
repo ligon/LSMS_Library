@@ -1,0 +1,65 @@
+#+title: Authorized framework batch landing
+#+author: Sue
+
+* Result
+
+The maintainer explicitly authorized the nine reviewed implementation PRs and evidence PR1158 after final validation.
+All nine implementation PRs are merged into development at =1933434b84de82ac72b3921a7fd8fe5c00154754=.
+GitHub, the local development-sync worktree and filesystem origin agree at that commit.
+Evidence PR1158 is also merged at =db00a79f17f841649f2b96827c5b9b4e858ce2f8=; its full tree equals the reviewed evidence publication4fd0c0ad5, and its changes are limited to326 campaign-report/handoff paths.
+
+| PR | Merge commit |
+|----+--------------|
+| [[https://github.com/ligon/LSMS_Library/pull/1161][1161]] | =ac6de755e99fa53bae7677042df92b654eef2b13= |
+| [[https://github.com/ligon/LSMS_Library/pull/1154][1154]] | =047d1ff514aefc0dd7536b4a366d2cdc087b48b7= |
+| [[https://github.com/ligon/LSMS_Library/pull/1155][1155]] | =f46dc011f766197156236f0b293986156dae03a0= |
+| [[https://github.com/ligon/LSMS_Library/pull/1156][1156]] | =064a7fb465b98c4a4cfa951235bd903a81a68d87= |
+| [[https://github.com/ligon/LSMS_Library/pull/1157][1157]] | =09a413ab4f8e8189980b4c83cdcf28037158e8b1= |
+| [[https://github.com/ligon/LSMS_Library/pull/1162][1162]] | =5519de059aa1a33359af3a34a887658271879ed1= |
+| [[https://github.com/ligon/LSMS_Library/pull/1163][1163]] | =5bd1a5834e1957aab464f1aa99a0544ce93c6a25= |
+| [[https://github.com/ligon/LSMS_Library/pull/1164][1164]] | =f50611161e9e58bf0676de5d771d4d6f07d0d8a3= |
+| [[https://github.com/ligon/LSMS_Library/pull/1165][1165]] | =1933434b84de82ac72b3921a7fd8fe5c00154754= |
+
+* Source identity and checks
+
+Every one of the14,437 candidate paths retains its exact mode, type and blob.
+The landed tree has only four added review reports from the later1157 tip; the historical first-round failure and resolving second-round pass are retained together.
+All runtime/package/configuration/test/script/bench/audit/workflow/build/dependency files match validated532 exactly.
+The final1165 publication and landed193 implementation trees are entirely identical.
+[[file:source-equivalence.json][Parent git-object proof]], [[file:verify_landing.py][read-only reproduction]], [[file:../landing-independent/final-development-review.org][independent merged-development review]].
+
+Retargeting was preceded by merging development into separate publication branches, with all11/39/12/9 reviewed task blobs preserved and focused GitHub diffs checked.
+New unit and Windows smoke checks passed before each retargeted PR merged.
+The earlier reviewed532 proof remains8,851 local passes and6,388 credentialed Linux passes, plus successful native Windows; the full semantic/corpus limitations remain unchanged.
+No duplicate full data run is needed for byte-identical runtime/test/build inputs.
+
+* Completed development CI and report-only push filtering
+
+The last code-changing development workflow [[https://github.com/ligon/LSMS_Library/actions/runs/39547934263][39547934263]] at193 completed SUCCESS.
+Unit tests, Windows smoke, native Windows script build and DVC remote reachability all pass.
+The native log proves checkout193 and exact Uganda results: shocks14457rows/10columns/8waves/digest0ab2ea4c79dd; assets116808rows/1column/8waves/digest9202ed542a14.
+[[file:implementation-development-ci-final.json][Final job conclusions and private-log identity]].
+
+The evidence merge does NOT trigger another push workflow: every changed report/handoff path matches the existing workflow's paths-ignore.
+This corrects the earlier prediction of a final evidence-push run; no infrastructure failure or pending job is inferred from its absence.
+Its own fresh PR unit and Windows checks passed before merge.
+[[file:evidence-publication-verification.json][326-path GitHub scope check]], [[file:final-development-verification.json][merged evidence/source synchronization proof]].
+No executable/configuration/test/build/audit input changed after the successful code CI.
+Ordinary development and PR-event data jobs remain skipped by policy; exact532 manual data6388 passes are separate evidence and not an enforced PR data gate.
+The current final bookkeeping outcome is also recorded in [[https://github.com/ligon/LSMS_Library/pull/1158][PR1158]].
+
+* Scope and operations
+
+Existing stale status headers for778/1159/1160 were corrected; their historical bodies were preserved and all three issues stay open.
+All32 scoped closure candidates are implemented after this batch, awaiting an authorized master release merge.
+778 retains its trust-mode policy note;932 enforcement,1149 staged acquisition and1110 science/land-grain policy remain separate.
+No release/tag, repository-protection change, shared-cache promotion or issue closure occurred.
+
+GitHub rejected coder@sucoder.dev for API merge attribution before any merge occurred; API merges use the authenticated GitHub identity and retain the GPT-6 trailer. Local merge commits use configured Sue attribution.
+One publication helper stopped after its successful commit because the hook success line was relayed on stderr; the durable origin ref was independently verified and the operation resumed without another commit.
+No production failure, source edit or loss of work resulted.
+
+The archived mutation controllers document the exact completed procedure; verify_landing.py is the read-only check.
+Raw job logs, survey frames and API issue bodies are excluded from this export.
+
+Sue

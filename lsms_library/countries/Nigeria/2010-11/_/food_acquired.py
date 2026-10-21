@@ -22,6 +22,13 @@ the residual -- not the survey's own q3a -- as the price denominator.  We
 now take each source's REPORTED quantity and REPORTED unit.  See
 nigeria.food_acquired_for_wave for the wave-by-wave questionnaire
 renumbering that made W2-W4 catastrophically wrong.
+
+GH #1035 (amended ruling @ligon 2026-10-19): the post-harvest round's sized
+unit codes come from the agriculture card, which states each container's
+weight.  A row recording a FRACTION of a sized mass container
+(0 < Quantity < 1) is served the stated kilograms as `Quantity_kg`, stamped
+`Nigeria::food_acquired::w1-card-weight`; every other row keeps
+`Quantity_kg` NA and the price-ratio inference.  See mapping.py.
 """
 import sys
 
@@ -30,16 +37,23 @@ import pandas as pd
 sys.path.append('../../_/')
 from lsms_library.local_tools import to_parquet
 from nigeria import food_acquired_for_wave
+from mapping import stamp_w1_card_weight
 
 # --- Harvest (2011Q1) ---
-harvest = food_acquired_for_wave(
+# The source path and variables stay LITERALS here: the cache hash folds the
+# DVC fingerprint of every data file a script names as a string literal.
+# mapping.W1_PH_* repeats them for the derivation's `inputs` callable, and
+# tests/test_gh1035_nigeria_w1_stated_weights.py keeps the two equal.  The
+# stated container weight is attached AFTER the build's duplicate-key
+# collapse, so the rule reads the served Quantity (GH #1035).
+harvest = stamp_w1_card_weight(food_acquired_for_wave(
     '../Data/sect10b_harvestw1.csv', '2011Q1',
     sources={
         'purchased': {'quantity': 's10bq3a', 'unit': 's10bq3b'},
         'produced':  {'quantity': 's10bq5a', 'unit': 's10bq5b'},
         'inkind':    {'quantity': 's10bq6a', 'unit': 's10bq6b'},
     },
-    expenditure='s10bq4')
+    expenditure='s10bq4'))
 
 # --- Planting (2010Q3) ---
 planting = food_acquired_for_wave(

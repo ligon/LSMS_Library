@@ -1,0 +1,13 @@
+README.md
+STATIC_REVIEW.md
+prepare_copy.py
+release_identity.py
+poetry-pytest-only
+ci_gate.py
+check_ci_gate_synthetic.py
+verify_published.py
+installed_smoke.py
+copy-summary.json
+preparation.json
+COPYLIST.txt
+MANIFEST.json

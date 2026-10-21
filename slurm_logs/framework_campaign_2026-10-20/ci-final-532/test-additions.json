@@ -1,0 +1,35 @@
+{
+  "actual_terminal_execution": {
+    "all_87_actually_executed_and_passed": true,
+    "basis": "Unique serial pytest file terminal group; static literal-parametrize case count 87 and collected/passed delta 87 independently agree",
+    "expected_case_count": 87,
+    "nonpass_marker_count": 0,
+    "observed_group_lengths": [
+      87
+    ],
+    "ordered_terminal_group_count": 1,
+    "pass_marker_count": 87,
+    "test_module": "tests/test_gh1160_pooled_fertilizer_rate.py"
+  },
+  "all_other_outcome_counts_and_warnings_unchanged": true,
+  "basis": "Read-only AST count of literal pytest parametrize lists; no collection/build/API replay",
+  "changed_test_assets_532_vs_4cab": [
+    "A\ttests/test_gh1160_pooled_fertilizer_rate.py"
+  ],
+  "collected_delta": 87,
+  "parameterized_case_counts": {
+    "test_accepted_area_layouts_and_index_precedence": 8,
+    "test_country_on_only_one_side_is_refused": 4,
+    "test_country_shape_survives_one_country_and_empty_paths": 24,
+    "test_countryless_area_columns_and_metadata_keep_legacy_result": 1,
+    "test_declared_country_factors_flow_through_existing_numerator": 2,
+    "test_disjoint_countries_do_not_join_equal_local_land": 2,
+    "test_existing_area_sum_is_preserved_with_country": 1,
+    "test_null_country_is_refused_before_filtering": 12,
+    "test_partial_country_overlap_joins_only_shared_country": 1,
+    "test_pooled_rates_equal_separate_calls": 32
+  },
+  "passed_delta": 87,
+  "test_file": "tests/test_gh1160_pooled_fertilizer_rate.py",
+  "total_new_cases": 87
+}

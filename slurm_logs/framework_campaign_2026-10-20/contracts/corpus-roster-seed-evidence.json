@@ -1,0 +1,383 @@
+{
+  "baseline_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "seeds": {
+    "1": {
+      "source_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+      "seed": "1",
+      "merge_on_order": [
+        "v",
+        "i",
+        "t"
+      ],
+      "served": {
+        "shape": [
+          42343,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "3002087b1d48e17801c14ddb853a4c11ca743ecc6845109cbc55c6fa915bab58"
+      },
+      "canonical_served": {
+        "shape": [
+          42343,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "d2bda77fa2881115e46e9abed65fa0947c44b2f5482f8924b1177872a149441d"
+      },
+      "raw_country": {
+        "shape": [
+          42343,
+          4
+        ],
+        "columns": [
+          "Age",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "t",
+          "i",
+          "pid"
+        ],
+        "dtypes": {
+          "Age": "float64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "2d5877eafb63eb47d82c9ecc9c1ce2115a2001b237fa45100b733715166bd753"
+      },
+      "raw_wave": {
+        "shape": [
+          42343,
+          4
+        ],
+        "columns": [
+          "Age",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "pid"
+        ],
+        "dtypes": {
+          "Age": "float64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "2b979645800b6d2fefce6d7fce2184eff17ae861692f4d6b8ffa96f188902a59"
+      },
+      "canonical_raw_country": {
+        "shape": [
+          42343,
+          4
+        ],
+        "columns": [
+          "Age",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "t",
+          "i",
+          "pid"
+        ],
+        "dtypes": {
+          "Age": "float64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "1d0d2d490f074d5d80869523f90418a630c3c69e270bc0111f86e088aeb570dc"
+      },
+      "canonical_raw_wave": {
+        "shape": [
+          42343,
+          4
+        ],
+        "columns": [
+          "Age",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "pid"
+        ],
+        "dtypes": {
+          "Age": "float64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "62c8a2fcc3dd28200b632e168bcaaabffc3813349f6cc82ec0da74977de1a8e3"
+      }
+    },
+    "3": {
+      "source_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+      "seed": "3",
+      "merge_on_order": [
+        "t",
+        "i",
+        "v"
+      ],
+      "served": {
+        "shape": [
+          42343,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "55b504a8d0ed1b32ce2bc24ec3a7128e4b87c80dc3b6139a5bc65e41ab94efd9"
+      },
+      "canonical_served": {
+        "shape": [
+          42343,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "d2bda77fa2881115e46e9abed65fa0947c44b2f5482f8924b1177872a149441d"
+      },
+      "raw_country": {
+        "shape": [
+          42343,
+          4
+        ],
+        "columns": [
+          "Age",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "t",
+          "i",
+          "pid"
+        ],
+        "dtypes": {
+          "Age": "float64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "aaa77df451bfa62998bb75d152b28f44f2e9ecfa30228d55872173540bac52f7"
+      },
+      "raw_wave": {
+        "shape": [
+          42343,
+          4
+        ],
+        "columns": [
+          "Age",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "pid"
+        ],
+        "dtypes": {
+          "Age": "float64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "69b03015b5de9c0ad256122ea149819e4cf5baab01afdb0f5a9d25c93d1f0459"
+      },
+      "canonical_raw_country": {
+        "shape": [
+          42343,
+          4
+        ],
+        "columns": [
+          "Age",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "t",
+          "i",
+          "pid"
+        ],
+        "dtypes": {
+          "Age": "float64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "1d0d2d490f074d5d80869523f90418a630c3c69e270bc0111f86e088aeb570dc"
+      },
+      "canonical_raw_wave": {
+        "shape": [
+          42343,
+          4
+        ],
+        "columns": [
+          "Age",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "pid"
+        ],
+        "dtypes": {
+          "Age": "float64",
+          "MonthsSpent": "int64",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "62c8a2fcc3dd28200b632e168bcaaabffc3813349f6cc82ec0da74977de1a8e3"
+      }
+    }
+  },
+  "comparisons": {
+    "raw-wave": {
+      "shape": [
+        42343,
+        4
+      ],
+      "index_order_equal": false,
+      "column_order_equal": true,
+      "canonical_exact_equal": true,
+      "row_position_mismatch_count": 14491
+    },
+    "raw-country": {
+      "shape": [
+        42343,
+        4
+      ],
+      "index_order_equal": false,
+      "column_order_equal": true,
+      "canonical_exact_equal": true,
+      "row_position_mismatch_count": 14491
+    },
+    "served": {
+      "shape": [
+        42343,
+        7
+      ],
+      "index_order_equal": false,
+      "column_order_equal": true,
+      "canonical_exact_equal": true,
+      "row_position_mismatch_count": 14491
+    }
+  },
+  "matches_corpus": {
+    "baseline": [
+      "1"
+    ],
+    "combined": [
+      "3"
+    ]
+  }
+}

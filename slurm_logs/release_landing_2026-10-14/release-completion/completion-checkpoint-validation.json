@@ -1,0 +1,166 @@
+{
+  "head": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "tracked_diff_sha256": "fba9e844f267ee59cc2c58e488d90ae90cd5ad612539189acaed5aac0092f81e",
+  "tracked_paths": [
+    ".sucoder/handoff.org",
+    "docs/releases/v0.15.0.md",
+    "slurm_logs/release_landing_2026-10-14/EXECUTION.org",
+    "slurm_logs/release_landing_2026-10-14/WORKPLAN.org"
+  ],
+  "new_files": [
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/guyana-sanity-followup/copy-proof.json",
+      "bytes": 6311,
+      "sha256": "b7bf9b7c1eef98ce5bd6407864a231e08fca68e73cb5e2f3889a20067fdd0a93"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/guyana-sanity-followup/result.json",
+      "bytes": 962,
+      "sha256": "eb1257569e52cfda2cab9db5df014cdcea8a67b2e02c495073c842bcd61b587a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/guyana-sanity-followup/verify_guyana_skip.py",
+      "bytes": 3549,
+      "sha256": "8cc8eaa265f31a819de3a6e9293ed7f6f28ddbb436696202b262dfc1d25d02cc"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/issue941-final-ci-body.md",
+      "bytes": 4678,
+      "sha256": "7d58093c0a1eca87cec546a15d001b9b33f1a65c88568b7ac986507bb4438e6e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/issue941-final-ci-update.json",
+      "bytes": 339,
+      "sha256": "6e41f723bde94b639fb339029c7c7b4735a0a43adee0628a6154f21eba622ae3"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/issues-after-release-merge.json",
+      "bytes": 9665,
+      "sha256": "46b0f45007e34313797961ba31052e8f139b3f210e43bf5a64102c25a58d6b4d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/local-release-tag.json",
+      "bytes": 353,
+      "sha256": "cd86f2465963aaf1aacb286c4f5bcf77a649b9dcd06bdd2ae70b5d5f6bf3e33e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/make-release-review/MAKE_RELEASE_REVIEW.md",
+      "bytes": 7069,
+      "sha256": "f106142e15af52ccaf3a366b9ec17e293418fc171111f1166992676ef6f2d4a9"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/make-release-review/MANIFEST.json",
+      "bytes": 565,
+      "sha256": "a6140de5a2d6a54d674d8292040aad541d283cbb4f2c9706589394f9ec749678"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/make-release-review/classify_release_outcomes.py",
+      "bytes": 8498,
+      "sha256": "487e9a4de2f3b85ed00b2bc5697ac68cebc783be8eb5d6b29137eb2e2c46bb60"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/make-release-review/make-release-evidence-review.json",
+      "bytes": 4843,
+      "sha256": "903fd7caa773f6773186afc46bb1e754cc704b824dbb5f1d015dcf272f72fa0a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/make-release-review/make-release-outcomes.json",
+      "bytes": 70147,
+      "sha256": "71727dbe32756ac852307945ded88d1f3e13275e71a6a4be85f757026370f779"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/make-release-summary.json",
+      "bytes": 1131,
+      "sha256": "4ef3fe0af50edcdb779a5dccf01815d39e2e14b3a4c2b5cec941ae63e97ec027"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/open-prs-after-master-merge.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/pr1015-merged.json",
+      "bytes": 174,
+      "sha256": "188388b84dff21ccf771442b309a455226fdac8c5be1bda775173acc16af489c"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/pr1015-premerge.json",
+      "bytes": 2397,
+      "sha256": "c55a68f4debd7eb3e40bc5f1c34924450a24565e235317f735e1ea5ad53856d2"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/pr999-merged.json",
+      "bytes": 173,
+      "sha256": "c4b43839a460efd43920e08bfd103f174d30c4bb723069ab3bdc32af3ebfa63e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/pr999-premerge.json",
+      "bytes": 7724,
+      "sha256": "5808ec91e4128325ad86641a1eba9276ff27d2aa1e443b0fee3f0a4381386256"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/release-completion/preservation-after-isolated-release-tests.json",
+      "bytes": 543,
+      "sha256": "3c4a59d118983c8f132c50fa144141e9f7ad500a6f8ba9113a4102cc2066efc1"
+    }
+  ],
+  "review_manifest_missing": [],
+  "review_manifest_mismatched": [],
+  "master_ci_checkpoint": {
+    "observed_utc": "2026-10-15T15:57:45.530729+00:00",
+    "run_id": 38759333750,
+    "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+    "status": "in_progress",
+    "jobs": [
+      {
+        "name": "data-tests",
+        "status": "in_progress",
+        "conclusion": ""
+      },
+      {
+        "name": "unit-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "dvc-remote-reachability",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "windows-script-build",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "docs",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "windows-smoke",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "dvc-lock-check",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "refresh-dvc-locks",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ],
+    "live_master_tip": {
+      "observed_utc": "2026-10-15T15:57:47.086605+00:00",
+      "expected_source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "master_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "matches_expected": true
+    }
+  },
+  "no_runtime_test_or_config_edits": true,
+  "phase6_local_tag_wording_corrected_and_reviewed": true,
+  "verdict": "APPROVE checkpoint; master data CI and publication outcomes pending"
+}

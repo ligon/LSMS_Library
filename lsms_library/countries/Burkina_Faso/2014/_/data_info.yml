@@ -86,9 +86,13 @@ individual_education:
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 cluster_features:
+    # GH #1050: no df_geo.  The EMC 2014 distribution ships no coordinate:
+    # emc2014_agri_gps.dta (the only file named for GPS) holds V20 "La
+    # parcelle a-t-elle ete mesuree par le GPS?" and V22, the GPS-measured
+    # parcel AREA in hectares -- not a position.  Evidence in
+    # _/CONTENTS.org, "cluster_features -- GPS by wave".
     dfs:
         - df_main
-        - df_geo
     df_main:
         file: emc2014_p1_logement_27022015.dta
         idxvars:
@@ -106,13 +110,6 @@ cluster_features:
                     Urbain: Urban
                     urbain: Urban
                     URBAIN: Urban
-    df_geo:
-        file: emc2014_agri_gps.dta
-        idxvars:
-            v: zd
-        myvars:
-            Latitude: lat_dd_mod
-            Longitude: lon_dd_mod
     merge_on:
         - v
     final_index:

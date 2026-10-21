@@ -67,9 +67,10 @@ _QUANTITY_COLS = [
 def test_food_prices_cache_dtype_float64():
     """Cached food_prices.parquet must store numeric columns as float64, not string."""
     path = data_root("Uganda") / "var" / "food_prices.parquet"
-    if not path.exists():
-        pytest.skip("food_prices.parquet not in cache")
-    df = pd.read_parquet(path)
+    try:  # the read is the check; a concurrent rebuild may delete it (GH #778)
+        df = pd.read_parquet(path)
+    except FileNotFoundError:
+        pytest.skip("food_prices.parquet not in cache (absent, or mid-rebuild)")
     for col in _PRICE_COLS:
         if col in df.columns:
             assert pd.api.types.is_float_dtype(df[col]), (
@@ -83,9 +84,10 @@ def test_food_prices_cache_dtype_float64():
 def test_food_quantities_cache_dtype_float64():
     """Cached food_quantities.parquet must store numeric columns as float64, not string."""
     path = data_root("Uganda") / "var" / "food_quantities.parquet"
-    if not path.exists():
-        pytest.skip("food_quantities.parquet not in cache")
-    df = pd.read_parquet(path)
+    try:  # the read is the check; a concurrent rebuild may delete it (GH #778)
+        df = pd.read_parquet(path)
+    except FileNotFoundError:
+        pytest.skip("food_quantities.parquet not in cache (absent, or mid-rebuild)")
     for col in _QUANTITY_COLS:
         if col in df.columns:
             assert pd.api.types.is_float_dtype(df[col]), (

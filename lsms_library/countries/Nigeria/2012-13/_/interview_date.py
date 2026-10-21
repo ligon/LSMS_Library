@@ -6,7 +6,7 @@ from lsms_library.local_tools import df_data_grabber, to_parquet
 
 
 ##Harvest '2013Q1'
-idxvars = dict(j='hhid',
+idxvars = dict(i='hhid',
                 t=('sector', lambda x: "2013Q1"))
 myvars = dict(year='saq13y',
                 month='saq13m',
@@ -16,7 +16,7 @@ df['int_t'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
 df=df.drop(columns=['year','month','day'])
 
 #Planting(2012Q3)
-idxvars = dict(j='hhid',
+idxvars = dict(i='hhid',
                 t=('sector', lambda x: "2012Q3"))
 myvars = dict(year='saq13y',
                 month='saq13m',

@@ -638,8 +638,12 @@ def synthetic_tree(tmp_path_factory):
     # Curates the ladder, but its sample() has no Rural column at all -- the
     # documented normal state for a country whose sample is (v, weight, strata).
     _make_country(countries, "Columnlessland", _SETTLEMENT_ORG, with_rural=False)
+    # The synthetic countries' raw files sit in the config tree with no .dvc
+    # sidecar -- new data awaiting `dvc add`, which GH #831 refuses unless
+    # the caller opts in.  This tree IS that case.
     return {"LSMS_COUNTRIES_ROOT": str(countries),
-            "LSMS_DATA_DIR": str(root / "data")}
+            "LSMS_DATA_DIR": str(root / "data"),
+            "LSMS_ALLOW_INTREE_SOURCES": "1"}
 
 
 def _run(script: str, env_extra: dict) -> str:

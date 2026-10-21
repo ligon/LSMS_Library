@@ -1,0 +1,1655 @@
+{
+  "master_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "actual_make_release_exit_code": 0,
+  "summary_sha256": "4ef3fe0af50edcdb779a5dccf01815d39e2e14b3a4c2b5cec941ae63e97ec027",
+  "private_xml_sha256": "ee54438d87a10c6fe83af30e69ab31e03b84b98a3cb025b9af6542e5087f86f2",
+  "corpus_tsv_sha256": "b0798aedb9a0c3f926796f1357a42b2e95f2dbdd01f4dd5e98d8040efb6192fd",
+  "testcases": 7700,
+  "terminal_counts": {
+    "passed": 7376,
+    "skipped": 314,
+    "xfailed": 9,
+    "xpassed": 1,
+    "warnings": 968
+  },
+  "junit_skip": 314,
+  "junit_xfail": 9,
+  "junit_no_failure_error_or_skip": 7377,
+  "junit_passed_count_includes_nonstrict_xpass": true,
+  "credential_guard_skip_messages": 0,
+  "skip_categories": {
+    "absent_at_collection_raw_cache_gate": 150,
+    "explicit_microdata_unavailable_message": 20,
+    "no_nonnull_sample_weights": 4,
+    "no_sample_weight_column": 4,
+    "missing_declared_index": 22,
+    "sample_weight_and_rural_precondition": 7,
+    "ambiguous_raw_sample_helper_returned_none": 8,
+    "fewer_than_two_comparable_expansion_waves": 15,
+    "no_identified_refreshment_households": 21,
+    "sample_two_weight_columns_precondition": 10,
+    "missing_declared_columns": 23,
+    "optional_import_identity_environment_unset": 1,
+    "missing_pinned_comparison_totals": 1,
+    "read_retry_exhausted_exception_type_unrecorded": 1,
+    "external_replication_directory_absent": 15,
+    "legacy_derived_table_cache_gate": 10,
+    "other_country_parameter_combination": 2
+  },
+  "xfail_categories": {
+    "existing_expected_missing_sample_weights": 4,
+    "known_tenure_vocabulary_defect": 5
+  },
+  "xfails": [
+    {
+      "country": "China",
+      "category": "existing_expected_missing_sample_weights",
+      "test_function": "tests.test_sample.TestSample::test_has_weight_column"
+    },
+    {
+      "country": "Kazakhstan",
+      "category": "existing_expected_missing_sample_weights",
+      "test_function": "tests.test_sample.TestSample::test_has_weight_column"
+    },
+    {
+      "country": "Pakistan",
+      "category": "existing_expected_missing_sample_weights",
+      "test_function": "tests.test_sample.TestSample::test_has_weight_column"
+    },
+    {
+      "country": "Peru",
+      "category": "existing_expected_missing_sample_weights",
+      "test_function": "tests.test_sample.TestSample::test_has_weight_column"
+    },
+    {
+      "country": "Albania",
+      "category": "known_tenure_vocabulary_defect",
+      "test_function": "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+    },
+    {
+      "country": "Cambodia",
+      "category": "known_tenure_vocabulary_defect",
+      "test_function": "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+    },
+    {
+      "country": "Kosovo",
+      "category": "known_tenure_vocabulary_defect",
+      "test_function": "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+    },
+    {
+      "country": "Tajikistan",
+      "category": "known_tenure_vocabulary_defect",
+      "test_function": "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+    },
+    {
+      "country": "Timor-Leste",
+      "category": "known_tenure_vocabulary_defect",
+      "test_function": "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+    }
+  ],
+  "raw_cache_gate_subcategories": {
+    "also_recorded_corpus_error": 66,
+    "derived_food_parquet_gate": 32,
+    "panel_id_parquet_gate": 52
+  },
+  "raw_cache_gate_pairs": [
+    {
+      "pair": "Armenia/household_roster",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Burkina_Faso/food_expenditures",
+      "skip_count": 4,
+      "classification": "derived_food_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Burkina_Faso/food_prices",
+      "skip_count": 4,
+      "classification": "derived_food_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Burkina_Faso/food_quantities",
+      "skip_count": 4,
+      "classification": "derived_food_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Burkina_Faso/panel_ids",
+      "skip_count": 6,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Ethiopia/panel_ids",
+      "skip_count": 6,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "EthiopiaRHS/panel_ids",
+      "skip_count": 4,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "GhanaLSS/panel_ids",
+      "skip_count": 4,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Malawi/food_expenditures",
+      "skip_count": 4,
+      "classification": "derived_food_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Malawi/food_prices",
+      "skip_count": 4,
+      "classification": "derived_food_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Malawi/panel_ids",
+      "skip_count": 6,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Mali/panel_ids",
+      "skip_count": 4,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Nepal/assets",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Nepal/cluster_features",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Nepal/food_acquired",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Nepal/household_roster",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Nepal/individual_education",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Nepal/interview_date",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Nepal/sample",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Niger/panel_ids",
+      "skip_count": 4,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Nigeria/panel_ids",
+      "skip_count": 6,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Peru/food_acquired",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Peru/individual_education",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Peru/interview_date",
+      "skip_count": 6,
+      "classification": "also_recorded_corpus_error",
+      "saved_corpus_status": "error"
+    },
+    {
+      "pair": "Senegal/panel_ids",
+      "skip_count": 4,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Tanzania/food_expenditures",
+      "skip_count": 4,
+      "classification": "derived_food_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Tanzania/food_prices",
+      "skip_count": 4,
+      "classification": "derived_food_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Tanzania/food_quantities",
+      "skip_count": 4,
+      "classification": "derived_food_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Tanzania/panel_ids",
+      "skip_count": 4,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    },
+    {
+      "pair": "Uganda/panel_ids",
+      "skip_count": 4,
+      "classification": "panel_id_parquet_gate",
+      "saved_corpus_status": "success"
+    }
+  ],
+  "reason_evidence": [
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Armenia/household_roster at data_root()",
+      "full_message_sha256": "d07d5c07bf89b600e8986bb39b469159e5b869daed33e1b70f4a70ef6faaec25",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Burkina_Faso/food_expenditures at data_root()",
+      "full_message_sha256": "dae8bce5438b33e93fb72f15dc13511d8e1184be95713f5754153700aec207fa",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Burkina_Faso/food_prices at data_root()",
+      "full_message_sha256": "65b04ce7eb3930ba86c6437739ce4b8b808545aeefbf1d69275c5c74ca07bdff",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Burkina_Faso/food_quantities at data_root()",
+      "full_message_sha256": "88598041b578e79b9dc0beb4249fdd549d53d2cd41d90ea40b3eeb51876eba87",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Burkina_Faso/panel_ids at data_root()",
+      "full_message_sha256": "3ec3b338335b609b93676e2a84278988a2b3dacc9d5287648659130266724142",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Ethiopia/panel_ids at data_root()",
+      "full_message_sha256": "d7584444f819f6dd39cfa7bc88d033148e0c3ceb3295e46ab334fd076e0581aa",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for EthiopiaRHS/panel_ids at data_root()",
+      "full_message_sha256": "1d97c909d95133a3b53992838dab4241e1a6ee113e248c369422bd02b31b0d20",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for GhanaLSS/panel_ids at data_root()",
+      "full_message_sha256": "37536c55b420957394ba2c0fcb03cd13b935dd654c2cd7040e5eb8069e96a1c8",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Malawi/food_expenditures at data_root()",
+      "full_message_sha256": "4f8452c29d0043d13c725aa0f806e313cfa1c678a28e6cc7232805157a30f5a4",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Malawi/food_prices at data_root()",
+      "full_message_sha256": "41c3c4bf14347f9dd65b1dfff13f8c1c116427b626226ce65d52fd897757dd92",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Malawi/panel_ids at data_root()",
+      "full_message_sha256": "8e705cbfbceb4c694bbf0b5ba8d53d7a5e0cbe2d2d3fe98c69a30239fa3fc1ba",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Mali/panel_ids at data_root()",
+      "full_message_sha256": "d40b8d484b34b0a24a7051b8182f493259a5507fd810c4803fcac8745ab68866",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Nepal/assets at data_root()",
+      "full_message_sha256": "67558be531e8ef0946cf9983654c5567e56625bff6a16d608b7eff11b6c836e2",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Nepal/cluster_features at data_root()",
+      "full_message_sha256": "9dddff38e662bfc24ac7b5f7afb6d37c839b9f46a8910bd9cbe252667114975f",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Nepal/food_acquired at data_root()",
+      "full_message_sha256": "0aab19b04bf337576d904de3881c9fcc9bdc150616a72d5d0df363a3c5a36f18",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Nepal/household_roster at data_root()",
+      "full_message_sha256": "a3521d16f8a03e09effcadf6a7216caf23fe7062a1b1eb4b1c69241ebb8da5bd",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Nepal/individual_education at data_root()",
+      "full_message_sha256": "4d0d92e4df168b70fff76dabf2976e50ddc50f9cba14c9367bff6be9472aedef",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Nepal/interview_date at data_root()",
+      "full_message_sha256": "8850890a2d224cab7a9780a3abaaabc25c102fef18d5a5117d8dadc6d10c844e",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Nepal/sample at data_root()",
+      "full_message_sha256": "4c1aa33f947955aa2f990940135f17ffcc0574c8411d6db2705a2ceebbb3769f",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Niger/panel_ids at data_root()",
+      "full_message_sha256": "df6a1d2d2424e74974448f3deff85e7c41061fb56fc1767cc25b73a971f834f0",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Nigeria/panel_ids at data_root()",
+      "full_message_sha256": "5ad0e50ed735fb74a47b574471517d800d223b25d28915420b2db2baee3c7ee0",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Peru/food_acquired at data_root()",
+      "full_message_sha256": "a9801b515ce39aa2c04bcc258fc609ef68ab9118ec0c51e4e3f3f92c84807069",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Peru/individual_education at data_root()",
+      "full_message_sha256": "b7f3bff53b042f5900dcfcb8ab4f994a5cf6a145396ae5dd04581b2bf844283b",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 6,
+      "exact_message_prefix": "no cache for Peru/interview_date at data_root()",
+      "full_message_sha256": "2f9d8ee9fcbd98e44af0ea5dcbf472cde0ca4c5e6f621b15e00cf7122ce21cf0",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present",
+        "tests.test_table_structure.TestTableStructure::test_index_levels",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Senegal/panel_ids at data_root()",
+      "full_message_sha256": "4b7b766297634c38c942dbbd6cc3c38ea0e2064252726bf20cf3e6d96c419292",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Tanzania/food_expenditures at data_root()",
+      "full_message_sha256": "f148b03c73f92deeb1615da8cfc968a77193af913efc6d7c8adbb1dfb96f32ef",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Tanzania/food_prices at data_root()",
+      "full_message_sha256": "860c19f0053bd97e5527327ae19c38e99a588878f541117ee2a9fb7dc7b9a393",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Tanzania/food_quantities at data_root()",
+      "full_message_sha256": "e1cc6acc68f0a8e250c1f2a0b127d2b1680788ab643c1e3542de8bf6bfd62c5e",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Tanzania/panel_ids at data_root()",
+      "full_message_sha256": "700778a5dab0178fa410f51ef96ff2087ae934f980fa4f7c6cdf8053b1a14968",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "absent_at_collection_raw_cache_gate",
+      "count": 4,
+      "exact_message_prefix": "no cache for Uganda/panel_ids at data_root()",
+      "full_message_sha256": "d4fe40042d3eaac601ee0d42a707daf1bdaebf217a84ea029e3463303b09bd57",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane",
+        "tests.test_table_structure.TestTableStructure::test_no_duplicate_rows",
+        "tests.test_table_structure.TestTableStructure::test_no_fully_null_columns",
+        "tests.test_table_structure.TestTableStructure::test_readable"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "ambiguous_raw_sample_helper_returned_none",
+      "count": 8,
+      "exact_message_prefix": "no raw sample parquet to read (cold data root?)",
+      "full_message_sha256": "a2451c9406d669267a4163972bf7da13b001e0c58d509455191b0ef2f0a78e3e",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves",
+        "tests.test_sample.TestSample::test_raw_weight_scale_classes_are_unambiguous"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "explicit_microdata_unavailable_message",
+      "count": 2,
+      "exact_message_prefix": "Armenia: no microdata (CLAUDE.md \u00a7Countries Without Microdata)",
+      "full_message_sha256": "9792a808296a57e3ede7d802742b66a817bda87460374a5e236eccda53e1fe12",
+      "test_functions": [
+        "tests.test_age_dtype_consistency::test_age_dtype_is_float64",
+        "tests.test_age_dtype_consistency::test_age_no_negative_values"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "explicit_microdata_unavailable_message",
+      "count": 16,
+      "exact_message_prefix": "Nepal: microdata not available (see CLAUDE.md)",
+      "full_message_sha256": "d30e7b95218f4533d691cfc7dd72ebd3810fd0b90b02c1309ea26da3f523c550",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_covers_all_waves",
+        "tests.test_sample.TestSample::test_cross_section_weight_positive_when_panel_null",
+        "tests.test_sample.TestSample::test_has_v_column",
+        "tests.test_sample.TestSample::test_has_weight_column",
+        "tests.test_sample.TestSample::test_index_is_i_t",
+        "tests.test_sample.TestSample::test_no_duplicate_index",
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves",
+        "tests.test_sample.TestSample::test_raw_weight_scale_classes_are_unambiguous",
+        "tests.test_sample.TestSample::test_reasonable_row_count",
+        "tests.test_sample.TestSample::test_v_is_string_dtype",
+        "tests.test_sample.TestSample::test_v_mostly_populated",
+        "tests.test_sample.TestSample::test_weight_nonnegative_where_present",
+        "tests.test_sample.TestSample::test_weight_normalisation_is_idempotent",
+        "tests.test_sample.TestSample::test_weighted_ratios_unchanged_by_normalisation",
+        "tests.test_sample.TestSample::test_weighted_sum_equals_household_count",
+        "tests.test_sample.TestSample::test_weights_normalised_to_within_wave_mean_one"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "explicit_microdata_unavailable_message",
+      "count": 2,
+      "exact_message_prefix": "Nepal: no microdata (CLAUDE.md \u00a7Countries Without Microdata)",
+      "full_message_sha256": "758384f848f0b407787088cf71e9929c24144d899dc8b89e4735db479711deff",
+      "test_functions": [
+        "tests.test_age_dtype_consistency::test_age_dtype_is_float64",
+        "tests.test_age_dtype_consistency::test_age_no_negative_values"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "external_replication_directory_absent",
+      "count": 15,
+      "exact_message_prefix": "Uganda replication dir not found; set LSMS_UGANDA_REPLICATION_DIR",
+      "full_message_sha256": "f40915dcbdb6da9ee206dae4319d243e0ed804d382b903e7b8081be16bba47d2",
+      "test_functions": [
+        "tests.test_uganda_api_vs_replication::test_api_matches_replication"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Azerbaijan has 0 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "e3a1ac92c2dac23b02a8e76082c95c0dc1502f7c59785deb002d9ff3c2ab2583",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Benin has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "440ec85951e69281a104e11bc23879fb0ebb2ab1dc538ad80d893c4c5a9ca1ae",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Cambodia has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "f736d9035a770b5f73fd6f0ec16295531e074f54e4a8c43ba047d39c83381546",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "CotedIvoire has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "281d28c723e122e5c556e93745d3aed202cb4d4ac735fcb0680816868c9d95ea",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "EthiopiaRHS has 0 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "4ac2a7818b05c54355dd06f851d68edd23392d0bf84c7927cbb79487df0098db",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "GhanaSPS has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "6c6ceb46bd10a7d26595a6a8b603381a0081b1d46194f67160c4eb674cc58943",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Guatemala has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "fe809f4e51860d6a7b2cf84f9da98fce0d3792bfd0b8f480395c80ab5f215355",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Guinea-Bissau has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "2671f0cd45a91ee8d1da205324ecd6484dbeb9883d9c9956aa047e7b9b5e0246",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Guyana has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "a8a7fcee6c64a09e18e34cccacd1ea9b1868c6e2816d5aa9356e17a3b5370f65",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "India has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "82b8e459e6f6d332329e258bdb05f34c31ef506a791b1505a472bd8a1c097da6",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Kosovo has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "e4ee01f57b7ab2b8a4f39c2eaeeaac8380ef771d984d4cea5a858ae0c4290a76",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Liberia has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "f732315385927c4bed54f6b3edad74ec403d8904c8e04aa2a82f3ace76bc9a3c",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Serbia has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "1b0b7ebf1899844557257f6386f44220e6ad2ad3fca488598f779f919a1710ee",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "South Africa has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "7d60f0420e131485316d906a926565458fa54fce69749cb73e0e3a060b7a2350",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "fewer_than_two_comparable_expansion_waves",
+      "count": 1,
+      "exact_message_prefix": "Togo has 1 expansion-scale wave(s); nothing to compare",
+      "full_message_sha256": "3b1c308ef7bbaf088b3107d10d7fe8260682bfaf348dd4965022ae6ea61060ea",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 1,
+      "exact_message_prefix": "Requires cached Uganda household_characteristics (data build needed)",
+      "full_message_sha256": "d3d18b59f41bb8457d6bbfd2fc0a5fde2ee93f5eae6a037462bb315511f1e553",
+      "test_functions": [
+        "tests.test_panel_attrition::test_panel_attrition_household_characteristics_is_upper_triangular"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 1,
+      "exact_message_prefix": "Requires cached Uganda household_characteristics and income (data build needed)",
+      "full_message_sha256": "5911c0701a625115207699feb437680c16e2798e76722d7c9ccf73623f593aef",
+      "test_functions": [
+        "tests.test_panel_attrition::test_panel_attrition_consistency_between_tables"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 2,
+      "exact_message_prefix": "Uganda/food_expenditures not cached (requires data build)",
+      "full_message_sha256": "deb73f16c06201d4f051cdc16100625f09de537d4c82c81fcf41b24e3938be55",
+      "test_functions": [
+        "tests.test_uganda_tables::test_fallback_path_uses_wave_data_scheme",
+        "tests.test_uganda_tables::test_uganda_makefile_backfill"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 1,
+      "exact_message_prefix": "Uganda/food_prices not cached (requires data build)",
+      "full_message_sha256": "e90ad9f185a479f0fb37519c10d172bcff6b3e17da6c02742de438857574f0c7",
+      "test_functions": [
+        "tests.test_uganda_tables::test_uganda_makefile_backfill"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 1,
+      "exact_message_prefix": "Uganda/food_quantities not cached (requires data build)",
+      "full_message_sha256": "27f2ba0310b4de2159d510a336cdf6c12888c3a6adf4f009dece1c01aa37e2b8",
+      "test_functions": [
+        "tests.test_uganda_tables::test_uganda_makefile_backfill"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 1,
+      "exact_message_prefix": "Uganda/household_characteristics not cached (requires data build)",
+      "full_message_sha256": "13424adc6e06ca24778056bc872a260cda1bb8b96a3c6d337cf98e2e3def7113",
+      "test_functions": [
+        "tests.test_uganda_tables::test_uganda_makefile_backfill"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 1,
+      "exact_message_prefix": "food_prices.parquet not in cache",
+      "full_message_sha256": "9c7a4775af849df17076b74523fc101a40221cf79923454a89e98f5013baefe4",
+      "test_functions": [
+        "tests.test_food_prices_dtype::test_food_prices_cache_dtype_float64"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 1,
+      "exact_message_prefix": "food_quantities.parquet not in cache",
+      "full_message_sha256": "d922e28e2371b69cdc64cda4c9a366a2d3c37562eedac88432a17e7e7a74593d",
+      "test_functions": [
+        "tests.test_food_prices_dtype::test_food_quantities_cache_dtype_float64"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "legacy_derived_table_cache_gate",
+      "count": 1,
+      "exact_message_prefix": "household_characteristics parquet not cached (requires data build)",
+      "full_message_sha256": "206e86fccaff8c0d02e5e7395e89c8f6fe3064ba25897d72aee2862c929f2ec2",
+      "test_functions": [
+        "tests.test_uganda_tables::test_uganda_household_characteristics_has_m_index"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Burkina_Faso/food_expenditures has no declared columns",
+      "full_message_sha256": "dbd3e973b4e10d57b18a40cb6bf1998f98b79ae2e891ae96235e0838186eaf32",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Burkina_Faso/food_prices has no declared columns",
+      "full_message_sha256": "de8bfa12ddb15761de32f6f521c8c70ca4828b6545a6e188416a00677abf57a7",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Burkina_Faso/food_quantities has no declared columns",
+      "full_message_sha256": "9e549beb206e09513979d05cdda081e55b15b4f4577a775ef97f2c000f4e9926",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Ethiopia/nutrition has no declared columns",
+      "full_message_sha256": "6446e6edc9adc3d1e0e1a92dbe95b75f87099a627e6180c001c079fa1f7305ef",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "EthiopiaRHS/panel_ids has no declared columns",
+      "full_message_sha256": "5eaf993e592b50d0d630ebebdd70da38ddb79158cc47b12d29f67534f7921cb9",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "GhanaLSS/nutrition has no declared columns",
+      "full_message_sha256": "1ffdcb32a6f30aa96478c7a1a7b914fe9691867952932069449beeea8581a5be",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "GhanaLSS/panel_ids has no declared columns",
+      "full_message_sha256": "858d7aa46f384f547f826c77548755d214e6afde0bac3025be8b3a0f2eb4b567",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Malawi/food_expenditures has no declared columns",
+      "full_message_sha256": "1c2944e0564a8bd670158415d4e425b364bea2510ca5b572e259b89571aed5ce",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Malawi/food_prices has no declared columns",
+      "full_message_sha256": "6303ded4bfcad75bca144595f5fe3f5fb9e4dc9dbbc2f66c094b03f4b737731b",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Mali/panel_ids has no declared columns",
+      "full_message_sha256": "aeb37f61e18905e1edf95410fa0c4c7a4e0d83832e99dac4fd6d32d6fd9290ce",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Niger/panel_ids has no declared columns",
+      "full_message_sha256": "f73338dfaa409a895215372ae2df8f630498ab0336c406760248fef800efb029",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Senegal/panel_ids has no declared columns",
+      "full_message_sha256": "add11bbb403fdbafbb21bfac9c87cfa6f5fa503b846dabc3f278d7f0f29a9433",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Tanzania/food_expenditures has no declared columns",
+      "full_message_sha256": "52623117610fdd19815e8b63af1f1dc003a36c412265a0f8eb83a84e0e01ed73",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Tanzania/food_prices has no declared columns",
+      "full_message_sha256": "11f479cdf412218554246cd6b1f01ea8bd34ecc8c13fbb57b2f60628d3a90646",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Tanzania/food_quantities has no declared columns",
+      "full_message_sha256": "7278a10cba4396fd7ca8069d3be412690b360387c280116278cba8f4279c1ec2",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Tanzania/panel_ids has no declared columns",
+      "full_message_sha256": "caa98ff3f1f190243f2be75a6efe758f5efd599ba4b2b2acaf9531d345bfc036",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Uganda/assets has no declared columns",
+      "full_message_sha256": "e18aadd75f2fa279cbaf487735a51453d9237667ce03188fcffded9f32914f1d",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Uganda/enterprise_income has no declared columns",
+      "full_message_sha256": "2266bb05b3f24a02300087a28f575c63148eb1dafd554621522a5dc9fca38cbd",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Uganda/fct has no declared columns",
+      "full_message_sha256": "b532bd2090d76c92fcc046bbff367afc92d138259de24d7fa404cb281eff1840",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Uganda/interview_date has no declared columns",
+      "full_message_sha256": "081c399bff3c1be017d9ee33352fd7bd553ceccd25d07c3fd5bc73f3e9f2f855",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Uganda/nutrition has no declared columns",
+      "full_message_sha256": "6f82ca80439c4108e189904c50728e84dd1d708c5d6914d0079eef08bf4dcb5c",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Uganda/panel_ids has no declared columns",
+      "full_message_sha256": "02ce034a022ad4108360f4a3df1af588c490553db4be993f5187dad55522157b",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_columns",
+      "count": 1,
+      "exact_message_prefix": "Uganda/shocks has no declared columns",
+      "full_message_sha256": "11e663c4df232067036d1c4ef8ed54d6012ca34ddd5915a25e307ba071e349cf",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_declared_columns_present"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Burkina_Faso/food_expenditures has no declared index",
+      "full_message_sha256": "0807779ae2ebb4bbb4b4e1b307ab3dd84ae8b4e23299c89190f1d468e1277365",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Burkina_Faso/food_prices has no declared index",
+      "full_message_sha256": "2c54bd980e45879e628cab9c680a9d1d29166147ce466b2dfaea73d3b9badf87",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Burkina_Faso/food_quantities has no declared index",
+      "full_message_sha256": "5a3c31fd21d1f9b2ed45a586f9a0dbc6b0cd33cd9c3c42f22bc76be7fb05d0a4",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Ethiopia/nutrition has no declared index",
+      "full_message_sha256": "a224a5d8fa931ba0c4730324e027fc9778f0635886ab2f0cdc8e206b6912f3bc",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "EthiopiaRHS/panel_ids has no declared index",
+      "full_message_sha256": "9f2b9b077ffb0a5c3131970b14d0a384be2d7d6e627f7d25f0043489f7bb1caf",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "GhanaLSS/nutrition has no declared index",
+      "full_message_sha256": "2a70cb31104ef677ee4ebc0d425fb3654d22a2a6daa209f39ffb965ef4e98c4d",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "GhanaLSS/panel_ids has no declared index",
+      "full_message_sha256": "5b2cde597ef79f7f4812b522be1357be4b4110dda6948bef4dc01612c06e32a4",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Malawi/food_expenditures has no declared index",
+      "full_message_sha256": "591499b441e856692fd48debd882b25400e918dcc4058ac5f4496b6114653e80",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Malawi/food_prices has no declared index",
+      "full_message_sha256": "2b40be06031a7353c79b31f5770b0d2c2556e5483bad43705064da32fed0498d",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Mali/panel_ids has no declared index",
+      "full_message_sha256": "2796f13038f4dbef4f50e36e9db8d46287bb942c9e66c83f249b60033eeddf3c",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Niger/panel_ids has no declared index",
+      "full_message_sha256": "86e8a994afcc852fdecdee556f7bf4c534cb3e90a2959312c9ecf815817ff0f2",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Senegal/panel_ids has no declared index",
+      "full_message_sha256": "a729b352f56c43092c8246967c9d26d947058c83aa6e51dbef003832db988108",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Tanzania/food_expenditures has no declared index",
+      "full_message_sha256": "4f99968a731121fa969417a8328686c7d2b6c95857d115689be5a2090cc849cf",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Tanzania/food_prices has no declared index",
+      "full_message_sha256": "a4bc889d2e4f4715cc0dce4de4cc1aab55993ccebcb7a19e6b8704e3e812addb",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Tanzania/food_quantities has no declared index",
+      "full_message_sha256": "70d2f6bfd17bb552f88567b5a4830bdd49009df06dcbcb0056ba7914283ff975",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Tanzania/panel_ids has no declared index",
+      "full_message_sha256": "8151aa435431fd8009d09600be10d9e2848cff910582181807ea33720a600659",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Uganda/assets has no declared index",
+      "full_message_sha256": "f85d8083b5fddb602493dc51a548097cd1e695c81a5dff67de81516e8521c26f",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Uganda/fct has no declared index",
+      "full_message_sha256": "4ed92f736a2792291defdcafb3fa318161c1b439bae87c05316f2448994de339",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Uganda/interview_date has no declared index",
+      "full_message_sha256": "2e8402b4ab792a8d7943df6b8a0111076f39e5376bf070ad0ac25b88c04c7312",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Uganda/nutrition has no declared index",
+      "full_message_sha256": "41605787f1f4987f251da35f12c76f4a5c8bd74d27b8ae9f665f594a09f97028",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Uganda/panel_ids has no declared index",
+      "full_message_sha256": "279d3a21d682447b06037d1e5f1f105f64207f9052d3dfd0e9a83178779995bb",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_declared_index",
+      "count": 1,
+      "exact_message_prefix": "Uganda/shocks has no declared index",
+      "full_message_sha256": "d7b5c41c38c121feb2d7131d76027b8ec04bd3b1f2c738ec24cea670d580ac8f",
+      "test_functions": [
+        "tests.test_table_structure.TestTableStructure::test_index_levels"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "missing_pinned_comparison_totals",
+      "count": 1,
+      "exact_message_prefix": "no pinned totals for GhanaLSS",
+      "full_message_sha256": "49d20d82655d97b8996a9ea361f39119848745959dbad923fb3bc6452875b4a0",
+      "test_functions": [
+        "tests.test_nonfood_expenditures_schema::test_reshaping_moved_no_money"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "no_identified_refreshment_households",
+      "count": 21,
+      "exact_message_prefix": "no refreshment-sample households identified",
+      "full_message_sha256": "ea678551e66f58c93419829bdd3c599b252be6d1a9e98f289eecaa0fe4e007ca",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_cross_section_weight_positive_when_panel_null"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "no_nonnull_sample_weights",
+      "count": 4,
+      "exact_message_prefix": "no non-null weights in any wave",
+      "full_message_sha256": "5b9897159112d70226e47d2b9d8c46544d65511bcdc5b334638fbb478a17cc50",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_weights_normalised_to_within_wave_mean_one"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "no_sample_weight_column",
+      "count": 4,
+      "exact_message_prefix": "no weight column",
+      "full_message_sha256": "4dfaabafe666946d40cee801aae49183b8eba0f20f2b4de3f89e6496696a37f4",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_weighted_sum_equals_household_count"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "optional_import_identity_environment_unset",
+      "count": 1,
+      "exact_message_prefix": "set LSMS_EXPECTED_ROOT to assert which checkout is imported",
+      "full_message_sha256": "c7f2daa46ad7c6e37fb5ab8c4569159660da250ec0d2cfe5e5c7e875c3a6929e",
+      "test_functions": [
+        "tests.test_categorical_mapping_resolution::test_import_is_from_the_expected_checkout"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "other_country_parameter_combination",
+      "count": 1,
+      "exact_message_prefix": "case is for Benin",
+      "full_message_sha256": "b08a90e310021ff09455282ea4be34079e273992c8aeef14d4369e17453568a5",
+      "test_functions": [
+        "tests.test_gh323_benin_togo::test_plot_inputs_recovers_the_discarded_line_item"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "other_country_parameter_combination",
+      "count": 1,
+      "exact_message_prefix": "case is for Togo",
+      "full_message_sha256": "78a2553d58709d8ababe89eaf5bb606341d40c1981173ee44a71022bd5342724",
+      "test_functions": [
+        "tests.test_gh323_benin_togo::test_plot_inputs_recovers_the_discarded_line_item"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "read_retry_exhausted_exception_type_unrecorded",
+      "count": 1,
+      "exact_message_prefix": "interview_date.parquet vanished/rewritten mid-run (concurrent cache mutation, GH #330)",
+      "full_message_sha256": "2efaa3234f06e02463e052eaa8273d7773165c4052af0e6b3c5a27d249d3d86d",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "sample_two_weight_columns_precondition",
+      "count": 10,
+      "exact_message_prefix": "need both weight columns",
+      "full_message_sha256": "7483ddce406c89229fc798f76afecc2a162e4a93937d435d5cee39372fbf8b5e",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_cross_section_weight_positive_when_panel_null"
+      ]
+    },
+    {
+      "kind": "pytest.skip",
+      "category": "sample_weight_and_rural_precondition",
+      "count": 7,
+      "exact_message_prefix": "need weight and Rural",
+      "full_message_sha256": "078c0089271eea4ad32473ce8fe248e13d8cdc8811627275c64200dcf155b022",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_weighted_ratios_unchanged_by_normalisation"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "existing_expected_missing_sample_weights",
+      "count": 1,
+      "exact_message_prefix": "China source data has no sampling weights (genuine data limitation, not a library bug)",
+      "full_message_sha256": "629d0ac4a9a798ee2dd9f7cefaf8be4c831577f2cc1496a42e58f6c8d0813ef8",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_has_weight_column"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "existing_expected_missing_sample_weights",
+      "count": 1,
+      "exact_message_prefix": "Kazakhstan source data has no sampling weights (genuine data limitation, not a library bug)",
+      "full_message_sha256": "f294ba28e9b0a5e77822ed8b0487bfed1107ff6a6d1cdb864dfa1ed1b7492147",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_has_weight_column"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "existing_expected_missing_sample_weights",
+      "count": 1,
+      "exact_message_prefix": "Pakistan source data has no sampling weights (genuine data limitation, not a library bug)",
+      "full_message_sha256": "dfb1d228fdf14e93a151e400dd27a517be167429ce83ddc871da2e06477cdcfa",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_has_weight_column"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "existing_expected_missing_sample_weights",
+      "count": 1,
+      "exact_message_prefix": "Peru source data has no sampling weights (genuine data limitation, not a library bug)",
+      "full_message_sha256": "3d28db973235f9de1e4d8612e83d22c25eeebec840c3fac712c2598eda09ec43",
+      "test_functions": [
+        "tests.test_sample.TestSample::test_has_weight_column"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "known_tenure_vocabulary_defect",
+      "count": 1,
+      "exact_message_prefix": "GH #602: Albania/plot_features ships unharmonized tenure labels:",
+      "full_message_sha256": "a0bdd2454eb9dc3f1ef6cece00540fc1db5da65702d6ea4726e44e390021d349",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "known_tenure_vocabulary_defect",
+      "count": 1,
+      "exact_message_prefix": "GH #602: Cambodia/plot_features ships unharmonized tenure labels:",
+      "full_message_sha256": "1811e83ec20bb71e2b397a8e9d08000854d167180297d419b7d9e0a8b0490a47",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "known_tenure_vocabulary_defect",
+      "count": 1,
+      "exact_message_prefix": "GH #602: Kosovo/plot_features ships unharmonized tenure labels:",
+      "full_message_sha256": "4dd9a86d2969023da5eab5490e9f774d18ec7d6338e302554cc18bca98b3f429",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "known_tenure_vocabulary_defect",
+      "count": 1,
+      "exact_message_prefix": "GH #602: Tajikistan/plot_features ships unharmonized tenure labels:",
+      "full_message_sha256": "b7939daaeb5f2d49999b9418c86a11c7aabae500e59792644d47c269774c95f8",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+      ]
+    },
+    {
+      "kind": "pytest.xfail",
+      "category": "known_tenure_vocabulary_defect",
+      "count": 1,
+      "exact_message_prefix": "GH #602: Timor-Leste/plot_features ships unharmonized tenure labels:",
+      "full_message_sha256": "eeded50f2c3c603b8df86d0d376b272e594bc05f7430aee5c401e1d23d9301dc",
+      "test_functions": [
+        "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane"
+      ]
+    }
+  ],
+  "limits": [
+    "Skip causes are the observed messages/guards, not independent scientific validation of every asserted source limitation.",
+    "No per-test cache-state history proves which None branch the generic raw-sample helper took.",
+    "Guyana read retry catches either FileNotFoundError or ArrowInvalid; exact exception and causal writer are unrecorded.",
+    "The isolated Guyana follow-up is separate evidence and does not alter these original run counts.",
+    "JUnit counts non-strict XPASS as a testcase without a skip/failure/error; terminal summary supplies the split."
+  ]
+}

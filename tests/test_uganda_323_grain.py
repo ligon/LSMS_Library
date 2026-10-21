@@ -89,11 +89,13 @@ aws_creds_available = _conftest.aws_creds_available
 #:
 #: This module uses the MARKER, deliberately.  The skipif form freezes the
 #: credentials answer at import, and the answer can change during a session:
-#: the in-tree ``countries/.dvc/s3_creds`` is not tracked in git, it is
-#: WRITTEN at import time by the auto-unlock, so a worktree that was
-#: credential-free when conftest loaded may not be a moment later.  (Observed
-#: while verifying this PR -- a run that looked credential-free silently was
-#: not.)  The marker re-asks the question when it matters.
+#: the reader-credentials file (``<config dir>/s3_creds``) is not tracked in
+#: git, it is WRITTEN at import time by the auto-unlock, so a checkout that
+#: was credential-free when conftest loaded may not be a moment later.
+#: (Observed while verifying this PR -- a run that looked credential-free
+#: silently was not.  The file then was the in-tree
+#: ``countries/.dvc/s3_creds``, which the library no longer writes, GH #1001.)
+#: The marker re-asks the question when it matters.
 #:
 #: Per-TEST rather than a module-level ``pytestmark``: 8 of these tests build
 #: nothing, and a module mark would skip them in the credential-free job

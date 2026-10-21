@@ -1,0 +1,2713 @@
+[
+  {
+    "authority": "Current country-side ruling and its amendment match merged PR1151; the PR reports zero remaining null-key rows and exact Country/Feature additive conservation.",
+    "body_sha256": "222486e123aa9955128dbee17788990f3ee5fc450a3d451e4271fea550a91a77",
+    "comment_evidence": [
+      {
+        "body_sha256": "1b427fbb7b81b96d7430898e8ca744da375d0d071a9b9ae4345bc68a21509b63",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1008#issuecomment-6259386114"
+      },
+      {
+        "body_sha256": "cde11c274091a5fe2d7c5c6fe91d4adfd7286bd8bf7e686248281634f777fbc5",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1008#issuecomment-6274329932"
+      },
+      {
+        "body_sha256": "9bfd03cf587c207fb561edb9d5817474fedf3c3d46c527359de1661e91e5fed9",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1008#issuecomment-6281860445"
+      }
+    ],
+    "comments_count": 3,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1008,
+    "observed_at": "2026-10-21T12:28:26.321Z",
+    "pr": 1151,
+    "provider": "connected GitHub",
+    "residuals": [
+      1138,
+      1139,
+      1141,
+      1142,
+      1145
+    ],
+    "runtime": [
+      "lsms_library/countries/GhanaLSS/_/ghanalss.py",
+      "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "f184814c2cd36048168417c11fccd1405f098de6",
+        "lines": 1304,
+        "path": "lsms_library/countries/GhanaLSS/_/ghanalss.py",
+        "sha256": "7071932c1b289d2b9f25aca98d203bdcf849b0bcf0239711d598f3412189b819"
+      },
+      {
+        "blob_oid": "16c39ca4ca05cf1a7ca75ef673c104f7978f06aa",
+        "lines": 362,
+        "path": "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py",
+        "sha256": "ce78375dd416808a3f109907b6ca01d8ed6f71befe410cc493560fc6f1f4b662"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "screen_8h",
+        "line": 213,
+        "path": "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "screen_8h",
+        "line": 213,
+        "path": "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py"
+      }
+    ],
+    "scope": "Repair GhanaLSS null keys country-side, recover cover-page sample gaps without guessing, retain honest missing-unit sentinels, and apply the final screener ruling while preserving Feature delete-and-report policy.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "a497d68346f5e97bf28a6f5753af971c924837b0c724865a625d9997402770cb",
+      "head_sha": "a04fa4ae76708245f1d8a6ee1c0fe2d28b0c3531",
+      "merge_commit_sha": "d638956065491d7a140ae90e3541bbf0b9972f82",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-20T11:45:16Z",
+      "number": 1151,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1151"
+    },
+    "test_anchors": [
+      {
+        "line": 120,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_row_participation_is_exactly_the_non_null_key_groups"
+      },
+      {
+        "line": 133,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_additive_conservation_is_separate_from_visit_aggregation"
+      },
+      {
+        "line": 150,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_sentinel_u_rejoins_the_sum"
+      },
+      {
+        "line": 192,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_unit_is_never_null"
+      },
+      {
+        "line": 211,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_screener_skipped_fills_are_not_served"
+      },
+      {
+        "line": 234,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_unknown_rows_get_no_inferred_kilograms"
+      },
+      {
+        "line": 243,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_canonical_keys_are_never_null"
+      },
+      {
+        "line": 256,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_glss12_cover_page_gaps_have_a_sample_row"
+      },
+      {
+        "line": 274,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_glss12_gap_recovery_reads_the_cluster_and_refuses_to_guess"
+      },
+      {
+        "line": 308,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_glss12_sample_hook_appends_the_gap"
+      },
+      {
+        "line": 414,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_screener_gate_drops_only_no"
+      },
+      {
+        "line": 444,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_only_a_blank_code_is_unknown"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "9081517e828720904ddbdb931409a8e72dc40176",
+        "lines": 470,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "sha256": "c056d40e669def7cdad28d8891b4e64b258c32b480adc3e3204f85264606bf39"
+      }
+    ],
+    "tests": [
+      "tests/test_gh1008_ghanalss_null_keys.py"
+    ],
+    "title": "GhanaLSS Feature food assembly deletes rows with missing cluster or unit keys",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1008",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "The later quantity-aware maintainer ruling supersedes the earlier label-weight proposal; merged PR and controls follow the amendment.",
+    "body_sha256": "f7885c48c2938cc82fa92510ed413a3a4c5b528b55af03f82bbebc22d3a51366",
+    "comment_evidence": [
+      {
+        "body_sha256": "b3b0748af939ab5e6dbee1d03e32726f7c7a319283cdc1585571ab4915974c62",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1035#issuecomment-6259386300"
+      },
+      {
+        "body_sha256": "85654fc82738cdc549380ab120ae4d6e2a5190666b649ad44b29860b990f8d7c",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1035#issuecomment-6279278218"
+      }
+    ],
+    "comments_count": 2,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1035,
+    "observed_at": "2026-10-21T12:28:26.924Z",
+    "pr": 1152,
+    "provider": "connected GitHub",
+    "residuals": [
+      1144
+    ],
+    "runtime": [
+      "lsms_library/countries/Nigeria/2010-11/_/food_acquired.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "717bbb27950a04a5abbdce4886cd094384e4660f",
+        "lines": 70,
+        "path": "lsms_library/countries/Nigeria/2010-11/_/food_acquired.py",
+        "sha256": "969680d11228460ff71cd5b926b45101c22a6007f2812621673fda0dacddd63b"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "line": 29,
+        "path": "lsms_library/countries/Nigeria/2010-11/_/food_acquired.py",
+        "selector": "Quantity_kg"
+      }
+    ],
+    "runtime_symbol_anchors": [],
+    "scope": "Apply W1-PH stated mass only to positive fractional container quantities; whole-container quantities remain inferred and volume policy remains unchanged.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "8a5561d03e2ca38982144ceafdb36c8d7254d960ac249bbadb905767dd490707",
+      "head_sha": "42f08b2c8b4000007194f0fd8e9502dafa790add",
+      "merge_commit_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-20T11:45:30Z",
+      "number": 1152,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1152"
+    },
+    "test_anchors": [
+      {
+        "line": 88,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_card_table_is_the_survey_card"
+      },
+      {
+        "line": 93,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_every_sized_code_is_decoded"
+      },
+      {
+        "line": 98,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_w1_labels_state_no_weight"
+      },
+      {
+        "line": 110,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_card_labels_are_unique"
+      },
+      {
+        "line": 116,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_no_label_uses_a_thousands_separator"
+      },
+      {
+        "line": 125,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_colliding_codes_keep_their_other_wave_meanings"
+      },
+      {
+        "line": 138,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_mapping_constants_match_the_wave_script"
+      },
+      {
+        "line": 174,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_derive_rule"
+      },
+      {
+        "line": 182,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_a_fraction_can_never_equal_its_card_weight"
+      },
+      {
+        "line": 197,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_stamp_selects_exactly_the_fraction_rows_on_mass_codes"
+      },
+      {
+        "line": 218,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_stamp_refuses_a_frame_that_already_has_survey_kilograms"
+      },
+      {
+        "line": 227,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_weights_agree_with_the_surveys_w1_conversion_file"
+      },
+      {
+        "line": 267,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_the_stamp_is_on_exactly_the_derived_rows"
+      },
+      {
+        "line": 286,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_kg_ladder_on_the_sized_labels"
+      },
+      {
+        "line": 315,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "test": "test_inputs_join_to_the_served_rows"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "02eeee0cf7d088e0f4b95c09baca9c24c6c45028",
+        "lines": 333,
+        "path": "tests/test_gh1035_nigeria_w1_stated_weights.py",
+        "sha256": "6791cfea7e77b532626d2b9f3cf1e3997d211df7e64d559346648bf52c9a555a"
+      }
+    ],
+    "tests": [
+      "tests/test_gh1035_nigeria_w1_stated_weights.py"
+    ],
+    "title": "DECISION: Nigeria W1 post-harvest unit labels drop the survey-stated container weights (~3.6k rows get inferred kg instead)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1035",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Final maintainer comment explicitly marks PR1094 fixed and names separate timestamp/grain follow-ups.",
+    "body_sha256": "f42dd77bb0ee389f1ece680c837d5668e03989220e7adc8b485fb8e03bf41417",
+    "comment_evidence": [
+      {
+        "body_sha256": "79376b52525e2e87114e1ff8c1bd48e5945426c0dfc1677ad9f93f3ffdb396c3",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1037#issuecomment-6273117526"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1037,
+    "observed_at": "2026-10-21T12:28:26.951Z",
+    "pr": 1094,
+    "provider": "connected GitHub",
+    "residuals": [
+      1095,
+      1096,
+      1045
+    ],
+    "runtime": [
+      "lsms_library/countries/Nigeria/2018-19/_/interview_date.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "a9dc259b0e6b08b948e6273324789ef06d159055",
+        "lines": 47,
+        "path": "lsms_library/countries/Nigeria/2018-19/_/interview_date.py",
+        "sha256": "639e7d354d6ebb4a624eaae6e478337cd0d4a3545a96cc3e60dcd3979e9a2c8d"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "line": 9,
+        "path": "lsms_library/countries/Nigeria/2018-19/_/interview_date.py",
+        "selector": "to_datetime"
+      }
+    ],
+    "runtime_symbol_anchors": [],
+    "scope": "Recover Nigeria W4 interview timestamps and correct its declared household level without serializing a bound date method; W3 month codes also restored.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "1b8f997a1af6657fcbc1b3cf078502183839e655354fda91380ea7e0e32f168e",
+      "head_sha": "dc2a501982e1975ab379fd2e09558d931d9a883e",
+      "merge_commit_sha": "6f9202612930783e4ab9cbe0f0ed1d0856b84cf2",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T17:25:33Z",
+      "number": 1094,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1094"
+    },
+    "test_anchors": [
+      {
+        "line": 61,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_every_wave_has_a_script"
+      },
+      {
+        "line": 68,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_no_script_stores_a_bound_date_method"
+      },
+      {
+        "line": 72,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_the_detector_sees_the_old_spelling"
+      },
+      {
+        "line": 94,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_household_id_is_the_declared_i_level"
+      },
+      {
+        "line": 104,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_the_idxvars_reader_sees_the_old_level"
+      },
+      {
+        "line": 109,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_w3_reads_the_month_code_not_its_label"
+      },
+      {
+        "line": 124,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_a_label_month_is_what_failed"
+      },
+      {
+        "line": 153,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_w4_rounds_are_served"
+      },
+      {
+        "line": 162,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_int_t_is_a_datetime_and_nothing_failed_to_parse"
+      },
+      {
+        "line": 174,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_household_level_is_i"
+      },
+      {
+        "line": 180,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_w3_rounds_are_served"
+      },
+      {
+        "line": 198,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "test": "test_every_wave_parquet_is_written_on_i"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "fe61f2ef97296ab009c89413089fd204fc04cfcd",
+        "lines": 214,
+        "path": "tests/test_gh1037_nigeria_interview_date.py",
+        "sha256": "7fe4475df25acba8c0dfabb8509284ab8addc60b8ef989b371ee542f3246069c"
+      }
+    ],
+    "tests": [
+      "tests/test_gh1037_nigeria_interview_date.py"
+    ],
+    "title": "Nigeria 2018-19 interview_date stores the text of a bound method (.date without ()): every W4 dated row is dropped",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1037",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Current requested placeholder mapping, source-content investigation and final fixed-on-development comment align with the merged PR.",
+    "body_sha256": "32caf59c7bd4829a94e2815c9c793285e005d0bd8e9040aab74d55407b117031",
+    "comment_evidence": [
+      {
+        "body_sha256": "175352cdf26b87999bc33290b129e8ee33f22b616d22ce9dae8ed457af63d169",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1038#issuecomment-6267484000"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1038,
+    "observed_at": "2026-10-21T12:28:26.932Z",
+    "pr": 1053,
+    "provider": "connected GitHub",
+    "residuals": [
+      1055,
+      1056
+    ],
+    "runtime": [
+      "lsms_library/countries/Ethiopia/2018-19/_/data_info.yml",
+      "lsms_library/countries/Ethiopia/2021-22/_/data_info.yml"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "aa0953d5f699bb690d2fe4a01e8feaf870f981e2",
+        "lines": 204,
+        "path": "lsms_library/countries/Ethiopia/2018-19/_/data_info.yml",
+        "sha256": "7d3f874acb981156c52b9151559352366da07b56404b64ca2795afb514297bf0"
+      },
+      {
+        "blob_oid": "3a6e3651d019176ee0b7b5368e2cbf27d4ee1f26",
+        "lines": 276,
+        "path": "lsms_library/countries/Ethiopia/2021-22/_/data_info.yml",
+        "sha256": "f57e3099e321e579d87f0b49161de25f2a55bc52fe33e9bc2e1a7caa6f52a4f5"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "line": 204,
+        "path": "lsms_library/countries/Ethiopia/2018-19/_/data_info.yml",
+        "selector": "##N/A##"
+      },
+      {
+        "line": 216,
+        "path": "lsms_library/countries/Ethiopia/2021-22/_/data_info.yml",
+        "selector": "##N/A##"
+      }
+    ],
+    "runtime_symbol_anchors": [],
+    "scope": "Map source ##N/A## interview-time placeholders to null at their wave read; other date/visit scientific questions stay separate.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "fbd2f296f8b76bdac75eaae717b8443dc292781af6abc7ad38fcf560dedb33bb",
+      "head_sha": "b482daa316be1d91357117237df520ddd5cff36b",
+      "merge_commit_sha": "c4242f09ad7b502dbe5f219372d043ba8cd35c3b",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T12:42:52Z",
+      "number": 1053,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1053"
+    },
+    "test_anchors": [
+      {
+        "line": 51,
+        "path": "tests/test_gh1038_ethiopia_interview_date_na.py",
+        "test": "test_wave_config_maps_the_placeholder_to_null"
+      },
+      {
+        "line": 60,
+        "path": "tests/test_gh1038_ethiopia_interview_date_na.py",
+        "test": "test_wired_mapping_reaches_the_cast_without_a_placeholder"
+      },
+      {
+        "line": 82,
+        "path": "tests/test_gh1038_ethiopia_interview_date_na.py",
+        "test": "test_warm_interview_date_has_no_placeholder"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "7a78140ddfe76f11d15641aa2b682bae479cadd0",
+        "lines": 101,
+        "path": "tests/test_gh1038_ethiopia_interview_date_na.py",
+        "sha256": "4c4dca2cdfff089c7d298b43f21b5e5607c85c984b0bce4cb9a5f7cf72cb4763"
+      }
+    ],
+    "tests": [
+      "tests/test_gh1038_ethiopia_interview_date_na.py"
+    ],
+    "title": "Ethiopia interview_date carries 115 '##N/A##' placeholder strings (2018-19, 2021-22)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1038",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "The entire issue is the single Nigerian food fill site plus ledger cleanup; merged implementation and discriminating blank-unit/kg controls cover that scope.",
+    "body_sha256": "27716d68d2ac57f797774b11b3eea1e9b949ca92f16a95af7d45e853ea355400",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1041,
+    "observed_at": "2026-10-21T12:28:27.639Z",
+    "pr": 1046,
+    "provider": "connected GitHub",
+    "residuals": [],
+    "runtime": [
+      "lsms_library/countries/Nigeria/_/nigeria.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "da1114619df401bd625a2419394674f4714827f0",
+        "lines": 2713,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py",
+        "sha256": "cadfff8de66d1e95705b9abda69ccb473740b3e54d0857131a38d70d3cbc83ec"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "food_acquired_for_wave",
+        "line": 2505,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "food_acquired_for_wave",
+        "line": 2505,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py"
+      }
+    ],
+    "scope": "Replace Nigeria's missing raw food-unit literal None with U_UNKNOWN and retire that exact minted-spelling ledger entry; quantities/acquisitions remain native.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "6c67e98025a32c6b47801b0f67656b4f5d21e94942f602ea7a8ade91d233d6b2",
+      "head_sha": "b4a2058e972381935eef8b60148478ee242f119d",
+      "merge_commit_sha": "eba670f5bafda574d9d397a781da80227747553e",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:49:10Z",
+      "number": 1046,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1046"
+    },
+    "test_anchors": [
+      {
+        "line": 35,
+        "path": "tests/test_gh1041_nigeria_missing_unit.py",
+        "test": "test_source_no_longer_mints_the_none_unit"
+      },
+      {
+        "line": 42,
+        "path": "tests/test_gh1041_nigeria_missing_unit.py",
+        "test": "test_blank_unit_code_becomes_the_sentinel"
+      },
+      {
+        "line": 85,
+        "path": "tests/test_gh1041_nigeria_missing_unit.py",
+        "test": "test_no_row_is_served_the_none_unit"
+      },
+      {
+        "line": 92,
+        "path": "tests/test_gh1041_nigeria_missing_unit.py",
+        "test": "test_missing_unit_rows_get_no_kilograms"
+      },
+      {
+        "line": 96,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_raw_zero_variants_and_blanks_are_unknown"
+      },
+      {
+        "line": 107,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_raw_missing_unit_accepts_nullable_and_categorical_columns"
+      },
+      {
+        "line": 113,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_unlisted_fractional_codes_warn_and_drop_without_becoming_kg"
+      },
+      {
+        "line": 121,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_unexpected_blank_mapping_retains_each_code_identity"
+      },
+      {
+        "line": 128,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_curated_catalog_keeps_physical_sizes_counts_and_residuals"
+      },
+      {
+        "line": 149,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_sources_are_classified_separately_and_wide_prices_survive"
+      },
+      {
+        "line": 173,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_original_purchase_quantities_control_value_classification"
+      },
+      {
+        "line": 184,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_nonpurchased_negative_quantities_remain_unknown"
+      },
+      {
+        "line": 192,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_known_units_keep_quantities_expenditure_and_reported_prices"
+      },
+      {
+        "line": 204,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_duplicate_partition_precedes_aggregation_and_preserves_expenditures"
+      },
+      {
+        "line": 222,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_empty_and_nonpositive_expense_keep_existing_filter"
+      },
+      {
+        "line": 231,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_runtime_sentinel_semantics_with_working_inference_control"
+      },
+      {
+        "line": 280,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_categorical_units_without_retyping_preserve_dtype_and_prices"
+      },
+      {
+        "line": 295,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_categorical_unknown_can_become_value"
+      },
+      {
+        "line": 306,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_categorical_mixed_units_and_sources_remain_separate"
+      },
+      {
+        "line": 375,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_sentinel_spelling_gets_no_price_ratio_factor"
+      },
+      {
+        "line": 390,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_every_sentinel_spelling_is_exercised"
+      },
+      {
+        "line": 398,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_sentinel_rows_keep_survey_kilograms"
+      },
+      {
+        "line": 410,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_accepted_residual_code_receives_the_unit_pooled_factor"
+      },
+      {
+        "line": 426,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_accepted_residual_code_is_included_in_kilograms"
+      },
+      {
+        "line": 444,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_unlisted_missing_unit_spelling_keeps_its_factor_and_WARNS"
+      },
+      {
+        "line": 471,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_units_and_sentinels_do_not_warn"
+      },
+      {
+        "line": 495,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_every_classified_spelling_gets_no_price_ratio_factor"
+      },
+      {
+        "line": 728,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_the_sweep_catches_each_minting_idiom"
+      },
+      {
+        "line": 741,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_the_sweep_ignores_what_is_not_a_minted_unit"
+      },
+      {
+        "line": 745,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_the_sweep_sees_the_known_minting_sites"
+      },
+      {
+        "line": 761,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_no_unclassified_missing_unit_spelling_is_minted"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "358a812b2be1a679dfa58078edc6a42dda1ca23d",
+        "lines": 104,
+        "path": "tests/test_gh1041_nigeria_missing_unit.py",
+        "sha256": "8d23267c848a77486aeec71d4568364c1cfd0d2b43e0461b6c99d64e48aab380"
+      },
+      {
+        "blob_oid": "ba216fd06d1e84b95d8b107c5be5e7b61de35139",
+        "lines": 778,
+        "path": "tests/test_962_unit_sentinel.py",
+        "sha256": "68490e8a74b2faee557609f44e827d3f37a491cbee0c94add70e367c94b8b7ec"
+      }
+    ],
+    "tests": [
+      "tests/test_gh1041_nigeria_missing_unit.py",
+      "tests/test_962_unit_sentinel.py"
+    ],
+    "title": "Nigeria food_acquired writes u='None' for a missing unit (nigeria.py:2447); 422 priced rows get pooled price-ratio kg",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1041",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Final maintainer comment says fixed after three red-team rounds and the six rulings, with all remaining work filed separately.",
+    "body_sha256": "6fc3c67a08a0df3d424da9c89ab5b81cae0078d812df13833d6cd944773633d4",
+    "comment_evidence": [
+      {
+        "body_sha256": "5f72c21b56f0d47c6719235fe1129b15eeb0f748c204b69cea19c3af2fe7e6ed",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1042#issuecomment-6259082574"
+      },
+      {
+        "body_sha256": "3fa58911987dee004ad90f2050d47d2d2884bf1e330e2599f971c0ee4995c15e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1042#issuecomment-6270142654"
+      }
+    ],
+    "comments_count": 2,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1042,
+    "observed_at": "2026-10-21T12:28:27.773Z",
+    "pr": 1076,
+    "provider": "connected GitHub",
+    "residuals": [
+      1072,
+      1073,
+      1074,
+      1075
+    ],
+    "runtime": [
+      "lsms_library/countries/GhanaLSS/_/ghanalss.py",
+      "lsms_library/countries/GhanaLSS/_/unit_labels.org",
+      "lsms_library/countries/Malawi/_/malawi.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "f184814c2cd36048168417c11fccd1405f098de6",
+        "lines": 1304,
+        "path": "lsms_library/countries/GhanaLSS/_/ghanalss.py",
+        "sha256": "7071932c1b289d2b9f25aca98d203bdcf849b0bcf0239711d598f3412189b819"
+      },
+      {
+        "blob_oid": "023d4eb3bc5e91ad856e5e1e1385e57d50671591",
+        "lines": 121,
+        "path": "lsms_library/countries/GhanaLSS/_/unit_labels.org",
+        "sha256": "e225c9d829ec329ff9766419bc94d6baaed04447760cb549ec43fd7a983da15c"
+      },
+      {
+        "blob_oid": "f0e697d4f2b7b5599bc434eaa1e23061d6981397",
+        "lines": 4067,
+        "path": "lsms_library/countries/Malawi/_/malawi.py",
+        "sha256": "f9a361c755fdef551eff28269a9f69caad36e3d5e5edb31d599d757585a5b86b"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "unrecorded_unit_to_count",
+        "line": 862,
+        "path": "lsms_library/countries/GhanaLSS/_/ghanalss.py"
+      },
+      {
+        "function": "_clean_freetext_unit",
+        "line": 74,
+        "path": "lsms_library/countries/Malawi/_/malawi.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "unrecorded_unit_to_count",
+        "line": 862,
+        "path": "lsms_library/countries/GhanaLSS/_/ghanalss.py"
+      },
+      {
+        "function": "_clean_freetext_unit",
+        "line": 74,
+        "path": "lsms_library/countries/Malawi/_/malawi.py"
+      }
+    ],
+    "scope": "Implement questionnaire-backed GhanaLSS/Malawi unit corrections and all six subsequent rulings; retain authoritative survey-kg values and explicitly separate unresolved nutrition/unit decisions.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "6f1093252a8fb90c9ffdc3482aca05fda2de5f23a30a803a7b962696ab82c0eb",
+      "head_sha": "d2238ba1a0ee06715adb6408d69232ee2d3f5a77",
+      "merge_commit_sha": "200e504a3869ef4755085f9a448b93df0493dd21",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T14:51:50Z",
+      "number": 1076,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1076"
+    },
+    "test_anchors": [
+      {
+        "line": 107,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_ghanalss_unit_labels_map_none_to_the_sentinel"
+      },
+      {
+        "line": 118,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_na_specify_text_is_the_sentinel"
+      },
+      {
+        "line": 122,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_na_does_not_fall_back_to_other_specify"
+      },
+      {
+        "line": 140,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_other_specify_code"
+      },
+      {
+        "line": 146,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_non_informative_specify_text_is_blank"
+      },
+      {
+        "line": 150,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_code23_boundary"
+      },
+      {
+        "line": 166,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_other_specify_to_unknown_without_specify_text"
+      },
+      {
+        "line": 175,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_wave_scripts_route_through_the_helper"
+      },
+      {
+        "line": 192,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_u_table_decodes_ihs3_codes_per_the_questionnaire"
+      },
+      {
+        "line": 203,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_2013_14_does_not_decode_codes_ihps_does_not_print"
+      },
+      {
+        "line": 211,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_delivered_rows_carry_the_sentinel_and_no_inferred_kg"
+      },
+      {
+        "line": 259,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_ghanalss_count_unit_scope_is_glss5_and_glss6_chicken_egg_coconut"
+      },
+      {
+        "line": 272,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_ghanalss_count_unit_relabel_is_scoped_and_lossless"
+      },
+      {
+        "line": 297,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_ghanalss_chicken_count_rows_get_a_plausible_bird_weight"
+      },
+      {
+        "line": 332,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_food_named_specify_text_is_a_food"
+      },
+      {
+        "line": 342,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_unit_specify_text_is_not_a_food"
+      },
+      {
+        "line": 349,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_code23_food_text_goes_to_the_sentinel"
+      },
+      {
+        "line": 361,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_malawi_2010_11_code_03_records_no_unit"
+      },
+      {
+        "line": 384,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_food_kg_factors_no_kg_refuses_inferred_kilograms_only"
+      },
+      {
+        "line": 422,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_no_kg_factor_yml_needs_a_reason"
+      },
+      {
+        "line": 483,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_ghanalss_declares_every_egg_count_unit_no_kg"
+      },
+      {
+        "line": 494,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "test": "test_ghanalss_eggs_are_counted_and_get_no_inferred_kilograms"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "aec3a7aa3bf14f12a88d57e3ae6f07a916ebf768",
+        "lines": 528,
+        "path": "tests/test_gh1042_missing_unit_spellings.py",
+        "sha256": "b2e7458abb8fa73b671b563fb5f577a46070f233bb6e629bbb63736f8cd89b9b"
+      }
+    ],
+    "tests": [
+      "tests/test_gh1042_missing_unit_spellings.py"
+    ],
+    "title": "Check GhanaLSS u='None' (2,508 rows) and Malawi u='N/A' (43 rows) against the questionnaires; both get inferred kg today",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1042",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Both requested defect classes are covered by merged PR1094 and named negative controls; final maintainer comment explicitly marks fixed.",
+    "body_sha256": "a427010dc58cc955efca019db6b8258a26cefc1b7ccfcc28d15ad34d1a8c3596",
+    "comment_evidence": [
+      {
+        "body_sha256": "79376b52525e2e87114e1ff8c1bd48e5945426c0dfc1677ad9f93f3ffdb396c3",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1047#issuecomment-6273117845"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1047,
+    "observed_at": "2026-10-21T12:28:29.903Z",
+    "pr": 1094,
+    "provider": "connected GitHub",
+    "residuals": [
+      1095,
+      1096,
+      1045
+    ],
+    "runtime": [
+      "lsms_library/countries/Nigeria/_/nigeria.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "da1114619df401bd625a2419394674f4714827f0",
+        "lines": 2713,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py",
+        "sha256": "cadfff8de66d1e95705b9abda69ccb473740b3e54d0857131a38d70d3cbc83ec"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "food_acquired_for_wave",
+        "line": 2505,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "food_acquired_for_wave",
+        "line": 2505,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py"
+      }
+    ],
+    "scope": "Normalize retained raw Nigerian unit codes, fill absent crop/input unit identity with Unknown at the correct stage, and preserve labelled paths.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "1b8f997a1af6657fcbc1b3cf078502183839e655354fda91380ea7e0e32f168e",
+      "head_sha": "dc2a501982e1975ab379fd2e09558d931d9a883e",
+      "merge_commit_sha": "6f9202612930783e4ab9cbe0f0ed1d0856b84cf2",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T17:25:33Z",
+      "number": 1094,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1094"
+    },
+    "test_anchors": [
+      {
+        "line": 65,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_unlisted_food_code_is_an_integer_string"
+      },
+      {
+        "line": 114,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_crop_unit_blank_or_unplaceable_is_unknown"
+      },
+      {
+        "line": 128,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_a_raw_crop_code_would_be_relabelled_as_a_food_unit"
+      },
+      {
+        "line": 141,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_an_unplaceable_unit_label_is_reported_not_silently_unknown"
+      },
+      {
+        "line": 159,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_missing_units_raise_no_report"
+      },
+      {
+        "line": 176,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_input_only_units_are_placed_and_kept_out_of_canon_unit"
+      },
+      {
+        "line": 184,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_metric_cup_is_the_u_tables_own_label"
+      },
+      {
+        "line": 207,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_plot_inputs_unit_is_nan_only_without_an_amount_and_is_filled_after_the_collapse"
+      },
+      {
+        "line": 241,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_crop_frame_without_a_unit_column_is_unknown"
+      },
+      {
+        "line": 280,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_no_food_unit_is_float_stringified"
+      },
+      {
+        "line": 288,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_no_crop_row_has_a_nan_unit"
+      },
+      {
+        "line": 301,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "test": "test_no_plot_input_has_a_nan_unit"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "9488421a35546d9684bb62b562b5393d1f3d14b6",
+        "lines": 321,
+        "path": "tests/test_gh1047_nigeria_unit_codes.py",
+        "sha256": "83b6238261b95ce8541e3a9c02f08e28680b79bd4d7efd343e86574eaab214e7"
+      }
+    ],
+    "tests": [
+      "tests/test_gh1047_nigeria_unit_codes.py"
+    ],
+    "title": "Nigeria: float-stringified raw unit code ('65.0') served as u; crop_production 2011Q1 has NaN u",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1047",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Final maintainer comment explicitly marks fixed; source metadata distinguishes parcel measurement/area from actual coordinates and the PR records red-team corrections.",
+    "body_sha256": "aa5c50c9d0d1b6b9d6a4eecc816e993d49c6bb1fa5644d3a08708310c3af6cd9",
+    "comment_evidence": [
+      {
+        "body_sha256": "21874b653d9401366d2979b4296dbff70b0d505a3b25e721c4553bebd79e44f0",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1050#issuecomment-6267484306"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1050,
+    "observed_at": "2026-10-21T12:28:28.510Z",
+    "pr": 1054,
+    "provider": "connected GitHub",
+    "residuals": [
+      1057,
+      1058,
+      1059,
+      1060
+    ],
+    "runtime": [
+      "lsms_library/countries/Burkina_Faso/2018-19/_/data_info.yml",
+      "lsms_library/countries/Burkina_Faso/2014/_/data_info.yml"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "171994e3efe245f88b2d82c0e27faae3fea79085",
+        "lines": 366,
+        "path": "lsms_library/countries/Burkina_Faso/2018-19/_/data_info.yml",
+        "sha256": "5094fd8dc10a44c4d14cb28954f9bf1a7f032a1bc51f18d85f9b4e9587594a73"
+      },
+      {
+        "blob_oid": "916a479884f0417c938181df351cf40fe47dddd2",
+        "lines": 253,
+        "path": "lsms_library/countries/Burkina_Faso/2014/_/data_info.yml",
+        "sha256": "a5c2a5862da455f23ef4e3bf423426101a93b6288578c3f93caab0e1a70c6d5a"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "line": 136,
+        "path": "lsms_library/countries/Burkina_Faso/2018-19/_/data_info.yml",
+        "selector": "coordonnes_gps__Latitude"
+      }
+    ],
+    "runtime_symbol_anchors": [],
+    "scope": "Wire the actual 2018-19 Burkina Faso GPS fields, remove the impossible 2014 sub-source, retain optionality only for waves without coordinates, and preserve geographic attributes.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "37459a714d1101f3d43b578fe7f5dfa2edd5a7f8f7cd7dbea4c80e9c2c0deb39",
+      "head_sha": "71435f93275ee1f85dd5a2e342e9b628e87ee1f7",
+      "merge_commit_sha": "2b077d11d698608ea917e5145b4cb4ab0ccc5256",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T12:42:56Z",
+      "number": 1054,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1054"
+    },
+    "test_anchors": [
+      {
+        "line": 119,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_2018_19_geo_subdf_maps_the_coordonnes_gps_columns"
+      },
+      {
+        "line": 129,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_2014_declares_no_geo_subdf"
+      },
+      {
+        "line": 138,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_no_wave_asks_for_lat_dd_mod"
+      },
+      {
+        "line": 146,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_optional_matches_the_waves_that_lack_gps"
+      },
+      {
+        "line": 170,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_2018_19_gps_file_is_one_fix_per_grappe"
+      },
+      {
+        "line": 183,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_2014_agri_gps_file_has_no_coordinate"
+      },
+      {
+        "line": 196,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_2021_22_household_gps_file_is_blank"
+      },
+      {
+        "line": 229,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_2018_19_clusters_carry_gps"
+      },
+      {
+        "line": 240,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_waves_without_gps_are_served_empty_not_invented"
+      },
+      {
+        "line": 248,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "test": "test_2018_19_gps_merge_is_lossless"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "2cbb4421e943321583617f92b7c98a61f74ab92f",
+        "lines": 256,
+        "path": "tests/test_burkina_faso_cluster_gps.py",
+        "sha256": "9e0146047e5d712d8cb9d4a72bac3b3c60718c899cb8d4caf1472c1c2cc62ec7"
+      }
+    ],
+    "tests": [
+      "tests/test_burkina_faso_cluster_gps.py"
+    ],
+    "title": "Burkina Faso cluster_features served without GPS: df_geo asks for lat_dd_mod/lon_dd_mod, which neither 2014 nor 2018-19 file carries (optional: true hides it)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1050",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Final maintainer comment explicitly marks PR1147 fixed; _coverage_skip_reason supplies the requested footer-only guard.",
+    "body_sha256": "ab606cd5fc5e350f4dcb82016d363c142cb88aba32580e14405a704b23dbab0d",
+    "comment_evidence": [
+      {
+        "body_sha256": "1e833390734692f0f110a49c3c9993e8e25e9e371d863c32bfa9a50422b1be92",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1113#issuecomment-6288674798"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1113,
+    "observed_at": "2026-10-21T12:28:32.856Z",
+    "pr": 1147,
+    "provider": "connected GitHub",
+    "residuals": [
+      1146
+    ],
+    "runtime": [
+      "tests/test_uganda_invariance.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "42f3d1dac904f5df6136f539d0c753ecf467c4de",
+        "lines": 255,
+        "path": "tests/test_uganda_invariance.py",
+        "sha256": "fd3a1ef979a65d3da0a8b5e60c365a92a0a941b50d998fc2057a6ba4ca4f2712"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "_coverage_skip_reason",
+        "line": 151,
+        "path": "tests/test_uganda_invariance.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "_coverage_skip_reason",
+        "line": 151,
+        "path": "tests/test_uganda_invariance.py"
+      }
+    ],
+    "scope": "Skip raw Uganda country-parquet invariance comparison when its coverage manifest is partial, preserving the full-coverage baseline test and structural checks.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "424251d92c95ffe425b5d3b589abdc8f4b8f5008e4dc8b5c30319049e6f2e16f",
+      "head_sha": "5df842f062f189cee0afab9b2061faa2a58a98a0",
+      "merge_commit_sha": "1485a1484d1fc3d5a1246bc3a567ef7cf2765115",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-20T10:17:12Z",
+      "number": 1147,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1147"
+    },
+    "test_anchors": [
+      {
+        "line": 182,
+        "path": "tests/test_uganda_invariance.py",
+        "test": "test_parquet_matches_baseline"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "42f3d1dac904f5df6136f539d0c753ecf467c4de",
+        "lines": 255,
+        "path": "tests/test_uganda_invariance.py",
+        "sha256": "fd3a1ef979a65d3da0a8b5e60c365a92a0a941b50d998fc2057a6ba4ca4f2712"
+      }
+    ],
+    "tests": [
+      "tests/test_uganda_invariance.py"
+    ],
+    "title": "test_uganda_invariance reads the raw L2 parquet, so a cold Uganda cache plus a concurrent single-wave call fails it (#891 coverage manifest)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1113",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Explicit final maintainer !=2 ruling is implemented in screen_8h and pinned by the discriminating drop-only-No test.",
+    "body_sha256": "59b5a96e18c060e492e014547d57cc8004fa9d99951496c285f0a22ab3aea306",
+    "comment_evidence": [
+      {
+        "body_sha256": "6c0d302e55d4bd2d8c689809a4b672d4404eaa83925da8651335025d652b5db4",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1140#issuecomment-6281860259"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 1140,
+    "observed_at": "2026-10-21T12:28:35.920Z",
+    "pr": 1151,
+    "provider": "connected GitHub",
+    "residuals": [
+      1145
+    ],
+    "runtime": [
+      "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "16c39ca4ca05cf1a7ca75ef673c104f7978f06aa",
+        "lines": 362,
+        "path": "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py",
+        "sha256": "ce78375dd416808a3f109907b6ca01d8ed6f71befe410cc493560fc6f1f4b662"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "screen_8h",
+        "line": 213,
+        "path": "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "screen_8h",
+        "line": 213,
+        "path": "lsms_library/countries/GhanaLSS/2016-17/_/food_acquired.py"
+      }
+    ],
+    "scope": "Drop only explicit No in GhanaLSS 2016-17 own-production screener; retain blank-screener real answers. Sibling-wave measurement is separate.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "a497d68346f5e97bf28a6f5753af971c924837b0c724865a625d9997402770cb",
+      "head_sha": "a04fa4ae76708245f1d8a6ee1c0fe2d28b0c3531",
+      "merge_commit_sha": "d638956065491d7a140ae90e3541bbf0b9972f82",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-20T11:45:16Z",
+      "number": 1151,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1151"
+    },
+    "test_anchors": [
+      {
+        "line": 120,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_row_participation_is_exactly_the_non_null_key_groups"
+      },
+      {
+        "line": 133,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_additive_conservation_is_separate_from_visit_aggregation"
+      },
+      {
+        "line": 150,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_sentinel_u_rejoins_the_sum"
+      },
+      {
+        "line": 192,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_unit_is_never_null"
+      },
+      {
+        "line": 211,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_screener_skipped_fills_are_not_served"
+      },
+      {
+        "line": 234,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_unknown_rows_get_no_inferred_kilograms"
+      },
+      {
+        "line": 243,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_canonical_keys_are_never_null"
+      },
+      {
+        "line": 256,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_glss12_cover_page_gaps_have_a_sample_row"
+      },
+      {
+        "line": 274,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_glss12_gap_recovery_reads_the_cluster_and_refuses_to_guess"
+      },
+      {
+        "line": 308,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_glss12_sample_hook_appends_the_gap"
+      },
+      {
+        "line": 414,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_screener_gate_drops_only_no"
+      },
+      {
+        "line": 444,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "test": "test_ghanalss_2016_17_only_a_blank_code_is_unknown"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "9081517e828720904ddbdb931409a8e72dc40176",
+        "lines": 470,
+        "path": "tests/test_gh1008_ghanalss_null_keys.py",
+        "sha256": "c056d40e669def7cdad28d8891b4e64b258c32b480adc3e3204f85264606bf39"
+      }
+    ],
+    "tests": [
+      "tests/test_gh1008_ghanalss_null_keys.py"
+    ],
+    "title": "DECISION (#1008 residual d): GhanaLSS 2016-17 8H screener gate: confirm `s8hq1 == 1` or switch to `s8hq1 != 2`",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1140",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Maintainer comment explicitly says PR1023 resolves the collision and corrects the original counts.",
+    "body_sha256": "dee94262972d4bbc2b69dc2952bce23ea4d643ae6d093a55ba2269609db09f29",
+    "comment_evidence": [
+      {
+        "body_sha256": "8a1347b480f32d200dd44316d9e5e1867742b088933abaa94ef33ff3e5d98c80",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/607#issuecomment-6246272180"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 607,
+    "observed_at": "2026-10-21T12:28:21.487Z",
+    "pr": 1023,
+    "provider": "connected GitHub",
+    "residuals": [
+      1033,
+      1034
+    ],
+    "runtime": [
+      "lsms_library/countries/Nigeria/_/nigeria.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "da1114619df401bd625a2419394674f4714827f0",
+        "lines": 2713,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py",
+        "sha256": "cadfff8de66d1e95705b9abda69ccb473740b3e54d0857131a38d70d3cbc83ec"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "food_unit_labels",
+        "line": 2478,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "food_unit_labels",
+        "line": 2478,
+        "path": "lsms_library/countries/Nigeria/_/nigeria.py"
+      }
+    ],
+    "scope": "Wave-aware Nigerian food-unit decoding, with the corrected W2 centilitre interpretation; residual size/rare-code/stated-weight tasks are separate.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "22f00f7b3efe48fbc258edfc405c88d8025586ed2552a38a6e2eb841a7a6cbb7",
+      "head_sha": "70d88ff1cde503792801de473087e2711e8c4c57",
+      "merge_commit_sha": "6f2fc7259b176d6bd4035abf79d5782f0d1ebbfa",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:44:30Z",
+      "number": 1023,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1023"
+    },
+    "test_anchors": [
+      {
+        "line": 45,
+        "path": "tests/test_nigeria_food_unit_decode.py",
+        "test": "test_round_maps_to_its_wave"
+      },
+      {
+        "line": 50,
+        "path": "tests/test_nigeria_food_unit_decode.py",
+        "test": "test_decode_reads_the_waves_own_column"
+      },
+      {
+        "line": 87,
+        "path": "tests/test_nigeria_food_unit_decode.py",
+        "test": "test_decode_agrees_with_the_dta_labels"
+      },
+      {
+        "line": 92,
+        "path": "tests/test_nigeria_food_unit_decode.py",
+        "test": "test_w2_code_4_is_centilitre_not_millilitre"
+      },
+      {
+        "line": 129,
+        "path": "tests/test_nigeria_food_unit_decode.py",
+        "test": "test_no_round_serves_another_waves_unit"
+      },
+      {
+        "line": 137,
+        "path": "tests/test_nigeria_food_unit_decode.py",
+        "test": "test_w1_millilitre_is_served_as_ml"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "1057573967398d29cefc3f61e119112defcf5570",
+        "lines": 140,
+        "path": "tests/test_nigeria_food_unit_decode.py",
+        "sha256": "165f0fc6cc9d024ed0a4a64828d4fc0cbd5076055966bf23e7fb624c768062f5"
+      }
+    ],
+    "tests": [
+      "tests/test_nigeria_food_unit_decode.py"
+    ],
+    "title": "Nigeria unit codes collide ACROSS WAVES but decode is wave-blind \u2014 53,142 rows (19.1%) mislabelled, incl. a hard 10x kg error (ml decoded as cl)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/607",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Two maintainer rulings narrow the implementation; the final comment explicitly marks this issue fixed pending release.",
+    "body_sha256": "18d023684c68203b368178916ebe4e202433011f96a9db6c4d0a23222181542c",
+    "comment_evidence": [
+      {
+        "body_sha256": "fa264bf418a3c2a45df531d3a905d7b4a663bb61441cb82ed5c05597613b904c",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/805#issuecomment-6259384402"
+      },
+      {
+        "body_sha256": "90d8e5029337929a20be9fa8d6f916beb947dcb48333683533ee0b3105aa0e63",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/805#issuecomment-6272303508"
+      },
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/805#issuecomment-6277583047"
+      }
+    ],
+    "comments_count": 3,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 805,
+    "observed_at": "2026-10-21T12:28:22.719Z",
+    "pr": 1105,
+    "provider": "connected GitHub",
+    "residuals": [],
+    "runtime": [
+      "lsms_library/local_tools.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "3cf58b7629fc84afc664769de01f41899e67d718",
+        "lines": 4288,
+        "path": "lsms_library/local_tools.py",
+        "sha256": "de2a4075128967eba0d832c9b442e47c7d5da943e561d52cbfaac5543aaf5818"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "_redecode_cp1252",
+        "line": 1562,
+        "path": "lsms_library/local_tools.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "_redecode_cp1252",
+        "line": 1562,
+        "path": "lsms_library/local_tools.py"
+      }
+    ],
+    "scope": "Accepted narrowed per-file cp1252 verdict for pre-118 Stata with no explicit encoding; UTF-8 double encodings, DOS files and format118 remain outside the accepted correction.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+      "head_sha": "03d04a9e015be53c0de7aec34723f9ffb772db22",
+      "merge_commit_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T21:21:02Z",
+      "number": 1105,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1105"
+    },
+    "test_anchors": [
+      {
+        "line": 52,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_cp1252_str_column_is_decoded_and_dtype_kept"
+      },
+      {
+        "line": 63,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_cp1252_value_labels_are_decoded_in_frame_and_in_categories"
+      },
+      {
+        "line": 76,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_ellipsis_label_survives_strip"
+      },
+      {
+        "line": 88,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_utf8_double_encoding_is_left_alone"
+      },
+      {
+        "line": 98,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_dos_code_page_file_is_refused_whole"
+      },
+      {
+        "line": 107,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_cp1252_hole_refuses_the_file"
+      },
+      {
+        "line": 115,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_a_refusing_label_in_an_unused_value_label_still_refuses"
+      },
+      {
+        "line": 133,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_truncated_double_encoding_is_not_a_candidate"
+      },
+      {
+        "line": 149,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_truncated_double_does_not_decide_or_join_the_file_verdict"
+      },
+      {
+        "line": 155,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_truncated_double_label_is_served_untouched"
+      },
+      {
+        "line": 172,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_clean_file_is_byte_identical_and_returned_unchanged"
+      },
+      {
+        "line": 180,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_explicit_encoding_disables_the_redecode"
+      },
+      {
+        "line": 186,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_format_118_is_out_of_scope"
+      },
+      {
+        "line": 194,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_release_sniff"
+      },
+      {
+        "line": 201,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_predicate_classes"
+      },
+      {
+        "line": 231,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_ehcvm1_roster_label_is_served_decoded"
+      },
+      {
+        "line": 238,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_nigeria_truncated_double_label_is_untouched"
+      },
+      {
+        "line": 245,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "test": "test_albania_dos_district_names_are_untouched"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "c5ca33afe52e74d2cbcfc0111de00d6e7b78c598",
+        "lines": 247,
+        "path": "tests/test_gh805_cp1252_reader.py",
+        "sha256": "46c8b752c7977152d8fbb190f7249ce79a310183cbab382abdc45f3fb03cd4b9"
+      }
+    ],
+    "tests": [
+      "tests/test_gh805_cp1252_reader.py"
+    ],
+    "title": "get_dataframe decodes every pre-118 .dta as Latin-1; cp1252 files (EHCVM-1 2018-19 s01_me_*) serve C1 controls for oe/euro/quotes -- 1,501 C1-signature labels corpus-wide",
+    "unfiled_residuals": [
+      "805-a DOS-code-page class",
+      "805-b format118 class"
+    ],
+    "url": "https://github.com/ligon/LSMS_Library/issues/805",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Current remaining-policy body plus explicit option(b) ruling and final fixed-on-development comment.",
+    "body_sha256": "c1279919e93f3b32fe0530ab95d384679ae98cc2608363fe30cfdd408da02e98",
+    "comment_evidence": [
+      {
+        "body_sha256": "95e9c704fd4abebde1ddf05c37e3d107833573b7ae1d49b0436cd99288700d35",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/831#issuecomment-6259384585"
+      },
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/831#issuecomment-6277583476"
+      }
+    ],
+    "comments_count": 2,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 831,
+    "observed_at": "2026-10-21T12:28:22.869Z",
+    "pr": 1105,
+    "provider": "connected GitHub",
+    "residuals": [],
+    "runtime": [
+      "lsms_library/local_tools.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "3cf58b7629fc84afc664769de01f41899e67d718",
+        "lines": 4288,
+        "path": "lsms_library/local_tools.py",
+        "sha256": "de2a4075128967eba0d832c9b442e47c7d5da943e561d52cbfaac5543aaf5818"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "_refuse_intree_source",
+        "line": 909,
+        "path": "lsms_library/local_tools.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "_refuse_intree_source",
+        "line": 909,
+        "path": "lsms_library/local_tools.py"
+      }
+    ],
+    "scope": "Refuse sidecar-less in-tree survey sources unless an acquisition context or explicit environment opt-in authorizes them.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+      "head_sha": "03d04a9e015be53c0de7aec34723f9ffb772db22",
+      "merge_commit_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T21:21:02Z",
+      "number": 1105,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1105"
+    },
+    "test_anchors": [
+      {
+        "line": 56,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_sidecar_less_intree_source_is_refused_with_an_actionable_error"
+      },
+      {
+        "line": 70,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_the_wave_script_relative_path_is_refused_too"
+      },
+      {
+        "line": 78,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_env_opt_in_reads_it"
+      },
+      {
+        "line": 85,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_env_flag_must_say_yes"
+      },
+      {
+        "line": 91,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_context_opt_in_reads_it_and_is_scoped"
+      },
+      {
+        "line": 99,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_lookup_table_under_underscore_dir_is_exempt"
+      },
+      {
+        "line": 104,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_file_outside_the_config_tree_is_unaffected"
+      },
+      {
+        "line": 109,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_get_data_file_intree_hit_is_refused_on_the_wb_branch"
+      },
+      {
+        "line": 130,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_acquisition_entry_points_run_inside_the_opt_in"
+      },
+      {
+        "line": 156,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "test": "test_a_sidecar_backed_workspace_copy_is_not_this_policy"
+      },
+      {
+        "line": 38,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_sidecarless_and_sidecar_beside_are_told_apart"
+      },
+      {
+        "line": 58,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_clean_tree_reports_nothing"
+      },
+      {
+        "line": 66,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_git_tracked_and_underscore_dir_files_are_sources_not_strays"
+      },
+      {
+        "line": 98,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_git_tracking_nothing_under_the_root_is_not_consulted"
+      },
+      {
+        "line": 139,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_the_real_tree_consults_git_and_excludes_its_tracked_csvs"
+      },
+      {
+        "line": 158,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_root_level_wave_dirs_are_swept_regardless_of_country"
+      },
+      {
+        "line": 173,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_cache_clear_prints_both_classes"
+      },
+      {
+        "line": 203,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_cache_clear_is_silent_on_a_clean_tree"
+      },
+      {
+        "line": 225,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "test": "test_no_cli_symbol_reaches_any_build_fingerprint"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "78a4c3035f329748182d123e77bbcc6d96faa55f",
+        "lines": 162,
+        "path": "tests/test_gh831_intree_source_policy.py",
+        "sha256": "eaeebbecef084572e6efbcea132ee6434a2fb33fcf18f4baeeb999057dd3bcac"
+      },
+      {
+        "blob_oid": "1cad7f05c0c779f7f1cec5bc1bbe0bf65229854b",
+        "lines": 239,
+        "path": "tests/test_gh831_cache_clear_intree_sources.py",
+        "sha256": "9f438d29ce8167ea2bf823244cbec511b7f7b42ddcae9fd86c76a3e447071f91"
+      }
+    ],
+    "tests": [
+      "tests/test_gh831_intree_source_policy.py",
+      "tests/test_gh831_cache_clear_intree_sources.py"
+    ],
+    "title": "Decide sidecar-less in-tree source read policy",
+    "url": "https://github.com/ligon/LSMS_Library/issues/831",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Amended maintainer ruling accepts finer grain and disclosed sentinel meanings; final comment explicitly marks fixed with separate residuals.",
+    "body_sha256": "06abfb571390723e06963ae84dfb59f1da028c73c16bfcf1a6f91053bba2a281",
+    "comment_evidence": [
+      {
+        "body_sha256": "76a0a1d88c7fc8938124a945cb55f6a05374aaabc1e0529fbbc7c87463b7e3e3",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/840#issuecomment-6259384786"
+      },
+      {
+        "body_sha256": "1d7ac1f5caacf03ff86c6aa09322993381421048ed27c51e8e56b300a46e07ff",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/840#issuecomment-6272303075"
+      },
+      {
+        "body_sha256": "31a80f0407289b4ad7a64bb852ac3265015e09a3f97e8b3e0a87df24da8cc0fc",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/840#issuecomment-6273116706"
+      }
+    ],
+    "comments_count": 3,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 840,
+    "observed_at": "2026-10-21T12:28:23.658Z",
+    "pr": 1086,
+    "provider": "connected GitHub",
+    "residuals": [
+      1087,
+      1088,
+      1089,
+      1090,
+      1091
+    ],
+    "runtime": [
+      "lsms_library/data_info.yml",
+      "lsms_library/countries/Mali/_/mali.py",
+      "lsms_library/countries/Niger/_/niger.py",
+      "lsms_library/countries/Tanzania/_/tanzania.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "a9f8944177a4f5e1bf51a216a57f14c372a52e70",
+        "lines": 1393,
+        "path": "lsms_library/data_info.yml",
+        "sha256": "7439c0ff8ede5a235dc8a8cd20d04a41faa489135ce550fb7beb0caf3255c3bc"
+      },
+      {
+        "blob_oid": "c02b939a9698eeaf29d1c334b34f44cdc33e3362",
+        "lines": 875,
+        "path": "lsms_library/countries/Mali/_/mali.py",
+        "sha256": "a7ed188ffc41ea4688ad6f38e13a9f05bcf0e300e17c5766b7ff7da0971f2292"
+      },
+      {
+        "blob_oid": "7243fa7f15e119eff1bbb14317787c8761c0b5bb",
+        "lines": 1555,
+        "path": "lsms_library/countries/Niger/_/niger.py",
+        "sha256": "4e9bfeb2ae3dd3655f0acc741572e0b3504b0c8d8043f8465ec814fe44e4da3a"
+      },
+      {
+        "blob_oid": "8e80b0edef3dd171c39647aedcf8f957fb0089ca",
+        "lines": 2231,
+        "path": "lsms_library/countries/Tanzania/_/tanzania.py",
+        "sha256": "028e83226754bdfda3b85d26ee81b28669aa75b876bf84b1802523bbd875d5c9"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "line": 166,
+        "path": "lsms_library/data_info.yml",
+        "selector": "community_prices:"
+      },
+      {
+        "line": 852,
+        "path": "lsms_library/countries/Mali/_/mali.py",
+        "selector": "community_prices:"
+      },
+      {
+        "line": 1424,
+        "path": "lsms_library/countries/Niger/_/niger.py",
+        "selector": "community_prices:"
+      }
+    ],
+    "runtime_symbol_anchors": [],
+    "scope": "Preserve community-price variety, visit and observation axes under the amended three-level ruling; retain conflicting source observations and remove only exact repeats.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "38c144c4b72b4d58f8889f1d41088de92384e0e1fbc7920ccbd9bb5996769216",
+      "head_sha": "a4fa1f3834ec2bafe248ce9b9992887bdfdba03c",
+      "merge_commit_sha": "9d4cd807c4221972749e8732f96c597fb12fc8fd",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T17:25:23Z",
+      "number": 1086,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1086"
+    },
+    "test_anchors": [
+      {
+        "line": 111,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_canonical_index_registers_the_three_levels"
+      },
+      {
+        "line": 115,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_every_added_level_has_a_sentinel"
+      },
+      {
+        "line": 125,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_not_a_nan_fabrication"
+      },
+      {
+        "line": 130,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_country_declares_its_levels"
+      },
+      {
+        "line": 134,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_builder_selects_nothing"
+      },
+      {
+        "line": 163,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_ghanalss_obs_is_kept_not_collapsed"
+      },
+      {
+        "line": 177,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_reduced_country_gets_sentinels"
+      },
+      {
+        "line": 184,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_assembled_levels_stay_integer"
+      },
+      {
+        "line": 244,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_a_repeated_slot_is_dropped_and_a_new_one_kept"
+      },
+      {
+        "line": 255,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_a_conflicting_unit_is_not_a_repeat"
+      },
+      {
+        "line": 265,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_a_byte_identical_row_does_not_count_as_a_record"
+      },
+      {
+        "line": 277,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_the_tail_accepts_the_result"
+      },
+      {
+        "line": 306,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_index_is_the_declared_one_and_unique"
+      },
+      {
+        "line": 313,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_no_null_on_an_added_level"
+      },
+      {
+        "line": 319,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_variety_is_a_code_not_a_float_string"
+      },
+      {
+        "line": 324,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_rows_and_cells_are_the_measured_ones"
+      },
+      {
+        "line": 334,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_mali_tomato_paste_varieties_survive"
+      },
+      {
+        "line": 343,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_mali_carries_both_passages"
+      },
+      {
+        "line": 347,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_tanzania_lumped_codes_keep_their_own_prices"
+      },
+      {
+        "line": 353,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_niger_second_records_are_slots_four_to_six"
+      },
+      {
+        "line": 364,
+        "path": "tests/test_community_prices_variety.py",
+        "test": "test_niger_no_second_record_repeats_a_served_row"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "7e8bd2e03808b63fdbe1d9770658c8f88e4ab1ab",
+        "lines": 375,
+        "path": "tests/test_community_prices_variety.py",
+        "sha256": "0635eb6de6ce947f3743adc36c8eeaf5f06b38758dedead97ea113b4f8826a36"
+      }
+    ],
+    "tests": [
+      "tests/test_community_prices_variety.py"
+    ],
+    "title": "community_prices drops the variety axis, keeping one (t,v,j,u) row arbitrarily (Mali 22.4%, Tanzania ~90%, Niger 90->45)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/840",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Maintainer comment explicitly says PR1028 delivers all three completion criteria and assigns live discoveries to separate issues.",
+    "body_sha256": "bde0c9ff45f863d0de3426af3dbb741147cb0cbad74a2fbcf52edb265f9c5a21",
+    "comment_evidence": [
+      {
+        "body_sha256": "663138baafa6169e8a9ff57e746389e1d6d31ca8bed6887821f177d0e379eb73",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/962#issuecomment-5777070498"
+      },
+      {
+        "body_sha256": "798133b1b75e9242a6ae30a1e6c19ee2a63d36b4b1230c81b4397f3e09097308",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/962#issuecomment-5777496346"
+      },
+      {
+        "body_sha256": "0686a16e1f01033101f5f9074f9d136517aa822e7b8643f0a840fb26120fc198",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/962#issuecomment-6246273122"
+      },
+      {
+        "body_sha256": "4057a05c7b86b96c87f4e05221b98e69547ae33a5fb67a6cba4f9714cb12fe61",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/962#issuecomment-6278917588"
+      }
+    ],
+    "comments_count": 4,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 962,
+    "observed_at": "2026-10-21T12:28:25.708Z",
+    "pr": 1028,
+    "provider": "connected GitHub",
+    "residuals": [
+      1043,
+      1044,
+      1148
+    ],
+    "runtime": [
+      "lsms_library/transformations.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "4c49a8a0f37fbcdeb4540339f4d23b20dbd4cd41",
+        "lines": 7880,
+        "path": "lsms_library/transformations.py",
+        "sha256": "cb973473420759f35b2046e0da618fdbddc278c78708038792b0e85856e1b4d0"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "_unit_sentinel_mask",
+        "line": 3773,
+        "path": "lsms_library/transformations.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "_unit_sentinel_mask",
+        "line": 3773,
+        "path": "lsms_library/transformations.py"
+      }
+    ],
+    "scope": "Food-country unit vocabulary inventory, discriminatory missing-spelling/minted-spelling guards, and the documented accepted residual-code inference contract; no inference-policy change.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "0b958461e21c32b5eb15e5dd67bc37fc2ebb733e64087027d781d0b6653e5ea3",
+      "head_sha": "51e0187f9a028d54158dd3769c07dac53b78dcf0",
+      "merge_commit_sha": "119edd8818170b5a186b82cbdfda88a0afe7e88c",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:44:05Z",
+      "number": 1028,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1028"
+    },
+    "test_anchors": [
+      {
+        "line": 96,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_raw_zero_variants_and_blanks_are_unknown"
+      },
+      {
+        "line": 107,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_raw_missing_unit_accepts_nullable_and_categorical_columns"
+      },
+      {
+        "line": 113,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_unlisted_fractional_codes_warn_and_drop_without_becoming_kg"
+      },
+      {
+        "line": 121,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_unexpected_blank_mapping_retains_each_code_identity"
+      },
+      {
+        "line": 128,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_curated_catalog_keeps_physical_sizes_counts_and_residuals"
+      },
+      {
+        "line": 149,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_sources_are_classified_separately_and_wide_prices_survive"
+      },
+      {
+        "line": 173,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_original_purchase_quantities_control_value_classification"
+      },
+      {
+        "line": 184,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_nonpurchased_negative_quantities_remain_unknown"
+      },
+      {
+        "line": 192,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_known_units_keep_quantities_expenditure_and_reported_prices"
+      },
+      {
+        "line": 204,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_duplicate_partition_precedes_aggregation_and_preserves_expenditures"
+      },
+      {
+        "line": 222,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_empty_and_nonpositive_expense_keep_existing_filter"
+      },
+      {
+        "line": 231,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_runtime_sentinel_semantics_with_working_inference_control"
+      },
+      {
+        "line": 280,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_categorical_units_without_retyping_preserve_dtype_and_prices"
+      },
+      {
+        "line": 295,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_categorical_unknown_can_become_value"
+      },
+      {
+        "line": 306,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_categorical_mixed_units_and_sources_remain_separate"
+      },
+      {
+        "line": 375,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_sentinel_spelling_gets_no_price_ratio_factor"
+      },
+      {
+        "line": 390,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_every_sentinel_spelling_is_exercised"
+      },
+      {
+        "line": 398,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_sentinel_rows_keep_survey_kilograms"
+      },
+      {
+        "line": 410,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_accepted_residual_code_receives_the_unit_pooled_factor"
+      },
+      {
+        "line": 426,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_accepted_residual_code_is_included_in_kilograms"
+      },
+      {
+        "line": 444,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_unlisted_missing_unit_spelling_keeps_its_factor_and_WARNS"
+      },
+      {
+        "line": 471,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_units_and_sentinels_do_not_warn"
+      },
+      {
+        "line": 495,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_every_classified_spelling_gets_no_price_ratio_factor"
+      },
+      {
+        "line": 728,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_the_sweep_catches_each_minting_idiom"
+      },
+      {
+        "line": 741,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_the_sweep_ignores_what_is_not_a_minted_unit"
+      },
+      {
+        "line": 745,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_the_sweep_sees_the_known_minting_sites"
+      },
+      {
+        "line": 761,
+        "path": "tests/test_962_unit_sentinel.py",
+        "test": "test_no_unclassified_missing_unit_spelling_is_minted"
+      },
+      {
+        "line": 66,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_the_kilogram_weighs_a_kilogram"
+      },
+      {
+        "line": 80,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_scaling_every_quantity_leaves_the_factors_alone"
+      },
+      {
+        "line": 102,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_two_items_one_unit_get_two_factors"
+      },
+      {
+        "line": 129,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_item_arm_default_is_off_and_keeps_the_dict_return"
+      },
+      {
+        "line": 148,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_min_reports_floor_falls_back_to_the_unit_rung_and_says_so"
+      },
+      {
+        "line": 168,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_min_baseline_floor_refuses_to_mint_a_factor"
+      },
+      {
+        "line": 184,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_tight_exception_admits_agreeing_reports_and_refuses_disagreeing"
+      },
+      {
+        "line": 226,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_food_floor_matches_the_crop_side"
+      },
+      {
+        "line": 236,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_na_item_key_survives_and_reaches_the_unit_rung"
+      },
+      {
+        "line": 255,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_layers_partition_the_frame"
+      },
+      {
+        "line": 275,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_survey_kg_outranks_every_inference"
+      },
+      {
+        "line": 301,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_metric_spellings_are_seeded_never_inferred"
+      },
+      {
+        "line": 323,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_kgprice_and_kgvalue_use_the_same_factor"
+      },
+      {
+        "line": 348,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_derived_tables_carry_the_provenance_counts"
+      },
+      {
+        "line": 364,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_item_axis_degrades_when_the_frame_has_no_item_level"
+      },
+      {
+        "line": 377,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_currency_denominated_labels_get_no_factor"
+      },
+      {
+        "line": 389,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_missing_unit_sentinels_get_no_inferred_factor"
+      },
+      {
+        "line": 416,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_a_nan_unit_label_is_a_sentinel_too"
+      },
+      {
+        "line": 431,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_uganda_curated_json_agrees_on_the_labels_the_parser_now_reads"
+      },
+      {
+        "line": 496,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_range_labels_are_read_as_one_endpoint_not_a_midpoint"
+      },
+      {
+        "line": 506,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_new_metric_keys_are_in_known_metric"
+      },
+      {
+        "line": 527,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_min_reports_gates_the_wave_not_the_pooled_support"
+      },
+      {
+        "line": 546,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_detail_frame_discloses_how_many_waves_and_how_far_apart"
+      },
+      {
+        "line": 578,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_a_single_wave_factor_is_counted_as_such"
+      },
+      {
+        "line": 592,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_baseline_max_spread_refuses_an_incoherent_baseline_by_default"
+      },
+      {
+        "line": 617,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_a_coherent_baseline_is_untouched_by_the_gate"
+      },
+      {
+        "line": 629,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_the_gate_uses_p90_over_p10_once_there_are_ten_reports"
+      },
+      {
+        "line": 650,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_a_refused_row_is_tagged_counted_and_falls_to_the_unit_rung"
+      },
+      {
+        "line": 689,
+        "path": "tests/test_food_kg_inference.py",
+        "test": "test_the_gate_never_costs_a_row_that_a_higher_rung_serves"
+      },
+      {
+        "line": 19,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_augment_adds_float_and_int_string_variants"
+      },
+      {
+        "line": 27,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_augment_leaves_non_numeric_labels_untouched"
+      },
+      {
+        "line": 32,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_augment_skips_genuine_non_integers"
+      },
+      {
+        "line": 37,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_augment_original_key_wins_on_collision"
+      },
+      {
+        "line": 52,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_leak_detector_flags_codes_prefixes_and_itemnames"
+      },
+      {
+        "line": 58,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_leak_detector_clean_frame"
+      },
+      {
+        "line": 63,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_leak_detector_no_u_level"
+      },
+      {
+        "line": 69,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_leak_detector_categorical_u_with_nan"
+      },
+      {
+        "line": 120,
+        "path": "tests/test_u_code_leak.py",
+        "test": "test_clean_countries_have_no_u_code_leaks"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "ba216fd06d1e84b95d8b107c5be5e7b61de35139",
+        "lines": 778,
+        "path": "tests/test_962_unit_sentinel.py",
+        "sha256": "68490e8a74b2faee557609f44e827d3f37a491cbee0c94add70e367c94b8b7ec"
+      },
+      {
+        "blob_oid": "dd7cab1a35d77481d4dc527a3d8fed0c40b45615",
+        "lines": 698,
+        "path": "tests/test_food_kg_inference.py",
+        "sha256": "454d8cdbce992548d3791faf5d7343c758a2367f0c045e2e4c3bde10812ddadc"
+      },
+      {
+        "blob_oid": "a89413dc559cdd436f00c68d5eeedd2dcd55577f",
+        "lines": 137,
+        "path": "tests/test_u_code_leak.py",
+        "sha256": "4b2fbd9d3430b1d07445d71f371564b1c42d50cd35276cd70dd8e68840715dfa"
+      }
+    ],
+    "tests": [
+      "tests/test_962_unit_sentinel.py",
+      "tests/test_food_kg_inference.py",
+      "tests/test_u_code_leak.py"
+    ],
+    "title": "Food-unit sentinel coverage after #967: reconcile residual-code kg semantics and guard missing-unit spellings",
+    "url": "https://github.com/ligon/LSMS_Library/issues/962",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  },
+  {
+    "authority": "Current remaining-body contract is canonical reachable spelling forms; merged PR documents lookup precedence, identical per-country served values and the negative guard.",
+    "body_sha256": "e565c3a20fcff54c509e38c499131866b7f0cd0eee5cc004ffbd4cb999da9166",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "additional demonstrated closure proposal for parent review",
+    "issue": 974,
+    "observed_at": "2026-10-21T12:28:25.326Z",
+    "pr": 1020,
+    "provider": "connected GitHub",
+    "residuals": [],
+    "runtime": [
+      "lsms_library/categorical_mapping/kinship.yml",
+      "lsms_library/country.py"
+    ],
+    "runtime_blob_proofs": [
+      {
+        "blob_oid": "472ab49ba7bcfbaf915724df4df3f94b6ee3663b",
+        "lines": 688,
+        "path": "lsms_library/categorical_mapping/kinship.yml",
+        "sha256": "60b7e2c65ba74285bb757c37c251952f5ffbaa38fb41ddbb0a53f0c048de9cb2"
+      },
+      {
+        "blob_oid": "c233eb731b10954b2963ba6d3b193b39e6714ff0",
+        "lines": 8630,
+        "path": "lsms_library/country.py",
+        "sha256": "7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c"
+      }
+    ],
+    "runtime_line_anchors": [
+      {
+        "function": "_expand_kinship",
+        "line": 6699,
+        "path": "lsms_library/country.py"
+      }
+    ],
+    "runtime_symbol_anchors": [
+      {
+        "function": "_expand_kinship",
+        "line": 6699,
+        "path": "lsms_library/country.py"
+      }
+    ],
+    "scope": "Fold the four reachable case-collision groups into their actual strip/title lookup forms without changing tuples or reached coverage. Punctuation/whitespace normalization is a separate policy choice.",
+    "source_reference_base": "https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/",
+    "state": "open",
+    "supporting_pr": {
+      "base": "development",
+      "body_sha256": "44679c3a8d3e16880f1593d8690e53486082fe9b2ed0b072b4ab7f4eed96f5aa",
+      "head_sha": "e86b4a7a96a28a63299997526899f3faebd8df78",
+      "merge_commit_sha": "26517e23127cd9c2c5edd948c027c11e86946295",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:43:12Z",
+      "number": 1020,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1020"
+    },
+    "test_anchors": [
+      {
+        "line": 37,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_every_kinship_key_is_a_string"
+      },
+      {
+        "line": 42,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_title_is_idempotent_so_the_shadowing_rule_is_exact"
+      },
+      {
+        "line": 48,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_no_key_is_shadowed_by_a_title_cased_twin"
+      },
+      {
+        "line": 62,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_no_two_keys_share_a_lookup_form"
+      },
+      {
+        "line": 83,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_pandas_title_agrees_with_str_title_on_every_key"
+      },
+      {
+        "line": 121,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_the_text_reader_sees_every_loaded_key"
+      },
+      {
+        "line": 126,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_no_key_line_is_duplicated"
+      },
+      {
+        "line": 158,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_spelling_variants_of_one_key_agree_on_their_tuple"
+      },
+      {
+        "line": 199,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "test": "test_adjudicated_dead_keys_stay_out"
+      }
+    ],
+    "test_blob_proofs": [
+      {
+        "blob_oid": "83ffd740dc6c61f40d3b01c31bb5928eb7c023fb",
+        "lines": 206,
+        "path": "tests/test_kinship_yml_hygiene.py",
+        "sha256": "d1dddb4c388ed889354837c51520e160d3a6cf1dfd15260f14e90435a51aad24"
+      }
+    ],
+    "tests": [
+      "tests/test_kinship_yml_hygiene.py"
+    ],
+    "title": "kinship.yml: apply the #813/#945 adjudication -- canonicalise the reachable spelling variants",
+    "unfiled_residuals": [
+      "Broader punctuation/whitespace lookup normalization remains a separate decision"
+    ],
+    "url": "https://github.com/ligon/LSMS_Library/issues/974",
+    "validation_limit": "Static acceptance/source/test verification plus existing merged-PR and exact532 validation evidence; no fresh tests, survey reads or scientific-default reassessment."
+  }
+]

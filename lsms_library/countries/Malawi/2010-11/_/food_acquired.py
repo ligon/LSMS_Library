@@ -21,9 +21,16 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 from malawi import (conversion_table_matching, food_acquired_to_canonical,
-                    normalize_food_label, _clean_freetext_unit)
+                    normalize_food_label, _clean_freetext_unit,
+                    is_other_specify_code, other_specify_to_unknown)
 
 wave = "2010-11"
+
+#: IHS3 Module G unit codes every recorded use of which contradicts the
+#: printed label (GH #1042 ruling 2): served as no unit recorded.  Compared
+#: without leading zeros: this wave ships the code as '3' (the shared `u`
+#: table keys it '03').
+_IHS3_CONTRADICTED_CODES = ['3']
 
 df = get_dataframe('../Data/Full_Sample/Household/hh_mod_g1.dta',
                    convert_categoricals=True)
@@ -108,6 +115,19 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
     # Keep native quantity + native unit; food_acquired_to_canonical computes
     # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
     df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(df[code_col])
+    # GH #1042: code 23 = OTHER (SPECIFY) with no usable specify text is "no
+    # unit recorded" -> the missing-unit sentinel, not the code's label.
+    df[u_col] = other_specify_to_unknown(
+        df[u_col], is_other_specify_code(df[code_col]).values,
+        df[detail_col].replace('nan', pd.NA))
+    # GH #1042 ruling 2 (@ligon 2026-10-18): a code whose every recorded use
+    # contradicts its printed label records no unit.  IHS3 code 03 "90 KG.
+    # BAG" is on 5 served rows -- 9 buns, 9 mandazi, 1 pork, 3 sugar, 1 own
+    # maize flour -- none of them a 90 kg bag.  Exact code only; '3A' stays.
+    df[u_col] = other_specify_to_unknown(
+        df[u_col], df[code_col].astype('string').str.strip()
+        .str.replace(r'\.0$', '', regex=True).str.lstrip('0')
+        .isin(_IHS3_CONTRADICTED_CODES).fillna(False).values)
 
 df['t'] = wave
 df = df.reset_index()

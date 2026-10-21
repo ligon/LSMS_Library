@@ -1,0 +1,51 @@
+#+TITLE: Release-closure exclusions and draft remaining scope
+#+AUTHOR: Sue
+
+* #778 -- keep OPEN (current body explicitly says so)
+
+Draft narrowed title: =assume_cache_fresh: decide whether unstamped country-script output at the final path may be served=.
+
+Draft remaining body:
+PR #1030 already isolated the original poison/destamp tests and repaired the raw-reader race.
+After PR #1162 lands, the two actionable follow-ups are also implemented: assumed-fresh data-read disappearance falls through only on FileNotFoundError, and the measured destructive/rebuilding real-country tests use physical private L2 roots.
+The already-private GhanaLSS and synthetic tests remain unchanged.
+The cold partial-aggregate hypothesis did not reproduce and is not reopened.
+
+Remaining is the carried trust-mode note: =assume_cache_fresh= can read a country script's complete but unstamped output while it occupies the final path.
+The earlier Nigeria crop-production observation found identical content; it does not establish every country/script path.
+Decide whether that admission is the intended trust contract or requires a distinct completion/provenance gate, then test the chosen rule with a discriminating private-root timing/control case.
+Do not infer corruption recovery, hashless-country migration or LSMS_NO_CACHE policy from this disappearance repair; #1071 remains separate.
+Use =Addresses #778=, not a closing keyword.
+
+* #932 -- keep OPEN (executable enforcement/permission decision remains)
+
+Draft narrowed title: =Development PRs still skip data-tests; choose and enforce an executable credentialed check path=.
+
+Draft remaining body:
+PR #1049 added merge_group execution, a nightly definition and disclosure, but this personal repository cannot use the intended merge queue.
+The current workflow still skips data-tests for pull_request events.
+Live ruleset25124452 requires only unit-tests, with strict=false and RepositoryRole5 always-bypass; there is no required PR route.
+Default master remains the v0.15.0 commit, so the new nightly definition is not yet on the default branch.
+
+The unapplied proposal requires a development-PR job path that actually runs and a required data-tests context.
+Fork PRs must fail the credential gate without secrets; a same-repository-only skip would count green and leave the gap.
+A maintainer must review/import the exact fork changes into a trusted same-repository PR before credentialed execution; never run untrusted code with secrets through pull_request_target.
+Manual exact-head dispatch is useful release evidence, but does not satisfy the eligible PR-event required-check route.
+Preserving strict=false and the role5 bypass preserves those limitations; tightening them or requiring PRs is a separate permission decision.
+No workflow or protection change is applied by this audit.
+
+* Scoped closures are not universal defect claims
+
+- #569 closes the ruled two-table registration; #1118-#1123 retain unit/source/key/grain problems. #1124/#1125 close only the harness blind spots. The EthiopiaRHS coarse crop exclusion remains a visible Class B finding, not a semantic pass.
+- #600/#1114 close failure-preservation and held-release policy; #1115/#1128 add lossless-or-loud metadata and the code-only queue. #978/#1127 acquisition, #1116 override policy and #1149 staging/retirement/raw-sidecar/config-vintage authority remain separate. No acquisition or shipped SOURCE rewrite is claimed.
+- #781 closes vocabulary and the ruled GLSS1/2 adjudications; #1129-#1131 remain. GLSS3 is explicitly empty-pending-machinery.
+- #793/#942 close the frozen loader and per-boundary two-field/Country-warning increment. #1133-#1136 remain; PR1137 additionally names remaining-country panel declarations, scan warning drain and exploratory Q6/Q7 work. The owner explicitly marks these issues fixed with follow-ups. Do not describe them as a corpus-wide cluster crosswalk or completed design curation.
+- If the unfiled #942 rollout/drain work needs tracking, proposed separate title: =Complete panel-boundary declarations and carry ClusterIdentityWarning into feature-audit findings=. Scope: inventory unrecorded boundaries, curate only supported statements, and drain existing warnings without deriving a cluster identity or changing served v. Ethiopia crosswalk acquisition and a cluster_reference schema remain separate choices.
+- #928 closes accepted P1/P2. P3 Status/Notes vocabulary, P4 ignorance registry/collapse and per-country migrations were explicitly deferred. Optional separate tracking title: =Decide categorical Status/Notes and ignorance-collapse contracts after key metadata=. No silent index-null conversion is authorized.
+- #867 closes cited inorganic shares and loud organic refusal. #1106-#1111 remain; #1159/#1160 fix country identity only. Existing #1110 land-grain policy remains; Malawi's old no-op docstring claim is contradicted by the independently observed plot/parcel counts and the already recorded country caveat.
+- #675 retains #1051 outage/probe limitations. #908/#1040/#1070 retain #920 and/or #1071 scope. #1001/#1031 retain #1032/#1064. #915 retains #1085.
+
+Other prior reviewed partial umbrellas (including #218/#637/#650/#698/#787/#798/#828/#845/#851/#920) are not promoted to closure here.
+Their full bodies were not all refreshed in this pass, so this paragraph records the previous audit boundary rather than a new exhaustive disposition.
+
+Sue

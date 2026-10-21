@@ -1,0 +1,183 @@
+#+title: GH #928 P1 + P2 --- =#+key:= and one categorical key resolver: measurements
+#+date: [2026-10-19 Mon]
+
+Evidence behind branch =fix/928-key-resolver= (base =ddd79800c=). Ruling
+(@ligon, 2026-10-18): P1 (=#+key:=) and P2 (one key resolver) as the first
+increment; P3 (=Status= / =Notes= vocabulary) and P4 (ignorance registry +
+=pd.NA= collapse) deferred.
+
+* Scripts
+
+| script             | what it measures                                                                 | needs data? |
+|--------------------+----------------------------------------------------------------------------------+-------------|
+| =census.py=        | per table, per level and per served view: each caller's key column + a hash of what it serves | no |
+| =summarise.py=     | one census: headline counts; two censuses: every field that moved                | no          |
+| =hash_probe.py=    | =build_transforms_fingerprint=, =Country._table_cache_hash=, =Wave._input_hash= | no          |
+| =hash_diff.py=     | moved / probed, per hash kind                                                     | no          |
+| =closure_parts.py= | every build-closure part as ={name: sha}=, to attribute a fingerprint move        | no          |
+| =served_e2e.py=    | 23 warm API reads, =assume_cache_fresh=True=, digested (rows, index, dtypes, CSV sha) | warm root |
+
+#+begin_src sh
+  # BEFORE: a worktree of the base; AFTER: this branch.  Same commands in each.
+  PYTHONSAFEPATH=1 PYTHONPATH=$PWD .venv/bin/python slurm_logs/gh928_key_resolver/census.py OUT.json
+  PYTHONSAFEPATH=1 PYTHONPATH=$PWD .venv/bin/python slurm_logs/gh928_key_resolver/summarise.py BEFORE.json AFTER.json
+  PYTHONSAFEPATH=1 PYTHONPATH=$PWD .venv/bin/python slurm_logs/gh928_key_resolver/hash_probe.py OUT.json
+#+end_src
+
+* Census of the base (every =#+name:= table, every level)
+
+| tables / levels                       | 315 / 42 (global, 39 countries' =_/=, GhanaLSS waves)           |
+| served views (country + wave)         | 580                                                              |
+| positional key names                  | =Code= 144, =Original Label= 82, =Alternate Spelling= 64, =Aggregate Label= 8, =Wave= 5, =Code_2005-06= 2, 10 others x1 |
+| tables declaring =#+key:=             | 0                                                                |
+| tables with a =Status= / =Notes= column | 0                                                              |
+| merge / market / hook / auto-apply disagree (default target) | *0* --- they were four copies of one expression |
+
+The only place two callers key a table differently is the degenerate
+=labels={T: <its own key column>}= request: the selection path excludes the
+target and keys on the next column (or none, raising =KeyError=).  That is the
+designed target-exclusion rule, not a disagreement, and it is unchanged.
+
+Pre-existing and unchanged: 4 raw tables whose positional key column holds a
+NaN crash =_augment_numeric_code_keys= (=int(nan)=) on the default path ---
+Ethiopia =harmonize_food=, GhanaLSS =nonfood_items= / =nonfood_items_9b=,
+Tanzania =harmonize_input=.  None is reachable by the auto-apply (no frame
+column or level carries those names).
+
+* After (this branch, base -> branch)
+
+| census, code change only           | 315 raw + 580 served tables: *0 field moves*; =_unit_kg_factors= 0 of 39 moved |
+| census, + Niger =#+key: Original Label= (above =#+name: u=) | 3 field moves, all Niger =u=: =declared_key= None -> =Original Label=; the degenerate =labels={'u': 'Original'}= goes from =ValueError= ("cannot convert float NaN to integer") to the explicit =KeyError= "no key column left" |
+| served data, 23 warm reads, 6 countries | *23 of 23 byte-identical* (Niger food_acquired / food_quantities / food_prices / crop_production / assets / housing / food_expenditures(market='Region'); Uganda, Malawi, Tanzania, Mali, Nigeria) |
+| cold build, Niger =food_acquired= and =crop_production= | identical to a cold build on the base (rows, index, dtypes, CSV sha) |
+
+* Cache cost --- corpus-invalidating
+
+| hash                           | moved / probed |
+|--------------------------------+----------------|
+| =build_transforms_fingerprint= | 7 / 7          |
+| =Country._table_cache_hash=    | 97 / 97 (12 countries) |
+| =Wave._input_hash=             | 35 / 35        |
+| no-op control (comment in =all_dfs_from_orgfile=) | 0 / 139 |
+
+Attribution (=closure_parts.py=, base vs branch): three callables change ---
+=local_tools.all_dfs_from_orgfile=, =country._categorical_key_column=,
+=country._row_union_categorical= --- and five constants are added
+(=CATEGORICAL_KEY_ATTR=, =CATEGORICAL_RESERVED_COLUMNS= in both modules,
+=_ORG_KEY_KEYWORD=).  The three re-routed read-path sites
+(=_apply_categorical_mappings=, =_market_lookup=, =_finalize_result=) are
+outside the closure and move nothing.  Every table of every country moves
+through =all_dfs_from_orgfile= alone, so no placement of P1 avoids it.
+
+* Placement: ABOVE =#+name:=, never below (a result that contradicts the issue text)
+
+The issue (and =slurm_logs/2026-09-18_categorical_composition/DESIGN.org=)
+put =#+key:= between =#+name:= and the table, verified only against the
+library's own parser.  In Org itself that placement breaks the table's name:
+=#+key:= is not an Org affiliated keyword, so =#+name:= attaches to the
+keyword line and the table is left unnamed.  Measured with Emacs 29.1
+(=emacs --batch -Q=, =org-element-parse-buffer= + =org-babel-ref-resolve=):
+
+| placement                      | org-element sees                  | =org-babel-ref-resolve "u"= |
+|--------------------------------+-----------------------------------+-----------------------------|
+| =#+name: u= / =#+key: Code= / table | keyword name="u"; table name=nil | (error "Reference not found") |
+| =#+key: Code= / =#+name: u= / table | keyword name=nil; table name="u" | the table                   |
+| =#+name: w= / =#+attr_lsms: :key Code= / table | table name="w", attr_lsms (":key Code") | the table |
+
+So the parser accepts =#+key:= only in the run of =#+= lines directly above
+=#+name:= and refuses it below, with the reason.  The DESIGN.org composition
+keywords (=#+keyspace:=, =#+fold:=, =#+column:=) are shown below =#+name:= too
+and inherit the same hazard.
+
+* Tests
+
+- =tests/test_categorical_key_resolver.py=: 40 passed (fails on the base at import).
+- Full suite, final tree, recipe =-n 7 --dist=loadfile=: =7639 passed, 277 skipped,
+  9 xfailed, 1 xpassed in 1503.68s=, 0 failed.  The XPASS
+  (=test_pakistan_cluster_features.py::test_extraction_is_cluster_grain=, a
+  non-strict existence proxy) is identical with base code on the base root.
+
+* Red team r1 follow-up (2026-10-19): F1 routed + guarded, F2 warns
+
+Verdict: =pass-with-fixes= (=backlog_review_local_40139031_1019/928-key-resolver-r1/VERDICT.md=).
+
+** F1 --- the fifth positional key-pick, routed
+
+=Mali/2014-15/_/mapping.py:_unit_canonicalizer= now asks
+=country._categorical_key_column= (lazy import, Uganda's precedent).  The
+=except (OSError, ValueError)= is not widened, so a bad declaration escapes.
+
+| cold =Country('Mali').food_acquired()=, two empty roots | before (=55147a6bc=) | after |
+|---------------------------------------------------------+---------------------+-------|
+| rows x cols                                              | 431,046 x 3         | identical (=assert_frame_equal=, exact) |
+| 2014-15 rows / distinct =u= / row-hash                   | 122,085 / 16 / =7871c7d132349996= | identical |
+| =_unit_canonicalizer()= entries                          | 74                  | identical |
+
+Scripts: =cold_mali.py=, =compare_mali.py=; output =r1_compare_mali.txt=.
+
+** F1 --- the structural guard
+
+=tests/test_categorical_key_resolver.py::test_no_positional_key_pick_survives_in_the_package=
+parses (=ast=, never imports) all 779 =.py= files under the package and the
+config tree.  Rule A: a comprehension filtered by =!= 'Preferred Label'= /
+=not in (... 'Preferred Label' ...)= / =not in CATEGORICAL_RESERVED_COLUMNS=,
+indexed =[0]= directly, through =next()=, or through its bound name anywhere
+in the scope.  Rule B: =.columns[0]= / =.iloc[:, 0]= on a name bound from a
+categorical-table reader.  Exempt: the resolver itself.  =guard_history.py=
+runs the same function over =git show= of each tree (=r1_guard_history.txt=):
+
+| tree | hits |
+|------+------|
+| base =ddd79800c= | 4: Mali =mapping.py:43=; =country.py= =_market_lookup=, =_build_replace_dict=, =_finalize_result= |
+| =55147a6bc= (r0 head) | 1: Mali =mapping.py:43= |
+| r1 | 0 |
+
+Every other candidate an =rg= sweep turns up, and why it is not a key-pick:
+
+| site | what it is |
+|------+------------|
+| =country.py= =_resolve_target= / =_relabel_j= =available = [...]= (x3) | error-message listings, never indexed |
+| =Tanzania/_/tanzania.py:377=, =Malawi/_/malawi.py:383= | column ENUMERATORS: every non-skip column is a raw-label source.  Not a key choice, so not flagged; but a =Status=/=Notes= column would be ingested as raw labels --- a P3 hazard, in the P3 residual (=r1_enumerators.txt= lists every enumeration over a mapping table; these two are the only skip-list ones) |
+| Panama / Uganda =nutrition.py=, Guatemala =fct.py= =.columns[0]= | food-composition CSV / Google-sheet frames, not categorical tables |
+| GhanaSPS =ghanasps.py:831=, =transformations.py:5424= =.iloc[:, 0]= | a bfilled unit frame; an rCSI frame |
+| Nigeria/Ethiopia/Malawi/Uganda =next((c for c in candidates ...))= | file-path candidates |
+
+** F2 --- a declaration that cuts off global inheritance is loud
+
+=_row_union_categorical= still serves the country table wholesale when the
+two keys differ; when EITHER side declares =#+key:= it now emits
+=CategoricalKeyMismatchWarning= (a =UserWarning=) naming the table, the
+country, both keys and the global rows not inherited.  Undeclared mismatches
+stay silent (=f2_census.py=, =r1_f2_census.json=):
+
+| census over 38 countries' =Country(c).categorical_mapping= | |
+|---+---|
+| =CategoricalKeyMismatchWarning= fired | *0* |
+| tables declaring =#+key:= (country / global) | 1 (Niger =u=, aligned) / 0 |
+| additive merges aligned | 45 |
+| additive merges falling back, undeclared (silent, #832) | 4: Malawi, Mali, Nigeria, Uganda =u= (=Code= vs =Original Label=) |
+
+** Cache cost of r1 (=hash_probe_full.py= / =hash_diff_by.py=, all 38 countries)
+
+| step | =build_transforms_fingerprint= | =Country._table_cache_hash= | =Wave._input_hash= |
+|------+------+------+------|
+| base -> r0 head (=55147a6bc=) | 10/10 | 538/538 | 494/494 |
+| r0 head -> F1 | 0/10 | 23/538 (Mali 23/23) | 5/494 (Mali 2014-15 x 5) |
+| F1 -> F2 | 10/10 | 538/538 | 494/494 |
+| no-op control (comment in =_row_union_categorical=) | 0/10 | 0/538 | 0/494 |
+| base -> r1 | 10/10 | 538/538 | 494/494 |
+
+F2's move is attributed by =closure_parts.py= to =Country.categorical_mapping=,
+=_merge_categorical_tables= and =_row_union_categorical= (all already in the
+build closure).  Nothing moves that r0 had not already moved against the
+base: one corpus re-warm, in the bundle.  9 Peru =_input_hash= values are
+=None= on every tree and are not counted.
+
+** Tests (r1 final tree)
+
+- =tests/test_categorical_key_resolver.py=: 56 passed (40 before r1; +12 guard, +4 F2).
+- Full suite, recipe =-n 6 --dist=loadfile --timeout=3000=, BLAS pinned,
+  =LSMS_BUILD_WORKERS=1=, private root (every table cold):
+  =7655 passed, 277 skipped, 9 xfailed, 1 xpassed, 1195 warnings in 1715.21s (0:28:35)=,
+  0 failed.  +16 passed against r0's 7639 = the 16 new tests.  The XPASS is
+  the same non-strict Pakistan existence proxy as on the base.

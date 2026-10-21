@@ -1,0 +1,189 @@
+{
+  "observed_utc": "2026-10-15T16:18:36.130941+00:00",
+  "run_id": 38759333750,
+  "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750",
+  "jobs": [
+    {
+      "name": "data-tests",
+      "databaseId": 116506129612,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T15:19:45Z",
+      "completedAt": "2026-10-15T16:17:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506129612",
+      "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 457010,
+      "log_sha256": "b049a9fc8cace05fe2b03598c8cd706e6d6c58a52e5f62bb2d31a4d613934b03",
+      "full_source_sha_present": true,
+      "test_summaries": [
+        {
+          "summary": "4927 passed, 2768 skipped, 4 xfailed, 1 xpassed, 1004 warnings in 3137.91s (0:52:17)",
+          "counts": {
+            "passed": 4927,
+            "skipped": 2768,
+            "xfailed": 4,
+            "xpassed": 1,
+            "warnings": 1004
+          },
+          "pytest_seconds": 3137.91
+        }
+      ],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "unit-tests",
+      "databaseId": 116506130011,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T15:19:45Z",
+      "completedAt": "2026-10-15T15:22:45Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130011",
+      "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 85161,
+      "log_sha256": "c7d8d833407d60e8a06c46ee5b9cce66d37aa7cc76b5a7b5d522adc56a563d21",
+      "full_source_sha_present": true,
+      "test_summaries": [
+        {
+          "summary": "3293 passed, 4407 skipped, 60 warnings in 132.36s (0:02:12)",
+          "counts": {
+            "passed": 3293,
+            "skipped": 4407,
+            "warnings": 60
+          },
+          "pytest_seconds": 132.36
+        }
+      ],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "dvc-remote-reachability",
+      "databaseId": 116506130068,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T15:19:44Z",
+      "completedAt": "2026-10-15T15:20:00Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130068",
+      "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 20779,
+      "log_sha256": "ce29b614395accfe5e011acb0078da370c7b0d8f96bdb1c840c8b06dd5aca30a",
+      "full_source_sha_present": true,
+      "test_summaries": [],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "windows-script-build",
+      "databaseId": 116506130111,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T15:19:47Z",
+      "completedAt": "2026-10-15T15:27:20Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130111",
+      "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 138135,
+      "log_sha256": "b4c0fc74885d8e96e4ad669ff5b480f1bbb7cce4b6cc82d13faa4d027c04253a",
+      "full_source_sha_present": true,
+      "test_summaries": [],
+      "failed_nodes": [],
+      "native_results": [
+        "Uganda:shocks rows=14457 cols=10 waves=8 digest=64a53fa7af55 (65s)",
+        "Uganda:assets rows=116808 cols=1 waves=8 digest=9202ed542a14 (56s)"
+      ]
+    },
+    {
+      "name": "docs",
+      "databaseId": 116506130114,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T15:19:46Z",
+      "completedAt": "2026-10-15T15:21:45Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130114",
+      "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 45353,
+      "log_sha256": "598277011dfc22ed933fe9198db0bfa852294ff53e247a4a7b4db5a8e6b6c7b7",
+      "full_source_sha_present": true,
+      "test_summaries": [],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "windows-smoke",
+      "databaseId": 116506130148,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T15:19:45Z",
+      "completedAt": "2026-10-15T15:22:29Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130148",
+      "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 94010,
+      "log_sha256": "03ec4ec390e6fe35608f5c3d02182f913bbb64cbcb5a0aa207ac301b06cd95c0",
+      "full_source_sha_present": true,
+      "test_summaries": [
+        {
+          "summary": "327 passed, 1 skipped in 8.69s",
+          "counts": {
+            "passed": 327,
+            "skipped": 1
+          },
+          "pytest_seconds": 8.69
+        }
+      ],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "dvc-lock-check",
+      "databaseId": 116506130200,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T15:19:45Z",
+      "completedAt": "2026-10-15T15:22:56Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130200",
+      "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 44780,
+      "log_sha256": "a24780d2cbb720cac72019647757dd1aa3c28b9d994fbb2ec8bbc63893e8f791",
+      "full_source_sha_present": true,
+      "test_summaries": [],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "refresh-dvc-locks",
+      "databaseId": 116507798258,
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-15T15:22:57Z",
+      "completedAt": "2026-10-15T15:22:57Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116507798258",
+      "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "active_steps": [],
+      "log_capture_attempts": 0
+    }
+  ],
+  "live_master_tip": {
+    "observed_utc": "2026-10-15T16:18:38.254473+00:00",
+    "expected_source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+    "master_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+    "matches_expected": true
+  },
+  "master_tip_ever_changed": false
+}

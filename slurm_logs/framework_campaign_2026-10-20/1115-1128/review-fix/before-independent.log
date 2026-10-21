@@ -1,0 +1,24 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_scalar_occurrences_cannot_silently_discard_held_catalog_identity[values1] _
+
+values = ['worldbank', 'external']
+
+    @pytest.mark.parametrize('values', [['worldbank', 'worldbank'], ['worldbank', 'external']])
+    def test_scalar_occurrences_cannot_silently_discard_held_catalog_identity(values):
+        text = ('SOURCE\n\nhttps://microdata.worldbank.org/catalog/987654321\n\n'
+                '#+CATALOG_ID: 987654321\n#+CATALOG_IDNO: held-release\n'
+                + ''.join(f'#+PROVENANCE_SOURCE: {value}\n' for value in values)
+                + '#+PROVENANCE_RECORDED: 2026-10-20\n')
+        parsed = pv.parse_source_org(text, COUNTRY, WAVE)
+        try:
+            rendered = pv.render_source_org(parsed)
+        except ValueError:
+            return  # Explicit ambiguity refusal is within the approved contract.
+>       assert '#+CATALOG_ID: 987654321' in rendered
+E       AssertionError: assert '#+CATALOG_ID: 987654321' in 'SOURCE\n\nhttps://microdata.worldbank.org/catalog/987654321\n\n#+CATALOG_ID: none\n#+CATALOG_IDNO: held-release\n#+CA.../catalog/987654321\n#+PROVENANCE_SOURCE: worldbank\n#+PROVENANCE_SOURCE: external\n#+PROVENANCE_RECORDED: 2026-10-20\n'
+
+../../control/framework-campaign/review-provenance/test_independent_provenance.py:170: AssertionError
+=========================== short test summary info ============================
+FAILED ../../control/framework-campaign/review-provenance/test_independent_provenance.py::test_scalar_occurrences_cannot_silently_discard_held_catalog_identity[values1]
+1 failed, 1 passed, 18 deselected in 2.57s

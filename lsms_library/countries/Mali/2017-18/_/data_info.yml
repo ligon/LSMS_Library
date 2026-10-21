@@ -188,8 +188,9 @@ interview_date:
             - grappe
             - exploitation
     myvars:
+        # GH #1045: parsed at build time from its (y, m, d) components (the
+        # numeric codes; their labels read 'Année 2017' / 'Septembre').
         Int_t:
-            - s0q21c
-            - s0q21b
-            - s0q21a
+            datetime: {y: s0q21c, m: s0q21b, d: s0q21a}
+            calendar: gregorian
     converted_categoricals: False

@@ -1,0 +1,195 @@
+{
+  "version": "0.15.0",
+  "package": "/local/job39919092/release-work/published-install-env/lib/python3.11/site-packages/lsms_library",
+  "countries_root": "/local/job39919092/release-work/published-install-env/lib/python3.11/site-packages/lsms_library/countries",
+  "data_root": "/local/job39919092/release-work/control/final-release-docs/installed-data",
+  "cwd": "/local/job39919092/release-work/control/final-release-docs",
+  "public_callables_checked": [
+    "Country",
+    "Wave",
+    "Feature",
+    "countries",
+    "features",
+    "coverage",
+    "currency_for",
+    "convert",
+    "PopulationRecord",
+    "population_records",
+    "RecallRecord",
+    "recall_records",
+    "recall",
+    "DerivationRecord",
+    "derivation_records",
+    "derivations",
+    "population_pyramid",
+    "coordinate_map",
+    "lorenz_curve",
+    "authenticate"
+  ],
+  "registered_countries": 38,
+  "declared_features": 38,
+  "country_config_reads": {
+    "Uganda": {
+      "waves": [
+        "2005-06",
+        "2009-10",
+        "2010-11",
+        "2011-12",
+        "2013-14",
+        "2015-16",
+        "2018-19",
+        "2019-20"
+      ],
+      "tables": [
+        "anthropometry",
+        "assets",
+        "cluster_features",
+        "crop_production",
+        "earnings",
+        "enterprise_income",
+        "fct",
+        "food_acquired",
+        "food_expenditures",
+        "food_prices",
+        "food_quantities",
+        "household_characteristics",
+        "household_roster",
+        "housing",
+        "income",
+        "individual_education",
+        "interview_date",
+        "livestock",
+        "months_food_inadequate",
+        "nonfood_expenditures",
+        "nutrition",
+        "panel_ids",
+        "people_last7days",
+        "plot_features",
+        "plot_inputs",
+        "plot_labor",
+        "sample",
+        "shocks"
+      ]
+    },
+    "Malawi": {
+      "waves": [
+        "2004-05",
+        "2010-11",
+        "2013-14",
+        "2016-17",
+        "2019-20"
+      ],
+      "tables": [
+        "anthropometry",
+        "assets",
+        "cluster_features",
+        "community_prices",
+        "crop_production",
+        "food_acquired",
+        "food_coping",
+        "food_expenditures",
+        "food_prices",
+        "food_quantities",
+        "food_security",
+        "household_characteristics",
+        "household_roster",
+        "housing",
+        "individual_education",
+        "interview_date",
+        "livestock",
+        "months_food_inadequate",
+        "panel_ids",
+        "people_last7days",
+        "plot_features",
+        "plot_inputs",
+        "plot_labor",
+        "sample",
+        "shocks",
+        "subjective_well_being"
+      ]
+    },
+    "Tanzania": {
+      "waves": [
+        "2008-09",
+        "2010-11",
+        "2012-13",
+        "2014-15",
+        "2019-20",
+        "2020-21"
+      ],
+      "tables": [
+        "anthropometry",
+        "assets",
+        "cluster_features",
+        "community_cluster_xwalk",
+        "community_prices",
+        "crop_production",
+        "food_acquired",
+        "food_coping",
+        "food_expenditures",
+        "food_prices",
+        "food_quantities",
+        "household_characteristics",
+        "household_roster",
+        "housing",
+        "individual_education",
+        "interview_date",
+        "life_satisfaction",
+        "livestock",
+        "panel_ids",
+        "people_last7days",
+        "plot_features",
+        "plot_inputs",
+        "plot_labor",
+        "sample",
+        "shocks"
+      ]
+    }
+  },
+  "provenance": {
+    "Malawi/2016-17": {
+      "catalog_ids": [
+        "2936",
+        "2939"
+      ],
+      "covers": []
+    },
+    "Malawi/2019-20": {
+      "catalog_ids": [
+        "3818",
+        "3819"
+      ],
+      "covers": []
+    },
+    "Tanzania/2008-15": {
+      "catalog_ids": [
+        "3814"
+      ],
+      "covers": [
+        "76",
+        "1050",
+        "2252",
+        "2862"
+      ]
+    }
+  },
+  "relations_file": "/local/job39919092/release-work/published-install-env/lib/python3.11/site-packages/lsms_library/catalog_relations.yml",
+  "same_study_aliases": {
+    "297": "297",
+    "902": "297"
+  },
+  "derived_5835": [
+    "1002",
+    "1952",
+    "2734",
+    "3557"
+  ],
+  "git_tracked_files": null,
+  "no_git_stray_counts": {
+    "with_sidecar": 0,
+    "no_sidecar": 0,
+    "stray_dirs": 0
+  },
+  "source_tree_unchanged_excluding_bytecode": true,
+  "synthetic_quantity_kg": 2.0
+}

@@ -7,9 +7,15 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-from malawi import conversion_table_matching, food_acquired_to_canonical, normalize_food_label
+from malawi import (conversion_table_matching, food_acquired_to_canonical,
+                    normalize_food_label, is_other_specify_code,
+                    other_specify_to_unknown)
 
 wave = "2013-14"
+
+#: IHS3 Module G unit codes the IHPS 2013 "CODES FOR UNIT" list omits
+#: (IHPS.Household.Qx.FINAL.PRINT.pdf, Module G, pp. 30-36).
+_IHPS13_UNPRINTED_CODES = ['03', '12', '13', '16', '17', '21']
 
 df = get_dataframe('../Data/HH_MOD_G1_13.dta', convert_categoricals=True)
 
@@ -84,6 +90,17 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
     # Keep native quantity + native unit; food_acquired_to_canonical computes
     # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
     df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(df[code_col])
+    # GH #1042: this wave ships no other-specify text, so every code-23
+    # (OTHER (SPECIFY)) row has no specification -> missing-unit sentinel.
+    df[u_col] = other_specify_to_unknown(
+        df[u_col], is_other_specify_code(df[code_col]).values)
+    # GH #1042: the shared `u` table decodes 03/12/13/16/17/21 per the IHS3
+    # list (90 kg bag, baskets, cup, tin, basin).  The IHPS 2013 Module G
+    # list prints none of them, so here they record no unit (6 served rows:
+    # buns, sugar, cooking oil, ... "in" a basket or 90 kg bag).
+    df[u_col] = other_specify_to_unknown(
+        df[u_col], df[code_col].astype('string').str.strip()
+        .isin(_IHPS13_UNPRINTED_CODES).fillna(False).values)
 
 df['t'] = wave
 df = df.reset_index()

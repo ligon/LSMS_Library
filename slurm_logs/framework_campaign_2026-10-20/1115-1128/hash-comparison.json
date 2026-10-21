@@ -1,0 +1,23 @@
+{
+  "build_fingerprints": {
+    "changed": [],
+    "count": 40
+  },
+  "country_hashes": {
+    "changed": [],
+    "count": 549
+  },
+  "shipped_source_inputs_identical": true,
+  "tested_working_files_sha256": {
+    ".claude/skills/add-wave/SKILL.md": "440c3823cb8a08b79449ad04c5b3f92240c2c232674ec2485b3c8a4f283eca20",
+    "AGENTS.md": "c1205513db01fb743ec3c8b8c0ec69615a2bfcd9521fb7ed2d3195bd1a7e20dd",
+    "lsms_library/data_access.py": "41bfd39d6bc67e440f3b42b40dc0a88342bde388ae4f173f1b1d042c7d5011b9",
+    "lsms_library/provenance.py": "8f6b50c404ff219cb0f74f13f0416393ca10dfc9ae09ae1d9e34ff14a79a40da",
+    "scripts/backfill_wave_provenance.py": "24f662904668ea076432401edc23965dc42253c45b549c87930d9ffa409a57f6",
+    "tests/test_wave_provenance.py": "b770dce14e5682c736c195a8c5ea722b163d3907207fe8a5471d23a948fc2708"
+  },
+  "wave_hashes": {
+    "changed": [],
+    "count": 2139
+  }
+}

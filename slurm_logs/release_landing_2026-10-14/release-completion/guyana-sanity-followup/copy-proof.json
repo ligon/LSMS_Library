@@ -1,0 +1,190 @@
+{
+  "source": "/local/job39919092/release-work/runtime/data-final-promotion/Guyana",
+  "target": "/local/job39919092/release-work/release-guyana-sanity-data/Guyana",
+  "original": {
+    "var/interview_date.parquet": {
+      "bytes": 15259,
+      "sha256": "3748f36c60f4ca2cb0e13419cbbfc3e1f4c6f32395334c7d4d030d47294ab60d",
+      "mtime_ns": 1792040763205509815,
+      "device": 64770,
+      "inode": 22944546
+    },
+    "var/individual_education.parquet": {
+      "bytes": 25222,
+      "sha256": "e2126d4d6b66e45a8a7948a38b0bbbe7c0abc9f206d40e23dedf8cce51a2f3aa",
+      "mtime_ns": 1792040764962523435,
+      "device": 64770,
+      "inode": 22944547
+    },
+    "var/sample.parquet": {
+      "bytes": 17180,
+      "sha256": "5e933594dee29d7fa0d00994f80c5af61dc71c69bd868463202c339969027d09",
+      "mtime_ns": 1792040763411511411,
+      "device": 64770,
+      "inode": 22944548
+    },
+    "var/assets.parquet": {
+      "bytes": 47901,
+      "sha256": "b82af954db25787667f5e19a64504116cd196dd6e7d801aec58a68490471d77d",
+      "mtime_ns": 1792040755936453465,
+      "device": 64770,
+      "inode": 22944549
+    },
+    "var/cluster_features.parquet": {
+      "bytes": 4690,
+      "sha256": "48c87b024b3758e7bba082fd96a28c887e27b1ab449881295c5d0abee08ed309",
+      "mtime_ns": 1792040756660459078,
+      "device": 64770,
+      "inode": 22944550
+    },
+    "var/housing.parquet": {
+      "bytes": 21123,
+      "sha256": "3506ec64449545fdfcb870b06980e6e0c6876788ee28cbe5d987331d30e751d4",
+      "mtime_ns": 1792040763750514040,
+      "device": 64770,
+      "inode": 22944551
+    },
+    "var/household_roster.parquet": {
+      "bytes": 37917,
+      "sha256": "18d1ab3cec696e451b67d066ad8f36642b49de3f518b1a0c42a3721f5b0e2649",
+      "mtime_ns": 1792040764302518319,
+      "device": 64770,
+      "inode": 22944552
+    },
+    "1992/_/interview_date.parquet": {
+      "bytes": 14930,
+      "sha256": "7670396d9ada03f71b063e502bf9d1aff8ba78ee87f2c20b491e807c9039d4e5",
+      "mtime_ns": 1792040762661505598,
+      "device": 64770,
+      "inode": 22944555
+    },
+    "1992/_/individual_education.parquet": {
+      "bytes": 25121,
+      "sha256": "3a19d3e39a249c8f9db77c570df82caae62e80cfb9be24c32cd4097fe71d7a76",
+      "mtime_ns": 1792040764952523357,
+      "device": 64770,
+      "inode": 22944556
+    },
+    "1992/_/sample.parquet": {
+      "bytes": 17075,
+      "sha256": "0d5094d9d54cc1d3bee8923122350fb10f4d75192a01c3a93b550206e365a76c",
+      "mtime_ns": 1792040763403511350,
+      "device": 64770,
+      "inode": 22944557
+    },
+    "1992/_/cluster_features.parquet": {
+      "bytes": 4585,
+      "sha256": "3a989f29131e8c7f87f3eda20016870812352ba5280c33ca6bf998ba9c6eb4d2",
+      "mtime_ns": 1792040756654459031,
+      "device": 64770,
+      "inode": 22944558
+    },
+    "1992/_/housing.parquet": {
+      "bytes": 21018,
+      "sha256": "c935c3fcfdc43f4335a960fcebd0c719f2e9ceb6c9654e1e42a3e9d12d12bed2",
+      "mtime_ns": 1792040763741513970,
+      "device": 64770,
+      "inode": 22944559
+    },
+    "1992/_/household_roster.parquet": {
+      "bytes": 37812,
+      "sha256": "77a86030e64fe127e16c72f556e86e44728df32c6fefe154e28d8d8f0714cc63",
+      "mtime_ns": 1792040764289518218,
+      "device": 64770,
+      "inode": 22944560
+    }
+  },
+  "copied": {
+    "var/interview_date.parquet": {
+      "bytes": 15259,
+      "sha256": "3748f36c60f4ca2cb0e13419cbbfc3e1f4c6f32395334c7d4d030d47294ab60d",
+      "mtime_ns": 1792040763205509815,
+      "device": 64770,
+      "inode": 23988107
+    },
+    "var/individual_education.parquet": {
+      "bytes": 25222,
+      "sha256": "e2126d4d6b66e45a8a7948a38b0bbbe7c0abc9f206d40e23dedf8cce51a2f3aa",
+      "mtime_ns": 1792040764962523435,
+      "device": 64770,
+      "inode": 23988108
+    },
+    "var/sample.parquet": {
+      "bytes": 17180,
+      "sha256": "5e933594dee29d7fa0d00994f80c5af61dc71c69bd868463202c339969027d09",
+      "mtime_ns": 1792040763411511411,
+      "device": 64770,
+      "inode": 23988109
+    },
+    "var/assets.parquet": {
+      "bytes": 47901,
+      "sha256": "b82af954db25787667f5e19a64504116cd196dd6e7d801aec58a68490471d77d",
+      "mtime_ns": 1792040755936453465,
+      "device": 64770,
+      "inode": 23988110
+    },
+    "var/cluster_features.parquet": {
+      "bytes": 4690,
+      "sha256": "48c87b024b3758e7bba082fd96a28c887e27b1ab449881295c5d0abee08ed309",
+      "mtime_ns": 1792040756660459078,
+      "device": 64770,
+      "inode": 23988111
+    },
+    "var/housing.parquet": {
+      "bytes": 21123,
+      "sha256": "3506ec64449545fdfcb870b06980e6e0c6876788ee28cbe5d987331d30e751d4",
+      "mtime_ns": 1792040763750514040,
+      "device": 64770,
+      "inode": 23988112
+    },
+    "var/household_roster.parquet": {
+      "bytes": 37917,
+      "sha256": "18d1ab3cec696e451b67d066ad8f36642b49de3f518b1a0c42a3721f5b0e2649",
+      "mtime_ns": 1792040764302518319,
+      "device": 64770,
+      "inode": 23988113
+    },
+    "1992/_/interview_date.parquet": {
+      "bytes": 14930,
+      "sha256": "7670396d9ada03f71b063e502bf9d1aff8ba78ee87f2c20b491e807c9039d4e5",
+      "mtime_ns": 1792040762661505598,
+      "device": 64770,
+      "inode": 23988116
+    },
+    "1992/_/individual_education.parquet": {
+      "bytes": 25121,
+      "sha256": "3a19d3e39a249c8f9db77c570df82caae62e80cfb9be24c32cd4097fe71d7a76",
+      "mtime_ns": 1792040764952523357,
+      "device": 64770,
+      "inode": 23988117
+    },
+    "1992/_/sample.parquet": {
+      "bytes": 17075,
+      "sha256": "0d5094d9d54cc1d3bee8923122350fb10f4d75192a01c3a93b550206e365a76c",
+      "mtime_ns": 1792040763403511350,
+      "device": 64770,
+      "inode": 23988118
+    },
+    "1992/_/cluster_features.parquet": {
+      "bytes": 4585,
+      "sha256": "3a989f29131e8c7f87f3eda20016870812352ba5280c33ca6bf998ba9c6eb4d2",
+      "mtime_ns": 1792040756654459031,
+      "device": 64770,
+      "inode": 23988119
+    },
+    "1992/_/housing.parquet": {
+      "bytes": 21018,
+      "sha256": "c935c3fcfdc43f4335a960fcebd0c719f2e9ceb6c9654e1e42a3e9d12d12bed2",
+      "mtime_ns": 1792040763741513970,
+      "device": 64770,
+      "inode": 23988120
+    },
+    "1992/_/household_roster.parquet": {
+      "bytes": 37812,
+      "sha256": "77a86030e64fe127e16c72f556e86e44728df32c6fefe154e28d8d8f0714cc63",
+      "mtime_ns": 1792040764289518218,
+      "device": 64770,
+      "inode": 23988121
+    }
+  }
+}

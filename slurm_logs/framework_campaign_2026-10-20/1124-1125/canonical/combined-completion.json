@@ -1,0 +1,36 @@
+{
+  "command": [
+    "/local/job40255479/venv_img/bin/python",
+    "/local/job40255479/worktrees/framework-integration/bench/feature_audit/scan.py",
+    "--features",
+    "canonical",
+    "--phases",
+    "1,2",
+    "--jobs",
+    "3",
+    "--out",
+    "/local/job40255479/canonical-audit-compare/combined-raw.jsonl"
+  ],
+  "controller_unchanged": true,
+  "cpu_affinity": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "elapsed_seconds": 2895.089115381241,
+  "head": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "identity": {
+    "countries_root": "/local/job40255479/worktrees/framework-integration/lsms_library/countries",
+    "data_root": "/local/job40255479/canonical-audit-compare/data-combined",
+    "package": "/local/job40255479/worktrees/framework-integration/lsms_library/__init__.py"
+  },
+  "label": "combined",
+  "nice": 19,
+  "returncode": 0,
+  "runtime": "/local/job40255479/worktrees/framework-integration",
+  "runtime_head_unchanged": true,
+  "scanner": "/local/job40255479/worktrees/framework-integration/bench/feature_audit/scan.py",
+  "scanner_sha256": "7380a8faf1cc3de87954d776d8592e05a505a2697443b3c9c52181a06bd041b4",
+  "started": 1792541430.166285
+}

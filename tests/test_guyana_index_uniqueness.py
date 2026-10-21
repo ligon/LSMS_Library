@@ -37,6 +37,7 @@ docstrings, and each has a reason:
 
 Prose in a CONTENTS.org is not enforcement; this file is.
 """
+import shutil
 import warnings
 
 import pandas as pd
@@ -72,6 +73,28 @@ EXPECTED_ROWS = {
 @pytest.fixture(scope="module")
 def guyana():
     return ll.Country("Guyana")
+
+
+@pytest.fixture
+def private_cold_root(tmp_path):
+    """The destructive cold control owns its L2; an empty source is allowed."""
+    shared = data_root()
+    root = tmp_path / "data"
+    root.mkdir()
+    if (shared / "Guyana").exists():
+        shutil.copytree(shared / "Guyana", root / "Guyana")
+    if (shared / "dvc-cache").exists():
+        (root / "dvc-cache").symlink_to((shared / "dvc-cache").resolve(),
+                                      target_is_directory=True)
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setenv("LSMS_DATA_DIR", str(root))
+        data_root.cache_clear()
+        assert data_root() == root
+        try:
+            yield root
+        finally:
+            patch.undo()
+            data_root.cache_clear()
 
 
 @pytest.mark.parametrize("table", sorted(EXPECTED_ROWS))
@@ -128,7 +151,7 @@ def _clear_guyana_caches(tables) -> None:
                 l2.unlink()
 
 
-def test_no_silent_collapse_warning_on_cold_build(monkeypatch):
+def test_no_silent_collapse_warning_on_cold_build(monkeypatch, private_cold_root):
     """No ``GrainCollapseWarning`` for any Guyana table on a COLD build.
 
     Built COLD (caches cleared + LSMS_NO_CACHE) so the collapse path actually

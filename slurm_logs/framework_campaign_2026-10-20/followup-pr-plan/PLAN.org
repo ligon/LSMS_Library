@@ -1,0 +1,128 @@
+#+TITLE: Incremental framework follow-up publication and landing plan
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Recommendation and current state
+
+Four draft PRs are now published by the parent: nutrition directly against development, and the other three against the existing integration comparison branch.
+No source, worktree, branch, commit or GitHub mutation was performed by this planner.
+Parent approved this publication structure and has already prepared the fresh nutrition publication branch.
+
+Live development is =ad1e87e1025dec98fe70734f4e60d12824fd31dd= (Windows PR #1153 merged).
+GitHub already has =integration/framework-v016-40255479= at =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+Original PRs [[https://github.com/ligon/LSMS_Library/pull/1154][#1154]], [[https://github.com/ligon/LSMS_Library/pull/1155][#1155]], [[https://github.com/ligon/LSMS_Library/pull/1156][#1156]] and [[https://github.com/ligon/LSMS_Library/pull/1157][#1157]] remain open against development.
+They cover #1093, #1099, #1143 and #1124/#1125 respectively.
+Their unit/windows-smoke checks succeeded; their PR data/native-script jobs were skipped, which is not data/native-script validation.
+GraphQL PR baseRefOid still reports976; the live branch REST ref is the authority for current development.
+
+Frozen final combined candidate is =4cab5f0db7d375ad543e652f61f43bd28fa94ecd= in the framework-followup worktree.
+Its full suite and exact-head credentialed CI are PENDING at this plan's snapshot.
+The separate farm audit and real pooled-reducer checks completed without new structural findings, as reported by the parent.
+[[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][Manual CI 39531148624]] runs that exact candidate; unit and Windows smoke checks succeeded, while native/data checks remain active.
+The earlier exact852 data run failed the Uganda nutrition raw hash and must not be described as green.
+The new test repair addresses that measured fingerprint boundary; its final CI outcome remains pending.
+
+* Exact draft PRs
+
+| Work / PR | Publication branch | Initial base | Exact published head | Body |
+|-----------+--------------------+--------------+----------------------+------|
+| Nutrition [[https://github.com/ligon/LSMS_Library/pull/1161][#1161]] | review/nutrition-cpu-hash-20261020 | development | 6553e01d6cd9013a2103124dcf7a2c945025a25c | [[file:nutrition-body.md]] |
+| #778 [[https://github.com/ligon/LSMS_Library/pull/1162][#1162]] | review/778-cache-race-20261020 | integration/framework-v016-40255479 | f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb | [[file:778-body.md]] |
+| #1115/#1128 [[https://github.com/ligon/LSMS_Library/pull/1163][#1163]] | review/1115-1128-provenance-20261020 | integration/framework-v016-40255479 | 44f6cd2e7d3665622d2119fe4725e5a7604a56fa | [[file:provenance-body.md]] |
+| #1159 [[https://github.com/ligon/LSMS_Library/pull/1164][#1164]] | review/1159-pooled-reducers-20261020 | integration/framework-v016-40255479 | 45f80dcb50da189b7864034b1d92863dca68de09 | [[file:1159-body.md]] |
+
+Exact titles are in =plan.json= and were sent with the body paths.
+The three comparison-base PRs contain only their own changes because 852 is an ancestor of each frozen worker head.
+Keep the source worker branches/worktrees pinned and publish separate review branches; no force push is required.
+The bodies explicitly prohibit merging into the temporary comparison base and identify the dependencies.
+
+Nutrition is independent of the original fixes: every path changed by its five commits has an identical preimage at ad1 and 852, and Uganda nutrition.py/fct.py are also identical there.
+This was verified with path-filtered git diffs without applying anything.
+The parent-created publication branch replays only these commits, in order:
+
+#+begin_example
+66416b61bcfeeb1904419445102c28eca61d6eb1
+5f571dcc476b7eee89f2c7a2628bde945aa03837
+dd745136013d8670e2897af046bf7ddaeac2710b
+6b400aeea2e9676e461d760f83980ebb8f223eea
+98822ed1ab3a2106b3be4c3d90aa086076e32ef0
+#+end_example
+
+No integration merge commit belongs in that replay.
+Expected nutrition publication paths are the four test/CONTENTS paths, one task ledger and nutrition-cpu aggregate evidence/probes listed in =plan.json=.
+Root completed the fresh-publication check: 15 focused controls passed and all 17 changed file bytes match the reviewed worker.
+The local body files now exactly match the published bodies, including this result and current pending gates.
+
+* Landing sequence for the parent
+
+1. DONE by parent: publish the four review branches and create drafts using the exact title/body records.
+   Nutrition targets development; the other three target the existing852 comparison branch.
+2. Complete final local/credentialed CI gates; mark nutrition ready and land it through the normal review process if approved.
+3. Land the original #1154-#1157 PRs through normal review, preserving their intended issue scopes.
+   #1153 is already landed; no new release is authorized.
+4. For each of the remaining three publication branches, create an isolated publication worktree after approval, merge the then-current development into that publication branch, resolve any conflict with the frozen reviewed diff as authority, and verify the resulting source/diff.
+   Push normally: the merge is a descendant of the already-published head.
+   Preserve all worker branches and do not force-push them.
+5. Only after development is an ancestor of the new publication head, retarget that PR to development.
+   Check that the displayed diff contains its intended files/behavior only; compare production/test blobs with the reviewed candidate and rerun relevant checks if conflicts or runtime changes occurred.
+6. Keep the new drafts pending until the intended final PR-head checks and data/native validation are complete.
+   Land the three reviewed follow-ups separately; their relative order has no additional required runtime dependency once the originals are present.
+   #1159 does specifically require #1154's declared-unit contract in its final stack.
+7. Update #1158 campaign evidence/issue closure bookkeeping after actual landing and completed validation.
+   Do not claim a 0.16 release or close unrelated scientific/source decisions.
+
+Retargeting alone is insufficient: the candidate history contains integration merges while development may contain separately merged/squashed original PRs.
+The shared merge bases can then make a three-dot comparison show original work again.
+Merging development into the publication branch makes the target an ancestor and yields an unambiguous incremental diff.
+Fresh development-based branches with only the listed nonmerge task commits are an alternate if conflicts make the merge approach undesirable; that requires a newly verified branch/PR rather than overwriting a frozen worker.
+
+* Scope and closure
+
+Use Addresses #778 for the draft as written.
+Its two actionable remaining items are implemented, but the carried unstamped-output trust-mode note is explicitly unchanged.
+[[file:778-narrowing.md]] supplies a concrete scope/closure note and an optional unfiled separate policy draft.
+Only after explicit issue narrowing should Fixes #778 be used as intended closure wording; never imply that hashless/trust policy was repaired.
+The distinct #1071 corruption/LSMS_NO_CACHE decision remains open.
+
+The provenance pair may say Fixes #1115 and Fixes #1128: full approved code-only scope is reviewed, including the round1 refusal repair.
+Keep #1149 staging/nested replacement/retirement/rollback and secondary release metadata out of that closure.
+#1159 may say Fixes #1159 for its two mass reducers; its inherited downstream fertilizer_rate country loss remains [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]].
+Nutrition has no new issue number and must not close #788 or reframe the historical #967 approval.
+
+The default branch is master, not development.
+GitHub interprets PR-description closing keywords only when the PR targets the default branch, so none of these integration/development-targeted PRs will automatically close an issue now.
+Keep explicit issue references and perform authorized later closure/release bookkeeping separately.
+Source: [[https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue][GitHub issue-linking documentation]].
+
+* CI and tooling notes
+
+The workflow has an unrestricted pull_request trigger, so draft PRs on the comparison base can run unit/windows-smoke checks.
+Data tests remain gated to manual dispatch/merge-group/selected pushes/schedules; a PR data job skipped by that condition is not a completed credentialed test.
+Do not change CI enforcement/rulesets or invent a merge-queue capability as part of publication.
+The separate #932 enforcement permission decision remains outside this plan.
+
+* Independent publication scope audit
+
+PASS: exact GitHub diff path sets match the intended local reviewed diffs for all four drafts.
+All 79 changed file blob SHAs match their reviewed workers: 17 nutrition, 11 cache, 39 provenance and 12 pooled-reducer files.
+Nutrition's 17 published blobs match the original98822 worker despite its new6553 ancestry.
+No extra/missing path, unexpected source change or burial of the original fixes was found.
+Base names, head SHAs and draft flags match the table above.
+The audit used read-only gh API/git queries; no tests, source edits or GitHub mutations were needed.
+=scope-audit.json= records the comparison and =published-prs.json= retains the read-only PR/file/check snapshot.
+
+* Bounded release recommendation
+
+Keep the runtime scope frozen while the final full suite and native/credentialed CI complete.
+If those gates and normal landing checks pass, proceed to a bounded release-candidate assessment rather than add another framework increment to this batch.
+No release is authorized by this plan.
+
+The next correctness priority is #1160's inherited fertilizer_rate country loss; it is explicitly outside #1164, and its pooled-rate contract must be decided before implementation.
+Acquisition staging/nested replacement/retirement under #1149 is the prerequisite for a separately reviewed real release-refresh procedure, not a claim supplied by #1163's metadata guards.
+Keep #932's enforcement permission decision, the prior known source/wiring inventory and scientist choices visible separately; these four PRs do not close them or establish enforced data CI.
+There is no compute/cache-cost reason to treat a skipped or pending gate as passed.
+
+The catalog-listed working-with-github skill path was absent and no matching file appeared in scoped skill-root searches.
+Ordinary gh read-only commands, local git inspection, workflow source and official GitHub documentation supplied the necessary evidence; no install/configuration change was attempted.
+
+Sue.

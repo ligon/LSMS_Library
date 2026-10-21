@@ -1,0 +1,9 @@
+{
+  "issue": 941,
+  "state": "OPEN",
+  "updated_utc": "2026-10-15T15:21:58.166058+00:00",
+  "before_sha256": "daf90cb81cc976dc6b5b47687b1034b973f637ec165794aefa03dd2238456cb0",
+  "after_sha256": "7d58093c0a1eca87cec546a15d001b9b33f1a65c88568b7ac986507bb4438e6e",
+  "historical_cause_unresolved": true,
+  "final_combined_ci_passed": true
+}

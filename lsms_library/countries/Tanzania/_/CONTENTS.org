@@ -710,16 +710,20 @@ The community questionnaire price data appears decent for 2019-20.
      region-level fallback is the most that can be done.
 3. Use community prices as a fallback when household-level unit values
    cannot be constructed (i.e., when =quant_purchase= is missing).
-4. Merge with existing =food_prices_quantities_and_expenditures.py=
-   logic so that household-level unit values take priority where
-   available, and community prices fill the gaps.
+4. Merge with the runtime derivation (=transformations.food_prices_from_acquired=,
+   dispatched by =Country._FOOD_DERIVED=) so that household-level unit
+   values take priority where available, and community prices fill the
+   gaps.  (This step used to name =_/food_prices_quantities_and_expenditures.py=;
+   that script was dead and was deleted 2026-10-17, GH #218.)
 
 *** Relevant files
 
 - =Tanzania/2019-20/Data/= --- community questionnaire files (DVC-tracked)
 - =Tanzania/2020-21/Data/= --- community questionnaire files (DVC-tracked)
-- =Tanzania/_/food_prices_quantities_and_expenditures.py= --- current price pipeline
-- =Tanzania/_/food_acquired.py= --- country-level aggregation
+- =lsms_library/transformations.py= (=food_prices_from_acquired=) --- current price pipeline, run at read time via =Country._FOOD_DERIVED=
+- =Tanzania/_/food_acquired.py= --- country-level aggregation /(retired GH #836,
+  2026-10-17; the framework concatenates the three wave parquets --- see
+  [[#issue-114][#114]] and the GH #836 note under =food_acquired.py= below)/
 
 *** Why the community-price ↔ household link cannot be made cleanly (diagnosis 2026-06-14)
 
@@ -1150,6 +1154,42 @@ The country-level script handles this with a blunt
 =x.loc[~x.index.duplicated(),:]= on line 65, which silently drops
 duplicates.  Row counts halve from 408,707 to 228,281.
 
+#+begin_quote
+*Update (GH #836, 2026-10-17) --- the country-level path above is retired.*
+The two paragraphs above describe =Tanzania/_/food_acquired.py=, which was
+deleted in GH #836.  It had already been off the API path since the
+canonical-index move (#169): the framework concatenates the three wave
+parquets and =_finalize_result= applies =id_walk=, so its rename of =UPHI=,
+its own =id_walk= and its blunt =~index.duplicated()= drop no longer run
+anywhere.  The text above is kept as history.  Note, though, that the
+408,707 → 228,281 halving it attributes to line 65 matches the *wave-level*
+exact-duplicate drop measured below (408,891 → 228,377), not the ~33,000-row
+country-level collapse the same paragraphs describe.
+
+Measured 2026-10-17 (the GH #836 review checked the served frame cold == warm):
+
+- *Served*: =Country('Tanzania').food_acquired()= is 251,730 rows at
+  =(i, t, v, j, u, s)=, index unique, =grain_reports()= = 0 (no
+  =GrainCollapseWarning=).  2008-15 rounds: 44,969 / 54,775 / 67,918 /
+  61,987 rows.
+- *What remains (the residual this WAITING now tracks)*: the =UPHI= fan-out in
+  =upd4_hh_j1.dta= is still dropped at the *wave* level, in
+  =tanzania.food_acquired()= (the =duplicated()= check is now ~line 604, not
+  213--219).  At
+  =(r_hhid, hj_00, round)= after =dropna(how='all')= the raw file has
+  408,891 rows, of which 180,514 are index duplicates and 228,377 unique ---
+  and 228,377 is also the count of distinct full rows, so the drop is
+  *lossless* (rows differ only in the unselected =UPHI=).  The function raises
+  if that ever stops being true.  UPHIs sharing an =r_hhid= in a round were one
+  household in that round, so one food record per =(r_hhid, round)= is the
+  survey's own grain, not a loss.  The open part is only that the drop is
+  *silent* (nothing counts or reports it) and that its correctness rests on
+  that exact-duplicate check.
+- The "Proposed fix strategy" below has been implemented, in substance, in
+  =map_08_15()= (R1-composite ids, split-offs suffixed =-sNN=; its docstring
+  cites #114).  It is no longer what this WAITING waits on.
+#+end_quote
+
 *** Observed data
 
 After deduplication (excluding UPHI), per-round household counts
@@ -1224,7 +1264,9 @@ duplicates.
 
 - =Tanzania/2008-15/_/food_acquired.py= --- wave-level script; reads =upd4_hh_j1.dta=
 - =Tanzania/_/tanzania.py= --- =food_acquired()= function (line 200), =map_08_15()= (line 16)
-- =Tanzania/_/food_acquired.py= --- country-level aggregation; applies =id_walk= and deduplicates
+- =Tanzania/_/food_acquired.py= --- country-level aggregation; applied =id_walk= and deduplicated
+  /(retired GH #836, 2026-10-17; off the API path since #169 --- the framework
+  concatenates the wave parquets and =_finalize_result= applies =id_walk=)/
 - =Tanzania/_/panel_ids.py= --- builds =updated_ids.json= via =map_08_15()=
 
 
@@ -1297,6 +1339,14 @@ df.index.name = 'Preferred Label'
 
 print(df_to_orgtbl(df))
 #+end_src
+
+*Superseded (GH #836, 2026-10-17) --- nothing reads this table.*  It was the
+item-label map of the retired country script =_/food_acquired.py=.  The live
+map is =#+name: harmonize_food= in =_/categorical_mapping.org= (applied in each
+wave script by =tanzania.food_acquired_to_canonical=), and that file IS in the
+cache hash.  Measured at retirement: the two tables carry the identical
+180 (wave, raw label) -> Preferred Label pairs.  Edit =harmonize_food=, not
+this copy; it is kept only as the output of the src block above.
 
 #+name: food_labels
 | Preferred Label          | 2008-15                                                  | 2019-20                                                  | 2020-21                                                  |
@@ -1482,27 +1532,87 @@ not match on a native-unit key.  Any consumer comparing the two tables at
 the fix that looks obvious (registering the sentinel) is the one the config
 already rules out.
 
-*** =CONTENTS.org= is a BUILD INPUT here --- and the cache hash cannot see it
+*** =community_prices= carries the SOURCE item code as =variety= (GH #840, 2026-10-19)
 
-=Tanzania/_/food_acquired.py= line 34 reads its item-label table out of *this
-file*:
+=j= on this table is the =harmonize_community_price= Preferred Label, which
+deliberately LUMPS source item codes so it can join =food_acquired.j=: 6
+MILLET (GRAIN) + 7 SORGHUM (GRAIN) -> "Millet & Sorghum (grain)", 16 COCOYAMS
++ 17 YAMS -> "Yams/Cocoyams", 25-27 carrots / tomatoes / onions ->
+"Vegetables (fresh)", and so on.  The lumped codes are priced separately and
+at different prices, so the =(t, v, j, u)= grain held several rows per cell
+and =community_prices_for_wave= kept the first: 261 of 2,769 cells in 2019-20
+and 1,281 of 13,062 in 2020-21, of which 243 / 1,149 disagreed on Price
+(cluster =01-06-47-85=, 2020-21: millet 2,000 TSh/kg, sorghum 16,000).
 
-: fl = df_from_orgfile('CONTENTS.org','food_labels')
+That function's GH #637 comment concluded "no additional index level is
+available that would not break the shared =j= vocabulary".  That is not so:
+the source code is finer than =j= and leaves =j= untouched.  Ruling @ligon
+2026-10-18 (#840): the index is now =(t, v, j, u, variety)=, =variety= the
+=item_id= code as a string ('1'..'52'), the file's own label in a new
+=Description= column -- upper-case in 2019-20, partly lower-case and partly
+English-for-Swahili in 2020-21 (MAHARAGE -> beans, KUNDE -> peas), which is
+why the code and not the label is the level.  Served rows 15,831 -> 17,699
+(3,076 + 14,623); the survey prices each code once per cluster (#637: zero
+repeats), so nothing is selected; the old choice was the lowest code, which
+reproduces the pre-#840 table on 15,831 of 15,831 cells.
 
-Tanzania is the *only* country in the corpus that does this (checked across
-every =countries/*/_/*.py= and =countries/*/*/_/*.py=); everywhere else such a
-table lives in =food_items.org= or =categorical_mapping.org=.  But
-=country.py= defines =_ORG_HASH_SKIP = \{"CONTENTS.org"\}= --- CONTENTS.org is
-excluded from =Wave._input_hash= / =Country._table_cache_hash= *as
-documentation*.
+*** =CONTENTS.org= WAS a build input here --- RESOLVED by retiring the script (GH #836, 2026-10-17)
 
-So editing the =food_labels= table below changes what =food_acquired= builds
-and does *not* invalidate the L2 cache: the stale parquet keeps being served.
-The exclusion is right for prose (this note, for instance, is cache-neutral by
-design) and wrong for a build table that happens to live in the same file.
-Either move =food_labels= to =food_items.org= (which IS hashed) or clear the
-cache by hand after touching it.  Reported, not fixed --- the move changes
-=food_acquired='s build inputs and forces a corpus rebuild of the table.
+=Tanzania/_/food_acquired.py= used to read its item-label table out of *this
+file* (=df_from_orgfile('CONTENTS.org','food_labels')=), while =country.py='s
+=_ORG_HASH_SKIP = \{"CONTENTS.org"\}= excludes this file from
+=Wave._input_hash= / =Country._table_cache_hash= as documentation --- so an edit
+to the table could not invalidate the cache.
+
+Resolved by *deleting the script*, not by moving the table, because the script
+was not on any working path (measured 2026-10-17 on a cold private root):
+
+- *Default backend*: a sentinel =raise= planted at the top of the script never
+  fired; the framework builds =food_acquired= by concatenating the three wave
+  parquets, and the cold frame (251,730 rows) equals the warm one.
+- *=LSMS_BUILD_BACKEND=make=*: the script IS invoked, and it crashes on
+  unmodified code --- =AssertionError: Cannot concat indices that do not have
+  the same number of levels= --- because it still renames =UPHI= to =j= and
+  expects the pre-canonical =(j, t, i)= wave index, while the wave parquets are
+  canonical =(t, i, j, u, s)= (GH #169).  Its label rename targeted level =i=,
+  which is now the *household*, so even a running script would have relabelled
+  nothing.
+- *Its effect is already served*: each wave script maps item labels through
+  =harmonize_food= (=_/categorical_mapping.org=, hashed), whose 180
+  (wave, raw label) -> Preferred Label pairs are identical to =food_labels='s;
+  the 60 served =j= values are exactly the 60 Preferred Labels.
+
+The =food_labels= table below is kept as history and marked superseded.  No
+Tanzania script reads =CONTENTS.org= any more.  (The catch-all
+=%.parquet: %.py CONTENTS.org tanzania.py= Makefile rule still names this file
+as an *mtime* prerequisite; that is make's business, not the cache hash's.)
+
+*Update (GH #1039, 2026-10-19).*  With the script gone there was no country
+rule at all, so =LSMS_BUILD_BACKEND=make= raised =Could not materialize
+Tanzania/food_acquired= cold, and on a warm root served whatever
+=var/food_acquired.parquet= held (a planted 5-row file came back as the
+"rebuild").  The make backend now builds a =materialize: make= table with no
+country rule and no =_/<table>.py= from its waves, exactly as the default
+backend does: measured cold, 251,730 rows, =assert_frame_equal= to the default
+backend's served frame; =var/= is not written.
+
+*Still in this directory, and dead:* =_/food_expenditures.py=,
+=_/food_quantities.py= and =_/food_unitvalues.py= (from the 2020 "Great
+rearrangement").  No Make rule names them and no table declares them, but the
+catch-all above makes them reachable: when deriving =food_expenditures= /
+=food_quantities= from =food_acquired= fails, =Country= falls back to legacy
+aggregation, =run_make_target= asks make for the in-tree name
+=Tanzania/_/food_expenditures.parquet=, and the catch-all runs the script (on
+BOTH backends, measured).  Each crashes at its first read, so today nothing is
+written: =food_unitvalues.py= and =food_quantities.py= first read
+=../2008-09/_/food_unitvalues.parquet= and =../2008-09/_/food_quantities.parquet=
+(no such wave folder; =2008-09= lives in =2008-15/=), and =food_expenditures.py=
+first reads the bare =food_unitvalues.parquet= -- the in-tree output its
+sibling would have written (line 6; measured traceback, red team r1).  If one ever ran, its
+=to_parquet(x, 'food_expenditures.parquet')= from =_/= matches none of
+=_resolve_data_path='s patterns and would write *in-tree* (the GH #803 class);
+they are the only three of ~620 =to_parquet= call sites in the corpus with that
+spelling.  Retiring them is a separate change (#788 ruling).
 
 *** Test...
 #+begin_src python :results output
@@ -1529,6 +1639,12 @@ max     58800.000000     70000.000000  ...      52.500000      52.500000
 #+end_example
 ** DONE food_prices_quantities_and_expenditures.py
 CLOSED: [2023-03-07 Tue 21:12]
+RETIRED 2026-10-17 (GH #218): the script is deleted.  It read the pre-canonical
+=food_acquired= columns (=unitvalue_purchase=, =unit_purchase=, =quant_ttl_consume=)
+and had raised =KeyError= on the canonical =(t, i, j, u, s)= table ever since
+GH #169.  The three tables are derived at read time; see
+"=food_expenditures= / =food_prices= / =food_quantities= are derived (GH #218)" at the
+end of this file.  The block below is the 2023 output, kept as history.
 Test...
 #+begin_src python :results output
 import pandas as pd
@@ -1678,6 +1794,49 @@ Longitude are therefore NOT emitted.
   (+ =_plot_harmonized_codes=, =_map_plot_codes=).
 - =Tanzania/2019-20/_/plot_features.py=, =Tanzania/2020-21/_/plot_features.py= :: per-wave scripts.
 - =Tanzania/_/plot_features.py= :: country concatenator (concat + id_walk).
+
+* Cluster id renumbering at round 3 (GH #942)
+
+*UPD4 round 3 (2012-13) renumbers 82 of the 409 NPS clusters, whole clusters
+at a time.*  Measured 2026-10-19 in the raw =2008-15/Data/upd4_hh_a.dta=, by
+tracking line (=UPHI=): 1,565 of the 7,082 lines present in both round 2 and
+round 3 change =clusterid=, but they collapse to only *83* distinct
+(round-2, round-3) id pairs, *81 of which differ in the last digit only*
+(=17113001 -> 17113000=, =17302007 -> 17302008=); just one of the 409 round-2
+clusters maps to more than one round-3 cluster.  Apart from that one round-2
+cluster, which splits (=7124001=: some of its lines keep the id in round 3,
+the rest go to =10207004=, which already exists in round 2), no renumbered
+round-2 id occurs in round 3 and no new round-3 id occurs in round 2; through
+the API, which sees linked households only, both counts are 0.  The affected
+clusters are in region codes 17--21 and 51--55 (Zanzibar).  Through the API
+(=Country('Tanzania').sample()=, which reads =clusterid= verbatim): 591 of the
+2,904 households linked across 2010-11 -> 2012-13 change =v=, in 82 one-to-one
+pairs.  At round 4 (2014-15) the change is partly undone: 12 of the 82 return
+to their round-2 id (58 households).  6 of the 82 round-3 ids still occur in
+2014-15, but no linked household keeps one; the other non-reverting
+households (10, in 8 clusters) move to new-format ids (11 or 12 characters,
+the 2014-15 refresh layout).  (Corrected 2026-10-19 after red team r1 R3; this
+paragraph used to say "6 keep the round-3 id", and that no renumbered id
+occurred on the other side at all.)
+
+So the 20% of linked households whose =v= changes at 2010-11 -> 2012-13 are
+*not movers*.  Two existing readings say they are, and both are contradicted:
+
+- =2008-15/_/sample.py=: "the NPS TRACKS movers, and 1,607 of the 8,359 panel
+  lines seen in more than one round change clusterid over their life."  At the
+  round-2 -> round-3 step, 1,565 of those changes are this renumbering.
+- =slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org= §2, Tanzania
+  2010-11 -> 2012-13: "panel-stable; 20% are /movers/".  A mover does not take
+  its whole cluster with it; a bijection of whole clusters is a renumbering.
+
+Why it matters: grouping on =v= across 2010-11 and 2012-13 (or clustering
+standard errors on it) splits each of the 82 clusters in two.
+=Tanzania/_/sampling.yml= therefore declares the 2012-13 and 2014-15 boundaries
+=cluster_id_continuity: wave-scoped= (partial), and a =Country('Tanzania')=
+frame carrying =v= across them raises a =ClusterIdentityWarning=; nothing
+served changes.  The cause (a correction of mis-coded EA serials? a re-listing?)
+is not documented in anything the repository holds.  A crosswalk is derivable
+for this boundary (it is a bijection) but is out of scope (GH #942 ruling).
 
 * The cluster key of =cluster_features= (GH #323, Site 2)
 
@@ -1862,7 +2021,20 @@ region code.  These are carried through as-is rather than repaired by guesswork.
   original-or-booster restriction, place-name case normalisation.
 - =tests/test_gh323_tanzania_cluster_key.py= :: 28 tests.
 
-* Known warm interview-date loss (GH #798, 2026-10-15)
+* Warm interview-date loss (GH #798, found 2026-10-15, FIXED 2026-10-17)
+
+*Resolved on branch =fix/798-datetime=.*  Both declared-datetime casts in
+=_finalize_result= now go through =country._coerce_datetime_column=, which
+parses with =format='mixed'= and emits a =DatetimeCoercionWarning=
+(country/table/column/count) for any non-blank string still served
+=NaT=.  Measured warm: =Country('Tanzania').interview_date()= 16,534 ->
+*22,427* rows over six waves (2019-20 1,184, 2020-21 4,709 restored),
+equal to the concatenated single-wave calls; the six genuinely null raw
+dates are still dropped and do not warn (they are null, not unparsed).
+Read-path only: 0 of 36 probed cache hashes moved.  The historical
+record below is kept as found; the single-wave workaround it describes
+is no longer needed.
+
 
 The four =2008-15/= UPD rounds store interview dates as space-separated
 timestamp strings in the raw country parquet; 2019-20 and 2020-21 store
@@ -1893,3 +2065,47 @@ On a separate complete warm-cache copy, concatenating ordinary
 =Country('Tanzania', preload_panel_ids=False)=, reproduced the exact
 22,427-row cold result without changing cache files. This is a bounded
 workaround for the verified cache/environment, not an all-wave fix.
+
+* 2026-10-18 -- =interview_date= parsed at build time (GH #1045 run 1)
+
+Every wave now parses =int_t= with the one build-time parser
+(=lsms_library/datetime_parse.py=) and stores =timestamp[us]= at both cache
+tiers (the country parquet stored =large_string= before).
+- =2008-15/_/interview_date.py= (script path, *one folder, four rounds*):
+  =assign_datetime= on =ha_18_3= (year, float) / =ha_18_2= (month *name*,
+  ='DECEMBER'=) / =ha_18_1= (day, float), run AFTER the asserted
+  =(r_hhid, round)= dedup so its counts are served households, not
+  replicated panel lines.  Reports are per *round* =t=, not per folder.  The
+  dedup assert now checks the raw components rather than the parsed date.
+  The script hands its report to =to_parquet(datetime_audit=...)=: it runs
+  in a =make= subprocess, so the stamp is the only way the report reaches a
+  warm read.
+- =2019-20= / =2020-21= (YAML path): =datetime: hh_a18=,
+  =format: '%Y-%m-%dT%H:%M:%S'=; the time of day is kept, as it always has
+  been served.  Their =_/interview_date.py= scripts were DEAD (the YAML block
+  wins in =grab_data=; one stripped the time with =.dt.date=) and are gone.
+
+*Contradiction with the #798 entry above, which says "the six genuinely
+null raw dates are still dropped".*  Parsed from the source components, the
+six are not all null: *4* are blank in every component, *1* is a recorded
+=2009/FEBRUARY/31= (2008-09; now =out_of_range=, still =NaT=, and reported
+on every read of 2008-09 as a =DatetimeParseWarning=), and *1* records a year and month
+with no day (2010-11, =i=08010060090321=), which is now served as
+2010-11-01 with =Derivation= =::interview_date::date-day-imputed=.  Served rows 22,427 ->
+22,428; 0 value differences on the 22,427 common rows (measured against a
+base-commit build in a separate data root).
+
+* 2026-10-17 -- =food_expenditures= / =food_prices= / =food_quantities= are derived (GH #218)
+
+The three tables are computed at read time from =food_acquired= by
+=Country._FOOD_DERIVED= (=transformations.food_*_from_acquired=); they are
+never written to =var/=.  The legacy country script
+=_/food_prices_quantities_and_expenditures.py= that used to claim them, and its
+grouped =&:= rule in =_/Makefile=, are deleted.  It was dead: run against the
+canonical =(t, i, j, u, s)= =food_acquired= it raised
+=KeyError: None of [Index(['unitvalue_purchase', 'unit_purchase'], ...)] are in the [columns]= before writing
+anything (the design doc =slurm_logs/DESIGN_218_food_legacy_retirement.org=
+recorded =KeyError('m')=; the column check now fails one step earlier).
+The script was written for the pre-GH #169 table in which =j= was the household and =i= the item; the canonical table swaps them back, so even its index assumptions were stale.  Removing the =!make= registrations does not change dispatch: =Country.data_scheme= auto-surfaces the three tables from =food_acquired=, and the derivation was already tried first.
+
+Served tables before and after the removal are frame-equal (196,293 / 196,280 / 251,717 rows; waves 2008-09 ... 2020-21, the four =2008-15/= rounds included).

@@ -1,0 +1,88 @@
+#+TITLE: Independent review of GH #778
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Assessment
+
+Production and test changes pass independent review at =3c97f20db8ca30c18f80a6aed681c76fc0a82aa3=, runtime commit =2aef1c2ac=, against =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+The full exact diff, task ledger, live issue body/comments, report, verification records and baseline control were read.
+No production or test defect was found.
+One nonblocking documentation-count discrepancy should be corrected before presenting the evidence as one run.
+
+P3: =REPORT.org:33= and =.coder/ledger/778-cache-race.md:72= say the baseline had 19 file replacements.
+The committed =verification.json:44= and private =isolation-before.json= both record 18.
+The 15 unlinks and 16 byte changes agree.
+Use 18 or identify the distinct run supporting 19; no runtime change is needed.
+
+* Exception and compatibility checks
+
+The two new catches surround only the assumed-fresh =get_dataframe= calls and catch only FileNotFoundError.
+Mapping, wave restriction and datetime replay remain outside the catches; finalization remains in the caller and runs once on a recovered ordinary cache hit.
+The ordinary loader is reused rather than wrapped in a broad recovery catch.
+PermissionError, generic OSError, corruption and programmer-error controls retain their existing paths.
+Full corrupt assumed-fresh reads still raise ParquetFormatError and unknown/corrupt subset coverage falls through, preserving the unresolved #1071 policy.
+No writer, lock, hash policy, source interpretation or country schema changed.
+
+The independent run passed 62 hermetic checks: 48 existing read-gate checks and 14 additional controls.
+The added controls exercise the real sanctioned reader after deletion following metadata access for full, subset and legacy-full coverage.
+They also prove FileNotFoundError propagates from restriction, date replay and finalization rather than being treated as a missing cache.
+Physical fixture checks use synthetic symlinked L2 files to verify all three fixtures make independent ordinary files and restore LSMS_DATA_DIR/data_root after both normal and failing test bodies.
+Guyana and India fixtures also start with absent country caches without a warm-only skip.
+The untouched old gate, rebound in memory by the existing negative-control script, independently gives the expected 6 failures and 11 passes with 31 deselections.
+
+* Physical live-cache controls
+
+Independent live probes used new private outer roots and physical copies from the frozen rewarm bundle.
+Only L1 was linked; no original corpus root was passed to a library API.
+The three warm controls passed with 67 SHA-identical seed files on distinct inodes.
+There were zero outer parquet unlinks, byte changes or file replacements; the original source bytes/inodes/mtimes remained unchanged and the outer root was restored.
+The two Guyana/India controls also passed from an empty outer L2, again with zero outer/source mutations and correct restoration.
+Together the candidate checks passed 67 tests, with no failure or skip.
+Cold physical-copy assertions are not inferred from an empty file set; the positive physical-copy control is the separate 67-file warm run.
+
+The fresh independent fingerprint census equals both original before/after inventories: 549 country hashes, 2,139 wave entries and 39 transform fingerprints.
+Thirty wave entries are existing None values; 2,109 are hashes.
+All are unchanged.
+
+* Country guidance and scope
+
+Guyana's documented household key is =(ED,SN,HH)= and cluster is =(ED,SN)= because ED repeats across segments.
+India employment is activity-grain =(t,i,pid,act)=; the wage is a non-additive per-day rate and Rural names workplace location.
+Togo has one vague per grappe; its field/parcel plot_features source is under Data1/s16a.
+Albania's 1996 EWS directory is not a declared wave and 2003/2004 have narrower panel domains.
+TODO/WAITING/LOGBOOK searches found the workflow declarations and no live task entries in these four guides.
+
+Guyana =CONTENTS.org:42-44= says a warm collapse warning never fires twice, while current stamped grain reports can replay warnings.
+That existing contradiction was retained as a finding about documentation, with the cold category-based test oracle preserved.
+It was not used to waive a failed test or change survey semantics.
+The issue's disproven partial-aggregate theory and unstamped-script-output policy were not revived or claimed solved.
+
+* Reproduction and boundaries
+
+The additional runnable controls are =test_additional_controls.py= in this review directory.
+Run from the frozen candidate with matching PYTHONPATH and LSMS_COUNTRIES_ROOT, an explicit private LSMS_DATA_DIR, and OPENBLAS_NUM_THREADS/OMP_NUM_THREADS/MKL_NUM_THREADS/LSMS_BUILD_WORKERS/LSMS_MAKE_JOBS all one.
+The controls assert exact runtime HEAD and real package/config identity.
+All reviewer processes stayed within CPUs 16-19.
+
+#+begin_src sh
+R=/local/job40255479/control/framework-campaign/review-778
+P=/local/job40255479/venv_img/bin/python
+export PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_DATA_DIR="$R/hermetic"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1 LSMS_MAKE_JOBS=1
+taskset -c16-19 "$P" -m pytest -q -p no:cacheprovider \
+  tests/test_gh1040_wave_read_gates.py "$R/test_additional_controls.py" \
+  --junitxml="$R/hermetic.xml"
+taskset -c16 "$P" slurm_logs/framework_campaign_2026-10-20/778/baseline_gate_probe.py
+taskset -c17 "$P" slurm_logs/framework_campaign_2026-10-20/778/hash_probe.py "$R/independent-hashes.json"
+#+end_src
+
+The baseline-gate command intentionally exits one.
+Use the existing =isolation_probe.py= with frozen bundle source =/global/scratch/fsa/fc_jevons/ligon/cache/.rewarm-bundle-94624fd6f/data= and new private output roots, once ordinarily and once with =--cold=.
+=aggregate_review.py= checks the private outputs and complete hash maps and emits =review.json= without survey rows or warning messages.
+Raw logs, XML and full private probe records remain under this control directory and should not be copied into tracked evidence.
+The source, branch and GitHub state were not changed; no shared L2 cache was mutated.
+All reviewer readers and subprocesses are stopped.
+
+Sue

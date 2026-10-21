@@ -1,0 +1,111 @@
+{
+  "reviewer": "Sue; independent of1160 implementation",
+  "verdict": "PASS",
+  "target_head": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "runtime_commit": "5125d0faa3e8074c289c5dd839cf1690d3e7a570",
+  "base": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "blocking_findings": [],
+  "focused": {
+    "passed": 387,
+    "skipped": [
+      {
+        "test": "tests.test_nigeria_sold_unit.TestBuiltTable::test_unit_sold_populated_only_in_w1_w2",
+        "reason": "no warm Nigeria crop_production parquet (absent, or mid-rebuild)"
+      },
+      {
+        "test": "tests.test_nigeria_sold_unit.TestBuiltTable::test_api_frame_serves_unit_sold_through_finalize",
+        "reason": "no warm Nigeria crop_production parquet (absent, or mid-rebuild)"
+      }
+    ],
+    "failed": 0,
+    "errors": 0,
+    "seconds": 10.03,
+    "producer_selection_passes": 347,
+    "additional_independent_passes": 40,
+    "requires_s3_deselected": 15,
+    "total_collected_before_marker": 404,
+    "selected": 389
+  },
+  "independent_negative_control": {
+    "base": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+    "intentional_failures": 12,
+    "passed": 0,
+    "deselected": 28,
+    "errors": 0,
+    "seconds": 1.09,
+    "meaning": "New multi-product/duplicate-area/category/nullable arithmetic cases fail on the old country-omitting function."
+  },
+  "independent_control_families": [
+    "multi-product fertilizer math and duplicate positive-area summation",
+    "extra country area cannot dilute another numerator",
+    "category/nullable country keys including unused categories",
+    "one/both shaped empty country inputs",
+    "incompatible numeric/text country labels safely refused rather than coerced into a join",
+    "empty nullable-integer country axis with text area country",
+    "per-country declarations and organic refusal under both nutrient bases",
+    "authoritative index with contradictory redundant columns and area local keys as columns",
+    "input and attrs immutability"
+  ],
+  "actual_warm_controls": {
+    "countries": [
+      "Malawi",
+      "Uganda"
+    ],
+    "pooled_mode_combinations": 4,
+    "comparisons_per_combination": [
+      "separate labeled Feature calls exact",
+      "reversed input/area row order exact",
+      "country columns exact"
+    ],
+    "ordinary_country_old_function_controls": 8,
+    "old_function_counterfactual_scope": "Only exact4cab fertilizer_rate was bound from AST in memory; its dependencies are unchanged in1160. This is not a full historical package replay.",
+    "rate_column_sums_are_checksums_not_national_fertilizer_totals": true
+  },
+  "hashes": {
+    "independent_matches_producer_before_and_after": true,
+    "maps": {
+      "country": {
+        "entries": 549,
+        "changed": 0,
+        "existing_none_values": 0
+      },
+      "wave": {
+        "entries": 2139,
+        "changed": 0,
+        "existing_none_values": 30
+      },
+      "tagged": {
+        "entries": 39,
+        "changed": 0,
+        "existing_none_values": 0
+      }
+    },
+    "errors": {}
+  },
+  "cache_control": {
+    "files": 287,
+    "original_source_bytes_inodes_sizes_mtimes_unchanged": true,
+    "private_target_files_changed": [],
+    "private_target_all_files_equal_initial_seed": true
+  },
+  "known_limitations": [
+    {
+      "kind": "existing1110 parcel policy/doc contradiction",
+      "documentation": "Malawi/_/CONTENTS.org:3035-3042",
+      "quote": "fertilizer_rate(Malawi) depends on on. ... This contradicts fertilizer_rate's docstring, which says the parcel step is a measured no-op on Malawi.",
+      "observed_both_old_and_new": {
+        "Malawi_plot_rows": 33402,
+        "Malawi_parcel_rows": 11622,
+        "Uganda_plot_rows": 0,
+        "Uganda_parcel_rows": 509
+      },
+      "disposition": "Not a new1160 regression; no parcel-policy or scientific-share change is authorized. Preserve the limitation rather than claim scientific green."
+    },
+    "Two Nigeria warm tests skip in this intentionally fresh hermetic root; marked requires_s3 tests are deliberately excluded, not counted as passes."
+  ],
+  "reviewer_probe_correction": "Initial private live probe incorrectly supplied currency to nonmonetary Country.plot_features and stopped with the existing API TypeError. Removed only that unsupported probe kwarg; successful final controls use the supported API. No production change.",
+  "source_unchanged": true,
+  "all_review_readers_and_verifiers_stopped": true,
+  "raw_logs_warnings_identifiers_microdata_private": true,
+  "source_sha256": "cb973473420759f35b2046e0da618fdbddc278c78708038792b0e85856e1b4d0"
+}

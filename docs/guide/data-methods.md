@@ -99,7 +99,21 @@ units : {'kgvalue', 'kgprice', 'unitvalue', 'unitprice'}, optional
     ``'unitvalue'`` (Expenditure / Quantity, per native
     u; gives 1 = Kwacha-per-Kwacha for u='Value' rows),
     ``'kgprice'`` (reported Price × kg_factor),
-    ``'unitprice'`` (reported Price as-is).  See
+    ``'unitprice'`` (reported Price as-is).
+    ``food_acquired.Price`` is whatever the source
+    recorded; in some countries (Uganda, measured:
+    94-99.9% of rows per wave) it is the statistics
+    office's own Expenditure / Quantity, so
+    ``'unitprice'`` and ``'unitvalue'`` are NOT
+    independent sources (GH #845).  Raises
+    ``UnitsUnavailableError`` (a ``ValueError``
+    subclass) naming the country and the missing
+    column when ``food_acquired`` cannot serve the
+    mode -- no ``Price`` for the ``*price`` modes
+    (15 of 20 countries with a ``food_acquired``,
+    2026-10-17); ``Feature`` drops such countries
+    with one warning and
+    ``attrs['units_unavailable']`` (GH #828).  See
     :func:`lsms_library.transformations.food_prices_from_acquired`
     and ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.
 volume_as_mass : bool, optional

@@ -1,0 +1,1303 @@
+{
+ "Benin": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic manure' (271 rows), 'Organic compost' (158 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would ass"
+  ],
+  "matched_contrib": {
+   "DAP": {
+    "nitrogen_kg": 6305.67576,
+    "plots": 324
+   },
+   "NPK": {
+    "nitrogen_kg": 151554.00108000002,
+    "plots": 1716
+   },
+   "Phosphate": {
+    "nitrogen_kg": 0.0,
+    "plots": 20
+   },
+   "Urea": {
+    "nitrogen_kg": 466452.53339,
+    "plots": 1697
+   }
+  },
+  "matched_labels": [
+   "DAP",
+   "NPK",
+   "Phosphate",
+   "Urea"
+  ],
+  "matched_rows": 3763,
+  "nitrogen_kg_total": 624312.21023,
+  "nitrogen_plots": 1823,
+  "per_label": {
+   "DAP": {
+    "rows": 324,
+    "rows_with_quantity": 324
+   },
+   "Fungicide": {
+    "rows": 99,
+    "rows_with_quantity": 99
+   },
+   "Herbicide": {
+    "rows": 1466,
+    "rows_with_quantity": 1466
+   },
+   "NPK": {
+    "rows": 1720,
+    "rows_with_quantity": 1720
+   },
+   "Organic compost": {
+    "rows": 158,
+    "rows_with_quantity": 158
+   },
+   "Organic manure": {
+    "rows": 271,
+    "rows_with_quantity": 271
+   },
+   "Other phytosanitary": {
+    "rows": 36,
+    "rows_with_quantity": 36
+   },
+   "Pesticide": {
+    "rows": 711,
+    "rows_with_quantity": 711
+   },
+   "Phosphate": {
+    "rows": 20,
+    "rows_with_quantity": 20
+   },
+   "Seed": {
+    "rows": 4101,
+    "rows_with_quantity": 4101
+   },
+   "Urea": {
+    "rows": 1699,
+    "rows_with_quantity": 1699
+   }
+  },
+  "rows": 10605,
+  "seconds": 1.4,
+  "unmatched_labels": {
+   "Fungicide": 99,
+   "Herbicide": 1466,
+   "Organic compost": 158,
+   "Organic manure": 271,
+   "Other phytosanitary": 36,
+   "Pesticide": 711,
+   "Seed": 4101
+  },
+  "unmatched_rows": 6842
+ },
+ "Burkina_Faso": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic manure' (2,339 rows), 'Organic compost' (1,570 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would"
+  ],
+  "matched_contrib": {
+   "DAP": {
+    "nitrogen_kg": 13206.271499999999,
+    "plots": 76
+   },
+   "NPK": {
+    "nitrogen_kg": 333619.02790000004,
+    "plots": 2120
+   },
+   "Phosphate": {
+    "nitrogen_kg": 0.0,
+    "plots": 58
+   },
+   "Urea": {
+    "nitrogen_kg": 220175.3545,
+    "plots": 2004
+   }
+  },
+  "matched_labels": [
+   "DAP",
+   "NPK",
+   "Phosphate",
+   "Urea"
+  ],
+  "matched_rows": 4271,
+  "nitrogen_kg_total": 567000.6539,
+  "nitrogen_plots": 2469,
+  "per_label": {
+   "DAP": {
+    "rows": 76,
+    "rows_with_quantity": 76
+   },
+   "Fungicide": {
+    "rows": 262,
+    "rows_with_quantity": 262
+   },
+   "Herbicide": {
+    "rows": 1644,
+    "rows_with_quantity": 1644
+   },
+   "NPK": {
+    "rows": 2125,
+    "rows_with_quantity": 2125
+   },
+   "Organic compost": {
+    "rows": 1570,
+    "rows_with_quantity": 1570
+   },
+   "Organic manure": {
+    "rows": 2339,
+    "rows_with_quantity": 2339
+   },
+   "Other phytosanitary": {
+    "rows": 95,
+    "rows_with_quantity": 95
+   },
+   "Pesticide": {
+    "rows": 615,
+    "rows_with_quantity": 615
+   },
+   "Phosphate": {
+    "rows": 59,
+    "rows_with_quantity": 59
+   },
+   "Seed": {
+    "rows": 11898,
+    "rows_with_quantity": 11898
+   },
+   "Urea": {
+    "rows": 2011,
+    "rows_with_quantity": 2011
+   }
+  },
+  "rows": 22694,
+  "seconds": 0.6,
+  "unmatched_labels": {
+   "Fungicide": 262,
+   "Herbicide": 1644,
+   "Organic compost": 1570,
+   "Organic manure": 2339,
+   "Other phytosanitary": 95,
+   "Pesticide": 615,
+   "Seed": 11898
+  },
+  "unmatched_rows": 18423
+ },
+ "CotedIvoire": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic manure' (408 rows), 'Organic compost' (86 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would asse"
+  ],
+  "matched_contrib": {
+   "DAP": {
+    "nitrogen_kg": 36770.570999999996,
+    "plots": 412
+   },
+   "NPK": {
+    "nitrogen_kg": 339425.34050000005,
+    "plots": 1331
+   },
+   "Phosphate": {
+    "nitrogen_kg": 0.0,
+    "plots": 102
+   },
+   "Urea": {
+    "nitrogen_kg": 1404834.204,
+    "plots": 1058
+   }
+  },
+  "matched_labels": [
+   "DAP",
+   "NPK",
+   "Phosphate",
+   "Urea"
+  ],
+  "matched_rows": 2930,
+  "nitrogen_kg_total": 1781030.1154999998,
+  "nitrogen_plots": 1764,
+  "per_label": {
+   "DAP": {
+    "rows": 415,
+    "rows_with_quantity": 415
+   },
+   "Fungicide": {
+    "rows": 336,
+    "rows_with_quantity": 336
+   },
+   "Herbicide": {
+    "rows": 3626,
+    "rows_with_quantity": 3625
+   },
+   "NPK": {
+    "rows": 1341,
+    "rows_with_quantity": 1341
+   },
+   "Organic compost": {
+    "rows": 86,
+    "rows_with_quantity": 86
+   },
+   "Organic manure": {
+    "rows": 408,
+    "rows_with_quantity": 408
+   },
+   "Other phytosanitary": {
+    "rows": 154,
+    "rows_with_quantity": 154
+   },
+   "Pesticide": {
+    "rows": 1695,
+    "rows_with_quantity": 1695
+   },
+   "Phosphate": {
+    "rows": 102,
+    "rows_with_quantity": 102
+   },
+   "Seed": {
+    "rows": 2015,
+    "rows_with_quantity": 2014
+   },
+   "Urea": {
+    "rows": 1072,
+    "rows_with_quantity": 1072
+   }
+  },
+  "rows": 11250,
+  "seconds": 0.4,
+  "unmatched_labels": {
+   "Fungicide": 336,
+   "Herbicide": 3626,
+   "Organic compost": 86,
+   "Organic manure": 408,
+   "Other phytosanitary": 154,
+   "Pesticide": 1695,
+   "Seed": 2015
+  },
+  "unmatched_rows": 8320
+ },
+ "Ethiopia": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Manure' (27,261 rows), 'Compost' (4,295 rows), 'Other Organic' (2,651 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, "
+  ],
+  "matched_contrib": {
+   "DAP": {
+    "nitrogen_kg": 73756.2369589729,
+    "plots": 13847
+   },
+   "NPS": {
+    "nitrogen_kg": 55376.21250023216,
+    "plots": 5261
+   },
+   "Urea": {
+    "nitrogen_kg": 371714.77139876236,
+    "plots": 15586
+   }
+  },
+  "matched_labels": [
+   "DAP",
+   "NPS",
+   "Urea"
+  ],
+  "matched_rows": 34817,
+  "nitrogen_kg_total": 500847.2208579673,
+  "nitrogen_plots": 22458,
+  "per_label": {
+   "Compost": {
+    "rows": 4295,
+    "rows_with_quantity": 0
+   },
+   "DAP": {
+    "rows": 13932,
+    "rows_with_quantity": 13847
+   },
+   "Manure": {
+    "rows": 27261,
+    "rows_with_quantity": 0
+   },
+   "NPS": {
+    "rows": 5264,
+    "rows_with_quantity": 5261
+   },
+   "Other Organic": {
+    "rows": 2651,
+    "rows_with_quantity": 0
+   },
+   "Pesticide": {
+    "rows": 3163,
+    "rows_with_quantity": 0
+   },
+   "Seed": {
+    "rows": 108713,
+    "rows_with_quantity": 67859
+   },
+   "Urea": {
+    "rows": 15621,
+    "rows_with_quantity": 15586
+   }
+  },
+  "rows": 180900,
+  "seconds": 2.0,
+  "unmatched_labels": {
+   "Compost": 4295,
+   "Manure": 27261,
+   "Other Organic": 2651,
+   "Pesticide": 3163,
+   "Seed": 108713
+  },
+  "unmatched_rows": 146083
+ },
+ "GhanaLSS": {
+  "coverage_warnings": [
+   "nitrogen_kg resolved a nitrogen share for 0 row(s) but the result is empty -- every fertilizer label either went unmatched or carries a nominal share of 0. Unmatched fertilizer-shaped labels -- no share keyed (a gap): 'Fertilizer' (1,091 rows); organic, refused a share by policy (GH #867): 'Manure' (443 rows). This has the right SHAPE and no content: len() > 0, finite and >= 0 all pass on a column"
+  ],
+  "matched_contrib": {},
+  "matched_labels": [],
+  "matched_rows": 0,
+  "nitrogen_kg_total": 0.0,
+  "nitrogen_plots": 0,
+  "per_label": {
+   "Animal rental": {
+    "rows": 167,
+    "rows_with_quantity": 0
+   },
+   "Containers": {
+    "rows": 2393,
+    "rows_with_quantity": 0
+   },
+   "Equipment rental": {
+    "rows": 462,
+    "rows_with_quantity": 0
+   },
+   "Fertilizer": {
+    "rows": 1091,
+    "rows_with_quantity": 1091
+   },
+   "Fuel and electricity": {
+    "rows": 21,
+    "rows_with_quantity": 0
+   },
+   "Irrigation": {
+    "rows": 6,
+    "rows_with_quantity": 0
+   },
+   "Maintenance and repair": {
+    "rows": 7,
+    "rows_with_quantity": 0
+   },
+   "Manure": {
+    "rows": 443,
+    "rows_with_quantity": 443
+   },
+   "Other production expense": {
+    "rows": 96,
+    "rows_with_quantity": 0
+   },
+   "Pesticide or Herbicide": {
+    "rows": 993,
+    "rows_with_quantity": 985
+   },
+   "Seed": {
+    "rows": 4371,
+    "rows_with_quantity": 0
+   },
+   "Storage": {
+    "rows": 360,
+    "rows_with_quantity": 0
+   },
+   "Transport": {
+    "rows": 872,
+    "rows_with_quantity": 0
+   }
+  },
+  "rows": 11282,
+  "seconds": 1.0,
+  "unmatched_labels": {
+   "Animal rental": 167,
+   "Containers": 2393,
+   "Equipment rental": 462,
+   "Fertilizer": 1091,
+   "Fuel and electricity": 21,
+   "Irrigation": 6,
+   "Maintenance and repair": 7,
+   "Manure": 443,
+   "Other production expense": 96,
+   "Pesticide or Herbicide": 993,
+   "Seed": 4371,
+   "Storage": 360,
+   "Transport": 872
+  },
+  "unmatched_rows": 11282
+ },
+ "Guinea-Bissau": {
+  "coverage_warnings": [
+   "nitrogen_kg resolved a nitrogen share for 0 row(s) but the result is empty -- every fertilizer label either went unmatched or carries a nominal share of 0. Unmatched fertilizer-shaped labels -- no share keyed (a gap): 'Adubos inorg\u00e2nicos - ureia' (190 rows), 'Adubos inorg\u00e2nicos - fosfatos' (57 rows), 'Adubos inorg\u00e2nicos - NPK/F\u00f3rmula \u00fanica' (46 rows), 'DAP e outros adubos inorg\u00e2nicos' (41 rows); o"
+  ],
+  "matched_contrib": {},
+  "matched_labels": [],
+  "matched_rows": 0,
+  "nitrogen_kg_total": 0.0,
+  "nitrogen_plots": 0,
+  "per_label": {
+   "Adubos inorg\u00e2nicos - NPK/F\u00f3rmula \u00fanica": {
+    "rows": 46,
+    "rows_with_quantity": 46
+   },
+   "Adubos inorg\u00e2nicos - fosfatos": {
+    "rows": 57,
+    "rows_with_quantity": 57
+   },
+   "Adubos inorg\u00e2nicos - ureia": {
+    "rows": 190,
+    "rows_with_quantity": 190
+   },
+   "Adubos org\u00e2nicos - estrume animal": {
+    "rows": 365,
+    "rows_with_quantity": 365
+   },
+   "Adubos org\u00e2nicos - lixo dom\u00e9stico": {
+    "rows": 150,
+    "rows_with_quantity": 150
+   },
+   "DAP e outros adubos inorg\u00e2nicos": {
+    "rows": 41,
+    "rows_with_quantity": 41
+   },
+   "Outras sementes": {
+    "rows": 867,
+    "rows_with_quantity": 867
+   },
+   "Outros Sementes de cereais": {
+    "rows": 96,
+    "rows_with_quantity": 96
+   },
+   "Outros produtos fitossanit\u00e1rios": {
+    "rows": 18,
+    "rows_with_quantity": 18
+   },
+   "Plantas, cordas/caules de tuberculos": {
+    "rows": 520,
+    "rows_with_quantity": 520
+   },
+   "Produtos fitossanit\u00e1rios - Fungicidas": {
+    "rows": 9,
+    "rows_with_quantity": 9
+   },
+   "Produtos fitossanit\u00e1rios - Herbicidas": {
+    "rows": 56,
+    "rows_with_quantity": 56
+   },
+   "Produtos fitossanit\u00e1rios - Pesticidas": {
+    "rows": 40,
+    "rows_with_quantity": 40
+   },
+   "Sementes de  milho preto": {
+    "rows": 278,
+    "rows_with_quantity": 278
+   },
+   "Sementes de algod\u00e3o": {
+    "rows": 1,
+    "rows_with_quantity": 1
+   },
+   "Sementes de arroz": {
+    "rows": 1827,
+    "rows_with_quantity": 1827
+   },
+   "Sementes de feij\u00e3o": {
+    "rows": 304,
+    "rows_with_quantity": 304
+   },
+   "Sementes de milho bacil": {
+    "rows": 314,
+    "rows_with_quantity": 314
+   },
+   "Sementes de milho cavalo": {
+    "rows": 293,
+    "rows_with_quantity": 293
+   },
+   "Sementes de s\u00e9samo": {
+    "rows": 62,
+    "rows_with_quantity": 62
+   }
+  },
+  "rows": 5534,
+  "seconds": 0.3,
+  "unmatched_labels": {
+   "Adubos inorg\u00e2nicos - NPK/F\u00f3rmula \u00fanica": 46,
+   "Adubos inorg\u00e2nicos - fosfatos": 57,
+   "Adubos inorg\u00e2nicos - ureia": 190,
+   "Adubos org\u00e2nicos - estrume animal": 365,
+   "Adubos org\u00e2nicos - lixo dom\u00e9stico": 150,
+   "DAP e outros adubos inorg\u00e2nicos": 41,
+   "Outras sementes": 867,
+   "Outros Sementes de cereais": 96,
+   "Outros produtos fitossanit\u00e1rios": 18,
+   "Plantas, cordas/caules de tuberculos": 520,
+   "Produtos fitossanit\u00e1rios - Fungicidas": 9,
+   "Produtos fitossanit\u00e1rios - Herbicidas": 56,
+   "Produtos fitossanit\u00e1rios - Pesticidas": 40,
+   "Sementes de  milho preto": 278,
+   "Sementes de algod\u00e3o": 1,
+   "Sementes de arroz": 1827,
+   "Sementes de feij\u00e3o": 304,
+   "Sementes de milho bacil": 314,
+   "Sementes de milho cavalo": 293,
+   "Sementes de s\u00e9samo": 62
+  },
+  "unmatched_rows": 5534
+ },
+ "Malawi": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic Fertilizer' (11,075 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would assert one as surely as an"
+  ],
+  "matched_contrib": {
+   "CAN Fertilizer": {
+    "nitrogen_kg": 23664.68481,
+    "plots": 1163
+   },
+   "D Compound Fertilizer": {
+    "nitrogen_kg": 5223.88384,
+    "plots": 523
+   },
+   "DAP Fertilizer": {
+    "nitrogen_kg": 1747.54728,
+    "plots": 184
+   },
+   "NPK Fertilizer": {
+    "nitrogen_kg": 272081.43033999996,
+    "plots": 22346
+   },
+   "Other Fertilizer": {
+    "nitrogen_kg": 0.0,
+    "plots": 331
+   },
+   "Urea Fertilizer": {
+    "nitrogen_kg": 537518.23331,
+    "plots": 12719
+   }
+  },
+  "matched_labels": [
+   "CAN Fertilizer",
+   "D Compound Fertilizer",
+   "DAP Fertilizer",
+   "NPK Fertilizer",
+   "Other Fertilizer",
+   "Urea Fertilizer"
+  ],
+  "matched_rows": 54339,
+  "nitrogen_kg_total": 840235.7795800001,
+  "nitrogen_plots": 33466,
+  "per_label": {
+   "CAN Fertilizer": {
+    "rows": 2037,
+    "rows_with_quantity": 2037
+   },
+   "D Compound Fertilizer": {
+    "rows": 726,
+    "rows_with_quantity": 726
+   },
+   "DAP Fertilizer": {
+    "rows": 273,
+    "rows_with_quantity": 273
+   },
+   "Fumigant": {
+    "rows": 125,
+    "rows_with_quantity": 125
+   },
+   "Fungicide": {
+    "rows": 80,
+    "rows_with_quantity": 80
+   },
+   "Herbicide": {
+    "rows": 549,
+    "rows_with_quantity": 549
+   },
+   "Insecticide": {
+    "rows": 1618,
+    "rows_with_quantity": 1618
+   },
+   "NPK Fertilizer": {
+    "rows": 26775,
+    "rows_with_quantity": 26775
+   },
+   "Organic Fertilizer": {
+    "rows": 11075,
+    "rows_with_quantity": 11075
+   },
+   "Other Fertilizer": {
+    "rows": 403,
+    "rows_with_quantity": 403
+   },
+   "Other Pesticide": {
+    "rows": 102,
+    "rows_with_quantity": 102
+   },
+   "Seed": {
+    "rows": 112296,
+    "rows_with_quantity": 112296
+   },
+   "Urea Fertilizer": {
+    "rows": 24125,
+    "rows_with_quantity": 24125
+   }
+  },
+  "rows": 180184,
+  "seconds": 2.2,
+  "unmatched_labels": {
+   "Fumigant": 125,
+   "Fungicide": 80,
+   "Herbicide": 549,
+   "Insecticide": 1618,
+   "Organic Fertilizer": 11075,
+   "Other Pesticide": 102,
+   "Seed": 112296
+  },
+  "unmatched_rows": 125845
+ },
+ "Mali": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): 'Other inorganic' (9,640 rows); organic, refused a share by policy (GH #867): 'Manure' (11,148 rows), 'Compost' (2,673 rows), 'Other organic' (1,189 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a "
+  ],
+  "matched_contrib": {
+   "DAP": {
+    "nitrogen_kg": 128005.47900000348,
+    "plots": 1240
+   },
+   "NPK": {
+    "nitrogen_kg": 104594.37,
+    "plots": 661
+   },
+   "Urea": {
+    "nitrogen_kg": 673761.9770000563,
+    "plots": 2307
+   }
+  },
+  "matched_labels": [
+   "DAP",
+   "NPK",
+   "Urea"
+  ],
+  "matched_rows": 28929,
+  "nitrogen_kg_total": 906361.8260000597,
+  "nitrogen_plots": 2869,
+  "per_label": {
+   "Compost": {
+    "rows": 2673,
+    "rows_with_quantity": 2673
+   },
+   "DAP": {
+    "rows": 9644,
+    "rows_with_quantity": 9644
+   },
+   "Fungicide": {
+    "rows": 6458,
+    "rows_with_quantity": 6458
+   },
+   "Herbicide": {
+    "rows": 6459,
+    "rows_with_quantity": 6459
+   },
+   "Manure": {
+    "rows": 11148,
+    "rows_with_quantity": 11148
+   },
+   "NPK": {
+    "rows": 9643,
+    "rows_with_quantity": 9643
+   },
+   "Other inorganic": {
+    "rows": 9640,
+    "rows_with_quantity": 9640
+   },
+   "Other organic": {
+    "rows": 1189,
+    "rows_with_quantity": 1189
+   },
+   "Other phytosanitary": {
+    "rows": 6447,
+    "rows_with_quantity": 6447
+   },
+   "Pesticide": {
+    "rows": 6460,
+    "rows_with_quantity": 6460
+   },
+   "Seed": {
+    "rows": 34332,
+    "rows_with_quantity": 33859
+   },
+   "Urea": {
+    "rows": 9642,
+    "rows_with_quantity": 9639
+   }
+  },
+  "rows": 113735,
+  "seconds": 1.1,
+  "unmatched_labels": {
+   "Compost": 2673,
+   "Fungicide": 6458,
+   "Herbicide": 6459,
+   "Manure": 11148,
+   "Other inorganic": 9640,
+   "Other organic": 1189,
+   "Other phytosanitary": 6447,
+   "Pesticide": 6460,
+   "Seed": 34332
+  },
+  "unmatched_rows": 84806
+ },
+ "Niger": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic manure' (5,775 rows), 'Organic compost' (1,740 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would"
+  ],
+  "matched_contrib": {
+   "DAP": {
+    "nitrogen_kg": 3851.3703599999994,
+    "plots": 245
+   },
+   "Mixed fertilizer": {
+    "nitrogen_kg": 37.199999999999996,
+    "plots": 11
+   },
+   "NPK": {
+    "nitrogen_kg": 10270.1352,
+    "plots": 714
+   },
+   "Phosphate": {
+    "nitrogen_kg": 0.0,
+    "plots": 16
+   },
+   "Urea": {
+    "nitrogen_kg": 37980.863240000006,
+    "plots": 816
+   }
+  },
+  "matched_labels": [
+   "DAP",
+   "Mixed fertilizer",
+   "NPK",
+   "Phosphate",
+   "Urea"
+  ],
+  "matched_rows": 2573,
+  "nitrogen_kg_total": 52139.5688,
+  "nitrogen_plots": 1380,
+  "per_label": {
+   "DAP": {
+    "rows": 336,
+    "rows_with_quantity": 336
+   },
+   "Fungicide": {
+    "rows": 345,
+    "rows_with_quantity": 345
+   },
+   "Herbicide": {
+    "rows": 229,
+    "rows_with_quantity": 229
+   },
+   "Mixed fertilizer": {
+    "rows": 29,
+    "rows_with_quantity": 29
+   },
+   "NPK": {
+    "rows": 938,
+    "rows_with_quantity": 938
+   },
+   "Organic compost": {
+    "rows": 1740,
+    "rows_with_quantity": 1740
+   },
+   "Organic manure": {
+    "rows": 5775,
+    "rows_with_quantity": 5771
+   },
+   "Other phytosanitary": {
+    "rows": 148,
+    "rows_with_quantity": 148
+   },
+   "Pesticide": {
+    "rows": 587,
+    "rows_with_quantity": 587
+   },
+   "Phosphate": {
+    "rows": 24,
+    "rows_with_quantity": 24
+   },
+   "Seed": {
+    "rows": 31029,
+    "rows_with_quantity": 31029
+   },
+   "Urea": {
+    "rows": 1246,
+    "rows_with_quantity": 1246
+   }
+  },
+  "rows": 42426,
+  "seconds": 0.8,
+  "unmatched_labels": {
+   "Fungicide": 345,
+   "Herbicide": 229,
+   "Organic compost": 1740,
+   "Organic manure": 5775,
+   "Other phytosanitary": 148,
+   "Pesticide": 587,
+   "Seed": 31029
+  },
+  "unmatched_rows": 39853
+ },
+ "Nigeria": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): 'Other Inorganic Fertilizer' (170 rows); organic, refused a share by policy (GH #867): 'Organic Fertilizer' (4,149 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0."
+  ],
+  "matched_contrib": {
+   "NPK": {
+    "nitrogen_kg": 82703.7184125,
+    "plots": 2973
+   },
+   "Urea": {
+    "nitrogen_kg": 90968.27381991225,
+    "plots": 1501
+   }
+  },
+  "matched_labels": [
+   "NPK",
+   "Urea"
+  ],
+  "matched_rows": 10014,
+  "nitrogen_kg_total": 173671.99223241225,
+  "nitrogen_plots": 4359,
+  "per_label": {
+   "Animal Traction": {
+    "rows": 6169,
+    "rows_with_quantity": 6169
+   },
+   "Herbicide": {
+    "rows": 9585,
+    "rows_with_quantity": 9585
+   },
+   "NPK": {
+    "rows": 6122,
+    "rows_with_quantity": 6065
+   },
+   "Organic Fertilizer": {
+    "rows": 4149,
+    "rows_with_quantity": 4149
+   },
+   "Other Inorganic Fertilizer": {
+    "rows": 170,
+    "rows_with_quantity": 170
+   },
+   "Pesticide": {
+    "rows": 4554,
+    "rows_with_quantity": 4554
+   },
+   "Seed": {
+    "rows": 61979,
+    "rows_with_quantity": 56409
+   },
+   "Urea": {
+    "rows": 3892,
+    "rows_with_quantity": 3883
+   }
+  },
+  "rows": 96620,
+  "seconds": 1.5,
+  "unmatched_labels": {
+   "Animal Traction": 6169,
+   "Herbicide": 9585,
+   "Organic Fertilizer": 4149,
+   "Other Inorganic Fertilizer": 170,
+   "Pesticide": 4554,
+   "Seed": 61979
+  },
+  "unmatched_rows": 86606
+ },
+ "Senegal": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic manure' (1,315 rows), 'Organic compost' (360 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would a"
+  ],
+  "matched_contrib": {
+   "DAP": {
+    "nitrogen_kg": 6734.791080000001,
+    "plots": 145
+   },
+   "NPK": {
+    "nitrogen_kg": 25879.596145000003,
+    "plots": 528
+   },
+   "Phosphate": {
+    "nitrogen_kg": 0.0,
+    "plots": 80
+   },
+   "Urea": {
+    "nitrogen_kg": 50087.385200000004,
+    "plots": 572
+   }
+  },
+  "matched_labels": [
+   "DAP",
+   "NPK",
+   "Phosphate",
+   "Urea"
+  ],
+  "matched_rows": 1977,
+  "nitrogen_kg_total": 82701.772425,
+  "nitrogen_plots": 932,
+  "per_label": {
+   "DAP": {
+    "rows": 210,
+    "rows_with_quantity": 210
+   },
+   "Fungicide": {
+    "rows": 177,
+    "rows_with_quantity": 177
+   },
+   "Herbicide": {
+    "rows": 458,
+    "rows_with_quantity": 457
+   },
+   "NPK": {
+    "rows": 792,
+    "rows_with_quantity": 792
+   },
+   "Organic compost": {
+    "rows": 360,
+    "rows_with_quantity": 359
+   },
+   "Organic manure": {
+    "rows": 1315,
+    "rows_with_quantity": 1312
+   },
+   "Other phytosanitary": {
+    "rows": 48,
+    "rows_with_quantity": 48
+   },
+   "Pesticide": {
+    "rows": 248,
+    "rows_with_quantity": 248
+   },
+   "Phosphate": {
+    "rows": 134,
+    "rows_with_quantity": 133
+   },
+   "Seed": {
+    "rows": 5318,
+    "rows_with_quantity": 5314
+   },
+   "Urea": {
+    "rows": 841,
+    "rows_with_quantity": 841
+   }
+  },
+  "rows": 9901,
+  "seconds": 0.6,
+  "unmatched_labels": {
+   "Fungicide": 177,
+   "Herbicide": 458,
+   "Organic compost": 360,
+   "Organic manure": 1315,
+   "Other phytosanitary": 48,
+   "Pesticide": 248,
+   "Seed": 5318
+  },
+  "unmatched_rows": 7924
+ },
+ "Tanzania": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic Fertilizer' (727 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would assert one as surely as any o"
+  ],
+  "matched_contrib": {
+   "CAN": {
+    "nitrogen_kg": 2968.68,
+    "plots": 190
+   },
+   "DAP": {
+    "nitrogen_kg": 2240.1899999999996,
+    "plots": 228
+   },
+   "NPK": {
+    "nitrogen_kg": 502.34999999999997,
+    "plots": 43
+   },
+   "Other Fertilizer": {
+    "nitrogen_kg": 0.0,
+    "plots": 32
+   },
+   "SA": {
+    "nitrogen_kg": 1143.24,
+    "plots": 94
+   },
+   "TSP": {
+    "nitrogen_kg": 0.0,
+    "plots": 2
+   },
+   "Urea": {
+    "nitrogen_kg": 12621.71,
+    "plots": 471
+   }
+  },
+  "matched_labels": [
+   "CAN",
+   "DAP",
+   "NPK",
+   "Other Fertilizer",
+   "SA",
+   "TSP",
+   "Urea"
+  ],
+  "matched_rows": 1060,
+  "nitrogen_kg_total": 19476.17,
+  "nitrogen_plots": 725,
+  "per_label": {
+   "CAN": {
+    "rows": 190,
+    "rows_with_quantity": 190
+   },
+   "DAP": {
+    "rows": 228,
+    "rows_with_quantity": 228
+   },
+   "Herbicide": {
+    "rows": 319,
+    "rows_with_quantity": 319
+   },
+   "NPK": {
+    "rows": 43,
+    "rows_with_quantity": 43
+   },
+   "Organic Fertilizer": {
+    "rows": 727,
+    "rows_with_quantity": 727
+   },
+   "Other Fertilizer": {
+    "rows": 32,
+    "rows_with_quantity": 32
+   },
+   "Pesticide": {
+    "rows": 724,
+    "rows_with_quantity": 724
+   },
+   "SA": {
+    "rows": 94,
+    "rows_with_quantity": 94
+   },
+   "Seed": {
+    "rows": 6868,
+    "rows_with_quantity": 6849
+   },
+   "TSP": {
+    "rows": 2,
+    "rows_with_quantity": 2
+   },
+   "Urea": {
+    "rows": 471,
+    "rows_with_quantity": 471
+   }
+  },
+  "rows": 9698,
+  "seconds": 0.7,
+  "unmatched_labels": {
+   "Herbicide": 319,
+   "Organic Fertilizer": 727,
+   "Pesticide": 724,
+   "Seed": 6868
+  },
+  "unmatched_rows": 8638
+ },
+ "Togo": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic manure' (405 rows), 'Organic compost' (149 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would ass"
+  ],
+  "matched_contrib": {
+   "DAP": {
+    "nitrogen_kg": 326.540538,
+    "plots": 76
+   },
+   "NPK": {
+    "nitrogen_kg": 71568.63133,
+    "plots": 2019
+   },
+   "Phosphate": {
+    "nitrogen_kg": 0.0,
+    "plots": 14
+   },
+   "Urea": {
+    "nitrogen_kg": 89207.81195999999,
+    "plots": 1979
+   }
+  },
+  "matched_labels": [
+   "DAP",
+   "NPK",
+   "Phosphate",
+   "Urea"
+  ],
+  "matched_rows": 4136,
+  "nitrogen_kg_total": 161102.983828,
+  "nitrogen_plots": 2103,
+  "per_label": {
+   "DAP": {
+    "rows": 77,
+    "rows_with_quantity": 77
+   },
+   "Fungicide": {
+    "rows": 60,
+    "rows_with_quantity": 60
+   },
+   "Herbicide": {
+    "rows": 1294,
+    "rows_with_quantity": 1294
+   },
+   "NPK": {
+    "rows": 2041,
+    "rows_with_quantity": 2041
+   },
+   "Organic compost": {
+    "rows": 149,
+    "rows_with_quantity": 149
+   },
+   "Organic manure": {
+    "rows": 405,
+    "rows_with_quantity": 403
+   },
+   "Other phytosanitary": {
+    "rows": 154,
+    "rows_with_quantity": 154
+   },
+   "Pesticide": {
+    "rows": 727,
+    "rows_with_quantity": 727
+   },
+   "Phosphate": {
+    "rows": 14,
+    "rows_with_quantity": 14
+   },
+   "Seed": {
+    "rows": 6805,
+    "rows_with_quantity": 6805
+   },
+   "Urea": {
+    "rows": 2004,
+    "rows_with_quantity": 2004
+   }
+  },
+  "rows": 13730,
+  "seconds": 0.4,
+  "unmatched_labels": {
+   "Fungicide": 60,
+   "Herbicide": 1294,
+   "Organic compost": 149,
+   "Organic manure": 405,
+   "Other phytosanitary": 154,
+   "Pesticide": 727,
+   "Seed": 6805
+  },
+  "unmatched_rows": 9594
+ },
+ "Uganda": {
+  "coverage_warnings": [
+   "nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): none; organic, refused a share by policy (GH #867): 'Organic Fertilizer' (3,966 rows). The organic refusal is deliberate -- manure and compost carry nitrogen, but no instrument records what a nominal share would need, and a 0.0 would assert one as surely as any"
+  ],
+  "matched_contrib": {
+   "Inorganic Fertilizer": {
+    "nitrogen_kg": 37.9,
+    "plots": 9
+   },
+   "Mixed Fertilizer": {
+    "nitrogen_kg": 10025.745999998973,
+    "plots": 945
+   },
+   "Nitrate Fertilizer": {
+    "nitrogen_kg": 1775.071,
+    "plots": 246
+   },
+   "Phosphate Fertilizer": {
+    "nitrogen_kg": 0.0,
+    "plots": 203
+   },
+   "Potash Fertilizer": {
+    "nitrogen_kg": 0.0,
+    "plots": 75
+   }
+  },
+  "matched_labels": [
+   "Inorganic Fertilizer",
+   "Mixed Fertilizer",
+   "Nitrate Fertilizer",
+   "Phosphate Fertilizer",
+   "Potash Fertilizer"
+  ],
+  "matched_rows": 1576,
+  "nitrogen_kg_total": 11838.716999998973,
+  "nitrogen_plots": 1436,
+  "per_label": {
+   "Fungicide": {
+    "rows": 253,
+    "rows_with_quantity": 252
+   },
+   "Growth Regulator": {
+    "rows": 1424,
+    "rows_with_quantity": 1421
+   },
+   "Inorganic Fertilizer": {
+    "rows": 11,
+    "rows_with_quantity": 9
+   },
+   "Insecticide": {
+    "rows": 2312,
+    "rows_with_quantity": 2301
+   },
+   "Miticide/Acaricide": {
+    "rows": 224,
+    "rows_with_quantity": 222
+   },
+   "Mixed Fertilizer": {
+    "rows": 1024,
+    "rows_with_quantity": 1019
+   },
+   "Nematicide/Molluscicide": {
+    "rows": 54,
+    "rows_with_quantity": 54
+   },
+   "Nitrate Fertilizer": {
+    "rows": 259,
+    "rows_with_quantity": 258
+   },
+   "Organic Fertilizer": {
+    "rows": 3966,
+    "rows_with_quantity": 3937
+   },
+   "Other Pesticide": {
+    "rows": 414,
+    "rows_with_quantity": 414
+   },
+   "Pesticide": {
+    "rows": 34,
+    "rows_with_quantity": 7
+   },
+   "Phosphate Fertilizer": {
+    "rows": 206,
+    "rows_with_quantity": 204
+   },
+   "Potash Fertilizer": {
+    "rows": 76,
+    "rows_with_quantity": 76
+   },
+   "Rodenticide": {
+    "rows": 29,
+    "rows_with_quantity": 29
+   },
+   "Seed": {
+    "rows": 73930,
+    "rows_with_quantity": 30737
+   }
+  },
+  "rows": 84216,
+  "seconds": 1.7,
+  "unmatched_labels": {
+   "Fungicide": 253,
+   "Growth Regulator": 1424,
+   "Insecticide": 2312,
+   "Miticide/Acaricide": 224,
+   "Nematicide/Molluscicide": 54,
+   "Organic Fertilizer": 3966,
+   "Other Pesticide": 414,
+   "Pesticide": 34,
+   "Rodenticide": 29,
+   "Seed": 73930
+  },
+  "unmatched_rows": 82640
+ }
+}

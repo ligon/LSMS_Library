@@ -1,0 +1,16 @@
+{
+  "finished_utc": "2026-10-15T16:18:38.303916+00:00",
+  "run_id": 38759333750,
+  "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "reason": "all jobs terminal; each completed log captured or three attempts exhausted",
+  "missing_log_jobs": [],
+  "semantic_review_required": true,
+  "live_master_tip": {
+    "observed_utc": "2026-10-15T16:18:38.254473+00:00",
+    "expected_source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+    "master_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+    "matches_expected": true
+  },
+  "master_tip_ever_changed": false,
+  "terminal_metadata_observations": 2
+}

@@ -90,7 +90,14 @@ EXPECTED_ROWS = {
     # 15,253 new `s='inkind'` rows across the two EHCVM waves.  Net +851.
     "food_acquired": 239877,    # 239,882 before GH #833's sugar fold
     "plot_inputs": 42426,       # 42,364 before the bundle
-    "community_prices": 15423,
+    # 15,423 before GH #840, which stopped selecting one row per (t, v, j, u)
+    # and added the variety / visit / obs levels: 2011-12 8,923 -> 32,369,
+    # 2014-15 6,500 -> 13,808; then 46,177 -> 46,043 when the red team showed
+    # 134 of the obs 4-6 rows were duplicate ENTRIES repeating a served row
+    # (2011-12 32,369 -> 32,352, 2014-15 13,808 -> 13,691).  Still 0 `Unknown`
+    # rows (below): the 795 unit-less CS07 observations are dropped, not
+    # filled (CONTENTS.org).
+    "community_prices": 46043,
 }
 EXPECTED_SENTINEL = {
     "crop_production": 4909,    # 4,920 before GH #865 dropped 11 all-sentinel lines
@@ -111,22 +118,21 @@ EXPECTED_SENTINEL_BY_WAVE = {
 def _aws_creds_available() -> bool:
     """True iff DVC could perform an S3 pull right now.
 
-    Mirrors the helper in ``tests/test_uganda_crop_condition.py`` /
-    ``tests/test_declared_spellings.py``; that duplication is the house pattern
-    until a shared ``conftest.py`` lands.
+    Delegates to the shared resolver in ``tests/conftest.py`` (exported
+    ``AWS_*`` -> the user-config ``s3_creds`` -> the legacy in-tree
+    ``countries/.dvc/s3_creds``).  This used to check only the in-tree
+    file, which the library stopped writing in GH #1001, so a fresh
+    checkout with user-config credentials silently skipped here.  Loaded by
+    path because both import spellings are broken (see
+    ``tests/test_tests_package_not_shadowed.py``).
     """
-    if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
-        return True
-    creds_file = (
-        Path(__file__).parent.parent
-        / "lsms_library" / "countries" / ".dvc" / "s3_creds"
-    )
-    if creds_file.exists():
-        try:
-            return "aws_access_key_id" in creds_file.read_text()
-        except OSError:
-            return False
-    return False
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_shared_conftest", Path(__file__).with_name("conftest.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.aws_creds_available()
 
 
 needs_data = pytest.mark.skipif(

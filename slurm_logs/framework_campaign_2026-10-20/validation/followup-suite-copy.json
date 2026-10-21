@@ -1,0 +1,13 @@
+{
+  "source": "/local/job40255479/corpus-combined-data",
+  "target": "/local/job40255479/followup-suite-data",
+  "source_runtime": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "files": 1519,
+  "bytes": 341221428,
+  "all_bytes_equal": true,
+  "all_physical_identities_distinct": true,
+  "source_size_mtime_inode_unchanged": true,
+  "only_symlink": "dvc-cache (shared content-addressed L1)",
+  "manifest_sha256": "b895444c79f91bba1a2f0612bb88e9bebfd8cdaff4b280a7f27dfb44658111b0",
+  "state": "prepared; no follow-up suite executed yet"
+}

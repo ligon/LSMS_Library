@@ -1,0 +1,23 @@
+{
+  "body": "> **Narrowed 2026-10-17 (backlog sweep).**\n>\n> **Resolved so far:** PR #1029 (`fix/labels-prices-contract`, `a141803a7`) -- the `units=` half. `food_prices(units='unitprice'|'kgprice')` on a country with no `Price` column now raises `UnitsUnavailableError` (a `ValueError` subclass) naming the country and the missing column; the `*value` modes raise it for a missing `Expenditure`/`Quantity`. `Feature` drops such a country with one warning and `attrs['units_unavailable']` (Contract B). Documented in the `units=` docstring and `docs/guide/data-methods.md`. Re-count: **15 of 20** food countries lack `Price`, not 6.\n>\n> **Remaining (this issue):** `food_expenditures(basis='total')` silently equals `'purchased'` on a country that records no in-kind / own-production `Expenditure`. **DECISION:** raise a typed error, or warn plus an `attrs` marker (the same treatment as `units=`). Related: #913 option C (a `basis='total'` source-coverage warning). Loose ends: GhanaAHIES, Peru and Nepal were not counted (no warm parquet); `bench/feature_audit/scan.py` does not read `units_unavailable`/`labels_unavailable` and may want a finding type for them.\n\n<details><summary>Original issue text</summary>\n\n`Country(c).food_prices(units='unitprice')` (and `'kgprice'`) returns an **empty frame silently** for a country whose `food_acquired` has no `Price` column -- Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania all do this (`(0, 1)` frame, no warning, no error). Four of the eight price-comparison agents hit it independently (Malawi's REPORT D6, Nigeria, Niger, Tanzania) and each had to establish by hand that \"0 rows\" meant \"the instrument never asks a price\" rather than \"a filter dropped everything\".\n\nThe `units` docstring promises \"NaN where the survey did not record a unit price\" and \"no silent fallback between modes\" -- both honoured -- but an empty frame is not NaN-where-missing; it is the absence of the column dressed as the absence of rows. `food_expenditures(basis='total')` has the same shape of ambiguity on a country that records no in-kind value (it silently equals `'purchased'`), which the five-source protocol had to special-case.\n\nProposed: when the requested mode needs a column the table does not carry (`Price` for the `*price` modes), raise a `LabelUnavailableError`-style error naming the country and the missing column -- the pattern `labels=` already uses for a country that cannot honour a request (Contract B, PR #550) -- so `Feature('food_prices')(units='unitprice')` degrades loudly per country instead of concatenating empties. A `warnings.warn` is the minimum. Add the fact to `docs/guide/data-methods.md` under `units=`.\n\n</details>\n",
+  "comments": [],
+  "labels": [
+    {
+      "id": "LA_kwDOL4CfUs8AAAABnEiGdw",
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "id": "LA_kwDOL4CfUs8AAAACf11p3A",
+      "name": "framework",
+      "description": "",
+      "color": "ededed"
+    }
+  ],
+  "number": 828,
+  "state": "OPEN",
+  "title": "food_expenditures(basis='total') silently equals 'purchased' where a country records no in-kind value; should raise or warn like units= now does",
+  "updatedAt": "2026-10-18T05:52:23Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/828"
+}

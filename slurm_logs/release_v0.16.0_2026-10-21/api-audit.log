@@ -1,0 +1,57 @@
+data-method kwargs (from country.py): 10
+  ok       waves=
+  ok       market=
+  ok       labels=
+  ok       age_cuts=
+  ok       units=
+  ok       volume_as_mass=
+  ok       currency=
+  ok       numeraire=
+  ok       basis=
+  ok       valuation=
+
+public machinery with NO call site (6):
+  lsms_library/transformations.py:7677  anthropometry_zscores()
+  lsms_library/transformations.py:7507  asset_index()
+  lsms_library/transformations.py:5740  dependency_ratio()
+  lsms_library/transformations.py:5652  tlu()
+  lsms_library/local_tools.py:3753  category_remap()
+  lsms_library/local_tools.py:2804  change_encoding()
+
+  Not necessarily dead -- may be built ahead of its consumer,
+  or public API for downstream users.  It IS the code most
+  likely to be reinvented, because no use-site search finds it.
+
+skills on disk (excluding gitnexus/generated): 15
+  listed   add-feature
+           Use this skill to add a missing feature (table) to an LSMS-ISA country in the ...
+  listed   add-feature/assets
+           Use this skill to add the assets (durable goods) feature to an LSMS-ISA countr...
+  listed   add-feature/food-acquired
+           Use this skill to add the food_acquired feature to an LSMS-ISA country. This s...
+  listed   add-feature/food-acquired/aggregate-labels
+           This skill should be used when calling `labels='Aggregate'` (or any `labels=X`...
+  listed   add-feature/food-acquired/units
+           This skill should be used when adding a new wave or country to food_acquired a...
+  listed   add-feature/housing
+           Use this skill to add the housing feature to an LSMS-ISA country. This skill s...
+  listed   add-feature/panel-ids
+           Use this skill to add panel household ID linkage to an LSMS-ISA country. This ...
+  listed   add-feature/pp-ph
+           Use this skill when adding or debugging a feature for a country whose wave has...
+  listed   add-feature/sample
+           Use this skill to add the sample (sampling design) feature to an LSMS-ISA coun...
+  listed   add-feature/shocks
+           Use this skill to add the shocks feature to an LSMS-ISA country. This skill sh...
+  listed   add-wave
+           Use this skill to add a new survey wave to an existing LSMS-ISA country. Cover...
+  listed   backlog-workflow
+           Use this skill to systematically work down the GitHub issue backlog with multi...
+  listed   cross-country-features
+           Use this skill when assembling, auditing, or fixing a table across countries w...
+  listed   profiling
+           Use this skill when you need to attribute time or memory cost inside the LSMS ...
+  listed   release
+           Use this skill when cutting a release of the LSMS Library. The primary path is...
+
+hashed build inputs untracked by git: none

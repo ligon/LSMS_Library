@@ -188,9 +188,17 @@ housing:
                 "9. Ceramic / marble tiles": Ceramic/Marble Tiles
                 "10. Others": Other
 
+# interview_date (GH #1038).  '##N/A##' is the Survey Solutions export
+# placeholder for an unrecorded timestamp, not a date: 8 of 6,770 households
+# carry it.  Each is fully interviewed (present in sample, household_roster,
+# food_acquired, ...); only the timestamp is missing, so it is null here
+# rather than a string the datetime cast has to reject (GH #798).
 interview_date:
     file: sect_cover_hh_w4.dta
     idxvars:
         i: household_id
     myvars:
-        int_t: InterviewStart
+        int_t:
+            - InterviewStart
+            - mapping:
+                '##N/A##': null

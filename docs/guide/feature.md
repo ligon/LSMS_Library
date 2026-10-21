@@ -42,6 +42,23 @@ Mali     2014-15  1003  1           M    45   0           0         consanguinea
 Uganda   2019-20  4001  1           M    52   0           0         consanguineal
 ```
 
+`transformations.seed_kg` and `transformations.nitrogen_kg` retain this
+country identity when reducing pooled `plot_inputs` to plots. Their output
+index is `(country, t, i, plot_id)` whenever the input carries a `country`
+index level or column, including one selected country and empty results.
+Country labels must be non-null. Ordinary country-less inputs return
+`(t, i, plot_id)`; `attrs['country']` alone does not add an index level.
+`transformations.fertilizer_rate` also retains country in its numerator,
+area grouping, join and output when both `plot_inputs` and `plot_features`
+carry it. Its output is `(country, t, i, plot_id)` for `on='plot'` and
+`(country, t, i, parcel)` for the existing default `on='parcel'`, including
+one labeled country and empty results. Country must be non-null on both
+inputs; labels on only one input are refused, with no inference or
+broadcasting. An index level takes precedence over a redundant country
+column. Area keys may still be columns. Country-less calls keep their
+existing contract, and attrs alone do not add country.
+Other transforms have their own documented grouping and joining contracts.
+
 ## Design Decisions
 
 ### Lazy Loading

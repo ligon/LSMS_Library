@@ -1,0 +1,9 @@
+[
+  {
+    "op": "add",
+    "path": "/rules/2/parameters/required_status_checks/-",
+    "value": {
+      "context": "data-tests"
+    }
+  }
+]

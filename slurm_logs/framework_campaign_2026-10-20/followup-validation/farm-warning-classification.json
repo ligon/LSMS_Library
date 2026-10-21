@@ -1,0 +1,74 @@
+{
+  "baseline_records": 382,
+  "candidate_records": 322,
+  "net_records": -60,
+  "delta_families": {
+    "added": {},
+    "removed": {
+      "cache_rebuild_notice": {
+        "count": 45,
+        "features": {
+          "crop_production": 16,
+          "plot_labor": 15,
+          "plot_inputs": 14
+        },
+        "checks": {
+          "runtime_warning": 45
+        },
+        "severities": {
+          "C": 45
+        },
+        "countries": [
+          "Benin",
+          "Burkina_Faso",
+          "CotedIvoire",
+          "Ethiopia",
+          "EthiopiaRHS",
+          "GhanaLSS",
+          "GhanaSPS",
+          "Guinea-Bissau",
+          "Malawi",
+          "Mali",
+          "Niger",
+          "Nigeria",
+          "Senegal",
+          "Tanzania",
+          "Togo",
+          "Uganda"
+        ]
+      },
+      "makefile_fallback": {
+        "count": 6,
+        "features": {
+          "crop_production": 2,
+          "plot_labor": 2,
+          "plot_inputs": 2
+        },
+        "checks": {
+          "runtime_warning": 6
+        },
+        "severities": {
+          "C": 6
+        },
+        "countries": []
+      },
+      "baseline_only_nigeria_make_candidate_failure": {
+        "count": 9,
+        "features": {
+          "crop_production": 3,
+          "plot_labor": 3,
+          "plot_inputs": 3
+        },
+        "checks": {
+          "runtime_warning": 9
+        },
+        "severities": {
+          "C": 9
+        },
+        "countries": []
+      }
+    }
+  },
+  "unclassified_records": 0,
+  "raw_messages_exported": false
+}

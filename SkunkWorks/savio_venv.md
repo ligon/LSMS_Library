@@ -1,10 +1,10 @@
-# Savio node-local venv: squashfs image (opt-in fast path)
+# Savio node-local venv: squashfs image (the default)
 
-This documents the **opt-in** single-file venv mechanism on Savio. The
-**default** recovery recipe is still the adopt-or-build tar-pipe in
-`.venv.lustre/README_WHY_THIS_EXISTS.md` (summarized in `CLAUDE.md`); this
-squashfs path is a faster, MDS-friendlier alternative driven by
-`bin/savio_venv.sh`.
+This documents **the** venv mechanism on Savio, driven by `bin/savio_venv.sh`.
+It was opt-in until 2026-10 (GH #960); the adopt-or-build tar-pipe in
+`.venv.lustre/README_WHY_THIS_EXISTS.md` used to be the default and is now a
+last-resort fallback only, because `/local/jobNNN` is reaped at job end (see
+"Why") and so there is never a venv on the node to adopt.
 
 This whole page is **Savio-specific**. On login nodes, laptops, and non-HPC
 clusters use a normal in-tree `.venv/`.
@@ -27,11 +27,29 @@ node-local footprint, and nothing to survive the reaper.
 
 ## The three artifacts (all gitignored)
 
-| Path | Role | Writable? |
-|------|------|-----------|
-| `.venv.lustre/` | canonical **master** venv on Lustre | yes — install deps here |
-| `.venv.sqfs` | read-only **image** built from the master (~255 MB, 1 inode) | no |
-| `.venv` → `/local/jobNNN/venv_img` | per-job **mount** of the image | no (read-only) |
+| Path | Role | Scope | Writable? |
+|------|------|-------|-----------|
+| `SHARE/.venv.lustre/` | canonical **master** venv on Lustre | global | yes — via `update` only |
+| `SHARE/.venv.sqfs` | read-only **image** built from the master (~230 MB, 1 inode) | global | no |
+| `SHARE/.venv.sqfs.gen-<generation>` | every image `update` has replaced — the rollbacks | global | no |
+| `SHARE/.venv.sqfs.prev` | hardlink to the newest rollback | global | no |
+| `/local/jobNNN/venv_img` | this job's **mount** of the image | per job | no (read-only) |
+| `<clone>/.venv` → the mount | convenience symlink | **per clone** | — |
+
+`SHARE` is the shared mirror (`~/mirrors/LSMS_Library`).  The script finds it
+from wherever it is run: `$LSMS_VENV_SHARE` if set, else the checkout itself if
+it holds `.venv.sqfs`, else the checkout's `origin` if that is a local directory
+holding one — which is what a sucoder `/local` clone has (GH #958).
+
+**The `.venv` symlink is per-clone state and is never written in `SHARE`.** It
+used to be: `mount` repointed the mirror's `.venv`, so with jobs on N nodes the
+last writer won and the other N−1 dangled.  Run from the mirror, `mount` now
+leaves `.venv` alone and prints the mount path to use directly.
+
+**The master carries no editable install of `lsms_library`** (GH #957), so the
+image is the dependency closure and nothing else; a checkout is selected with
+`PYTHONPATH=<checkout>`.  `update` refuses to image a master that has
+reacquired one (`poetry install` without `--no-root` does exactly that).
 
 ## Update the venv (when deps change)
 
@@ -45,11 +63,41 @@ bin/savio_venv.sh update "somepkg==1.2.3"        # any pip args
 bin/savio_venv.sh update
 ```
 
-`update` (1) optionally `pip install`s its args into `.venv.lustre`, (2)
-verifies the master imports `lsms_library`, (3) `mksquashfs … -no-xattrs` to a
-temp file, (4) atomically `mv`s it over `.venv.sqfs`. Jobs already running keep
-their old mount (old inode) until they re-mount; **new** `mount` calls pick up
-the new image.
+`update` holds an exclusive `flock` on `SHARE/.venv.lock` throughout (the
+master is shared Lustre state; `flock` works there, not under NFS `$HOME`), then
+(1) optionally `pip install`s its args into `.venv.lustre`, (2) refuses a master
+carrying an editable install, (3) verifies the master imports `lsms_library`
+from the checkout the script lives in (`PYTHONPATH`, `PYTHONSAFEPATH`), (4)
+rewrites console-script shebangs to the self-locating form (below), (5) stamps
+`VENV_GENERATION` into the master, (6) `mksquashfs … -no-xattrs` to a temp file,
+(7) hardlinks the outgoing image to `.venv.sqfs.gen-<its generation>` (and
+`.venv.sqfs.prev`), then atomically `mv`s the new one over `.venv.sqfs`. Jobs already running keep their old mount (old inode)
+until they re-mount; **new** `mount` calls pick up the new image.
+
+**Two nodes can therefore run different generations at once**, legitimately.
+`mount` prints the generation it mounted and `bin/savio_venv.sh status` shows
+both the image's and this job's mount's.  `VENV_GENERATION` records the UTC
+build time, host, the checkout and commit it was built from, and the sha256 of
+that checkout's `poetry.lock` and of the master's `pip freeze`.  The lock hash
+records which lock was *present*, not that the master was installed from it:
+`update [pip-args]` mutates the master with pip and never checks the result
+against the lock.  `pip_freeze_sha256` is the field that identifies the closure.
+(The first stamped image, `20261017T230017Z`, calls the field
+`poetry_lock_sha256`.)
+
+**Every replaced image is kept**, named by its generation (@ligon,
+2026-10-17).  The rollback used to be a single `.prev` slot, and the first run
+of the new `update` silently dropped the 2026-09-07 pre-#957 image, the only
+copy of that closure.  An image built before the stamp existed is named by its
+mtime with an `-unstamped` suffix (`.venv.sqfs.gen-20260922T073356Z-unstamped`
+is the closure v0.15.0 was validated under).  `update` refuses to overwrite an
+existing rollback that is a different file.  Each is ~240 MB and updates are
+rare, so nothing prunes them automatically: `bin/savio_venv.sh status` lists
+them; delete by hand once a generation is truly unwanted.
+
+Rollback: `ln -f SHARE/.venv.sqfs.gen-<G> SHARE/.venv.sqfs.new && mv -f
+SHARE/.venv.sqfs.new SHARE/.venv.sqfs` (atomic; then re-mount).  `.venv.sqfs.prev`
+names the newest rollback.
 
 > For a dependency change that must reach `pyproject.toml`/`poetry.lock`, edit
 > those and `poetry install` into the master as usual, then run
@@ -60,19 +108,52 @@ the new image.
 ## Use the venv in a job
 
 ```bash
-bin/savio_venv.sh mount      # mounts .venv.sqfs and points .venv at it
-.venv/bin/python -m pytest …  # invoke via `python -m` (see note)
+bin/savio_venv.sh mount      # mounts the image, verifies it, points THIS clone's .venv at it
+export PYTHONPATH="$PWD"     # select this checkout; nothing else will (GH #957)
+.venv/bin/python -m pytest …  # or .venv/bin/pytest -- both work (see below)
+bin/savio_venv.sh status     # image + mount generation
 bin/savio_venv.sh umount     # optional; the job's /local is reaped at job end anyway
 ```
 
 `mount` mounts at `/local/$SLURM_JOB_ID/venv_img` (deliberately distinct from
 the adopt-or-build tar-pipe's `/local/$SLURM_JOB_ID/venv`, so the two paths
-never collide) and repoints the `.venv` symlink there.
+never collide).  It verifies the import *through the mount path* before
+touching any symlink.
 
-Always invoke as `.venv/bin/python -m <module>`: console-script shebangs
-(`bin/pytest`) point at the stable `.venv` symlink, and `pyvenv.cfg`'s `home =`
-points at the base system python, so going through the interpreter is robust
-regardless of the mount path.
+**Console scripts are self-locating** (GH #958 defect 5).  pip writes an
+absolute shebang naming the interpreter it ran under, so the image's
+`bin/pytest` and friends used to name either the mirror's `.venv` (dangling on
+every node but the last to mount) or the Lustre master's own python (which
+*works*, silently, importing every package over Lustre from whatever the master
+holds today rather than from the mounted image).  `update` rewrites every one
+to the trampoline pip itself uses for relocatable scripts:
+
+```sh
+#!/bin/sh
+'''exec' "$(dirname -- "$(realpath -- "$0")")"/python "$0" "$@"
+' '''
+```
+
+which execs the `python` beside the script, so a script runs under whichever
+mount it was invoked through.  `.venv/bin/python -m <module>` remains fine.
+
+### Dispatching a job to another node
+
+The burst job cannot see this node's `/local` clone.  Use the same recipe an
+interactive node runs — clone the branch into the job's own `/local`, mount
+the image from there, select the clone:
+
+```bash
+git clone --branch "$BRANCH" ~/mirrors/LSMS_Library "/local/job$SLURM_JOB_ID/mirrors/LSMS_Library"
+cd "/local/job$SLURM_JOB_ID/mirrors/LSMS_Library"
+bin/savio_venv.sh mount && export PYTHONPATH="$PWD"
+```
+
+Do **not** point a job at the mirror's working tree for anything but
+`development`: pushing a branch does not check it out, so the mirror's tree
+stays on `development` and the job tests that while believing it tests your
+branch.  And do not `cp -a .venv.lustre` into the job (the README's old prolog):
+that is a ~33k-file Lustre metadata storm.
 
 ## How the mount works (and the one wrinkle)
 
@@ -83,15 +164,19 @@ regardless of the mount path.
   `fusermount3 → /usr/bin/fusermount` **shim** on `PATH`. No admin/root needed
   (`/dev/fuse` is world-RW; `fusermount` is setuid-root).
 - **Fallbacks** (handled by the script): if FUSE is unavailable, it extracts the
-  image with `unsquashfs -d` (still one Lustre inode read). If `.venv.sqfs` is
-  missing entirely, fall back to the default adopt-or-build tar-pipe.
+  image with `unsquashfs -d` (still one Lustre inode read). Only if `.venv.sqfs`
+  is missing entirely, fall back to the adopt-or-build tar-pipe — whose ADOPT
+  step will find nothing, since `/local` job directories are reaped.
 
 ## Requirements / assumptions
 
 - `apptainer` present (for `squashfuse_ll`), `/dev/fuse` readable/writable, and
-  a setuid `fusermount`. All true on Savio savio2/savio3 as of 2026-06.
+  a setuid `fusermount`. All true on Savio savio2/savio3 as of 2026-06, on
+  savio4 (n0035, 2026-09-21) and on savio3 again (n0019, 2026-10-17).
 - `mksquashfs` / `unsquashfs` on `PATH` (present on Savio).
 - `mksquashfs` here lacks `zstd`; the script uses `gzip`.
+- `squashfs-tools` is 4.3, which has no `unsquashfs -cat`; `status` extracts the
+  one `VENV_GENERATION` file to a temp directory instead.
 
 ## Endgame (the real fix for cross-node persistence)
 

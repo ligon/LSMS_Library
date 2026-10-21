@@ -1,0 +1,25 @@
+Ethiopia per wave (before sum, plots | after sum, plots):
+           before           after      
+              sum  size       sum  size
+t                                      
+2011-12   31661.7  4325   31661.7  4325
+2013-14   81761.9  5515   81761.9  5515
+2015-16  202250.7  5195  214700.7  5816
+2018-19   94546.8  3259  114331.3  3854
+2021-22   35249.9  2269   58391.5  2948
+Ethiopia fertilizer PRODUCT kg (nutrient=product numerator): 1,217,832.5 -> 1,509,286.2 (+291,453.8)
+Ethiopia fertilizer_rate N: rows 0 -> 0; median <NA> -> <NA>; sum 0.0 -> 0.0
+Ethiopia fertilizer_rate product: rows 0 -> 0; median <NA> -> <NA>; sum 0.0 -> 0.0
+Malawi per wave (before sum, plots | after sum, plots):
+           before            after       
+              sum   size       sum   size
+t                                        
+2010-11   48956.4   8085   49195.1   8142
+2013-14  187342.9   3503  188848.4   3518
+2016-17  333857.4  10523  334896.5  10630
+2019-20  264855.3  11002  267295.8  11176
+Malawi fertilizer PRODUCT kg (nutrient=product numerator): 2,905,191.0 -> 2,970,489.5 (+65,298.5)
+Malawi fertilizer_rate N: rows 11,551 -> 11,622; median 0.10 -> 0.10; sum 1,760,860.0 -> 1,763,224.2
+Malawi fertilizer_rate product: rows 11,551 -> 11,622; median 0.28 -> 0.29; sum 7,176,958.9 -> 7,206,512.0
+Malawi D Compound product kg 65,298.5; N at 0.08 5,223.9; at WB 0.07 4,570.9
+Malawi NPK product kg 1,600,479.0; N at map 0.17 272,081.4; at 23:21:0+4S 0.23 368,110.2

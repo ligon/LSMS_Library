@@ -1,0 +1,116 @@
+{
+  "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "actual_make_exit": 0,
+  "make_log_sha256_verified": "99012c6a69034ed9425023785bead72464b4ce992f91ff456f01498d8c395711",
+  "literal_terminal_summary_verified": "7376 passed, 314 skipped, 9 xfailed, 1 xpassed, 968 warnings in 1024.34s (0:17:04)",
+  "outer_make_seconds": 1028.667356162332,
+  "pytest_seconds": 1024.34,
+  "local_tag_type": "tag",
+  "local_tag_target": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "local_tag_object": "d4ff03d28ab417c5d98f8e1e7c94d1261b8331bc",
+  "no_publication_inference": true,
+  "raw_sample_message_review": {
+    "eight_cases": {
+      "China": {
+        "skip_count": 2,
+        "recorded_raw_shape": [
+          787,
+          1
+        ],
+        "recorded_raw_columns": [
+          "v"
+        ],
+        "recorded_raw_index_names": [
+          "i",
+          "t"
+        ],
+        "cache_file_sha256": "a63f41764052cc1918884d33dc3ee5df09da84277ab8e01345c4b8aa5c528cc8"
+      },
+      "Kazakhstan": {
+        "skip_count": 2,
+        "recorded_raw_shape": [
+          1996,
+          2
+        ],
+        "recorded_raw_columns": [
+          "Rural",
+          "v"
+        ],
+        "recorded_raw_index_names": [
+          "i",
+          "t"
+        ],
+        "cache_file_sha256": "5aa8782b74ae6774f2ce4d28cb021f1d64c6354ffd9fb2e644b8ab086dec39b2"
+      },
+      "Pakistan": {
+        "skip_count": 2,
+        "recorded_raw_shape": [
+          4967,
+          3
+        ],
+        "recorded_raw_columns": [
+          "Rural",
+          "strata",
+          "v"
+        ],
+        "recorded_raw_index_names": [
+          "i",
+          "t"
+        ],
+        "cache_file_sha256": "a718c52f894e3725634927ac8ae9c9f74f91418f7de71061f37e210c8ee927a3"
+      },
+      "Peru": {
+        "skip_count": 2,
+        "recorded_raw_shape": [
+          3623,
+          2
+        ],
+        "recorded_raw_columns": [
+          "Rural",
+          "v"
+        ],
+        "recorded_raw_index_names": [
+          "i",
+          "t"
+        ],
+        "cache_file_sha256": "6b412096b8745acf9ad618df852020f54fa03684fc9cf4f0c47ce305e5e4644f"
+      }
+    },
+    "source_guard": "tests/test_sample.py:79-111 returns None for absent path, missing weight, missing t, or empty usable weights; callers at384 and419 emit the same generic message.",
+    "conclusion": "Saved complete caches lack weight. Generic skip text does not establish missing cache; exact per-test None branch was not logged.",
+    "scientific_source_weight_availability_not_readjudicated": true
+  },
+  "Guyana_followup": {
+    "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+    "node": "tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Guyana/interview_date]",
+    "exit_code": 0,
+    "passed": 1,
+    "skipped": 0,
+    "failures": 0,
+    "seconds": 9.107820861041546,
+    "private_cache_files": 13,
+    "original_and_copy_preserved": true,
+    "original_skip_cause": "Guard catches either FileNotFoundError or ArrowInvalid; XML does not distinguish them. Concurrent cold-build interaction is plausible but not established.",
+    "country_documentation": "Household identity is ED-SN-HH; cluster identity is ED-SN. Materialize-make tables may use script fallback because no country Makefile is shipped.",
+    "scope": "Existing warm-cache sanity assertion only; no new scientific or cold-build claim.",
+    "log_sha256": "02971b43cfea0236b1b0427dad9a11a64491ff74c0fe4710031b177e7cfa67aa",
+    "junit_sha256": "83946895ed2dea259a665eb03dcbbe6e7f67f9bacc5373596ed900f57719519d",
+    "reviewer_verified_single_unskipped_junit_case": true,
+    "reviewer_verified_thirteen_distinct_physical_copies": true,
+    "reviewer_ran_test_or_read_cache": false
+  },
+  "evidence_sha256": {
+    "make-release-summary.json": "4ef3fe0af50edcdb779a5dccf01815d39e2e14b3a4c2b5cec941ae63e97ec027",
+    "make-release-run/invocation.json": "13bb9dfd13164dca6659e0c362014a28733dd71c9e6ec6d2bcb13461fac03e0e",
+    "guyana-sanity-followup/result.json": "eb1257569e52cfda2cab9db5df014cdcea8a67b2e02c495073c842bcd61b587a",
+    "guyana-sanity-followup/copy-proof.json": "b7bf9b7c1eef98ce5bd6407864a231e08fca68e73cb5e2f3889a20067fdd0a93",
+    "verify_guyana_skip.py": "8cc8eaa265f31a819de3a6e9293ed7f6f28ddbb436696202b262dfc1d25d02cc"
+  },
+  "source_sha256": {
+    "tests/test_sample.py": "819c6cbc91f2ca12a05762077649d59b3b57d1cc961eeafc81e26d36662550d0",
+    "tests/test_table_structure.py": "d8523a4c218288954d7d3a6cfbd0c418e03a59ef03a863db9191915f23d8db00",
+    "tests/conftest.py": "47643d0ffd9cd75ca02b5899a11969f41866815bd03d97c78aa6858931a75c5a",
+    "tests/test_guyana_index_uniqueness.py": "de5f8940fa6a5003b70b3605e5f0248362bc541e8685632765e7d0b543dfe4c9",
+    "lsms_library/countries/Guyana/_/CONTENTS.org": "63ecbd5401137983250e75ea7fa296e232eec410d0fd51a306659234d8f19469"
+  }
+}

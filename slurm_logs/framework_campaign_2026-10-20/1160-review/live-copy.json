@@ -1,0 +1,14 @@
+{
+  "source": "/local/job40255479/followup-farm-data",
+  "target": "/local/job40255479/control/framework-campaign/review-1160/live-data",
+  "countries": [
+    "Uganda",
+    "Malawi"
+  ],
+  "files": 287,
+  "bytes": 65382116,
+  "physical_l2_copy_verified": true,
+  "source_bytes_inode_size_mtime_unchanged": true,
+  "only_symlink": "dvc-cache",
+  "api_never_reads_source_root": true
+}

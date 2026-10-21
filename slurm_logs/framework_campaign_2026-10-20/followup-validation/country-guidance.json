@@ -1,0 +1,102 @@
+{
+  "countries": {
+    "Benin": {
+      "contents_sha256": "880c194588dbaa8693e110572097a76c7a26181456f72792bc0a1e9bbe73435b",
+      "idiosyncrasy": "Distinct seed-crop labels identify line items after input labels become Seed; a historical non-injective map lost rows.",
+      "live_headings_reviewed": 0,
+      "logbooks_reviewed": 0
+    },
+    "Burkina_Faso": {
+      "contents_sha256": "220241b0be7e824941dc69b1429e1e4905c311ab797dec8459491d72c1bb6e93",
+      "idiosyncrasy": "Parcel GPS area is not a geographic coordinate; the2014 module ships area measurements without position.",
+      "live_headings_reviewed": 3,
+      "logbooks_reviewed": 0
+    },
+    "CotedIvoire": {
+      "contents_sha256": "d3cd30adf65c316b50f4d705452d658bb787c417949d266f4d797a49ea851ae6",
+      "idiosyncrasy": "The canonical plot-axis spelling is plot_id; native crop/labor declarations were aligned explicitly.",
+      "live_headings_reviewed": 0,
+      "logbooks_reviewed": 0
+    },
+    "Ethiopia": {
+      "contents_sha256": "87e4d5cafcbbdba09e2c7b477dd37286447fbe0545ca1cc253fdb36223cdd3ce",
+      "idiosyncrasy": "ESS parcel attributes broadcast onto field rows through a left join; parcel and field grains differ.",
+      "live_headings_reviewed": 1,
+      "logbooks_reviewed": 0
+    },
+    "EthiopiaRHS": {
+      "contents_sha256": "6674b61595665053998a33ca2ca6bc810e6eeb655e7d73cbb7fb34fb611736dd",
+      "idiosyncrasy": "Coarse household-level crop data lacks plot grain;1989 livestock/income files served at1999 remain a live documented WAITING caveat.",
+      "live_headings_reviewed": 0,
+      "logbooks_reviewed": 0
+    },
+    "GhanaLSS": {
+      "contents_sha256": "2b88b5b6a7ebf9d743dc0475f0152c20b6c71f3879d18c651875a06f720720ec",
+      "idiosyncrasy": "GLSS1/2 include a rotating panel; independent cross-sections begin atGLSS3, and household take is per workload rather than perEA.",
+      "live_headings_reviewed": 0,
+      "logbooks_reviewed": 0
+    },
+    "GhanaSPS": {
+      "contents_sha256": "e7cd655a312f5bc7e6158ea243a0d9acc14ad553988251892fe9f06a0fa8bd64",
+      "idiosyncrasy": "Agricultural service purchases are distinct from crop sales; sales are household-crop grain in2013 and plot-crop in2017.",
+      "live_headings_reviewed": 10,
+      "logbooks_reviewed": 0
+    },
+    "Guinea-Bissau": {
+      "contents_sha256": "e5ba965d269b5e179d8d574e1b9dd6dc21cffe14a26039445bee8db854feedf0",
+      "idiosyncrasy": "One EHCVM2018-19 wave only; no2021-22 wave. Native plots use a field/parcel composite.",
+      "live_headings_reviewed": 0,
+      "logbooks_reviewed": 0
+    },
+    "Malawi": {
+      "contents_sha256": "e238418cc64695e5db8f92b4cca1f8c8a7618704d3779c472d734503dacb37f9",
+      "idiosyncrasy": "Historical null-plot rows were lost by groupby dropna; duplicate rows on actual plot identifiers were not the explanation.",
+      "live_headings_reviewed": 2,
+      "logbooks_reviewed": 0
+    },
+    "Mali": {
+      "contents_sha256": "8c92a3906f78ee82646e2aef0f2282ecc529f0311753050a7899592b810953b4",
+      "idiosyncrasy": "Plot features use two EHCVM parcel waves; some2021 source rows lack real plot identifiers.",
+      "live_headings_reviewed": 0,
+      "logbooks_reviewed": 0
+    },
+    "Niger": {
+      "contents_sha256": "b1bf5794b242c794437995eb76742db763951397d8dfdb691d064af569ef67ee",
+      "idiosyncrasy": "Site1/Site2 identifier grain issues are documented source/config work, including an existing plot_inputs cell.",
+      "live_headings_reviewed": 0,
+      "logbooks_reviewed": 0
+    },
+    "Nigeria": {
+      "contents_sha256": "93bcd7230736ddfdf607f3b9a4a53dbc9cdbed297fca16489b79171d8d90a65f",
+      "idiosyncrasy": "Some2011 crop units have lost container size; size-agnostic labels can remain unconverted under the existing ladder.",
+      "live_headings_reviewed": 1,
+      "logbooks_reviewed": 0
+    },
+    "Senegal": {
+      "contents_sha256": "1764554a8d554e463a9539f7ddb413085ef8798b2c278d82d41283fe72498f5e",
+      "idiosyncrasy": "Plot identifiers combine field and parcel; area prefers GPS measurement then converted farmer estimate.",
+      "live_headings_reviewed": 2,
+      "logbooks_reviewed": 0
+    },
+    "Tanzania": {
+      "contents_sha256": "84699943b8e64395345bc3890d9981eaf3ece11bb73bd8d1f98f61d6c507c32f",
+      "idiosyncrasy": "2019 extended-panel and2020 refresh-panel waves are disjoint by design; the closed#114 duplicate-food issue retains a live WAITING entry.",
+      "live_headings_reviewed": 8,
+      "logbooks_reviewed": 3
+    },
+    "Togo": {
+      "contents_sha256": "84315c829eebe672690c26dff764fd526a9933acc04d0346951aa03e4e551eda",
+      "idiosyncrasy": "Distinct seed-crop line items need injective labels after every seed input becomes Seed.",
+      "live_headings_reviewed": 0,
+      "logbooks_reviewed": 0
+    },
+    "Uganda": {
+      "contents_sha256": "774d5bc13c35ca5a6d9543766648f88dbc1efe508d73aa388d5ac6e81146256c",
+      "idiosyncrasy": "Agriculture modules cover a self-selected subset; wave household weights do not describe that subset. Existing crop-value WAITING and null-key/KgFactor TODO caveats remain.",
+      "live_headings_reviewed": 12,
+      "logbooks_reviewed": 3
+    }
+  },
+  "scope": "Prior documentation read before farm findings were assessed; no country source diagnosis or changes. Live caveats are evidence, not assumed stale.",
+  "ethiopia_rhs_waiting_note": "WAITING appears in prose rather than a TODO heading; read explicitly."
+}

@@ -1,0 +1,35 @@
+{
+  "verdict": "APPROVE amended content/metadata verification; archive-byte equality explicitly false",
+  "reviewed_verification_script": "/local/job39919092/release-work/control/final-release-docs/verify_artifacts.py",
+  "reviewed_script_sha256": "b4286b5a7b1f75120479b51b20557b4012028917013c041dc1f8e9452952c4aa",
+  "evidence": {
+    "REVIEW.md": {
+      "sha256": "7c6153a68c831b30468b3cd90119bcb87bb6e2eddc7cdf89821a07dc4a7d945b",
+      "bytes": 3833
+    },
+    "analyze.py": {
+      "sha256": "7e8938ad0c7a9b00d4ea0850e254f5150f7bcaa0e83aa40ed5a111feb61c0642",
+      "bytes": 5484
+    },
+    "comparison.json": {
+      "sha256": "5454bcdbd2d5ffcea73e45617fcb542bb464609b67415ee9e3f5e41e5d871a5b",
+      "bytes": 4452129
+    },
+    "verify_headers.py": {
+      "sha256": "97d3e32b83499be8ad184696fd358cde1a85b1620c11dd7db6671895ea05a7d3",
+      "bytes": 3210
+    },
+    "headers.json": {
+      "sha256": "5d698615d41c522b24ac769e47571a65479d8fe11abf0b30c886e126202eb3cb",
+      "bytes": 528
+    },
+    "analyze.log": {
+      "sha256": "4caa5b214774eab7e47808938590faa595d2f40d79511a3f9b26e9dd154cd936",
+      "bytes": 1912
+    }
+  },
+  "library_api_calls": 0,
+  "corpus_cache_access": false,
+  "archives_unchanged": true,
+  "published_compressor_identity": "unknown; no CI compressor attribution asserted"
+}

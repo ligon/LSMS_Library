@@ -1,0 +1,10 @@
+{
+  "body": "From the #569 follow-up (`fix/569-plot-registration`, plot_labor/plot_inputs registration).\n\n- Mali serves `Family` / `Hired` / `Other` (capitalised). Every other EHCVM / ISA country serves lower-case `family` / `hired` (/ `other`).\n- GhanaSPS serves 7 per-instrument values (`casual`, `communal`, `family`, `hired`, `other`, `permanent`, `self`), and GhanaLSS serves `exchange` / `hired`.\n- So `Feature('plot_labor').groupby('source')` splits Mali from everyone else.\n- **Tier:** A for the Mali case fix (one country re-warm). C for a cross-country `harmonize_labor_source` decision.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1121,
+  "state": "OPEN",
+  "title": "#569 residual D: the `plot_labor.source` vocabulary is not harmonised across countries",
+  "updatedAt": "2026-10-19T22:38:36Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1121"
+}

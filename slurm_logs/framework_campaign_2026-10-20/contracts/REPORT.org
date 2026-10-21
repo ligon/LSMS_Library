@@ -1,0 +1,126 @@
+#+title: Framework contracts campaign reconciliation, 2026-10-20
+#+author: Sue
+
+* Scope and evidence
+
+Reviewed development =976fc840d12ba40f1602b7dff58b81548632b2a9= in isolated read-only worktree =review/framework-contracts-20261020=.
+Archived current GitHub bodies/comments in =issue-*.json= and merged PR inventory in =merged-prs.json=.
+=records.json= classifies each assigned issue, retains author rulings, and drafts exact residual text for partials.
+No tracked source edits, commits, GitHub writes or shared-cache writes were made.
+
+Read AGENTS, backlog-workflow, Feature audit harness, cross-country-features, aggregate-labels, sample and units skills before assessing their contracts; orgmode was used for this report.
+No country source was assessed: country-specific findings below are attributed to the issue investigations and were not remeasured against raw data here.
+Data-free evidence in =synthetic-evidence.json= checks import identity and reproduces three framework defects.
+
+* Recommended bounded additions before v0.16.0
+
+** 1. #1143: repair number-token parsing in explicit metric labels
+
+Current =transformations.py:1601= patterns match the numeric suffix after comma: 1,5 L -> 5; 0,9 kg -> 9; 12,5 cl -> .05; 1,500 kg -> 500; 0,125 kg -> 125.
+Fractions still work, and 20gallon correctly declines; preserve both behaviors.
+The issue documents 945 affected served rows across Senegal, Benin and CotedIvoire; these counts are not remeasured here.
+
+- Reuse :: =_EXPLICIT_METRIC_PATTERNS=, =_metric_number= and =_parse_explicit_metric=; avoid normalizing a label and then allowing a partial numeric-token match.
+- Tests :: =tests/test_metric_fraction_parse.py=, =tests/test_crop_kg_factor.py=, existing food-factor tests; add discriminating decimal/thousands/zero-prefix/ambiguous-token cases.
+- Done :: exact parser expectations, unchanged fraction/plural/volume-as-mass/word-boundary behavior, and before/after food quantities and prices on the three countries.
+- Impact :: derived read-time numbers; the issue identifies GhanaLSS nutrition import closure as a potential hash mover, so measure actual hashes instead of claiming zero invalidation.
+- Parallel :: independent of CI fix and sampling/harness work; coordinate merge with #1093 because both edit transformations.py.
+
+** 2. #1093: use the already-declared unit masses consistently
+
+=harvest_kg_factors= now reads =_declared_kg_factors=, but =median_price_valuation= sold-kg denominator still calls bare =_kg_factor_series= (=transformations.py:7271=).
+=seed_kg= and =nitrogen_kg= do likewise (=transformations.py:5453= and =:5333=); =Country._finalize_result= attaches =unit_kg= only to crop_production (=country.py:4028=).
+Synthetic plot_inputs with declared Quintal=100 returns zero seed and nitrogen rows instead of 100 kg seed and 46 kg N.
+The issue reports 710 Ethiopia positive-Quantity_sold Quintal rows omitted from the price pool.
+
+- Reuse :: =_declared_kg_factors=, its argument/attrs/country resolution and precedence; extend attrs attachment to plot_inputs and preserve it through Feature assembly.
+- Tests :: =tests/test_crop_kg_factor.py:646= onward, =tests/test_median_price_valuation.py=, =tests/test_867_nitrogen_content.py=, attrs-carrier tests; test index/column u, per-country tables and explicit empty override.
+- Done :: three paths honor declared masses; synthetic 100/46 outputs; sold-price pool includes declared-unit observations; yield_kg explicit/attrs forwarding pinned; unchanged outputs with no declarations.
+- Impact :: read-time transform changes; verify fingerprints because transformations.py is in GhanaLSS nutrition import closure.
+- Parallel :: own worktree; coordinate transformations.py merge with parser fix. Does not need fertilizer-product or ambiguous-unit decisions.
+
+** 3. #1124 + #1125: make release audit detect whole-country loss
+
+=_assembly_invariants= (=bench/feature_audit/scan.py:426=) sums only countries present in result before checking row loss (=scan.py:486=).
+Synthetic A=2/B=7 built with only A=2 assembled produces NO findings.
+The canonical sweep list (=scan.py:85=) omits crop_production, plot_labor and plot_inputs.
+The crop warm test (=tests/test_feature_canonical_index.py:565=) catches every country exception and checks only result participants; hardened =_warm_assembly= already exists at =:862=.
+
+- Reuse :: hardened warm helper; participation and additive conservation are separate invariants.
+- Tests :: a completely excluded country must emit Class B even when retained rows conserve perfectly; allowed additive collapses need distinct reporting; warm country raising must fail by name.
+- Done :: canonical sweep covers three registered agriculture features; per-country participation cannot disappear through modal exclusion or caught errors; rerun relevant sweep at combined release head.
+- Impact :: harness/tests only; zero cache invalidation. Strengthens verification for all other additions.
+- Parallel :: fully independent of production fixes; combine #1124 and #1125 in one focused review because they close the same blind spot.
+
+** 4. #1134 + #1135: finish the already-ruled sampling metadata increments
+
+Oct19 author rulings resolve both decisions: add not-stated design_tag only with not-found/derived-from-data now; structural tags arrive one at a time with the first evidenced record; retain provenance/confidence triple.
+Keep SPAN/no renumbering threshold, but first warning line must show boundary size: clusters renumbered and linked-household share net of movers.
+Current =sampling.py:134= has only two Uganda tags; =tests/test_sampling.py:167= still asserts exact Uganda vocabulary.
+Current =sampling.py:958= report and =:971= formatter expose notes, not structured numerical extent.
+
+- Done :: real looked-for/not-found record ships with sentinel; incompatible tag/source pairs refused; all allowed tags used by shipped records; Nigeria .67% and one 100% warning include evidenced numerator/denominator/net-of-movers extent.
+- Impact :: read-path/metadata, no data rewrite; verify hash invariance. Avoid repeated sample() builds at warning time; prefer recorded measured counts with evidence.
+- Parallel :: independent files from parser/transform/harness; #1136 broad design curation waits for vocabulary extension.
+
+** 5. #1109 (small optional addition): preserve unknown organic quantity
+
+The issue reports Malawi organic quantities authored NA but assembled with sum -> 0.0 for all 11,075 rows.
+A =sum(min_count=1)= change should preserve unknown rather than invent a measured zero; neighboring code already uses that idiom.
+This is independent of disputed fertilizer-product shares and grams/kg code interpretation (#1106/#1111).
+Read Malawi CONTENTS first before implementation; bundle with amount-without-unit repair there if that work proceeds.
+Acceptance must distinguish all-NA, real zero and mixed positive/NA groups and retain non-organic totals.
+One Malawi module change may move all Malawi hashes; ample compute makes this manageable.
+
+* Existing unlanded #851 deserves recovery, not duplicate implementation
+
+Parent identified =fix/851-recall-period@8288cd112eccd1ddc54fd764519739d53e6f89fb=.
+GitHub compare against reviewed development reports 17 commits ahead, 78 behind, 21 files; =compare-851.json= archives it.
+It already implements period conversion, typed errors, per-column ask counts, Feature wave-grain degrade via slicing the unconverted result (to preserve cross-wave kg inference), and 987 lines of tests.
+Its commits report initial full suite 7,662 passed/one generated-doc failure subsequently repaired and repeated 67-cell arithmetic measurements; these are branch-author reports, not fresh validation here.
+It has no open PR.
+
+Oct20 option A ruling requires per-wave disclosure of households asked fewer times and implied understatement in attrs['period']; branch recall.py at inspected head carries exposure/factor/counts but no such shortfall disclosure.
+Integrate current development, implement this disclosure, inspect latest red-team reports and rerun combined-head verification before proposing its PR.
+Keep #1148 per-household cover-page exposure as follow-up B, and GLSS3 within-wave stratum windows separate.
+Do not let a substantial feature increment silently become a release gate just because most code already exists; it needs independent review.
+
+* Resolved implementation awaiting release closure
+
+- #569 :: PR #1126; explicit residuals #1118-#1125 remain.
+- #793 / #942 :: PR #1137; residuals #1133-#1136 remain.
+- #781 :: PR #1132; #1129-#1131 remain; Oct19 GLSS1/2 verdict ruling already matches merged data.
+- #674 :: PR #1024; #1036 distinct-empty-table residual also implemented in #1105.
+- #928 :: approved P1/P2 in #1105; P3/P4 explicitly deferred, not missing accepted work.
+- #931 :: PR #1092; propagation defect #1093 remains.
+- #867 :: PR #1112; #1106-#1111 remain and must not inherit a closed status.
+- #915 :: PR #1098; symlink accepted-set decision #1085 remains.
+- #680 :: PR #1097; issue comment confirms image re-imaged to fooddatacentral 1.0.13.
+
+* Work to narrow or defer
+
+=records.json= includes full residual title/body drafts for #698/#798/#787/#828/#845/#851.
+#698 must remain open for upstream Ghana relabels (#1100/#1101), despite the kinship.yml implementation in #1104.
+#798 is final served-coverage promotion plus a read-strict decision, not an unrepaired warm datetime bug.
+#787 still needs ambiguous-key semantics and scientific curation; Contract B is settled and must remain intact.
+#828 total-basis warning/refusal is still undecided; its units half landed.
+#845 still needs four countries' Price provenance and optional-diagnostic decision; agreement cannot establish independent elicitation.
+#1129 currency-per-currency unitvalue needs an explicit choice; do not silently extend kgvalue policy.
+
+#1118 amount-without-unit is already ruled Unknown, but six-country builds and Nigeria non-input-row treatment make a broad fix larger than a mechanical framework patch.
+#1119/#1121 combine safe spelling/case fixes with genuine grain/vocabulary decisions; split them before dispatch.
+#1120 missing household/sample identity, #1123 destructive source collapses, #1111 applied-unit code list and #1103 truncated Kosovo labels require source evidence.
+#1106 Chitowe, #1108 unknown fertilizer and #1110 parcel keys need product/join meaning decisions; do not substitute generic defaults.
+#1133 Uganda rendering lookup is tractable but 322 pairs must be evidenced and validated against already-declared real cluster regime changes.
+#1136 corpus sampling curation is valuable independent work, not required to ship the loaded Uganda/panel metadata.
+
+* Suggested execution order
+
+Run CI repair concurrently with parser, audit/test and sampling worktrees.
+The declared-unit propagation worker can run concurrently with parser, with their transformations.py patches reviewed together at integration.
+Do the Malawi mechanical repair independently only after country documentation read; never race shared cache changes for the same country.
+Recover/review #851 existing branch as a separate track while bounded fixes complete.
+After selecting/landing the bounded set, use final combined head for full suite, feature participation/conservation sweep and served coverage refresh; report known source/wiring failures separately.
+Issue closure is a release reconciliation action, not proof that every follow-up is fixed.
+
+-- Sue

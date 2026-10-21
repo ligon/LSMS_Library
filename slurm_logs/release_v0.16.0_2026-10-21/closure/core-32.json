@@ -1,0 +1,1273 @@
+[
+  {
+    "body_sha256": "c9c77c66e286c0d6a0954870a10759467ee0bbc1daa22df1372ed44b5b4fe0a4",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "1e94aa0bac34cd9483ae6e94f672c5f4379b8dc7fa47f0139e6d8039d8c0d078",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/569#issuecomment-5621059475"
+      },
+      {
+        "body_sha256": "d96747729b966aa763aa0181e0df4ad92b528e481a0a604b8f72d0aade42fa7d",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/569#issuecomment-6259382765"
+      },
+      {
+        "body_sha256": "c359bce874c4493c3303718f060e1f22e4d1a301d164da18ab95ed252be44945",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/569#issuecomment-6279272557"
+      }
+    ],
+    "comments_count": 3,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 569,
+    "observed_at": "2026-10-21T12:28:21.426Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1118,
+      1119,
+      1120,
+      1121,
+      1122,
+      1123
+    ],
+    "scope": "Registering both plot tables, preserving stage/worker and household-grain sentinel, landed. Residuals #1118-#1125 stay separate.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "c37cd38d16294e0bc442ab6144f7caff4264a1b202f92ae7af80acbb7ee4bd0c",
+        "head_sha": "7514fc819108b047da90e2b847f894011b0dd7ab",
+        "merge_commit_sha": "095eab691a4bde6dbcb338d3b6da90824b4136e5",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T23:03:46Z",
+        "number": 1126,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1126"
+      }
+    ],
+    "title": "Register plot_labor and plot_inputs in Feature after resolving their remaining grain differences",
+    "url": "https://github.com/ligon/LSMS_Library/issues/569"
+  },
+  {
+    "body_sha256": "c3a72923960d862ba0c30147bdc692e71caea196009ea2120137e00aba4ab65d",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "454a1a1c272d2bc78a7c274319a2cbc2ebdbbfc0f17c425a8244b4e95732cf0b",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/600#issuecomment-6259383018"
+      },
+      {
+        "body_sha256": "cc22bf05bc76b0a076cfeb91fa6b0ee07a4652d858c2e62a3ce3c85da7de226d",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/600#issuecomment-6278936563"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 600,
+    "observed_at": "2026-10-21T12:28:21.450Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1116,
+      1149
+    ],
+    "scope": "Failed catalog resolution preserves record and reports separately; held-release and hand-recorded value gates implemented. Follow-ups #1114/#1115/#1116/#1128 are separate.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "83a574017b74827d990a4ffb1f7ce83aef424f10c87f51c7234200bfb224ff34",
+        "head_sha": "c257f7da13338c21cffe9a5cfdc2ddf9d033948c",
+        "merge_commit_sha": "2070823cf2c387cd82df100c3d8a1828dc473101",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T22:39:56Z",
+        "number": 1117,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1117"
+      }
+    ],
+    "title": "Preserve existing provenance when a catalog backfill cannot resolve its source",
+    "url": "https://github.com/ligon/LSMS_Library/issues/600"
+  },
+  {
+    "body_sha256": "100f76403a3eb0d2700a5b3b3c840eeb302cd451025d0ca8d4f30583afb4f0ca",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "c8badce31745989c5c4391f0e9170e7ab422be2c5b9397f7aaf13bfb761f0bba",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/674#issuecomment-6246272457"
+      }
+    ],
+    "comments_count": 1,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 674,
+    "observed_at": "2026-10-21T12:28:21.396Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Bare mapping request raises TypeError; empty-table residual #1036 also landed in #1105.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "ef299b423290cc036387fe47ada6813e53395f9ced1178ba601a43eda19e5df7",
+        "head_sha": "58c39415503d99fe847724d481a061e329f5571b",
+        "merge_commit_sha": "e10a6a8233010e4afc7c3e91dfa6803a6004625f",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T03:18:08Z",
+        "number": 1024,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1024"
+      }
+    ],
+    "title": "get_categorical_mapping returns {} silently when no value column is requested \u2014 third recurrence",
+    "url": "https://github.com/ligon/LSMS_Library/issues/674"
+  },
+  {
+    "body_sha256": "e2f2933f1744a31af822c5ab899e55ae266674a8426dbfbd011df3f8b4561b06",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 675,
+    "observed_at": "2026-10-21T12:28:21.496Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1051
+    ],
+    "scope": "Follow-ups split into #1051; do not reopen the implemented original defect.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "bd7f758bf7cefa2109ef3f69eb808d7f6542b85d753448c58033bbf5976bc08a",
+        "head_sha": "f34c99ecb9f2e7a8f19d19b772a2519c392fd5eb",
+        "merge_commit_sha": "ddd79800cdde24b5524ca61c82a1e8423d47ef83",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T03:18:36Z",
+        "number": 1052,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1052"
+      }
+    ],
+    "title": "A degraded build caches as fresh: parquet missing a required column still carries a valid content hash",
+    "url": "https://github.com/ligon/LSMS_Library/issues/675"
+  },
+  {
+    "body_sha256": "e34fba0c5114c33bc4fb622c446ab08936773c4547da2730fe3c8619e10eced9",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "793348e26c6ec32b4bab69277dad1ae70df4b4127d504c871a2cc9ecccd4e5d0",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/680#issuecomment-5398788732"
+      },
+      {
+        "body_sha256": "8c879d99cd8b2c79a28ebf22eece4cda1b601bda2fcda15bed6c512b4e354520",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/680#issuecomment-6273709487"
+      },
+      {
+        "body_sha256": "c6960e6911b3d0dfdfe2ca5ea6889a102f4c90540c88944f975ec665680dcfc2",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/680#issuecomment-6278587055"
+      }
+    ],
+    "comments_count": 3,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 680,
+    "observed_at": "2026-10-21T12:28:22.215Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "fooddatacentral floor 1.0.13 landed; issue comment confirms re-imaged Savio generation 20261019T221223Z.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "b3741467fdc48884de7f2845fee43f5015b322601f14b87dc50596d0bf3238e4",
+        "head_sha": "7227c9a3ed1b557b357f1c847812a86dfeb57c40",
+        "merge_commit_sha": "805f84dd4aa31e923701b8d1796e9a4324bf76c6",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T17:56:15Z",
+        "number": 1097,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1097"
+      }
+    ],
+    "title": "bug: fooddatacentral ships a broken top-level `tests` package that shadows ours \u2014 kills the whole suite at collection in CI",
+    "url": "https://github.com/ligon/LSMS_Library/issues/680"
+  },
+  {
+    "body_sha256": "0cfebe3ceadeef608be1b84ea3768c182cc50ddcc4f60eb9fe720d51b19323e9",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "783c6cc7d1d3e6b3d4567b75778273c781f3ba2c4588c76d25d42d10f49aad90",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/781#issuecomment-5600396433"
+      },
+      {
+        "body_sha256": "27c9a3c5da3db3aab21b976ec4ae207f6a2299d0b8a15ade29bd4a822f6db98b",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/781#issuecomment-6259383556"
+      },
+      {
+        "body_sha256": "6a41752b19bffe537a04218e0ca7cc4dc6a44f491e3ff49804c4929fb269f9e7",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/781#issuecomment-6279410406"
+      },
+      {
+        "body_sha256": "9d8d4495dbb775c0843d1411cc7af35fbe178e76b62de8b22fe58898c28106a9",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/781#issuecomment-6281883244"
+      }
+    ],
+    "comments_count": 4,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 781,
+    "observed_at": "2026-10-21T12:28:22.169Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1129,
+      1130,
+      1131
+    ],
+    "scope": "Tier-keyed correctly-empty/empty-pending-machinery verdicts landed. Oct19 ruling retains GLSS1/2 correctly-empty; GLSS3 residual #1130.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "c974ae609cc7eec2c94213df0ce5400d04e9d126ad00b133ae693e8cd4b4e397",
+        "head_sha": "88280fc435472e3db94a094afd9f393f642472ee",
+        "merge_commit_sha": "4c630652cd60f60c5c1bdc1e958b1878f774a706",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T23:12:56Z",
+        "number": 1132,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1132"
+      }
+    ],
+    "title": "No verdict vocabulary for `dropped`: a correctly-empty cell is graded as \"the silent-drop bug class\" with no way to say otherwise",
+    "url": "https://github.com/ligon/LSMS_Library/issues/781"
+  },
+  {
+    "body_sha256": "6827172131ec40792f5dabb7069fbf581935a253268067d036c73e2cd4da1071",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 790,
+    "observed_at": "2026-10-21T12:28:22.697Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Issue body stale. Keep tracked GhanaLSS unit_labels.csv and live Uganda reader.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "cc654abf4084e812a4a3a1953fe360d749048aed6868684ccdc8824991f556a3",
+        "head_sha": "88bfbc98edee0cf2fd76b89e7e9e831e9de4e647",
+        "merge_commit_sha": "5b64a779640db65a18ed7a05232b994e1ad0cd07",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T01:43:25Z",
+        "number": 1021,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1021"
+      }
+    ],
+    "title": "Five country modules still write unitlabels.csv into _/ as a side effect (ghanasps, ghanalss, ethiopia, togo, tanzania); two readers have no callers",
+    "url": "https://github.com/ligon/LSMS_Library/issues/790"
+  },
+  {
+    "body_sha256": "9cacfce2b38a99c1bf150e7f1d98f20652aa34b730f7df67ada5a30291290d77",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "59819b74e57e36cd67ea26cb99682f08881d989285699b1f881ea647470b1c3d",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/793#issuecomment-6259383942"
+      },
+      {
+        "body_sha256": "35bbc92c2efd228445d39550ca398650ffcd84ab9066d1dbc113bb895cc3c595",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/793#issuecomment-6281752876"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 793,
+    "observed_at": "2026-10-21T12:28:22.862Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1134,
+      1136
+    ],
+    "scope": "Sampling loader, Country.sampling and attrs landed; vocabulary/curation residuals are #1134/#1136.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "1d8e0d2b300c61869d73e0b65acc4f6988f415f31a27d3f2f3d861356ed4cc50",
+        "head_sha": "f11349703bc7137937d7c3aa37bb4ff497376d0a",
+        "merge_commit_sha": "238a4c15d8d691204097649765c58d1a2c6b1d59",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-20T02:14:32Z",
+        "number": 1137,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1137"
+      }
+    ],
+    "title": "DECISION: sampling.yml -- freeze the Uganda exemplar's vocabulary as-is, then build the loader (SamplingRecord, Country.sampling, attach in _finalize_result)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/793"
+  },
+  {
+    "body_sha256": "9e9f364e9de3ae2e3a8830133a9e4d27936db5e9414ac7cbeb09ac9a137d00d6",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "e9648ff4b11d69070de959dfcbe5c254fda17979d0e8c3dc566300a04668585b",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/836#issuecomment-6246272807"
+      }
+    ],
+    "comments_count": 1,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 836,
+    "observed_at": "2026-10-21T12:28:23.659Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "No live CONTENTS build-reader defect remains.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "0442b8e79df770bce14b860e60cd07c17409a1c971bdd2368ff47f3179db27bf",
+        "head_sha": "0d4f01618e8750301f03c6f6171fe3d445050cc8",
+        "merge_commit_sha": "32f8bb2372fd4744143776216e9e50640bc4d2d2",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T01:43:52Z",
+        "number": 1026,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1026"
+      }
+    ],
+    "title": "Tanzania/_/food_acquired.py reads a build table out of CONTENTS.org, which the cache hash deliberately skips",
+    "url": "https://github.com/ligon/LSMS_Library/issues/836"
+  },
+  {
+    "body_sha256": "83d8cf5752249b9d0d523ba9d834a4dfc1ce6a063fb56b0b394535227bae9731",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "de9d473667ac994d82e3f92ec3a5d1572db75ad193b1c52c47ecbeb60870580e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/867#issuecomment-6259385140"
+      },
+      {
+        "body_sha256": "69035c5e42ca3dcc7fe4898270677d1e0fd7f8f85c17016187a946cdfe56aa82",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/867#issuecomment-6278286545"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 867,
+    "observed_at": "2026-10-21T12:28:23.659Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1106,
+      1107,
+      1108,
+      1109,
+      1110,
+      1111
+    ],
+    "scope": "Cited NPS/D Compound shares and loud organic refusal landed. Six residuals #1106-#1111 remain.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "53e2ba38d508feba6b22e218a55772638ca89bb495426d74470cab4422da5715",
+        "head_sha": "baccf7fd60762c196e62e6b57289a1f96f4ef752",
+        "merge_commit_sha": "931934b12205bd3f2ad5e4682fdcb0db69ed4be1",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T21:57:28Z",
+        "number": 1112,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1112"
+      }
+    ],
+    "title": "_NITROGEN_CONTENT has no entry for NPS, D Compound or any organic input, so those fertilizer rows contribute 0 kg N silently",
+    "url": "https://github.com/ligon/LSMS_Library/issues/867"
+  },
+  {
+    "body_sha256": "a51c00204356866f583d55bcbc0a8039bc96ff450e945d0317dfd93fa469153d",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "262c0e3ff365c9bee79e53fed68d58cfcf2704fe8deb307cfebd29e28a503dc4",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/908#issuecomment-6246273016"
+      }
+    ],
+    "comments_count": 1,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 908,
+    "observed_at": "2026-10-21T12:28:23.658Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      920
+    ],
+    "scope": "Original one-comment premise corrected by maintainer: AST-normalized comment edits never moved hashes; logic edits did.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "acf1b9defa9a654c7924984aa1aced5538bb7fa7da39e6ac21395f0b2a8d26c3",
+        "head_sha": "c0526ba3efc804e526cfb2db5e3c8efb7a8eb886",
+        "merge_commit_sha": "6ca9c4db77515db7773fd8eabe957e47ffd5552e",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T03:18:22Z",
+        "number": 1027,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1027"
+      }
+    ],
+    "title": "Cache mechanism code is inside the content fingerprint: one comment in load_dataframe_with_dvc cold-rebuilds the corpus",
+    "url": "https://github.com/ligon/LSMS_Library/issues/908"
+  },
+  {
+    "body_sha256": "f5fb1e161cfc95fc71df3b3a87d3406da2e19d825710ddf0191143c26273d075",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "d02138ac752368c3f953a0466f7aa41878f86f00c54234356566f81a2b2998be",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/915#issuecomment-6259385356"
+      },
+      {
+        "body_sha256": "b5e35653cbfce7c5fb293e6523c02160b71675597401d43c69d6e72748fff008",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/915#issuecomment-6273709131"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 915,
+    "observed_at": "2026-10-21T12:28:24.112Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1085
+    ],
+    "scope": "Directory-without-scheme rejected, acquisition allow_unregistered opt-in implemented. Symlink-policy residual #1085 remains.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "1a86cb54b7b78a4098840da6363a9780e41f9cc9cf53be8489cd14ded829b71b",
+        "head_sha": "b2fdc3f7327d1d9c80f0835cde1afa55b868bdf1",
+        "merge_commit_sha": "92631d56bad6a088f2ad7a2402005dc5570d5157",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T17:56:21Z",
+        "number": 1098,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1098"
+      }
+    ],
+    "title": "Decide whether Country rejects existing unregistered directories",
+    "url": "https://github.com/ligon/LSMS_Library/issues/915"
+  },
+  {
+    "body_sha256": "0810a953b84b6dccc09235a365de64cce6a6ae2380a8ffd890344e04cc9fbb84",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "64d8b2d8f3878b9f4eb84272ee6304df94a00c601b9bc77bbb6dc54ec452e962",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/928#issuecomment-6259385540"
+      },
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/928#issuecomment-6277583859"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 928,
+    "observed_at": "2026-10-21T12:28:24.131Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Approved P1 key metadata and P2 shared resolver landed; P3/P4 were explicitly deferred.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+        "head_sha": "03d04a9e015be53c0de7aec34723f9ffb772db22",
+        "merge_commit_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T21:21:02Z",
+        "number": 1105,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1105"
+      }
+    ],
+    "title": "DECISION: categorical_mapping.org -- accept P1 (#+key:) + P2 (one key resolver for the four callers) as the first increment, deferring P3/P4",
+    "url": "https://github.com/ligon/LSMS_Library/issues/928"
+  },
+  {
+    "body_sha256": "393bfe93d8235d2b7c811fcca7cc1863e0fb4f75e9fe4f94149f0f634957da10",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "a91f3e34cc8a72bc5235ef9acacb5f239421052e48f7c9dd4424e375ab359ac6",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/931#issuecomment-6259385735"
+      },
+      {
+        "body_sha256": "3164ca349521b35008a6095be1f73fe1821c3b36311c7e7f880376abf1e99fbb",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/931#issuecomment-6273117092"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 931,
+    "observed_at": "2026-10-21T12:28:24.159Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "harvest_kg_factors reads declared u_kg and external Ethiopia answer key retained; residual #1093 separate.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "e1e783e14b7ac095dd41998e783190cce05d1d3d6239e03c87ffc607f8da5649",
+        "head_sha": "de652e7f62a39f5cee920eddcddf87862b47ea67",
+        "merge_commit_sha": "870dc417976528c149c7e941bd65ddd4d546dcfe",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T17:25:28Z",
+        "number": 1092,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1092"
+      }
+    ],
+    "title": "Decide whether crop conversion should use declared unit_kg",
+    "url": "https://github.com/ligon/LSMS_Library/issues/931"
+  },
+  {
+    "body_sha256": "aaad0939b1292ba6460630a71dc85742c889b7225ab05a85408e1b7373d921ab",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "7cd15a74a8a7bfd01d0e41ec4c74ba27a28c58ddc6cf9f19624abc6240d7a634",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/942#issuecomment-5731607800"
+      },
+      {
+        "body_sha256": "90f37e22c032ed8c58dbc96cfcb0bb1653875af8d2e365770173d8b48cb74d08",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/942#issuecomment-6259384175"
+      },
+      {
+        "body_sha256": "35bbc92c2efd228445d39550ca398650ffcd84ab9066d1dbc113bb895cc3c595",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/942#issuecomment-6281753100"
+      }
+    ],
+    "comments_count": 3,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 942,
+    "observed_at": "2026-10-21T12:28:24.826Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1133,
+      1135,
+      1136
+    ],
+    "scope": "Per-boundary two-field declarations and Country warning landed; #1133/#1135 remain.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "1d8e0d2b300c61869d73e0b65acc4f6988f415f31a27d3f2f3d861356ed4cc50",
+        "head_sha": "f11349703bc7137937d7c3aa37bb4ff497376d0a",
+        "merge_commit_sha": "238a4c15d8d691204097649765c58d1a2c6b1d59",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-20T02:14:32Z",
+        "number": 1137,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1137"
+      }
+    ],
+    "title": "v is wave-scoped in some countries: the same cluster gets a new id each round, with no crosswalk",
+    "url": "https://github.com/ligon/LSMS_Library/issues/942"
+  },
+  {
+    "body_sha256": "77d18a64ca8ce457b3de6f8bf67db5d3ba82836230c80de420ef5a1d22655090",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "718a9f5df8f76edc61e77737f5ed03088fa06a644dd87300a0b508f2231cba4a",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1001#issuecomment-6246272047"
+      }
+    ],
+    "comments_count": 1,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1001,
+    "observed_at": "2026-10-21T12:28:26.228Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1032,
+      1064
+    ],
+    "scope": "CI migration #1031 is also done. Library legacy permission rungs #1064 and DVC btime #1032 are separate.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "a37637b30389a6a79e728122acacfb00a429063b5d1cced63abe9f7aab0c850c",
+        "head_sha": "66a0a12ee2e49490d09474b162947ead46a022a9",
+        "merge_commit_sha": "5525e6924acecf3df4f888111e2787569d1064fa",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T01:43:39Z",
+        "number": 1022,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1022"
+      }
+    ],
+    "title": "Remove runtime credential writes into the installed countries tree",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1001"
+  },
+  {
+    "body_sha256": "2291d3417d05b862837d5276384676f96f71344ee6dc576fe21974e31763cc21",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1002,
+    "observed_at": "2026-10-21T12:28:26.151Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Stale issue has no fixed comment but merged PR and source/tests implement all requested paths; hermetic selection passes.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "d4bced1aec9713af9d564ea750a5aec31e5ef6bd5c4454d43de1e2874618d9ee",
+        "head_sha": "307e9f38f8be730799265eaba382aed07b85d446",
+        "merge_commit_sha": "ba3e58e9a454d65fc3c2df54681d2e8a36bec78a",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T03:17:55Z",
+        "number": 1019,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1019"
+      }
+    ],
+    "title": "Keep unreadable non-DTA binaries out of text fallback",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1002"
+  },
+  {
+    "body_sha256": "c175bc570aa0028d9ca660b461bc0fce3c2aabbd121f7d9afa1336007807bbad",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "21fe5edd091871727bbe3fb0a87aafb0f3e441df71b0c7ba8248e77b5ffe23b7",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1031#issuecomment-6270141613"
+      }
+    ],
+    "comments_count": 1,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1031,
+    "observed_at": "2026-10-21T12:28:26.287Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1032,
+      1064
+    ],
+    "scope": "Credentialed workflow_dispatch39259408940 supplied end-to-end evidence; no in-tree reader credential file permitted.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "e0a21752974100835e5ed08a840135d061918893006c3b58a86e29aa11b1b10c",
+        "head_sha": "41c372e43223a029acb99917834a6de40b8c71a2",
+        "merge_commit_sha": "12f48d83018c3167e12e803a5f38ee4e34e4ad40",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T14:51:38Z",
+        "number": 1065,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1065"
+      }
+    ],
+    "title": "CI writes S3 reader credentials into the countries tree (ci.yml:248, :390), so the user-config-only path is never tested end to end",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1031"
+  },
+  {
+    "body_sha256": "64535b534069f8cf9eb24865aef31d74936abb1575632db9429462dcb3b878ad",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "fa4d85459bb16675ffd7c40fc91ea127752a8a2ea9dfa7d3ca9ba0ee12494cc0",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1036#issuecomment-6259386552"
+      },
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1036#issuecomment-6277584193"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1036,
+    "observed_at": "2026-10-21T12:28:27.159Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Declared empty table distinct error landed in bundle.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+        "head_sha": "03d04a9e015be53c0de7aec34723f9ffb772db22",
+        "merge_commit_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T21:21:02Z",
+        "number": 1105,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1105"
+      }
+    ],
+    "title": "categorical-mapping cascade: a declared-but-EMPTY org table silently falls through to a lower level",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1036"
+  },
+  {
+    "body_sha256": "e4d3d0df4dc4c78e888933a0f13c2a3611cbdcccb017df2aa2de64357dc3ba86",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "be58472556ecd2f8ec322486244eae91ada288c5059475fc8d0b379e9a536940",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1039#issuecomment-6259386847"
+      },
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1039#issuecomment-6277584590"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1039,
+    "observed_at": "2026-10-21T12:28:26.832Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1071
+    ],
+    "scope": "Default-backend barren subset inconsistency split as #1099. Existing country-builder stale-output route is separate; do not weaken authority policy.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+        "head_sha": "03d04a9e015be53c0de7aec34723f9ffb772db22",
+        "merge_commit_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T21:21:02Z",
+        "number": 1105,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1105"
+      }
+    ],
+    "title": "DECISION: LSMS_BUILD_BACKEND=make cannot build a materialize: make table that has wave scripts but no country rule (Tanzania food_acquired)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1039"
+  },
+  {
+    "body_sha256": "a5bf4930bc1ecc17ddc1ad25acd77f9eee167c8e1396604fede442cacce6f35f",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1040#issuecomment-6277584865"
+      }
+    ],
+    "comments_count": 1,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1040,
+    "observed_at": "2026-10-21T12:28:27.802Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1071
+    ],
+    "scope": "Behavior questions intentionally split as #1071; corruption admission fixed as #1070.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+        "head_sha": "03d04a9e015be53c0de7aec34723f9ffb772db22",
+        "merge_commit_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T21:21:02Z",
+        "number": 1105,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1105"
+      }
+    ],
+    "title": "Wave-tier cache read gates are still inside the build fingerprint (Wave.grab_data, run_make_target, assume_cache_fresh serve)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1040"
+  },
+  {
+    "body_sha256": "cf4af231d06b5cdf2971b4c02565c4397036b42184cb5513ec52097defa88ff7",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1070#issuecomment-6277585764"
+      }
+    ],
+    "comments_count": 1,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1070,
+    "observed_at": "2026-10-21T12:28:30.508Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1071
+    ],
+    "scope": "No residual here; corrupted-read recovery policy remains #1071.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+        "head_sha": "03d04a9e015be53c0de7aec34723f9ffb772db22",
+        "merge_commit_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T21:21:02Z",
+        "number": 1105,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1105"
+      }
+    ],
+    "title": "get_dataframe serves a non-parquet .parquet as an empty CSV frame; under assume_cache_fresh that becomes the served table",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1070"
+  },
+  {
+    "body_sha256": "baa26b92191d4868d7ed43d82090922a0bd58f6fad38c6b2b0307acc41b7c560",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1093,
+    "observed_at": "2026-10-21T12:28:31.493Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Declared unit propagation; inherited reducer country-axis/pooling semantics remain separate.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "a75ac72b059e86c7bfc0e85a2eb570897a07a2b9675de7c46811216ed4644975",
+        "head_sha": "eaf7b9913b37e04e924bd05a17e691e0263ecb4e",
+        "merge_commit_sha": "047d1ff514aefc0dd7536b4a366d2cdc087b48b7",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T04:54:04Z",
+        "number": 1154,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1154"
+      }
+    ],
+    "title": "median_price_valuation (sold kg), seed_kg and nitrogen_kg are blind to a country's declared u_kg (Ethiopia: 710 Quintal rows with Quantity_sold drop from the price pool)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1093"
+  },
+  {
+    "body_sha256": "eb267306c8b46a6d02810e3e7e725017054e61020d7e5466314f12c92c933a88",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1099,
+    "observed_at": "2026-10-21T12:28:31.491Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Narrow absent-subset boundary; genuine builders and source failures preserved.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "f32965807fcd79981d6756730ff456f63960948b5c9d66326b8c96e9e2abd701",
+        "head_sha": "f9871610f02bca8d1f82a352c4925353439cb6bc",
+        "merge_commit_sha": "f46dc011f766197156236f0b293986156dae03a0",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T04:54:08Z",
+        "number": 1155,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1155"
+      }
+    ],
+    "title": "Default backend: a barren-subset request (a wave that does not declare the table) serves 0 rows warm but raises 'Could not materialize' cold",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1099"
+  },
+  {
+    "body_sha256": "68fbe66f8d76481b0cd340b88acd1ad41dc88b2e36df4a9a709e1567c3c28060",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "2d701504d9b3a6b04004a853772c2ee701440545b8d8642171047084de9bbe6d",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1114#issuecomment-6279009553"
+      }
+    ],
+    "comments_count": 1,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1114,
+    "observed_at": "2026-10-21T12:28:32.890Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      978,
+      1127,
+      1116,
+      1149
+    ],
+    "scope": "Held-release decision implemented. Acquisition tasks #978/#1127 separate; latest-release durable queue #1128 explicitlyGO later.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "83a574017b74827d990a4ffb1f7ce83aef424f10c87f51c7234200bfb224ff34",
+        "head_sha": "c257f7da13338c21cffe9a5cfdc2ddf9d033948c",
+        "merge_commit_sha": "2070823cf2c387cd82df100c3d8a1828dc473101",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-19T22:39:56Z",
+        "number": 1117,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1117"
+      }
+    ],
+    "title": "DECISION: does `#+CATALOG_IDNO:` / `#+CATALOG_DOI:` record the release we HOLD, or the catalog's latest?",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1114"
+  },
+  {
+    "body_sha256": "e63dcaa4853224cd7a8db738a378186710319842168d7e75948400cf6822da4f",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1115,
+    "observed_at": "2026-10-21T12:28:33.070Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1116,
+      1149
+    ],
+    "scope": "All four reported round-trip defects repaired. Unknown/repeated/empty metadata and keyword-looking notes survive; contradictory source/holding or unsafe scalar rewrites refuse before changing destination bytes. Fresh130-file census and independent round2 evidence; no shipped SOURCE edits.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "345f420dce6dbc1c6d6e70ebfbb3cd01172bffe051b929d4fe1602f9e63b0b71",
+        "head_sha": "124c2436d7e1a279c72f4d8f650d250eab6c7d67",
+        "merge_commit_sha": "5bd1a5834e1957aab464f1aa99a0544ce93c6a25",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T05:03:04Z",
+        "number": 1163,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1163"
+      }
+    ],
+    "title": "provenance.py: a SOURCE.org round-trip drops unknown `#+KEY:` lines, takes the URL from any line, and re-ingests its own placeholder as prose",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1115"
+  },
+  {
+    "body_sha256": "d623ac64e777dee40c1fc0ac4b972471e19397e0c64a6da0ba63e6680dfa5606",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1124,
+    "observed_at": "2026-10-21T12:28:33.977Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Baseline missing-country signal plus canonical farm sweep; Class B requires triage.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "1170acd7f777382596a3599eceb78836dbf523464314807267e3f07556572984",
+        "head_sha": "d84061818b0b430e8b00fa26b5b6d19e4694eb96",
+        "merge_commit_sha": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T04:54:17Z",
+        "number": 1157,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1157"
+      }
+    ],
+    "title": "#569 residual G: `bench/feature_audit/scan.py` row-conservation is blind to modal exclusion",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1124"
+  },
+  {
+    "body_sha256": "b6d85117c48fc67090a6eb896297fb64d359a6db9b723752a28a69e5fd0a5582",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1125,
+    "observed_at": "2026-10-21T12:28:34.422Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Named warm-read failures and exact participation; documented coarse RHS allowance expires with plot grain.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "1170acd7f777382596a3599eceb78836dbf523464314807267e3f07556572984",
+        "head_sha": "d84061818b0b430e8b00fa26b5b6d19e4694eb96",
+        "merge_commit_sha": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T04:54:17Z",
+        "number": 1157,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1157"
+      }
+    ],
+    "title": "#569 residual H: the crop_production warm-assembly test still swallows per-country exceptions",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1125"
+  },
+  {
+    "body_sha256": "7e9e995781179a984d6e44c71642d264a61eff94be2f8867850dc33b8915da5b",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [
+      {
+        "body_sha256": "9d19b8be7ec98a9aebba729619f12ecf617204634561c602b9d6f4e57f8786ed",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1128#issuecomment-6281986593"
+      },
+      {
+        "body_sha256": "2c51ea9c599eaacc8c8593414059d1c296a97499e5d8af5a34defac9d21b1a93",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1128#issuecomment-6288844785"
+      }
+    ],
+    "comments_count": 2,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1128,
+    "observed_at": "2026-10-21T12:28:34.522Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      978,
+      1127,
+      1116,
+      1149
+    ],
+    "scope": "Code-only GO plus optionA release-unknown ruling implemented: held IDNO never inferred from catalog alone; latest/first-seen queue is separate, discovery reports stale release, complete successful acquisition clears queue. Failed cross-entry download/push cannot stamp. No actual acquisition or shipped queue population claimed.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "345f420dce6dbc1c6d6e70ebfbb3cd01172bffe051b929d4fe1602f9e63b0b71",
+        "head_sha": "124c2436d7e1a279c72f4d8f650d250eab6c7d67",
+        "merge_commit_sha": "5bd1a5834e1957aab464f1aa99a0544ce93c6a25",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T05:03:04Z",
+        "number": 1163,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1163"
+      }
+    ],
+    "title": "provenance: record the catalog's newer release as #+CATALOG_LATEST_IDNO beside the held one, so stale releases form an acquisition queue (#1114 ruling)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1128"
+  },
+  {
+    "body_sha256": "2b91a29d4c9e61077af0fba1d6069345415c1433bbfa9c8ee3e8608b70398e02",
+    "body_unchanged_from_prior_audit": true,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1143,
+    "observed_at": "2026-10-21T12:28:35.792Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [],
+    "scope": "Whole metric token parsing; explicit ambiguity refusal retained.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "0e06a3dc6d4b5a8f2eb1edae16edf251b241a4d61552be2942213eee22ccb584",
+        "head_sha": "1070a4d03e764ec8e3b0e61d4f825bc793eeeae7",
+        "merge_commit_sha": "064a7fb465b98c4a4cfa951235bd903a81a68d87",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T04:54:12Z",
+        "number": 1156,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1156"
+      }
+    ],
+    "title": "_parse_explicit_metric misreads decimal commas: Senegal 'Bouteille de 1,5 L' served 5.0 kg, C\u00f4te d'Ivoire 'Sac (0,9 Kg)' 9.0 kg (945 served rows)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1143"
+  },
+  {
+    "body_sha256": "395bcce8d284a9af44dc246de0eafa4176d4946dcd540fe615b856fde9accf6a",
+    "body_unchanged_from_prior_audit": false,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1159,
+    "observed_at": "2026-10-21T12:28:37.118Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1110
+    ],
+    "scope": "Maintainer chose country-preserving mass reducers; both index/column country forms, nonnull boundary, one/empty results and declared factors tested. Downstream1160 now separately covered by1165; price pooling/scientific defaults unchanged.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "3fa534d5c89dbead9ce28f272319be72aa41e7515596f4b6654ac6fb1bac151d",
+        "head_sha": "d124c0df70db2e04dceb4a8c19eb0d40df14dbee",
+        "merge_commit_sha": "f50611161e9e58bf0676de5d771d4d6f07d0d8a3",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T05:03:09Z",
+        "number": 1164,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1164"
+      }
+    ],
+    "title": "seed_kg and nitrogen_kg silently merge countries with colliding plot IDs",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1159"
+  },
+  {
+    "body_sha256": "407c731ab9216c7f01db8da45dfc77eb15280169fea0207dac7ae94bda60a09a",
+    "body_unchanged_from_prior_audit": false,
+    "comment_evidence": [],
+    "comments_count": 0,
+    "comments_unchanged_from_prior_audit": true,
+    "disposition": "safe closure under current ruled scope",
+    "issue": 1160,
+    "observed_at": "2026-10-21T12:28:37.235Z",
+    "prior_source_and_acceptance_audit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c:slurm_logs/framework_campaign_2026-10-20/release-closure/closure-table.json",
+    "provider": "connected GitHub",
+    "retained_residual_issues": [
+      1110
+    ],
+    "scope": "Maintainer chose country-preserving rates; numerator AND positive-area identity, both nutrient/land modes, one-sided/null refusal, index precedence and area keys as columns tested. Independent387-case and real pooled controls pass; existing1110 land-grain policy/docstring tension remains outside identity scope.",
+    "state": "open",
+    "supporting_prs": [
+      {
+        "base": "development",
+        "body_sha256": "ad7b88b2e8ba38f1601acfa7c63ed9158e70432849a74ea6ad760d22ef539753",
+        "head_sha": "23c1e2d52801bf206a15ec5900bca5d62e7f850f",
+        "merge_commit_sha": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+        "merge_in_dev": true,
+        "merge_in_v015": false,
+        "merged": true,
+        "merged_at": "2026-10-21T05:09:02Z",
+        "number": 1165,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1165"
+      }
+    ],
+    "title": "fertilizer_rate silently merges countries with colliding plot IDs in numerator and area",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1160"
+  }
+]

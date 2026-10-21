@@ -100,11 +100,65 @@ codebook records (Togo `659/660/662` = banana/meat/yam portions; Burkina
 - Document them in `{Country}/_/CONTENTS.org` — what they are, why undecodable.
 - Note them in the `tests/test_u_code_leak.py` header ledger as ACCEPTED.
 
-They are not a functional problem: per the `units=` modes (parent skill,
-*Downstream API*), these rows still contribute to `food_expenditures`
-(unit-independent) and `food_prices(units='unitvalue')` (per-native-unit);
-only the kg aggregate (`food_quantities(units='kgs')` → `u='kg'`) excludes
-them.
+**What the kg ladder does with them (GH #962 — this paragraph used to say
+the opposite).** An accepted residual is a *unit we cannot name*, not an
+*absent* unit, so `transformations.food_kg_factors` treats it like any other
+non-metric label: it enters the price-ratio inference and, where its
+`(t, j, u)` cell or its households' u-pooled ratio can be estimated, it
+**receives an inferred factor** — usually the u-pooled `unit` rung, since a
+residual is rare enough that its own `(item, unit)` cell seldom clears
+`min_reports` — and therefore **is included** in
+`food_quantities(units='kgs')` (`u='kg'`), `food_prices(units='kgvalue')`
+and every per-kg figure. The factor's provenance is disclosed per row in
+`KgFactorSource` (and counted in `attrs['kg_factor_sources']`); read it
+before trusting a residual's kilograms. Measured on Uganda after #967: the
+eight unlabelled codes (`136`, `156087`, `139093`, `142092`, `156096`,
+`156090`, `181087`, `142090`) sit on 24 rows, all 24 served by the `unit`
+rung. Togo `659/660/662` and Burkina `254/255` are served the same way.
+
+Only the **missing-unit sentinels** are kept out of the inference:
+a NaN `u` and the spellings in `transformations._U_SENTINELS`
+(`Unknown`, legacy `Manquant`; case/space-insensitive) get
+`KgFactorSource == 'none'` unless the survey shipped its own kilograms
+(`survey_kg`), and the currency-denominated `Value` gets `none` too. So:
+
+| `u` is… | kg factor | in `units='kgs'`? |
+|---|---|---|
+| metric / stated size (`Kg`, `Sack (50 kgs)`) | `metric` | yes |
+| native or count unit, **or accepted residual code** | `item_unit` / `item_unit_tight` / `unit` / `none` | yes, where a rung serves it |
+| missing-unit sentinel (NaN, `_U_SENTINELS`) | `none` (or `survey_kg`) | only via `survey_kg` |
+| declared in `_/no_kg_factor.yml` (an `(item, unit)` cell) | `none` (or `survey_kg` / `metric`) | only via those |
+| `Value` | `none` | no |
+
+**Item-level "no kg factor" (GH #1042).** When an item's own kg-labelled
+rows are wrong, every inferred rung for that item divides by a corrupt
+`(t, j)` baseline and no gate notices -- GhanaLSS eggs: the egg `Kilogram`
+rows price at the per-egg price, so `(Egg, Single)` was 0.50 kg per egg and
+`(Egg, Crate)` 0.030 kg. Declare the cells in `countries/{C}/_/no_kg_factor.yml`
+(`item`, optional `units` list -- absent means every unit -- and a required
+`reason`); labels are the ones the wave scripts write (before
+`_finalize_result`). `Country._no_kg_factor_cells` reads it at read time and
+the derived food tables pass it to `food_kg_factors(no_kg=...)`, which treats
+the rows exactly like sentinel rows and reports them in
+`attrs['kg_factor_declared_none']` (`rows_matched`, `rows_refused`, per
+cell). The `.yml` moves no cache hash. Use it for an item whose inference is
+*known* wrong, with the measured factors in `reason`; it is not a tolerance
+knob. A country script that calls `food_quantities_from_acquired` itself
+(GhanaLSS `nutrition.py`) does not get the declaration unless it passes
+`no_kg=`.
+
+**`_U_SENTINELS` is a closed vocabulary.** A *new* spelling of "no unit"
+(`'None'`, `'N/A'`, `''`, `'---'`) is NOT recognised: it is treated as a
+unit and acquires a pooled price-ratio factor. Write missing units as
+`transformations.U_UNKNOWN`; do not invent a spelling.
+`tests/test_962_unit_sentinel.py` sweeps the country tree for literal
+strings written into `u` via `fillna(...)` and fails on one that is neither
+a sentinel nor in its evidence ledger.
+
+Either way these rows still contribute to `food_expenditures`
+(unit-independent) and `food_prices(units='unitvalue')` (per-native-unit).
+Changing the residual policy (e.g. refusing them a pooled factor) is a
+scientific decision with its own before/after accounting, not a doc fix.
 
 ## Gotchas that actually bit us
 

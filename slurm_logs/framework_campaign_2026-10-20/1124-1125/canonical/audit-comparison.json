@@ -1,0 +1,819 @@
+{
+  "baseline": {
+    "by_feature": {
+      "assets": {
+        "records": 40,
+        "status_counts": {
+          "skip": 1,
+          "warn": 39
+        }
+      },
+      "cluster_features": {
+        "records": 153,
+        "status_counts": {
+          "skip": 1,
+          "warn": 152
+        }
+      },
+      "crop_production": {
+        "records": 206,
+        "status_counts": {
+          "warn": 206
+        }
+      },
+      "food_acquired": {
+        "records": 228,
+        "status_counts": {
+          "error": 1,
+          "skip": 1,
+          "warn": 226
+        }
+      },
+      "food_expenditures": {
+        "records": 342,
+        "status_counts": {
+          "error": 1,
+          "pass": 1,
+          "skip": 1,
+          "warn": 339
+        }
+      },
+      "food_prices": {
+        "records": 760,
+        "status_counts": {
+          "error": 1,
+          "pass": 1,
+          "skip": 1,
+          "warn": 757
+        }
+      },
+      "food_quantities": {
+        "records": 600,
+        "status_counts": {
+          "error": 1,
+          "pass": 1,
+          "skip": 1,
+          "warn": 597
+        }
+      },
+      "household_characteristics": {
+        "records": 204,
+        "status_counts": {
+          "pass": 1,
+          "skip": 2,
+          "warn": 201
+        }
+      },
+      "household_roster": {
+        "records": 178,
+        "status_counts": {
+          "pass": 1,
+          "skip": 2,
+          "warn": 175
+        }
+      },
+      "individual_education": {
+        "records": 91,
+        "status_counts": {
+          "error": 1,
+          "skip": 1,
+          "warn": 89
+        }
+      },
+      "interview_date": {
+        "records": 78,
+        "status_counts": {
+          "error": 1,
+          "skip": 1,
+          "warn": 76
+        }
+      },
+      "plot_features": {
+        "records": 175,
+        "status_counts": {
+          "fail": 5,
+          "warn": 170
+        }
+      },
+      "plot_inputs": {
+        "records": 77,
+        "status_counts": {
+          "warn": 77
+        }
+      },
+      "plot_labor": {
+        "records": 54,
+        "status_counts": {
+          "warn": 54
+        }
+      },
+      "sample": {
+        "records": 63,
+        "status_counts": {
+          "skip": 1,
+          "warn": 62
+        }
+      },
+      "shocks": {
+        "records": 36,
+        "status_counts": {
+          "warn": 36
+        }
+      }
+    },
+    "error_fail_pairs": [
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "food_acquired",
+        "fingerprint": "food_acquired|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "food_expenditures",
+        "fingerprint": "food_expenditures|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "food_prices",
+        "fingerprint": "food_prices|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "food_quantities",
+        "fingerprint": "food_quantities|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "individual_education",
+        "fingerprint": "individual_education|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "interview_date",
+        "fingerprint": "interview_date|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Albania",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Albania||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Cambodia",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Cambodia||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Kosovo",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Kosovo||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Tajikistan",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Tajikistan||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Timor-Leste",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Timor-Leste||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      }
+    ],
+    "records": 3285,
+    "severity_counts": {
+      "A": 33,
+      "B": 69,
+      "C": 3165,
+      "none": 5,
+      "skip": 13
+    },
+    "skip_cells": [
+      {
+        "feature": "assets",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "cluster_features",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "food_acquired",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "food_expenditures",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "food_prices",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "food_quantities",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "household_characteristics",
+        "reason": "Armenia: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "household_characteristics",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "household_roster",
+        "reason": "Armenia: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "household_roster",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "individual_education",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "interview_date",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "sample",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      }
+    ],
+    "status_counts": {
+      "error": 6,
+      "fail": 5,
+      "pass": 5,
+      "skip": 13,
+      "warn": 3256
+    }
+  },
+  "combined": {
+    "by_feature": {
+      "assets": {
+        "records": 67,
+        "status_counts": {
+          "skip": 1,
+          "warn": 66
+        }
+      },
+      "cluster_features": {
+        "records": 233,
+        "status_counts": {
+          "skip": 1,
+          "warn": 232
+        }
+      },
+      "crop_production": {
+        "records": 222,
+        "status_counts": {
+          "warn": 222
+        }
+      },
+      "food_acquired": {
+        "records": 247,
+        "status_counts": {
+          "error": 1,
+          "skip": 1,
+          "warn": 245
+        }
+      },
+      "food_expenditures": {
+        "records": 350,
+        "status_counts": {
+          "error": 1,
+          "pass": 1,
+          "skip": 1,
+          "warn": 347
+        }
+      },
+      "food_prices": {
+        "records": 769,
+        "status_counts": {
+          "error": 1,
+          "pass": 1,
+          "skip": 1,
+          "warn": 766
+        }
+      },
+      "food_quantities": {
+        "records": 600,
+        "status_counts": {
+          "error": 1,
+          "pass": 1,
+          "skip": 1,
+          "warn": 597
+        }
+      },
+      "household_characteristics": {
+        "records": 279,
+        "status_counts": {
+          "pass": 1,
+          "skip": 2,
+          "warn": 276
+        }
+      },
+      "household_roster": {
+        "records": 293,
+        "status_counts": {
+          "pass": 1,
+          "skip": 2,
+          "warn": 290
+        }
+      },
+      "individual_education": {
+        "records": 149,
+        "status_counts": {
+          "error": 1,
+          "skip": 1,
+          "warn": 147
+        }
+      },
+      "interview_date": {
+        "records": 8176,
+        "status_counts": {
+          "error": 1,
+          "skip": 1,
+          "warn": 8174
+        }
+      },
+      "plot_features": {
+        "records": 204,
+        "status_counts": {
+          "fail": 5,
+          "warn": 199
+        }
+      },
+      "plot_inputs": {
+        "records": 91,
+        "status_counts": {
+          "warn": 91
+        }
+      },
+      "plot_labor": {
+        "records": 69,
+        "status_counts": {
+          "warn": 69
+        }
+      },
+      "sample": {
+        "records": 131,
+        "status_counts": {
+          "skip": 1,
+          "warn": 130
+        }
+      },
+      "shocks": {
+        "records": 136,
+        "status_counts": {
+          "warn": 136
+        }
+      }
+    },
+    "error_fail_pairs": [
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "food_acquired",
+        "fingerprint": "food_acquired|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "food_expenditures",
+        "fingerprint": "food_expenditures|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "food_prices",
+        "fingerprint": "food_prices|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "food_quantities",
+        "fingerprint": "food_quantities|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "individual_education",
+        "fingerprint": "individual_education|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "build",
+        "count": 1,
+        "country": "Peru",
+        "feature": "interview_date",
+        "fingerprint": "interview_date|Peru||build",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "A",
+        "status": "error"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Albania",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Albania||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Cambodia",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Cambodia||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Kosovo",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Kosovo||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Tajikistan",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Tajikistan||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      },
+      {
+        "check": "declared_spellings",
+        "count": 1,
+        "country": "Timor-Leste",
+        "feature": "plot_features",
+        "fingerprint": "plot_features|Timor-Leste||declared_spellings",
+        "kwargs": {},
+        "phase": "1a-sanity",
+        "severity": "B",
+        "status": "fail"
+      }
+    ],
+    "records": 12016,
+    "severity_counts": {
+      "A": 33,
+      "B": 70,
+      "C": 11895,
+      "none": 5,
+      "skip": 13
+    },
+    "skip_cells": [
+      {
+        "feature": "assets",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "cluster_features",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "food_acquired",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "food_expenditures",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "food_prices",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "food_quantities",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "household_characteristics",
+        "reason": "Armenia: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "household_characteristics",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "household_roster",
+        "reason": "Armenia: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "household_roster",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "individual_education",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "interview_date",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      },
+      {
+        "feature": "sample",
+        "reason": "Nepal: known no-source-data country (CLAUDE.md)"
+      }
+    ],
+    "status_counts": {
+      "error": 6,
+      "fail": 5,
+      "pass": 5,
+      "skip": 13,
+      "warn": 11987
+    }
+  },
+  "new_error_fail_pairs": [],
+  "new_or_changed_assembly_findings": [],
+  "no_new_assembly_findings": true,
+  "raw_findings_private": true,
+  "removed_error_fail_pairs": [],
+  "removed_or_changed_assembly_findings": [],
+  "same_scanner_sha256": "7380a8faf1cc3de87954d776d8592e05a505a2697443b3c9c52181a06bd041b4",
+  "scope_skips_identical": true,
+  "warning_fingerprint_added_or_increased": [
+    {
+      "check": "runtime_warning",
+      "count": 27,
+      "country": null,
+      "feature": "assets",
+      "fingerprint": "assets|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 80,
+      "country": null,
+      "feature": "cluster_features",
+      "fingerprint": "cluster_features|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 16,
+      "country": null,
+      "feature": "crop_production",
+      "fingerprint": "crop_production|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 19,
+      "country": null,
+      "feature": "food_acquired",
+      "fingerprint": "food_acquired|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 8,
+      "country": null,
+      "feature": "food_expenditures",
+      "fingerprint": "food_expenditures|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 9,
+      "country": null,
+      "feature": "food_prices",
+      "fingerprint": "food_prices|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 75,
+      "country": null,
+      "feature": "household_characteristics",
+      "fingerprint": "household_characteristics|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 1,
+      "country": null,
+      "feature": "household_roster",
+      "fingerprint": "household_roster|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "B",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 114,
+      "country": null,
+      "feature": "household_roster",
+      "fingerprint": "household_roster|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 58,
+      "country": null,
+      "feature": "individual_education",
+      "fingerprint": "individual_education|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 8098,
+      "country": null,
+      "feature": "interview_date",
+      "fingerprint": "interview_date|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 29,
+      "country": null,
+      "feature": "plot_features",
+      "fingerprint": "plot_features|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 14,
+      "country": null,
+      "feature": "plot_inputs",
+      "fingerprint": "plot_inputs|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 15,
+      "country": null,
+      "feature": "plot_labor",
+      "fingerprint": "plot_labor|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 68,
+      "country": null,
+      "feature": "sample",
+      "fingerprint": "sample|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    },
+    {
+      "check": "runtime_warning",
+      "count": 100,
+      "country": null,
+      "feature": "shocks",
+      "fingerprint": "shocks|ALL||runtime_warning",
+      "kwargs": {},
+      "phase": "1a-sanity",
+      "severity": "C",
+      "status": "warn"
+    }
+  ],
+  "warning_fingerprint_removed_or_decreased": []
+}

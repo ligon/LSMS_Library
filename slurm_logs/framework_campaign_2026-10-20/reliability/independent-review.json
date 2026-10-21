@@ -1,0 +1,1551 @@
+{
+  "status": "PASS: zero suite failures/errors; eight newly skipped invariance cases independently PASS in separate sanctioned supplement",
+  "reviewer": "Sue",
+  "observed_utc": "2026-10-21T00:28:34.462876+00:00",
+  "reported_source_identities": {
+    "baseline": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "combined": "852ac2bfcd5f798533f56e7efa1f77db80c0138f"
+  },
+  "source_identity_limit": "JUnit/log files themselves do not record commit SHA; exact run source identities supplied by parent frozen-run manifest.",
+  "baseline": {
+    "xml_sha256": "48e9cc1a1969acc386bac40f137e9981a0f3349b85086381bc9af8e0739fc349",
+    "log_sha256": "a01e16f1008f90bdea7c724c2ccfa3b9cffdc3056caa59e0a283eb6bac5ec8d5",
+    "counts": {
+      "passed": 8369,
+      "skipped": 279,
+      "xfail": 9,
+      "xpass": 1,
+      "warnings": 1232,
+      "seconds": 893.14
+    },
+    "testcases": 8658,
+    "failures": 0,
+    "errors": 0,
+    "credential_skip_cases": []
+  },
+  "combined": {
+    "xml_sha256": "209bc73e3e32f318cbe045e9e2092a9b2a8c2e7c9a533c9df5d76c5803470186",
+    "log_sha256": "badd090183c782b7dc7eb16774d715239863f7c9be276c61d467cee20f170519",
+    "counts": {
+      "passed": 8562,
+      "skipped": 285,
+      "xfail": 9,
+      "xpass": 1,
+      "warnings": 1388,
+      "seconds": 1158.04
+    },
+    "testcases": 8857,
+    "failures": 0,
+    "errors": 0,
+    "credential_skip_cases": []
+  },
+  "transitions": [
+    {
+      "baseline": "junit_pass_including_possible_xpass",
+      "combined": "junit_pass_including_possible_xpass",
+      "count": 8361
+    },
+    {
+      "baseline": "junit_pass_including_possible_xpass",
+      "combined": "skip",
+      "count": 8
+    },
+    {
+      "baseline": "skip",
+      "combined": "junit_pass_including_possible_xpass",
+      "count": 2
+    },
+    {
+      "baseline": "skip",
+      "combined": "skip",
+      "count": 277
+    },
+    {
+      "baseline": "xfail",
+      "combined": "xfail",
+      "count": 9
+    }
+  ],
+  "changed_cases": [
+    {
+      "id": "tests.test_categorical_mapping_resolution::test_import_is_from_the_expected_checkout",
+      "baseline": {
+        "outcome": "skip",
+        "reason": "set LSMS_EXPECTED_ROOT to assert which checkout is imported",
+        "seconds": 0.001
+      },
+      "combined": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.001
+      }
+    },
+    {
+      "id": "tests.test_gh866_stale_country_parquet_not_laundered::test_a_poisoned_country_parquet_is_REBUILT_not_served[GhanaLSS/nutrition]",
+      "baseline": {
+        "outcome": "skip",
+        "reason": "GhanaLSS/nutrition not warm",
+        "seconds": 0.002
+      },
+      "combined": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 50.223
+      }
+    },
+    {
+      "id": "tests.test_uganda_invariance::test_parquet_matches_baseline[2005-06/_/food_acquired.parquet]",
+      "baseline": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.037
+      },
+      "combined": {
+        "outcome": "skip",
+        "reason": "Parquet not built: 2005-06/_/food_acquired.parquet",
+        "seconds": 0.001
+      }
+    },
+    {
+      "id": "tests.test_uganda_invariance::test_parquet_matches_baseline[2009-10/_/food_acquired.parquet]",
+      "baseline": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.025
+      },
+      "combined": {
+        "outcome": "skip",
+        "reason": "Parquet not built: 2009-10/_/food_acquired.parquet",
+        "seconds": 0.001
+      }
+    },
+    {
+      "id": "tests.test_uganda_invariance::test_parquet_matches_baseline[2010-11/_/food_acquired.parquet]",
+      "baseline": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.023
+      },
+      "combined": {
+        "outcome": "skip",
+        "reason": "Parquet not built: 2010-11/_/food_acquired.parquet",
+        "seconds": 0.001
+      }
+    },
+    {
+      "id": "tests.test_uganda_invariance::test_parquet_matches_baseline[2011-12/_/food_acquired.parquet]",
+      "baseline": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.025
+      },
+      "combined": {
+        "outcome": "skip",
+        "reason": "Parquet not built: 2011-12/_/food_acquired.parquet",
+        "seconds": 0.001
+      }
+    },
+    {
+      "id": "tests.test_uganda_invariance::test_parquet_matches_baseline[2013-14/_/food_acquired.parquet]",
+      "baseline": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.031
+      },
+      "combined": {
+        "outcome": "skip",
+        "reason": "Parquet not built: 2013-14/_/food_acquired.parquet",
+        "seconds": 0.001
+      }
+    },
+    {
+      "id": "tests.test_uganda_invariance::test_parquet_matches_baseline[2015-16/_/food_acquired.parquet]",
+      "baseline": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.029
+      },
+      "combined": {
+        "outcome": "skip",
+        "reason": "Parquet not built: 2015-16/_/food_acquired.parquet",
+        "seconds": 0.001
+      }
+    },
+    {
+      "id": "tests.test_uganda_invariance::test_parquet_matches_baseline[2018-19/_/food_acquired.parquet]",
+      "baseline": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.03
+      },
+      "combined": {
+        "outcome": "skip",
+        "reason": "Parquet not built: 2018-19/_/food_acquired.parquet",
+        "seconds": 0.001
+      }
+    },
+    {
+      "id": "tests.test_uganda_invariance::test_parquet_matches_baseline[2019-20/_/food_acquired.parquet]",
+      "baseline": {
+        "outcome": "junit_pass_including_possible_xpass",
+        "reason": "",
+        "seconds": 0.029
+      },
+      "combined": {
+        "outcome": "skip",
+        "reason": "Parquet not built: 2019-20/_/food_acquired.parquet",
+        "seconds": 0.001
+      }
+    }
+  ],
+  "added_cases": [
+    {
+      "id": "tests.test_feature_audit_participation::test_a_whole_country_is_named_with_its_own_lost_rows",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.08
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_an_empty_assembly_names_all_positive_built_countries",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.157
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_country_exclusion_and_retained_collapse_are_counted_separately",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.075
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_explicitly_disabled_or_nonbaseline_checks_allow_country_degradation[kwargs0-False]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.076
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_explicitly_disabled_or_nonbaseline_checks_allow_country_degradation[kwargs1-False]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.076
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_explicitly_disabled_or_nonbaseline_checks_allow_country_degradation[kwargs2-True]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.075
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_missing_country_axis_is_structural_and_does_not_guess_attribution",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.074
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_registered_farm_tables_are_in_canonical_audit",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_retained_additive_collapse_remains_a_warning_for_triage",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.08
+    },
+    {
+      "id": "tests.test_feature_audit_participation::test_zero_row_country_is_not_an_excluded_positive_build",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.076
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_coarse_rhs_expectation_does_not_hide_another_country_loss",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.033
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_coarse_rhs_warm_read_failure_remains_fatal",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.026
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_rhs_must_participate_as_soon_as_plot_grain_appears[plot]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.043
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_rhs_must_participate_as_soon_as_plot_grain_appears[plot_alias]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.033
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_rhs_must_participate_as_soon_as_plot_grain_appears[plot_column]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.037
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_warm_assembly_reads_match_feature_default_currency",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.03
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_warm_crop_accepts_only_documented_coarse_rhs_exclusion",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.033
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_warm_crop_guard_names_a_country_read_failure_with_three_survivors",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.021
+    },
+    {
+      "id": "tests.test_feature_canonical_index::test_warm_crop_guard_rejects_an_entire_country_exclusion",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.031
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_does_not_accept_unknown_table_or_wave",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.008
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_does_not_turn_a_failed_full_build_into_empty",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.007
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[all-dvc]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.07
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[all-make]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.035
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[cold-dvc]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.031
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[cold-make]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.069
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[no_cache-dvc]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.044
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[no_cache-make]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.038
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[partial-dvc]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.039
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[partial-make]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.035
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[stale-dvc]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.037
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_is_typed_and_preserves_other_cached_waves[stale-make]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.031
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_keeps_required_source_failure",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.009
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_without_make_preserves_unknown_country_rules[False-dvc]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.021
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_without_make_preserves_unknown_country_rules[False-make]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.021
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_without_make_preserves_unknown_country_rules[True-dvc]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.01
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_absent_subset_without_make_preserves_unknown_country_rules[True-make]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.021
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_covered_subset_cache_hit_does_not_construct_waves[False]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.045
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_covered_subset_cache_hit_does_not_construct_waves[True]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.042
+    },
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_full_default_backend_build_does_not_probe_country_builder",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.658
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_ambiguous_multi_country_record_is_refused",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.02
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_country_finalize_attaches_input_declaration_and_feature_keeps_it",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.78
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declaration_never_fabricates_missing_unit_mass[nitrogen_kg-None]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.015
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declaration_never_fabricates_missing_unit_mass[nitrogen_kg-Unknown]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.015
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declaration_never_fabricates_missing_unit_mass[seed_kg-None]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.013
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declaration_never_fabricates_missing_unit_mass[seed_kg-Unknown]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.014
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declaration_overrides_metric_but_does_not_modify_harvest_fallback",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.022
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declared_quintal_supplies_seed_and_nitrogen[argument-False]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.023
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declared_quintal_supplies_seed_and_nitrogen[argument-True]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.03
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declared_quintal_supplies_seed_and_nitrogen[attrs-False]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.024
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declared_quintal_supplies_seed_and_nitrogen[attrs-True]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.03
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_declared_sold_kg_restores_price_pool_observation",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.04
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_each_country_gets_its_own_mass[column]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.025
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_each_country_gets_its_own_mass[index]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.024
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_explicit_override_and_empty_override[nitrogen_kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.023
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_explicit_override_and_empty_override[seed_kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.02
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_explicit_sold_kg_is_authoritative",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.025
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_invalid_declaration_keeps_metric_fallback[-1]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.014
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_invalid_declaration_keeps_metric_fallback[0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.014
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_invalid_declaration_keeps_metric_fallback[inf]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.014
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_invalid_declaration_keeps_metric_fallback[nan]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.014
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_no_declaration_keeps_existing_metric_and_missing_behavior[False-nitrogen_kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.046
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_no_declaration_keeps_existing_metric_and_missing_behavior[False-seed_kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.036
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_no_declaration_keeps_existing_metric_and_missing_behavior[True-nitrogen_kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.057
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_no_declaration_keeps_existing_metric_and_missing_behavior[True-seed_kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.049
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_valuation_without_declarations_is_unchanged",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.029
+    },
+    {
+      "id": "tests.test_gh1093_declared_unit_consumers::test_yield_forwards_explicit_and_attrs_declarations",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.108
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[,5 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[.5 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[0,125,000 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1 / / 2 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1 500 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1, 5 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1,,5 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1,50,000 g]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1,500.5 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1,5000 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1.5.2 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1//2 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1/2/3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1e + 3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1e -3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1e+ 3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1e++3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1e+3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1e--3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1e-3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_an_ambiguous_number_declines_rather_than_being_partly_read[1e3 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_comma_fraction_parts_and_unit_scales[0,125 g-0.000125]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_comma_fraction_parts_and_unit_scales[0,125 tonne-125.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_comma_fraction_parts_and_unit_scales[0,5 / 2 kg-0.25]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_comma_fraction_parts_and_unit_scales[12,5 millilitres-0.0125]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_comma_fraction_parts_and_unit_scales[2 x 0,5 L-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_comma_fraction_parts_and_unit_scales[2x0,5 L-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_comma_fraction_parts_and_unit_scales[3 / 1,5 kg-2.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_comma_fraction_parts_and_unit_scales[Bottle0,5L-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[0,125 kg-0.125]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[0,5 L-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[0,500 kg-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[0,9 Kg-0.9]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[1,25 kg-1.25]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[1,5 L-1.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.002
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[1001. 12,5 cl (d\\xe9mi walatt)-0.125]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[12,5 cl-0.125]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[12,5cl(Demi Walatt)-0.125]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[12,5cl(demi walatt)-0.125]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[2,5 Kg-2.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[987. Filet (2,5Kg)-2.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[993. Bouteille de 1,5 litre-1.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[Bidon de 0,5 L-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[Bidon de 1,5 L-1.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[Bouteille de 1,5 L-1.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[Bouteille de 1,5 litre-1.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[Filet (2,5 kg)-2.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[Sac (0,9 Kg)-0.9]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[Sac (0,9 kg)-0.9]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[Sac (2,5 Kg)-2.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_decimal_comma_is_read_as_a_decimal[sac de 2,5kg-2.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_docstring_examples_run[_metric_scalar]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_docstring_examples_run[_parse_explicit_metric]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.005
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[categorical_mapping/ehcvm_units.org-12,5 cl (d\\xe9mi walatt)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[categorical_mapping/ehcvm_units.org-Bouteille de 1,5 litre]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[categorical_mapping/ehcvm_units.org-Filet (2,5Kg)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[categorical_mapping/ehcvm_units.org-Sac (0,9 kg)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[categorical_mapping/ehcvm_units.org-sac de 2,5kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Benin/_/categorical_mapping.org-Bidon de 0,5 L]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Benin/_/categorical_mapping.org-Bidon de 1,5 L]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Benin/_/categorical_mapping.org-Sac (2,5 Kg)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Benin/_/categorical_mapping.org-sac de 2,5kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/CotedIvoire/_/categorical_mapping.org-Sac (0,9 Kg)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/CotedIvoire/_/categorical_mapping.org-Sac (0,9 kg)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/categorical_mapping.org-1001. 12,5 cl (d\\xe9mi walatt)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/categorical_mapping.org-12,5cl(demi walatt)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/categorical_mapping.org-987. Filet (2,5Kg)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/categorical_mapping.org-993. Bouteille de 1,5 litre]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/categorical_mapping.org-Bouteille de 1,5 L]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/categorical_mapping.org-Filet (2,5 kg)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/units.org-12,5cl(Demi Walatt)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.002
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/units.org-12,5cl(demi walatt)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_every_shipped_comma_label_reads_its_stated_size[countries/Senegal/_/units.org-Bouteille de 1,5 L]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_declines_are_unchanged[1/0 kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_declines_are_unchanged[2 quintaux]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_declines_are_unchanged[20gallon drum]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_declines_are_unchanged[Heap (Small)]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_declines_are_unchanged[bidon de demi litre]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_declines_are_unchanged[half kg]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[0.5 tonne-500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[1/2 kg-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[1L Carton-1.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[2 lbs sack-0.907184]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[3/4 kg-0.75]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[50 kg Bag-50.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[500 g packet-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[500 ml Bottle-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Basin/20 kg-20.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Bidon de 1 litre et d\\xe9mi-1.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Boite (500 milligrammes)-0.0005]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Bottle(500ml)-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Bouteille (75 centilitres)-0.75]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Cup/Mug(0.5lt)-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Fish Cut piece (1 - 2 kg)-2.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Gourd (1-5lts)-5.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Jerrican (5 ltrs)-5.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Packet(1/4lt / 1/4kg)-0.25]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Plastic basin(5lts)-5.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Sack (50 kgs)-50.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_existing_spellings_are_unchanged[Tin (Debe) (20 lts)-20.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_food_ladder_serves_the_stated_size_on_the_metric_rung",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.107
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_number_reads_comma_fraction_parts",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[0,125-0.125]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[0,500-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[0,9-0.9]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[0.5-0.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[000,500-500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[001,500-1500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[01,500-1500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[1,000,000-1000000.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[1,25-1.25]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[1,5-1.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[1,500-1500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[10,000-10000.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[12,5-12.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_grammar[50-50.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_refuses_an_ambiguous_comma[,5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_refuses_an_ambiguous_comma[1,50,000]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_refuses_an_ambiguous_comma[1,500.5]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_refuses_an_ambiguous_comma[1,5000]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_metric_scalar_refuses_an_ambiguous_comma[1,]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_new_parser_symbols_reach_no_build_fingerprint",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.446
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_seeded_factor_is_the_stated_size",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.005
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_the_config_tree_has_comma_labels_to_check",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.077
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[000,500 kg-500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[001,500 kg-1500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[01,500 kg-1500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[1,000,000 g-1000.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[1,500 kg-1500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[10,000 g-10.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[1500 kg-1500.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[20kg-20.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_thousands_separator_and_plain_integers[50 KG-50.0]",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "id": "tests.test_metric_decimal_comma::test_volume_as_mass_false_still_declines_a_comma_volume",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.0
+    }
+  ],
+  "added_by_module": {
+    "tests.test_feature_audit_participation": 10,
+    "tests.test_feature_canonical_index": 9,
+    "tests.test_gh1039_make_backend_no_country_rule": 20,
+    "tests.test_gh1093_declared_unit_consumers": 27,
+    "tests.test_metric_decimal_comma": 134
+  },
+  "removed_cases": [
+    {
+      "id": "tests.test_gh1039_make_backend_no_country_rule::test_default_backend_is_unchanged",
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 0.57
+    }
+  ],
+  "unchanged_skip_count": 277,
+  "unchanged_xfail_reasons": {
+    "tests.test_sample.TestSample::test_has_weight_column[China]": "China source data has no sampling weights (genuine data limitation, not a library bug)",
+    "tests.test_sample.TestSample::test_has_weight_column[Kazakhstan]": "Kazakhstan source data has no sampling weights (genuine data limitation, not a library bug)",
+    "tests.test_sample.TestSample::test_has_weight_column[Pakistan]": "Pakistan source data has no sampling weights (genuine data limitation, not a library bug)",
+    "tests.test_sample.TestSample::test_has_weight_column[Peru]": "Peru source data has no sampling weights (genuine data limitation, not a library bug)",
+    "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane[Albania/plot_features]": "GH #602: Albania/plot_features ships unharmonized tenure labels: Tenure: 12358/16013 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'privatised' (12358); TenureSystem: 15961/16013 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'deed' (14809), 'sales_receipt' (419), 'none' (391), 'usufruct' (178), 'will' (140), +1 more",
+    "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane[Cambodia/plot_features]": "GH #602: Cambodia/plot_features ships unharmonized tenure labels: Tenure: 2951/2951 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'BY INHERITANCE OF GIFT FROM RELATIVES' (1440), 'BOUGHT IT FROM A NON-RELATIVE' (628), 'GIVEN BY THE GOVERNMENT OR LOCAL AUTHORITY' (373), 'BOUGHT IT FROM A RELATIVE' (207), 'CLEARED LAND/OCCUPIED FOR FREE' (117), +4 more; TenureSystem: 2951/2951 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'PRIVATE' (2871), 'STATE PUBLIC' (45), 'STATE PRIVATE' (12), 'INDIGENOUS' (12), 'COMMON PROPERTY' (7), +1 more",
+    "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane[Kosovo/plot_features]": "GH #602: Kosovo/plot_features ships unharmonized tenure labels: Tenure: 6469/6469 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'Owned' (6419), 'Rented' (26), 'Borrowed' (24); TenureSystem: 50/50 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'No payment' (24), 'Rent' (24), 'Sharecropped' (2)",
+    "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane[Tajikistan/plot_features]": "GH #602: Tajikistan/plot_features ships unharmonized tenure labels: TenureSystem: 3683/3683 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'CERTIFICATE' (2137), 'ACT (SEALED DOCUMENT)' (1196), 'NO DOCUMENTS' (238), 'SALES RECEIPT' (85), 'OTHER' (27)",
+    "tests.test_table_structure.TestFeatureSanity::test_feature_is_sane[Timor-Leste/plot_features]": "GH #602: Timor-Leste/plot_features ships unharmonized tenure labels: Tenure: 6308/6308 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'Part owner' (5099), 'Owner' (874), 'Public land' (127), 'Private land' (115), 'Other' (52), +2 more"
+  },
+  "farm_warm_cases": {
+    "tests.test_feature_canonical_index::test_warm_corpus_assembly_loses_no_rows": {
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 175.331
+    },
+    "tests.test_feature_canonical_index::test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_labor]": {
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 259.784
+    },
+    "tests.test_feature_canonical_index::test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_inputs]": {
+      "outcome": "junit_pass_including_possible_xpass",
+      "reason": "",
+      "seconds": 196.905
+    }
+  },
+  "xpass_limit": "Both terminal logs report1 xpassed; JUnit successes contain no XPASS discriminator and logs omit XPASS testcase IDs/reasons. Cannot infer unchanged XPASS identity.",
+  "supplement": {
+    "source": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+    "data_root": "/local/job40255479/uganda-invariance-review-data",
+    "source_copy_root": "/local/job40255479/corpus-baseline-data",
+    "shared_only": "L1 dvc-cache symlink",
+    "copied_files": 172,
+    "copy_bytes_sha256_equal": true,
+    "copy_distinct_inodes": true,
+    "wave_copies_preserved_in_private_backup": true,
+    "population": [
+      {
+        "wave": "2005-06",
+        "rows": 40749,
+        "columns": 3,
+        "seconds": 3.793,
+        "parquet_recreated": true
+      },
+      {
+        "wave": "2009-10",
+        "rows": 38107,
+        "columns": 3,
+        "seconds": 3.425,
+        "parquet_recreated": true
+      },
+      {
+        "wave": "2010-11",
+        "rows": 35489,
+        "columns": 3,
+        "seconds": 3.367,
+        "parquet_recreated": true
+      },
+      {
+        "wave": "2011-12",
+        "rows": 38983,
+        "columns": 3,
+        "seconds": 3.446,
+        "parquet_recreated": true
+      },
+      {
+        "wave": "2013-14",
+        "rows": 50703,
+        "columns": 3,
+        "seconds": 3.408,
+        "parquet_recreated": true
+      },
+      {
+        "wave": "2015-16",
+        "rows": 50108,
+        "columns": 3,
+        "seconds": 3.485,
+        "parquet_recreated": true
+      },
+      {
+        "wave": "2018-19",
+        "rows": 53288,
+        "columns": 3,
+        "seconds": 4.395,
+        "parquet_recreated": true
+      },
+      {
+        "wave": "2019-20",
+        "rows": 48144,
+        "columns": 3,
+        "seconds": 3.809,
+        "parquet_recreated": true
+      }
+    ],
+    "pytest_exit_code": 0,
+    "tests": 8,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 33.602,
+    "case_ids": [
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[2005-06/_/food_acquired.parquet]",
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[2009-10/_/food_acquired.parquet]",
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[2010-11/_/food_acquired.parquet]",
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[2011-12/_/food_acquired.parquet]",
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[2013-14/_/food_acquired.parquet]",
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[2015-16/_/food_acquired.parquet]",
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[2018-19/_/food_acquired.parquet]",
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[2019-20/_/food_acquired.parquet]"
+    ],
+    "fixture_or_baseline_edits": false,
+    "source_copy_unchanged": true,
+    "pytest_xml_sha256": "7d119afc1cf62accd700118caf564aafe90b93631928876735a4c3214e0c545b",
+    "pytest_log_sha256": "3648a682e085bb2b161e1eca33ef7bd8c80d491d8b146d4370355eb1218e3b5e",
+    "pytest_seconds": 2.94
+  },
+  "full_suite_skips_remain_skips": true,
+  "missing_wave_skip_cause": {
+    "direct_cause": "The read-only test found neither in-tree nor data_root wave parquet and skipped; it does not materialize missing inputs.",
+    "exact_remover_limit": "Logs/JUnit do not identify which concurrent operation removed these files. Stale Uganda food cache rebuild warnings exist, but are insufficient to attribute a precise remover/race.",
+    "historical_docs": "CONTENTS3186 purge claim explicitly superseded at3204; current test_uganda_tables only defines unused remove/restore helpers, contradicting historical3337 deletion attribution."
+  },
+  "verification_processes_stopped": true,
+  "scope": {
+    "new_tests_run": "only authorized eight existing Uganda invariance cases",
+    "no_source_or_fixture_or_baseline_edits": true,
+    "no_git_or_GitHub_mutation": true,
+    "no_shared_L2_mutation": true,
+    "corpus_combined_data_not_touched": true
+  }
+}

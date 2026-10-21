@@ -1,0 +1,654 @@
+{
+  "observed_utc": "2026-10-15T16:18:30.291785+00:00",
+  "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "ci": {
+    "conclusion": "success",
+    "headSha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+    "jobs": [
+      {
+        "completedAt": "2026-10-15T16:17:39Z",
+        "conclusion": "success",
+        "databaseId": 116506129612,
+        "name": "data-tests",
+        "startedAt": "2026-10-15T15:19:45Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-15T15:19:46Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-15T15:19:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:50Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-15T15:19:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:50Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-10-15T15:19:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:56Z",
+            "conclusion": "success",
+            "name": "Install Poetry",
+            "number": 4,
+            "startedAt": "2026-10-15T15:19:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:20:09Z",
+            "conclusion": "success",
+            "name": "Install dependencies",
+            "number": 5,
+            "startedAt": "2026-10-15T15:19:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:20:09Z",
+            "conclusion": "success",
+            "name": "Configure DVC credentials",
+            "number": 6,
+            "startedAt": "2026-10-15T15:20:09Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:25:13Z",
+            "conclusion": "success",
+            "name": "Build Uganda tables",
+            "number": 7,
+            "startedAt": "2026-10-15T15:20:09Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T16:17:36Z",
+            "conclusion": "success",
+            "name": "Run full test suite",
+            "number": 8,
+            "startedAt": "2026-10-15T15:25:13Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T16:17:37Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 15,
+            "startedAt": "2026-10-15T16:17:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T16:17:37Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 16,
+            "startedAt": "2026-10-15T16:17:37Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T16:17:37Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "startedAt": "2026-10-15T16:17:37Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506129612"
+      },
+      {
+        "completedAt": "2026-10-15T15:22:45Z",
+        "conclusion": "success",
+        "databaseId": 116506130011,
+        "name": "unit-tests",
+        "startedAt": "2026-10-15T15:19:45Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-15T15:19:46Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-15T15:19:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:50Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-15T15:19:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:50Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-10-15T15:19:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:20:04Z",
+            "conclusion": "success",
+            "name": "Install Poetry",
+            "number": 4,
+            "startedAt": "2026-10-15T15:19:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:20:26Z",
+            "conclusion": "success",
+            "name": "Install dependencies",
+            "number": 5,
+            "startedAt": "2026-10-15T15:20:04Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:42Z",
+            "conclusion": "success",
+            "name": "Run tests",
+            "number": 6,
+            "startedAt": "2026-10-15T15:20:26Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:42Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "startedAt": "2026-10-15T15:22:42Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:43Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "startedAt": "2026-10-15T15:22:42Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:43Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "startedAt": "2026-10-15T15:22:43Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130011"
+      },
+      {
+        "completedAt": "2026-10-15T15:20:00Z",
+        "conclusion": "success",
+        "databaseId": 116506130068,
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-15T15:19:44Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-15T15:19:46Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-15T15:19:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:49Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-15T15:19:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:49Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-10-15T15:19:49Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:52Z",
+            "conclusion": "success",
+            "name": "Install boto3 + pyyaml (the script needs nothing else)",
+            "number": 4,
+            "startedAt": "2026-10-15T15:19:49Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:52Z",
+            "conclusion": "success",
+            "name": "Configure DVC credentials",
+            "number": 5,
+            "startedAt": "2026-10-15T15:19:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:56Z",
+            "conclusion": "success",
+            "name": "Sweep the remote",
+            "number": 6,
+            "startedAt": "2026-10-15T15:19:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:57Z",
+            "conclusion": "success",
+            "name": "Upload the missing-blob report",
+            "number": 7,
+            "startedAt": "2026-10-15T15:19:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:57Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 13,
+            "startedAt": "2026-10-15T15:19:57Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:58Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "startedAt": "2026-10-15T15:19:57Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:58Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "startedAt": "2026-10-15T15:19:58Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130068"
+      },
+      {
+        "completedAt": "2026-10-15T15:27:20Z",
+        "conclusion": "success",
+        "databaseId": 116506130111,
+        "name": "windows-script-build",
+        "startedAt": "2026-10-15T15:19:47Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-15T15:19:48Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-15T15:19:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:58Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-15T15:19:48Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:21:45Z",
+            "conclusion": "success",
+            "name": "Run conda-incubator/setup-miniconda@v3",
+            "number": 3,
+            "startedAt": "2026-10-15T15:19:58Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:24:58Z",
+            "conclusion": "success",
+            "name": "Install the library",
+            "number": 4,
+            "startedAt": "2026-10-15T15:21:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:25:07Z",
+            "conclusion": "success",
+            "name": "Configure S3 read credentials",
+            "number": 5,
+            "startedAt": "2026-10-15T15:24:58Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:27:14Z",
+            "conclusion": "success",
+            "name": "Cold-build and compare with Linux",
+            "number": 6,
+            "startedAt": "2026-10-15T15:25:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:27:17Z",
+            "conclusion": "success",
+            "name": "Post Run conda-incubator/setup-miniconda@v3",
+            "number": 11,
+            "startedAt": "2026-10-15T15:27:14Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:27:19Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "startedAt": "2026-10-15T15:27:17Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:27:19Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "startedAt": "2026-10-15T15:27:19Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130111"
+      },
+      {
+        "completedAt": "2026-10-15T15:21:45Z",
+        "conclusion": "success",
+        "databaseId": 116506130114,
+        "name": "docs",
+        "startedAt": "2026-10-15T15:19:46Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-15T15:19:48Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-15T15:19:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:51Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-15T15:19:48Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:52Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-10-15T15:19:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:59Z",
+            "conclusion": "success",
+            "name": "Install dependencies",
+            "number": 4,
+            "startedAt": "2026-10-15T15:19:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:20:02Z",
+            "conclusion": "success",
+            "name": "Build docs",
+            "number": 5,
+            "startedAt": "2026-10-15T15:19:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:20:03Z",
+            "conclusion": "success",
+            "name": "Run actions/upload-pages-artifact@v3",
+            "number": 6,
+            "startedAt": "2026-10-15T15:20:02Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:21:43Z",
+            "conclusion": "success",
+            "name": "Deploy to GitHub Pages",
+            "number": 7,
+            "startedAt": "2026-10-15T15:20:03Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:21:43Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 13,
+            "startedAt": "2026-10-15T15:21:43Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:21:43Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "startedAt": "2026-10-15T15:21:43Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:21:43Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "startedAt": "2026-10-15T15:21:43Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130114"
+      },
+      {
+        "completedAt": "2026-10-15T15:22:29Z",
+        "conclusion": "success",
+        "databaseId": 116506130148,
+        "name": "windows-smoke",
+        "startedAt": "2026-10-15T15:19:45Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-15T15:19:46Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-15T15:19:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:57Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-15T15:19:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:57Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-10-15T15:19:57Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:20:24Z",
+            "conclusion": "success",
+            "name": "Install Poetry",
+            "number": 4,
+            "startedAt": "2026-10-15T15:19:57Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:21:48Z",
+            "conclusion": "success",
+            "name": "Install dependencies",
+            "number": 5,
+            "startedAt": "2026-10-15T15:20:24Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:08Z",
+            "conclusion": "success",
+            "name": "Import + config smoke",
+            "number": 6,
+            "startedAt": "2026-10-15T15:21:48Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:15Z",
+            "conclusion": "success",
+            "name": "Collect tests",
+            "number": 7,
+            "startedAt": "2026-10-15T15:22:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:25Z",
+            "conclusion": "success",
+            "name": "Run portability + config tests",
+            "number": 8,
+            "startedAt": "2026-10-15T15:22:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:26Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 15,
+            "startedAt": "2026-10-15T15:22:25Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:28Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 16,
+            "startedAt": "2026-10-15T15:22:26Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:28Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "startedAt": "2026-10-15T15:22:28Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130148"
+      },
+      {
+        "completedAt": "2026-10-15T15:22:56Z",
+        "conclusion": "success",
+        "databaseId": 116506130200,
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-15T15:19:45Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-15T15:19:47Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-15T15:19:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:51Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-15T15:19:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:51Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-10-15T15:19:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:19:58Z",
+            "conclusion": "success",
+            "name": "Install Poetry",
+            "number": 4,
+            "startedAt": "2026-10-15T15:19:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:20:19Z",
+            "conclusion": "success",
+            "name": "Install dependencies",
+            "number": 5,
+            "startedAt": "2026-10-15T15:19:58Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:53Z",
+            "conclusion": "success",
+            "name": "Verify DVC lockfiles",
+            "number": 6,
+            "startedAt": "2026-10-15T15:20:19Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:54Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "startedAt": "2026-10-15T15:22:53Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:54Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "startedAt": "2026-10-15T15:22:54Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-15T15:22:54Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "startedAt": "2026-10-15T15:22:54Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116506130200"
+      },
+      {
+        "completedAt": "2026-10-15T15:22:57Z",
+        "conclusion": "skipped",
+        "databaseId": 116507798258,
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-15T15:22:57Z",
+        "status": "completed",
+        "steps": [],
+        "url": "https://github.com/ligon/LSMS_Library/actions/runs/38759333750/job/116507798258"
+      }
+    ],
+    "status": "completed"
+  },
+  "remote_refs_before": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9\trefs/heads/master",
+  "previous_release": "v0.14.0",
+  "clean_release_worktree": true,
+  "tag_object": "d4ff03d28ab417c5d98f8e1e7c94d1261b8331bc"
+}

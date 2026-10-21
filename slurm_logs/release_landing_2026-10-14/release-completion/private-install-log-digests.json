@@ -1,0 +1,25 @@
+{
+  "classification": "Only file names, sizes and SHA256; private logs are not archived",
+  "files": [
+    {
+      "name": "pip-install.log",
+      "bytes": 50977,
+      "sha256": "c81084e7e2ffa9ddff0316bbffb586b9381588965272f8bf028605a5ef491ee9"
+    },
+    {
+      "name": "pip-install-report.json",
+      "bytes": 2144961,
+      "sha256": "8808b2c24181df787085fe2cd48132b861328f5573638c86f7cdab18a70140d4"
+    },
+    {
+      "name": "installed-smoke.log",
+      "bytes": 5540,
+      "sha256": "5e4a69ebe384fccc8d17a42531427c218a252a818c88e1553b47ca10c8567a57"
+    },
+    {
+      "name": "sdist-rebuild.log",
+      "bytes": 118,
+      "sha256": "448f1aded442281b0e36fd552252cfdcd395ffc1048f4ef3b2b2aeb5d7a3ad16"
+    }
+  ]
+}

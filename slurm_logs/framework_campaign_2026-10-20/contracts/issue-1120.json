@@ -1,0 +1,10 @@
+{
+  "body": "From the #569 follow-up (`fix/569-plot-registration`, plot_labor/plot_inputs registration).\n\n**NaN keys** (Feature frame, 2026-10-19):\n\n| table | level | country counts |\n|---|---|---|\n| `plot_labor` | `plot_id` | Uganda 3,656, Malawi 40 |\n| `plot_labor` | `v` | Ethiopia 1,823, Uganda 1,235, Nigeria 108, GhanaLSS 1 |\n| `plot_inputs` | `v` | Ethiopia 882, Uganda 729, Nigeria 63, GhanaLSS 2 |\n| `plot_inputs` | `plot_id` | Uganda 1 |\n\n- The `v` NaNs come from the sample join: households missing from `sample()`.\n- Feature serves these rows intact. They are deferred deletions.\n\n**Strict-mode flip** (r1-measured). Under `LSMS_READ_STRICT=1`, these reads now raise `NullIndexKeyError` on `v`; on base they did not:\n- `Country('Ethiopia').plot_labor()`\n- `Country('Nigeria').plot_labor()`\n- `Country('Ethiopia').plot_inputs()`\n\nThe same thing happened to crop_production at its registration. This gates any CI `LSMS_READ_STRICT=1`.\n\n**Tier:** B (per-country households missing from `sample()`).\n",
+  "comments": [],
+  "labels": [],
+  "number": 1120,
+  "state": "OPEN",
+  "title": "#569 residual C: NaN keys on declared plot-table index levels, now all named by Site I; `LSMS_READ_STRICT=1` newly raises on three reads",
+  "updatedAt": "2026-10-19T22:38:36Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1120"
+}

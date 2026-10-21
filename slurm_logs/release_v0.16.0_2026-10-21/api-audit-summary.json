@@ -1,0 +1,7 @@
+{
+  "exit_code": 0,
+  "checkout": "/local/job40255479/worktrees/release-v016",
+  "source_sha": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c",
+  "asserted_import": "/local/job40255479/worktrees/release-v016/lsms_library/__init__.py",
+  "log_bytes": 2755
+}

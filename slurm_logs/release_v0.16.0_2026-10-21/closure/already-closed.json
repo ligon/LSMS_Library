@@ -1,0 +1,93 @@
+[
+  {
+    "body_sha256": "cfe226548a05fa0769e5fb527fa833e0ea51754639e3939d668f10d353bbd01e",
+    "comment_evidence": [
+      {
+        "body_sha256": "7de7a7355004b82e4d6c696daa9d29ef81c76f3b470b97c2170ff4f2dd56beae",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/953#issuecomment-5732210648"
+      },
+      {
+        "body_sha256": "ee0e8798a6e4896716f6d222d4d55f15d59f2d07ccd6be5425c081dbe35c9421",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/953#issuecomment-5732309995"
+      },
+      {
+        "body_sha256": "c2779e7276c2ff799f91d330f60ddb2ae993d9ba569d1410995084aba6520375",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/953#issuecomment-5732373285"
+      },
+      {
+        "body_sha256": "c529baae10a93ad735d8fc83af5246caeae738b9080a0a49182990d0dfa87024",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/953#issuecomment-6180936802"
+      },
+      {
+        "body_sha256": "69c65b2564257ac7367dd2c3c9133c49a2acbb43541548c7a6515e0950c58648",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/953#issuecomment-6243970071"
+      }
+    ],
+    "comments_count": 5,
+    "issue": 953,
+    "observed_at": "2026-10-21T12:28:25.390Z",
+    "provider": "connected GitHub",
+    "state": "closed",
+    "title": "DECISION: give get_categorical_mapping a cross-country rung (directory of per-table mappings) or retire the second inheritance mechanism",
+    "url": "https://github.com/ligon/LSMS_Library/issues/953"
+  },
+  {
+    "body_sha256": "157422d41fa162a0df808287163894e43c773c5b9dfb59dc70275d7104487f0b",
+    "comment_evidence": [
+      {
+        "body_sha256": "7217aa1b80d95046fd95c3a840eda856c499c7f68ee0d6995c88172f2a4a5386",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/958#issuecomment-5772261846"
+      },
+      {
+        "body_sha256": "5d85003fa0c25a6b12187b0167f3d9dd862b7fac48f4f14fb67ac6390d400e53",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/958#issuecomment-5772274692"
+      },
+      {
+        "body_sha256": "f6932fbfed46317ced06e3f0d4977db1e3f7bcebd5205ea4210c5c2a213afe92",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/958#issuecomment-5772696232"
+      },
+      {
+        "body_sha256": "5d2f5ed3575800b9f841ded6d76ac9226bed98e2b52fb88d61d28709083dd15c",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/958#issuecomment-6243953993"
+      }
+    ],
+    "comments_count": 4,
+    "issue": 958,
+    "observed_at": "2026-10-21T12:28:25.412Z",
+    "provider": "connected GitHub",
+    "state": "closed",
+    "title": "bin/savio_venv.sh and the mirror's .venv symlink assume one node, one checkout and one job -- four defects that only appear with simultaneous multi-node work",
+    "url": "https://github.com/ligon/LSMS_Library/issues/958"
+  },
+  {
+    "body_sha256": "391aab5d6fc57ba0851b2f6978585a61b3f1490830d620f09c0d053e2e492dc7",
+    "comment_evidence": [
+      {
+        "body_sha256": "7217aa1b80d95046fd95c3a840eda856c499c7f68ee0d6995c88172f2a4a5386",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/960#issuecomment-5772262245"
+      },
+      {
+        "body_sha256": "5d2f5ed3575800b9f841ded6d76ac9226bed98e2b52fb88d61d28709083dd15c",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/960#issuecomment-6243954260"
+      }
+    ],
+    "comments_count": 2,
+    "issue": 960,
+    "observed_at": "2026-10-21T12:28:25.346Z",
+    "provider": "connected GitHub",
+    "state": "closed",
+    "title": "venv docs: four statements are now wrong -- promote the squashfs mount to the default, demote adopt-or-build, fix the sys.path table and the burst recipe",
+    "url": "https://github.com/ligon/LSMS_Library/issues/960"
+  }
+]

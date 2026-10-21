@@ -1,0 +1,84 @@
+{
+  "base": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "final_old_gate_negative_proof": {
+    "deselected": 31,
+    "failed": 6,
+    "passed": 11
+  },
+  "fingerprints": {
+    "build_transforms": {
+      "changed": 0,
+      "entries": 39,
+      "none": 0
+    },
+    "country": {
+      "changed": 0,
+      "entries": 549,
+      "none": 0
+    },
+    "wave": {
+      "changed": 0,
+      "entries": 2139,
+      "none": 30
+    }
+  },
+  "focused": {
+    "errors": 0,
+    "failures": 0,
+    "seconds": 68.77,
+    "skipped": 0,
+    "tests": 190,
+    "warnings": 33
+  },
+  "initial_negative_proof": {
+    "deselected": 31,
+    "failed": 5,
+    "passed": 10
+  },
+  "isolation": {
+    "baseline": {
+      "copied_files": 67,
+      "copy_distinct_inodes": true,
+      "copy_sha_matches": true,
+      "outer_byte_changes": 16,
+      "outer_file_replacements": 18,
+      "outer_parquet_unlinks": 15,
+      "pytest_exit_code": 0,
+      "root_restored": true,
+      "source_bytes_and_stats_unchanged": true
+    },
+    "candidate": {
+      "copied_files": 67,
+      "copy_distinct_inodes": true,
+      "copy_sha_matches": true,
+      "outer_byte_changes": 0,
+      "outer_file_replacements": 0,
+      "outer_parquet_unlinks": 0,
+      "pytest_exit_code": 0,
+      "root_restored": true,
+      "source_bytes_and_stats_unchanged": true
+    },
+    "candidate_cold": {
+      "copied_files": 0,
+      "copy_distinct_inodes": true,
+      "copy_sha_matches": true,
+      "outer_byte_changes": 0,
+      "outer_file_replacements": 0,
+      "outer_parquet_unlinks": 0,
+      "pytest_exit_code": 0,
+      "root_restored": true,
+      "source_bytes_and_stats_unchanged": true
+    }
+  },
+  "issue": 778,
+  "ledger_commit": "e08b7f337",
+  "read_gate_suite": {
+    "passed": 48,
+    "seconds": 4.77
+  },
+  "residuals": [
+    "#1071 corruption semantics unchanged",
+    "assume_cache_fresh existing unstamped-script-output serve retained",
+    "No partial-aggregate theory claimed"
+  ]
+}

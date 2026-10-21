@@ -1,0 +1,14 @@
+{
+  "head": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "root": "/local/job40255479/worktrees/framework-followup",
+  "package": "/local/job40255479/worktrees/framework-followup/lsms_library/__init__.py",
+  "countries_root": "/local/job40255479/worktrees/framework-followup/lsms_library/countries",
+  "data_root": "/local/job40255479/control/framework-campaign/review-1160/baseline-data",
+  "source_sha256": "7296587e5bf141e08236da16c29c08f971d24641ea6678ca1673456fc0572394",
+  "affinity": [
+    16,
+    17,
+    18,
+    19
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "verdict": "ACCEPT remaining633 warning classification; no unexplained added semantic/assembly finding within reviewed evidence",
+  "reviewer": "Sue",
+  "observed_utc": "2026-10-21T01:09:54.943424+00:00",
+  "baseline": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "candidate": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "public_artifact_sha256": {
+    "non-interview-warning-classification.json": "e3ff4dd09e9bded05a6ae525ad7f4dcadd9a97b8578743f3c998f24abf6b770a",
+    "classify_warning_delta.py": "54b34db30edc844c466e0deca5b313cf7d42f9117a8fdb90a52dd46b4949b6d6",
+    "local-cache-controls.json": "ab881c09ef1fb87fbddd0102c6bb367d5a68cd1be390dddc36756e4cf96832e2",
+    "compare_local_controls.py": "45532e36e55d1d39b07451786f7cf8e77b9987c47b6f82316f19ab05e5d5dcfe",
+    "food-comparison.json": "7a188d7b9c73d4e99a5baab4a113d49f270d2eead8fa58f7c46af82a89689857",
+    "README.org": "f17777273e0c502176bc6a2ceadb888e1325df554ca15b987e400dbaf4ef52c4"
+  },
+  "independent_checks": {
+    "complete_normalized_warning_records_added": 674,
+    "complete_normalized_warning_records_removed": 41,
+    "net_warning_addition": 633,
+    "net_severity_counts": {
+      "A": 0,
+      "B": 1,
+      "C": 632
+    },
+    "all_public_private_report_reproducer_bytes_equal": true,
+    "family_counts_and_cold_witness_counts_reproduced": true,
+    "all_added_cache_notices_explicit_STALE_stored_hash_mismatch": 284,
+    "removed_cache_notices_explicit_STALE_stored_hash_mismatch": 1,
+    "complete_nonpassing_assembly_records_equal_including_details_metrics": true,
+    "added_dependency_table_fallback_message_witnesses": 67,
+    "Peru_person_id_message_present_once_in_each_cold_control_with_RuntimeWarning": true,
+    "Peru_mapping_source_bytes_identical": true,
+    "Peru_documentation_anchor": "lsms_library/countries/Peru/_/CONTENTS.org:830-848",
+    "Uganda_cluster_grain_footer_reports_identical": 8,
+    "quantity_reaggregation_parser_delta": -6863.435,
+    "quantity_reaggregation_serialized_delta": -6863.434999465942,
+    "quantity_reaggregation_absolute_tolerance_difference": 5.340580173651688e-07,
+    "quantity_reaggregation_aggregate_got_identical": true,
+    "quantity_reaggregation_still_ClassC_warn_both_heads": true
+  },
+  "independent_local_frame_comparison": {
+    "frames_independently_exact_compared_ignoring_row_order": 125,
+    "rows": 16139392,
+    "features": [
+      "cluster_features",
+      "food_acquired",
+      "household_roster",
+      "sample"
+    ],
+    "order_only": [
+      [
+        "Benin",
+        "household_roster"
+      ],
+      [
+        "Burkina_Faso",
+        "household_roster"
+      ],
+      [
+        "CotedIvoire",
+        "household_roster"
+      ],
+      [
+        "Guinea-Bissau",
+        "household_roster"
+      ]
+    ],
+    "seconds": 15.742,
+    "APIs_called": false,
+    "cache_writes": false
+  },
+  "producer_family_counts": {
+    "added": {
+      "categorical_mapping_warning": 46,
+      "cluster_missing_key_exclusion": 4,
+      "documented_guyana_weight_only_exclusion": 1,
+      "documented_peru_cluster_projection": 1,
+      "documented_peru_person_id_repair": 1,
+      "documented_tanzania_cluster_design": 2,
+      "existing_reaggregation_total_warning": 1,
+      "expected_stale_cache_rebuild_notice": 284,
+      "makefile_missing_fallback_warning": 36,
+      "rhs_acquisition_source_exclusion": 1,
+      "source_grain_conflict": 8,
+      "stata_utf8_fallback_warning": 259,
+      "stated_metric_inference_conflict": 30
+    },
+    "removed": {
+      "baseline_only_make_failure_warning": 1,
+      "cached_grain_warning_replay": 8,
+      "existing_reaggregation_total_warning": 1,
+      "expected_stale_cache_rebuild_notice": 1,
+      "stated_metric_inference_conflict": 30
+    }
+  },
+  "limits": [
+    "Cold witness matching proves message presence, not equal emission multiplicity or causal attribution;67 additions use dependency-table fallback witnesses.",
+    "Country lists for unscoped warning strings remain possible controls, not inferred per-record origins.",
+    "The baseline-only Nigeria Make warning root cause remains unknown; identical eventual food cache is not a claim the operational issue is fixed.",
+    "Local cache comparisons cover125 materialized frames across4 tables; not all16 served Feature outputs, kwargs or questionnaire meanings.",
+    "All warning occurrences, six build errors, five real tenure failures and13 scope exclusions remain visible; audit process exit0 is not semantic green.",
+    "Cache hashes and warning volume/cost are not invariant; no warnings were suppressed."
+  ],
+  "APIs_called": false,
+  "cache_writes": false,
+  "source_git_GitHub_writes": false,
+  "reviewer_processes_stopped": true
+}

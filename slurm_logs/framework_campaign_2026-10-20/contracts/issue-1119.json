@@ -1,0 +1,10 @@
+{
+  "body": "From the #569 follow-up (`fix/569-plot-registration`, plot_labor/plot_inputs registration).\n\n- **Marker spellings** (Feature frame, measured 2026-10-19; unchanged by #569):\n  - `(not crop-specific)`: Benin 6,504, Burkina_Faso 10,796, CotedIvoire 9,235, Guinea-Bissau 5,534, Niger 11,397, Senegal 4,583, Togo 6,925.\n  - `Whole Plot`: Ethiopia 69,024.\n  - `Farm-level`: GhanaLSS 759.\n  - `n/a`: Nigeria 34,641, Uganda 10,292.\n  - **NaN on the index level**: Malawi 67,888, Mali 79,448, Tanzania 2,830; 150,166 in all. Site I reports these, and the first `groupby` on `j` deletes them.\n- Under the GhanaLSS Farm-level convention, the marker should read `Farm-level` everywhere. That is a DECISION on whether `(not crop-specific)` folds in.\n- **Spelling split** (new, from r1). Burkina_Faso and Senegal `plot_inputs` say `Ma\u00efs en grain` (2,274 / 735 rows) and `Ni\u00e9b\u00e9/Haricots secs` (2,156 / 460 rows), where their `crop_production` says `Ma\u00efs` and `Ni\u00e9b\u00e9`. Coverage including the marker is Burkina_Faso 5/9 and Senegal 6/10. A join of `seed_kg` onto `crop_production` on `j` silently misses maize and cowpea seed in those two countries. Fix it in the two countries' `harmonize_seed_crop` (or equivalent) mapping.\n- **Guinea-Bissau's `j` is the marker alone** (5,534 rows), because the crop is embedded in its raw Portuguese `input` labels (`Sementes de arroz`). So `seed_kg(seed_label='Seed')` finds no Guinea-Bissau rows.\n- **Cost:** country-config work in up to 13 countries, which moves each one's hashes (a per-country re-warm).\n- **Tier:** C + DECISION (marker); B (BF/Senegal spelling; Guinea-Bissau crop extraction).\n",
+  "comments": [],
+  "labels": [],
+  "number": 1119,
+  "state": "OPEN",
+  "title": "#569 residual A: the \"not crop-specific\" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production",
+  "updatedAt": "2026-10-19T22:38:35Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1119"
+}

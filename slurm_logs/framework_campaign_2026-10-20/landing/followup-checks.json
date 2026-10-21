@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-21T05:02:39.180448+00:00",
+  "prs": [
+    {
+      "pr": 1162,
+      "head": "dffb0760406c74cea677f360f76be52cbed27975",
+      "checks": {
+        "windows-smoke": {
+          "status": "completed",
+          "conclusion": "success",
+          "id": 119046586176
+        },
+        "unit-tests": {
+          "status": "completed",
+          "conclusion": "success",
+          "id": 119046585963
+        }
+      },
+      "ready": true
+    },
+    {
+      "pr": 1163,
+      "head": "124c2436d7e1a279c72f4d8f650d250eab6c7d67",
+      "checks": {
+        "windows-smoke": {
+          "status": "completed",
+          "conclusion": "success",
+          "id": 119046625489
+        },
+        "unit-tests": {
+          "status": "completed",
+          "conclusion": "success",
+          "id": 119046625151
+        }
+      },
+      "ready": true
+    },
+    {
+      "pr": 1164,
+      "head": "d124c0df70db2e04dceb4a8c19eb0d40df14dbee",
+      "checks": {
+        "windows-smoke": {
+          "status": "completed",
+          "conclusion": "success",
+          "id": 119046691229
+        },
+        "unit-tests": {
+          "status": "completed",
+          "conclusion": "success",
+          "id": 119046691131
+        }
+      },
+      "ready": true
+    }
+  ]
+}

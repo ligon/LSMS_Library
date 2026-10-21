@@ -9,10 +9,14 @@ pytest_plugins = ["pytester"]
 @pytest.fixture
 def isolated_net(pytester, monkeypatch):
     # Copy the production test plugin, not a second implementation of its
-    # hook. The temporary root has no checkout-local credential file.
+    # hook.  Its credential file is pinned to a path that does not exist
+    # (GH #1031), so "no credentials" does not depend on where the copy sits:
+    # a copy that finds lsms_library/config.py beside it would otherwise read
+    # the developer's (or CI's) real ``<config dir>/s3_creds``.
     monkeypatch.delenv("AWS_ACCESS_KEY_ID", raising=False)
     monkeypatch.delenv("AWS_SECRET_ACCESS_KEY", raising=False)
     monkeypatch.setenv("LSMS_SKIP_AUTH", "1")
+    monkeypatch.setenv("LSMS_S3_CREDS", str(pytester.path / "no_s3_creds"))
     pytester.makeconftest(Path(__file__).with_name("conftest.py").read_text())
     return pytester
 

@@ -714,12 +714,18 @@ def test_nitrogen_kg_normalises_the_trailing_fertilizer_word():
 
 
 def test_nitrogen_kg_does_not_fuzzy_match_an_unknown_fertilizer():
-    """'D Compound Fertilizer' and 'Organic Fertilizer' must stay unmatched:
-    inventing a nominal N share for them would be worse than reporting the
-    gap."""
+    """'Super D Compound Fertilizer' and 'Organic Fertilizer' must stay
+    unmatched: inventing a nominal N share for them would be worse than
+    reporting the gap.
+
+    GH #867 (ruling @ligon 2026-10-18) gave Malawi's exact 'D Compound
+    Fertilizer' a CITED 8% share, so it is no longer the unknown label here;
+    'Super D Compound Fertilizer' CONTAINS the new key 'd compound' and is
+    the sharper near-miss for the no-fuzzy-match property.  Organic stays
+    refused by the same ruling."""
     pi = _plot_inputs([
         ('2019-20', 'hh1', 'p1', 'Urea Fertilizer', 'Maize', 'kg', 100.0),
-        ('2019-20', 'hh1', 'p1', 'D Compound Fertilizer', 'Maize', 'kg',
+        ('2019-20', 'hh1', 'p1', 'Super D Compound Fertilizer', 'Maize', 'kg',
          50.0),
         ('2019-20', 'hh1', 'p1', 'Organic Fertilizer', 'Maize', 'kg', 900.0),
     ])
@@ -728,7 +734,8 @@ def test_nitrogen_kg_does_not_fuzzy_match_an_unknown_fertilizer():
     assert out.loc[('2019-20', 'hh1', 'p1'),
                    'Nitrogen_kg'] == pytest.approx(46.0)
     unmatched = out.attrs['nitrogen_input_match']['unmatched_labels']
-    assert set(unmatched) == {'D Compound Fertilizer', 'Organic Fertilizer'}
+    assert set(unmatched) == {'Super D Compound Fertilizer',
+                              'Organic Fertilizer'}
 
 
 def test_fertilizer_rate_warns_on_an_empty_grain_join():

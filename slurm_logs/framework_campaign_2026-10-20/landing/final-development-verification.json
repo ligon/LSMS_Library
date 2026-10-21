@@ -1,0 +1,22 @@
+{
+  "final_development": "db00a79f17f841649f2b96827c5b9b4e858ce2f8",
+  "evidence_publication": "4fd0c0ad5f2f2e9ffbb4e3edc20a80e77422b91c",
+  "implementation": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+  "final_full_tree_equals_reviewed_evidence_publication": true,
+  "evidence_parents_exactly_implementation_and_reviewed_publication": true,
+  "github_local_tracking_and_filesystem_origin_development_agree": true,
+  "development_worktree_clean": true,
+  "authorized_prs_merged": [
+    1161,
+    1154,
+    1155,
+    1156,
+    1157,
+    1162,
+    1163,
+    1164,
+    1165,
+    1158
+  ],
+  "at": "2026-10-21T05:19:57.222968+00:00"
+}

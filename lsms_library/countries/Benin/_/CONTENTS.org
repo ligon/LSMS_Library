@@ -1,6 +1,13 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* Decimal-comma metric labels (GH #1143, measured 2026-10-20)
+
+The shared parser now reads the entire numeric token in =Bidon de 1,5 L= (120 rows), =Bidon de 0,5 L= (3 rows) and =Sac (2,5 Kg)= (3 rows), instead of serving 5 kg per unit for all three.
+The factors are now 1.5, 0.5 and 2.5 respectively; litre labels retain the existing =volume_as_mass=True= assumption and decline under =False=.
+Private cold builds measure 126 changed quantity rows, 68 changed =food_prices()= rows and 353.37 fewer kilograms, with =food_acquired= exactly unchanged.
+No unit mapping was edited; aggregate evidence is in =slurm_logs/framework_campaign_2026-10-20/1143/=.
+
 * Overview
 
 Benin EHCVM (Enquête Harmonisée sur les Conditions de Vie des
@@ -499,6 +506,15 @@ nothing else.  The C1-control spellings were deleted from
 =lsms_library/categorical_mapping/kinship.yml= at the same time, so that
 file no longer carries the artefact and a regression would surface as an
 =Unknown relationship labels= warning instead of resolving silently.
+
+*Moved to the reader, 2026-10-19 (GH #805).*  =get_dataframe= now re-decodes
+the cp1252 strings of a pre-118 =.dta= itself (value labels and str columns;
+=local_tools._redecode_cp1252=), so this label arrives as =Frère, sœur= and
+the wave-level =_decode_cp1252= is retired.  Measured: the served
+=household_roster= is identical before and after (42,343 rows), i.e. the reader
+reproduces the hook exactly.  The decision is per file and refuses DOS code
+pages and UTF-8 double encodings; see the block comment above =_C1_RE= in
+=local_tools.py=.
 
 Same defect and same fix in Niger 2018-19, Senegal 2018-19 and Togo 2018 (all format-115 cp1252 EHCVM-1
 roster files).  See GH #801 and the #797 vocabulary sweep

@@ -347,9 +347,20 @@ def _check_no_all_null_columns(
 
 
 def _check_no_constant_columns(df: pd.DataFrame) -> Check:
-    """Warn about columns with a single unique value (excluding NaN)."""
+    """Warn about columns with a single unique value (excluding NaN).
+
+    The ``Derivation`` provenance column is exempt: it is NA on every row the
+    survey reported and carries one registry key on the rows a derivation
+    built, so a single distinct value is its normal shape, not a defect
+    (Tanzania ``interview_date``: one ``date-day-imputed`` key on 1 of 22,428
+    rows; GH #1045 r1).  Exempt by name, not by an "almost all NA" rule,
+    which would also hide a genuinely constant survey column.
+    """
+    from .derivations import COLUMN as derivation_column
     constant = []
     for col in df.columns:
+        if col == derivation_column:
+            continue
         nunique = df[col].dropna().nunique()
         if nunique <= 1 and len(df) > 1:
             constant.append(col)

@@ -12,6 +12,7 @@ import numpy as np
 from pandas import concat, get_dummies, MultiIndex
 from cfe.df_utils import use_indices
 from .local_tools import format_id
+from .errors import UnitsUnavailableError
 
 # Build-path transforms live in build_transforms.py (their output is baked
 # into the cached L2 parquet).  Re-exported here so the country build
@@ -126,6 +127,51 @@ class StatedVsInferredKgWarning(UserWarning):
     (``warnings.simplefilter('error', StatedVsInferredKgWarning)``)
     independently of the library's other warnings.
     """
+
+
+class MissingLookingUnitWarning(UserWarning):
+    """A ``u`` spelling that LOOKS like "no unit" was given inferred kilograms.
+
+    ``_U_SENTINELS`` is closed on purpose: adding a spelling changes served
+    kilograms, and what a raw label means is a questionnaire question, not a
+    string-matching one (GH #962; @ligon 2026-10-18 chose to REPORT rather
+    than decide).  So a spelling such as ``None``, ``N/A`` or ``---`` that is
+    not a sentinel is still a unit to the ladder and still receives a
+    price-ratio factor -- and this warning names it, with its row count and
+    the kilograms it was given, so the per-country decision (remap to
+    ``U_UNKNOWN``, or record it as a genuine unit) is taken on evidence.
+
+    Carries ``country`` (from ``df.attrs``, may be ``None``) and ``spellings``
+    (``{spelling: {'rows': n, 'kg': x}}``).  The same counts ride on
+    ``attrs['kg_factor_missing_looking']`` of :func:`food_kg_factors`.
+    """
+
+    def __init__(self, message, *, country=None, spellings=None):
+        super().__init__(message)
+        self.country = country
+        self.spellings = dict(spellings or {})
+
+
+class UnmatchedNoKgCellWarning(UserWarning):
+    """A declared "no kg factor" cell matched no row of the frame (GH #1042).
+
+    A ``no_kg=`` cell (``countries/{C}/_/no_kg_factor.yml``) refuses inferred
+    kilograms to the rows it matches, and a cell that matches nothing refuses
+    nothing -- so a misspelt item (``Eggs`` for ``Egg``) or unit used to be
+    accepted silently, its only trace ``rows_matched: 0`` inside
+    ``attrs['kg_factor_declared_none']`` (red team r3, R4).  This warning
+    names such cells.  It also fires, correctly, when the frame simply holds
+    no rows of the cell -- a call restricted to waves that lack it -- so read
+    it against the waves you asked for before editing the declaration.
+
+    Carries ``country`` (from ``df.attrs``, may be ``None``) and ``cells``
+    (the unmatched ``(item, unit)`` pairs, ``unit=None`` meaning every unit).
+    """
+
+    def __init__(self, message, *, country=None, cells=()):
+        super().__init__(message)
+        self.country = country
+        self.cells = tuple(cells)
 
 
 class UnitLabelCollisionWarning(UserWarning):
@@ -1552,28 +1598,72 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
 # -- 4x and 16x overstatements of a half- and quarter-kilo packet.  Same shape
 # as the plural bug GH #850 fixed: a regex that reads PART of a
 # self-describing label and asserts the result.
+#
+# The number group also admits a COMMA (GH #1143), and for the same reason.
+# Without it ``Bouteille de 1,5 L`` matched the ``5`` adjacent to ``L`` and was
+# served 5.0 kg, ``Sac (0,9 kg)`` 9.0 kg and ``12,5 cl`` 0.05 kg -- the
+# French-style decimal comma every EHCVM unit vocabulary uses.  The regex only
+# CAPTURES a comma token; :func:`_metric_number` decides what it means
+# (decimal or thousands) and refuses anything else, so the parser returns
+# ``None`` rather than reading a part of a number it cannot read whole.  The
+# token captures separators even when malformed: validation belongs to
+# _metric_number, and must see the whole token rather than a suffix after a
+# repeated comma, slash or whitespace (ledger 1143-decimal-comma §3/§4).
+# The left boundary forbids beginning at a digit or punctuation suffix.
+_METRIC_NUMBER = r'(?<![\d.,])(\d[\d.,]*(?:\s*/+\s*[\d.,]*)*)'
+
 _EXPLICIT_METRIC_PATTERNS = (
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:kilogrammes?|kilograms?|kgs?)\b',
                 re.IGNORECASE), 1, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:grammes?|grams?|gms?|grs?|g)\b',
                 re.IGNORECASE), 1/1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*milligrammes?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*milligrammes?\b',
                 re.IGNORECASE), 1e-6, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*tonnes?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*tonnes?\b',
                 re.IGNORECASE), 1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:lbs?|pounds?)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:lbs?|pounds?)\b',
                 re.IGNORECASE), 0.453592, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*millilitres?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*millilitres?\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*centilitres?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*centilitres?\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*ml\b',
+    (re.compile(_METRIC_NUMBER + r'\s*ml\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*cl\b',
+    (re.compile(_METRIC_NUMBER + r'\s*cl\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
                 re.IGNORECASE), 1, True),
 )
+
+# The two comma grammars (GH #1143).  Disjoint by construction: a decimal
+# comma has exactly one comma and one or two digits after it; a thousands
+# separator has every group after a comma exactly three digits long and no
+# leading ``0,``.  A leading-zero comma is decimal at any precision, as in
+# ``0,125`` (ledger 1143-decimal-comma §3). A token that is neither (``1,5000``,
+# ``1,50,000``) is ambiguous and is refused, never guessed.
+_DECIMAL_COMMA = re.compile(r'(?:\d+,\d{1,2}|0,\d+)')
+_THOUSANDS_COMMA = re.compile(r'(?!0,)\d{1,3}(?:,\d{3})+')
+
+
+def _metric_scalar(text):
+    """Value of one number token (no fraction): dot-decimal or comma-aware.
+
+    >>> _metric_scalar('1,5'), _metric_scalar('12,5'), _metric_scalar('1,25')
+    (1.5, 12.5, 1.25)
+    >>> _metric_scalar('1,500'), _metric_scalar('10,000')
+    (1500.0, 10000.0)
+    >>> _metric_scalar('0,500')
+    0.5
+    """
+    t = str(text).strip()
+    if ',' not in t:
+        return float(t)
+    if '.' not in t:
+        if _DECIMAL_COMMA.fullmatch(t):
+            return float(t.replace(',', '.'))
+        if _THOUSANDS_COMMA.fullmatch(t):
+            return float(t.replace(',', ''))
+    raise ValueError(f"ambiguous comma in metric number {t!r}")
 
 
 def _metric_number(text):
@@ -1585,15 +1675,18 @@ def _metric_number(text):
     (``Packet(1/2lt / 1/2kg)``, ``Packet -medium (1/4kg)``).  Before this the
     pattern captured only the digits adjacent to the unit token, so those read
     as 2 kg and 4 kg -- a 4x and a 16x overstatement.
+
+    A comma is read by :func:`_metric_scalar` (GH #1143): ``'1,5'`` -> 1.5,
+    ``'1,500'`` -> 1500.0, and an ambiguous comma raises ``ValueError``.
     """
     t = str(text).strip()
     if '/' in t:
         num, _, den = t.partition('/')
-        d = float(den.strip())
+        d = _metric_scalar(den)
         if d == 0:
             raise ZeroDivisionError(t)
-        return float(num.strip()) / d
-    return float(t)
+        return _metric_scalar(num) / d
+    return _metric_scalar(t)
 
 
 def _parse_explicit_metric(s, *, volume_as_mass=True):
@@ -1650,6 +1743,27 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     0.25
     >>> _parse_explicit_metric('3/4 kg')
     0.75
+
+    Decimal commas (GH #1143).  The EHCVM unit vocabularies spell sizes the
+    French way; before the fix each of these read only the digits adjacent to
+    the unit token (5.0, 9.0, 5.0 and 0.05).
+
+    >>> _parse_explicit_metric('Bouteille de 1,5 L')
+    1.5
+    >>> _parse_explicit_metric('Sac (0,9 Kg)')
+    0.9
+    >>> _parse_explicit_metric('Filet (2,5Kg)')
+    2.5
+    >>> _parse_explicit_metric('12,5cl(demi walatt)')
+    0.125
+
+    A comma followed by three-digit groups is a thousands separator; a comma
+    that fits neither grammar is refused rather than partly read.
+
+    >>> _parse_explicit_metric('1,500 kg')
+    1500.0
+    >>> _parse_explicit_metric('0,125 kg')
+    0.125
     """
     if not isinstance(s, str):
         return None
@@ -1658,6 +1772,11 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
             continue
         m = pattern.search(s)
         if m:
+            # Refuse numeric suffixes after whitespace / exponent notation,
+            # preserving numbered labels ("1001. 12,5 cl") and the existing
+            # inner size in multiplier labels ("2x500g") (ledger §3/§4).
+            if re.search(r'(?:[\d,]\s+|\d[eE][\s+-]*)$', s[:m.start()]):
+                return None
             try:
                 return _metric_number(m.group(1)) * scale
             except (ValueError, IndexError, ZeroDivisionError, TypeError):
@@ -1694,16 +1813,13 @@ def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     # above; a declared row for a fluid unit is the country's own statement and
     # is left alone.
     #
-    # GH #931: only the FOOD callers pass `unit_kg` (`food_kg_factors`, via
-    # `Country.<food_prices|food_quantities>`).  `harvest_kg_factors` calls
-    # this function with `unit_kg` defaulted, and `_kg_factor_series` cannot
-    # pass it at all, so the crop ladder is blind to declared `u_kg` rows.
-    # That is deliberate for now: Ethiopia's external check on the WB shipped
-    # crop factors (`Quintal` == 100.0 where the library has no opinion;
-    # `test_quintal_is_exactly_100kg_on_every_newly_served_row`) depends on
-    # the crop ladder NOT holding a declared quintal.  Pinned by
-    # `tests/test_crop_kg_factor.py::test_crop_ladder_is_blind_to_declared_unit_kg`;
-    # see the `harvest_kg_factors` docstring before threading `unit_kg` here.
+    # GH #931 (@ligon, 2026-10-18): the CROP ladder reads the same declaration,
+    # but not through this argument.  `harvest_kg_factors` can be handed a
+    # pooled `Feature` frame, whose rows need one country's table each, so it
+    # resolves the declaration per row (`_declared_kg_factors`) and lays it
+    # over this function's output with the precedence it would have had here.
+    # `tests/test_crop_kg_factor.py::test_crop_declared_overlay_equals_food_seeding`
+    # pins that the two routes give the same number for the same unit.
     for key, kg in (unit_kg or {}).items():
         factors[str(key).lower()] = kg
 
@@ -1882,12 +1998,44 @@ FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit',
                          'item_unit_tight', 'unit', 'none')
 
 
+def _declared_no_kg_mask(df, no_kg, item_col='j'):
+    """Rows of *df* on a declared "no kg factor" cell (GH #1042).
+
+    *no_kg* is an iterable of ``(item, unit)`` pairs, ``unit=None`` meaning
+    every unit of the item.  Returns the boolean row mask and a dict
+    ``{(item, unit): row mask}`` for the per-cell report.  Labels are matched
+    on :func:`_normalise_join_key`, the key the item arm itself joins on.
+    """
+    mask = np.zeros(len(df), dtype=bool)
+    cells = {}
+    if not no_kg:
+        return mask, cells
+    idx_names = list(df.index.names or [])
+    if item_col in idx_names:
+        items = df.index.get_level_values(item_col)
+    elif item_col in df.columns:
+        items = df[item_col]
+    else:
+        return mask, cells
+    raw_u = (df.index.get_level_values('u') if 'u' in idx_names else df['u'])
+    items = _normalise_join_key(items)
+    units = _normalise_join_key(raw_u)
+    for item, unit in no_kg:
+        m = items == str(item).strip().lower()
+        if unit is not None:
+            m = m & (units == str(unit).strip().lower())
+        cells[(item, unit)] = m
+        mask |= m
+    return mask, cells
+
+
 def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                     min_reports=FOOD_KG_MIN_REPORTS,
                     min_baseline=FOOD_KG_MIN_BASELINE,
                     min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
                     tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
-                    baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD):
+                    baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD,
+                    no_kg=None):
     """Per-ROW kg-per-unit for a ``food_acquired`` frame, with provenance.
 
     The food twin of :func:`harvest_kg_factors`, and deliberately the same
@@ -1916,6 +2064,21 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         partition.
     volume_as_mass, min_reports, min_baseline, min_baseline_tight, tight_tolerance
         Passed through; see :func:`conversion_to_kgs`.
+    no_kg : iterable of ``(item, unit)`` pairs, optional
+        Declared cells for which NO INFERRED kilogram is minted (GH #1042):
+        matching rows lose the ``item_unit`` / ``item_unit_tight`` / ``unit``
+        candidates and are served ``none`` -- carried in their native unit --
+        unless the survey's own kilograms (``survey_kg``) or the label's
+        stated metric content (``metric``) serve them, exactly as for a
+        missing-unit sentinel.  ``unit=None`` declares every unit of the
+        item.  Matched on stripped, lower-cased labels as this function sees
+        them (the frame BEFORE ``_finalize_result``'s categorical mapping,
+        GH #770).  The declared rows still enter the estimators as evidence:
+        this refuses to SERVE a factor, it does not re-estimate anyone
+        else's.  A country declares its cells in ``_/no_kg_factor.yml``
+        (read at read time by ``Country._no_kg_factor_cells``).  A declared
+        cell that matches no row emits :class:`UnmatchedNoKgCellWarning`
+        (a misspelt label, or a frame without such rows).
 
     Returns
     -------
@@ -1929,6 +2092,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         the dispersion gate cost their own ``(item, unit)`` factor and where
         they landed instead (``rows_refused == refused_to_unit +
         refused_to_none``).  Only the first partitions the frame.
+        ``attrs['kg_factor_declared_none']`` reports the *no_kg* declaration:
+        ``rows_matched`` (rows on a declared cell) and ``rows_refused`` (of
+        those, rows an inferred rung WOULD have served and that are now
+        ``none``), per cell in ``cells``.
 
     Notes
     -----
@@ -2139,6 +2306,38 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         kg_wave_spread = np.where(_sentinel, np.nan, kg_wave_spread)
         refused = refused & ~_sentinel
 
+    # GH #1042 (@ligon 2026-10-18): an item-level "no kg factor".  Some
+    # (item, unit) cells have a price-ratio inference that is known to be
+    # wrong -- GhanaLSS eggs: the egg 'Kilogram' rows price at the per-egg
+    # price, so the (t, Egg) per-kg baseline is built from mislabelled
+    # counts and (Egg, Single) comes out at 0.50 kg per egg.  A declared cell
+    # is treated exactly like a sentinel row: it keeps ``survey_kg`` and
+    # ``metric``, and loses every INFERRED candidate.
+    no_kg = tuple((item, unit) for item, unit in (no_kg or ()))
+    declared, declared_cells = _declared_no_kg_mask(df, no_kg, item_col)
+    unmatched = [c for c in dict.fromkeys(no_kg)
+                 if c not in declared_cells or not declared_cells[c].any()]
+    if unmatched:
+        country = df.attrs.get('country')
+        where = f"{country}: " if country else ""
+        desc = ', '.join(f"{item!r}/{'every unit' if unit is None else repr(unit)}"
+                         for item, unit in unmatched)
+        warnings.warn(UnmatchedNoKgCellWarning(
+            f"{where}{len(unmatched)} declared no-kg-factor cell(s) match no "
+            f"row of this frame: {desc}.  A misspelt item or unit declares "
+            f"nothing; check _/no_kg_factor.yml against the frame's '{item_col}' "
+            f"and 'u' labels as the wave scripts write them.  A frame "
+            f"restricted to waves without such rows also lands here "
+            f"(GH #1042).", country=country, cells=unmatched), stacklevel=3)
+    would_infer = declared & (~np.isnan(kg_item) | ~np.isnan(kg_unit))
+    if declared.any():
+        kg_item = np.where(declared, np.nan, kg_item)
+        kg_unit = np.where(declared, np.nan, kg_unit)
+        kg_tight = kg_tight & ~declared
+        kg_waves = np.where(declared, np.nan, kg_waves)
+        kg_wave_spread = np.where(declared, np.nan, kg_wave_spread)
+        refused = refused & ~declared
+
     kg_survey = np.full(len(df), np.nan)
     from_survey = np.zeros(len(df), dtype=bool)
     if 'Quantity_kg' in df.columns:
@@ -2200,12 +2399,49 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     # invariant a reader will check.
     refused = refused & np.isnan(kg_survey) & np.isnan(kg_metric)
     out['baseline_refused_spread'] = refused
+    # A diagnostic beside the partition (the rows are counted in ``none`` --
+    # or ``survey_kg`` / ``metric`` -- above), so a reader can see WHY a
+    # declared row has no kilograms.
+    declared_refused = would_infer & (source == 'none')
+    out.attrs['kg_factor_declared_none'] = {
+        'rows_matched': int(declared.sum()),
+        'rows_refused': int(declared_refused.sum()),
+        'cells': {
+            f"{item}|{unit if unit is not None else '*'}": {
+                'rows_matched': int(m.sum()),
+                'rows_refused': int((m & declared_refused).sum())}
+            for (item, unit), m in declared_cells.items()},
+    }
     out.attrs['kg_factor_baseline_gate'] = {
         'baseline_max_spread': baseline_max_spread,
         'rows_refused': int(refused.sum()),
         'refused_to_unit': int((refused & (source == 'unit')).sum()),
         'refused_to_none': int((refused & (source == 'none')).sum()),
     }
+    # GH #962 (@ligon 2026-10-18): REPORT a missing-looking spelling that the
+    # ladder served kilograms; never change its factor here.
+    looks, raw_u = _missing_looking_unit_mask(df)
+    hit = looks & (source != 'none')
+    found = {}
+    if hit.any():
+        qty = (pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+               if 'Quantity' in df.columns else np.full(len(df), np.nan))
+        kg = qty * np.asarray(resolved, dtype=float)
+        for sp in sorted(set(raw_u[hit])):
+            m = hit & (raw_u == sp)
+            found[sp] = {'rows': int(m.sum()),
+                         'kg': float(np.nansum(kg[m]))}
+        country = df.attrs.get('country')
+        where = f"{country}: " if country else ""
+        desc = ', '.join(f"{sp!r} {v['rows']} rows / {v['kg']:,.0f} kg"
+                         for sp, v in found.items())
+        warnings.warn(MissingLookingUnitWarning(
+            f"{where}unit spelling(s) that read as 'no unit' but are not "
+            f"sentinels were given inferred kilograms: {desc}.  Check the "
+            f"questionnaire: remap to U_UNKNOWN if they mean no unit was "
+            f"recorded, or record them as genuine units in CONTENTS.org "
+            f"(GH #962).", country=country, spellings=found), stacklevel=3)
+    out.attrs['kg_factor_missing_looking'] = found
     return out
 
 
@@ -2849,7 +3085,8 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
     return x
 
 
-def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_kg=None):
+def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_kg=None,
+                                  no_kg=None):
     """Derive food quantities from food_acquired.
 
     Parameters
@@ -2924,7 +3161,8 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
         return q
 
     # units == 'kgs': carry rule
-    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
+    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                              no_kg=no_kg)
     v = _apply_kg_conversion(df, kgf['kg_per_unit'])
 
     # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
@@ -2961,10 +3199,13 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
         kgf.attrs['kg_factor_wave_spread'])
     out.attrs['kg_factor_baseline_gate'] = dict(
         kgf.attrs['kg_factor_baseline_gate'])
+    out.attrs['kg_factor_declared_none'] = dict(
+        kgf.attrs['kg_factor_declared_none'])
     return out
 
 
-def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_kg=None):
+def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_kg=None,
+                              no_kg=None):
     """Derive food prices from food_acquired.
 
     Returned at the canonical ``(t, i, j, u, s)`` grain (``v`` is omitted
@@ -3004,7 +3245,35 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
           market price for ``s='purchased'``, farmgate for
           ``s='produced'``, imputed for ``s='inkind'``.
 
+        ``food_acquired.Price`` is **whatever the country's source
+        recorded** under that name -- not a guarantee of an elicited
+        price.  In some countries it is the statistics office's own
+        ``Expenditure / Quantity``: Uganda's UBOS "market" / "farmgate"
+        price columns agree with the row's own value / quantity on
+        94.4-99.9% of purchased and 95.3-99.99% of produced rows per wave
+        (measured 2026-10-17 on the served table; raw-file check and
+        per-wave numbers in ``countries/Uganda/_/CONTENTS.org``).  So
+        ``'unitprice'`` and ``'unitvalue'`` (likewise ``'kgprice'`` and
+        ``'kgvalue'``) are **not independent sources**: comparing them can
+        return an identity dressed as a validation.  Check the agreement
+        share for the country you hold before treating them as two
+        measurements (GH #845).  Same-day measurement on the other
+        ``Price``-bearing countries, provenance not established: Panama
+        100%, GhanaLSS 100% (produced rows only), Guatemala 97.7%, Serbia
+        88.5% of comparable rows.
+
         See ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.
+
+    Raises
+    ------
+    UnitsUnavailableError
+        (a ``ValueError`` subclass) when the requested mode needs a column
+        ``food_acquired`` does not carry: ``Price`` for ``'kgprice'`` /
+        ``'unitprice'`` (the instrument records no unit price), or
+        ``Expenditure`` / ``Quantity`` for the ``*value`` modes.  Before
+        GH #828 the ``*price`` case returned an empty frame silently.
+        ``Country`` names the country on the error; ``Feature`` drops such
+        a country with one warning and ``attrs['units_unavailable']``.
 
     Returns
     -------
@@ -3050,19 +3319,19 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
     if units in {'kgvalue', 'unitvalue'}:
         missing = [c for c in ('Expenditure', 'Quantity') if c not in df.columns]
         if missing:
-            raise ValueError(
-                f"food_prices(units={units!r}) requires {missing} on food_acquired"
-            )
+            raise UnitsUnavailableError(units=units, missing=missing)
     if units in {'kgprice', 'unitprice'}:
         if 'Price' not in df.columns:
-            # No reported Price column at all → empty frame with right schema.
-            empty = df.iloc[0:0].copy()
-            empty['Price'] = np.array([], dtype='float64')
-            return empty[['Price']]
+            # No reported Price column at all: the instrument records no unit
+            # price.  RAISE rather than return an empty frame (GH #828) -- an
+            # empty frame is the absence of the column dressed as the absence
+            # of rows, and Feature concatenated the empties silently.
+            raise UnitsUnavailableError(units=units, missing=['Price'])
 
     kgf = None
     if units == 'kgvalue':
-        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
+        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                              no_kg=no_kg)
         v = _apply_kg_conversion(df, kgf['kg_per_unit'])
         with np.errstate(divide='ignore', invalid='ignore'):
             v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
@@ -3078,7 +3347,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
             # (GH #850): before that, this branch mapped ``u -> factor``
             # through an independent dict, so the two branches could
             # disagree on a row.
-            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
+            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                              no_kg=no_kg)
             kg_per_unit = pd.Series(_as_float(kgf['kg_per_unit']),
                                     index=df.index)
             with np.errstate(divide='ignore', invalid='ignore'):
@@ -3135,6 +3405,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
             kgf.attrs['kg_factor_wave_spread'])
         v.attrs['kg_factor_baseline_gate'] = dict(
             kgf.attrs['kg_factor_baseline_gate'])
+        v.attrs['kg_factor_declared_none'] = dict(
+            kgf.attrs['kg_factor_declared_none'])
     return v
 
 
@@ -3474,6 +3746,28 @@ U_UNKNOWN = 'Unknown'
 #: Every live spelling of "no unit recorded", lower-cased.  A NaN ``u`` counts
 #: too, and is handled separately in :func:`_unit_sentinel_mask`.
 _U_SENTINELS = frozenset({U_UNKNOWN.lower(), 'manquant'})
+
+
+#: Lower-cased, stripped ``u`` spellings that READ as "no unit" but are not in
+#: :data:`_U_SENTINELS`.  Matching one does NOT change a factor; it makes
+#: :func:`food_kg_factors` warn (:class:`MissingLookingUnitWarning`).  A
+#: spelling made only of punctuation (``---``, ``.``, ``?``) matches too.
+_MISSING_LOOKING_UNITS = frozenset({
+    'none', 'n/a', 'na', 'nan', 'null', 'nil', 'missing', 'not applicable',
+    'not stated', 'not specified', 'unspecified', "don't know", 'dk'})
+
+
+def _missing_looking_unit_mask(df):
+    """Rows whose ``u`` reads as "no unit" yet is NOT a sentinel (GH #962)."""
+    u = _level_or_column(df, 'u')
+    if u is None:
+        return np.zeros(len(df), dtype=bool), np.array([], dtype=object)
+    col = pd.Series(u)
+    text = col.astype(str).str.strip().str.lower()
+    looks = (text.isin(_MISSING_LOOKING_UNITS)
+             | text.str.fullmatch(r'[-._?/ ]+').fillna(False))
+    looks &= ~text.isin(_U_SENTINELS) & col.notna()
+    return looks.to_numpy(dtype=bool), col.astype(str).str.strip().to_numpy()
 
 
 def _unit_sentinel_mask(df):
@@ -3866,9 +4160,128 @@ def _shipped_factor_lookup(df, shipped_factors):
     return out, out_source, matched
 
 
+#: ``df.attrs`` key of a frame's DECLARED unit masses (GH #931).  Shape
+#: ``{country: {u label, lower-cased: kg}}`` -- keyed by country, as the
+#: ``population`` / ``recall`` / ``derivations`` records are, so a pooled
+#: ``Feature`` frame's record is the plain union of its countries' records
+#: (``feature._ATTRS_CARRIERS``) and each row can be served its OWN country's
+#: table.  Written by ``Country._finalize_result`` on ``crop_production`` and
+#: ``plot_inputs`` from
+#: ``Country._unit_kg_factors`` -- the country's merged ``u`` and ``u_kg``
+#: categorical tables, the same composition the food ladder is handed -- and
+#: read by :func:`harvest_kg_factors` when its ``unit_kg`` is left ``None``.
+UNIT_KG_ATTRS_KEY = 'unit_kg'
+
+
+def merge_unit_kg_attrs(frames):
+    """Union the ``unit_kg`` attrs of several frames, for ``Feature()`` assembly.
+
+    ``attrs`` survive a ``concat`` only when every input agrees, and the
+    countries of a ``Feature`` frame carry different records by design, so the
+    record dies at assembly unless it is re-attached (``CLAUDE.md``, "Panel ID
+    Transitive Chains and the ``attrs`` Flag").  Each element may be a frame or
+    the bare ``attrs`` mapping captured from one, as for ``recall``.
+    """
+    out = {}
+    for f in frames:
+        got = (getattr(f, 'attrs', f) or {}).get(UNIT_KG_ATTRS_KEY)
+        if isinstance(got, Mapping):
+            for country, table in got.items():
+                if isinstance(table, Mapping):
+                    out.setdefault(str(country), {}).update(table)
+    return out
+
+
+def _declared_kg_factors(df, unit_kg):
+    """Per-row kg-per-unit from a DECLARED unit-mass table (GH #931).
+
+    *unit_kg* is either ``{u label: kg}`` (one table, applied to every row) or
+    ``{country: {u label: kg}}`` (the ``attrs`` record; each row is served its
+    own country's table, read off a ``country`` level or column, else off
+    ``df.attrs['country']``, else the record's only entry).  ``None`` reads
+    the record from ``df.attrs``; an empty mapping declares nothing.  Labels
+    match case-insensitively, exactly as the ``metric`` seeds do.
+
+    Returns ``(values, origin)``: a float ndarray aligned POSITIONALLY to *df*
+    (NaN where nothing is declared, or the declaration is not finite and > 0),
+    and where the table came from -- ``'argument'``, ``'attrs'`` or ``None``.
+
+    A record with several countries and no way to tell which row is whose is
+    REFUSED with a warning and serves nothing: guessing would hand one
+    country's quintal to another's, which is the error ``u_kg`` exists to stop
+    (GH #919: 100 kg in Ethiopia, 100 lb in Central America).
+    """
+    origin = 'argument'
+    if unit_kg is None:
+        unit_kg = df.attrs.get(UNIT_KG_ATTRS_KEY)
+        origin = 'attrs' if unit_kg is not None else None
+    out = np.full(len(df), np.nan)
+    if not unit_kg:
+        return out, origin
+    if not isinstance(unit_kg, Mapping):
+        raise TypeError(
+            "unit_kg must be a mapping {u label: kg} or {country: {u label: "
+            f"kg}}; got {type(unit_kg).__name__}")
+    nested = [isinstance(v, Mapping) for v in unit_kg.values()]
+    if any(nested) and not all(nested):
+        raise ValueError(
+            "unit_kg mixes {u label: kg} entries with {country: {...}} "
+            "entries; pass one shape or the other")
+
+    def lowered(table):
+        return {str(k).lower(): v for k, v in table.items()}
+
+    units = pd.Series(_level_or_column(df, 'u')).astype(str).str.lower()
+    if not all(nested):
+        return _valid_factor(units.map(lowered(unit_kg))), origin
+
+    tables = {str(c): lowered(t) for c, t in unit_kg.items()}
+    countries = _level_or_column(df, 'country')
+    if countries is None:
+        country = df.attrs.get('country')
+        if country is not None and str(country) in tables:
+            table = tables[str(country)]
+        elif len(tables) == 1:
+            table = next(iter(tables.values()))
+        else:
+            warnings.warn(
+                f"the declared unit_kg record names "
+                f"{sorted(tables)} but the frame has no 'country' level or "
+                f"column and no attrs['country'] among them, so no row can be "
+                f"matched to its country's table and NONE is applied.  Keep "
+                f"the 'country' level, or pass unit_kg= for the one country.",
+                stacklevel=3)
+            return out, origin
+        return _valid_factor(units.map(table)), origin
+
+    country_of = pd.Series(countries).astype(str)
+    for country, table in tables.items():
+        rows = (country_of == country).to_numpy()
+        if rows.any():
+            out[rows] = _as_float(units[rows].map(table))
+    return _valid_factor(out), origin
+
+
+def _kg_factor_series_with_declared(df, *, volume_as_mass=True, unit_kg=None):
+    """Existing unit-factor fallback, overlaid with each row's declaration.
+
+    Reuses the resolver and precedence of the crop ladder (GH #1093,
+    ledger ``1093-declared-unit-factors.md`` sections 2-4).  Kept separate
+    from ``_kg_factor_series`` because ``harvest_kg_factors`` needs that
+    unmodified fallback to construct its own reported/shipped/audit layers.
+    ``None`` reads attrs; an explicit empty mapping suppresses that record.
+    A declaration never supplies a unit to a missing-unit sentinel.
+    """
+    fallback = _kg_factor_series(df, volume_as_mass=volume_as_mass)
+    declared, _ = _declared_kg_factors(df, unit_kg)
+    declared = np.where(_unit_sentinel_mask(df), np.nan, declared)
+    return pd.Series(np.where(np.isnan(declared), fallback.to_numpy(), declared),
+                     index=df.index, dtype='float64')
+
+
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
                        min_reports=SURVEY_MEDIAN_MIN_REPORTS,
-                       shipped_factors=None):
+                       shipped_factors=None, unit_kg=None):
     """Per-row kg-per-unit factor for ``crop_production``, and its PROVENANCE.
 
     The factor half of :func:`harvest_kg`, exposed on its own so the layers
@@ -3907,13 +4320,22 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         within the same country-wave, where at least *min_reports* rows
         report one; falling back to ``u`` alone.  The survey's own weights
         filling the survey's own gaps -- see :func:`_survey_median_factors`.
+    ``metric``
+        A factor that is READ, never estimated: the country's DECLARED unit
+        mass (``u_kg``, see *unit_kg* below), else :data:`KNOWN_METRIC`, else
+        a label that states its own content (``Sack (50 kgs)``).  A
+        declaration outranks :data:`KNOWN_METRIC` here exactly as it does on
+        the food ladder (GH #919), because it is the only layer a country can
+        override.  Split out of ``inferred`` in GH #929; a row it serves has
+        the same ``kg_per_unit`` it would have under ``inferred``.
     ``inferred``
         The shared unit→kg machinery, unchanged: :func:`_kg_factor_series`
         → :func:`_get_kg_factors` (hand-coded metric tokens, the
-        explicit-metric label parser, then price-ratio inference).  This is
-        the ONLY layer that acts on a frame with no ``KgFactor`` column, so
-        such a frame gets exactly the factors it got before this function
-        existed.
+        explicit-metric label parser, then price-ratio inference), with the
+        declared masses laid over it at the seeds' precedence.  This is the
+        ONLY layer that acts on a frame with no ``KgFactor`` column, so such a
+        frame gets exactly the factors it got before this function existed
+        -- apart from the declared units, which is the point of GH #931.
     ``none``
         No layer produced a usable factor.  Counted, not hidden: these rows
         contribute nothing to ``Harvest_kg``.
@@ -3927,30 +4349,34 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``country`` are all optional.
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors` (1 litre = 1 kg for fluids).
+    unit_kg : mapping, optional
+        The country's DECLARED unit masses -- where a country ships a
+        conversion table, it is used (GH #931, @ligon 2026-10-18).  Either
+        ``{u label: kg}`` for every row, or ``{country: {u label: kg}}``, each
+        row then served its own country's table.  Left ``None`` (the default)
+        it is read from ``crop_production.attrs['unit_kg']``, which
+        ``Country(...).crop_production()`` stamps from the country's merged
+        ``u`` and ``u_kg`` categorical tables (``Country._unit_kg_factors``,
+        the same composition ``food_prices`` / ``food_quantities`` hand the
+        food ladder) and which ``Feature('crop_production')`` carries per
+        country.  So ``harvest_kg(ll.Country('Ethiopia').crop_production())``
+        serves a ``Quintal`` at the 100 kg the global ``u_kg`` declares, where
+        it used to serve it ``none``.  Pass ``{}`` to declare nothing.
 
-        There is deliberately NO ``unit_kg`` parameter here (GH #931).  The
-        FOOD ladder (:func:`food_kg_factors`) receives a country's declared
-        ``u_kg`` table through ``unit_kg`` -- composed by
-        ``Country._unit_kg_factors`` and passed only for ``food_prices`` /
-        ``food_quantities`` -- and lets it outrank :data:`KNOWN_METRIC`
-        (GH #919).  The CROP ladder never sees that table: its ``metric``
-        layer seeds :func:`_seeded_kg_factors` with ``unit_kg`` defaulted,
-        and ``inferred`` goes through :func:`_kg_factor_series`, which has no
-        ``unit_kg`` either.  So a unit a country declares in ``u_kg`` (say
-        ``Quintal: 100``) is served ``none`` here unless a ``KgFactor``
-        column, a *shipped_factors* table or :data:`KNOWN_METRIC` supplies
-        it.  The asymmetry is LOAD-BEARING, not an oversight: Ethiopia's only
-        EXTERNAL check on the World Bank's shipped factor table is that
-        ``Quintal`` comes back as exactly 100.0 on 13,924 rows the library
-        has NO independent opinion about
-        (``tests/test_ethiopia_shipped_factors.py::test_quintal_is_exactly_100kg_on_every_newly_served_row``,
-        ``Ethiopia/_/CONTENTS.org`` "The real external check").  Teaching
-        this ladder to read ``u_kg`` would make that check a tautology, the
-        way the ``Kg``/``Gram`` overlap already is.  Whether the crop ladder
-        SHOULD read ``u_kg`` is an open decision (GH #931 item 2) that has to
-        land together with a re-expressed external check; the asymmetry
-        itself is pinned by
-        ``tests/test_crop_kg_factor.py::test_crop_ladder_is_blind_to_declared_unit_kg``.
+        The declaration lands in the ``metric`` layer (below ``reported``,
+        ``shipped`` and ``survey_median``), outranks :data:`KNOWN_METRIC` and
+        the label parser there, and never reaches a row whose ``u`` records
+        no unit.  A frame that has LOST its ``attrs`` -- a ``merge`` with a
+        frame whose ``attrs`` differ, for instance -- carries no record and
+        gets no declared factor: count ``attrs['kg_factor_sources']
+        ['declared']``, or pass *unit_kg* explicitly.
+
+        This used to be withheld on purpose: Ethiopia's external check on the
+        World Bank's shipped table was phrased as "rows the library has no
+        opinion on", and a declared quintal would have turned it into a
+        comparison of the WB table with the library's own ``u_kg``.  That
+        check is now made against an answer key neither side supplies
+        (``tests/test_ethiopia_shipped_factors.py::test_shipped_quintal_matches_the_external_answer_key``).
     min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
         ``N`` for the ``survey_median`` layer.  One number is applied to
         every group, but the groups are per country-wave, so a thin module
@@ -4013,8 +4439,13 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``KgFactorSource``
             one of :data:`KG_FACTOR_LAYERS`.
         ``kg_reported`` / ``kg_shipped`` / ``kg_survey_median`` /
-        ``kg_inferred``
+        ``kg_metric`` / ``kg_inferred``
             what each layer offered for that row, whether or not it won.
+        ``kg_declared``
+            what the DECLARED table (*unit_kg*) offered for the row, NaN where
+            it declares nothing for that unit.  Already inside ``kg_metric``
+            and ``kg_inferred`` with precedence; kept apart so the declaration
+            can be audited on its own.
             ``kg_reported`` and ``kg_shipped`` are POST-screen, so a rejected
             value reads NaN here and ``kg_reported_rejected`` /
             ``kg_shipped_rejected`` is True; the raw value is untouched in the
@@ -4030,26 +4461,33 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             normalises both ``None`` and ``pd.NA`` to NaN in an object
             column.
 
-        Two tallies ride on ``.attrs``:
+        Three tallies ride on ``.attrs``:
 
         ``kg_factor_sources``
-            ``{layer: n_rows}`` over the INPUT rows.  The five layers of
+            ``{layer: n_rows}`` over the INPUT rows.  The layers of
             :data:`KG_FACTOR_LAYERS` partition the frame and sum to
             ``len(crop_production)`` -- ``shipped`` included, and therefore
-            present as ``0`` when no table is passed.  Three further keys ride
+            present as ``0`` when no table is passed.  Four further keys ride
             OUTSIDE that partition, since a row they count is still served by
-            one of the five: ``reported_implausible`` and
+            those layers: ``reported_implausible`` and
             ``shipped_implausible`` count rows whose offered factor the screen
             REJECTED, and ``shipped_matched`` counts rows the shipped table
             supplied a finite factor for at all -- a JOIN diagnostic taken
             before the sentinel, the screen and the rank, and the right number
-            to check when a table looks like it did nothing.  POOLED: on a
+            to check when a table looks like it did nothing.  ``declared``
+            counts rows the *unit_kg* table offered a factor for, whether or
+            not a higher layer won.  POOLED: on a
             cross-country
             :class:`~lsms_library.feature.Feature` frame these counts run over
             every country at once, so ``reported: 40000`` says nothing about
             WHICH country reported.  Read it as a total, never as coverage;
             the per-row frame answers the real question with one
             ``groupby('country')``.
+        ``kg_factor_declared_from``
+            where the declared table came from: ``'attrs'`` (the frame's own
+            ``unit_kg`` record), ``'argument'`` (*unit_kg* passed), or
+            ``None`` -- no declaration reached this call, so ``declared`` is 0
+            for want of a table rather than for want of a declared unit.
         ``kg_factor_disagreement``
             For ``reported_vs_shipped``, ``reported_vs_survey_median`` and
             ``reported_vs_inferred``:
@@ -4116,6 +4554,21 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
 
     sentinel = _unit_sentinel_mask(df)
 
+    # GH #931: the country's DECLARED unit masses (`u_kg`), laid over the read
+    # seeds with the precedence `_seeded_kg_factors(unit_kg=...)` gives them on
+    # the food ladder -- a declaration outranks KNOWN_METRIC and the label
+    # parser.  Per ROW rather than threaded through `_seeded_kg_factors`,
+    # because a pooled `Feature` frame needs a different table for each
+    # country's rows.  Laid over BOTH `metric` and `inferred_arr`, so the
+    # invariant below (the seeds sit inside `inferred_arr` with precedence, and
+    # `resolved` reads `inferred_arr`) still holds.  A row that recorded no
+    # unit is not given one, as for the shipped layer.
+    declared, declared_from = _declared_kg_factors(df, unit_kg)
+    declared = np.where(sentinel, np.nan, declared)
+    decl_ok = ~np.isnan(declared)
+    metric = np.where(decl_ok, declared, metric)
+    inferred_arr = np.where(decl_ok, declared, inferred_arr)
+
     if shipped_factors is None:
         shipped = np.full(len(df), np.nan)
         shipped_rejected = np.zeros(len(df), dtype=bool)
@@ -4177,6 +4630,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
          'kg_shipped_rejected': shipped_rejected,
          'kg_shipped_source': shipped_source,
          'kg_metric': metric,
+         'kg_declared': declared,
          'kg_survey_median': survey_median,
          'kg_inferred': inferred_arr},
         index=df.index)
@@ -4198,7 +4652,15 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     # 0 for a table that matched nothing at all.  Only this one separates a
     # mis-keyed table from a table that was simply outranked.
     counts['shipped_matched'] = shipped_matched
+    # GH #931.  Outside the partition, like `shipped_matched`: a declared row is
+    # still SERVED by one of the five (`metric` unless a higher layer won).
+    counts['declared'] = int(decl_ok.sum())
     out.attrs['kg_factor_sources'] = counts
+    # Kept OUT of the counts so every value there stays an int.  It is what
+    # tells "this country declares nothing for these units" ('attrs', with
+    # `declared` 0) apart from "no declaration reached this call" (None) --
+    # e.g. a frame whose attrs a merge discarded.
+    out.attrs['kg_factor_declared_from'] = declared_from
     # A row with no unit recorded is excluded from the audit as well: there
     # is nothing for its reported factor to be compared against, since no
     # per-unit factor -- inferred or median -- can exist for a non-unit.
@@ -4234,7 +4696,8 @@ def _disagreement(reference, other,
 
 
 def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
-               min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None):
+               min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None,
+               unit_kg=None):
     """Total harvested kilograms per (t, i, plot_id, j) from ``crop_production``.
 
     MECHANICAL reduction (GAP 1 → WB ``Plotcrop``/``Plot`` ``harvest_kg``).
@@ -4290,6 +4753,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
             harvest_kg(
                 cp,
                 shipped_factors=ethiopia.crop_conversion_factors(...))
+    unit_kg : mapping, optional
+        The country's DECLARED unit masses, forwarded to
+        :func:`harvest_kg_factors` (GH #931).  Left ``None`` it is read from
+        ``crop_production.attrs['unit_kg']``, which ``Country`` and
+        ``Feature`` frames carry; pass ``{}`` to declare nothing.
     carry_native : bool, default False
         When False (default, matching the WB construct), rows whose ``u``
         has no known kg factor contribute NOTHING to the sum — ``Harvest_kg``
@@ -4311,7 +4779,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         a ``reported`` row whose ``Quantity`` is 0 or NaN is counted
         ``reported`` and still drops out of the sum below.
         ``result.attrs['kg_factor_disagreement']`` carries the layer-pair
-        audit described in :func:`harvest_kg_factors`.
+        audit described in :func:`harvest_kg_factors`, and
+        ``result.attrs['kg_factor_declared_from']`` where the declared
+        ``u_kg`` table came from (GH #931).
 
     Notes
     -----
@@ -4325,18 +4795,21 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     *lower bound* on the WB figure for plots dominated by non-metric
     containers; magnitudes agree on metric-reported plots.
 
-    Closing that gap is a per-country job in three forms, none of them a
+    Closing that gap is a per-country job in four forms, none of them a
     change to this transform: extend the country's ``u``-table
-    (``harvest_units``); wire the instrument's own conversion factor into
-    the optional ``KgFactor`` column, which the ``reported`` and
-    ``survey_median`` layers above then consume; or -- where the survey ships
-    a conversion TABLE rather than a per-row factor -- load that table and
-    pass it as *shipped_factors*.  The third is the one Ethiopia and Malawi
-    need (GH #852, #854): their tables are keyed on crop x unit x region, so
-    they can never be a per-row column, and the de-duplication and region
-    resolution they require are decisions that belong at the call site rather
-    than baked into a parquet.  The second reaches rows the
-    first cannot -- Uganda's 2018-19 season-A harvest side ships a
+    (``harvest_units``); declare a unit whose mass is FIXED -- a standard
+    container, or a regional unit like the quintal -- in the country's
+    ``u_kg`` table, which this ladder reads since GH #931; wire the
+    instrument's own conversion factor into the optional ``KgFactor``
+    column, which the ``reported`` and ``survey_median`` layers above then
+    consume; or -- where the survey ships a conversion TABLE rather than a
+    per-row factor -- load that table and pass it as *shipped_factors*.  The
+    last is the one Ethiopia and Malawi need (GH #852, #854): their tables
+    are keyed on crop x unit x region, so they can never be a per-row column
+    or a ``u_kg`` row, and the de-duplication and region resolution they
+    require are decisions that belong at the call site rather than baked
+    into a parquet.  Wiring ``KgFactor`` reaches rows no unit table can --
+    Uganda's 2018-19 season-A harvest side ships a
     100%-populated ``a5aq6d`` conversion factor and NO harvest-unit code at
     all, so its 7 153 rows sit at ``u='Unknown'`` and no unit table can ever
     convert them.
@@ -4357,7 +4830,8 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     qty = pd.to_numeric(df['Quantity'], errors='coerce')
     factors = harvest_kg_factors(df, volume_as_mass=volume_as_mass,
                                  min_reports=min_reports,
-                                 shipped_factors=shipped_factors)
+                                 shipped_factors=shipped_factors,
+                                 unit_kg=unit_kg)
     kg_per_unit = factors['kg_per_unit']
     kg = qty * kg_per_unit
     if carry_native:
@@ -4378,6 +4852,8 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     res.attrs['kg_factor_sources'] = factors.attrs['kg_factor_sources']
     res.attrs['kg_factor_disagreement'] = factors.attrs[
         'kg_factor_disagreement']
+    res.attrs['kg_factor_declared_from'] = factors.attrs[
+        'kg_factor_declared_from']
     return res
 
 
@@ -4411,7 +4887,8 @@ def _parcel_from_feature_plot(plot_id):
 
 def yield_kg(crop_production, plot_features, *, area_col='Area',
              volume_as_mass=True, on='parcel',
-             min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None):
+             min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None,
+             unit_kg=None):
     """Harvested kilograms per unit plot area (WB ``yield_kg``).
 
     MECHANICAL reduction (GAP 1).  Sums :func:`harvest_kg` and plot area to a
@@ -4440,6 +4917,10 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         it (`.coder/ledger/harvest-kg-shipped-factors.md` section 6 Q1/Q3)::
 
             yield_kg(cp, pf, shipped_factors=ethiopia.crop_conversion_factors())
+    unit_kg : mapping, optional
+        Forwarded to :func:`harvest_kg` (GH #931).  Unlike *shipped_factors*
+        it needs no passing: left ``None`` it is read from
+        ``crop_production.attrs['unit_kg']``.
     on : {'parcel', 'plot'}, default 'parcel'
         Land grain to join on.
 
@@ -4476,7 +4957,8 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
 
     hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass,
                     min_reports=min_reports,
-                    shipped_factors=shipped_factors).reset_index()
+                    shipped_factors=shipped_factors,
+                    unit_kg=unit_kg).reset_index()
     hk_key = _resolve_plot_level(hk.columns)
     if hk_key is None:
         raise ValueError(
@@ -4621,6 +5103,95 @@ def total_hired_labor_days(plot_labor):
 #   Urea 46% N; CAN (calcium ammonium nitrate) 26%; SA / sulphate of ammonia
 #   21%; DAP (di-ammonium phosphate) 18%; NPK 17-17-17 ≈ 17%; TSP/SSP/MOP
 #   carry no nitrogen.
+#
+# Two country-specific BLENDS carry a cited share (GH #867, ruling @ligon
+# 2026-10-18: "NPS and Malawi D Compound get CITED N shares"):
+#   - NPS 19% N (Ethiopia ``NPS``; the ESS asks for it from W3 2015-16, and
+#     by W5 it has displaced DAP).  Grade 19-38-0+7S: IFDC & AFAP for AGRA,
+#     *Assessment of Fertilizer Distribution Systems and Opportunities for
+#     Developing Fertilizer Blends: Ethiopia* (June 2018), Table 1
+#     "Fertilizers available in Ethiopia and volumes sold for the 2016-17
+#     season" (report p. 3): "NP 19 38 0 + 7S  NPS".  The same table lists
+#     the boron / zinc variants at 17.7-18.9% N.  The ESS has one NPS
+#     question, so 0.19 is the base grade (plain NPS), not a per-bag
+#     figure: NPS+B at 18.9% was the largest seller by volume (377,527 t
+#     against plain NPS's 238,191 t in 2016-17), and it out-imports plain
+#     NPS in every year 2017-2022 in IFDC's *Fertilizer Statistics Overview
+#     Ethiopia 2010-2022* (2023 Edition, p. 12), where plain NPS is 14-25%
+#     of the four grades' volume.  The volume-weighted mean N of the four is
+#     18.8% in 2016-17 and 18.7-18.9% in each of 2017-2022, so 0.19 is at
+#     most ~1.4% (relative) high.  Agrees with the WB harmonised panel
+#     (ETH_ESS3.do:896, ETH_ESS4.do:918, ETH_ESS5.do:984: ``NPS_kg*0.19``).
+#   - D Compound 8% N (Malawi ``D Compound Fertilizer``, Module D type code
+#     5; the IHS has no separate Super D code).  The Malawi documents below
+#     give 8% N while the P/K/S grade drifts; the one exception is named
+#     after them.
+#       * IFDC with the Department of Agricultural Research Services,
+#         Ministry of Agriculture, for the Government of Malawi, *Proposed
+#         Fertilizer Regulations, 2003* (Appendix C, under the Proposed
+#         Fertilizer Act, 2003; September 2003; WIPO Lex MW022, "Other
+#         Texts").  A DRAFT prepared by IFDC, not enacted regulations, and
+#         the grade is a worked penalty example, not a schedule of
+#         registered grades: Schedule B, A. "Investigational Allowances --
+#         Penalty Rates", Examples of Penalty Compilation, example 2,
+#         printed p. 31 (PDF p. 23): 'A "D" compound (8-14-7-6.5S)
+#         fertilizer was guaranteed as 8% N, 14% P2O5, 7% K2O, and 6.5%S'.
+#       * IFDC & AFAP for AGRA, *Assessment of Fertilizer Distribution
+#         Systems and Opportunities for Developing Fertilizer Blends:
+#         Malawi* (June 2018), Table 1 "Main fertilizer straights, compounds
+#         and blends available in Malawi" (report p. 5): "8:18:15+6S+0.1B
+#         Compound D/Super D", whose next row is "NPK 10:24:20 + 6S + 0.1B
+#         Super D" -- a different product at ~10% N, which is why a ``Super
+#         D`` label gets no share here.  IFDC's *Fertilizer Statistics
+#         Overview Malawi* names both: 8-18-15+6S+0.1B+0.1Zn "(Compound D)"
+#         and 10-24-20+6S+0.1B "(Super D)", in the 2016-2021 edition (2022
+#         Edition, draft 1), p. 7, and the 2019-2023 (2024 Edition), p. 8.
+#       * Independent of IFDC: Ministry of Agriculture, *Guide to
+#         Agriculture Production and Natural Resources Management in
+#         Malawi* (revised 2020), Table 54 "Some commonly used fertilizers
+#         in tobacco and their nutrient composition", printed p. 232 (PDF
+#         p. 254 of the copy hashed): "Compound D 8 18 15 4 0.1" (N, P2O5,
+#         K2O, S, B %), beside "Super D 10.5 24 20 6 0.15".
+#     DIVERGES from both other harmonisations of these files.  The WB panel
+#     uses 0.07 with no citation (MWI_IHPS1.do:804 and IHPS2-4, ``gen
+#     nitrogen_kg5 = D_kg * 0.07`` under ``*CD compound``).  A 7% grade IS
+#     in print for Malawi: FAO & GoM (Omuto & Vargas), *Soil nutrient loss
+#     assessment in Malawi* (2018), p. IX: "Compound D (a local term that
+#     refers to an NPK blend of 7-14-7)", attributed to "the Government of
+#     Malawi (GoM)" with no source note.  7-14-7 is Zimbabwe's Compound D
+#     grade.  The report cites IFDC's 2013 *Malawi fertilizer assessment*
+#     (fn 34) for crop yields, not for this grade, so IFDC 2013 as the
+#     origin of the WB's 0.07 is unverified.  EPAR uses 0.10
+#     (EPAR_UW_Malawi_IHS_W1.do:2204-2208, "D COMPOUND - 10-20-10",
+#     ``0.10*(itemcode==5)``), which is Zambia's Compound D grade.  So 0.08
+#     is the grade the Malawi documents give, and 0.07 / 0.10 are other
+#     countries' grades.  On Malawi's 726 D Compound rows 0.08 and 0.07
+#     differ by 1/8.  Any Super D a household recorded under code 5 would
+#     make 0.08 slightly low; that cannot be measured.
+#     Page text and SHA-256 of every source: slurm_logs/gh867_nitrogen/.
+#
+# ORGANIC INPUTS ARE REFUSED A SHARE, DELIBERATELY (GH #867, same ruling:
+# "Organic inputs (manure, compost, organic fertilizer) get a documented
+# refusal: they stay unmatched and loud").  Manure and compost DO carry
+# nitrogen, so a share of 0.0 would be as much an invented number as any
+# other, and no instrument in the corpus records what a nominal share would
+# need -- the animal, the feedstock, the moisture, the storage.  Measured
+# over the 14 warm ``plot_inputs`` tables (2026-10-19), the refusal is not
+# free in either direction: Ethiopia's 34,207 organic rows carry no
+# quantity at all (an ``Applied`` dummy only), Malawi's 11,075 serve a
+# unitless 0.0, most EHCVM / Mali / Niger quantities are in carts and
+# sacks; but Tanzania (12.2M kg), Nigeria (3.07M), Uganda (2.70M) and Niger
+# (1.64M) report kg-convertible organic quantities so large that even the
+# 0.5% N the issue floated (itself uncited) would be the dominant term of
+# the country's total (Tanzania's inorganic N is 19,476 kg; 0.5% of 12.2M
+# kg is 61,115).  The WB ``nitrogen_kg`` this
+# reproduces is inorganic N (ETH_ESS4.do:919 sums UREA / DAP / NPS only).
+# So no organic key may enter this map -- :data:`_ORGANIC_INPUT_PATTERN`
+# names the vocabulary, :func:`nitrogen_kg` counts those rows separately on
+# ``attrs['nitrogen_input_match']['refused_organic_labels']`` and names them
+# in :class:`NutrientCoverageWarning`, and a test refuses an organic key.
+# A caller who has a share for their own sample can still pass one through
+# ``nitrogen_content=``.
 class NutrientCoverageWarning(UserWarning):
     """A fertilizer input label resolved to NO nitrogen share.
 
@@ -4638,8 +5209,11 @@ class NutrientCoverageWarning(UserWarning):
 
     Fires for an unmatched label that *names itself* a fertilizer input --
     the corpus's own vocabulary, :data:`_FERTILIZER_LABEL_HINTS`
-    (fertilizer / fertiliser / manure / compost, plus the Portuguese
-    ``adubo`` and French ``engrais``) -- and NOT for ``Seed`` / ``Pesticide``
+    (fertilizer / fertiliser / manure / compost / organic, plus the
+    Portuguese ``adubo`` and French ``engrais``), and for every label
+    :data:`_ORGANIC_INPUT_PATTERN` classes as organic -- the documented
+    refusal (GH #867) is named apart from a fertilizer nobody has keyed --
+    and NOT for ``Seed`` / ``Pesticide``
     / ``Herbicide``, which are correctly outside a nitrogen map and are the
     bulk of the rows (Malawi ``Seed`` alone is 112,296).  A warning nobody
     reads is how the original defect survived, so the firehose form is
@@ -4685,7 +5259,22 @@ _NITROGEN_CONTENT = {
     'ssp': 0.0,
     'mop': 0.0,
     'other fertilizer': 0.0,
+    # country-specific blends, cited above (GH #867)
+    'nps': 0.19,          # Ethiopia, 19-38-0+7S (IFDC/AFAP 2018 Table 1)
+    'd compound': 0.08,   # Malawi, 8% N (IFDC proposed regs 2003;
+                          # IFDC/AFAP 2018; MoA Guide 2020)
 }
+
+
+# The ORGANIC-input vocabulary refused a share above (GH #867).  Matches
+# English ``Organic Fertilizer`` / ``Organic manure`` / ``Other Organic`` /
+# ``Manure`` / ``Compost``, Portuguese ``Adubos orgânicos - estrume animal``
+# and French ``fumier`` -- and NOT ``Other inorganic`` (Mali) or
+# ``inorgânicos``: the leading ``\b`` refuses an ``organ`` that follows
+# ``in``.  Used to CLASSIFY an unmatched label for the tally and the warning;
+# it never assigns a share.
+_ORGANIC_INPUT_PATTERN = re.compile(
+    r'\b(?:org[aâ]ni|manure|compost|estrume|fumier)', re.IGNORECASE)
 
 
 # Word stems that mark an input label as a FERTILIZER in the corpus's own
@@ -4694,8 +5283,19 @@ _NITROGEN_CONTENT = {
 # / ``Adubos inorganicos - ureia``) and French.  Used ONLY to decide whether
 # an unmatched label is worth warning about; it never affects a nutrient
 # share, so a stem missing from this tuple costs a warning, never a number.
+# The organic REFUSAL is named through :data:`_ORGANIC_INPUT_PATTERN`,
+# independently of these stems (``_warn_nitrogen_coverage`` names every
+# refused label), so Ethiopia's ``Other Organic`` (2,651 rows) and Mali's
+# ``Other organic`` (1,189) -- unnamed before GH #867, no stem matched them
+# -- are loud whether or not ``organic`` is here.  What the ``organic`` stem
+# itself adds, as a SUBSTRING test, is the labels the pattern deliberately
+# does NOT class as organic: Mali's ``Other inorganic`` (9,640 rows, 1,694
+# with a positive quantity), an "other" fertilizer slot whose product the
+# instrument does not name and which carries no share by ruling (@ligon
+# 2026-10-14).  The warning now names it as a gap, as it already named
+# Nigeria's ``Other Inorganic Fertilizer``.
 _FERTILIZER_LABEL_HINTS = ('fertilizer', 'fertiliser', 'manure', 'compost',
-                           'adubo', 'engrais')
+                           'organic', 'adubo', 'engrais')
 
 
 def _normalise_input_label(label):
@@ -4714,9 +5314,10 @@ def _normalise_input_label(label):
     then with a trailing ``' fertilizer'`` / ``' fertiliser'`` REMOVED, then
     with ``' fertilizer'`` ADDED.  Exactness is preserved -- no substring or
     fuzzy matching -- so ``Organic Fertilizer`` still resolves to nothing
-    (``organic`` is not a key, and asserting a nominal N share for manure
-    would be inventing a number), and ``D Compound Fertilizer`` and
-    Ethiopia's ``NPS`` likewise stay unmatched and get named in the warning.
+    (``organic`` is not a key, and the organic refusal above is deliberate,
+    GH #867), while ``D Compound Fertilizer`` resolves through the strip rule
+    to ``d compound`` and Ethiopia's ``NPS`` to ``nps`` -- both keyed with
+    cited shares since GH #867.  ``Super D Compound`` or ``NPSB`` would not.
 
     Measured over the 11 warm ``plot_inputs`` tables (2026-09-09): the strip
     rule is what Malawi needs (53,210 rows across NPK / Urea / CAN / DAP
@@ -4740,7 +5341,12 @@ def _nitrogen_shares(labels, content):
 
     Returns ``(share_series, tally)``.  ``tally`` mirrors
     ``harvest_kg_factors``'s ``shipped_matched``: a JOIN diagnostic, taken
-    before anything else can hide it.
+    before anything else can hide it.  ``refused_organic_labels`` /
+    ``refused_organic_rows`` are the SUBSET of the unmatched labels that
+    :data:`_ORGANIC_INPUT_PATTERN` classes as organic -- the documented
+    refusal (GH #867), as distinct from a fertilizer nobody has keyed yet.
+    They stay inside ``unmatched_*``: the partition is still matched +
+    unmatched.
     """
     resolved = {}
     for label in pd.unique(pd.Series(labels).astype(str)):
@@ -4752,6 +5358,8 @@ def _nitrogen_shares(labels, content):
     counts = pd.Series(labels).astype(str).value_counts()
     unmatched = {str(k): int(v) for k, v in counts.items()
                  if str(k) not in resolved}
+    refused = {k: v for k, v in unmatched.items()
+               if _ORGANIC_INPUT_PATTERN.search(k)}
     tally = {
         'matched_rows': int(sum(v for k, v in counts.items()
                                 if str(k) in resolved)),
@@ -4759,26 +5367,42 @@ def _nitrogen_shares(labels, content):
         'matched_labels': sorted(resolved),
         'unmatched_labels': dict(sorted(unmatched.items(),
                                         key=lambda kv: -kv[1])),
+        'refused_organic_rows': int(sum(refused.values())),
+        'refused_organic_labels': dict(sorted(refused.items(),
+                                              key=lambda kv: -kv[1])),
     }
     return share, tally
 
 
 def _warn_nitrogen_coverage(tally, total_mass, n_rows):
     """Emit :class:`NutrientCoverageWarning` where coverage failed."""
+    # An organic label refused a share (GH #867) is always named, whatever
+    # the stems say: the ruling is that the refusal stays LOUD.
+    refused = tally.get('refused_organic_labels', {})
     suspicious = {k: v for k, v in tally['unmatched_labels'].items()
-                  if any(h in k.lower() for h in _FERTILIZER_LABEL_HINTS)}
+                  if k in refused
+                  or any(h in k.lower() for h in _FERTILIZER_LABEL_HINTS)}
     zero_mass = (n_rows == 0) or not (total_mass > 0)
     if not suspicious and not zero_mass:
         return
-    named = ', '.join(f"{k!r} ({v:,} rows)" for k, v in
-                      list(suspicious.items())[:8]) or 'none'
+    # A fertilizer nobody has keyed (a GAP) and an organic input refused a
+    # share by ruling are different findings; name them apart so the gap is
+    # not lost among the refusals.
+    gaps = {k: v for k, v in suspicious.items() if k not in refused}
+    organic = {k: v for k, v in suspicious.items() if k in refused}
+
+    def _name(d):
+        return ', '.join(f"{k!r} ({v:,} rows)" for k, v in
+                         list(d.items())[:8]) or 'none'
+    named = (f"no share keyed (a gap): {_name(gaps)}; organic, refused a "
+             f"share by policy (GH #867): {_name(organic)}")
     if zero_mass:
         warnings.warn(
             "nitrogen_kg resolved a nitrogen share for "
             f"{tally['matched_rows']:,} row(s) but the result is "
             f"{'empty' if n_rows == 0 else 'identically zero'} -- every "
             "fertilizer label either went unmatched or carries a nominal "
-            f"share of 0. Unmatched fertilizer-shaped labels: {named}. "
+            f"share of 0. Unmatched fertilizer-shaped labels -- {named}. "
             "This has the right SHAPE and no content: len() > 0, finite and "
             ">= 0 all pass on a column of zeros. Check "
             "attrs['nitrogen_input_match'] and pass nitrogen_content= with "
@@ -4787,16 +5411,40 @@ def _warn_nitrogen_coverage(tally, total_mass, n_rows):
     else:
         warnings.warn(
             f"nitrogen_kg: fertilizer-shaped input label(s) resolved to NO "
-            f"nitrogen share and contribute nothing to the total: {named}. "
-            "That may be correct (organic manure and compost carry no "
-            "nominal share in _NITROGEN_CONTENT, deliberately -- asserting "
-            "one would invent a number) but it is not visible in the "
-            "returned frame. Full tally on "
-            "attrs['nitrogen_input_match'].",
+            f"nitrogen share and contribute nothing to the total -- "
+            f"{named}. The organic refusal is deliberate -- manure and "
+            "compost carry nitrogen, but no instrument records what a "
+            "nominal share would need, and a 0.0 would assert one as surely "
+            "as any other number -- yet it is not visible in the returned "
+            "frame. Full tally on attrs['nitrogen_input_match'] "
+            "(refused_organic_labels separates the two).",
             NutrientCoverageWarning, stacklevel=3)
 
 
-def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
+def _plot_input_country_index(df):
+    """Keep country identity before plot-input filtering (GH #1159).
+
+    Reuses the column-promotion pattern of ``_with_u_in_index`` and the
+    index-before-column convention of ``_declared_kg_factors``; see ledger
+    ``1159-pooled-reducers.md`` sections 2-4.  Metadata alone adds no axis.
+    """
+    country = _level_or_column(df, 'country')
+    if country is not None:
+        if pd.isna(country).any():
+            raise ValueError(
+                "plot_inputs country labels must be non-null; supply each "
+                "row's country or split into country-less frames")
+        if not any(name in df.index.names for name in ('t', 'i', *_PLOT_LEVELS)):
+            raise ValueError(
+                "plot_inputs must carry local plot identity in its index "
+                "('t', 'i', or 'plot_id'); country alone is not a plot key")
+        if 'country' not in df.index.names:
+            return df.set_index('country', append=True)
+    return df
+
+
+def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
+                unit_kg=None):
     """Kilograms of nitrogen applied per plot (WB ``nitrogen_kg``).
 
     MECHANICAL reduction (GAP 2).  For each fertilizer input row, convert
@@ -4814,16 +5462,27 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
         product).  Defaults to :data:`_NITROGEN_CONTENT`.
     volume_as_mass : bool, default True
         Forwarded to the unit→kg conversion.
+    unit_kg : mapping, optional
+        Declared unit masses, overriding metric/inferred unit factors.
+        Defaults to ``plot_inputs.attrs['unit_kg']``; an explicit empty
+        mapping disables declarations.  Accepts per-country records as in
+        :func:`harvest_kg_factors`.
 
     Returns
     -------
     pd.DataFrame
-        One ``Nitrogen_kg`` column indexed by ``(t, i, plot_id)``.  Plots with
-        fertilizer input but no convertible-unit row sum to 0; plots with no
-        fertilizer at all are absent.  ``attrs['nitrogen_input_match']``
+        One ``Nitrogen_kg`` column indexed by ``(t, i, plot_id)``.  If the
+        input carries ``country`` as an index level or column, the index is
+        ``(country, t, i, plot_id)``, including for one country or an empty
+        result.  Country labels must be non-null; country metadata alone
+        does not add an axis.  Rows without a convertible quantity do not
+        contribute; plots with no contributing fertilizer rows are absent.
+        ``attrs['nitrogen_input_match']``
         carries the label-join tally -- ``matched_rows`` /
         ``unmatched_rows`` / ``matched_labels`` / ``unmatched_labels``
-        (label -> row count, descending).
+        (label -> row count, descending), and ``refused_organic_rows`` /
+        ``refused_organic_labels``, the organic subset of the unmatched
+        labels (refused a share by policy, GH #867).
 
     Notes
     -----
@@ -4841,9 +5500,18 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     A label that still resolves to nothing and *names itself* a fertilizer
     input now raises :class:`NutrientCoverageWarning`; the full tally rides
     on ``attrs`` either way.  Matching stays EXACT after normalisation: no
-    substring or fuzzy match, so ``Organic Fertilizer``, ``D Compound
-    Fertilizer`` and Ethiopia's ``NPS`` stay unmatched and get named rather
-    than being assigned an invented nominal share.
+    substring or fuzzy match, so ``Organic Fertilizer`` stays unmatched and
+    gets named rather than being assigned an invented nominal share.
+
+    **Blends and organics (GH #867, ruling @ligon 2026-10-18).**  Ethiopia's
+    ``NPS`` (0.19, grade 19-38-0+7S) and Malawi's ``D Compound Fertilizer``
+    (0.08) carry CITED shares -- publisher, document and table are in the
+    comment above :data:`_NITROGEN_CONTENT`; D Compound's 0.08 diverges
+    from the WB panel's uncited 0.07 and EPAR's 0.10 (Zimbabwe's and
+    Zambia's Compound D grades).  Organic inputs (manure, compost,
+    organic fertilizer, in every corpus language) are REFUSED a share:
+    they stay unmatched, are counted on ``refused_organic_*``, and are
+    named in the warning as a refusal, not a gap.
     Divergence from WB: the WB code keys N-share off the *product* a survey
     records (urea 0.46, DAP 0.18, NPK 0.17, …).  The UNPS questionnaire (and
     therefore our ``plot_inputs.input``) records only nutrient *class*, so we
@@ -4854,7 +5522,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     explicit ``nitrogen_content`` to reproduce a particular country's table.
     """
     content = _NITROGEN_CONTENT if nitrogen_content is None else nitrogen_content
-    df = plot_inputs.copy()
+    df = _plot_input_country_index(plot_inputs.copy())
     if 'Quantity' not in df.columns:
         raise ValueError("plot_inputs must have a 'Quantity' column")
 
@@ -4872,17 +5540,10 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     n_share, _match_tally = _nitrogen_shares(inp, content)
     n_share.index = df.index
 
-    # Resolve a kg quantity.  Uganda keeps the unit in a *column* ``u``; the
-    # shared factor machinery wants ``u`` in the index, so temporarily
-    # promote it when needed.
-    if 'u' in (df.index.names or []):
-        kg_per_unit = _kg_factor_series(df, volume_as_mass=volume_as_mass)
-    elif 'u' in df.columns:
-        tmp = df.set_index('u', append=True)
-        kg_per_unit = _kg_factor_series(tmp, volume_as_mass=volume_as_mass)
-        kg_per_unit.index = df.index
-    else:
+    if 'u' not in (df.index.names or []) and 'u' not in df.columns:
         raise ValueError("plot_inputs must carry a 'u' unit level or column")
+    kg_per_unit = _kg_factor_series_with_declared(
+        df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     qty = pd.to_numeric(df['Quantity'], errors='coerce')
     n_kg = qty * kg_per_unit * n_share
@@ -4892,7 +5553,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
 
     out = pd.DataFrame({'Nitrogen_kg': n_kg}).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level]
+    group_by = [n for n in ['country', 't', 'i', plot_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
     res = _canonicalise_plot_level(res, plot_level)
@@ -4905,7 +5566,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     return res
 
 
-def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
+def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True, unit_kg=None):
     """Kilograms of seed applied per plot (WB ``seed_kg``).
 
     MECHANICAL reduction (GAP 2).  Filters ``plot_inputs`` to seed rows,
@@ -4922,11 +5583,18 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
         Preferred Label).
     volume_as_mass : bool, default True
         Forwarded to the unit→kg conversion.
+    unit_kg : mapping, optional
+        Declared unit masses, as in :func:`nitrogen_kg`.  ``None`` reads
+        ``plot_inputs.attrs['unit_kg']``; ``{}`` disables declarations.
 
     Returns
     -------
     pd.DataFrame
-        One ``Seed_kg`` column indexed by ``(t, i, plot_id)``.
+        One ``Seed_kg`` column indexed by ``(t, i, plot_id)``.  If the
+        input carries ``country`` as an index level or column, the index is
+        ``(country, t, i, plot_id)``, including for one country or an empty
+        result.  Country labels must be non-null; country metadata alone
+        does not add an axis.
 
     Notes
     -----
@@ -4935,7 +5603,7 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
     matching the WB ``seed_kg`` which is also NaN there.  Otherwise shares
     the metric-unit conversion caveat of :func:`harvest_kg`.
     """
-    df = plot_inputs
+    df = _plot_input_country_index(plot_inputs)
     if 'Quantity' not in df.columns:
         raise ValueError("plot_inputs must have a 'Quantity' column")
     if 'input' in (df.index.names or []):
@@ -4947,20 +5615,16 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
         raise ValueError("plot_inputs must have an 'input' level or column")
 
     seed = seed.copy()
-    if 'u' in (seed.index.names or []):
-        kg_per_unit = _kg_factor_series(seed, volume_as_mass=volume_as_mass)
-    elif 'u' in seed.columns:
-        tmp = seed.set_index('u', append=True)
-        kg_per_unit = _kg_factor_series(tmp, volume_as_mass=volume_as_mass)
-        kg_per_unit.index = seed.index
-    else:
+    if 'u' not in (seed.index.names or []) and 'u' not in seed.columns:
         raise ValueError("plot_inputs must carry a 'u' unit level or column")
+    kg_per_unit = _kg_factor_series_with_declared(
+        seed, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     qty = pd.to_numeric(seed['Quantity'], errors='coerce')
     kg = qty * kg_per_unit
     out = pd.DataFrame({'Seed_kg': kg}).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level]
+    group_by = [n for n in ['country', 't', 'i', plot_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
     res = _canonicalise_plot_level(res, plot_level)
@@ -6135,10 +6799,11 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
           rows, same unit conversion, N-share forced to 1.0.  Output column
           ``Fertilizer_kg_per_ha``.  Note this covers the INORGANIC
           vocabulary only: ``_NITROGEN_CONTENT``'s keys are the nutrient
-          classes (nitrate / phosphate / potash / mixed) and the product
-          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) -- manure and
-          other organic inputs carry no key and contribute nothing to
-          either basis.
+          classes (nitrate / phosphate / potash / mixed), the product
+          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) and two cited
+          blends (Ethiopia NPS, Malawi D Compound; GH #867) -- manure and
+          other organic inputs are refused a key (GH #867) and contribute
+          nothing to either basis.
     area_col : str, default 'Area'
         Plot-area column in ``plot_features``.
     volume_as_mass : bool, default True
@@ -6173,6 +6838,11 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         One column -- ``Nitrogen_kg_per_ha`` or ``Fertilizer_kg_per_ha``,
         named for the numerator so the basis cannot be lost -- indexed by
         ``(t, i, plot_id)`` (or ``(t, i, parcel)`` for ``on='parcel'``).
+        If both inputs carry a ``country`` index level or column, country
+        is retained as the first grouping, joining and output level, even
+        for one country or empty results. Country labels must be non-null;
+        country on only one input is refused. Index labels take precedence
+        over a redundant column; attrs alone do not supply country.
 
     Notes
     -----
@@ -6204,6 +6874,19 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         raise ValueError(
             f"fertilizer_rate on= must be 'plot' or 'parcel', got {on!r}")
 
+    # GH #1160 / ledger sections 2-4: country is part of both land keys.
+    # Validate identity before nutrient or positive-area filtering. The
+    # numerator's existing helper validates its own non-null country labels.
+    input_country = _level_or_column(plot_inputs, 'country')
+    area_country = _level_or_column(plot_features, 'country')
+    if (input_country is None) != (area_country is None):
+        raise ValueError(
+            "fertilizer_rate: country labels must be present on both "
+            "plot_inputs and plot_features, or absent from both")
+    if area_country is not None and pd.isna(area_country).any():
+        raise ValueError(
+            "fertilizer_rate: plot_features country labels must be non-null")
+
     if nutrient == 'N':
         num = nitrogen_kg(plot_inputs, volume_as_mass=volume_as_mass)
         num_col, out_col = 'Nitrogen_kg', 'Nitrogen_kg_per_ha'
@@ -6224,7 +6907,12 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
             "fertilizer_rate: the fertilizer numerator has no 'plot_id' level "
             "to join area on")
 
-    pf = plot_features.reset_index()
+    # Preserve accepted area keys in columns. Only remove a redundant
+    # country column when the index is the authoritative identity source.
+    pf = plot_features
+    if 'country' in pf.index.names and 'country' in pf.columns:
+        pf = pf.drop(columns='country')
+    pf = pf.reset_index()
     plot_key = _resolve_plot_level(pf.columns)
     if plot_key is None:
         raise ValueError(
@@ -6232,7 +6920,8 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     if area_col not in pf.columns:
         raise ValueError(f"plot_features must have a {area_col!r} column")
 
-    base = [k for k in ['t', 'i'] if k in num.columns and k in pf.columns]
+    base = [k for k in ['country', 't', 'i']
+            if k in num.columns and k in pf.columns]
 
     if on == 'parcel':
         num['_land'] = [
@@ -6246,6 +6935,12 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         num['_land'] = num[num_key].astype(str)
         pf['_land'] = pf[plot_key].astype(str)
 
+    # An empty parcel comprehension otherwise infers float, unlike the
+    # string keys returned by both parcel helpers. Preserve the pooled
+    # empty-result contract without changing country-less behavior.
+    if input_country is not None and num.empty:
+        num['_land'] = num['_land'].astype(str)
+
     keys = base + ['_land']
     fert = num.groupby(keys, dropna=False)[num_col].sum().reset_index()
 
@@ -6258,17 +6953,27 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         # Silent emptiness is the failure this guard exists for: both sides
         # have rows, the inner merge matched none, and the result is a
         # correctly-shaped frame with nothing in it.
-        warnings.warn(
-            f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer land "
-            f"key(s) and the {len(area):,} area land key(s) have NO value in "
-            "common, so the result is empty. The two features use different "
-            "plot vocabularies -- e.g. Uganda's ag modules key plots "
-            "'{hhid}-{parcel}-{plot}' while plot_features keys them "
-            f"'{{parcel}}_{{suffix}}'. Examples -- fertilizer: "
-            f"{sorted(map(str, fert['_land'].unique()))[:3]}; area: "
-            f"{sorted(map(str, area['_land'].unique()))[:3]}. Try "
-            f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
-            PlotGrainMismatchWarning, stacklevel=2)
+        if 'country' in base:
+            warnings.warn(
+                f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer "
+                f"country/land key(s) and the {len(area):,} area country/land "
+                "key(s) have NO value in common, so the result is empty. "
+                "Check both country labels and land vocabularies. Examples "
+                f"-- fertilizer: {list(fert[keys].head(3).itertuples(index=False, name=None))}; "
+                f"area: {list(area[keys].head(3).itertuples(index=False, name=None))}.",
+                PlotGrainMismatchWarning, stacklevel=2)
+        else:
+            warnings.warn(
+                f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer land "
+                f"key(s) and the {len(area):,} area land key(s) have NO value in "
+                "common, so the result is empty. The two features use different "
+                "plot vocabularies -- e.g. Uganda's ag modules key plots "
+                "'{hhid}-{parcel}-{plot}' while plot_features keys them "
+                f"'{{parcel}}_{{suffix}}'. Examples -- fertilizer: "
+                f"{sorted(map(str, fert['_land'].unique()))[:3]}; area: "
+                f"{sorted(map(str, area['_land'].unique()))[:3]}. Try "
+                f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
+                PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged[out_col] = merged[num_col] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=[out_col])
@@ -6529,6 +7234,7 @@ def median_price_valuation(item_df, geo_levels, *,
                            threshold=10,
                            weight_col=None,
                            volume_as_mass=True,
+                           unit_kg=None,
                            price_col='_unit_price',
                            out_col='Value'):
     """Value item rows at a geography-ladder *median unit price* (WB valuation).
@@ -6649,6 +7355,11 @@ def median_price_valuation(item_df, geo_levels, *,
         ``tests/test_median_price_valuation.py``.  See :func:`_weighted_median`.
     volume_as_mass : bool, default True
         Forwarded to the kg conversion of ``qty_col`` when ``kg_qty`` is None.
+    unit_kg : mapping, optional
+        Declared unit masses for converting ``qty_col`` when ``kg_qty`` is
+        None, as in :func:`harvest_kg_factors`.  Defaults to
+        ``item_df.attrs['unit_kg']``; ``{}`` suppresses that record.
+        An explicit ``kg_qty`` remains authoritative and ignores this option.
     price_col : str, default '_unit_price'
         Name for the imputed-price column added to the returned frame.
     out_col : str, default 'Value'
@@ -6722,8 +7433,8 @@ def median_price_valuation(item_df, geo_levels, *,
             raise ValueError(f"item_df must have a {qty_col!r} column "
                              "(or pass kg_qty)")
         sold_native = pd.to_numeric(df[qty_col], errors='coerce')
-        sold_kg = sold_native * _kg_factor_series(
-            df, volume_as_mass=volume_as_mass)
+        sold_kg = sold_native * _kg_factor_series_with_declared(
+            df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     # Step 1: observed unit price; zero/inf priced rows excluded from the pool.
     with np.errstate(divide='ignore', invalid='ignore'):

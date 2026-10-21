@@ -1,0 +1,135 @@
+#+title: Independent combined-suite reconciliation and Uganda supplement
+#+author: Sue
+#+date: 2026-10-20
+
+* Result
+
+PASS for reported full-suite correctness, with the eight new missing-file skips independently covered by a separate successful supplement.
+Zero failures/errors in either JUnit file and no credential-related skip reasons.
+All three farm warm tests passed in the combined suite.
+Nine XFAIL test identities and their complete reasons are exactly unchanged.
+The single XPASS count is unchanged; its identity cannot be proved from these artifacts.
+All reviewer verifier processes are stopped.
+
+Baseline source reported by parent: =976fc840d12ba40f1602b7dff58b81548632b2a9=.
+Combined source reported by parent: =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+The XML/log files do not themselves embed commit SHA; the supplemental runner independently asserts the exact combined checkout before importing/building/testing.
+
+* Exact full-suite accounting
+
+| Outcome | Baseline | Combined | Delta |
+|---------+----------+----------+-------|
+| Ordinary passed, terminal summary | 8369 | 8562 | +193 |
+| Plain skipped | 279 | 285 | +6 |
+| XFAIL | 9 | 9 | 0 |
+| XPASS, non-strict | 1 | 1 | 0 |
+| Failures/errors | 0/0 | 0/0 | 0 |
+| Total testcase IDs | 8658 | 8857 | +199 |
+| Warnings, terminal summary | 1232 | 1388 | +156 |
+| Seconds, terminal summary | 893.14 | 1158.04 | +264.90 |
+
+JUnit counts XFAIL inside its skipped field:288 versus294; this is279+9 versus285+9, not a discrepancy.
+There are8,657 shared testcase IDs,200 added and1 removed, with no duplicate IDs in either file.
+Of the shared IDs,8,361 are JUnit-success in both runs,277 retain the exact same plain-skip reason,9 retain the exact same XFAIL reason,8 move success-to-skip and2 move skip-to-success.
+The ordinary-pass net reconciles:200 added -1 removed -8 newly skipped +2 newly executed =+193, while aggregate XPASS stays1.
+A JUnit-success includes non-strict XPASS; no identity inference is made from that category.
+
+Added IDs all have JUnit-success outcomes:
+
+| Module | Added |
+|--------+-------|
+| test_metric_decimal_comma | 134 |
+| test_gh1093_declared_unit_consumers | 27 |
+| test_gh1039_make_backend_no_country_rule | 20 |
+| test_feature_audit_participation | 10 |
+| test_feature_canonical_index | 9 |
+
+Removed: =tests.test_gh1039_make_backend_no_country_rule::test_default_backend_is_unchanged=, a previous JUnit-success.
+The approved #1099 patch replaces its old warm-only unchanged assertion with discriminating cold/warm/partial/stale/no-cache, genuine failure and cache-hit/builder controls;20 new cases are present in that module.
+Every added/removed ID and exact result is retained in the companion JSON.
+
+* All changed skip reasons
+
+Two prior skips now execute successfully:
+
+- =tests.test_categorical_mapping_resolution::test_import_is_from_the_expected_checkout= was skipped because "set LSMS_EXPECTED_ROOT to assert which checkout is imported"; it now succeeds.
+- =tests.test_gh866_stale_country_parquet_not_laundered::test_a_poisoned_country_parquet_is_REBUILT_not_served[GhanaLSS/nutrition]= was skipped because "GhanaLSS/nutrition not warm"; it now succeeds.
+
+Eight prior successes become skips in =tests.test_uganda_invariance::test_parquet_matches_baseline=, one for each wave's =_/food_acquired.parquet=:2005-06,2009-10,2010-11,2011-12,2013-14,2015-16,2018-19,2019-20.
+Each exact reason is "Parquet not built: <wave>/_/food_acquired.parquet".
+Thus279+8-2=285; there are no unexplained additional skip identities/reasons.
+These are missing-file skips, not #1113 partial-manifest skips and not missing-credential skips.
+
+The nine unchanged XFAILs are four sampling-weight limitations (China,Kazakhstan,Pakistan,Peru) and five #602 tenure-vocabulary findings (Albania,Cambodia,Kosovo,Tajikistan,Timor-Leste).
+Their exact testcase IDs and full reasons are identical and stored in JSON.
+The terminal logs both report1 non-strict XPASS, but neither prints its testcase ID/reason and JUnit has no XPASS discriminator: unchanged identity is NOT established.
+
+* Farm warm evidence from the combined JUnit
+
+| Existing test | Result | Seconds |
+|---------------+--------+---------|
+| test_warm_corpus_assembly_loses_no_rows | PASS | 175.331 |
+| test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_labor] | PASS | 259.784 |
+| test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_inputs] | PASS | 196.905 |
+
+All three have no skipped/failure/error child, matching their existing non-xfail definitions independently reviewed earlier.
+They ran rather than satisfying the suite through cold-cache skips.
+
+* Why the suite missed the eight entries
+
+The existing invariance test is a read-only regression comparison (test_uganda_invariance.py:183-196).
+It first looks for each literal relative path in the Uganda config tree, then under the configured data_root, and skips immediately if neither exists.
+It never calls Country/Wave to build a missing input.
+For a present file, it checks required coverage, shape, columns, index names, canonicalized dtypes and content digest; absent coverage in the full run is not a fingerprint pass.
+
+Uganda CONTENTS was read before country assessment, including its dated caveats and LOGBOOK.
+Recorded idiosyncrasy: the invariance module depends on prior cache presence, not automatic materialization.
+CONTENTS:3329 explicitly says it "is NOT a reliable net" and advises explicitly building the table to verify a baseline entry.
+The historical3186 claim that the session hook purges Uganda is superseded by3204: "The session-start purge is retired".
+Its later3337 claim "tests/test_uganda_tables.py DELETES generated parquets" is not supported by the current file's call paths: remove/restore helper definitions remain, with no calls in that file.
+These contradictions are reported as historical/current distinctions, not grounds for blaming a retired purge.
+The nutrition direction hold is also explicitly lifted by the dated Oct15 maintainer approval at3306; no new fixture approval was inferred and no fixture was changed.
+
+The combined log records stale-hash Uganda/food_acquired rebuilds, consistent with the declared corpus re-warm requirement.
+Neither those warnings nor JUnit trace the exact concurrent operation that removed the eight wave files.
+This review therefore does not attribute the missing files to a specific test or race.
+That exact-remover question remains a cache-test-isolation follow-up, separate from the completed data comparison.
+
+* Authorized supplementary coverage
+
+A NEW private root, =/local/job40255479/uganda-invariance-review-data=, received a physical copy of Uganda from the completed immutable baseline cache.
+All172 copied files were SHA256-identical with distinct inodes; source copies remain byte-identical afterward.
+Only dvc-cache/L1 is a symlink.
+The eight copied target wave files were preserved in a separate private backup directory, leaving all eight expected locations absent before population.
+No source/shared deletion, fixture change, baseline update or cache-policy change was made.
+The still-writing corpus-combined-data root was never used.
+
+From frozen852, mounted Python with exact PYTHONPATH/countries/data-root assertions, credential gate open, CPUs16-19, BLAS/OMP/MKL1 and build/make workers1:
+
+#+begin_src python
+uga = ll.Country('Uganda', preload_panel_ids=False)
+for wave in uga.waves:
+    frame = uga[wave].food_acquired()
+    assert (data_root('Uganda') / wave / '_' / 'food_acquired.parquet').exists()
+#+end_src
+
+All eight sanctioned calls recreated their absent wave files in3.4-4.4 seconds each.
+The exact eight existing invariance test IDs then passed:8 passed,0 skipped,0 failures,0 errors in2.94 seconds.
+Population plus pytest took33.60 seconds.
+The current rebuilt wave frames have rows40,749;38,107;35,489;38,983;50,703;50,108;53,288;48,144 in wave order, each with3 columns.
+The existing assertions verified their pinned fingerprints; no broader source interpretation is claimed.
+
+The full-suite result remains8,562 passed/285 skipped: those eight skips are not relabeled as full-suite passes.
+The separate8-pass supplement supplies the missing baseline comparison evidence.
+=uganda-wave-supplement.py= is the runnable reproduction, with =uganda-wave-supplement.json= containing aggregate outcomes and isolation checks.
+The script requires unused private roots to avoid overwriting prior reviewer state.
+
+* Artifact and scope limits
+
+The companion JSON records SHA256 for both full-run XML/log pairs, every added/removed ID, all ten changed common outcomes, exact XFAIL reasons and supplemental results.
+Raw logs/XML remain private under =/local/job40255479/control/framework-campaign/=.
+This review initially used XML/logs only; the parent explicitly authorized the narrow eight-case supplementary build/test after the coverage gap was found.
+No source/git/GitHub mutation or shared L2 write occurred, and no full suite was repeated.
+No precise XPASS identity or precise concurrent wave-file remover is inferred.
+
+-- Sue

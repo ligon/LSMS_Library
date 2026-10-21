@@ -1,0 +1,1192 @@
+[
+  {
+    "body_sha256": "d47dbd733e5d76c343f3ddd03a904002dfb071175550365696b12130c42f813c",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 218,
+    "observed_at": "2026-10-21T12:28:21.425Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Remaining retired-family Makefile/registration references remain after selected script retirement.",
+    "state": "open",
+    "title": "Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/218"
+  },
+  {
+    "body_sha256": "97d37d60048c11d2e28ef4ddc0941c8b3478bd81d42a5ff4f6514b50cf36b7ce",
+    "comment_evidence": [
+      {
+        "body_sha256": "266113bff52737796e6a02a79d5b647881e6e16849459293c49d091bafcd6863",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/637#issuecomment-5038336539"
+      },
+      {
+        "body_sha256": "c9c727650a7a57dd915cb0bf0c70e03b1246871e91187a44b44ccc48222806f3",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/637#issuecomment-5038380874"
+      },
+      {
+        "body_sha256": "635821b978a8dd289049f5cad70b18df07edeefca7e65ce0c08d4afd9e5f7688",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/637#issuecomment-5038531815"
+      },
+      {
+        "body_sha256": "4bee816bddbefa338b92310337d6448bc9bdb732c475bccc5feb0a2c592beb17",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/637#issuecomment-5038831263"
+      },
+      {
+        "body_sha256": "2909d7c737e2331b902bba044f8c1a72dcd2b1d29191b1a1d1ee09103f1caad1",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/637#issuecomment-5041524935"
+      },
+      {
+        "body_sha256": "b4566d9a2d824786d0c162446970589639816263d7795ba56b7e6838748c7a88",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/637#issuecomment-5041537819"
+      }
+    ],
+    "comments_count": 6,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 637,
+    "observed_at": "2026-10-21T12:37:28.645Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Remaining first/last country-site key-soundness inventory, with source/subprocess measurement rather than duplicate counts.",
+    "state": "open",
+    "title": "Complete the remaining first/last aggregation key-soundness audit after the merged reviews",
+    "url": "https://github.com/ligon/LSMS_Library/issues/637"
+  },
+  {
+    "body_sha256": "8b660f3524cdae21549f35e339827e74824c5ce0925266630da145af9011d142",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 650,
+    "observed_at": "2026-10-21T12:37:28.222Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Documentation minimum standard, automatic acquisition and missing-document backfill remain.",
+    "state": "open",
+    "title": "Documentation/ should not be optional: 3 waves carry only a provenance stub, and add_wave() never fetches the real thing",
+    "url": "https://github.com/ligon/LSMS_Library/issues/650"
+  },
+  {
+    "body_sha256": "097a4202feb35bb0abee0c58ec6033aa3e1d986edea5fbb40d59d39eb1bf7b2c",
+    "comment_evidence": [
+      {
+        "body_sha256": "d645b9007548f2632312da8ff0f4405ce99b5d4696098d8a28f4dedc99995821",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-5568358474"
+      },
+      {
+        "body_sha256": "1eeb9775172c75c13cafbd6cc7c3e294ee8f095ede17faa4e97b602cb9d0a63b",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-5571472610"
+      },
+      {
+        "body_sha256": "4fa44d54a2c3979af8985fc405ec284bd8e0b5413674f4a07a64da632e1db846",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-5732473573"
+      },
+      {
+        "body_sha256": "e167471c41b2ff657b3a11d05ec4dc0f23e83e1b462e02eb0c92cfdd10dcd3b1",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-6259383184"
+      },
+      {
+        "body_sha256": "fa1630d63218815d337498f8876268815bcb133bc20ed5971daf17060a0ed0b5",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/698#issuecomment-6277141634"
+      }
+    ],
+    "comments_count": 5,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 698,
+    "observed_at": "2026-10-21T12:28:22.136Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Latest maintainer comment explicitly keeps OPEN for upstream Ghana relabels1100/1101 and separate1102/1103.",
+    "state": "open",
+    "title": "DECISION: kinship -- extend the conflation rule to the Affinity slot alone ([G, D, null]) for 'X of head or spouse' / 'X or X-in-law' labels",
+    "url": "https://github.com/ligon/LSMS_Library/issues/698"
+  },
+  {
+    "body_sha256": "4a3fca053550af3c2deb710be125a6123080809475aee28558bf6a52e444ad48",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 778,
+    "observed_at": "2026-10-21T12:28:22.028Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Trust-mode admission of a complete unstamped script output at the final path remains a policy/timing contract; disappearance/private-test fixes do not settle it.",
+    "state": "open",
+    "title": "Tests that rebuild in the SHARED root under LSMS_NO_CACHE still open the #866 delete-then-rebuild window; assume_cache_fresh has an exists()-then-read race",
+    "url": "https://github.com/ligon/LSMS_Library/issues/778"
+  },
+  {
+    "body_sha256": "f316cb80445a1c661933250ed16ce40ec8f3e01cf79e42875e91fc6e72494a49",
+    "comment_evidence": [
+      {
+        "body_sha256": "3cf5dd7895c2af1ca1bdff589fc24da1faaea2f367fd5c09ccf8a7ba7d85ed17",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/787#issuecomment-5558057625"
+      },
+      {
+        "body_sha256": "917d5401a4bc6a586b4580732d62902cd4ff3a21fbfec96e37179af311fbce27",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/787#issuecomment-5558180148"
+      },
+      {
+        "body_sha256": "18c00c2342e4fe79a074d2fa29921e9b9adde5a4f002e63e8ee339564728c5e1",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/787#issuecomment-5558259142"
+      },
+      {
+        "body_sha256": "417146174a8113771a5c61822f540e2a54b9ca217282cb8c304cefc055f750e0",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/787#issuecomment-5559369063"
+      }
+    ],
+    "comments_count": 4,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 787,
+    "observed_at": "2026-10-21T12:28:22.013Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Read-path label/quantity contract retains current broader remaining scope after the labels_unmatched increment.",
+    "state": "open",
+    "title": "labels=: resolve ambiguous Preferred Label targets, curate Aggregate variants, fix numeric-target examples",
+    "url": "https://github.com/ligon/LSMS_Library/issues/787"
+  },
+  {
+    "body_sha256": "53f424b8a39b7c89c0c05088de66c9f8e92be310f267a2bff6da3f0e40d7b18f",
+    "comment_evidence": [
+      {
+        "body_sha256": "3f7234b9f3e709f4903b33649db1683bbf5487d04a7fd64f67ea4e87d530ff35",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/798#issuecomment-5600421916"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 798,
+    "observed_at": "2026-10-21T12:28:22.705Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Remaining datetime read-path/rebuild semantics retain the current narrowed issue; build-time migration is not complete.",
+    "state": "open",
+    "title": "Mali interview_date: rewrite the stale data_scheme.yml:69-73 comment (state the measured collapse loss) and refresh the coverage matrix",
+    "url": "https://github.com/ligon/LSMS_Library/issues/798"
+  },
+  {
+    "body_sha256": "c0e27d9fc953b5620e84a5058327938de38c375f72e37e420aa5f65f62acbaff",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 828,
+    "observed_at": "2026-10-21T12:28:22.674Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "basis=total still needs the missing in-kind coverage warning/decision; units-unavailable handling alone does not complete it.",
+    "state": "open",
+    "title": "food_expenditures(basis='total') silently equals 'purchased' where a country records no in-kind value; should raise or warn like units= now does",
+    "url": "https://github.com/ligon/LSMS_Library/issues/828"
+  },
+  {
+    "body_sha256": "d2f253a64ea1bbdefa9af6796b374c25c35f0066edf6f6909bb3e96d56bd1e56",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 845,
+    "observed_at": "2026-10-21T12:28:23.657Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Remaining per-country Price provenance and diagnostic decisions remain after general docstring clarification.",
+    "state": "open",
+    "title": "Price provenance: is Price elicited or derived for Panama/GhanaLSS/Guatemala/Serbia; explain Uganda's ~5% gap; decide on a read-time diagnostic",
+    "url": "https://github.com/ligon/LSMS_Library/issues/845"
+  },
+  {
+    "body_sha256": "190b6d309dafd8b2d389c2d2f0b50c4dcee70b4e80ab8fe945beedc0c727200d",
+    "comment_evidence": [
+      {
+        "body_sha256": "a1e2eaff6453832061687b7a73d3601753d22b20f0811191b024eaad5a1f0e20",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/851#issuecomment-5603490696"
+      },
+      {
+        "body_sha256": "f75d4bfc4ff8f6b737bef94e4a7a1244d600800d0b2928aa92fb593d451b92ab",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/851#issuecomment-6259384970"
+      },
+      {
+        "body_sha256": "69276396b40ab32563c21dca5bb8f033b4d840c88517b919517b9222d147927b",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/851#issuecomment-6288828253"
+      }
+    ],
+    "comments_count": 3,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 851,
+    "observed_at": "2026-10-21T12:37:28.489Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Recall-period PhaseII/exposure work remains in the existing unlanded cf117 lineage, outside actual dev ancestry.",
+    "state": "open",
+    "title": "DECISION: recall windows Phase II -- ship period= on food_expenditures/food_quantities with coverage at 28 of 67 cells under Contract B, and refuse period= on food_prices",
+    "url": "https://github.com/ligon/LSMS_Library/issues/851"
+  },
+  {
+    "body_sha256": "eed635362399cc598406df9752cedc151dcdec0215e1c7bb1aa4f4a7f331d67d",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 920,
+    "observed_at": "2026-10-21T12:28:24.095Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Rebuild notice level and remaining warm read-path profiling remain after the fingerprint/read-gate repair.",
+    "state": "open",
+    "title": "Cache-miss rebuild is silent on a git checkout (DECISION: info vs warning); profile the per-call read-path transforms on GhanaLSS",
+    "url": "https://github.com/ligon/LSMS_Library/issues/920"
+  },
+  {
+    "body_sha256": "436d13f2f95b04a273033e9713b246539a7527267da944ae501b921172baf3df",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 932,
+    "observed_at": "2026-10-21T12:28:24.113Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Real development-PR data execution/enforcement remains absent; nightly/manual/merge_group definitions do not establish a personal-repository merge queue or eligible required PR check.",
+    "state": "open",
+    "title": "247 requires_s3 tests skip on every PR and on development, so a red suite reports green",
+    "url": "https://github.com/ligon/LSMS_Library/issues/932"
+  },
+  {
+    "body_sha256": "57a0aa4af8192eaac0bdb121628630ef94c1b73a4b19658699832e412f43692e",
+    "comment_evidence": [
+      {
+        "body_sha256": "c801de7826340705dcb6a35c9f766828b136c6c5e28b947a69e6ab367ed694b9",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/978#issuecomment-6279009906"
+      },
+      {
+        "body_sha256": "25cd8484cf37ea0b78e3e27090244068bb565d6fcf1ccaac7ad1ce0c845bee54",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/978#issuecomment-6281986130"
+      }
+    ],
+    "comments_count": 2,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 978,
+    "observed_at": "2026-10-21T12:28:25.433Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Nigeria W5: acquire WB v02 (NGA_2023_GHSP-W5_v02_M) and wire NGA_HouseholdGeovariables_Y5.dta as cluster_features df_geo",
+    "state": "open",
+    "title": "Nigeria W5: acquire WB v02 (NGA_2023_GHSP-W5_v02_M) and wire NGA_HouseholdGeovariables_Y5.dta as cluster_features df_geo",
+    "url": "https://github.com/ligon/LSMS_Library/issues/978"
+  },
+  {
+    "body_sha256": "83f5d2fdcb41dd24f02098c058af5cf75f47bfe04f7cec3ba6629184d4aa533a",
+    "comment_evidence": [
+      {
+        "body_sha256": "ab7f968b05251015770436cc27a9163caac4e07ac97c1b3150a9661ce0b35bbc",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1032#issuecomment-6268237478"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1032,
+    "observed_at": "2026-10-21T12:28:26.164Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DVC writes countries_root()/.dvc/tmp/btime when the DVCFileSystem is built: the last runtime write into the config tree",
+    "state": "open",
+    "title": "DVC writes countries_root()/.dvc/tmp/btime when the DVCFileSystem is built: the last runtime write into the config tree",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1032"
+  },
+  {
+    "body_sha256": "92811246c48a06fca0837dd06d34be13e9f9906801d3649924e051fb60a809b9",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1033,
+    "observed_at": "2026-10-21T12:28:26.406Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Nigeria W4 food unit labels carry invented W3 size prefixes; W4's size columns (s7bq2c/s7bq9c/s10bq2c/s10bq9c) are never read",
+    "state": "open",
+    "title": "Nigeria W4 food unit labels carry invented W3 size prefixes; W4's size columns (s7bq2c/s7bq9c/s10bq2c/s10bq9c) are never read",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1033"
+  },
+  {
+    "body_sha256": "5714959f4d08b51955fcc5e3d8f9d92b35d02213992ea95a0038074bd70ef02e",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1034,
+    "observed_at": "2026-10-21T12:28:26.925Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but served as 'other specify (13x)'",
+    "state": "open",
+    "title": "Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but served as 'other specify (13x)'",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1034"
+  },
+  {
+    "body_sha256": "7ab0f8f65da6658339090657b2ba1f74479560cb62fad83692d8ff50eb22060f",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1043,
+    "observed_at": "2026-10-21T12:28:27.618Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Ethiopia crop_production tags a missing harvest unit as 'Other (Specify)' (ethiopia.py:1827), hiding it from the sentinel mask",
+    "state": "open",
+    "title": "Ethiopia crop_production tags a missing harvest unit as 'Other (Specify)' (ethiopia.py:1827), hiding it from the sentinel mask",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1043"
+  },
+  {
+    "body_sha256": "2f31399b684b8faa3c1ba9406b8b066a88abb95caeb88c38a2d82c220d79e19e",
+    "comment_evidence": [
+      {
+        "body_sha256": "f06f9852195ae501620629d0811dda3d56e5449ce7b3a679d1bdd176bf2397cd",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1044#issuecomment-6270142130"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1044,
+    "observed_at": "2026-10-21T12:28:27.875Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "1989 EthiopiaRHS unit-code decoding/data-entry hypothesis remains; the integer/missing-unit partial correction is not completion.",
+    "state": "open",
+    "title": "EthiopiaRHS food units: float-stringified codes 31.0/83.0/95.0 leak inferred kg after 1989, and 1989 serves raw unit codes",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1044"
+  },
+  {
+    "body_sha256": "f278108b7f03956e98bb9f1eee1cb22d104c6427cd07c5aa6f7305ffdba0dc3f",
+    "comment_evidence": [
+      {
+        "body_sha256": "e5b5356db6606702c7adbb8d09f6b92d13d499076fa42de94a308877d30a92f2",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1045#issuecomment-6268281131"
+      },
+      {
+        "body_sha256": "e546666ea72d5ca61e83f8c1099ad1f639f9a1a9b0cfb6151311c16b6b2dfdb6",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1045#issuecomment-6269094391"
+      },
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1045#issuecomment-6277585147"
+      },
+      {
+        "body_sha256": "8b9d98d19c9d66bfb607c4518790a5822c0c3437e2242881832b4ad3284f8b6e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1045#issuecomment-6277586222"
+      }
+    ],
+    "comments_count": 4,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1045,
+    "observed_at": "2026-10-21T12:28:27.682Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Runs2+, calendar phases2-4 and the timestamp time-of-day decision remain.",
+    "state": "open",
+    "title": "Parse every calendar quantity at build time with one parser (dates, year-months, month-of-year, years); read-time cast becomes a pass-through",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1045"
+  },
+  {
+    "body_sha256": "2f1c9bac481adf3275400a83533bcf76c5db6e65fc2635b29b4a308345ab0e9e",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1051,
+    "observed_at": "2026-10-21T12:28:28.691Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Degraded-build grading (#675) residuals: outage crashes the build, single-file probe, read-only L1 never heals, offline probe cost, precursor drops",
+    "state": "open",
+    "title": "Degraded-build grading (#675) residuals: outage crashes the build, single-file probe, read-only L1 never heals, offline probe cost, precursor drops",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1051"
+  },
+  {
+    "body_sha256": "cc2d5068fa9657605f529ee346b494b458f1851fa6a4f77d4ec38fc2ae42ca09",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1055,
+    "observed_at": "2026-10-21T12:37:28.184Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: Ethiopia 2021-22 interview_date dates the post-harvest agriculture visit (1,475 of 4,959 households), not the household interview",
+    "state": "open",
+    "title": "DECISION: Ethiopia 2021-22 interview_date dates the post-harvest agriculture visit (1,475 of 4,959 households), not the household interview",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1055"
+  },
+  {
+    "body_sha256": "d7a3b0830aa839773ab71ca15b0b7db513baee04243620d41aa1a2c68c1fb233",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1056,
+    "observed_at": "2026-10-21T12:37:28.703Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Ethiopia interview_date serves 33 device-clock dates years outside fieldwork (W4 15, W5 18)",
+    "state": "open",
+    "title": "Ethiopia interview_date serves 33 device-clock dates years outside fieldwork (W4 15, W5 18)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1056"
+  },
+  {
+    "body_sha256": "fa97f835acd7cf55361bda3557ec5a0418a363bafcf96366a6aa102b2c8ed0f5",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1057,
+    "observed_at": "2026-10-21T12:37:28.496Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: Burkina Faso 2021-22 cluster_features -- serve the 2018-19 cluster GPS for the 527 tracked grappes (registered derivation)",
+    "state": "open",
+    "title": "DECISION: Burkina Faso 2021-22 cluster_features -- serve the 2018-19 cluster GPS for the 527 tracked grappes (registered derivation)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1057"
+  },
+  {
+    "body_sha256": "7cb96590b522c5cd8bf0779fcd4c4ee189a460f53ae47f9237058a4d0db4b347",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1058,
+    "observed_at": "2026-10-21T12:37:29.250Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Burkina Faso 2021-22 plot_features: wire parcel GPS s16aq46__latitude/__longitude (4,180 of 8,467 parcels); check Mali/Niger/Senegal s16a",
+    "state": "open",
+    "title": "Burkina Faso 2021-22 plot_features: wire parcel GPS s16aq46__latitude/__longitude (4,180 of 8,467 parcels); check Mali/Niger/Senegal s16a",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1058"
+  },
+  {
+    "body_sha256": "114c172a97c1b1e1cf417c4a58d474fabf75cd241c61272b50d8a6319e9d716c",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1059,
+    "observed_at": "2026-10-21T12:37:29.209Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Burkina Faso cluster_features District: 50 cross-wave spelling variants (mapping table) and 3 genuine province disagreements on shared grappes",
+    "state": "open",
+    "title": "Burkina Faso cluster_features District: 50 cross-wave spelling variants (mapping table) and 3 genuine province disagreements on shared grappes",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1059"
+  },
+  {
+    "body_sha256": "96fcd46d688abbfb1a303e489afb40cb9becc22c20eb2ed060563fa147a8da78",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1060,
+    "observed_at": "2026-10-21T12:37:29.136Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Burkina Faso 2014: province varies within 94 of 900 zd in the source (pre-existing cluster_features GrainCollapseWarning, 1,034 of 10,800 rows)",
+    "state": "open",
+    "title": "Burkina Faso 2014: province varies within 94 of 900 zd in the source (pre-existing cluster_features GrainCollapseWarning, 1,034 of 10,800 rows)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1060"
+  },
+  {
+    "body_sha256": "259fb97f565ae1c3d1435315c097dfc64b0e88da049ffcc42ee4332fd5e15255",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1061,
+    "observed_at": "2026-10-21T12:28:28.488Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "EthiopiaRHS 1994a: unit codes 40/76/80-82/85/86 are the round-1 scheme but are decoded with 1997's labels (238 rows)",
+    "state": "open",
+    "title": "EthiopiaRHS 1994a: unit codes 40/76/80-82/85/86 are the round-1 scheme but are decoded with 1997's labels (238 rows)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1061"
+  },
+  {
+    "body_sha256": "9d538bc2bead3201a49113a481e023a01b4fb7403ef712db369c0a6e97eaaa3e",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1064,
+    "observed_at": "2026-10-21T12:28:28.346Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: data_access still accepts the in-tree countries/.dvc/s3_creds as a credential fallback (reader rung reports 'read' on a file DVCFileSystem never uses)",
+    "state": "open",
+    "title": "DECISION: data_access still accepts the in-tree countries/.dvc/s3_creds as a credential fallback (reader rung reports 'read' on a file DVCFileSystem never uses)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1064"
+  },
+  {
+    "body_sha256": "817235a005430993c1dd146826b1030e970e8a2b258d3e1fc8758feb1f545785",
+    "comment_evidence": [
+      {
+        "body_sha256": "2a378047a5fac8cbfffe3f9481d0eb2f7eab08021eccac00df19219573c24f4e",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1066#issuecomment-6277585445"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1066,
+    "observed_at": "2026-10-21T12:28:28.512Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Original no-DVC grain stamp is fixed, but the issue's explicit assumed-fresh grain replay residual remains; Country._read_assumed_fresh_cache still intentionally omits replay.",
+    "state": "open",
+    "title": "The no-DVC-repo L2-country write stamps no lsms_grain_audit, so a grain loss is silent on every warm read (pip-install / LSMS_COUNTRIES_ROOT route)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1066"
+  },
+  {
+    "body_sha256": "31222170239dc5855499443ecd80f6458067a171d199806cb693626a6ee650e2",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1068,
+    "observed_at": "2026-10-21T12:37:29.196Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: native-unit modes treat U_UNKNOWN as a pooled pseudo-unit (food_prices(units='unitvalue'), food_quantities(units='units'))",
+    "state": "open",
+    "title": "DECISION: native-unit modes treat U_UNKNOWN as a pooled pseudo-unit (food_prices(units='unitvalue'), food_quantities(units='units'))",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1068"
+  },
+  {
+    "body_sha256": "27864d487abc4deea5e812667cd4c82c20dc81a4bed9aeb108f08619dcf0aadc",
+    "comment_evidence": [
+      {
+        "body_sha256": "08a7de691fdf8a4dd3a21181d291d109ee83e2a28da6f9c1d3d3a6d09e4ccb43",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1071#issuecomment-6273014246"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1071,
+    "observed_at": "2026-10-21T12:28:31.059Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: the wave and country cache tiers disagree on LSMS_NO_CACHE spelling and on corrupt-file handling",
+    "state": "open",
+    "title": "DECISION: the wave and country cache tiers disagree on LSMS_NO_CACHE spelling and on corrupt-file handling",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1071"
+  },
+  {
+    "body_sha256": "5ac6876ebb85102a983313ed62af61b332e86f9b67fd2feb85e1e6d183c3f23f",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1072,
+    "observed_at": "2026-10-21T12:28:30.507Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "GhanaLSS nutrition ignores _/no_kg_factor.yml and weighs counted eggs at 0.50 kg; make the declaration a hashed input of nutrition",
+    "state": "open",
+    "title": "GhanaLSS nutrition ignores _/no_kg_factor.yml and weighs counted eggs at 0.50 kg; make the declaration a hashed input of nutrition",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1072"
+  },
+  {
+    "body_sha256": "866c45f5776b9b78a37d20282f31bf71a8ce48fca6adbeb1bf72ed0e0b590743",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1073,
+    "observed_at": "2026-10-21T12:28:30.506Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: GhanaLSS egg units priced like one egg (All, Nut, Finger, Stick, Barrel, Bunch) get ~1 kg each -- extend the no-kg declaration to every egg unit?",
+    "state": "open",
+    "title": "DECISION: GhanaLSS egg units priced like one egg (All, Nut, Finger, Stick, Barrel, Bunch) get ~1 kg each -- extend the no-kg declaration to every egg unit?",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1073"
+  },
+  {
+    "body_sha256": "a748c56f81a7e56710dc613d855f422d926cb44f3ffb3782b5d83c8c260da19b",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1074,
+    "observed_at": "2026-10-21T12:28:30.508Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: Malawi rows served u=Unknown keep a shipped code-23 survey_kg (29 Mango rows at 10.99 kg per mango, 7,088 kg)",
+    "state": "open",
+    "title": "DECISION: Malawi rows served u=Unknown keep a shipped code-23 survey_kg (29 Mango rows at 10.99 kg per mango, 7,088 kg)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1074"
+  },
+  {
+    "body_sha256": "23f9477e1ffd049bb826ca59c6247cef9aa96c8c98ba63e1471e37644f9f4ecc",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1075,
+    "observed_at": "2026-10-21T12:28:30.506Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Malawi leftover unit codes: 2010-11 suffixed codes (16b/16a/12a/21b/12b/03a, 13 rows) and IHS2 '90 kg bag' (2004-05, 4 of 6 uses contradict the label)",
+    "state": "open",
+    "title": "Malawi leftover unit codes: 2010-11 suffixed codes (16b/16a/12a/21b/12b/03a, 13 rows) and IHS2 '90 kg bag' (2004-05, 4 of 6 uses contradict the label)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1075"
+  },
+  {
+    "body_sha256": "640474252453592ae66455f207c27b3d7d6f4ea4d64f60990d2eb23c29c935ec",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1085,
+    "observed_at": "2026-10-21T12:28:31.743Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: a country entry that is a symlink escaping countries_root() is listed by countries() but refused by Country() as path traversal",
+    "state": "open",
+    "title": "DECISION: a country entry that is a symlink escaping countries_root() is listed by countries() but refused by Country() as path traversal",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1085"
+  },
+  {
+    "body_sha256": "18d82a13ed98b487f62a05e0657028088616132d40da9f4ae47513e9d893b0b6",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1087,
+    "observed_at": "2026-10-21T12:37:29.279Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: how to serve a second source record that disagrees with the first (Niger community_prices, 30 rows)",
+    "state": "open",
+    "title": "DECISION: how to serve a second source record that disagrees with the first (Niger community_prices, 30 rows)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1087"
+  },
+  {
+    "body_sha256": "8049fc56ae49cb924a94091415e97321d36a63fbda17be459de90680fc070631",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1088,
+    "observed_at": "2026-10-21T12:37:29.225Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Niger CS07 9999 quantity sentinel arrives as float32 9999.9 and is not caught",
+    "state": "open",
+    "title": "Niger CS07 9999 quantity sentinel arrives as float32 9999.9 and is not caught",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1088"
+  },
+  {
+    "body_sha256": "0e0f2db117839ad89ed39e1bc273ef1b9ccf42c0261045a63b9fd38e5b92f3d9",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1089,
+    "observed_at": "2026-10-21T12:37:29.771Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Mali community_prices reads only relev\u00e9 3 of three",
+    "state": "open",
+    "title": "Mali community_prices reads only relev\u00e9 3 of three",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1089"
+  },
+  {
+    "body_sha256": "85d579f2a5941b908d76746b074458f14a0f7ec2d808537d3bcefdd7516e7053",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1090,
+    "observed_at": "2026-10-21T12:37:29.750Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Niger `cs07q01` \"Riz\" decodes to `j = 'Autre Riz local'` for both of its varieties",
+    "state": "open",
+    "title": "Niger `cs07q01` \"Riz\" decodes to `j = 'Autre Riz local'` for both of its varieties",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1090"
+  },
+  {
+    "body_sha256": "3b38f4e649e986631f18304fa6e287593d6520f47686edb9fdc300c77c2e67d2",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1091,
+    "observed_at": "2026-10-21T12:37:29.911Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "retire the Mali / Niger / Tanzania community_prices concatenators",
+    "state": "open",
+    "title": "retire the Mali / Niger / Tanzania community_prices concatenators",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1091"
+  },
+  {
+    "body_sha256": "d13574bfe1975edce6b2c1def5f2fb30d0024079c206d2372ad200c7f3f964d9",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1095,
+    "observed_at": "2026-10-21T12:37:29.900Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Nigeria community_prices silently drops W4/W5 rows whose recorded unit the canonicaliser does not know (2,482 W4 + 2,746 W5 rows)",
+    "state": "open",
+    "title": "Nigeria community_prices silently drops W4/W5 rows whose recorded unit the canonicaliser does not know (2,482 W4 + 2,746 W5 rows)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1095"
+  },
+  {
+    "body_sha256": "a9ab398f7cf8a24fd8b84bcd573c14b3f8fc70d2c31d04d379132ff76f97b5d1",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1096,
+    "observed_at": "2026-10-21T12:37:29.938Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: Nigeria interview_date serves visit dates for households that were not interviewed (interview_result refused / unavailable / not found)",
+    "state": "open",
+    "title": "DECISION: Nigeria interview_date serves visit dates for households that were not interviewed (interview_result refused / unavailable / not found)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1096"
+  },
+  {
+    "body_sha256": "1027b18870f677492c156f3220facec9d52e91c0bff12e7e35493af50be19db1",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1100,
+    "observed_at": "2026-10-21T12:28:31.498Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Ghana: parent-or-parent-in-law code is served Parent [1, 0, consanguineal] (2,962 people) -- the #698 'X or X-in-law' form, relabelled upstream",
+    "state": "open",
+    "title": "Ghana: parent-or-parent-in-law code is served Parent [1, 0, consanguineal] (2,962 people) -- the #698 'X or X-in-law' form, relabelled upstream",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1100"
+  },
+  {
+    "body_sha256": "9f28bf5ea6adbb132cf52b8c005b3af318190726fc90e5fc3088e401a3093c57",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1101,
+    "observed_at": "2026-10-21T12:28:31.566Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "GhanaLSS GLSS3/4 code 6 'Relative of head or head's spouse' is served [null, null, consanguineal] (2,977 people)",
+    "state": "open",
+    "title": "GhanaLSS GLSS3/4 code 6 'Relative of head or head's spouse' is served [null, null, consanguineal] (2,977 people)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1101"
+  },
+  {
+    "body_sha256": "6f309809088d6ae02ebc6df852cfde91e54ae4163b963f7c90cd20087928b8a5",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1102,
+    "observed_at": "2026-10-21T12:28:31.575Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION: kinship conflations of the #698 shape outside its wording (Timor-Leste Adopted/stepchild, Cambodia Adopted/Foster, Guyana Servant/Other, bare 'Other')",
+    "state": "open",
+    "title": "DECISION: kinship conflations of the #698 shape outside its wording (Timor-Leste Adopted/stepchild, Cambodia Adopted/Foster, Guyana Servant/Other, bare 'Other')",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1102"
+  },
+  {
+    "body_sha256": "77d60d8a99b57c9d86b42477c93fafbd7082b2a2ffdfa59b9a7b2d7032fe0059",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1103,
+    "observed_at": "2026-10-21T12:28:32.324Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Kosovo 2000 kinship: truncated labels 'Other re' (71) and 'Niece/Ne' (455) need the code list",
+    "state": "open",
+    "title": "Kosovo 2000 kinship: truncated labels 'Other re' (71) and 'Niece/Ne' (455) need the code list",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1103"
+  },
+  {
+    "body_sha256": "ad54e8d12e93af125d7c334e0ccd563cbe134646095fa3f19024ce478b58bad5",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1106,
+    "observed_at": "2026-10-21T12:28:32.189Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Malawi `NPK Fertilizer` is Chitowe 23:21:0+4S but is served at the shared map's NPK 17-17-17 (0.17 vs 0.23 N)",
+    "state": "open",
+    "title": "Malawi `NPK Fertilizer` is Chitowe 23:21:0+4S but is served at the shared map's NPK 17-17-17 (0.17 vs 0.23 N)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1106"
+  },
+  {
+    "body_sha256": "210e19b1fae6f40f1ba00bbd872866acc9c03f816515b4e13e0b3d4e103e7072",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1107,
+    "observed_at": "2026-10-21T12:28:32.160Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Guinea-Bissau `nitrogen_kg` returns 0 rows \u2014 its four Portuguese inorganic labels are keyed to nothing",
+    "state": "open",
+    "title": "Guinea-Bissau `nitrogen_kg` returns 0 rows \u2014 its four Portuguese inorganic labels are keyed to nothing",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1107"
+  },
+  {
+    "body_sha256": "46d8d1955064ea2dcca61f37813f9e3523f32f5bd0a532769608e868213125c6",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1108,
+    "observed_at": "2026-10-21T12:28:32.219Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "GhanaLSS `Fertilizer` (1,091 rows with a quantity) has no product identity, so it gets no N share",
+    "state": "open",
+    "title": "GhanaLSS `Fertilizer` (1,091 rows with a quantity) has no product identity, so it gets no N share",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1108"
+  },
+  {
+    "body_sha256": "3357604473a5cbc03479fb2e238d35669d9519270d91afe4cd61d0cf707a5582",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1109,
+    "observed_at": "2026-10-21T12:28:32.437Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Malawi organic-fertilizer `Quantity` is a fabricated 0.0 (`'Quantity': 'sum'` without `min_count`)",
+    "state": "open",
+    "title": "Malawi organic-fertilizer `Quantity` is a fabricated 0.0 (`'Quantity': 'sum'` without `min_count`)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1109"
+  },
+  {
+    "body_sha256": "c9574dd005adf04c5e0e82d2147aab4ffe3d14204e9103414ab2828020c99f8d",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1110,
+    "observed_at": "2026-10-21T12:28:32.267Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Parcel/plot land-grain symmetry and scientific/default policy remain separate from country identity fixes.",
+    "state": "open",
+    "title": "`fertilizer_rate`'s default `on='parcel'` mis-joins Malawi and empties Ethiopia; its docstring's \"measured no-op on Malawi\" is false",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1110"
+  },
+  {
+    "body_sha256": "a40771fb4d948c57ebdaf0fa84effa853de93d161b362435e6efe1153a6ca8a6",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1111,
+    "observed_at": "2026-10-21T12:28:32.848Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Malawi applied-fertilizer unit `ag_d39e`/`ag_d39j` probably misread \u2014 13,302 rows served as grams carry 203.8 kg N that would be 203,843.6 kg as kilograms; 17,044 rows NULL `u`",
+    "state": "open",
+    "title": "Malawi applied-fertilizer unit `ag_d39e`/`ag_d39j` probably misread \u2014 13,302 rows served as grams carry 203.8 kg N that would be 203,843.6 kg as kilograms; 17,044 rows NULL `u`",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1111"
+  },
+  {
+    "body_sha256": "4755dcc5b6d5ffd86dfa355ea25a394c7d7101090e4226c8242d9bec57c8bce7",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1116,
+    "observed_at": "2026-10-21T12:28:32.965Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#600 residual: override records take their note and validation from `_OVERRIDES`, over a hand edit to the file",
+    "state": "open",
+    "title": "#600 residual: override records take their note and validation from `_OVERRIDES`, over a hand edit to the file",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1116"
+  },
+  {
+    "body_sha256": "4adb3682dc17cbc3f45058d77e1fd87c08324653d67ecd12c19f51975d5803c7",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1118,
+    "observed_at": "2026-10-21T12:28:32.881Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "`Country(...).plot_inputs()` serves `u` NA on 122,900 rows in six countries, where `Feature('plot_inputs')` serves `'Unknown'` \u2014 contradicting the #1041 ruling",
+    "state": "open",
+    "title": "`Country(...).plot_inputs()` serves `u` NA on 122,900 rows in six countries, where `Feature('plot_inputs')` serves `'Unknown'` \u2014 contradicting the #1041 ruling",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1118"
+  },
+  {
+    "body_sha256": "53e00854e385fb0660511a9abbf72ba3de7f0623c8a6f7c103ae99acdd9a06ee",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1119,
+    "observed_at": "2026-10-21T12:28:33.636Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#569 residual A: the \"not crop-specific\" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production",
+    "state": "open",
+    "title": "#569 residual A: the \"not crop-specific\" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1119"
+  },
+  {
+    "body_sha256": "4d1443a939434f607ba85bb8caaa111e2d990b56b17e2bd824e721fb08d35392",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1120,
+    "observed_at": "2026-10-21T12:28:33.694Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#569 residual C: NaN keys on declared plot-table index levels, now all named by Site I; `LSMS_READ_STRICT=1` newly raises on three reads",
+    "state": "open",
+    "title": "#569 residual C: NaN keys on declared plot-table index levels, now all named by Site I; `LSMS_READ_STRICT=1` newly raises on three reads",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1120"
+  },
+  {
+    "body_sha256": "1b72898ef3c3db9595d661c476aee97a449da97c18a49175bf699647d6d51245",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1121,
+    "observed_at": "2026-10-21T12:28:33.590Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#569 residual D: the `plot_labor.source` vocabulary is not harmonised across countries",
+    "state": "open",
+    "title": "#569 residual D: the `plot_labor.source` vocabulary is not harmonised across countries",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1121"
+  },
+  {
+    "body_sha256": "f85ae6f43e88b876a185d21ce1916c910907b1ed1b53826385474d614ad16c62",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1122,
+    "observed_at": "2026-10-21T12:28:33.642Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#569 residual E: stale \"plot_labor / plot-level features not registered in index_info\" comments",
+    "state": "open",
+    "title": "#569 residual E: stale \"plot_labor / plot-level features not registered in index_info\" comments",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1122"
+  },
+  {
+    "body_sha256": "816f489bba533c88097b4982d7a74bbb1372e4548329501cd783b36aa90ecffd",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1123,
+    "observed_at": "2026-10-21T12:28:33.712Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#569 residual F: wave-level destructive collapses in EHCVM `plot_inputs` (Country path, pre-existing)",
+    "state": "open",
+    "title": "#569 residual F: wave-level destructive collapses in EHCVM `plot_inputs` (Country path, pre-existing)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1123"
+  },
+  {
+    "body_sha256": "93743886dd5ba7340e30fa2de23a3b53bd639d6d57bc0071000bd61277d443db",
+    "comment_evidence": [
+      {
+        "body_sha256": "5899f8a044258387109da367e9245d8182afb2fcbb7e69865e545ffc3357473d",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1127#issuecomment-6281986367"
+      },
+      {
+        "body_sha256": "c6d68bf9c36eda44c4564e16f0e324682c47574cbf0d8f51024c5a87ad0f68b3",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1127#issuecomment-6282011092"
+      },
+      {
+        "body_sha256": "5da1295ed92c3f76ede495776fc28204a81dc0d16750df5a639cebcb635c8785",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1127#issuecomment-6282124112"
+      },
+      {
+        "body_sha256": "cd117d3ac3908813c5711ca03772c7e682186dae772f98d43ee6f368388d2ba5",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1127#issuecomment-6288898571"
+      }
+    ],
+    "comments_count": 4,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1127,
+    "observed_at": "2026-10-21T12:28:34.430Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Ethiopia 2021-22: acquire ESPS-5 v03_M (replaces the plot geovariables file) and re-stamp SOURCE.org (#1114 ruling)",
+    "state": "open",
+    "title": "Ethiopia 2021-22: acquire ESPS-5 v03_M (replaces the plot geovariables file) and re-stamp SOURCE.org (#1114 ruling)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1127"
+  },
+  {
+    "body_sha256": "736fe8605d1212afeb068f52c5136447f329c6e82e19530ba47ef6a7345e9643",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1129,
+    "observed_at": "2026-10-21T12:28:34.509Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "`food_prices(units='unitvalue')` serves exactly 1.0 for every `u='Value'` row: 1,107,464 GhanaLSS rows across all seven waves",
+    "state": "open",
+    "title": "`food_prices(units='unitvalue')` serves exactly 1.0 for every `u='Value'` row: 1,107,464 GhanaLSS rows across all seven waves",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1129"
+  },
+  {
+    "body_sha256": "2c9274b606e102095fbc9114336017d9bcd916a0583b01a2e372247b359d19d0",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1130,
+    "observed_at": "2026-10-21T12:28:34.422Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "GhanaLSS 1991-92 own-produce valuation: decide the `All` unit, then extend `8h-farmgate` to GLSS3",
+    "state": "open",
+    "title": "GhanaLSS 1991-92 own-produce valuation: decide the `All` unit, then extend `8h-farmgate` to GLSS3",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1130"
+  },
+  {
+    "body_sha256": "e918eb33e74e9adedf1bd55d3956db562fece308204e12e6a4791ae840cbeeca",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1131,
+    "observed_at": "2026-10-21T12:28:34.681Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Re-check the GhanaLSS `food_security` 1987-88 and 1988-89 `unsure` verdicts: the GLSS1 questionnaire scans are readable as images",
+    "state": "open",
+    "title": "Re-check the GhanaLSS `food_security` 1987-88 and 1988-89 `unsure` verdicts: the GLSS1 questionnaire scans are readable as images",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1131"
+  },
+  {
+    "body_sha256": "4a53e6a59585020eed817ea1990578e7b3d569e9464bbc577f6cc3cf5eca35a9",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1133,
+    "observed_at": "2026-10-21T12:28:35.204Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids",
+    "state": "open",
+    "title": "Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1133"
+  },
+  {
+    "body_sha256": "2724bf3d2714ff1a91a727d2d4bd24bb02670de439287bd3f4b3a81d753c1840",
+    "comment_evidence": [
+      {
+        "body_sha256": "3dde728f997d6d3f0e6762593381a7ab02a733bd8f68a98c68e67cfe91fb3457",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1134#issuecomment-6281929291"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1134,
+    "observed_at": "2026-10-21T12:28:35.211Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION (#793 residual): the frozen `DESIGN_TAGS` (2 values) cannot express an undocumented or single-stage design, so no non-Uganda design record can be written until it is widened",
+    "state": "open",
+    "title": "DECISION (#793 residual): the frozen `DESIGN_TAGS` (2 values) cannot express an undocumented or single-stage design, so no non-Uganda design record can be written until it is widened",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1134"
+  },
+  {
+    "body_sha256": "521fd5d17121960116a129bee7bdb0a144df4da0df0b5a0ae21d5f215be0488e",
+    "comment_evidence": [
+      {
+        "body_sha256": "030892ca9cc1244ecbf01739a310d1ac2cfec44d887959e5fbdd1d3bd184f1d4",
+        "created_at": null,
+        "url": "https://github.com/ligon/LSMS_Library/issues/1135#issuecomment-6281949507"
+      }
+    ],
+    "comments_count": 1,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1135,
+    "observed_at": "2026-10-21T12:28:35.378Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "DECISION (#942): `ClusterIdentityWarning`: which boundaries count (H2: any in span vs adjacent), and whether a partial renumbering needs a size threshold (H3)",
+    "state": "open",
+    "title": "DECISION (#942): `ClusterIdentityWarning`: which boundaries count (H2: any in span vs adjacent), and whether a partial renumbering needs a size threshold (H3)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1135"
+  },
+  {
+    "body_sha256": "bc5dca76184a5078322b96603c1fd67037ea906cb5614e2a0a74ca9806c38d02",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1136,
+    "observed_at": "2026-10-21T12:28:35.130Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#793 residual: curate design fields beyond Uganda (NADA DDI probe, per-country evidence, missing strata)",
+    "state": "open",
+    "title": "#793 residual: curate design fields beyond Uganda (NADA DDI probe, per-country evidence, missing strata)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1136"
+  },
+  {
+    "body_sha256": "deb8c83022cc922ab67c54f3fd64f352021267871dd385814cc7892e5cac3ea4",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1138,
+    "observed_at": "2026-10-21T12:28:35.125Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#1008 residual b: GhanaLSS GLSS1/2 `labor` keeps 20 null-`v` rows for ids with no cover, roster or food record",
+    "state": "open",
+    "title": "#1008 residual b: GhanaLSS GLSS1/2 `labor` keeps 20 null-`v` rows for ids with no cover, roster or food record",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1138"
+  },
+  {
+    "body_sha256": "fad5c3bf2c3d68c8b360fe5acbe70a3322f2bfc8da4765a024b22f71d3ebab50",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1139,
+    "observed_at": "2026-10-21T12:28:35.277Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#1008 residual c: GhanaLSS GLSS1/2 `sample` serves 13 data-less cover-page households; 114518 may duplicate the recovered 114519",
+    "state": "open",
+    "title": "#1008 residual c: GhanaLSS GLSS1/2 `sample` serves 13 data-less cover-page households; 114518 may duplicate the recovered 114519",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1139"
+  },
+  {
+    "body_sha256": "a590f7ff2113623749251a636c235ac963aea6c8d40e277cc4a269f16cdc917f",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1141,
+    "observed_at": "2026-10-21T12:28:35.910Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "#1008 residual e: GhanaLSS `inputs_produced_farmgate` returns ungated 8H rows",
+    "state": "open",
+    "title": "#1008 residual e: GhanaLSS `inputs_produced_farmgate` returns ungated 8H rows",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1141"
+  },
+  {
+    "body_sha256": "caa631cc57cc6426cfae0e047d567d06a9a344dd5ba4a151a3d83b9d5a4c2a88",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1142,
+    "observed_at": "2026-10-21T12:28:36.078Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "GhanaLSS 1991-92 `sample` omits 29 interviewed households, so their 142 roster rows serve a NaN `v`",
+    "state": "open",
+    "title": "GhanaLSS 1991-92 `sample` omits 29 interviewed households, so their 142 roster rows serve a NaN `v`",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1142"
+  },
+  {
+    "body_sha256": "acd7b75d39cf7ff0cc8b0c4c74d44cda57d37d23da32d3dec7694256659af69a",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1144,
+    "observed_at": "2026-10-21T12:28:35.834Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Nigeria food_acquired j is decoded wave-blind: W1 'Other vegetables' served as 'Leaves', 'Leaves' as 'Dry Pepper' (item twin of #607)",
+    "state": "open",
+    "title": "Nigeria food_acquired j is decoded wave-blind: W1 'Other vegetables' served as 'Leaves', 'Leaves' as 'Dry Pepper' (item twin of #607)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1144"
+  },
+  {
+    "body_sha256": "db1423da859aef13b8500e4e4227773c87cf6f30c0ffaffc9e35fa8357bf54ca",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1145,
+    "observed_at": "2026-10-21T12:28:36.693Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "GhanaLSS 1998-99 / 2005-06 / 2012-13 8H screener: measure blank-screener rows with real answers, and align to 'drop only No' (#1140 ruling)",
+    "state": "open",
+    "title": "GhanaLSS 1998-99 / 2005-06 / 2012-13 8H screener: measure blank-screener rows with real answers, and align to 'drop only No' (#1140 ruling)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1145"
+  },
+  {
+    "body_sha256": "4a81c0529c3a48d271ded70598ac973bca6c07780280c5effa09e372f88fc696",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1146,
+    "observed_at": "2026-10-21T12:28:37.180Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Test-side follow-ups to #1113: baseline generator pins partial parquets; Nigeria sold-unit test latent; cold-session invariance coverage",
+    "state": "open",
+    "title": "Test-side follow-ups to #1113: baseline generator pins partial parquets; Nigeria sold-unit test latent; cold-session invariance coverage",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1146"
+  },
+  {
+    "body_sha256": "370b4bc3c10dc8edd125dd413c153bdfb401bc52f7b8e93f529b9f5e7c4318a3",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1148,
+    "observed_at": "2026-10-21T12:28:37.229Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "period=: per-household exposure from each passage's interview status (Burkina 2014, GhanaLSS) instead of one declared constant per wave (#851 option B)",
+    "state": "open",
+    "title": "period=: per-household exposure from each passage's interview status (Burkina 2014, GhanaLSS) instead of one declared constant per wave (#851 option B)",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1148"
+  },
+  {
+    "body_sha256": "5203a722a964666ee59c6a2d3cc8210823839d2b676a380e9510d93e8c23058f",
+    "comment_evidence": [],
+    "comments_count": 0,
+    "disposition": "retain OPEN; not a release closure",
+    "issue": 1149,
+    "observed_at": "2026-10-21T12:28:37.131Z",
+    "provider": "connected GitHub",
+    "remaining_scope": "Nested archive layout, staging, sidecar placement and reviewed retirement remain; provenance safeguards are not a staging/rollback implementation.",
+    "state": "open",
+    "title": "add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1149"
+  }
+]

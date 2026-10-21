@@ -38,9 +38,11 @@ import pandas as pd
 import pyreadstat
 import pytest
 
-from lsms_library.local_tools import (_dvc_cache_path, _is_sas_xport,
-                                      _is_stata_dta, _sniff_head,
-                                      get_dataframe)
+from pyarrow.lib import ArrowInvalid
+
+from lsms_library.local_tools import (ParquetFormatError, _dvc_cache_path,
+                                      _is_sas_xport, _is_stata_dta,
+                                      _sniff_head, get_dataframe)
 
 XPORT_MAGIC = b'HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!'
 
@@ -205,10 +207,10 @@ def test_a_real_dta_still_reads(tmp_path):
 
 
 #: A claimed DTA fails before text fallback if its Stata decoders fail.
-#: The outer path-string retry can still raise SPSS ReadstatError; its
-#: inconsistent error type is a separate reader-chain issue. Keep that
-#: diagnostic visible while checking that neither encoding serves garbage.
-_LOUD = (ValueError, pd.errors.ParserError, pyreadstat.ReadstatError)
+#: Since GH #1002 the path-string retry is SPSS-only, so a non-SPSS file no
+#: longer surfaces an unrelated SPSS ``ReadstatError``: the chain's own
+#: ``ValueError`` is what escapes, under either encoding.
+_LOUD = (ValueError,)
 
 
 @pytest.mark.parametrize("encoding", [None, "latin-1"])
@@ -236,6 +238,59 @@ def test_a_corrupt_header_dta_is_not_a_garbage_frame(tmp_path, encoding):
     assert not _is_stata_dta(_sniff_head(str(fn)))
     with pytest.raises(ValueError, match="has a .dta suffix but no Stata header"):
         get_dataframe(str(fn), encoding=encoding)
+
+
+# ---------------------------------------------------------------------------
+# #1070 -- a .parquet suffix refuses the text readers, as .dta does
+# ---------------------------------------------------------------------------
+
+def _parquet_bytes(tmp_path):
+    src = tmp_path / 'src.parquet'
+    pd.DataFrame({'hhid': np.arange(200), 'val': np.linspace(0, 1, 200)}).to_parquet(src)
+    return src.read_bytes()
+
+
+@pytest.mark.parametrize("encoding", [None, "latin-1"])
+@pytest.mark.parametrize("raw", [
+    b'this is not a parquet file',   # was served as an EMPTY frame
+    b'hhid,val\n1,0.5\n2,1.5\n',     # was served as two ROWS
+    bytes([255, 254, 253, 0]) * 16,  # was a bare ValueError
+    b'',                             # was EmptyDataError
+], ids=['garbage-text', 'csv-text', 'binary', 'empty'])
+def test_a_parquet_suffix_without_parquet_magic_is_refused(tmp_path, raw, encoding):
+    fn = tmp_path / 'var.parquet'
+    fn.write_bytes(raw)
+    with pytest.raises(ParquetFormatError, match="has a .parquet suffix but no Parquet header") as info:
+        get_dataframe(str(fn), encoding=encoding)
+    assert str(fn) in str(info.value)
+    assert isinstance(info.value, ValueError)
+
+
+@pytest.mark.parametrize("encoding", [None, "latin-1"])
+def test_a_truncated_parquet_fails_loudly_with_the_arrow_cause(tmp_path, encoding):
+    """Genuine ``PAR1`` header, footer gone: only pyarrow can tell, and its
+    failure is kept as the cause rather than handed to the text readers."""
+    raw = _parquet_bytes(tmp_path)
+    fn = tmp_path / 'truncated.parquet'
+    fn.write_bytes(raw[:len(raw) // 2])
+    with pytest.raises(ParquetFormatError, match="has a Parquet header but cannot be decoded") as info:
+        get_dataframe(str(fn), encoding=encoding)
+    assert isinstance(info.value.__cause__, ArrowInvalid), repr(info.value.__cause__)
+
+
+def test_a_real_parquet_still_reads(tmp_path):
+    fn = tmp_path / 'real.parquet'
+    fn.write_bytes(_parquet_bytes(tmp_path))
+    got = get_dataframe(str(fn))
+    assert list(got.columns) == ['hhid', 'val'] and len(got) == 200
+
+
+def test_parquet_content_under_another_suffix_still_reads(tmp_path):
+    """The refusal is keyed on the ``.parquet`` suffix; dispatch by content
+    is unchanged for every other name."""
+    fn = tmp_path / 'table.bin'
+    fn.write_bytes(_parquet_bytes(tmp_path))
+    assert len(get_dataframe(str(fn))) == 200
 
 
 # ---------------------------------------------------------------------------
@@ -317,3 +372,147 @@ def test_peru_1990_expend_ssp_reads_fully_populated():
     assert df.shape == (1509, 5)
     assert list(df.columns) == ['HID', 'HHSIZE', 'PCFDEXP', 'WT', 'TOTPCX']
     assert int(df.notna().sum().sum()) == 1509 * 5
+
+
+# ---------------------------------------------------------------------------
+# #1002 -- unreadable non-DTA binaries, the SPSS path retry, cause chaining
+# ---------------------------------------------------------------------------
+#
+# The four synthetic repros of ``slurm_logs/release_landing_2026-10-14/
+# reader-residual-repro.json``: before the fix the Stata-looking ``.bin``
+# returned an empty ``(0, 1)`` frame (its column named after the header
+# bytes) under both encodings, and the unknown ``.bin`` returned the same
+# under latin-1 and, under the default decoding, escaped as a bare
+# ``ReadstatError`` from ``pd.read_spss`` -- a reader the file was never a
+# candidate for -- with the chain's own failure discarded.
+
+#: Stata 10/11 release byte, LOHI, filetype 1 -- then nothing: the sniff says
+#: Stata, both Stata decoders fail, and the bytes are full of NULs.
+_TRUNCATED_STATA_BIN = bytes([114, 2, 1, 0]) + bytes(60)
+#: No magic of any kind (and a UTF-16 BOM, which latin-1 happily decodes).
+_UNKNOWN_BIN = bytes([255, 254, 253, 0]) * 16
+
+
+def _exception_chain(exc):
+    seen = []
+    while exc is not None and exc not in seen:
+        seen.append(exc)
+        exc = exc.__cause__ or exc.__context__
+    return seen
+
+
+@pytest.mark.parametrize('encoding', [None, 'latin-1'])
+@pytest.mark.parametrize('name, raw', [
+    ('truncated-stata.bin', _TRUNCATED_STATA_BIN),
+    ('unknown.bin', _UNKNOWN_BIN),
+], ids=['truncated-stata', 'unknown'])
+def test_an_unreadable_binary_raises_rather_than_serving_an_empty_frame(
+        tmp_path, name, raw, encoding):
+    fn = tmp_path / name
+    fn.write_bytes(raw)
+    with pytest.raises(ValueError) as info:
+        get_dataframe(str(fn), encoding=encoding)
+    # The refusal names the binary header and carries an explicit cause --
+    # the binary-reader failure that preceded it -- rather than replacing it.
+    assert info.value.__cause__ is not None, repr(info.value)
+
+
+@pytest.mark.parametrize('encoding', [None, 'latin-1'])
+def test_a_stata_sniffed_bin_keeps_the_stata_failure_as_cause(tmp_path, encoding):
+    fn = tmp_path / 'truncated-stata.bin'
+    fn.write_bytes(_TRUNCATED_STATA_BIN)
+    with pytest.raises(ValueError) as info:
+        get_dataframe(str(fn), encoding=encoding)
+    msgs = ' | '.join(f'{type(e).__name__}: {e}'
+                      for e in _exception_chain(info.value))
+    assert 'binary' in str(info.value), msgs
+    assert 'read_dta' in msgs or 'Stata' in msgs or 'stata' in msgs, msgs
+
+
+@pytest.fixture
+def spss_spy(monkeypatch):
+    """Record every SPSS reader invocation (and let it run)."""
+    calls = []
+    real_spss, real_sav = pd.read_spss, pyreadstat.read_sav
+
+    def spy_spss(path, *a, **k):
+        calls.append(('read_spss', str(path)))
+        return real_spss(path, *a, **k)
+
+    def spy_sav(path, *a, **k):
+        calls.append(('read_sav', str(path)))
+        return real_sav(path, *a, **k)
+
+    monkeypatch.setattr(pd, 'read_spss', spy_spss)
+    monkeypatch.setattr(pyreadstat, 'read_sav', spy_sav)
+    return calls
+
+
+@pytest.mark.parametrize('encoding', [None, 'latin-1'])
+@pytest.mark.parametrize('raw', [_TRUNCATED_STATA_BIN, _UNKNOWN_BIN],
+                         ids=['truncated-stata', 'unknown'])
+def test_the_spss_retry_is_not_invoked_for_a_bin(tmp_path, spss_spy, raw,
+                                                 encoding):
+    fn = tmp_path / 'x.bin'
+    fn.write_bytes(raw)
+    with pytest.raises(ValueError):
+        get_dataframe(str(fn), encoding=encoding)
+    assert spss_spy == []
+
+
+def test_a_broken_sav_still_reaches_the_spss_readers_and_chains(tmp_path,
+                                                                spss_spy):
+    """SPSS magic with a garbage body: the SPSS readers ARE the candidates,
+    they fail, and the first failure survives as the explicit cause instead
+    of being replaced by whatever the path-string retry raised."""
+    fn = tmp_path / 'broken.sav'
+    fn.write_bytes(b'$FL2@(#) SPSS DATA FILE' + b'garbage ' * 40)
+    with pytest.raises(Exception) as info:
+        get_dataframe(str(fn), encoding='latin-1')
+    assert spss_spy, 'SPSS readers should have been tried for a .sav'
+    assert info.value.__cause__ is not None, repr(info.value)
+    assert not isinstance(info.value, (AttributeError, NameError))
+
+
+def _spss_frame():
+    return pd.DataFrame({'hhid': [1.0, 2.0, 3.0], 'name': ['ana', 'bo', 'cé']})
+
+
+@pytest.mark.parametrize('suffix, compress', [('.sav', False), ('.zsav', True),
+                                              ('.bin', False)])
+def test_a_real_spss_file_still_reads(tmp_path, suffix, compress):
+    """``.sav`` and ``.zsav`` by suffix; SPSS content under a foreign suffix
+    by its ``$FL2`` magic."""
+    fn = tmp_path / f'real{suffix}'
+    pyreadstat.write_sav(_spss_frame(), str(fn), compress=compress)
+    got = get_dataframe(str(fn))
+    assert got['hhid'].tolist() == [1.0, 2.0, 3.0]
+    assert got['name'].tolist() == ['ana', 'bo', 'cé']
+
+
+@pytest.mark.parametrize('encoding', [None, 'latin-1'])
+def test_a_text_csv_still_reads_under_both_encodings(tmp_path, encoding):
+    fn = tmp_path / 'text.csv'
+    fn.write_bytes('hhid,name\n1,ana\n2,jos\xe9\n'.encode(encoding or 'utf-8'))
+    got = get_dataframe(str(fn), encoding=encoding)
+    assert got['name'].tolist() == ['ana', 'jos\xe9']
+
+
+def test_a_tab_delimited_text_file_still_reads(tmp_path):
+    fn = tmp_path / 'text.txt'
+    fn.write_bytes(b'hhid\tval\n1\t0.5\n2\t1.5\n')
+    got = get_dataframe(str(fn))
+    assert len(got) == 2
+
+
+def test_a_programmer_error_in_a_reader_still_propagates(tmp_path, monkeypatch):
+    """#200's boundary: only parser/I-O failures mean "try the next reader"."""
+    fn = tmp_path / 'text.csv'
+    fn.write_bytes(b'hhid,val\n1,0.5\n')
+
+    def broken(*a, **k):
+        raise AttributeError('programmer error')
+
+    monkeypatch.setattr(pd, 'read_csv', broken)
+    with pytest.raises(AttributeError, match='programmer error'):
+        get_dataframe(str(fn))

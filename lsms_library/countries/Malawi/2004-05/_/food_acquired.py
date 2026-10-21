@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import json
 from malawi import (food_acquired_to_canonical, normalize_food_label,
-                    _extract_kg_conversion)
+                    _extract_kg_conversion, other_specify_to_unknown)
 
 wave = "2004-05"
 
@@ -41,6 +41,12 @@ df = df.set_index(['j', 'i']).replace(r'^\s*$', pd.NA, regex=True)
 # that regex's grams factor: 0.01 -> 0.001).
 for src in ('consumed', 'bought', 'produced', 'gifted'):
     df[f'cfactor_{src}'] = _extract_kg_conversion(df[f'u_{src}'])
+    # GH #1042: IHS2 Module I prints OTHER (SPECIFY) as code 20, labelled
+    # 'Other' in sec_i.dta.  This script reads no specify text (i0Xboth), and
+    # of the 892 served code-20 rows 882 have none and the other 10 name a
+    # food, not a unit ('Curry', 'Sweet Potato', ...): no unit was recorded.
+    df[f'u_{src}'] = other_specify_to_unknown(
+        df[f'u_{src}'], (df[f'u_{src}'] == 'Other').fillna(False).values)
     # Keep native quantity + native unit; food_acquired_to_canonical computes
     # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
 

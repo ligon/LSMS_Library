@@ -1,0 +1,17 @@
+REPORT.org
+summary.json
+core-32.json
+additional-16-proposals.json
+actual-posttag-pr-inventory.json
+retained-residuals.json
+already-closed.json
+static-identity.json
+commit-keyword-audit.json
+closing-keywords-48.txt
+release-pr-body.md
+scope-decisions.json
+reconcile.py
+finalize.py
+REPRO.org
+COPYLIST.txt
+MANIFEST.json

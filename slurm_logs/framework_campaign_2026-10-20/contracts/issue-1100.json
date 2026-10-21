@@ -1,0 +1,10 @@
+{
+  "body": "Residual of #698 (`fix/698-kinship-affinity`); red-team r1 verified the counts.\n\n- **Where.** GhanaLSS 2005-06 `Parent/Parentlaw` 466, 2012-13 `Parent/Parentlaw` 897, 2016-17 `Parent/Parent-In-Law` 1,094. GhanaSPS 2009-10 `Parent/Parent-in-Law` 208, 2013-14 `Parent or parent-in-law` 132, 2017-18 `Parent/Parent-in-law` 165.\n- **The defect.** Each is one survey code for parent OR parent-in-law, i.e. the \"X or X-in-law\" form the 2026-10-18 ruling covers. But `GhanaLSS/_/categorical_mapping.org` and `GhanaSPS/_/categorical_mapping.org` relabel it to the shared-vocabulary `Parent` before `_expand_kinship` runs. Kinship therefore serves `[1, 0, consanguineal]`.\n- **The fix.** Add a Ghana Preferred Label (for example `Parent/parent-in-law`) plus a `kinship.yml` key `[1, 0, null]`. Then decide the `Comparable Label`: Comparable `Parent` pools blood parents and in-laws in GLSS1/2 too, and `tests/test_finalize_order_797.py` pins Comparable `Parent` \u2192 `consanguineal`.\n- **Cost.** Both `.org` files are build inputs, so every GhanaLSS and GhanaSPS L2-country hash moves: a two-country re-warm, not a corpus one. The `kinship.yml` key alone is free.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1100,
+  "state": "OPEN",
+  "title": "Ghana: parent-or-parent-in-law code is served Parent [1, 0, consanguineal] (2,962 people) -- the #698 'X or X-in-law' form, relabelled upstream",
+  "updatedAt": "2026-10-19T18:30:33Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1100"
+}

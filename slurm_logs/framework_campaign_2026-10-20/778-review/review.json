@@ -1,0 +1,100 @@
+{
+  "additional_controls_sha256": "6427b1ba2b94b3930b2931f7498c92fb06ea30911c0d1232b5a490ff403f4b67",
+  "all_review_readers_stopped": true,
+  "base": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "cache_hashes": {
+    "build_transforms": {
+      "changed": 0,
+      "entries": 39,
+      "existing_none_entries": 0
+    },
+    "country": {
+      "changed": 0,
+      "entries": 549,
+      "existing_none_entries": 0
+    },
+    "wave": {
+      "changed": 0,
+      "entries": 2139,
+      "existing_none_entries": 30
+    }
+  },
+  "country_guidance": {
+    "Albania": "1996EWS is not a declared wave;2003/2004 are narrower panel subsamples.",
+    "Guyana": "Household(ED,SN,HH), cluster(ED,SN); ED repeats across segments.",
+    "India": "Employment(t,i,pid,act); per-day wage is not additive; Rural is workplace.",
+    "Togo": "One vague per grappe; plot_features is field/parcel grain from Data1/s16a."
+  },
+  "exception_contract": "Only FileNotFoundError from the two assumed-fresh get_dataframe calls recovers; mapping, restriction, replay, finalization and ordinary-path errors stay outside those catches.",
+  "existing_documentation_contradiction": "Guyana CONTENTS:42-44 says a warm collapse warning never fires twice; current stamped grain reports can replay. Cold category-based oracle was preserved, not waived.",
+  "findings": [
+    {
+      "kind": "evidence_consistency",
+      "locations": [
+        "slurm_logs/framework_campaign_2026-10-20/778/REPORT.org:33",
+        ".coder/ledger/778-cache-race.md:72"
+      ],
+      "priority": "P3",
+      "recorded_baseline_file_replacements": 18,
+      "reported_baseline_file_replacements": 19,
+      "requested_correction": "Use18 or explicitly identify a separate19-replacement run; no runtime change needed.",
+      "supporting_evidence": "verification.json:44 and private isolation-before.json agree on18"
+    }
+  ],
+  "identity": {
+    "countries_root": "/local/job40255479/worktrees/778-cache-race/lsms_library/countries",
+    "cwd": "/local/job40255479/worktrees/778-cache-race",
+    "data_root": "/local/job40255479/control/framework-campaign/review-778/hermetic",
+    "package": "/local/job40255479/worktrees/778-cache-race/lsms_library/__init__.py"
+  },
+  "independent_tests": {
+    "additional_controls": 14,
+    "additional_families": [
+      "real sanctioned-reader disappearance full/subset/legacy",
+      "restriction/date-replay/finalization missing dependencies propagate",
+      "three fixtures physically dereference L2 and restore after normal/error exit",
+      "cold Guyana/India fixture setup has no warm prerequisite"
+    ],
+    "candidate_failures": 0,
+    "candidate_passes_including_live": 67,
+    "candidate_skips": 0,
+    "existing_gate_controls": 48,
+    "hermetic_total": 62,
+    "old_gate_negative_control": "6 failed, 11 passed, 31 deselected in 1.51s"
+  },
+  "live_isolation": {
+    "cold": {
+      "outer_byte_changes": 0,
+      "outer_data_root_restored": true,
+      "outer_file_replacements": 0,
+      "outer_parquet_unlinks": 0,
+      "passed": 2,
+      "physical_seed_copy_checked": false,
+      "seed_files": 0,
+      "source_bytes_inodes_mtimes_unchanged": true
+    },
+    "warm": {
+      "outer_byte_changes": 0,
+      "outer_data_root_restored": true,
+      "outer_file_replacements": 0,
+      "outer_parquet_unlinks": 0,
+      "passed": 3,
+      "physical_seed_copy_checked": true,
+      "seed_files": 67,
+      "source_bytes_inodes_mtimes_unchanged": true
+    }
+  },
+  "production_or_test_defects_found": [],
+  "raw_logs_and_messages_private": true,
+  "reviewer": "Sue (independent of implementation)",
+  "runtime_commit": "2aef1c2ac",
+  "source_country_py_sha256": "7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c",
+  "target_head": "3c97f20db8ca30c18f80a6aed681c76fc0a82aa3",
+  "tracked_source_unchanged": true,
+  "unchanged_limits": [
+    "#1071 corrupt full/subset assumed-fresh policy",
+    "assumed-fresh unstamped script output serve",
+    "no partial-aggregate theory established or revived"
+  ],
+  "verdict": "PASS for production/tests; nonblocking aggregate-report count correction"
+}

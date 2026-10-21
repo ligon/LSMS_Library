@@ -1,0 +1,61 @@
+[
+  {
+    "pr": 1165,
+    "old_head": "532d58700fa46e52a0b390198604eca1dc4de00e",
+    "head": "23c1e2d52801bf206a15ec5900bca5d62e7f850f",
+    "base": "development",
+    "development_ancestor": "f50611161e9e58bf0676de5d771d4d6f07d0d8a3",
+    "worktree": "/local/job40255479/worktrees/land-1165",
+    "scope_count": 9,
+    "all_reviewed_blobs_preserved": true,
+    "github_diff_verified": true,
+    "blobs": [
+      {
+        "path": ".coder/ledger/1160-pooled-rate.md",
+        "reviewed_blob": "b19947e792ede069d820dddeed29cd8f21a9cd91",
+        "merged_blob": "b19947e792ede069d820dddeed29cd8f21a9cd91"
+      },
+      {
+        "path": "docs/guide/feature.md",
+        "reviewed_blob": "e88ae6e5fadb45ef96559493763fcafe4022ce91",
+        "merged_blob": "e88ae6e5fadb45ef96559493763fcafe4022ce91"
+      },
+      {
+        "path": "lsms_library/transformations.py",
+        "reviewed_blob": "4c49a8a0f37fbcdeb4540339f4d23b20dbd4cd41",
+        "merged_blob": "4c49a8a0f37fbcdeb4540339f4d23b20dbd4cd41"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1160/REPORT.org",
+        "reviewed_blob": "8bb744c5c2ee1b6c33a21503850fa1ee36b67c67",
+        "merged_blob": "8bb744c5c2ee1b6c33a21503850fa1ee36b67c67"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1160/negative_control.py",
+        "reviewed_blob": "d66423a965aeac905a4fe9f08b1aa1323379f5cb",
+        "merged_blob": "d66423a965aeac905a4fe9f08b1aa1323379f5cb"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1160/reproduce.py",
+        "reviewed_blob": "cbc9d2bf96f83634aa2a46807be5f46e3ef9a65b",
+        "merged_blob": "cbc9d2bf96f83634aa2a46807be5f46e3ef9a65b"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1160/run.sh",
+        "reviewed_blob": "01d1ad84df9dd694fc5d7d2f176178c522ba9167",
+        "merged_blob": "01d1ad84df9dd694fc5d7d2f176178c522ba9167"
+      },
+      {
+        "path": "slurm_logs/framework_campaign_2026-10-20/1160/verification.json",
+        "reviewed_blob": "5f6fd46717674e33f53a059540f146e818fc9e8a",
+        "merged_blob": "5f6fd46717674e33f53a059540f146e818fc9e8a"
+      },
+      {
+        "path": "tests/test_gh1160_pooled_fertilizer_rate.py",
+        "reviewed_blob": "555c55d6207cc355149e08d4db181922c62e31df",
+        "merged_blob": "555c55d6207cc355149e08d4db181922c62e31df"
+      }
+    ],
+    "at": "2026-10-21T05:03:37.401942+00:00"
+  }
+]

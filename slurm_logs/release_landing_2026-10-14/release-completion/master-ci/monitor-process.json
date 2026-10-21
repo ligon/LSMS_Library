@@ -1,0 +1,8 @@
+{
+  "pid": 151082,
+  "started_utc": "2026-10-15T15:20:48.441078+00:00",
+  "run_id": 38759333750,
+  "expected_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "detached": true,
+  "script": "/local/job39919092/release-work/control/framework/master-ci/monitor.py"
+}

@@ -1,0 +1,10 @@
+{
+  "body": "From the #569 follow-up (`fix/569-plot-registration`, plot_labor/plot_inputs registration).\n\n- Rows destroyed: Burkina_Faso 2018-19 163 of 22,877 (150 conflicting tuples); Senegal 10; CotedIvoire 1; Niger 51 / 35 / 6 / 3. Niger is tracked under #614 / #637.\n- These are replayed from the grain-audit stamp; r1 reproduced the counts.\n- Benin and Togo fixed the same class by making `harmonize_seed_crop` injective and asserting uniqueness in the wave script. Burkina_Faso, Senegal and CotedIvoire lack that fix.\n- **Tier:** B, likely under #637.\n",
+  "comments": [],
+  "labels": [],
+  "number": 1123,
+  "state": "OPEN",
+  "title": "#569 residual F: wave-level destructive collapses in EHCVM `plot_inputs` (Country path, pre-existing)",
+  "updatedAt": "2026-10-19T22:38:38Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1123"
+}

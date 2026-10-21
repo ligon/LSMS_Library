@@ -11,5 +11,7 @@
 #
 # Consumers updated: tanzania.harmonized_food_labels() now reads
 # categorical_mapping.org:harmonize_food (default args).  No data_info.yml
-# referenced this file (Tanzania food_acquired is the script path, which maps
-# item labels at the country level via CONTENTS.org:food_labels).
+# referenced this file (Tanzania food_acquired is the script path; each wave
+# script maps item labels to harmonize_food Preferred Labels through
+# tanzania.food_acquired_to_canonical).  The old country-level re-labelling
+# from CONTENTS.org:food_labels was retired with _/food_acquired.py (GH #836).

@@ -1,0 +1,36 @@
+#+TITLE: GH #867 -- NPS, D Compound and organic inputs in =_NITROGEN_CONTENT=
+#+DATE: 2026-10-19
+
+Ruling (@ligon, 2026-10-18, issue comment): NPS and Malawi D Compound get
+CITED N shares; organic inputs get a documented refusal -- unmatched and
+loud, no nominal share.
+
+* Files
+- =census_867.py= :: =nitrogen_kg= over every warm =plot_inputs= (14
+  countries) via the Country API; per-label rows, rows with a quantity,
+  matched contribution, tally, warning text.  =census_before.json= was run
+  on the clean base (=200e504a3=), =census_after.json= on the branch.
+- =organic_units.py= / =organic_units.txt= :: every organic row per
+  country: quantity present, units, kg-convertible kilograms.  The
+  evidence behind the refusal's "not free in either direction".
+- =perwave_867.py= / =perwave.txt= :: Ethiopia / Malawi per-wave totals and
+  =fertilizer_rate= before / after (the "before" is the branch map minus
+  the two new keys, which is the base map exactly).
+- =hash_probe_867.py= / =hash_diff.txt= :: the cache-cost probe.
+- =sources/SOURCES.org= :: verbatim page text, URL and SHA-256 of every
+  document cited for a share.
+
+* Result (served =nitrogen_kg=, all 14 warm =plot_inputs=)
+
+| country       | matched rows      | plots             | kg N before | kg N after |
+|---------------+-------------------+-------------------+-------------+------------|
+| Ethiopia      | 29,553 -> 34,817  | 20,563 -> 22,458  |   445,471.0 |  500,847.2 |
+| Malawi        | 53,613 -> 54,339  | 33,113 -> 33,466  |   835,011.9 |  840,235.8 |
+| 12 others     | unchanged         | unchanged         |   identical |  identical |
+
+NPS contributes 55,376.2 kg N over 5,261 plots; D Compound 5,223.9 over 523
+(4,570.9 at the WB panel's uncited 0.07).
+
+* Cache cost
+0 of 549 =Country._table_cache_hash=, 0 of 2,139 =Wave._input_hash=, 0 of
+40 =build_transforms_fingerprint= moved (=hash_diff.txt=).

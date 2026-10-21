@@ -1,0 +1,42 @@
+#+title: v0.16.0 release execution
+#+author: Sue
+#+date: 2026-10-21
+
+* Authorization and scope
+
+The maintainer explicitly instructed: "Okay, let's get 0.16.0 out".
+This authorizes release notes, the development-to-master release merge, the v0.16.0 tag, GitHub Release, automated PyPI publication and verification of the published artifacts.
+No further release confirmation is needed.
+CI enforcement/protection changes, new data acquisition and shared-cache promotion remain outside this release.
+
+* Starting state
+
+Development: =acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c=.
+Master and v0.15.0: =cb44e3522a2426ba03431ca9a218cc63fe03f6c9=.
+There are50 merged PRs in development ancestry since that tag, including documentation.
+The v0.16.0 Git tag, GitHub Release and PyPI version are absent.
+Runtime/config/tests/audit/workflow/build inputs match validated532d58700 exactly.
+Existing evidence:8851 local passes,6388 credentialed Linux passes, native Windows and development code CI39547934263 pass.
+Known19 source/wiring gaps, five tenure findings and scientific/provenance-policy residuals remain documented.
+
+* Execution gates
+
+1. Reconcile complete release notes and exact issue closures; retain partial umbrellas.
+2. Merge release-note documentation into development, then merge development into master with a MERGE COMMIT and one closing keyword per verified resolved issue.
+3. Verify final master runtime/test/build identity and run the actual Makefile release target once using a private physical L2 copy, the extracted image, explicit import/config/data identity,16 loadfile workers and numerical/build threads pinned to one.
+   Pytest must succeed before that target creates the annotated tag.
+4. Observe master-push CI, including credentialed Linux and native Windows, before publishing.
+   Build/publish from the exact tag through publish.yml; use workflow_dispatch only if the release event does not start it.
+5. Verify PyPI0.16.0, distribution digests/payloads and an installed-wheel smoke outside all checkouts.
+6. Verify release issue closures and retained open residuals, synchronize durable refs and record final handoff.
+
+* Parallel work
+
+- framework_reliability: complete since-v0.15 release-note draft and50-PR coverage map.
+- framework_contracts: independent final closure/ancestry audit and accidental closing-keyword check.
+- windows_ci: isolated full-suite release wrapper/cache copy and published-artifact verification controls.
+
+All agent source worktrees remain frozen; preparation outputs are private and separate.
+Root owns every merge, tag and publication action.
+
+Sue

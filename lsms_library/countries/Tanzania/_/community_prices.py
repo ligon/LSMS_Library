@@ -2,8 +2,9 @@
 (parity-loop GAP C -- OURS-ONLY; maintainer priority).
 
 Each buildable wave's ``Tanzania/<wave>/_/community_prices.py`` produces a
-parquet at grain (t, v, j, u) with the single reported column Price (the
-village-market unit price).  This script concatenates the per-wave parquets.
+parquet at grain (t, v, j, u, variety) (GH #840: variety = the source
+community-price item code) with the reported column Price (the village-market
+unit price) and the questionnaire's item label, Description.  This script concatenates the per-wave parquets.
 
 There is NO id_walk here: the grain carries no household ``i`` (community
 prices are a cluster-level instrument), and ``v`` is the community
@@ -39,6 +40,6 @@ for t in WAVES:
 assert pieces, "community_prices: no wave-level parquets found"
 
 p = pd.concat(pieces)
-assert p.index.is_unique, "community_prices: (t,v,j,u) not unique after concat"
+assert p.index.is_unique, "community_prices: (t,v,j,u,variety) not unique after concat"
 
 to_parquet(p, '../var/community_prices.parquet')

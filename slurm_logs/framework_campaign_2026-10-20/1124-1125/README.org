@@ -1,0 +1,68 @@
+#+title: Feature audit participation and warm farm checks
+#+author: Sue
+#+date: 2026-10-20
+
+* Result
+
+The baseline audit now names each positive-row country omitted from =Feature()=, separately from row collapse within countries that remain.
+The canonical sweep includes =crop_production=, =plot_labor= and =plot_inputs=.
+Crop warm tests reuse the existing hash-checked assembly helper, fail named country read errors, compare exact expected participation, and match =Feature='s default =currency='index'= representation.
+No production library, schema, country config or cache machinery changes.
+
+Synthetic controls distinguish A's two retained rows from B's seven omitted rows, separate a retained additive collapse, handle empty and zero-row countries, retain legitimate kwarg degradation, and flag a malformed nonempty frame missing its required country axis without guessing attribution.
+The new tests fail on the base: eight failed, 75 passed, three warm checks deselected.
+Initial corrected synthetic validation passed all 83 tests.
+The combined targeted/live run passed 91 tests and all three actual warm checks, with one test-fixture error from pandas 3 rejecting a positional =rename_axis= dictionary.
+After naming the index keyword explicitly, all 13 focused scanner/alias controls passed.
+Independent review passed 88 synthetic checks, all three live warm checks on a separate physical cache copy, and six additional probes using production =Feature=; it found the same isolated fixture error before that repair.
+
+* Documented EthiopiaRHS contract
+
+The initial strict warm crop check exposed an existing documented exclusion: EthiopiaRHS builds 17,523 rows at =(t, i, j, u)=, with =Quantity= and =Area_ha=, and no plot grain.
+The cross-country skill section 2 and =.coder/ledger/feature-canonical-crop-production.md:113= deliberately keep this coarse table outside the plot-grain assembly.
+The scanner continues to emit its separate Class B =country_exclusion= warning for all 17,523 rows; no finding is suppressed.
+
+The warm acceptance test expects this one exclusion only while the actual EthiopiaRHS frame carries neither =plot= nor =plot_id= in its index or columns.
+It still reads EthiopiaRHS and fails a named read error.
+As soon as either plot spelling appears, participation is required.
+Additional synthetic controls prove that another excluded country still fails, plot-index/alias/column versions of EthiopiaRHS must participate, and an EthiopiaRHS read failure remains fatal.
+There is no row-count constant, production exemption or blanket expected-failure marker.
+
+* Private warm farm audit
+
+The frozen bundle at =/global/scratch/fsa/fc_jevons/ligon/cache/.rewarm-bundle-94624fd6f/data= was copied physically to =/local/job40255479/1124-farm-corpus=.
+All 1,519 parquets were ordinary files with link count one; only L1 =dvc-cache= is symlinked to shared storage.
+Default hash-checked reads rebuilt outdated private copies as needed.
+Code/config import identity was asserted, and the processes were confined to CPUs 8--15 with BLAS threads and =LSMS_BUILD_WORKERS= set to one.
+
+The three-feature phase-1 audit visited 16 crop countries, 15 labor countries and 14 input countries.
+It emitted 344 warning records: 29 Class B and 315 Class C, with no error or failure records.
+The only new country-exclusion finding is the documented EthiopiaRHS crop case; no retained-country row-conservation finding appeared in these three tables.
+=audit-summary.json= retains aggregates; full findings and logs remain private because diagnostic warnings can contain identifiers.
+
+Country documentation was read before data: Tanzania's live WAITING #114 back-casts split-offs into earlier waves; Nigeria has distinct PP/PH rounds; Ethiopia's field joins need =holder_id=; Malawi's sale unit and condition differ from harvest; Niger's split-offs require =EXTENSION=; Togo agriculture is under =Data1=; Mali's crop unit is a column; Guinea-Bissau's parcel key combines field and parcel.
+Previously read Benin, CotedIvoire, Senegal, Uganda and GhanaLSS notes supplied their remaining country conventions.
+The dated Malawi note predicting pre-registration exclusion is historical evidence, not a reason to remove its deliberately retained condition axis.
+No new country-level defect was inferred or curated here.
+
+* Cache guard and reproduction
+
+Against exact base =976fc840d=, all 549 country hashes, 2,139 wave hashes and 39 tagged build fingerprints are unchanged, with no hash-probe errors.
+The hash probe reused =slurm_logs/framework_campaign_2026-10-20/1143/hash_reach.py= from commit =9409219a1=; the exact-base result is private at =/local/job40255479/1143-private/hash-before.json= and this branch's result at =/local/job40255479/1124-hashes.json=.
+The unchanged production tree can also be checked directly with =git diff 976fc840d -- lsms_library=.
+
+Run from this checkout with its image environment active:
+
+#+begin_example
+export PYTHONPATH="$PWD"
+export LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_DATA_DIR=/local/job40255479/1124-farm-corpus
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+python -m pytest -q tests/test_feature_audit_participation.py \
+  tests/test_feature_canonical_index.py
+python bench/feature_audit/scan.py \
+  --features crop_production plot_labor plot_inputs --phases 1 --jobs 3 \
+  --out /tmp/farm-feature-audit.jsonl
+#+end_example
+
+Use a separate physical cache copy for independent validation; API reads can rebuild stale parquets.

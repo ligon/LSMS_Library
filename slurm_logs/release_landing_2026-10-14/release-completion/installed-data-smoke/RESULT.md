@@ -1,0 +1,11 @@
+SCOPE DEVIATIONS
+
+None. The coordinator-approved installed data smoke passed using only the prepared independent Uganda cache copy. No original-corpus, final-promotion or shared L2 API calls or writes occurred. This is an ordinary warm-data check, not a cold build or credentialed-access claim.
+
+Installed release: LSMS_Library 0.15.0, tag commit cb44e3522a2426ba03431ca9a218cc63fe03f6c9, actual public PyPI wheel SHA-256 a19b458f2d2fce0bb67c192338ffb02fb745f78af3ba77b0d5db1c3395c0f9f0. All 11,751 installed package members match the verified downloaded wheel, whose complete package inventory/content matches the tag. Code and country configuration resolve inside published-install-env, outside every checkout.
+
+One ordinary Country('Uganda', preload_panel_ids=False).assets() call completed in 0.643 seconds with zero warnings. The served result exactly matches the previously recorded corpus fingerprint: 116,808 rows, one float64 Value column, index (i,t,j), hash ef853b421deca593f6e5286a7925317689561515a48bb629234f94202ebdf714. All eight per-wave row counts match, including 9,491 in 2019-20 and 9,227 in 2018-19. The recorded 4,237 duplicate keys after label mapping also match; this does not confuse the served frame with the unique raw asset keys.
+
+Before the API call, the country cache hash matched the reviewed final-source expectation and its footer covered all eight waves. All 172 prepared-copy parquet SHA-256/size/mtime/device/inode identities remained exactly unchanged. The installed package contents and filesystem identities stayed unchanged apart from permitted Python bytecode. The empty private configuration remains empty. Environment credentials and source/config overrides were scrubbed; only the prepared private L2 and existing immutable L1 were available. No cache bypass was used.
+
+The prior REVIEW.md/review.json document the preparation and then-pending execution; this RESULT.md and result.json record the subsequently authorized successful execution. Raw run.log stays private, with only its hash and size included in provenance.json. The separate wheel-container review qualifies the no-Git sdist rebuild as identical in member contents, not compressed archive bytes.

@@ -1,0 +1,96 @@
+{
+  "actual_CI_blas_kernel_logged": false,
+  "actual_checkout_shas": [
+    "532d58700fa46e52a0b390198604eca1dc4de00e"
+  ],
+  "all_skip_reasons_enumerated": false,
+  "analyzed_at": "2026-10-21T04:16:34.786044+00:00",
+  "changed_test_assets_since_852": [
+    "M\ttests/fixtures/uganda_baseline.json",
+    "M\ttests/test_gh1040_wave_read_gates.py",
+    "M\ttests/test_gh1093_declared_unit_consumers.py",
+    "A\ttests/test_gh1159_pooled_reducers.py",
+    "A\ttests/test_gh1160_pooled_fertilizer_rate.py",
+    "M\ttests/test_gh866_stale_country_parquet_not_laundered.py",
+    "M\ttests/test_guyana_index_uniqueness.py",
+    "M\ttests/test_india_employment_activity_index.py",
+    "M\ttests/test_uganda_invariance.py",
+    "A\ttests/test_uganda_invariance_hash_variants.py",
+    "M\ttests/test_wave_provenance.py"
+  ],
+  "collected_delta_vs_852": 280,
+  "collected_items": [
+    9137
+  ],
+  "credential_evidence_limit": "Console does not enumerate all skip reasons. Gate success and absence of credential-skip warnings are observed; do not represent the entire skip population as individually adjudicated.",
+  "credential_gate_passed": true,
+  "credential_skip_evidence_counts": {
+    "NoCredentialsError": 0,
+    "PartialCredentialsError": 0,
+    "Skipped: no S3 credentials": 0,
+    "UnmarkedS3TestWarning": 0,
+    "needs S3 credentials to build country data": 0,
+    "reached a credential-less skip at RUN time": 0
+  },
+  "delta_vs_previous_852": {
+    "failed": -1,
+    "passed": 281,
+    "skipped": 0,
+    "xfailed": 0,
+    "xpassed": 0
+  },
+  "event": "workflow_dispatch",
+  "failed_nodeids": [],
+  "full_suite_step_conclusion": "success",
+  "job_conclusion": "success",
+  "job_id": 119005820593,
+  "log_fetch_saved_once": true,
+  "nutrition_case": {
+    "actually_executed_and_passed": true,
+    "basis": "Serial pytest terminal status markers mapped to sorted _parquet_ids; fingerprint fixture keys unchanged; no collection-reordering hook in pinned source.",
+    "manifest_case_count": 53,
+    "ordered_terminal_group_count": 1,
+    "skipped": false,
+    "sorted_case_position_zero_based": 49,
+    "terminal_marker": "."
+  },
+  "nutrition_kernel_cause_scope": "Exact local controlled counterfactual; no direct observation of CI hardware kernel.",
+  "previous_852": {
+    "collected": 8857,
+    "failed": 1,
+    "passed": 6107,
+    "skipped": 2744,
+    "xfailed": 4,
+    "xpassed": 1
+  },
+  "private_log_bytes": 572349,
+  "private_log_sha256": "433f75da9a8442a7ff43ad17670c83af80d4c71ed8235dfc7ae57aacc7dfc585",
+  "pytest_seconds": 5484.84,
+  "pytest_totals": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 6388,
+    "skipped": 2744,
+    "warnings": 1219,
+    "xfailed": 4,
+    "xpassed": 1
+  },
+  "rate_regression": {
+    "all_87_actually_executed_and_passed": true,
+    "basis": "Unique serial pytest file terminal group; static literal-parametrize case count 87 and collected/passed delta 87 independently agree",
+    "expected_case_count": 87,
+    "nonpass_marker_count": 0,
+    "observed_group_lengths": [
+      87
+    ],
+    "ordered_terminal_group_count": 1,
+    "pass_marker_count": 87,
+    "test_module": "tests/test_gh1160_pooled_fertilizer_rate.py"
+  },
+  "raw_log_never_printed": true,
+  "run_conclusion_at_fetch": "success",
+  "run_head": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "run_id": 39533863014,
+  "run_status_at_fetch": "completed",
+  "uganda_build_passed": true
+}

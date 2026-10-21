@@ -1,0 +1,20 @@
+== full_base -> full_head
+btf: 10 of 10 moved
+tch: 538 of 538 moved
+wih: 494 of 494 moved
+== full_head -> full_f1
+btf: 0 of 10 moved
+tch: 23 of 538 moved
+wih: 5 of 494 moved
+== full_f1 -> full_f2
+btf: 10 of 10 moved
+tch: 538 of 538 moved
+wih: 494 of 494 moved
+== full_f2 -> full_noop
+btf: 0 of 10 moved
+tch: 0 of 538 moved
+wih: 0 of 494 moved
+== full_base -> full_f2
+btf: 10 of 10 moved
+tch: 538 of 538 moved
+wih: 494 of 494 moved

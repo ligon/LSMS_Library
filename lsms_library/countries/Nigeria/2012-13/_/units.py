@@ -13,7 +13,9 @@ with open('../../_/food_items.json') as f:
 unitcodes = {1:'Kg',
              2:'g',
              3:'l',
-             4:'ml',
+             # W2 code 4 is centilitre: both W2 .dta files label it
+             # 'centilitre (cl)' (GH #607; categorical_mapping.org u table).
+             4:'cl',
              5:'mudu',
              6:'olodo',
              7:'congo',
@@ -72,7 +74,7 @@ conv = conv.stack('m')
 conv = conv.unstack('u')
 conv['Kg'] = 1000
 conv['g'] = 1
-conv['ml'] = 1
+conv['cl'] = 10  # code 4 is cl (GH #607), i.e. 10 ml
 conv['l'] = 1000
 
 conv=conv.stack('u')

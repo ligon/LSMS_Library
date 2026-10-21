@@ -90,9 +90,10 @@ def _read_raw_sample_weights(country_name: str):
     materialized.
     """
     path = data_root(country_name) / "var" / "sample.parquet"
-    if not path.exists():
+    try:  # the read is the check; a concurrent rebuild may delete it (GH #778)
+        raw = pd.read_parquet(path)
+    except FileNotFoundError:
         return None
-    raw = pd.read_parquet(path)
     if "weight" not in raw.columns:
         return None
     if "t" in (raw.index.names or []):

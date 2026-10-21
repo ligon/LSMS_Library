@@ -1,0 +1,16 @@
+{
+  "issue": 1160,
+  "url": "https://github.com/ligon/LSMS_Library/issues/1160",
+  "title": "fertilizer_rate silently merges countries with colliding plot IDs in numerator and area",
+  "implementation_authorized": false,
+  "dedup_related": [
+    1110,
+    867,
+    637,
+    1159
+  ],
+  "independently_reproduced_at": [
+    "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+    "45f80dcb50da189b7864034b1d92863dca68de09"
+  ]
+}

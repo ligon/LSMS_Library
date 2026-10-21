@@ -1,6 +1,331 @@
-#+title: Handoff -- 2026-10-14 release landing IN PROGRESS
+#+title: Handoff -- v0.16.0 release, 2026-10-21
 
-* Current execution -- 2026-10-15 final implementation validation
+* Release authorized and preparation in progress -- 2026-10-21
+
+The maintainer instructed "Okay, let's get 0.16.0 out".
+Release documentation, development-to-master merge, annotated tag, GitHub Release, automated PyPI publication and verification are authorized; do not request confirmation again.
+No CI protection, acquisition, shared-cache promotion or scientific-policy change is included.
+
+Release preparation starts from development =acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c=; master and v0.15.0 resolve to =cb44e3522a2426ba03431ca9a218cc63fe03f6c9=.
+All 50 merged PRs since that tag are mapped in =slurm_logs/release_v0.16.0_2026-10-21/notes/=.
+Complete user notes are =docs/releases/v0.16.0.md= and =docs/migration/v0.16.0.md=.
+The strict API/skill audit passed.
+The final source/test/maintainer-ruling audit accepts 48 issue closures; use the separate-keyword list in =slurm_logs/release_v0.16.0_2026-10-21/closure/closing-keywords-48.txt=.
+The 77 referenced residual scopes remain OPEN, including 778/932/1044/1045/1066/1110/1149; no issue is closed by preparation.
+
+Root owns release merges, tag and publication.
+Merge development to master with a MERGE COMMIT and one closing keyword per independently verified issue; retain partial umbrellas.
+Run the actual Makefile release target in a frozen final-master checkout with the prepared private 1,519-file cache seed, extracted image, explicit checkout/config/data identity and 16 loadfile workers.
+The reviewed adapter waits for both the local full suite and the exact automatic master-push CI before returning zero, so make creates no tag on a failed gate.
+Controllers and safe aggregate preparation evidence are in =slurm_logs/release_v0.16.0_2026-10-21/verification-prep/=; full per-file cache manifest and raw outcomes remain private in =/local/job40255479/control/release-v016/=.
+
+No v0.16.0 tag or publication existed at the preparation checkpoint.
+After gates pass, push the annotated tag to origin and GitHub, publish the GitHub Release, observe publish.yml, then verify exact PyPI archives/digests/package payloads and an offline installed-configuration smoke.
+Record actual final SHAs, CI run and publication results before concluding.
+
+Sue
+
+
+* Completed authorized framework campaign landing -- 2026-10-20
+
+All nine implementation PRs (#1154--#1157 and #1161--#1165), plus evidence PR #1158, merged with explicit maintainer authorization.
+Implementation commit: =1933434b84de82ac72b3921a7fd8fe5c00154754=.
+Evidence merge: =db00a79f17f841649f2b96827c5b9b4e858ce2f8=.
+Later documentation commits may advance development; query its current GitHub ref instead of treating the implementation pin as live status.
+
+Runtime, configuration, tests, scripts, audit, workflows, build and dependency files exactly match validated candidate =532d58700fa46e52a0b390198604eca1dc4de00e=.
+All 14,437 candidate paths retain their mode/type/blob; only four historical PR1157 review reports were added to the implementation tree.
+Independent static review passed; original worker/integration refs remain frozen.
+Reports: =slurm_logs/framework_campaign_2026-10-20/landing/= and =landing-independent/=.
+
+Validation is complete: 8,851 local passes and 6,388 credentialed Linux passes, including nutrition and all 87 new rate cases.
+Code-push CI =39547934263= at193 passed unit, Windows smoke, native Windows and DVC reachability.
+The native log proves checkout193: shocks14,457x10/eight waves/digest0ab2ea4c79dd; assets116,808x1/eight waves/digest9202ed542a14.
+Evidence PR1158 also passed its fresh unit/Windows checks; its326 changed paths contain only reports and the handoff.
+Report-only development pushes match the existing workflow's paths-ignore: no separate post-evidence push run is expected.
+The earlier prediction of another push run was wrong and is corrected in landing/REPORT.org.
+The durable PR1158 description records the completed live source/CI outcome.
+
+All32 scoped closure candidates are implemented pending an authorized master release merge.
+#778 retains its trust-mode question; #932 enforcement stays open.
+Only existing status headers for778/1159/1160 were updated; no issue was closed.
+The19 known source/wiring gaps, five tenure findings, #1110 science/land-grain policy and #1149 staging remain explicit.
+
+Next release work: reconcile complete notes sincev0.15.0, prepare the development-to-master release PR with one closing keyword per verified issue, then obtain the release instruction.
+No release/tag, protection change or shared-cache promotion is authorized by this batch.
+Main checkout may remain on the completion-docs branch; =/local/job40255479/worktrees/development-sync= holds development.
+GitHub/local/tracking/filesystem-origin development were verified atdb00; verify the later notes-only tip when resuming.
+All heavy work is done. The node remains billed; suggest =sucoder release= when pausing.
+
+* Earlier active landing -- maintainer authorized the batch, 2026-10-20 21:52 PDT
+
+Human explicitly said yes/go to merging1154--57+1161--65 and evidence1158 into development in dependency order. No repeat permission needed for that batch.
+Merged1161ac6de755e,1154047d1ff51,1155f46dc011f,1156064a7fb46,115709a413ab4; live/source/origin development09a413ab4.
+Retargeted/ready1162head dffb07604,1163head124c2436d,1164head d124c0df7 aftermergingdevelopmentintoisolatedpublicationworktreesland-{1162,1163,1164}.
+All11/39/12reviewedtaskblobsandGitHubfocuseddiffsverifiedunchanged;newunit/WindowsPRchecksrunningparallel.
+No sourceworker/ref mutations; original532 candidate frozen.
+Landingcontrollers/journalprivate control/framework-campaign/landing/; update_publications.py reproducibleandpublication-updates.json capturesheads/blobs.
+FirstAPImerge attemptwithcoder@sucoder.dev rejectedbeforeanymerge; retriedusingauthenticatedGitHubidentity+GPT-6trailer.
+Firstpublicationhelperstoppedaftercommitbecausehooksuccesslinearrivesstderr; independentlyverifiedoriginrefdffbpublished/resumedwithoutrecommit. No productionfailure orlostwork.
+Nextwait1162--64latestchecks,mergeexactheads,fetch/syncdevelopment;updateretarget1165fromlatestdev,verifyall9blobsunchanged,waitchecks/merge.
+Thenverifyallruntime/test/build/auditbytesagainst532,updatedocs1158fromdev/reportlanding+handoff,mergeauthorizedevidencePRandwatchfinaldevelopmentCI. Onlythenfinish.
+No release/tag/protection/cachepromotionauthorization; don'tclose32releasecandidatesbeforeauthorizedmasterrelease.
+
+* Earlier final validation checkpoint -- 2026-10-20 21:18 PDT
+
+Final frozen532 run39533863014 SUCCESS at exactactualcheckout; unit/smoke/native/dataallPASS.
+Data119005820593:6388passed2744skipped4xfail1xpass1219warnings5484.84s,9137collected,zero failures/errors.
+Nutritionuniquepassmarker49/53;all87ratecasesuniqueall-dotgroup;parentverifiedrawlogSHA433f75da9a8442a7ff43ad17670c83af80d4c71ed8235dfc7ae57aacc7dfc585.
+Credentialgate/UgabuildPASS/all6runtimecredentialindicatorcounts0;allremoteskipreasonsnotenumerated/kernelunobserved.
+Old4cabalsoPASS6301/2744/4/1;finaladds87passes/collectedandnoothersummarydelta.
+Alllocalimplementation/review/validation/packaging/releaseprepCOMPLETE;source532immutableandallwritersstopped.
+CurrentpublicreportsSTATUS.org/rate-validation/ci-final-532/release-closure/release-drafts.
+Closure32conditionalafterlanding+authorizedmasterrelease;778partial/932enforcementOPEN. Noissuesclosed.
+AllninefixPRbodies+evidenceupdated/readbackverified;markingready1161+1158;1162--65remainstackeddraftuntilretargetafterprerequisites.
+Noadditionalmerge/releaseauthorizationhasarrived. NextaskONEbatchmergeoverridefor1154--57,1161--65andevidence1158;quote/linkbacklogskillrule88.
+Afterapproval:1161then1154--57;mergedevintoseparatepublicationbranches/retarget1162--64;checkbyteequivalenceandchecks/merge;repeat1165;finalmergedruntimebytesmustmatch532,observeactualdevpushCI.
+Nevermergeintointegrationcomparisonbases/forcepush/mutatefrozenworkerheads. EvidencePRlastifincludedapproval.
+Noextrafullsuiteifruntime/test/build/auditbytesidentical;release/tag/protection/cachepromotionstillseparate.
+Allnodeheavyworkdone;allocationbilled/idle, suggest sucoder release whenpausingafterreportsdurable.
+
+* Earlier remote checkpoint -- 2026-10-20 20:46 PDT
+
+Main docs branch unchanged; final source532 immutable.
+Earlier exact4cab remote run39531148624 COMPLETED SUCCESS:6301passed2744skipped4xfail1xpass1219warnings5048.88s,9050collected.
+Actualcheckout verified; nutritioncase executesPASS(marker. at49/53); credentialgate/UgabuildPASS, credentialindicatorcounts0; allremote skipreasonsnotenumerated.
+Public aggregate/controller export=ci-followup-4cab/, distinctfrompending532.
+Final532run39533863014/data119005820593 remainsrunning; unit/smoke/nativePASS, gate/buildPASS.
+contracts owns read-only45sobserver39231; keepallsourcefrozen/noresubmission.
+Draftrelease/migrationnotes exportedrelease-drafts/ (scopeapprovedincrementonly, Linuxpendingtimestamp; fourmanifestsourcepathscorrectedbyparent).
+reliabilityfinalreleaseclosureaudit pending;23post-v0.15alreadylanded+9approvedfixissuecandidates=32potentialafterlanding,778partialstaysopen. Verifyfinalreportbeforeclaim.
+Noadditionalmerge/release/protectionauthorization; nextfinish532CI/evidence, thenonebatchmergeoverridequestionwithskillquote.
+
+* Earlier active checkpoint -- 2026-10-20 19:52 PDT
+
+Sue/GPT-6, job40255479 on n0071.savio3,32cores93GiB,>2d20h left.
+Main docs branch=docs/framework-campaign-20261020, previouspublishedc30f8aa47; newfinal artifacts are being checkpointed now.
+Draft evidencePR1158; STATUS.org owns live state.
+
+Windows1153 alone is human-authorized/merged atdevelopmentad1e87e1025dec98fe70734f4e60d12824fd31dd (liveGitHubref independently checked19:44).
+Open original reviewed implementationPRs1154--57 cover1093/1099/1143/1124+1125.
+Open newdrafts1161nutritiondirectdev6553e01d6,1162cachef7eb,1163provenance44f6,1164pooled45f80,1165rate532d58700.
+1162--64base852integration;1165base4cab integration forclean diffs.
+AfterearlierPRsland,mergedevelopmentintopublicationbranches thenretarget; nevermergeintocomparisonbases/forcepush/sourceworkerbranches.
+All79publishedblobs1161--64and9blobs1165matchreviewedcommits.
+Noadditionalmerge/release/tag/protection/cachepromotionauthorization.
+
+LATEST FROZEN SOURCE=532d58700fa46e52a0b390198604eca1dc4de00e, allapproved fixes including1160.
+Worker1160-pooled-rate and separateintegrationworktreeframework-rate pointatthatHEAD, clean/immutable/publishedorigin+GitHubintegration/framework-rate-40255479.
+Runtime1160=5125d0faa; producer347pass/2explicitNigeria cache skips,baseline80fail7pass87controls;firstcandidate85pass2emptyparcel fails preserved/fixedcountry-only.
+IndependentreviewPASS387cases(347existing+40reviewer)/2skip/15S3deselect;12old-mathintentionalfailures;liveMalawi/Uganda4modesexactpooled/separate/reverse/column,8ordinaryoldfunctioncalls exact.
+0hashmoves549/2139/39;existing#1110Malawi33402plot/11622parcel contradictsoldno-opdocstring,documentedCONTENTS;Uganda0/509 inherited;notchangedby1160.
+Allproducer/reviewer/processesSTOPPED;14independentexportfilesverifiedmanifestdad6f823...copy1160-review/.
+
+LATEST FULL SUITE COMPLETE/session35359 exited0:8851passed276skipped9xfail1xpass1222warnings736.35s,0fail/error/credentialskips.
+All16workers/sourcechecksPASS,noin-treecountryparquet.
+Newphysicalrate-suite-data1519files341221428bytes,copyfromquiescentfarmrootwhosebytesmatchimmutable852;onlyL1linked.
+All87newcasesPASS;0removed/0existingoutcomeorreasondeltas vs4cab9050cases;directPakistanXPASSidenticalbothsides.
+Evidence/reprocontrollersrate-validation/;rawlogs/XML/eventsprivatecontrol/framework-campaign/rate-validation/suite-532d58700/.
+LatestpackagingPASS532:wheel/sdist0.15.0.post396.dev0+532d58700all11753packagefilesbyteexact,installedconfigsmoke/network+buildforbiddenPASS,cleanworktree/allprocessesstopped.
+Copied7rate-packagingartifacts;untypeddevversion/existingdeps/noinstalledmicrodatabuild/checkouttestsnotpackaged/uploadnotvalidatedlimits retained.
+
+ONLY REMOTE CREDENTIALED LINUX REMAINS.
+contractsobservesTWOdistinctmanualruns:39531148624exact4cabdatajob118997075291;39533863014exact532datajob119005820593.
+Bothunit/smoke/native/credentialgate/UgabuildPASS;bothdatafullsuitesRUNNING (532started~19:44).
+Native532job119005820748 verifiedshocks14457x10/8waves0ab2ea4c79dd/assets116808x1/8waves9202ed542a14,rawlogprivate rate-validation/windows-native.log.
+Rootoldwatchsession40278 alsoobserves4cab;contractsread-only45spollsandwillcapturefinaljoblogs/aggregatesincontrol/framework-campaign/followup-ci-review/{rate-532,earliercontrol}/.
+DoNOTcancel/redispatch/updatefrozenheads; keepfailed852run39519191762andoriginalcoldcorpuscontrols unchanged.
+
+Next:collectremoteLinuxresults,actualnutritioncaseexecutionandcredential-skiplimits;recordalloutcomes;finalizePRbodies/evidence/markreadywhenrealgatespass.
+ThenaskhumanbatchmergeoverrideforconcretereadyPRs underbacklog-workflow ('PRs for human merge -- never auto-merge');only1153overrideexists.
+AllnineimplementationPRbodiesupdatedwith532localPASSandlatestCIpending;new1165issueheaderrecordsretentionruling/pendingPR;778remainsAddresses/openfortrustnote.
+No moreimplementationtasks authorized/pending;1160isdone/reviewed.
+Node nowmostlyidlewhileexternalCIruns;afterfinalreports/decisions suggest sucoder release.
+
+Useextractedpython/local/job40255479/venv_img/bin/python,threads/build/make1,exactcwd/PYTHONPATH/config/privateLSMS_DATA_DIR.
+Nevereditdurablemirrorworkingtree orsharewritableL2; originalcorpusrootsimmutable.
+CommitwithSue/GPT-6attributionandcheckSUCODERpublished;GitHubpushusesexplicitURL,originisfilesystemmailbox.
+
+* Earlier campaign checkpoints -- 2026-10-20, Sue / GPT-6, job 40255479, n0071.savio3
+
+Windows PR #1153 is merged with explicit maintainer authorization at =ad1e87e1025dec98fe70734f4e60d12824fd31dd=.
+GitHub and filesystem-origin development are synchronized there through the clean =development-sync= worktree.
+Development push CI =39522182800= and the complete Windows-branch manual run =39515878586= both passed, including native Windows.
+The manual run also passed credentialed Linux data tests.
+
+Approved issues #1093, #1099, #1143, #1124 and #1125 are independently reviewed and in open PRs #1154--#1157.
+No merge authorization for those PRs has arrived.
+Frozen combined source =852ac2bfcd5f798533f56e7efa1f77db80c0138f= is published on GitHub/origin branch =integration/framework-v016-40255479=.
+Do not move that branch or edit its source while the remaining validators run.
+The main checkout is =docs/framework-campaign-20261020=, draft evidence PR #1158, and is safe for documentation updates.
+
+The combined full suite passed: 8,562 passed, 285 skipped, nine expected failures, one non-strict unexpected pass, zero failures/errors or credential skips, in 1,158.04 seconds.
+Independent reconciliation accounts for every skip difference; eight newly skipped Uganda wave-invariance cases passed separately after sanctioned API population in a new physical cache.
+All three farm warm checks passed.
+Exact unexpected-pass identity and the exact concurrent wave-file remover are not proved.
+
+Both exact 976/852 cold corpora completed all 549 requests: 530 successes and the same 19 normalized full error messages.
+Six intended food quantity/price tables change.
+Four roster hashes differ only by row order in paired cache and warm-API comparisons; Benin seeds 1/3 reproduce both original fingerprints on unchanged baseline.
+There are no schema, row-count, wave-count, null-count, cache-metadata or warning-category count deltas.
+A separate fresh fixed-seed Mali cold/warm supplement matches both sources exactly in original order, while preserving the inherited MonthsSpent cold-object/warm-string difference.
+Reports and runnable scripts are committed under =slurm_logs/framework_campaign_2026-10-20/=.
+
+Remaining validators:
+
+- Exact-head GitHub run =39519191762= completed FAILURE: one Uganda rawnutrition fingerprint failure,6107passes/2744skips/4xfail/1xpass in5374.11s; credential gate passed, unit/smoke/native Windows passed.
+- Paired 16-feature canonical audits, phases 1/2, run under =/local/job40255479/canonical-audit-compare/=.
+  Agent =windows_ci= owns them, with three workers per audit on CPUs 0--3 / 4--7, private physical caches and shared L1 only.
+  Both scans and all warning classification have completed; six Peru errors, five tenure failures and thirteen source skips remain identical.
+  All8,731 warning additions are accounted for; framework_reliability independently accepted both interview and remaining633 classifications with explicit limits.
+  Aggregate evidence and28 verified artifact hashes are copied into1124-1125/canonical/.
+  Do not restart the validators or mutate their preserved cache/source evidence.
+
+Full-suite exec 30937 and corpus execs 19447/23742 have finished.
+Raw evidence remains private under =control/framework-campaign/= and =corpus-{baseline,combined}-out= in this job's local root.
+
+Use =/local/job40255479/venv_img/bin/python= directly: the squashfs image was extracted after FUSE failed; never use the writable master environment.
+Always assert the exact PYTHONPATH, countries root, cwd and private LSMS_DATA_DIR; pin BLAS/build workers to one.
+Never edit the shared mirror's working tree.
+Original corpus roots are immutable; every replay uses a new physical copy.
+
+New independently verified issue #1159 tracks pooled seed/nitrogen reducers dropping country identity and summing colliding local plot IDs on both sources.
+The maintainer subsequently chose COUNTRY-PRESERVING pooled results and authorized delegation of the next pass; implementation is now assigned in a separate worktree.
+The #932 protection proposal remains unapplied; this personal-account repository cannot use the assumed organization merge queue.
+Requiring genuine PR-event data checks needs separate permission.
+#851 has substantial existing unlanded work; do not reimplement it.
+No release was requested or attempted.
+
+Next: finish paired audits and exact-head GitHub data CI; classify every delta; commit aggregate evidence; finalize STATUS/handoff; update PR validation bodies and ready evidence PR #1158.
+Implementation PRs #1154--#1157 remain for human merge under backlog-workflow unless the maintainer overrides that rule.
+Release/tag/publish, protection changes and shared-cache promotion are outside the authorized work.
+
+Campaign details: [[file:../slurm_logs/framework_campaign_2026-10-20/STATUS.org][STATUS.org]].
+Older checkpoints below are historical.
+
+** Newly authorized parallel follow-up
+
+The maintainer asked to delegate the next work now and ruled #1159: retain country in pooled results.
+All three worktrees are based on unchanged852; original integration stays frozen.
+
+- framework_reliability: =/local/job40255479/worktrees/778-cache-race=, branch =fix/778-cache-race-40255479=, CPUs8--11; implement remaining #778 only, preserving corruption policy.
+- framework_contracts: =/local/job40255479/worktrees/1115-1128-provenance=, branch =fix/1115-1128-provenance-40255479=, CPUs12--15; reuse existing unlanded613611578 and apply all newest rulings, code-only without live catalog/acquisition writes.
+- windows_ci: =/local/job40255479/worktrees/1159-pooled-reducers=, branch =review/1159-pooled-reducers-40255479=, CPUs16--19; implement country-preserving seed/nitrogen reduction identity, no unrelated scientific changes.
+
+Each uses the extracted interpreter, exact import/config identity, private writable L2, numerical/build threads one and <=4 loadfile pytest workers.
+They commit with attribution and verify origin publication; no GitHub push/PR/merge until parent coordinates independent review and dependencies.
+Next: finish original candidate CI/evidence, review and validate each new increment, then integrate/test the follow-up candidate. No release or protection changes.
+
+Follow-up checkpoint: #1159 frozen45f80dcb5/runtime da84c7c79 independently passes260 focused plus16 added controls. #778 frozenf7eb194d7/runtime2aef1c2ac independently passes67 controls; doc-only replacement count is corrected18. Reviewed increments are merged into new integration/framework-followup-40255479 at2ff4bc737, original852 unchanged.
+Provenance runtime519437658 is frozen for immutable-commit static review by framework_reliability; final ledger/evidence HEAD is still being prepared. Completed344 related +23 policy tests, API audit,130 SOURCE unchanged, zero549/2139/40 table-plus-aggregate hashes. Optional broad matrix interrupted exit2 after45 tests, two private wave parquets only, child group stopped; not a passed check. Wait for final HEAD/full stop before verifier execution.
+windows_ci is preparing combined follow-up validation and waiting for parent's final frozen integration pin. Prepared physical L2 root/followup-suite-data has1519 equal-hash/distinct-inode files from immutable852 corpus; source unchanged. Full suite planned16loadfile workers, CPUs0--7/20--31, BLAS/build/make1,600s thread timeout, exact same-process import/config/data assertions, logfile/XML. No execution yet.
+New inherited fertilizer_rate pooling residual is filed as #1160 with independent old/new synthetic proof; no implementation authorized.
+Original exact852 GitHub run39519191762 FAILED one raw Uganda nutrition hash check: actualf3d3...89fd6 vs approved12d25...50e3a; shape/schema/index/dtypes pass. Monitor242 completed; combined_ci_final is stored. No raw CI artifacts. windows_ci owns focused private nutrition/order/float/call-order diagnosis; contracts independently verified192matching package versions, same runner/image/Python/thread pins, and no Uganda/workflow/fixture/lock source delta between passing1d3 and852. Exact cause is now proven by fixed-input BLAS counterfactual, independently rerun by parent:SkylakeX12d25→Haswellf3d3→SkylakeX12d25,8cells/max2ULP. ActualCIkernel unlogged; no CI artifacts. Isolated repair worktree=uganda-nutrition-cpu-hash, branchfix/uganda-nutrition-cpu-hash-40255479 at852; windows_ci implementing optional exact nutrition-only variant while preserving primaryhash, allotherstructural/hashchecks, productionarithmetic. framework_contracts prepared independentreview, awaiting frozenSHA. Parent independent diagnosispublicartifacts committednextunder nutrition-ci-diagnosis/. Provenance round-one review found repeated PROVENANCE_SOURCE conflict canrender heldCATALOG_ID asnone; producer guardfix dbae899fa, revisedFULLFREEZE44f6cd2e7, allreadersstoppedbeforefix. framework_reliability round2 nowrunning:20 unchangedindependentcontrolsPASS; newcanonicalmetadata controlfailurebeingadjudicatedbeforeverdict. Producersuite347PASS,130SOURCE and549/2139/40hashesunchanged. Do not mutate44f6 duringreview. Follow-up full suite has NOT run; integration remains2ff4bc737 pending provenance review and nutrition diagnosis.
+
+** Follow-up final freeze -- 2026-10-20 19:07 PDT
+
+Provenance44f6cd2e7 independently PASS:370 repository +30 reviewer controls,130 SOURCE unchanged and zero549/2139/40 hash movements. Reviewer canonical-key assertion correction is disclosed, not hidden. Aggregate evidence copied to provenance-review/.
+Nutrition test repair98822ed1a independently PASS:14 reviewer +15 producer controls; actual full23777x15 Haswell/SkylakeX outputs accepted, +1.0 mutation rejected under both. Primary and all other manifest fields unchanged. Aggregate evidence copied to nutrition-repair-review/.
+All four follow-up increments are integrated at frozen4cab5f0db7d375ad543e652f61f43bd28fa94ecd, branchintegration/framework-followup-40255479, published origin/GitHub. No further source edits while validators run.
+windows_ci is authorized GO fullsuite16loadfile CPU0-7,20-27 plus separate physical farmcopy CPUs28-31; exact import/config/cwd/data assertions,threads/build/make1. Private followup-suite-data prepared1519files. Pending, no pass claim.
+GitHub fullmanualCI39531148624 queued on exact4cab, nativeWindows enabled. Root monitors; preserve original852failedrun39519191762.
+framework_reliability prepares reviewable incremental PR plan/bodies without GitHub mutations. framework_contracts performs private packaging dry-run without release/tag/publish/sharedvenv changes. No merge authorization beyond1153.
+
+** Published follow-up drafts -- 2026-10-20 19:19 PDT
+
+New drafts:1161 nutritiondirectdevelopment@6553e01d6,1162cache@f7eb194d7,1163provenance@44f6cd2e7,1164pooledreducers@45f80dcb5. Lastthreebaseintegration852forfocusedreviews; do notmergeintothatbase. Afteroriginal1154--57land, mergelivedevelopmentintoeachpublicationbranch, verifydiff/runtimebytes, retargetdevelopmentwithoutforce. Worker/sourcebranchesremainfrozen. All79GitHubfileblobSHAsacross4newPRsmatchreviewedheads;scopeauditPASS.
+Nutritionpublicationisfreshad1+fivecherrypicks;all17filesmatchreviewed98822,15authfreecontrolsPASSagain. No runtime dependencyontheoriginalfivefixes. AllcommitsDurablypublishedorigin/GitHub.
+Final4cabunit,smoke,nativeWindowsSUCCESS;datafullsuiterunning(job118997075291/run39531148624). Native shocks0ab2ea4c79dd/assets9202ed542a14,row/wavecountsunchanged. framework_contractsownsfinalCIobservation/aggregatereconciliation;rootwatchsession40278isrunningtoo. No newdispatchneeded.
+Scopedfarmcomplete:322warnings,0errors/fails;all76nonruntimefullrecords/metricsand29ClassBfindingsmatch852.60removedruntimewarningsfullyclassified45rebuild+6fallback+9NigeriaMakecandidatefailures(causenotinferred).1519farmcachebytesunchanged.3warmchecksPASS.14countries792775pooledinputrows:200346seed/75784Nresultrowsexactseparate/reverse/countrycolumn. GhanaLSS/Guinea-Bissauemptybothroutes,notbroadercoverageclaim. windows_ciownsfullsuite+finalcaseaccounting;stillrunningtailcasesat19:19,no passclaimyet.
+PackagingPASSexact4cabwheel+sdist0.15.0.post392.dev0+4cab5f0db;all11753packagefilesbyteidentical;installedconfigsmokePASSwithoutnetwork/data builds. Allpackagingprocessesstopped/worktreeclean. Evidencecopiedpackaging-review/. Notataggedreleaseorcleannewdependencyresolver/fullinstalleddata test.
+Rootupdatedoriginal1154--57bodieswithtruthfulcompleted852evidence/knownsingleCIfailure/1161repair/finalCIpending. Draft1158stillpendingfinalvalidation.
+Optionalquestionpending:implement#1160before0.16usingcountry-preservingruleorDeferdocumentedlimitation. Noanswer/authorizationyet; noimplementation. Do nottreatelapsedtime/preselectionasapproval. #932rulesetstillunappliedanduser-ownedrepoqueueunavailable;#851originnewercf117notoldGitHub8288.
+
+** Local4cab validation complete; #1160 approved -- 2026-10-20 19:25 PDT
+
+Localexact4cabPASS8764/276skip/9xfail/1xpass/1222warnings765.96s,0fail/error/credentialskips;all16workersexited0/sourceunchanged. Export18artifactsverifiedmanifest55fbf514...copyfollowup-validation/. RootindependentXMLcaseaccountPASS8857→9050,198newpass−5oldpass+9unskip,nootheroutcomechange;xfailIDsunchanged;baselineXPASSidentityunclaimed.
+Publicationplan/scopeauditcopiedfollowup-pr-plan/;all79GitHubfileblobsverifiedagainstworkerheads. AllfournewdraftPRunit/smokechecksPASS. Theirbodiesnowrecordlocal4cabPASSandremotecredentialedLinuxpending. #1159issuebodyrecordsretentionruling/pending1164;#778bodyrecordspending1162/unchangedtrustnote/Addressesnotclosure.
+USERANSWER:fix#1160before0.16country-preserving. reliabilityassignednewworktree1160-pooled-rate at4cab,CPU8-11,focusedimplementation+baselinecontrols/hashimpact/ledger/attributedcommits. NoGHwritesbyworker. windows_ciownsindependentreviewCPU16-19afterFINALwholeworkerfreeze/allwritersstopped. Rootmustnotlabel4cabCIastestoflater1160code. contractsownsremoteCI39531148624observation/datajob118997075291;currentunit/smoke/nativePASS,credentialgate/UgabuildPASS,datafullsuiteactive.
+Next:finish1160implementation/review,integratenewfrozenhead,appropriatefinalvalidation+PR;finish4cabCIwithoutdiscardingitsresult;humanmergepermissionstillneededunderbacklogskill. Neverautomergeorrelease.
+
+* Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
+- Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.
+  Fixes #958 (all five defects) and #960 (docs).  #957 closed (done 2026-09-22).
+  #961 tracker: close when #1017 merges.  Default branch is master, so close
+  #958/#960/#961 BY HAND after the merge.
+- Venv recipe now: =bin/savio_venv.sh mount= FROM THE CLONE (finds the image via
+  origin), then =export PYTHONPATH=$PWD=.  =status= shows the generation.
+  The "Operational facts" below naming /local/job39919092 are dead.
+- Shared image re-imaged with approval: generation =20261017T230017Z=
+  (ligonlibrary 0.2.3, self-locating shebangs).  Rollback =.venv.sqfs.prev= is
+  the 2026-09-22 image (the v0.15.0 validation closure).  The 2026-09-07
+  pre-#957 image was LOST to the one-slot rollback; its closure is
+  slurm_logs/venv_provenance/master_freeze_2026-09-21.txt.
+- Mirror's dangling =.venv= symlink removed; =.venv.lustre/README_WHY_THIS_EXISTS.md=
+  bannered SUPERSEDED (untracked).  =.venv.lock= in the mirror is untracked until
+  #1017 merges (gitignore entry is on the branch).
+- @ligon chose generation-named rollbacks: every replaced image kept as
+  =.venv.sqfs.gen-<G>=; the 2026-09-22 image is =.venv.sqfs.gen-20260922T073356Z-unstamped=.
+
+* Current execution -- 2026-10-15 v0.15.0 published and verified
+All 23 implementation PRs and the final evidence PR #1015 are merged. Release
+PR #999 merged development into master with two-parent commit
+=cb44e3522a2426ba03431ca9a218cc63fe03f6c9= at 15:19:31 UTC. The complete tree
+equals final documentation head =2e41feda3=; runtime/tests/dependencies/build
+inputs match validated =3914d8804= except the reviewed CONTENTS prose.
+All 21 intended issue closures and ten selected retained-open scopes were
+verified. No PR remained open immediately after the release merge.
+
+The actual =make release v=0.15.0= passed at this master commit using a new
+physical cache copy, eight loadfile workers, 600-second per-test timeout and
+single BLAS/build workers: 7,376 passed, 314 skipped, nine expected failures,
+one existing non-strict unexpected pass, zero failures/errors in 1,024.34 s.
+No credential-guard skip occurred. Four weight expectations and five known
+#602 tenure defects account for the expected failures. All skip categories
+are independently reviewed; they are not blanket source-availability claims.
+One Guyana cached sanity assertion skipped after its read retry exhausted;
+it separately passed on a 13-file physical copy without skips. Its original
+exception/cause remains unknown, and the suite's 314-skip count is unchanged.
+
+Annotated =v0.15.0= object =d4ff03d28ab417c5d98f8e1e7c94d1261b8331bc=
+peels to =cb44e3522a2426ba03431ca9a218cc63fe03f6c9= on GitHub and the
+filesystem mirror. Master CI =38759333750= PASSED: 4,927 data passes,
+2,768 skips, four expected failures, one existing non-strict unexpected pass,
+zero failures. All applicable unit/Windows/docs/DVC jobs passed; no refresh
+or master change occurred. The automatic release-event publishing run
+=38767928967= passed both jobs. Release:
+https://github.com/ligon/LSMS_Library/releases/tag/v0.15.0
+PyPI: https://pypi.org/project/LSMS-Library/0.15.0/
+
+Downloaded wheel SHA256 =a19b458f2d2fce0bb67c192338ffb02fb745f78af3ba77b0d5db1c3395c0f9f0=;
+source archive =e8ed24a6609268b02220e2eb94c7809ab5c153468094614c8af2b8444c78c657=.
+Every one of 11,751 package members matches the tag. The no-Git source rebuild
+has identical contents for all 11,756 wheel members and equivalent metadata;
+compressed archive bytes differ only in independently explained DEFLATE
+encoding and associated sizes/offsets. Do not claim byte-identical archives.
+Fresh installation from PyPI brought 170 dependencies and passed pip check,
+20 public-callable/config checks, and a separate ordinary warm Uganda assets
+call: 116,808 rows, eight waves, exact expected content and all 172 private
+parquets unchanged. Cold credentialed Windows builds are separate evidence.
+
+Both 1,519-file frozen evidence roots retain their recorded identities after
+the isolated release tests. The verified 1,518-file shared promotion and its
+recoverable backups stand. No shared/frozen L2 API was used for installation
+validation. All 193 ref versions have dispositions: 101 landed, 63 superseded,
+19 rejected, six archives, four integration refs; zero active unresolved refs.
+Historical branches remain intact. The final completion change descends from
+release master and restores that ancestry to development when merged. Final
+external refs are recorded in its PR body after merge, avoiding a self-referential
+commit hash. Remaining work is the documented issue backlog, not a release hold.
+At this document's pre-merge checkpoint, the completion PR and final ref check
+remain to be finished; publication and installed-release verification are complete.
+
+The #967 approval and existing scientific limitations remain unchanged:
+Mali/Tanzania warm-date loss, Liberia precision and Mali scalar conversion,
+19 source/wiring gaps, Feature findings, and Uganda's reciprocal FCT/nutrition
+metadata loss remain explicit. Publication is not a new scientific approval.
+
+* Prior execution checkpoint -- final implementation validation (historical)
 The maintainer approved #967: "Okay, thumbs up on #967" after reviewing the
 before/after nutrition accounting and inherited assumptions. Its approved
 fixture change is merged. All 53 baseline entries match; 127 focused tests

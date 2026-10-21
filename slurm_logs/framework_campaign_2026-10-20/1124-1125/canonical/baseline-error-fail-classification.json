@@ -1,0 +1,85 @@
+{
+  "baseline_errors": [
+    {
+      "check": "build",
+      "country": "Peru",
+      "exception_type": "RuntimeError",
+      "feature": "food_acquired"
+    },
+    {
+      "check": "build",
+      "country": "Peru",
+      "exception_type": "RuntimeError",
+      "feature": "food_expenditures"
+    },
+    {
+      "check": "build",
+      "country": "Peru",
+      "exception_type": "RuntimeError",
+      "feature": "interview_date"
+    },
+    {
+      "check": "build",
+      "country": "Peru",
+      "exception_type": "RuntimeError",
+      "feature": "individual_education"
+    },
+    {
+      "check": "build",
+      "country": "Peru",
+      "exception_type": "RuntimeError",
+      "feature": "food_prices"
+    },
+    {
+      "check": "build",
+      "country": "Peru",
+      "exception_type": "RuntimeError",
+      "feature": "food_quantities"
+    }
+  ],
+  "baseline_fails": [
+    {
+      "check": "declared_spellings",
+      "country": "Albania",
+      "feature": "plot_features",
+      "severity": "B"
+    },
+    {
+      "check": "declared_spellings",
+      "country": "Cambodia",
+      "feature": "plot_features",
+      "severity": "B"
+    },
+    {
+      "check": "declared_spellings",
+      "country": "Kosovo",
+      "feature": "plot_features",
+      "severity": "B"
+    },
+    {
+      "check": "declared_spellings",
+      "country": "Tajikistan",
+      "feature": "plot_features",
+      "severity": "B"
+    },
+    {
+      "check": "declared_spellings",
+      "country": "Timor-Leste",
+      "feature": "plot_features",
+      "severity": "B"
+    }
+  ],
+  "evidence": {
+    "cold_baseline_source": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "cold_baseline_summary": "/local/job40255479/mirrors/LSMS_Library/slurm_logs/framework_campaign_2026-10-20/validation/cold-baseline-summary.json",
+    "known_unharmonized": "tests/test_declared_spellings.py:36-60",
+    "strict_named_xfail": "tests/test_table_structure.py:311-331",
+    "test_evidence_unchanged_from_976fc840d": true,
+    "vocabulary_context": "https://github.com/ligon/LSMS_Library/issues/602"
+  },
+  "five_fails_exactly_match_known_unharmonized_gh602_set": true,
+  "five_failures_are_real_defects_retained_as_fail": true,
+  "no_error_or_fail_status_downgrades": true,
+  "raw_findings_private": true,
+  "six_errors_exactly_match_independent_cold_baseline_peru_cells": true
+}

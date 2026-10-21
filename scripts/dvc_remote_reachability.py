@@ -40,6 +40,33 @@ DVC_DIR = COUNTRIES / ".dvc"
 _KEY_RE = re.compile(r"([0-9a-f]{2})/([0-9a-f]{30}(?:\.dir)?)$")
 
 
+def _reader_creds_file() -> Path:
+    """The reader's credentials file, resolved the way the library resolves it.
+
+    ``lsms_library.config.s3_creds_path()`` (``$LSMS_S3_CREDS`` ->
+    ``<config dir>/s3_creds``), which is the file ``DVCFileSystem`` is
+    handed.  ``config.py`` is loaded BY FILE: this script runs with only
+    boto3 + pyyaml installed, and importing the package would run its auth
+    flow.  The in-tree ``.dvc/s3_creds`` is NOT a fallback (GH #1031):
+    ``DVCFileSystem`` never reads it (``local_tools._build_dvcfs`` overrides
+    ``credentialpath``), and CI writes the user-config file.  The library's
+    own ``data_access._check_remote_access`` still accepts it (GH #1064).
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_reachability_lsms_config", REPO / "lsms_library" / "config.py")
+    cfg = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cfg)
+    user = cfg.s3_creds_path()
+    if not (user.is_file() and user.stat().st_size > 0):
+        raise SystemExit(
+            f"no S3 reader credentials at {user}; write them there or point "
+            "LSMS_S3_CREDS at the file (an ordinary `import lsms_library` "
+            "decrypts them into that path)")
+    return user
+
+
 def _remote_from_config() -> tuple[str, str, dict[str, str]]:
     cp = configparser.ConfigParser()
     cp.read(DVC_DIR / "config")
@@ -55,7 +82,7 @@ def _remote_from_config() -> tuple[str, str, dict[str, str]]:
     assert url.startswith("s3://"), url
     bucket, _, prefix = url[len("s3://"):].partition("/")
     creds = configparser.ConfigParser()
-    creds.read(DVC_DIR / sect.get("credentialpath", "s3_creds"))
+    creds.read(_reader_creds_file())
     conf = configparser.ConfigParser()
     conf.read(DVC_DIR / sect.get("configpath", "s3_config"))
     kw = {

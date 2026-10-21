@@ -1,0 +1,94 @@
+{
+  "publication_head": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+  "base": "ad1e87e1025dec98fe70734f4e60d12824fd31dd",
+  "reviewed_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+  "files": [
+    {
+      "path": ".coder/ledger/uganda-nutrition-cpu-hash.md",
+      "byte_equal_reviewed": true,
+      "sha256": "0d3f824b7ca15854a72e7ff1645ba17e1050253af3ecbcae89b9bb1ec33faf00"
+    },
+    {
+      "path": "lsms_library/countries/Uganda/_/CONTENTS.org",
+      "byte_equal_reviewed": true,
+      "sha256": "774d5bc13c35ca5a6d9543766648f88dbc1efe508d73aa388d5ac6e81146256c"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org",
+      "byte_equal_reviewed": true,
+      "sha256": "b40dd06f8b8d50bebdbb0bfb6100b6113c8dee5731567d2cb65fb755dacc66eb"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/baseline_plugin.py",
+      "byte_equal_reviewed": true,
+      "sha256": "6396657345c5cd8e0ced2873633862945adb09865764dba7166c9179b306bd55"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/blas-comparison.json",
+      "byte_equal_reviewed": true,
+      "sha256": "ae35e66073f2271beede75c4915955e434646e5e54850e9dd68e0cd12f25dc82"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/compare_blas.py",
+      "byte_equal_reviewed": true,
+      "sha256": "46baf5c42f5d9aba1a1a622d1d14d35d55bd32c265e479a499606fa6378e49ab"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/hash-impact.json",
+      "byte_equal_reviewed": true,
+      "sha256": "1e9fd4fd1a60d3290f3561bd87519dbe621ffa92224d7ecd2d85b14e6fa6c5f7"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/immutability.json",
+      "byte_equal_reviewed": true,
+      "sha256": "2d3328624bbc38d0e36067439dba6332892f94fa76e71a080a33486faf52a810"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/probe.py",
+      "byte_equal_reviewed": true,
+      "sha256": "5e3a5f6cd92e9867492e8e3baefa5ac4e31d7f0dd5f480e44141f16e99120cf4"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-Haswell.json",
+      "byte_equal_reviewed": true,
+      "sha256": "63bde1e7f831374276976eed7d052c19acf88c67a30bae60cfd5f9c4f52deacc"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real-SkylakeX.json",
+      "byte_equal_reviewed": true,
+      "sha256": "6a8a98f5b8b7fce2ff565512ebfdde167894add48bf21ef1b34ba4a902c72cae"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/real_control.py",
+      "byte_equal_reviewed": true,
+      "sha256": "4da2c56c5c1a8677cae9988958ba2443af4340db184e1343d9e9c0a2d120b7c2"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/verification.json",
+      "byte_equal_reviewed": true,
+      "sha256": "b260a9e17fe1d405b86b1e91c5d0d73b089437c01a66359b44937b466c8632a4"
+    },
+    {
+      "path": "slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/warm-reconstruction.json",
+      "byte_equal_reviewed": true,
+      "sha256": "663de24d3987b0343bfd3e4e373b70b137297f58e58840daa1a6a318a88c6b1e"
+    },
+    {
+      "path": "tests/fixtures/uganda_baseline.json",
+      "byte_equal_reviewed": true,
+      "sha256": "56b2961b276fac1c68e9b839c84e7f887184e078c8e34b43522fec4855d36788"
+    },
+    {
+      "path": "tests/test_uganda_invariance.py",
+      "byte_equal_reviewed": true,
+      "sha256": "fd3a1ef979a65d3da0a8b5e60c365a92a0a941b50d998fc2057a6ba4ca4f2712"
+    },
+    {
+      "path": "tests/test_uganda_invariance_hash_variants.py",
+      "byte_equal_reviewed": true,
+      "sha256": "b7b5121edd15a9123cf423c44c3711f43be7ce5ae86997d7788b65bdefca813d"
+    }
+  ],
+  "all_changed_files_byte_equal_reviewed": true,
+  "clean": true
+}

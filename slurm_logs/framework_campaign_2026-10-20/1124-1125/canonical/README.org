@@ -1,0 +1,126 @@
+#+TITLE: Paired canonical Feature audit, 2026-10-20
+#+AUTHOR: Sue
+
+* Result and scope
+
+The same frozen scanner ran all 16 canonical features and phases 1 and 2 against baseline =976fc840d12ba40f1602b7dff58b81548632b2a9= and combined =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+Scanner SHA256 is =7380a8faf1cc3de87954d776d8592e05a505a2697443b3c9c52181a06bd041b4=.
+Both controllers exited zero after 1,772 and 2,895 seconds, respectively; this means the scanner completed, while its errors and failures remain findings.
+Source heads and scanner content stayed frozen.
+
+| Emitted records | Baseline | Combined |
+|-----------------+----------+----------|
+| Warnings        |     3256 |    11987 |
+| Errors          |        6 |        6 |
+| Failures        |        5 |        5 |
+| Passes          |        5 |        5 |
+| Scope skips     |       13 |       13 |
+| Total JSON rows |     3285 |    12016 |
+
+There are no added or removed error/failure pairs and no new assembly findings, including their row-count metrics.
+The scanner retains EthiopiaRHS's documented coarse-grain crop exclusion as a Class B finding.
+The five failures are the exact =KNOWN_UNHARMONIZED= plot-tenure vocabulary cases for Albania, Cambodia, Kosovo, Tajikistan and Timor-Leste from GH #602.
+The six errors are Peru's food_acquired, food_expenditures, food_prices, food_quantities, interview_date and individual_education build cells, exactly matching the independently serialized cold baseline.
+The 13 default scope skips name Armenia's two and Nepal's eleven no-source-data cells, with exact reasons in =audit-comparison.json=.
+Together these skips and errors retain visibility of the corpus's 19 known source/wiring gaps.
+The five vocabulary failures remain real defects; this report adds no exemption.
+
+* Warning review
+
+The warning increase is 8,731: 8,098 interview_date warnings and 633 across the other features.
+The fingerprint comparison records 16 increased groups and no decreased groups; exact message comparison also records changed messages within those coarse groups.
+Raw warning messages and identifiers remain private under =/local/job40255479/canonical-audit-compare/=.
+
+The interview increase is fully accounted for: 8,000 Malawi date-format/dayfirst warnings, 50 Mali Stata UTF-8 fallback warnings, 13 categorical warnings in Malawi and Timor-Leste, 10 missing-Makefile fallback warnings, and 25 stale-cache rebuild notices.
+All 8,073 non-cache messages match the independently serialized cold controls.
+Both cold runs have identical warning messages and categories by country.
+All 27 actual audit L2 interview_date frames compare exactly: 690,030 rows, including index, dtypes and values.
+Non-runtime interview checks and Class B messages are identical.
+The scanner captures each emitted warning, so rebuilding exposes repeated date parser warnings that a warm read did not emit.
+
+The remaining exact-message changes are 674 additions and 41 removals, net 633.
+Additions include 284 rebuild notices, 259 encoding warnings, 46 categorical warnings, 36 missing-Makefile notices, and documented source/grain warnings.
+The single added Class B runtime warning is Peru's existing person-id repair, explicitly documented at =lsms_library/countries/Peru/_/CONTENTS.org:830-848= and present with the exact same message in both independent cold controls.
+Eight Uganda warm-cache grain-report replay messages are replaced by eight source-build grain conflict messages.
+A baseline-only Nigeria make-failure warning disappears; its cause is not inferred, and the eventual Nigeria food_acquired cache frames are exactly equal.
+Thirty changed metric/inference warning messages replace thirty older messages as the approved parser quantities change.
+An existing reaggregation warning changes its baseline quantity total by -6,863.435, exactly accounted for by the three measured parser countries; its Aggregate total is unchanged and the warning remains visible.
+Every remaining source warning matches an exact message from a same-runtime cold control, including dependency builds.
+Details and affected-country control lists are in =non-interview-warning-classification.json=.
+Unscoped warning strings can match several cold countries; those lists are possible exact-message controls, not invented row-level attribution.
+
+Direct comparisons of 125 local audit cache frames covering 16,139,392 rows strengthen these controls.
+All index and cell values agree; four household_roster tables differ only in row order: Benin, Burkina_Faso, CotedIvoire and Guinea-Bissau.
+This is the audit-cache set under its own concurrent warming schedule.
+The separate serialized cold-corpus comparison reports Benin, Burkina_Faso, Mali and Togo; these country sets are measured separately.
+Uganda cluster_features, Peru household_roster, Guyana sample, and all compared food_acquired frames are exactly equal.
+These checks explain the warning exposure without waiving a data difference.
+
+* Intended numerical changes
+
+Fresh public Country API measurements after each audit reproduce 945 changed kilogram-quantity rows and 783 changed price rows.
+Senegal contributes 783 quantity and 692 price changes; Benin 126 and 68; CotedIvoire 36 and 23.
+Country kilogram-total deltas are -6,280.835, -353.37 and -229.23, respectively.
+Food source frames, output rows, index, columns, dtypes and native quantities agree.
+Per-wave totals are in =food-comparison.json=; individual snapshots remain private.
+The scanner's existing aggregate-quantity baseline-total change equals the sum of these measured kilogram deltas to floating-point tolerance.
+
+* Cache and import controls
+
+Each audit received its own physical copy of the frozen 1,519-parquet bundle at =/global/scratch/fsa/fc_jevons/ligon/cache/.rewarm-bundle-94624fd6f/data=.
+No L2 file is hardlinked or shared; only =dvc-cache= is a shared L1 symlink.
+Writable roots are =/local/job40255479/canonical-audit-compare/data-baseline= and =data-combined=.
+The APIs never read the shared L2 root.
+Default hash checks rebuild the candidate's invalidated bundle entries.
+This intentional warm-start asymmetry is why matched serialized cold controls and local value comparisons accompany warning counts.
+Baseline affinity was CPUs 0-3 and combined affinity CPUs 4-7, with three workers each and nice 19.
+BLAS, OMP, MKL and LSMS_BUILD_WORKERS were pinned to one.
+Package, countries-root and data-root real paths were asserted before each scanner invocation.
+
+The relevant country CONTENTS documents, including TODO, WAITING and LOGBOOK entries, were read before assessing findings.
+For example, Tanzania's NPS back-casting and cluster design, EthiopiaRHS's coarse crop grain, Guyana's composite household key and weight-only rows, and Peru's guarded person-id repair are documented controls.
+No country mapping or production source was edited by this validation.
+
+* Reproduction
+
+The scripts retain the exact allocation paths and source pins used for this run.
+For a new allocation, replace the =/local/job40255479/= prefix and provision the two pinned checkouts and the frozen bundle before running them.
+Use fresh, distinct writable roots and physical copies of the frozen bundle; do not run against a shared L2 or reuse the private result roots.
+=run_audit.py= selects the runtime by its =baseline= or =combined= argument, asserts import identity and source pin, and runs the same combined scanner against either runtime.
+
+Prepare the private copies before starting either controller.
+The destination roots must not exist already.
+
+#+begin_src python
+from pathlib import Path
+import shutil
+
+bundle = Path('/global/scratch/fsa/fc_jevons/ligon/cache/.rewarm-bundle-94624fd6f/data')
+root = Path('/local/job40255479/canonical-audit-compare')
+root.mkdir(exist_ok=True)
+for label in ['baseline', 'combined']:
+    dest = root / f'data-{label}'
+    assert not dest.exists()
+    shutil.copytree(bundle, dest, symlinks=True, copy_function=shutil.copy2)
+    assert sorted(str(p.relative_to(dest)) for p in dest.rglob('*') if p.is_symlink()) == ['dvc-cache']
+    parquets = list(dest.rglob('*.parquet'))
+    assert len(parquets) == 1519
+    for p in parquets:
+        assert p.stat().st_nlink == 1
+        assert p.stat().st_ino != (bundle / p.relative_to(dest)).stat().st_ino
+#+end_src
+
+#+begin_src sh
+nice -n 19 taskset -c 0-3 /local/job40255479/venv_img/bin/python run_audit.py baseline
+nice -n 19 taskset -c 4-7 /local/job40255479/venv_img/bin/python run_audit.py combined
+#+end_src
+
+After both completion files exist, run =compare_audits.py=.
+After an individual audit completes, =run_food_measurements.py baseline= or =combined= reuses that audit's private cache for the three food API measurements.
+Then run =compare_food_outputs.py= from the combined checkout with its PYTHONPATH and LSMS_COUNTRIES_ROOT.
+=compare_local_controls.py= checks local cache values; =classify_interview_delta.py= and =classify_warning_delta.py= use the separate completed serialized cold corpus outputs as warning controls.
+The paired =*-completion.json= records contain exact commands, affinities, source identity and elapsed time.
+=copy-evidence.json= records the physical-copy checks; =artifact-sha256.json= fingerprints the exported artifacts.
+Raw JSONL records, full build logs, private snapshots and individual warning messages are excluded from this directory.
+
+Sue

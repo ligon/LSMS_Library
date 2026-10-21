@@ -1,0 +1,16 @@
+{
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "elapsed_seconds": 25.718144416809082,
+  "head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "returncodes": {
+    "Benin": 0,
+    "CotedIvoire": 0,
+    "Senegal": 0
+  },
+  "same_audit_cache_after_scan_completion": true
+}

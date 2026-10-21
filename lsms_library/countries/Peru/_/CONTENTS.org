@@ -1088,3 +1088,32 @@ autosuministro / autoconsumo / ambos) and =ak03= (an amount in soles), and
 that is all -- confirmed in both =dicciona.pdf= and the file.  So a wired Peru
 =food_acquired= would carry Expenditure only, and =food_prices= /
 =food_quantities= are structurally unreachable for this wave.
+
+* Kinship: what ENNIV 1994's ten codes can and cannot say (GH #698)
+
+Ruling (@ligon, 2026-10-18, GH #698): "'X of head or spouse' and 'X or
+X-in-law' labels become [G, D, null], Affinity only" -- the 2026-09-07
+null-component rule (=categorical_mapping/kinship.yml= header) carried to
+labels whose generation and collateral distance ARE determinate.  Kinship
+is expanded at READ time, so the change moved no cache hash and no
+=household_characteristics= number (it reads Sex/Age/residence only;
+measured byte-identical before/after).
+
+The 1994 B01 code list (verbatim in =_/categorical_mapping.org=) carries two
+conflations, both now recorded as the explicit unknowns the instrument
+implies -- never as a guess:
+
+| code | label           | tuple              | people | why                                                       |
+|------+-----------------+--------------------+--------+-----------------------------------------------------------|
+|    6 | =Padre/Suegro=   | [1, 0, null]       |    279 | parent OR parent-in-law: one generation up, lineal, blood or marriage (was [1, 0, consanguineal] until 2026-10-19) |
+|    7 | =Otro pariente=  | [null, null, null] |    884 | the enumerator manual's own definition spans generations -3..+3, distances 0..2 and both affinities (GH #684/#698, 2026-08-22) |
+
+*Degeneracies that are the instrument, not bugs* (measured 2026-10-19):
+
+- =Distance= is 0 for every person except the 884 =Otro pariente= (NA).  The
+  ten codes contain no sibling, uncle, nephew or cousin category at all.
+- Every person one generation up (all 279) has Affinity NA, because code 6 is
+  the only code for that generation.
+- =Generation= runs -2 .. +1 only (plus the 884 NA): no grandparent code.
+
+Do not "fix" any of these by inventing a tuple; the codes are not there.

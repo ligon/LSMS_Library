@@ -1,0 +1,19 @@
+{
+  "local_headers_checked": 11756,
+  "central_headers_checked": 11756,
+  "prefix_and_end_record_checked": true,
+  "headers_equal_after_zeroing_only_compressed_sizes_and_offsets": true,
+  "local_header_normalized_fields": [
+    "compressed_size"
+  ],
+  "central_header_normalized_fields": [
+    "compressed_size",
+    "local_header_offset"
+  ],
+  "end_record_normalized_fields": [
+    "central_directory_offset"
+  ],
+  "no_unaccounted_padding_or_data_descriptors": true,
+  "archives_unchanged": true,
+  "library_api_calls": 0
+}

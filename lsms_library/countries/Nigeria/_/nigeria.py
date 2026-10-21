@@ -349,6 +349,61 @@ def _canon_unit(s):
     return pd.NA
 
 
+# Units only the plot_inputs modules record (GH #1047), which `_canon_unit`
+# (built for HARVEST units) does not know.  Measured 2026-10-19, served
+# rows: W4/W5 seed '210. STEMS' (415 + 470), W4 seed '280. METRIC CUP' (94)
+# and '260. SEEDLING/PLANT' (23), W5 organic fertilizer '21. TRACTORS' (16)
+# -- 1,018 rows with a quantity, all served u = NaN before.  280 is the W4
+# codebook's own 'Metric Cup' (the `u` table's code 280).  Kept OUT of
+# `_canon_unit` so crop_production / community_prices cannot move.
+_INPUT_UNIT_LABELS = (
+    ('stem', 'Stem'),
+    ('seedling', 'Seedling/Plant'),
+    ('metric cup', 'Metric Cup'),
+    ('tractor', 'Tractor'),
+)
+
+
+def _canon_input_unit(s):
+    """`_canon_unit`, extended with the units only the input modules use."""
+    u = _canon_unit(s)
+    if pd.isna(u) and not (s is None or (isinstance(s, float) and pd.isna(s))):
+        tl = _strip_code_prefix(s).lower()
+        for needle, label in _INPUT_UNIT_LABELS:
+            if needle in tl:
+                return label
+    return u
+
+
+class UnplacedUnitLabelWarning(UserWarning):
+    """A recorded unit LABEL the canonicaliser cannot place (GH #1047).
+
+    Such a row is served ``U_UNKNOWN`` like a blank one, which would be a
+    silent loss of a unit the survey recorded -- so it is named here."""
+
+
+def _canon_units(labels, canon=_canon_unit, where=''):
+    """Map a decoded unit-label Series through `canon`, REPORTING what it
+    cannot place.  A blank, or a bare numeric code with no value label, is
+    NA silently (a missing unit; the caller serves it ``U_UNKNOWN``).  A
+    non-numeric label that `canon` returns NA for is NA too, but raises an
+    `UnplacedUnitLabelWarning` naming each label and its row count."""
+    import warnings
+    out = labels.map(canon).astype('string')
+    text = labels.astype('string').str.strip()
+    body = text.map(lambda s: s if pd.isna(s) else _strip_code_prefix(s))
+    unplaced = (out.isna() & body.notna() & (body != '')
+                & ~body.str.fullmatch(r'[\d.]+').fillna(False))
+    if unplaced.any():
+        counts = text[unplaced].value_counts().to_dict()
+        warnings.warn(
+            f"Nigeria {where}: {int(unplaced.sum())} row(s) carry a unit label "
+            f"that cannot be placed and are served as Unknown: {counts}. "
+            "Teach the canonicaliser in nigeria.py (GH #1047).",
+            UnplacedUnitLabelWarning, stacklevel=2)
+    return out
+
+
 def _month_str(month_series, year_series):
     """Build a 'YYYY-MM' month string from numeric month + year columns;
     pd.NA where month is missing/invalid."""
@@ -416,6 +471,7 @@ def crop_production_for_wave(t, frames, crop_labels):
     (canonical note, lsms_library/data_info.yml `crop_production.
     Unit_sold`).
     """
+    from lsms_library.transformations import U_UNKNOWN
     pieces = []
     for fr in frames:
         df = fr['df']
@@ -437,10 +493,23 @@ def crop_production_for_wave(t, frames, crop_labels):
 
         piece['Quantity'] = (pd.to_numeric(df[fr['qty']], errors='coerce')
                              if fr.get('qty') in df.columns else pd.NA)
+        # `u` is never NaN (GH #1047, the crop side of #1041): a unit
+        # `_canon_unit` cannot place is the missing-unit sentinel U_UNKNOWN.
+        # That is a blank raw code (13,126 rows, nearly all with no harvest
+        # quantity), a frame naming no unit column, and the 12 W1-PH rows
+        # whose code (5, 0) has no value label.  Those 12 do NOT keep their
+        # raw code, as an unlisted FOOD code does (#607): crop `u` is a LABEL
+        # space, and the API-time `u` table is keyed on food codes, so a raw
+        # '5' would be served as the W2 food unit 'mudu'.  NaN used to be
+        # served on 13,138 rows and fell out of every groupby on `u`.  A
+        # non-numeric label it cannot place is NAMED (`_canon_units`), not
+        # folded into U_UNKNOWN silently; none occurs today.
         if fr.get('unit') in dec.columns:
-            piece['u'] = dec[fr['unit']].map(_canon_unit).astype('string').values
+            u = _canon_units(dec[fr['unit']],
+                             where=f"crop_production {t} {fr['unit']}")
+            piece['u'] = u.fillna(U_UNKNOWN).values
         else:
-            piece['u'] = pd.Series(pd.NA, index=df.index, dtype='string').values
+            piece['u'] = pd.Series(U_UNKNOWN, index=df.index, dtype='string').values
 
         # SURVEY-REPORTED kilograms per ONE unit of THIS row's `u` -- the
         # GHS-Panel "Kg/L conversion factor" column (`*_conv`), asked beside
@@ -588,12 +657,15 @@ INPUT_TRACTOR = 'Tractor/Machinery'
 NO_CROP = 'n/a'      # crop-level sentinel for non-seed (crop-agnostic) rows
 
 
-def _seed_unit_label(unit_series, unit_dec):
+def _seed_unit_label(unit_series, unit_dec, where=''):
     """Canonical unit label for a seed-quantity unit column.  `unit_dec`
     is the decoded-label Series (convert_categoricals=True); fall back to
-    pd.NA where the unit is blank/junk."""
+    pd.NA where the unit is blank/junk (served U_UNKNOWN by
+    `assemble_plot_inputs` where the row records an amount, NA where it
+    records none).  An unplaceable LABEL is named, not folded
+    silently (`_canon_units`)."""
     if unit_dec is not None:
-        return unit_dec.map(_canon_unit).astype('string')
+        return _canon_units(unit_dec, canon=_canon_input_unit, where=where)
     return pd.Series(pd.NA, index=unit_series.index, dtype='string')
 
 
@@ -681,7 +753,8 @@ def seed_rows_for_wave(df, dec, hhid, plot, crop, channels, crop_labels,
              if ch['qty'] in df.columns
              else pd.Series(pd.NA, index=df.index, dtype='Float64'))
         u = (_seed_unit_label(df[ch['unit']],
-                              dec[ch['unit']] if ch['unit'] in dec.columns else None)
+                              dec[ch['unit']] if ch['unit'] in dec.columns else None,
+                              where=f"plot_inputs Seed {ch['unit']}")
              if ch.get('unit') else pd.Series(pd.NA, index=df.index, dtype='string'))
         q.index = df.index
         u.index = df.index
@@ -750,7 +823,8 @@ def fert_rows_long_typed(df, dec, hhid, plot, channels, type_map):
         typ = (pd.to_numeric(df[ch['type']], errors='coerce').astype('Int64')
                .map(type_map).astype('string'))
         q = pd.to_numeric(df[ch['qty']], errors='coerce').astype('Float64')
-        u = (dec[ch['unit']].map(_canon_unit).astype('string')
+        u = (_canon_units(dec[ch['unit']], canon=_canon_input_unit,
+                          where=f"plot_inputs fertilizer {ch['unit']}")
              if ch.get('unit') and ch['unit'] in dec.columns
              else pd.Series('Kg', index=df.index, dtype='string'))
         chan_frames.append(pd.DataFrame({
@@ -813,7 +887,8 @@ def fert_rows_wide_typed(df, dec, hhid, plot, specs):
         if sp['qty'] not in df.columns:
             continue
         q = pd.to_numeric(df[sp['qty']], errors='coerce').astype('Float64')
-        u = (dec[sp['unit']].map(_canon_unit).astype('string')
+        u = (_canon_units(dec[sp['unit']], canon=_canon_input_unit,
+                          where=f"plot_inputs {sp['input']} {sp['unit']}")
              if sp.get('unit') and sp['unit'] in dec.columns
              else pd.Series('Kg', index=df.index, dtype='string'))
         piece = pd.DataFrame({
@@ -867,7 +942,8 @@ def chem_rows(df, dec, hhid, plot, specs):
                  if sp.get('qty') in df.columns
                  else pd.Series(pd.NA, index=df.index, dtype='Float64'))
             if sp.get('unit') and sp['unit'] in dec.columns:
-                u = dec[sp['unit']].map(_canon_unit).astype('string')
+                u = _canon_units(dec[sp['unit']], canon=_canon_input_unit,
+                                 where=f"plot_inputs {sp['input']} {sp['unit']}")
             else:
                 u = pd.Series(pd.NA, index=df.index, dtype='string')
         q.index = df.index
@@ -908,6 +984,21 @@ def assemble_plot_inputs(t, parts):
     out['t'] = t
     out['crop'] = out['crop'].fillna(NO_CROP).astype('string')
     out['input'] = out['input'].astype('string')
+    # A row that records an AMOUNT and no unit is U_UNKNOWN (GH #1047, the
+    # #1041 ruling): 178 served rows, 164 with a quantity (a blank code, or
+    # a code with no value label) and 14 with a zero.  A row that records NO
+    # quantity in any channel keeps u = NA (dispatcher decision 2026-10-19):
+    # `u` is a COLUMN here, so no groupby can delete the row, and NA says
+    # "no amount, so no unit" where `Unknown` would claim an amount.  5,546
+    # seed rows (W1-W3 "no seed used on this plot" or no channel answered;
+    # W4/W5 tree crops, whose planting quantity is not asked).  Filled HERE,
+    # after every per-channel collapse, never per channel: `_pick_channel` /
+    # `fert_rows_long_typed` decide "one unit -> sum, mixed -> keep the
+    # largest" on the NA-aware units, and a per-channel fill would turn a
+    # blank channel into a second "unit".  See CONTENTS.org.
+    from lsms_library.transformations import U_UNKNOWN
+    out['u'] = out['u'].astype('string')
+    out.loc[out['u'].isna() & out['Quantity'].notna(), 'u'] = U_UNKNOWN
     # Dedup on the index grain (defensive: a handful of duplicate
     # (i, plot, input, crop) rows can survive the per-module collapse).
     out = out.sort_values(['i', 'plot_id', 'input', 'crop'])
@@ -2373,6 +2464,44 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
 # `s` for W4 should be aware the purchased row is a 30-day purchase, not a
 # 7-day consumption flow.
 
+def round_wave(t):
+    """Wave folder (``'2012-13'``) of a PP/PH round label (``'2012Q3'``).
+
+    Every Nigeria wave directory holds two rounds with distinct ``t``; this
+    inverts :data:`PP_QUARTER` / :data:`PH_QUARTER`.  Raises ``KeyError``
+    for a label that is neither.
+    """
+    rounds = {r: w for d in (PP_QUARTER, PH_QUARTER) for w, r in d.items()}
+    return rounds[t]
+
+
+def food_unit_labels(t):
+    """``{raw code: label}`` for the food-module unit codes of round ``t``.
+
+    Read from the per-wave column of the ``u`` table in
+    ``categorical_mapping.org`` (the column named by :func:`round_wave`),
+    NOT from its Preferred Label column, which records only the W3/W4
+    meaning of a colliding code (GH #607).  Keys are registered as int,
+    int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the CSV
+    sources arrive as floats.  Codes the wave's column marks ``---`` are
+    absent, so the caller can keep their raw code.
+    """
+    from lsms_library.local_tools import df_from_orgfile
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    tab = df_from_orgfile(os.path.join(here, 'categorical_mapping.org'),
+                          name='u')
+    wave = round_wave(t)
+    out = {}
+    for code, lab in zip(tab['Code'], tab[wave]):
+        if pd.isna(lab) or str(lab).strip() in ('', '---'):
+            continue
+        c = int(float(code))
+        lab = str(lab).strip()
+        out.update({c: lab, float(c): lab, str(c): lab, f'{c}.0': lab})
+    return out
+
+
 def food_acquired_for_wave(fn, t, sources, expenditure,
                            item='item_cd', hhid='hhid'):
     """Canonical (t, i, j, u, s) food_acquired rows for one Nigeria round.
@@ -2408,11 +2537,13 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         tail (GH #251).
     """
     from lsms_library.local_tools import get_dataframe
-    from lsms_library.transformations import _finalize_canonical_food_acquired
+    from lsms_library.transformations import (
+        U_UNKNOWN, _finalize_canonical_food_acquired)
 
     df = get_dataframe(fn)
 
     food_labels = harmonized_food_labels()
+    unit_codes = food_unit_labels(t)
 
     i = df[hhid].astype(int).astype(str)
     j = df[item].replace(food_labels)
@@ -2421,12 +2552,20 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
     pieces = []
     for s, spec in sources.items():
         q = pd.to_numeric(df[spec['quantity']], errors='coerce')
-        # `u` is stored as the RAW unit code; the framework's automatic
-        # categorical mapping resolves it to the `u` table's Preferred
-        # Label at API time (do NOT pre-resolve here -- that is what every
-        # other Nigeria wave has always done and what the cached parquets
-        # hold).
-        u = df[spec['unit']]
+        # `u` is DECODED HERE, per round, from the `u` table's column for
+        # this round's wave (GH #607).  Unit codes collide ACROSS waves --
+        # 4 is ml in W1 but cl from W2 on, 5/6 are piece/other in W1-PP
+        # but mudu/olodo in W2, 10/11/14 are W2's medium/small derica and
+        # tiya but bin/basket, paint rubber and tin from W3 on, and W1-PH's
+        # 11..95 are sized sacks/basins/bunches -- while the framework's
+        # automatic mapping keys on `Code` alone and applies the single
+        # Preferred Label column to every wave.  A code the wave's column
+        # does not list keeps its raw code (it is never folded into the
+        # missing-unit sentinel, which means "no unit recorded").  The raw
+        # code is read through `format_id`: the CSV columns are float, so
+        # an unlisted 65 would otherwise be served as '65.0' (GH #1047).
+        u = df[spec['unit']].map(unit_codes)
+        u = u.where(u.notna(), df[spec['unit']].map(format_id))
         piece = pd.DataFrame({
             't': t,
             'i': i.values,
@@ -2444,7 +2583,15 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         pieces.append(piece)
 
     out = pd.concat(pieces, ignore_index=True)
-    out['u'] = out['u'].fillna('None')
+    # A blank raw unit code means NO UNIT WAS RECORDED.  Write the library's
+    # missing-unit sentinel, not a made-up label: ``food_kg_factors``
+    # recognises U_UNKNOWN (``_U_SENTINELS``) and serves those rows
+    # ``KgFactorSource == 'none'``, whereas the old literal 'None' was
+    # treated as a real unit and given pooled price-ratio kilograms
+    # (847 rows, 1,133 kg; GH #1041).  The value is assigned AFTER the
+    # per-round decode above, and the `u` table has no 'Unknown' Code, so
+    # the API-time categorical mapping passes it through unchanged.
+    out['u'] = out['u'].fillna(U_UNKNOWN)
 
     return _finalize_canonical_food_acquired(out)
 

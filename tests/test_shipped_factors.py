@@ -488,14 +488,18 @@ def test_the_counts_dict_gains_both_keys_and_still_partitions():
     df = _cp(rows)
     counts = harvest_kg_factors(df, shipped_factors=table).attrs[
         "kg_factor_sources"]
+    # GH #931 added `declared` (rows the declared u_kg table offered a factor
+    # for), outside the partition like `shipped_matched`.  0 here: a bare frame
+    # carries no `unit_kg` record.
     assert set(counts) == set(KG_FACTOR_LAYERS) | {"reported_implausible",
                                                    "shipped_implausible",
-                                                   "shipped_matched"}
+                                                   "shipped_matched",
+                                                   "declared"}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     assert counts == {"reported": 0, "shipped": 1, "survey_median": 0,
                       "metric": 1, "inferred": 0, "none": 2,
                       "reported_implausible": 0, "shipped_implausible": 1,
-                      "shipped_matched": 2}
+                      "shipped_matched": 2, "declared": 0}
 
 
 def test_the_source_column_rides_through():

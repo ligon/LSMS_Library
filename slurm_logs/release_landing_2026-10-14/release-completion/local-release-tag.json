@@ -1,0 +1,10 @@
+{
+  "checked_utc": "2026-10-15T15:39:47.802828+00:00",
+  "version": "0.15.0",
+  "tag_object": "d4ff03d28ab417c5d98f8e1e7c94d1261b8331bc",
+  "target_commit": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "tagger_date": "2026-10-15T08:37:21-07:00",
+  "annotation": "Release 0.15.0",
+  "github_tag_pushed": false,
+  "publication_pending_master_ci": true
+}

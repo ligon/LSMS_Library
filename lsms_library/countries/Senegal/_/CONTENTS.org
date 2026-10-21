@@ -82,6 +82,15 @@ the delivered accented label is unchanged. The C1-control spellings were deleted
 file no longer carries the artefact and a regression would surface as an
 =Unknown relationship labels= warning instead of resolving silently.
 
+*Moved to the reader, 2026-10-19 (GH #805).*  =get_dataframe= now re-decodes
+the cp1252 strings of a pre-118 =.dta= itself (value labels and str columns;
+=local_tools._redecode_cp1252=), so this label arrives as =Frère, sœur= and
+the wave-level =_decode_cp1252= (and its =_fix_relationship= re-titling -- =.title()= of the decoded label already gives =Frère, Sœur=) is retired.  Measured: the served
+=household_roster= is identical before and after (129,650 rows), i.e. the reader
+reproduces the hook exactly.  The decision is per file and refuses DOS code
+pages and UTF-8 double encodings; see the block comment above =_C1_RE= in
+=local_tools.py=.
+
 Same defect and same fix in Niger 2018-19, Benin 2018-19 and Togo 2018 (all format-115 cp1252 EHCVM-1
 roster files).  See GH #801 and the #797 vocabulary sweep
 (=slurm_logs/gh797/vocab_sweep/REPORT.org= section 2.4).
@@ -712,3 +721,29 @@ warned about above.
 *Latent elsewhere*: =Niger/2018-19/_/mapping.py= carries the identical
 =if value:= formatter.  Niger's =s01q02= has no nulls, so it emits no ='Nan'=
 today; left alone deliberately, so the GH #813 fix stays provably targeted.
+
+* 2026-10-17 -- =food_expenditures= / =food_prices= / =food_quantities= are derived (GH #218)
+
+The three tables are computed at read time from =food_acquired= by
+=Country._FOOD_DERIVED= (=transformations.food_*_from_acquired=); they are
+never written to =var/=.  The legacy country script
+=_/food_prices_quantities_and_expenditures.py= that used to claim them, and its
+grouped =&:= rule in =_/Makefile=, are deleted.  It was dead: run against the
+canonical =(t, i, j, u, s)= =food_acquired= it raised
+=KeyError: None of [Index(['last expenditure'], ...)] are in the [columns]= before writing
+anything (the design doc =slurm_logs/DESIGN_218_food_legacy_retirement.org=
+recorded =KeyError('m')=; the column check now fails one step earlier).
+Senegal never registered the three tables in =data_scheme.yml=, so only the script and its =Makefile= rule went.  Noted while measuring, NOT fixed here: two 2018-19 =food_prices= rows (item =Autres tisanes et infusions=, units =Bouteille de 25 cl= / =Bouteille de 33 cl=, households 112008 and 17011) carry =Price= of 1.8e22 and 1.5e22 FCFA, so the column's sum is 3.2e22 -- a source/unit defect for its own issue.
+
+Served tables before and after the removal are frame-equal (319,638 / 319,730 / 436,348 rows; waves 2018-19, 2021-22).
+
+* Decimal-comma metric labels (GH #1143, measured 2026-10-20)
+
+The shared metric parser now reads =Bouteille de 1,5 L= as 1.5 kg-equivalent under =volume_as_mass=True=, rather than the trailing 5, and =Filet (2,5 kg)= as 2.5 kg rather than 5.
+Private cold builds measure 782 bottle rows (385 in 2018-19, 397 in 2021-22) plus one =Filet= row in 2021-22: 783 affected rows in total, not 783 bottle rows as GH #1143's table says.
+=food_acquired= itself is exactly unchanged; kilogram quantities fall by 6,280.835 kg and 692 =food_prices()= rows change.
+Full aggregates and reproducible checks live in =slurm_logs/framework_campaign_2026-10-20/1143/=.
+
+The separate =12,5 cl= spelling remains latent: =categorical_mapping.org= maps =12,5cl(demi walatt)= and =1001. 12,5 cl (demi walatt)= (the latter carries an accent in the actual key) to =Demi walatt=, which states no size for the parser.
+There are 624 such served rows, 248 in 2018-19 and 376 in 2021-22.
+Changing their Preferred Label or declaring a kg factor is a separate curation decision; this parser correction changes neither crosswalk key nor mapping.

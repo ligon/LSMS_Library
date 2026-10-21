@@ -82,57 +82,14 @@ def Relationship(value):
     TRUTHY -- so an unanswered ``s01q02`` went through ``str(nan).title()``
     and was served as the literal string ``'Nan'``.  3 of this wave's
     66,119 person-rows (and 15,201 of 2021-22's 78,732).  A missing answer
-    is ``pd.NA``; non-null values are title-cased exactly as before, which
-    the cp1252 repair below (``_fix_relationship``, GH #801) relies on.
-    ``_decode_cp1252`` returns a non-string unchanged, so ``pd.NA`` passes
-    through the hook untouched.
+    is ``pd.NA``; non-null values are title-cased exactly as before.  The
+    cp1252 ``Frère, sœur`` label reaches this formatter already decoded
+    (GH #805, at the reader), so ``.title()`` yields ``Frère, Sœur``
+    directly; the GH #801 ``_fix_relationship`` re-titling is retired.
     '''
     if pd.isna(value):
         return pd.NA
     return str(value).title()
-
-
-def _decode_cp1252(value):
-    """Re-decode a value label that the reader took as Latin-1 but the file
-    wrote as cp1252 (GH #801).
-
-    ``s01_me_sen2018.dta`` is Stata format 115 with no declared encoding, and its
-    value-label bytes are Windows-1252: ``Fr\\xe8re, s\\x9cur`` for
-    ``Frere, soeur`` (0x9C is the oe ligature in cp1252).  ``get_dataframe``
-    reads it through pandas ``StataReader``, which decodes every pre-118
-    file as Latin-1, so 0x9C comes back as the C1 control U+009C and the
-    served label was ``Frere, s<U+009C>ur``.  (pyreadstat's default, or
-    ``encoding='cp1252'``, reads the same file correctly -- the defect is
-    the reader's fallback, not the file.)  Latin-1 and cp1252 agree on
-    every byte outside 0x80-0x9F, so re-encoding as Latin-1 and decoding
-    as cp1252 changes only strings that carry a C1 control and leaves
-    every other label byte-identical.  Returns the input unchanged for
-    non-strings, strings without a C1 control, and the five cp1252 holes
-    (0x81, 0x8D, 0x8F, 0x90, 0x9D) that cannot be decoded.
-    """
-    if not isinstance(value, str) or not any('\x80' <= ch <= '\x9f' for ch in value):
-        return value
-    try:
-        return value.encode('latin-1').decode('cp1252')
-    except (UnicodeEncodeError, UnicodeDecodeError):
-        return value
-
-
-def _fix_relationship(value):
-    """``_decode_cp1252`` for the Relationship column, re-title-cased.
-
-    The ``Relationship`` formatter above has already ``.title()``-cased
-    the label, and ``str.title`` treats the control byte as a word break,
-    so the artefact reaches the hook as ``Frère, S<U+009C>Ur``; decoding
-    alone would give ``Frère, SœUr``. Re-titling yields ``Frère, Sœur``,
-    the accented sibling EHCVM-1 label. The unused ASCII ``Frere, Soeur``
-    kinship key was removed under GH #974. Values the decode leaves alone
-    are returned untouched.
-    """
-    fixed = _decode_cp1252(value)
-    if isinstance(fixed, str) and fixed != value:
-        return fixed.title()
-    return value
 
 
 def Region(value):
@@ -227,9 +184,9 @@ def household_roster(df):
     out-of-biological-range inputs at the source via _is_plausible_age
     and [0, 120] clamps on the DOB and year-math fallback paths.
 
-    Also restores the ``Frere, soeur`` Relationship label that the
-    Latin-1 read of this cp1252 file turns into ``Frere, S<U+009C>Ur``
-    (``_fix_relationship``; GH #801).
+    The ``Frère, Sœur`` Relationship label of this cp1252 file is decoded
+    by the reader since GH #805; the GH #801 ``_fix_relationship`` hook
+    that used to repair ``Frère, S<U+009C>Ur`` here is retired.
     '''
 
     def _age_from_row(x):
@@ -240,7 +197,5 @@ def household_roster(df):
 
     df["Age"] = df.apply(_age_from_row, axis=1)
     df = df.drop('interview_date', axis='columns')
-    if 'Relationship' in df.columns:
-        df['Relationship'] = df['Relationship'].map(_fix_relationship)
 
     return df

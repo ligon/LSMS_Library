@@ -102,8 +102,11 @@ def test_the_eviction_precedes_the_country_fallback():
 def test_exactly_the_country_tier_call_sites_pass_the_flag():
     """Pins the call-site table.  `load_dataframe_with_dvc` is the only place
     that has decided not to serve `var/<t>.parquet`; the JSON tier targets
-    `_/<t>.json`, and LSMS_BUILD_BACKEND=make is documented as a *bypass* of
-    the parquet tiers, not an invalidation of them."""
+    `_/<t>.json`, and LSMS_BUILD_BACKEND=make writes no L2-country parquet, so
+    deleting one there would destroy a valid default-backend cache and
+    replace it with nothing.  (GH #1039's no-builder route passes
+    `country_builder=` on an existing line instead: it never asks the
+    country fallback at all, so there is nothing to evict.)"""
     calls = [ln for ln in SOURCE.splitlines() if "load_from_waves(" in ln
              and "def load_from_waves(" not in ln]
     passing = [ln for ln in calls if "evict_country_cache=" in ln]
@@ -125,7 +128,9 @@ def test_the_rebuild_failure_is_still_raised_not_swallowed():
 
 @pytest.fixture
 def private_helper_root(tmp_path):
-    """Scope only synthetic helpers; delivered tests retain their warm roots.
+    """Scope only synthetic helpers; the delivered poison test uses
+    ``private_country_root`` (below), a warm COPY, so it never mutates the
+    shared root either (GH #778).
 
     Reuse the before/finally discipline from the GH970 fixture (ledger #1003
     §§2–4). Restoring an environment variable does not clear its cached paths.
@@ -196,14 +201,49 @@ def test_helper_root_preserves_other_root_and_restores_paths(tmp_path, monkeypat
 # Tier 2 -- delivered
 # ==========================================================================
 
-def _warm(country: str, table: str) -> Path | None:
-    p = data_root() / country / "var" / f"{table}.parquet"
-    return p if p.exists() else None
+@pytest.fixture
+def private_country_root(tmp_path):
+    """A private ``LSMS_DATA_DIR`` holding a COPY of one country's warm cache.
+
+    The poison test below writes a 5-row slice into ``var/<table>.parquet``.
+    Done in the shared root, every other xdist worker that reads that cell raw
+    or with ``assume_cache_fresh=True`` -- a different file, so
+    ``--dist=loadfile`` does not separate them -- is served the poison
+    (GH #778: Nigeria ``crop_production``, raw readers 12/315 wrong).  So copy
+    the country's subtree into ``tmp_path``, symlink ``dvc-cache`` to the real
+    blob store (L1 is read-only here), and flip the root with the same
+    before/finally ``data_root.cache_clear()`` discipline as
+    ``private_helper_root``.  Yields ``isolate(country, table) -> Path``, the
+    private parquet, skipping before any copy if the shared cell is cold.
+    """
+    shared = data_root()
+    root = tmp_path / "data"
+    root.mkdir()
+    with pytest.MonkeyPatch.context() as patch:
+        def isolate(country: str, table: str) -> Path:
+            src = shared / country / "var" / f"{table}.parquet"
+            if not src.exists():
+                pytest.skip(f"{country}/{table} not warm")
+            blobs = shared / "dvc-cache"
+            if blobs.exists() and not (root / "dvc-cache").exists():
+                (root / "dvc-cache").symlink_to(blobs.resolve(), target_is_directory=True)
+            shutil.copytree(shared / country, root / country)
+            patch.setenv("LSMS_DATA_DIR", str(root))
+            data_root.cache_clear()
+            assert data_root() == root
+            return root / country / "var" / f"{table}.parquet"
+        try:
+            yield isolate
+        finally:
+            patch.undo()
+            data_root.cache_clear()
+            shutil.rmtree(root, ignore_errors=True)
 
 
 @pytest.mark.parametrize("country,table", SURFACE,
                          ids=[f"{c}/{t}" for c, t in SURFACE])
-def test_a_poisoned_country_parquet_is_REBUILT_not_served(country, table):
+def test_a_poisoned_country_parquet_is_REBUILT_not_served(country, table,
+                                                          private_country_root):
     """The repro, inverted.
 
     Poison the CONTENT as well as the hash, so a row count alone cannot pass:
@@ -214,9 +254,7 @@ def test_a_poisoned_country_parquet_is_REBUILT_not_served(country, table):
     """
     import pyarrow.parquet as pq
 
-    p = _warm(country, table)
-    if p is None:
-        pytest.skip(f"{country}/{table} not warm")
+    p = private_country_root(country, table)
 
     ref = getattr(Country(country), table)()
     backup = p.with_suffix(".parquet.gh866bak")
@@ -246,7 +284,7 @@ def test_a_poisoned_country_parquet_is_REBUILT_not_served(country, table):
         shutil.move(str(backup), str(p))
 
 
-def test_a_wave_produced_table_is_never_evicted(monkeypatch):
+def test_a_wave_produced_table_is_never_evicted(monkeypatch, private_country_root):
     """Scoped by control flow, not by luck.
 
     `Togo/plot_features` is rule-less too, but its waves produce rows, so the
@@ -254,9 +292,7 @@ def test_a_wave_produced_table_is_never_evicted(monkeypatch):
     what keeps the removal away from the 13 Make rules that consume a var/
     parquet as a prerequisite.
     """
-    p = _warm("Togo", "plot_features")
-    if p is None:
-        pytest.skip("Togo/plot_features not warm")
+    private_country_root("Togo", "plot_features")
 
     evicted = []
     original = Country._evict_stale_country_cache

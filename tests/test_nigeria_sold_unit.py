@@ -318,9 +318,12 @@ class TestBuiltTable:
     def test_unit_sold_populated_only_in_w1_w2(self):
         from lsms_library.local_tools import data_root
         path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
-        if not path.exists():
-            pytest.skip("no warm Nigeria crop_production parquet")
-        df = pd.read_parquet(path)
+        # The read is the check, not a prior exists(): since GH #866 a rebuild
+        # deletes var/ first, so the file can vanish in between (GH #778).
+        try:
+            df = pd.read_parquet(path)
+        except FileNotFoundError:
+            pytest.skip("no warm Nigeria crop_production parquet (absent, or mid-rebuild)")
         if UNIT_SOLD not in df.columns:
             pytest.skip("warm Nigeria crop_production parquet predates Unit_sold (re-warm needed)")
         t = df.index.get_level_values("t") if "t" in df.index.names else df["t"]
@@ -338,14 +341,20 @@ class TestBuiltTable:
         only (`assume_cache_fresh=True`); never cold-builds in CI."""
         from lsms_library.local_tools import data_root
         path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
-        if not path.exists():
-            pytest.skip("no warm Nigeria crop_production parquet")
-        if UNIT_SOLD not in pd.read_parquet(path, columns=None).columns:
+        # The read is the check (GH #778); see the test above.
+        try:
+            cols = pd.read_parquet(path, columns=None).columns
+        except FileNotFoundError:
+            pytest.skip("no warm Nigeria crop_production parquet (absent, or mid-rebuild)")
+        if UNIT_SOLD not in cols:
             pytest.skip("warm Nigeria crop_production parquet predates Unit_sold (re-warm needed)")
         import lsms_library as ll
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            df = ll.Country("Nigeria", assume_cache_fresh=True).crop_production()
+            try:
+                df = ll.Country("Nigeria", assume_cache_fresh=True).crop_production()
+            except FileNotFoundError:
+                pytest.skip("warm Nigeria crop_production parquet vanished mid-read (rebuild in progress)")
         assert UNIT_SOLD in df.columns
         assert str(df[UNIT_SOLD].dtype).startswith("string"), df[UNIT_SOLD].dtype
         assert UNIT_SOLD not in df.index.names

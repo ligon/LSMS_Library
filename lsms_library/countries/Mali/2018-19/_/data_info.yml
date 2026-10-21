@@ -360,5 +360,15 @@ interview_date:
             - grappe
             - menage
     myvars:
-        Int_t: s00q23a
+        # GH #1045: s00q23a is a Survey Solutions stamp, 'YYYY-MM-DDTHH:MM:SS'.
+        # `resolution: day` reproduces what has always been served (mali.py's
+        # old Int_t formatter took `.date()`); serving the recorded time of day
+        # is a separate decision (see Mali/_/CONTENTS.org).  'Manquant' is the
+        # sentinel that formatter recognised.
+        Int_t:
+            datetime: s00q23a
+            format: '%Y-%m-%dT%H:%M:%S'
+            sentinels: [Manquant]
+            resolution: day
+            calendar: gregorian
 

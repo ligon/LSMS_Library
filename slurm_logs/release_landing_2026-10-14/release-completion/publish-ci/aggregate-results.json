@@ -1,0 +1,128 @@
+{
+  "observed_utc": "2026-10-15T16:22:19.197239+00:00",
+  "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "tag": "v0.15.0",
+  "annotated_tag_object": "d4ff03d28ab417c5d98f8e1e7c94d1261b8331bc",
+  "release": {
+    "id": 414021163,
+    "html_url": "https://github.com/ligon/LSMS_Library/releases/tag/v0.15.0",
+    "tag_name": "v0.15.0",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-10-15T16:18:45Z"
+  },
+  "workflow": {
+    "databaseId": 38767928967,
+    "headSha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+    "headBranch": "v0.15.0",
+    "status": "completed",
+    "conclusion": "success",
+    "event": "release",
+    "createdAt": "2026-10-15T16:18:48Z",
+    "updatedAt": "2026-10-15T16:20:16Z",
+    "url": "https://github.com/ligon/LSMS_Library/actions/runs/38767928967"
+  },
+  "jobs": [
+    {
+      "databaseId": 116535902863,
+      "name": "build",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T16:18:51Z",
+      "completedAt": "2026-10-15T16:19:44Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38767928967/job/116535902863",
+      "log": {
+        "name": "build.log",
+        "bytes": 76974,
+        "sha256": "7d3feb5e4d8e2e41a867065010aecc3e5c1b7c1647fe314b6c7c07f683852275"
+      }
+    },
+    {
+      "databaseId": 116536350142,
+      "name": "publish",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T16:19:46Z",
+      "completedAt": "2026-10-15T16:20:15Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38767928967/job/116536350142",
+      "log": {
+        "name": "publish.log",
+        "bytes": 52963,
+        "sha256": "c88a3d70ea6fa1193104bffc66d49164ef0bcc2bcb50757175ba75398bbda7aa"
+      }
+    }
+  ],
+  "version_evidence": [
+    "Building 0.15.0 from v0.15.0",
+    "Building LSMS_Library (0.15.0)"
+  ],
+  "artifact": {
+    "id": 11988459813,
+    "name": "dist",
+    "size_in_bytes": 11583578,
+    "digest": "sha256:5793da7215cf91da8018a1875e747f4030a3ee92abb33f99ce037366c1f6838c",
+    "expired": false
+  },
+  "artifact_upload_download_sha256_equal": true,
+  "pypi": {
+    "json_url": "https://pypi.org/pypi/LSMS-Library/0.15.0/json",
+    "project_url": "https://pypi.org/project/LSMS-Library/0.15.0/",
+    "name": "LSMS-Library",
+    "version": "0.15.0",
+    "files": [
+      {
+        "filename": "lsms_library-0.15.0-py3-none-any.whl",
+        "size": 8852718,
+        "packagetype": "bdist_wheel",
+        "upload_time_iso_8601": "2026-10-15T16:20:09.632452Z",
+        "url": "https://files.pythonhosted.org/packages/b8/07/9f7372ae555316c0dac916316e058d9ca333c66f953a38a379e948a94844/lsms_library-0.15.0-py3-none-any.whl",
+        "yanked": false,
+        "sha256": "a19b458f2d2fce0bb67c192338ffb02fb745f78af3ba77b0d5db1c3395c0f9f0",
+        "matches_publish_log_attestation_digest": true
+      },
+      {
+        "filename": "lsms_library-0.15.0.tar.gz",
+        "size": 5300551,
+        "packagetype": "sdist",
+        "upload_time_iso_8601": "2026-10-15T16:20:12.193841Z",
+        "url": "https://files.pythonhosted.org/packages/57/cf/f3ccfab9a7e85262c28115d288317b1eb562701d62763920343bd9b20cc7/lsms_library-0.15.0.tar.gz",
+        "yanked": false,
+        "sha256": "e8ed24a6609268b02220e2eb94c7809ab5c153468094614c8af2b8444c78c657",
+        "matches_publish_log_attestation_digest": true
+      }
+    ]
+  },
+  "capture_identities": [
+    {
+      "name": "run.json",
+      "bytes": 3261,
+      "sha256": "85b7f43088529389a31a7c7cce2a42fba43fc4995729cde1cdb80403c2fa3e5b"
+    },
+    {
+      "name": "release.json",
+      "bytes": 27229,
+      "sha256": "04b3302251a0d7a127010c7961191addb4e2b1d48b9af190215ffa489529a25c"
+    },
+    {
+      "name": "tag-ref.json",
+      "bytes": 335,
+      "sha256": "6cae9922986fef204f98d1e59286d6476618516c049fdb9bde8687ce13d7ea42"
+    },
+    {
+      "name": "tag-object.json",
+      "bytes": 665,
+      "sha256": "706f8d062d338bc83854928d0096dd899dd6d494fc4ab6a3064b4ffbc747bb8c"
+    },
+    {
+      "name": "pypi-version.json",
+      "bytes": 10461,
+      "sha256": "c66c3a4990e6731bb615992c8af24e95ae1cd9b636dc7c6dfcedd4288a1ae2d2"
+    },
+    {
+      "name": "artifacts.json",
+      "bytes": 703,
+      "sha256": "cc06398886faa1110cebf2e03aaf680de05baa06b680bad64191961da872ab20"
+    }
+  ],
+  "limits": "Read-only workflow/log/API observation. Distribution digests are compared between the publish log attestation and public PyPI metadata; this monitor did not download/install the distributions or initiate publication."
+}

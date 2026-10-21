@@ -1,0 +1,218 @@
+{
+  "base": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "candidate": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "candidate_clean": true,
+  "files": [
+    {
+      "path": ".claude/skills/add-wave/SKILL.md",
+      "sha256": "440c3823cb8a08b79449ad04c5b3f92240c2c232674ec2485b3c8a4f283eca20",
+      "matches": [
+        {
+          "issue": "1115-1128",
+          "reviewed_head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "c1205513db01fb743ec3c8b8c0ec69615a2bfcd9521fb7ed2d3195bd1a7e20dd",
+      "matches": [
+        {
+          "issue": "1115-1128",
+          "reviewed_head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "docs/guide/feature.md",
+      "sha256": "f77530205f45b01fdaa4194484d6fad8e4c14904101a82aed7b7bab36ac07ccf",
+      "matches": [
+        {
+          "issue": "1159",
+          "reviewed_head": "45f80dcb50da189b7864034b1d92863dca68de09",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "lsms_library/countries/Uganda/_/CONTENTS.org",
+      "sha256": "774d5bc13c35ca5a6d9543766648f88dbc1efe508d73aa388d5ac6e81146256c",
+      "matches": [
+        {
+          "issue": "nutrition-cpu",
+          "reviewed_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "lsms_library/country.py",
+      "sha256": "7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c",
+      "matches": [
+        {
+          "issue": "778",
+          "reviewed_head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "lsms_library/data_access.py",
+      "sha256": "41bfd39d6bc67e440f3b42b40dc0a88342bde388ae4f173f1b1d042c7d5011b9",
+      "matches": [
+        {
+          "issue": "1115-1128",
+          "reviewed_head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "lsms_library/provenance.py",
+      "sha256": "aeba0ff3e925579bd023b1549039de1e807f6e83dac84ab05a5669a3bd3bf1d6",
+      "matches": [
+        {
+          "issue": "1115-1128",
+          "reviewed_head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "lsms_library/transformations.py",
+      "sha256": "7296587e5bf141e08236da16c29c08f971d24641ea6678ca1673456fc0572394",
+      "matches": [
+        {
+          "issue": "1159",
+          "reviewed_head": "45f80dcb50da189b7864034b1d92863dca68de09",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "scripts/backfill_wave_provenance.py",
+      "sha256": "dace4ac6727ae7f913e07555f35416dbb9cfab38aebc24bfc3dee1c56e34429c",
+      "matches": [
+        {
+          "issue": "1115-1128",
+          "reviewed_head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/fixtures/uganda_baseline.json",
+      "sha256": "56b2961b276fac1c68e9b839c84e7f887184e078c8e34b43522fec4855d36788",
+      "matches": [
+        {
+          "issue": "nutrition-cpu",
+          "reviewed_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_gh1040_wave_read_gates.py",
+      "sha256": "4f053141d69247dd4960b75e05954efdd92c74bb79491ae2c29deb775d8bb348",
+      "matches": [
+        {
+          "issue": "778",
+          "reviewed_head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_gh1093_declared_unit_consumers.py",
+      "sha256": "dfa4d93e2b7125ca7be565c3f45fe6d3b564bf19969d89216e39a7992d0fc626",
+      "matches": [
+        {
+          "issue": "1159",
+          "reviewed_head": "45f80dcb50da189b7864034b1d92863dca68de09",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_gh1159_pooled_reducers.py",
+      "sha256": "815a77aa771a0f60e2bbd79578337baf4c716518789f028c34ce5aea164ca998",
+      "matches": [
+        {
+          "issue": "1159",
+          "reviewed_head": "45f80dcb50da189b7864034b1d92863dca68de09",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_gh866_stale_country_parquet_not_laundered.py",
+      "sha256": "427ba65b8d55060db301b423b0dd8a09234bee0f6eb04edb3f595b68c00a04be",
+      "matches": [
+        {
+          "issue": "778",
+          "reviewed_head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_guyana_index_uniqueness.py",
+      "sha256": "28e872f616fe576fddfd768a178066ec6f040404143f0a34ac9062303e3b5ed8",
+      "matches": [
+        {
+          "issue": "778",
+          "reviewed_head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_india_employment_activity_index.py",
+      "sha256": "3c10a89b117155f8c2ec14a2703ddd8dd83d7b9d5ac7d116c2defb3a8c506748",
+      "matches": [
+        {
+          "issue": "778",
+          "reviewed_head": "f7eb194d7a54176ad44dfdeb6529e6b4b1715aeb",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_uganda_invariance.py",
+      "sha256": "fd3a1ef979a65d3da0a8b5e60c365a92a0a941b50d998fc2057a6ba4ca4f2712",
+      "matches": [
+        {
+          "issue": "nutrition-cpu",
+          "reviewed_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_uganda_invariance_hash_variants.py",
+      "sha256": "b7b5121edd15a9123cf423c44c3711f43be7ce5ae86997d7788b65bdefca813d",
+      "matches": [
+        {
+          "issue": "nutrition-cpu",
+          "reviewed_head": "98822ed1ab3a2106b3be4c3d90aa086076e32ef0",
+          "byte_equal": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_wave_provenance.py",
+      "sha256": "bd7fd68dd823fb341b1032eb9d6fa09ba64579feef1104066bcb0dc143dbe488",
+      "matches": [
+        {
+          "issue": "1115-1128",
+          "reviewed_head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+          "byte_equal": true
+        }
+      ]
+    }
+  ],
+  "all_reviewed_file_bytes_preserved": true,
+  "scope": "Non-ledger, non-report changes since852; no executable validation or CI claim."
+}

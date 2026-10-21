@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import base64
 import configparser
+import functools
 import hashlib
 import json
 import logging
@@ -61,15 +62,17 @@ import zipfile
 from collections.abc import Sequence
 from contextlib import contextmanager
 from pathlib import Path
+from typing import NamedTuple
 from urllib.parse import urlparse
 
 from . import config
 from .catalog_relations import derived_from, same_study_aliases
 from .paths import countries_root, data_root
 from .provenance import (
-    SOURCE_WORLDBANK,
     WaveProvenance,
+    acquired_release,
     read_provenance,
+    source_org_path,
     write_provenance,
 )
 
@@ -111,6 +114,25 @@ def _fetch_destination(path: Path, populate_cache: bool = False) -> Path:
     if populate_cache:
         return _COUNTRIES_DIR / path
     return data_root() / path
+
+
+def _acquisition(func):
+    """Run an ACQUISITION entry point inside
+    ``local_tools.allow_intree_sources()`` (GH #831).
+
+    ``get_dataframe`` refuses a sidecar-less source inside the config tree
+    unless the caller opts in.  ``add_wave`` / ``populate_and_push`` extract
+    into the config tree on purpose (``_fetch_destination(...,
+    populate_cache=True)``) and ``dvc add`` what landed, so anything read
+    during them is acquisition, not a stray -- they are the sanctioned
+    opt-in.  Lazy import: ``local_tools`` imports this module lazily too.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        from .local_tools import allow_intree_sources
+        with allow_intree_sources():
+            return func(*args, **kwargs)
+    return wrapper
 
 # ---------------------------------------------------------------------------
 # Country -> WB catalog registry
@@ -465,7 +487,7 @@ def _sweep_orphaned_locks(dvc_dir: Path, before: set[Path]) -> None:
             logger.warning("could not remove orphaned lock %s: %s", q, exc)
 
 
-def _run_dvc(cmd, *, cwd, timeout) -> subprocess.CompletedProcess:
+def _run_dvc(cmd, *, cwd, timeout, env=None) -> subprocess.CompletedProcess:
     """``subprocess.run`` for dvc, but a timeout does not leave a lock behind.
 
     The write is NOT made atomic -- no wrapper can make an external process\'s
@@ -477,7 +499,7 @@ def _run_dvc(cmd, *, cwd, timeout) -> subprocess.CompletedProcess:
     before = _dvc_lock_files(dvc_dir)
     proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE, text=True,
-                            start_new_session=True)
+                            start_new_session=True, env=env)
     try:
         out, err = proc.communicate(timeout=timeout)
         return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
@@ -545,7 +567,8 @@ def _dvc_timeout(default: int = 1800) -> int:
 
 
 def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
-                             base_delay: float = 4.0) -> subprocess.CompletedProcess:
+                             base_delay: float = 4.0,
+                             env=None) -> subprocess.CompletedProcess:
     """Run a ``dvc`` CLI command, retrying only on DVC lock contention.
 
     Returns the final :class:`subprocess.CompletedProcess`.  A non-zero exit
@@ -558,7 +581,7 @@ def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
     thundering herd of writers waking together.
     """
     sub = cmd[1] if len(cmd) > 1 else "dvc"
-    result = _run_dvc(cmd, cwd=cwd, timeout=timeout)
+    result = _run_dvc(cmd, cwd=cwd, timeout=timeout, env=env)
     for attempt in range(1, retries + 1):
         if result.returncode == 0:
             return result
@@ -569,7 +592,7 @@ def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
         logger.warning("dvc %s: lock contention (attempt %d/%d); retrying in %.1fs",
                        sub, attempt, retries, delay)
         time.sleep(delay)
-        result = _run_dvc(cmd, cwd=cwd, timeout=timeout)
+        result = _run_dvc(cmd, cwd=cwd, timeout=timeout, env=env)
     return result
 
 
@@ -799,65 +822,30 @@ def _gpg_decrypt(gpg_file: Path, passphrase: str) -> str | None:
     return None
 
 
-def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
-    """Mirror user-config ``s3_creds`` into the in-tree ``.dvc/s3_creds``.
+def _reader_credentials_env() -> dict[str, str] | None:
+    """Subprocess env pointing a ``dvc`` CLI READ at the user-config creds.
 
-    Legacy wave scripts in ``lsms_library/countries/{country}/{wave}/_/*.py``
-    call ``dvc.api.open(fn, mode='rb')`` directly.  These calls do not
-    pass a ``credentialpath`` override, so DVC resolves the relative
-    ``credentialpath = s3_creds`` from ``.dvc/config`` against the DVC
-    directory itself --- i.e. ``lsms_library/countries/.dvc/s3_creds``.
+    ``.dvc/config`` pins ``credentialpath = s3_creds``, which the ``dvc`` CLI
+    resolves *in-tree* (``countries_root()/.dvc/s3_creds``).  The library no
+    longer writes that file (GH #1001: ``countries_root()`` is read-only at
+    runtime), so a CLI read of the remote -- ``unpushed_blobs``'s
+    ``dvc status --cloud`` -- is handed the user-config file instead.
+    ``dvc_s3`` applies ``credentialpath`` with
+    ``os.environ.setdefault("AWS_SHARED_CREDENTIALS_FILE", ...)``, so a
+    variable already present in the child's environment wins.
 
-    The v0.7.0 user-config migration moved credential storage to
-    :func:`config.s3_creds_path` (``~/.config/lsms_library/s3_creds``)
-    so the package can install into read-only site-packages, and
-    :class:`DVCFileSystem` constructions in ``local_tools`` override
-    ``credentialpath`` to point there.  But ``dvc.api.open()`` does
-    not benefit from that override --- on a fresh clone, the in-tree
-    ``s3_creds`` is missing (gitignored) and legacy scripts hit
-    ``NoCredentialsError``.
-
-    This helper bridges the gap by copying the user-config credentials
-    into the in-tree ``.dvc/s3_creds`` location whenever the in-tree
-    file is missing or stale.  Idempotent and safe to call repeatedly.
-
-    Returns ``True`` if the in-tree mirror is in sync (either already
-    matched or was just written), ``False`` otherwise (no source creds,
-    write failed, or read-only DVC dir).
+    Returns ``None`` (inherit the environment unchanged) when the user has
+    already exported ``AWS_SHARED_CREDENTIALS_FILE`` or has no user-config
+    creds.  Deliberately NOT used for ``dvc push``: there the writer creds
+    arrive through the very ``credentialpath`` this would pre-empt (see
+    :func:`_s3_writer_credentialpath`).
     """
-    if dvc_dir is None:
-        dvc_dir = _COUNTRIES_DIR / ".dvc"
-
-    user_creds = config.s3_creds_path()
-    if not (user_creds.exists() and user_creds.stat().st_size > 0):
-        return False
-
-    if not dvc_dir.exists():
-        return False
-
-    legacy_creds = dvc_dir / "s3_creds"
-    try:
-        user_text = user_creds.read_text(encoding="utf-8")
-    except OSError as exc:
-        logger.debug("Could not read user-config s3_creds: %s", exc)
-        return False
-
-    # Skip the write if the legacy file already matches.
-    if legacy_creds.exists():
-        try:
-            if legacy_creds.read_text(encoding="utf-8") == user_text:
-                return True
-        except OSError:
-            pass  # fall through to overwrite
-
-    try:
-        legacy_creds.write_text(user_text, encoding="utf-8")
-    except OSError as exc:
-        logger.debug("Could not mirror s3_creds to %s: %s", legacy_creds, exc)
-        return False
-
-    logger.debug("Mirrored s3_creds to legacy in-tree path %s", legacy_creds)
-    return True
+    if os.environ.get("AWS_SHARED_CREDENTIALS_FILE"):
+        return None
+    creds = config.s3_creds_path()
+    if not (creds.exists() and creds.stat().st_size > 0):
+        return None
+    return {**os.environ, "AWS_SHARED_CREDENTIALS_FILE": str(creds)}
 
 
 def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
@@ -867,9 +855,11 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     key validation is the real access gate; the obfuscated passphrase
     just keeps the value from being trivially discoverable via grep.
 
-    Always attempts to mirror the resulting creds into the legacy
-    in-tree ``.dvc/s3_creds`` path (see :func:`_sync_legacy_dvc_creds`)
-    so that legacy ``dvc.api.open()`` call sites still work.
+    Writes to :func:`config.s3_creds_path` only.  *dvc_dir* is READ (for
+    the encrypted files) and never written: ``countries_root()`` is
+    read-only at runtime (GH #1001).  The reader hands that path to
+    ``DVCFileSystem`` itself (``local_tools._build_dvcfs``), so no in-tree
+    ``.dvc/s3_creds`` copy is needed.
 
     Returns ``True`` if ``s3_creds`` was written (or already exists).
     """
@@ -879,9 +869,6 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     creds_file = config.s3_creds_path()
     creds_file.parent.mkdir(parents=True, exist_ok=True)
     if creds_file.exists() and creds_file.stat().st_size > 0:
-        # User-config creds already in place; still ensure the legacy
-        # in-tree mirror is populated for `dvc.api.open()` callers.
-        _sync_legacy_dvc_creds(dvc_dir)
         return True
 
     enc_file = dvc_dir / "s3_reader_creds.enc"
@@ -931,9 +918,6 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     except OSError as exc:
         logger.warning("Could not write s3_creds: %s", exc)
         return False
-
-    # Mirror into the legacy in-tree path so `dvc.api.open()` works.
-    _sync_legacy_dvc_creds(dvc_dir)
 
     logger.info("Auto-unlocked S3 read credentials via WB API key.")
     return True
@@ -1016,17 +1000,12 @@ def reset_permissions_cache() -> None:
 # ---------------------------------------------------------------------------
 
 def _read_source_url(country: str, wave: str) -> str | None:
-    """Read the catalog URL from SOURCE.org."""
-    source = _COUNTRIES_DIR / country / wave / "Documentation" / "SOURCE.org"
-    if not source.exists():
-        return None
-    try:
-        text = source.read_text(encoding="utf-8")
-        m = re.search(r'https?://[^\s\]\)]+', text)
-        return m.group(0).rstrip("/") if m else None
-    except (OSError, UnicodeDecodeError):
-        # File missing or undecodable — treat as no-source-link.
-        return None
+    """Read the primary URL, excluding secondary metadata and notes (#1115).
+
+    Reuse the same body/explicit-CATALOG_URL rule as the provenance accessor;
+    a note containing a catalog link is not an acquisition instruction.
+    """
+    return read_provenance(_COUNTRIES_DIR, country, wave).url
 
 
 def _extract_catalog_id(url: str) -> str | None:
@@ -1160,8 +1139,20 @@ def _download_and_extract(download_url: str, zip_filename: str,
 
 
 def _extract_all_from_zip(download_url: str, zip_filename: str,
-                          dest_dir: Path, api_key: str) -> list[Path]:
-    """Download a zip and extract ALL data files.  Returns list of paths."""
+                          dest_dir: Path, api_key: str,
+                          report: dict | None = None) -> list[Path]:
+    """Download a zip and extract ALL data files.  Returns list of paths.
+
+    A file already at its destination is NOT overwritten, and is not in the
+    returned list.  Pass *report* (a dict) to learn what was left alone and
+    whether the download failed: ``report["skipped"]`` lists those files and
+    ``report["error"]`` is set on failure.  The acquisition path needs both
+    before it may record which release a directory holds (GH #1128): a
+    pre-existing file is the OLD release's.
+    """
+    if report is not None:
+        report.setdefault("skipped", [])
+        report.setdefault("error", None)
     import urllib.request
 
     with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as tmp:
@@ -1186,6 +1177,8 @@ def _extract_all_from_zip(download_url: str, zip_filename: str,
                 if any(name.lower().endswith(s) for s in data_suffixes):
                     basename = Path(name).name
                     dest = dest_dir / basename
+                    if dest.exists() and report is not None:
+                        report["skipped"].append(dest)
                     if not dest.exists():
                         dest.parent.mkdir(parents=True, exist_ok=True)
                         with zf.open(name) as src, open(dest, "wb") as dst:
@@ -1201,12 +1194,30 @@ def _extract_all_from_zip(download_url: str, zip_filename: str,
             zipfile.BadZipFile) as e:
         # network / HTTP / disk / corrupt-zip; programmer bugs propagate.
         logger.error("Full zip download/extract failed: %s", e)
+        if report is not None:
+            report["error"] = f"{type(e).__name__}: {e}"
         return extracted
     finally:
         try:
             os.unlink(tmp_path)
         except OSError:
             pass
+
+
+class _AcquiredRelease(NamedTuple):
+    """What one acquisition download put on disk (GH #1128)."""
+    catalog_id: str
+    idno: str
+    extracted: tuple[Path, ...]     # files written
+    skipped: tuple[Path, ...]       # already there, so NOT overwritten
+    error: str | None               # the download / extraction failed
+
+
+# ``(country, wave)`` -> the release the last acquisition download for that
+# wave extracted.  Set by ``get_data_file(..., populate_cache=True)`` -- the
+# only place that knows which idno it fetched and whether every file landed --
+# and consumed by ``_record_acquired_release``.
+_ACQUIRED_RELEASES: dict[tuple[str, str], _AcquiredRelease] = {}
 
 
 # ---------------------------------------------------------------------------
@@ -1532,6 +1543,7 @@ def unpushed_blobs(remote: str | None = None,
         cmd += [str(t) for t in targets]
     result = _run_dvc_with_lock_retry(
         cmd, cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
+        env=_reader_credentials_env(),
     )
     out = (result.stdout or "").strip()
     if not out:
@@ -1547,6 +1559,96 @@ def unpushed_blobs(remote: str | None = None,
     return []
 
 
+def _record_acquired_release(country: str, wave: str,
+                             entry: dict | None = None) -> WaveProvenance | None:
+    """Record in ``SOURCE.org`` the release an acquisition just put on disk.
+
+    The acquisition path is the only writer of the HELD release keys
+    (``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:``), and it clears the latest-seen
+    trio a re-stamp queued (``#+CATALOG_LATEST_*``), because the newer release
+    is now the one held (GH #1114 / #1128).  See
+    :func:`lsms_library.provenance.acquired_release`.
+
+    Written only when the download demonstrably put the WHOLE release there:
+    nothing failed, and no file was left in place.  ``_extract_all_from_zip``
+    never overwrites a file, so a pre-existing one is the old release's, and
+    recording the new idno over it would be the false claim #1114 exists to
+    prevent.  Otherwise ``SOURCE.org`` is left as it is, with a warning.
+
+    *entry* is the catalog row for the entry, if the caller already has it;
+    otherwise it is looked up (for the DOI, title and years).  Returns the
+    record written, or ``None``.
+    """
+    acq = _ACQUIRED_RELEASES.pop((country, wave), None)
+    if acq is None or not acq.extracted:
+        logger.warning("%s/%s: no World Bank release was extracted; "
+                       "SOURCE.org not updated.", country, wave)
+        return None
+    if acq.error or acq.skipped:
+        why = (f"the download failed ({acq.error})" if acq.error else
+               f"{len(acq.skipped)} file(s) already in Data/ were not "
+               f"overwritten (e.g. {acq.skipped[0].name}) and may be another "
+               "release's")
+        logger.warning("%s/%s: %s, so it cannot be said that the directory "
+                       "holds %s.  SOURCE.org not updated; clear Data/ and "
+                       "re-run to record the release.", country, wave, why,
+                       acq.idno)
+        return None
+    # Files the release did NOT ship stay where they are (nothing deletes
+    # them): Ethiopia 6161's v03 only renamed a file, so acquiring it leaves
+    # v02's eth_plotgeovariables_y5.dta beside Pub_ETH_PlotGeovariables_Y5.
+    # The release is still held whole; say what else is there.  The scan is
+    # recursive: Nigeria/2023-24's Data/ holds 0 top-level entries and 106
+    # sidecars under subdirectories (``Post Harvest Wave 5/...``), which a
+    # top-level listing reported as nothing (red team r1, R5 iii).  The
+    # skip gate above is NOT: ``_extract_all_from_zip`` flattens to
+    # ``Data/<basename>`` and skips only a top-level file of that name, so a
+    # nested older release is neither skipped nor overwritten -- it is left
+    # beside the flat new one, and named here.  Nested layouts are GH #1149.
+    shipped = {p.name.lower() for p in acq.extracted}
+    data_dir = _COUNTRIES_DIR / country / wave / "Data"
+    others = sorted(
+        str(f.relative_to(data_dir)) for f in data_dir.rglob("*")
+        if f.is_file()
+        and Path(f.name.removesuffix(".dvc")).suffix.lower()
+        in {".dta", ".csv", ".sav"}
+        and f.name.removesuffix(".dvc").lower() not in shipped)
+    if others:
+        logger.warning("%s/%s: Data/ also holds %d file(s) (searched "
+                       "recursively) that %s does not ship (e.g. %s).  They "
+                       "are another release's; check the wave's config does "
+                       "not read them.  The skip gate that keeps an earlier "
+                       "release from being recorded over is per-basename at "
+                       "the top level of Data/ only, so a release held in "
+                       "subdirectories is not seen by it (GH #1149).",
+                       country, wave, len(others), acq.idno, others[0])
+    if entry is None or str(entry.get("id")) != acq.catalog_id:
+        entry = None
+        spec = _COUNTRY_CATALOG.get(country)
+        if spec is not None and spec.code:
+            entry = next((e for e in _wb_catalog_search(spec.code,
+                                                        collection=None)
+                          if str(e["id"]) == acq.catalog_id), None)
+    entry = entry or {}
+    same = str(entry.get("idno") or "").strip() == acq.idno.strip()
+    ys, ye = entry.get("year_start"), entry.get("year_end")
+    prov = acquired_release(
+        read_provenance(_COUNTRIES_DIR, country, wave),
+        country=country, wave=wave, catalog_id=acq.catalog_id,
+        idno=acq.idno,
+        # The row's DOI is its idno's; a row for another release says nothing.
+        doi=(entry.get("doi") or None) if same else None,
+        title=entry.get("title") or None,
+        years=(f"{ys}-{ye}" if ys and ye else (str(ys) if ys else None)),
+        repository=entry.get("repository") or None,
+        url=(f"https://microdata.worldbank.org/index.php/catalog/"
+             f"{acq.catalog_id}"),
+        method="add-wave")
+    write_provenance(_COUNTRIES_DIR, prov)
+    return prov
+
+
+@_acquisition
 def populate_and_push(country: str, wave: str,
                       remote: str | None = None) -> list[Path]:
     """Download all data files for a wave from WB and push to DVC cache.
@@ -1558,6 +1660,15 @@ def populate_and_push(country: str, wave: str,
 
     Requires both ``wb_api`` read access and write access to a DVC
     remote.
+
+    ``SOURCE.org`` is updated to name the release downloaded, and any
+    ``#+CATALOG_LATEST_*`` keys are cleared -- but only when the whole release
+    landed (see :func:`_record_acquired_release`) AND every file of it was
+    pushed.  The record is written after the push, not before: a release
+    that is on disk in one checkout but not on the remote is not held by the
+    library -- every other reader reaches the files through DVC -- so
+    recording it first would name a release the remote does not have (red
+    team r1, R5 i).
 
     Parameters
     ----------
@@ -1575,6 +1686,7 @@ def populate_and_push(country: str, wave: str,
     """
     # Use a dummy filename to trigger the download; populate_cache=True
     # extracts everything from the zip.
+    _ACQUIRED_RELEASES.pop((country, wave), None)      # this call's, only
     dummy = f"{country}/{wave}/Data/_probe_.dta"
     get_data_file(dummy, populate_cache=True)
 
@@ -1599,7 +1711,26 @@ def populate_and_push(country: str, wave: str,
     logger.info("Downloaded %d data files for %s/%s; adding to DVC ...",
                 len(rel_paths), country, wave)
 
-    return push_to_cache_batch(rel_paths, remote=remote, dvc_add=True)
+    try:
+        pushed = push_to_cache_batch(rel_paths, remote=remote, dvc_add=True)
+    except BaseException:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
+        raise
+
+    # The held release moves only here and in add_wave (GH #1128) -- and here
+    # only once the remote holds every file, so the record never names a
+    # release the shared store does not have.
+    expected = {f.resolve() for f in data_files}
+    confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in pushed}
+    if confirmed == expected:
+        _record_acquired_release(country, wave)
+    else:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
+        logger.warning("%s/%s: %d of %d file(s) pushed, so the release is not "
+                       "recorded in SOURCE.org: it is on disk here but not "
+                       "on the remote.  Re-run once the push succeeds.",
+                       country, wave, len(pushed), len(rel_paths))
+    return pushed
 
 
 # ---------------------------------------------------------------------------
@@ -1761,6 +1892,21 @@ def local_catalog_ids(country: str) -> dict[str, list[str]]:
     return {k: sorted(v) for k, v in held.items()}
 
 
+def local_held_idnos(country: str) -> dict[str, set[str]]:
+    """Map each PRIMARY catalog id we hold -> the release idnos recorded for it.
+
+    ``#+CATALOG_IDNO:`` describes a directory's primary entry only, so a
+    secondary id (Malawi/2016-17's 2939) has no recorded release and is
+    absent here: whether we hold its latest release cannot be judged.
+    """
+    held: dict[str, set[str]] = {}
+    for wave in _local_waves(country):
+        prov = read_provenance(_COUNTRIES_DIR, country, wave)
+        if prov.is_worldbank and prov.idno:
+            held.setdefault(prov.catalog_id, set()).add(prov.idno.strip())
+    return held
+
+
 def local_covered_ids(country: str) -> dict[str, list[str]]:
     """Map each catalog id *covered* by a release we hold -> the dirs covering it.
 
@@ -1807,7 +1953,9 @@ def _logical_wave_labels(country: str) -> set[str]:
         return set()
     try:
         from .country import Country
-        waves = set(Country(country).waves)
+        # Acquisition: discovery runs on directories not yet wired up (all
+        # ten unregistered dirs are in _COUNTRY_CATALOG), so opt in (GH #915).
+        waves = set(Country(country, allow_unregistered=True).waves)
     except (ImportError, OSError, KeyError, ValueError, AttributeError) as exc:
         logger.debug("Could not read logical waves for %s: %s", country, exc)
         return set()
@@ -1845,13 +1993,22 @@ def discover_waves(country: str,
         working: ``covered`` / ``derived`` / ``unknown`` rows all keep
         ``local=False``, because we do not hold their *files*.
     ``local_status``
-        ``"yes"`` / ``"covered"`` / ``"derived"`` / ``"unknown"`` / ``"no"``.
+        ``"yes"`` / ``"stale-release"`` / ``"covered"`` / ``"derived"`` /
+        ``"unknown"`` / ``"no"``.
         A ``no`` has to be **earned** -- it is a confident claim that we neither
         hold this study nor anything containing it, and a confident wrong answer
         is worse than an admitted gap (GH #600):
 
         ``yes``
             A wave dir records this catalog id.
+        ``stale-release``
+            A wave dir records this catalog id, and the release it records
+            holding (``#+CATALOG_IDNO:``) is older than the catalog's latest
+            (this row's ``idno``) -- Nigeria/2023-24 holds ``v01_M`` of 6410,
+            the catalog is at ``v02_M``.  Held (``local=True``), and an
+            acquisition target: ``add_wave`` / ``populate_and_push`` fetch the
+            newer release (GH #1128).  Judged on the primary entry of a dir
+            only; a dir's secondary ids record no release and read ``yes``.
         ``covered``
             We do not hold this entry's files, but a release we *do* hold
             subsumes its content -- ``Tanzania/2008-15/`` holds the Uniform
@@ -1875,6 +2032,10 @@ def discover_waves(country: str,
     ``local_waves``
         The wave directories that back, cover, or constitute this entry (empty
         for ``no``).
+    ``held_idnos``
+        The release idnos the dirs holding this entry as their primary record
+        (sorted; empty where none is recorded, or the entry is not held).
+        Compare with the row's ``idno``, the catalog's latest.
 
     Which WB *collections* are searched is per-country config: the
     ``repositories`` field of :class:`CountryCatalog`, defaulting to
@@ -1923,6 +2084,9 @@ def discover_waves(country: str,
         return {cid: sorted(waves) for cid, waves in merged.items()}
 
     held = canonical_holdings(local_catalog_ids(country))
+    # Releases are compared on the EXACT id: an alias is another entry, whose
+    # idno differs by construction.
+    held_idnos = local_held_idnos(country)
     covered = canonical_holdings(local_covered_ids(country))
     derived = derived_from()
 
@@ -1942,9 +2106,14 @@ def discover_waves(country: str,
         e["wave"] = _catalog_to_wave_label(e)
         cid = aliases.get(e["id"], e["id"])
         constituents = [aliases.get(c, c) for c in derived.get(cid, [])]
+        e["held_idnos"] = sorted(held_idnos.get(str(e["id"]), ()))
+        latest = str(e.get("idno") or "").strip()
         if cid in held:
             e["local"] = True
-            e["local_status"] = "yes"
+            # A held entry whose recorded release is not the catalog's latest
+            # is still held -- and is a re-acquisition target (GH #1128).
+            stale = bool(latest) and any(h != latest for h in e["held_idnos"])
+            e["local_status"] = "stale-release" if stale else "yes"
             e["local_waves"] = held[cid]
         elif cid in covered:
             # Content held, files not: a release we hold subsumes this entry.
@@ -1983,6 +2152,7 @@ def _get_console(verbose: bool):
         return None
 
 
+@_acquisition
 def add_wave(country: str, catalog_id: str,
              wave: str | None = None,
              confirm: bool = True,
@@ -1994,6 +2164,14 @@ def add_wave(country: str, catalog_id: str,
     Creates the directory structure (``Data/``, ``Documentation/``,
     ``_/``), writes ``SOURCE.org``, downloads the Stata zip, extracts
     all data files, and optionally pushes to the DVC remote.
+
+    ``SOURCE.org`` records the release downloaded as the one held
+    (``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:``) and clears any
+    ``#+CATALOG_LATEST_*`` keys -- re-running ``add_wave`` on a wave the
+    backfill queued as having a newer release is how that release is acquired
+    (GH #1128).  It is written once the whole release has landed (see
+    :func:`_record_acquired_release`); everything else the record already
+    holds for the same entry is kept.
 
     Parameters
     ----------
@@ -2109,32 +2287,37 @@ def add_wave(country: str, catalog_id: str,
 
     # Record provenance: the WB catalog *id* this directory came from, so
     # discover_waves() can match on identity instead of guessing from a
-    # year-derived label.  Always (re)written -- add_wave knows the id for a
-    # fact, and an existing bare-URL SOURCE.org carries strictly less
-    # information than the record we can write here.
-    years = None
-    if entry is not None:
-        ys, ye = entry.get("year_start"), entry.get("year_end")
-        years = f"{ys}-{ye}" if ys and ye else (str(ys) if ys else None)
-
-    write_provenance(_COUNTRIES_DIR, WaveProvenance(
-        country=country,
-        wave=wave,
-        source=SOURCE_WORLDBANK,
-        catalog_id=cat_id,
-        idno=idno,
-        title=(entry or {}).get("title") or None,
-        years=years,
-        repository=(entry or {}).get("repository") or None,
-        url=catalog_url,
-        method="add-wave",
-    ))
+    # year-derived label.  Only a NEW file receives a routing record now,
+    # without a held release.  Existing records are left byte-identical until
+    # successful acquisition; an explicit fetch URL routes a different entry
+    # without discarding held or unknown facts first (#1128).
+    needs_source_override = (
+        _extract_catalog_id(_read_source_url(country, wave) or "") != cat_id)
+    if (needs_source_override
+            and not source_org_path(_COUNTRIES_DIR, country, wave).exists()):
+        existing = read_provenance(_COUNTRIES_DIR, country, wave)
+        years = None
+        if entry is not None:
+            ys, ye = entry.get("year_start"), entry.get("year_end")
+            years = f"{ys}-{ye}" if ys and ye else (str(ys) if ys else None)
+        routing = acquired_release(
+            existing, country=country, wave=wave, catalog_id=cat_id,
+            idno=None, title=(entry or {}).get("title") or None,
+            years=years, repository=(entry or {}).get("repository") or None,
+            url=catalog_url, method="add-wave")
+        write_provenance(_COUNTRIES_DIR, routing)
     log(f"Created {country}/{wave}/ directory structure")
 
     # --- Download -----------------------------------------------------------
     with status(f"Downloading Stata zip from World Bank ..."):
+        _ACQUIRED_RELEASES.pop((country, wave), None)  # this call's, only
         dummy = f"{country}/{wave}/Data/_probe_.dta"
-        get_data_file(dummy, populate_cache=True)
+        if needs_source_override:
+            # Route this acquisition explicitly without replacing any existing
+            # record before the requested release actually lands (#1128).
+            get_data_file(dummy, populate_cache=True, _source_url=catalog_url)
+        else:
+            get_data_file(dummy, populate_cache=True)
 
     data_dir = wave_dir / "Data"
     data_suffixes = {".dta", ".csv", ".sav"}
@@ -2156,8 +2339,12 @@ def add_wave(country: str, catalog_id: str,
         rel_paths = [f.relative_to(_COUNTRIES_DIR) for f in data_files]
 
         with status(f"dvc add ({len(data_files)} files) ..."):
-            pushed = push_to_cache_batch(
-                rel_paths, remote=remote, dvc_add=True)
+            try:
+                pushed = push_to_cache_batch(
+                    rel_paths, remote=remote, dvc_add=True)
+            except BaseException:
+                _ACQUIRED_RELEASES.pop((country, wave), None)
+                raise
 
         elapsed = time.time() - t0
 
@@ -2172,6 +2359,22 @@ def add_wave(country: str, catalog_id: str,
         log(f"Downloaded {len(data_files)} files "
             f"(push=False) in {elapsed:.0f}s")
         result = data_files
+
+    # Ledger section 4: a requested push is part of acquisition success, while
+    # push=False deliberately records a complete local download.  Neither a
+    # failed/partial push nor a same-length list of other files certifies it.
+    expected = {f.resolve() for f in data_files}
+    confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in result}
+    if not push or confirmed == expected:
+        held = _record_acquired_release(country, wave, entry=entry)
+        if held is not None:
+            log(f"SOURCE.org: holds {held.idno}")
+    else:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
+        logger.warning(
+            "%s/%s: push did not confirm every downloaded file; "
+            "SOURCE.org not updated, held release and latest queue kept.",
+            country, wave)
 
     # --- Summary table ------------------------------------------------------
     if con is not None and result:
@@ -2239,7 +2442,8 @@ def _as_countries_relative(path: Path) -> Path:
 
 
 def get_data_file(path: str | Path,
-                  populate_cache: bool = False) -> Path | None:
+                  populate_cache: bool = False, *,
+                  _source_url: str | None = None) -> Path | None:
     """Obtain a raw data file, trying local -> DVC remotes -> World Bank.
 
     Parameters
@@ -2250,6 +2454,10 @@ def get_data_file(path: str | Path,
     populate_cache : bool
         If True and the file is downloaded from the WB, also extract
         all files from the zip (not just the one requested).
+    _source_url : str, optional
+        Internal acquisition-only routing override. Requires populate_cache
+        and the acquisition opt-in context; ordinary reads use SOURCE.org.
+        This keeps an existing record intact until add_wave succeeds.
 
     Returns
     -------
@@ -2257,6 +2465,10 @@ def get_data_file(path: str | Path,
         Absolute path to the file on local disk, or ``None`` if
         unavailable.
     """
+    if _source_url is not None:
+        from .local_tools import _ALLOW_INTREE_SOURCES
+        if not populate_cache or not _ALLOW_INTREE_SOURCES.get():
+            raise ValueError("A source URL override requires acquisition mode")
     path = _as_countries_relative(Path(path))
     # Read from the config tree if the file is already there (a maintainer
     # checkout with real data in it is a normal working state, and every
@@ -2353,7 +2565,8 @@ def get_data_file(path: str | Path,
                         "World Bank.")
         return None
 
-    source_url = _read_source_url(country, wave)
+    source_url = (_source_url if _source_url is not None
+                  else _read_source_url(country, wave))
     if not source_url:
         logger.warning("No SOURCE.org found for %s/%s", country, wave)
         return None
@@ -2385,8 +2598,12 @@ def get_data_file(path: str | Path,
     data_dir = _COUNTRIES_DIR / country / wave / "Data"
 
     if populate_cache:
+        report: dict = {}
         extracted = _extract_all_from_zip(download_url, zip_filename,
-                                          data_dir, api_key)
+                                          data_dir, api_key, report=report)
+        _ACQUIRED_RELEASES[(country, wave)] = _AcquiredRelease(
+            catalog_id=catalog_id, idno=idno, extracted=tuple(extracted),
+            skipped=tuple(report["skipped"]), error=report["error"])
         if abs_path.exists():
             return abs_path
         for f in extracted:

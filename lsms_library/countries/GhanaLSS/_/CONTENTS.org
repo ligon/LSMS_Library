@@ -387,7 +387,7 @@ as an artefact of it.
 | Rounds    | Cluster ID range | Notes                             |
 |-----------+------------------+-----------------------------------|
 | GLSS1     | 1xxx             | 200 EAs from 1984 census frame    |
-| GLSS2     | 2xxx             | 200 EAs, fresh draw               |
+| GLSS2     | 2xxx             | ~170 EAs: ~half retained GLSS1 workloads (RENUMBERED), ~half from master-sample replicate 6 |
 | GLSS3     | 3xxx             |                                   |
 | GLSS4     | 4xxx             |                                   |
 | GLSS5     | 5xxxx            | 5-digit codes                     |
@@ -396,6 +396,26 @@ as an artefact of it.
 
 The changing prefix makes cross-wave cluster linkage impossible
 without an explicit mapping file.
+
+*GLSS2 is not a fresh draw* (corrected 2026-10-19, GH #942; this row used to
+say "200 EAs, fresh draw" -- see /Tensions/ s2 below, now resolved).  Half of
+GLSS1's workloads were retained for GLSS2 and renumbered into the 2xxx scheme,
+half came from master-sample replicate 6 (G3report.pdf, Appendix 1, printed
+p. 110).  Measured through =Country('GhanaLSS').sample()=: 712 households link
+GLSS1 to GLSS2 and *none* keeps its =v=; they fall in 79 cluster pairs, a clean
+bijection (=1003 -> 2009=, =1013 -> 2049=, ...) with =Region= and =Rural=
+agreeing 79/79.  176 GLSS1 and 170 GLSS2 clusters, so 97 / 91 are unpaired and
+are genuinely different EAs.  The 79 is a *lower bound* on the retained
+workloads (half of 176 is ~88): either some retained workloads yielded no
+re-interview, or "workload" is not exactly "EA".
+
+This is now machine-readable: =GhanaLSS/_/sampling.yml= declares the 1988-89
+boundary =cluster_id_continuity: wave-scoped=, so any =Country('GhanaLSS')=
+frame carrying =v= across 1987-88 -> 1988-89 raises a
+=ClusterIdentityWarning= (rows unchanged).  GLSS3 onward are declared
+=unobservable=: no household links across those boundaries, so grouping on
+=v= across them groups genuinely different EAs and is not warned on.  No
+crosswalk is built (GH #942 ruling, 2026-10-18).
 
 ** Urban/Rural (=Rural=)
 
@@ -553,13 +573,17 @@ no such pointer yet -- adding one is a one-line follow-up.
 
 | Round | File             | i        | v     | weight   | strata | Rural  |
 |-------+------------------+----------+-------+----------+--------+--------|
-| GLSS1 | =Y00A.DAT=       | =HID=    | =CLUST= | ---    | ---    | Appendix I (broadcast) |
-| GLSS2 | =Y00A.DAT=       | =HID=    | =CLUST= | ---    | ---    | Appendix I (broadcast) |
+| GLSS1 | =Y00A.DAT= (+2)  | =HID=    | =CLUST= | ---    | ---    | Appendix I (broadcast) |
+| GLSS2 | =Y00A.DAT= (+2)  | =HID=    | =CLUST= | ---    | ---    | Appendix I (broadcast) |
 | GLSS3 | =POV_GH.DTA=     | =[clust,nh]= | =clust= | --- | =region= | =loc2= |
 | GLSS4 | =SEC0A.DTA=      | =[clust,nh]= | =clust= | --- | =region= | =loc2= |
 | GLSS5 | =parta/sec0.dta= | =hhid=   | =clust= | =weight= | =region= | =loc2= (=parta/sec7.dta=) |
 | GLSS6 | =PARTA/g6loc_edt.dta= | =HID= | =clust= | =weight= | =region= | =loc2= |
 | GLSS7 | =g7sec0.dta=     | =[clust,nh]= | =clust= | =WTA_S= | =region= | =urbrur= |
+
+(+2): two households per wave that =Y00A.DAT= omits are appended from the
+roster / food modules' own =CLUST= (GH #1008) -- see /Four interviewed
+households are missing from the GLSS1/GLSS2 cover page/ below.
 
 * Sampling universe, exclusions and sub-samples
 
@@ -1075,7 +1099,9 @@ Consequences a user must not miss:
 Flagged, both sides quoted.  *s1 is now resolved in place* (2026-08-24) --- the
 two assertions it contradicted have been qualified where they stand, rather
 than left to be found 700 lines later; the tension is kept below with both
-quotes intact.  s2--s4 remain *unresolved*.
+quotes intact.  *s2 is resolved in place too* (2026-10-19, GH #942): the
+cluster-numbering row now reads "~half retained ... ~half from replicate 6".
+s3--s4 remain *unresolved*.
 
 *** 1. "no rotating panel or refreshment sample mechanism"
 
@@ -1106,7 +1132,11 @@ this was *not* an accident of fieldwork: it was the stated design.  The
 "Despite being designed as..." framing in that section is contradicted by GSS's
 own documentation.
 
-*** 2. "GLSS2 | 2xxx | 200 EAs, fresh draw"
+*** 2. "GLSS2 | 2xxx | 200 EAs, fresh draw" --- RESOLVED 2026-10-19 (GH #942)
+
+The row has been corrected where it stands (see =Cluster (PSU) variable=); the
+original wording is kept in the quote below, with the reasoning, so the
+correction can be audited.
 
 The cluster-numbering table in =Sampling Design= says:
 
@@ -1998,6 +2028,342 @@ TODO below).
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
+*** =u='None'= is "no unit recorded", not a unit (GH #1042, 2026-10-18)
+
+*Decision.*  The Section 8H own-production unit spelled =None= / =none=
+now maps to the missing-unit sentinel =Unknown=
+(=transformations.U_UNKNOWN=) in =_/unit_labels.org=, so the kg inference
+refuses it (=_unit_sentinel_mask=) and those rows are carried in their native
+unit.  The remap sits in the country table because that is where all three
+waves mint the label; an API-time =categorical_mapping.org= row would rename
+the served column *after* the kg factor was inferred.
+
+*Where the rows come from* (all =s='produced'=, 2,508 served rows, 798
+=(t,i,j)= groups; *none* of those groups reports any other unit):
+
+| wave    | variable | code | served rows | raw code-0 rows, consumer & qty > 0 |
+|---------+----------+------+-------------+-------------------------------------|
+| 1998-99 | =s8hq9=  | 0    |          88 |  36 (decoded by the wave's own =s8hq9= table, =0 None=) |
+| 2005-06 | =s8hq13= | 0    |       1,450 | 639 (value label =none=) |
+| 2012-13 | =s8hq9=  | 0    |         970 | 343 (value label =none=) |
+
+*Questionnaire (C4), wave by wave* (re-read 2026-10-18; corrects the first
+version of this entry, which wrongly put count units in GLSS5's list).  The
+three instruments do *not* share an 8H unit list:
+
+- *GLSS4 (1998-99)*, =1998-99/Documentation/questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf=,
+  Part B §8H Q9 "ENTER UNIT THAT THE RESPONDENT CHOOSES".  It prints *two
+  different, conflicting* unit lists, and *neither has a code 0 / None*:
+  - p. 8.15 (PDF p. 72; pages 8.11-8.14 point their Q9 here): =Pounds 1,
+    Kilogram 2, Ton 3, Minibag 5, Maxibag 5, Sheet 6, Basket 7, Bowl 8,
+    American tin 9, Tree 10, Stick 11, Bundle 12, Barrel 13, Liter 14,
+    Gallon 16, Beer bottle 16, Bunch 17, Nut 18, Fruit 19, Log 20, Box 21,
+    Margarine Tin 22, Tubers 23, Fingers 24= -- misprinted as printed (5 and
+    16 each used twice, no 4 or 15);
+  - p. 8.17 (PDF p. 74; attached to the meat/poultry/fish page 8.16 and to
+    8.17 itself -- milk, drinks): =Pounds 1, Kilogram 2, Ton 3, Minibag 4,
+    Maxibag 5, Sheet 6, Basket 7, Bowl 8, American tin 9, Crate 10,
+    Single/Whole 11, Bundle 12, Barrel 13, Litre 14, Gallon 15, Beer Bottle 16,
+    Box 17=.
+  So codes 10, 11 and 17 mean different things depending on which list the
+  enumerator used, and *chicken and eggs (page 8.16) were coded on the list
+  that has =Single/Whole 11=*.  Neither list prints =All=, which the 1998-99
+  data decodes (2,180 Egg rows, 289 Chicken rows).  Not fixed here -- see
+  the GLSS4 dual-list residual in the GH #1042 report.
+- *GLSS5 (2005-06)*, =2005-06/Documentation/G5QPartB.pdf=, Part B §8H Q13
+  "SEE LIST OF UNIT CODES": =None 00, All 01, American tin 02, Barrel 03,
+  Basket 04, Beer bottle 05, Bowl 06, Box 07, Bunch 08, Bundle 09,
+  Fanta bottle 10, Fingers 11, Fruits 12, Gallon 13, Kilogram 14, Litre 15,
+  Log 16, Margarine tin 17, Maxi bag 18, Mini bag 19, Nut 20, Pounds 21,
+  Sheet 22, Stick 23, Tonne 24, Tubers 26= (no 25).  *There is no Single,
+  Piece, Dozen, Crate or Whole.*  =singles= exists only in the DATA, as the
+  unprinted value label 37 of =s8hq13= in =sec8h.dta=, one of twelve codes
+  the data add after the printed list (=25 tree=, then =27 balls, 28 bar,
+  29 bucket, 30 crate, 31 dozen, 32 loaf, 33 pair, 34 pieces, 35 pots, 36 set,
+  37 singles, 38 yards/meter=) -- post-codes, not options the enumerator was
+  shown.  8C(1), 8C(2) and 8D print
+  near copies (pp. 8.5-8.8, PDF pp. 11-14): they *add* =Tree 25=, spell
+  code 12 =Fruit= (8H: =Fruits=), and *keep* =Margarine tin 17= (corrected
+  2026-10-18; an earlier version said they drop it).  Only 8G's list
+  (p. 8.10, PDF p. 16) lacks =Margarine tin 17= -- it also omits =None 00= and
+  every code 15-23.  No Section 8 list prints a count unit.  How it was
+  read: the list is in the PDF text layer on printed pp. 8.11, 8.12, 8.14,
+  8.15 and 8.17; the text layer of 8.13 (oils) and *8.16 (eggs and snail)*
+  carries no list, so for those two pages this rests on the GH #1042 red
+  team's full read of the document, not on extracted text.
+- *GLSS6 (2012-13)*, =2012-13/Documentation/QUESTIONNAIRES/GLSS6 Part B Questionnaire.pdf=,
+  §8H "UNIT CODES REFER TO PAGE 8.10"; the list on p. 8.10 (PDF p. 15) runs
+  =None 00 ... Yards 42= and *adds the count units* =Crate 13=, =Dozen 15=,
+  =Pieces 31=, =Single 37= (beside =Balls 03=, =Pair 30=, =Set 35=, ...).
+  The other list on that page (processed/transformed goods, =Cassava flour 01=
+  ...) has no None; the red team additionally read =None ....00= heading the
+  p. 8.4 crop list and "IF NONE PUT '00'" in §9A Q3 (not re-read here).
+
+So code 0 is the instrument's "nothing / not applicable" code in GLSS5 and
+GLSS6, and GLSS4 has no such code at all.
+
+*Data.*  Code 0 is also the zero-fill on non-consumer rows: 374,626 of the
+375,782 2005-06 =s8hq1='no'= rows, and 978,825 of the 979,290 2012-13 rows
+whose =s8hq1= is not ='yes'= (60 of them blank), carry it -- almost all
+with no quantity at all.  The served =None= rows were nevertheless
+being given *inferred* kilograms -- 39,029 kg in total (=item_unit= 1,745
+rows, =unit= 653, =item_unit_tight= 110) -- and the factors are nonsense:
+Pepper 26 kg per "None" (110 rows, 28,773 kg = 74% of the total), Egg 1.2 kg
+per egg, and 653 rows on the cross-item pooled factor 0.679.
+
+*What it is not -- and the evidence that actually holds.*  The first version
+of this entry argued that GLSS5 "offers singles/piece for exactly that", so a
+counted chicken would have been coded as one.  *That is false* (above): GLSS5
+prints no count unit at all, so an enumerator who counted birds or eggs had
+no code to record it.  What the data show instead is that, for Chicken and
+Egg, the unit label carries *no size information in any unit*: in 2005-06
+every Chicken unit prices like one bird (=All= 981 rows at a median 30,000;
+=Kilogram= 140 at 22,500; =None= 184 at 25,000; =Single= 73 at 30,000) and
+every Egg unit like one egg (=All= 1,690 at 1,000; =None= 200 at 1,200;
+=Single= 105 at 1,000; =Kilogram= 13 at 1,000); in 2012-13 Chicken =None=
+203 rows at 10 against =Single= 2,723 at 12, Egg =None= 26 at 0.4 against
+=Single= 3,056 at 0.4.  So =None= on these rows is plausibly "counted, with
+no code to say so".  The slice is 687 rows (27% of the 2,508) and 1,475 kg
+(3.8% of the 39,029 kg removed).  Serving them =Unknown= (no inferred kg) is
+the conservative default; the count-unit follow-up below acts on the price
+evidence where -- and only where -- the resulting kilograms are plausible.
+
+*Accounting* (private cold rebuild of GhanaLSS at 3e3bd26ee + this change):
+see the GH #1042 commit message and =tests/test_gh1042_missing_unit_spellings.py=.
+| measure                                     | before        | after         |
+|---------------------------------------------+---------------+---------------|
+| =u='None'= rows (1998-99 / 2005-06 / 2012-13) | 88 / 1,450 / 970 | 0           |
+| =u='Unknown'= rows                          | 0             | 88 / 1,450 / 970 |
+| =food_acquired= rows; sum Expenditure       | 5,340,606; 19,059,899,600.9 | unchanged |
+| =food_quantities(units='kgs')= total kg     | 11,079,155.43 | 11,040,126.57 (-39,028.86) |
+| =kg_factor_sources= item_unit / tight / unit / none | 1,011,668 / 70,443 / 606,596 / 3,565,404 | 1,009,923 / 70,333 / 605,943 / 3,567,912 |
+| =kg_factor_baseline_gate= rows_refused      | 428,373       | 428,173       |
+| =food_prices()= rows, =kgvalue= / =kgprice= | 568,624 / 189,649 | 567,839 / 188,864 |
+| =food_prices()= rows, =unitvalue= / =unitprice= | 1,676,093 / 189,656 | unchanged |
+| =nutrition._quantities()= (486,507 cells)   | 10,813,574.81 kg | identical, max abs diff 0 |
+
+*Not changed:* =nutrition.py='s =NON_PHYSICAL_UNITS= still names ='none'=;
+after the rename the rows arrive as =Unknown= and pass that filter, but they
+carry no kg factor and are dropped by its =u == 'kg'= mask, so the nutrient
+quantities are unchanged (measured above).  =community_prices= (the other
+=unit_labels.org= reader) has no =None= rows.  =u='All'= is a different
+question and is untouched.
+
+*** Count unit for own-produced chicken: unit code 0 -> =Single= (GH #1042 follow-up, @ligon 2026-10-18)
+
+*Decision.*  @ligon asked for count units for chicken and eggs.  Acted on
+where the evidence holds *and* the resulting kilograms are plausible, which
+is Chicken in 2005-06 and 2012-13 only.  =ghanalss.unrecorded_unit_to_count=
+(called in both wave =food_acquired.py= scripts right after
+=to_country_food_labels=, i.e. on the country =j= axis and the canonical =u=)
+relabels =s='produced'=, =u='Unknown'= rows of the items in
+=ghanalss.UNRECORDED_UNIT_IS_COUNT= to =Single= -- the spelling GLSS6 prints
+(=Single 37=) and GLSS5's data carries (value label 37), so they pool with
+the genuine count rows.  Pure relabel; the index stays unique (asserted --
+Trap 9).  It is a harmonisation of the unit *label*, like the
+=None -> Unknown= row in =unit_labels.org=, not a registered derivation.
+
+*Evidence, per (wave, item)* (=s='produced'=, branch head before this change;
+test: median price of the =None= rows against the same wave's =Single= rows,
+and the share of =None= rows within [0.5x, 2x] of that median):
+
+| wave    | item     | None rows @ median | Single rows @ median | in band | (item, Single) kg | done? |
+|---------+----------+--------------------+----------------------+---------+-------------------+-------|
+| 2005-06 | Chicken  | 184 @ 25,000       | 73 @ 30,000          | 0.98    | 1.2 -> 1.07       | yes   |
+| 2012-13 | Chicken  | 203 @ 10           | 2,723 @ 12           | 0.95    | 1.2 -> 1.07       | yes   |
+| 1998-99 | Chicken  | 8 @ 5,000          | none served          | --      | --                | no: nothing to pool with |
+| 2005-06 | Egg      | 200 @ 1,200        | 105 @ 1,000          | 0.94    | *0.50 per egg*    | no    |
+| 2012-13 | Egg      | 26 @ 0.4           | 3,056 @ 0.4          | 0.96    | *0.50 per egg*    | no    |
+| 2012-13 | Other Domestic Poultry | 41 @ 15 | 444 @ 14         | 1.00    | 0.79              | no: below a live bird |
+| 2012-13 | Goat     | 15 @ 50            | 178 @ 60             | 1.00    | 4.54              | no: a goat is ~20-30 kg |
+| 2005-06, 2012-13 | Coconut (fresh) | 28 @ 1,000; 18 @ 0.4 | 12 @ 1,000; 310 @ 0.5 | 1.00 | 1.0 | no: plausible, not asked for -- candidate |
+
+=None= is *not* a count in general: in 2012-13 its rows price at 10x the
+=Single= median for Maize (cob) and Okra, 5x for Eggplant and Pepper, 6x for
+Maize (flour/dough).  2005-06's own test is weak (Maize (cob), Onion and Shea
+Butter also "pass" because their prices barely vary across any unit), which
+is why the kg check is the second gate and not a formality.
+
+*Why eggs are NOT done* (superseded 2026-10-18: eggs are now relabelled AND
+declared no-kg -- next entry).  The price evidence holds, but the ladder infers
+=(Egg, Single)= at *0.501 kg per egg* (an egg is ~0.05-0.065 kg), because the
+egg =Kilogram= rows price at the per-egg price (1,000 cedis in 2005-06, 0.4 GHS
+in 2012-13): the =(t, Egg)= per-kg baseline is built from counts mislabelled
+as kilograms.  That is the same fault that gave the old =(Egg, None)= 1.2 kg
+and gives =(Egg, Piece)= 0.0012 kg.  The task's rule was "if the inferred factor
+is implausible, leave the rows at the count unit with =none= kg" -- but
+=food_kg_factors= has *no item-level refusal*: a row on =Single= reaches the
+=item_unit= rung, then the u-pooled =unit= rung, and never =none=.  So a
+remapped egg row would be served 0.50 kg, and the egg rows stay =Unknown=
+(still counted by =units='units'=).  Note the *genuine* =(Egg, Single)= rows
+already carry that factor (105 + 3,056 + 10,727 in 2005-06 / 2012-13 /
+2016-17, all =s=); not changed here.  GH #1042 residual.
+
+*Accounting* (private cold rebuild; before = branch head f0d1396b6):
+| measure                                       | before                     | after                      |
+|-----------------------------------------------+----------------------------+----------------------------|
+| =u='Unknown'= rows 1998-99 / 2005-06 / 2012-13 | 88 / 1,450 / 970           | 88 / 1,266 / 767           |
+| produced Chicken =Single= 2005-06 / 2012-13   | 73 / 2,723                 | 257 / 2,926                |
+| =food_acquired= rows; sum Expenditure         | 5,340,606; 19,059,899,600.9 | unchanged; index unique   |
+| =(Chicken, Single)= =kg_per_unit= (all waves)  | 1.2 (=item_unit=)          | 1.0714 (=item_unit=)       |
+| kg on the 387 remapped rows                   | 0 (=none=)                 | 233.6 + 307.6 = 541.2      |
+| kg on the genuine produced Chicken =Single= rows 2005-06 / 2012-13 | 245.2 / 4,957.0 | 218.9 / 4,425.9 |
+| =food_quantities(units='kgs')= total kg       | 11,040,126.57              | 11,040,085.37 (-41.20)     |
+| =kg_factor_sources= item_unit / none          | 1,009,923 / 3,567,912      | 1,010,310 / 3,567,525      |
+| =kg_factor_baseline_gate= rows_refused        | 428,173                    | unchanged                  |
+| =food_prices()= =kgvalue= / =kgprice=         | 567,839 / 188,864          | 568,027 / 189,052 (+188 =(t,i,j)= cells) |
+| =food_prices()= =unitvalue= / =unitprice=; =food_quantities(units='units')= rows | 1,676,093 / 189,656; 1,694,623 | unchanged |
+| =nutrition._quantities()=                     | 486,507 cells, 10,813,574.81 kg | 486,695 cells, 10,813,533.61 kg |
+
+Pooling the 387 rows (priced a little below the genuine =Single= rows) pulls
+the shared factor down 11%, so every =(Chicken, Single)= row in every wave and
+source loses 11% of its kilograms -- net, the country gains 541 kg on the
+remapped rows and loses 582 kg elsewhere.  1.07 kg is still a plausible
+dressed bird.  Pinned by =tests/test_gh1042_missing_unit_spellings.py=
+(=..._count_unit_*=, =..._chicken_count_rows_get_a_plausible_bird_weight=).
+
+*** Eggs and fresh coconut: count unit; eggs get NO inferred kilograms (GH #1042 rulings, @ligon 2026-10-18)
+
+*Rulings.*  (1a) Own-produced egg on unit code 0 -> =Single=, as chicken;
+(1b) an *item-level "no kg factor"*, so egg rows on a count unit keep their
+native count and get =KgFactorSource == 'none'=; (3) fresh coconut on unit
+code 0 -> =Single=; (6) the chicken cross-wave move is accepted and disclosed
+(below).  The "Why eggs are NOT done" paragraph of the entry above is
+superseded by this one.
+
+*Price evidence, re-measured* (cold build at 7b20e8c31, =s='produced'=,
+median =Expenditure/Quantity= of the code-0 =Unknown= rows vs the same wave's
+=Single= rows):
+| wave    | item            | Unknown rows @ median | Single rows @ median | in [0.5x, 2x] |
+|---------+-----------------+-----------------------+----------------------+---------------|
+| 2005-06 | Egg             | 200 @ 1,200           | 105 @ 1,000          | 0.94          |
+| 2012-13 | Egg             | 26 @ 0.40             | 3,056 @ 0.40         | 0.96          |
+| 2005-06 | Coconut (fresh) | 28 @ 1,000            | 12 @ 1,000           | 1.00          |
+| 2012-13 | Coconut (fresh) | 18 @ 0.40             | 310 @ 0.50           | 1.00          |
+Same waves and scope as chicken: 1998-99 serves no =Single= for egg or
+coconut (4 egg code-0 rows, no coconut), so there is nothing to pool with.
+No =(t,i,j,s,visit)= group holds both =Unknown= and =Single= for either item,
+so the relabel cannot collide (Trap 9).  =(Coconut (fresh), Single)= infers
+1.0 kg per coconut, before and after.  That is plausible *by coincidence*
+(red team r3, R7; re-measured 2026-10-19): it is the same counts-as-kg
+artefact as the eggs.  The =(t, Coconut (fresh))= baseline is the 2012-13
+=Kg= rows (49, served =metric=), which price at a median 0.5 per "kg" --
+the =Single= median, 0.5 -- so they are coconuts counted under a kilogram
+label, and the ratio of two per-coconut prices is 1.  2005-06 has no =Kg=
+coconut rows.  The same baseline serves =Fruit= 1.0 kg (1,017 rows, all
+waves) and =All= 0.6 kg (581 rows).  Not declared: the number happens to be
+a defensible coconut weight; recorded so nobody reads it as measured.
+
+*The declaration.*  =_/no_kg_factor.yml= names =Egg= on every count unit it
+carries: =Single=, =Piece=, =Ball= (GLSS6 prints =Balls 03= beside =Pieces
+31=), =Pair=, =Dozen=, =Crate=.  Factors the ladder served them before, all
+implausible because the =(t, Egg)= per-kg baseline is built from egg
+=Kilogram= rows that price at the per-egg price: =Single= 0.5006 kg
+(13,888 rows), =Piece= 0.0012 (714), =Ball= 0.0012 (122), =Pair= 0.0825
+(u-pooled, 5), =Dozen= 0.024 (42), =Crate= 0.030 (1,636; a crate is 30
+eggs).  Not declared: =All=, containers (=Basket=, =Bowl=, ...) and
+=Heap=.  The mechanism is
+=transformations.food_kg_factors(no_kg=...)=, fed at read time by
+=Country._no_kg_factor_cells=; the rows are disclosed in
+=attrs['kg_factor_declared_none']=.
+
+*=All= is an OPEN residual, not a settled exclusion* (red team r3, R2;
+re-measured at this head, 2026-10-19).  The first version of this entry
+excluded =All= as "GLSS's 'all', not a count".  The price evidence says
+otherwise: egg =All= rows price like ONE egg -- median =Expenditure /
+Quantity= 2005-06 1,000 against =Single= 1,000 and =Kg= 1,000; 2012-13 0.40
+against 0.40 and 0.40; 1998-99 200 against =Kg= 250 (no =Single= served
+there; 1991-92 has no expenditure) -- and =nutrition.py= itself classes
+=all= as non-physical (=NON_PHYSICAL_UNITS=).  So =All= is still served
+1.0 kg per unit from the very =(t, Egg)= baseline the declaration calls
+broken: *12,928 rows, 23,584.02 kg* (1991-92 8,932 rows / 4,602.80 kg;
+1998-99 2,180 / 11,437.12; 2005-06 1,690 / 6,885.10; 2012-13 126 /
+659.00), every row =item_unit= at exactly 1.0.  The smaller item-rung units
+behave the same way: =Nut= 146 rows / 493.00 kg, =Finger= 141 / 479.00,
+=Stick= 41 / 141.00, =Barrel= 14 / 41.00, all at 1.0 and pricing at 1,000
+per unit in 2005-06 (=Finger= 200 in 1998-99), and =Bunch= 13 / 154.00 at
+2.0 (priced 2,000).  In all, the item rung serves 24,899.95 of the
+25,606.42 egg kg still served.  Whether to extend the declaration (the
+simplest form is =item: Egg= with no =units=, i.e. every egg unit; =metric=
+would still serve =Kg= / =Pound= / =Gram= / =Liter= / =Milliliter=) or to
+rule that =All= is a measure is a decision for @ligon, not taken here.
+Also out of the mechanism's reach *by design*: the 288 egg =Kg= rows
+(518.70 kg) served by the =metric= rung although they price per egg -- a
+declaration refuses inferred factors only.
+
+*Before / after* (private cold rebuilds; before = 7b20e8c31):
+| measure                                       | before                      | after                       |
+|-----------------------------------------------+-----------------------------+-----------------------------|
+| =u='Unknown'= rows 1998-99 / 2005-06 / 2012-13 | 88 / 1,266 / 767            | 88 / 1,038 / 723            |
+| Egg =Single= 2005-06 / 2012-13 / 2016-17      | 105 / 3,056 / 10,727        | 305 / 3,082 / 10,727        |
+| Coconut (fresh) =Single= 2005-06 / 2012-13    | 12 / 310                    | 40 / 328                    |
+| =food_acquired= rows; sum Expenditure         | 5,340,606; 19,059,899,600.9 | unchanged; index unique     |
+| egg count-unit rows / their kg                | 16,407 / 32,881.51 (inferred) | 16,633 / 0 (=none=)       |
+| =kg_factor_declared_none= matched = refused   | --                          | 16,633                      |
+| =food_quantities(units='kgs')= total kg       | 11,040,085.37               | 11,007,391.86 (-32,693.51)  |
+| =kg_factor_sources= item_unit / unit / none   | 1,010,310 / 605,943 / 3,567,525 | 993,954 / 605,938 / 3,583,886 |
+| =kg_factor_baseline_gate= rows_refused        | 428,173                     | 428,168                     |
+| =food_prices()= =kgvalue= / =kgprice=         | 568,027 / 189,052           | 560,023 / 187,096           |
+| =food_prices()= =unitvalue= / =unitprice=     | 1,676,093 / 189,656         | unchanged                   |
+The kg fall is exactly the egg rows' inferred kilograms less the coconut
+rows' new 188.00 kg; no other row is re-priced (the declared rows still
+enter the estimators as evidence).  Eggs on other units keep their
+25,606.42 kg.
+
+*Not reached by the declaration -- an OPEN residual, and these rulings ADD
+egg kilograms to =nutrition=* (red team r3, R1).  =nutrition.py:_quantities=
+calls =food_quantities_from_acquired(fa, units='kgs')= itself, without
+=no_kg= (and without =unit_kg=), so the =nutrition= table still weighs every
+counted egg at the ladder's factors -- =(Egg, Single)= 0.5006 kg.  Before
+the egg relabel, the 226 own-produced code-0 egg rows were =Unknown= (no
+factor) and fell out at nutrition's =u == 'kg'= filter; as =Single= they are
+now weighed, and the 46 relabelled coconut rows likewise.  Measured
+2026-10-19 by running =_quantities= in each checkout against its own
+cold-built =food_acquired= (development =ddd79800c= is identical to
+7b20e8c31 for Egg and Coconut):
+| =nutrition._quantities()=  | 7b20e8c31 (before the rulings)  | rulings head =ad9df1e3b=   | change   |
+|----------------------------+---------------------------------+----------------------------+----------|
+| Egg 2005-06                | 98 cells, 1,335.66 kg           | 178 cells, 1,602.13 kg     | +266.47  |
+| Egg 2012-13                | 1,339 cells, 8,662.50 kg        | 1,349 cells, 8,746.10 kg   | +83.60   |
+| Egg 2016-17                | 5,948 cells, 24,508.93 kg       | unchanged                  | 0        |
+| Coconut (fresh) 2005-06 / 2012-13 | 1,897.97 / 2,598.75 kg   | 1,969.97 / 2,714.75 kg     | +72.00 / +116.00 |
+| all items                  | 486,695 cells, 10,813,533.61 kg | 486,793 cells, 10,814,071.68 kg | +538.07 |
+(Development: 486,507 cells, 10,813,574.81 kg; the step to 7b20e8c31 is the
+chicken relabel, measured in the entry above.)  The 2016-17 row is the
+larger point: =nutrition= serves 24,508.93 kg of egg there at 0.50 kg per
+egg, which =food_quantities()= no longer does.  Measured at this head, not
+applied: passing =no_kg=c._no_kg_factor_cells()= would take =nutrition= to
+479,663 cells / 10,780,840.09 kg (-33,231.59), Egg 2005-06 1,077.85 /
+2012-13 515.75 / 2016-17 31.97 kg; passing =unit_kg= (=quintal= 100) moves 0
+cells today.  Not done on this branch because =_/no_kg_factor.yml= would
+then become a *build* input of =var/nutrition.parquet=, and it is not hashed
+(=_BUILD_INPUT_SUFFIXES= has no =.yml=): an edit to the declaration would
+leave =nutrition= stale with no signal.  GH #1042 residual (drafted in the
+r3-fix report: route =_quantities= through =no_kg= and hash the =.yml= for
+that table).
+
+*Why goat and other domestic poultry are NOT relabelled* (ruling 3): both
+pass the price test in 2012-13 (Goat 15 @ 50 vs 178 @ 60; Other Domestic
+Poultry 41 @ 15 vs 444 @ 14; all in band) *and in 2005-06*, there on one or
+two =Single= rows only (Goat 14 @ 170,000 vs 1 @ 160,000, in band 1.00;
+Other Domestic Poultry 20 @ 30,000 vs 2 @ 45,000, 0.95 -- added 2026-10-19,
+red team r3, R8), but the =(item, Single)= factor
+the ladder would serve them is implausible -- Goat 4.54 kg (a goat is ~20-30
+kg), Other Domestic Poultry 0.79 kg (below a live bird) -- so a relabel would
+mint wrong kilograms where =Unknown= mints none.
+
+*Chicken: the cross-wave move, accepted and disclosed (ruling 6).*  The
+=(Chicken, Single)= factor is one number per =(j, u)= pooled across waves, so
+pooling the 387 relabelled 2005-06/2012-13 rows moved it 1.2 -> 1.0714 kg for
+*every* wave.  2016-17 was not relabelled, yet its 155 purchased =(Chicken,
+Single)= rows (194.5 birds) go 233.40 -> 208.39 kg (-10.7%; re-measured at
+this head -- the 1.2 is the factor measured before the chicken relabel).
+And the price test cannot distinguish =Single= from =Kilogram= for chicken
+(2005-06 medians: =Single= 30,000, =Kilogram= 22,500, the code-0 rows 25,000:
+one bird is about a kilogram), so the chicken relabel rests on the
+plausibility of the resulting kilograms and on the quantities (whole birds),
+not on price alone.
+
 *** Test...
 #+begin_src python :results output
 import pandas as pd
@@ -2113,11 +2479,69 @@ empty"* -- that gap is *GH #781*.  Until #781 gives it a word, this entry is
 the record: the six cells are empty *on purpose*, and re-grading them back
 to =sane= by restoring a constant would be a regression, not a fix.
 
+*Update 2026-10-19 (GH #781): the word exists, and it is THREE cells now,
+not six.*  PR #916's =8h-farmgate= valuation priced 1998-99, 2005-06 and
+2012-13 (=food_prices()= serves 1998-99 / 2005-06 / 2012-13 / 2016-17),
+so only GLSS1-3 are still =dropped=.  They are adjudicated in
+=.coder/coverage/absent_verdicts.csv=, and they do *not* get the same
+verdict:
+
+| wave    | verdict                   | why                                                                                                   |
+|---------+---------------------------+-------------------------------------------------------------------------------------------------------|
+| 1987-88 | =correctly-empty=         | 12A/12B ask amounts only; 100% =u='Value'=; every mode empty but =unitvalue=, which is identically 1.0 |
+| 1988-89 | =correctly-empty=         | same form (see below)                                                                                 |
+| 1991-92 | =empty-pending-machinery= | 8H records a quantity and a per-unit price; =food_prices(units='kgprice')= already serves 28,754 rows  |
+
+1991-92 is *not* correctly empty: only the default =kgvalue= mode is
+empty, and only because 8H is "deliberately NOT wired" (the farmgate
+section above).  It stays in the queue until that decision is taken.  The
+counts quoted there have since drifted: today 80,277 of 287,712 produced
+rows carry both factors and =All= is 94,039 rows (were 80,282 / 286,922 /
+93,349).
+
+*Two facts found doing it.*  (1) GLSS1's and GLSS2's questionnaire PDFs
+have no text layer, but they *can* be read: =pypdf= extracts each page as
+an image, and the page is legible (that is how C4 ran for these two
+verdicts).  The =food_security= 1987-88 / 1988-89 =unsure= rows in that
+file say C4 "could not run" because the scans cannot be *searched*; they
+could be re-checked by reading the 78 pages.  (2) =GHA_1988_GLSS_Household_Questionnaire_EN.pdf=
+is *GLSS1's scan republished*, not a GLSS2 instrument.  It is a different
+file from GLSS1's (file md5s differ), but all 78 of its page images are
+identical to GLSS1's: the embedded CCITT-fax image streams byte for byte,
+and the decoded pixels, on every page (compared with =pypdf= 6.21.1; no
+digest is quoted, because =pypdf='s extracted =page.images[0].data= wrapper
+is not even deterministic run to run on p.1).  The cover is *one filled-in
+copy* -- handwritten "CLUSTER 03 HOUSEHOLD 07" -- scanned once and
+published under both waves.  So the PDF shows nothing about the form GLSS2
+fielded.  GLSS2's wave-specific instrument evidence is its Basic Information
+Document plus D1, and that document is not independent either: both waves
+ship editions of the *joint* "GLSS, 1987-88 and 1988-89 Basic Information"
+(1988-89: August 1993, 56 pp; 1987-88: March 1999, 60 pp).  What it does
+do is name where the two years differ.  PDF p.3: "In 1988-89 the household,
+community and price questionnaires were repeated"; p.4 flags Sections
+0B/0C ("only available for 1988-89") and 17A-C (cognitive tests, 1988-89
+only), and no Section 12 exception; p.8 describes 12A/12B as amounts.  D1
+agrees: 1988-89 has exactly 1987-88's value-only shape.  The same caveat
+applies to fact (1): reading those 78 pages re-checks *GLSS1's* form, so
+for the 1988-89 =food_security= row it reaches GLSS2 only through the
+BID's "repeated" and its list of year-specific sections.
+
 *NaN is interim, not terminal.*  The kg factor for =u='Value'= exists and
 equals =1/price=; it just varies over =(j, t, m)=, which a per-label
 constant cannot represent.  Recovering it from a price source (=community_prices=
 via a =source== argument) is Step 2 of #770 and is gated on the item-label
 work in #782.  Do not reintroduce a per-label constant in the meantime.
+*For GLSS1/2 this is now read as terminal (GH #781):* the #781 verdicts
+treat =food_prices= 1987-88 and 1988-89 as *closed* (=correctly-empty=),
+because the only price those waves recorded is the cluster price already
+served as =community_prices=, so a household quantity imputed as
+Expenditure / community price would make household =food_prices= re-serve
+=community_prices= under another name -- and #562 3b as specced fills
+=Quantity= on the derived =food_quantities= path, not in =food_acquired=,
+which is what =food_prices= derives from.  The close goes inert by itself
+if either wave ever builds rows (verdicts are keyed by tier), and @ligon
+is asked to confirm it in the #781 PR.  1991-92 is unaffected: it stays
+=empty-pending-machinery=.
 
 *** DONE food_expenditures
 Now derived canonically by =_FOOD_DERIVED= -- index =(i, t, v, j, s)=.  The old
@@ -2674,6 +3098,24 @@ mixed encoding is also why this is not the 2012-13 code-262 artefact noted
 under the food vocabulary (a Mac-Roman NBSP read as latin-1): different
 file, different source charset, same symptom class.
 
+*Correction, 2026-10-19 (GH #805): =g7sec9a.dta= is format 117, not 118.*
+Its header reads =<stata_dta><header><release>117</release>= (the same for
+=g7sec9b.dta=, =g7price.dta= and the other GLSS7 files the #805 census
+touched), and pandas decodes every format below 118 as latin-1 -- it does
+not try UTF-8 first, so "each string that fails UTF-8 is decoded per-string
+as latin-1" above describes the right symptom through the wrong mechanism.
+The consequence is the opposite of the paragraph above: the #805 reader
+rule DOES cover this file.  =get_dataframe= now re-decodes its cp1252
+strings (=Women\x92s= -> =Women’s=, =\x96= -> =–=, =\x94= -> =”=);
+across the 15 GLSS7 files it changes 390,554 served cells and leaves every
+non-C1 cell byte-identical.  The repaired config keeps its ASCII
+transcription (='=, =-=, ="=), and nothing served moves: =nonfood_expenditures=
+decodes on the numeric item code and =community_prices= builds its labels
+from the config, so both are identical before and after (977,193 and
+660,168 rows).  A re-derivation of =nonfood_items= from the raw read would
+now see the typographic characters, not C1 controls -- still not the
+config's ASCII spelling, so transcribe deliberately.
+
 ** 2005-06 is in OLD cedi, and the served numbers look 1000x wrong until you look
 
 Median row: 2005-06 *60,000*, 2012-13 *23*, 2016-17 *35*.  That is the July
@@ -2749,13 +3191,19 @@ Still NOT wired (genuine blockers, not feature gaps to close cheaply):
 
 Read this before touching any =mapping.py= or any =Code | Label= table here.
 
-** Trap 1: a bare =get_categorical_mapping= returns an EMPTY dict, silently
+** Trap 1: a bare =get_categorical_mapping= returned an EMPTY dict, silently (raises =TypeError= since GH #674)
+
+/2026-10-17 (GH #674, Sue):/ the bare form now raises =TypeError= before any
+file is read, naming =code_label_map= as the alternative, so this trap can no
+longer ship a null column.  The history below is kept because it explains
+=code_label_map='s dual keys and the =assert ..., 'decoded to an EMPTY dict'=
+guards in this country's scripts.
 
 =local_tools.get_categorical_mapping(tablename=X)= called *without* a
-value-column keyword returns =\{\}=.  It passes =idxvars='Code'= and no myvars,
-so =df_data_grabber= drops the Label column and the =.squeeze()= yields
-nothing.  Nothing raises.  Every lookup then misses, returns =pd.NA=, and the
-column ships 100% null while the build reports success.
+value-column keyword used to return =\{\}=.  It passed =idxvars='Code'= and no
+myvars, so =df_data_grabber= dropped the Label column and the =.squeeze()=
+yielded nothing.  Nothing raised.  Every lookup then missed, returned =pd.NA=,
+and the column shipped 100% null while the build reported success.
 
 This has bitten GhanaLSS *three separate times*:
 
@@ -2784,6 +3232,19 @@ because the second half of this trap is key types: =df_data_grabber=
 stringifies the Code index via =format_id= (so keys are ='1'=), while wave
 mapping functions variously look up with =int(value)= or =str(value)=.  Both
 historical bugs were partly key-type mismatches.
+
+/2026-10-17 (GH #953, Sue):/ =1991-92/_/mapping.py='s private =_code_label_map=
+was the last hand-rolled copy of the cascade here; it now delegates to
+=local_tools.code_label_map= (keeping its int-keyed result), so all four wave
+=mapping.py= modules resolve levels the same way: wave =_/= -> country =_/= ->
+the cross-country level, which the resolver appends itself.  Their old third
+rung (=f'{path}/../../_/'= = =countries/_/=) never existed and is gone.  Each
+level may hold tables in =categorical_mapping.org= or
+=categorical_mapping/*.org=.  Measured: the module-level =region_dict=,
+=rural_dict= and =relationship_dict= are identical before and after in all four
+waves, and no shared table is named =region=, =rural= or =relationship=, so
+Trap 2's fall-through to ={}= is unchanged.  Cost: every GhanaLSS table's hash
+moves (the =mapping.py= files are build inputs), one rebuild.
 
 ** Trap 2: GLSS3's and GLSS4's relationship scheme is NOT GLSS1's
 
@@ -5008,3 +5469,370 @@ under the 1998-99 wave reducer are a separate upstream loss, not the
 cohort counted here.  Choosing a source-supported unit/cluster treatment
 or changing assembly's null-key policy requires its own reviewed fix ([[https://github.com/ligon/LSMS_Library/issues/1008][GH #1008]]);
 this note changes neither identifiers nor measures.
+
+*** FIXED country-side (GH #1008, 2026-10-19): =Unknown= for a blank unit; 8H gated on its screener; four cover-page gaps recovered
+
+*Rulings* (@ligon, on the issue).  2026-10-18: fix it country-side, per "core
+never fixes the index" -- 2016-17's null =u= becomes the =Unknown= sentinel,
+and the GLSS1/GLSS2 null-=v= households are investigated in =sample=.
+2026-10-19, after red-team r1: gate 2016-17's Section 8H on its screener,
+the questionnaire's own skip logic (subsection below).  2026-10-19, on GH
+#1140 after red-team r2: the gate is =s8hq1 != 2= -- drop only "No"; a
+blank-screener row that carries real answers is kept.
+Feature's null-key policy (decision D2, delete-and-report) is unchanged, and
+=tests/test_gh1008_ghanalss_null_keys.py= pins that it is.
+
+**** 2016-17: every null =u= is a BLANK raw unit code
+
+Census of the 13,380 served rows (served before the 8H screener gate; 1,342
+after it -- see the next subsection) (raw read, before the wave script's
+collapse; 13,382 source rows): *every one has a missing unit code* --
+=s9bq{n}c= in =g7sec9b_small.dta= or =s8hq{n}u= in =g7sec8h.dta= is blank.
+*None* is an unlabelled code (absent from =unit_9b= / the 8H value labels)
+and *none* is a label =_/unit_labels.org= fails to map, so there was nothing
+to decode and no physical unit to recover.
+
+| =s=       | rows   | what the row carries                         |
+|-----------+--------+----------------------------------------------|
+| produced  | 12,925 | a selling price only (no quantity, no unit)  |
+| produced  |     32 | quantity + price                             |
+| produced  |      1 | quantity only                                |
+| purchased |    422 | quantity + amount spent                      |
+
+=2016-17/_/food_acquired.py= writes =transformations.U_UNKNOWN= for a
+blank code, the #1041 rule -- *and only for a blank code*.  The sentinel is
+written in =_stack_visits= from the RAW column the decoder reads
+(=_blank_code=: NaN, or =''= after stripping); a code that is present but
+does not decode stays NaN, so the null-index audit (Site I) still reports it.
+(The first version of this fix, red-teamed in r1, applied
+=fillna(U_UNKNOWN)= after decoding, which would have laundered any decode
+failure into =Unknown=.  No served row was affected -- the raw 9B file's
+2,624 unlabelled codes (75: 2,261; 77: 363) and 53 unmapped labels (=Mole=
+48, =Ounce= 2, =Drum=, =Ampoule=, =Plot=; red-team r1's census, re-measured) all sit on
+items =Code_9b= does not harmonize -- but the next harmonized one would
+have been silently relabelled.)  The =Value= rescue tests "no unit" as
+=u.isna() | u == 'Unknown'=, i.e. the same rows it reached before.  The kg
+ladder already served a NaN =u= =none=; =Unknown= is the same mask
+(=_unit_sentinel_mask=), so =kg_factor_sources= is unchanged by the
+sentinel itself.
+
+*The 12,925 price-only rows are mostly not observations.*  12,813 of them are
+=visit= 2 (=s8hq3p=) and carry *one constant price per item*:
+
+| item (=foodcd=)      | =s8hq3p= | rows  |
+|----------------------+----------+-------|
+| Cassava-tubers (10)  |        2 | 4,805 |
+| Tomatoes (50)        |        3 | 3,225 |
+| Pepper (55)          |        2 | 2,507 |
+| Okro (53)            |        7 | 2,276 |
+
+with no quantity and no unit, and *11,934 of the 12,813 are (household,
+item) rows whose screener =s8hq1= = 2* ("did not consume this item from own
+production").  The 8H screener is otherwise consistent: =s8hq1= = 2 holds
+868,255 rows and *none* carries a quantity or a unit at any visit.  Ordinary
+visit-2 prices for the same items vary (Okra median 2.0, Cassava 5.0 per
+unit), so 2/2/3/7 is a fill, not an answer.  The first version of this fix
+served them on =u='Unknown'= with their recorded price (the 2026-10-18
+ruling authorised the sentinel, not a deletion): =food_prices(units=
+'unitprice')= gained 12,957 =Unknown= rows, 12,813 of them these fills, and
+12,925 rows rejoined =Feature('food_acquired')= with Quantity, Expenditure
+and Price all NA (=Feature= re-derives =Price= as =Expenditure / Quantity=).
+The 2026-10-19 ruling removes the screener-"No" ones -- next subsection.
+
+**** 2016-17: Section 8H drops only its screener-"No" rows, =s8hq1 != 2= (rulings 2026-10-19; GH #1140)
+
+=s8hq1= ("did the household consume [item] from own production?") is asked
+*per (household, item) row* -- 8,468 of 14,009 households answer "Yes" for
+some items and "No" for others -- and the questionnaire skips the visit
+columns on "No".  =2016-17/_/food_acquired.py= (=screen_8h=) now drops a
+source row where =s8hq1 == 2= and keeps every other row, before the visit
+stack.  The first ruling was spelled =s8hq1 == 1=, which is what 1998-99
+(=== 1=), 2005-06 and 2012-13 (=== 'yes'=) do; red-team r2 measured that it
+also dropped 39 blank-screener rows carrying real consumption, and the
+ruling on GH #1140 (@ligon, 2026-10-19) fixed the gate at =!= 2=: drop only
+"No".  The sibling waves still drop their blank screeners; measuring them
+is GH #1145.  2016-17 was the only multi-visit round without any gate.
+
+Census of =g7sec8h.dta= (934,584 rows), what the gate removes and keeps:
+
+| =s8hq1=   | rows    | any value | a quantity | a price, no quantity at any visit | a unit | kept? |
+|-----------+---------+-----------+------------+-----------------------------------+--------+-------|
+| 1 "Yes"   |  65,609 |    46,967 |     46,963 |                                 4 | 46,945 | yes   |
+| 2 "No"    | 868,255 |    12,038 |        *0* |                            12,038 |    *0* | *no*  |
+| blank     |     720 |        48 |         39 |                                 9 |     39 | *yes* (#1140) |
+
+(Rows are (household, item) source records; a row can carry values at
+several visits.  The 865 visit-2 fills on "Yes" rows sit on rows that DO
+report consumption at other visits, which is why only 4 "Yes" rows are
+price-only throughout.)
+
+*Every one of the 12,038 screener-"No" price-only rows is one constant per
+(visit, item)* -- shown here before they are dropped:
+
+| visit | item (=foodcd=)     | price | rows  |
+|-------+---------------------+-------+-------|
+|     2 | Cassava-tubers (10) |     2 | 4,700 |
+|     2 | Tomatoes (50)       |     3 | 3,079 |
+|     2 | Pepper (55)         |     2 | 2,197 |
+|     2 | Okro (53)           |     7 | 1,958 |
+|     4 | 23                  |    10 |     8 |
+|     5 | 30                  |   2.5 |    15 |
+|     5 | 72                  |     4 |     3 |
+|     5 | 3                   |     3 |     1 |
+|     6 | 11                  |     1 |    13 |
+|     6 | 51                  |     3 |    28 |
+|     7 | 21                  |     5 |    36 |
+
+11,934 at visit 2 (the ruling's count) and 104 at visits 3..7.  Red-team r1
+called the visits-3..7 price-only class (112 rows) "genuine"; 104 of those
+112 are these screener-"No" constants, i.e. the same fill, so the ruling's
+expectation that "the ~112 genuine price-only rows stay" does not hold under
+the gate (5 are on "Yes" rows and 3 on blank screeners; all 8 stay under
+=!= 2=).  The 9 blank-screener source rows that are price-only throughout
+carry the same constants again (visit 2 Cassava 2 x5, Tomato 3 x1; visit 5
+item 30 at 2.5; visit 6 item 51 at 3; visit 7 item 21 at 5): the fill is
+per (visit, item), independent of the screener.
+
+*What =!= 2= keeps that === 1= dropped -- the GH #1140 decision.*  A blank
+screener is not a "No", and 39 blank-screener rows in 11 households carry
+real consumption -- 109 quantity cells with units and prices, every one with
+=s8hq2= (months consumed) answered: (clust, nh) = (70567, 3), (70567, 6),
+(70567, 8), (70567, 12), (70785, 8) x11, (70821, 2) x2, (70821, 4) x3,
+(70821, 12), (70842, 3) x9, (70842, 4) x8, (70922, 5).  They are coherent
+multi-visit consumption (70785/08 Yam 15/6/5/10/4 Tubers; 70842/03 Pepper
+1/1/0.5/5/0.5 Heap; 70842/03 Eggs 6 Single): sum Q 285.0, derived sum E
+1,009.05 (red-team r2, R2).  === 1= dropped them, as the sibling waves drop
+theirs; =!= 2= serves them and drops exactly the 12,038 "No" fills.
+Red-team r1's "removes exactly the 11,934 fills and nothing measured" was
+true of =!= 2=, not of === 1=.  Ruled =!= 2= on GH #1140 (@ligon,
+2026-10-19); =test_ghanalss_2016_17_screener_gate_drops_only_no= pins the
+spelling and fails under === 1= and under no gate.
+
+*A fact of the ruling: 17 blank-screener price-only cells are served on
+=u='Unknown'=.*  14 are the visit-2 constants (Cassava 2 x5, Tomato 3 x3,
+Pepper 2 x3, Okra 7 x3) and 3 are later-visit ones (Cowpea 5 at visit 7,
+Oil (coconut) 2.5 at visit 5, Onion 3 at visit 6) -- the same per-(visit,
+item) constants as the "No" fills, 9 of them on source rows that are
+price-only throughout and 8 on rows that report a quantity at another
+visit.  "Drop only No" keeps them, exactly as it keeps the 865 such fills on
+"Yes" rows: a "constant = fill" rule would be a judgement the questionnaire
+does not make.  Recorded, not relitigated.
+
+*What stays on =u='Unknown'=* (1,342 served rows): 422 blank-unit
+purchases (quantity + amount) and 920 produced rows -- the 879 visit-2 fills
+on screener-"Yes" and blank rows (Cassava 105, Tomato 146, Pepper 310, Okra
+318; 865 "Yes" + 14 blank; the "Yes" rows report real consumption at other
+visits), 8 later-visit price-only rows (on "Yes" rows: Yam at 3 and at 5,
+visit 3; Maize flour at 3 x3, visit 5; plus the 3 blank-screener ones
+above) and 33 rows with a quantity (32 with a price).  Served-row
+accounting: /Accounting, the 8H screener gate/ below.
+
+**** GLSS1/GLSS2: four interviewed households are missing from the cover page
+
+The 92 null-=v= rows were four households, two per wave, that have no row in
+=Y00A.DAT= -- the =sample= source -- so their =v=-join returned NaN:
+
+| wave    | =HID=  | food rows | in =Y01A= (roster)? | food files     | =CLUST= on their rows |
+|---------+--------+-----------+---------------------+----------------+-----------------------|
+| 1987-88 | 104838 | 36        | yes (2 persons)     | =Y12A=         | 1048 |
+| 1987-88 | 114519 | 18        | yes (7 persons)     | =Y12A=         | 1145 |
+| 1988-89 | 220629 | 18        | yes (1 person)      | =Y12A=         | 2206 |
+| 1988-89 | 269433 | 20        | *no*                | =Y12A=, =Y12B= | 2694 |
+
+The evidence that the cluster is *recorded*, not inferred:
+
+- every module that names them carries =CLUST= on their own rows -- 30+
+  files in each wave (=Y01A=-=Y16B= for 104838 / 114519; =Y00B=, =Y00C=,
+  =Y01A=-=Y17C= for 220629; =Y04=-=Y17C= for 269433, which has no roster
+  record but has employment, agriculture, livestock and food records), and
+  never two values;
+- the GLSS1/GLSS2 id structure, =HID = CLUST * 100 + NH=, holds on *100% of
+  rows of every file where =CLUST= is the cluster code* (and =NH == HID %
+  100= on all of =Y00A=).  Not every file's =CLUST= is: =HEAD.DAT= (both
+  waves) carries a sequential 1..N index under that name (0% match), 1988-89
+  =HHCOMM.DAT= carries GLSS1 household ids (85.6%), and =ZSCOREH.DAT='s
+  =CLUST= is entirely blank.  None of the three is a =_cover_page_gaps=
+  source;
+- the survey's own control and aggregate files count them.  1988-89
+  =Y00B.DAT= (section interview control) has 220629 with =CLUST= 2206,
+  =NH= 29, =RESULT1= 1 (completed), and the 3,194-row =Y00C.DAT= cover
+  section carries 220629 too -- in place of 260605: =Y00A= and =Y00C= differ
+  by exactly one household each way (=Y00A= - =Y00C= = {260605}, =Y00C= -
+  =Y00A= = {220629}; cluster 2206 holds 31 households in =Y00A= and 32 in
+  =Y00C=, cluster 2606 17 and 16), and =Y00B= likewise has 220629 and not
+  260605.  GSS's =EXPEND.DAT= aggregate includes 104838
+  and 114519 (1987-88; the only two of its households absent from =Y00A=) and 220629
+  (1988-89, with =CLUST= blank there -- merged from the same deficient
+  cover).  1987-88 ships no =Y00B= / =Y00C=;
+- interview dates fit: =Y16A= dates 104838 6/12/87 beside the cover's
+  5/12/87 for 104837 / 104839, and 114519 10/2/88 beside 114517's 10/2/88
+  (red-team r1);
+- no cover-page =REPLACES= / =REPLACED= names them, and none is in
+  =PANELC.DAT=;
+- each is the 32nd household of a two-workload cluster whose cover lists 31.
+  "Each group of 16, 32 or 48 households within a sampling area is referred
+  to as a cluster" (/Cluster counts/ above).  Of the 1987-88 clusters above
+  30 households, 15 hold exactly 32, three hold 31 (two of them 1048 and
+  1145), one 34 and one 48; in 1988-89, 25 hold 32, two hold 31 (exactly 2206
+  and 2694), one 30 and one 47.
+
+So the =sample= hook (=1987-88/_/mapping.py= / =1988-89/_/mapping.py=,
+=_cover_page_gaps=) appends households that the roster or a Section 12 food
+module records and =Y00A.DAT= omits, with the =CLUST= their own rows carry;
+it raises on a household naming two clusters or an id that does not begin
+with its =CLUST=.  =Rural= (Appendix I, via =v=) and the synthesised weight
+1.0 then treat them like every other household of a self-weighting wave.
+
+*Deliberately not recovered*: a household that appears in ONE non-roster,
+non-food module.  =Y05B1.DAT= (1988-89 main job) names 15 households of a
+cluster, 2198, that has *no* cover, roster or food record anywhere in GLSS2,
+and =Y05E1.DAT= / =Y16A=/=Y16B.DAT= (1987-88) name 112516, absent from cover,
+roster and food alike.  A one-module appearance cannot be told from a
+mis-keyed id, so =labor= still serves 1 (1987-88) and 19 (1988-89) null-=v=
+rows for them (before this fix: 5 and 26).  Open; GH #1008 residual.
+
+*The inconsistency this removes*: the =household_roster= of 104838 / 114519 /
+220629 used to reach the API with a NaN =v= (9 + 1 rows) because the roster
+too takes =v= from =sample=; both now carry the cluster.
+
+*Caveat -- the cover page also has the opposite defect: data-less rows.*
+=Y00A.DAT= holds 12 households in 1987-88 that have no roster or Section 12
+food record (108712, 111202, 111915, *114518*, 115328, 115331, 115607,
+116507, 116508, 116515, 119006, 119502) and one in 1988-89 (260605, a
+17-household cluster 2606).  They predate this fix and are still served by
+=sample=.  *114518 is the =NH= neighbour of the recovered 114519, in the
+same cluster 1145* (cover: interviewed 11/2/88, =REPLACES= 7), so it may be
+114519's own cover record mis-keyed by one -- in which case =sample= 1987-88
+now holds that household twice, once as a data-less phantom.  It does not
+move =v= (both rows are 1145) or any food row, and the synthesised weight
+is 1.0 either way; not resolved here (GH #1139).  *260605 has the same shape
+in 1988-89*: it is the one data-less row of =Y00A= and the one household
+=Y00C= lacks, while =Y00C= and =Y00B= both carry the recovered 220629 that
+=Y00A= lacks -- a one-for-one swap between the two cover files.  260605's
+cover row is blank on =RELIGION= / =LANGHD= / =LANGR= / =INTRPRET= and is
+dated 23/3/89 beside its neighbours' 21/3 and 22/3; =Y00B= dates 220629
+30/3/89.  So 260605 may be 220629's own cover record mis-keyed, in which
+case =sample= 1988-89 holds that household twice too.  A household count
+only: =v= differs (2606 vs 2206) but the weight is 1.0 and no food row is
+involved.  Not resolved here (GH #1139).
+
+**** Accounting (private cold rebuild; before = =200e504a3=, after = this change)
+
+| measure                                               | before        | after         |
+|-------------------------------------------------------+---------------+---------------|
+| =food_acquired= rows (Country); sums Q / E            | 5,340,606; 15,658,040,288.26 / 19,059,899,600.91 | unchanged |
+| 2016-17 =u= NaN / =Unknown= (produced + purchased)    | 13,380 / 0    | 0 / 13,380 (12,958 + 422) |
+| =food_acquired= =v= NaN, 1987-88 / 1988-89            | 54 / 38       | 0 / 0         |
+| =Feature('food_acquired')(['GhanaLSS'])= rows         | 1,704,880     | 1,718,320     |
+| =Feature= grain report =nan_key_rows=                 | 13,472        | 0 (no report) |
+| =Feature= sums Q / E                                  | 15,658,023,356.44 / 19,059,879,328.34 | = Country sums |
+| =sample= rows, 1987-88 / 1988-89                      | 3,147 / 3,194 | 3,149 / 3,196 |
+| =kg_factor_sources= (food_acquired)                   | identical; the 13,380 =Unknown= rows are all =none= | |
+| =food_quantities(units='kgs')= rows                   | 1,623,253     | 1,623,676 (+423 native =Unknown=) |
+| =food_quantities(units='kgs')= kilograms (=u='kg'=)   | 11,007,391.86 | unchanged     |
+| =food_prices()= rows: =kgvalue= / =kgprice=           | 560,023 / 187,096 | unchanged |
+| =food_prices()= rows: =unitvalue= / =unitprice=       | 1,676,093 / 189,656 | 1,676,514 / 202,613 |
+| =food_expenditures()= rows; total                     | 1,406,099; 15,637,502,177.88 | unchanged |
+| =nutrition= (34,798 rows), every column sum           | --            | byte-identical |
+| =null_index_reports()= GhanaLSS =food_acquired=       | =u= 13,380; =v= 92 | none   |
+| =null_index_reports()= GhanaLSS =household_roster= =v= | 152 (1987-88 9, 1988-89 1, 1991-92 142) | 142 (1991-92 only) |
+| =labor= =v= NaN, 1987-88 / 1988-89                    | 5 / 26        | 1 / 19        |
+
+=Feature='s sums now equal =Country='s to the last digit: nothing in the
+GhanaLSS food assembly is deleted any more; the remaining reduction
+(5,340,606 -> 1,718,320) is visit aggregation alone, and =math.fsum= is
+conserved across it.
+
+**** Accounting, the 8H screener gate =s8hq1 != 2= (private cold rebuilds; before = the table above's "after", i.e. the sentinel with no gate, re-measured by red-team r2 at =64790d3b1=; after = this branch, the =!= 2= gate + the narrowed sentinel, re-measured 2026-10-20 in a private cold rebuild of this branch beside a base =1485a1484= root (= =238a4c15d= + a test-only PR) whose GhanaLSS parquets graded fresh and were served warm; identical on every row to red-team r2's =!= 2= build)
+
+Every number in the "before" column reproduced the table above exactly
+(red-team r2).  The narrowed sentinel moves nothing on its own (no served
+unit code fails to decode); every movement below is the gate, and every
+removed row is a screener-"No" price-only fill.  The superseded === 1=
+spelling (branch head =86ec36a29=, red-team r2's measurement) is shown for
+the record: the difference between its column and the "after" column is
+exactly the blank-screener rows the GH #1140 ruling keeps.
+
+| measure                                                    | before            | === 1= (superseded) | after (=!= 2=)    | change    |
+|------------------------------------------------------------+-------------------+---------------------+-------------------+-----------|
+| =food_acquired= rows (Country)                             | 5,340,606         | 5,328,442           | 5,328,568         | -12,038   |
+| ... 2016-17 =produced=                                     | 151,721           | 139,557             | 139,683           | -12,038   |
+| ... of which =u='Unknown'= price-only fills                | 12,925            | 870                 | 887               | -12,038   |
+| ... of which blank-screener rows with a quantity           | 109               | 0                   | 109               | 0         |
+| 2016-17 =u= NaN / =Unknown= (produced + purchased)         | 0 / 13,380 (12,958 + 422) | 0 / 1,325 (903 + 422) | 0 / 1,342 (920 + 422) | |
+| visit-2 fills served (Cassava 2 / Tomato 3 / Pepper 2 / Okra 7) | 12,813       | 865 (100 / 143 / 307 / 315) | 879 (105 / 146 / 310 / 318) | -11,934 |
+| =food_acquired= sums Q / E                                 | 15,658,040,288.26 / 19,059,899,600.91 | -285.0 / -1,009.05 | unchanged | 0 / 0 |
+| =Feature('food_acquired')(['GhanaLSS'])= rows              | 1,718,320         | 1,706,220           | 1,706,282         | -12,038   |
+| =Feature= rows with Q, E, Price all NA                     | 23,269 (2016-17 12,926) | 11,214 (2016-17 871) | 11,231 (2016-17 888) | -12,038 |
+| =Feature= =nan_key_rows= / sums                            | none; = Country   | none; = Country     | none; = Country   |           |
+| =kg_factor_sources= (=food_prices= / =food_quantities=)    | item_unit 993,954; unit 605,938; none 3,583,886 | 993,881; 605,903; 3,571,830 | 993,954; 605,938; 3,571,848 | 0; 0; -12,038 |
+| =food_prices()= rows: =kgvalue= / =kgprice=                | 560,023 / 187,096 | 559,980 / 187,053   | 560,023 / 187,096 | 0 / 0     |
+| =food_prices()= rows: =unitvalue= / =unitprice=            | 1,676,514 / 202,613 | 1,676,470 / 190,514 | 1,676,514 / 190,575 | 0 / -12,038 |
+| =food_quantities(units='kgs')= rows; kilograms             | 1,623,676; 11,007,391.86 | 1,623,637; 11,007,314.38 | 1,623,676; 11,007,391.86 | 0; 0 |
+| =food_quantities(units='units')= rows                      | 1,695,046         | 1,695,001           | 1,695,046         | 0         |
+| =food_expenditures()= rows; total (=basis='purchased'=)    | 1,406,099; 15,637,502,177.88 | unchanged  | unchanged         | 0         |
+| =nutrition= rows; every column sum                         | 34,798; Energy 18,256,924,922.06 | Energy -115,424.75 | byte-identical | 0 |
+| =no_kg_factor.yml= egg rows declared =none= (GH #1042)     | 16,633 (Egg/Single 14,114) | 16,632 (14,113) | 16,633 (14,114) | 0 |
+
+Under =!= 2= the gate removes no row that carries a kg factor, so no
+=(j, u)= factor is re-estimated: =nutrition= (34,798 rows, every column
+sum) and the per-wave kilograms of =food_quantities(units='kgs')= are
+byte-identical to the "before" column AND to the base =1485a1484= build --
+measured on 2026-10-20 (=math.fsum= per column and per wave), not inferred.  (The
+=== 1= spelling was not so contained: red-team r2 found that removing the
+39 blank-screener rows moved two factors that are pooled across waves --
+the u-pooled =American Tin= and =(Rice (local), Bowl)= -- and with them
+=nutrition= and the kilograms of every food wave, by under 0.01%.  An
+earlier version of this entry said "every other wave untouched" of that
+spelling; it was false, and is gone.)  =sample=, =household_roster= and
+every table other than =food_acquired= and its derivations are untouched
+by the gate.
+
+*Net, base =1485a1484= -> this branch* (the two tables composed; this
+branch cold, the base root fresh-graded, 2026-10-20): =food_acquired= 5,340,606 -> 5,328,568 rows,
+sums Q / E unchanged at Country; 2016-17 =u= NaN 13,380 -> 0, =Unknown=
+0 -> 1,342; =v= NaN 92 -> 0; =sample= 1987-88 3,147 -> 3,149, 1988-89
+3,194 -> 3,196; =Feature('food_acquired')(['GhanaLSS'])= 1,704,880 ->
+1,706,282 rows with =nan_key_rows= 13,472 -> none, and its sums Q / E now
+equal Country's to the last digit (15,658,023,356.44 -> 15,658,040,288.26;
+19,059,879,328.34 -> 19,059,899,600.91); =food_prices= =unitvalue=
+1,676,093 -> 1,676,514 and =unitprice= 189,656 -> 190,575 (919 2016-17
+=Unknown= rows), =kgvalue= 560,023 and =kgprice= 187,096 unchanged;
+=food_quantities= =kgs= rows 1,623,253 -> 1,623,676 with the kilograms
+unchanged, =units= 1,694,623 -> 1,695,046; =food_expenditures= and
+=nutrition= unchanged; GhanaLSS =null_index_reports()= four findings -> none.
+
+*Still open, and NOT this issue*: 1991-92 =household_roster= has 142 rows
+(29 households) with a NaN =v=.  Same class, different file, measured but
+not fixed: the 1991-92 =sample= reads =POV_GH.DTA= (4,523 households),
+while the cover =S0A.DTA= and the roster =S1.DTA= hold 4,552 (=S1.DTA=
+20,403 rows) -- exactly the response count quoted above.  Recovering the 29
+from =S0A= gives =v= (=clust= is on the row), but their =Rural= / =strata=
+would have to be broadcast from the cluster, which needs its own decision.
+Drafted as a new issue alongside GH #1008.
+
+* =food_acquired.u = 'None'= -- meaning UNVERIFIED, served inferred kilograms (GH #962, 2026-10-17)
+
+=_/unit_labels.org= maps the raw labels =None= / =none= to the Preferred
+Label =None=.  Measured on a fresh corpus: *2,508 rows, all =s = produced=*
+(1998-99: 88, 2005-06: 1,450, 2012-13: 970), 2,475 priced, and every one is
+served an inferred kg factor (=item_unit= 1,745, =unit= 653,
+=item_unit_tight= 110): 3.90e4 kg of the country's 1.108e7 (0.35%).  If
+"None" is the respondent's "no unit" it is a missing-unit spelling that
+=transformations._U_SENTINELS= does not know (cf. Nigeria's library-minted
+='None'=); if it is a real answer ("none -- loose/unmeasured") it is a unit.
+*Not established* -- the questionnaires were not checked -- so it is recorded
+as unverified and left untouched.  Separately, 13,380 rows carry a NaN =u=
+(already a sentinel: served =none=).  /Since GH #1008 (2026-10-19) none of
+those 13,380 2016-17 rows is served with a NaN =u=: 1,342 are served
+=u='Unknown'=, and the other 12,038 (price-only fills on rows whose Section
+8H screener says "No") are removed by the 8H screener gate =s8hq1 != 2=
+(GH #1140); see the GH #1008 entry under /Feature assembly drops null-key
+food rows/./
+
+*Superseded (GH #1042, 2026-10-18).*  Verified against the GLSS4/5/6
+questionnaires: =None= is code 0, the instrument's "nothing / not applicable"
+code, and is now served as =Unknown= with no inferred kilograms; the
+own-produced chicken, egg and fresh-coconut rows whose code 0 prices like
+one item are served on the count unit =Single=.  See the GH #1042 entries
+under the food_acquired section.

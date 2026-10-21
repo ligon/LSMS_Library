@@ -1,0 +1,16 @@
+{
+  "1099_cold": {
+    "type": "RuntimeError",
+    "error": "Could not materialize Fakeland/build_me: no wave-level build succeeded and no cached parquet was found at /local/job40255479/tmp/reliability-probes-sthih1ks/data/Fakeland/var/build_me.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+  },
+  "778_assumed_fresh_race": {
+    "type": "FileNotFoundError",
+    "error": "synthetic concurrent eviction"
+  },
+  "1115": {
+    "url_derived_from_secondary": "https://example.org/secondary",
+    "extra_lost": true,
+    "placeholder_as_prose": "(source URL not recorded)",
+    "second_render_changes": false
+  }
+}

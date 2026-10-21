@@ -986,6 +986,63 @@ class TestDVCCaching:
             check_dtype=False,
         )
 
+    def test_dvc_fallback_warning_names_the_miss_reason(
+        self,
+        mock_country_structure,
+        monkeypatch,
+        caplog,
+    ):
+        """GH #920(a): the user-visible fallback warning says WHY the cache
+        was not served and that a full rebuild follows.
+
+        A ``var/`` parquet stamped with a hash that no longer matches the
+        inputs must produce a warning naming ``STALE`` -- before #920 it read
+        only "Falling back to manual aggregation", indistinguishable from a
+        first-ever build and silent about the cost.
+        """
+        import logging
+        from dvc.exceptions import DvcException
+
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        monkeypatch.delenv("LSMS_NO_CACHE", raising=False)
+
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        write_parquet(pd.DataFrame({"col1": [1, 2]}), cache_path,
+                      absolute_path=True, cache_hash="old-inputs",
+                      cache_waves=["2020-21"])
+        rebuilt_df = pd.DataFrame({"col1": [7, 8, 9]})
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)), \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
+            patch.object(Country, "_table_cache_hash", return_value="current-inputs"), \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(test_data=lambda: rebuilt_df, data_scheme=["test_data"])), \
+            patch.object(Country, "_augment_index_from_related_tables", side_effect=lambda df, *a, **k: df), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_file_path.return_value = mock_country_structure
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["test_data"]
+            mock_resources.return_value = {"Data Scheme": {"test_data": {}}}
+            mock_repo_class.side_effect = DvcException("simulated DVC unavailable")
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            with caplog.at_level(logging.WARNING, logger="lsms_library.country"):
+                country._aggregate_wave_data(method_name="test_data")
+
+        msgs = [r.getMessage() for r in caplog.records
+                if "Falling back to manual aggregation" in r.getMessage()]
+        assert len(msgs) == 1, [r.getMessage() for r in caplog.records]
+        assert "STALE" in msgs[0], msgs[0]
+        assert "FULL REBUILD" in msgs[0] and "1 wave(s) (2020-21)" in msgs[0], msgs[0]
+
     # NOTE: A previous revision of this file had two test_layer1_*
     # tests pinning a `cache_remote_stream=True` kwarg on DVCFS.open.
     # They were removed when empirical testing (Niger Run A,

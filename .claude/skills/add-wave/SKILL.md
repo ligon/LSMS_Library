@@ -34,16 +34,19 @@ Returns a list of dicts annotated with:
 | key            | meaning                                                                 |
 |----------------|-------------------------------------------------------------------------|
 | `local`        | `bool` — `True` only when a wave dir *records* this catalog id.          |
-| `local_status` | `"yes"` / `"covered"` / `"derived"` / `"unknown"` / `"no"` (see below).  |
+| `local_status` | `"yes"` / `"stale-release"` / `"covered"` / `"derived"` / `"unknown"` / `"no"` (see below). |
 | `local_waves`  | the wave dirs that back, cover, or constitute this entry.                |
+| `held_idnos`   | the release idnos those dirs record holding (compare the row's `idno`, the catalog's latest). |
 
-**Only `local_status == "no"` is an acquisition candidate**, and a `no` has to
-be *earned* — it is a confident claim that we neither hold this study nor
+**Acquisition candidates are `no` (a new wave) and `stale-release` (a newer
+release of a wave we hold). The existing flat/no-overwrite extraction does not implement a staged refresh or nested-layout replacement; those remain GH #1149 and need a separately reviewed acquisition procedure.**  A `no` has to be
+*earned* — it is a confident claim that we neither hold this study nor
 anything containing it (GH #600):
 
 | status | meaning | `local` |
 |---|---|---|
 | `yes` | a wave dir records this catalog id | `True` |
+| `stale-release` | a wave dir records this catalog id, but holds an older release (`#+CATALOG_IDNO:`) than the catalog's latest — Nigeria 2023-24 holds `v01_M`, the catalog is at `v02_M`. The backfill records the newer one as `#+CATALOG_LATEST_IDNO:`, so `rg CATALOG_LATEST_IDNO lsms_library/countries` is the queue (GH #1128) | `True` |
 | `covered` | we don't hold its files, but a release we *do* hold subsumes its content — Tanzania's `2008-15/` holds the Uniform Panel Dataset (3814), whose `round` column carries NPS rounds 1–4 (76, 1050, 2252, 2862) | `False` |
 | `derived` | built *out of* entries we hold, **all** of them — Nigeria 5835 is the four GHS-Panel waves, harmonized | `False` |
 | `unknown` | we cannot say: a matching dir records no WB id, **or** the label is a logical wave inside a multi-round folder that no record accounts for | `False` |
@@ -70,6 +73,15 @@ evidence.
 entry** — a `Panel/` + `Cross_Sectional/` split is the tell. The WB datafile API
 settles it in one call: `/index.php/api/catalog/{id}/data_files?id_format=id`
 lists an entry's files; compare against the `.dta` you actually downloaded.
+
+`#+CATALOG_IDNO:` / `#+CATALOG_DOI:` name the release a directory HOLDS; only
+`add_wave` / `populate_and_push` move them, once the whole release has demonstrably landed, and they clear the
+`#+CATALOG_LATEST_*` keys. With `push=True`, every file must also be
+successfully pushed; `push=False` records a complete local download.
+Existing raw files are not overwritten. Nested paths, retirement of older
+files and rollback are separate GH #1149 work, not supplied by these metadata
+guards. Existing SOURCE facts stay intact until the requested acquisition
+succeeds, even when it requests a different primary entry.
 
 To (re)stamp provenance across the tree:
 
@@ -177,6 +189,8 @@ Waves = {'2011-12': (),
 The tuple values are panel linkage info `(cover_file, old_id_col, new_id_col)`. Use `()` for waves that start a new panel or where linkage is unknown.
 
 Not all countries have a `Waves` dict. If the file doesn't exist or lacks a `Waves`/`waves` variable, the `Country` class falls back to scanning for directories with `Documentation/SOURCE.org` -- no registration step needed.
+
+For a **new country** (or a staged directory) whose `_/data_scheme.yml` does not exist yet, `ll.Country(name)` raises `UnregisteredCountryError` (GH #915); check its waves with `ll.Country(name, allow_unregistered=True).waves` until the data scheme lands, and never leave that opt-in in analysis code.
 
 ### Step 4: Write feature configs
 

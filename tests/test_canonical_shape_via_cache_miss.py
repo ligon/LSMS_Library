@@ -70,37 +70,25 @@ def _aws_creds_available() -> bool:
     The cache-miss tests delete cached parquets and force the framework
     to rebuild from source, which goes through DVC -> S3.  Without
     credentials the rebuild fails with ``NoCredentialsError`` regardless
-    of whether the test logic is correct.
+    of whether the test logic is correct.  The CI ``unit-tests`` job sets
+    ``LSMS_SKIP_AUTH=1`` and carries no secrets, so this returns False
+    there and the tests below silent-skip.
 
-    Three credential locations are checked, matching where lsms_library
-    / DVC / boto3 actually look:
-
-    1. ``AWS_ACCESS_KEY_ID`` / ``AWS_SECRET_ACCESS_KEY`` env vars
-       (set by the ``data-tests`` CI job from repo secrets).
-    2. ``lsms_library/countries/.dvc/s3_creds`` (written by either the
-       ``data-tests`` CI job or the import-time auto-unlock path).
-    3. The auto-unlock path itself: if ``import lsms_library`` succeeds
-       without ``LSMS_SKIP_AUTH=1`` set, the ``.gpg``-decrypt-on-import
-       hook has already populated location (2).
-
-    The CI ``unit-tests`` job intentionally sets ``LSMS_SKIP_AUTH=1`` to
-    keep PR validation fast and data-free; this function returns False
-    in that environment, and the tests below silent-skip.
+    Delegates to the shared resolver in ``tests/conftest.py`` (exported
+    ``AWS_*`` -> the user-config ``s3_creds`` -> the legacy in-tree
+    ``countries/.dvc/s3_creds``).  This used to check only the in-tree
+    file, which the library stopped writing in GH #1001, so a fresh
+    checkout with user-config credentials silently skipped here.  Loaded by
+    path because both import spellings are broken (see
+    ``tests/test_tests_package_not_shadowed.py``).
     """
-    if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get(
-        "AWS_SECRET_ACCESS_KEY"
-    ):
-        return True
-    creds_file = (
-        Path(__file__).parent.parent
-        / "lsms_library" / "countries" / ".dvc" / "s3_creds"
-    )
-    if creds_file.exists():
-        try:
-            return "aws_access_key_id" in creds_file.read_text()
-        except OSError:
-            return False
-    return False
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_shared_conftest", Path(__file__).with_name("conftest.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.aws_creds_available()
 
 
 # Module-level skip: every test in this file needs DVC -> S3 access.

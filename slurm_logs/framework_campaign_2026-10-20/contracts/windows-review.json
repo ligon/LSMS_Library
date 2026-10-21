@@ -1,0 +1,50 @@
+{
+  "reviewer": "Sue",
+  "verdict": "PASS",
+  "findings": [],
+  "base": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "reviewed_files_sha256": {
+    ".github/workflows/ci.yml": "24d92199b0b968a9422276ea7d672542002ac626dd2eb3df3ee2b8fa16d38d0d",
+    "slurm_logs/framework_campaign_2026-10-20/windows/README.org": "67af19336ca1db18fffb42f52d1c756e22d2d0113cc76295c5be251104d68474",
+    "slurm_logs/framework_campaign_2026-10-20/windows/decode-delta.json": "e478d4b29e5a513d143677ab6d0a5abc482d51ab110e078a92c304acff16a9af",
+    "slurm_logs/framework_campaign_2026-10-20/windows/verify_decode_delta.py": "05baa2edf06dee67ecb22559b04ca3ddc97065fd59d07f55c8be2615db46c9e0"
+  },
+  "country_documentation_read": "lsms_library/countries/Uganda/_/CONTENTS.org, including TODO/WAITING and encoding entry at 3572",
+  "relevant_idiosyncrasy": "Pre-118 Stata cp1252 label bytes previously served as latin-1 C1 controls; HowCoped0/1/2 have 862/756/394 documented U+0085-to-U+2026 cell corrections. Existing null Shock key remains served and warned.",
+  "verification": {
+    "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 PYTHONPATH=/local/job40255479/worktrees/windows-ci LSMS_COUNTRIES_ROOT=/local/job40255479/worktrees/windows-ci/lsms_library/countries LSMS_DATA_DIR=/local/job40255479/windows-ci-data taskset -c 16-19 /local/job40255479/venv_img/bin/python slurm_logs/framework_campaign_2026-10-20/windows/verify_decode_delta.py",
+    "cwd": "/local/job40255479/worktrees/windows-ci",
+    "exit_code": 0,
+    "shocks_rows": 14457,
+    "shocks_current_digest": "0ab2ea4c79dd",
+    "shocks_inverse_decoding_digest": "64a53fa7af55",
+    "changed_cells": 2012,
+    "changed_cells_by_column": {
+      "HowCoped0": 862,
+      "HowCoped1": 756,
+      "HowCoped2": 394
+    },
+    "assets_rows": 116808,
+    "assets_digest": "9202ed542a14",
+    "report_matches_archived_json": true,
+    "exact_frame_roundtrip": true
+  },
+  "scope_checks": {
+    "only_ci_expect_and_comment_changed": true,
+    "runtime_decoder_and_compilers_unchanged": true,
+    "installed_wheel_packaged_config_conda_toolchain_and_cold_build_checks_unchanged": true,
+    "test_coverage_or_filters_weakened": false,
+    "artifacts_contain_household_identifiers_or_microdata": false,
+    "private_l2_only": true
+  },
+  "limits": [
+    "Evidence proves exact counterfactual accounting of the stated label substitution, not equality with a separately built pre-805 historical frame.",
+    "Existing 48-bit CI digest is a regression checksum, not a collision-proof proof of historical equality. Full frame roundtrip supports the bounded substitution argument; reported SHA256 hashes match the inspected current/counterfactual tables.",
+    "Actual Windows installed-wheel/conda CI rerun remains required; independent verifier ran on Linux with the reviewed worktree and private cache."
+  ],
+  "author_validation_logs_reviewed": {
+    "cold-build-before.log": "Old shocks expectation mismatches; assets expectation passes.",
+    "cold-build-after.log": "Corrected expectations pass on separate private L2.",
+    "focused-tests.log": "69 passed in 9.62 seconds; existing author run inspected, not rerun by reviewer."
+  }
+}

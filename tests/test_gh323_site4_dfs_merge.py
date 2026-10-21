@@ -269,6 +269,10 @@ def testland(tmp_path, monkeypatch):
     monkeypatch.setenv("LSMS_COUNTRIES_ROOT", str(croot))
     monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setenv("LSMS_NO_CACHE", "1")
+    # The synthetic country's raw files sit in the config tree with no .dvc
+    # sidecar -- new data awaiting `dvc add`, which GH #831 refuses unless
+    # the caller opts in.  This fixture IS that case.
+    monkeypatch.setenv("LSMS_ALLOW_INTREE_SOURCES", "1")
     countries_root.cache_clear()
     data_root.cache_clear()
 
@@ -419,7 +423,8 @@ def test_hard_error_says_optional_true_is_country_wide(testland):
 def test_missing_file_stays_soft_even_for_a_required_column(testland, monkeypatch):
     """A file that is not AVAILABLE is not a config bug -- no YAML edit fixes
     it, and hard-failing would break every legitimate partial-data checkout.
-    Only the KeyError kind (file loaded, column absent) escalates."""
+    Only the config kinds escalate: a KeyError (file loaded, column absent)
+    and -- since GH #675 -- a ``file:`` naming no file and no sidecar."""
     from lsms_library import local_tools
 
     read = local_tools.get_dataframe
@@ -433,6 +438,13 @@ def test_missing_file_stays_soft_even_for_a_required_column(testland, monkeypatc
 
     monkeypatch.setattr(local_tools, "get_dataframe", missing_geo)
     wave = testland(data_info=_data_info(geo_file="absent.csv"), geo_file="geo.csv")
+    # An UNAVAILABLE source is one that exists -- here, DVC-tracked -- but
+    # cannot be fetched.  Since GH #675 a `file:` with no file AND no sidecar
+    # is a typo'd path, i.e. a config bug, and escalates like the KeyError
+    # (tests/test_gh675_degraded_build.py); the sidecar keeps this test about
+    # what its name says.  The reader is faked, so the sidecar is never parsed.
+    (wave.file_path / "Data" / "absent.csv.dvc").write_text(
+        "outs:\n- md5: 00000000000000000000000000000000\n  path: absent.csv\n")
     with pytest.warns(UserWarning, match="could not load"):
         df = wave.grab_data("cluster_features")
     assert "Latitude" not in df.columns

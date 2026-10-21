@@ -1,0 +1,5 @@
+.............................................
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py:2004: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+45 passed in 102.30s (0:01:42)

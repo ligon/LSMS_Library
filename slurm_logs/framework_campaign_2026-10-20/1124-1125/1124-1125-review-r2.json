@@ -1,0 +1,98 @@
+{
+  "status": "PASS",
+  "policy_real_feature_probes": {
+    "coarse": {
+      "correctly_passes": true,
+      "scanner_keeps_coarse_class_b": true
+    },
+    "other_country_lost": {
+      "correctly_fails": true,
+      "message": "['A']"
+    },
+    "plot": {
+      "correctly_fails": true,
+      "message": "['EthiopiaRHS']"
+    },
+    "plot_alias": {
+      "correctly_fails": true,
+      "message": "['EthiopiaRHS']"
+    },
+    "plot_column": {
+      "correctly_fails": true,
+      "message": "['EthiopiaRHS']"
+    },
+    "rhs_read_error": {
+      "correctly_fails": true,
+      "message": "warm crop_production countries raised: {'EthiopiaRHS': 'RuntimeError: RHS warm failure'}"
+    }
+  },
+  "source_hashes": {
+    "bench/feature_audit/scan.py": "7380a8faf1cc3de87954d776d8592e05a505a2697443b3c9c52181a06bd041b4",
+    "tests/test_feature_canonical_index.py": "e19b8341c2e353e2e0195b7a7d775d352ae3a778a3cd3112645a2129f4e65e33",
+    "tests/test_feature_audit_participation.py": "8045e92463188622a11c7d944988e809b9fa8664e192ab1e443a27640488d049"
+  },
+  "reviewer": "Sue / GPT-6",
+  "date": "2026-10-20",
+  "head": "ca5bb83ca2f291a0019615dd2222fb6ccbd89c1e",
+  "base": "976fc840d",
+  "findings": [],
+  "prior_policy_source_hashes": {
+    "bench/feature_audit/scan.py": "7380a8faf1cc3de87954d776d8592e05a505a2697443b3c9c52181a06bd041b4",
+    "tests/test_feature_canonical_index.py": "fe1edba99d5620ef94ffd54dfd8659729d37ffcf75c0dc5265ede825e0345d33",
+    "tests/test_feature_audit_participation.py": "8045e92463188622a11c7d944988e809b9fa8664e192ab1e443a27640488d049"
+  },
+  "final_only_source_change": "pandas3 fixture rename_axis(index=...) keyword; reverse-change hash matches independently tested policy source",
+  "readers_stopped": true,
+  "validation_limits": [
+    "Not a final-head full-suite rerun: unchanged policy used 88 passing synthetic cases plus 19 final-head focused controls including the sole repaired fixture.",
+    "Three live warm checks reused separate physical L2 copy of producer-rebuilt farm corpus; no independent full cold farm build.",
+    "Production Feature/Country/schema/cache code unchanged; no independent hash-mutation probe in this review."
+  ],
+  "tests": {
+    "pre_fixture_synthetics": {
+      "passed": 88,
+      "failed": 1,
+      "seconds": 116.9,
+      "sole_failure": "RHS plot_alias fixture positional rename_axis(dict), repaired and rerun"
+    },
+    "final_head_focused": {
+      "passed": 19,
+      "failed": 0,
+      "seconds": 1.12,
+      "wall_seconds": 2.05
+    },
+    "independent_live_farm": {
+      "passed": 3,
+      "failed": 0,
+      "seconds": 61.71,
+      "wall_seconds": 62.64,
+      "cases": [
+        "crop_production warm participation/row conservation",
+        "plot_labor warm participation/row conservation/sentinels",
+        "plot_inputs warm participation/row conservation/sentinels"
+      ],
+      "private_parquets": 1519,
+      "physical_l2_inodes_differ": true,
+      "shared_symlink_only": "dvc-cache / L1"
+    },
+    "independent_actual_feature_policy_probes": {
+      "passed": 6,
+      "failed": 0
+    }
+  },
+  "environment": {
+    "python": "/local/job40255479/venv_img/bin/python",
+    "PYTHONPATH": "/local/job40255479/worktrees/1124-1125-feature-audit",
+    "LSMS_COUNTRIES_ROOT": "/local/job40255479/worktrees/1124-1125-feature-audit/lsms_library/countries",
+    "LSMS_DATA_DIR": "/local/job40255479/1124-reliability-r2-corpus",
+    "identity_asserted": [
+      "real package path under candidate",
+      "countries_root exact candidate tree",
+      "data_root exact private copy"
+    ],
+    "cpu": "24-27",
+    "BLAS_OMP_MKL_threads": 1,
+    "LSMS_BUILD_WORKERS": 1,
+    "LSMS_MAKE_JOBS": 1
+  }
+}

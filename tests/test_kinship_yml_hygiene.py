@@ -17,12 +17,13 @@ and #945) because nothing rejected a variant at the moment it was added.
 This turns the next one into a red run at the moment someone can fix it,
 at zero runtime cost.
 
-Deliberately NOT asserted here: that no two keys collide under ``.title()``
-at all.  Four pairs do (``"LODGER/LODGER'S RELATIVE"`` vs
-``"Lodger/Lodger's relative"``, and three like it) where *neither* member is
-title-cased and the title-cased form is not itself a key -- both members are
-reachable through the raw lookup, so removing either would change behaviour.
-Which spelling is canonical is GH #813's decision, not this test's.
+Also asserted (GH #974): no two keys share a ``.strip().title()`` form.
+Until 2026-10-17 four pairs did (``"LODGER/LODGER'S RELATIVE"`` vs
+``"Lodger/Lodger's relative"``, and three like it), *neither* member
+title-cased and the title-cased form not itself a key, so each member was
+reached only through the raw fallback.  They were folded onto that title
+form, which answers every member on the first lookup -- the canonical
+spelling of a group is the lookup's own normal form, not a choice.
 """
 from __future__ import annotations
 
@@ -56,6 +57,37 @@ def test_no_key_is_shadowed_by_a_title_cased_twin():
         "already answers for it) -- {key: (its tuple, twin, twin's tuple)}: "
         f"{offenders}"
     )
+
+
+def test_no_two_keys_share_a_lookup_form():
+    """One key per ``label.strip().title()`` form (GH #974).
+
+    Two keys sharing a title form are spellings of one lookup group.  Write
+    the group ONCE, as its title form: that key answers every member on the
+    first lookup, so coverage is kept and the variant cannot regrow.
+    Spellings that differ in whitespace or punctuation are different lookup
+    forms and are NOT caught here -- the lookup does not fold them.
+    """
+    kin = _load_kinship_map()
+    groups = {}
+    for k in kin:
+        groups.setdefault(k.strip().title(), []).append(k)
+    collide = {t: ks for t, ks in groups.items() if len(ks) > 1}
+    assert not collide, (
+        "kinship.yml keys that share a .strip().title() form; replace each "
+        "group with ONE key spelled as the title form (str.title() artefacts "
+        f"such as \"'S\" included) -- {{title form: keys}}: {collide}"
+    )
+
+
+def test_pandas_title_agrees_with_str_title_on_every_key():
+    """``_expand_kinship`` titles with pandas ``.str.title()`` (pyarrow-backed
+    under pandas 3), while these tests reason with ``str.title()``.  The
+    rules above are only exact if the two agree on every key."""
+    import pandas as pd
+    keys = list(_load_kinship_map())
+    titled = pd.Series(keys, dtype="string").str.strip().str.title().tolist()
+    assert [(k, t) for k, t in zip(keys, titled) if t != k.strip().title()] == []
 
 
 # ---------------------------------------------------------------------------

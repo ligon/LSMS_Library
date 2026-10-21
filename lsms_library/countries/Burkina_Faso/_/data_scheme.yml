@@ -303,7 +303,3 @@ Data Scheme:
     Industry: {type: str, optional: true}
     working_age: bool
     materialize: make
-
-  food_expenditures: !make
-  food_prices: !make
-  food_quantities: !make

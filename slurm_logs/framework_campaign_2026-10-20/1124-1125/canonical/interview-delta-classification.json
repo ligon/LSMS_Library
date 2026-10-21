@@ -1,0 +1,216 @@
+{
+  "added_runtime_warnings": 8098,
+  "baseline_records_including_scope_skip": 78,
+  "class_b_warning_messages_identical": true,
+  "combined_records_including_scope_skip": 8176,
+  "independent_cold_warning_messages_and_categories_identical_by_country": true,
+  "interpretation": "Candidate rebuilds invalidated frozen-bundle caches; harness captures every repeated emitted warning. These emitted warning counts are real, while exact local cached frames, structural checks and matched cold warning controls are unchanged.",
+  "local_audit_l2_country_frames": [
+    {
+      "country": "Albania",
+      "exact_frame_equal": true,
+      "rows": 9236
+    },
+    {
+      "country": "Azerbaijan",
+      "exact_frame_equal": true,
+      "rows": 2016
+    },
+    {
+      "country": "Benin",
+      "exact_frame_equal": true,
+      "rows": 24035
+    },
+    {
+      "country": "Burkina_Faso",
+      "exact_frame_equal": true,
+      "rows": 30709
+    },
+    {
+      "country": "Cambodia",
+      "exact_frame_equal": true,
+      "rows": 1512
+    },
+    {
+      "country": "CotedIvoire",
+      "exact_frame_equal": true,
+      "rows": 38973
+    },
+    {
+      "country": "Ethiopia",
+      "exact_frame_equal": true,
+      "rows": 8351
+    },
+    {
+      "country": "GhanaLSS",
+      "exact_frame_equal": true,
+      "rows": 188687
+    },
+    {
+      "country": "Guinea-Bissau",
+      "exact_frame_equal": true,
+      "rows": 16053
+    },
+    {
+      "country": "Guyana",
+      "exact_frame_equal": true,
+      "rows": 1807
+    },
+    {
+      "country": "India",
+      "exact_frame_equal": true,
+      "rows": 2251
+    },
+    {
+      "country": "Iraq",
+      "exact_frame_equal": true,
+      "rows": 42968
+    },
+    {
+      "country": "Kosovo",
+      "exact_frame_equal": true,
+      "rows": 2880
+    },
+    {
+      "country": "Liberia",
+      "exact_frame_equal": true,
+      "rows": 2986
+    },
+    {
+      "country": "Malawi",
+      "exact_frame_equal": true,
+      "rows": 69484
+    },
+    {
+      "country": "Mali",
+      "exact_frame_equal": true,
+      "rows": 24939
+    },
+    {
+      "country": "Niger",
+      "exact_frame_equal": true,
+      "rows": 37898
+    },
+    {
+      "country": "Nigeria",
+      "exact_frame_equal": true,
+      "rows": 39228
+    },
+    {
+      "country": "Pakistan",
+      "exact_frame_equal": true,
+      "rows": 4956
+    },
+    {
+      "country": "Senegal",
+      "exact_frame_equal": true,
+      "rows": 42824
+    },
+    {
+      "country": "Serbia",
+      "exact_frame_equal": true,
+      "rows": 5557
+    },
+    {
+      "country": "South Africa",
+      "exact_frame_equal": true,
+      "rows": 8809
+    },
+    {
+      "country": "Tajikistan",
+      "exact_frame_equal": true,
+      "rows": 12306
+    },
+    {
+      "country": "Tanzania",
+      "exact_frame_equal": true,
+      "rows": 22433
+    },
+    {
+      "country": "Timor-Leste",
+      "exact_frame_equal": true,
+      "rows": 6277
+    },
+    {
+      "country": "Togo",
+      "exact_frame_equal": true,
+      "rows": 18493
+    },
+    {
+      "country": "Uganda",
+      "exact_frame_equal": true,
+      "rows": 24362
+    }
+  ],
+  "local_audit_l2_country_frames_exactly_equal": true,
+  "non_runtime_checks_identical": true,
+  "raw_messages_and_identifiers_private": true,
+  "removed_runtime_warnings": 0,
+  "warning_families": {
+    "categorical_mapping_warning": {
+      "cold_message_matched": 13,
+      "count": 13,
+      "countries": {
+        "Malawi": 10,
+        "Timor-Leste": 3
+      }
+    },
+    "date_format_dayfirst_warning": {
+      "cold_message_matched": 8000,
+      "count": 8000,
+      "countries": {
+        "Malawi": 8000
+      }
+    },
+    "expected_stale_cache_rebuild_notice": {
+      "cold_message_matched": 0,
+      "count": 25,
+      "countries": {
+        "Albania": 1,
+        "Azerbaijan": 1,
+        "Benin": 1,
+        "Burkina_Faso": 1,
+        "Cambodia": 1,
+        "CotedIvoire": 1,
+        "Ethiopia": 1,
+        "Guinea-Bissau": 1,
+        "Guyana": 1,
+        "India": 1,
+        "Iraq": 1,
+        "Kosovo": 1,
+        "Liberia": 1,
+        "Malawi": 1,
+        "Mali": 1,
+        "Niger": 1,
+        "Pakistan": 1,
+        "Senegal": 1,
+        "Serbia": 1,
+        "South Africa": 1,
+        "Tajikistan": 1,
+        "Tanzania": 1,
+        "Timor-Leste": 1,
+        "Togo": 1,
+        "Uganda": 1
+      }
+    },
+    "makefile_missing_fallback_warning": {
+      "cold_message_matched": 10,
+      "count": 10,
+      "countries": {
+        "Guyana": 1,
+        "India": 1,
+        "Iraq": 2,
+        "Kosovo": 1,
+        "Pakistan": 1,
+        "Tajikistan": 4
+      }
+    },
+    "stata_utf8_fallback_warning": {
+      "cold_message_matched": 50,
+      "count": 50,
+      "countries": {
+        "Mali": 50
+      }
+    }
+  }
+}

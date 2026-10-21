@@ -25,6 +25,11 @@ on:
   schedule:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
     - cron: '17 6 * * 1'
+    # Nightly data-tests on `development` (GH #932).  NOTE: GitHub runs a
+    # scheduled workflow from the DEFAULT branch's copy of this file (master),
+    # so this line takes effect only once it reaches master; the data-tests
+    # job checks out `development` explicitly for this event.
+    - cron: '41 10 * * *'
   # Manual trigger (GH #941).  `data-tests` otherwise runs only on a push to
   # master / separate_data, i.e. once per release -- so a failure there
   # (52 EHCVM failures on the v0.14.0 push, 2026-09-17) could not be
@@ -102,7 +107,30 @@ jobs:
         run: >-
           poetry run pytest -n auto --dist=loadfile
           --timeout=600 --timeout-method=thread
-          --durations=25
+          --durations=25 --junitxml=unit-tests.xml
+      # GH #932: say what this green check does NOT cover.  Every
+      # `requires_s3` test skips here (no credentials), so a pass verifies
+      # code, not data.  The data tests gate the merge queue and run nightly.
+      - name: State what this check did not verify
+        if: always()
+        run: |
+          python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import xml.etree.ElementTree as ET
+          try:
+              suites = ET.parse('unit-tests.xml').getroot()
+              suites = [suites] if suites.tag == 'testsuite' else list(suites)
+              tests = sum(int(x.get('tests', 0)) for x in suites)
+              skipped = sum(int(x.get('skipped', 0)) for x in suites)
+              line = (f"**{skipped:,} of {tests:,} tests were skipped** in this job "
+                      f"({skipped / max(tests, 1):.0%}), almost all `requires_s3` (no credentials).")
+          except Exception as exc:  # the summary must never fail the job
+              line = f"(could not read unit-tests.xml: {exc})"
+          print("### unit-tests does not verify data\n")
+          print(line)
+          print("A green `unit-tests` check verifies the code paths that need no microdata.")
+          print("The data tests (`data-tests`) run in the `development` merge queue, nightly")
+          print("on `development`, on release pushes, and on manual dispatch (GH #932).")
+          PY
 
   # Windows reader smoke exercises platform defaults: cp1252 text encoding,
   # no ``fork`` start method, no process groups, a case-insensitive checkout.
@@ -173,8 +201,10 @@ jobs:
   # PATH and make/sh/find are asserted to resolve inside the conda env, so
   # this measures what a user with only that environment gets.  Cold-builds
   # two Uganda script-path tables and checks them against the Linux build:
-  #   Uganda:shocks rows=14457 waves=8 digest=64a53fa7af55
+  #   Uganda:shocks rows=14457 waves=8 digest=0ab2ea4c79dd
   #   Uganda:assets rows=116808 waves=8 digest=9202ed542a14
+  # GH #805: 2,012 HowCoped cells now decode U+0085 as U+2026; the
+  # aggregate-only proof is in slurm_logs/framework_campaign_2026-10-20/windows/.
   # Secrets are restricted to integration pushes or an explicit maintainer
   # dispatch; pull requests (including forks) never execute this job.
   windows-script-build:
@@ -218,7 +248,7 @@ jobs:
           PROBE_STRIP: '\Git\,mingw64,chocolatey'
           REQUIRE_CONDA_TOOLS: "1"
           REQUIRE_INSTALLED_LIBRARY: "1"
-          EXPECT: "Uganda:shocks=14457:64a53fa7af55,Uganda:assets=116808:9202ed542a14"
+          EXPECT: "Uganda:shocks=14457:0ab2ea4c79dd,Uganda:assets=116808:9202ed542a14"
           LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
           LSMS_BUILD_WORKERS: "1"
           PYTHONUNBUFFERED: "1"
@@ -232,7 +262,8 @@ jobs:
   # integration branches; reader creds only.
   dvc-remote-reachability:
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.ref == 'refs/heads/development' || github.ref == 'refs/heads/master'
+    # Only the WEEKLY cron: the nightly one (GH #932) is for data-tests.
+    if: github.event.schedule == '17 6 * * 1' || github.ref == 'refs/heads/development' || github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -240,16 +271,30 @@ jobs:
           python-version: '3.11'
       - name: Install boto3 + pyyaml (the script needs nothing else)
         run: pip install boto3 pyyaml
-      - name: Configure DVC credentials
+      # GH #1031: the reader credentials go to the USER-CONFIG path
+      # (`config.s3_creds_path()`), as in the Windows job -- never into the
+      # countries tree, which the script no longer reads.  `config.py` is
+      # loaded BY FILE because this job installs only boto3 + pyyaml, and
+      # importing the package would pull in dvc and pandas.  The script
+      # resolves the path with the same loader and the same interpreter.
+      - name: Configure S3 read credentials
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
         run: |
-          cat > lsms_library/countries/.dvc/s3_creds <<EOF
-          [default]
-          aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-          aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+          python - <<'EOF'
+          import importlib.util, os
+          spec = importlib.util.spec_from_file_location("cfg", "lsms_library/config.py")
+          cfg = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(cfg)
+          f, e = cfg.s3_creds_path(), os.environ
+          f.parent.mkdir(parents=True, exist_ok=True)
+          f.write_text("[default]\naws_access_key_id = " + e["AWS_ACCESS_KEY_ID"]
+                       + "\naws_secret_access_key = " + e["AWS_SECRET_ACCESS_KEY"] + "\n")
+          f.chmod(0o600)
+          print("wrote", f)
           EOF
+          test ! -e lsms_library/countries/.dvc/s3_creds
       - name: Sweep the remote
         run: python scripts/dvc_remote_reachability.py --out dvc_remote_missing.tsv
       - name: Upload the missing-blob report
@@ -367,14 +412,32 @@ jobs:
       OPENBLAS_NUM_THREADS: "1"
       OMP_NUM_THREADS: "1"
       MKL_NUM_THREADS: "1"
-    # Push to a release branch, or a manual `workflow_dispatch` on any ref
-    # (GH #941): the dispatch is the only way to re-run this job on a fix
-    # without a release.
+    # When this runs (GH #932, @ligon 2026-10-18):
+    #  - merge_group: every merge into `development` through the merge queue
+    #    is data-tested BEFORE it lands.  On pull_request events the job is
+    #    SKIPPED, and GitHub counts a skipped job as passing a required check,
+    #    so making `data-tests` required in the merge-queue ruleset gates the
+    #    queue without slowing PR pushes;
+    #  - the nightly schedule (`41 10 * * *`), against `development`: the
+    #    backstop for anything that bypassed the queue and for drift outside
+    #    the repo (S3 contents, WB downloads, dependency resolution);
+    #  - a push to a release branch, as before;
+    #  - a manual `workflow_dispatch` on any ref (GH #941).
+    # Before #932 only the last two applied, so every PR and every
+    # `development` push skipped ~4,250 `requires_s3` tests and reported green.
     if: >-
       github.event_name == 'workflow_dispatch'
+      || github.event_name == 'merge_group'
+      || github.event.schedule == '41 10 * * *'
       || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data'))
+    # A hung data test must not hold the merge queue for the 6-hour default.
+    # The job takes ~57-63 min today (2026-10-15 runs).
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+        with:
+          # A scheduled run would otherwise test the default branch (master).
+          ref: ${{ github.event_name == 'schedule' && 'development' || '' }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -382,16 +445,38 @@ jobs:
         run: pip install poetry
       - name: Install dependencies
         run: poetry install --no-root
-      - name: Configure DVC credentials
+      # GH #1031: the USER-CONFIG path (`config.s3_creds_path()`), as in the
+      # Windows job, so this run exercises what a user has: no
+      # `countries/.dvc/s3_creds`.  Resolved under `poetry run`, i.e. by the
+      # interpreter (and platformdirs) the library and the `requires_s3` gate
+      # in tests/conftest.py use.  `config.py` is loaded BY FILE so writing
+      # the file does not run the package's import-time auth flow.
+      - name: Configure S3 read credentials
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
         run: |
-          cat > lsms_library/countries/.dvc/s3_creds <<EOF
-          [default]
-          aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-          aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+          poetry run python - <<'EOF'
+          import importlib.util, os
+          spec = importlib.util.spec_from_file_location("cfg", "lsms_library/config.py")
+          cfg = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(cfg)
+          f, e = cfg.s3_creds_path(), os.environ
+          f.parent.mkdir(parents=True, exist_ok=True)
+          f.write_text("[default]\naws_access_key_id = " + e["AWS_ACCESS_KEY_ID"]
+                       + "\naws_secret_access_key = " + e["AWS_SECRET_ACCESS_KEY"] + "\n")
+          f.chmod(0o600)
+          print("wrote", f)
           EOF
+          test ! -e lsms_library/countries/.dvc/s3_creds
+      # Fail loudly rather than let ~4,250 `requires_s3` tests skip and report
+      # green, which is what a credential the gate cannot see would do.
+      - name: Assert the requires_s3 gate is open
+        run: >-
+          poetry run python -c "import importlib.util as u;
+          s = u.spec_from_file_location('c', 'tests/conftest.py'); m = u.module_from_spec(s);
+          s.loader.exec_module(m);
+          assert m.aws_creds_available(), 'requires_s3 tests would be SKIPPED: no reader credentials'"
       - name: Build Uganda tables
         run: |
           cd lsms_library/countries/Uganda/_

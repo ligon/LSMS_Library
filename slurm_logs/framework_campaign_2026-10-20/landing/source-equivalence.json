@@ -1,0 +1,25 @@
+{
+  "candidate": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "publication": "23c1e2d52801bf206a15ec5900bca5d62e7f850f",
+  "landed_implementation": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+  "candidate_paths": 14437,
+  "landed_paths": 14441,
+  "all_candidate_modes_types_blobs_preserved": true,
+  "publication_and_landed_full_trees_identical": true,
+  "candidate_tree_inventory_sha256": "ad980f870b0d82d1ca0a28e8a293cbab84ee02bcbfc6a4444142e98a08a892c0",
+  "landed_tree_inventory_sha256": "79b739b4486adf3d736e070a6c879e9170ebcbf2e0100ab7fd6d27ce0e302492",
+  "only_added_paths": [
+    "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.json",
+    "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.org",
+    "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.json",
+    "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.org"
+  ],
+  "only_added_blobs": {
+    "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.json": "100644 blob 70f3ebaa57e7ed57d29f7623d00a72153978fba5",
+    "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review-r2.org": "100644 blob 84f1d7848382bf91677c54b7f0225eab50b4245c",
+    "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.json": "100644 blob f1ffc22cc5aa40130aaba4c1501690e53c96226b",
+    "slurm_logs/framework_campaign_2026-10-20/1124-1125/1124-1125-review.org": "100644 blob b7b5988bc4f6a11578cb1e29f3b4bbed5f9f577e"
+  },
+  "runtime_config_package_tests_scripts_bin_tools_bench_workflows_build_dependencies_identical": true,
+  "scope": "Read-only git objects; no package code, test or data/cache API executed."
+}

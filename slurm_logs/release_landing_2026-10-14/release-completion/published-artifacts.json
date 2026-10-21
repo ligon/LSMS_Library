@@ -1,0 +1,37 @@
+{
+  "version": "0.15.0",
+  "tag_commit": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "artifacts": [
+    {
+      "name": "lsms_library-0.15.0-py3-none-any.whl",
+      "bytes": 8852718,
+      "sha256": "a19b458f2d2fce0bb67c192338ffb02fb745f78af3ba77b0d5db1c3395c0f9f0",
+      "url": "https://files.pythonhosted.org/packages/b8/07/9f7372ae555316c0dac916316e058d9ca333c66f953a38a379e948a94844/lsms_library-0.15.0-py3-none-any.whl",
+      "packagetype": "bdist_wheel"
+    },
+    {
+      "name": "lsms_library-0.15.0.tar.gz",
+      "bytes": 5300551,
+      "sha256": "e8ed24a6609268b02220e2eb94c7809ab5c153468094614c8af2b8444c78c657",
+      "url": "https://files.pythonhosted.org/packages/57/cf/f3ccfab9a7e85262c28115d288317b1eb562701d62763920343bd9b20cc7/lsms_library-0.15.0.tar.gz",
+      "packagetype": "sdist"
+    }
+  ],
+  "selected_tagged_source_members_equal": [
+    "lsms_library/__init__.py",
+    "lsms_library/country.py",
+    "lsms_library/local_tools.py",
+    "lsms_library/transformations.py",
+    "lsms_library/catalog_relations.yml",
+    "lsms_library/data_info.yml",
+    "lsms_library/countries/Uganda/_/assets.py",
+    "lsms_library/countries/Uganda/_/kgs_per_other_units.json",
+    "lsms_library/countries/Mali/_/CONTENTS.org",
+    "lsms_library/countries/Tanzania/_/CONTENTS.org",
+    "lsms_library/countries/Liberia/_/CONTENTS.org"
+  ],
+  "all_package_members_match_tagged_git_blobs": true,
+  "package_member_count": 11751,
+  "missing_or_extra_package_members": [],
+  "no_credential_or_parquet_filenames_in_wheel_and_sdist": true
+}

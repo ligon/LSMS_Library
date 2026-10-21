@@ -1,0 +1,11 @@
+{
+  "baseline_cases": 8857,
+  "candidate_cases": 9050,
+  "added_all_pass": 198,
+  "removed_previously_passed_in_JUnit": 5,
+  "skip_to_pass": 9,
+  "other_outcome_changes": 0,
+  "xfail_identity_equal": true,
+  "all_changes_accounted_for": true,
+  "XPASS_limit": "JUnit records non-strict XPASS as PASS; this comparison does not identify baseline XPASS."
+}

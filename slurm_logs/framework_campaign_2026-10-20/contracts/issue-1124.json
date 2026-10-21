@@ -1,0 +1,10 @@
+{
+  "body": "From the #569 follow-up (`fix/569-plot-registration`, plot_labor/plot_inputs registration).\n\n- `row_conservation` sums only the countries *present* in the assembly. A country dropped whole by `_select_kept_shape` is never counted as lost: the pre-#569 scan reported 0 Class-B rows for 942,441 excluded rows.\n- Fix: compare against every country that built, and emit Class B for the excluded ones.\n- Also: `CANONICAL_FEATURES` omits `crop_production`, `plot_labor` and `plot_inputs`.\n- **Tier:** A (harness).\n",
+  "comments": [],
+  "labels": [],
+  "number": 1124,
+  "state": "OPEN",
+  "title": "#569 residual G: `bench/feature_audit/scan.py` row-conservation is blind to modal exclusion",
+  "updatedAt": "2026-10-19T22:38:40Z",
+  "url": "https://github.com/ligon/LSMS_Library/issues/1124"
+}

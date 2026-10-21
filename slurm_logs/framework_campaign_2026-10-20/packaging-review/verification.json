@@ -1,0 +1,79 @@
+{
+  "all_subprocesses_stopped": true,
+  "archive": {
+    "CLI_entrypoint_present": true,
+    "dynamic_version_placeholder_restored": true,
+    "missing_package_files_in_sdist": [],
+    "missing_package_files_in_wheel": [],
+    "nonzero_dynamic_version": true,
+    "private_worktree_clean": true,
+    "raw_binary_data_in_sdist": [],
+    "raw_binary_data_in_wheel": [],
+    "scope": "All tracked lsms_library runtime/config/script/provenance/sidecar files. Checkout-only tests/fixtures are not distributed by current packaging policy.",
+    "sdist": {
+      "bytes": 5651524,
+      "filename": "lsms_library-0.15.0.post392.dev0+4cab5f0db.tar.gz",
+      "files": 11757,
+      "sha256": "04ceffcefd7ca27d3636a9042820680cf1a615e1599c25ca9fdae0d6b1a5e90e",
+      "wheel_built_from_this_sdist": true
+    },
+    "sdist_package_byte_differences": [],
+    "source_sha": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+    "test_fixture_in_sdist": false,
+    "test_fixture_in_wheel": false,
+    "tracked_package_files": 11753,
+    "version": "0.15.0.post392.dev0+4cab5f0db",
+    "wheel": {
+      "bytes": 9074337,
+      "filename": "lsms_library-0.15.0.post392.dev0+4cab5f0db-py3-none-any.whl",
+      "files": 11758,
+      "sha256": "e0f459448e76b452abe366115527804e6c9e25829c66fa6956d24fa4a4a79a2f"
+    },
+    "wheel_package_byte_differences": []
+  },
+  "installed_smoke": {
+    "countries_root": "/local/job40255479/control/framework-campaign/packaging-review/installed-target/lsms_library/countries",
+    "data_builds_forbidden": true,
+    "data_root": "/local/job40255479/control/framework-campaign/packaging-review/smoke-data",
+    "network_forbidden": true,
+    "no_parquet_produced": true,
+    "package_file": "/local/job40255479/control/framework-campaign/packaging-review/installed-target/lsms_library/__init__.py",
+    "registered_countries": 38,
+    "roster_declaring_countries": 37,
+    "roster_required_columns": [
+      "Sex",
+      "Age",
+      "Relationship",
+      "Generation",
+      "Distance",
+      "Affinity"
+    ],
+    "scope": "Installed wheel config discovery only; no installed data build",
+    "uganda_declared_table_count": 28,
+    "uganda_waves": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ],
+    "version": "0.15.0.post392.dev0+4cab5f0db"
+  },
+  "limits": [
+    "Untagged development version, not0.16.0 tag",
+    "Installed target uses existing image dependencies",
+    "No installed data build or raw-data access",
+    "Checkout tests/fixtures absent from both archives under current package-only policy",
+    "No publish/upload validation"
+  ],
+  "no_release_or_github_actions": true,
+  "no_shared_environment_installation": true,
+  "private_backend_install_only": true,
+  "source_sha": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "source_worktree_clean": true,
+  "verdict": "PASS_WITH_STATED_SCOPE_LIMITS",
+  "version": "0.15.0.post392.dev0+4cab5f0db"
+}

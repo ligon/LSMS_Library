@@ -1,0 +1,77 @@
+{
+  "classification": "aggregate terminal outcomes and source-only tools; raw survey logs remain private",
+  "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "run_id": 38759333750,
+  "files": [
+    {
+      "name": "REPORT.md",
+      "bytes": 5105,
+      "sha256": "c241518507f995a7ccbbd30de73010c831e1209909b9e873e6888933aedd0120"
+    },
+    {
+      "name": "aggregate-results.json",
+      "bytes": 6747,
+      "sha256": "9af43e91317316cf957fa0b66bb3047c6e47cb1cc28c9ac83bed122fec63e0d7"
+    },
+    {
+      "name": "docs-lock-observations.json",
+      "bytes": 334,
+      "sha256": "9801edc4add55f3f58af227e4cf12ed5a06fa45d8df26e3afa0ca22e125ade84"
+    },
+    {
+      "name": "expected-native.json",
+      "bytes": 755,
+      "sha256": "8610fe06e5b928e75f46dbb26cd4fae5c3bd9b351547056b4454fa0da2f112fa"
+    },
+    {
+      "name": "freeze_terminal.py",
+      "bytes": 5719,
+      "sha256": "e783b3dc9cf016f6c80f256b1f27c7ca86b7f17beff6ac98eb1816f33c0367f5"
+    },
+    {
+      "name": "master-tip-history.jsonl",
+      "bytes": 204,
+      "sha256": "7588e68ce2dc4b696c0be2e9625d522996065cdebe66ddf54cc3870889e46ca1"
+    },
+    {
+      "name": "master-tip.json",
+      "bytes": 214,
+      "sha256": "9f18c57709497efe029d9d247e02a48feff2f97aabc089e4262d0d92580330f8"
+    },
+    {
+      "name": "monitor-finished.json",
+      "bytes": 615,
+      "sha256": "1aaebad1bc7791fe87bc790835de2c3720b3528bc53d4dbccd9d0e75b85657c6"
+    },
+    {
+      "name": "monitor-process.json",
+      "bytes": 266,
+      "sha256": "599c46605962471ac50a4121da552af6856e5405e77d6123ea5fd99fdb2fad8b"
+    },
+    {
+      "name": "monitor.py",
+      "bytes": 6133,
+      "sha256": "e7c2e3601a1a0897e4243f5896b0ead962af9f1203519c6a06561ddd7cedae26"
+    },
+    {
+      "name": "native-validation.json",
+      "bytes": 805,
+      "sha256": "626f17dea249c71acc4fd7c032ccb91b8517a43d91ff7beb4c3fe4ac2389dc89"
+    },
+    {
+      "name": "render_report.py",
+      "bytes": 3878,
+      "sha256": "b094b46a31f3dd0149a6efbf6adf8d49b452c7dc462f93e7e5044fd479c8f911"
+    },
+    {
+      "name": "semantic-review.json",
+      "bytes": 15235,
+      "sha256": "5a025a1ed9c654f793fd5552646587ff6720f4ba2837a8b3013c5417c1a7b74b"
+    },
+    {
+      "name": "source-identity.json",
+      "bytes": 504,
+      "sha256": "7c0e360560c0d2cccf9a87fbbf0ed36427cb35bfa64b6550e19334fcd0fe9fa4"
+    }
+  ]
+}
