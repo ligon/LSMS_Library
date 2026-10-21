@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T21:38:05.420886+00:00",
+  "observed_at": "2026-10-21T22:07:33.683216+00:00",
   "actions": [
     {
       "issue": 822,
@@ -154,6 +154,14 @@
     {
       "issue": 1081,
       "action": "Actual generated handlers reproduce all three deliberately typed categorical RuntimeErrors masked by legacy fallback. Explicit root-approved third KeyDeclarationError scope; real parser tests discriminate42fail/31pass onf8. Mocked successful fallback qualifies old blanket loud-failure claim, not an observed healthy Ethiopia legacy cache. New separate writer approved; no candidate/PR/PASS claimed yet. Live issue title/body updated, original report retained."
+    },
+    {
+      "issue": 1111,
+      "action": "Independent bounded global14 PASS at653f against actual5dde:129tests/full parent-based frames+attrs/all235pair sums/organic/N/Uganda/scanner/warm. Dedicated default Feature target-cold returns serialized in new roots; earlier fd235 limitation remains historical. Validation source public and PR1193 body updated. No public merge;2013/2016 C4 residuals remain."
+    },
+    {
+      "issue": 1058,
+      "action": "Independent44-test PASS; PR1194 open awaitinghumanmerge. Actual4180pairs/7350parcels/19784public/33608Feature and all13scanner records verified;24BFhash moves only. Live issue records implementation and completed negative held-country source checks. New global15 coexistence with prior1123 in progress; no public merge."
     }
   ],
   "verified_issue_metadata": [
@@ -288,6 +296,14 @@
       "dependency_pr": 1175,
       "ci": "success; run39678420581",
       "partial_residual": "2013/2016 literalC4 instrument authority remains"
+    },
+    {
+      "number": 1194,
+      "issue": 1058,
+      "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "runtime": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
+      "review": "PASS44tests/source-native-walked-public/full13frames+attrs/Feature/warm/scanner/hash; Senegal2freshcountry+2freshYAML+2legitimatehashless; one non-source symlink final-onlyreceipt qualified",
+      "ci": "in_progress; run39683305731"
     }
   ]
 }

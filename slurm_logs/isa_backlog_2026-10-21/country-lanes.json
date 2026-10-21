@@ -6,7 +6,7 @@
     "Burkina_Faso": {
       "path": "/local/job40255479/worktrees/isa-Burkina_Faso",
       "branch": "isa/Burkina_Faso-20261021",
-      "status": "independent-review-active",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "niger_lane",
       "initial_issue": 1148,
       "dependency": "Approved #851 Phase II is not implemented at baseline; source-status evidence remains conflicting",
@@ -52,7 +52,10 @@
       "active_reviewer": "mali_lane",
       "active_review_path": "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso",
       "active_private_review": "/local/job40255479/control/isa-backlog-20261021/review-1058-Burkina_Faso",
-      "active_review_status": "Independent review active; no PASS or PR claimed yet"
+      "active_review_status": "PASS;44tests, exact source/native/walked/public/Feature/warm/scanner/hash; explicit Senegal tier and non-source symlink receipt limits",
+      "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1194",
+      "active_ci": "in_progress; run39683305731",
+      "combined_review": "Active at4227e3a802c7349b11f41ec70a924d712159e587 against actualglobal14, including earlier1123 input/sample/cluster preservation"
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
@@ -125,7 +128,8 @@
       "active_dependency_pr": 1175,
       "active_ci": "success; run39678420581",
       "composition_evidence": "/local/job40255479/control/isa-backlog-20261021/review-1111-Malawi-composition",
-      "composition_capture_limit": "First cold public Feature was not serialized after private currency-argument expectation mismatch; all persisted cold raw frames and passed Country preserved, full default post-cold capture and fresh-process warm proof exact"
+      "composition_capture_limit": "First cold public Feature was not serialized after private currency-argument expectation mismatch; all persisted cold raw frames and passed Country preserved, full default post-cold capture and fresh-process warm proof exact",
+      "combined_review": "PASS at653f against actual5dde;129tests/full pair/organic/native/Country/defaultFeature/N/Uganda/scanner/warm; independent cold Feature captures now serialized at new source pin; earlier fd235 limit preserved"
     },
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
@@ -243,7 +247,7 @@
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
       "branch": "isa/Uganda-20261021",
-      "status": "reviewed-pr-awaiting-human",
+      "status": "read-only-cache-writer-diagnosis",
       "owner": "triage_panel",
       "frozen_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
       "review_path": "/local/job40255479/worktrees/isa-review-1062-v2",
@@ -256,22 +260,35 @@
         "finding": "Valid partial sibling caches bypass income input verification under inherited Make; baseline returns all waves."
       },
       "ci": "GitHub PR CI success on frozen4ef24fb",
-      "active_issue": 1006,
-      "active_path": "/local/job40255479/worktrees/isa-Uganda-1006",
-      "active_branch": "fix/1006-uganda-derived-api-tests-20261021",
-      "active_owner": "review_malawi_1109",
       "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Uganda/1006",
-      "previous_issue_status": "1062 reviewedPR1173 awaitinghuman",
-      "active_frozen_head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
-      "active_runtime_head": "1eb9bb377157c78f74962c7a9de59807d446b239",
-      "active_precode_ledger": "cdb6274ef",
-      "active_reviewer": "niger_lane",
-      "active_review_path": "/local/job40255479/worktrees/isa-review-1006-Uganda",
-      "active_author_tests": 66,
-      "active_boundary": "Three test files only plusledger/safeevidence; no production/fixture/cache persistence changes",
-      "active_review_verdict": "PASS66tests0skip; full9frames+2matrices; comprehensivefault/absence/credentials/restoration/immutability controls",
-      "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1191",
-      "active_ci": "success;run39669180447"
+      "previous_issue_status": "1062PR1173 and1006PR1191 independently reviewed/CIgreen awaiting human merge; neither proves1078 repaired",
+      "reviewed_1006": {
+        "active_issue": 1006,
+        "active_path": "/local/job40255479/worktrees/isa-Uganda-1006",
+        "active_branch": "fix/1006-uganda-derived-api-tests-20261021",
+        "active_owner": "review_malawi_1109",
+        "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Uganda/1006",
+        "active_frozen_head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+        "active_runtime_head": "1eb9bb377157c78f74962c7a9de59807d446b239",
+        "active_precode_ledger": "cdb6274ef",
+        "active_reviewer": "niger_lane",
+        "active_review_path": "/local/job40255479/worktrees/isa-review-1006-Uganda",
+        "active_author_tests": 66,
+        "active_boundary": "Three test files only plusledger/safeevidence; no production/fixture/cache persistence changes",
+        "active_review_verdict": "PASS66tests0skip; full9frames+2matrices; comprehensivefault/absence/credentials/restoration/immutability controls",
+        "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1191",
+        "active_ci": "success;run39669180447"
+      },
+      "active_issue": 1078,
+      "active_owner": "review_nigeria_1034",
+      "active_path": "/local/job40255479/worktrees/isa-Uganda-1078",
+      "active_branch": "diagnose/1078-uganda-cache-writer-20261021",
+      "active_control_with_1062": "/local/job40255479/worktrees/isa-Uganda-1078-with1062",
+      "active_control_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Uganda/1078",
+      "active_scope": "Read-only exact9NaN-to-zero current-hash writer attribution under f8 vs reviewed1062; verified physical historical evidence copied; no fix approved",
+      "active_historical_delta": "Independent historical comparison confirms exact sixQuantity and threeExpenditure NaN-to-zero cells,2011-12 only; allotherfullframes/attrs exact, same storeded5c69e8hash",
+      "active_hypothesis": "Unconfirmed: Wave.food_acquired reads script result then separately checks external parquet; a concurrent normal eviction could trigger legacy sum and zero all-NA cells. Actual unchanged-code timing/concurrent writer attribution still required; no fix approved."
     }
   },
   "shared_lanes": {
@@ -296,7 +313,7 @@
     "1081": {
       "path": "/local/job40255479/worktrees/isa-framework-1081-fix",
       "branch": "fix/1081-preserve-categorical-errors-20261021",
-      "status": "author-runtime-verification-active",
+      "status": "independent-review-active",
       "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "scope": "Explicit three existing typed categorical errors: minimal imports/two bare re-raise clauses only; UnitsUnavailable byte-exact and generic/Feature/label policies unchanged",
       "dedup": "Live issue/zero comments and100recent userPRs checked; no implementation match",
@@ -320,13 +337,17 @@
       "API_hashes_evaluated": 549,
       "measured_framework_fingerprint_changes": 0,
       "framework_fingerprints_evaluated": 39,
-      "author_status": "Ledger/runtime FS-published;235tests+166desired probes+5valuation controls pass; normal healthy full API/warm checks active; no final freeze or independent PASS yet"
+      "author_status": "Final clean FS-published/quiescent.235tests,166desiredprobes,5valuation and6Featurecontrols/head;68full API comparisons,60parquets/root0warmwrites;0/549hashes and0/39tags.Independent review active; no PR or PASS yet.",
+      "frozen_head": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "reviewer": "niger_lane",
+      "review_path": "/local/job40255479/worktrees/isa-review-1081",
+      "private_review": "/local/job40255479/control/isa-backlog-20261021/review-1081"
     }
   },
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "head": "4227e3a802c7349b11f41ec70a924d712159e587",
     "included_prs": [
       1172,
       1173,
@@ -341,9 +362,10 @@
       1189,
       1191,
       1192,
-      1193
+      1193,
+      1194
     ],
-    "status": "Fourteen reviewed PRs integrated cleanly; bounded Malawi coexistence review active; do not mutate frozen head",
+    "status": "Fifteen reviewed PRs integrated cleanly; new Burkina cross-feature coexistence review active, do not mutate frozen head",
     "public_prs_merged": false,
     "unit_session": 28550,
     "unit_exit_code": 0,
@@ -361,7 +383,7 @@
     "cohort_excluded_all_country_cases": 2,
     "api_review_completed": true,
     "api_review_verdict": "PASS: nine Country calls and four Features exactly match complete frozen corrected reference frames/attrs; fresh-process warm writes zero of1519parquets",
-    "source_head_frozen": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "source_head_frozen": "4227e3a802c7349b11f41ec70a924d712159e587",
     "cohort_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "api_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "current_head_validation_completed": false,
@@ -383,9 +405,9 @@
     "six_cohort_completed": true,
     "six_cohort_session": 23070,
     "six_cohort_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
-    "current_head_validation_owner": "review_nigeria_1034",
-    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/malawi-fourteen-review",
-    "current_head_validation_status": "Preparation terminal-success; actual global13/global14 Country/native/raw and matched parent expectations pass, organic/N/Uganda exact; final dedicated default Feature cold-entry/warm/129tests/oracle/scanner/freeze proof active",
+    "current_head_validation_owner": "mali_lane",
+    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/burkina-fifteen-review",
+    "current_head_validation_status": "Active against actualglobal14; prior1123 non-doc blobs preserved exactly.Healthy plot/input/sample/cluster scopes and source-gated cold/warm/Feature checks pending.",
     "eleven_increment": {
       "head": "7886f7ece49767b2357a2f559c474e0eb710561f",
       "verdict": "PASS",
@@ -416,7 +438,7 @@
       "tracked_paths_unchanged": 14992,
       "evidence": "integration/uganda-twelve-review/"
     },
-    "public_branch_head": "5dde66645a444b025aa69682838cdf7c033a6e88",
+    "public_branch_head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
     "thirteen_increment": {
       "head": "5dde66645a444b025aa69682838cdf7c033a6e88",
       "control": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
@@ -430,6 +452,26 @@
       "fresh_process_new_instance_writes": 0,
       "private_data_root_files_checked_per_root": 27,
       "evidence": "integration/nigeria-thirteen-review/"
+    },
+    "fourteen_increment": {
+      "head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+      "control": "5dde66645a444b025aa69682838cdf7c033a6e88",
+      "verdict": "PASS",
+      "tests_passed": 129,
+      "tests_skipped": 0,
+      "source_pair_sums_exact": 235,
+      "organic_answers_preserved": 11075,
+      "all_full_native_Country_default_Feature_frames_attrs_exact": true,
+      "dedicated_default_Feature_cold_entry_frames_serialized": true,
+      "warm_private_data_files_checked_per_root": 90,
+      "roots": 4,
+      "warm_changed_files": 0,
+      "healthy_Uganda_plot_inputs_rows": 84216,
+      "healthy_Uganda_sample_rows": 24362,
+      "scanner_records": 15,
+      "scanner_exact_records": 11,
+      "scanner_expected_count_only_records": 4,
+      "evidence": "integration/malawi-fourteen-review/"
     }
   }
 }

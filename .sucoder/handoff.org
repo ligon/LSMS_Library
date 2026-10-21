@@ -658,27 +658,28 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 
 Sue, GPT-6. The goal remains ACTIVE; actionable country backlog work continues.
 Main development is clean at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
-Report branch =docs/isa-backlog-20261021=, previous checkpoint =a4781bebce8ddddb6380d5bfde97bd090f3d63cd=; commit this current note with the next checkpoint.
+Report branch =docs/isa-backlog-20261021=, previous checkpoint =596b13e70e3d4d6002a6a877b539b33d518a2f03=; commit this current note with the next checkpoint.
 Campaign draft PR #1170: inventory, exact residuals, reconciliation, independent reviews and source-safe evidence.
 The detailed current records are =slurm_logs/isa_backlog_2026-10-21/{STATUS.org,country-lanes.json,reconciliation.json}=.
 
 ** Public PRs and source validation
 
-Fourteen independently reviewed implementation PRs remain open and unmerged.
-All fourteen latest CI runs passed, including Malawi #1193(run39678420581).
-PRs: #1172, #1173, #1175, #1176, #1178, #1180, #1181, #1182, #1185, #1186, #1189, #1191, #1192 and #1193.
-Exact heads and bases are in =public-pr-checkpoint.json=.
+Fifteen independently reviewed implementation PRs remain open, unmerged and individually mergeable at the22:06UTC live checkpoint.
+The first fourteen latest CI runs passed; new Burkina PR1194 is in progress(run39683305731).
+PRs: #1172, #1173, #1175, #1176, #1178, #1180, #1181, #1182, #1185, #1186, #1189, #1191, #1192, #1193 and #1194.
+Exact heads and bases are in =public-pr-checkpoint-fifteen.json=; earlier snapshots remain historical.
 #1178 is stacked on #1172 and #1193 on #1175; retarget each only after a human merges its parent.
 No public PR is automatically merged.
 
-Validation-only branch =isa/integration-20261021= is clean and FROZEN at =653f77b1437886138f6b29078dcfb6108bf1e9c6= for bounded global14 Malawi coexistence review.
-The public branch names reviewed global13 =5dde66645a444b025aa69682838cdf7c033a6e88=; all prior ancestor pins are public.
+Validation-only branch =isa/integration-20261021= is now clean and FROZEN at =4227e3a802c7349b11f41ec70a924d712159e587= for bounded global15 Burkina coexistence review.
+Its previous653f77b1437886138f6b29078dcfb6108bf1e9c6 global14 review PASSED and released before the new merge.
+The public validation branch still names validated653f; all earlier ancestor pins are public. Do not move4227 until the current reviewer releases it.
 Global13 PASS:60tests,5228source gains, all old native/raw/Country/both Feature full payloads and attrs exact, current Niger1088 exact, all6scanner records matched; zero writes across27files/root.
-Do not mutate653f until reviewer release; push the updated validation branch only after its own PASS.
+Root read final global14 report/proof, pushed653f and updated PR1193 body, then clean-merged PR1194 into4227 after release. All prior1123 non-doc changes remain exact; no public implementation PR was merged. Do not attribute earlier PASS to4227.
 Its twelve-change Uganda increment passed 25 scoped plus 41 supporting cases, zero skips, and two API processes each matching nine complete frames and two attrition matrices to independent f8/#1191 references.
 Six stale required prerequisites rebuilt normally from 55 held source blobs; all eight required tables then had current hashes and eight-wave manifests.
 Warm API/test serving changed none of the 64 scoped parquets; all 14,992 tracked paths, modes, HEAD and clean status remained exact.
-The old twelve-change freeze is released; the new653f fourteen-change freeze is active. Do not relabel these bounded results as a full corpus rebuild.
+Global14 PASS:129tests, full both-parent frames/attrs, all235pair sums/11075organic/Nfullframe/Uganda exact,15scanner records11exact+4expectedcounts. New dedicated default Feature cold returns were serialized at this new source pin; earlier fd235 limitation is preserved. Warm reads write zero of90files in each of4private roots; all392physical-copy/five frozen trees/970prior evidence receipts exact. Do not relabel this bounded proof as a full corpus rebuild.
 Safe exports: =integration/uganda-twelve-review/=; private evidence: =control/isa-backlog-20261021/integration/uganda-twelve-review/=.
 
 Earlier completed proofs retain their exact pins:
@@ -696,32 +697,31 @@ The initial ten-change Org marker mistake was corrected by =bbdcf3457= without c
 
 The concurrency limit is root plus three workers; do not dispatch a fourth worker.
 
-- =review_nigeria_1034= performs bounded global14 Malawi coexistence review at frozen =653f77b1437886138f6b29078dcfb6108bf1e9c6= against actual global13 =5dde66645a444b025aa69682838cdf7c033a6e88=.
-  Private =integration/malawi-fourteen-review/=; actual global13 control =isa-baseline-thirteen-Malawi= has root-prepared ignored DVC tmp pointing to exact baseline-dvc-tmp private target.
-  Global13 independent review is final PASS and quiescent in =integration/nigeria-thirteen-review/=; its evidence is immutable.
-  Prior standalone Nigeria #1095 at =b8b03e448= independently PASSED:60 tests,23 adversarial groups, ten meaningful baseline failures, exact full source/native/Country/Feature/attrs and all six scanner records.
-  PR1192 is open with CI success(run39676834859); literal future unresolved-label retention remains TierC in1095.
-  Root read global13 final report, pushed5dde and updated PR1192 body; reviewed Malawi composition was then clean-merged and published653f.
-  Global14 preparation is now terminal-success: current Uganda plot/sample caches were located in immutable api-eleven-review/data and30raw Uganda prerequisites plus28MWDTA+2instruments were MD5-gated/copied. Earlier failed preparation gates stay preserved; no API probe preceded terminal success.
-  Full cold Country/native/raw and both parent-based expectations already pass:180184->179949, organic11075/7missing exact, N1028195.63206 exact, Uganda plot84216/sample24362 exact. Separate isolated default-Feature cold-entry capture, freshwarm,129tests, source oracle,15scanner records and final freezes are active. No broad repeat without new concern.
-- =mali_lane= independently reviews frozen Burkina #1058 =20a5541867ef0b991b01031cd4c766681b537fc0= in =isa-review-1058-Burkina_Faso= against freshf8 =isa-review-1058-Burkina_Faso-base=.
-  Private =review-1058-Burkina_Faso/=; both new source checkouts have root-prepared ignored DVCtmp symlinks to exact private baseline/candidate-dvc-tmp targets, with guards permitting only those resolved metadata paths.
-  Author =niger_lane= completed and is IDLE; its writer =isa-Burkina_Faso-1058-fix=, original f8 diagnosis and all private1058-fix evidence are frozen/quiescent and FS-published.
-  Ledger-first =b5ced85c571bc4d5b430371d1f92ace336c24a3f= precedes runtime =7eee549b15cacbe1e86b60a925b0899dc85d49e6=; final20a documentation adds zero hash changes.
-  Author36tests pass0skip; baseline15newcases give12fail/3pass. Full13frames/source/attrs/warm0writes/Feature33608/scanner13warn/hash24BF+525others+39tags proofs complete, no independent PASS or PR claimed yet.
-  Reviewer must independently prove optional positionalFloat64 q46 coordinates on7350retained parcels (4180pairs/3170missing;1117null-key placeholders excluded) while preserving old sixpayloads/attrs/IDs/2018/2014/universe and full healthy Senegal13824frames plus6cachebytes.
-  Two Senegal COUNTRY caches are genuinely current-hash/fullcoverage, two YAML sample-wave caches current-hash, but two script-path plot companions are legitimately HASHLESS. Preserve all6bytes/modes/mtimes; never stamp or claim all6 embedded hashes.
-  Initial review bootstrap misnamed a nonexistent isa-review-1123-Burkina_Faso path; no disappearance is claimed. Protect actual cfd0781123 writer/private review evidence, absence-check the mistaken path, retain failed launch.
-  The over-strict six-hash preparation stop is also preserved; corrected tier-aware preparation must succeed terminally before API builds.
-- =review_malawi_1109= now implements approved bounded shared #1081 in NEW =isa-framework-1081-fix=, branch =fix/1081-preserve-categorical-errors-20261021=, fromf8.
-  Original =isa-framework-1081= and =framework1081-diagnosis/= remain frozen, exact14,880tracked files/modes/HEAD/clean; no network/source mutation/process remains.
-  Root read full diagnosis/proposal/ledger and independently verified actual handler/class/test contracts. Explicit third CategoricalKeyDeclarationError inclusion is approved alongside Empty/Conflict.
-  Scope only existing-class imports and two bare re-raise clauses before generic catches, one73-case test file, ledger-first commit and safe evidence. No parser/country/schema/hierarchy/Feature or unrelated fallback changes.
-  Preserve exact UnitsUnavailable default/scalar legacy policy and strict country-named refusal, generic legacy success/exhaustion, scalar labels, strict environments, original typed object/args/cause/notes/context.
-  Diagnose baseline:166handler+5valuation controls,162existing tests pass; proposed73cases give42fail/31pass, zero errors/skips. Successful mocked legacy return qualifies old loud-failure claim, without real healthy Ethiopia legacy-cache claim.
-  Ledger-first =12346145ab715c28b604f3cc8cdfba7d82db7072= and runtime/test =ca3e5cc119896983b49f50a6b9dade6a5f825131= are FS-published.235tests+166desired probes+5valuation controls pass0skip; separate metadata processes measure0/549 API changes and0/39framework changes.
-  Healthy ISA full API/warm checks are active from120physical copies of60SHA-verified Ethiopia/Uganda L2 prerequisites. Final source freeze/quiescence and DIFFERENT independent reviewer remain required; no final PASS or PR yet.
-  Active private =framework1081-fix/=; safe frozen diagnosis is exported in campaign =framework1081-diagnosis/=. No candidate PASS or PR claimed yet.
+- =review_nigeria_1034= performs READ-ONLY Uganda #1078 diagnosis, no implementation approved.
+  Source snapshots =isa-Uganda-1078= atf8 branch =diagnose/1078-uganda-cache-writer-20261021= and detached =isa-Uganda-1078-with1062= at reviewed4ef24fb72421e0573841aeb63b8c19b93a4f97d8.
+  Private =Uganda/1078/=; root prepared exact private baseline/reviewed1062 DVCtmp targets, receipt root-metadata-preparation.json, with all other checkout writes denied and normal FileExistsError handling.
+  Historical3parquets+t_full.log were physically copied and SHA/size/mode/mtime-gated from durable issue evidence into historical-evidence; receipts root-historical-preparation-private.json and queued-1078-historical-evidence.json. They are historical observations, not current expected whole outputs.
+  FIRST full Uganda CONTENTS including live tasks, name idiosyncrasies/quote contradictions; then source tests and prior ledger. Never broadly print nutrition.py/literal USDA key or invoke FDC/acquisition.
+  Attribute actual9NaN-to-zero writer under current hash using bounded Uganda test/order/concurrent probes and private write instrumentation preserving actual arguments/bytes; record PID/testnode/stack/hash/masks. Comparef8 and1062, do not infer repair from green1062 or other-country isolation.
+  Normal target-cold/private held sources only, all physical prep terminal-success before probes; no uncontrolled full-suite bisect, source/read-gate edits, fabricated hashes, NO_CACHE/assume-fresh/stamping/shared-cache/DVC CLI or GitHub/ref mutations.
+  Return concrete DIAGNOSIS/PROPOSAL/ledger-draft/commands and exact tested limits; no broad locks or runtime fix without root approval.
+  Its prior completed global14 review is immutable/quiescent at =integration/malawi-fourteen-review/= and safe exports are in the campaign.
+- =mali_lane= performs bounded global15 Burkina coexistence at frozen4227 against actualglobal14 in =isa-baseline-fourteen-Burkina=.
+  New private =integration/burkina-fifteen-review/= has root-prepared control DVCtmp -> exact private baseline-dvc-tmp. Candidate's existing tmp stays unchanged; all other checkout writes denied, existing btime creates raise FileExistsError.
+  The standalone1058 review is final PASS at20a5541867ef0b991b01031cd4c766681b537fc0, now public PR1194. It passed44tests, all13fullframe/source/warm/scanner comparisons, actual24BF/525others/39tags; source, old evidence and consumers quiescent. Safe exports =review-1058-Burkina_Faso/=; receipt caveats remain explicit.
+  New global15 proof must preserve all4180pairs/3170missing/19784plotrows/33608plotFeature AND prior1123input22877/all183restoredlines/sample20648/cluster2035/inputFeature47212 with Benin10605 and Togo13730 comparators.
+  Read full BF/Senegal/Benin/Togo notes first (or verify byte-identical prior complete readings with named idiosyncrasies), source-gate physical held copies terminally, compare actual14/15 plus immutable1123 references with complete attrs/order/dtypes/nulls.
+  Run36GPS+8independent controls plus relevant1123identity regressions, scoped scanner findings, actual current country/YAML hashes/coverage and independent freshwarm0writes. Script companions may legitimately remain hashless; never stamp or claim everywavehash current.
+  Do not repeat broad549/39/fullsuite without new concern; exact runtime union and prior source pins cover the bounded scope. No acquisition/sharedcache/read-gate/NO_CACHE/assumefresh/Git/GitHub mutation.
+- =niger_lane= independently reviews framework1081, authored by review_malawi_1109, at frozen bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0 in =isa-review-1081= against =isa-review-1081-base= f8.
+  New private =review-1081/= has two exact root-prepared private baseline/candidate DVCtmp links and root-metadata-preparation.json; source paths otherwise read-only.
+  FIRST full Ethiopia/Uganda CONTENTS with named idiosyncrasies/quoted contradictions, then categorical skills/standing ledger/author reports and original diagnosis.
+  Runtime ca3e5cc119896983b49f50a6b9dade6a5f825131 adds exactly9production lines: three existing error imports and two bare re-raise clauses. Ledger FIRST12346145ab715c28b604f3cc8cdfba7d82db7072. Finalbfbb docs-only runtime/test blobs+modes exact.
+  Root explicitly approved KeyDeclarationError along with Empty/Conflict; preserve exact object/args/cause/context/notes, byte-identical UnitsUnavailable policy, generic legacy and Feature degrade/missing-curation/scalar policies.
+  Author235tests+166desired probes+5valuation+6Featurecontrols/head pass; f8same73tests give42fail/31pass. Actual0/549APIhashes and0/39framework fingerprints, not inferred.
+  Author healthy17fullframes/head/stage=68comparisons, fullattrs/defaultvsNone args exact,60parquets/root0warmwrites and120physical-copy receipts exact. This is normal current-hash L2 evidence, NOT source-cold/L1 reconstruction; no acquisition or broader corpus claim.
+  Independently verify these boundaries from fresh physical roots, retain all diagnosis/author/BF/global evidence unchanged, then stop consumers for final PASS/NEEDS_FIX. No PR yet.
+  The author is idle; its =isa-framework-1081-fix= and =framework1081-fix/= are frozen/quiescent. A stale Ethiopia CONTENTS unitprice-empty-frame claim was reported against actual typed refusal on f8/candidate; keep as proposed next-country-doc correction pending independent confirmation.
 
 Malawi #1111 independent standalone a935 PASSED101 tests after deleting five test lines that pinned the excluded organic defect; production remains exact9b.
 Root-owned composition =fd2356ee94ecfc7448527dc0085b9e4d60368049= in =isa-Malawi-1111-composed= independently PASSED129 tests, all235source pair sums, both parent-based full frames/attrs, all11075organic answers,15scanner records and zero warm writes across17parquets/root.
@@ -730,13 +730,13 @@ Original standalone author/review artifacts remain unchanged; no permanent tests
 Explicit provenance limit: first cold public Feature was not serialized after a private currency=None reference/default argument mismatch; all cold raw frames and passed Country proof persist, subsequent full default Feature uses fresh matched de9 control from unchanged cold caches, followed by independent fresh-process warm proof.
 Safe exports =review-1111-Malawi-v2/= and =review-1111-Malawi-composition/=; matching private roots are quiescent, not active.
 
-Idle writers =burkina_lane= and =mali_lane= must leave their frozen source/evidence unchanged.
-The active P2 shared diagnosis is #1081, prepared f8 worktree =isa-framework-1081=, branch =fix/1081-derived-categorical-errors-20261021=.
+Idle writers =burkina_lane= and =review_malawi_1109= must leave frozen source/evidence unchanged. niger_lane and mali_lane are active independent reviewers as above.
+The original frozen P2 shared diagnosis for #1081 remains in f8 worktree =isa-framework-1081=, branch =fix/1081-derived-categorical-errors-20261021=.
 Live issue/zero comments and 100 recent PRs were checked; no matching implementation.
 Private =framework1081-queued-context.json= records the derived food/roster handlers and related CategoricalKeyDeclarationError question.
 The read-only diagnosis is complete and root approved the explicit minimal three-type correction; preserve UnitsUnavailable default fall-through and unrelated legacy handling, and never use the original issue's suggested stash-probe.
 
-Queued read-only follow-ups: #1078 Uganda test writer attribution and #1135 settled warning-size ruling. Private =queued-1078-context.json= and =queued-1135-context.json= retain live issue/comments and100recent PR dedup; neither is dispatched or approved for code. Historical1078 three parquets and t_full.log still exist at the exact issue evidence path, read-only.
+Queued read-only follow-up #1135 has a settled warning-size ruling, retained with live issue/comments and100recent PR dedup in private =queued-1135-context.json=; not dispatched or approved for code yet. #1078 is now active as above, with original historical evidence preserved read-only.
 
 ** Source boundaries and residuals
 
@@ -783,7 +783,7 @@ All archived contents and unchanged source receipts were checked; duplicate cach
 A SECOND verified owner-only archive now includes Uganda twelve-change, standalone Malawi1111 and Nigeria1095 author diagnostics:1,236files/10roots,185,096,692bytes.
 Path =quiescent-followup-21h00.tar.gz= in the same durable directory; SHA256 =4a9bc56d4d307d2da0434f36b06d026bee8990fc4e97eb1ab218e7252d74776a=.
 All archive contents/source receipts were checked. Root sets overlap; counts are not unique combined totals.
-Independent Nigeria1095, Malawi composition, BF1058 diagnosis/newwriter and global13/global14/framework1081 and BF writer roots still need a further quiescent snapshot.
+Independent Nigeria1095, Malawi composition, BF1058 diagnosis/newwriter and A FOURTH verified archive is complete: quiescent-followup-21h55.tar.gz, SHA256 db34d7cb1537f35ca2e2ef8e02540cf2c2bfec2bcf30066677c2fb508380d83e,74743101compressed bytes,650files/4roots (global13/global14 reviews,framework1081diagnosis,BF1058author). Source receipts/archivecontents exact; launcher durably copied0600, SHA42d2be1683430188ca77520f1290010ab09a4f112204b631e4d65a8b92672708. Root session25095 completed successfully and is closed. See private-evidence-durability-fourth.json. New BF independent/global15, framework1081 finalauthor/independent and Uganda1078 roots still need a later quiescent snapshot; do not claim they are in this archive.
 A THIRD verified archive =quiescent-followup-21h30.tar.gz= adds312files/3roots (independent Nigeria1095, Malawi composition, BF1058 diagnosis),56,655,122bytes, SHA256 =efacc5ffc55263a0e69010c8113905e932650b23036b6c698a93a5c4fd689bca=.
 All source receipts and archive contents exact; launcher is durably copied0600. See =private-evidence-durability-third.json=.
 See =private-evidence-durability*.json= for safe aggregate receipts.

@@ -1,0 +1,19 @@
+{
+  "observed_at_UTC": "2026-10-21T21:59:16.316908+00:00",
+  "archive": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-followup-21h55.tar.gz",
+  "archive_sha256": "db34d7cb1537f35ca2e2ef8e02540cf2c2bfec2bcf30066677c2fb508380d83e",
+  "archive_bytes": 74743101,
+  "private_files_verified": 650,
+  "quiescent_review_roots": [
+    "integration/nigeria-thirteen-review",
+    "integration/malawi-fourteen-review",
+    "framework1081-diagnosis",
+    "Burkina_Faso/1058-fix"
+  ],
+  "source_after_exact": true,
+  "archive_contents_verified": true,
+  "raw_sources_and_duplicate_L1_L2_excluded": true,
+  "full_private_manifest": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-followup-21h55.manifest.private.json",
+  "durable_launcher_sha256": "42d2be1683430188ca77520f1290010ab09a4f112204b631e4d65a8b92672708",
+  "limits": "Completed global13/global14 reviews, framework1081 diagnosis and BF1058-fix author only. Independent BF1058/framework1081, Uganda1078 and final framework1081 author evidence require a later quiescent archive; originals remain unchanged."
+}
