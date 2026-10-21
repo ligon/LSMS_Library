@@ -2050,6 +2050,26 @@ not a repair of the general #788 builder-authority/sibling-write issue,
 which remains open. The October 15 #967 approval remains in force;
 no nutrition value, factor policy or fixture changes here.
 
+*** Requested-output builds preserve sibling caches (GH #1062, 2026-10-21)
+
+The authority question in the historical entries above was decided by the maintainer on 2026-10-17 and reaffirmed on 2026-10-18 (GH #788): the framework is authoritative for tables assembled from waves.
+The coupled-output defect is corrected here without changing the FCT or nutrition arithmetic.
+=nutrition.py fct= writes only =var/fct.parquet=, while =nutrition.py nutrition= (also the direct-invocation default) writes only =var/nutrition.parquet=.
+Both retain the existing food intersection and nutrient matrix; neither rewrites its companion.
+Their separate Make targets no longer run the legacy country =food_acquired= compiler as a prerequisite, because quantities already come from the normal Country API.
+
+=income.py= first asks the framework to materialize =earnings= and =enterprise_income=, then reads their verified raw country parquets with =get_dataframe=.
+Each sibling call temporarily selects =LSMS_BUILD_BACKEND=dvc= so that valid existing one-wave caches expand to the requested all-wave coverage even when income inherits the make backend.
+The exact original backend value (or absent key) is restored with =try/finally= before the raw read, including when materialization raises.
+Independent review found that pinning only the Make wrapper was insufficient: Make skips a valid partial target that already exists, serving 1,810 rows of 2011-12 as the all-wave income table instead of 14,740 rows over eight waves.
+Its original source sums, duplicate-key aggregation and household-union arithmetic remain unchanged; the finalized API return is deliberately not an operand.
+The Make targets for those two inputs are thin API calls with =LSMS_BUILD_BACKEND=dvc= pinned in the subprocess, so a make-backend request cannot recurse into itself.
+The historical concatenation scripts and their regression tests remain as reference; normal Make rules no longer run them.
+
+The Makefile edit moves every Uganda table's content hash and no other country's hash.
+This routing correction does not adjudicate the FCT source notes or live-API fallback (GH #771), and does not establish that GH #1078's nine-cell concurrent-suite corruption is repaired.
+See =.coder/ledger/1062-uganda-sibling-writes.md= and the scoped verification report in =slurm_logs/isa_backlog_2026-10-21/1062/=.
+
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
 - Note taken on [2026-07-21 Tue] \\
