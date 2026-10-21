@@ -1,0 +1,83 @@
+#+TITLE: Country-preserving plot-input reductions, GH #1159
+#+AUTHOR: Sue
+
+* Contract and implementation
+
+The maintainer explicitly chose retained country identity.
+=seed_kg= and =nitrogen_kg= now emit =(country, t, i, plot_id)= whenever a country index level or column exists.
+The rule also covers one labeled country and empty/filtered results.
+Ordinary country-less inputs retain their existing output shape; =attrs['country']= alone adds no axis.
+Present null country labels are refused before filtering, as the parent ruled.
+The helper promotes a country column before filtering so colliding local indexes never misalign row identities.
+Country alone cannot turn an otherwise invalid missing local reduction index into a country-only sum.
+Existing unit declaration resolution, explicit-empty overrides, factor refusal, nitrogen shares and diagnostics are reused.
+
+The frozen untouched runtime is =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+Ledger-only commit =eeffc8816= precedes implementation; the before/after probes recorded its HEAD while the exact transformation source SHA256 identifies their different runtime contents.
+The baseline negative control imports the untouched integration checkout and verifies its source bytes against that exact baseline commit.
+
+* Evidence
+
+The issue's colliding metric A/B fixture previously returned one country-less 3 kg seed row and one 1.38 kg nitrogen row, for either country representation.
+Both representations now return A=1/B=2 kg seed and A=0.46/B=0.92 kg nitrogen in distinct country-keyed rows.
+Tests also cover distinct local IDs, reversed order, one country, aliases, unit columns, empty/unknown-unit/missing-quantity paths, declarations and immutability.
+The existing Country-finalize/Feature-assembly declaration test now exercises colliding household IDs as well as distinct ones, for both reducers.
+
+The final targeted selection passes 260 tests in 8.77 seconds, with two Nigeria warm-cache checks skipped because the private cache has no crop_production parquet and 15 requires_s3 tests deselected.
+The same final contract regressions on untouched 852 produce 71 failures and 18 passes, with 26 unrelated factor tests deselected.
+Those 71 failures establish the baseline negative control; they are not candidate failures.
+Two existing nutrient-coverage warnings remain visible in the deliberate missing-local-key controls.
+
+Actual hashes are unchanged: 0/549 country-table, 0/2,139 wave and 0/39 tagged fingerprints.
+The hash census uses the existing campaign's =hash_reach.py= without changing hash machinery.
+The raw full hash maps stay under =/local/job40255479/1159-private/=; =comparison.json= records their digests, counts and checked zero-delta result.
+No shared L2 cache was read or changed, no real-country microdata was needed, and no country configuration changed.
+Code, countries-root and private data-root identities were asserted in the probes and baseline control.
+Numerical thread counts and LSMS_BUILD_WORKERS were one; processes stayed within CPUs 16-19.
+
+* Downstream scope
+
+The small old/new control confirms that =fertilizer_rate= still independently drops country in its numerator/area grouping.
+Its pooled synthetic rate remains 0.276, while separate A/B calls remain 0.46 and 0.23.
+The entire downstream result description is exactly equal before and after this increment.
+The residual is inherited and remains outside this two-reducer fix.
+=CONTRACT-REVIEW.md= records compatibility risks, the acceptance plan and a separate downstream residual draft.
+The reducer docstrings and Feature guide document the narrow supported output contract.
+
+* Reproduction
+
+Use the image Python, run from the runtime checkout, and set PYTHONPATH and LSMS_COUNTRIES_ROOT to that same checkout.
+LSMS_DATA_DIR must name a private root; these synthetic probes require no L1 link or L2 corpus.
+For a new allocation, substitute its local prefix and preserve the exact baseline checkout.
+
+#+begin_src sh
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+export PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_DATA_DIR=/local/job40255479/1159-private/data
+taskset -c 16-19 /local/job40255479/venv_img/bin/python -m pytest -q \
+  tests/test_gh1159_pooled_reducers.py tests/test_gh1093_declared_unit_consumers.py \
+  tests/test_867_nitrogen_content.py tests/test_plot_id_canonical.py \
+  tests/test_863_transforms.py tests/test_crop_kg_factor.py tests/test_nigeria_sold_unit.py \
+  -m 'not requires_s3' --tb=short
+/local/job40255479/venv_img/bin/python slurm_logs/framework_campaign_2026-10-20/1159/probe.py \
+  --out /local/job40255479/1159-private/probe-after-final.json
+/local/job40255479/venv_img/bin/python slurm_logs/framework_campaign_2026-10-20/1159/hash_reach.py \
+  /local/job40255479/1159-private/hash-after-final.json
+#+end_src
+
+Run the same probe and hash census before implementation from the baseline runtime, writing =probe-before.json= and =hash-before.json=.
+The final test file can be loaded against the untouched baseline without editing that checkout:
+
+#+begin_src sh
+export PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_DATA_DIR=/local/job40255479/1159-private/baseline-data
+/local/job40255479/venv_img/bin/python \
+  /local/job40255479/worktrees/1159-pooled-reducers/slurm_logs/framework_campaign_2026-10-20/1159/negative_control.py \
+  --runtime "$PWD" --tests /local/job40255479/worktrees/1159-pooled-reducers
+#+end_src
+
+That command intentionally exits one when the regressions fail on the baseline.
+Full pytest logs remain private; save them as =final-targeted-tests.log= and =final-baseline-negative.log= under the private root.
+=compare.py --private-root ROOT --out comparison.json= checks probe values, unchanged downstream output and all hash-key comparisons before emitting aggregate evidence.
+
+Sue
