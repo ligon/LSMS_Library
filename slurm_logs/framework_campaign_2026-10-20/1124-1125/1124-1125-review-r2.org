@@ -1,0 +1,77 @@
+#+title: GH #1124/#1125 independent final review
+#+author: Sue
+#+date: 2026-10-20
+
+* Verdict
+
+PASS at ca5bb83ca2f291a0019615dd2222fb6ccbd89c1e against development976fc840d.
+The round1 failure is resolved by the explicitly approved, documented coarse EthiopiaRHS boundary.
+No remaining correctness finding.
+All reviewer processes have stopped.
+No candidate source, git state, GitHub state or shared L2 cache was changed by this reviewer.
+
+* Behavior checked
+
+The canonical sweep includes crop_production, plot_labor and plot_inputs (scan.py:85-97).
+The baseline audit separately warns about each positive built country absent from Feature (scan.py:456-464), including entirely empty results.
+A2/B7 returning A2 attributes B7 to country_exclusion; A2 becoming A1 separately reports retained row collapse.
+Zero-row expected countries are not false positive losses.
+A malformed nonempty result lacking the country axis gets a structural finding (scan.py:479) rather than guessed attribution.
+Kwargs/ContractB variants retain their intentional exclusions without the new baseline signal; a separate real production Feature labels=Aggregate probe verified this path.
+
+The crop warm test reuses the hardened helper (test_feature_canonical_index.py:565 and849).
+Warm read errors fail by country name before a fewer-than-three skip can hide them.
+Cold countries alone are skipped; warm empty countries are read but excluded from positive participation.
+Country monetary reads use currency=index, matching Feature defaults.
+Exact retained participation and per-country row counts remain mandatory.
+
+Only EthiopiaRHS without plot/plot_id in either its returned index or columns is excluded from crop warm expected participation (test_feature_canonical_index.py:579).
+The country is still read and any read error remains fatal.
+As soon as plot, legacy plot alias or plot_id-column grain appears, its participation is required.
+Another country's loss still fails.
+The scanner has NO EthiopiaRHS exception: its coarse17,523-row exclusion remains visible as Class B triage evidence.
+This inherits cross-country-features section2 and feature-canonical-crop-production ledger:113-117/170, without changing production assembly or inventing plot identifiers.
+
+* Independent evidence
+
+- Final head: 19 scanner and warm-guard controls passed in1.12s (2.05s wall), including the repaired plot_alias fixture.
+- Same frozen policy before the one-keyword fixture repair: 88 synthetic cases passed in116.90s; sole failure was positional rename_axis(dict), independently reproduced and now repaired.
+- Three actual live farm warm checks passed in61.71s (62.64s wall) on a separate physical1519-parquet L2 copy: crop_production, plot_labor, plot_inputs.
+- Six extra probes using REAL production Feature assembly passed: coarse RHS allowance, other-country loss, future RHS plot index, legacy plot alias, plot_id column and named RHS warm-read error. Coarse RHS remains a scanner Class B finding.
+- Package/config/data paths were asserted exactly, with mounted image Python, private LSMS_DATA_DIR, BLAS/OMP/MKL1, LSMS_BUILD_WORKERS1, LSMS_MAKE_JOBS1 and CPUs24-27.
+
+Scanner and participation-test SHA256 hashes are identical to the prior independent policy run.
+Reversing ONLY the final fixture keyword reproduces the previous canonical-test SHA256 exactly.
+The companion JSON records both hash sets, aggregate outcomes and environment.
+
+* Scope and reproducibility
+
+The final-head focused command, from the candidate worktree with the environment in the JSON, is:
+
+#+begin_src shell
+/local/job40255479/venv_img/bin/python -m pytest -q --disable-warnings \
+  tests/test_feature_audit_participation.py \
+  tests/test_feature_canonical_index.py::test_warm_crop_guard_names_a_country_read_failure_with_three_survivors \
+  tests/test_feature_canonical_index.py::test_warm_crop_guard_rejects_an_entire_country_exclusion \
+  tests/test_feature_canonical_index.py::test_warm_assembly_reads_match_feature_default_currency \
+  tests/test_feature_canonical_index.py::test_warm_crop_accepts_only_documented_coarse_rhs_exclusion \
+  tests/test_feature_canonical_index.py::test_coarse_rhs_expectation_does_not_hide_another_country_loss \
+  tests/test_feature_canonical_index.py::test_rhs_must_participate_as_soon_as_plot_grain_appears \
+  tests/test_feature_canonical_index.py::test_coarse_rhs_warm_read_failure_remains_fatal
+#+end_src
+
+Actual farm command on the separate physical copy:
+
+#+begin_src shell
+/local/job40255479/venv_img/bin/python -m pytest -q --disable-warnings \
+  tests/test_feature_canonical_index.py::test_warm_corpus_assembly_loses_no_rows \
+  tests/test_feature_canonical_index.py::test_warm_corpus_plot_table_assembly_keeps_every_country_and_row
+#+end_src
+
+This review does not claim a final-head full-suite rerun or an independent full cold farm build.
+The three warm checks were run before the final fixture-only keyword repair; the exact reverse-change hash proves their tested runtime/policy source is unchanged.
+The parent owns combined full-suite validation on the integration head.
+Runtime Feature, Country, schema and cache machinery are untouched; no independent hash-mutation probe was needed for this reviewer verdict.
+The original round1 FAIL artifacts remain alongside this report as the review history.
+
+-- Sue
