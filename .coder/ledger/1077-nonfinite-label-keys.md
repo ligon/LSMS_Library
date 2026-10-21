@@ -15,7 +15,7 @@ This is a shared read-path fix, isolated from the country worktrees.
 | Machinery | Location | Existing coverage | Decision |
 |---|---|---|---|
 | Numeric spelling augmentation | `lsms_library/country.py:407` | `tests/test_u_code_leak.py` | Extend finite-value guard only |
-| Categorical key resolver | `lsms_library/country.py:481` | `tests/test_categorical_key.py`, label-selection tests | Reuse unchanged |
+| Categorical key resolver | `lsms_library/country.py:481` | `tests/test_categorical_key_resolver.py`, label-selection tests | Reuse unchanged |
 | Query-time mappings | `lsms_library/country.py:3510` | `tests/test_label_selection.py` | Reuse actual mapping path |
 | Food label contract | `.claude/skills/add-feature/food-acquired/aggregate-labels/SKILL.md` | Label selection and passthrough tests | Preserve |
 
