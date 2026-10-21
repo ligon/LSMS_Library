@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T18:16:40.768860+00:00",
+  "observed_at": "2026-10-21T18:25:37.966189+00:00",
   "actions": [
     {
       "issue": 822,
@@ -78,6 +78,10 @@
     {
       "issue": 822,
       "action": "Linked independently reviewed PR1180 and exact native observation recovery; documented old versus eligible counts/base cells and split1179"
+    },
+    {
+      "issue": 1077,
+      "action": "Corrected historical36cell and zero-cache-cost premises; current34cells, missing-source lookup filter required to prevent null-label fabrication; frozen candidate under independent review"
     }
   ],
   "verified_issue_metadata": [

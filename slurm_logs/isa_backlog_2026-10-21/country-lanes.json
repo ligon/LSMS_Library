@@ -27,7 +27,8 @@
       "frozen_head": "286108cf7ecc1a6e1e07150b8eec8411f5326b05",
       "review_path": "/local/job40255479/worktrees/isa-review-1118-Ethiopia",
       "reviewer": "mali_lane",
-      "author_tests_passed": 58
+      "author_tests_passed": 58,
+      "documentation_head": "9e698a3677da8097da42fec90c90525cdaaf3e68"
     },
     "Malawi": {
       "path": "/local/job40255479/worktrees/isa-Malawi",
@@ -140,11 +141,15 @@
       "path": "/local/job40255479/worktrees/isa-framework-1077",
       "branch": "fix/1077-nonfinite-label-keys-20261021",
       "owner": "triage_east",
-      "status": "implementation",
+      "status": "independent-review",
       "scope": "Finite numeric-label-key guard; country configuration untouched",
       "precode_ledger": "3e9b7dd0a",
       "cache_scope": "28 Uganda hashes move through existing build import; 521 others and39tagged unchanged",
-      "additional_finding": "Finite guard alone permits null-input label fabrication; source-null rows must be filtered before lookup construction"
+      "additional_finding": "Finite guard alone permits null-input label fabrication; source-null rows must be filtered before lookup construction",
+      "frozen_head": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+      "reviewer": "niger_lane",
+      "review_path": "/local/job40255479/worktrees/isa-review-1077",
+      "author_tests": 230
     }
   },
   "integration": {

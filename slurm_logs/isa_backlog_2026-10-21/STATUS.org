@@ -21,6 +21,7 @@ Shared framework changes require a separate coordinated lane.
 The #1077 numeric-label-key fix is in that lane, leaving country configurations untouched.
 Its existing Uganda build caller moves 28 Uganda hashes; the tagged fingerprints and other countries stay unchanged.
 A finite guard alone fabricated labels for null inputs; the lookup must first discard rows with missing source keys.
+The complete candidate at =3f520e09f= passed230author tests and exact Uganda default/cold/warm proofs; independent review is active.
 =country-lanes.json= records paths, owners, frozen heads, review verdicts and PRs.
 
 | Country | Current result or next step |
