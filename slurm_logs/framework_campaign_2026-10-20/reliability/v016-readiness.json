@@ -1,0 +1,384 @@
+{
+  "assessment": "bounded_release_candidate_recommended_after_gates; no release authorized",
+  "observed_utc": "2026-10-21T00:09:48.167097+00:00",
+  "source": {
+    "baseline": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+    "integration": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+    "harness_runtime": "ca5bb83ca2f291a0019615dd2222fb6ccbd89c1e",
+    "harness_pr_head_docs_added": "d84061818b0b430e8b00fa26b5b6d19e4694eb96"
+  },
+  "release_holds": [
+    "Exact integration head full suite complete, no unexplained new failures/errors; baseline was 8369 passed,279 skipped,9 xfail,1 preexisting nonstrict xpass.",
+    "Matched exact976 and852 cold corpus comparison complete; no new request failures, wrong-wave rows, unexplained raw/served changes or participation loss.",
+    "Final-head native Windows plus credentialed Linux CI complete with requires_s3 gate open; manual run39519191762 still in progress at observation.",
+    "All five open fix PRs receive human merge/review resolution and final merged source is verified; no tag/publication authorized."
+  ],
+  "known_source_wiring_19": {
+    "historical_source": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+    "requests": 549,
+    "succeeded": 530,
+    "errors": 19,
+    "Armenia_unavailable": 2,
+    "Nepal_unavailable": 11,
+    "Peru_unwired": 6,
+    "policy": "Comparison baseline only, not permission to ignore new/different failures. Exact976/852 refresh pending."
+  },
+  "ci_enforcement": {
+    "issue": 932,
+    "implementation_pr": 1049,
+    "status": "partial_permission_decision_unapplied",
+    "current_required_checks": [
+      "unit-tests"
+    ],
+    "proposal_required_checks": [
+      "unit-tests",
+      "data-tests"
+    ],
+    "job_condition_addition": "|| (github.event_name == 'pull_request' && github.base_ref == 'development')",
+    "must_not_add_same_repo_only_skip_condition": true,
+    "fork_policy": "Run job without secrets and fail credential gate; maintainer reviews/imports exact changes to trusted same-repository PR. Never pull_request_target with untrusted code.",
+    "manual_run_satisfies_pr_required_check": false,
+    "strict": false,
+    "bypass": "RepositoryRole5 always preserved",
+    "merge_queue_available_for_current_personal_repo": false,
+    "nightly": "Activates after workflow reaches default master; checks development explicitly."
+  },
+  "release_issue_candidates": [
+    {
+      "issue": 569,
+      "prs": [
+        1126
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Registering both plot tables, preserving stage/worker and household-grain sentinel, landed. Residuals #1118-#1125 stay separate."
+    },
+    {
+      "issue": 600,
+      "prs": [
+        1117
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Failed catalog resolution preserves record and reports separately; held-release and hand-recorded value gates implemented. Follow-ups #1114/#1115/#1116/#1128 are separate."
+    },
+    {
+      "issue": 674,
+      "prs": [
+        1024
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Bare mapping request raises TypeError; empty-table residual #1036 also landed in #1105."
+    },
+    {
+      "issue": 675,
+      "prs": [
+        1052
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Follow-ups split into #1051; do not reopen the implemented original defect."
+    },
+    {
+      "issue": 680,
+      "prs": [
+        1097
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "fooddatacentral floor 1.0.13 landed; issue comment confirms re-imaged Savio generation 20261019T221223Z."
+    },
+    {
+      "issue": 781,
+      "prs": [
+        1132
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Tier-keyed correctly-empty/empty-pending-machinery verdicts landed. Oct19 ruling retains GLSS1/2 correctly-empty; GLSS3 residual #1130."
+    },
+    {
+      "issue": 790,
+      "prs": [
+        1021
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Issue body stale. Keep tracked GhanaLSS unit_labels.csv and live Uganda reader."
+    },
+    {
+      "issue": 793,
+      "prs": [
+        1137
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Sampling loader, Country.sampling and attrs landed; vocabulary/curation residuals are #1134/#1136."
+    },
+    {
+      "issue": 836,
+      "prs": [
+        1026
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "No live CONTENTS build-reader defect remains."
+    },
+    {
+      "issue": 867,
+      "prs": [
+        1112
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Cited NPS/D Compound shares and loud organic refusal landed. Six residuals #1106-#1111 remain."
+    },
+    {
+      "issue": 908,
+      "prs": [
+        1027
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Original one-comment premise corrected by maintainer: AST-normalized comment edits never moved hashes; logic edits did."
+    },
+    {
+      "issue": 915,
+      "prs": [
+        1098
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Directory-without-scheme rejected, acquisition allow_unregistered opt-in implemented. Symlink-policy residual #1085 remains."
+    },
+    {
+      "issue": 928,
+      "prs": [
+        1105
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Approved P1 key metadata and P2 shared resolver landed; P3/P4 were explicitly deferred."
+    },
+    {
+      "issue": 931,
+      "prs": [
+        1092
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "harvest_kg_factors reads declared u_kg and external Ethiopia answer key retained; residual #1093 separate."
+    },
+    {
+      "issue": 942,
+      "prs": [
+        1137
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Per-boundary two-field declarations and Country warning landed; #1133/#1135 remain."
+    },
+    {
+      "issue": 1001,
+      "prs": [
+        1022
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "CI migration #1031 is also done. Library legacy permission rungs #1064 and DVC btime #1032 are separate."
+    },
+    {
+      "issue": 1002,
+      "prs": [
+        1019
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Stale issue has no fixed comment but merged PR and source/tests implement all requested paths; hermetic selection passes."
+    },
+    {
+      "issue": 1031,
+      "prs": [
+        1065
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Credentialed workflow_dispatch39259408940 supplied end-to-end evidence; no in-tree reader credential file permitted."
+    },
+    {
+      "issue": 1036,
+      "prs": [
+        1105
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Declared empty table distinct error landed in bundle."
+    },
+    {
+      "issue": 1039,
+      "prs": [
+        1105
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Default-backend barren subset inconsistency split as #1099. Existing country-builder stale-output route is separate; do not weaken authority policy."
+    },
+    {
+      "issue": 1040,
+      "prs": [
+        1105
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Behavior questions intentionally split as #1071; corruption admission fixed as #1070."
+    },
+    {
+      "issue": 1070,
+      "prs": [
+        1105
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "No residual here; corrupted-read recovery policy remains #1071."
+    },
+    {
+      "issue": 1093,
+      "prs": [
+        1154
+      ],
+      "status": "reviewed_candidate_open_pr_requires_merge_and_final_validation",
+      "scope_note": "Declared unit propagation; inherited reducer country-axis/pooling semantics remain separate."
+    },
+    {
+      "issue": 1099,
+      "prs": [
+        1155
+      ],
+      "status": "reviewed_candidate_open_pr_requires_merge_and_final_validation",
+      "scope_note": "Narrow absent-subset boundary; genuine builders and source failures preserved."
+    },
+    {
+      "issue": 1114,
+      "prs": [
+        1117
+      ],
+      "status": "merged_in_baseline_pending_release",
+      "scope_note": "Held-release decision implemented. Acquisition tasks #978/#1127 separate; latest-release durable queue #1128 explicitlyGO later."
+    },
+    {
+      "issue": 1124,
+      "prs": [
+        1157
+      ],
+      "status": "reviewed_candidate_open_pr_requires_merge_and_final_validation",
+      "scope_note": "Baseline missing-country signal plus canonical farm sweep; Class B requires triage."
+    },
+    {
+      "issue": 1125,
+      "prs": [
+        1157
+      ],
+      "status": "reviewed_candidate_open_pr_requires_merge_and_final_validation",
+      "scope_note": "Named warm-read failures and exact participation; documented coarse RHS allowance expires with plot grain."
+    },
+    {
+      "issue": 1143,
+      "prs": [
+        1156
+      ],
+      "status": "reviewed_candidate_open_pr_requires_merge_and_final_validation",
+      "scope_note": "Whole metric token parsing; explicit ambiguity refusal retained."
+    }
+  ],
+  "candidate_counts": {
+    "already_merged_baseline": 23,
+    "new_approved_issue_fixes_in_open_prs": 5,
+    "total_reviewed_scope": 28
+  },
+  "not_fully_resolved": [
+    218,
+    637,
+    650,
+    698,
+    778,
+    787,
+    798,
+    828,
+    845,
+    851,
+    920,
+    932,
+    1032,
+    1051,
+    1064,
+    1071,
+    1115,
+    1116,
+    1128,
+    1149
+  ],
+  "next_priorities": [
+    {
+      "rank": 1,
+      "issues": [
+        778
+      ],
+      "reason": "Reproduced missing-file race and remaining mutating tests; narrow FileNotFoundError fallthrough, no corruption-policy decision needed."
+    },
+    {
+      "rank": 2,
+      "issues": [
+        1115,
+        1128
+      ],
+      "reason": "Lossless provenance roundtrip and already-ruled durable latest-release queue share parser/renderer; synthetic proof and shipped record census, no live acquisition needed."
+    },
+    {
+      "rank": 3,
+      "issues": [
+        1149
+      ],
+      "reason": "Already-ruled staged acquisition prevents nested-path loss/collision; coordinate provenance writes only after success, synthetic zip tests."
+    },
+    {
+      "rank": 4,
+      "issues": [
+        1134,
+        1135
+      ],
+      "reason": "Explicitly ruled sampling increments; retain provenance and quantified warning extent, avoid broad scientific curation."
+    },
+    {
+      "rank": 5,
+      "issues": [
+        218
+      ],
+      "reason": "Finish dangling retired build routes after actual API/Make proof; lower leverage than correctness races/provenance."
+    }
+  ],
+  "scientist_or_source_decisions": [
+    {
+      "issues": [
+        787,
+        1100,
+        1101,
+        1102,
+        1103
+      ],
+      "scope": "Kinship/labels require definitions or original code lists."
+    },
+    {
+      "issues": [
+        828,
+        1129,
+        1130,
+        1131
+      ],
+      "scope": "Valuation/recall/unit meaning and questionnaire evidence; period branch851 is separate unlanded feature recovery."
+    },
+    {
+      "issues": [
+        1106,
+        1107,
+        1108,
+        1110,
+        1111,
+        1119,
+        1120,
+        1123,
+        1133,
+        1136
+      ],
+      "scope": "Fertilizer identity, join grain, source keys/collapses, cluster/design evidence; do not use generic fills to make audit green."
+    }
+  ],
+  "runtime_policy_decisions": [
+    1032,
+    1064,
+    1071,
+    1085,
+    1116
+  ],
+  "heavy_tests_launched": false,
+  "github_writes": false,
+  "source_or_git_mutations": false
+}

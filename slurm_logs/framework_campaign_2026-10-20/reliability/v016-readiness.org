@@ -1,0 +1,145 @@
+#+title: v0.16 readiness after the approved framework fixes
+#+author: Sue
+#+date: 2026-10-20
+
+* Recommendation
+
+Keep this candidate bounded to Windows plus the approved five issues.
+Finish the exact-head validation before adding more framework scope.
+The five fixes have independent review; the current evidence supports a release-candidate assessment, not a claim that0.16.0 is ready to publish.
+No release, merge, tag, issue closure or protection change is authorized by this report.
+
+Base: =976fc840d12ba40f1602b7dff58b81548632b2a9=.
+Frozen integration: =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+The harness runtime at =ca5bb83ca= is included there; PR#1157's later =d84061818= only adds the final review documentation.
+The complete identities and issue dispositions are in =v016-readiness.json=.
+
+* Actual holds before release consideration
+
+1. Complete the combined full suite on852, with no unexplained new failures/errors or credential-gated skips. The exact976 baseline was8,369 passed,279 skipped,9 expected failures and1 pre-existing non-strict unexpected pass; it is not candidate validation.
+2. Finish matched cold549-request corpus comparison at976 and852. Account for intended parser/valuation changes, preserved raw data, absent-subset semantics, country participation and cache metadata. No unexplained new failure or lost country can be waived as warning noise.
+3. Complete native Windows and credentialed Linux CI on852. [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][Run39519191762]] currently has Windows smoke success with native-script, unit and data jobs in progress. The older [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][Windows-fix run]] passed native-script, unit and smoke, but its Linux data job still runs and its source is only1d3e8dfdf.
+4. Resolve the five open PRs through the human merge workflow and verify the actual final merged source. A green individual PR whose data job skipped is not the credentialed release gate.
+
+The approved source changes are narrow: #1093 restores706 usable declared-Quintal sales; #1143 corrects945 quantity and783 price rows across three countries; #1099 preserves typed empty strict subsets and real error boundaries; #1124/#1125 improve verification without production assembly changes.
+The #1099 build fingerprint change deliberately requires a corpus re-warm; cache compute cost is not a reason to avoid these correctness checks.
+
+* Known residuals, without expanding release scope
+
+The historical549-request corpus at7fa05179c had530 successes and19 explicit source/wiring errors: Armenia2 unavailable sources; Nepal11 unavailable sources; Peru6 declared but unwired requests.
+Armenia/Nepal require acquisition, and Peru requires implementation/source wiring; none is fixed by the five framework changes.
+This is a comparison inventory, not a waiver: the running exact976/852 pair must demonstrate which failures remain identical.
+Reference: =slurm_logs/release_landing_2026-10-14/corpus/FINDINGS.md=.
+
+The farm scanner's Class B warning for17,523 EthiopiaRHS coarse crop rows is documented design, not a new source failure.
+The warm test allows that exclusion only while the actual RHS frame carries neither plot nor plot_id in its index/columns; read errors remain fatal and every other positive warm country is required.
+Scanner warnings remain visible for triage rather than being suppressed to obtain green.
+
+Scientific/source questions remain separate: kinship ambiguity/code lists (#787/#1100-#1103); valuation/recall and currency-valued unit semantics (#828/#1129/#1130/#1131); fertilizer product identity and units, parcel meaning, source keys/collapses and cluster/design evidence (#1106-#1111/#1119/#1120/#1123/#1133/#1136).
+No broad relabeling, fabricated identifiers, nitrogen shares or inferred questionnaire meaning belongs in this release pass.
+Already-ruled #1134/#1135 sampling increments are actionable later, not undecided scientific policy.
+The substantial existing #851 period branch still needs integration/disclosure/review and is a separate feature increment, not an automatic release hold.
+
+Runtime/API policy choices also remain: #1032 read-only wheel DVC tmp writes, #1064 credential permission reporting, #1071 corrupt-cache/no-cache semantics, #1085 escaping symlinks and #1116 provenance note authority.
+#1032 is a real supported-environment limitation: record its supported-install impact and obtain an explicit choice if read-only wheel source reads are promised; do not call import-only tests coverage of that failure.
+None is silently decided by this bounded candidate.
+
+* #932 enforcement proposal consistency
+
+PR#1049's workflow code landed, but active ruleset25124452 requires only unit-tests.
+GitHub owner.type=User means the merge-queue premise is unavailable under present ownership.
+Thus the current proposal must use development pull requests, not a nonexistent queue.
+
+The existing unapplied =proposed-development-ruleset.json= and =ruleset-change.json= correctly add data-tests while preserving all other captured settings.
+The paired workflow change must add exactly the development-PR event branch to the current data-tests condition:
+
+#+begin_example
+|| (github.event_name == 'pull_request' && github.base_ref == 'development')
+#+end_example
+
+Do not condition this branch on same-repository ownership: skipping fork jobs would be accepted as a successful required check.
+Run fork jobs without secrets and let the existing requires_s3 credential assertion fail closed.
+A maintainer must review/import those exact changes into a trusted same-repository PR before credentialed validation; never execute untrusted fork code with secrets under pull_request_target.
+Observe a genuine successful PR-event data-tests run before requiring the check.
+Manual workflow_dispatch remains useful exact-head release evidence but does not satisfy the eligible PR required-check event.
+The workflow's existing comment saying PR data jobs are skipped must be rewritten with the condition change; otherwise the proposal's explanation is stale.
+
+Preserving strict=false does not require the checked branch to be current with the latest development base.
+Preserving RepositoryRole5 always-bypass still permits that actor to bypass requirements; the ruleset also does not require a PR route.
+Requiring current branches, removing bypass or requiring PRs are separate explicit permission decisions.
+Refresh the live ruleset before any approved application; no settings were changed here.
+The nightly workflow will activate only when its schedule reaches default master, although the job explicitly checks out development.
+
+Official documentation: [[https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue][queue ownership eligibility]], [[https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-jobs-with-conditions][skipped jobs count as success]], [[https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks][eligible required-check events]].
+
+* Reviewed issue-closure candidates
+
+This is the exact candidate list within the76 overlapping reliability/contracts dispositions reviewed for this campaign, deduplicated to23 already-merged issues plus5 newly approved fixes.
+It is not an exhaustive audit of every repository issue since the last tag.
+Every candidate must still be checked against the eventual release contents and current issue text before the development-to-master release PR.
+Use one closing keyword per resolved issue there; open development-target fix PRs do not themselves close issues on default master.
+
+Already implemented in976, pending release:
+
+| Issue | Supporting merged PR |
+|-------+----------------------|
+| [[https://github.com/ligon/LSMS_Library/issues/569][#569]] | [[https://github.com/ligon/LSMS_Library/pull/1126][#1126]] |
+| [[https://github.com/ligon/LSMS_Library/issues/600][#600]] | [[https://github.com/ligon/LSMS_Library/pull/1117][#1117]] |
+| [[https://github.com/ligon/LSMS_Library/issues/674][#674]] | [[https://github.com/ligon/LSMS_Library/pull/1024][#1024]] |
+| [[https://github.com/ligon/LSMS_Library/issues/675][#675]] | [[https://github.com/ligon/LSMS_Library/pull/1052][#1052]] |
+| [[https://github.com/ligon/LSMS_Library/issues/680][#680]] | [[https://github.com/ligon/LSMS_Library/pull/1097][#1097]] |
+| [[https://github.com/ligon/LSMS_Library/issues/781][#781]] | [[https://github.com/ligon/LSMS_Library/pull/1132][#1132]] |
+| [[https://github.com/ligon/LSMS_Library/issues/790][#790]] | [[https://github.com/ligon/LSMS_Library/pull/1021][#1021]] |
+| [[https://github.com/ligon/LSMS_Library/issues/793][#793]] | [[https://github.com/ligon/LSMS_Library/pull/1137][#1137]] |
+| [[https://github.com/ligon/LSMS_Library/issues/836][#836]] | [[https://github.com/ligon/LSMS_Library/pull/1026][#1026]] |
+| [[https://github.com/ligon/LSMS_Library/issues/867][#867]] | [[https://github.com/ligon/LSMS_Library/pull/1112][#1112]] |
+| [[https://github.com/ligon/LSMS_Library/issues/908][#908]] | [[https://github.com/ligon/LSMS_Library/pull/1027][#1027]] |
+| [[https://github.com/ligon/LSMS_Library/issues/915][#915]] | [[https://github.com/ligon/LSMS_Library/pull/1098][#1098]] |
+| [[https://github.com/ligon/LSMS_Library/issues/928][#928]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] |
+| [[https://github.com/ligon/LSMS_Library/issues/931][#931]] | [[https://github.com/ligon/LSMS_Library/pull/1092][#1092]] |
+| [[https://github.com/ligon/LSMS_Library/issues/942][#942]] | [[https://github.com/ligon/LSMS_Library/pull/1137][#1137]] |
+| [[https://github.com/ligon/LSMS_Library/issues/1001][#1001]] | [[https://github.com/ligon/LSMS_Library/pull/1022][#1022]] |
+| [[https://github.com/ligon/LSMS_Library/issues/1002][#1002]] | [[https://github.com/ligon/LSMS_Library/pull/1019][#1019]] |
+| [[https://github.com/ligon/LSMS_Library/issues/1031][#1031]] | [[https://github.com/ligon/LSMS_Library/pull/1065][#1065]] |
+| [[https://github.com/ligon/LSMS_Library/issues/1036][#1036]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] |
+| [[https://github.com/ligon/LSMS_Library/issues/1039][#1039]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] |
+| [[https://github.com/ligon/LSMS_Library/issues/1040][#1040]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] |
+| [[https://github.com/ligon/LSMS_Library/issues/1070][#1070]] | [[https://github.com/ligon/LSMS_Library/pull/1105][#1105]] |
+| [[https://github.com/ligon/LSMS_Library/issues/1114][#1114]] | [[https://github.com/ligon/LSMS_Library/pull/1117][#1117]] |
+
+New reviewed fixes, still OPEN and requiring merge/final validation:
+
+| Issue | PR | Candidate head |
+|-------+----+----------------|
+| #1093 | [[https://github.com/ligon/LSMS_Library/pull/1154][#1154]] | eaf7b9913 |
+| #1099 | [[https://github.com/ligon/LSMS_Library/pull/1155][#1155]] | f9871610f |
+| #1143 | [[https://github.com/ligon/LSMS_Library/pull/1156][#1156]] | 1070a4d03 |
+| #1124, #1125 | [[https://github.com/ligon/LSMS_Library/pull/1157][#1157]] | d84061818; runtime ca5bb83ca |
+
+Windows [[https://github.com/ligon/LSMS_Library/pull/1153][PR#1153]], head1d3e8dfdf, is a separate CI correction without a numbered issue here.
+At read-only observation all five PRs are open; #1153-#1156 unit/smoke checks pass, #1157 unit/smoke are still running, and all five PR-event data jobs skipped.
+
+Do NOT close the partial umbrellas #218/#637/#650/#698/#778/#787/#798/#828/#845/#851/#920/#932 or residuals #1051/#1071/#1115/#1116/#1128/#1149 on the strength of these PRs.
+In particular #569 retains #1118-#1123 after the two harness fixes; #793/#942 retain #1133-#1136; #867 retains #1106-#1111; #600/#1114 retain provenance/acquisition queue work.
+#928 closes its accepted P1/P2 increment only; P3/P4 were explicitly deferred.
+The complete per-candidate residual notes remain in the JSON.
+
+* Next priorities after this bounded pass
+
+1. #778: reproduced assumed-fresh exists/read disappearance race plus remaining mutating real-country tests. Catch only FileNotFoundError and isolate cache writers; preserve #1071 corruption policy. Highest next correctness leverage, with deterministic synthetic proof already available.
+2. #1115 + #1128: lossless provenance parsing/rendering and already-ruled durable latest-release queue in one branch. Preserve unknown/repeated facts, held-versus-latest identity and acquisition-only held updates; census shipped SOURCE records without live catalog writes.
+3. #1149: implement ruled staged acquisition, recursive existing-sidecar matching, collision refusal and zip-path preservation; coordinate success-only provenance writes after the previous pair. Synthetic archives suffice before live acquisition.
+4. #1134/#1135: implement already-ruled sampling sentinel and quantified warning extent with evidenced records, independently of broad design curation.
+5. #218: finish dead retired-food build routes with Make/API proof; lower priority than the reproduced race and provenance loss.
+
+#1051 outage behavior remains a useful focused follow-up after a concrete reproduction; single-file/read-only/offline residuals need measured boundaries.
+Do not spend this release pass reimplementing the23 landed issues merely because their GitHub state remains open.
+
+* Verification limits
+
+Read-only evidence synthesis only; no new heavy tests, source edits, git mutations, GitHub writes or shared-cache writes.
+CI states are a timestamped snapshot and may complete after this report.
+The final combined suite, paired corpus and credentialed native run are owned by the parent and still running at this assessment.
+A later successful assessment still requires the maintainer's release instruction.
+
+-- Sue
