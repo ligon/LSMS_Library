@@ -82,5 +82,27 @@ census are evidence/residuals, not requests to decide source facts.
 ---
 ### Phase 3 -- verification
 
-Pending implementation and private cold/warm, source-conservation,
-Country/Feature, targeted-test and 549/39 hash checks.
+- `plot_inputs_for_wave` -- OK (§§2-5): existing sentinel, actual null/blank
+  units normalized after the unchanged reducer; recorded no-amount units
+  retained. Native decoder, predicates, IDs and factors unchanged.
+- Source oracle -- OK (§§4-5): all 9,698 output rows / all bound fields
+  conserved; all 19 no-amount records remain. Six pre-existing 2020 mixed-unit
+  Seed/Pulses groups have complete helper/Country frame and attrs equality;
+  explicitly deferred to #637.
+- Normal public API -- OK (§4): held-only empty-L2 cold build and separate
+  process warm build match the entire expected frame, keys, dtypes and attrs;
+  exactly 408 unit replacements. Warm parquet bytes/mtimes unchanged.
+- Feature/comparator -- OK (§§2-4): verified fresh Uganda comparator has
+  84,216 rows, no missing units, unchanged 27 parquet files; normal Feature
+  retains all 93,914 rows and each complete country part.
+- Tests -- OK (§4): final 16 new tests pass; scoped suite 243 passed before
+  three extra quantity parameters. Old helper: 14 expected failures, two
+  unchanged-behavior passes; early-fill mutant: expected duplicate-control
+  failure. API audit passes; all 11 scanner warnings accounted for.
+- Fingerprints -- OK (§§2/4): all 549 country/table hashes / 39 framework
+  fingerprints checked; exactly 25 Tanzania hashes change, none elsewhere.
+  CONTENTS is documentation excluded from build hashes.
+- Evidence and exact residuals:
+  `slurm_logs/isa_backlog_2026-10-21/1118-Tanzania/REPORT.org`,
+  `source-grounding.json`, `verification.json` and portable source/API
+  verification scripts. Raw records/full logs remain private.
