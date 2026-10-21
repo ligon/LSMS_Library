@@ -1,0 +1,1478 @@
+{
+  "PRs_verified_by_GitHub_merge_SHA_ancestry_despite_nonstandard_merge_message": [
+    1153
+  ],
+  "all_actual_posttag_git_PR_merge_numbers_covered": true,
+  "count": 50,
+  "git_PR_merge_records": [
+    {
+      "merge_commit": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c",
+      "number": 1166
+    },
+    {
+      "merge_commit": "db00a79f17f841649f2b96827c5b9b4e858ce2f8",
+      "number": 1158
+    },
+    {
+      "merge_commit": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+      "number": 1165
+    },
+    {
+      "merge_commit": "f50611161e9e58bf0676de5d771d4d6f07d0d8a3",
+      "number": 1164
+    },
+    {
+      "merge_commit": "5bd1a5834e1957aab464f1aa99a0544ce93c6a25",
+      "number": 1163
+    },
+    {
+      "merge_commit": "5519de059aa1a33359af3a34a887658271879ed1",
+      "number": 1162
+    },
+    {
+      "merge_commit": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+      "number": 1157
+    },
+    {
+      "merge_commit": "064a7fb465b98c4a4cfa951235bd903a81a68d87",
+      "number": 1156
+    },
+    {
+      "merge_commit": "f46dc011f766197156236f0b293986156dae03a0",
+      "number": 1155
+    },
+    {
+      "merge_commit": "047d1ff514aefc0dd7536b4a366d2cdc087b48b7",
+      "number": 1154
+    },
+    {
+      "merge_commit": "ac6de755e99fa53bae7677042df92b654eef2b13",
+      "number": 1161
+    },
+    {
+      "merge_commit": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+      "number": 1152
+    },
+    {
+      "merge_commit": "d638956065491d7a140ae90e3541bbf0b9972f82",
+      "number": 1151
+    },
+    {
+      "merge_commit": "1485a1484d1fc3d5a1246bc3a567ef7cf2765115",
+      "number": 1147
+    },
+    {
+      "merge_commit": "238a4c15d8d691204097649765c58d1a2c6b1d59",
+      "number": 1137
+    },
+    {
+      "merge_commit": "4c630652cd60f60c5c1bdc1e958b1878f774a706",
+      "number": 1132
+    },
+    {
+      "merge_commit": "095eab691a4bde6dbcb338d3b6da90824b4136e5",
+      "number": 1126
+    },
+    {
+      "merge_commit": "2070823cf2c387cd82df100c3d8a1828dc473101",
+      "number": 1117
+    },
+    {
+      "merge_commit": "931934b12205bd3f2ad5e4682fdcb0db69ed4be1",
+      "number": 1112
+    },
+    {
+      "merge_commit": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+      "number": 1105
+    },
+    {
+      "merge_commit": "2f3104c5f52573998f9dec704ab25bda3c13319e",
+      "number": 1104
+    },
+    {
+      "merge_commit": "92631d56bad6a088f2ad7a2402005dc5570d5157",
+      "number": 1098
+    },
+    {
+      "merge_commit": "805f84dd4aa31e923701b8d1796e9a4324bf76c6",
+      "number": 1097
+    },
+    {
+      "merge_commit": "6f9202612930783e4ab9cbe0f0ed1d0856b84cf2",
+      "number": 1094
+    },
+    {
+      "merge_commit": "870dc417976528c149c7e941bd65ddd4d546dcfe",
+      "number": 1092
+    },
+    {
+      "merge_commit": "9d4cd807c4221972749e8732f96c597fb12fc8fd",
+      "number": 1086
+    },
+    {
+      "merge_commit": "200e504a3869ef4755085f9a448b93df0493dd21",
+      "number": 1076
+    },
+    {
+      "merge_commit": "277226e56d4e7433233802ab2c51a19e321d78f3",
+      "number": 1067
+    },
+    {
+      "merge_commit": "12f48d83018c3167e12e803a5f38ee4e34e4ad40",
+      "number": 1065
+    },
+    {
+      "merge_commit": "2b077d11d698608ea917e5145b4cb4ab0ccc5256",
+      "number": 1054
+    },
+    {
+      "merge_commit": "c4242f09ad7b502dbe5f219372d043ba8cd35c3b",
+      "number": 1053
+    },
+    {
+      "merge_commit": "ddd79800cdde24b5524ca61c82a1e8423d47ef83",
+      "number": 1052
+    },
+    {
+      "merge_commit": "6ca9c4db77515db7773fd8eabe957e47ffd5552e",
+      "number": 1027
+    },
+    {
+      "merge_commit": "e10a6a8233010e4afc7c3e91dfa6803a6004625f",
+      "number": 1024
+    },
+    {
+      "merge_commit": "ba3e58e9a454d65fc3c2df54681d2e8a36bec78a",
+      "number": 1019
+    },
+    {
+      "merge_commit": "eba670f5bafda574d9d397a781da80227747553e",
+      "number": 1046
+    },
+    {
+      "merge_commit": "fb2f2ce8e6a3d3c902f7d3f09e882eb862da0b6d",
+      "number": 1029
+    },
+    {
+      "merge_commit": "f8e14a7c23d27a53194bad8c188e3c1b03078055",
+      "number": 1025
+    },
+    {
+      "merge_commit": "6f2fc7259b176d6bd4035abf79d5782f0d1ebbfa",
+      "number": 1023
+    },
+    {
+      "merge_commit": "dbab68d8c0675f28fa2631cf990e5f44645a3658",
+      "number": 1030
+    },
+    {
+      "merge_commit": "119edd8818170b5a186b82cbdfda88a0afe7e88c",
+      "number": 1028
+    },
+    {
+      "merge_commit": "32f8bb2372fd4744143776216e9e50640bc4d2d2",
+      "number": 1026
+    },
+    {
+      "merge_commit": "5525e6924acecf3df4f888111e2787569d1064fa",
+      "number": 1022
+    },
+    {
+      "merge_commit": "5b64a779640db65a18ed7a05232b994e1ad0cd07",
+      "number": 1021
+    },
+    {
+      "merge_commit": "26517e23127cd9c2c5edd948c027c11e86946295",
+      "number": 1020
+    },
+    {
+      "merge_commit": "3ff6ddf60ca2bbcef2c595a51d3aee5b31d51ba6",
+      "number": 1049
+    },
+    {
+      "merge_commit": "3e3bd26ee904341d08fe582e5c9136ba24f803fd",
+      "number": 1018
+    },
+    {
+      "merge_commit": "58e6de00dceae2f6e7220b8979291a1ef465e1f0",
+      "number": 1017
+    },
+    {
+      "merge_commit": "ab41e389ea010195b647f4e5345f914c707e57c2",
+      "number": 1016
+    }
+  ],
+  "input_metadata_count": 200,
+  "records": [
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "57fe29477f45d2a4aeec5ff57a4b7d03e9049b4394a5771f44048f89063c68bf",
+      "classification": "release/evidence documentation only",
+      "core_closures_supported": [],
+      "head_sha": "3c5428a6900cecf42f99614124f311a9fbab4bf2",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T05:31:14Z",
+      "number": 1166,
+      "title": "docs: finalize framework landing status and CI evidence",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1166"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1160,
+        1110
+      ],
+      "body_sha256": "ad7b88b2e8ba38f1601acfa7c63ed9158e70432849a74ea6ad760d22ef539753",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1160
+      ],
+      "head_sha": "23c1e2d52801bf206a15ec5900bca5d62e7f850f",
+      "mentions_not_promoted_to_closure": [
+        1110
+      ],
+      "merge_commit_sha": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T05:09:02Z",
+      "number": 1165,
+      "title": "Preserve country identity through fertilizer-rate joins",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1165"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1159
+      ],
+      "body_sha256": "3fa534d5c89dbead9ce28f272319be72aa41e7515596f4b6654ac6fb1bac151d",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1159
+      ],
+      "head_sha": "d124c0df70db2e04dceb4a8c19eb0d40df14dbee",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "f50611161e9e58bf0676de5d771d4d6f07d0d8a3",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T05:03:09Z",
+      "number": 1164,
+      "title": "Preserve country identity in seed and nitrogen plot reductions",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1164"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1115,
+        1128
+      ],
+      "body_sha256": "345f420dce6dbc1c6d6e70ebfbb3cd01172bffe051b929d4fe1602f9e63b0b71",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1115,
+        1128
+      ],
+      "head_sha": "124c2436d7e1a279c72f4d8f650d250eab6c7d67",
+      "mentions_not_promoted_to_closure": [
+        1149
+      ],
+      "merge_commit_sha": "5bd1a5834e1957aab464f1aa99a0544ce93c6a25",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T05:03:04Z",
+      "number": 1163,
+      "title": "Preserve SOURCE facts and separate held releases from latest observations",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1163"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "5e1560e14ff2a37b0fcac34fa31bb163d883bdb6f2ed14e551859b4ca15e5e12",
+      "classification": "partial implementation; umbrella/residual remains open",
+      "core_closures_supported": [],
+      "head_sha": "dffb0760406c74cea677f360f76be52cbed27975",
+      "mentions_not_promoted_to_closure": [
+        778,
+        1071
+      ],
+      "merge_commit_sha": "5519de059aa1a33359af3a34a887658271879ed1",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T05:03:00Z",
+      "number": 1162,
+      "title": "Recover disappearing assumed-fresh caches and isolate forced rebuild tests",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1162"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "f92de036e4fa6fbb74ea11904061672eebf82af48f260e6e413fc9e492db9ba6",
+      "classification": "CI fingerprint/evidence support, no separate issue closure",
+      "core_closures_supported": [],
+      "head_sha": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+      "mentions_not_promoted_to_closure": [
+        788
+      ],
+      "merge_commit_sha": "ac6de755e99fa53bae7677042df92b654eef2b13",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:00Z",
+      "number": 1161,
+      "title": "Accept the measured Uganda nutrition fingerprint without weakening invariance checks",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1161"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1153
+      ],
+      "body_sha256": "872f86094e9bc36f64c0e520e6206514c040ffed6a65050a4fa8531ce85b3190",
+      "classification": "release/evidence documentation only",
+      "core_closures_supported": [],
+      "head_sha": "4fd0c0ad5f2f2e9ffbb4e3edc20a80e77422b91c",
+      "mentions_not_promoted_to_closure": [
+        778,
+        932,
+        1110,
+        1149
+      ],
+      "merge_commit_sha": "db00a79f17f841649f2b96827c5b9b4e858ce2f8",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T05:18:56Z",
+      "number": 1158,
+      "title": "Record framework campaign validation and v0.16 assessment",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1158"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1124,
+        1125
+      ],
+      "body_sha256": "1170acd7f777382596a3599eceb78836dbf523464314807267e3f07556572984",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1124,
+        1125
+      ],
+      "head_sha": "d84061818b0b430e8b00fa26b5b6d19e4694eb96",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:17Z",
+      "number": 1157,
+      "title": "Detect excluded countries and harden warm farm assembly checks",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1157"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1143
+      ],
+      "body_sha256": "0e06a3dc6d4b5a8f2eb1edae16edf251b241a4d61552be2942213eee22ccb584",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1143
+      ],
+      "head_sha": "1070a4d03e764ec8e3b0e61d4f825bc793eeeae7",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "064a7fb465b98c4a4cfa951235bd903a81a68d87",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:12Z",
+      "number": 1156,
+      "title": "Parse decimal-comma metric labels without numeric suffix loss",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1156"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1099
+      ],
+      "body_sha256": "f32965807fcd79981d6756730ff456f63960948b5c9d66326b8c96e9e2abd701",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1099
+      ],
+      "head_sha": "f9871610f02bca8d1f82a352c4925353439cb6bc",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "f46dc011f766197156236f0b293986156dae03a0",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:08Z",
+      "number": 1155,
+      "title": "Return typed empty answers for absent wave subsets",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1155"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1093
+      ],
+      "body_sha256": "a75ac72b059e86c7bfc0e85a2eb570897a07a2b9675de7c46811216ed4644975",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1093
+      ],
+      "head_sha": "eaf7b9913b37e04e924bd05a17e691e0263ecb4e",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "047d1ff514aefc0dd7536b4a366d2cdc087b48b7",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T04:54:04Z",
+      "number": 1154,
+      "title": "Use declared unit masses in seed, nitrogen and sale valuation",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1154"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        805
+      ],
+      "body_sha256": "9b0587fb589a2237fd1fe29802fa64d849844f9809189c51d6519f99c3fe1d5b",
+      "classification": "CI fingerprint/evidence support, no separate issue closure",
+      "core_closures_supported": [],
+      "head_sha": "1d3e8dfdf264c40cc4ce4eb9a1f77b9d71634ad6",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "ad1e87e1025dec98fe70734f4e60d12824fd31dd",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-21T00:34:57Z",
+      "number": 1153,
+      "title": "CI: update Windows shocks digest after the cp1252 repair",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1153"
+    },
+    {
+      "additional_closures_proposed": [
+        1035
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1035
+      ],
+      "body_sha256": "8a5561d03e2ca38982144ceafdb36c8d7254d960ac249bbadb905767dd490707",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "42f08b2c8b4000007194f0fd8e9502dafa790add",
+      "mentions_not_promoted_to_closure": [
+        1144
+      ],
+      "merge_commit_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-20T11:45:30Z",
+      "number": 1152,
+      "title": "Nigeria W1-PH: serve the container card weight only to fractional quantities (quantity-aware, #1035)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1152"
+    },
+    {
+      "additional_closures_proposed": [
+        1008,
+        1140
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1008
+      ],
+      "body_sha256": "a497d68346f5e97bf28a6f5753af971c924837b0c724865a625d9997402770cb",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "a04fa4ae76708245f1d8a6ee1c0fe2d28b0c3531",
+      "mentions_not_promoted_to_closure": [
+        1138,
+        1139,
+        1141,
+        1142,
+        1145
+      ],
+      "merge_commit_sha": "d638956065491d7a140ae90e3541bbf0b9972f82",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-20T11:45:16Z",
+      "number": 1151,
+      "title": "GhanaLSS: recover null declared-index keys; 2016-17 8H screener drops only \"No\" (#1008, #1140)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1151"
+    },
+    {
+      "additional_closures_proposed": [
+        1113
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1113
+      ],
+      "body_sha256": "424251d92c95ffe425b5d3b589abdc8f4b8f5008e4dc8b5c30319049e6f2e16f",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "5df842f062f189cee0afab9b2061faa2a58a98a0",
+      "mentions_not_promoted_to_closure": [
+        891,
+        1146
+      ],
+      "merge_commit_sha": "1485a1484d1fc3d5a1246bc3a567ef7cf2765115",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-20T10:17:12Z",
+      "number": 1147,
+      "title": "test_uganda_invariance: skip a partial-coverage L2 parquet instead of failing on it (#1113)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1147"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        793
+      ],
+      "body_sha256": "1d8e0d2b300c61869d73e0b65acc4f6988f415f31a27d3f2f3d861356ed4cc50",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        793,
+        942
+      ],
+      "head_sha": "f11349703bc7137937d7c3aa37bb4ff497376d0a",
+      "mentions_not_promoted_to_closure": [
+        1133,
+        1134,
+        1135,
+        1136
+      ],
+      "merge_commit_sha": "238a4c15d8d691204097649765c58d1a2c6b1d59",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-20T02:14:32Z",
+      "number": 1137,
+      "title": "sampling.yml loader + per-boundary v-continuity warning (#793, #942)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1137"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        781
+      ],
+      "body_sha256": "c974ae609cc7eec2c94213df0ce5400d04e9d126ad00b133ae693e8cd4b4e397",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        781
+      ],
+      "head_sha": "88280fc435472e3db94a094afd9f393f642472ee",
+      "mentions_not_promoted_to_closure": [
+        562,
+        770,
+        1129,
+        1130,
+        1131
+      ],
+      "merge_commit_sha": "4c630652cd60f60c5c1bdc1e958b1878f774a706",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T23:12:56Z",
+      "number": 1132,
+      "title": "coverage: verdict vocabulary for dropped cells (correctly-empty / empty-pending-machinery, keyed by tier) (#781)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1132"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        569
+      ],
+      "body_sha256": "c37cd38d16294e0bc442ab6144f7caff4264a1b202f92ae7af80acbb7ee4bd0c",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        569
+      ],
+      "head_sha": "7514fc819108b047da90e2b847f894011b0dd7ab",
+      "mentions_not_promoted_to_closure": [
+        637,
+        740,
+        1118,
+        1119,
+        1120,
+        1121,
+        1122,
+        1123
+      ],
+      "merge_commit_sha": "095eab691a4bde6dbcb338d3b6da90824b4136e5",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T23:03:46Z",
+      "number": 1126,
+      "title": "Register plot_labor and plot_inputs in Feature's Index Info (#569)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1126"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        600
+      ],
+      "body_sha256": "83a574017b74827d990a4ffb1f7ce83aef424f10c87f51c7234200bfb224ff34",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        600,
+        1114
+      ],
+      "head_sha": "c257f7da13338c21cffe9a5cfdc2ddf9d033948c",
+      "mentions_not_promoted_to_closure": [
+        978,
+        1116
+      ],
+      "merge_commit_sha": "2070823cf2c387cd82df100c3d8a1828dc473101",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T22:39:56Z",
+      "number": 1117,
+      "title": "backfill_wave_provenance: a failed resolution leaves SOURCE.org intact, and a re-stamp never overwrites a recorded fact (#600)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1117"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        867
+      ],
+      "body_sha256": "53e2ba38d508feba6b22e218a55772638ca89bb495426d74470cab4422da5715",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        867
+      ],
+      "head_sha": "baccf7fd60762c196e62e6b57289a1f96f4ef752",
+      "mentions_not_promoted_to_closure": [
+        1106,
+        1107,
+        1108,
+        1109,
+        1110,
+        1111
+      ],
+      "merge_commit_sha": "931934b12205bd3f2ad5e4682fdcb0db69ed4be1",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T21:57:28Z",
+      "number": 1112,
+      "title": "nitrogen_kg: cited N shares for NPS and Malawi D Compound; organic inputs refused, counted and named (#867)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1112"
+    },
+    {
+      "additional_closures_proposed": [
+        805,
+        831
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        928,
+        1036,
+        1039,
+        1040,
+        1070
+      ],
+      "head_sha": "03d04a9e015be53c0de7aec34723f9ffb772db22",
+      "mentions_not_promoted_to_closure": [
+        1044,
+        1045,
+        1066
+      ],
+      "merge_commit_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T21:21:02Z",
+      "number": 1105,
+      "title": "Corpus bundle 2026-10-19: #805/#831, #928, #1036, #1039, #1040 (+#1070), #1045 (+#1066) -- one re-warm",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1105"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "7bdaf11ef60ea065c342e6cf5637a11bb0d408dffe3896396d91e463631be8cf",
+      "classification": "partial implementation; umbrella/residual remains open",
+      "core_closures_supported": [],
+      "head_sha": "964a26dd8a7fbd9bc4fb7d71cbddffc8c3d60c92",
+      "mentions_not_promoted_to_closure": [
+        698,
+        1100,
+        1101,
+        1102,
+        1103
+      ],
+      "merge_commit_sha": "2f3104c5f52573998f9dec704ab25bda3c13319e",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T20:56:22Z",
+      "number": 1104,
+      "title": "kinship: affinity-only conflations are [G, D, null] (#698)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1104"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        915
+      ],
+      "body_sha256": "1a86cb54b7b78a4098840da6363a9780e41f9cc9cf53be8489cd14ded829b71b",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        915
+      ],
+      "head_sha": "b2fdc3f7327d1d9c80f0835cde1afa55b868bdf1",
+      "mentions_not_promoted_to_closure": [
+        1085
+      ],
+      "merge_commit_sha": "92631d56bad6a088f2ad7a2402005dc5570d5157",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T17:56:21Z",
+      "number": 1098,
+      "title": "Country() refuses an existing directory with no _/data_scheme.yml; acquisition opts in (#915)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1098"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        680
+      ],
+      "body_sha256": "b3741467fdc48884de7f2845fee43f5015b322601f14b87dc50596d0bf3238e4",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        680
+      ],
+      "head_sha": "7227c9a3ed1b557b357f1c847812a86dfeb57c40",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "805f84dd4aa31e923701b8d1796e9a4324bf76c6",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T17:56:15Z",
+      "number": 1097,
+      "title": "deps: fooddatacentral >= 1.0.13 (no top-level tests/ package) (#680)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1097"
+    },
+    {
+      "additional_closures_proposed": [
+        1037,
+        1047
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1037
+      ],
+      "body_sha256": "1b8f997a1af6657fcbc1b3cf078502183839e655354fda91380ea7e0e32f168e",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "dc2a501982e1975ab379fd2e09558d931d9a883e",
+      "mentions_not_promoted_to_closure": [
+        1045
+      ],
+      "merge_commit_sha": "6f9202612930783e4ab9cbe0f0ed1d0856b84cf2",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T17:25:33Z",
+      "number": 1094,
+      "title": "Nigeria interview_date (W3 recovered, W4 bound method fixed) and unit codes (float strings, crop and plot_inputs missing units) (#1037, #1047)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1094"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        931
+      ],
+      "body_sha256": "e1e783e14b7ac095dd41998e783190cce05d1d3d6239e03c87ffc607f8da5649",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        931
+      ],
+      "head_sha": "de652e7f62a39f5cee920eddcddf87862b47ea67",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "870dc417976528c149c7e941bd65ddd4d546dcfe",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T17:25:28Z",
+      "number": 1092,
+      "title": "Crop kg ladder reads a country's declared u_kg; Ethiopia's quintal check re-expressed against an external key (#931)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1092"
+    },
+    {
+      "additional_closures_proposed": [
+        840
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        840
+      ],
+      "body_sha256": "38c144c4b72b4d58f8889f1d41088de92384e0e1fbc7920ccbd9bb5996769216",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "a4fa1f3834ec2bafe248ce9b9992887bdfdba03c",
+      "mentions_not_promoted_to_closure": [
+        788,
+        871
+      ],
+      "merge_commit_sha": "9d4cd807c4221972749e8732f96c597fb12fc8fd",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T17:25:23Z",
+      "number": 1086,
+      "title": "community_prices: add variety + visit + obs index levels, select nothing (#840)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1086"
+    },
+    {
+      "additional_closures_proposed": [
+        1042
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1042
+      ],
+      "body_sha256": "6f1093252a8fb90c9ffdc3482aca05fda2de5f23a30a803a7b962696ab82c0eb",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "d2238ba1a0ee06715adb6408d69232ee2d3f5a77",
+      "mentions_not_promoted_to_closure": [
+        1072,
+        1073,
+        1074,
+        1075
+      ],
+      "merge_commit_sha": "200e504a3869ef4755085f9a448b93df0493dd21",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T14:51:50Z",
+      "number": 1076,
+      "title": "Unit codes checked against the questionnaires: GhanaLSS and Malawi (#1042), with @ligon's six rulings",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1076"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1044
+      ],
+      "body_sha256": "eec46efe26e70f906f656af16cb714c8ae30fe00075a2e765b79fe61608b21a6",
+      "classification": "partial implementation; umbrella/residual remains open",
+      "core_closures_supported": [],
+      "head_sha": "bd8f4ce89f071fc740cc40c1a8e190deda29f57f",
+      "mentions_not_promoted_to_closure": [
+        1044,
+        1061
+      ],
+      "merge_commit_sha": "277226e56d4e7433233802ab2c51a19e321d78f3",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T14:51:45Z",
+      "number": 1067,
+      "title": "EthiopiaRHS food units: integer codes after 1989; missing units -> Unknown; 1989 code 1 is a quintal (#1044, partial)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1067"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1031
+      ],
+      "body_sha256": "e0a21752974100835e5ed08a840135d061918893006c3b58a86e29aa11b1b10c",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1031
+      ],
+      "head_sha": "41c372e43223a029acb99917834a6de40b8c71a2",
+      "mentions_not_promoted_to_closure": [
+        1032,
+        1064
+      ],
+      "merge_commit_sha": "12f48d83018c3167e12e803a5f38ee4e34e4ad40",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T14:51:38Z",
+      "number": 1065,
+      "title": "CI: S3 reader credentials go to the user-config path, never the countries tree (#1031)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1065"
+    },
+    {
+      "additional_closures_proposed": [
+        1050
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1050
+      ],
+      "body_sha256": "37459a714d1101f3d43b578fe7f5dfa2edd5a7f8f7cd7dbea4c80e9c2c0deb39",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "71435f93275ee1f85dd5a2e342e9b628e87ee1f7",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "2b077d11d698608ea917e5145b4cb4ab0ccc5256",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T12:42:56Z",
+      "number": 1054,
+      "title": "Burkina Faso cluster_features: wire 2018-19 GPS; record that 2014 and 2021-22 ship none (#1050)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1054"
+    },
+    {
+      "additional_closures_proposed": [
+        1038
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1038
+      ],
+      "body_sha256": "fbd2f296f8b76bdac75eaae717b8443dc292781af6abc7ad38fcf560dedb33bb",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "b482daa316be1d91357117237df520ddd5cff36b",
+      "mentions_not_promoted_to_closure": [
+        871
+      ],
+      "merge_commit_sha": "c4242f09ad7b502dbe5f219372d043ba8cd35c3b",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T12:42:52Z",
+      "number": 1053,
+      "title": "Ethiopia interview_date: map the '##N/A##' placeholder to null (#1038)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1053"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        675
+      ],
+      "body_sha256": "bd7f758bf7cefa2109ef3f69eb808d7f6542b85d753448c58033bbf5976bc08a",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        675
+      ],
+      "head_sha": "f34c99ecb9f2e7a8f19d19b772a2519c392fd5eb",
+      "mentions_not_promoted_to_closure": [
+        515,
+        920,
+        1051
+      ],
+      "merge_commit_sha": "ddd79800cdde24b5524ca61c82a1e8423d47ef83",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T03:18:36Z",
+      "number": 1052,
+      "title": "cache: a build degraded by an unreadable dfs: source no longer caches as fresh (GH #675)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1052"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        932
+      ],
+      "body_sha256": "91546fd81f9fe10319223a914dc51f8edca56721d74c33c6f686138b0667805a",
+      "classification": "partial implementation; umbrella/residual remains open",
+      "core_closures_supported": [],
+      "head_sha": "58fae9bcd650f2d89c75ab4eba695959d44f8056",
+      "mentions_not_promoted_to_closure": [
+        907,
+        932,
+        941
+      ],
+      "merge_commit_sha": "3ff6ddf60ca2bbcef2c595a51d3aee5b31d51ba6",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:42:59Z",
+      "number": 1049,
+      "title": "ci: data-tests gate the development merge queue, run nightly; unit-tests states what it skipped (GH #932)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1049"
+    },
+    {
+      "additional_closures_proposed": [
+        1041
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1041
+      ],
+      "body_sha256": "6c67e98025a32c6b47801b0f67656b4f5d21e94942f602ea7a8ade91d233d6b2",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "b4a2058e972381935eef8b60148478ee242f119d",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "eba670f5bafda574d9d397a781da80227747553e",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:49:10Z",
+      "number": 1046,
+      "title": "Nigeria food_acquired: a blank unit code is U_UNKNOWN, not 'None' (GH #1041)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1046"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "e52169c2abdbe27fdeb228352c5f93060ce56f4b6bb16feffdc5489e1d4a4a09",
+      "classification": "partial implementation; umbrella/residual remains open",
+      "core_closures_supported": [],
+      "head_sha": "34487e7cae4a0ad63c8401e34cb4635fb68787a9",
+      "mentions_not_promoted_to_closure": [
+        330,
+        778,
+        809,
+        866
+      ],
+      "merge_commit_sha": "dbab68d8c0675f28fa2631cf990e5f44645a3658",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:44:17Z",
+      "number": 1030,
+      "title": "tests: isolate gh866/gh809 cache-poisoning tests in a private LSMS_DATA_DIR; read-is-the-check for var/ readers (GH #778)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1030"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "d22cb1ee929d6f22d4b4aa95ea53f241e124845c8d8b8baaebe6a5fe78e1663e",
+      "classification": "partial implementation; umbrella/residual remains open",
+      "core_closures_supported": [],
+      "head_sha": "a141803a74d7032c7b84e460b11edc2c5df4ee3f",
+      "mentions_not_promoted_to_closure": [
+        550,
+        787,
+        828,
+        845
+      ],
+      "merge_commit_sha": "fb2f2ce8e6a3d3c902f7d3f09e882eb862da0b6d",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:45:55Z",
+      "number": 1029,
+      "title": "Read-path contracts: Feature carries `labels_unmatched`; `units=` raises `UnitsUnavailableError`; document Price provenance (#787 item 3, #828, #845)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1029"
+    },
+    {
+      "additional_closures_proposed": [
+        962
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        962
+      ],
+      "body_sha256": "0b958461e21c32b5eb15e5dd67bc37fc2ebb733e64087027d781d0b6653e5ea3",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "51e0187f9a028d54158dd3769c07dac53b78dcf0",
+      "mentions_not_promoted_to_closure": [
+        1043,
+        1044
+      ],
+      "merge_commit_sha": "119edd8818170b5a186b82cbdfda88a0afe7e88c",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:44:05Z",
+      "number": 1028,
+      "title": "GH #962: state the real residual-code kg contract; guard minted unit spellings across fillna/replace/where/assignment",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1028"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        908,
+        908
+      ],
+      "body_sha256": "acf1b9defa9a654c7924984aa1aced5538bb7fa7da39e6ac21395f0b2a8d26c3",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        908
+      ],
+      "head_sha": "c0526ba3efc804e526cfb2db5e3c8efb7a8eb886",
+      "mentions_not_promoted_to_closure": [
+        809,
+        866,
+        891,
+        920
+      ],
+      "merge_commit_sha": "6ca9c4db77515db7773fd8eabe957e47ffd5552e",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T03:18:22Z",
+      "number": 1027,
+      "title": "cache: move the L2-country read gate out of the build fingerprint; say why a rebuild happens (#908, #920a)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1027"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        836
+      ],
+      "body_sha256": "0442b8e79df770bce14b860e60cd07c17409a1c971bdd2368ff47f3179db27bf",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        836
+      ],
+      "head_sha": "0d4f01618e8750301f03c6f6171fe3d445050cc8",
+      "mentions_not_promoted_to_closure": [
+        114,
+        169,
+        788
+      ],
+      "merge_commit_sha": "32f8bb2372fd4744143776216e9e50640bc4d2d2",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:43:52Z",
+      "number": 1026,
+      "title": "Tanzania: retire dead country-level `food_acquired.py` that read CONTENTS.org; guard the `_ORG_HASH_SKIP` invariant (#836)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1026"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "7d68efe36f0f31f7e21523de7171f430b1dab11c936bc2865fa74bcb3f6aae11",
+      "classification": "partial implementation; umbrella/residual remains open",
+      "core_closures_supported": [],
+      "head_sha": "600964e9a989139fe3d437bf608224fb63f92981",
+      "mentions_not_promoted_to_closure": [
+        798
+      ],
+      "merge_commit_sha": "f8e14a7c23d27a53194bad8c188e3c1b03078055",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:45:42Z",
+      "number": 1025,
+      "title": "Parse declared datetime columns per value; warn on unparsed strings (GH #798)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1025"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [
+        953
+      ],
+      "base": "development",
+      "body_keyword_refs": [
+        674
+      ],
+      "body_sha256": "ef299b423290cc036387fe47ada6813e53395f9ced1178ba601a43eda19e5df7",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        674
+      ],
+      "head_sha": "58c39415503d99fe847724d481a061e329f5571b",
+      "mentions_not_promoted_to_closure": [
+        348,
+        372,
+        377,
+        953
+      ],
+      "merge_commit_sha": "e10a6a8233010e4afc7c3e91dfa6803a6004625f",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T03:18:08Z",
+      "number": 1024,
+      "title": "get_categorical_mapping: raise TypeError on a bare org-table call (GH #674)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1024"
+    },
+    {
+      "additional_closures_proposed": [
+        607
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        607
+      ],
+      "body_sha256": "22f00f7b3efe48fbc258edfc405c88d8025586ed2552a38a6e2eb841a7a6cbb7",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "70d88ff1cde503792801de473087e2711e8c4c57",
+      "mentions_not_promoted_to_closure": [
+        223,
+        1033,
+        1034
+      ],
+      "merge_commit_sha": "6f2fc7259b176d6bd4035abf79d5782f0d1ebbfa",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:44:30Z",
+      "number": 1023,
+      "title": "Nigeria food_acquired: decode unit codes per wave, not wave-blind (GH #607)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1023"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1001
+      ],
+      "body_sha256": "a37637b30389a6a79e728122acacfb00a429063b5d1cced63abe9f7aab0c850c",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1001
+      ],
+      "head_sha": "66a0a12ee2e49490d09474b162947ead46a022a9",
+      "mentions_not_promoted_to_closure": [
+        803,
+        810,
+        914,
+        1032
+      ],
+      "merge_commit_sha": "5525e6924acecf3df4f888111e2787569d1064fa",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:43:39Z",
+      "number": 1022,
+      "title": "Stop writing S3 credentials into the installed countries tree (GH #1001)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1022"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        790
+      ],
+      "body_sha256": "cc654abf4084e812a4a3a1953fe360d749048aed6868684ccdc8824991f556a3",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        790
+      ],
+      "head_sha": "88bfbc98edee0cf2fd76b89e7e9e831e9de4e647",
+      "mentions_not_promoted_to_closure": [
+        218
+      ],
+      "merge_commit_sha": "5b64a779640db65a18ed7a05232b994e1ad0cd07",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:43:25Z",
+      "number": 1021,
+      "title": "Retire dead food_prices_quantities_and_expenditures scripts (BF/Senegal/Tanzania) and uncalled prices_and_units (#218, #790)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1021"
+    },
+    {
+      "additional_closures_proposed": [
+        974
+      ],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "44679c3a8d3e16880f1593d8690e53486082fe9b2ed0b072b4ab7f4eed96f5aa",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [],
+      "head_sha": "e86b4a7a96a28a63299997526899f3faebd8df78",
+      "mentions_not_promoted_to_closure": [
+        813,
+        945
+      ],
+      "merge_commit_sha": "26517e23127cd9c2c5edd948c027c11e86946295",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T01:43:12Z",
+      "number": 1020,
+      "title": "kinship.yml: one key per lookup form -- fold the 4 title-collision groups (GH #974)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1020"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [
+        1002
+      ],
+      "body_sha256": "d4bced1aec9713af9d564ea750a5aec31e5ef6bd5c4454d43de1e2874618d9ee",
+      "classification": "scoped resolved implementation",
+      "core_closures_supported": [
+        1002
+      ],
+      "head_sha": "307e9f38f8be730799265eaba382aed07b85d446",
+      "mentions_not_promoted_to_closure": [
+        200,
+        920
+      ],
+      "merge_commit_sha": "ba3e58e9a454d65fc3c2df54681d2e8a36bec78a",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-19T03:17:55Z",
+      "number": 1019,
+      "title": "readers: keep unreadable binaries out of the text tail; SPSS retry for SPSS only (GH #1002)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1019"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [
+        953
+      ],
+      "base": "development",
+      "body_keyword_refs": [
+        953
+      ],
+      "body_sha256": "022eefc280533095a699e09c7c882602cfb15e25b03f9bc6f791612664fe7c2b",
+      "classification": "already-closed issue support",
+      "core_closures_supported": [],
+      "head_sha": "d9a1146be4a9fbee173a50f59d52dd2d6dc0fe2b",
+      "mentions_not_promoted_to_closure": [
+        953
+      ],
+      "merge_commit_sha": "3e3bd26ee904341d08fe582e5c9136ba24f803fd",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-18T00:57:44Z",
+      "number": 1018,
+      "title": "Categorical mappings: a level is categorical_mapping.org and/or categorical_mapping/ (#953)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1018"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [
+        958,
+        960
+      ],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "2b04fce3e0d822381c0f5a5fd2691a1e00c25fd182d77296cdc76d0e974a6bc8",
+      "classification": "already-closed issue support",
+      "core_closures_supported": [],
+      "head_sha": "6f606342bc2d1f57126cc92f93c670bbb96f371a",
+      "mentions_not_promoted_to_closure": [
+        957,
+        958,
+        960,
+        961
+      ],
+      "merge_commit_sha": "58e6de00dceae2f6e7220b8979291a1ef465e1f0",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-18T00:55:34Z",
+      "number": 1017,
+      "title": "venv: per-clone state out of the shared mirror; self-locating shebangs (#958, #960)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1017"
+    },
+    {
+      "additional_closures_proposed": [],
+      "already_closed_related_issues": [],
+      "base": "development",
+      "body_keyword_refs": [],
+      "body_sha256": "c6616db8ef250f8064ea7e39e05035df0b79346f9fe1fef2f8e5411303aa139a",
+      "classification": "release/evidence documentation only",
+      "core_closures_supported": [],
+      "head_sha": "934cca8054df744698a172d2cd0daa033812d1fc",
+      "mentions_not_promoted_to_closure": [],
+      "merge_commit_sha": "ab41e389ea010195b647f4e5345f914c707e57c2",
+      "merge_in_dev": true,
+      "merge_in_v015": false,
+      "merged": true,
+      "merged_at": "2026-10-15T16:42:58Z",
+      "number": 1016,
+      "title": "docs: record verified v0.15.0 release completion",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1016"
+    }
+  ]
+}

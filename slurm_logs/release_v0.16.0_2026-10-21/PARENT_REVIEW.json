@@ -1,0 +1,22 @@
+{
+  "author": "Sue",
+  "reviewed_development": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c",
+  "validated_source": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "candidate_to_development_delta": {
+    "paths": 333,
+    "reports": 332,
+    "handoff": 1,
+    "runtime_config_tests_workflow_build_differences": 0
+  },
+  "notes_independent_review": "PASS after returned-frame attrs and inherited monetary currency-axis clarifications",
+  "prep_independent_review": "PASS with assertions enabled and master checkout frozen",
+  "strict_api_audit": "PASS",
+  "publication_not_yet_executed": true,
+  "published_docs": {
+    "docs/releases/v0.16.0.md": "2d32325566523f7366de247e98e9e33160f85d30312525891a46680df5bfaaae",
+    "docs/migration/v0.16.0.md": "196923a6075b54b9a1aab41cfb12842b36451290d4065b864957f0eb3b4842ba"
+  },
+  "producer_drafts_retained": "Frozen notes/* and MANIFEST describe pre-review drafts; docs/* are corrected publication copies.",
+  "full_suite_invocation": "run_make_release.sh explicitly unsets PYTHONOPTIMIZE/PYTHONSAFEPATH; artifact verification must also use assertion-enabled normal Python.",
+  "scope": "Documentation/preparation only; no runtime change, source/cache clearing, tag or publication."
+}

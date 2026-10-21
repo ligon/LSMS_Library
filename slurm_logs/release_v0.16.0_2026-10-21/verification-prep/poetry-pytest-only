@@ -1,0 +1,117 @@
+#!/local/job40255479/venv_img/bin/python
+"""Parent-owned make release adapter. No Poetry, setup, install or build."""
+from collections import Counter
+import hashlib
+import json
+import os
+from pathlib import Path
+import sys
+import time
+
+if not __debug__:
+    raise RuntimeError('Release gate requires enabled Python assertions')
+assert sys.argv[1:3] == ['run', 'pytest'], 'Adapter accepts only POETRY run pytest'
+assert os.environ.get('RELEASE_CI_RUN_ID', '').isdigit(), 'Parent must supply the exact master push CI run ID'
+from release_identity import assert_identity
+pin = assert_identity()
+out = Path(os.environ['RELEASE_OUT'])
+out.mkdir(mode=0o700, parents=True, exist_ok=False)
+assert Path(os.environ['RELEASE_COPY_MANIFEST']).resolve() == Path(__file__).resolve().parent / 'copy-manifest-private.json'
+manifest = json.loads(Path(os.environ['RELEASE_COPY_MANIFEST']).read_text())
+data = Path(pin['data_root'])
+files = {p.relative_to(data).as_posix(): p for p in data.rglob('*')
+         if p.is_file() and 'dvc-cache' not in p.relative_to(data).parts}
+assert files.keys() == manifest.keys()
+for name, p in files.items():
+    assert not p.is_symlink()
+    assert hashlib.sha256(p.read_bytes()).hexdigest() == manifest[name]['sha256'], name
+assert (data / 'dvc-cache').is_symlink()
+expected_args = ['-n', '16', '--dist=loadfile', '--timeout=600', '--timeout-method=thread',
+                 '--maxfail=1', '--tb=short', '-ra', '--durations=25']
+assert sys.argv[3:] == expected_args, sys.argv[3:]
+(out / 'STARTED.json').write_text(json.dumps(pin, indent=2) + '\n')
+os.environ['LSMS_ISSUES_LOG'] = str(out / 'issues-private.log')
+import pytest
+
+
+class Reports:
+    def __init__(self):
+        self.results = {}
+        self.workers = set()
+        self.counts = {}
+
+    def pytest_runtest_logreport(self, report):
+        xfail = getattr(report, 'wasxfail', None)
+        if report.failed:
+            outcome = 'failure' if report.when == 'call' else 'error'
+        elif report.skipped:
+            outcome = 'xfailed' if xfail else 'skipped'
+        elif report.when == 'call':
+            outcome = 'xpassed' if xfail else 'passed'
+        else:
+            return
+        reason = str(xfail) if xfail else str(report.longrepr[2]) if report.skipped and isinstance(report.longrepr, tuple) else ''
+        if reason.startswith('Skipped: '):
+            reason = reason[len('Skipped: '):]
+        old = self.results.get(report.nodeid)
+        if old is None or old['outcome'] not in {'failure', 'error'}:
+            self.results[report.nodeid] = {'outcome': outcome, 'reason': reason}
+        node = getattr(report, 'node', None)
+        if node is not None:
+            self.workers.add(node.gateway.id)
+        if outcome in {'failure', 'error'}:
+            (out / 'FAILURE-private.json').write_text(json.dumps({'nodeid': report.nodeid, 'phase': report.when}) + '\n')
+
+    def pytest_sessionfinish(self, session, exitstatus):
+        terminal = session.config.pluginmanager.get_plugin('terminalreporter')
+        self.counts = {name: len(terminal.stats.get(name, [])) for name in
+                       ['passed', 'skipped', 'xfailed', 'xpassed', 'failed', 'error', 'warnings']}
+
+
+reports = Reports()
+start = time.monotonic()
+code = int(pytest.main(expected_args + ['-p', 'release_identity',
+           f'--junitxml={out / "suite-private.xml"}', '-o', f'cache_dir={out / "pytest-cache"}'], plugins=[reports]))
+assert_identity()
+baseline_path = Path('/local/job40255479/control/framework-campaign/rate-validation/suite-532d58700/outcomes-private.json')
+baseline = json.loads(baseline_path.read_text())
+changes = []
+for node in sorted(baseline.keys() | reports.results.keys()):
+    old = baseline.get(node)
+    new = reports.results.get(node)
+    if old is not None:
+        old = {k: old[k] for k in ['outcome', 'reason']}
+    if old != new:
+        changes.append({'nodeid': node, 'before': old, 'after': new})
+(out / 'outcomes-private.json').write_text(json.dumps(reports.results, indent=2) + '\n')
+(out / 'transitions-private.json').write_text(json.dumps(changes, indent=2) + '\n')
+identities = sorted(p.name for p in out.glob('identity-gw*.json'))
+summary = {**pin, 'pytest_exitstatus': code, 'seconds': time.monotonic() - start,
+           'counts': reports.counts, 'workers_reporting': sorted(reports.workers),
+           'worker_identity_files': identities, 'baseline_transition_count': len(changes),
+           'baseline': '532d58700fa46e52a0b390198604eca1dc4de00e',
+           'skip_reasons': dict(Counter(r['reason'] for r in reports.results.values() if r['outcome'] == 'skipped')),
+           'xpass_cases': [n for n, r in reports.results.items() if r['outcome'] == 'xpassed']}
+gate_ok = code == 0 and len(identities) == 16 and len(reports.workers) == 16 and not changes
+summary['local_suite_passed'] = gate_ok
+summary['release_gate_passed'] = False
+(out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+if not gate_ok:
+    print('Release gate refused: review pytest result, identities and baseline transitions before any tag.', file=sys.stderr)
+    raise SystemExit(code or 1)
+# pytest.main returned and all xdist workers have shut down before this wait.
+# No test rerun or Git mutation occurs during the read-only exact-run barrier.
+from ci_gate import wait_for_success
+try:
+    summary['ci'] = wait_for_success(os.environ['RELEASE_CI_RUN_ID'], pin['sha'], out,
+                                    timeout=int(os.environ.get('RELEASE_CI_WAIT_SECONDS', '10800')))
+    assert_identity()
+except Exception as error:
+    summary['ci_gate_error'] = str(error)
+    (out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+    raise
+summary['release_gate_passed'] = True
+(out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+(out / 'completion.json').write_text(json.dumps({'state': 'passed', 'sha': pin['sha'],
+                                                  'ci_run_id': int(os.environ['RELEASE_CI_RUN_ID'])}) + '\n')
+raise SystemExit(0)

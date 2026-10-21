@@ -1,0 +1,366 @@
+# v0.16.0
+
+Changes since v0.15.0 (`cb44e3522a2426ba03431ca9a218cc63fe03f6c9`,
+2026-10-15), through reviewed development
+`acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c`.
+
+This release completes the bounded framework backlog campaign and includes the
+country corrections merged before it. It changes several index and error
+contracts, restores observations previously lost during parsing or assembly,
+and protects cache and provenance boundaries. **Expect harmonized caches to
+rebuild on first access.** Raw L1 source blobs remain reusable.
+
+The [migration note](../migration/v0.16.0.md) covers the index, metadata and
+exception changes. Validation covers the implementation and its documented
+boundaries; it is not blanket scientific approval of every table.
+
+## Feature indexes, pooled quantities and sampling metadata
+
+**`plot_labor` and `plot_inputs` now assemble on canonical indexes.**
+`plot_labor` retains stage, worker, source and season distinctions;
+`plot_inputs` retains input, crop, unit and season. Country-native results stay
+unchanged. Missing plot/stage/worker dimensions use the structural
+`Farm-level` sentinel: it means the survey did not resolve that dimension,
+not an observed plot or a total over every stage. Household-grain EHCVM inputs
+remain available with that qualification. `crop` is aligned to canonical `j`.
+[PR #1126](https://github.com/ligon/LSMS_Library/pull/1126).
+
+**`community_prices` retains variety, visit and observation identity.** Its
+canonical index is now `(t, v, j, u, variety, visit, obs)`, with `country`
+prepended by Feature. This preserves observations formerly selected away in
+Mali, Niger and Tanzania; other countries receive documented missing-dimension
+sentinels. Niger's exact repeated entries are removed without discarding
+conflicting observations. Consumers must choose any later aggregation
+explicitly. [PR #1086](https://github.com/ligon/LSMS_Library/pull/1086).
+
+**Plot-input calculations retain country identity.** `seed_kg` and
+`nitrogen_kg` return `(country, t, i, plot_id)` whenever a country index level
+or column is present. `fertilizer_rate` retains country through both mass and
+area aggregation and returns country-keyed plot or parcel rates. Identical
+local IDs in different countries no longer become one summed plot or rate.
+The rule includes one labeled country and empty results; ordinary country-less
+calls keep their existing shape. Null country labels are refused before
+filtering. Rates require country on both inputs or neither, with no implicit
+broadcasting. Index labels take precedence over a redundant column.
+[PR #1164](https://github.com/ligon/LSMS_Library/pull/1164),
+[PR #1165](https://github.com/ligon/LSMS_Library/pull/1165).
+
+**Declared unit masses reach the agriculture consumers.** Harvest conversion,
+seed mass, nitrogen mass and sold-quantity conversion for
+`median_price_valuation` reuse country declarations carried in
+`attrs['unit_kg']`; explicit overrides and existing refusal/precedence rules
+remain available. The measured Ethiopia valuation pool gains 706 usable
+Quintal sale observations; four further positive-quantity rows remain excluded
+for nonpositive sale values. The change does not prescribe a different price
+pool. [PR #1092](https://github.com/ligon/LSMS_Library/pull/1092),
+[PR #1154](https://github.com/ligon/LSMS_Library/pull/1154).
+
+Nitrogen conversion adds cited nominal shares for Ethiopia NPS (0.19) and
+Malawi D Compound (0.08). Organic inputs remain unmatched, counted and loud
+rather than receiving an invented nutrient share. `nutrient='N'` and
+`nutrient='product'` remain distinct rate bases.
+[PR #1112](https://github.com/ligon/LSMS_Library/pull/1112).
+
+**Sampling declarations are exposed through `Country.sampling` and frame
+metadata.** The immutable records retain evidence and distinguish household
+continuity from cluster-ID continuity at each wave boundary. A multi-wave
+Country result carrying `v` warns when recorded boundaries have incompatible
+cluster identities; `LSMS_CLUSTER_STRICT=1` raises instead. This does not build
+a cluster crosswalk, relabel `v`, revise survey weights or complete design
+curation for every country.
+[PR #1137](https://github.com/ligon/LSMS_Library/pull/1137).
+
+## Country data and unit corrections
+
+Counts below come from each cited PR's own before/after comparison; they are
+not a single measured v0.15.0-to-v0.16.0 corpus delta.
+
+- **GhanaLSS:** recover GLSS1/2 sample households so their food rows acquire
+  cluster keys, and distinguish blank raw unit codes from known units.
+  Feature food assembly no longer loses the previously measured 13,472
+  null-key rows. The GLSS7 own-produce screener drops only an explicit No;
+  blank-screen records with real answers remain.
+  [PR #1151](https://github.com/ligon/LSMS_Library/pull/1151).
+- **Nigeria:** decode food units per wave and round, including the different
+  W1 post-planting/post-harvest vocabularies and W2's centilitres. Missing food
+  units become `Unknown`, not the inference-eligible literal `None`.
+  Agriculture unit codes no longer leak float-string spellings; missing units
+  on recorded quantities are distinguished from rows with no quantity.
+  [PR #1023](https://github.com/ligon/LSMS_Library/pull/1023),
+  [PR #1046](https://github.com/ligon/LSMS_Library/pull/1046),
+  [PR #1094](https://github.com/ligon/LSMS_Library/pull/1094).
+- **Nigeria W1 post-harvest container weights:** the ruled survey-card
+  conversion applies only to sized-container rows with `0 < Quantity < 1`,
+  through a named derivation and the `survey_kg` rung. Quantities at least one
+  remain on inference, whose reference pool consequently changes. Litre codes
+  are excluded from this weight rule. This is not a new sampling-weight
+  adjustment or a general endorsement of container inference.
+  [PR #1152](https://github.com/ligon/LSMS_Library/pull/1152).
+- **GhanaLSS and Malawi:** questionnaire-based unit repairs replace unsupported
+  missing-unit spellings. GhanaLSS chicken, egg and fresh-coconut count records
+  receive `Single`. A read-time `no_kg_factor.yml` declaration can prohibit
+  inferred kilograms for specified item/unit cells while preserving reported
+  and explicit-metric masses; GhanaLSS eggs use it. Nutrition's separate
+  declaration-bypass limitation remains below.
+  [PR #1076](https://github.com/ligon/LSMS_Library/pull/1076).
+- **EthiopiaRHS:** normalize 1994-97 unit codes and preserve measured rows with
+  missing units as `Unknown`, restoring 212 rows without manufacturing inferred
+  kilograms. The 1989 unit decode remains incomplete; documenting code 1 as a
+  quintal does not mean the full old code list has been implemented.
+  [PR #1067](https://github.com/ligon/LSMS_Library/pull/1067).
+- **Dates:** repair Nigeria W3 labeled-month parsing and W4's accidentally
+  stored bound-method strings, recovering 9,262 and 10,236 dated rows in their
+  respective cold comparisons. Ethiopia's `##N/A##` timestamp marker becomes
+  null, allowing the existing completeness selector to recover one valid
+  dated record. Missing timestamps are not replaced by a different visit.
+  [PR #1094](https://github.com/ligon/LSMS_Library/pull/1094),
+  [PR #1053](https://github.com/ligon/LSMS_Library/pull/1053).
+- **Burkina Faso:** wire the distributed 2018-19 cluster coordinates, populated
+  for 555 of 585 clusters. The held 2014 and 2021-22 files do not supply those
+  cluster coordinates; they are not filled by carrying another wave forward.
+  [PR #1054](https://github.com/ligon/LSMS_Library/pull/1054).
+
+**Explicit metric labels parse whole number tokens.** Decimal commas such as
+`1,5 L` and `0,9 kg` no longer match only the digits after the comma;
+`1,500 kg` is a thousands-separated mass. Existing fractions, range endpoints,
+inner multiplier sizes and unit boundaries are retained, and malformed or
+ambiguous tokens are refused. The measured repair affects 945 quantity rows
+and 783 price rows across Senegal, Benin and CotedIvoire.
+[PR #1156](https://github.com/ligon/LSMS_Library/pull/1156).
+
+**Kinship preserves uncertainty in individual components.** Labels such as
+"relative of head or spouse" no longer assert consanguinity when only
+Generation and Distance are determined; Affinity becomes missing. Fully
+ambiguous Guyana combinations become unknown in every component. Filters on
+`Affinity == 'consanguineal'` therefore change membership. Separately,
+case-equivalent lookup keys are consolidated without changing their tuples.
+[PR #1104](https://github.com/ligon/LSMS_Library/pull/1104),
+[PR #1020](https://github.com/ligon/LSMS_Library/pull/1020).
+
+## Mapping, errors and metadata contracts
+
+A categorical-mapping level can contain `categorical_mapping.org`,
+`categorical_mapping/*.org`, or both. Tables are located by `#+name:`, not
+filename; wave, country and global levels resolve in that order. Overrides
+remain whole-table. A duplicate declaration within a level raises
+`CategoricalMappingConflictError`; a declared empty table raises
+`EmptyCategoricalTableError` instead of silently inheriting a lower-level
+mapping. Requesting no value column raises `TypeError`. Explicit `idxvars=`
+and `#+key:` metadata share one key resolver rather than several positional
+choices. The broader Status/Notes vocabulary remains deferred.
+[PR #1018](https://github.com/ligon/LSMS_Library/pull/1018),
+[PR #1024](https://github.com/ligon/LSMS_Library/pull/1024),
+[PR #1105](https://github.com/ligon/LSMS_Library/pull/1105).
+
+Explicit `units=` modes now raise `UnitsUnavailableError` when their required
+Price, Expenditure or Quantity columns are unavailable, instead of silently
+returning an empty frame. It is a `ValueError` subclass. Feature assembly
+reports excluded countries in `attrs['units_unavailable']` and an aggregated
+warning. `labels_unmatched` also survives Feature assembly as a country-keyed
+mapping, including a one-country result; callers expecting a flat report must
+update. `Price` is documented as a country-provided field, not an
+independent benchmark guaranteed to differ from Expenditure/Quantity.
+[PR #1029](https://github.com/ligon/LSMS_Library/pull/1029).
+
+`Country` rejects existing but unregistered directories without
+`_/data_scheme.yml`. Acquisition/scaffold callers can opt in with
+`allow_unregistered=True`; malformed path spellings are not ordinary country
+names. [PR #1098](https://github.com/ligon/LSMS_Library/pull/1098).
+
+Residual-unit guards now distinguish an accepted but unnamed code from an
+actual missing-unit sentinel: the former can still receive a disclosed
+inferred kg factor, while the latter is excluded from that inference.
+Static guards cover several ways country code can mint unit spellings; they
+do not prove every raw label or computed spelling has been curated.
+[PR #1028](https://github.com/ligon/LSMS_Library/pull/1028).
+
+## Readers, dates and cache behavior
+
+The reader keeps unreadable non-Stata binaries out of permissive text
+fallbacks, tries SPSS readers only for SPSS evidence, and preserves error
+causes. A non-parquet file claiming a `.parquet` suffix raises
+`ParquetFormatError`. Narrow cp1252 re-decoding repairs eligible pre-118 Stata
+strings, including the Uganda shocks punctuation corrected in the native
+Windows expectation; this is not a universal encoding detector.
+Sidecar-less raw files inside the country configuration tree, outside config
+`_/` directories, raise `InTreeSourceError` unless the caller uses the
+explicit acquisition/session opt-in.
+[PR #1019](https://github.com/ligon/LSMS_Library/pull/1019),
+[PR #1105](https://github.com/ligon/LSMS_Library/pull/1105),
+[PR #1153](https://github.com/ligon/LSMS_Library/pull/1153).
+
+Datetime handling no longer chooses one format for an entire mixed-wave
+column and loses the differently formatted observations. The read fallback
+settles numeric day/month order per wave only where evidence permits; an
+undecidable order is null with a warning. Mixed timezone failures are also
+reported. The shared build-time parser and cached datetime-audit metadata
+begin the migration away from string dates, including Mali and Tanzania;
+warm reads replay the recorded audit. Time-of-day policy and the remaining
+migration are not all resolved.
+[PR #1025](https://github.com/ligon/LSMS_Library/pull/1025),
+[PR #1105](https://github.com/ligon/LSMS_Library/pull/1105).
+
+Cache read gates are separated from content-build fingerprints, so edits to
+those mechanisms no longer invalidate data by themselves. Builds record
+secondary-source drops at both parquet tiers; degraded results warn, and the
+cache can rebuild once a missing source is available through the checked fast
+tiers. Outage/probe limitations remain explicit. Assumed-fresh reads recover
+only a disappearing file by falling through to the ordinary path; corruption,
+permissions, mapping and source failures are not suppressed.
+[PR #1027](https://github.com/ligon/LSMS_Library/pull/1027),
+[PR #1052](https://github.com/ligon/LSMS_Library/pull/1052),
+[PR #1162](https://github.com/ligon/LSMS_Library/pull/1162).
+
+The make backend builds a `materialize: make` table from its waves when no
+country builder exists. A known strict wave subset whose waves do not declare
+the table now returns the declared typed empty frame consistently across
+cache states, including the default backend, while preserving usable caches
+for other waves. Unknown waves/tables, genuine builders and real source
+failures keep their errors.
+[PR #1105](https://github.com/ligon/LSMS_Library/pull/1105),
+[PR #1155](https://github.com/ligon/LSMS_Library/pull/1155).
+
+Dead country-level food-derived compilers and their uncalled unit-label
+writers/readers are retired where verified. The live API derives food tables
+from canonical `food_acquired`, and generated `unitlabels.csv` side effects
+are removed. This does not complete every dangling legacy reference in #218
+or decide every country-builder authority case in #788.
+[PR #1021](https://github.com/ligon/LSMS_Library/pull/1021),
+[PR #1026](https://github.com/ligon/LSMS_Library/pull/1026).
+
+## Provenance and credentials
+
+Failed catalog resolution leaves existing SOURCE records intact and records
+the failure separately. Parse/render preserves unknown, repeated and empty
+metadata and keyword-looking notes; the primary URL is not taken from an
+unrelated link in those notes. Unsafe or contradictory rewrites fail before
+changing destination bytes.
+
+Held-release identity stays separate from the catalog's latest observation.
+Backfill records a latest-release/first-seen queue without inventing an absent
+held release; discovery can report `stale-release`. Complete successful
+acquisition updates the held record and clears the queue. A requested push
+must confirm success before stamping, while an explicit successful
+`push=False` local acquisition remains supported. These are metadata guards,
+not staging, raw-file rollback or proof that every country configuration has
+switched vintages. No bulk acquisition or shipped SOURCE backfill is part of
+this release. [PR #1117](https://github.com/ligon/LSMS_Library/pull/1117),
+[PR #1163](https://github.com/ligon/LSMS_Library/pull/1163).
+
+Package import no longer copies reader credentials into the installed country
+tree. CI and test credential discovery use the user-config path and the data
+job asserts that its credential gate is open. Remaining legacy permission
+paths and DVC's own temporary-file writes mean this is not a guarantee that
+every data operation works on a read-only installation.
+[PR #1022](https://github.com/ligon/LSMS_Library/pull/1022),
+[PR #1065](https://github.com/ligon/LSMS_Library/pull/1065).
+
+## Validation, tooling and upgrade notes
+
+**Expect a corpus-wide cold rebuild of both harmonized parquet tiers.**
+Reader/build/mapping changes and the absent-subset repair change content
+fingerprints. Ordinary reads rebuild affected files automatically; no blanket
+cache deletion is required, and L1 raw blobs remain reusable. Read-time-only
+repairs do not remove the invalidation caused by the other changes.
+
+The Feature audit includes all three canonical farm tables and reports a
+whole positive-built country disappearing separately from conservation among
+retained countries. Warm farm checks fail named country-read errors instead
+of silently omitting them. Coverage verdicts distinguish evidenced
+`correctly-empty` from `empty-pending-machinery`, with tier-specific rules and
+no permanent exemption when rows appear later.
+[PR #1157](https://github.com/ligon/LSMS_Library/pull/1157),
+[PR #1132](https://github.com/ligon/LSMS_Library/pull/1132).
+
+The identified cache-poisoning and forced-rebuild tests use private roots;
+raw readers treat disappearance as
+unavailable rather than an ordinary data mismatch, and Uganda invariance tests
+skip an explicitly incomplete manifest while still rejecting falsely complete
+or unstamped truncated results. Nutrition invariance retains its approved
+primary hash and accepts one independently measured additional exact raw hash;
+it adds no general tolerance or fixture regeneration.
+[PR #1030](https://github.com/ligon/LSMS_Library/pull/1030),
+[PR #1147](https://github.com/ligon/LSMS_Library/pull/1147),
+[PR #1161](https://github.com/ligon/LSMS_Library/pull/1161).
+
+The validated implementation at `532d58700` passed the local suite with
+**8,851 passed, 276 skipped, nine expected failures and one non-strict
+unexpected pass**, with no failures/errors. Exact-head credentialed Linux
+[run 39533863014](https://github.com/ligon/LSMS_Library/actions/runs/39533863014)
+passed **6,388 tests**, with 2,744 skips, four expected failures and one
+non-strict unexpected pass, with no failures/errors. Native Windows cold
+builds also passed. The remote console does not enumerate every skip reason;
+these results do not turn skipped tests into passes. The merged development
+runtime/configuration/tests/build inputs were independently matched to that
+validated source, and the subsequent development code-push CI passed its unit,
+Windows and DVC jobs. Ordinary development/PR data jobs still skip by policy.
+[Final landing evidence](https://github.com/ligon/LSMS_Library/pull/1166),
+[campaign evidence](https://github.com/ligon/LSMS_Library/pull/1158).
+
+Prerelease wheel/sdist inspection verified all 11,753 tracked package payload
+files against the candidate source. Installed-package checks cover metadata
+and configuration discovery with network/data builds forbidden; they do not
+validate every installed-wheel microdata path or substitute for verification
+of the eventual published artifacts.
+[Packaging evidence](https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/slurm_logs/framework_campaign_2026-10-20/rate-packaging/REPORT.org).
+
+The minimum `fooddatacentral` version is **1.0.13**, which removes its broken
+top-level `tests` package. Python >=3.11 and pandas >=3.0 are unchanged.
+Savio image tooling separates clone-local state from the shared image, locks
+updates, records generations and uses relocatable console-script entrypoints;
+checkout/config identity still needs to be set explicitly.
+[PR #1097](https://github.com/ligon/LSMS_Library/pull/1097),
+[PR #1017](https://github.com/ligon/LSMS_Library/pull/1017).
+
+The workflow adds nightly development testing, merge-group support and unit
+skip summaries. **It does not currently enforce credentialed data tests on
+ordinary development PRs.** The proposed enforcement/ruleset change remains
+unapplied, and the personal repository cannot use the intended merge queue.
+Manual credentialed runs are release evidence, not a substitute for an
+eligible required PR check. [PR #1049](https://github.com/ligon/LSMS_Library/pull/1049),
+[#932](https://github.com/ligon/LSMS_Library/issues/932).
+
+## Remaining data and scientific limits
+
+The matched 549-request cold corpus and sixteen-feature audits compared
+campaign-start development `976fc840d` (already containing the older
+post-v0.15.0 merges) with `852ac2bfc` (the original five campaign fixes).
+They were not a full cold v0.15.0-to-final-v0.16.0 counterfactual. Later scoped
+farm/pooled checks and the final `532d58700` suites validate the follow-up
+increments separately. Both matched corpora retain **530 successful requests
+out of 549**, with the same 19 documented source/wiring gaps: two Armenian requests, eleven
+Nepalese requests and six declared but unwired Peru requests. The cross-country
+audit retains the known Peru errors and five tenure findings
+([#602](https://github.com/ligon/LSMS_Library/issues/602)). EthiopiaRHS's coarse
+crop table remains a visible exclusion, not a newly accepted plot-grain
+result. These checks are not an all-green or universally complete corpus claim.
+[Corpus review](https://github.com/ligon/LSMS_Library/blob/acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c/slurm_logs/framework_campaign_2026-10-20/contracts/corpus-review.org).
+
+Existing scientific/source choices remain visible: GhanaLSS nutrition bypasses
+the egg no-inferred-kg declaration
+([#1072](https://github.com/ligon/LSMS_Library/issues/1072)); EthiopiaRHS 1989
+unit decoding remains incomplete
+([#1044](https://github.com/ligon/LSMS_Library/issues/1044)); fertilizer product
+identity, units, organic quantities and parcel/plot interpretation remain
+separate from country identity
+([#1106](https://github.com/ligon/LSMS_Library/issues/1106)-[#1111](https://github.com/ligon/LSMS_Library/issues/1111)).
+The old Malawi parcel-mode no-op docstring is contradicted by the recorded
+plot/parcel results; #1160 preserves that land policy rather than resolving it.
+GLSS3 own-produce valuation and value-only native-unit price behavior also
+remain separate work
+([#1130](https://github.com/ligon/LSMS_Library/issues/1130),
+[#1129](https://github.com/ligon/LSMS_Library/issues/1129)).
+
+Acquisition staging/retirement and configuration-vintage replacement remain
+[#1149](https://github.com/ligon/LSMS_Library/issues/1149); held metadata alone
+is not proof of a transactional raw-file upgrade. Trust-mode admission of
+unstamped country-script output and corruption-recovery policy remain
+[#778](https://github.com/ligon/LSMS_Library/issues/778) and
+[#1071](https://github.com/ligon/LSMS_Library/issues/1071), with degraded-source
+outage/probe limitations in
+[#1051](https://github.com/ligon/LSMS_Library/issues/1051). The assumed-fresh
+grain-audit replay gap remains in
+[#1066](https://github.com/ligon/LSMS_Library/issues/1066); datetime-audit replay
+does not repair that separate ledger. Existing litre-as-kg and nominal-container assumptions, unresolved date/visit
+interpretation, and other sampling, kinship, unit and source-curation decisions
+are not adjudicated by closing their implemented framework increments.
