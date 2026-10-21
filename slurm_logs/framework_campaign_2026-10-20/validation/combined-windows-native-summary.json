@@ -1,0 +1,13 @@
+{
+  "workflow_run": 39519191762,
+  "source_sha": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "job_id": 118958593557,
+  "job_conclusion": "success",
+  "native_results": [
+    "RESULT Uganda:shocks rows=14457 cols=10 waves=8 digest=0ab2ea4c79dd (60s)",
+    "RESULT Uganda:assets rows=116808 cols=1 waves=8 digest=9202ed542a14 (49s)"
+  ],
+  "log_sha256": "09f701d9883dcc448ee9eb977be88a546af06993e21bf702a9fc7ac7e50f59a6",
+  "log_private_path": "/local/job40255479/control/framework-campaign/combined-windows-native.log",
+  "linux_data_job": "still running; not described as passed"
+}
