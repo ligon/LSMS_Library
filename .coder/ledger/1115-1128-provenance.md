@@ -65,13 +65,15 @@ The old full suite did NOT finish; its progress marks are not a green full-suite
 | Exhaustive round-trip evidence | Extend shipped SOURCE census; count repeated lines as occurrences | Existing census is useful, but set-only checks cannot prove repeated-line retention |
 | Regression evidence | Existing acquisition/provenance/discovery tests + targeted adversarial controls | No served Feature table is changed; full feature/corpus rebuild is unnecessary unless measured reach reveals otherwise |
 
-## §6 Scope questions surfaced to parent
+## §6 Scope decisions surfaced to and accepted by parent
 
-No new user permission is needed for the approved code-only pair.
-The prior r1fix explicitly drafted two limitations: `add_wave` stamps before optional push, and a wrong-primary-id correction can still stamp a catalog IDNO without acquisition.
-Proposed conservative finish: only record after a complete push when `push=True`, retain successful-download semantics when `push=False`, and refuse a stamped primary-ID correction rather than invent/change held release facts.
-Known scalar repeats currently remain parse-last-win with a count-loss refusal on backfill; decide whether to preserve them in the representation here or narrow/report that residual explicitly before claiming universal losslessness.
-These checks are for the parent to align the implementation with the accepted brief, not repeated questions to the user.
+The parent read the complete ledger and authorized the bounded finish without another user question.
+`add_wave(push=True)` now records only after a complete push; `push=False` retains demonstrated complete local-download semantics.
+Stamped primary-entry corrections with held IDNO/DOI are refused instead of substituting catalog release facts.
+An existing SOURCE file stays intact through failed cross-entry acquisition, using an explicit URL override gated to the existing acquisition context and populate-cache mode.
+Known scalar occurrences are appended to the record carrier, preserving positional compatibility and historical last-nonempty accessors; unsafe rewrites explicitly refuse.
+Archive staging, overwrite/retirement, raw-file/sidecar rollback and secondary-entry release semantics remain separate residuals, especially #1149.
+The finish also preserves queued DOI/first-seen facts when a catalog observation temporarily omits metadata, and preserves additional bare body URLs as notes rather than treating all URL lines as primary boilerplate.
 
 ## Country evidence already read
 
@@ -82,4 +84,18 @@ Nigeria's held v01 nested layout and Ethiopia's held v02/replacement plot-file g
 
 ### Phase 3 verification
 
-Pending implementation and independent review.
+Runtime commit `519437658beab58471b2d754a2a7fc7abb236218` is published and executable logic is frozen; independent review remains pending.
+Documentation-only follow-up `ee11667f5fb6cc11380fe9392a65cd4e5f403b12` corrects three superseded script docstring claims; executable AST after stripping docstrings is identical to runtime519.
+Reuse stayed within the six planned source/test/generic-documentation files; no country SOURCE/CONTENTS/config file differs from base852.
+`source_census.py` verifies all 130 shipped SOURCE bytes/mtime remain unchanged, no lost information occurrences, no render instability or parsed-record drift; the exact same inputs lose five GhanaSPS secondary-source lines on baseline852.
+The 104 World Bank / 26 external records are unchanged; all 104 WB records already have held IDNO.
+The completed related suite passed 344 tests, and the two existing config-tree read/write policy modules passed 23 tests; strict API/skills/hash-input audit exited zero.
+Actual 852 code fails 17 selected parser/routing controls; exact prior613 function replay fails 13 completion/routing/held-correction controls while three previously correct paths pass.
+Complete reachability measurement moves 0/549 country hashes, 0/2139 wave hashes and 0/40 table-plus-aggregate build fingerprints.
+No frame rebuild is required by this code-only reachability result, and no served-corpus or full-suite claim is made.
+An optional broader coverage test run was interrupted with exit2 after 45 completed tests when it unexpectedly started real private food builds; it is an incomplete check, excluded from the completed passing selections.
+Its process group is fully stopped; its two private GhanaLSS L2-wave parquets are separately inventoried without frame reads.
+Acceptance limits: canonical whitespace/key ordering and list-id membership normalization remain; repeated/empty scalar conflicts can require explicit curation rather than a rewrite, including an empty URL/source with inferred nonempty accessor.
+Evidence and runnable commands: `slurm_logs/framework_campaign_2026-10-20/1115-1128/REPORT.org`, `verification.json`, `reproduce.sh`.
+Prior r1 findings addressed: repeated unknown/empty regex loss, tests tied to shipped queue state, missing-held-IDNO invention, push-before-certification, stamped primary correction, recursive leftover visibility and cross-entry pre-download SOURCE mutation.
+Nested layout/staging, rollback and secondary-entry release metadata are documented residuals; no live acquisition/backfill was run.

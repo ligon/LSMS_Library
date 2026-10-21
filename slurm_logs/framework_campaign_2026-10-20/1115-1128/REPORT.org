@@ -1,0 +1,132 @@
+#+TITLE: GH #1115 / #1128 provenance implementation
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Frozen implementation
+Runtime commit: =519437658beab58471b2d754a2a7fc7abb236218=, published by the SuCoder hook.
+Follow-up documentation-only correction: =ee11667f5fb6cc11380fe9392a65cd4e5f403b12=, also published.
+The correction removes superseded comments about primary-entry overrides; executable AST after stripping docstrings is exactly identical to runtime519.
+Base: =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+Branch: =fix/1115-1128-provenance-40255479=.
+Status: ready for independent review; this producer report is not an independent approval.
+No GitHub push, PR, merge, release, live backfill or real acquisition was performed.
+
+The runtime commit changes exactly six files:
+- =lsms_library/provenance.py=
+- =lsms_library/data_access.py=
+- =scripts/backfill_wave_provenance.py=
+- =tests/test_wave_provenance.py=
+- =AGENTS.md= (=CLAUDE.md= remains its symlink)
+- =.claude/skills/add-wave/SKILL.md=
+
+* Reuse and authority
+The substantive implementation from =origin/fix/1128-1115-provenance-latest= at =613611578= was ported, preserving that branch unchanged.
+The port reuses =df2d74208=, =a3cc1fb0c=, =a731c52b4= and generic guidance through =613611578=.
+The runtime commit credits the original Claude Opus 5.5 implementation and this GPT-6 finish.
+It excludes all prior shipped SOURCE edits, placeholder cleanups, live queue stamping, country CONTENTS changes and unrelated stale merge ancestry.
+The separate planning ledger was committed as =4f7394ce90c2c31822934a9495fc5aa8cf1b4739= before implementation.
+
+Complete #1115/#1128 issue and comment reads, #1114's held-release ruling, the prior r1 VERDICT.md and r1fix REPORT.md were reconciled before edits.
+The owner's 2026-10-20 ruling controls: backfill never supplies a held IDNO from catalog metadata alone; an absent held release stays absent and is reported as =release-unknown=.
+Only demonstrated acquisition may stamp a held release.
+
+* Behavior and boundaries
+=provenance.py:221,245,410,490= share primary-URL selection between parsing and preserved prose.
+Only explicit =CATALOG_URL= or the body preceding metadata supplies the primary URL.
+Secondary metadata and note URLs cannot route acquisition.
+Unknown keys retain every value, including repeated and empty occurrences; keyword-looking note lines and paragraph breaks survive.
+Only one occurrence of the chosen bare primary URL is boilerplate; additional bare URLs, even a repeated primary URL, remain notes.
+The no-URL placeholder is idempotent and is removed from notes where an older writer re-ingested it.
+
+Known scalar accessors keep their historical last-nonempty value.
+The appended =scalar_keywords= field retains repeated known scalar occurrences and explicit empty values for direct parse/render.
+Changing a scalar without reconciling its retained occurrences raises an explicit ValueError before SOURCE bytes are written.
+A backfill reconstruction that loses such occurrences is refused by its occurrence-count guard.
+This deliberately does not promise arbitrary byte-for-byte Org preservation: keyword groups render in canonical order, whitespace is normalized, list-valued =CATALOG_ID=/=CATALOG_COVERS= retain membership rather than duplicate spellings, and a legacy record may receive canonical metadata.
+An explicit empty URL/source whose accessor must infer a nonempty value cannot be rewritten automatically while retaining both meanings; it is refused rather than silently losing the empty fact.
+
+=backfill_wave_provenance.py:617,652,885= protect held IDNO/DOI, maintain latest IDNO/DOI/first-seen separately, and report missing held releases.
+Repeated observations preserve first-seen; temporarily absent catalog DOI does not erase a queued DOI.
+An existing observation survives a missing held IDNO without being promoted to a held fact.
+A stamped primary-entry correction with held IDNO or DOI is refused, rather than assigning the new entry's release from catalog metadata.
+Legacy routing corrections without a held release remain supported and receive no held IDNO.
+
+=data_access.py:1002,1562,1652,2156,2444= reuse the parser URL rule and existing actual extraction receipts.
+A requested push must confirm every expected path, not merely return the right list length; failed, partial, duplicate and exception outcomes retain SOURCE and its latest queue.
+=push=False= records only a demonstrated complete local download.
+An existing SOURCE record stays byte-identical during a failed cross-entry download; a private acquisition-only URL override selects the requested entry without overwriting held/unknown facts first.
+The override requires both =populate_cache=True= and the existing acquisition opt-in context.
+Ordinary reads keep the default path and cannot use this override.
+
+Archive staging, nested replacement, overwrite/retirement, rollback of raw files/sidecars, and secondary-entry release metadata remain separate residuals, particularly #1149.
+A partial extraction can leave files in its synthetic destination while SOURCE correctly refuses to certify the release; these metadata guards do not promise raw-file rollback.
+Same-basename old files are not overwritten and block certification.
+Recursive leftover warnings identify other names, but they do not implement a refresh procedure.
+The separate #978/#1127 acquisitions were neither run nor declared complete here.
+
+* Completed validation
+| Check | Result | Evidence |
+|-------+--------+----------|
+| Eight related provenance/acquisition/discovery/hash modules, two loadfile workers | 344 passed; one expected mocked credential warning | [[file:related-final.log]] |
+| Two existing config-tree read/write policy modules | 23 passed | [[file:policy-controls.log]] |
+| Strict API/skill/hash-input audit | exit 0 | [[file:api-audit.log]] |
+| Actual frozen 852 parser/routing negative control | 17 failed as expected | [[file:negative-base.log]] |
+| Exact 613 function replay over current helpers | 13 failed, 3 passed as expected | [[file:negative-prior.log]] |
+| Read-only shipped SOURCE census | 130/130 inputs unchanged; no information loss, instability or parsed-record drift | [[file:source-census-patched.json]] |
+| Complete hash reach | 0/549 country, 0/2139 wave, 0/40 table-plus-aggregate build fingerprints moved | [[file:hash-comparison.json]] |
+
+The related selection is =test_wave_provenance.py test_acquisition_source_validation.py test_capability.py test_catalog.py test_data_access.py test_provenance.py test_repository_discovery.py test_build_transform_hash.py=.
+The policy selection is =test_gh831_intree_source_policy.py test_gh831_no_runtime_writes_into_config_tree.py=.
+All ran with the image Python, exact worktree package/config identity, private LSMS_DATA_DIR, BLAS/OMP/MKL/build workers 1 and CPU affinity within 12-15.
+No full-suite or new served-corpus claim is made.
+
+The actual-base negative control changes only a collection compatibility constant absent at 852; no baseline function is patched.
+The prior-function replay AST-loads exact =add_wave=, =populate_and_push=, =_read_source_url= and selected backfill =main= definitions from 613, using live current helper globals so test mocks remain effective.
+It isolates false certification, premature SOURCE rewrites and held-release correction; it is explicitly not an entire prior-code checkout comparison.
+See [[file:negative_controls.py]].
+The first prior-function prototype incorrectly copied globals before test mocks and was corrected before the retained final negative-prior log; it is not counted as evidence.
+Earlier targeted/related logs retain the corrected fixture failures and the trailing-empty-scalar bug discovered during implementation; the completed final runs above supersede them.
+
+* Shipped SOURCE evidence
+The census is mechanical parse/render only; it does not reinterpret holdings or call catalogs.
+All 130 input SHA256s match the untouched base, and each read checks input size, mtime and bytes again after rendering in memory.
+There are 104 World Bank records and 26 external records; none of the 104 lacks a held IDNO.
+Baseline loses five GhanaSPS/2017-18 secondary-source line occurrences and changes that parsed record; the patch loses none.
+Both render outputs become stable after one canonical render.
+Six patched canonical renders differ from the shipped source text because the prior placeholder cleanup commits were deliberately excluded; none is written.
+Their identities and input hashes are in [[file:source-census-patched.json]], with baseline in [[file:source-census-base.json]].
+
+GhanaSPS CONTENTS records 2017-18's mixed vintage: ten Harvard Dataverse CC0 additions coexist with the original extract under different terms.
+Its five secondary-source lines are recorded facts, not an alternate primary URL.
+The live TODO entries were read.
+Nepal CONTENTS has a retained internal contradiction: its top says "2003-04 (NLSS II) -- WB catalog 1000", while its own BID/caveat says NLSS II is 74 and NLSS III is 1000.
+No country file was changed to resolve that contradiction in this code-only task.
+The absence of NSO-hosted microdata remains separate from known provenance.
+
+* Incomplete optional check
+The optional command below was interrupted with exit 2 after 45 completed tests when the coverage module began an unrelated real private food build.
+That progress is not a completed passing check and is excluded from the 344+23 results.
+Process group 3399372 received SIGINT; a later process-table check found no remaining group members.
+
+#+begin_src sh
+# Same exact worktree/private data environment as the completed tests.
+taskset -c 13 /local/job40255479/venv_img/bin/python -m pytest -q \
+  tests/test_coverage_matrix.py tests/test_gh831_intree_source_policy.py \
+  tests/test_gh831_no_runtime_writes_into_config_tree.py
+#+end_src
+
+The private root contains exactly two L2-wave parquets from that incomplete run, GhanaLSS food_acquired for 1987-88 and 1988-89.
+They were inventoried without reading their frames and are not validation evidence for served data.
+See [[file:coverage-policy-interrupted.log]] and [[file:optional-private-cache.json]].
+No original corpus/shared L2 was accessed through the API or mutated.
+
+* Reproduction and identity
+See [[file:reproduce.sh]], [[file:source_census.py]], [[file:hash_probe.py]] and [[file:negative_controls.py]].
+The JSON probes report git HEAD before the runtime commit, when the source changes were working-tree changes on the ledger commit.
+=hash-comparison.json= records the final six runtime-file SHA256s and =verification.json= ties them to the frozen runtime commit; HEAD alone is not claimed to identify that dirty probe source.
+Every tested runtime source hash matches runtime519.
+The final script hash differs only because the later independent-review documentation correction updates three docstrings; =verification.json= records both hashes and its AST-equality check.
+All other runtime/doc/test files remain byte-identical to runtime519.
+No raw household values, source data, private frame dumps or credentials are in these tracked artifacts.
+
+Sue
