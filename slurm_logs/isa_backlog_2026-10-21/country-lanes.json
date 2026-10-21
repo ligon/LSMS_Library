@@ -314,7 +314,20 @@
         "all_FCT_food_write_inputs_outputs_correct": true
       },
       "active_precode_ledger": "695b57970",
-      "active_ledger_review": "Rootread complete ledger; approved private actual origin, meaningful memory/parquet route distinctions, unchanged public DataFrame/fullattrs/legitimate reducer, explicit broad hash measurement and scoped ordinary healing."
+      "active_ledger_review": "Rootread complete ledger; approved private actual origin, meaningful memory/parquet route distinctions, unchanged public DataFrame/fullattrs/legitimate reducer, explicit broad hash measurement and scoped ordinary healing.",
+      "active_measured_working_candidate_scope": {
+        "country_API_hashes_changed": 549,
+        "country_API_hashes_evaluated": 549,
+        "framework_fingerprints_changed": 39,
+        "framework_fingerprints_evaluated": 39,
+        "declared_wave_table_hashes_changed": 1362,
+        "declared_wave_table_hashes_evaluated": 1362,
+        "registry_added_only": "lsms_library.country.Wave.food_acquired",
+        "scope_cause": "Private origin plumbing in all-table-tagged grab_data",
+        "no_exclusions_schema_bypass": true,
+        "no_corpus_rebuild": true,
+        "status": "Actual separate-source pre-rebuild working-tree measurement; final runtime commit and immutable receipts pending"
+      }
     }
   },
   "shared_lanes": {
@@ -449,7 +462,7 @@
     "six_cohort_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
     "current_head_validation_owner": "mali_lane",
     "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/framework-sixteen-review",
-    "current_head_validation_status": "Active; exact9addedproduction lines reconstruct entireactual15country.py; all6new blobs equalbfbb. No earlier PASS inherited.",
+    "current_head_validation_status": "Complete60-file terminal physical/current gate succeeded before probes:Et24 newly source-built+Uganda36 immutablecurrent. Candidate354tests passed0skip(235existing1081selection+119nonfinite keys); actual15 healthy17frames and candidate166handler controls active. No final PASS yet.",
     "eleven_increment": {
       "head": "7886f7ece49767b2357a2f559c474e0eb710561f",
       "verdict": "PASS",

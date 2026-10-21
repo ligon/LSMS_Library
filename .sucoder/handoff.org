@@ -658,7 +658,7 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 
 Sue, GPT-6. The goal remains ACTIVE; actionable country backlog work continues.
 Main development is clean at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
-Report branch =docs/isa-backlog-20261021=, previous checkpoint =752718b8d0d80603d11f103d9aa3df7a7b047234=; commit this current note with the next checkpoint.
+Report branch =docs/isa-backlog-20261021=, previous checkpoint =075e067129ae103ea1ad2991aa1cf422172cf3a8=; commit this current note with the next checkpoint.
 Campaign draft PR #1170: inventory, exact residuals, reconciliation, independent reviews and source-safe evidence.
 The detailed current records are =slurm_logs/isa_backlog_2026-10-21/{STATUS.org,country-lanes.json,reconciliation.json}=.
 
@@ -794,3 +794,9 @@ quiescent-followup-22h30.tar.gz preserves1,518files/4released roots (independent
 ** Ethiopia prerequisite extension completed -- 2026-10-21
 
 Mali reviewer completed four normal held-source Et table builds atactual15:20physicalL1source receipts,24companions (4country current/fullcoverage,10YAMLcurrent,10legithashless sample/food). New source checkoutbytes/modes/HEADclean unchanged, zero consumers; freshwarm0cachewrites. Food326456/roster126376 fullframes/attrs matchhealthyrefs; sample25914/clusters2168. A privatepostbuild harness stop used HC25528 for sample; corrected expectation only, no source/data edits. Review now reruns complete60file terminal gate before GLOBAL16 probes; no passing result inherited.
+
+** Current gate and hash-cost facts -- 2026-10-21
+
+Global16 complete60-file physical/current gate PASSED beforeprobes. Candidate354tests0skip(235categoricalselection+119nonfinitekey cases) passed. Actual15healthy17frames andcandidate166handler/context controls active; NOFINALPASSyet.
+Ug1078 working candidate pre-rebuild scope ACTUALLY549/549countryAPI,39/39framework,1362/1362declared wave-table hashes changed; registrygains onlyWave.food_acquired. No exclusions/schema changes or corpusrebuild. Rootacknowledged cost and constrained continuingwork to approved scopedUg validation; finalimmutable source/runtimecommit/receipts and independentassessment remain required. Initial14route tests13pass/1fixture setupstop usedlegitimatehashlesscache; correctedsetup uses actuallystale taggedcache, rerunpending.
+A SIXTH verified private archive, quiescent-followup-22h40.tar.gz, preserves1,292files/3released roots (Ug1078diagnosis,original1135diagnosis,Etprereqstaging),307472195bytes,SHA256=b31e587207904057b80731f8d9717a7dc3b2d2fb31520e7985d43cb7de1010c3. Sourceafter/everymember verified; launcher0600SHA=eb9268b8916494fab584314785db4456de55e5eb3c812c67d3d514524fbf3a27. Root session99564SUCCESS/CLOSED. Active1078writer/global16review/Nigeria1135counts are NOTincluded. Safe receiptprivate-evidence-durability-sixth.json.

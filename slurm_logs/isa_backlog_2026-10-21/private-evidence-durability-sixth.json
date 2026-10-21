@@ -1,0 +1,20 @@
+{
+  "archive": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-followup-22h40.tar.gz",
+  "sha256": "b31e587207904057b80731f8d9717a7dc3b2d2fb31520e7985d43cb7de1010c3",
+  "bytes": 307472195,
+  "roots": [
+    "Uganda/1078",
+    "framework1135-diagnosis",
+    "integration/framework-sixteen-Ethiopia-prereq"
+  ],
+  "verified_files": 1292,
+  "source_bytes": 1819685576,
+  "excluded_entries": 40,
+  "archive_contents_verified": true,
+  "source_after_exact": true,
+  "private_directory_owner_only": true,
+  "archive_manifest_launcher_mode": "0600",
+  "launcher": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/archive_quiescent_followup_22h40.py",
+  "launcher_sha256": "eb9268b8916494fab584314785db4456de55e5eb3c812c67d3d514524fbf3a27",
+  "limit": "Raw-source/instrument extension payloads and duplicate caches excluded. Root counts overlap prior archives. Active1078 writer/global16 review/Nigeria1135 counts not included."
+}
