@@ -67,9 +67,32 @@ sales (#820), cover keys (#660), factors and unit curation are outside scope.
 ## §6 Open questions for the human
 
 None. The standing #1041 ruling settles Ethiopia's missing-unit semantics.
-Implementation waits for the dispatcher's explicit boundary confirmation.
+The dispatcher explicitly approved the final-column-only boundary after the
+held-source diagnosis. Ledger-only commit `7c0198e2e` preceded implementation.
 
 ### Phase 3 - verification
 
-Pending implementation and private cold/warm, source-use, comparator and
-targeted-test checks. This ledger is committed before implementation.
+- `plot_inputs_for_wave` - **OK (anchored on §2-§5)**: reuses `U_UNKNOWN`;
+  only final null/whitespace-only unit payloads move. Five complete helper
+  frames match baseline after this exact replacement.
+- Public cold and fresh-process warm Ethiopia - **OK (§3/§4)**: 180,900 rows,
+  exactly 37,370 null-to-Unknown changes; all other values, keys, dtypes,
+  multiplicities and Country attrs exact. All source-use keys survive.
+  The 40,977 `Kg` rows without Quantity remain `Kg`.
+- Nitrogen - **OK (§4/§5)**: complete output and attrs exact, including the
+  unchanged total `500847.2208579673` kg N; no factor or amount inferred here.
+- Feature + healthy Uganda - **OK (§4/§5)**: full 265,116-row assembled frame
+  exact. Its sole metadata delta is the correct
+  `canonical_alignment.promoted.Ethiopia.u` count, 37,370 -> 0; every other
+  attr matches. Uganda's 84,216 rows and attrs are exact before/after.
+- Invalidation - **OK (§2/§4)**: 25/25 Ethiopia table hashes move; 0/28 Uganda
+  hashes move. All 38 private L2 parquet bytes and mtimes stay fixed through
+  the fresh-process warm proof.
+- Tests - **OK (§3/§4)**: 58 passed, zero skips/failures/errors using two
+  loadfile workers. The 14 new cases expose 8 baseline failures / 6 passes.
+- Existing Feature scanner - **OK (§4)**: 13 -> 12 warnings, zero fail/error;
+  11 normalized records exact, two removed and one added fully accounted for
+  by the former constant-u finding and the 37,370 -> 0 alignment count.
+- Evidence and limits: `slurm_logs/isa_backlog_2026-10-21/1118-Ethiopia/`.
+  Other countries' #1118 work, #820, #660, and other Ethiopia feature outputs
+  are outside this validation; no blanket corpus claim.

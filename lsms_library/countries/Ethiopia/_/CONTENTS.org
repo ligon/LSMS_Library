@@ -1370,6 +1370,20 @@ that report use without a kg; NaN for seed rows).  NO =nitrogen_kg= /
   - =Ethiopia/_/categorical_mapping.org= -- =harmonize_input= (input
     taxonomy), =harmonize_crop= (crop =j= for seed/pesticide rows).
 
+** 2026-10-21 -- Missing plot-input units use =Unknown= (GH #1118)
+
+The #1041 ruling applies even when an input has no reported amount: a missing or blank unit is =transformations.U_UNKNOWN= (=Unknown=).
+The final =plot_inputs_for_wave= build boundary now applies that rule, preserving every nonblank unit verbatim.
+This retains genuine organic and pesticide =Applied=True= observations; it does not infer a quantity or conversion factor.
+Reported =Kg= seed and fertilizer rows keep =Kg= even when their quantity is absent.
+
+Private held-source checks across all five waves found 37,370 such use-only rows among 180,900 plot-input rows: 27,261 Manure, 4,295 Compost, 2,651 Other Organic and 3,163 Pesticide.
+They previously carried null units (no blank strings occurred in the held data).
+The per-wave counts are 9,141 / 8,881 / 8,879 / 5,567 / 4,902 in chronological order.
+All source-use keys, non-unit values, row multiplicities and attributes remain unchanged.
+The section5 holder/crop purchase join still attaches only to a unique plot; this normalization does not resolve ambiguous purchase allocation.
+See =.coder/ledger/1118-ethiopia-plot-input-units.md= and the safe aggregate report under =slurm_logs/isa_backlog_2026-10-21/1118-Ethiopia/=.
+
 ** 2026-10-19 -- =transformations.nitrogen_kg= credits NPS at 0.19 (GH #867)
 
 Ruling (@ligon, 2026-10-18): NPS gets a CITED share; organic inputs a
