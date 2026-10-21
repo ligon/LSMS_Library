@@ -1,0 +1,22 @@
+{
+  "exit_code": 0,
+  "command": [
+    "/local/job40255479/venv_img/bin/python",
+    "-m",
+    "pytest",
+    "-n",
+    "1",
+    "--dist=loadfile",
+    "-q",
+    "tests/test_gh1035_nigeria_w1_stated_weights.py"
+  ],
+  "runtime_base": "6fda46bc5437758bd650cf4016f0782a124281cf",
+  "patch_sha256": "8145796ca742bb7fd0cf7230df3bd74a11aa4f1841cca620b3b6f48727149f1f",
+  "passed": 25,
+  "skipped": 0,
+  "warnings": 9,
+  "runtime_or_config_changes": false,
+  "baseline_failure": "set of shared-label quarters includes2011Q1 and2015Q3, contradicting obsolete W1-only assumption",
+  "independent_review": "pending",
+  "raw_log": "private; not committed"
+}

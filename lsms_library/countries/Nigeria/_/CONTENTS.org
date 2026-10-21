@@ -3,6 +3,36 @@
 * Food Conversion Table
 A food conversion table can be found at https://docs.google.com/spreadsheets/d/1whE_EW5x-jxrsKvYWfefdBppzp_TZhPP61bdEN-FEJ4/
 
+* food_acquired item names are decoded per QUARTER (GH #1144, 2026-10-21)
+
+The food CSVs carry numeric =item_cd= without the Stata twins' value labels.
+These codes change meaning both between waves and BETWEEN THE TWO W2 ROUNDS: the post-planting =2012Q3= still uses the older groundnut/pepper scheme, while post-harvest =2013Q1= uses the newer one.
+The food-only =harmonized_food_labels(t)= branch therefore reads the actual quarter; the no-argument resolver remains unchanged for crop and community-price codebooks.
+The separate W1 card-weight =derivation_inputs= reconstruction uses the same food quarter, so changing served item names does not strand their raw answers.
+
+*The old quarter columns were not an answer key.*
+The held W2-PP Stata dictionary says code 44 is "other nuts/seeds/pulses", 77 is leaves and 78 is other vegetables; the =2012Q3= cells instead said =Groundnuts (shelled)=, =Dry Pepper= and leaves.
+The held W2-PH dictionary says the SAME codes are shelled groundnuts, dry pepper and leaves, but the =2013Q1= cells instead said other nuts, leaves and other vegetables.
+Blindly switching to those old quarter columns would have introduced 2,135 wrong PH rows while missing 1,686 wrong PP rows.
+Those source-contradicted cells, the W2-PP groundnut/pepper detail, and eight positively used missing PH entries (45, 79, 141--146; 6,288 source rows) are now corrected from the held dictionaries.
+Preferred and Aggregate columns are unchanged.
+
+*Do not add an attribute the source did not record.*
+W1 PP/PH and W2 PP say only =Groundnuts= (2,839 retained source rows) and =Pepper= (10,446); W2 code 21 says only =Maize (shelled)= (1,425 across PP/PH).
+They are served with those native names, rather than the historical aliases' invented unshelled/fresh/on-the-cob qualifiers (approved country correction, 2026-10-21).
+W2 code 20 DOES say =maize (unshelled/on the cob)=, so its corresponding specific Preferred name is source-backed.
+An exact normalized Preferred name wins over colliding historical aliases; only the reviewed example-only =Other Spices (e.g. Maggi)= alias is otherwise used.
+These three native names are not new Aggregate buckets: an alternate-label request leaves an uncurated name intact and reports it through the ordinary label-coverage diagnostic.
+
+A known code with missing quarter curation is reported by =FoodItemDecodeWarning= and keeps its raw code; an unreviewed or ambiguous alias keeps the native name and is reported when used.
+Unknown raw codes and NaN item keys keep the existing raw/missing contract.
+An absent quarter, including W5's =2023Q3=/=2024Q1=, raises explicitly; this change adds no W5 food feature.
+
+*Inherited specificity questions, not settled here.*
+The W4-PH codebook says =Maize (On the cob)= for code 20 while its curated Preferred name adds =unshelled=, and =Milk tinned= for code 113 while its curated name adds =unsweetened=.
+Those later-wave curation choices need their own instrument check; this correction preserves them and makes no claim that every inherited qualifier is proven.
+The raw measurements and source rows remain the survey's answers; kilograms and prices still come from the existing transforms, whose label-pooled inference can move other waves after an item rename.
+
 * food_acquired acquisition sources (GH #591)
 
 The GHS-Panel food module asks total 7-day consumption of each item and then
@@ -214,6 +244,14 @@ have *no label even in the =.dta=*" holds for the post-HARVEST file only.
 MEDIUM=, =152. BASIN LARGE= (and =161. BUNDLE MEDIUM=), and all 12 rows are
 in 2015Q3 (post-planting).  Left as =other specify (13x)= here (W3 out of
 scope for #607).
+
+*Resolved 2026-10-21 (GH #1034).*  The =2015-16= column now decodes =131= as =Sack/Bag Medium=, =151= as =Basin Medium=, =152= as =Basin Large= and =161= as =Bundle Medium=, without adding kilogram factors.
+The two rounds share this column; the twelve served rows affected are all in 2015Q3 (=131= three, =151= eight, =152= one), and no wired post-harvest source uses these codes.
+The raw quantities, expenditures and row counts are unchanged.
+
+*Qualification to the correction above.*  Re-reading the held Stata metadata shows that the post-harvest TOTAL-consumption unit =s10bq2b= also carries all four labels.
+The post-harvest columns the build actually reads (=s10bq3b=, =s10bq6b=, =s10bq7b=) do not, and contribute no rows on these codes.
+Thus "no label in the post-harvest file" was too broad; it was a statement about the wired fields, not every unit column in that file.
 
 ** A blank unit code is =Unknown=, not ='None'= (GH #1041, 2026-10-18)
 
