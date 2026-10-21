@@ -2359,6 +2359,37 @@ class TestAcquiredRelease:
 class TestPreservedKnownScalars:
     """Known scalar accessors stay last-value, while round trips keep facts."""
 
+    @pytest.mark.parametrize('sources', [
+        ['worldbank', 'worldbank'], ['worldbank', 'external'],
+    ])
+    def test_source_occurrences_cannot_erase_held_catalog_identity(self, tmp_path, sources):
+        # Independent review's counterexample: retaining both source lines
+        # must not turn the held catalog id into CATALOG_ID none on render.
+        text = ('SOURCE\n\nhttps://microdata.worldbank.org/catalog/987654321\n\n'
+                '#+CATALOG_ID: 987654321\n#+CATALOG_IDNO: held-release\n'
+                + ''.join(f'#+PROVENANCE_SOURCE: {source}\n' for source in sources)
+                + '#+PROVENANCE_RECORDED: 2026-10-20\n')
+        _write_source(tmp_path, 'Example', '2020', text)
+        record = pv.parse_source_org(text, 'Example', '2020')
+        assert record.catalog_ids == ['987654321']
+        if sources[-1] != pv.SOURCE_WORLDBANK:
+            with pytest.raises(ValueError, match='explicit provenance curation'):
+                pv.write_provenance(tmp_path, record)
+            assert pv.source_org_path(tmp_path, 'Example', '2020').read_text() == text
+        else:
+            rendered = pv.render_source_org(record)
+            assert '#+CATALOG_ID: 987654321\n' in rendered
+            assert '#+CATALOG_IDNO: held-release\n' in rendered
+            assert pv.parse_source_org(rendered, 'Example', '2020') == record
+
+    def test_inconsistent_source_cannot_erase_catalog_coverage(self):
+        record = pv.parse_source_org(
+            'SOURCE\n\n#+CATALOG_ID: none\n#+CATALOG_COVERS: 123\n'
+            '#+PROVENANCE_SOURCE: external\n', 'Example', '2020')
+        assert record.covers == ['123']
+        with pytest.raises(ValueError, match='explicit provenance curation'):
+            pv.render_source_org(record)
+
     @pytest.mark.parametrize('key,values', [
         ('PROVENANCE_NOTE', ['first fact', 'second fact']),
         ('PROVENANCE_NOTE', ['same fact', 'same fact']),

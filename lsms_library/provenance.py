@@ -497,6 +497,13 @@ def render_source_org(prov: WaveProvenance) -> str:
     repeated one, an empty value as a bare ``#+KEY:`` -- and the notes are
     carried as parsed.
     """
+    if (prov.catalog_ids or prov.covers) and not prov.is_worldbank:
+        # A repeated PROVENANCE_SOURCE can leave the last-value accessor
+        # external/unknown while the record still holds catalog identity.
+        # Emitting none/unknown below would erase that identity (#1115).
+        raise ValueError(
+            "Cannot render catalog holdings or coverage without a worldbank "
+            "primary entry; explicit provenance curation is required")
     body = prov.url if prov.url else URL_PLACEHOLDER
     lines = ["SOURCE", "", body, ""]
 
