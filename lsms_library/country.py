@@ -39,6 +39,9 @@ from .local_tools import df_data_grabber, format_id, get_categorical_mapping, ge
 from .local_tools import (CATEGORICAL_KEY_ATTR, CATEGORICAL_MAPPING_DIR,
                           CATEGORICAL_MAPPING_FILE,
                           CATEGORICAL_RESERVED_COLUMNS,
+                          CategoricalKeyDeclarationError,
+                          CategoricalMappingConflictError,
+                          EmptyCategoricalTableError,
                           categorical_mapping_files,
                           load_categorical_level)
 from .local_tools import (
@@ -6291,6 +6294,9 @@ class Country:
                             "Deriving %s from food_acquired failed (%s); "
                             "falling back to legacy aggregation", name, exc)
                         derived = None
+                    except (EmptyCategoricalTableError, CategoricalMappingConflictError,
+                            CategoricalKeyDeclarationError):
+                        raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if units is not None or map_labels or valuation is not None:
                             # Caller explicitly asked for canonical units= /
@@ -6361,6 +6367,9 @@ class Country:
                             if age_cuts is not None:
                                 rc_kwargs['age_cuts'] = tuple(age_cuts)
                             derived = roster_to_characteristics(roster, **rc_kwargs)
+                    except (EmptyCategoricalTableError, CategoricalMappingConflictError,
+                            CategoricalKeyDeclarationError):
+                        raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         logger.info(
                             "Deriving %s from household_roster failed (%s); "
