@@ -1,0 +1,45 @@
+{
+  "verdict": "NEEDS_FIX",
+  "frozen_head": "9b883974a81d6ee664bbca425b7d484f0f14eb7a",
+  "finding": {
+    "severity": "high",
+    "path": "tests/test_1111_malawi_applied_kg.py",
+    "line": 149,
+    "end_line": 151,
+    "summary": "Permanent zero/null/no-Applied organic assertions reject the independently reviewed organic correction, outside the fertilizer-unit boundary",
+    "fixture_quantity": 123.0,
+    "fixture_affirmative_flag": true,
+    "correct_organic_behavior": "Reported positive Quantity, represented unit, Applied present",
+    "no_composition_attempted": true
+  },
+  "trees_at_review_release": {
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_files": 14880,
+      "content_mode_HEAD_and_clean_exact": true
+    },
+    "candidate": {
+      "head": "9b883974a81d6ee664bbca425b7d484f0f14eb7a",
+      "tracked_files": 14887,
+      "content_mode_HEAD_and_clean_exact": true
+    },
+    "organic": {
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "tracked_files": 14910,
+      "content_mode_HEAD_and_clean_exact": true
+    },
+    "writer": {
+      "head": "9b883974a81d6ee664bbca425b7d484f0f14eb7a",
+      "tracked_files": 14887,
+      "content_mode_HEAD_and_clean_exact": true
+    }
+  },
+  "candidate_tracked_manifest_SHA256": "689ad2915cc1088a3af8647bce4f3ad36abe8aaf91f57040503a8deabf3f0b70",
+  "physical_preparation_complete": true,
+  "independent_runtime_source_hash_and_scanner_proofs_completed": false,
+  "runtime_or_pytest_workers_started": 0,
+  "preparation_worker_completed": true,
+  "source_git_GH_mutations": 0,
+  "scope_limit": "Stopped at confirmed test composition blocker before independent cold/oracle/scanner/hash validation",
+  "private_9b_preparation_retained_for_followup": true
+}

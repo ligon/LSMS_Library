@@ -657,7 +657,7 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 * 2026-10-21 -- Active LSMS-ISA country backlog campaign
 
 Sue, GPT-6. Goal remains ACTIVE; country backlog work continues.
-Report branch =docs/isa-backlog-20261021=; previous checkpoint =77af7dcf6=; current record is committed with this note.
+Report branch =docs/isa-backlog-20261021=; previous checkpoint =83ec4f67e=; current record is committed with this note.
 Main =development= remains clean at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
 Campaign draft PR #1170 contains the inventory, exact residual drafts, reconciliation, reviews and source-safe evidence.
 See =slurm_logs/isa_backlog_2026-10-21/STATUS.org= and =country-lanes.json= for current paths and frozen heads.
@@ -685,47 +685,39 @@ Current Purchased/Quantity_purchased are API names whose existing bindings read 
 ** Active workers and next concrete actions
 
 Three workers beside root; do not dispatch a fourth worker.
-- =niger_lane=: completed Uganda1006 independentPASS and stopped; idle.
-  Detachedreview =/local/job40255479/worktrees/isa-review-1006-Uganda= andwriter =isa-Uganda-1006= remainfrozen at2b6cf4ccb.
-  Rootread allthree testdiffs andindependentreview; publicPR1191opened, live1006prependedreviewed-but-unmergedstatus, CI39669180447success.
-  Private =control/isa-backlog-20261021/review-1006-Uganda/=; aggregateexport =review-1006-Uganda/=.
-- =review_malawi_1109=: active READONLY eleven-fix/Burkina joint API verification atintegration7886f7ece.
-  Private =control/isa-backlog-20261021/integration/api-eleven-review/=, newphysicalprivatecaches fromquiescenttenfixdata plusBFheldL1.
-  Mustcompare Bfplot_inputs/sample/cluster fullframes+attrs to independent384references, Benin/Togo fullframes/cachebytes, Feature47212,13focusedtests/four explicitdeselections andfreshwarm0writes.
-  Initial20fullframereferencesPASS, onlytenBurkina parquets rebuilt and1509otherparquets exact; focusedtests/freshwarm/fullreceipt stillactive.
-  Don't mutate integration head until the final review completes.
-- =burkina_lane=: writer in fresh f8 =/local/job40255479/worktrees/isa-Malawi-1111=, branch =fix/1111-malawi-applied-kg-20261021=; ledgerFIRST63c2c4315.
-  Approved ONLY2010+2019drivers: declare kg for alreadyselected enumerator totals BEFORE unchanged aggregation; no rescale/helper/reducer/eligibility/otherwave/organic/seed/pesticide change.
-  Twelve actual-driver tests pass; unchanged-driver negative10fail/2pass; full cold/warm/source/Feature/hash verification active.
-  Correct measured total180,184baseline179,949candidate;169,109 is NONORGANIC subset, not f8Country total.
-  f8 retains11,075organic zero rows; this branch preserves them. Later composition withde9 must preserve de9's recovered quantities/Applied semantics.
- 235 same-source application-pair coalescences (51in2010+184in2019) preserve every positive kg contribution; no afteraggregation relabel/selector loss.
-  LiteralC4 excludes2016(noag-questionnaire sidecar) and2013(unheld questionnaire/DDI); no physical-unit change approved there.
-  Actual footprint26MalawiAPI entries=22nonderived+4derived,523other-country hashes and39framework tags exact; wave_/all.py hashing also rebuilds supporting sample.
-  Main/fresh sample frames and six cache frames exact; separate fresh warm paths make zero writes.
-  Fresh f8/candidate sample-only cold warnings match in full and order,18each; main candidate has six events.
-  Ten missing-label-set metadata bindings are a separate source count, not a one-event/one-file attribution.
-  Scope correction is additive in malawi-1111-diagnosis/SCOPE-CORRECTION.org; original receipts retained.
-  Private diagnosis =control/isa-backlog-20261021/Malawi/1111/=; source-safe export =malawi-1111-diagnosis/=.
-  Unknown602trueabsent units plus3observed unlisted seed codes remain1118, seedpurchaseunit issue1190, source-use retention1174 and composition1106 separate.
-  Next collect writerfreeze, dispatch independentreview, then root-owned separate composition validation with1175; do not mutate de9/frozenworktrees.
-- =mali_lane=: READONLY Nigeria1095 diagnosis in =/local/job40255479/worktrees/isa-Nigeria-1095=, f8 branch =fix/1095-nigeria-community-units-20261021=.
-  No fix boundary approved yet. Reproduce source C8unitloss, metricSIZE rescue/exclusions, fullpayload/round/Feature finding accounting and minimal helper scope.
-  Private =control/isa-backlog-20261021/Nigeria/1095/=.
-  Legacy W1/W2C8 CSV DVC keys are md5-dos2unix; keep bytes and rawSHA/rawMD5 plus normalized-key receipts, reuse fobj_md5 not rewritten sources.
-  Initial preparation/cold failures quarantined; require complete verified prep before dependent probes.
-  Normal Country updated_ids also needs held W2/W3 cover pages despite preload_panel_ids=False; source/panel dependencies must be staged normally, no JSON/bypass shortcut.
-  Next read diagnosis/ledger/proposal, approve minimal community-specific correction only after actual scope known.
+
+- =niger_lane= verifies the combined twelve-PR Uganda increment at frozen =55ec81b5f04aed8239128d8453aa7dd5ee0f2d25=.
+  Run the meaningful 25 scoped plus 41 supporting tests, nine complete default/Region API references and two attrition matrices against private verified inputs.
+  Private root: =control/isa-backlog-20261021/integration/uganda-twelve-review/=.
+  No result yet; keep the integration source frozen.
+- =review_malawi_1109= independently reviews Malawi1111 at =9b883974a81d6ee664bbca425b7d484f0f14eb7a= in detached =isa-review-1111-Malawi=.
+  Root found three new test assumptions pinning f8's known organic defect: zero organic Quantity, null organic u and absence of Applied.
+  These would reject composition with the reviewed organic PR1175.
+  The reviewer confirmed NEEDS_FIX and released the freeze, retaining all four source-tree receipts; no runtime proof had started.
+  Writer =burkina_lane= now removes only the five excluded-organic selection/assertion lines, retaining all fertilizer, seed, pesticide and namespace checks; bounded descendant tests/receipts are active in a fresh private sibling root.
+  Production remains the approved two-driver correction; all original fullframe standalone receipts stay intact.
+- =mali_lane= implements Nigeria1095 in =isa-Nigeria-1095=, ledger-first =f4d17e5d5= published.
+  Approved: ten exact community-only label aliases and honest reporting after metric rescue, leaving global harvest canonicalization, current drop/eligibility and size/reducer rules unchanged.
+  The literal future-label retention requirement remains an explicit residual design choice; this is partial work, never closure by silently narrowing the issue.
+  New normal empty-L2 Country builds return 136,566 prices (W4 31,757, W5 30,064), healthy Niger 46,043; full conservation/hash/scanner/warm proofs are still active.
+  Private root: =control/isa-backlog-20261021/Nigeria/1095/=.
+  Preserve CRLF sources and DVC md5-dos2unix receipts; source and panel preparation must finish successfully before dependent probes.
+
+Malawi1111 author result before the test-conflict finding: 101 tests passed; baseline10fail/2pass and late-label mutant12fail.
+Only 2010/2019 driver unit declarations change, before the unchanged additive reducer; all235 coalescences preserve source-positive contributions.
+Country180,184 becomes179,949;169,109 is the nonorganic subset, not total; f8 retains11,075 organic zero rows.
+LiteralC4 still excludes2013/2016; 26 Malawi API hashes move,523others/39framework fingerprints stay exact.
+Fresh f8/candidate sample57,118 frames/cacheframes match; eighteen full cold warning records each match in order, separate from main six event and ten source-binding counts.
+After test-only amendment and independent PASS, root must verify composition in a separate worktree with de9; do not mutate frozen standalone evidence.
 
 ** Joint validation pins and pending work
 
-Validation-only branch =isa/integration-20261021= currently frozen at =7886f7ece49767b2357a2f559c474e0eb710561f=, eleven reviewed PRs combined.
-Most recent merge1189 was clean, committed via ordinary hook and published.
-Its combined Burkina source/API check has an initial full-reference PASS; focused tests, fresh warm checks and final immutable receipts are still active.
-Do not inherit older pass scope onto the current head.
-Use physically separate inputs from quiescent completed reviews; compare full Burkina Country sample/cluster/plot_inputs and Benin/Togo Feature against independent1123references, normal stale-cache rebuild, freshwarm0writes, and focused13tests.
-It is now dispatched toreview_malawi_1109, the completedAPI9reviewer; root should stayinteractive.
-After itfinishes, integrate1191test-onlyhead andrunits meaningful66case selection againstcombinedproductioncode; do notrelabelolderproofs.
+Validation-only branch =isa/integration-20261021= currently frozen at =55ec81b5f04aed8239128d8453aa7dd5ee0f2d25=, twelve reviewed PRs combined.
+The eleven-PR head7886f7ece passed independent bounded Burkina validation:20 complete frame/attr references per process,13 focused tests,4 explicit deselections, zero warm writes across1519parquets.
+Exactly10Burkina parquets rebuilt normally;1509others and all comparator cache bytes/modes/mtimes remained exact.
+Safe exports are in =integration/api-eleven-review/=; previous9/10proofs retain their own source pins.
+The newest merge1191 was clean, committed normally and hook-published; the bounded Uganda combined-code check is active under niger_lane.
+Do not relabel older proofs as twelve-PR results.
 
 Completed independent source pins:
 - Six-fix5906e8715:266tests/0skip; exec23070; original10257launcher failed beforetests onguard assertion.
@@ -758,7 +750,12 @@ Always exactcwd/PYTHONPATH/config and realpathassert; no editableinstall or writ
 Pin numeric/build/Make threads1, boundpytestloadfileworkers≤4peragent; root/nodebudget32cores93GiB.
 All L1/L2copies private and physical; no sourceacquisition,DVCCLI,sharedcachewrite/clear/promotion,assume-fresh/hashstamp bypass or intreedata.
 Onlysource-safe aggregate evidence entersGit. Fullframes/IDs/logs live under =/local/job40255479/control/isa-backlog-20261021/=.
-Before releasing/turnover, preserve quiescentprivate scripts/logs/frame proofs to a private durable scratch archive excluding duplicateL1/L2caches; this has not been done yet.
+Completed eighteen quiescent review roots are now archived privately and verified:957files,153,526,829compressedbytes.
+Durable archive =/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-reviews-20h45.tar.gz=, SHA256=e828a78dca5b82e9863d35700ef408f475e5693c2742286c1a8ce1acb3007858=.
+Owner-only permissions verified, inherited setgid retained; full private manifest and launcher are beside it.
+Duplicate caches/raw sources excluded; archive reads verified every retained file and unchanged source receipt.
+Active task roots and writer diagnoses still need a later quiescent archive before release/turnover; do not claim they are already included.
+See private-evidence-durability.json for safe aggregate receipts.
 Original1519release manifest sourcefiles remainunchanged;16unmanifestedrawDTAseedextras excluded fromrootcohortstaging.
 A priorunitrun'sgpg-agent has sharedhomedir; private-terminationguard refused it, so leave it unmodified.
 Gitcommit hooks publishFSorigin; verifySUCODERpublished. Merges made with --no-commit thenordinarycommit publish normally.

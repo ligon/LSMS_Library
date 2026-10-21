@@ -89,7 +89,14 @@
       "approved_boundary": "Only2010+2019drivers: preserve enumerator kg numeric quantities, correct unitbefore unchangedaggregation;235application-pair coalescences; no2013/2016/sharedhelper/organic/seed/pesticide change",
       "remaining_authority": "LiteralC4 excludes2016missingquestionnaire sidecar and2013unheld questionnaire/DDI",
       "seed_purchase_unit_residual": 1190,
-      "observed_hash_footprint": "26MalawiAPI entries (22nonderived+4derived),523other-country entries and39framework fingerprints exact; supporting sample must rebuild normally"
+      "observed_hash_footprint": "26MalawiAPI entries (22nonderived+4derived),523other-country entries and39framework fingerprints exact; supporting sample must rebuild normally",
+      "active_frozen_head": "9b883974a81d6ee664bbca425b7d484f0f14eb7a",
+      "active_reviewer": "review_malawi_1109",
+      "active_review_path": "/local/job40255479/worktrees/isa-review-1111-Malawi",
+      "active_author_tests": 101,
+      "active_review_status": "NEEDS_FIX at9b: excluded-organic assertions pin known f8 bug; reviewer quiescent, author test-only descendant active",
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Malawi/1111-fix",
+      "active_initial_review_evidence": "review-1111-Malawi-initial/"
     },
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
@@ -170,7 +177,7 @@
       "active_branch": "fix/1095-nigeria-community-units-20261021",
       "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Nigeria/1095",
       "previous_issue_status": "1034PR1172 and1144stackedPR1178 independently reviewed, frozen, CIpassed; humanmerge pending",
-      "active_scope": "Read-only C8loss/units/size exclusions/healthycomparator/actual source and panel prerequisites; no fix approved"
+      "active_scope": "Approved exact ten community-only aliases and honest warning after metric rescue, preserving current drop/eligibility; literal future-label retention remains a partial residual design choice"
     },
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
@@ -251,7 +258,7 @@
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "7886f7ece49767b2357a2f559c474e0eb710561f",
+    "head": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
     "included_prs": [
       1172,
       1173,
@@ -263,9 +270,10 @@
       1182,
       1185,
       1186,
-      1189
+      1189,
+      1191
     ],
-    "status": "Eleven reviewed fixes integrated; firstnine fullAPI/testPASS andten-fix incrementalPASS retainpins; newBurkina combinedAPI verification pending",
+    "status": "Twelve reviewed PRs integrated; bounded combined Uganda66-test/full-API check active; previous proofs retain pins",
     "public_prs_merged": false,
     "unit_session": 28550,
     "unit_exit_code": 0,
@@ -283,7 +291,7 @@
     "cohort_excluded_all_country_cases": 2,
     "api_review_completed": true,
     "api_review_verdict": "PASS: nine Country calls and four Features exactly match complete frozen corrected reference frames/attrs; fresh-process warm writes zero of1519parquets",
-    "source_head_frozen": "7886f7ece49767b2357a2f559c474e0eb710561f",
+    "source_head_frozen": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
     "cohort_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "api_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "current_head_validation_completed": false,
@@ -305,8 +313,21 @@
     "six_cohort_completed": true,
     "six_cohort_session": 23070,
     "six_cohort_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
-    "current_head_validation_owner": "review_malawi_1109",
-    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/api-eleven-review",
-    "current_head_validation_status": "active; head7886f7ece must remainfrozen"
+    "current_head_validation_owner": "niger_lane",
+    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/uganda-twelve-review",
+    "current_head_validation_status": "active; head55ec81b5f must remain frozen",
+    "eleven_increment": {
+      "head": "7886f7ece49767b2357a2f559c474e0eb710561f",
+      "verdict": "PASS",
+      "tests_passed": 13,
+      "tests_deselected": 4,
+      "tests_skipped": 0,
+      "complete_frame_comparisons_per_process": 20,
+      "warm_changed_parquets": 0,
+      "parquets_checked": 1519,
+      "initial_Burkina_rebuilds": 10,
+      "initial_other_parquets_exact": 1509,
+      "evidence": "integration/api-eleven-review/"
+    }
   }
 }
