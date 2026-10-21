@@ -1,0 +1,67 @@
+#+TITLE: Independent review of Uganda nutrition exact-hash repair
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Verdict
+PASS at =98822ed1ab3a2106b3be4c3d90aa086076e32ef0=.
+No blocking findings.
+All reviewer readers/verifiers stopped; the candidate remains clean and untouched.
+Runtime/test repair is =5f571dcc4=; later test/CONTENTS wording corrections accurately refer to unmeasured fingerprints rather than unmeasured kernels.
+
+* Boundaries independently verified
+The complete fixture JSON comparison against exact852 finds exactly one new field: =var/nutrition.parquet.content_hash_variants= contains only =f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6=.
+Every old manifest field and every other entry are unchanged, including the approved primary =12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a=.
+The test checks the primary plus only that entry's optional list; it introduces no rounding, tolerance, kernel forcing or global allowance.
+All shape, columns, index names and dtype assertions precede hash acceptance.
+Missing/empty optional lists preserve exact primary behavior.
+Null primary content remains explicitly unpinned debt while structural assertions remain active.
+Explicit partial-coverage and recorded-error skips retain their existing behavior.
+The fingerprint, dtype-canonicalization and coverage helpers have identical ASTs to852.
+
+The only changed file under =lsms_library/= is the additive Uganda CONTENTS note.
+Nutrition production code, all other production modules/config/source data, the baseline generator, workflow, lock file and Windows expectations are unchanged.
+CONTENTS is explicitly excluded from build inputs; inspected producer hash evidence records zero movement across549 country,2139 wave and39 tagged table fingerprints.
+No additional corpus rebuild or full-suite claim is needed or made for this test-only allowance.
+
+* Independent execution
+Fourteen independent hermetic controls passed using actual synthetic parquet fingerprints and the real invariance test, without replacing its fingerprint function.
+They check accepted entry-local alternate, primary legacy acceptance, absent/empty/arbitrary-list rejection, other-entry isolation, four structural refusals, null debt, coverage skip and error-debt skip.
+See [[file:test_independent_variants.py]] and [[file:independent.log]].
+Their standalone pytest root does not register the repository's requires_s3 marker, producing14 PytestUnknownMarkWarning messages; no control was skipped and there was no network/data dependency.
+The15 producer controls were independently rerun and passed: [[file:producer-tests.log]].
+
+Two fresh single-thread processes independently read only the existing private fixed operands and computed the full23777x15 nutrition result.
+Each writes to its own new private review root and calls the actual candidate invariance test without using Country/Feature or a build.
+SkylakeX exactly reproduces the approved12d25 primary and passes.
+Haswell exactly reproducesf3d3 and passes.
+Adding1.0 to one numeric value is rejected under each kernel; the unmodified frame is restored only within its new private review root.
+Haswell differs from the fixed primary in8 cells of1 row, at most2 ULPs /3.637978807091713e-12; SkylakeX differs in zero cells.
+Input SHA256s, index, column order and dtypes are identical across both processes, and input hashes are rechecked after evaluation.
+See [[file:real_kernel_control.py]], [[file:real-Haswell.json]] and [[file:real-SkylakeX.json]].
+No raw survey rows or identifiers are in this review evidence.
+
+* Authority and interpretation
+Uganda CONTENTS was read before source interpretation, including the nutrition history and live TODO/WAITING/LOGBOOK caveats.
+The relevant recorded idiosyncrasy is coupled FCT/nutrition sibling writes: a recipe writes both while the framework stamps only the requested table (#788).
+That metadata issue is separate from this arithmetic-kernel counterfactual and remains open.
+The dated October15 #967 decision explicitly lifts the historical hold for23777x15 /12d25; there is no blanket ongoing hold for that approved result.
+The new CONTENTS paragraph retains that approval, nominal-container and nutrient-provenance limits and the #788 caveat.
+Its report link resolves.
+
+The failed CI run did not log its actual BLAS kernel and retained no raw parquet artifact.
+The exact Haswell reconstruction is a controlled counterfactual matching its hash, not direct observation of the runner's selected architecture.
+Both original CI logs independently show identical192 installed package/version pairs, same runner/image/Python and thread pins; that does not prove identical CPU dispatch.
+This finite acceptance recognizes the measured fingerprint only; unmeasured fingerprints still fail.
+
+* Reproduction and identity
+Interpreter: =/local/job40255479/venv_img/bin/python=.
+Cwd/PYTHONPATH: =/local/job40255479/worktrees/uganda-nutrition-cpu-hash=.
+LSMS_COUNTRIES_ROOT names the same worktree's =lsms_library/countries=.
+Each control asserts exact package/config/cwd/frozen HEAD identity and uses a new physical private data root prefixed =/local/job40255479/nutrition-repair-review-=.
+BLAS/OMP/MKL/build workers are1, with distinct CPU affinities12-15 across the four parallel processes.
+For the real controls, set OPENBLAS_CORETYPE before starting Python to Haswell or SkylakeX.
+Fixed inputs are read from =/local/job40255479/nutrition-ci-warm=; neither that root nor any original corpus/cache/source is mutated.
+Unmocked urllib networking is forbidden.
+All subprocesses exited0 before this report was frozen.
+
+Sue

@@ -1,0 +1,58 @@
+#+TITLE: Provenance independent review -- round 1 finding
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Verdict
+
+FAIL for one remaining unsafe repeated-scalar round trip at frozen HEAD =13beb2fa5dd709521efcd4f9ff63bf889fe3bac7=.
+Runtime =519437658beab58471b2d754a2a7fc7abb236218=; static review read the exact git content, then execution began only after final full-freeze authorization.
+No candidate source, git state, shipped metadata or shared cache was changed by this reviewer.
+All reviewer verifiers/readers stopped after the 20-case independent run.
+
+* Finding P2 -- repeated source classification can erase held catalog identity
+
+Location: =lsms_library/provenance.py:504= (source-dependent catalog-ID rendering), in combination with =:542= (known scalar restoration).
+
+#+begin_example
+SOURCE
+
+https://microdata.worldbank.org/catalog/987654321
+
+#+CATALOG_ID: 987654321
+#+CATALOG_IDNO: held-release
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_RECORDED: 2026-10-20
+#+end_example
+
+=parse_source_org= retains =catalog_ids=['987654321']=, =idno='held-release'= and both source-keyword occurrences, with its documented last-value accessor =source='external'=.
+=render_source_org= emits =#+CATALOG_ID: none=, retains the held IDNO and both source lines, and raises no error.
+Consequently direct =write_provenance= can erase a previously recorded held identity when asked merely to round-trip that ambiguous record.
+This input is internally contradictory; that is a reason to refuse automatic rewrite, not to silently choose which recorded identity to delete.
+The approved boundary explicitly permits preserving repeated metadata OR loudly refusing an unsafe rewrite, so no scientific/source-default invention is needed.
+The backfill has separate membership/deletion guards; this finding concerns the direct parser/render/writer contract.
+No shipped SOURCE is claimed to contain this ambiguity, and this is a pre-existing ambiguous-input behavior still outside the newly claimed repeated-scalar preservation guarantee.
+
+Suggested bounded remedy: refuse rendering/writing when the effective non-WB source conflicts with retained catalog holdings, or retain all recorded identity facts without resolving their authority.
+Add the conflicting repeated source-key case alongside its consistent repeated-worldbank control.
+Require the destination bytes remain unchanged on refusal.
+
+* Validation so far
+
+Reviewer-owned =test_independent_provenance.py=: 1 failed, 19 passed in 2.63s; no skips.
+The failing case is =test_scalar_occurrences_cannot_silently_discard_held_catalog_identity[values1]=.
+Passing controls include incomplete/partial/duplicate/wrong-path/raising push receipts for both entrypoints, complete push/no-push downloads, failed cross-entry SOURCE preservation, empty extraction, existing skipped files, repeated note metadata, consistent repeated source metadata, unknown-held-release observation preservation and queue first-seen transitions.
+Unmocked urllib access is forbidden by an autouse guard.
+The review used exact candidate cwd/PYTHONPATH/LSMS_COUNTRIES_ROOT and real-path import assertion, a private data root, mounted image Python, CPU8-11 and BLAS/build workers1.
+HEAD and tracked source were unchanged after execution.
+No related/broad module selection has yet been independently executed; producer's reported 344+23 passes are not counted as this reviewer's result.
+The optional interrupted coverage run remains excluded from all completed-pass claims.
+
+* Artifacts
+
+- =test_independent_provenance.py= -- executable synthetic controls.
+- =independent.log= / =independent.xml= -- exact first-round execution.
+- =PREFLIGHT.org= -- authority and prior-r1 review checklist.
+
+Parent and producer notified; waiting for a new frozen source or a scope disposition before further reads/tests.
+Sue.

@@ -1,0 +1,15 @@
+{
+  "all_match_producer_manifests": true,
+  "country_files_changed": [],
+  "doc_correction_executable_ast_equal": true,
+  "final_source_sha256": {
+    ".claude/skills/add-wave/SKILL.md": "440c3823cb8a08b79449ad04c5b3f92240c2c232674ec2485b3c8a4f283eca20",
+    "AGENTS.md": "c1205513db01fb743ec3c8b8c0ec69615a2bfcd9521fb7ed2d3195bd1a7e20dd",
+    "lsms_library/data_access.py": "41bfd39d6bc67e440f3b42b40dc0a88342bde388ae4f173f1b1d042c7d5011b9",
+    "lsms_library/provenance.py": "aeba0ff3e925579bd023b1549039de1e807f6e83dac84ab05a5669a3bd3bf1d6",
+    "scripts/backfill_wave_provenance.py": "dace4ac6727ae7f913e07555f35416dbb9cfab38aebc24bfc3dee1c56e34429c",
+    "tests/test_wave_provenance.py": "bd7fd68dd823fb341b1032eb9d6fa09ba64579feef1104066bcb0dc143dbe488"
+  },
+  "head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+  "original_reviewer_sha256": "0b2fe2aa74a5d0d39ce8b83ca398cd13dd8b2292bbbc74542ea26390b6e80a46"
+}

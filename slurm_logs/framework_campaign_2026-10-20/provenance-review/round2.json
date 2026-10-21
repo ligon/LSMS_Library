@@ -1,0 +1,101 @@
+{
+  "all_verifier_readers_stopped": true,
+  "base": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "candidate_tracked_tree_clean": true,
+  "census": {
+    "canonical_render_different_not_written": 6,
+    "files": 130,
+    "input_digest_map_matches_base": true,
+    "inputs_unchanged": true,
+    "lost_information_occurrences": 0,
+    "missing_held_idno": 0,
+    "parsed_record_drift": 0,
+    "source_counts": {
+      "external": 26,
+      "worldbank": 104
+    },
+    "unstable": 0
+  },
+  "correction_runtime": "dbae899fa2d9193c17010bb5f3838dd326d815fd",
+  "fingerprints": {
+    "build_fingerprints": {
+      "changed": 0,
+      "entries": 40,
+      "existing_none_entries": 0
+    },
+    "country_hashes": {
+      "changed": 0,
+      "entries": 549,
+      "existing_none_entries": 0
+    },
+    "wave_hashes": {
+      "changed": 0,
+      "entries": 2139,
+      "existing_none_entries": 30
+    }
+  },
+  "git_or_github_mutations": false,
+  "head": "44f6cd2e7d3665622d2119fe4725e5a7604a56fa",
+  "identity_manifest": "round2-identity.json",
+  "independent_validation": {
+    "final_boundary_controls": {
+      "errors": 0,
+      "failed": 0,
+      "seconds": 2.23,
+      "skipped": 0,
+      "tests": 10
+    },
+    "first_combined_execution": {
+      "claimed_single_all_green_execution": false,
+      "failure_disposition": "Reviewer assertion forbade legitimate canonical CATALOG_URL addition; corrected to original occurrence retention and only10 reviewer controls rerun; candidate unchanged",
+      "reviewer_only": {
+        "errors": 0,
+        "failed": 1,
+        "skipped": 0,
+        "tests": 10
+      },
+      "seconds": 67.19,
+      "total": {
+        "errors": 0,
+        "failed": 1,
+        "skipped": 0,
+        "tests": 380
+      },
+      "warning_count": 1
+    },
+    "original_reviewer_controls": {
+      "errors": 0,
+      "failed": 0,
+      "seconds": 2.8,
+      "skipped": 0,
+      "tests": 20
+    },
+    "repository_related_and_policy": {
+      "errors": 0,
+      "failed": 0,
+      "skipped": 0,
+      "tests": 370
+    }
+  },
+  "initial_runtime": "519437658beab58471b2d754a2a7fc7abb236218",
+  "limits": [
+    "No actual acquisition or live backfill/catalog calls",
+    "No shipped SOURCE or CONTENTS changes",
+    "Canonical metadata ordering/whitespace; list membership rather than duplicate spelling",
+    "Explicit curation for contradictory metadata",
+    "Secondary-entry release metadata remains separate",
+    "GH1149 staging/nested replacement/retirement/rollback remains separate",
+    "Acquisition metadata receipts do not prove served config switched raw vintages",
+    "Unrelated852 CI nutrition failure not attributed to this provenance source"
+  ],
+  "producer_optional_interrupted_check_counted_as_pass": false,
+  "real_country_data_frames_read": false,
+  "remaining_findings": [],
+  "reviewer": "Sue / GPT-6",
+  "reviewer_runtime_mutations": false,
+  "round1_evidence_unchanged": true,
+  "round1_finding_resolved": true,
+  "scope": "Approved code-only #1115/#1128; local scoped review, no release/full-suite/served-corpus/CI approval",
+  "shared_L2_or_corpus_API_calls": false,
+  "verdict": "PASS"
+}

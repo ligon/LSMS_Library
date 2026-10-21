@@ -1,0 +1,101 @@
+#+TITLE: Provenance independent review -- round 2
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Verdict and exact source
+
+PASS for the approved code-only #1115/#1128 scope at final frozen HEAD =44f6cd2e7d3665622d2119fe4725e5a7604a56fa=.
+Base: =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
+Initial runtime: =519437658beab58471b2d754a2a7fc7abb236218=.
+Review correction: =dbae899fa2d9193c17010bb5f3838dd326d815fd=.
+The intervening =ee11667f5fb6cc11380fe9392a65cd4e5f403b12= correction changes only backfill docstrings: independently stripped executable AST is identical to runtime519.
+Final file SHA256s match the producer's original final-source manifest overlaid with the two-file review-correction manifest; see =round2-identity.json=.
+No country SOURCE/CONTENTS file differs from base.
+Candidate HEAD and tracked tree remained unchanged and clean throughout review.
+All reviewer verifier processes/readers are stopped.
+
+This is local scoped approval, not a full-suite, served-corpus, credentialed-CI or release approval.
+The unrelated CI852 Uganda nutrition failure was not attributed to this provenance source.
+
+* Round 1 finding resolved
+
+The unchanged original reviewer file now passes all 20 controls at the final HEAD.
+Its SHA256 is still =0b2fe2aa74a5d0d39ce8b83ca398cd13dd8b2292bbbc74542ea26390b6e80a46=.
+=ROUND1.org=, =round1.json=, =independent.log= and =independent.xml= remain unchanged.
+
+The seven-line render guard refuses catalog holdings OR coverage without a consistent World Bank primary entry.
+It runs before render/write can replace the destination, so it does not choose one of the conflicting human declarations or silently erase catalog identity.
+Reviewer controls verify exact pre-existing SOURCE bytes survive refusal for effective external/unknown sources with held IDs, coverage, or both.
+Consistent duplicate World Bank declarations retain multi-ID holdings/coverage; external non-WB national release identifiers remain supported.
+No related identity/coverage loss was found within these boundaries.
+
+* Independent validation
+
+| Check | Independent result |
+|-------+--------------------|
+| Original reviewer controls, unchanged | 20 passed, 0 failed/skipped, 2.80s |
+| Related reviewer boundary controls, final assertion | 10 passed, 0 failed/skipped, 2.23s |
+| Eight related repository modules plus two config-tree policy modules | 370 passed, 0 repository failures/errors/skips, one expected mocked credential warning |
+| Fresh read-only shipped SOURCE census | 130 inputs unchanged; zero information-occurrence loss, unstable render or parsed-record drift |
+| Shipped input digest comparison to untouched base | All 130 SHA256s identical |
+| Census source classifications | 104 worldbank, 26 external; zero WB records missing held IDNO |
+| Actual complete country hashes | 0/549 changed |
+| Actual complete wave entries | 0/2139 changed; 30 existing None entries retained |
+| Table-plus-aggregate transform fingerprints | 0/40 changed |
+| Exact final runtime/doc/test SHA256 manifest | Match |
+| Backfill documentation correction executable AST | Identical |
+
+The first combined run contained 370 repository cases and 10 added reviewer cases: 379 passed and one reviewer case failed in 67.19s.
+That failure was an overly strict reviewer assertion requiring the entire metadata Counter to stay identical; the sole extra entry was the established canonical =CATALOG_URL= for an already-recorded primary body URL.
+The intended loss check was corrected to require every original keyword/value occurrence survive while allowing that canonical addition.
+Only the 10 added reviewer cases were rerun, all passing; candidate source stayed unchanged.
+The original first-round 20-case file was never edited.
+The retained =round2-related.log/xml= show that failure and all 370 repository cases passing; =round2-boundaries.log/xml= show the corrected reviewer controls.
+This is not represented as a single all-green 380-case execution.
+
+Repository selection:
+=test_wave_provenance.py test_acquisition_source_validation.py test_capability.py test_catalog.py test_data_access.py test_provenance.py test_repository_discovery.py test_build_transform_hash.py test_gh831_intree_source_policy.py test_gh831_no_runtime_writes_into_config_tree.py=.
+Three loadfile workers ran on CPUs8-10; the complete hash probe used CPU11.
+The mounted image interpreter, exact candidate cwd/PYTHONPATH/config root, explicit private data roots and BLAS/OMP/MKL/build workers 1 were used.
+Reviewer acquisition controls forbid unmocked urllib access and use only synthetic private config trees/archive contents and mocked push receipts.
+No live acquisition/catalog call, shared L2/corpus API, real frame read, source clear, GitHub write or git mutation was performed.
+
+* Authority and regression assessment
+
+The live #1114 ruling and #1128 unknown-held-release ruling are implemented: catalog metadata alone never supplies an absent held release.
+Stamped primary-entry correction is refused; latest observations remain separate and do not launder a held release.
+Queue first-seen transitions and missing catalog DOI/held-release cases retain recorded observations instead of certifying acquisition.
+Same-entry and cross-entry failure paths preserve existing SOURCE bytes.
+Both entrypoints require the complete expected path set for a requested push; empty, partial, duplicate, unrelated-path and raising receipts cannot certify a release.
+Explicit push=False still records an actual complete local download, while empty/skipped extraction cannot certify one.
+The URL rule excludes note/secondary metadata and preserves additional bare URL evidence.
+Repeated/empty unknown metadata and keyword-looking notes survive; unsafe known scalar rewrites and dependent source/holding conflicts refuse explicitly.
+
+The prior r1 shipped-queue coupling is removed: the 12 release-transition tests now construct frozen literal records, and the shipped queue assertion checks only that each present queued release differs from its held release.
+Those repository cases passed in this review; no fixed requirement that exactly two shipped queue entries exist remains.
+The backfill census counts line occurrences rather than only set membership.
+Its 130 source inputs were checked before/after for bytes, size and mtime, and its complete input digest map matches base.
+The broad optional coverage run described by the producer was interrupted with exit 2 after 45 tests; it is not counted as any completed pass here.
+The producer's 17 base failures and 13 prior-function failures are supporting inspected evidence, not additional independent executions claimed by this reviewer.
+
+* Limits retained
+
+No shipped placeholder cleanup or latest-queue stamping was performed.
+The six canonical renders differing from the shipped texts are not writes or unexplained information loss.
+Metadata ordering/whitespace are canonicalized; list-valued catalog fields preserve membership rather than duplicate spelling.
+Ambiguous known scalar/holding combinations may now require explicit curation instead of an automatic rewrite.
+Secondary held entries still lack separate release metadata.
+Flat/no-overwrite acquisition, nested source-layout replacement, retirement, raw-file/sidecar rollback and staging remain #1149.
+Successful metadata receipts do not prove an existing country's config switched the files it serves to a new vintage.
+This review neither acquires nor declares completion of #978/#1127 or any other real release refresh.
+
+* Reproduction and artifacts
+
+Set =REVIEW_FROZEN_HEAD= to =44f6cd2e7d3665622d2119fe4725e5a7604a56fa=, cwd/PYTHONPATH to the provenance worktree, LSMS_COUNTRIES_ROOT to its countries directory, an explicit new private LSMS_DATA_DIR, and all BLAS/build worker variables to1.
+Run the mounted Python against the two reviewer files, then the repository selection above with at most 4 loadfile workers.
+The existing =source_census.py= and =hash_probe.py= were rerun with outputs redirected here; the hash root includes =1115-1128-hash-= and contains no parquet before/after.
+=round2.json= contains the aggregate verdict and validation counts.
+=round2-identity.json= identifies the exact accepted source manifest.
+=round2-census.json= and =round2-hashes.json= retain the independently rerun metadata/fingerprint evidence.
+
+Sue.
