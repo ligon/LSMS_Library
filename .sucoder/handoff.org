@@ -1,6 +1,36 @@
 #+title: Handoff -- framework campaign, 2026-10-20
 
-* Final validation checkpoint -- 2026-10-20 21:18 PDT
+* Latest landing checkpoint -- all nine fixes merged
+
+Maintainer explicitly authorized1154--57+1161--65+evidence1158. No further merge approval needed for that batch.
+AllnineimplementationPRsMERGED; development1933434b84de82ac72b3921a7fd8fe5c00154754 synchronizedGitHub/local/origin.
+All14,437candidate532pathsretainmode/type/blob; onlyfourlater1157reviewreportsadded. Full193tree=23c1publicationtree.
+Source532/runtimeworkerrefsremainfrozen; privateandpubliclanding/source-equivalence.json holdsrootproof; independentcontractsSTATICPASScomplete; sixfrozenartifactslanding-independent/.
+RetargetedPRs11/39/12/9taskblobsunchanged;latestunit/windowssmokepassedbeforemerges. No failures.
+Updated778/1159/1160existingstatusheadersonly; allissuesOPEN.32implementedreleaseclosurecandidatesawaitauthorizedmasterrelease;778partial/932enforcementretained.
+Evidence1158isbeingupdatedfromdevelopment/authorizedformergebutnotyetlandedatthissnapshot.
+ImplementationpushCI39547934263at193pending/inprogress. Afterevidencemerge, observeFINALdevelopmentpushunit/smoke/native, recordactualmergeSHA/run/conclusioninPR1158body (durableliveoutcome), and reportfinish.
+ThefinaldocumentationsnapshotdoesnotclaimfutureCIpass; retrieveGHcurrentHEADandPR1158bodyforcompletedstatus.
+No needrepeatfullsuiteifruntime/test/build/auditfilesremainbyteidentical532; manualcandidateCI6388passes/local8851/nativePASS alreadycomplete.
+Nextfinish1158only, verifyfinalruntimeidentityanddevelopmentCI; noadditionalframeworkimplementationorpermissionquestion.
+No release/tag/protection/cachepromotionauthorization; releaseassessment/completehistorynotes/mastermerge remainseparate.
+Allnodeheavyworkdone; nodebilled/idle, suggest sucoder release whenpausing.
+
+* Earlier active landing -- maintainer authorized the batch, 2026-10-20 21:52 PDT
+
+Human explicitly said yes/go to merging1154--57+1161--65 and evidence1158 into development in dependency order. No repeat permission needed for that batch.
+Merged1161ac6de755e,1154047d1ff51,1155f46dc011f,1156064a7fb46,115709a413ab4; live/source/origin development09a413ab4.
+Retargeted/ready1162head dffb07604,1163head124c2436d,1164head d124c0df7 aftermergingdevelopmentintoisolatedpublicationworktreesland-{1162,1163,1164}.
+All11/39/12reviewedtaskblobsandGitHubfocuseddiffsverifiedunchanged;newunit/WindowsPRchecksrunningparallel.
+No sourceworker/ref mutations; original532 candidate frozen.
+Landingcontrollers/journalprivate control/framework-campaign/landing/; update_publications.py reproducibleandpublication-updates.json capturesheads/blobs.
+FirstAPImerge attemptwithcoder@sucoder.dev rejectedbeforeanymerge; retriedusingauthenticatedGitHubidentity+GPT-6trailer.
+Firstpublicationhelperstoppedaftercommitbecausehooksuccesslinearrivesstderr; independentlyverifiedoriginrefdffbpublished/resumedwithoutrecommit. No productionfailure orlostwork.
+Nextwait1162--64latestchecks,mergeexactheads,fetch/syncdevelopment;updateretarget1165fromlatestdev,verifyall9blobsunchanged,waitchecks/merge.
+Thenverifyallruntime/test/build/auditbytesagainst532,updatedocs1158fromdev/reportlanding+handoff,mergeauthorizedevidencePRandwatchfinaldevelopmentCI. Onlythenfinish.
+No release/tag/protection/cachepromotionauthorization; don'tclose32releasecandidatesbeforeauthorizedmasterrelease.
+
+* Earlier final validation checkpoint -- 2026-10-20 21:18 PDT
 
 Final frozen532 run39533863014 SUCCESS at exactactualcheckout; unit/smoke/native/dataallPASS.
 Data119005820593:6388passed2744skipped4xfail1xpass1219warnings5484.84s,9137collected,zero failures/errors.

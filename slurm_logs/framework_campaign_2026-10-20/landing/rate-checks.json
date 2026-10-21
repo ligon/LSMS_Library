@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-21T05:08:37.531289+00:00",
+  "prs": [
+    {
+      "pr": 1165,
+      "head": "23c1e2d52801bf206a15ec5900bca5d62e7f850f",
+      "checks": {
+        "unit-tests": {
+          "status": "completed",
+          "conclusion": "success",
+          "id": 119048654032
+        },
+        "windows-smoke": {
+          "status": "completed",
+          "conclusion": "success",
+          "id": 119048653802
+        }
+      },
+      "ready": true
+    }
+  ]
+}

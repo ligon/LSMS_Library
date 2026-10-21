@@ -1,0 +1,18 @@
+{
+  "REPORT.org": "ada4a6d2c8f3d4d61e757620b37e9750383f4a3ef8c169a956019b1230b15f17",
+  "api-author-note.txt": "9bd49f500b3345de1bda43323fc703ef78dc9814aab79d2df7258fae9bfe1197",
+  "followup-checks.json": "96785a8a43ae758b6157ce5c956ebc07c176a1d5e5bfeb9ddf188140d53ff24b",
+  "implementation-development-ci.json": "bc7576f75e37913cd37b63d33595e6a47ba9113835d0d7414337a41354ddd5cf",
+  "issue-status-updates.jsonl": "86ee9e01fe9921c67e63d8078455b9c148af9ac7c066068e35fe9eeec9b0bd81",
+  "merge_publications.py": "1ee8137c0942f0d97e2e376a445bfbc1a04568819578b515520a9411173b9ffc",
+  "merges.jsonl": "f62164e4439c8d8b9371a27dac09f18b9a8ea84723318a039db1dbd4dde366ca",
+  "publication-updates.json": "ea1b81579fae3d6726bcca24c32c5c96193b6b1f694312fd1b7dca97c0fe178f",
+  "rate-checks.json": "b230219cd9fe312a2f72d0874c87661f729d51237ab9399e2def6060b1ecb1ed",
+  "rate-publication-update.json": "da4906a0aa051b6f1cf7b5b911b2e730097163a2159d941c7f52391d083054f5",
+  "source-equivalence.json": "11336cf63e92cc97481c6f823bba6f13d4e70e909dc00baebe8c092bf7b42812",
+  "update_publications.py": "2f748f3641eb282344f2f91d146dfe8d69d88d3ef558daafc20adba795a789e0",
+  "update_rate_publication.py": "7821bf9eddba50bff5795b2bdfaf55cc97a7983baeded479e125b9a52e97df2c",
+  "verify_landing.py": "73ac8105d4d3c94f4cb15883353bb4f26461e39a58cbe82c9bf284101b4660a6",
+  "wait_pr_checks.py": "115503e754c707bd56f5a7b613002a63dc66b054be06325b27e23f11c513d570",
+  "wait_rate_checks.py": "bc145d31cf015dc618843faf3a3ccb8a8441a51d2f814337ef5c5b90b16f5725"
+}

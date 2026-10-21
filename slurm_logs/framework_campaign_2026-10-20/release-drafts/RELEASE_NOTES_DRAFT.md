@@ -1,6 +1,6 @@
 # Draft release notes: approved framework increment
 
-This is draft text for the approved framework increment at `532d58700fa46e52a0b390198604eca1dc4de00e`. It is not a complete release history since v0.15.0. The listed PRs remain open, except the merged Windows expectation repair; this draft does not announce or authorize a 0.16.0 release.
+This is draft text for the approved framework increment at `532d58700fa46e52a0b390198604eca1dc4de00e`, whose runtime/configuration/test/build files match landed development `1933434b84de82ac72b3921a7fd8fe5c00154754` exactly. It is not a complete release history since v0.15.0. All listed implementation PRs are merged into development; this draft does not announce or authorize a 0.16.0 release.
 
 ## Returned data and derived quantities
 

@@ -46,8 +46,8 @@
   "copy_files": [
     {
       "path": "RELEASE_NOTES_DRAFT.md",
-      "bytes": 4949,
-      "sha256": "5c4622980715bbf37d70756a0ce2e1c1c5f5fc181e8b5c3c43ef36b04b670414"
+      "bytes": 5056,
+      "sha256": "baa9b533d3d6e693fa34cad23a72df0b5497b063c3769244893609dc1590ecd2"
     },
     {
       "path": "MIGRATION_DRAFT.md",
@@ -56,5 +56,7 @@
     }
   ],
   "parent_review": "Corrected four nonexistent producer-report paths to committed independent evidence; draft text hashes unchanged. Final release draft updated after exact532 remote success; original producer draft remains in git history.",
-  "parent_finalization_utc": "2026-10-21T04:19:11.511694+00:00"
+  "parent_finalization_utc": "2026-10-21T05:11:19.285555+00:00",
+  "landed_implementation_sha": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+  "all_listed_implementation_prs_merged": true
 }
