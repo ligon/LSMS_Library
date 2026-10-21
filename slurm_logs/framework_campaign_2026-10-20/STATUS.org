@@ -6,7 +6,7 @@
 The maintainer approved Windows CI repair and five additional framework issues: #1143, #1093, #1099, #1124 and #1125.
 All five implementations passed independent review and are combined at frozen =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
 Subsequent approved cache, provenance, pooled-reducer and fertilizer-rate work is also implemented and independently reviewed.
-The latest frozen combined source is =532d58700fa46e52a0b390198604eca1dc4de00e=; its local full suite, independent review, packaging and native Windows pass; credentialed GitHub Linux remains running.
+The latest frozen combined source is =532d58700fa46e52a0b390198604eca1dc4de00e=; its local full suite, independent review, packaging, native Windows and credentialed GitHub Linux all pass.
 Implementation PRs #1154--#1157 and #1161--#1165 are open; Windows #1153 alone has explicit merge authorization and is merged.
 No release has been requested or attempted.
 
@@ -206,7 +206,7 @@ Every549/2139/39 fingerprint and the private physical cache/source identities re
 Existing #1110 is explicitly retained: Malawi's33402 plot/11622 parcel results contradict the old function docstring's no-op claim, as already documented in CONTENTS; Uganda remains0/509. Both functions reproduce the counts.
 Draft [[https://github.com/ligon/LSMS_Library/pull/1165][PR #1165]] uses frozen4cab as its comparison base, with all nine published file blobs verified against reviewed532. After the earlier PRs land, update from development and retarget; do not merge into the comparison base.
 A separate immutable =framework-rate= integration worktree points at that same532 source for parallel full-suite validation, with a new1519-file physical L2 copy and sixteen pinned loadfile workers. The final run passes8851/276skipped/9xfail/1xpass,1222warnings,zero failures/errors or credential skips in736.35seconds. All87 added cases pass; all9050 existing outcomes/reasons match4cab exactly, including the directly observed Pakistan XPASS. Source stays clean with no in-tree country parquet. [[file:rate-validation/REPORT.org][Final full-suite report]].
-New [[https://github.com/ligon/LSMS_Library/actions/runs/39533863014][manual CI39533863014]] runs exact532: unit, Windows smoke, native Windows, credential gate and Uganda build pass; credentialed Linux remains running. Native digests and row/wave counts match; [[file:rate-validation/windows-native-summary.json][native evidence]].
+New [[https://github.com/ligon/LSMS_Library/actions/runs/39533863014][manual CI39533863014]] runs exact532: unit, Windows smoke, native Windows, credential gate, Uganda build and credentialed Linux full suite all pass. Native digests and row/wave counts match; [[file:rate-validation/windows-native-summary.json][native evidence]].
 The4cab evidence and run39531148624 remain an exact earlier-batch control, never a claim about the later rate fix.
 The final-source packaging dry-run passes: both archives contain all11753 tracked package files with exact bytes, version0.15.0.post396.dev0+532d58700, and installed config discovery passes with network/data builds forbidden. All processes stopped and worktree clean. [[file:rate-packaging/REPORT.org][Final-source packaging]]. No release/tag/shared environment change.
 No further merge or release authorization has arrived.
@@ -219,7 +219,7 @@ The credential gate and Uganda build passed; no runtime credential-failure/skip 
 Remote console output does not enumerate every skip reason, so the entire remote skip population is not claimed individually adjudicated.
 The actual runner BLAS kernel remains unobserved.
 [[file:ci-followup-4cab/REPORT.org][Exact-head reconciliation]], [[file:ci-followup-4cab/verification.json][aggregate evidence and private-log identity]].
-These results cover4cab, before #1160; the distinct final532 credentialed run remains pending.
+These results cover4cab, before #1160; the distinct final532 credentialed run also passes, with its own evidence below.
 
 [[file:release-drafts/RELEASE_NOTES_DRAFT.md][Draft release notes]] and [[file:release-drafts/MIGRATION_DRAFT.md][migration notes]] cover only the approved increment, not the entire history sincev0.15.0 or a release announcement.
 The migration note records country-axis changes, explicit invalid-input refusals, automatic harmonized-cache rewarming and decimal-comma interpretation.
@@ -230,6 +230,23 @@ This is a scoped audit, not every repository issue; the exact list and retained 
 [[file:release-closure/closing-keywords.txt][Prepared closing keywords]] are only a draft for an eventual authorized release PR; no issue has been closed.
 The [[file:reliability/policy-current.json][fresh read-only protection snapshot]] confirms only unit-tests is required on development; #932 remains unapplied.
 No further merge, release, tag, protection or shared-cache promotion action is authorized.
+
+* Final exact-source remote gate complete
+
+The final [[https://github.com/ligon/LSMS_Library/actions/runs/39533863014][run39533863014]] at =532d58700fa46e52a0b390198604eca1dc4de00e= completed SUCCESS.
+Actual data-job checkout is verified; unit, Windows smoke, native Windows and credentialed Linux jobs pass.
+The final remote suite reports6,388 passed,2,744 skipped,four expected failures,one non-strict unexpected pass,zero failures/errors,1,219 warnings in5,484.84seconds;9,137 collected cases.
+Uganda nutrition actually executes and passes; its terminal marker is a pass at the unique expected49/53 fixture position.
+All87 new rate cases execute and pass in their unique terminal group; the pass/collection count rises87 versus the earlier4cab run, with every other summary count unchanged.
+The credential gate and Uganda build pass, and all six runtime credential-failure/skip indicator counts are zero.
+The remote console does not enumerate every skip reason; individual adjudication of all2,744 skips and observation of the actual BLAS kernel are not claimed.
+[[file:ci-final-532/REPORT.org][Final exact-head reconciliation]], [[file:ci-final-532/verification.json][verification]], [[file:ci-final-532/two-head-comparison.json][separate-head comparison]].
+
+All approved implementation and validation work is complete; no further framework increment is recommended for this bounded candidate.
+Next: obtain a single explicit batch merge override for PRs1154--1157 and1161--1165 plus evidence1158, land in dependency order after retargeting the stacked publication branches, verify merged runtime/test/build/audit bytes against532 and observe development CI.
+The backlog-workflow requires human merge; the existing override covers1153 alone.
+No merge, release/tag, protection change or shared-cache promotion is performed by this checkpoint.
+Release preparation still requires an authorized development-to-master merge and final release instruction; draft notes cover only the approved increment.
 
 * Environment and reproducibility
 

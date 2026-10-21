@@ -1,0 +1,11 @@
+{
+  "parent_log_digest_verified": true,
+  "parent_unique_expected_summary_verified": true,
+  "parent_rate_terminal_group": {
+    "count": 87,
+    "all_passed": true,
+    "unique": true
+  },
+  "final_source_and_worker_clean_at_exact_sha": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "remote_manual_run_is_not_pr_event_enforcement": true
+}

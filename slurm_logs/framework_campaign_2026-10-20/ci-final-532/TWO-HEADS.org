@@ -1,0 +1,23 @@
+#+TITLE: Two exact-head manual CI runs
+#+AUTHOR: Sue
+
+* Final result
+Both exact-head manual workflow runs completed successfully.
+
+| Head | Run | Passed | Skipped | Xfailed | Xpassed | Failed/errors | Suite seconds |
+|------+-----+--------+---------+---------+---------+---------------+---------------|
+| 4cab5f0db7d375ad543e652f61f43bd28fa94ecd | 39531148624 | 6301 | 2744 | 4 | 1 | 0 | 5048.88 |
+| 532d58700fa46e52a0b390198604eca1dc4de00e | 39533863014 | 6388 | 2744 | 4 | 1 | 0 | 5484.84 |
+
+The final head added exactly 87 collected and passing cases, accounted for by the parameterized #1160 regression module; all other outcome counts and the 1219 warnings are unchanged.
+Both data logs independently prove the exact checkout SHA, successful credential gate and Uganda build, and actual execution plus pass of nutrition case 49 in the unique 53-case ordered terminal group.
+The new rate module has one unique 87-case terminal group containing exactly 87 pass markers and no skip/failure markers.
+Both unit, Windows smoke, and native Windows jobs succeeded.
+No credential-error/skip warning indicators occurred; the console does not enumerate all 2744 skip reasons, so individual skip causes are not all verified.
+No actual CI BLAS kernel observation is claimed.
+These are separate workflow_dispatch runs and do not establish genuine PR-event check eligibility or change repository rules.
+The 19 source/wiring gaps and 5 tenure findings remain separate semantic release limits.
+
+* Evidence
+Each run retains its own REPORT.org and verification.json; two-head-comparison.json and test-additions.json reconcile counts without combining cohorts.
+Observers and reconciliation readers are stopped; raw logs remain private and are excluded from the aggregate copy list.

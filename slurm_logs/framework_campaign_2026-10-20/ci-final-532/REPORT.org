@@ -1,0 +1,44 @@
+#+TITLE: Exact-head remote CI reconciliation
+#+AUTHOR: Sue
+
+* Result
+Run 39533863014 at =532d58700fa46e52a0b390198604eca1dc4de00e= concluded =success=.
+Actual data-job checkout: =532d58700fa46e52a0b390198604eca1dc4de00e=.
+Credentialed data job 119005820593 concluded =success=.
+Pytest totals: ={"errors": 0, "failed": 0, "passed": 6388, "skipped": 2744, "warnings": 1219, "xfailed": 4, "xpassed": 1}=.
+Collected items: =[9137]=; suite duration 5484.84 seconds.
+
+* Executed nutrition case and credentials
+All 87 new #1160 rate cases actually executed and passed: one unique 87-case terminal group contains 87 pass markers and no other markers.
+Nutrition ordered terminal marker: =.= at zero-based case 49 of 53.
+Unique full ordered terminal groups: 1; actual execution and pass: True.
+Serial pytest terminal status markers mapped to sorted _parquet_ids; fingerprint fixture keys unchanged; no collection-reordering hook in pinned source.
+Credential gate passed: True; Uganda build passed: True.
+Runtime credential failure/skip evidence counts: ={"NoCredentialsError": 0, "PartialCredentialsError": 0, "Skipped: no S3 credentials": 0, "UnmarkedS3TestWarning": 0, "needs S3 credentials to build country data": 0, "reached a credential-less skip at RUN time": 0}=.
+Console does not enumerate all skip reasons. Gate success and absence of credential-skip warnings are observed; do not represent the entire skip population as individually adjudicated.
+No actual runner BLAS kernel observation is claimed; the earlier numerical explanation is an exact controlled local counterfactual.
+
+* Comparison with the previous exact-852 failure
+Previous totals: ={"collected": 8857, "failed": 1, "passed": 6107, "skipped": 2744, "xfailed": 4, "xpassed": 1}=.
+Count differences: ={"failed": -1, "passed": 281, "skipped": 0, "xfailed": 0, "xpassed": 0}=; collected difference: 280.
+Failed node count: 0.
+Changed test assets are enumerated in verification.json; no totals from different heads are combined.
+
+* Job conclusions
+- windows-smoke: =success= (job 119005820374).
+- data-tests: =success= (job 119005820593).
+- unit-tests: =success= (job 119005820648).
+- windows-script-build: =success= (job 119005820748).
+- dvc-lock-check: =skipped= (job 119005821520).
+- dvc-remote-reachability: =skipped= (job 119005821600).
+- docs: =skipped= (job 119005821618).
+- refresh-dvc-locks: =skipped= (job 119005822329).
+
+* Reproduction and limits
+Read-only GET observation and the final completed job log are retained privately.
+The final log was saved once after it became available; raw log contents and survey rows were not printed or copied into this report.
+Run =rate-532/reconcile.py= with the mounted image Python, then =write_report.py= and =verify_rate_terminal.py= from the parent private report directory.
+The controllers pin the original private evidence/source paths; authorized completed-job logs and API metadata are prerequisites and are excluded from the public aggregate copy.
+A successful workflow_dispatch is exact-head manual evidence; it is not a genuine PR-event data check and does not change repository rules.
+The 19 retained source/wiring failures and five tenure audit findings remain separate release-readiness limitations.
+No source, fixtures, caches, credentials, repository settings, or GitHub state were mutated by this observation.

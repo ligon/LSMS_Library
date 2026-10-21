@@ -4,8 +4,11 @@
   "draft_as_of_utc": "2026-10-21T03:40:37Z",
   "linux_data_ci": {
     "run": 39533863014,
-    "status": "in_progress",
-    "url": "https://github.com/ligon/LSMS_Library/actions/runs/39533863014"
+    "status": "completed",
+    "url": "https://github.com/ligon/LSMS_Library/actions/runs/39533863014",
+    "conclusion": "success",
+    "passed": 6388,
+    "skipped": 2744
   },
   "local_suite": {
     "passed": 8851,
@@ -43,8 +46,8 @@
   "copy_files": [
     {
       "path": "RELEASE_NOTES_DRAFT.md",
-      "bytes": 4538,
-      "sha256": "10d29145f5c053279c26f8d5899525e6012983c29ffceee07945c2960583fb62"
+      "bytes": 4949,
+      "sha256": "5c4622980715bbf37d70756a0ce2e1c1c5f5fc181e8b5c3c43ef36b04b670414"
     },
     {
       "path": "MIGRATION_DRAFT.md",
@@ -52,5 +55,6 @@
       "sha256": "f90d3fc3244eaa56a41c68ec452587233a49cb034881c3e73908dc0589b7e9b3"
     }
   ],
-  "parent_review": "Corrected four nonexistent producer-report paths to committed independent evidence; draft text hashes unchanged."
+  "parent_review": "Corrected four nonexistent producer-report paths to committed independent evidence; draft text hashes unchanged. Final release draft updated after exact532 remote success; original producer draft remains in git history.",
+  "parent_finalization_utc": "2026-10-21T04:19:11.511694+00:00"
 }
