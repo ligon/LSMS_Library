@@ -1,0 +1,103 @@
+#+TITLE: GH #778 remaining cache race and forced-build isolation
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+* Result and scope
+
+Ready for independent review on =fix/778-cache-race-40255479=.
+Base is frozen reviewed candidate =852ac2bfcd5f798533f56e7efa1f77db80c0138f=; grounding ledger was published separately as =e08b7f337=.
+Live [[https://github.com/ligon/LSMS_Library/issues/778][issue #778]] and all returned comments were read (none).
+Merged =34487e7ca= / PR #1030 already resolves the earlier poison/destamp/raw-reader isolation; the partial-aggregate theory was not reproduced and is not revived here.
+
+=Country._read_assumed_fresh_cache= now returns None only when either of its two =get_dataframe= calls raises FileNotFoundError (=country.py:4684=).
+That selects the existing ordinary loader; no retry, writer, lock, hash, finalizer or country-policy change was added.
+PermissionError, other OSError, ParquetFormatError, ValueError, index-mapping errors and ordinary source failures retain their existing paths.
+Manifest subset filtering and legacy full-request pass-through remain covered by the existing site 3 tests.
+
+Only three remaining real-country forced-build controls are isolated:
+- Guyana's explicit L2-clear/seven-table cold warning control gets a physical private country copy (=test_guyana_index_uniqueness.py:78=).
+- India's LSMS_NO_CACHE employment control gets the same local fixture pattern (=test_india_employment_activity_index.py:85=).
+- Togo's LSMS_NO_CACHE plot_features control reuses the same-file PR #1030 private fixture (=test_gh866_stale_country_parquet_not_laundered.py:284=).
+Only L1 is linked; country copytree follows symlinks to make physical L2 copies.
+Guyana/India retain cold execution when the source country cache is absent; Togo retains its existing warm prerequisite.
+GhanaLSS interview_date, GhanaLSS visit derivations and the synthetic dfs-merge controls already set private roots at this base and were left untouched.
+
+* Evidence
+
+| Check | Result |
+|-------+--------|
+| Initial tests against unchanged 852 source | 5 failed, 10 passed, 31 deselected |
+| Final 17 controls with only the old 852 gate bound in memory | 6 failed, 11 passed, 31 deselected |
+| Candidate entire 1040 read-gate file | 48 passed in 4.77s |
+| Candidate focused eight-file suite, 4 loadfile workers | 190 passed, 0 skipped, 0 failures/errors, 33 warnings in 68.77s |
+| Original three force-build controls on an expendable physical copy | 3 passed; 15 outer parquet unlinks, 16 byte changes, 19 file replacements |
+| Isolated candidate three controls on a separate physical copy | 3 passed; 0 outer unlinks, 0 byte changes, 0 file replacements |
+| Guyana/India controls starting with empty outer L2 | 2 passed; 0 outer mutations |
+| Physical seed verification | 67 files identical SHA256, distinct inodes |
+| Original immutable source country files | Bytes, inodes and mtimes unchanged in all three probe runs |
+| Actual cache fingerprints before/after | 549 country hashes unchanged; 2139 wave entries unchanged (2109 hashes, 30 existing None); 39 transform fingerprints unchanged |
+| API surface audit; git diff --check | Passed |
+
+The final negative control adds disappearance before the footer; its full-request case fails on the old gate, while the subset case already falls through.
+It also corrects the success-path stub to the existing gate protocol =(df, covered, None)=; the initial five-failure run predates these changes.
+The old gate is bound from =git show 852ac2bfc:lsms_library/country.py= in a separate process without editing source (=baseline_gate_probe.py=).
+The patched race is deterministic: tests unlink their planted private parquet at the precise read boundary rather than relying on thread timing.
+The ordinary source-error control proves that a later genuine FileNotFoundError is still raised; the ordinary-hit control proves finalization occurs exactly once after fallthrough.
+
+* Country documentation and limits
+
+Read each country's complete =_/CONTENTS.org=, including any TODO/WAITING/LOGBOOK entries, before assessment.
+Guyana documents household =(ED,SN,HH)= and cluster =(ED,SN)= because ED repeats across segments; expected missing-Makefile fallbacks are retained.
+India documents activity-grain employment =(t,i,pid,act)= and per-day wages, with workplace Rural distinct from residence; no aggregation policy changes were made.
+Togo documents one vague per grappe and Data1/s16a as the plot_features source; its field/parcel grain is retained.
+Albania's existing wave-subset tests were also run: 1996 EWS is intentionally excluded, and 2003/2004 are a panel subsample with narrower supported domains.
+No new survey-specific fact was discovered that requires a CONTENTS addition.
+
+One historical Guyana documentation/test claim conflicts with the current warm audit machinery: "warning fires only on a COLD build" and "the warning never fires again" versus current stamped grain-report replay.
+This work preserves the explicit cold oracle and makes no claim that warm warnings cannot fire.
+The raw warning logs include known quantity/source warnings and remain private; the committed evidence contains aggregate counts only.
+
+GH #1071 remains a separate unresolved corruption-policy decision: a corrupt full assumed-fresh parquet still raises ParquetFormatError, whereas corrupt/unknown subset coverage falls through.
+=assume_cache_fresh=True= also still deliberately serves unstamped script output when its existing coverage contract permits it.
+This work does not claim to solve either policy, prove the disproven partial-aggregate theory, or guarantee all possible future tests are nonmutating.
+The focused suite excludes the unchanged poison/destamp delivered cases; the newly reused Togo fixture path and both changed cold fixtures ran on real private caches.
+
+* Reproduction
+
+Run from this checkout with the mounted image interpreter and exact import/config identity.
+The helpers assert real package/config paths; no original corpus root is passed to a library API.
+
+#+begin_src sh
+cd /local/job40255479/worktrees/778-cache-race
+export PYTHONPATH="$PWD"
+export LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_DATA_DIR=/local/job40255479/778-hermetic-data
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1 LSMS_MAKE_JOBS=1
+P=/local/job40255479/venv_img/bin/python
+R=slurm_logs/framework_campaign_2026-10-20/778
+taskset -c8-11 "$P" "$R/baseline_gate_probe.py" > "$R/baseline-final-tests.log" 2>&1
+taskset -c8-11 "$P" -m pytest tests/test_gh1040_wave_read_gates.py -q
+taskset -c8-11 "$P" "$R/hash_probe.py" /local/job40255479/778-repeat-hashes.json
+taskset -c8-11 "$P" "$R/isolation_probe.py" /local/job40255479/corpus-baseline-data /local/job40255479/778-repeat-copy /local/job40255479/778-repeat-isolation.json
+taskset -c8-11 "$P" "$R/isolation_probe.py" /local/job40255479/corpus-baseline-data /local/job40255479/778-repeat-cold /local/job40255479/778-repeat-cold.json --cold
+taskset -c8-11 "$P" scripts/api_surface_audit.py
+#+end_src
+
+The negative-control command intentionally exits 1.
+Each isolation output root must be new; the probe refuses an existing root and verifies source bytes/stats after pytest.
+For the focused run, seed physical copies of Guyana/India/Togo/Albania under a new private root (L1 link only), select it with LSMS_DATA_DIR, and run:
+
+#+begin_src sh
+taskset -c8-11 "$P" -m pytest -n4 --dist=loadfile -q \
+  tests/test_gh1040_wave_read_gates.py tests/test_dvc_caching.py \
+  tests/test_gh891_wave_subset_cache.py tests/test_build_transform_hash.py \
+  tests/test_gh809_hashless_country_parquet.py \
+  tests/test_gh866_stale_country_parquet_not_laundered.py \
+  tests/test_guyana_index_uniqueness.py \
+  tests/test_india_employment_activity_index.py \
+  -k 'not test_a_destamped_parquet_rebuilds_once_and_does_not_loop and not test_a_poisoned_country_parquet_is_REBUILT_not_served'
+#+end_src
+
+No GitHub write, source/shared-cache clear, protection change or release was performed.
+Sue.

@@ -23,11 +23,14 @@ carrying a wage survives it (5,627 of 6,158).
 """
 from __future__ import annotations
 
+import shutil
+
 import pandas as pd
 import pytest
 
 import lsms_library as ll
 from lsms_library.country import _normalize_dataframe_index
+from lsms_library.local_tools import data_root
 
 
 # --- Unit test: no real data needed.  Pins the reducer's fabrication directly. --
@@ -79,6 +82,28 @@ def test_person_level_collapse_destroys_jobs_when_act_is_dropped():
 
 # --- Integration tests against the real India table. -------------------------
 
+@pytest.fixture
+def private_cold_root(tmp_path):
+    """Force-build only in a physical L2 copy, also when the source is cold."""
+    shared = data_root()
+    root = tmp_path / 'data'
+    root.mkdir()
+    if (shared / 'India').exists():
+        shutil.copytree(shared / 'India', root / 'India')
+    if (shared / 'dvc-cache').exists():
+        (root / 'dvc-cache').symlink_to((shared / 'dvc-cache').resolve(),
+                                      target_is_directory=True)
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setenv('LSMS_DATA_DIR', str(root))
+        data_root.cache_clear()
+        assert data_root() == root
+        try:
+            yield root
+        finally:
+            patch.undo()
+            data_root.cache_clear()
+
+
 @pytest.fixture(scope='module')
 def emp() -> pd.DataFrame:
     try:
@@ -96,7 +121,7 @@ def test_act_level_is_declared(emp):
 
 
 @pytest.mark.requires_s3
-def test_no_gh323_collapse_warning_on_a_COLD_build(monkeypatch):
+def test_no_gh323_collapse_warning_on_a_COLD_build(monkeypatch, private_cold_root):
     """The warning fires ONLY on a cold build -- so this test MUST force one.
 
     In warm operation the collapse is already baked into the L2-country parquet

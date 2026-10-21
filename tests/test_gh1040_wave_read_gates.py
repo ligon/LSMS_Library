@@ -492,6 +492,131 @@ def test_site3_read_error(acf):
     assert finalized == []
 
 
+@pytest.mark.parametrize("coverage", ["covered-full", "covered-subset", "legacy-full"])
+def test_site3_disappearing_data_read_falls_through(acf, monkeypatch, coverage):
+    """GH #778: losing a parquet after its footer read is an ordinary miss."""
+    make, path, frame, finalized = acf
+    c = make()
+    metadata = {} if coverage == "legacy-full" else {"cache_waves": list(c.waves)}
+    _plant(path, frame, cache_hash="x", **metadata)
+    waves = [c.waves[-1]] if coverage == "covered-subset" else list(c.waves)
+    reads = []
+
+    def disappear(candidate):
+        assert candidate == path and candidate.exists()
+        reads.append(candidate)
+        candidate.unlink()
+        raise FileNotFoundError(candidate)
+
+    monkeypatch.setattr(C, "get_dataframe", disappear)
+    with pytest.raises(_FellThrough):
+        c._aggregate_wave_data(waves, CF_TABLE)
+    assert reads == [path] and finalized == []
+
+
+@pytest.mark.parametrize("error", [PermissionError("denied"), OSError("I/O failure"),
+                                   LT.ParquetFormatError("corrupt"), ValueError("bad read")])
+@pytest.mark.parametrize("manifest", [True, False])
+def test_site3_other_data_read_errors_still_raise(acf, monkeypatch, error, manifest):
+    make, path, frame, finalized = acf
+    c = make()
+    metadata = {"cache_waves": list(c.waves)} if manifest else {}
+    _plant(path, frame, cache_hash="x", **metadata)
+
+    def fail(candidate):
+        raise error
+
+    monkeypatch.setattr(C, "get_dataframe", fail)
+    with pytest.raises(type(error)) as caught:
+        c._aggregate_wave_data(list(c.waves), CF_TABLE)
+    assert caught.value is error and finalized == []
+
+
+@pytest.mark.parametrize("subset", [False, True])
+def test_site3_disappearing_before_footer_falls_through(acf, monkeypatch, subset):
+    make, path, frame, finalized = acf
+    c = make()
+    _plant(path, frame, cache_hash="x", cache_waves=list(c.waves))
+    read_footer = C.read_parquet_cache_waves
+    reads = []
+
+    def disappear_before_footer(candidate):
+        candidate.unlink()
+        return read_footer(candidate)
+
+    def read_missing(candidate):
+        assert not candidate.exists()
+        reads.append(candidate)
+        raise FileNotFoundError(candidate)
+
+    monkeypatch.setattr(C, "read_parquet_cache_waves", disappear_before_footer)
+    monkeypatch.setattr(C, "get_dataframe", read_missing)
+    waves = [c.waves[-1]] if subset else list(c.waves)
+    with pytest.raises(_FellThrough):
+        c._aggregate_wave_data(waves, CF_TABLE)
+    assert reads == ([] if subset else [path]) and finalized == []
+
+
+@pytest.mark.parametrize("manifest", [True, False])
+def test_site3_missing_file_error_outside_data_read_still_raises(acf, monkeypatch, manifest):
+    make, path, frame, finalized = acf
+    c = make()
+    metadata = {"cache_waves": list(c.waves)} if manifest else {}
+    _plant(path, frame, cache_hash="x", **metadata)
+    error = FileNotFoundError("index mapping dependency")
+
+    def fail(frame):
+        raise error
+
+    monkeypatch.setattr(C, "map_index", fail)
+    with pytest.raises(FileNotFoundError) as caught:
+        c._aggregate_wave_data(list(c.waves), CF_TABLE)
+    assert caught.value is error and path.exists() and finalized == []
+
+
+def test_site3_disappearance_does_not_hide_ordinary_source_error(acf, monkeypatch):
+    make, path, frame, finalized = acf
+    c = make()
+    _plant(path, frame, cache_hash="x", cache_waves=list(c.waves))
+    source_error = FileNotFoundError("required source is unavailable")
+
+    def disappear(candidate):
+        candidate.unlink()
+        raise FileNotFoundError(candidate)
+
+    def ordinary(self, *args, **kwargs):
+        raise source_error
+
+    monkeypatch.setattr(C, "get_dataframe", disappear)
+    monkeypatch.setattr(C.Country, "_read_l2_country_cache", ordinary)
+    with pytest.raises(FileNotFoundError) as caught:
+        c._aggregate_wave_data(list(c.waves), CF_TABLE)
+    assert caught.value is source_error and finalized == []
+
+
+def test_site3_disappearance_can_serve_an_ordinary_cache_hit(acf, monkeypatch):
+    """A concurrent replacement can be served through the normal read gate."""
+    make, path, frame, finalized = acf
+    c = make()
+    _plant(path, frame, cache_hash="x", cache_waves=list(c.waves))
+    replacement = frame.iloc[:1].copy()
+    replacement["Sex"] = "ordinary replacement"
+
+    def disappear(candidate):
+        candidate.unlink()
+        raise FileNotFoundError(candidate)
+
+    def ordinary(self, method_name, candidate, waves):
+        assert method_name == CF_TABLE and candidate == path
+        return replacement, list(waves), None
+
+    monkeypatch.setattr(C, "get_dataframe", disappear)
+    monkeypatch.setattr(C.Country, "_read_l2_country_cache", ordinary)
+    got = c._aggregate_wave_data(list(c.waves), CF_TABLE)
+    pd.testing.assert_frame_equal(got, replacement)
+    assert len(finalized) == 1
+
+
 def test_country_gate_read_error_is_graded_before_it_is_read(root):
     """GH #1070, for comparison with site 3: the ordinary L2-country gate never
     READS a non-parquet ``.parquet`` -- it has no readable hash, so it grades
