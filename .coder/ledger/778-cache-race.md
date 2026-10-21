@@ -62,4 +62,22 @@ This ledger is surfaced before implementation per prior-art-ledger; parent can r
 
 ### Phase3 -- verification
 
-Pending implementation and focused controls, baseline negative proof, private source-cache before/after hashes and measured build fingerprint comparison.
+Implementation and aggregate report committed/published as `2aef1c2ac`.
+The read gate extends its existing two reads with FileNotFoundError-only fallthrough; ordinary grading/finalization and country policy are reused unchanged.
+Existing `acf`/`_plant` fixtures cover disappearance before/after footer reads, manifest full/subset and legacy full requests, nonmissing read errors, index-mapping FileNotFoundError, ordinary source failure and successful ordinary-hit finalization.
+The initial unchanged-source proof was5 failures/10 passes; the final17 controls with only the frozen852 gate rebound in memory produced6 failures/11 passes, including the newly added before-footer full case.
+
+- Whole1040 read-gate file:48 passed.
+- Focused eight-file suite with4 loadfile workers:190 passed,0 skipped/failures/errors,33 warnings in68.77s.
+- Three original force-build controls on an expendable private copy:3 passed but15 outer parquet unlinks,16 byte changes and19 file replacements.
+- Candidate physical-copy controls:3 passed with zero outer mutation;67 seed files SHA-identical with distinct inodes, and immutable original source bytes/inodes/mtimes unchanged.
+- Cold Guyana/India controls:2 passed starting with empty outer L2, without introducing warm-only skips.
+- Actual complete inventories:549 country hashes,2139 wave entries (30 existing None) and39 table transform fingerprints identical before/after.
+- API surface audit and `git diff --check`:passed.
+
+The §2 reuse/§3 definitions/§4 invariants are preserved.
+No source/country build machinery, scientific default, corruption policy or fingerprint definition was changed.
+The only test fixture scope changes are Guyana/India cold controls and reuse of the same-file private fixture for Togo; copytree now follows country symlinks so L2 remains physical.
+Known #1071 and assume-fresh unstamped-script-output behavior remain explicit in `slurm_logs/framework_campaign_2026-10-20/778/REPORT.org`.
+No new survey idiosyncrasy was found; the historical warm-warning documentation contradiction remains reported rather than used to weaken the cold control.
+Independent parent review remains required before GitHub PR/landing; source is frozen after this ledger verification commit.
