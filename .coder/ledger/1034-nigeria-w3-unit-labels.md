@@ -2,11 +2,11 @@
 
 **Search tier used:** ripgrep + git floor. Base: f8d236694.
 
-## Section 1 Task, restated
+## §1 Task, restated
 
 Decode the four unit codes labelled by Nigeria W3's planting Stata source but missing or residual-labelled in the 2015-16 column of the country `u` table. Keep the existing food builder, all quantities/expenditures, other wave mappings and kilogram machinery. This does not address item labels (#1144) or W4 size vocabulary (#1033).
 
-## Section 2 Existing machinery
+## §2 Existing machinery
 
 | Symbol | Source | Existing tests | Decision |
 |---|---|---|---|
@@ -18,11 +18,11 @@ Decode the four unit codes labelled by Nigeria W3's planting Stata source but mi
 | `_finalize_canonical_food_acquired` | transformations.py | source-split and sentinel tests | Reuse canonical row aggregation; no new reducer |
 | Country/Feature food derivation | STANDING.md Section 2 | food/schema/Feature audit | Reuse; no kilogram factors introduced |
 
-## Section 3 Definitions and conventions
+## §3 Definitions and conventions
 
 Inherit STANDING.md Sections 3-4 and CLAUDE.md Data Access / food schema; canonical declarations remain in lsms_library/data_info.yml. Nigeria CONTENTS.org:211-217 explicitly corrects its earlier PH-only negative: planting labels 131 SACK/BAG MEDIUM, 151 BASIN MEDIUM, 152 BASIN LARGE, 161 BUNDLE MEDIUM. Match established title-case vocabulary; add no stated mass. CONTENTS.org:134-163 explains why the two rounds share a wave column despite round-specific source coverage. Unit labels and kg conversion are different tasks (food-acquired/units skill).
 
-## Section 4 Invariants and assumptions
+## §4 Invariants and assumptions
 
 - Preserve the existing no-argument food/crop item decoder; #1144 remains separate.
 - Preserve all existing u table cells except the three 2015-16 placeholder cells; add code161 with no mapping in other wave columns. Keep the existing Preferred Label values for131/151/152 so global Code lookups do not change.
@@ -31,7 +31,7 @@ Inherit STANDING.md Sections 3-4 and CLAUDE.md Data Access / food schema; canoni
 - Content hashes cover country categorical Org input and can invalidate every Nigeria table; measure the exact blast radius before landing. Do not claim food-only hash impact.
 - All builds use asserted worktree identity, image Python, thread counts1, LSMS_BUILD_WORKERS=1 and physical private L2 roots. Read cached raw sources through sanctioned IO. No raw acquisition, DVC CLI or shared L2 writes.
 
-## Section 5 Reuse decision
+## §5 Reuse decision
 
 | Quantity | Decision | Reason |
 |---|---|---|
@@ -40,12 +40,20 @@ Inherit STANDING.md Sections 3-4 and CLAUDE.md Data Access / food schema; canoni
 | Kilograms and prices | Reuse transforms | No new unit factors; report any inference change caused by relabelling |
 | Verification | Extend independent-label/synthetic tests, cold compare, existing Feature scan | Table self-comparison alone cannot catch semantic mistakes |
 
-## Section 6 Open questions for the human
+## §6 Open questions for the human
 
 None within root's approved four-label scope. Source labels, code161's absence from positive rows and all-round preservation will be checked from held data. #1144 item mislabelling and #1033 W4 size semantics remain out of scope.
 
 ## Phase 3 verification
 
-Pending implementation and private cold comparison.
+- `u` table extension - OK (anchored on sections 2-5): existing decoder, four source labels, no new factor; independent source metadata and three strengthened counterfactual failures support the meanings.
+- Native food build - OK (sections 3-4): 595,725 rows before/after; exactly twelve PP u keys change, all values/missingness preserved, seven other quarters exactly equal.
+- PH qualification - OK (section 4): zero affected rows in wired PH fields; metadata also labels the unwired PH q2b column, so CONTENTS now corrects the earlier whole-file negative.
+- Derived effects - OK (section 5): existing pooling changes kg by +19.0043809523 and fourteen default prices; no new factor or inference logic. Safe aggregate report separates kg-only sums from retained native quantities.
+- Regression checks - OK (section 5): 53 selected tests pass, zero skips; Feature before/after normalized 455-record multisets identical (452 retained warnings, three passes, zero fail/error/skip), Uganda frames equal.
+- Cache cost - OK (section 4): 24/24 Nigeria hashes move, 0/28 Uganda; explicit report avoids the earlier food-only cost shorthand.
+- No CONTRADICTION or REINVENTION within this scoped implementation. Raw source acquisition, other Nigeria defects and scientific policy remain out of scope.
+
+Evidence: slurm_logs/isa_backlog_2026-10-21/1034/REPORT.org and validation.json.
 
 Sue
