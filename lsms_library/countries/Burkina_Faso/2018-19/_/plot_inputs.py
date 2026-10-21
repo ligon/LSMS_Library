@@ -121,4 +121,12 @@ df = pd.DataFrame({
 df = _finish_plot_inputs(df, '2018-19')
 
 assert len(df) > 0, 'plot_inputs 2018-19 produced no rows'
+# GH #1123: distinct native input slots must retain distinct declared keys,
+# even when their measured payloads happen to be equal (ledger sections 2-4).
+# Match the Benin/Togo pre-write guard; never let core select a row silently.
+dups = df.index[df.index.duplicated()]
+assert dups.empty, (
+    f"Burkina_Faso plot_inputs 2018-19: {len(dups)} duplicate tuple(s) on "
+    "(t, i, input, crop, u); distinct reported input identities collide"
+)
 to_parquet(df, 'plot_inputs.parquet')
