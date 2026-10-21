@@ -1,0 +1,26 @@
+{
+  "checked_at_UTC": "2026-10-21T21:24:15Z",
+  "policy": "Supplement to immutable earlier twelve-PR checkpoint; read-only metadata, no public merge or base change",
+  "pull_requests": [
+    {
+      "number": 1192,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1192",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1193,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1193",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "base": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "base_sha": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+#+TITLE: Recorded bounded composition review commands
+#+AUTHOR: Sue
+
+All API/source/test commands use the private =run.sh= entry point, mounted image, exact frozen checkout/import/config identity, offline socket guards with =unshare -rn=, private cache/config/DVC site roots and single numeric/build/Make threads.
+The candidate is fd2356ee; the control is de9, not f8.
+The scripts and full logs remain private.
+Do not rerun =prepare.py= or a cold command over populated roots, delete evidence or clear a cache to force success.
+A new source-cold reproduction requires new physical input/cache destinations and an explicitly matching private metadata-target setup; current =root-metadata-preparation.json= binds the ignored tmp exception to this exact root.
+
+#+begin_src bash
+R=/local/job40255479/control/isa-backlog-20261021/review-1111-Malawi-composition
+PY=/local/job40255479/venv_img/bin/python
+
+# Recorded fresh preparation; asserts new destinations and MD5 gates sources.
+"$PY" "$R/prepare.py" > "$R/preparation-private.log" 2>&1
+
+# Initial preserved harness failures: old immutable Feature artifact used
+# explicit currency=None; these commands request the normal default.
+bash "$R/run.sh" base "$R/runtime.py" cold > "$R/base-cold-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/runtime.py" cold > "$R/candidate-cold-private.log" 2>&1
+
+# Argument-matched control: explicit currency=None equals immutable artifact;
+# normal default is independently captured in output-base/cold-feature-private.pkl.
+bash "$R/run.sh" base "$R/runtime_v2.py" cold > "$R/base-cold-v2-private.log" 2>&1
+
+# Full composed capture and comparison of the persisted original cold caches.
+# post-cold requires exact before/after bytes/mtimes; it does not rebuild source.
+bash "$R/run.sh" candidate "$R/runtime_v3.py" post-cold > "$R/candidate-post-cold-private.log" 2>&1
+
+# Separate fresh-process normal warm repeats, new Country/Feature instances,
+# full frames/attrs and zero writes to every private parquet.
+bash "$R/run.sh" base "$R/runtime_v3.py" warm > "$R/base-warm-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/runtime_v3.py" warm > "$R/candidate-warm-private.log" 2>&1
+
+bash "$R/run.sh" candidate "$R/test_runner.py" > "$R/tests-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/source_oracle.py" > "$R/source-oracle-private.log" 2>&1
+bash "$R/run.sh" base "$R/run_scan.py" > "$R/base-scan-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/run_scan.py" > "$R/candidate-scan-private.log" 2>&1
+"$PY" "$R/compare_scan.py" > "$R/scan-comparison-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/cache_gates.py" > "$R/cache-gates-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/summarize.py" > "$R/summary-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/final_proof.py" > "$R/final-proof-private.log" 2>&1
+#+end_src
+
+=test_runner.py= records the exact pytest argument vector and phase/outcome list in =tests-private.json=.
+The selection expands to:
+#+begin_src bash
+python -m pytest -n 2 --dist=loadfile -q -p no:cacheprovider -p pytest_identity \
+  --basetemp=PRIVATE --junitxml=PRIVATE \
+  tests/test_1111_malawi_applied_kg.py \
+  tests/test_1109_malawi_input_quantity.py \
+  tests/test_867_nitrogen_content.py \
+  tests/test_863_transforms.py \
+  tests/test_plot_id_canonical.py -k 'not warm'
+#+end_src
+There are129 passes, zero skips/errors/failures and no accepted migration failures.
+=pytest_identity= checks each worker's frozen cwd/import/config identity.
+
+The source oracle is a private adaptation of the completed standalone independent oracle, substituting actual de9 and composed public outputs.
+It rereads held numeric source fields, checks source-group sums and every positive/affirmative pair, and reuses only the established identifier closure.
+The two source instruments are physically MD5-gated; their standalone layout-extracted role verification is retained unchanged as reference evidence.
+
+=run_scan.py= executes each checkout's actual scanner with =--features plot_inputs --countries Malawi Uganda --phases 1,2 --jobs 1= and a private output path.
+=compare_scan.py= checks every full ordered finding and requires the fresh de9 records to equal the immutable earlier de9 scanner artifact.
+Only the explicit expected count substitutions are permitted; there is no value/attrs/axis/path normalization.
+=cache_gates.py= verifies fresh current hashes and all-wave coverage for both countries' plot_inputs and sample country caches with zero parquet writes.
+No all-country hash census is repeated.
+=final_proof.py= rehashes tracked content/modes and original quiescent source/reference receipts, checks exact warm cache receipts, metadata-target identity, network/write logs and subprocess quiescence.
+
+The original candidate cold public Feature snapshot was not serialized before the mismatched-reference expectation failed.
+Its cold raw caches remain intact, its Country comparison had already passed, and all complete public captures thereafter come from those byte/mtime-identical caches.
+That limit is explicit in REVIEW.org and composition-summary.json.
+No original receipt is retroactively relabelled as a successfully captured cold public Feature comparison.
+
+Sue.

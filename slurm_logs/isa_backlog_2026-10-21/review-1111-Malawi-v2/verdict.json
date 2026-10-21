@@ -1,0 +1,95 @@
+{
+  "verdict": "PASS",
+  "head": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "reviewer": "Sue (GPT-6)",
+  "blocking_findings": [],
+  "initial_NEEDS_FIX_preserved": true,
+  "test_descendant_only_removes_excluded_organic_pin": true,
+  "candidate_regression_tests": {
+    "passed": 101,
+    "skipped": 0
+  },
+  "candidate_driver_tests": {
+    "passed": 12,
+    "skipped": 0
+  },
+  "baseline_negative_tests": {
+    "failed": 10,
+    "passed": 2,
+    "errors": 0
+  },
+  "late_label_mutant_tests": {
+    "failed": 12,
+    "errors": 0
+  },
+  "independent_source_coalescences": {
+    "2010-11": 51,
+    "2019-20": 184,
+    "all_same_source_positive_affirmative": true
+  },
+  "source_covered_kg_sum": 1765763.95,
+  "all_inorganic_numeric_Quantity_sum_conserved": 2899339.95,
+  "Country_rows": [
+    180184,
+    179949
+  ],
+  "Feature_rows": [
+    264400,
+    264165
+  ],
+  "Uganda_rows": 84216,
+  "sample_rows": 57118,
+  "nitrogen_before": 840235.7795800001,
+  "nitrogen_after": 1028195.63206,
+  "nitrogen_delta_decimal": 187959.85248,
+  "full_frames_order_dtypes_null_masks_attrs_verified": true,
+  "all_unaffected_payload_verified": true,
+  "cold_warm_normal_APIs_zero_warm_parquet_writes": true,
+  "cold_source_sample_ordered_warning_records": [
+    18,
+    18
+  ],
+  "main_candidate_warning_events": 6,
+  "distinct_native_metadata_bindings": 10,
+  "scanner_records": [
+    15,
+    15
+  ],
+  "scanner_full_records_exact": 11,
+  "scanner_expected_count_only_changes": 4,
+  "scanner_errors_failures": 0,
+  "hash_inventory": {
+    "all": 549,
+    "Malawi_changed": 26,
+    "other_unchanged": 523,
+    "framework_exact": 39
+  },
+  "immutable_clean_checkouts": 5,
+  "quiescent_author_files_unchanged": 424,
+  "prior_review_files_unchanged": 200,
+  "network_attempts": 0,
+  "subprocesses_remaining": 0,
+  "limits": [
+    "Standalone f8-based partial correction; organic PR1175 composition is root-owned and unrun here.",
+    "2013/2016 literal C4 instrument gate remains unsatisfied; no acquisition.",
+    "No full suite or new residual census; source-qualified seed/missing/purchase units, nutrient composition and retention remain separate.",
+    "Negative-test xdist identity failures and initial private script syntax failure preserved; final baseline negatives run serial."
+  ],
+  "safe_artifact_sha256": {
+    "instrument-check.json": "2975d6154e173d53c362aee915666ad568251055621c787223018a5be9a910da",
+    "source-oracle.json": "c3f7eab52c14c16edb622cb3f084b24ed3a9667c6362cd4f07bdbe6177c3687b",
+    "runtime-comparison.json": "4307ac326ebc8a22f6e4e1147b88d2f5503f0676c8d64b8c8afb68b889e5cd2a",
+    "warning-checks.json": "05bb31a428699054cf994b2cd470ef113118121bc1fcb70884c2ac2da509d801",
+    "hash-scope.json": "908fcea7f3260ed4e0f5bc535ff0dab109f64ae286d9cc859a28d712cb3b40f3",
+    "scanner-comparison.json": "b0007057598cd635c464cc18fb67ec92f485edab3ed54b60d344ecba86072718",
+    "proof.json": "5cead4205512d69c486f83c038b193be5e5e05724cafd99523a5e89f2d9bd91d",
+    "REVIEW.org": "a23eb364c08e74cadb3941596692db83b37ee136958d2c856eb2c46fc0147764",
+    "REPRODUCE.org": "0b86e358511a221a6657e79360ca692fbc3b09e0fd2a4204db12a73e667eda02",
+    "RESIDUAL-DRAFT.org": "63007579cb0688d7f104a114b2ceba626135e560fddb8cfaa4fcec458b2c52e2",
+    "baseline-negative-tests.json": "95fdcfff850cec2c522a15ae7ce48a0f5efc0ba1c24964c6df8590aa0e04352a",
+    "candidate-new-tests.json": "d413aa1fe15ee65d22fd7e6c98e469722ef0d0cc3e64d54591f216800b79caae",
+    "candidate-regressions-tests.json": "b43b8f3ba406ec5841e2fe642916ccbbc099a4a9fdfa92653f27a4df0733e6ee",
+    "candidate-mutant-tests.json": "56e1cdfb6c3eeac7f7467b9e2b0e92933165e8c5a065e1d0f63eb997c42359b8"
+  }
+}

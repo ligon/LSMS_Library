@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T20:15:02.055512+00:00",
+  "observed_at": "2026-10-21T21:25:19.712899+00:00",
   "actions": [
     {
       "issue": 822,
@@ -138,6 +138,18 @@
     {
       "issue": 1006,
       "action": "Fullindependenttest-onlyPASS; PR1191readyhumanreview, preservewholeissuehistoricalevidence and explicitpendinglanding; no prod/fixture/persistencechange"
+    },
+    {
+      "issue": 1095,
+      "action": "Independent PASS; PR1192 open and CIgreen, all5228 recorded-unit recoveries verified. Live issue retains explicit future unplaced-label retention TierC residual; nothing merged."
+    },
+    {
+      "issue": 1058,
+      "action": "Fresh diagnosis corrects denominator to7350 retained parcels with4180pairs, excluding1117null-key placeholders; held Mali/Niger/Senegal source checks negative. Approved only2021sourcecoordinate projection in separate writer; live issue updated, no PR yet."
+    },
+    {
+      "issue": 1111,
+      "action": "Standalone101-test PASS and composed129-test PASS; stacked partial PR1193 on1175 ready for human review. All11075organic answers and235same-source pair sums exact.2013/2016 C4 residuals stay open; first cold Feature capture limitation retained."
     }
   ],
   "verified_issue_metadata": [
@@ -252,7 +264,26 @@
       "head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
       "runtime": "1eb9bb377157c78f74962c7a9de59807d446b239",
       "review": "PASS25scoped+41support; test-onlyallproduction/fixtureblobs exactf8;9frames+2matrices/strongfaults/cleanup/absence/creds",
-      "ci": "pending;newPR"
+      "ci": "success; run39669180447"
+    },
+    {
+      "number": 1192,
+      "issue": 1095,
+      "head": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "runtime": "e55de22856064ab3b01f1bc5fcfac681f2f3ebc8",
+      "review": "PASS60tests/23adversarial;5228gains exact/full source/native/Country/Feature/attrs/scanner/hash/warm",
+      "ci": "success; run39676834859",
+      "partial_residual": "Future unresolved-label retention remains TierC in1095"
+    },
+    {
+      "number": 1193,
+      "issue": 1111,
+      "head": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "review": "Standalone PASS101; composed PASS129/full source/native/Country/Feature/attrs/scanner/warm; explicit cold Feature snapshot provenance limit",
+      "base": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "dependency_pr": 1175,
+      "ci": "in_progress; run39678420581",
+      "partial_residual": "2013/2016 literalC4 instrument authority remains"
     }
   ]
 }

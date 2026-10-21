@@ -1,0 +1,106 @@
+{
+  "head": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+  "source_slots": 33193,
+  "source_quantity_sum": 1765763.95,
+  "per_source_slot": [
+    {
+      "wave": "2010-11",
+      "source_half": "Full_Sample",
+      "slot": 1,
+      "rows": 11364,
+      "selected_quantity_sum": 662587.5,
+      "missing_quantities": 8,
+      "observed_zero_quantities": 0
+    },
+    {
+      "wave": "2010-11",
+      "source_half": "Full_Sample",
+      "slot": 2,
+      "rows": 5285,
+      "selected_quantity_sum": 306767.0,
+      "missing_quantities": 4,
+      "observed_zero_quantities": 0
+    },
+    {
+      "wave": "2019-20",
+      "source_half": "Cross_Sectional",
+      "slot": 1,
+      "rows": 8602,
+      "selected_quantity_sum": 409435.15,
+      "missing_quantities": 0,
+      "observed_zero_quantities": 11
+    },
+    {
+      "wave": "2019-20",
+      "source_half": "Cross_Sectional",
+      "slot": 2,
+      "rows": 3962,
+      "selected_quantity_sum": 199327.55,
+      "missing_quantities": 0,
+      "observed_zero_quantities": 2
+    },
+    {
+      "wave": "2019-20",
+      "source_half": "Panel",
+      "slot": 1,
+      "rows": 2763,
+      "selected_quantity_sum": 128137.75,
+      "missing_quantities": 0,
+      "observed_zero_quantities": 4
+    },
+    {
+      "wave": "2019-20",
+      "source_half": "Panel",
+      "slot": 2,
+      "rows": 1217,
+      "selected_quantity_sum": 59509.0,
+      "missing_quantities": 0,
+      "observed_zero_quantities": 1
+    }
+  ],
+  "pairs": [
+    {
+      "wave": "2010-11",
+      "same_source_positive_affirmative_pairs": 51,
+      "members": 102,
+      "member_quantity_sum": 4670.0
+    },
+    {
+      "wave": "2019-20",
+      "same_source_positive_affirmative_pairs": 184,
+      "members": 368,
+      "member_quantity_sum": 17322.0
+    }
+  ],
+  "new_coalescences": 235,
+  "observed": {
+    "base": {
+      "target_rows": 33152,
+      "every_source_group_amount_exact": true,
+      "every_purchase_and_Improved_payload_absent": true
+    },
+    "candidate": {
+      "target_rows": 32917,
+      "every_source_group_amount_exact": true,
+      "every_purchase_and_Improved_payload_absent": true
+    }
+  },
+  "existing_retention": {
+    "2010-11": {
+      "source_No_slots": 20,
+      "missing_use_slots": 13,
+      "missing_quantity_slots": 12,
+      "observed_zero_slots": 0
+    },
+    "2019-20": {
+      "source_No_slots": 0,
+      "missing_use_slots": 0,
+      "missing_quantity_slots": 0,
+      "observed_zero_slots": 18
+    }
+  },
+  "all_group_numeric_contributions_exact": true,
+  "oracle_uses_production_fertilizer_or_assembler": false,
+  "only_identifier_closure_reused": true,
+  "no_native_pair_substitution_or_rescaling": true
+}

@@ -1,0 +1,33 @@
+{
+  "HEAD": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+  "base": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+  "Country_rows": [
+    180184,
+    179949
+  ],
+  "Feature_rows": [
+    264400,
+    264165
+  ],
+  "numeric_inorganic_Quantity_sum_conserved": 2899339.95,
+  "excluded_wave_physical_total_claim": false,
+  "organic_full_original_order_index_axis_dtypes_null_masks_attrs_and_Applied_exact": 11075,
+  "organic_positive": 11068,
+  "organic_missing": 7,
+  "qualified_organic_units_and_no_inferred_factors_preserved": true,
+  "all_235_positive_same_source_pair_sums_reverified": true,
+  "nitrogen_full_frame_and_attrs_exact_standalone": true,
+  "nitrogen_total": 1028195.63206,
+  "original_target_cold_API_and_all_five_raw_caches_complete": true,
+  "original_cold_Country_full_validation_passed_before_Feature_reference_mismatch": true,
+  "original_cold_public_Feature_pickle_saved": false,
+  "full_Feature_capture": "post-cold ordinary API, exactly unchanged cold cache bytes and mtimes; separate fresh-process warm repeat also exact",
+  "immutable_de9_Feature_artifact_arguments": {
+    "currency": null
+  },
+  "fresh_de9_default_control_arguments": "library default; includes currency index level",
+  "explicit_currency_None_full_frame_attrs_exact_immutable_artifact": true,
+  "fresh_default_full_frame_used_for_default_composition_expectation": true,
+  "normalization_of_values_attrs_axes_or_paths": false,
+  "additional_source_rebuild_after_reference_argument_mismatch": false
+}

@@ -1,0 +1,6 @@
+{
+  "owned_live_python_data_consumers": 0,
+  "test_workers_quiescent": true,
+  "release": "QUIESCENT; no further probes scheduled",
+  "network_connect_attempts": 0
+}

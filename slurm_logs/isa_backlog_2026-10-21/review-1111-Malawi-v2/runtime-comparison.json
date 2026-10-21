@@ -1,0 +1,41 @@
+{
+  "head": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+  "Country_rows": [
+    180184,
+    179949
+  ],
+  "nonorganic_rows": [
+    169109,
+    168874
+  ],
+  "Feature_rows": [
+    264400,
+    264165
+  ],
+  "whole_expected_unit_projection_and_existing_additive_grouping_exact": true,
+  "unaffected_full_frame_in_original_order_exact": true,
+  "all_unaffected_attrs_and_null_masks_exact": true,
+  "organic_f8_standalone_rows_exact": 11075,
+  "untouched_wave_frames": [
+    {
+      "wave": "2013-14",
+      "rows": 16188,
+      "full_frame_order_dtypes_attrs_exact": true
+    },
+    {
+      "wave": "2016-17",
+      "rows": 52494,
+      "full_frame_order_dtypes_attrs_exact": true
+    }
+  ],
+  "Uganda_full_frame_and_Feature_part_attrs_exact": true,
+  "all_inorganic_numeric_quantity_sum": 2899339.95,
+  "nitrogen_before": 840235.7795800001,
+  "nitrogen_after": 1028195.63206,
+  "nitrogen_delta": 187959.85247999988,
+  "floating_delta_minus_decimal": -1.1641532182693481e-10,
+  "diagnostic_absolute_precision_check": 1e-08,
+  "library_or_test_tolerance_changed": false,
+  "whole_reference_frame_order_proved_separately_against_frozen_author_frames": true,
+  "organic_composition_attempted": false
+}

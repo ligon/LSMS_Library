@@ -1,0 +1,63 @@
+#+TITLE: Independent #1111 v2 reproduction entry points
+#+AUTHOR: Sue
+
+These are the recorded review entry points.
+All runtime/source-reader/test commands use the private =run.sh=, mounted image, exact checkout/config identity assertions, =unshare -rn= and active socket-method guard.
+Numerical/build/make threads are one; candidate tests use two loadfile workers and baseline negatives run serial.
+Each stdout/stderr stream was written to its correspondingly named private log.
+The preparation/cold sequence asserts fresh destinations and must not be replayed over this completed evidence root.
+For a new cold reproduction, allocate a new private root and adapt the evidence-prefix constants in physical copies of these scripts.
+Do not clear or overwrite these roots.
+Warm/source comparisons can use the preserved roots.
+No script acquires a source or changes a tracked tree/ref.
+
+#+begin_src bash
+R=/local/job40255479/control/isa-backlog-20261021/review-1111-Malawi-v2
+PY=/local/job40255479/venv_img/bin/python
+
+# Fresh private preparation; MD5-gates all held inputs before runtime.
+"$PY" "$R/prepare.py" > "$R/preparation-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/verify_instruments.py" > "$R/instruments-v2-private.log" 2>&1
+
+bash "$R/run.sh" baseline "$R/runtime.py" cold > "$R/baseline-cold-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/runtime.py" cold > "$R/candidate-cold-private.log" 2>&1
+bash "$R/run.sh" sample-baseline "$R/sample_runtime.py" cold > "$R/sample-baseline-cold-private.log" 2>&1
+bash "$R/run.sh" sample-candidate "$R/sample_runtime.py" cold > "$R/sample-candidate-cold-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/source_oracle.py" > "$R/source-oracle-private.log" 2>&1
+
+bash "$R/run.sh" baseline "$R/runtime.py" warm > "$R/baseline-warm-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/runtime.py" warm > "$R/candidate-warm-private.log" 2>&1
+bash "$R/run.sh" sample-baseline "$R/sample_runtime.py" warm > "$R/sample-baseline-warm-private.log" 2>&1
+bash "$R/run.sh" sample-candidate "$R/sample_runtime.py" warm > "$R/sample-candidate-warm-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/compare_runtime.py" > "$R/runtime-comparison-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/warning_checks.py" > "$R/warning-checks-private.log" 2>&1
+
+bash "$R/run.sh" candidate "$R/test_runner.py" new > "$R/candidate-new-tests-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/test_runner.py" regressions > "$R/candidate-regressions-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/test_runner.py" mutant > "$R/candidate-mutant-private.log" 2>&1
+bash "$R/run.sh" baseline "$R/test_runner_baseline_serial.py" negative > "$R/baseline-negative-v3-private.log" 2>&1
+
+bash "$R/run.sh" baseline "$R/hash_inventory.py" > "$R/baseline-hashes-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/hash_inventory.py" > "$R/candidate-hashes-private.log" 2>&1
+bash "$R/run.sh" baseline "$R/run_scan.py" > "$R/baseline-scan-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/run_scan.py" > "$R/candidate-scan-private.log" 2>&1
+"$PY" "$R/compare_scope.py" > "$R/scope-comparison-private.log" 2>&1
+bash "$R/run.sh" candidate "$R/final_proof.py" > "$R/final-proof-private.log" 2>&1
+#+end_src
+
+=test_runner.py= records its complete pytest argument vector and phase/outcome list in the matching JSON receipt.
+The101-case command expands to =-n2 --dist=loadfile -q -p no:cacheprovider -p pytest_identity= plus private basetemp/JUnit paths, the four files listed in REVIEW.org and =-k 'not warm'=.
+New12 and mutant12 use the frozen candidate test path; mutant adds =-p late_mutant=.
+The baseline final command uses =--rootdir=/local/job40255479/worktrees/isa-baseline -n0=, the same frozen candidate test file and exact baseline runtime/config identity.
+Negative receipts require pytest exit1 with10call-failures/2passes; mutant requires12call-failures.
+JUnit confirms zero errors in either negative control.
+Mutant failures are nine duplicate-full-key assertions and three early-unit-binding assertions, with no syntax/name/type/import failure.
+Initial failed instrument and xdist-baseline harness logs are preserved separately; they are not overwritten or counted as successful checks.
+
+=run_scan.py= executes the current frozen checkout's actual =bench/feature_audit/scan.py --features plot_inputs --countries Malawi Uganda --phases 1,2 --jobs 1 --out <private jsonl>=.
+=compare_scope.py= requires every full record in order to equal the baseline after only the explicitly enumerated expected count edits; it performs no path, value or attr normalization.
+=hash_inventory.py= recomputes all549 hashes and39 fingerprints rather than reading producer counts.
+=final_proof.py= rehashes all tracked files and all quiescent evidence/copy sources, checks source MD5s, unchanged warm receipts and subprocess quiescence, and writes safe proof.json.
+Full rows, IDs, source metadata, warning examples, JUnit failure traces and frame snapshots remain private.
+
+Sue.
