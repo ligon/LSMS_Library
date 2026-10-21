@@ -1,0 +1,3197 @@
+{
+  "records": [
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 218,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T04:34:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/218"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:32Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:32Z"
+      },
+      "matches_expected": true,
+      "number": 569,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:32Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:32Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/569"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:33Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:33Z"
+      },
+      "matches_expected": true,
+      "number": 600,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:33Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:33Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/600"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:33Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:34Z"
+      },
+      "matches_expected": true,
+      "number": 607,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:34Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:33Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/607"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 637,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-15T17:02:37Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/637"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 650,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-15T17:02:50Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/650"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:34Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:34Z"
+      },
+      "matches_expected": true,
+      "number": 674,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:34Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:34Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/674"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:34Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:35Z"
+      },
+      "matches_expected": true,
+      "number": 675,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:35Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:34Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/675"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:35Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:35Z"
+      },
+      "matches_expected": true,
+      "number": 680,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:35Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:35Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/680"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 698,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T20:56:25Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/698"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 778,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-21T05:09:40Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/778"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:35Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:36Z"
+      },
+      "matches_expected": true,
+      "number": 781,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:36Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:35Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/781"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 787,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T05:53:46Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/787"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:36Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:36Z"
+      },
+      "matches_expected": true,
+      "number": 790,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:36Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/790"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:37Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:37Z"
+      },
+      "matches_expected": true,
+      "number": 793,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:37Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:37Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/793"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 798,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T13:50:13Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/798"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:37Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:38Z"
+      },
+      "matches_expected": true,
+      "number": 805,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:38Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:37Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/805"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 828,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T05:52:23Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/828"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:38Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:38Z"
+      },
+      "matches_expected": true,
+      "number": 831,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:38Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:38Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/831"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:38Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:39Z"
+      },
+      "matches_expected": true,
+      "number": 836,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:39Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:38Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/836"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:39Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:39Z"
+      },
+      "matches_expected": true,
+      "number": 840,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:39Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/840"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 845,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T05:52:24Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/845"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 851,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T10:26:47Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/851"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:39Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:40Z"
+      },
+      "matches_expected": true,
+      "number": 867,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:40Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/867"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:40Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:40Z"
+      },
+      "matches_expected": true,
+      "number": 908,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:40Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:40Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/908"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:41Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:41Z"
+      },
+      "matches_expected": true,
+      "number": 915,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:41Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:41Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/915"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 920,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T14:25:40Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/920"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:41Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:41Z"
+      },
+      "matches_expected": true,
+      "number": 928,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:41Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:41Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/928"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:42Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:42Z"
+      },
+      "matches_expected": true,
+      "number": 931,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:42Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:42Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/931"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 932,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-15T17:03:22Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/932"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:42Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:42Z"
+      },
+      "matches_expected": true,
+      "number": 942,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:42Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:42Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/942"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:43Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:43Z"
+      },
+      "matches_expected": true,
+      "number": 962,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:43Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:43Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/962"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:43Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:44Z"
+      },
+      "matches_expected": true,
+      "number": 974,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:44Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:43Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/974"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 978,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T02:33:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/978"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:44Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:44Z"
+      },
+      "matches_expected": true,
+      "number": 1001,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:44Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:44Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1001"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:45Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:45Z"
+      },
+      "matches_expected": true,
+      "number": 1002,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:45Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:45Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1002"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:45Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:46Z"
+      },
+      "matches_expected": true,
+      "number": 1008,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:46Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:45Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1008"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:46Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:46Z"
+      },
+      "matches_expected": true,
+      "number": 1031,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:46Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:46Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1031"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1032,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T13:21:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1032"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1033,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T05:50:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1033"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1034,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T05:50:40Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1034"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:47Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:47Z"
+      },
+      "matches_expected": true,
+      "number": 1035,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:47Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:47Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1035"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:47Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:47Z"
+      },
+      "matches_expected": true,
+      "number": 1036,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:47Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:47Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1036"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:48Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:48Z"
+      },
+      "matches_expected": true,
+      "number": 1037,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:48Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:48Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1037"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:48Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:49Z"
+      },
+      "matches_expected": true,
+      "number": 1038,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:49Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:48Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1038"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:49Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:50Z"
+      },
+      "matches_expected": true,
+      "number": 1039,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:50Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:49Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1039"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:50Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:51Z"
+      },
+      "matches_expected": true,
+      "number": 1040,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:51Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:50Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1040"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:51Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:52Z"
+      },
+      "matches_expected": true,
+      "number": 1041,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:52Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:51Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1041"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:53Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:53Z"
+      },
+      "matches_expected": true,
+      "number": 1042,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:53Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:53Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1042"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1043,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-18T05:50:48Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1043"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1044,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T14:52:10Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1044"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1045,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T21:21:24Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1045"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:54Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:54Z"
+      },
+      "matches_expected": true,
+      "number": 1047,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:54Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:54Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1047"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:55Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:55Z"
+      },
+      "matches_expected": true,
+      "number": 1050,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:55Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:55Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1050"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1051,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T02:26:56Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1051"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1055,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T12:19:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1055"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1056,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T12:19:40Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1056"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1057,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T12:19:41Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1057"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1058,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T12:19:42Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1058"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1059,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T12:19:43Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1059"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1060,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T12:19:44Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1060"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1061,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T12:50:07Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1061"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1064,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T13:20:52Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1064"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1066,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T21:21:21Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1066"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1068,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T14:08:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1068"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:56Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:56Z"
+      },
+      "matches_expected": true,
+      "number": 1070,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:56Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:56Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1070"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1071,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T17:20:13Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1071"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1072,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T14:23:34Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1072"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1073,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T14:23:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1073"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1074,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T14:23:37Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1074"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1075,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T14:23:38Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1075"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1085,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T16:12:11Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1085"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1087,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T16:45:01Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1087"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1088,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T16:45:03Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1088"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1089,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T16:45:04Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1089"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1090,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T16:45:05Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1090"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1091,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T16:45:06Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1091"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:57Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:57Z"
+      },
+      "matches_expected": true,
+      "number": 1093,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:57Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:57Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1093"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1095,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T16:58:30Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1095"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1096,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T16:58:31Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1096"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:46Z",
+      "closure_linked_to_release1168": false,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "Commit",
+          "oid": "7117f5b683d5c98812027277de88b5d9d7a8536a",
+          "url": "https://github.com/ligon/LSMS_Library/commit/7117f5b683d5c98812027277de88b5d9d7a8536a"
+        },
+        "createdAt": "2026-10-21T13:01:47Z"
+      },
+      "matches_expected": true,
+      "number": 1099,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "Commit",
+              "oid": "7117f5b683d5c98812027277de88b5d9d7a8536a",
+              "url": "https://github.com/ligon/LSMS_Library/commit/7117f5b683d5c98812027277de88b5d9d7a8536a"
+            },
+            "createdAt": "2026-10-21T13:01:47Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:46Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1099"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1100,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T18:30:33Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1100"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1101,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T18:30:34Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1101"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1102,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T18:30:35Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1102"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1103,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T18:30:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1103"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1106,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T21:29:52Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1106"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1107,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T21:29:53Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1107"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1108,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T21:29:55Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1108"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1109,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T21:29:56Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1109"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1110,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T21:29:57Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1110"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1111,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T21:29:58Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1111"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:58Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:58Z"
+      },
+      "matches_expected": true,
+      "number": 1113,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:58Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:58Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1113"
+    },
+    {
+      "closedAt": "2026-10-21T13:01:59Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:01:59Z"
+      },
+      "matches_expected": true,
+      "number": 1114,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:01:59Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:01:59Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1114"
+    },
+    {
+      "closedAt": "2026-10-21T13:02:00Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:02:00Z"
+      },
+      "matches_expected": true,
+      "number": 1115,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:02:00Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:02:00Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1115"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1116,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:20:22Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1116"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1118,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:38:33Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1118"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1119,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:38:35Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1119"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1120,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:38:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1120"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1121,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:38:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1121"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1122,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:38:37Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1122"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1123,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:38:38Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1123"
+    },
+    {
+      "closedAt": "2026-10-21T13:02:01Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:02:01Z"
+      },
+      "matches_expected": true,
+      "number": 1124,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:02:01Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:02:01Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1124"
+    },
+    {
+      "closedAt": "2026-10-21T13:02:02Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:02:02Z"
+      },
+      "matches_expected": true,
+      "number": 1125,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:02:02Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:02:02Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1125"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1127,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T10:31:05Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1127"
+    },
+    {
+      "closedAt": "2026-10-21T13:02:03Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:02:04Z"
+      },
+      "matches_expected": true,
+      "number": 1128,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:02:04Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:02:03Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1128"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1129,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:48:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1129"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1130,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:48:37Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1130"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1131,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:48:38Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1131"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1133,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:55:59Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1133"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1134,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T02:29:17Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1134"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1135,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T02:30:57Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1135"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1136,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:56:02Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1136"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1138,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:57:01Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1138"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1139,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:57:02Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1139"
+    },
+    {
+      "closedAt": "2026-10-21T13:02:04Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:02:04Z"
+      },
+      "matches_expected": true,
+      "number": 1140,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:02:04Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:02:04Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1140"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1141,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:57:05Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1141"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1142,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:57:06Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1142"
+    },
+    {
+      "closedAt": "2026-10-21T13:02:04Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:02:05Z"
+      },
+      "matches_expected": true,
+      "number": 1143,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:02:05Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:02:04Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1143"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1144,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-19T22:58:05Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1144"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1145,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T02:23:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1145"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1146,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T03:45:29Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1146"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1148,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T10:26:48Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1148"
+    },
+    {
+      "closedAt": null,
+      "closure_linked_to_release1168": false,
+      "expected_state": "OPEN",
+      "latest_close_event": null,
+      "matches_expected": true,
+      "number": 1149,
+      "state": "OPEN",
+      "stateReason": null,
+      "timelineItems": {
+        "nodes": []
+      },
+      "updatedAt": "2026-10-20T10:28:38Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1149"
+    },
+    {
+      "closedAt": "2026-10-21T13:02:05Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:02:05Z"
+      },
+      "matches_expected": true,
+      "number": 1159,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:02:05Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:02:05Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1159"
+    },
+    {
+      "closedAt": "2026-10-21T13:02:05Z",
+      "closure_linked_to_release1168": true,
+      "expected_state": "CLOSED",
+      "latest_close_event": {
+        "__typename": "ClosedEvent",
+        "closer": {
+          "__typename": "PullRequest",
+          "mergeCommit": {
+            "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+          },
+          "mergedAt": "2026-10-21T13:01:30Z",
+          "number": 1168,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+        },
+        "createdAt": "2026-10-21T13:02:06Z"
+      },
+      "matches_expected": true,
+      "number": 1160,
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "timelineItems": {
+        "nodes": [
+          {
+            "__typename": "ClosedEvent",
+            "closer": {
+              "__typename": "PullRequest",
+              "mergeCommit": {
+                "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+              },
+              "mergedAt": "2026-10-21T13:01:30Z",
+              "number": 1168,
+              "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+            },
+            "createdAt": "2026-10-21T13:02:06Z"
+          }
+        ]
+      },
+      "updatedAt": "2026-10-21T13:02:05Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1160"
+    }
+  ],
+  "summary": {
+    "accepted1099_commit_closure_explanation": {
+      "cause": "Accepted1099 closed by its existing commit keyword when its history reached master, rather than by the release PR keyword; expected closure, no correction needed.",
+      "closer_commit": "7117f5b683d5c98812027277de88b5d9d7a8536a",
+      "closer_commit_is_master_merge_ancestor": true,
+      "closer_url": "https://github.com/ligon/LSMS_Library/commit/7117f5b683d5c98812027277de88b5d9d7a8536a",
+      "issue": 1099,
+      "matches_frozen_verified1099_commit_keyword": true
+    },
+    "accepted_actually_closed": 48,
+    "accepted_expected_closed": 48,
+    "accepted_with_release1168_close_link": 47,
+    "accepted_without_release1168_close_link": [
+      1099
+    ],
+    "closure_timestamps": [
+      "2026-10-21T13:01:32Z",
+      "2026-10-21T13:01:33Z",
+      "2026-10-21T13:01:34Z",
+      "2026-10-21T13:01:35Z",
+      "2026-10-21T13:01:36Z",
+      "2026-10-21T13:01:37Z",
+      "2026-10-21T13:01:38Z",
+      "2026-10-21T13:01:39Z",
+      "2026-10-21T13:01:40Z",
+      "2026-10-21T13:01:41Z",
+      "2026-10-21T13:01:42Z",
+      "2026-10-21T13:01:43Z",
+      "2026-10-21T13:01:44Z",
+      "2026-10-21T13:01:45Z",
+      "2026-10-21T13:01:46Z",
+      "2026-10-21T13:01:47Z",
+      "2026-10-21T13:01:48Z",
+      "2026-10-21T13:01:49Z",
+      "2026-10-21T13:01:50Z",
+      "2026-10-21T13:01:51Z",
+      "2026-10-21T13:01:53Z",
+      "2026-10-21T13:01:54Z",
+      "2026-10-21T13:01:55Z",
+      "2026-10-21T13:01:56Z",
+      "2026-10-21T13:01:57Z",
+      "2026-10-21T13:01:58Z",
+      "2026-10-21T13:01:59Z",
+      "2026-10-21T13:02:00Z",
+      "2026-10-21T13:02:01Z",
+      "2026-10-21T13:02:02Z",
+      "2026-10-21T13:02:03Z",
+      "2026-10-21T13:02:04Z",
+      "2026-10-21T13:02:05Z"
+    ],
+    "default_branch": {
+      "name": "master",
+      "target": {
+        "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+      }
+    },
+    "fields_fetched": "Only issue status/reason/timestamps/URLs and close/reopen metadata; no bodies, titles or comments",
+    "limits": "Snapshot of issue states after release PR1168; CI/release/tag/publication are not assessed here",
+    "missing_closures": [],
+    "mutations": "Private report/query files only; no repository/GitHub/source/data/cache mutation",
+    "observed_at": "2026-10-21T13:04:09.576299+00:00",
+    "provider": "GET-equivalent read-only gh GraphQL query projection; connected issue tools cannot exclude bodies",
+    "release_pr": {
+      "baseRefName": "master",
+      "headRefName": "development",
+      "mergeCommit": {
+        "oid": "097283459f80016b0f00a51b814a0cb964a42789"
+      },
+      "mergedAt": "2026-10-21T13:01:30Z",
+      "number": 1168,
+      "state": "MERGED",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1168"
+    },
+    "retained_actually_open": 77,
+    "retained_expected_open": 77,
+    "status": "PASS",
+    "unexpected_retained_closures": []
+  }
+}

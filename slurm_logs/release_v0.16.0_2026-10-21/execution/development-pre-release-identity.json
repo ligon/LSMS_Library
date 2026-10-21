@@ -1,0 +1,17 @@
+{
+  "candidate": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "release_commit": "ee97d80aab8874e71e89dcdd5f93f18715fab935",
+  "identical_non_report_paths": 12421,
+  "identical_package_files": 11753,
+  "mode_type_blob_identity": true,
+  "unexpected_differences": 0,
+  "documented_changed_paths": 380,
+  "source_tree_sha256": "c4dda57badd1cacf2fad93d50d70481b028a36eaf46ab64fa2258c0f50736992",
+  "allowed_deltas": [
+    "slurm_logs/**",
+    ".sucoder/handoff.org",
+    "docs/releases/v0.16.0.md",
+    "docs/migration/v0.16.0.md"
+  ],
+  "scope": "All tracked non-report Git modes/types/blob IDs match the validated candidate exactly; no package imports or data reads."
+}

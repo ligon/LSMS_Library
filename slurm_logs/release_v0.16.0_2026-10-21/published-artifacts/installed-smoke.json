@@ -1,0 +1,23 @@
+{
+  "package_file": "/local/job40255479/control/release-v016/published-0.16.0/installed-target/lsms_library/__init__.py",
+  "version": "0.16.0",
+  "countries_root": "/local/job40255479/control/release-v016/published-0.16.0/installed-target/lsms_library/countries",
+  "data_root": "/local/job40255479/control/release-v016/published-0.16.0/installed-data",
+  "registered_countries": 38,
+  "uganda_waves": [
+    "2005-06",
+    "2009-10",
+    "2010-11",
+    "2011-12",
+    "2013-14",
+    "2015-16",
+    "2018-19",
+    "2019-20"
+  ],
+  "uganda_declared_tables": 28,
+  "roster_declaring_countries": 37,
+  "network_forbidden": true,
+  "data_builds_forbidden": true,
+  "no_parquet_produced": true,
+  "scope": "Installed configuration smoke only; existing image dependencies; no dependency-resolution or installed microdata claim"
+}

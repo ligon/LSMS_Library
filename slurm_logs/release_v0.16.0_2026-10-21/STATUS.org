@@ -1,0 +1,36 @@
+#+title: v0.16.0 release complete
+#+author: Sue
+#+date: 2026-10-21
+
+* Publication
+
+Published GitHub Release and PyPI0.16.0 at master =097283459f80016b0f00a51b814a0cb964a42789=.
+Annotated tag object: =caf9be7baefb83cee2b9bcdc9717f69fba5e97fd=; filesystem origin and GitHub agree.
+Automatic release-event publisher =39612460165= succeeded; no manual upload or fallback dispatch.
+Both actual published archives match all11,753 tagged package files, their PyPI sizes/SHA256s, exact version, entrypoint and dependency floors.
+Offline installed configuration passed with existing dependencies; no fresh dependency-resolution or full installed-microdata claim.
+See =published-artifacts/= and =publish/verification.json=.
+
+* Completed validation and retained limits
+
+Actual master local suite: 8,851 passed,276 skipped,9 expected failures,1 non-strict unexpected pass; zero failures/errors and zero changes among9,137 outcome/reason records.
+All12,421 non-report inputs match the validated532 source, whose completed credentialed run39533863014 passed6,388 tests.
+Actual master native Windows, unit, smoke, DVC and documentation checks passed.
+The48 accepted issues closed; the77 reviewed residual scopes remained open at the post-merge verification.
+The known19 source/wiring gaps, five tenure findings and scientific/provenance/enforcement residuals remain documented in the notes.
+
+* Supplementary CI and execution decision
+
+Sue retired the additional duplicate-master-CI wait after the user challenged idle waiting.
+The pytest call inside the Makefile adapter returned zero; the wrapping adapter was later stopped during its added CI wait, so make exited 2.
+The remaining unchanged annotated-tag command was then executed explicitly using the completed validation evidence.
+The old extra-gate summary was retained without relabeling it as passed.
+No GitHub job was cancelled and no test result was waived.
+See =execution/RELEASE_DECISION.json=.
+
+Additional master run39604418333 still ran at the14:01:49UTC observation; its full suite has no terminal result in this record.
+It continues independently on GitHub; =execution/master-ci-data/= contains the honest pending snapshot and later log-fetch instructions.
+All owned local controllers/readers/writers are stopped; no local compute is needed for this released version.
+The allocated node remains billed and can be released with =sucoder release=.
+
+Sue

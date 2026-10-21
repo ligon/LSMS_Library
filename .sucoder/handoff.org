@@ -1,5 +1,83 @@
 #+title: Handoff -- v0.16.0 release, 2026-10-21
 
+* v0.16.0 published and verified -- 2026-10-21
+
+Release and PyPI0.16.0 are live at master097283459f80016b0f00a51b814a0cb964a42789.
+Annotated tagcaf9be7baefb83cee2b9bcdc9717f69fba5e97fd agrees across local/filesystem-origin/GitHub.
+Publisher39612460165 succeeded automatically from the release event.
+Actual wheel/sdist bytes match all11,753 tagged package files and PyPI digests; versions, requirements, entrypoint and offline installed-config smoke PASS.
+Final local suite8851/276skip/9xfail/1non-strictXPASS has zero failures/errors and zero9137-outcome/reason changes.
+All12,421 non-report source inputs match completed credentialed6388-pass candidate532; actual master native Windows/unit/smoke/DVC/docs also PASS.
+All48 accepted issues closed; all77 retained references were OPEN at the post-merge check.
+
+The extra duplicate-master wait was retired explicitly; see execution/RELEASE_DECISION.json.
+Do not relabel the old pending extra-gate summary as passed: the local tests passed, the waiting adapter was stopped, and the remaining tag command was executed explicitly using completed exact-code evidence.
+Duplicate master Linux39604418333 continues independently with no terminal verdict recorded here; fetching its eventual log is supplementary, not a reason to repeat the completed release.
+All owned local observers/controllers/writers are stopped, and the node can be released.
+
+Final notes: =docs/releases/v0.16.0.md=; migration: =docs/migration/v0.16.0.md=.
+Final safe evidence: =slurm_logs/release_v0.16.0_2026-10-21/STATUS.org= and =COMPLETED.json=.
+Completion records originate on =docs/v0.16.0-completion=, based on the released master commit, for normal merge into development and history synchronization.
+Query the live development ref rather than assuming this record's commit is its latest tip.
+No additional tag, publication, CI protection change or cache promotion is needed.
+
+Sue
+
+* Tag and GitHub Release published; PyPI upload active -- 2026-10-21
+
+The maintainer challenged idle waiting on the duplicate GitHub Linux job.
+Sue retired that agent-added wait, using the completed6388-pass credentialed run39533863014 at532 plus exact12421-input identity and the fresh8851-pass master local suite/native platform checks.
+No test result was waived or relabeled; the duplicate master run39604418333 continues.
+Only the already-finished Makefile pytest adapter's extra waiting process was stopped; its historical extra-gate summary stays pending/false.
+The remaining unchanged annotated-tag command was executed explicitly after verification.
+See =execution/RELEASE_DECISION.json=; this supersedes the earlier two-gate execution plan without rewriting its historical records.
+
+Annotated v0.16.0 is pushed to filesystem origin and GitHub at master097283459f80016b0f00a51b814a0cb964a42789.
+The GitHub Release is published and actual release-event publish workflow39612460165 is running from that exact tag.
+No fallback dispatch was needed.
+The windows_ci agent is verifying actual PyPI archives/package bytes/metadata plus the offline installed-configuration smoke as soon as upload appears.
+Root must verify the publisher, review actual artifacts and record final status; do not claim the duplicate Linux run has passed before its own completion.
+
+Sue
+
+* Local release suite and platform jobs PASS; Linux gate pending -- 2026-10-21
+
+Actual make release at master097 passed: 8,851/276skip/9xfail/1non-strictXPASS; zero failures/errors and zero changes among all 9,137 outcome/reason records versus532.
+All16 worker identities passed, numerical/build threads are1, and no in-tree country parquet was produced.
+The adapter is waiting on exact master CI39604418333 after shutting down xdist; do not rerun the suite.
+Local proof: =slurm_logs/release_v0.16.0_2026-10-21/local-final/=.
+
+All platform jobs passed at actual097: unit4,685/4,452skip; Windows smoke327/1skip; credentialed native Windows shocks/assets match approved dimensions and digests; DVC reachability/lock and documentation deploy PASS.
+Linux credentials/gate and Uganda prerequisite build passed; its full suite is running.
+All48 accepted issue closures and all77 retained OPEN scopes were independently verified, with no mismatch.
+Safe evidence: =master-ci-platform/= and =postmerge-issues/= under the release report directory.
+No tag or publication exists yet; keep executable master frozen and continue observing Linux CI.
+
+Sue
+
+* Release merged; final gates active -- 2026-10-21 06:02 PDT
+
+Preparation PR 1167 merged as =ee97d80aab8874e71e89dcdd5f93f18715fab935=.
+Release PR 1168 merged development to master with a MERGE COMMIT as =097283459f80016b0f00a51b814a0cb964a42789=; GitHub parsed all 48 issue closures.
+GitHub, tracking, local and filesystem-origin master agree at that commit.
+All 12,421 non-report tracked inputs (11,753 package files) exactly match validated 532 in Git mode/type/blob; =execution/master-source-identity.json= records the proof.
+
+The actual Makefile release target is running in frozen =/local/job40255479/worktrees/release-v016-master=, process session 41992.
+It collected 9,137 cases and all 16 worker identities passed.
+The private full log is =/local/job40255479/control/release-v016/make-release-final.log=.
+Automatic exact-master CI =39604418333= runs alongside it, including credentialed Linux, native Windows and documentation deployment.
+The adapter waits for local outcome/reason parity and that exact CI SUCCESS before returning zero; make then creates the annotated v0.16.0 tag.
+No tag, GitHub Release or PyPI publication has happened at this checkpoint.
+
+Keep master checkout and refs frozen until the Makefile tag line finishes.
+Do not run tests again while the adapter waits on CI; inspect its private summary and job observers instead.
+The contracts agent checks 48 closures and 77 retained scopes; windows_ci verifies platform jobs; framework_reliability observes the Linux data job.
+All observer outputs remain private until reviewed and copied as safe aggregates.
+Root owns tag push, GitHub Release, publish.yml observation, published-artifact verification and final durable records.
+The completion worktree/branch is separate so recording this checkpoint does not mutate the executable checkout.
+
+Sue
+
 * Release authorized and preparation in progress -- 2026-10-21
 
 The maintainer instructed "Okay, let's get 0.16.0 out".

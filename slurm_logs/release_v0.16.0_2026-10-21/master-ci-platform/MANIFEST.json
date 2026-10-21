@@ -1,0 +1,22 @@
+{
+  "COPYLIST.txt": {
+    "bytes": 78,
+    "sha256": "3a6954999ac92885d2fe38d1d5e980c5bccfb240e49d8f071352979d3c9c3459"
+  },
+  "REPORT.md": {
+    "bytes": 2799,
+    "sha256": "7d8db53e8a518969a8cd8a7ea71c7ae994a7d71368ece13e712a4fb734a79598"
+  },
+  "finalize.py": {
+    "bytes": 4836,
+    "sha256": "257c812f7a7d013f1c871c6aec5641a9d85726b8428018ec1139caaa2017bade"
+  },
+  "monitor.py": {
+    "bytes": 7078,
+    "sha256": "299ec41c9c6c2dacc6181142854db1a46e96aebb303089b6cfd36762066016cd"
+  },
+  "verification.json": {
+    "bytes": 15587,
+    "sha256": "5642e7bd7636a4cc8a203a111e47f149333d6e4fd3b7f332bb0aac80fe88a59e"
+  }
+}

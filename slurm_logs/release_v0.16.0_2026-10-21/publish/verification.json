@@ -1,0 +1,111 @@
+{
+  "workflow_run": 39612460165,
+  "url": "https://github.com/ligon/LSMS_Library/actions/runs/39612460165",
+  "event": "release",
+  "tag": "v0.16.0",
+  "head_sha": "097283459f80016b0f00a51b814a0cb964a42789",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "job": "build",
+      "job_id": 119264599480,
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install poetry + dynamic-versioning plugin",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Resolve & sanity-check version",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build sdist + wheel",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "log_sha256": "c859847222210de859eaa82bebb84effab7b5fe7d8cea262d33009d4ab5b164a",
+      "log_bytes": 85714,
+      "contains_release_commit": true,
+      "contains_exact_version": true
+    },
+    {
+      "job": "publish",
+      "job_id": 119265234000,
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/download-artifact@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Publish to PyPI",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Publish to PyPI",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "log_sha256": "c00dae6098f548d93e883a7f62ef13f712d466d8565c25b4a5e60279c512a1c0",
+      "log_bytes": 52869,
+      "contains_release_commit": false,
+      "contains_exact_version": true
+    }
+  ],
+  "publisher": "Trusted Publishing / OIDC; no manual upload or fallback dispatch",
+  "scope": "Actual publisher success; downloaded PyPI payload verification recorded separately"
+}
