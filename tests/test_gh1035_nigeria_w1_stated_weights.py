@@ -297,9 +297,16 @@ def test_kg_ladder_on_the_sized_labels(food_acquired, w1ph):
     q = food_acquired['Quantity'].reindex(f.index).to_numpy()
     src = f['KgFactorSource'].to_numpy()
     sized = u.isin(set(mass) | litres).to_numpy()
-    assert set(t[sized]) == {'2011Q1'}
+    w1 = (t == '2011Q1').to_numpy()
+    assert set(t[sized & w1]) == {'2011Q1'}
+    # GH #1034: W3 shares these native names, but not W1's stated card.
+    later_shared = sized & ~w1
+    assert later_shared.any()
+    assert not (src[later_shared] == 'survey_kg').any()
+    stamp = food_acquired['Derivation'].reindex(f.index).to_numpy()
+    assert not pd.Series(stamp[later_shared]).eq(KEY).fillna(False).any()
     assert not (src[sized] == 'metric').any()
-    on_mass = u.isin(mass).to_numpy() & (q > 0)
+    on_mass = w1 & u.isin(mass).to_numpy() & (q > 0)
     frac = on_mass & (q < 1)
     whole = on_mass & (q >= 1)
     assert frac.sum() > 0 and whole.sum() > 0

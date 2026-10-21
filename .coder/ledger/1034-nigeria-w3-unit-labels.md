@@ -80,3 +80,13 @@ Baseline failing log and proposed patch are private in
 `control/isa-backlog-20261021/east/1144/`. Apply on a separate branch based at6f,
 verify the relevant complete tests against its unchanged held data and freeze
 for independent review before updating the public PR head.
+
+Follow-up verification before freeze: complete GH #1035 file passes25tests,
+zero skips, on a physical private L1/L2 copy with exact amendment checkout
+identity and an offline socket guard. The unchanged6f control failed its
+all-quarter exclusivity assertion; the amended test retains W1 numeric and
+provenance assertions and verifies observed later shared-name rows are not
+stamped with the W1 card. Existing53-test/source/derived review remains
+preserved. No runtime/config input changed. Warnings remain private because
+the diagnostic logger can include household-level records. Independent
+review of this test-only amendment is required before the PR returns ready.
