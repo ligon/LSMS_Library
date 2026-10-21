@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T16:14:41.742847+00:00",
+  "observed_at": "2026-10-21T16:44:19.694087+00:00",
   "actions": [
     {
       "issue": 822,
@@ -14,6 +14,10 @@
       "issue": 1171,
       "action": "opened Ethiopia diagnosis residual split from1062",
       "parent_comment_url": "https://github.com/ligon/LSMS_Library/issues/1062#issuecomment-6320609557"
+    },
+    {
+      "issue": 1062,
+      "action": "narrowed to Uganda implementation and completed current census; Ethiopia split1171, known dangling nonISA recipes218; PR1173 independently reviewed"
     }
   ],
   "verified_issue_metadata": [
@@ -39,5 +43,21 @@
       "url": "https://github.com/ligon/LSMS_Library/issues/1171"
     }
   ],
-  "implementation_prs_merged": 0
+  "implementation_prs_merged": 0,
+  "implementation_prs": [
+    {
+      "number": 1172,
+      "issue": 1034,
+      "head": "6fda46bc5437758bd650cf4016f0782a124281cf",
+      "review": "PASS",
+      "ci": "success; credentialed data jobs skipped"
+    },
+    {
+      "number": 1173,
+      "issue": 1062,
+      "head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "review": "PASS after amendment",
+      "ci": "pending"
+    }
+  ]
 }

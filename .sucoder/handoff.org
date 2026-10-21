@@ -653,3 +653,31 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 - Default branch is master: "Closes #N" never fires on a development merge -- close issues by hand with the PR cited.
 
 -- Sue
+
+* 2026-10-21 -- Active LSMS-ISA country backlog campaign
+
+Sue, GPT-6. Report branch =docs/isa-backlog-20261021=; preceding report commit =516fa67462202440e0fe18d71b4d5eff6c178ed9=.
+Development baseline =f8d236694c26fe9e709c5548f02c70f74ea72c33= remains clean.
+The v0.16.0 release above is complete; current work is the eight-country backlog.
+See =slurm_logs/isa_backlog_2026-10-21/STATUS.org= and =country-lanes.json=.
+
+PR #1170 is the draft campaign evidence. Reviewed country PRs await human merge:
+- Nigeria #1034: PR #1172, frozen =6fda46bc=, CI success with credentialed data jobs skipped.
+- Uganda #1062: PR #1173, amended frozen =4ef24fb=; first candidate =58ccfc2= was rejected for partial-cache/Make coverage.
+No auto-merge. Both rejected and passing independent reviews are preserved.
+
+Active country lanes: Nigeria #1144 source-backed quarter decoder; Malawi #1109 recorded organic amounts/units amendment; Niger #1088 exact sentinel diagnosis.
+Other five country worktrees are created; rotate into three worker slots.
+The immutable PR/review branches must not advance with the mutable country lanes.
+Private source/frame evidence: =/local/job40255479/control/isa-backlog-20261021/=.
+No shared-cache mutation, source acquisition or full-suite/corpus validation is claimed.
+
+Next: complete Malawi public-source accounting (six unlabelled organic codes must survive the food mapping), freeze and independently review; review Niger diagnosis before its concrete fix; finish Nigeria decoder accounting before independent review.
+Then rotate queued Mali/Burkina_Faso/Ethiopia/Tanzania work through the country lanes.
+Do not count planned PRs or retained human/data decisions as resolved bugs.
+
+Use mounted image =/local/job40255479/venv_img/bin/python=, generation =20261019T221223Z=, exact checkout/config identity, private L2, one BLAS/build thread.
+Job40255479 has32cores/93GiB and about54hours left at this checkpoint; no deadline warning.
+Every ordinary commit must print =SUCODER: published=; never edit the durable mirror working tree.
+
+Sue

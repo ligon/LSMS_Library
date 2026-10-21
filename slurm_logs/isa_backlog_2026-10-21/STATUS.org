@@ -3,72 +3,70 @@
 #+date: 2026-10-21
 #+TODO: TODO ACTIVE WAITING | DONE
 
-* ACTIVE Inventory and reconcile
+* ACTIVE Country backlog campaign
 
-The maintainer requested the backlog workflow for the eight LSMS-ISA countries.
-Scope: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania and Uganda.
-The initial live GitHub snapshot has 156 open issues, zero open PRs and 300 recent merged PRs.
-Country-keyword matching finds 117 candidates; this is not the final scope count.
-All 156 issues are assigned exactly once for applicability and residual review.
+The scope is Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania and Uganda.
+The verified release foundation and clean development baseline are =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+The initial inventory classified all 156 open issues exactly once: 97 reference ISA countries, including overlapping umbrellas, and 59 are outside this campaign.
+The 37 partial records carry exact residual titles and bodies in =triage.json=; their old counts are historical unless measured again.
+=summary.json= records the tier and dependency ordering; enhancements and acquisition remain human dispositions.
 
-| Read-only lane | Issues | Primary countries |
-|----------------+--------+-------------------|
-| east | 50 | Ethiopia, Nigeria |
-| west | 57 | Malawi, Burkina_Faso, Mali, Niger |
-| panel | 49 | Uganda, Tanzania |
+* Country lanes and review
 
-Raw GitHub snapshots and working reports are private under =/local/job40255479/control/isa-backlog-20261021/=.
-Only reviewed issue-level metadata and aggregate evidence will be copied into this report directory.
+Each country owns a persistent worktree and branch under =/local/job40255479/worktrees/isa-<country>=.
+Focused PR heads are frozen separately, and independent reviewers use immutable detached worktrees.
+The collaboration interface permits three active workers beside the scrum master; countries rotate through those slots.
+Shared framework changes require a separate coordinated lane.
+=country-lanes.json= records paths, owners, frozen heads, review verdicts and PRs.
 
-* Baseline and resources
+| Country | Current result or next step |
+|---------+-----------------------------|
+| Nigeria | #1034 independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]], frozen =6fda46bc=; PR CI success, credentialed data jobs skipped. #1144 source-backed quarter decoder now in implementation. |
+| Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. |
+| Malawi | #1109 initial review rejected a false source premise; amendment reads recorded organic amounts/units and protects unlabelled unit identities. New independent review required. |
+| Niger | #1088 current CS07 sentinel/source/duplicate-entry diagnosis active. |
+| Burkina_Faso | Worktree queued; source/recall and plot-key issues prioritised in triage. |
+| Ethiopia | Worktree queued; #1171 is the diagnosis-only sibling-prerequisite follow-up. |
+| Mali | Worktree queued; #822 narrowed to missing price readings, duplicate #1089 closed. |
+| Tanzania | Worktree queued; preserve documented UPHI back-casting and live WAITING caveats. |
 
-The main working clone is clean on =development= at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
-Published v0.16.0 is recorded in =.sucoder/handoff.org=; no release work is pending.
-The report worktree is =/local/job40255479/worktrees/isa-campaign=, branch =docs/isa-backlog-20261021=.
-The shared filesystem origin is durable and must not be edited directly.
+* Evidence that changed the fixes
+
+Uganda's first candidate returned only 1,810 income rows from valid single-wave sibling caches under inherited make, versus the baseline's 14,740 rows across eight waves.
+The amendment verifies sibling coverage through the authoritative cache path, restores the exact inherited backend and retains the original raw arithmetic.
+Independent re-review passed that live sequence, 29 focused tests, 20 restoration controls, eight affected order checks and unchanged Feature findings.
+Only 28 Uganda table hashes move; all 521 other-country hashes and 39 framework fingerprints remain unchanged.
+Both the rejected and passing reviews are preserved in =review-1062-initial/= and =review-1062-v2/=.
+
+Malawi's first min-count attempt dropped organic rows at finalization; an Applied carrier corrected that boundary.
+Independent primary-source review then found 11,068 reported positive organic quantities among 11,075 affirmative-use rows, contradicting the existing documentation's claim that no quantity was asked.
+The new amendment reads those amounts and units, preserves seven missing amounts, and keeps all 169,109 nonorganic records unchanged in the current paired check.
+Actual public-finalizer accounting also exposed six unlabelled organic codes being misread by the food codebook; the country fallback now needs explicit source-qualified identities.
+=review-1109-initial/REVIEW.md= and =1109-source-amendment.md= record the evidence and approved correction; no final Malawi PASS is claimed.
+
+Nigeria #1144 diagnosis found the W2 quarter table itself swaps PP/PH meanings for codes 44/77/78.
+The unchanged-table proposal would introduce 2,135 new PH errors and was rejected.
+=1144-design.md= approves source-backed quarter corrections and retention of unqualified source labels instead of inferred freshness, shell or cob attributes.
+The complete no-argument crop/community mapping and Preferred/Aggregate curation remain invariants.
+
+* Reconciliation
+
+=reconciliation.json= records exact issue actions.
+#822 describes the current Mali 2014-15 readings 1-2 residual; #1089 was closed as its duplicate, without claiming a code fix.
+#1171 splits the Ethiopia nutrition Make-prerequisite diagnosis from #1062; no live Ethiopia corruption is claimed.
+#1062 now describes the reviewed Uganda implementation and completed current source census; dangling non-ISA derived-food recipes remain #218.
+No PR has been merged automatically.
+
+* Resources and reproducibility
 
 Node =n0071.savio3=, job =40255479=: 32 allocated cores and 93 GiB RAM, about 55 hours remaining at bootstrap.
-Start account usage: 68,980.77 SUs used of 1,500,000 SUs allocated; 59,090.57 CPU-hours.
-The existing mounted/extracted image is generation =20261019T221223Z= at =/local/job40255479/venv_img=.
-Its Python imports pandas 3.0.6 and this checkout with explicit =PYTHONPATH=.
-The main clone's =.venv= is an incomplete pre-existing directory; use the verified image directly, without rebuilding or adopting the writable Lustre master.
-The strict API/skill audit discovers all 15 hand-authored skills.
-
-* Execution rules
-
-Use the existing backlog workflow and Feature regression net.
-Grounding: =.coder/ledger/isa-backlog-20261021.md= and the standing baseline.
-Read each country's =_/CONTENTS.org= including live TODO/WAITING entries before diagnosis.
-Reconcile merged fixes and maintainer decisions before implementing.
-Diagnose silent data loss before dispatching a concrete fix.
-Use one isolated worktree per fix, exact package/config identity and private writable caches.
-Verify the actual source path, run targeted tests and the relevant Feature audit, then freeze for independent adversarial review.
-Open PRs for human merge; do not auto-merge.
-Record exact residuals for partial work and human decisions/acquisition.
-
-* TODO Implementation and independent review
-
-No fix is claimed complete at this checkpoint.
-
-* Country ownership -- maintainer steering, 2026-10-21
-
-The maintainer requested country-specific worktrees and parallel ownership.
-Use one durable working lane per country so related issues share source knowledge, fixtures and a country rebuild.
-Nigeria, Malawi and Uganda are active; Burkina_Faso, Ethiopia, Mali, Niger and Tanzania have their own worktrees queued from the same baseline.
-The first three existing worktrees will move to country-named paths only after their owners report no running processes.
-Do not move a live checkout underneath a test or build.
-Keep focused issue/cohort commits and PRs; review immutable frozen commits in separate worktrees while a country lane advances.
-Shared framework edits remain a separate coordinated lane.
-The available collaboration interface supports three worker agents alongside the scrum master, so country lanes rotate through those slots.
-
-* Verification finding -- Malawi #1109
-
-The proposed one-line min_count fix passed synthetic tests but failed the actual cold API check.
-Making every all-missing Quantity nullable removed all 11,075 organic-use rows plus 437 other all-missing records at the API's dropna boundary.
-No passing/fixed claim was made.
-The revised country-scoped design reuses the existing optional Applied field to carry the explicitly reported organic-use flag, corrects organic Quantity only, and preserves nonorganic behavior pending source diagnosis.
-This needs new exact row/index and numeric controls before independent review.
-
-Sue
+Start usage: 68,980.77 of 1,500,000 SUs; 59,090.57 CPU-hours.
+Use image generation =20261019T221223Z= at =/local/job40255479/venv_img= with explicit matching checkout/config paths and realpath assertions.
+Pin numerical threads to one and =LSMS_BUILD_WORKERS=1=; budget xdist workers and use =--dist=loadfile=.
+Every source-backed comparison uses physically separate writable L2 copies and relevant held L1 blobs, with no acquisition or shared-cache mutation.
+The strict API/skill audit passes all 15 hand-authored skills.
+No full-suite/corpus rebuild has been claimed for these focused country PRs.
+Private raw inputs, frame snapshots and detailed logs stay under =/local/job40255479/control/isa-backlog-20261021/=.
+Only source-safe aggregate evidence is committed.
 
 Sue

@@ -16,10 +16,13 @@
     "Malawi": {
       "path": "/local/job40255479/worktrees/isa-Malawi",
       "branch": "isa/Malawi-20261021",
-      "status": "verification-before-move",
+      "status": "source-backed-amendment",
       "owner": "triage_west",
-      "current_path": "/local/job40255479/worktrees/isa-1109",
-      "initial_issue": 1109
+      "initial_issue": 1109,
+      "frozen_head": "c08abb3f1dd03fd211d5071b45369dcbae42857f",
+      "review_path": "/local/job40255479/worktrees/isa-review-1109",
+      "review_verdict": "NEEDS_FIX",
+      "finding": "All seven organic source modules record quantity/unit; cold public replay additionally found cross-domain numeric unit remapping."
     },
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
@@ -29,16 +32,22 @@
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
       "branch": "isa/Niger-20261021",
-      "status": "queued"
+      "status": "diagnosis",
+      "owner": "niger_lane",
+      "initial_issue": 1088
     },
     "Nigeria": {
       "path": "/local/job40255479/worktrees/isa-Nigeria",
       "branch": "isa/Nigeria-20261021",
-      "status": "independent-review",
+      "status": "implementing-next-issue",
       "owner": "triage_east",
       "frozen_head": "6fda46bc5437758bd650cf4016f0782a124281cf",
       "review_path": "/local/job40255479/worktrees/isa-review-1034",
-      "initial_issue": 1034
+      "initial_issue": 1034,
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1172",
+      "review_verdict": "PASS",
+      "next_issue": 1144,
+      "ci": "GitHub PR CI success on frozen 6fda46bc; credentialed data jobs skipped"
     },
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
@@ -48,11 +57,18 @@
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
       "branch": "isa/Uganda-20261021",
-      "status": "independent-review",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "triage_panel",
-      "frozen_head": "58ccfc2ca03644006a5ddcf6bd399de81a25a415",
-      "review_path": "/local/job40255479/worktrees/isa-review-1062",
-      "initial_issue": 1062
+      "frozen_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "review_path": "/local/job40255479/worktrees/isa-review-1062-v2",
+      "initial_issue": 1062,
+      "review_verdict": "PASS",
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1173",
+      "previous_review": {
+        "head": "58ccfc2ca03644006a5ddcf6bd399de81a25a415",
+        "verdict": "NEEDS_FIX",
+        "finding": "Valid partial sibling caches bypass income input verification under inherited Make; baseline returns all waves."
+      }
     }
   }
 }
