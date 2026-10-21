@@ -1,0 +1,45 @@
+{
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "reviewed_issues": 156,
+  "in_scope_issues_including_umbrellas_and_duplicate": 97,
+  "outside_country_campaign": 59,
+  "scope_tiers": {
+    "B": 32,
+    "C": 48,
+    "A": 10,
+    "D": 7
+  },
+  "dedup_all": {
+    "open": 118,
+    "partial": 37,
+    "duplicate": 1
+  },
+  "partial_records_with_residual_drafts": 37,
+  "by_country": {
+    "Burkina_Faso": 22,
+    "Ethiopia": 32,
+    "Malawi": 30,
+    "Mali": 26,
+    "Niger": 28,
+    "Nigeria": 33,
+    "Tanzania": 23,
+    "Uganda": 28
+  },
+  "fully_resolved_recommendations": 0,
+  "first_dispatched": [
+    1034,
+    1109,
+    1062
+  ],
+  "approved_design_pending_implementation": [
+    851,
+    894,
+    1134
+  ],
+  "notes": [
+    "Counts are issue references, not distinct confirmed bugs. Umbrellas, partials, decisions and one duplicate overlap.",
+    "P0/P1 input priorities normalize to priority1; source_priority retains each lane original. Excluded rows normalize to5.",
+    "Raw issue/comment snapshots are private and not copied into tracked evidence.",
+    "No issue may close on a generic fixed comment; #932 and #1066 remain partial."
+  ]
+}

@@ -19,9 +19,13 @@ framework authoritative for country tables assembled from waves.
    currency, labels or identifiers. Preserve the existing earnings/enterprise
    sum and union-of-households behavior. If this cannot preserve those values,
    report the discrepancy before widening the design.
-4. Remove the raw compiler prerequisites from income's Make rule. Disconnect
-   the concatenate-only earnings/enterprise Make recipes from normal builds;
-   do not rewrite their tests or remove historical scripts merely for cleanup.
+4. Remove the raw compiler prerequisites from income's Make rule. Replace
+   earnings/enterprise target recipes with thin calls to their existing Country
+   API, with `LSMS_BUILD_BACKEND=dvc` explicit in those subprocesses. Retain the
+   listed Make targets so `make all` stays reachable. This prevents the make
+   backend from falling back through the retained historical scripts or
+   recursively calling itself. Do not rewrite their numeric tests or remove
+   historical scripts merely for cleanup.
 5. Census Uganda recipes and the other countries' rules that consume `var/`
    siblings. Report concrete analogous cases. Fix only Uganda in this branch;
    draft a precise residual if cross-country findings remain.
@@ -36,6 +40,9 @@ fct/nutrition and earnings/income orders; exact frame/index/dtype comparisons;
 verify untouched siblings retain bytes, footer hash and coverage. Run the
 relevant Feature audit. Editing Uganda's Makefile costs one Uganda rewarm;
 measure and report hashes rather than claiming it is table-scoped.
+Include Make-backend/no-recursion and `make all` reachability controls.
+Historical compilers applied `id_walk` before writing: raw cache identity and
+final API identity must be measured separately, not assumed interchangeable.
 
 Root design by Sue; implementation must first provide a per-task prior-art
 ledger and report any contradiction with the country documentation.
