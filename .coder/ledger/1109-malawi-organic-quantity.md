@@ -5,10 +5,10 @@ Inherits `.coder/ledger/STANDING.md`; source/test evidence is re-grepped below.
 
 ## §1 Task, restated
 
-Preserve missing reported Quantity when Malawi plot_inputs consolidates input
-lines. Module D records organic fertilizer use but no amount; its missing
-amount must survive assembly. Retain observed zero and existing numeric sums.
-No unit interpretation, fertilizer share, identifier, or other reducer changes.
+Preserve missing organic Quantity and the raw Module D organic-use answer through Malawi plot_inputs assembly and Country finalization.
+Carry ag_d36 == 1 as nullable Applied=True, following Ethiopia.
+Overlay only organic groups with sum(min_count=1), aligned on the complete existing key; retain observed numeric/zero organic inputs and the existing nonorganic sums.
+No unit interpretation, fertilizer share, identifier, core filter, or other existing reducer changes.
 
 ## §2 Existing machinery
 
@@ -18,6 +18,8 @@ No unit interpretation, fertilizer share, identifier, or other reducer changes.
 | `assemble_plot_inputs` | same file `:3148`, aggregation `:3223` | Plain Quantity sum fabricates 0 for all-missing groups; actual helper regression needed | extend |
 | `_seed_purchase_block` | same file `:3142` | Existing `lambda s: s.sum(min_count=1)` preserves missing purchase quantity | reuse pattern |
 | four wave `plot_inputs.py` callers | `Malawi/{2010-11,2013-14,2016-17,2019-20}/_/` | All delegate organic and other input assembly to this helper | reuse |
+| `Applied` use carrier | `Ethiopia/_/ethiopia.py:2117-2124`; `Ethiopia/_/data_scheme.yml:234` | Preserves raw organic-use flag with missing Quantity through Country finalization | reuse candidate |
+| `Country._finalize_result` | `lsms_library/country.py:3961-3981` | Drops rows with every payload missing; exposes row-loss boundary of a reducer-only patch | preserve unchanged |
 | `nitrogen_kg` | `lsms_library/transformations.py` | Organic input has no assigned share; `tests/test_867_nitrogen_content.py` covers explicit refusal | reuse unchanged |
 | isolated module import | `tests/test_malawi_cassava_recode.py` | Loads country helper by file path, not a global `malawi` module | reuse test pattern |
 
@@ -35,8 +37,9 @@ No unit interpretation, fertilizer share, identifier, or other reducer changes.
 
 - Consolidation keeps native `(t,i,plot_id,input,crop,u)` grain and
   `dropna=False`; #1118/#1119's missing index-label issues remain separate.
-- Every reducer other than Quantity, every flag, all observed numeric sums,
-  index values and ordering remain unchanged.
+- Every existing reducer, flag, nonorganic value, index value and ordering remains unchanged.
+- Applied is an additional optional nullable boolean: True only for the raw affirmative organic-use answer and NA elsewhere.
+- Recompute organic Quantity alone with sum(min_count=1), aligned on the full existing key; do not infer application for 437 nonorganic records exposed by the rejected global reducer change.
 - `malawi.py` is a whole-country build input. Editing it invalidates every
   Malawi source-table cache once; a private cold plot_inputs build verifies
   this change without promoting or deleting shared caches.
@@ -47,18 +50,25 @@ No unit interpretation, fertilizer share, identifier, or other reducer changes.
 
 | quantity | decision | reason |
 |---|---|---|
-| all-missing Quantity group | extend existing reducer | min_count=1 exists in neighboring machinery; no new helper |
+| organic Quantity groups | extend existing assembly | keyed min_count=1 overlay preserves missing/observed quantities; nonorganic sum unchanged |
+| raw organic use | extend with existing Applied carrier | preserve affirmative ag_d36 answer through the existing all-null row filter |
 | observed zero and numeric sum | reuse | keep additive sum semantics and nullable float dtype |
 | organic use row | reuse | existing source block already models reported presence correctly |
 | nitrogen output | reuse unchanged | organic refusal policy excludes missing/zero alike |
 
 ## §6 Open questions for the human
 
-None for this bounded missingness correction. #1111/#1106/#1118 and other
-Malawi science/unit defects remain outside scope. Root authorized implementation
-after this ledger is surfaced.
+Root approved the narrow extension after the first cold comparison: raw organic Applied carrier plus organic-only keyed missingness correction.
+No open question blocks that correction.
+The 437 nonorganic records (390 Seed, 24 NPK, 11 Urea, 6 DAP, 4 Herbicide, 1 Fungicide, 1 Insecticide) keep their existing behavior and require a separately drafted source-presence/missingness investigation.
+#1111/#1106/#1118 remain outside scope.
 
 ## Phase 3 - verification
 
-Pending actual-helper regression, targeted tests, private cold before/after,
-Feature plot_inputs comparison and independent review.
+Actual-helper regression: candidate 7 pass; untouched base 3 missingness failures and 4 observed-value passes.
+Neighbor nitrogen pure tests plus new regressions: 31 pass.
+Plot declaration/harmonization/permutation checks: 21 pass.
+Private offline cold source builds: baseline 180,184 rows / 11,075 organic zeros; reducer-only candidate 168,672 rows / zero organic rows.
+This fails section 4 row preservation and cannot be accepted.
+Nitrogen sum is unchanged, but 14 zero-only plots and the organic refusal warning disappear.
+A country-side presence carrier and a new finalization regression are required before revalidation.
