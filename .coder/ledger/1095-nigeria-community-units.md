@@ -33,12 +33,26 @@ W1–W3 and all existing W4/W5 rows/keys/Price/Derivation/NA masks exact; no new
 
 ## 5. Reuse/extend choice
 
-Extend only the community-specific label path; keep shared `_canon_unit` unchanged. Defer and accurately word reporting via existing `_canon_units`. The ten-label fix has a complete source/actual-helper conservation proof and 31 private positive/adversarial controls; ten production recovery expectations fail on unchanged f8. Actual implemented cold/warm/Feature/scanner validation is required before freeze.
+Extend only the community-specific label path; keep shared `_canon_unit` unchanged. Defer and accurately word reporting via existing `_canon_units`. The ten-label fix has a complete source/actual-helper conservation proof and 31 private positive/adversarial controls; ten production recovery expectations fail on unchanged f8. Implemented verification is complete; see section 7 and the safe task report.
 
 ## 6. Approved partial scope and residual
 
 Root approved the ten community-only aliases and reporting AFTER metric rescue with default-preserving `_canon_units` disposition. Future genuinely unplaced labels retain the existing NA/drop policy, now reported accurately. No observed positive recorded residual remains in held W3-W5 after aliases. This is PARTIAL work on #1095: its literal "instead of dropping" intent remains a Tier C retention/fallback design residual. No fallback, new unit meaning or global unit expansion is authorized.
 
-Full cold/warm native/helper/Country/Feature comparisons, six-finding audit accounting, unchanged healthy Niger, actual all-549 country hashes and all-39 tagged fingerprints, baseline failures and fault boundaries remain verification obligations.
+The retention/fallback decision remains a future Tier C residual, explicitly preserving the original issue's literal retention intent.
+
+
+## 7. Verification against the ledger
+
+Runtime/evidence commit: `e55de22856064ab3b01f1bc5fcfac681f2f3ebc8`.
+
+- **OK (sections 2-4):** exact community-only label extension reuses `_strip_code_prefix` and existing Preferred Labels. AST checks preserve all shared harvest/input/food functions and both size algorithms. Existing reporter defaults are pinned exactly; future community unplaced labels are reported AFTER rescue with accurate existing-drop disposition.
+- **OK (sections 3-4):** actual normal empty-L2 cold builds preserve all 131,338 old rows, dtypes, null masks and attrs across native/helper, wave, raw-country and Country layers; recover exactly 5,228 unique source cells without collision/fanout; and preserve exact old metric-drop source masks (14,603 W3, 0 W4, 133 W5). No factor, size, eligibility, reducer or grain change.
+- **OK (sections 2-4):** fresh-process warm Country/Feature frames and all private cache bytes/mtimes are exact. Healthy Niger remains 46,043 rows and three cache files byte-identical. Feature grows 177,381 to 182,609 with every old row and full attrs exact. All six scanner findings are accounted and multiset-exact after only root-path normalization; no errors/failures/skips.
+- **OK (sections 2, 4):** 60 focused tests pass with no skips; ten actual production-builder recovery controls fail on f8. Accurate deferred reporting, all ten labels, malformed/missing/bare-code units, eligibility and size/factor boundaries are covered. API audit passes.
+- **OK (sections 2, 4):** actual complete 549-cell census has 24 Nigeria hashes move, 525 others unchanged, and all 39 tagged framework fingerprints unchanged. Other Nigeria table outputs are not claimed verified.
+- **OK (section 4):** final claims use a second physical private verified root after an interrupted initial selector briefly overlapped the first cold run. Preparation gated cold, warm and Feature phases; no other consumer overlapped each final data root. All 24 complete final frames/attrs match the first successful results. Source receipts verify 13 held blobs / 28,426,011 bytes per root, including unchanged-byte CSV text-key verification. Initial artifacts/logs remain private.
+
+See `slurm_logs/isa_backlog_2026-10-21/Nigeria/1095/REPORT.org`, `validation.json`, `REPRODUCE.sh` and `DRAFT-RESIDUAL.md`. Final tracked-content/mode/head/status and process-quiescence proofs are private; independent review follows freeze. No GitHub writes, source acquisition, shared-cache mutation, fixture/golden edit or framework change.
 
 Sue
