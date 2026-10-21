@@ -287,6 +287,100 @@ class TestNigerDuplicateEntries:
         assert "slot" not in out.columns
 
 
+class TestNigerQuantitySentinels:
+    """GH #1088: recognize the two exact 9999.9 representations only in
+    Quantity, retaining the price and the existing recorded-price grain."""
+
+    @staticmethod
+    def _long(niger, quantities, prices=(100.0, 150.0, 200.0)):
+        records = [
+            (1, 1, 701, 7011, 1,
+             prices[0], quantities[0], prices[1], quantities[1],
+             prices[2], quantities[2]),
+        ]
+        labels, codes = TestNigerDuplicateEntries._grids(records)
+        return niger._community_price_triples(
+            labels, {"Mil": "Millet"}, {"Kg": "Kg"},
+            TestNigerDuplicateEntries.TRIPLES, codes=codes)
+
+    @pytest.mark.parametrize("quantity", [9999.9, 9999.900390625])
+    @pytest.mark.parametrize("slot", [1, 2, 3])
+    def test_exact_missing_code_keeps_price_through_finalize(
+            self, niger_module, quantity, slot):
+        from lsms_library import Country
+
+        quantities = [1.0, 2.0, 3.0]
+        quantities[slot - 1] = quantity
+        long = self._long(niger_module, quantities)
+        wave = niger_module._finish_community_prices(long, "2014-15")
+        country = Country("Niger")
+        served = country._finalize_result(
+            wave, country._materialization_entry("community_prices"),
+            "community_prices")
+        assert len(long) == len(served) == 3
+        assert served.index.is_unique
+        assert list(served.index.names) == CANONICAL
+        assert served.index.get_level_values("obs").tolist() == [1, 2, 3]
+        assert served["Price"].tolist() == [100.0, 150.0, 200.0]
+        assert pd.isna(long.set_index("obs").loc[slot, "Quantity"])
+        assert pd.isna(served.xs(slot, level="obs")["Quantity"].iloc[0])
+
+    @pytest.mark.parametrize("quantity", [
+        9997.0, 9998.0, 9999.8, 9999.89, 9999.91,
+        # The adjacent float32 values: a tolerance/float32 coercion must not
+        # turn a distinct reported weight into the missing code.
+        9999.8994140625, 9999.9013671875,
+        # Adjacent doubles around each exact missing-code representation.
+        9999.899999999998, 9999.900000000001,
+        9999.900390624998, 9999.900390625002,
+        10000.0, 99998.0, 100000.0,
+    ])
+    def test_nearby_reported_quantity_is_unchanged(self, niger_module, quantity):
+        out = self._long(niger_module, [quantity, 2.0, 3.0]).set_index("obs")
+        assert out.loc[1, "Quantity"] == quantity
+        assert out.loc[1, "Price"] == 100.0
+
+    @pytest.mark.parametrize("quantity", [0.0, -1.0, None, 9999.0, 99999.0])
+    @pytest.mark.parametrize("slot", [1, 2, 3])
+    def test_existing_missing_quantity_policy_is_unchanged(
+            self, niger_module, quantity, slot):
+        quantities = [1.0, 2.0, 3.0]
+        quantities[slot - 1] = quantity
+        out = self._long(niger_module, quantities).set_index("obs")
+        assert len(out) == 3
+        assert pd.isna(out.loc[slot, "Quantity"])
+        assert out["Price"].tolist() == [100.0, 150.0, 200.0]
+
+    @pytest.mark.parametrize("price", [9999.9, 9999.900390625])
+    def test_quantity_missing_codes_do_not_expand_price_filter(
+            self, niger_module, price):
+        out = self._long(niger_module, [1.0, 2.0, 3.0],
+                         prices=[price, 150.0, 200.0]).set_index("obs")
+        assert len(out) == 3
+        assert out.loc[1, "Price"] == price
+        assert out.loc[1, "Quantity"] == 1.0
+
+    @pytest.mark.parametrize("second_quantity, expected_obs", [
+        (1.0, [1, 4]),  # The held-source tail: a reported weight is distinct.
+        (9999.9, [1]),  # Exact normalized content repeats are still copies.
+    ])
+    def test_second_record_uses_existing_content_equality(
+            self, niger_module, second_quantity, expected_obs):
+        nan = float("nan")
+        labels, codes = TestNigerDuplicateEntries._grids([
+            (1, 1, 701, 7011, 1, 100.0, 9999.900390625, nan, nan, nan, nan),
+            (1, 2, 701, 7011, 1, 100.0, second_quantity, nan, nan, nan, nan),
+        ])
+        out = niger_module._community_price_triples(
+            labels, {"Mil": "Millet"}, {"Kg": "Kg"},
+            TestNigerDuplicateEntries.TRIPLES, codes=codes).set_index("obs")
+        assert out.index.tolist() == expected_obs
+        assert out["Price"].eq(100.0).all()
+        assert pd.isna(out.loc[1, "Quantity"])
+        if second_quantity == 1.0:
+            assert out.loc[4, "Quantity"] == 1.0
+
+
 def _build(country):
     import lsms_library as ll
     try:
