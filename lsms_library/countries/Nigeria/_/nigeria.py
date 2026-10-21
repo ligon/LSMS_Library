@@ -378,16 +378,18 @@ def _canon_input_unit(s):
 class UnplacedUnitLabelWarning(UserWarning):
     """A recorded unit LABEL the canonicaliser cannot place (GH #1047).
 
-    Such a row is served ``U_UNKNOWN`` like a blank one, which would be a
-    silent loss of a unit the survey recorded -- so it is named here."""
+    Name the label and the caller's disposition rather than silently losing
+    a unit the survey recorded."""
 
 
-def _canon_units(labels, canon=_canon_unit, where=''):
+def _canon_units(labels, canon=_canon_unit, where='',
+                 disposition='served as Unknown'):
     """Map a decoded unit-label Series through `canon`, REPORTING what it
     cannot place.  A blank, or a bare numeric code with no value label, is
-    NA silently (a missing unit; the caller serves it ``U_UNKNOWN``).  A
+    NA silently (a missing unit).  A
     non-numeric label that `canon` returns NA for is NA too, but raises an
-    `UnplacedUnitLabelWarning` naming each label and its row count."""
+    `UnplacedUnitLabelWarning` naming each label, its row count and the
+    caller's disposition.  The crop/input default remains ``U_UNKNOWN``."""
     import warnings
     out = labels.map(canon).astype('string')
     text = labels.astype('string').str.strip()
@@ -398,10 +400,36 @@ def _canon_units(labels, canon=_canon_unit, where=''):
         counts = text[unplaced].value_counts().to_dict()
         warnings.warn(
             f"Nigeria {where}: {int(unplaced.sum())} row(s) carry a unit label "
-            f"that cannot be placed and are served as Unknown: {counts}. "
+            f"that cannot be placed and are {disposition}: {counts}. "
             "Teach the canonicaliser in nigeria.py (GH #1047).",
             UnplacedUnitLabelWarning, stacklevel=2)
     return out
+
+
+# C8 labels already registered in categorical_mapping.org's `u` table.
+# Keep this extension local to community prices (ledger #1095, sections 2-5):
+# `_canon_unit` also serves harvest and sold units, with a different codebook.
+_COMMUNITY_UNIT_LABELS = {
+    'loaf': 'Loaf',
+    'bottle/can': 'Bottle/Can',
+    'cube': 'Cube',
+    'metric cup': 'Metric Cup',
+    'wrap': 'Wrap',
+    'tea spoon': 'Tea Spoon',
+    'table spoon': 'Table Spoon',
+    'crate': 'Crate',
+    'slice': 'Slice',
+    'whole animal': 'Whole Animal',
+}
+
+
+def _canon_community_unit(s):
+    """Place exact C8 label bodies, then use the existing base-unit decoder."""
+    if not pd.isna(s):
+        label = _COMMUNITY_UNIT_LABELS.get(_strip_code_prefix(s).lower())
+        if label is not None:
+            return label
+    return _canon_unit(s)
 
 
 def _month_str(month_series, year_series):
@@ -2293,11 +2321,14 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             axis=1)
         code = pd.to_numeric(df[fr['item']], errors='coerce')
         price = pd.to_numeric(df[fr['price']], errors='coerce')
+        unit_labels = None
 
         if mode == 'codes':
             j = code.astype('Int64').map(crop_labels).astype('string')
             if fr.get('unit') and fr['unit'] in dec.columns:
-                u = dec[fr['unit']].map(_canon_unit).astype('string')
+                unit_labels = dec[fr['unit']]
+                u = unit_labels.map(_canon_community_unit).astype('string')
+                initially_unplaced = u.isna()
             else:
                 u = pd.Series(pd.NA, index=df.index, dtype='string')
         else:  # names (W1/W2)
@@ -2376,6 +2407,18 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             unrecorded = (piece['u'].isin(['g', 'cl', 'Kg', 'l'])
                           & qty.isna())
             piece.loc[unrecorded, 'u'] = pd.NA
+
+        if unit_labels is not None:
+            # Report only labels still unplaced AFTER the existing metric
+            # rescue.  Reporting up-front falsely counts rescued g/cl rows;
+            # known metric units dropped for unrecorded sizes are separate.
+            # Retention/fallback remains the explicit #1095 design residual.
+            report = (initially_unplaced & piece['u'].isna()
+                      & piece['v'].notna() & piece['j'].notna()
+                      & piece['Price'].notna() & (piece['Price'] > 0))
+            _canon_units(unit_labels[report], canon=_canon_community_unit,
+                         where=f'community_prices {t}',
+                         disposition='dropped after metric-size rescue')
 
         pieces.append(piece)
 
