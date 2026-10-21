@@ -55,29 +55,49 @@ record, so there is nothing to write by accident.  A wave is unresolved when:
 * the record the ladder *would* write drops something the file already holds
   -- an id, a ``covers`` entry, a ``#+KEY:`` line, the preserved prose.  The
   backfill may add to and update a record; it may not delete from one;
-* the catalog now reports a **different release** of the entry the file
-  records -- a changed (not newly added) ``#+CATALOG_IDNO:`` or
-  ``#+CATALOG_DOI:`` under the same catalog id (kind ``release-changed``).
-  Those keys describe the release whose files the directory HOLDS
-  (:mod:`lsms_library.provenance`: "which source dataset a wave directory
-  actually holds"); the catalog reports its LATEST.  Stamping the latest
-  would make the record lie about what is on disk -- ``Nigeria/2023-24``
-  holds ``NGA_2023_GHSP-W5_v01_M`` (106 files, no household geovariables;
-  ``Nigeria/_/CONTENTS.org``) while the catalog has moved to ``v02_M``.  An
-  override that *corrects* the id is exempt: a different entry has a
-  different idno by construction.
+* the catalog reports a different ``#+CATALOG_DOI:`` for the **same**
+  ``#+CATALOG_IDNO:`` the file records (kind ``doi-changed``): the idno says
+  it is the release held, so there is no newer release to record, and which
+  DOI is right is a human's call.
+
+A newer release is recorded, not refused (GH #1114 / #1128)
+------------------------------------------------------------
+``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:`` name the release whose files the
+directory HOLDS (:mod:`lsms_library.provenance`); the catalog reports only its
+LATEST.  Ruling (@ligon, 2026-10-19): *a wave's recorded catalog release
+should name the version we hold; where there are more recent versions we will
+generally want to update to those.*  So when the catalog's idno differs from
+the held one under the same catalog id, the re-stamp **keeps the held
+``CATALOG_IDNO`` / ``CATALOG_DOI``** and writes the newer release beside them::
+
+    #+CATALOG_IDNO: NGA_2023_GHSP-W5_v01_M          <- held, never moved here
+    #+CATALOG_LATEST_IDNO: NGA_2023_GHSP-W5_v02_M   <- the catalog's latest
+    #+CATALOG_LATEST_DOI: https://doi.org/10.48529/90ec-pv69
+    #+CATALOG_LATEST_SEEN: 2026-10-19               <- first seen
+
+``CATALOG_LATEST_SEEN`` is the date a re-stamp FIRST saw that latest release;
+it is kept while the latest is unchanged, so a queued wave is not rewritten on
+every run.  When the catalog's idno equals the held one the three keys are
+removed.  ``rg CATALOG_LATEST_IDNO lsms_library/countries`` is the acquisition
+queue; only an acquisition (``data_access.add_wave`` / ``populate_and_push``)
+moves the held keys, and it clears the trio.  Before this a newer release was
+refused (kind ``release-changed``) and listed only in the per-run review
+artifact.  An override that *corrects* the id is exempt: a different entry
+has a different idno by construction.
 
 The review artifact is an org file, written **outside** ``countries_root()``
 (the config tree is read-only at runtime; see CLAUDE.md), by default to
 ``platformdirs.user_cache_path("lsms_library")/provenance_review/``; override
 with ``--review-file``.  It is written on every run, ``--dry-run`` included,
 and from a ``finally`` -- so a run that dies part-way still says what it
-wrote before it died, and a missing file never needs interpreting.  Three
+wrote before it died, and a missing file never needs interpreting.  Four
 named tables: ``catalog_queries`` (rows the catalog returned per country --
 zero means the country was not checked at all), ``unresolved`` (one row per
-wave left intact: what the file records, and why it could not be resolved)
-and ``changed`` (one row per value a successful re-stamp writes -- or, under
-``--dry-run``, would write -- with the old and the new value).
+wave left intact: what the file records, and why it could not be resolved),
+``changed`` (one row per value a successful re-stamp writes -- or, under
+``--dry-run``, would write -- with the old and the new value) and
+``release_changed`` (every wave whose catalog release is newer than the one
+held, written this run or already recorded: the acquisition queue).
 
 The exit status is non-zero when every country queried returned no rows: that
 is an outage, a missing key or a filter, not a clean run.
@@ -99,7 +119,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import replace
 from pathlib import Path
 
@@ -110,6 +130,7 @@ from lsms_library.data_access import (
 )
 from lsms_library.paths import countries_root
 from lsms_library.provenance import (
+    LATEST_KEYS,
     SOURCE_EXTERNAL,
     SOURCE_UNKNOWN,
     SOURCE_WORLDBANK,
@@ -117,6 +138,7 @@ from lsms_library.provenance import (
     VALIDATION_CONTENT,
     WB_DOI_PREFIX,
     _KEYWORD_RE,
+    _regions,
     WaveProvenance,
     parse_source_org,
     read_provenance,
@@ -314,12 +336,15 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
                 notes: str | None = None,
                 validation: str | None = None,
                 also_ids: list[str] | None = None,
-                covers: list[str] | None = None) -> WaveProvenance:
+                covers: list[str] | None = None,
+                extra: dict[str, str] | None = None) -> WaveProvenance:
     # ``also_ids`` / ``covers`` are hand-recorded facts this script cannot
     # rediscover from the catalog: the OTHER entries a directory holds, and the
     # entries a held release subsumes (GH #600).  A re-stamp must carry them
     # through -- rebuilding the record from the catalog alone would silently
     # delete them, which is how a partial record gets created in the first place.
+    # ``extra`` (the #+KEY: lines provenance.py has no field for) likewise: it
+    # is rendered since GH #1115, so dropping it here would read as a deletion.
     primary = str(entry["id"])
     ids = [primary] + [i for i in (also_ids or []) if i != primary]
     return WaveProvenance(
@@ -339,6 +364,7 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
         note=note,
         superseded_url=superseded,
         notes=notes,
+        extra=dict(extra or {}),
     )
 
 
@@ -364,7 +390,7 @@ def resolve(country: str, wave: str, root: Path,
                 country=country, wave=wave, source=SOURCE_EXTERNAL,
                 url=ov.get("url") or existing.url,
                 method="manual-override", recorded=today,
-                note=ov["note"], notes=keep,
+                note=ov["note"], notes=keep, extra=dict(existing.extra),
             ), "override"
 
         # 4b. Resolve to a specific catalog id.
@@ -390,7 +416,8 @@ def resolve(country: str, wave: str, root: Path,
                            notes=keep,
                            validation=ov.get("validation"),
                            also_ids=existing.catalog_ids[1:],
-                           covers=existing.covers), "override"
+                           covers=existing.covers,
+                           extra=existing.extra), "override"
 
     url = existing.url or ""
 
@@ -418,7 +445,8 @@ def resolve(country: str, wave: str, root: Path,
                                note=existing.note,
                                validation=existing.validation,
                                also_ids=existing.catalog_ids[1:],
-                               covers=existing.covers), method
+                               covers=existing.covers,
+                               extra=existing.extra), method
         # Recorded an id the catalog did not return for this country.  Do not
         # invent a replacement -- and do not downgrade the recorded one to
         # 'unknown' either: an outage or a filter looks exactly like this.
@@ -433,7 +461,8 @@ def resolve(country: str, wave: str, root: Path,
         entry = by_doi.get(suffix)
         if entry:
             return _from_entry(country, wave, entry, "doi-lookup", today,
-                               notes=keep), "doi-lookup"
+                               notes=keep,
+                               extra=existing.extra), "doi-lookup"
         raise Unresolved(
             "doi-not-in-catalog",
             f"SOURCE.org records WB DOI {suffix}, which matches no entry the "
@@ -524,9 +553,15 @@ def _resolve_not_wb(country: str, wave: str, root: Path, reason: str | None,
     ), "external"
 
 
-def _keys(text: str) -> list[str]:
-    """The ``#+KEY:`` names a SOURCE.org gives a value, in order, once each."""
-    return list(dict.fromkeys(k for k, v in _KEYWORD_RE.findall(text) if v))
+def _keys(text: str) -> Counter:
+    """How many times each ``#+KEY:`` line occurs in a SOURCE.org record.
+
+    Occurrences, not names, and an empty value counts: a repeated key whose
+    render keeps one line, or an empty-valued key the render omits, is a lost
+    line, and a set of names cannot see either (GH #1115, red team r1).
+    """
+    record, _notes = _regions(text)
+    return Counter(k for k, _v in _KEYWORD_RE.findall("\n".join(record)))
 
 
 def dropped_by_write(old_text: str, new: WaveProvenance) -> list[str]:
@@ -541,6 +576,10 @@ def dropped_by_write(old_text: str, new: WaveProvenance) -> list[str]:
     A ``manual-override`` may replace a recorded id -- correcting one is what
     the override table is for (it records the URL it replaced) -- but may not
     delete anything else.
+
+    The ``#+CATALOG_LATEST_*`` keys are exempt: they are this script's own
+    observation of the catalog, removed when the catalog's release equals the
+    held one again (GH #1128).
     """
     new_text = render_source_org(new)
     old = parse_source_org(old_text, new.country, new.wave)
@@ -550,9 +589,16 @@ def dropped_by_write(old_text: str, new: WaveProvenance) -> list[str]:
         lost += [f"CATALOG_ID {i}" for i in old.catalog_ids
                  if i not in back.catalog_ids]
     lost += [f"CATALOG_COVERS {i}" for i in old.covers if i not in back.covers]
-    kept = set(_keys(new_text))
-    lost += [f"#+{k}" for k in _keys(old_text)
-             if k not in kept and k != "PROVENANCE_RECORDED"]
+    # Per key, the write may not emit FEWER lines than the file holds.  The
+    # list keys are judged above by id membership (two ``#+CATALOG_ID:`` lines
+    # render as one), ``PROVENANCE_RECORDED`` is this script's own stamp, and
+    # the latest-seen trio is its own observation.
+    kept = _keys(new_text)
+    lost += [f"#+{k}" + (f" x{n - kept[k]}" if kept[k] else "")
+             for k, n in _keys(old_text).items()
+             if kept[k] < n and k not in ("PROVENANCE_RECORDED", "CATALOG_ID",
+                                          "CATALOG_COVERS")
+             and k not in LATEST_KEYS]
     if old.url and not back.url:
         lost.append("the source URL")
     if old.notes and old.notes not in (back.notes or ""):
@@ -568,14 +614,84 @@ def _doi_key(doi: str | None) -> str | None:
     return doi.split("doi.org/")[-1].strip().rstrip("/") or None
 
 
+def latest_release(old_text: str, new: WaveProvenance,
+                   today: str) -> WaveProvenance:
+    """Hold the release *old_text* records; record the catalog's beside it.
+
+    *new* is the record the ladder built from the catalog row, so its
+    ``idno`` / ``doi`` are the catalog's LATEST release.  Under the same
+    primary catalog id (GH #1114 / #1128):
+
+    * a different idno -> *new* with the held ``idno`` / ``doi`` put back and
+      the catalog's release in ``latest_idno`` / ``latest_doi``.  The catalog's
+      DOI never becomes the held one: Nigeria/2023-24's ``90ec-pv69`` is the
+      v02 DOI, and we hold v01 (``zd5s-tj25``).  ``latest_seen`` keeps the
+      date this latest release was first seen, else today;
+    * the same idno -> *new* without the latest-seen keys (removed if present).
+
+    Anything else -- a corrected primary id (an override), a file recording no
+    idno (see :func:`release_unknown`: a stamp never adds one), a catalog row
+    with none -- is *new* as it is.  Entry-level fields (title, years, repository) follow the catalog as
+    they always have; only the release keys are held.
+    """
+    old = parse_source_org(old_text, new.country, new.wave)
+    if (old.catalog_id != new.catalog_id or not old.idno or not new.idno):
+        return new
+    if old.idno.strip() == new.idno.strip():
+        return replace(new, latest_idno=None, latest_doi=None,
+                       latest_seen=None)
+    same_latest = (old.latest_idno or "").strip() == new.idno.strip()
+    return replace(
+        new, idno=old.idno, doi=old.doi,
+        latest_idno=new.idno,
+        latest_doi=(new.doi or old.latest_doi) if same_latest else new.doi,
+        latest_seen=(old.latest_seen if same_latest and old.latest_seen
+                     else today))
+
+
+def release_unknown(old_text: str | None, new: WaveProvenance) -> WaveProvenance:
+    """*new* without a held release, where *old_text* records none.
+
+    ``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:`` name the release this directory
+    HOLDS, and only an acquisition -- which knows what it downloaded -- may
+    write them (#1128 ruling, @ligon 2026-10-20).  A record with a catalog id
+    and no release (hand-written, or an acquisition interrupted between the
+    routing write and the download) is therefore stamped with the ENTRY's
+    facts -- title, years, repository, URL -- and no release, and listed in
+    the review artifact as ``release-unknown``.  It used to be given the
+    catalog's latest idno and DOI as the held ones, after which it could never
+    read ``stale-release`` (red team r1, residual 3).  A DOI the old record
+    does carry is a release fact a human wrote, and is kept.
+
+    Not applied when the old record holds an idno: :func:`latest_release`
+    governs that, and an override correcting the primary id still takes the
+    corrected entry's release (its old idno named another entry; decision
+    recorded in the r1 follow-up report).
+    """
+    old = (parse_source_org(old_text, new.country, new.wave)
+           if old_text is not None else None)
+    if old is not None and old.idno:
+        return new
+    same_entry = old is not None and old.catalog_id == new.catalog_id
+    # Unknown held release is not evidence that an existing observation was
+    # resolved. Keep its queue facts; do not invent a new held release or move
+    # an observation to another primary entry during an override.
+    return replace(
+        new, idno=None, doi=(old.doi if old is not None else None),
+        latest_idno=old.latest_idno if same_entry else None,
+        latest_doi=old.latest_doi if same_entry else None,
+        latest_seen=old.latest_seen if same_entry else None)
+
+
 def release_changed(old_text: str, new: WaveProvenance) -> list[str]:
     """Release keys writing *new* over *old_text* would change, as ``old -> new``.
 
     ``#+CATALOG_IDNO:`` and ``#+CATALOG_DOI:`` name a *release* of a catalog
-    entry, and the record means the release this directory HOLDS.  The catalog
-    reports only its latest, so when the two disagree under the same catalog
-    id the catalog has moved on and the files on disk have not -- unless a
-    human says otherwise, which is a decision this script cannot take.
+    entry, and the record means the release this directory HOLDS.  Applied
+    after :func:`latest_release`, which keeps a held idno and its DOI, so
+    what is left is a DOI the catalog reports differently for the SAME idno
+    (refused as ``doi-changed``): there is no newer release to record, and
+    which DOI is right is a human's call.
 
     Only a CHANGE counts: a key the file lacks may be added (that is what a
     first stamp does), and a key the new record lacks is ``dropped_by_write``'s
@@ -604,7 +720,10 @@ _FIELD_KEYS = (
     ("covers", "CATALOG_COVERS"), ("idno", "CATALOG_IDNO"),
     ("title", "CATALOG_TITLE"), ("years", "CATALOG_YEARS"),
     ("repository", "CATALOG_REPOSITORY"), ("doi", "CATALOG_DOI"),
-    ("url", "CATALOG_URL"), ("method", "PROVENANCE_METHOD"),
+    ("url", "CATALOG_URL"),
+    ("latest_idno", "CATALOG_LATEST_IDNO"), ("latest_doi", "CATALOG_LATEST_DOI"),
+    ("latest_seen", "CATALOG_LATEST_SEEN"),
+    ("method", "PROVENANCE_METHOD"),
     ("validation", "PROVENANCE_VALIDATION"),
     ("superseded_url", "PROVENANCE_SUPERSEDED_URL"),
     ("note", "PROVENANCE_NOTE"), ("notes", "(preserved notes)"),
@@ -684,13 +803,22 @@ def _cell(value) -> str:
 def write_review(path: Path, unresolved: list[dict], queries: list[dict],
                  changed: list[dict], *, root: Path, dry_run: bool,
                  argv: list[str], when: str,
-                 aborted: str | None = None) -> Path:
+                 aborted: str | None = None,
+                 stale: list[dict] | None = None,
+                 unknown: list[dict] | None = None) -> Path:
     """Write the review artifact: what this run left intact, and why -- and
-    every value it changed (or, dry, would have changed)."""
+    every value it changed (or, dry, would have changed), and every wave
+    holding an older release than the catalog's latest."""
+    stale = stale or []
+    unknown = unknown or []
+    k_cols = ("Country", "Wave", "Catalog ID", "Catalog IDNO", "Catalog DOI",
+              "SOURCE.org")
     q_cols = ("Country", "Code", "Rows returned")
     u_cols = ("Country", "Wave", "Kind", "Recorded source",
               "Recorded CATALOG_ID", "Recorded method", "SOURCE.org", "Reason")
     c_cols = ("Country", "Wave", "SOURCE.org", "Key", "Old", "New")
+    s_cols = ("Country", "Wave", "Catalog ID", "Held IDNO", "Latest IDNO",
+              "Held DOI", "Latest DOI", "Latest seen", "SOURCE.org")
 
     def table(name: str, cols: tuple[str, ...], rows: list[dict]) -> list[str]:
         return ([f"#+name: {name}", "| " + " | ".join(cols) + " |",
@@ -720,6 +848,14 @@ def write_review(path: Path, unresolved: list[dict], queries: list[dict],
         "re-run once the catalog answers; never re-stamp one as =unknown=.",
         "A country with 0 rows in =catalog_queries= was not checked at all.",
         f"The =changed= table lists every value this run {verb}, old and new.",
+        "The =release_changed= table is the acquisition queue: waves whose",
+        "catalog entry has a newer release than the one held.  The held",
+        "=CATALOG_IDNO= / =CATALOG_DOI= are kept; the newer release is",
+        "recorded beside them as =#+CATALOG_LATEST_*= (GH #1128).",
+        "The =release_unknown= table lists every World Bank record that names",
+        "a catalog entry but no held release: this script never supplies one",
+        "from the catalog alone (#1128 ruling), so =#+CATALOG_IDNO:= stays",
+        "absent until an acquisition writes it.",
         "",
         "* Catalog queries",
         *table("catalog_queries", q_cols, queries),
@@ -730,6 +866,12 @@ def write_review(path: Path, unresolved: list[dict], queries: list[dict],
         f"* Values {verb} ({len({(r['Country'], r['Wave']) for r in changed})}"
         " SOURCE.org)",
         *table("changed", c_cols, changed),
+        "",
+        f"* Newer release in the catalog ({len(stale)})",
+        *table("release_changed", s_cols, stale),
+        "",
+        f"* Catalog entry recorded, release unknown ({len(unknown)})",
+        *table("release_unknown", k_cols, unknown),
     ]
     path.parent.mkdir(parents=True, exist_ok=True)
     # Atomic: a reader never sees half an artifact, and a failed write never
@@ -773,6 +915,8 @@ def main(argv: list[str] | None = None) -> int:
     unresolved: list[dict] = []
     queries: list[dict] = []
     changed: list[dict] = []
+    stale: list[dict] = []
+    unknown: list[dict] = []
 
     def leave_intact(country: str, wave: str, u: Unresolved) -> None:
         existing = read_provenance(root, country, wave)
@@ -793,6 +937,32 @@ def main(argv: list[str] | None = None) -> int:
               outcome: str) -> None:
         path = source_org_path(root, country, wave)
         old = path.read_text(encoding="utf-8") if path.exists() else None
+        unchanged = False
+        if old is not None:
+            prior = parse_source_org(old, country, wave)
+            if (prior.catalog_id != prov.catalog_id
+                    and (prior.idno or prior.doi)):
+                # An override may correct entry routing, but catalog metadata
+                # alone cannot establish the held release of another entry
+                # (#1128 ruling; ledger sections 3/4).
+                leave_intact(country, wave, Unresolved(
+                    "held-release-correction",
+                    "Correcting the primary catalog entry would replace a "
+                    "recorded held release. Acquire or explicitly curate the "
+                    "held release first; SOURCE.org was left intact."))
+                return
+            # Hold the release on record; a newer one goes beside it (#1128).
+            prov = latest_release(old, prov, today)
+        # A record with no held release gets none from the catalog (#1128).
+        before = prov
+        prov = release_unknown(old, prov)
+        if prov is not before and prov.is_worldbank:
+            actions["release-unknown"] += 1
+            unknown.append({
+                "Country": country, "Wave": wave,
+                "Catalog ID": prov.catalog_id,
+                "Catalog IDNO": before.idno, "Catalog DOI": before.doi,
+                "SOURCE.org": "absent" if old is None else "present"})
         if old is not None:
             lost = dropped_by_write(old, prov)
             if lost:
@@ -804,18 +974,29 @@ def main(argv: list[str] | None = None) -> int:
             moved = release_changed(old, prov)
             if moved:
                 leave_intact(country, wave, Unresolved(
-                    "release-changed",
-                    f"Resolved ({outcome}), but the catalog now reports a "
-                    f"different release than SOURCE.org records: "
-                    f"{'; '.join(moved)}.  The record names the release "
-                    "these files ARE; check which one is on disk before "
-                    "re-stamping."))
+                    "doi-changed",
+                    f"Resolved ({outcome}), but the catalog reports a "
+                    f"different DOI for the release SOURCE.org records: "
+                    f"{'; '.join(moved)}.  Same idno, so no newer release "
+                    "to record; settle which DOI is right by hand."))
                 return
-            if unchanged_by_write(old, prov):
-                actions["unchanged"] += 1
-                counts[outcome] += 1
-                rows.append((country, wave, outcome, "unchanged"))
-                return
+            unchanged = unchanged_by_write(old, prov)
+        if prov.is_stale_release:
+            actions["stale-release"] += 1
+            stale.append({
+                "Country": country, "Wave": wave,
+                "Catalog ID": prov.catalog_id,
+                "Held IDNO": prov.idno, "Latest IDNO": prov.latest_idno,
+                "Held DOI": prov.doi, "Latest DOI": prov.latest_doi,
+                "Latest seen": prov.latest_seen,
+                "SOURCE.org": ("already recorded" if unchanged
+                               else "would record" if args.dry_run
+                               else "recorded")})
+        if unchanged:
+            actions["unchanged"] += 1
+            counts[outcome] += 1
+            rows.append((country, wave, outcome, "unchanged"))
+            return
         for key, was, now_ in changed_by_write(old, prov):
             changed.append({"Country": country, "Wave": wave,
                             "SOURCE.org": ("updated" if old is not None
@@ -827,6 +1008,8 @@ def main(argv: list[str] | None = None) -> int:
         counts[outcome] += 1
         detail = (f"{prov.catalog_id} {prov.idno or ''}".strip()
                   if prov.catalog_id else (prov.note or "")[:52])
+        if prov.is_stale_release:
+            detail += f" (catalog latest: {prov.latest_idno})"
         rows.append((country, wave, outcome, detail))
 
     def run_country(country: str) -> None:
@@ -906,7 +1089,7 @@ def main(argv: list[str] | None = None) -> int:
         # say what it wrote before it died (red team r1, R13).
         write_review(review, unresolved, queries, changed, root=root,
                      dry_run=args.dry_run, argv=argv,
-                     when=now.isoformat(), aborted=aborted)
+                     when=now.isoformat(), aborted=aborted, stale=stale, unknown=unknown)
 
     # --- Report -------------------------------------------------------------
     width = max((len(f"{c}/{w}") for c, w, _, _ in rows), default=20)
@@ -926,6 +1109,9 @@ def main(argv: list[str] | None = None) -> int:
     print(f"      {verb:<16}: {actions['written']}")
     print(f"      unchanged       : {actions['unchanged']}  "
           "(content identical; not rewritten)")
+    print(f"      stale release   : {actions['stale-release']}  "
+          "(catalog has a newer release; held keys kept, "
+          "#+CATALOG_LATEST_* recorded)")
     print(f"  unresolved        : {counts['unresolved']}  "
           "(LEFT INTACT -- see the review artifact)")
     print(f"  skipped           : {counts['skipped']}  "

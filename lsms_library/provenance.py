@@ -19,9 +19,9 @@ This module makes provenance explicit and machine-readable.  It **extends**
 ``SOURCE.org`` (the file :func:`lsms_library.data_access.add_wave` already
 writes) rather than introducing a parallel mechanism, by appending org-mode
 ``#+KEY: value`` keyword lines beneath the existing free-text URL body.  The
-bare URL stays as the first URL in the file, so the legacy reader
-(``data_access._read_source_url``, which greps the first ``http(s)://…``)
-keeps working unchanged.
+bare URL stays at the top of the file. Acquisition reuses this parser's
+primary URL rule through ``data_access._read_source_url``; metadata and
+notes cannot supply a missing primary URL.
 
 Example::
 
@@ -81,6 +81,25 @@ repository under a second id; a derived re-release built out of studies we
 hold) are facts about the **catalog**, not about any one of our directories, so
 they live in :mod:`lsms_library.catalog_relations` — see
 ``lsms_library/catalog_relations.yml``.
+
+A catalog entry also has **releases** (``v01_M``, ``v02_M``, …), and the
+record names two of them, under different keys (GH #1114 / #1128):
+
+``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:``
+    The release whose files the directory **holds**.  Moved only by an
+    acquisition (``data_access.add_wave`` / ``populate_and_push``), never by a
+    re-stamp from the catalog.
+``#+CATALOG_LATEST_IDNO:`` / ``#+CATALOG_LATEST_DOI:`` / ``#+CATALOG_LATEST_SEEN:``
+    The catalog's **newer** release, when it has one, and the date a re-stamp
+    first saw it.  Absent when the latest is the release held.  So
+    ``rg CATALOG_LATEST_IDNO lsms_library/countries`` is the queue of waves
+    whose newer release has not been acquired.
+
+Everything under :data:`NOTES_HEADING` belongs to a human and is carried
+verbatim, ``#+KEY:`` lines included (GH #1115): ``GhanaSPS/2017-18`` records a
+second, Dataverse vintage of ten files as ``#+SECONDARY_SOURCE*`` lines in the
+middle of its notes.  Keywords are parsed only from the record above that
+heading.
 """
 
 from __future__ import annotations
@@ -88,7 +107,7 @@ from __future__ import annotations
 import datetime as _dt
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -119,7 +138,11 @@ _ID_UNKNOWN = "unknown"
 VALIDATION_CONTENT = "content-validated"   # the wave's data files corroborate the id
 VALIDATION_CATALOG_ONLY = "catalog-only"   # catalog metadata only; no local data to check
 
-_KEYWORD_RE = re.compile(r"^\s*#\+([A-Z_]+):\s*(.*?)\s*$", re.MULTILINE)
+# ``[ \t]*``, not ``\s*``: under MULTILINE ``\s*`` spans a newline, so an
+# empty-valued key swallowed the next line into its value and BOTH lines
+# vanished from the render (GH #1115, red team r1).  A keyword's value ends at
+# its own line, always.
+_KEYWORD_RE = re.compile(r"^[ \t]*#\+([A-Z_]+):[ \t]*(.*?)[ \t]*$", re.MULTILINE)
 _URL_RE = re.compile(r"https?://[^\s\]\)]+")
 _CATALOG_ID_RE = re.compile(r"/catalog/(\d+)")
 
@@ -133,10 +156,90 @@ _LIST_SEP_RE = re.compile(r"[,\s]+")
 # idempotent: re-running the backfill does not nest or duplicate the block.
 NOTES_HEADING = "* Notes (preserved from the original SOURCE.org)"
 
+# The body render_source_org writes when a record has no URL.  It is
+# boilerplate, not prose: it used to be re-ingested as prose, so the next
+# render carried it into the notes block (GH #1115; GhanaSPS/2017-18).
+URL_PLACEHOLDER = "(source URL not recorded)"
+
 # A line that carries no information beyond the URL itself: the literal
-# "SOURCE" banner, or a bare URL / org-mode [[link]].
+# "SOURCE" banner, a bare URL / org-mode [[link]], or the placeholder above.
 _BOILERPLATE_RE = re.compile(
-    r"^\s*(SOURCE|/?\[?\[?https?://[^\]\s]*\]?\]?)\s*$", re.IGNORECASE)
+    r"^\s*(SOURCE|/?\[?\[?https?://[^\]\s]*\]?\]?|"
+    + re.escape(URL_PLACEHOLDER) + r")\s*$", re.IGNORECASE)
+
+# The catalog's newer release, recorded beside the held one (GH #1128).  A
+# re-stamp writes and removes these; they are observations of the catalog, not
+# facts about the directory, so removing them is not a deletion.
+LATEST_KEYS = ("CATALOG_LATEST_IDNO", "CATALOG_LATEST_DOI",
+               "CATALOG_LATEST_SEEN")
+
+# Every keyword WaveProvenance has a field for.  Any other #+KEY: above the
+# notes heading is carried in ``extra`` and rendered back after these.
+_KNOWN_KEYS = frozenset({
+    "CATALOG_ID", "CATALOG_COVERS", "CATALOG_IDNO", "CATALOG_TITLE",
+    "CATALOG_YEARS", "CATALOG_REPOSITORY", "CATALOG_DOI", "CATALOG_URL",
+    *LATEST_KEYS,
+    "PROVENANCE_SOURCE", "PROVENANCE_METHOD", "PROVENANCE_VALIDATION",
+    "PROVENANCE_RECORDED", "PROVENANCE_NOTE", "PROVENANCE_SUPERSEDED_URL"})
+
+# Repeated scalar keywords still have a last-value accessor, but that must not
+# make a direct parse/render erase the other recorded values (#1115; ledger
+# section 4).  Keep their occurrences separately; a writer changing such a
+# scalar must first resolve the ambiguity rather than silently drop facts.
+_SCALAR_FIELDS = {
+    "CATALOG_IDNO": "idno", "CATALOG_TITLE": "title",
+    "CATALOG_YEARS": "years", "CATALOG_REPOSITORY": "repository",
+    "CATALOG_DOI": "doi", "CATALOG_URL": "url",
+    "CATALOG_LATEST_IDNO": "latest_idno", "CATALOG_LATEST_DOI": "latest_doi",
+    "CATALOG_LATEST_SEEN": "latest_seen", "PROVENANCE_SOURCE": "source",
+    "PROVENANCE_METHOD": "method", "PROVENANCE_VALIDATION": "validation",
+    "PROVENANCE_RECORDED": "recorded", "PROVENANCE_NOTE": "note",
+    "PROVENANCE_SUPERSEDED_URL": "superseded_url",
+}
+
+
+def _regions(text: str) -> tuple[list[str], list[str]]:
+    """Split SOURCE.org into ``(record, notes)``: the lines above
+    :data:`NOTES_HEADING` and the lines below it (``[]`` when it is absent)."""
+    lines = text.splitlines()
+    for i, ln in enumerate(lines):
+        if ln.strip() == NOTES_HEADING:
+            return lines[:i], lines[i + 1:]
+    return lines, []
+
+
+def _body(record: list[str]) -> list[str]:
+    """The free-text body: the record's lines above its first ``#+`` line."""
+    out: list[str] = []
+    for ln in record:
+        if ln.lstrip().startswith("#+"):
+            break
+        out.append(ln)
+    return out
+
+
+def _primary_url(record: list[str]) -> str | None:
+    """Explicit primary metadata, or the URL in the pre-metadata body."""
+    values = [value for key, value in _KEYWORD_RE.findall("\n".join(record))
+              if key == "CATALOG_URL" and value]
+    if values:
+        return values[-1]
+    match = _URL_RE.search("\n".join(_body(record)))
+    return match.group(0).rstrip("/") if match else None
+
+
+def _tidy(lines: list[str]) -> list[str]:
+    """Collapse runs of blank lines to one and trim blank lines at the ends,
+    keeping the paragraph breaks a human wrote."""
+    out: list[str] = []
+    for ln in lines:
+        if ln.strip():
+            out.append(ln.rstrip())
+        elif out and out[-1]:
+            out.append("")
+    while out and not out[-1]:
+        out.pop()
+    return out
 
 
 def preserved_prose(text: str) -> str | None:
@@ -145,14 +248,40 @@ def preserved_prose(text: str) -> str | None:
     Returns ``None`` when the file says nothing beyond its URL.  Idempotent:
     text already rendered by :func:`render_source_org` yields back exactly the
     prose it preserved.
+
+    Two regions, two rules (GH #1115):
+
+    * Above :data:`NOTES_HEADING` (all of a legacy file), a line is prose
+      unless it is a ``#+KEY: value`` keyword -- those are the record -- or
+      boilerplate (:data:`_BOILERPLATE_RE`). Only one bare primary URL is
+      boilerplate; additional bare URL occurrences are preserved as notes.
+    * Below it, every line is a human's and is kept verbatim, ``#+KEY:`` lines
+      included (``GhanaSPS/2017-18``'s ``#+SECONDARY_SOURCE*`` lines sit in the
+      middle of a paragraph that explains them).  The one exception is
+      :data:`URL_PLACEHOLDER`, which only ever got there by being re-ingested.
+
+    Paragraph breaks are kept in both (runs of blank lines collapse to one).
     """
-    if NOTES_HEADING in text:
-        text = text.split(NOTES_HEADING, 1)[1]
-    lines = [ln.rstrip() for ln in text.splitlines()]
-    keep = [ln for ln in lines
-            if ln.strip()
-            and not ln.lstrip().startswith("#+")
-            and not _BOILERPLATE_RE.match(ln)]
+    record, notes = _regions(text)
+    primary = _primary_url(record)
+    discarded_primary = False
+    head = []
+    for line in record:
+        if _KEYWORD_RE.match(line):
+            continue
+        if _BOILERPLATE_RE.match(line):
+            url = _URL_RE.search(line)
+            if url is None:
+                continue  # SOURCE banner or the no-URL placeholder
+            if (not discarded_primary and primary
+                    and url.group(0).rstrip("/") == primary.rstrip("/")):
+                discarded_primary = True  # rendered as the primary body URL
+                continue
+            # Another bare URL is recorded evidence, not primary boilerplate.
+        head.append(line)
+    head = _tidy(head)
+    tail = _tidy([ln for ln in notes if ln.strip() != URL_PLACEHOLDER])
+    keep = head + [""] + tail if head and tail else head or tail
     return "\n".join(keep) if keep else None
 
 
@@ -188,6 +317,21 @@ class WaveProvenance:
     ``covers`` is a different relation and must not be confused with it: entries
     whose *content* this directory's files subsume but whose *files* we do not
     hold.  Nothing in ``covers`` is a claim to hold anything.
+
+    ``idno`` / ``doi`` describe the release this directory HOLDS;
+    ``latest_idno`` / ``latest_doi`` the catalog's newer release when it has
+    one, first seen on ``latest_seen`` (GH #1128).  ``extra`` holds any other
+    ``#+KEY:`` line of the record, **every occurrence** in order within each key
+    (``{key: [value, ...]}``): a repeated unknown key used to keep only its
+    last value, so the first line vanished on render (GH #1115, red team r1).
+    A plain ``str`` value is accepted and rendered as one line.
+
+    ``scalar_keywords`` retains every occurrence of repeated known scalar
+    keys (and explicit empty values). Accessors keep their historical last
+    nonempty value; rendering preserves the other recorded facts. An attempt to change
+    such a scalar without resolving its stored occurrences raises rather than
+    silently erasing them. The backfill's occurrence guard likewise refuses
+    a reconstruction that would discard them.
     """
 
     country: str
@@ -206,10 +350,14 @@ class WaveProvenance:
     note: str | None = None
     superseded_url: str | None = None     # prior URL, when we corrected one
     notes: str | None = None              # human prose preserved from the original
-    extra: dict[str, str] = field(default_factory=dict)
+    extra: dict[str, list[str]] = field(default_factory=dict)
     # Append fields to preserve the pre-#600 positional constructor order.
     catalog_ids: list[str] = field(default_factory=list)  # every entry held here
     covers: list[str] = field(default_factory=list)       # entries subsumed, NOT held
+    latest_idno: str | None = None        # the catalog's newer release (GH #1128)
+    latest_doi: str | None = None
+    latest_seen: str | None = None        # ISO date a re-stamp first saw it
+    scalar_keywords: dict[str, list[str]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         # Keep the scalar and the list in agreement whichever one was supplied.
@@ -230,6 +378,12 @@ class WaveProvenance:
         ``False`` only for :data:`SOURCE_UNKNOWN` — i.e. a genuine gap.
         """
         return self.is_worldbank or self.source == SOURCE_EXTERNAL
+
+    @property
+    def is_stale_release(self) -> bool:
+        """True when the catalog has a newer release than the one held."""
+        return bool(self.idno and self.latest_idno
+                    and self.idno.strip() != self.latest_idno.strip())
 
 
 def source_org_path(countries_dir: Path, country: str, wave: str) -> Path:
@@ -264,13 +418,21 @@ def parse_source_org(text: str, country: str, wave: str) -> WaveProvenance:
     be collapsed by a dict comprehension over ``findall``, so a second
     ``#+CATALOG_ID:`` line was silently dropped — you could not record a second
     id even by hand, and nothing said so (GH #600).
+
+    Keywords are read from the record only, never from below
+    :data:`NOTES_HEADING` (that is prose, :func:`preserved_prose`), and the
+    URL comes from ``#+CATALOG_URL:`` or else from the free-text body above
+    the first ``#+`` line -- not from the first URL anywhere in the file,
+    which in ``GhanaSPS/2017-18`` is a ``#+SECONDARY_SOURCE:`` in the notes of
+    a wave that records no source URL at all (GH #1115).
     """
+    record, _notes = _regions(text)
     kw: dict[str, list[str]] = {}
-    for key, val in _KEYWORD_RE.findall(text):
+    for key, val in _KEYWORD_RE.findall("\n".join(record)):
         kw.setdefault(key, []).append(val)
 
     def one(key: str) -> str | None:
-        """The value of a scalar keyword (the last, if a file repeats it)."""
+        """The last nonempty value of a scalar keyword (legacy compatibility)."""
         vals = [v for v in kw.get(key, []) if v]
         return vals[-1] if vals else None
 
@@ -283,10 +445,7 @@ def parse_source_org(text: str, country: str, wave: str) -> WaveProvenance:
                     out.append(cid)
         return out
 
-    url = one("CATALOG_URL")
-    if not url:
-        m = _URL_RE.search(text)
-        url = m.group(0).rstrip("/") if m else None
+    url = _primary_url(record)
 
     catalog_ids = many("CATALOG_ID")
 
@@ -299,13 +458,6 @@ def parse_source_org(text: str, country: str, wave: str) -> WaveProvenance:
         method = "legacy-source-url" if url else None
     else:
         method = one("PROVENANCE_METHOD")
-
-    known = {"CATALOG_ID", "CATALOG_COVERS", "CATALOG_IDNO", "CATALOG_TITLE",
-             "CATALOG_YEARS", "CATALOG_REPOSITORY", "CATALOG_DOI",
-             "CATALOG_URL",
-             "PROVENANCE_SOURCE", "PROVENANCE_METHOD", "PROVENANCE_VALIDATION",
-             "PROVENANCE_RECORDED", "PROVENANCE_NOTE",
-             "PROVENANCE_SUPERSEDED_URL"}
 
     return WaveProvenance(
         country=country,
@@ -325,17 +477,27 @@ def parse_source_org(text: str, country: str, wave: str) -> WaveProvenance:
         note=one("PROVENANCE_NOTE"),
         superseded_url=one("PROVENANCE_SUPERSEDED_URL"),
         notes=preserved_prose(text),
-        extra={k: v[-1] for k, v in kw.items() if k not in known},
+        extra={k: list(v) for k, v in kw.items() if k not in _KNOWN_KEYS},
+        latest_idno=one("CATALOG_LATEST_IDNO"),
+        latest_doi=one("CATALOG_LATEST_DOI"),
+        latest_seen=one("CATALOG_LATEST_SEEN"),
+        scalar_keywords={k: list(v) for k, v in kw.items()
+                         if k in _SCALAR_FIELDS
+                         and (len(v) > 1 or not v[-1])},
     )
 
 
 def render_source_org(prov: WaveProvenance) -> str:
     """Render a :class:`WaveProvenance` as ``SOURCE.org`` text.
 
-    The recorded URL is emitted as the first ``http(s)://`` in the file so the
-    legacy reader (``data_access._read_source_url``) keeps finding it.
+    The recorded primary URL is emitted in the body and its metadata field.
+
+    Lossless with :func:`parse_source_org` (GH #1115): every key the record
+    holds is emitted -- ``extra`` after the known keys, every occurrence of a
+    repeated one, an empty value as a bare ``#+KEY:`` -- and the notes are
+    carried as parsed.
     """
-    body = prov.url if prov.url else "(source URL not recorded)"
+    body = prov.url if prov.url else URL_PLACEHOLDER
     lines = ["SOURCE", "", body, ""]
 
     if prov.is_worldbank:
@@ -356,7 +518,10 @@ def render_source_org(prov: WaveProvenance) -> str:
                      ("CATALOG_YEARS", prov.years),
                      ("CATALOG_REPOSITORY", prov.repository),
                      ("CATALOG_DOI", prov.doi),
-                     ("CATALOG_URL", prov.url)):
+                     ("CATALOG_URL", prov.url),
+                     ("CATALOG_LATEST_IDNO", prov.latest_idno),
+                     ("CATALOG_LATEST_DOI", prov.latest_doi),
+                     ("CATALOG_LATEST_SEEN", prov.latest_seen)):
         if val:
             lines.append(f"#+{key}: {val}")
 
@@ -374,12 +539,91 @@ def render_source_org(prov: WaveProvenance) -> str:
         lines.append(f"#+PROVENANCE_SUPERSEDED_URL: {prov.superseded_url}")
     if prov.note:
         lines.append(f"#+PROVENANCE_NOTE: {prov.note}")
+    for key, values in prov.scalar_keywords.items():
+        field_name = _SCALAR_FIELDS.get(key)
+        if field_name is None or not values:
+            raise ValueError(f"Invalid preserved scalar keyword: {key}")
+        current = getattr(prov, field_name) or ""
+        nonempty = [value for value in values if value]
+        last = nonempty[-1] if nonempty else ""
+        if key == "PROVENANCE_SOURCE":
+            current, last = current.lower(), last.lower()
+        if current != last:
+            raise ValueError(
+                f"Cannot rewrite repeated or empty #+{key}: without "
+                "explicit provenance curation")
+        retained = [f"#+{key}: {value}".rstrip() for value in values]
+        position = next((i for i, line in enumerate(lines)
+                         if line.startswith(f"#+{key}:")), len(lines))
+        # Canonical output has at most one occurrence before this restoration.
+        lines[position:position + (position < len(lines))] = retained
+    # Keys this module has no field for are a human's (or a newer writer's):
+    # emitted, never dropped.  A known key in ``extra`` would be emitted twice.
+    for key, vals in prov.extra.items():
+        if key in _KNOWN_KEYS:
+            continue
+        for val in ([vals] if isinstance(vals, str) else vals):
+            lines.append(f"#+{key}: {val}".rstrip())
 
     # Never silently drop human-written prose.
     if prov.notes:
         lines += ["", NOTES_HEADING, prov.notes]
 
     return "\n".join(lines) + "\n"
+
+
+def acquired_release(existing: WaveProvenance | None, *, country: str,
+                     wave: str, catalog_id: str, idno: str | None,
+                     doi: str | None = None, title: str | None = None,
+                     years: str | None = None, repository: str | None = None,
+                     url: str | None = None, method: str = "add-wave",
+                     recorded: str | None = None) -> WaveProvenance:
+    """The record to write once an acquisition holds release *idno* of
+    catalog entry *catalog_id* (GH #1128).
+
+    This is the one place the HELD keys move: ``idno`` / ``doi`` become the
+    release acquired, and the latest-seen trio is cleared -- the newer release
+    a re-stamp queued is now the one held.
+
+    *existing* is the record already on disk, if any.  When it names the same
+    primary entry, everything a human or an earlier stamp established (the
+    other ids the directory holds, ``covers``, the note, the validation, the
+    method, the preserved notes, unknown keys) is carried through.  When it
+    names another entry, or none, only the human's prose and unknown keys
+    are, and its URL is kept as the superseded one.
+
+    *doi*, when not given, is taken from *existing* only where it describes
+    *idno*: the queued ``latest_doi`` if *idno* is the queued latest release,
+    the held ``doi`` if it is the release already held.  Otherwise it is left
+    blank rather than describe another release.
+    """
+    catalog_id = str(catalog_id)
+    if doi is None and existing is not None and idno:
+        if existing.latest_idno and existing.latest_idno.strip() == idno.strip():
+            doi = existing.latest_doi
+        elif existing.idno and existing.idno.strip() == idno.strip():
+            doi = existing.doi
+    if (existing is not None and existing.is_worldbank
+            and existing.catalog_id == catalog_id):
+        keep_method = existing.method not in (None, "legacy-source-url")
+        return replace(
+            existing, idno=idno, doi=doi,
+            title=title or existing.title, years=years or existing.years,
+            repository=repository or existing.repository,
+            url=url or existing.url,
+            method=existing.method if keep_method else method,
+            recorded=recorded,
+            latest_idno=None, latest_doi=None, latest_seen=None)
+    prior = existing.url if existing is not None else None
+    superseded = (prior if prior and url
+                  and prior.rstrip("/") != url.rstrip("/") else None)
+    return WaveProvenance(
+        country=country, wave=wave, source=SOURCE_WORLDBANK,
+        catalog_ids=[catalog_id], idno=idno, doi=doi, title=title,
+        years=years, repository=repository, url=url, method=method,
+        recorded=recorded, superseded_url=superseded,
+        notes=existing.notes if existing is not None else None,
+        extra=dict(existing.extra) if existing is not None else {})
 
 
 def read_provenance(countries_dir: Path, country: str,
