@@ -1,0 +1,53 @@
+#+title: LSMS-ISA backlog after v0.16.0
+#+author: Sue
+#+date: 2026-10-21
+#+TODO: TODO ACTIVE WAITING | DONE
+
+* ACTIVE Inventory and reconcile
+
+The maintainer requested the backlog workflow for the eight LSMS-ISA countries.
+Scope: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania and Uganda.
+The initial live GitHub snapshot has 156 open issues, zero open PRs and 300 recent merged PRs.
+Country-keyword matching finds 117 candidates; this is not the final scope count.
+All 156 issues are assigned exactly once for applicability and residual review.
+
+| Read-only lane | Issues | Primary countries |
+|----------------+--------+-------------------|
+| east | 50 | Ethiopia, Nigeria |
+| west | 57 | Malawi, Burkina_Faso, Mali, Niger |
+| panel | 49 | Uganda, Tanzania |
+
+Raw GitHub snapshots and working reports are private under =/local/job40255479/control/isa-backlog-20261021/=.
+Only reviewed issue-level metadata and aggregate evidence will be copied into this report directory.
+
+* Baseline and resources
+
+The main working clone is clean on =development= at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+Published v0.16.0 is recorded in =.sucoder/handoff.org=; no release work is pending.
+The report worktree is =/local/job40255479/worktrees/isa-campaign=, branch =docs/isa-backlog-20261021=.
+The shared filesystem origin is durable and must not be edited directly.
+
+Node =n0071.savio3=, job =40255479=: 32 allocated cores and 93 GiB RAM, about 55 hours remaining at bootstrap.
+Start account usage: 68,980.77 SUs used of 1,500,000 SUs allocated; 59,090.57 CPU-hours.
+The existing mounted/extracted image is generation =20261019T221223Z= at =/local/job40255479/venv_img=.
+Its Python imports pandas 3.0.6 and this checkout with explicit =PYTHONPATH=.
+The main clone's =.venv= is an incomplete pre-existing directory; use the verified image directly, without rebuilding or adopting the writable Lustre master.
+The strict API/skill audit discovers all 15 hand-authored skills.
+
+* Execution rules
+
+Use the existing backlog workflow and Feature regression net.
+Grounding: =.coder/ledger/isa-backlog-20261021.md= and the standing baseline.
+Read each country's =_/CONTENTS.org= including live TODO/WAITING entries before diagnosis.
+Reconcile merged fixes and maintainer decisions before implementing.
+Diagnose silent data loss before dispatching a concrete fix.
+Use one isolated worktree per fix, exact package/config identity and private writable caches.
+Verify the actual source path, run targeted tests and the relevant Feature audit, then freeze for independent adversarial review.
+Open PRs for human merge; do not auto-merge.
+Record exact residuals for partial work and human decisions/acquisition.
+
+* TODO Implementation and independent review
+
+No fix is claimed complete at this checkpoint.
+
+Sue
