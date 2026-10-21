@@ -61,12 +61,12 @@ Exactly these Preferred Label changes:
 
 | Original Label | Before | Approved target |
 |---|---|---|
-| Semences d'autres cereales (source spelling retains accents) | Autre crop | Autre cereale (existing Benin/Togo spelling, accents retained) |
+| Semences d'autres céréales | Autre crop | Autre céréale |
 | Plants/boutures de tubercules | Autre crop | Autre tubercule |
 | 21 | Autre crop | Unknown [Burkina_Faso 2018-19 s16bq01=21] |
 
-The literal accented source/target strings are those already used by
-Benin/Togo. Keep Autres semences and unused bare 20 unchanged. The two named
+The accented source/target strings are those already used by Benin/Togo.
+Keep Autres semences and unused bare 20 unchanged. The two named
 splits alone leave 98 duplicate extras; the third source-qualified fallback
 is necessary. Correct the false comment claiming code 21 is Autres semences,
 record these source/coverage facts in CONTENTS and add focused regressions.
@@ -90,8 +90,51 @@ actual 549/39 hash scope, meaningful tests and API audit before review.
 
 ## Verification
 
-Pending implementation and its actual cold/warm evidence. The diagnosis-only
-counterfactual is not a production candidate build. Independent review follows
-a clean frozen head.
+Implementation: `69ed4d2028a6f989a8ac45d117a5cffc60a831fd`.
+Source-safe evidence and residual drafts:
+`slurm_logs/isa_backlog_2026-10-21/Burkina_Faso/1123/`.
+The ledger was committed first in `d780445e8`; the ordinary publishing hook
+published every implementation/evidence commit. Independent review remains
+the next gate.
+
+- **OK (sections 2-5):** repeat call-site search confirms existing extraction,
+  ehcvm_i, mapping lookup, native grain, normalizer and Feature machinery are
+  reused. Parsed before/after tables differ in exactly the three approved
+  target cells; the entire legacy input map is exact. No parallel resolver,
+  source classifier or reducer was introduced.
+- **OK (sections 3-4):** two physically absent BF L2 roots, each seeded only
+  with eight MD5-verified held L1 blobs, rebuild through actual Country. Source
+  wave rows stay 22,877; public rows rise 22,694 -> 22,877. Every original
+  selected and all 183 previously lost source lines retain complete payloads,
+  units, other keys and dtypes. Twenty equal-payload extras remain distinct.
+- **OK (sections 2-4):** all public/pre-final country and six raw wave sample
+  and cluster frames, dtypes and full logical attrs are exact across revisions.
+  All expected cache hashes/coverage are current after the builds. No stale
+  companion is trusted/restamped. Separate-process warm and new-Country calls
+  are exact and change no parquet byte or nanosecond mtime.
+- **OK (sections 2-4):** nine new regressions and four scoped existing
+  Benin/Togo tests pass with zero skips. The final new file on immutable f8
+  gives eight failures and one pass. Actual-script write-spy tests reject
+  the incomplete two-split mutant and future even equal-payload duplicates
+  before writing. The independent real-source oracle compares every native
+  line's complete measurements and unit. API audit passes.
+- **OK (sections 3-4):** the current 2014/2021-22 public subset requests stay
+  empty; the 2018-qualified token reaches only 2018-19. Code 21's physical
+  meaning and legacy Seed classification remain explicitly unverified.
+- **OK (section 4):** actual inventory moves exactly 24 BF hashes, with
+  525 other-country hashes and all 39 framework fingerprints exact. Every
+  comparator Country/Feature frame and full logical attrs remain exact;
+  all 12 Benin/Togo cache files are byte-identical and fresh.
+- **OK (sections 2-4):** Feature rows rise 47,029 -> 47,212 with no additional
+  loss. Scoped phases 1/2 findings change from eight warnings to six: only
+  the two BF input-collapse warnings disappear, and all other six full
+  normalized records are exact. No fail/error/skip or unrun kwarg grid is
+  claimed. Raw frames and warning examples remain private.
+
+No remaining runtime CONTRADICTION or REINVENTION against this ledger was
+found. The corrected code-21 comment and historical sample-count discrepancy
+are quoted in the report rather than declaring country documentation stale.
+The old a63/#1148 worktree, other-country #1123 work, source authority and
+#1119 vocabulary alignment remain outside this implementation.
 
 Sue
