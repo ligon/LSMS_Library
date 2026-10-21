@@ -658,7 +658,7 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 
 Sue, GPT-6. The goal remains ACTIVE; actionable country backlog work continues.
 Main development is clean at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
-Report branch =docs/isa-backlog-20261021=, previous checkpoint =86b4854bdd0c14c638135dcb98a8c989f3017d9c=; commit this current note with the next checkpoint.
+Report branch =docs/isa-backlog-20261021=, previous checkpoint =665da0cc57e685741369fd964e67a4cb5cf0bbd5=; commit this current note with the next checkpoint.
 Campaign draft PR #1170: inventory, exact residuals, reconciliation, independent reviews and source-safe evidence.
 The detailed current records are =slurm_logs/isa_backlog_2026-10-21/{STATUS.org,country-lanes.json,reconciliation.json}=.
 
@@ -712,11 +712,14 @@ The concurrency limit is root plus three workers; do not dispatch a fourth worke
   Baseline15newcases gave12fail/3pass;13existing plus complete cold/warm baseline and549/39baseline inventory exact. Candidate final proof is active after a preserved private native2018six-column versus country-union eight-column assertion mismatch; runtime unchanged.
   Meaningful source/native/public/Feature/negative/hash/warm/scanner controls required; then freeze for independent review by a different agent.
   Active private =Burkina_Faso/1058-fix/=; no PR yet. Issue1058 title/body now report the fresh denominator and completed negative Mali/Niger/Senegal header checks.
-- =review_malawi_1109= now diagnoses shared #1081 READ-ONLY in =isa-framework-1081= at f8; no implementation approved.
-  FIRST full Ethiopia CONTENTS including tasks, name actual idiosyncrasy and quote contradictions; then relevant categorical skills, standing ledger and named tests.
-  Private =framework1081-diagnosis/= and context =framework1081-queued-context.json=.
-  Reproduce actual generated derived food/roster handlers and typed errors, including default/strict/Aggregate argument paths; report distinct CategoricalKeyDeclarationError scope question.
-  Preserve intentional UnitsUnavailable default legacy fallback and all unrelated generic fallbacks; no stash probe, tracked/Git/ref/GitHub mutation or acquisition.
+- =review_malawi_1109= now implements approved bounded shared #1081 in NEW =isa-framework-1081-fix=, branch =fix/1081-preserve-categorical-errors-20261021=, fromf8.
+  Original =isa-framework-1081= and =framework1081-diagnosis/= remain frozen, exact14,880tracked files/modes/HEAD/clean; no network/source mutation/process remains.
+  Root read full diagnosis/proposal/ledger and independently verified actual handler/class/test contracts. Explicit third CategoricalKeyDeclarationError inclusion is approved alongside Empty/Conflict.
+  Scope only existing-class imports and two bare re-raise clauses before generic catches, one73-case test file, ledger-first commit and safe evidence. No parser/country/schema/hierarchy/Feature or unrelated fallback changes.
+  Preserve exact UnitsUnavailable default/scalar legacy policy and strict country-named refusal, generic legacy success/exhaustion, scalar labels, strict environments, original typed object/args/cause/notes/context.
+  Diagnose baseline:166handler+5valuation controls,162existing tests pass; proposed73cases give42fail/31pass, zero errors/skips. Successful mocked legacy return qualifies old loud-failure claim, without real healthy Ethiopia legacy-cache claim.
+  Writer must run235 meaningful tests plus desired-outcome probes, measure actual549/39scope in separate source states (no stash/inferredzero), bounded held healthy ISA full API/warm/Feature policy checks, and freeze clean published head/quiescent sources for DIFFERENT reviewer.
+  Active private =framework1081-fix/=; safe frozen diagnosis is exported in campaign =framework1081-diagnosis/=. No candidate PASS or PR claimed yet.
 
 Malawi #1111 independent standalone a935 PASSED101 tests after deleting five test lines that pinned the excluded organic defect; production remains exact9b.
 Root-owned composition =fd2356ee94ecfc7448527dc0085b9e4d60368049= in =isa-Malawi-1111-composed= independently PASSED129 tests, all235source pair sums, both parent-based full frames/attrs, all11075organic answers,15scanner records and zero warm writes across17parquets/root.
@@ -729,7 +732,7 @@ Idle writers =burkina_lane= and =mali_lane= must leave their frozen source/evide
 The active P2 shared diagnosis is #1081, prepared f8 worktree =isa-framework-1081=, branch =fix/1081-derived-categorical-errors-20261021=.
 Live issue/zero comments and 100 recent PRs were checked; no matching implementation.
 Private =framework1081-queued-context.json= records the derived food/roster handlers and related CategoricalKeyDeclarationError question.
-A read-only diagnosis is required before code; preserve UnitsUnavailable default fall-through and unrelated legacy handling, and never use the issue's suggested stash-probe.
+The read-only diagnosis is complete and root approved the explicit minimal three-type correction; preserve UnitsUnavailable default fall-through and unrelated legacy handling, and never use the original issue's suggested stash-probe.
 
 Queued read-only follow-ups: #1078 Uganda test writer attribution and #1135 settled warning-size ruling. Private =queued-1078-context.json= and =queued-1135-context.json= retain live issue/comments and100recent PR dedup; neither is dispatched or approved for code. Historical1078 three parquets and t_full.log still exist at the exact issue evidence path, read-only.
 

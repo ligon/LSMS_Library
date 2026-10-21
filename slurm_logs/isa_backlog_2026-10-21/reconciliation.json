@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T21:32:11.444390+00:00",
+  "observed_at": "2026-10-21T21:38:05.420886+00:00",
   "actions": [
     {
       "issue": 822,
@@ -150,6 +150,10 @@
     {
       "issue": 1111,
       "action": "Standalone101-test PASS and composed129-test PASS; stacked partial PR1193 on1175 ready for human review. All11075organic answers and235same-source pair sums exact.2013/2016 C4 residuals stay open; first cold Feature capture limitation retained."
+    },
+    {
+      "issue": 1081,
+      "action": "Actual generated handlers reproduce all three deliberately typed categorical RuntimeErrors masked by legacy fallback. Explicit root-approved third KeyDeclarationError scope; real parser tests discriminate42fail/31pass onf8. Mocked successful fallback qualifies old blanket loud-failure claim, not an observed healthy Ethiopia legacy cache. New separate writer approved; no candidate/PR/PASS claimed yet. Live issue title/body updated, original report retained."
     }
   ],
   "verified_issue_metadata": [

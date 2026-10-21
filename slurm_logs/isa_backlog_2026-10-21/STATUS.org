@@ -134,6 +134,6 @@ The read-only diagnosis's narrower-footprint expectation is superseded by this m
 The 602 truly missing noninorganic units and three observed unlisted seed codes remain the separate #1118 remainder.
 
 Three owner-only durable private snapshots now preserve completed evidence:957files/18roots,1,236files/10roots, and312files/3roots. All archived contents and unchanged source receipts are verified. The last includes independent Nigeria1095, Malawi composition and Burkina1058 diagnosis; root sets overlap and are not summed as unique files. See =private-evidence-durability*.json=. Later completed and active roots still need a further quiescent snapshot.
-The shared #1081 lane is now read-only diagnosis; no implementation is approved and intentional UnitsUnavailable fallback remains an invariant.
+The shared #1081 diagnosis completed:166 generated-handler probes, five valuation controls and162 existing tests pass;73 proposed regressions give42fail/31pass onf8. Root approved minimal typed re-raise clauses for Empty/Conflict plus explicitly included KeyDeclaration errors in a new separate writer. The original issue's blanket loud-failure claim is qualified by a successful mocked legacy fallback, not an observed healthy Ethiopia legacy cache. Intentional UnitsUnavailable and generic fallback policies remain unchanged; candidate validation and independent review are pending. See =framework1081-diagnosis/=.
 
 Sue

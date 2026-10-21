@@ -289,15 +289,24 @@
       "ci": "success; run39654667663"
     },
     "1081": {
-      "path": "/local/job40255479/worktrees/isa-framework-1081",
-      "branch": "fix/1081-derived-categorical-errors-20261021",
-      "status": "active-read-only-diagnosis",
+      "path": "/local/job40255479/worktrees/isa-framework-1081-fix",
+      "branch": "fix/1081-preserve-categorical-errors-20261021",
+      "status": "approved-bounded-implementation",
       "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
-      "scope": "Typed categorical errors masked by generic legacy fallbacks in food/roster derived Country paths; no implementation approved",
+      "scope": "Explicit three existing typed categorical errors: minimal imports/two bare re-raise clauses only; UnitsUnavailable byte-exact and generic/Feature/label policies unchanged",
       "dedup": "Live issue/zero comments and100recent userPRs checked; no implementation match",
       "private_context": "/local/job40255479/control/isa-backlog-20261021/framework1081-queued-context.json",
       "owner": "review_malawi_1109",
-      "private_evidence": "/local/job40255479/control/isa-backlog-20261021/framework1081-diagnosis"
+      "private_evidence": "/local/job40255479/control/isa-backlog-20261021/framework1081-fix",
+      "diagnosis_worktree": "/local/job40255479/worktrees/isa-framework-1081",
+      "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/framework1081-diagnosis",
+      "baseline_regression_counts": {
+        "failed": 42,
+        "passed": 31,
+        "errors": 0
+      },
+      "diagnosis_existing_tests_passed": 162,
+      "diagnosis_handler_probes": 166
     }
   },
   "integration": {
