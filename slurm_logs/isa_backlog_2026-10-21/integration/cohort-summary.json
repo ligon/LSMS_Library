@@ -1,0 +1,14 @@
+{
+  "source_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
+  "selection_files": 11,
+  "workers": 8,
+  "distribution": "loadfile",
+  "offline_guard": true,
+  "source_fetches": 0,
+  "cases": 266,
+  "outcomes": {
+    "passed": 266
+  },
+  "suite_seconds": 126.48,
+  "skipped_test_names": []
+}

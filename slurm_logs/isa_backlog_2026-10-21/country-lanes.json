@@ -17,13 +17,17 @@
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
       "branch": "isa/Ethiopia-20261021",
-      "status": "implementation",
+      "status": "independent-review",
       "owner": "review_nigeria_1034",
       "initial_issue": 1118,
       "scope": "Ethiopia missing plot-input units only; standing U_UNKNOWN ruling",
       "diagnosis_rows": 180900,
       "missing_unit_rows": 37370,
-      "approved_boundary": "Final u null/whitespace-only -> existing U_UNKNOWN; every Applied use-only row and non-unit payload preserved"
+      "approved_boundary": "Final u null/whitespace-only -> existing U_UNKNOWN; every Applied use-only row and non-unit payload preserved",
+      "frozen_head": "286108cf7ecc1a6e1e07150b8eec8411f5326b05",
+      "review_path": "/local/job40255479/worktrees/isa-review-1118-Ethiopia",
+      "reviewer": "mali_lane",
+      "author_tests_passed": 58
     },
     "Malawi": {
       "path": "/local/job40255479/worktrees/isa-Malawi",
@@ -57,7 +61,7 @@
       "runtime_review_head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1180",
       "residual_issue": 1179,
-      "ci": "pending"
+      "ci": "success; run39649319628"
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -105,10 +109,13 @@
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
       "branch": "isa/Tanzania-20261021",
-      "status": "diagnosis",
+      "status": "implementation",
       "owner": "burkina_lane",
       "initial_issue": 1118,
-      "scope": "Tanzania missing plot-input units only; source diagnosis before implementation"
+      "scope": "Tanzania missing plot-input units only; source diagnosis before implementation",
+      "missing_unit_rows": 408,
+      "diagnosis_rows": 9698,
+      "approved_boundary": "Retain known units without amounts; fill null/blank units after unchanged duplicate collapse"
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
@@ -152,8 +159,9 @@
       1178,
       1180
     ],
-    "status": "Six reviewed PRs combined; 11-file cohort regression selection running under 8 loadfile workers/private held inputs",
+    "status": "PASS:266tests zero skips/failures/errors across11files",
     "public_prs_merged": false,
-    "test_session": 10257
+    "test_session": 23070,
+    "completed": true
   }
 }

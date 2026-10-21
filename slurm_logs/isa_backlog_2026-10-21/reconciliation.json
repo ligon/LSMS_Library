@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T18:06:44.672043+00:00",
+  "observed_at": "2026-10-21T18:16:40.768860+00:00",
   "actions": [
     {
       "issue": 822,
@@ -148,7 +148,7 @@
       "issue": 822,
       "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
       "review": "PASS;39tests zero skips; original obs3/source masks exact",
-      "ci": "pending"
+      "ci": "success; run39649319628"
     }
   ]
 }
