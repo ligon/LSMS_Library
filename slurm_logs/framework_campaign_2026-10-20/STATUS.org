@@ -60,7 +60,9 @@ The driver retains its nonzero error exit; this is not a blanket green corpus.
 There are no status, row-count, schema, wave-count, null-count, warning-category-count or cache-metadata changes.
 Six food quantity/price tables change as intended; four roster fingerprints differ only in order in paired cache and warm-API checks.
 Unchanged-baseline Benin cold builds under seeds1/3 reproduce both original fingerprints exactly.
-Mali's MonthsSpent cold-object/warm-string difference occurs on both sources and remains an explicit separate limit; unavailable original cold served frames are not claimed to have been directly compared.
+A separate fixed-seed Mali supplement captures new cold and warm returns: both sources match exactly in original order, including all 220,732 rows, seven columns, indices, dtypes and values.
+Both reproduce the existing MonthsSpent cold-object/warm-string difference; unavailable original corpus cold served frames are not claimed to have been directly compared.
+Evidence: [[file:contracts/mali-cold-review.org][fresh Mali cold/warm supplement]].
 All 549 expected country hashes and 1,183 observed wave hashes move through the tagged #1099 build closure; this observed-file count is not the complete census of 2,139 wave hashes.
 Evidence: [[file:contracts/corpus-review.org][independent corpus review]], [[file:contracts/corpus-comparison.json][all measured differences]].
 

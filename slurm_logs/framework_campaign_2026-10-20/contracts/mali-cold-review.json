@@ -1,0 +1,266 @@
+{
+  "all_review_processes_stopped": true,
+  "api_processes": 4,
+  "baseline_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "candidate_sha": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "cold_warm_by_source": {
+    "baseline": {
+      "MonthsSpent_dtype": {
+        "cold": "object",
+        "warm": "string"
+      },
+      "MonthsSpent_missingness_exact_equal": true,
+      "MonthsSpent_scalar_types": {
+        "cold": {
+          "NAType": 350,
+          "float": 137543,
+          "int": 46014,
+          "str": 36825
+        },
+        "warm": {
+          "NAType": 43823,
+          "str": 176909
+        }
+      },
+      "MonthsSpent_string_representations_equal": true,
+      "cold_warning_counts": {
+        "NullReadWarning": 1,
+        "UnicodeWarning": 70
+      },
+      "materialized_parquet_tables": [
+        "household_roster",
+        "sample"
+      ],
+      "original_column_order_equal": true,
+      "original_index_order_equal": true,
+      "other_columns_index_labels_dtypes_values_exact_equal": true,
+      "warm_cache_bytes_mtime_unchanged": true,
+      "warm_warning_counts": {
+        "NullReadWarning": 1
+      }
+    },
+    "combined": {
+      "MonthsSpent_dtype": {
+        "cold": "object",
+        "warm": "string"
+      },
+      "MonthsSpent_missingness_exact_equal": true,
+      "MonthsSpent_scalar_types": {
+        "cold": {
+          "NAType": 350,
+          "float": 137543,
+          "int": 46014,
+          "str": 36825
+        },
+        "warm": {
+          "NAType": 43823,
+          "str": 176909
+        }
+      },
+      "MonthsSpent_string_representations_equal": true,
+      "cold_warning_counts": {
+        "NullReadWarning": 1,
+        "UnicodeWarning": 70
+      },
+      "materialized_parquet_tables": [
+        "household_roster",
+        "sample"
+      ],
+      "original_column_order_equal": true,
+      "original_index_order_equal": true,
+      "other_columns_index_labels_dtypes_values_exact_equal": true,
+      "warm_cache_bytes_mtime_unchanged": true,
+      "warm_warning_counts": {
+        "NullReadWarning": 1
+      }
+    }
+  },
+  "country": "Mali",
+  "final_comparator_exit_code": 0,
+  "fixed_hash_seed": 1,
+  "limits": [
+    "These are two new fixed-seed builds, not a direct comparison of unavailable original corpus cold returns.",
+    "Mali cold-to-warm MonthsSpent typing is preserved as a separate inherited limitation; no source, fixture, scientific reading or dtype normalization was changed.",
+    "String-representation comparison is reported separately and is not used to normalize either source frame for the exact cold baseline/candidate comparison."
+  ],
+  "new_private_data_roots": {
+    "baseline": "/local/job40255479/mali-cold-review-baseline",
+    "combined": "/local/job40255479/mali-cold-review-combined"
+  },
+  "new_source_comparisons": {
+    "cold": {
+      "canonical_exact_frame_equal": true,
+      "column_order_equal": true,
+      "fingerprints": {
+        "baseline": {
+          "columns": [
+            "Affinity",
+            "Age",
+            "Distance",
+            "Generation",
+            "MonthsSpent",
+            "Relationship",
+            "Sex"
+          ],
+          "content_hash": "c28c4d5e0dcf9f1762df70189c445fbc9f5bdaf922f80bbca9c658600346d294",
+          "dtypes": {
+            "Affinity": "string",
+            "Age": "Float64",
+            "Distance": "Int64",
+            "Generation": "Int64",
+            "MonthsSpent": "object",
+            "Relationship": "string",
+            "Sex": "string"
+          },
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "pid"
+          ],
+          "shape": [
+            220732,
+            7
+          ]
+        },
+        "combined": {
+          "columns": [
+            "Affinity",
+            "Age",
+            "Distance",
+            "Generation",
+            "MonthsSpent",
+            "Relationship",
+            "Sex"
+          ],
+          "content_hash": "c28c4d5e0dcf9f1762df70189c445fbc9f5bdaf922f80bbca9c658600346d294",
+          "dtypes": {
+            "Affinity": "string",
+            "Age": "Float64",
+            "Distance": "Int64",
+            "Generation": "Int64",
+            "MonthsSpent": "object",
+            "Relationship": "string",
+            "Sex": "string"
+          },
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "pid"
+          ],
+          "shape": [
+            220732,
+            7
+          ]
+        }
+      },
+      "index_level_dtypes": [
+        "str",
+        "str",
+        "string",
+        "str"
+      ],
+      "index_order_equal": true,
+      "original_order_exact_frame_equal": true,
+      "shape": [
+        220732,
+        7
+      ]
+    },
+    "warm": {
+      "canonical_exact_frame_equal": true,
+      "column_order_equal": true,
+      "fingerprints": {
+        "baseline": {
+          "columns": [
+            "Affinity",
+            "Age",
+            "Distance",
+            "Generation",
+            "MonthsSpent",
+            "Relationship",
+            "Sex"
+          ],
+          "content_hash": "9869140252edbf5c4d2537ed4fc7f2365a4cc3813ed4c6574becdd06713909d1",
+          "dtypes": {
+            "Affinity": "string",
+            "Age": "Float64",
+            "Distance": "Int64",
+            "Generation": "Int64",
+            "MonthsSpent": "string",
+            "Relationship": "string",
+            "Sex": "string"
+          },
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "pid"
+          ],
+          "shape": [
+            220732,
+            7
+          ]
+        },
+        "combined": {
+          "columns": [
+            "Affinity",
+            "Age",
+            "Distance",
+            "Generation",
+            "MonthsSpent",
+            "Relationship",
+            "Sex"
+          ],
+          "content_hash": "9869140252edbf5c4d2537ed4fc7f2365a4cc3813ed4c6574becdd06713909d1",
+          "dtypes": {
+            "Affinity": "string",
+            "Age": "Float64",
+            "Distance": "Int64",
+            "Generation": "Int64",
+            "MonthsSpent": "string",
+            "Relationship": "string",
+            "Sex": "string"
+          },
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "pid"
+          ],
+          "shape": [
+            220732,
+            7
+          ]
+        }
+      },
+      "index_level_dtypes": [
+        "str",
+        "str",
+        "string",
+        "str"
+      ],
+      "index_order_equal": true,
+      "original_order_exact_frame_equal": true,
+      "shape": [
+        220732,
+        7
+      ]
+    }
+  },
+  "original_corpus_frames_compared": false,
+  "original_corpus_roots_used_for_API": false,
+  "private_snapshot_lossless_roundtrips_verified": true,
+  "reviewer": "Sue",
+  "runtime": {
+    "LSMS_BUILD_WORKERS": 1,
+    "MKL_NUM_THREADS": 1,
+    "OMP_NUM_THREADS": 1,
+    "OPENBLAS_NUM_THREADS": 1,
+    "cpus": "20-23",
+    "max_concurrent_api_processes": 2
+  },
+  "source_trees_clean_after_builds": true,
+  "table": "household_roster"
+}
