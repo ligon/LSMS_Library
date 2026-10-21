@@ -1,0 +1,67 @@
+{
+  "comma_labels": {
+    "Bouteille de 1,5 L": {
+      "kg_factors": [
+        5.0
+      ],
+      "native_quantity_sum": 1793.81,
+      "rows": 782,
+      "sources": {
+        "metric": 782
+      }
+    },
+    "Filet (2,5 kg)": {
+      "kg_factors": [
+        5.0
+      ],
+      "native_quantity_sum": 1.0,
+      "rows": 1,
+      "sources": {
+        "metric": 1
+      }
+    }
+  },
+  "country": "Senegal",
+  "factor_sources": {
+    "item_unit": 248410,
+    "item_unit_tight": 828,
+    "metric": 107894,
+    "none": 6751,
+    "unit": 72693
+  },
+  "food_acquired_rows": 436576,
+  "head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "kilograms": {
+    "2018-19": {
+      "finite_sum": 388902.55355863605,
+      "median": 0.6666666666666666,
+      "nonnull": 208909,
+      "rows": 208909
+    },
+    "2021-22": {
+      "finite_sum": 378837.356856074,
+      "median": 0.6,
+      "nonnull": 220709,
+      "rows": 220709
+    }
+  },
+  "package": "/local/job40255479/worktrees/baseline-976fc840d/lsms_library/__init__.py",
+  "phase": "baseline",
+  "price_rows": 319730,
+  "prices": {
+    "2018-19": {
+      "finite_sum": 3.2421425205194978e+22,
+      "median": 615.3846153846154,
+      "nonnull": 149434,
+      "rows": 149434
+    },
+    "2021-22": {
+      "finite_sum": 221373342.54957643,
+      "median": 700.0,
+      "nonnull": 170296,
+      "rows": 170296
+    }
+  },
+  "private_root": "/local/job40255479/canonical-audit-compare/data-baseline",
+  "quantity_rows": 436348
+}

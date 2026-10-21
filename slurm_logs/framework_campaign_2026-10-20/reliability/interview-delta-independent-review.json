@@ -1,0 +1,144 @@
+{
+  "status": "ACCEPT interview delta accounting and known error/fail classification, with explicit scope/semantic limits",
+  "reviewer": "Sue",
+  "observed_utc": "2026-10-21T01:02:26.711376+00:00",
+  "baseline": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "candidate": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "scanner_sha256": "7380a8faf1cc3de87954d776d8592e05a505a2697443b3c9c52181a06bd041b4",
+  "artifact_sha256": {
+    "interview-delta-classification.json": "666ebba78c8649285a6ac3dc67dfc7ce3341e7c75df6b357d6019e0eba3c7763",
+    "classify_interview_delta.py": "50ac11a8205e9e03ffaf8688e7edcd256e7d18e78c175e6c624d5eb7766820ab",
+    "baseline-error-fail-classification.json": "e9043f83947ab29c845f286bf01ddc5a8c92aca6170b9e703283fa392f6a1f02",
+    "audit-comparison.json": "f3410f27b9156394c657c7be1eea9a00026e314ec08e49cee402cc1b4e03f7cd",
+    "baseline-raw.jsonl": "d7bd61a20bc7a81d508df75370aa2590e7c0a0adecdf816e9b0f82948607a896",
+    "combined-raw.jsonl": "036e63aa73fc781d1f7aff4046ee62d1301edacd0301ef962ac328ddcfa07eb6"
+  },
+  "independent_checks": {
+    "interview_baseline_records": 78,
+    "interview_candidate_records": 8176,
+    "full_normalized_runtime_record_added": 8098,
+    "full_normalized_runtime_record_removed": 0,
+    "all_non_runtime_records_including_metrics_detail_expected_fingerprint_equal": 27,
+    "full_class_B_findings_equal": true,
+    "local_date_parquet_frames_exactly_equal": 27,
+    "local_frame_rows": 690030,
+    "cold_warning_files_per_head": 29,
+    "cold_counters_equal_by_country_category_message_and_multiplicity": true,
+    "stale_notice_all_explicit_stored_hash_mismatch": 25,
+    "all_error_fail_records_equal_except_elapsed_seconds": true,
+    "timing_only_differences": {
+      "Peru/food_acquired": {
+        "baseline": 0.04,
+        "candidate": 0.03
+      },
+      "Peru/food_expenditures": {
+        "baseline": 0.13,
+        "candidate": 0.12
+      },
+      "Peru/food_prices": {
+        "baseline": 0.15,
+        "candidate": 0.14
+      }
+    },
+    "known_failure_tests_byte_identical_at_both_heads": [
+      "tests/test_declared_spellings.py",
+      "tests/test_table_structure.py"
+    ]
+  },
+  "interview_warning_families": {
+    "categorical_mapping_warning": {
+      "cold_message_matched": 13,
+      "count": 13,
+      "countries": {
+        "Malawi": 10,
+        "Timor-Leste": 3
+      }
+    },
+    "date_format_dayfirst_warning": {
+      "cold_message_matched": 8000,
+      "count": 8000,
+      "countries": {
+        "Malawi": 8000
+      }
+    },
+    "expected_stale_cache_rebuild_notice": {
+      "cold_message_matched": 0,
+      "count": 25,
+      "countries": {
+        "Albania": 1,
+        "Azerbaijan": 1,
+        "Benin": 1,
+        "Burkina_Faso": 1,
+        "Cambodia": 1,
+        "CotedIvoire": 1,
+        "Ethiopia": 1,
+        "Guinea-Bissau": 1,
+        "Guyana": 1,
+        "India": 1,
+        "Iraq": 1,
+        "Kosovo": 1,
+        "Liberia": 1,
+        "Malawi": 1,
+        "Mali": 1,
+        "Niger": 1,
+        "Pakistan": 1,
+        "Senegal": 1,
+        "Serbia": 1,
+        "South Africa": 1,
+        "Tajikistan": 1,
+        "Tanzania": 1,
+        "Timor-Leste": 1,
+        "Togo": 1,
+        "Uganda": 1
+      }
+    },
+    "makefile_missing_fallback_warning": {
+      "cold_message_matched": 10,
+      "count": 10,
+      "countries": {
+        "Guyana": 1,
+        "India": 1,
+        "Iraq": 2,
+        "Kosovo": 1,
+        "Pakistan": 1,
+        "Tajikistan": 4
+      }
+    },
+    "stata_utf8_fallback_warning": {
+      "cold_message_matched": 50,
+      "count": 50,
+      "countries": {
+        "Mali": 50
+      }
+    }
+  },
+  "retained_semantic_findings": {
+    "Peru_RuntimeError_builds": 6,
+    "known_unharmonized_tenure_failures": 5,
+    "explicit_scope_skips": 13,
+    "scope_skip_breakdown": {
+      "Nepal": 11,
+      "Armenia": 2
+    },
+    "error_fail_statuses_downgraded": false
+  },
+  "outside_interview_scope": {
+    "all_canonical_warning_increase": 8731,
+    "other_feature_warning_increase": 633,
+    "class_B_baseline": 69,
+    "class_B_candidate": 70,
+    "additional_class_B": "household_roster/1a-sanity/runtime_warning/country=None; not classified by this review"
+  },
+  "limits": [
+    "Equal cached dates are consistency evidence, not questionnaire/date-semantic verification.",
+    "Local parquet equality excludes cache footer hash/manifest metadata and does not independently establish every served API or kwargs result.",
+    "General classifier non_runtime_checks_identical compares only an identity projection; this independent review additionally compared complete normalized records for the actual dataset.",
+    "Only expected fixed checkout/cache-root strings normalized; real warning occurrence changes remain explicit.",
+    "Cold controls compare country/category/message/multiplicity; audit warning records do not independently prove causal attribution of every rebuild path.",
+    "Audit returncode0 proves scanner completion, not semantic green.",
+    "All8098 warning emissions are real; warning-volume/runtime cost must not be described as unchanged."
+  ],
+  "lsms_library_APIs_called": false,
+  "cache_writes": false,
+  "source_git_GitHub_writes": false
+}

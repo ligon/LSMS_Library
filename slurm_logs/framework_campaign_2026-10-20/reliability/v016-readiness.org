@@ -14,21 +14,33 @@ Frozen integration: =852ac2bfcd5f798533f56e7efa1f77db80c0138f=.
 The harness runtime at =ca5bb83ca= is included there; PR#1157's later =d84061818= only adds the final review documentation.
 The complete identities and issue dispositions are in =v016-readiness.json=.
 
-* Actual holds before release consideration
+* Validation and remaining release work
 
-1. Complete the combined full suite on852, with no unexplained new failures/errors or credential-gated skips. The exact976 baseline was8,369 passed,279 skipped,9 expected failures and1 pre-existing non-strict unexpected pass; it is not candidate validation.
-2. Finish matched cold549-request corpus comparison at976 and852. Account for intended parser/valuation changes, preserved raw data, absent-subset semantics, country participation and cache metadata. No unexplained new failure or lost country can be waived as warning noise.
-3. Complete native Windows and credentialed Linux CI on852. [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][Run39519191762]] currently has Windows smoke success with native-script, unit and data jobs in progress. The older [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][Windows-fix run]] passed native-script, unit and smoke, but its Linux data job still runs and its source is only1d3e8dfdf.
-4. Resolve the five open PRs through the human merge workflow and verify the actual final merged source. A green individual PR whose data job skipped is not the credentialed release gate.
+The exact =852= local full suite passed: 8,562 passed, 285 skipped, nine expected failures, one non-strict unexpected pass and zero failures/errors or credential skips.
+Independent case reconciliation and the separate eight-case Uganda cache-population supplement are linked from [[file:../STATUS.org][STATUS.org]].
+Both exact =976= and =852= cold corpora completed all 549 requests: 530 successes and the same nineteen normalized full error messages.
+Six intended food tables change; roster ordering and inherited Mali cold/warm typing limits have separate controlled evidence.
+The paired sixteen-feature canonical scans completed with the same six Peru build errors and five known tenure-label failures; all warning differences are classified, with independent review of the 633 non-interview additions pending.
+
+Native Windows passes on exact =852= in [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][run 39519191762]], along with unit and smoke checks; its credentialed Linux data suite is still running.
+The earlier [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][Windows-fix run]] passed all four jobs, including credentialed data tests.
+Windows PR #1153 was explicitly authorized and merged at =ad1e87e10=; actual development push CI also passed.
+
+Before release consideration:
+
+1. Finish exact-head Linux data CI and the final paired audit classification, retaining real errors/failures and increased warning emissions.
+2. Resolve the four open implementation PRs through human merge and verify the actual merged source against the validated candidate.
+3. Complete the eventual release-content/issue-closure audit and obtain release instructions before tagging or publishing.
 
 The approved source changes are narrow: #1093 restores706 usable declared-Quintal sales; #1143 corrects945 quantity and783 price rows across three countries; #1099 preserves typed empty strict subsets and real error boundaries; #1124/#1125 improve verification without production assembly changes.
 The #1099 build fingerprint change deliberately requires a corpus re-warm; cache compute cost is not a reason to avoid these correctness checks.
 
 * Known residuals, without expanding release scope
 
-The historical549-request corpus at7fa05179c had530 successes and19 explicit source/wiring errors: Armenia2 unavailable sources; Nepal11 unavailable sources; Peru6 declared but unwired requests.
+The matched exact976/852 cold corpora each have530 successes and19 explicit source/wiring errors: Armenia2 unavailable sources; Nepal11 unavailable sources; Peru6 declared but unwired requests.
 Armenia/Nepal require acquisition, and Peru requires implementation/source wiring; none is fixed by the five framework changes.
-This is a comparison inventory, not a waiver: the running exact976/852 pair must demonstrate which failures remain identical.
+All nineteen normalized full messages match in the exact976/852 comparison.
+They remain explicit failures; this is not a blanket green corpus.
 Reference: =slurm_logs/release_landing_2026-10-14/corpus/FINDINGS.md=.
 
 The farm scanner's Class B warning for17,523 EthiopiaRHS coarse crop rows is documented design, not a new source failure.
@@ -117,12 +129,20 @@ New reviewed fixes, still OPEN and requiring merge/final validation:
 | #1124, #1125 | [[https://github.com/ligon/LSMS_Library/pull/1157][#1157]] | d84061818; runtime ca5bb83ca |
 
 Windows [[https://github.com/ligon/LSMS_Library/pull/1153][PR#1153]], head1d3e8dfdf, is a separate CI correction without a numbered issue here.
-At read-only observation all five PRs are open; #1153-#1156 unit/smoke checks pass, #1157 unit/smoke are still running, and all five PR-event data jobs skipped.
+Windows #1153 is merged with explicit authorization.
+The four remaining implementation PRs have green unit/smoke checks; their skipped PR-event data jobs are not credentialed validation.
+The separate exact combined-source manual run supplies that evidence when complete.
 
 Do NOT close the partial umbrellas #218/#637/#650/#698/#778/#787/#798/#828/#845/#851/#920/#932 or residuals #1051/#1071/#1115/#1116/#1128/#1149 on the strength of these PRs.
 In particular #569 retains #1118-#1123 after the two harness fixes; #793/#942 retain #1133-#1136; #867 retains #1106-#1111; #600/#1114 retain provenance/acquisition queue work.
 #928 closes its accepted P1/P2 increment only; P3/P4 were explicitly deferred.
 The complete per-candidate residual notes remain in the JSON.
+
+* New inherited reducer contract decision
+
+[[https://github.com/ligon/LSMS_Library/issues/1159][#1159]] independently reproduces pooled seed/nitrogen reducers dropping country identity and merging colliding country-local plot IDs at both976 and852, even with metric units.
+Before promising pooled reducer safety, choose country-preserving results or explicit refusal of pooled input.
+No remedy is included in the five approved fixes; PR#1154 links this residual without claiming its unit-factor propagation fixes reduction identity.
 
 * Next priorities after this bounded pass
 
@@ -139,7 +159,7 @@ Do not spend this release pass reimplementing the23 landed issues merely because
 
 Read-only evidence synthesis only; no new heavy tests, source edits, git mutations, GitHub writes or shared-cache writes.
 CI states are a timestamped snapshot and may complete after this report.
-The final combined suite, paired corpus and credentialed native run are owned by the parent and still running at this assessment.
+The parent has completed the local suite, matched corpus and native Windows validation; exact-head Linux data CI and independent acceptance of the remaining warning classification remain pending in this updated assessment.
 A later successful assessment still requires the maintainer's release instruction.
 
 -- Sue

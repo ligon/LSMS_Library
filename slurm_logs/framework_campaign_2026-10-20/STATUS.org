@@ -70,11 +70,21 @@ Native Windows passes on exact combined =852=: shocks: 14,457 rows/10 columns/ei
 The Windows repair is an expected-digest correction after GH #805: reversing only 2,012 cp1252-corrected cells recovers the old digest, with exact indices/dtypes/other values retained.
 Evidence: [[file:validation/combined-windows-native-summary.json][combined native results]] and PR #1153's exact encoding-delta accounting.
 
+The paired sixteen-feature canonical scans completed with the same scanner on both sources.
+Both retain six Peru build errors, five #602 tenure-vocabulary failures, five passes and thirteen identical documented source skips.
+There are no new assembly findings or error/failure pairs; these retained failures remain real findings.
+Warnings increase from 3,256 to 11,987: all 8,098 added interview-date records and the other 633 net additions are classified.
+The extra Class B roster warning is Peru's documented person-id repair and matches both cold controls.
+Rebuild exposure accounts for repeated parsing/source warnings; the existing reaggregation warning's quantity change equals the measured parser delta.
+Independent interview review verifies complete non-runtime records and 27 exact date frames covering 690,030 rows; the remaining warning classification is undergoing independent review.
+Another 125 local frame comparisons cover 16,139,392 rows with equal index/cell values and four order-only roster differences.
+The audit's order-only country set differs from the serialized cold corpus set and is recorded separately.
+Evidence: [[file:1124-1125/canonical/README.org][paired canonical report and reproduction]], [[file:reliability/interview-delta-independent-review.org][independent interview review]].
+
 * Verification still running
 
 - Exact-head GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], source =852=; native Windows, unit and smoke pass, credentialed Linux data job still runs.
-- Canonical Feature audit :: Same strengthened scanner against baseline =976= and combined =852=, all 16 canonical features, phases1/2, default documented exclusions recorded, separate physical L2 roots under =/local/job40255479/canonical-audit-compare/=.
-  Six audit worker processes use CPUs0--7 with numerical/build threads one; full paired comparison awaits both completion manifests.
+- Canonical warning review :: Both scans and classification have completed; the independent review of the 633 non-interview additions is pending. Raw findings remain private.
 
 Do not change integration HEAD or its source while these validators run.
 No source fix was made for the pre-existing roster ordering or Mali dtype behavior.

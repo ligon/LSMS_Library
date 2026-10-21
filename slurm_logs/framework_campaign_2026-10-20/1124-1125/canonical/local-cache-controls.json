@@ -1,0 +1,881 @@
+{
+  "all_frames_equal_ignoring_row_order": true,
+  "frames": [
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Albania",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 1827
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Azerbaijan",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 169
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Benin",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 670
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Burkina_Faso",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 2035
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Cambodia",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 252
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "China",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 30
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "CotedIvoire",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 1484
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Ethiopia",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 2168
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "EthiopiaRHS",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 126
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaAHIES",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 7200
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaLSS",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 3791
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guatemala",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 1065
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guinea-Bissau",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 450
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guyana",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 168
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "India",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 120
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Iraq",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 5789
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Kazakhstan",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 135
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Kosovo",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 360
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Liberia",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 32
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Malawi",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 3235
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Mali",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 3006
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Niger",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 1599
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Nigeria",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 7070
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Pakistan",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 301
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Peru",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 364
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Senegal",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 1194
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Serbia",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 510
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Serbia and Montenegro",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 919
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "South Africa",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 355
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Tajikistan",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 767
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Tanzania",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 2387
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Timor-Leste",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 600
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Togo",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 540
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Uganda",
+      "feature": "cluster_features",
+      "row_order_only_difference": false,
+      "rows": 4809
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Albania",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 21357
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Azerbaijan",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 2016
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Benin",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 8012
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Burkina_Faso",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 20648
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Cambodia",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 1512
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "China",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 787
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "CotedIvoire",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 19380
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Ethiopia",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 25914
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "EthiopiaRHS",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 10453
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaAHIES",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 121671
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaLSS",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 56334
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaSPS",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 15452
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guatemala",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 7276
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guinea-Bissau",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 5351
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guyana",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 1807
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "India",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 2251
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Iraq",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 42968
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Kazakhstan",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 1996
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Kosovo",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 2880
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Liberia",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 2986
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Malawi",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 57118
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Mali",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 24939
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Niger",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 20231
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Nigeria",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 49770
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Pakistan",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 4967
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Panama",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 18353
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Peru",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 3623
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Senegal",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 14276
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Serbia",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 5557
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Serbia and Montenegro",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 8934
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "South Africa",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 8809
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Tajikistan",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 12523
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Tanzania",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 22433
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Timor-Leste",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 6277
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Togo",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 6171
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Uganda",
+      "feature": "sample",
+      "row_order_only_difference": false,
+      "rows": 24362
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Albania",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 90731
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Azerbaijan",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 10012
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Benin",
+      "feature": "household_roster",
+      "row_order_only_difference": true,
+      "rows": 42343
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Burkina_Faso",
+      "feature": "household_roster",
+      "row_order_only_difference": true,
+      "rows": 150678
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Cambodia",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 6351
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "China",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 2998
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "CotedIvoire",
+      "feature": "household_roster",
+      "row_order_only_difference": true,
+      "rows": 111789
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Ethiopia",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 127890
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "EthiopiaRHS",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 52801
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaAHIES",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 593934
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaLSS",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 246594
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaSPS",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 54251
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guatemala",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 37771
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guinea-Bissau",
+      "feature": "household_roster",
+      "row_order_only_difference": true,
+      "rows": 42839
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guyana",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 7827
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "India",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 14493
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Iraq",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 303231
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Kazakhstan",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 7221
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Kosovo",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 17917
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Liberia",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 12263
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Malawi",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 260612
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Mali",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 220732
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Niger",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 131190
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Nigeria",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 287630
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Pakistan",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 36079
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Peru",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 19285
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Senegal",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 129650
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Serbia",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 17375
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Serbia and Montenegro",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 27752
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "South Africa",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 43687
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Tajikistan",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 79309
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Tanzania",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 112885
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Timor-Leste",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 34113
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Togo",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 27480
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Uganda",
+      "feature": "household_roster",
+      "row_order_only_difference": false,
+      "rows": 147612
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Benin",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 187930
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Burkina_Faso",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 765816
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Cambodia",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 38201
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "CotedIvoire",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 296945
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Ethiopia",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 326456
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "EthiopiaRHS",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 54905
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaLSS",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 5328568
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "GhanaSPS",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 407929
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guatemala",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 215982
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Guinea-Bissau",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 126925
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Malawi",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 971531
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Mali",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 431046
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Niger",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 239877
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Nigeria",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 595725
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Panama",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 570942
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Senegal",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 436576
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Serbia",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 200046
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Tanzania",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 251730
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Togo",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 112445
+    },
+    {
+      "all_index_and_cell_values_equal": true,
+      "country": "Uganda",
+      "feature": "food_acquired",
+      "row_order_only_difference": false,
+      "rows": 355571
+    }
+  ],
+  "raw_values_and_identifiers_private": true
+}

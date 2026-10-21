@@ -22,7 +22,7 @@ Both exact 976/852 cold corpora completed all 549 requests: 530 successes and th
 Six intended food quantity/price tables change.
 Four roster hashes differ only by row order in paired cache and warm-API comparisons; Benin seeds 1/3 reproduce both original fingerprints on unchanged baseline.
 There are no schema, row-count, wave-count, null-count, cache-metadata or warning-category count deltas.
-Mali's existing MonthsSpent cold-object/warm-string limit remains explicit.
+A separate fresh fixed-seed Mali cold/warm supplement matches both sources exactly in original order, while preserving the inherited MonthsSpent cold-object/warm-string difference.
 Reports and runnable scripts are committed under =slurm_logs/framework_campaign_2026-10-20/=.
 
 Remaining validators:
@@ -30,8 +30,10 @@ Remaining validators:
 - Exact-head GitHub run =39519191762= still has its data job running; unit, smoke and native Windows passed.
 - Paired 16-feature canonical audits, phases 1/2, run under =/local/job40255479/canonical-audit-compare/=.
   Agent =windows_ci= owns them, with three workers per audit on CPUs 0--3 / 4--7, private physical caches and shared L1 only.
-  The baseline audit is nearly done; the combined audit is processing the heavier food grids.
-  Do not restart or mutate its controller or source.
+  Both scans and all warning classification have completed; six Peru errors, five tenure failures and thirteen source skips remain identical.
+  All8,731 warning additions are accounted for; framework_reliability is independently reviewing the633 non-interview additions.
+  Aggregate evidence and28 verified artifact hashes are copied into1124-1125/canonical/.
+  Do not restart the validators or mutate their preserved cache/source evidence.
 
 Full-suite exec 30937 and corpus execs 19447/23742 have finished.
 Raw evidence remains private under =control/framework-campaign/= and =corpus-{baseline,combined}-out= in this job's local root.

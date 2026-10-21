@@ -1,0 +1,114 @@
+{
+  "Benin": {
+    "food_acquired": {
+      "exactly_unchanged": true,
+      "rows": 187930
+    },
+    "prices": {
+      "by_wave": {
+        "2018-19": {
+          "after_sum": 175640580.75708964,
+          "before_sum": 175604440.6459643,
+          "changed_rows": 68,
+          "delta": 36140.11112535265
+        }
+      },
+      "changed_rows": 68,
+      "index_columns_dtypes_unchanged": true,
+      "rows": 132811
+    },
+    "quantities": {
+      "by_wave": {
+        "2018-19": {
+          "after_sum": 159507.2398289145,
+          "before_sum": 159860.6098289145,
+          "changed_rows": 126,
+          "delta": -353.37
+        }
+      },
+      "changed_rows": 126,
+      "index_columns_dtypes_unchanged": true,
+      "rows": 187338
+    }
+  },
+  "CotedIvoire": {
+    "food_acquired": {
+      "exactly_unchanged": true,
+      "rows": 296945
+    },
+    "prices": {
+      "by_wave": {
+        "2018-19": {
+          "after_sum": 142970366.122975,
+          "before_sum": 142965032.78964165,
+          "changed_rows": 23,
+          "delta": 5333.333333333333
+        }
+      },
+      "changed_rows": 23,
+      "index_columns_dtypes_unchanged": true,
+      "rows": 182891
+    },
+    "quantities": {
+      "by_wave": {
+        "2018-19": {
+          "after_sum": 352840.11422069836,
+          "before_sum": 353069.34422069835,
+          "changed_rows": 36,
+          "delta": -229.23
+        }
+      },
+      "changed_rows": 36,
+      "index_columns_dtypes_unchanged": true,
+      "rows": 296945
+    }
+  },
+  "Senegal": {
+    "food_acquired": {
+      "exactly_unchanged": true,
+      "rows": 436576
+    },
+    "prices": {
+      "by_wave": {
+        "2018-19": {
+          "after_sum": 3.2421425205194978e+22,
+          "before_sum": 3.2421425205194978e+22,
+          "changed_rows": 327,
+          "delta": 106687.77777777778
+        },
+        "2021-22": {
+          "after_sum": 221494418.21624312,
+          "before_sum": 221373342.54957643,
+          "changed_rows": 365,
+          "delta": 121075.66666666667
+        }
+      },
+      "changed_rows": 692,
+      "index_columns_dtypes_unchanged": true,
+      "rows": 319730
+    },
+    "quantities": {
+      "by_wave": {
+        "2018-19": {
+          "after_sum": 385630.718558636,
+          "before_sum": 388902.55355863605,
+          "changed_rows": 385,
+          "delta": -3271.835
+        },
+        "2021-22": {
+          "after_sum": 375828.356856074,
+          "before_sum": 378837.356856074,
+          "changed_rows": 398,
+          "delta": -3009.0
+        }
+      },
+      "changed_rows": 783,
+      "index_columns_dtypes_unchanged": true,
+      "rows": 436348
+    }
+  },
+  "totals": {
+    "changed_price_rows": 783,
+    "changed_quantity_rows": 945
+  }
+}

@@ -1,0 +1,61 @@
+#+title: Independent interview-date audit delta review
+#+author: Sue
+#+date: 2026-10-20
+
+* Acceptance
+
+Accept the +8,098 interview_date record accounting and the baseline error/fail classification, with the limits below.
+This is consistency/regression evidence, not semantic green.
+Reviewed exact976fc840d versus frozen852ac2bfc using the same scanner SHA7380a8fa.
+No library API calls, cache writes, source/git/GitHub mutations or new builds/tests.
+Only JSON/log/source-text reads and direct read-only comparisons of completed private date parquets.
+
+* All added interview records accounted
+
+| Added warning family | Count | Scope |
+|----------------------+-------+-------|
+| Date-format/dayfirst | 8000 | Malawi |
+| Stata UTF8 fallback | 50 | Mali |
+| Categorical mapping | 13 | Malawi10, Timor-Leste3 |
+| Missing Makefile fallback | 10 | Guyana1,India1,Iraq2,Kosovo1,Pakistan1,Tajikistan4 |
+| Explicit STALE stored-hash mismatch rebuild notices | 25 | 25 named countries |
+| Total | 8098 | No removed interview runtime warnings |
+
+Interview records78 ->8,176 exactly reconcile to that increase.
+Independent full normalized runtime-record multisets, including context/severity/metrics/fingerprint rather than message alone, confirm +8,098/-0.
+All25 rebuild notices explicitly say stored content hash differs; no generic cache-miss category was silently assumed stale.
+All8,073 non-cache-notice emissions match cold-control message/category witnesses; matched cold counters are exactly equal by country/category/message/multiplicity across29 files per head.
+Warnings remain real emitted occurrences, including8,000 repeated date-format notices; this is not unchanged warning volume or unchanged runtime cost.
+
+The classifier's non-runtime identity projection alone would not establish metric/detail equality.
+This independent review strengthens it: all27 complete normalized non-runtime interview records are exactly equal, including details, metrics, expected values and fingerprints, as are complete Class B records.
+Direct independent read-only assert_frame_equal(check_exact=True) also confirms all27 local interview_date country parquets,690,030 rows total, with unchanged row order, index, columns, values and dtypes.
+This does not compare cache footer hash/manifest metadata or independently rerun every served API/kwargs path.
+Equal parsed dates can still share a pre-existing semantic defect; no questionnaire/date-order interpretation was adjudicated.
+
+* Baseline errors and failures stay visible
+
+Six Peru RuntimeError build cells are retained: food_acquired,food_expenditures,food_prices,food_quantities,individual_education,interview_date.
+They exactly match the corresponding independently cold-built976 baseline cells; neither status nor normalized serialized error detail changed.
+Three build elapsed-time metrics differ by0.01 seconds; after excluding only metrics.seconds, all11 error/fail records are exactly equal.
+
+Five declared_spellings FAILs remain: Albania,Cambodia,Kosovo,Tajikistan,Timor-Leste plot_features.
+The exact set matches KNOWN_UNHARMONIZED; the two anchoring test files are byte-identical at976 and852.
+These are real #602 vocabulary defects requiring source/semantic work, not passing assertions and not downgraded warnings.
+The canonical scanner separately records13 no-source scope skips (Nepal11,Armenia2); these are explicit exclusions rather than successes.
+Together6 errors +13 scope exclusions account for the known19 corpus source/wiring cells without changing the denominator silently.
+The scanner's returncode0 means completed execution, not all checks passed.
+
+* Limits outside interview dates
+
+The full canonical audit grows3,285 ->12,016 records and3,256 ->11,987 warnings: +8,731 overall.
+This report accounts for8,098 of those; the other633 warning emissions across14 features require their separate classification.
+Global Class B69 ->70 includes one added household_roster phase1a-sanity runtime_warning (country=None), outside this interview review.
+It must not be hidden behind interview_date's unchanged Class B result.
+The interview review neither accepts nor resolves that separate warning.
+
+Raw diagnostic messages and identifiers remain private.
+The companion JSON records artifact hashes, exact aggregate checks and scope limits.
+No source meaning was inferred from numeric/cache equality, and no warning/failure was suppressed to call the candidate green.
+
+-- Sue
