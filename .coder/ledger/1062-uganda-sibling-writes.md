@@ -27,7 +27,7 @@ Uganda `CONTENTS.org:1917-2050` documents two builders and coupled output metada
 
 - Preserve every nutrition/FCT operand, food intersection, operation order, index/columns/dtypes and exact numbers on this machine. No #771 API/FCT-source work, key movement, density change, fixture/baseline refresh or tolerance change.
 - One requested script output; no sibling bytes/footer/hash/coverage changes on repeated requested-table builds once inputs are valid. Sibling creation through its normal API is allowed when absent/stale, and must leave a verified stamped raw cache.
-- Income arithmetic consumes raw pre-finalize frames, avoiding API-time v/currency/label changes. Preserve union-of-households and current duplicate/source aggregation.
+- Income arithmetic consumes raw pre-finalize frames, avoiding API-time v/currency/label changes. Preserve union-of-households and current duplicate/source aggregation. Sibling materialization must use the dvc backend even when income inherits make: valid existing subset caches otherwise bypass both manifest coverage checks and the new Make recipes. Restore the original environment exactly after each materialization, on success or failure; keep the original absent-key state absent.
 - Physical private L2 per code revision; only L1 may be shared read-only. All real build comparisons use the same node, image interpreter and pinned numeric threads; assert checkout/config realpath.
 - Do not infer #1078 nine-cell corruption resolved from this correction alone.
 
@@ -40,6 +40,8 @@ Uganda `CONTENTS.org:1917-2050` documents two builders and coupled output metada
 - **Reuse** content-hash inventory and Feature audit scripts for verification; no cache-hash mechanism change.
 
 ## 6. Open questions and contradictions
+
+Independent review at 58ccfc2ca found a coverage contradiction in the initial verification: existing valid 2011-12-only sibling caches under inherited make produce 1,810 income rows instead of 14,740/all eight waves, because Make skips existing targets. The dispatcher approved a local try/finally backend pin only around each public sibling materialization in income.py. Add natural valid-subset cache and success/failure/unset environment restoration regressions; retain all arithmetic and raw reads. No global helper, LSMS_NO_CACHE change or broader framework policy is needed.
 
 No scientific decision required within the concrete boundary. Documented historical authority-open statements are superseded by the explicit #788 ruling, not silently dismissed. Exact paired private builds establish raw and served values agree, including household IDs: 14 frame comparisons across seven tables, plus unchanged final candidate raw frames after 13 order controls. Cross-country analogous consumers and #1078 remain separately reported residuals.
 

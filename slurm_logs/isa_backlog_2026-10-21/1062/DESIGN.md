@@ -55,3 +55,14 @@ historical scripts also permits explicit make-backend fallback to the legacy
 compiler. The pinned wrapper preserves both entry points and prevents
 recursion without schema changes. Historical script tests remain intact;
 only their income IO stub learns the new API materialization boundary.
+
+Independent-review amendment (starting 58ccfc2ca): valid one-wave earnings
+and enterprise-income caches under inherited make bypass the wrapper recipes
+because their target files already exist. The sibling public API calls inside
+income.py must temporarily set LSMS_BUILD_BACKEND=dvc themselves. Use local
+try/finally to restore the exact original string or absent key after each call,
+on success or exception; then continue the existing raw read/arithmetic.
+Do not change LSMS_NO_CACHE, public methods, cache policy or numeric operations.
+The new regression seeds valid 2011-12 caches through the dvc API and asks for
+all-wave income under make; initial income wrongly has 1,810 rows/one wave
+instead of the exact 14,740-row/eight-wave reference.
