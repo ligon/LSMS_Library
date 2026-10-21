@@ -201,11 +201,6 @@ def test_helper_root_preserves_other_root_and_restores_paths(tmp_path, monkeypat
 # Tier 2 -- delivered
 # ==========================================================================
 
-def _warm(country: str, table: str) -> Path | None:
-    p = data_root() / country / "var" / f"{table}.parquet"
-    return p if p.exists() else None
-
-
 @pytest.fixture
 def private_country_root(tmp_path):
     """A private ``LSMS_DATA_DIR`` holding a COPY of one country's warm cache.
@@ -232,7 +227,7 @@ def private_country_root(tmp_path):
             blobs = shared / "dvc-cache"
             if blobs.exists() and not (root / "dvc-cache").exists():
                 (root / "dvc-cache").symlink_to(blobs.resolve(), target_is_directory=True)
-            shutil.copytree(shared / country, root / country, symlinks=True)
+            shutil.copytree(shared / country, root / country)
             patch.setenv("LSMS_DATA_DIR", str(root))
             data_root.cache_clear()
             assert data_root() == root
@@ -289,7 +284,7 @@ def test_a_poisoned_country_parquet_is_REBUILT_not_served(country, table,
         shutil.move(str(backup), str(p))
 
 
-def test_a_wave_produced_table_is_never_evicted(monkeypatch):
+def test_a_wave_produced_table_is_never_evicted(monkeypatch, private_country_root):
     """Scoped by control flow, not by luck.
 
     `Togo/plot_features` is rule-less too, but its waves produce rows, so the
@@ -297,9 +292,7 @@ def test_a_wave_produced_table_is_never_evicted(monkeypatch):
     what keeps the removal away from the 13 Make rules that consume a var/
     parquet as a prerequisite.
     """
-    p = _warm("Togo", "plot_features")
-    if p is None:
-        pytest.skip("Togo/plot_features not warm")
+    private_country_root("Togo", "plot_features")
 
     evicted = []
     original = Country._evict_stale_country_cache
