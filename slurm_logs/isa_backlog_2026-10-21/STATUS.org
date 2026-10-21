@@ -22,10 +22,10 @@ Shared framework changes require a separate coordinated lane.
 
 | Country | Current result or next step |
 |---------+-----------------------------|
-| Nigeria | #1034 independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]], frozen =6fda46bc=; PR CI success, credentialed data jobs skipped. #1144 source-backed quarter decoder now in implementation. |
+| Nigeria | #1034 independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]], frozen =6fda46bc=; temporarily draft while a wider suite's W1-only label assumption is reproduced and strengthened. Original CI succeeded with credentialed data jobs skipped. #1144 source-backed quarter decoder now in implementation. |
 | Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. |
-| Malawi | #1109 initial review rejected a false source premise; amendment reads recorded organic amounts/units and protects unlabelled unit identities. New independent review required. |
-| Niger | #1088 current CS07 sentinel/source/duplicate-entry diagnosis active. |
+| Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. |
+| Niger | #1088 cold/warm source-backed fix frozen =d602f8d63=; independent review active. |
 | Burkina_Faso | Worktree queued; source/recall and plot-key issues prioritised in triage. |
 | Ethiopia | Worktree queued; #1171 is the diagnosis-only sibling-prerequisite follow-up. |
 | Mali | Worktree queued; #822 narrowed to missing price readings, duplicate #1089 closed. |
@@ -42,8 +42,8 @@ Both the rejected and passing reviews are preserved in =review-1062-initial/= an
 Malawi's first min-count attempt dropped organic rows at finalization; an Applied carrier corrected that boundary.
 Independent primary-source review then found 11,068 reported positive organic quantities among 11,075 affirmative-use rows, contradicting the existing documentation's claim that no quantity was asked.
 The new amendment reads those amounts and units, preserves seven missing amounts, and keeps all 169,109 nonorganic records unchanged in the current paired check.
-Actual public-finalizer accounting also exposed six unlabelled organic codes being misread by the food codebook; the country fallback now needs explicit source-qualified identities.
-=review-1109-initial/REVIEW.md= and =1109-source-amendment.md= record the evidence and approved correction; no final Malawi PASS is claimed.
+Actual public-finalizer accounting also exposed six unlabelled organic codes being misread by the food codebook; the country fallback carries explicit source-qualified identities.
+=review-1109-initial/REVIEW.md= and =1109-source-amendment.md= record the evidence and approved correction; the amended independent original-baseline PASS is in =review-1109-v2/REVIEW.md=.
 
 Nigeria #1144 diagnosis found the W2 quarter table itself swaps PP/PH meanings for codes 44/77/78.
 The unchanged-table proposal would introduce 2,135 new PH errors and was rejected.

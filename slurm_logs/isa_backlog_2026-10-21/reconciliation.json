@@ -30,6 +30,14 @@
     {
       "issue": 1088,
       "action": "corrected nominal9999.9 vs stored-double/float32-promoted representation; exact76currentservedrows confirmed, quantity-only fix pending"
+    },
+    {
+      "issue": 1174,
+      "action": "filed precise437nonorganic source-use diagnosis, separate from organic1109; linked existing905/1118/637 without claiming duplicate implementation"
+    },
+    {
+      "issue": 1109,
+      "action": "source-corrected scope; independent original-baseline PASS, reviewed PR1175 pending human merge; residual1174 linked"
     }
   ],
   "verified_issue_metadata": [
@@ -70,6 +78,13 @@
       "head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
       "review": "PASS after amendment",
       "ci": "success; no credentialed data rebuild"
+    },
+    {
+      "number": 1175,
+      "issue": 1109,
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "review": "PASS vs originalf8",
+      "ci": "success; no credentialed corpus rebuild"
     }
   ]
 }

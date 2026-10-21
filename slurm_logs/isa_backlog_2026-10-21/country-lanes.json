@@ -16,18 +16,21 @@
     "Malawi": {
       "path": "/local/job40255479/worktrees/isa-Malawi",
       "branch": "isa/Malawi-20261021",
-      "status": "independent-amendment-review",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "triage_west",
       "initial_issue": 1109,
       "frozen_head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
       "review_path": "/local/job40255479/worktrees/isa-review-1109-v2",
-      "review_verdict": "pending",
+      "review_verdict": "PASS against originalf8",
       "previous_review": {
         "head": "c08abb3f1dd03fd211d5071b45369dcbae42857f",
         "path": "/local/job40255479/worktrees/isa-review-1109",
         "verdict": "NEEDS_FIX",
         "finding": "All seven organic source modules record quantity/unit; cold public replay additionally found cross-domain numeric unit remapping."
-      }
+      },
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1175",
+      "residual_issue": 1174,
+      "ci": "GitHub PR CI success on de9c2734b; local source/data verification independent"
     },
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
@@ -37,9 +40,12 @@
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
       "branch": "isa/Niger-20261021",
-      "status": "implementation-and-private-verification",
+      "status": "independent-review",
       "owner": "niger_lane",
-      "initial_issue": 1088
+      "initial_issue": 1088,
+      "frozen_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "review_path": "/local/job40255479/worktrees/isa-review-1088",
+      "review_verdict": "pending"
     },
     "Nigeria": {
       "path": "/local/job40255479/worktrees/isa-Nigeria",
@@ -52,7 +58,15 @@
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1172",
       "review_verdict": "PASS",
       "next_issue": 1144,
-      "ci": "GitHub PR CI success on frozen 6fda46bc; credentialed data jobs skipped"
+      "ci": "GitHub PR CI success on frozen 6fda46bc; credentialed data jobs skipped",
+      "pr1172_draft_reason": "Wider suite exposed W1-only container-label assumption; separate stronger per-round test amendment being reproduced/reviewed. Runtime6f immutable.",
+      "test_amendment": {
+        "head": "3e6582987",
+        "review_path": "/local/job40255479/worktrees/isa-review-1034-v2",
+        "review": "pending",
+        "runtime_config_unchanged": true,
+        "GH1035_passed": 25
+      }
     },
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
