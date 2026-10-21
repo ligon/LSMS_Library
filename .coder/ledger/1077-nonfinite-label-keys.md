@@ -6,8 +6,10 @@ Search tier: ripgrep and git; no available GitNexus MCP. Baseline
 ## Section 1. Task
 
 Prevent nonfinite numeric keys in existing categorical tables from crashing
-query-time label selection for ISA countries. Preserve the existing additive
-integer-code spelling expansion and the original replacement dictionary.
+query-time label selection for ISA countries. Preserve the helper's additive
+integer-code spelling expansion and original dictionary. At the mapping
+caller, omit rows whose resolved source key is actually missing, so missing
+metadata cannot turn a null input into an unrelated code or label.
 This is a shared helper fix, isolated from the country worktrees. The original
 zero-cache-cost premise was contradicted by its Uganda build consumer (below).
 
@@ -34,6 +36,10 @@ canonical schema, sanctioned IO and pre-finalize caches. `country.py`'s
 - Preserve every original key/value pair, including nonfinite keys.
 - Do not manufacture numeric variants for NaN or positive/negative infinity.
 - Preserve finite integer expansion, fractional-key behavior and collisions.
+- The mapping caller filters actual missing source keys before dictionary
+  construction. Preserve null targets, all nonmissing source keys including
+  infinities and literal strings 'nan'/'inf', and sentinel protections.
+  Actual null input must remain null in both column and index mappings.
 - Do not change curated tables, missing-label errors, data, build routing,
   cache schema or fingerprint policy. The finite guard's genuine Uganda
   build dependency moves all 28 Uganda hashes; the other 521 of 549 hashes
@@ -51,8 +57,16 @@ curation policy is needed.
 
 ## Section 6. Open questions
 
-None for this bounded guard. A separate issue would be needed to change how
-original nonfinite replacement keys themselves are interpreted by pandas.
+The original additive helper contract is unchanged. Root approved a bounded
+caller fix after the adversarial probe: keeping a NaN source-key row allowed
+pandas to turn missing input into an unrelated nonmissing target in 21/34
+real column cells and 8/34 index cells (one measured process). Uganda u/Code
+changed np.nan/None/pd.NA into 807089 via the missing 2005-06 dictionary key.
+The caller must therefore drop only actual missing resolved source keys
+before `set_index`, while preserving all nonmissing keys and null targets.
+This is the issue's skip-NaN-key scope; it is not new label curation. The
+intermediate probe remains private failure evidence. No caller fix has yet
+been implemented at this ledger checkpoint.
 
 Measured correction to the root-authored initial premise: the helper is also
 called while building Uganda food, so a guard edit changes its country-level
