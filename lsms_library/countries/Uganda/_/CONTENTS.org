@@ -831,7 +831,9 @@ The preferred labels include native units (=Kg=, =Gram=, =Litre=, =Akendo (Small
 =food_acquired()= renames the =u= index through this map; source-specific missing-unit handling then distinguishes =Unknown= from =Value= before the canonical parquet is written.
 
 The =u= table also retains the per-wave variant columns (=2005-06=, =2009-10=, ..., =2019-20=) that document the raw unit labels in each wave's Stata metadata.
-These extra columns are unused at runtime but preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
+These extra columns preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
+The =Code -> Preferred Label= build decoder does not use them.
+Query-time label selection uses the shared categorical-key resolver and can read them as source keys or requested targets.
 
 The legacy =_/unitlabels.csv= /=_/unitlabels.py= pipeline (which
 emitted a 2-column projection of the same data) was retired in
