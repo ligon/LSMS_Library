@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T17:53:09.895618+00:00",
+  "observed_at": "2026-10-21T18:06:44.672043+00:00",
   "actions": [
     {
       "issue": 822,
@@ -70,6 +70,14 @@
     {
       "issue": 1088,
       "action": "Updated live issue with independently reviewed PR1176, exact cold/warm invariants and pending human landing"
+    },
+    {
+      "issue": 1179,
+      "action": "Filed diagnosis-only129unresolved-unit entries; no blanket validity or eligibility-change claim"
+    },
+    {
+      "issue": 822,
+      "action": "Linked independently reviewed PR1180 and exact native observation recovery; documented old versus eligible counts/base cells and split1179"
     }
   ],
   "verified_issue_metadata": [
@@ -134,6 +142,13 @@
       "base": "fix/1034-nigeria-w3-unit-labels-20261021",
       "dependency_pr": 1172,
       "ci": "success; run39645861519"
+    },
+    {
+      "number": 1180,
+      "issue": 822,
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "review": "PASS;39tests zero skips; original obs3/source masks exact",
+      "ci": "pending"
     }
   ]
 }

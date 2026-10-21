@@ -47,13 +47,17 @@
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
       "branch": "isa/Mali-20261021",
-      "status": "independent-review",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "mali_lane",
       "initial_issue": 822,
-      "frozen_head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+      "frozen_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
       "review_path": "/local/job40255479/worktrees/isa-review-822",
       "reviewer": "niger_lane",
-      "review_verdict": "pending"
+      "review_verdict": "PASS; 39 tests, zero skips; documentation-only descendant PASS",
+      "runtime_review_head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1180",
+      "residual_issue": 1179,
+      "ci": "pending"
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -101,7 +105,10 @@
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
       "branch": "isa/Tanzania-20261021",
-      "status": "queued"
+      "status": "diagnosis",
+      "owner": "burkina_lane",
+      "initial_issue": 1118,
+      "scope": "Tanzania missing plot-input units only; source diagnosis before implementation"
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
@@ -128,21 +135,25 @@
       "owner": "triage_east",
       "status": "implementation",
       "scope": "Finite numeric-label-key guard; country configuration untouched",
-      "precode_ledger": "3e9b7dd0a"
+      "precode_ledger": "3e9b7dd0a",
+      "cache_scope": "28 Uganda hashes move through existing build import; 521 others and39tagged unchanged",
+      "additional_finding": "Finite guard alone permits null-input label fabrication; source-null rows must be filtered before lookup construction"
     }
   },
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "1d388ba36f068f38025d63fef52476ff9a9ab155",
+    "head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
     "included_prs": [
       1172,
       1173,
       1175,
       1176,
-      1178
+      1178,
+      1180
     ],
-    "status": "validation preparation; no combined test result claimed",
-    "public_prs_merged": false
+    "status": "Six reviewed PRs combined; 11-file cohort regression selection running under 8 loadfile workers/private held inputs",
+    "public_prs_merged": false,
+    "test_session": 10257
   }
 }

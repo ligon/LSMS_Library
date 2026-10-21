@@ -18,7 +18,9 @@ Each country owns a persistent worktree and branch under =/local/job40255479/wor
 Focused PR heads are frozen separately, and independent reviewers use immutable detached worktrees.
 The collaboration interface permits three active workers beside the scrum master; countries rotate through those slots.
 Shared framework changes require a separate coordinated lane.
-The #1077 finite numeric-label-key guard is in that lane, leaving country configurations untouched.
+The #1077 numeric-label-key fix is in that lane, leaving country configurations untouched.
+Its existing Uganda build caller moves 28 Uganda hashes; the tagged fingerprints and other countries stay unchanged.
+A finite guard alone fabricated labels for null inputs; the lookup must first discard rows with missing source keys.
 =country-lanes.json= records paths, owners, frozen heads, review verdicts and PRs.
 
 | Country | Current result or next step |
@@ -29,8 +31,8 @@ The #1077 finite numeric-label-key guard is in that lane, leaving country config
 | Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. |
 | Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report. Exact unknown masks and genuine policy/source questions are documented. Production unchanged; #851 integration remains pending. |
 | Ethiopia | Country-scoped #1118 diagnosis confirmed 37,370 use-only null-unit rows out of 180,900; minimal build normalization is approved under the existing U_UNKNOWN ruling; #1171 remains the separate nutrition follow-up. |
-| Mali | #822 frozen =23d338e50=: restores 115,713 readings; owner cold/warm/old-obs3 conservation and 39 tests passed. Independent review active. Duplicate #1089 closed. |
-| Tanzania | Worktree queued; preserve documented UPHI back-casting and live WAITING caveats. |
+| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI pending. Residual #1179 owns unresolved units. |
+| Tanzania | #1118 country-only missing plot-input unit diagnosis active; preserve documented UPHI back-casting and live WAITING caveats. |
 
 * Evidence that changed the fixes
 
@@ -77,7 +79,9 @@ Use image generation =20261019T221223Z= at =/local/job40255479/venv_img= with ex
 Pin numerical threads to one and =LSMS_BUILD_WORKERS=1=; budget xdist workers and use =--dist=loadfile=.
 Every source-backed comparison uses physically separate writable L2 copies and relevant held L1 blobs, with no acquisition or shared-cache mutation.
 The strict API/skill audit passes all 15 hand-authored skills.
-A separate validation-only integration branch combines the five reviewed PRs at =1d388ba36=; combined checks are being prepared.
+A separate validation-only integration branch now combines six reviewed PRs, including Mali; combined checks are being prepared.
+Its private input staging copied all 1,519 manifest-pinned L2 files and 2,733 held ISA source blobs (11.73 GB) without acquisition.
+The 1,081 absent declared source blobs were reported and left absent; sixteen unmanifested raw seed files were excluded.
 No full-suite/corpus rebuild has been claimed for these focused country PRs.
 Private raw inputs, frame snapshots and detailed logs stay under =/local/job40255479/control/isa-backlog-20261021/=.
 Only source-safe aggregate evidence is committed.
