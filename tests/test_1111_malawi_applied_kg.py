@@ -144,11 +144,6 @@ def test_nonfertilizer_channels_and_native_namespaces_stay_independent(drive,
     pesticide = result[result.index.get_level_values('input') == 'Insecticide']
     assert (pesticide.index.get_level_values('u') == 'Liter').all()
     assert pesticide.Quantity.eq(2.0).all()
-    organic = result[result.index.get_level_values('input') ==
-                     'Organic Fertilizer']
-    assert organic.Quantity.eq(0.0).all()
-    assert organic.index.get_level_values('u').isna().all()
-    assert 'Applied' not in result  # this branch preserves its f8 boundary
 
 
 @pytest.mark.parametrize('wave', ['2010-11', '2019-20'])

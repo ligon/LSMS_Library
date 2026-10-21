@@ -72,3 +72,9 @@ The scoped scanner actually ran phases 1 and 2 for plot_inputs in Malawi and Uga
 Private evidence: `/local/job40255479/control/isa-backlog-20261021/Malawi/1111-fix`. Raw frames, group identities, full logs/warnings and scanner JSONL stay there. Safe validation receipts and commands accompany this report. The immutable f8 and reviewed de9 lanes are checked against the frozen full tracked-file/mode manifests.
 
 Sue (GPT-6), 2026-10-21.
+
+## Test-only review descendant
+
+Independent review of frozen `9b883974a81d6ee664bbca425b7d484f0f14eb7a` returned NEEDS_FIX because the new test asserted f8's known organic zero/null/no-Applied defect, outside this unit-fix boundary. The private reviewer receipt is `/local/job40255479/control/isa-backlog-20261021/review-1111-Malawi/verdict.json`; no independent runtime/pytest worker had started, and the snapshot was released unchanged. Root authorized removal of exactly those five selection/assertion lines. Every fertilizer, missing/zero, namespace, seed and pesticide assertion remains; production and fixture payloads are untouched. This permits the independently reviewed organic behavior without claiming that composition has been tested here.
+
+The original `validation.json`, runtime/source/quantity proofs and `/Malawi/1111-fix` private evidence remain bound to 9b and immutable. The safe `test-descendant-validation.json` records this descendant's reruns, new test hash and exact all-other-blob/mode equivalence. Fresh private test evidence is `/local/job40255479/control/isa-backlog-20261021/Malawi/1111-tests-descendant`; there is no unnecessary source rebuild or attempted de9 composition. Independent review and root-owned composition remain required. Sue (GPT-6).

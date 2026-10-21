@@ -92,3 +92,12 @@ Actual-driver negatives: baseline 10 fail / 2 pass, candidate 12 pass, dangerous
 All 15 scanner records are individually reconciled in the report, with no new finding; phase 2 has no plot_inputs kwargs in the actual harness.
 Source-safe receipts and runnable commands: `slurm_logs/isa_backlog_2026-10-21/Malawi/1111/`.
 Root-owned #1109 composition remains pending; this branch has not inherited de9 organic code. Sue (GPT-6).
+
+## Test-only review correction after 9b883974a
+
+Independent review returned NEEDS_FIX at frozen `9b883974a81d6ee664bbca425b7d484f0f14eb7a`: the new test pinned f8's excluded organic zero/null/no-Applied defect and would reject the independently reviewed #1109 correction.
+Reviewer receipt: `/local/job40255479/control/isa-backlog-20261021/review-1111-Malawi/verdict.json`; review stopped before runtime/pytest validation and released the unchanged clean snapshot.
+Root then authorized deleting only those five organic selection/assertion lines while retaining every in-scope check, plus this note/report and a descendant receipt.
+No production code, fixture payload, original 9b runtime/quantity proof or original private evidence is changed; independent f8 organic invariance remains historical source evidence, not a permanent test requirement.
+The original report/validation receipts are bound to 9b; `test-descendant-validation.json` records the new test hash, rerun outcomes and exact all-other-blob/mode equivalence.
+Separate organic composition is still pending root, with no attempt in this lane. Sue (GPT-6).
