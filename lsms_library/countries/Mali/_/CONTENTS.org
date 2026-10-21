@@ -1244,3 +1244,28 @@ Two further facts about this table, both pre-existing and unchanged:
   =(t, v, i, j, u, s)= collapse (passage dropped) sums to 1,534.  That minted
   spelling is the class the #1041 ruling forbids (a missing unit is
   =U_UNKNOWN=, ='Unknown'=); drafted as its own issue, not fixed here.
+
+* EAC-I plot-labor source blocks and casing (GH #1121, 2026-10-21)
+
+The currently wired =plot_labor= sources are EAC-I 2014-15 and 2017-18, not the two EHCVM waves.
+The four files are =EACIMAINOUVRE_p1.dta= / =EACIS2F_p2.dta= and =eaci17_s11ep1.dta= / =eaci17_s7ep2.dta=.
+Post-planting and post-harvest passages contribute person-count times days-each across men, women and children.
+The existing build sums these reported contributions within =(t,i,plot_id,source)=, retaining reported hired remuneration as Wage.
+It does not expose passage, task or demographic split as separate levels; the casing repair changes none of these choices.
+
+The sources are fixed questionnaire blocks: family, non-family hired, and mutual-aid/free/exchange labor.
+They are not decoded from a raw source-category field.
+The wave scripts already emit lower-case synthetic Codes; =harmonize_labor_source= now keeps the Preferred Labels =family/hired/other=.
+Previously its capitalized =Family/Hired/Other= labels contradicted the helper's lower-case taxonomy prose and split Feature groups from the other ISA countries.
+The matching schema comment now agrees with the table.
+The existing exact lower-case family/hired transforms consequently select Mali's reported rows.
+
+Fresh held-source metadata corroborates the block meanings and person/day/remuneration fields.
+In the 2017 PH child hired block, =s7eq13c1= is children, =s7eq13c2= days and =s7eq13c3= remuneration.
+The existing driver deliberately uses c1*c2 for PersonDays rather than the historical WB do-file's c1*c3 slip; preserve that correction.
+No questionnaire PDF was newly acquired or inspected.
+
+The pre-change private cold/fresh-process warm diagnosis retained 52,057 Mali rows: 14,843 in 2014-15 and 37,214 in 2017-18, with 33,655 family / 9,565 hired / 8,837 other.
+The mapping is one-to-one: the intended change is source case only, with no amount, key, row, attribute, eligibility or reducer change.
+GhanaSPS's seven instrument-specific labels and GhanaLSS exchange/hired remain the separate Tier C part of #1121.
+See =.coder/ledger/1121-mali-labor-source.md= and =slurm_logs/isa_backlog_2026-10-21/Mali/1121/=.
