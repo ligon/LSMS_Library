@@ -1598,28 +1598,72 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
 # -- 4x and 16x overstatements of a half- and quarter-kilo packet.  Same shape
 # as the plural bug GH #850 fixed: a regex that reads PART of a
 # self-describing label and asserts the result.
+#
+# The number group also admits a COMMA (GH #1143), and for the same reason.
+# Without it ``Bouteille de 1,5 L`` matched the ``5`` adjacent to ``L`` and was
+# served 5.0 kg, ``Sac (0,9 kg)`` 9.0 kg and ``12,5 cl`` 0.05 kg -- the
+# French-style decimal comma every EHCVM unit vocabulary uses.  The regex only
+# CAPTURES a comma token; :func:`_metric_number` decides what it means
+# (decimal or thousands) and refuses anything else, so the parser returns
+# ``None`` rather than reading a part of a number it cannot read whole.  The
+# token captures separators even when malformed: validation belongs to
+# _metric_number, and must see the whole token rather than a suffix after a
+# repeated comma, slash or whitespace (ledger 1143-decimal-comma §3/§4).
+# The left boundary forbids beginning at a digit or punctuation suffix.
+_METRIC_NUMBER = r'(?<![\d.,])(\d[\d.,]*(?:\s*/+\s*[\d.,]*)*)'
+
 _EXPLICIT_METRIC_PATTERNS = (
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:kilogrammes?|kilograms?|kgs?)\b',
                 re.IGNORECASE), 1, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:grammes?|grams?|gms?|grs?|g)\b',
                 re.IGNORECASE), 1/1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*milligrammes?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*milligrammes?\b',
                 re.IGNORECASE), 1e-6, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*tonnes?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*tonnes?\b',
                 re.IGNORECASE), 1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:lbs?|pounds?)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:lbs?|pounds?)\b',
                 re.IGNORECASE), 0.453592, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*millilitres?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*millilitres?\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*centilitres?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*centilitres?\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*ml\b',
+    (re.compile(_METRIC_NUMBER + r'\s*ml\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*cl\b',
+    (re.compile(_METRIC_NUMBER + r'\s*cl\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
                 re.IGNORECASE), 1, True),
 )
+
+# The two comma grammars (GH #1143).  Disjoint by construction: a decimal
+# comma has exactly one comma and one or two digits after it; a thousands
+# separator has every group after a comma exactly three digits long and no
+# leading ``0,``.  A leading-zero comma is decimal at any precision, as in
+# ``0,125`` (ledger 1143-decimal-comma §3). A token that is neither (``1,5000``,
+# ``1,50,000``) is ambiguous and is refused, never guessed.
+_DECIMAL_COMMA = re.compile(r'(?:\d+,\d{1,2}|0,\d+)')
+_THOUSANDS_COMMA = re.compile(r'(?!0,)\d{1,3}(?:,\d{3})+')
+
+
+def _metric_scalar(text):
+    """Value of one number token (no fraction): dot-decimal or comma-aware.
+
+    >>> _metric_scalar('1,5'), _metric_scalar('12,5'), _metric_scalar('1,25')
+    (1.5, 12.5, 1.25)
+    >>> _metric_scalar('1,500'), _metric_scalar('10,000')
+    (1500.0, 10000.0)
+    >>> _metric_scalar('0,500')
+    0.5
+    """
+    t = str(text).strip()
+    if ',' not in t:
+        return float(t)
+    if '.' not in t:
+        if _DECIMAL_COMMA.fullmatch(t):
+            return float(t.replace(',', '.'))
+        if _THOUSANDS_COMMA.fullmatch(t):
+            return float(t.replace(',', ''))
+    raise ValueError(f"ambiguous comma in metric number {t!r}")
 
 
 def _metric_number(text):
@@ -1631,15 +1675,18 @@ def _metric_number(text):
     (``Packet(1/2lt / 1/2kg)``, ``Packet -medium (1/4kg)``).  Before this the
     pattern captured only the digits adjacent to the unit token, so those read
     as 2 kg and 4 kg -- a 4x and a 16x overstatement.
+
+    A comma is read by :func:`_metric_scalar` (GH #1143): ``'1,5'`` -> 1.5,
+    ``'1,500'`` -> 1500.0, and an ambiguous comma raises ``ValueError``.
     """
     t = str(text).strip()
     if '/' in t:
         num, _, den = t.partition('/')
-        d = float(den.strip())
+        d = _metric_scalar(den)
         if d == 0:
             raise ZeroDivisionError(t)
-        return float(num.strip()) / d
-    return float(t)
+        return _metric_scalar(num) / d
+    return _metric_scalar(t)
 
 
 def _parse_explicit_metric(s, *, volume_as_mass=True):
@@ -1696,6 +1743,27 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     0.25
     >>> _parse_explicit_metric('3/4 kg')
     0.75
+
+    Decimal commas (GH #1143).  The EHCVM unit vocabularies spell sizes the
+    French way; before the fix each of these read only the digits adjacent to
+    the unit token (5.0, 9.0, 5.0 and 0.05).
+
+    >>> _parse_explicit_metric('Bouteille de 1,5 L')
+    1.5
+    >>> _parse_explicit_metric('Sac (0,9 Kg)')
+    0.9
+    >>> _parse_explicit_metric('Filet (2,5Kg)')
+    2.5
+    >>> _parse_explicit_metric('12,5cl(demi walatt)')
+    0.125
+
+    A comma followed by three-digit groups is a thousands separator; a comma
+    that fits neither grammar is refused rather than partly read.
+
+    >>> _parse_explicit_metric('1,500 kg')
+    1500.0
+    >>> _parse_explicit_metric('0,125 kg')
+    0.125
     """
     if not isinstance(s, str):
         return None
@@ -1704,6 +1772,11 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
             continue
         m = pattern.search(s)
         if m:
+            # Refuse numeric suffixes after whitespace / exponent notation,
+            # preserving numbered labels ("1001. 12,5 cl") and the existing
+            # inner size in multiplier labels ("2x500g") (ledger §3/§4).
+            if re.search(r'(?:[\d,]\s+|\d[eE][\s+-]*)$', s[:m.start()]):
+                return None
             try:
                 return _metric_number(m.group(1)) * scale
             except (ValueError, IndexError, ZeroDivisionError, TypeError):

@@ -1,0 +1,462 @@
+{
+  "reviewer": "Sue",
+  "verdict": "FAIL_PENDING_TWO_NARROW_CORRECTIONS",
+  "reviewed_head": "9409219a1b247ddb379670f2cf384391173784ec",
+  "findings": [
+    {
+      "priority": "P2",
+      "location": "lsms_library/transformations.py:1645",
+      "title": "Thousands recognition rejects zero-padded groups allowed by the exact issue grammar",
+      "authority": "GH #1143: \\d{1,3}(,\\d{3})+ is thousands unless token starts with literal 0,.",
+      "actual": "[1-9]\\d{0,2}(?:,\\d{3})+",
+      "cases": {
+        "01,500 kg": {
+          "expected": 1500.0,
+          "actual": null
+        },
+        "001,500 kg": {
+          "expected": 1500.0,
+          "actual": null
+        },
+        "000,500 kg": {
+          "expected": 500.0,
+          "actual": null
+        },
+        "0,500 kg": {
+          "expected": 0.5,
+          "actual": 0.5
+        }
+      },
+      "requested_fix": "Implement the literal issue grammar with only its literal 0, exception and add zero-padded first-group tests. No new numeric convention is needed."
+    },
+    {
+      "priority": "P2_ADJACENT_HARDENING",
+      "location": "lsms_library/transformations.py:1778",
+      "title": "Exponent-like fragments with repeated signs or whitespace still leak numeric suffixes",
+      "preexisting": true,
+      "actual_cases": {
+        "1e--3kg": 3.0,
+        "1e++3kg": 3.0,
+        "1e -3 kg": 3.0,
+        "1e+ 3 kg": 3.0
+      },
+      "expected_for_scoped_unsupported_exponent_fragments": null,
+      "reason": "Current prefix check handles only digit[eE] followed by at most one sign immediately before the number. The broader claim that unsupported exponent-like fragments decline is not true for these forms. This is not a new regression, and no live-data effect is established.",
+      "requested_fix": "Narrowly extend current prefix guard for repeated signs/whitespace after digit[eE]; retain existing ranges/multipliers/numbered labels and scope documentation rather than redesigning syntax."
+    }
+  ],
+  "independent_tests": {
+    "passed": 359,
+    "warnings": 39,
+    "seconds": 96.76,
+    "selection": [
+      "test_metric_decimal_comma.py",
+      "test_metric_fraction_parse.py",
+      "test_volume_as_mass_kwarg.py",
+      "test_food_kg_inference.py",
+      "test_crop_kg_factor.py",
+      "test_gh838_stated_vs_inferred.py",
+      "test_gh919_country_qualified_units.py",
+      "test_build_transform_hash.py"
+    ],
+    "exact_package_and_countries_identity_asserted": true,
+    "private_root": "/local/job40255479/1143-independent-review",
+    "threads": {
+      "OPENBLAS_NUM_THREADS": 1,
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1,
+      "LSMS_BUILD_WORKERS": 1
+    },
+    "cpus": "20-23",
+    "xdist": "4 --dist=loadfile"
+  },
+  "private_snapshot_replay": {
+    "Benin": {
+      "food_acquired": {
+        "comma_label_rows_by_wave": {
+          "Bidon de 0,5 L": {
+            "2018-19": 3
+          },
+          "Bidon de 1,5 L": {
+            "2018-19": 120
+          },
+          "Sac (2,5 Kg)": {
+            "2018-19": 3
+          }
+        },
+        "exactly_unchanged": true,
+        "rows": 187930
+      },
+      "prices": {
+        "by_wave": {
+          "2018-19": {
+            "after_sum": 175640580.75708964,
+            "before_sum": 175604440.6459643,
+            "changed_rows": 68,
+            "delta": 36140.11112535265
+          }
+        },
+        "changed_rows": 68,
+        "index_columns_dtypes_unchanged": true,
+        "price_ratio_counts": {
+          "10.0": 3,
+          "2.0": 1,
+          "3.3333333333": 64
+        },
+        "rows": 132811
+      },
+      "quantities": {
+        "by_wave": {
+          "2018-19": {
+            "after_sum": 159507.2398289145,
+            "before_sum": 159860.6098289145,
+            "changed_rows": 126,
+            "delta": -353.37
+          }
+        },
+        "changed_rows": 126,
+        "index_columns_dtypes_unchanged": true,
+        "price_ratio_counts": null,
+        "rows": 187338
+      }
+    },
+    "CotedIvoire": {
+      "food_acquired": {
+        "comma_label_rows_by_wave": {
+          "Sac (0,9 Kg)": {
+            "2018-19": 36
+          }
+        },
+        "exactly_unchanged": true,
+        "rows": 296945
+      },
+      "prices": {
+        "by_wave": {
+          "2018-19": {
+            "after_sum": 142970366.122975,
+            "before_sum": 142965032.78964165,
+            "changed_rows": 23,
+            "delta": 5333.333333333333
+          }
+        },
+        "changed_rows": 23,
+        "index_columns_dtypes_unchanged": true,
+        "price_ratio_counts": {
+          "10.0": 23
+        },
+        "rows": 182891
+      },
+      "quantities": {
+        "by_wave": {
+          "2018-19": {
+            "after_sum": 352840.11422069836,
+            "before_sum": 353069.34422069835,
+            "changed_rows": 36,
+            "delta": -229.23
+          }
+        },
+        "changed_rows": 36,
+        "index_columns_dtypes_unchanged": true,
+        "price_ratio_counts": null,
+        "rows": 296945
+      }
+    },
+    "Senegal": {
+      "food_acquired": {
+        "comma_label_rows_by_wave": {
+          "Bouteille de 1,5 L": {
+            "2018-19": 385,
+            "2021-22": 397
+          },
+          "Filet (2,5 kg)": {
+            "2021-22": 1
+          }
+        },
+        "exactly_unchanged": true,
+        "rows": 436576
+      },
+      "prices": {
+        "by_wave": {
+          "2018-19": {
+            "after_sum": 3.2421425205194978e+22,
+            "before_sum": 3.2421425205194978e+22,
+            "changed_rows": 327,
+            "delta": 106687.77777777778
+          },
+          "2021-22": {
+            "after_sum": 221494418.21624312,
+            "before_sum": 221373342.54957643,
+            "changed_rows": 365,
+            "delta": 121075.66666666667
+          }
+        },
+        "changed_rows": 692,
+        "index_columns_dtypes_unchanged": true,
+        "price_ratio_counts": {
+          "2.0": 1,
+          "3.3333333333": 691
+        },
+        "rows": 319730
+      },
+      "quantities": {
+        "by_wave": {
+          "2018-19": {
+            "after_sum": 385630.718558636,
+            "before_sum": 388902.55355863605,
+            "changed_rows": 385,
+            "delta": -3271.835
+          },
+          "2021-22": {
+            "after_sum": 375828.356856074,
+            "before_sum": 378837.356856074,
+            "changed_rows": 398,
+            "delta": -3009.0
+          }
+        },
+        "changed_rows": 783,
+        "index_columns_dtypes_unchanged": true,
+        "price_ratio_counts": null,
+        "rows": 436348
+      }
+    },
+    "hash_reach": {
+      "country": {
+        "changed": 22,
+        "changed_cells": [
+          "GhanaLSS/cluster_features",
+          "GhanaLSS/community_prices",
+          "GhanaLSS/crop_production",
+          "GhanaLSS/food_acquired",
+          "GhanaLSS/food_expenditures",
+          "GhanaLSS/food_prices",
+          "GhanaLSS/food_quantities",
+          "GhanaLSS/food_security",
+          "GhanaLSS/household_characteristics",
+          "GhanaLSS/household_roster",
+          "GhanaLSS/housing",
+          "GhanaLSS/individual_education",
+          "GhanaLSS/interview_date",
+          "GhanaLSS/labor",
+          "GhanaLSS/livestock",
+          "GhanaLSS/nonfood_expenditures",
+          "GhanaLSS/nutrition",
+          "GhanaLSS/panel_ids",
+          "GhanaLSS/plot_features",
+          "GhanaLSS/plot_inputs",
+          "GhanaLSS/plot_labor",
+          "GhanaLSS/sample"
+        ],
+        "total": 549
+      },
+      "tagged": {
+        "changed": 0,
+        "changed_cells": [],
+        "total": 39
+      },
+      "wave": {
+        "changed": 154,
+        "changed_cells": [
+          "GhanaLSS/cluster_features/1987-88",
+          "GhanaLSS/cluster_features/1988-89",
+          "GhanaLSS/cluster_features/1991-92",
+          "GhanaLSS/cluster_features/1998-99",
+          "GhanaLSS/cluster_features/2005-06",
+          "GhanaLSS/cluster_features/2012-13",
+          "GhanaLSS/cluster_features/2016-17",
+          "GhanaLSS/community_prices/1987-88",
+          "GhanaLSS/community_prices/1988-89",
+          "GhanaLSS/community_prices/1991-92",
+          "GhanaLSS/community_prices/1998-99",
+          "GhanaLSS/community_prices/2005-06",
+          "GhanaLSS/community_prices/2012-13",
+          "GhanaLSS/community_prices/2016-17",
+          "GhanaLSS/crop_production/1987-88",
+          "GhanaLSS/crop_production/1988-89",
+          "GhanaLSS/crop_production/1991-92",
+          "GhanaLSS/crop_production/1998-99",
+          "GhanaLSS/crop_production/2005-06",
+          "GhanaLSS/crop_production/2012-13",
+          "GhanaLSS/crop_production/2016-17",
+          "GhanaLSS/food_acquired/1987-88",
+          "GhanaLSS/food_acquired/1988-89",
+          "GhanaLSS/food_acquired/1991-92",
+          "GhanaLSS/food_acquired/1998-99",
+          "GhanaLSS/food_acquired/2005-06",
+          "GhanaLSS/food_acquired/2012-13",
+          "GhanaLSS/food_acquired/2016-17",
+          "GhanaLSS/food_expenditures/1987-88",
+          "GhanaLSS/food_expenditures/1988-89",
+          "GhanaLSS/food_expenditures/1991-92",
+          "GhanaLSS/food_expenditures/1998-99",
+          "GhanaLSS/food_expenditures/2005-06",
+          "GhanaLSS/food_expenditures/2012-13",
+          "GhanaLSS/food_expenditures/2016-17",
+          "GhanaLSS/food_prices/1987-88",
+          "GhanaLSS/food_prices/1988-89",
+          "GhanaLSS/food_prices/1991-92",
+          "GhanaLSS/food_prices/1998-99",
+          "GhanaLSS/food_prices/2005-06",
+          "GhanaLSS/food_prices/2012-13",
+          "GhanaLSS/food_prices/2016-17",
+          "GhanaLSS/food_quantities/1987-88",
+          "GhanaLSS/food_quantities/1988-89",
+          "GhanaLSS/food_quantities/1991-92",
+          "GhanaLSS/food_quantities/1998-99",
+          "GhanaLSS/food_quantities/2005-06",
+          "GhanaLSS/food_quantities/2012-13",
+          "GhanaLSS/food_quantities/2016-17",
+          "GhanaLSS/food_security/1987-88",
+          "GhanaLSS/food_security/1988-89",
+          "GhanaLSS/food_security/1991-92",
+          "GhanaLSS/food_security/1998-99",
+          "GhanaLSS/food_security/2005-06",
+          "GhanaLSS/food_security/2012-13",
+          "GhanaLSS/food_security/2016-17",
+          "GhanaLSS/household_characteristics/1987-88",
+          "GhanaLSS/household_characteristics/1988-89",
+          "GhanaLSS/household_characteristics/1991-92",
+          "GhanaLSS/household_characteristics/1998-99",
+          "GhanaLSS/household_characteristics/2005-06",
+          "GhanaLSS/household_characteristics/2012-13",
+          "GhanaLSS/household_characteristics/2016-17",
+          "GhanaLSS/household_roster/1987-88",
+          "GhanaLSS/household_roster/1988-89",
+          "GhanaLSS/household_roster/1991-92",
+          "GhanaLSS/household_roster/1998-99",
+          "GhanaLSS/household_roster/2005-06",
+          "GhanaLSS/household_roster/2012-13",
+          "GhanaLSS/household_roster/2016-17",
+          "GhanaLSS/housing/1987-88",
+          "GhanaLSS/housing/1988-89",
+          "GhanaLSS/housing/1991-92",
+          "GhanaLSS/housing/1998-99",
+          "GhanaLSS/housing/2005-06",
+          "GhanaLSS/housing/2012-13",
+          "GhanaLSS/housing/2016-17",
+          "GhanaLSS/individual_education/1987-88",
+          "GhanaLSS/individual_education/1988-89",
+          "GhanaLSS/individual_education/1991-92",
+          "GhanaLSS/individual_education/1998-99",
+          "GhanaLSS/individual_education/2005-06",
+          "GhanaLSS/individual_education/2012-13",
+          "GhanaLSS/individual_education/2016-17",
+          "GhanaLSS/interview_date/1987-88",
+          "GhanaLSS/interview_date/1988-89",
+          "GhanaLSS/interview_date/1991-92",
+          "GhanaLSS/interview_date/1998-99",
+          "GhanaLSS/interview_date/2005-06",
+          "GhanaLSS/interview_date/2012-13",
+          "GhanaLSS/interview_date/2016-17",
+          "GhanaLSS/labor/1987-88",
+          "GhanaLSS/labor/1988-89",
+          "GhanaLSS/labor/1991-92",
+          "GhanaLSS/labor/1998-99",
+          "GhanaLSS/labor/2005-06",
+          "GhanaLSS/labor/2012-13",
+          "GhanaLSS/labor/2016-17",
+          "GhanaLSS/livestock/1987-88",
+          "GhanaLSS/livestock/1988-89",
+          "GhanaLSS/livestock/1991-92",
+          "GhanaLSS/livestock/1998-99",
+          "GhanaLSS/livestock/2005-06",
+          "GhanaLSS/livestock/2012-13",
+          "GhanaLSS/livestock/2016-17",
+          "GhanaLSS/nonfood_expenditures/1987-88",
+          "GhanaLSS/nonfood_expenditures/1988-89",
+          "GhanaLSS/nonfood_expenditures/1991-92",
+          "GhanaLSS/nonfood_expenditures/1998-99",
+          "GhanaLSS/nonfood_expenditures/2005-06",
+          "GhanaLSS/nonfood_expenditures/2012-13",
+          "GhanaLSS/nonfood_expenditures/2016-17",
+          "GhanaLSS/nutrition/1987-88",
+          "GhanaLSS/nutrition/1988-89",
+          "GhanaLSS/nutrition/1991-92",
+          "GhanaLSS/nutrition/1998-99",
+          "GhanaLSS/nutrition/2005-06",
+          "GhanaLSS/nutrition/2012-13",
+          "GhanaLSS/nutrition/2016-17",
+          "GhanaLSS/panel_ids/1987-88",
+          "GhanaLSS/panel_ids/1988-89",
+          "GhanaLSS/panel_ids/1991-92",
+          "GhanaLSS/panel_ids/1998-99",
+          "GhanaLSS/panel_ids/2005-06",
+          "GhanaLSS/panel_ids/2012-13",
+          "GhanaLSS/panel_ids/2016-17",
+          "GhanaLSS/plot_features/1987-88",
+          "GhanaLSS/plot_features/1988-89",
+          "GhanaLSS/plot_features/1991-92",
+          "GhanaLSS/plot_features/1998-99",
+          "GhanaLSS/plot_features/2005-06",
+          "GhanaLSS/plot_features/2012-13",
+          "GhanaLSS/plot_features/2016-17",
+          "GhanaLSS/plot_inputs/1987-88",
+          "GhanaLSS/plot_inputs/1988-89",
+          "GhanaLSS/plot_inputs/1991-92",
+          "GhanaLSS/plot_inputs/1998-99",
+          "GhanaLSS/plot_inputs/2005-06",
+          "GhanaLSS/plot_inputs/2012-13",
+          "GhanaLSS/plot_inputs/2016-17",
+          "GhanaLSS/plot_labor/1987-88",
+          "GhanaLSS/plot_labor/1988-89",
+          "GhanaLSS/plot_labor/1991-92",
+          "GhanaLSS/plot_labor/1998-99",
+          "GhanaLSS/plot_labor/2005-06",
+          "GhanaLSS/plot_labor/2012-13",
+          "GhanaLSS/plot_labor/2016-17",
+          "GhanaLSS/sample/1987-88",
+          "GhanaLSS/sample/1988-89",
+          "GhanaLSS/sample/1991-92",
+          "GhanaLSS/sample/1998-99",
+          "GhanaLSS/sample/2005-06",
+          "GhanaLSS/sample/2012-13",
+          "GhanaLSS/sample/2016-17"
+        ],
+        "total": 2139
+      }
+    }
+  },
+  "independent_exact_changed_rows": {
+    "Senegal": {
+      "quantities": 783,
+      "prices": 692
+    },
+    "Benin": {
+      "quantities": 126,
+      "prices": 68
+    },
+    "CotedIvoire": {
+      "quantities": 36,
+      "prices": 23
+    }
+  },
+  "positive_adversarial_checks": {
+    "leading_zero_arbitrary_precision": "0,0000125 kg -> 0.0000125",
+    "comma_fraction": "1,000/0,125 kg -> 8000; 1,25 / 0,5 kg -> 2.5; 1,5 / 2,5 kg -> .6",
+    "dual_fraction": "Packet(1/4lt / 1/4kg) -> .25",
+    "multipliers": "2x500g / 2 X 500g -> .5",
+    "range_endpoint": "Gourd(1-5lts) -> 5",
+    "numbered_label": "1001. 12,5cl -> .125",
+    "malformed_declines": [
+      "1,234.56kg",
+      "1.234,56kg",
+      "1,5000kg",
+      "1,50,000g",
+      "1 / / 2kg"
+    ],
+    "unit_boundaries_decline": [
+      "12,5clX",
+      "12,5cl_foo"
+    ]
+  },
+  "country_docs": {
+    "Senegal": "Mojibake crosswalk keys remain load-bearing; 624 Demi walatt rows hide the numeric size after mapping and stay latent. No mapping is changed.",
+    "Benin": "2018-2019 staging directory was an md5-identical duplicate, not a second wave.",
+    "CotedIvoire": "Uppercase CIV filenames; historical CILSS food is unwired. Candidate documents the contradiction between older no-u-table text and current named u table rather than changing mappings."
+  },
+  "evidence_limits": [
+    "Replayed before/final snapshots from private roots using sanctioned get_dataframe; independently compared exact Quantity/Price equality as well as producer tolerant comparison. Did not independently repeat producer cold source builds.",
+    "Hash reach replay compares stored full hash snapshots: 22/549 country and 154/2139 wave hashes differ, all GhanaLSS; 0/39 tagged fingerprints differ. Full base/current hash census was not independently regenerated.",
+    "No raw records or household identifiers are written in reviewer artifacts."
+  ],
+  "process_status": "All verifier processes finished before producer was authorized to mutate; no source/GitHub/shared L2 changes by reviewer."
+}

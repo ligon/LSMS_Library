@@ -1,0 +1,44 @@
+{
+  "comma_labels": {
+    "Sac (0,9 Kg)": {
+      "kg_factors": [
+        0.9
+      ],
+      "native_quantity_sum": 28.3,
+      "rows": 36,
+      "sources": {
+        "metric": 36
+      }
+    }
+  },
+  "country": "CotedIvoire",
+  "factor_sources": {
+    "item_unit": 97497,
+    "metric": 27081,
+    "none": 6,
+    "unit": 172361
+  },
+  "food_acquired_rows": 296945,
+  "head": "505042aa34ea0a0422ad8a60464f08f4fb5f8d05",
+  "kilograms": {
+    "2018-19": {
+      "finite_sum": 352840.11422069836,
+      "median": 0.5714285714285714,
+      "nonnull": 296939,
+      "rows": 296939
+    }
+  },
+  "package": "/local/job40255479/worktrees/1143-decimal-comma/lsms_library/__init__.py",
+  "phase": "after",
+  "price_rows": 182891,
+  "prices": {
+    "2018-19": {
+      "finite_sum": 142970366.122975,
+      "median": 500.0,
+      "nonnull": 182891,
+      "rows": 182891
+    }
+  },
+  "private_root": "/local/job40255479/1143-private/final-CotedIvoire",
+  "quantity_rows": 296945
+}
