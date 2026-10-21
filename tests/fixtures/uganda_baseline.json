@@ -1380,6 +1380,9 @@
       "Zinc"
     ],
     "content_hash": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+    "content_hash_variants": [
+      "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6"
+    ],
     "dtypes": {
       "Calcium": "float64",
       "Carbohydrate": "float64",
