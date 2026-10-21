@@ -240,3 +240,18 @@ The allocation has more than 47 hours left and no deadline warning at this check
 Country work and independent reviews remain active; no PR is merged automatically.
 
 Sue
+
+* Publication -- 2026-10-21 23:52 UTC
+
+Reviewed standalone #1078 is PR [[https://github.com/ligon/LSMS_Library/pull/1197][1197]] at =d46795c303e2409ddb8ed5e4c62efca4e87ca347=.
+The seventeen implementation PRs are open and unmerged; the new PR is individually mergeable and its CI run 39696155414 is in progress.
+The sixteen-change integration remains at its verified =d527249ba9d3eaebf190a075e39043e36d2dbb85=; there is no seventeen-change proof.
+The separate Niger unit-index dtype owner is [[https://github.com/ligon/LSMS_Library/issues/1196][#1196]], with exact-source and artifact evidence linked from its body.
+No country data were normalized and no broad cache rebuild was started for publication.
+
+Sue
+
+At the 23:58 UTC live checkpoint, all seventeen exact public heads remain open, unmerged, individually mergeable and CI-green.
+PR1197 CI run39696155414 completed successfully.
+=public-pr-checkpoint-global17.json= records each actual head, base, state and successful run.
+Global16 remains the latest completed combined proof.

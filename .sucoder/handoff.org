@@ -878,3 +878,19 @@ Tanzania1091 checkout e75be9c56fa6c318ce32cea5a8be6d448578bed1 and private root 
 No public implementation PR has been merged. Goal remains active.
 
 Sue
+
+* Publication -- 2026-10-21 23:52 UTC
+
+PR1197 is open at d46795c303e2409ddb8ed5e4c62efca4e87ca347; metadata confirms open/unmerged/mergeable, CI39696155414 in progress.
+Niger strict cold/warm dtype residual is now1196; do not duplicate it.
+Seventeen implementation PRs exist, but verified integration remains global16 d527; no1078/1062 composition proof yet.
+New archive8 is running under exec session55915 using archive_quiescent_followup_23h55_bounded.py.
+Initial plan stopped before any archive creation at4GiB; measured4393492017bytes/2592files now bounded explicitly at5GiB, same six immutable roots and exclusions.
+Four exact public Nigeria instrument PDFs are an explicit private-archive exception; microdata/L1/L2/raw sources and parser tree remain excluded.
+Wait for terminal success, verify every member/source receipt and owner-only durable modes, then record safe receipt. Never claim archive durability from its launch.
+
+Sue
+
+At23:58UTC all17 exact public heads are freshly verified open/unmerged/mergeable/CI-success; see public-pr-checkpoint-global17.json.
+PR1197 CI39696155414 is SUCCESS. PR1170 body now reflects17publicPRs and source-backed current country work.
+Do not confuse the17head metadata checkpoint with global17 integration; global16 d527 remains latest combined PASS.

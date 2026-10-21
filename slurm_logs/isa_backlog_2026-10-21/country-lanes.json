@@ -164,13 +164,13 @@
         "active_ci": "success;run39661144364"
       },
       "active_issue": 1091,
-      "active_owner": "mali_lane",
+      "active_owner": "niger_lane (independent review)",
       "active_path": "/local/job40255479/worktrees/isa-Mali-1091-fix",
       "active_branch": "fix/1091-mali-community-builder-20261021",
       "active_baseline": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Mali/1091-fix",
       "active_scope": "Root FULLread concreteproposal/ledger/tests/proof;approvedledgerFIRST thenonlyremoveMali countryconcat+explicitvarrule/recipe/adjacentcomments;retainwavepattern,scheme,finalizer,framework. Newmeaningfultests/fullsource/subset/attrs/Feature/scanner/actual549/39scope gates before independent review. No code/PRPASS yet.",
-      "active_interim_result": "Both source-backed baseline backends preserve155931prices. Strict fullframe comparison stops only because Make lacks id_converted=True attr; raw Make country has legacy8level i==v shim/hashless/no manifest versus authoritative7level/current/fullcoverage. Original stop preserved, unsupported subsets being probed.",
+      "active_interim_result": "Author111 focused passes; new baseline controls24fail4pass. Forty runtime stages preserve155931supported rows; unsupported requests are declared empty. Independent verdict pending.",
       "diagnosis_1091": {
         "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
         "status": "COMPLETE/frozen/quiescent",
@@ -188,7 +188,6 @@
         "Make public fullattrs equal authoritativeDEFAULT inclid_converted=True",
         "Make frameworkwave route writes noCOUNTRYparquet"
       ],
-      "active_predicted_hash_scope_not_yet_measured": "24Mali/525otherunchanged/39frameworkunchanged; mustmeasurebefore sourcebuild",
       "active_future_PR_base": "fix/822-mali-community-readings-20261021 (PR1180); rootwillopenafterindependentPASS; no publicmerge",
       "active_precode_ledger": "337f8432193902c0d6f3d6251ff911606d0955b6",
       "active_measured_working_scope": {
@@ -196,7 +195,14 @@
         "other_country_unchanged": 525,
         "framework_unchanged": 39,
         "status": "Actual own-source parent-vs-working-candidate census terminal before country rebuild; final frozen-source receipts still required"
-      }
+      },
+      "active_status": "Frozen author candidate; independent review active",
+      "active_frozen_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "active_runtime_head": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+      "active_review_path": "/local/job40255479/worktrees/isa-review-Mali-1091",
+      "active_private_review": "/local/job40255479/control/isa-backlog-20261021/review-Mali-1091",
+      "active_actual_hash_scope": "24 Mali hashes change;525 other-country hashes and39 framework fingerprints exact; measured before source builds.",
+      "precode_prediction_historical": "24Mali/525otherunchanged/39frameworkunchanged; mustmeasurebefore sourcebuild"
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -208,7 +214,15 @@
       "review_path": "/local/job40255479/worktrees/isa-review-1088",
       "review_verdict": "PASS; 67 tests, zero skips",
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1176",
-      "ci": "GitHub PR CI success on d602f8d63; local source/data verification independent"
+      "ci": "GitHub PR CI success on d602f8d63; local source/data verification independent",
+      "active_issue": 1091,
+      "active_owner": "review_nigeria_1034",
+      "active_path": "/local/job40255479/worktrees/isa-Niger-1091",
+      "active_branch": "diagnose/1091-niger-community-builder-20261021",
+      "active_baseline": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Niger/1091",
+      "active_status": "Read-only country-builder diagnosis in progress",
+      "active_interim_result": "Old Make returns all46043 rows for each supported singleton and absent-wave request. Default correctly filters32352/13691/0. Current food cold/warm u dtype residual is1196; no source edits."
     },
     "Nigeria": {
       "path": "/local/job40255479/worktrees/isa-Nigeria",
@@ -278,7 +292,14 @@
       "runtime_review_head": "0c8d9645ec35d65eb252fc6abcd7e7c2e777b89b",
       "review_verdict": "PASS;246tests, zero skips; full source/cold/warm/Feature/hash; documentation-only descendant PASS",
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1185",
-      "ci": "success;run39657075627"
+      "ci": "success;run39657075627",
+      "prepared_1091": {
+        "path": "/local/job40255479/worktrees/isa-Tanzania-1091",
+        "branch": "diagnose/1091-tanzania-community-builder-20261021",
+        "baseline": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+        "private_evidence": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091",
+        "status": "Prepared exact ignored metadata target; not yet dispatched"
+      }
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
@@ -411,7 +432,7 @@
         "no_final_independent_verdict_or_PR_yet": true
       },
       "active_issue": 849,
-      "active_owner": "review_nigeria_1034",
+      "active_owner": "mali_lane (artifact-only addendum)",
       "active_path": "/local/job40255479/worktrees/isa-Uganda-849",
       "active_branch": "diagnose/849-uganda-reported-kgfactor-20261021",
       "active_baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
@@ -422,7 +443,9 @@
         972
       ],
       "active_prior_work_roots_frozen": true,
-      "active_interim_finding": "Factor-only private projection preserves133331rows/allnonfactorpayload, but115requested groups have multiplepositivefactors;113retainmultiple screenedfactors,112known-unit/condition groups with allvalidoperands differ in first-factor-times-sum versus per-source sum (net+10710.9000002kg/absolute26602.0999998kg). Six2018controlgroups pre-existing. Full source report/freeze pending, no colmap promotion approved."
+      "active_interim_finding": "First-factor/summed-quantity carrier loses native production pairing. Actual IDs/slots support preservation; unkeyed2010 and Feature assembly need explicit observation contract. No factor-only promotion or implementation approved.",
+      "active_status": "Frozen849 source diagnosis; new artifact-only exactness addendum active",
+      "active_private_addendum": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum"
     }
   },
   "shared_lanes": {
@@ -508,6 +531,42 @@
         "interpretation": "Manuals support prior-wave/listing-dwelling nonmovement interpretation; do not resolve exact address-round alignment, complete movement history,20unknown statuses or allphysicalK. No numeric record/formatter implementation approved.",
         "live_issue_updated": "2026-10-21T23:23:23Z"
       }
+    },
+    "1078": {
+      "path": "/local/job40255479/worktrees/isa-framework-1078-fix",
+      "branch": "fix/1078-food-producer-provenance-20261021",
+      "status": "reviewed PR awaiting human review and merge",
+      "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "frozen_head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "runtime_head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+      "precode_ledger": "695b57970c17fdaec5a3e63a8c0f283b29b86282",
+      "reviewer": "niger_lane",
+      "review_path": "/local/job40255479/control/isa-backlog-20261021/review-1078",
+      "addendum_path": "/local/job40255479/control/isa-backlog-20261021/review-1078-unit-attribution",
+      "review_verdict": "PASS for scoped source/race/healing/healthy controls and bounded publication addendum; full-suite FAIL remains explicit",
+      "focused_tests": 64,
+      "full_selection": {
+        "passed": 4689,
+        "skipped": 4453,
+        "failed": 9,
+        "errors": 0,
+        "failure_cause": "Existing persistence tests intentionally change protected tracked-source timestamps; separate unchanged nine-case private-operand run passes."
+      },
+      "diagnostic_repeat": "All 9151 node identities/outcomes exact; all24 new denials attributed. Original six metadata-free events remain individually unattributed.",
+      "exact_artifact_check": "Explicit zero-tolerance values and recursive typed full attrs across195 immutable inputs; sole Niger cross-stage u dtype exception preserved.",
+      "cache_scope": {
+        "changed_API_hashes": 549,
+        "changed_framework_fingerprints": 39,
+        "changed_declared_wave_hashes": 1362,
+        "changed_nonnull_API_wave_hashes": 2109,
+        "coordinated_rebuild_window_required": true,
+        "whole_corpus_rebuilt": false
+      },
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1197",
+      "ci": "success; run39696155414",
+      "residual_issue": 1196,
+      "composition_with_1062_or_global16_verified": false,
+      "execution_qualification": "Preliminary unguarded attrs-type census is explicitly qualified; subsequent artifact checks guarded, original receipts preserved."
     }
   },
   "integration": {

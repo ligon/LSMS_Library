@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T23:25:50.675532+00:00",
+  "observed_at": "2026-10-21T23:54:53.767835+00:00",
   "actions": [
     {
       "issue": 822,
@@ -214,6 +214,18 @@
     {
       "issue": 1135,
       "action": "Root retrieved4public official questionnaire/manual PDFs separately;3exactdeclaredDVCMD5matches. Read W4pp24/25 andW5pp5/19/20/23 andquestionnairecover. Prior-wave/listing language strengthens flaginterpretation, but unknown20/exactaddress-round/physicalK unresolved; manual carryover/routing tension explicit. Liveissuefollowup published withdirectsources;frozenhelddiagnosis/cache untouched. No numericcuration/formatter implementationapproved."
+    },
+    {
+      "issue": 1078,
+      "action": "Opened independently reviewed PR1197 at d46795c303e2409ddb8ed5e4c62efca4e87ca347 after explicit exact artifact and denial-attribution publication gates. Full-suite failures, execution qualification, broad coordinated rebuild cost and missing1062/global16 composition remain explicit."
+    },
+    {
+      "issue": 1196,
+      "action": "Filed deduplicated Niger public food u StringDtype cold/warm residual, reproduced on both f8 and1078 runtime; complete payload/typed attrs otherwise exact under explicit artifact proof. No fix or normalized equality claimed."
+    },
+    {
+      "issue": 1091,
+      "action": "Mali candidate frozen9e8ebeabb,111author passes and24meaningful baseline failures/fourpasses; independent review active. Separate Niger diagnosis on reviewed1088 finds wrong-wave Make outputs for supported singleton and unsupported requests; no Niger implementation yet. Tanzania checkout prepared only."
     }
   ],
   "verified_issue_metadata": [
@@ -365,6 +377,17 @@
       "base": "development",
       "review": "PASS235tests0skip/166handler controls perhead/72extra cause-context/68fullframe/fullattrs/0warm writes/actual0of549and0of39",
       "ci": "success; run39685546468"
+    },
+    {
+      "number": 1197,
+      "issue": 1078,
+      "head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "runtime": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+      "base": "development",
+      "review": "PASS scoped source/race/healing/healthy plus bounded exactness/attribution addendum; full-suite FAIL4689pass4453skip9protected-utime failures; separate9case private-operand pass",
+      "ci": "success; run39696155414",
+      "coordinated_rebuild_window_required": true,
+      "composition_with_current_global16_verified": false
     }
   ]
 }
