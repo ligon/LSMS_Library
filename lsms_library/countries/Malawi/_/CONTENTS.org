@@ -3021,21 +3021,22 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
     panel and EPAR credit code 1 at 0.23.  On 1,600,479 kg of NPK product,
     0.17 gives 272,081.4 kg N and 0.23 would give 368,110.2.  The map has no
     country axis, so this is a design decision, drafted as a new issue.
-  - *=Organic Fertilizer= (11,075 rows) is refused a share* by the same
-    ruling, and is named in =NutrientCoverageWarning= as a refusal.  *The
-    served =Quantity= of those rows is 0.0, not NA.*  =_organic_block= writes
-    NA by design (Module D records no organic quantity), but
-    =assemble_plot_inputs= consolidates duplicate lines with
-    =agg({'Quantity': 'sum'})=, and an all-NA group sums to 0.0 (the
-    neighbouring =Quantity_purchased= aggregation already uses
-    =min_count=1=).  So 11,075 rows report a measured zero that the survey
-    never recorded.  No =nitrogen_kg= number depends on it (organic rows get
-    no share), but it is a fabricated value.
-    *Fixed 2026-10-21 (GH #1109)*: organic Quantity groups use =sum(min_count=1)=, aligned on the complete existing key.
-    The raw affirmative =ag_d36= answer is carried as =Applied=True=, following Ethiopia's quantity-free organic-use records; this preserves the records through the framework's all-null-row filter.
-    All-missing organic groups retain NA, and reported zero and numeric sums retain their meanings.
-    Other input types receive =Applied= NA and keep their existing Quantity reducer.
-    The source unit and non-crop index markers are unchanged; their residuals remain GH #1118 / #1119.
+  - *=Organic Fertilizer= (11,075 rows) is refused a share* by the same ruling, and is named in =NutrientCoverageWarning= as a refusal.
+    *Source correction, 2026-10-21 (GH #1109)*: the earlier statement "Module D records no organic quantity" was false.
+    All seven held Module D headers label =ag_d37a= quantity applied and =ag_d37b= unit; the library had left these fields unmaterialized, although the survey asked them.
+    The six sources loaded by the current scripts contain 11,075 affirmative-use rows: 11,068 positive quantities, seven missing quantities and 11,067 observed units.
+    (The held 2010-11 Panel source is redundant in the current wave builder.)
+    Their independent organic-unit dictionary agrees: 2 Kilogram, 10 Bucket, 11 Wheelbarrow, 12 Ox cart, 13 Other (Specify).
+    The organic block now reads those fields, using existing =Kilogramme= / =Ox-Cart= spellings and preserving native quantities without conversion or imputation.
+    Five recorded code-1 units and one code-3 unit in 2013-14 are unlisted in that dictionary and retain source-qualified raw identities =Organic unit code 1= / =Organic unit code 3=; only the eight missing units become =U_UNKNOWN= under #1041.
+    Bare numeric fallback was rejected after a public-boundary check showed that Country's unrelated food-unit aliases turn 1 into =Kilogramme= and 3 into =90 kg Bag=; the source qualifier prevents that misinterpretation without changing food or framework mappings.
+    =Other (Specify)= and its separate free-text inventory are not interpreted here.
+    Earlier served zeros came from an all-NA =Quantity= sum after the helper discarded reported amounts; the initial c08 #1109 patch changed all 11,075 to NA, and this source-backed amendment supersedes that interpretation.
+    Organic groups use =sum(min_count=1)= aligned on the complete key, retaining missing amounts and any observed zero.
+    Raw affirmative =ag_d36= is carried as nullable =Applied=True= so missing-amount use records survive finalization.
+    Other inputs receive =Applied= NA and retain their existing Quantity reducer, units and non-crop index markers; remaining residuals stay GH #1118 / #1119.
+    No organic nitrogen share or inferred container weight is introduced.
+    Source dictionary/count evidence is recorded in =slurm_logs/isa_campaign_2026-10-21/1109/= and the dated source amendment.
     Editing =malawi.py= and =data_scheme.yml= moves every Malawi cache hash, so this requires one country re-warm.
     *Separate residual, measured by the rejected global =min_count=1= patch*: 437 nonorganic records have no other payload (390 Seed, 24 NPK, 11 Urea, 6 DAP, 4 Herbicide, 1 Fungicide, 1 Insecticide).
     Changing their Quantity to NA deletes them at finalization; their source-presence semantics need their own investigation, and this organic correction preserves their existing values.

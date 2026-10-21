@@ -9,6 +9,11 @@ ap.add_argument('--comparator-data',required=True,type=Path)
 ap.add_argument('--out-root',required=True,type=Path)
 args=ap.parse_args()
 ROOT=args.checkout.resolve()
+import lsms_library as ll
+import pyarrow.parquet as pq
+from lsms_library.paths import countries_root
+assert Path(ll.__file__).resolve()==ROOT/'lsms_library/__init__.py'
+assert countries_root().resolve()==ROOT/'lsms_library/countries'
 RAW=args.shared_data.resolve()
 DEST=args.out_root.resolve()
 country=ROOT/'lsms_library/countries/Malawi'
@@ -49,6 +54,9 @@ for p in sorted(sources):
 for variant in ('baseline','fixed'):
     for table in ('plot_inputs','sample'):
         p=args.comparator_data.resolve()/'Uganda/var'/f'{table}.parquet';assert p.is_file(),p
+        comparator=ll.Country('Uganda')
+        expected=comparator._table_cache_hash(table,comparator.waves)
+        assert pq.read_metadata(p).metadata[b'lsms_cache_hash'].decode()==expected,(p,expected)
         out=DEST/variant/'Uganda/var'/p.name;out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,out)
         assert p.stat().st_ino!=out.stat().st_ino
 (DEST/'seed-manifest.json').write_text(json.dumps(manifest,indent=2))

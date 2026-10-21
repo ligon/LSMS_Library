@@ -2868,7 +2868,8 @@ def months_food_inadequate_for_wave(t, df, idcol, i_prefix=''):
 #     quantity (ag_d39a/ag_d39d/ag_d39e slot 1; ag_d39f|ag_d39g type +
 #     ag_d39i|ag_d39j applied-qty slot 2 -- the slot-2 column letters
 #     shifted between the IHS3/IHPS2 layout and the IHS4/IHS5 layout),
-#     an ORGANIC FERTILIZER used? flag (ag_d36), and up to two
+#     an ORGANIC FERTILIZER used? flag (ag_d36), quantity/unit
+#     (ag_d37a/ag_d37b), and up to two
 #     PESTICIDE/HERBICIDE types + qty + unit (ag_d41a/b/c slot 1;
 #     ag_d41d/e/f slot 2), gated by the any-agrochemical flag ag_d40.
 #   * Module G (ag_mod_g) -- the seasonal plot-crop roster.  Per (plot,
@@ -2918,6 +2919,17 @@ _MWI_FERT_UNIT_LABELS = {
     5: '5 kg Bag',
     6: '10 kg Bag',
     7: '50 kg Bag',
+    13: 'Other (Specify)',
+}
+
+# Module D ORGANIC applied-unit dictionary (ag_d37b), independently
+# evidenced in all seven held source headers (2026-10-21; ledger section 3).
+# This is neither the inorganic-fertilizer nor the food-unit codebook.
+_MWI_ORGANIC_UNIT_LABELS = {
+    2: 'Kilogramme',
+    10: 'Bucket',
+    11: 'Wheelbarrow',
+    12: 'Ox-Cart',
     13: 'Other (Specify)',
 }
 
@@ -3004,21 +3016,38 @@ def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
     return pd.concat(pieces, ignore_index=True)
 
 
-def _organic_block(df, *, hhid, plotkey, flag, t):
-    """One row per plot where organic fertilizer was reported applied
-    (ag_d36 == 1/Yes).  Applied carries that reported answer; Quantity / u
-    are NA (Module D records no organic-fertilizer quantity)."""
+def _organic_block(df, *, hhid, plotkey, flag, t,
+                   qty='ag_d37a', unit='ag_d37b'):
+    """Reported organic use, quantity and native unit from Module D.
+
+    Only ag_d36 == 1/Yes supplies a row. Missing optional amount/unit
+    fields remain supported; Applied preserves affirmative use even when
+    the amount is missing. Unlisted recorded units retain their raw codes
+    with a source qualifier to prevent unrelated food-unit alias decoding.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+
     if flag is None or flag not in df.columns:
         return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
                                      'Quantity', 'u', 'Improved', 'Applied'])
     used = _int_codes(df[flag]) == 1
+    q = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
+         if qty and qty in df.columns
+         else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+    if unit and unit in df.columns:
+        codes = _int_codes(df[unit])
+        u = codes.map(_MWI_ORGANIC_UNIT_LABELS).astype('string')
+        raw = 'Organic unit code ' + codes.astype('string')
+        u = u.fillna(raw).fillna(U_UNKNOWN)
+    else:
+        u = pd.Series(U_UNKNOWN, index=df.index, dtype='string')
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
         'plot_id':        df['plotkey'].astype('string').values,
         '_input_code': _MWI_INPUT_ORGANIC,
         'crop':        pd.array([pd.NA] * len(df), dtype='string'),
-        'Quantity':    pd.array([pd.NA] * len(df), dtype='Float64'),
-        'u':           pd.array([pd.NA] * len(df), dtype='string'),
+        'Quantity':    q.values,
+        'u':           u.values,
         'Improved':    pd.array([pd.NA] * len(df), dtype='boolean'),
         'Applied':     used.astype('boolean').values,
     })

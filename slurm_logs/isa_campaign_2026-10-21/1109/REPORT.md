@@ -1,33 +1,60 @@
-# Malawi organic input quantities - GH #1109
+# Malawi reported organic inputs - GH #1109
 
-Malawi's organic-use records now retain missing Quantity and carry the raw affirmative Module D answer as optional nullable `Applied=True`. This preserves the fact that fertilizer was used without inventing an amount. Existing nonorganic quantities and the framework's all-null-row policy are unchanged.
+Source-backed amendment, 2026-10-21: Malawi now serves organic fertilizer quantity and native unit from Module D ag_d37a/ag_d37b, with the raw affirmative ag_d36 answer carried as nullable Applied=True.
+All 11,075 organic records are retained: 11,068 positive amounts and seven missing amounts.
+Observed zero remains zero in the regression controls; the actual held sources contain no affirmative-use zero amount.
 
-The shared assembly keeps its original reducers. An organic-only `sum(min_count=1)` is aligned on the complete existing key, including null crop/unit components; numeric and observed-zero organic inputs are preserved. `Applied` follows Ethiopia's existing convention and is reduced with `max`.
+The earlier country note and initial #1109 patch said "Module D records no organic quantity".
+Independent review of all seven held headers disproved that claim; the six sources loaded by current wave scripts contain the amounts and units.
+These fields were unmaterialized by the library, not unasked by the survey.
+The initial c08 result (all 11,075 organic amounts NA) is superseded.
+SOURCE-AMENDMENT.md and the living ledger document the corrected evidence and approved design.
 
-The first proposed global min_count replacement failed actual cold validation: it deleted all 11,075 organic records plus 437 nonorganic records at Country finalization. The accepted extension carries the explicit organic-use answer and confines the quantity correction to organic groups. The rejected result is recorded separately; no such lost-row result is accepted.
+The organic field has its own five-code dictionary: 2 Kilogram, 10 Bucket, 11 Wheelbarrow, 12 Ox cart, 13 Other (Specify).
+The implementation uses existing canonical Kilogramme/Ox-Cart spellings and adds both fields to the 2016 Cross_Sectional column projection.
+It reads quantities numerically without imputation or rescaling and keeps the existing organic-only keyed sum(min_count=1) overlay.
+Other input reducers and the framework all-null-row policy remain unchanged.
 
-## Verification
+A second boundary check rejected literal numeric fallback: Country's unrelated food-unit aliases converted raw organic code 1 to Kilogramme and code 3 to 90 kg Bag.
+The approved source-qualified fallback preserves these six unlabelled source answers as Organic unit code 1 (five rows) and Organic unit code 3 (one row).
+They are distinct from eight genuinely missing units, which use existing U_UNKNOWN under #1041.
+No food/framework mapping, organic N share, container weight or free-text Other interpretation was added.
 
-Frozen baseline runtime: `f8d236694c26fe9e709c5548f02c70f74ea72c33`. Both source builds ran offline with exact checkout/config/data identity, threads limited to one, existing image Python, physical private L1 copies and fresh private Malawi L2. No DVC CLI, new source acquisition, shared cache mutation/promotion, dependency edit or fixture regeneration occurred.
+## Final verification
 
-- **36 targeted tests passed**, including the new 11-case actual-helper/finalizer regression and the private warm Malawi nitrogen check. The Ethiopia warm test was explicitly excluded from this Malawi seed.
-- **21 existing plot declaration, harmonization and permutation checks passed.**
-- The untouched base produces **six regression failures and five compatibility passes**.
-- Cold and fresh warm Malawi retain **180,184 rows**, exact original index labels/order/dtypes, original column order and all preexisting measures except the intended **11,075 organic Quantity values: 0 -> NA**. `Applied` is boolean, true on those rows and missing on all 169,109 others.
-- Organic counts per wave are **1,991 / 822 / 3,617 / 4,645** for 2010-11 / 2013-14 / 2016-17 / 2019-20.
-- Nitrogen output is **exactly frame-equal**: 33,466 plots, total **840,235.7795800001 kg N**; the organic refusal warning remains.
-- `Feature('plot_inputs')(['Malawi','Uganda'], currency=None)` retains both countries and all **264,400 rows** (180,184 + 84,216). Original pooled index/order/dtypes and all preexisting measures are exact except the intended organic Quantity correction. Uganda is unchanged.
-- The relevant scanner has **15 warnings, zero failures and zero errors** on both sources. All check identities and warning records are unchanged except the expected constant-column detail now also names `Applied`: its nonmissing values are affirmative. Existing null crop/unit and scheme-order warnings remain outside this patch.
-- Measured hash impact: **22/22 Malawi table hashes change, 0/24 Uganda hashes change**. A Malawi country rewarm is required; no original cache was promoted or cleared.
+- **72 targeted tests passed**, including 28 actual-helper/assembly/finalizer cases, the real Country categorical-map collision regression, existing nitrogen tests, the private warm Malawi N check and plot declaration/harmonization checks.
+  No test was skipped; the Ethiopia warm test was excluded because the private seed covers Malawi/Uganda.
+- Before production edits, c08 gives **15 failures / 12 passes** on the then-27-case regression.
+  The added actual-Country fallback regression first fails on bare numeric units and then passes with source-qualified units.
+- A fresh offline private Malawi build uses 28 physically copied existing L1 blobs, exact canonical import/config identity, the mounted image Python and single-thread builds.
+  It retains **180,184 rows**, including **169,109 nonorganic records** with exact original index/order/values/dtypes, and all organic index parts/other measures except the intended unit rekeying and quantity restoration.
+  The comparator is the independent review's frozen-c08 cold artifact; source hashes identify the tested code snapshot.
+- Independent raw-source accounting checks all seven headers and every one of the 11,075 loaded organic answers at both wave and finalized public keys.
+  Final native units: **5,518 Kilogramme; 2,155 Ox-Cart; 1,451 Bucket; 1,204 Other (Specify); 733 Wheelbarrow; eight Unknown; five Organic unit code 1; one Organic unit code 3**.
+  The six source-qualified codes receive **no inferred kg factor**.
+- Default nitrogen output and its input-match/refusal tally are **exactly unchanged**: 33,466 plots, **840,235.7795800001 kg N**.
+  All 11,075 organic inputs remain explicitly refused a nominal share; qualified unit names introduce no conversion or nutrient contribution.
+- Cold/warm Malawi output is exact, and pooled Malawi/Uganda retains **264,400 rows** (180,184 + 84,216).
+  All Uganda and nonorganic Malawi rows are exact; other organic fields/index parts are exact modulo Quantity/u.
+- The final relevant scanner has **15 warnings, zero failures and zero errors**, with the same check identities/statuses as c08.
+  Only the two null-index warning details change, reflecting native missing-unit rows falling from 28,724 to 17,649.
+  Existing null crop, nonorganic null unit, column-content and index-order warnings remain explicit and outside this change.
+- Hash comparison moves all **22 measured Malawi source-table hashes** and **zero of 24 Uganda hashes**: one Malawi country rewarm.
+  No shared cache was edited/promoted/cleared, no raw data acquired, and no DVC CLI, dependency/lock/fixture/baseline change occurred.
 
-The initial comparator copy from the older shared cache was stale and caused a rejected offline scanner run. Final comparison uses physically copied, footer-verified current-release Uganda plot_inputs/sample parquets from the validated v0.16 seed; original files are unchanged.
+Current safe aggregate artifacts are named source-amended-*.json; raw logs and row-level frames remain private under control/isa-backlog-20261021/Malawi/source-amendment.
+The older baseline-cold.json, fixed-final-cold.json, comparison.json, warm-feature.json and one-line-failure.json describe historical f8/c08 or rejected reducer behavior, with their recorded SHAs/hashes; they do not describe the final source-backed result.
+The rejected global min_count patch's loss of 437 nonorganic records remains valid independent evidence for the separate residual.
 
 ## Remaining scope
 
-`RESIDUAL.md` drafts source diagnosis for the 437 nonorganic records exposed by the rejected global reducer. They retain existing values here; their reported-use semantics are not inferred. The draft reconciles #905's reducer sweep, #1118's unit issue and #637's key audit. No new issue or comment was posted.
+RESIDUAL.md retains the precise 437-record diagnosis and dedup reconciliation with #905/#1118/#637; all those records keep their existing behavior here.
+No issue or comment was created.
+For #1118 reporting only, **17,649 native null-unit rows remain, all nonorganic and with the existing nonmissing Quantity**.
+Organic rows now have observed units, source-qualified unlabelled identity or Unknown; only seven organic quantities are missing, replacing the obsolete 11,075-missing-amount denominator.
+#1118 is partial; disputed inorganic units (#1111), product composition (#1106), free-text Other and non-crop markers remain separate.
 
-Malawi still has 28,724 native null-unit rows. After this correction, 17,649 have nonmissing Quantity and 11,075 are organic-use records with missing Quantity and Applied true. The old #1118 classification counted fabricated organic zero as an amount. Unit codebook #1111, product composition #1106 and native marker issues #1118/#1119 remain unchanged.
+Ledger verification is OK against sections 2-4 after explicitly correcting the false source premise and the measured post-read alias collision.
+Independent review is next.
 
-The ledger verification is **OK against sections 2-4**: existing use carrier and min_count machinery are reused, reported zero is preserved, full native grain and other reducers are unchanged, and no core policy is bypassed. Independent review remains the dispatcher's next step.
-
-- Sue
+Sue
