@@ -1,0 +1,70 @@
+{
+  "reviewer": "Sue",
+  "verdict": "PASS",
+  "reviewed_head": "dc7e3db91291afb190845a2e02ad42e4a4a21fc9",
+  "previous_review": "1143-review.json FAIL at 9409219a1 retained as historical evidence",
+  "findings": [],
+  "corrections_verified": {
+    "thousands": "(?!0,)\\d{1,3}(?:,\\d{3})+ now follows literal issue grammar; 01,500 and 001,500 read 1500; 000,500 reads 500; 0,125 stays decimal .125.",
+    "exponent_like_fragments": "Prefix guard now includes repeated signs/whitespace after digit[eE], so prior observed unsupported fragments decline. This was adjacent hardening of a pre-existing gap, not repair of a new regression.",
+    "preserved_controls": [
+      "Gourd (1-5lts) -> 5",
+      "Packet(1/4lt / 1/4kg) -> .25",
+      "2x500g -> .5",
+      "1001. 12,5cl -> .125",
+      "1,25 / 0,5 kg -> 2.5",
+      "0,0000125 kg -> .0000125",
+      "1,5 L with volume_as_mass=False -> None",
+      "0,000,500 kg -> None"
+    ]
+  },
+  "independent_tests": {
+    "passed": 219,
+    "warnings": 1,
+    "seconds": 5.54,
+    "files": [
+      "test_metric_decimal_comma.py",
+      "test_metric_fraction_parse.py",
+      "test_volume_as_mass_kwarg.py"
+    ],
+    "extra_direct_assertions": 17,
+    "exact_package_and_countries_identity_asserted": true,
+    "private_root": "/local/job40255479/1143-independent-review-round2",
+    "cpus": "20-23",
+    "xdist": "4 --dist=loadfile",
+    "OPENBLAS_NUM_THREADS": 1,
+    "OMP_NUM_THREADS": 1,
+    "MKL_NUM_THREADS": 1,
+    "LSMS_BUILD_WORKERS": 1
+  },
+  "independent_served_unit_exhaustion": {
+    "method": "Compiled only the frozen 9409219a1 parser definitions/constants in a private Python namespace from git show; compared corrected parser on every unique nonnull served u label in private final food_acquired snapshots, both volume_as_mass settings. No source-file substitution or cache write.",
+    "Senegal": {
+      "rows": 436576,
+      "unit_labels": 62,
+      "both_modes_identical": true
+    },
+    "Benin": {
+      "rows": 187930,
+      "unit_labels": 79,
+      "both_modes_identical": true
+    },
+    "CotedIvoire": {
+      "rows": 296945,
+      "unit_labels": 52,
+      "both_modes_identical": true
+    }
+  },
+  "producer_evidence_inspected": {
+    "six_full_outputs": "review-live-invariance.json records unchanged quantity and price frames for all three countries, with String-index NA sentinel policy normalized to pd.NA on both sides to account for parquet serialization.",
+    "earlier_independent_snapshot_replay": "Round one independently reproduced exact 945 changed quantity rows / 783 changed price rows and source-frame invariance versus baseline. Exhaustive served-label comparison here proves these two microcorrections do not change parser outputs for any current measured unit.",
+    "hash_cost": "Producer evidence: 22/549 country and 154/2139 wave hashes move, all GhanaLSS, with 0/39 tagged build fingerprints moving. Not independently regenerated in round two.",
+    "full_focused_tests": "Producer reports 370 passed after corrections; reviewer independently ran the smaller 219-test selection rather than describing producer results as an independent full rerun."
+  },
+  "evidence_limits": [
+    "No new independent cold source builds or complete API six-frame comparison were run in round two; private served-unit exhaustion plus producer full-frame evidence were used.",
+    "No universal parser grammar beyond the explicitly scoped issue rules, existing controls and unsupported exponent-like fragment guard is claimed."
+  ],
+  "country_guidance": "Prior-round Benin/Senegal/CotedIvoire CONTENTS review remains applicable; microcorrection changes no country mapping or recorded survey fact.",
+  "process_status": "All reviewer verification subprocesses exited zero before report. No source edits/commits, GitHub writes or shared L2 mutations."
+}
