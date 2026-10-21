@@ -106,3 +106,45 @@ Postchange tests,549/39inventory and independent review remain FUTURE gates; pro
 This ledger is committed FIRST on the approved focused writer based on
 reviewed822, before production/tests. Phase3 implementation verification
 will be recorded after measured source, hash, backend, attrs and subset gates.
+
+### Phase 3 implementation verification
+
+- OK (sections 2-5): the exact country script/rule is retired; the wave
+  pattern, wave script, scheme, finalizer, driver and framework are unchanged.
+- OK (sections 3-4): 40 actual runtime stages (20 initial and 20 fresh-process
+  warm) preserve supported 155931-row frames in exact order, axes, dtypes,
+  masks and recursively typed attrs against the reviewed 822 parent DEFAULT.
+  Native shim and COUNTRY layers are compared against their separate oracles.
+  All three obs counts and both passage counts remain exact.
+- OK (section 4): both backends return zero rows for each unsupported strict
+  subset and their combination, in empty and populated states. No community
+  source build or cache write occurs for these requests. Existing Make's
+  missing id_converted=True is intentionally corrected to DEFAULT full attrs.
+- OK (sections 2/4): Make writes no new COUNTRY parquet. Its two supported
+  fresh-process warm calls naturally rebuild the hashless native wave file,
+  preserving bytes/size/mode; DEFAULT warm calls write no cache files.
+- OK (sections 2/4): 111 focused pytest cases pass with zero skips/errors;
+  the one explicitly deselected requires_s3-marked 822 public test function
+  separately passes with physically held sources. The 28 new controls yield
+  24 meaningful failures and four passes on untouched aba2badfe.
+- OK (section 4): actual Mali/Niger Country and default/explicit currency=None
+  Feature frames (201974 rows each) match parent full frames and typed attrs;
+  Niger's current-hash/full-coverage cache is byte/mode/mtime unchanged.
+  Both complete scanner phases yield the same two raw WARN records, byte-exact.
+- OK (section 4): 42 physical copies of two held sources pass sidecar MD5 and
+  copy SHA/size/mode/mtime/inode gates before APIs. No acquisition occurs.
+- OK (section 5): the actual inventory, measured before rebuilding, changes
+  exactly 24 Mali hashes; 525 other-country hashes and all 39 tagged framework
+  fingerprints remain exact. This is not an output claim for the other tables.
+- QUALIFIED (sections 2/4): CLI stages remain distinct. Supported pre-write API
+  frames match parent API; post-read artifacts match parent artifacts with
+  complete typed attrs and footer metadata. Unchanged JSON attrs serialization
+  can change Python container types across those stages. Unsupported API
+  matches the actual declared-empty factory/finalizer; visit/obs are str rather
+  than the old filtered table's int64. The unchanged parquet writer converts
+  its empty object Description to StringDtype. No frame/attrs normalization or
+  framework/writer edit is used to declare equality.
+- OK (section 4): strict API audit passes; original diagnosis/822 evidence and
+  all three protected source trees remain exact. Final clean publication and
+  zero-consumer receipts accompany READY for independent review. Independent
+  review and composition remain required; this is not an author PASS.
