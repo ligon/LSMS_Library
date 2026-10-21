@@ -15,7 +15,7 @@ GitHub and filesystem-origin development are synchronized there; the separate lo
 Its [[https://github.com/ligon/LSMS_Library/actions/runs/39522182800][development push CI]] passed, including native Windows.
 The earlier [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][complete Windows-fix run]] also passed credentialed Linux data tests: 5,911 passed, 2,742 skipped, four expected failures and one non-strict unexpected pass, with the credential gate open.
 
-The four remaining implementation PRs are open, with green PR unit and Windows smoke checks:
+The original four implementation PRs are open, with green PR unit and Windows smoke checks:
 
 | PR | Approved issues | Head |
 |----+-----------------+------|
@@ -26,7 +26,7 @@ The four remaining implementation PRs are open, with green PR unit and Windows s
 
 The harness PR's final review documents follow implementation =ca5bb83ca=, which is already integrated; production/test/audit files match the frozen candidate.
 Consolidated evidence is [[https://github.com/ligon/LSMS_Library/pull/1158][draft PR #1158]].
-These PRs remain for human merge under the backlog-workflow rule; the explicit Windows override does not merge the other four.
+All nine subsequent fix PRs remain for human merge under the backlog-workflow rule; the explicit Windows override covers only #1153.
 
 * Verification completed
 
@@ -108,7 +108,7 @@ It reproduces with metric units at both =976= and =852= and is linked from PR #1
 The maintainer has now explicitly chosen country-preserving pooled results and authorized the separate follow-up implementation described below.
 
 Recommend keeping this candidate bounded while final gates finish.
-For the next pre-release pass, recommend #778's assumed-fresh disappearance race/cache-mutating tests and the #1159 pooled-reducer contract/fix, with provenance #1115/#1128 in parallel.
+That follow-up pass, including #778, #1159 and provenance #1115/#1128, is now implemented, independently reviewed and integrated; #1160 follows the same country-preserving rule.
 Staged acquisition #1149 follows the provenance pair; sampling #1134/#1135 is another bounded already-ruled increment.
 The existing substantial #851 period branch needs recovery/integration/disclosure/review rather than duplicate implementation, and is a separate feature increment.
 The [[file:reliability/v016-readiness.org][readiness assessment]] lists 28 potential release-closure issues from the reviewed scope, supporting PRs and retained residuals; this is not an exhaustive release closure audit.
@@ -148,7 +148,7 @@ Follow-up checkpoint:
 All four follow-up increments are integrated and frozen at =4cab5f0db7d375ad543e652f61f43bd28fa94ecd= on =integration/framework-followup-40255479=, published to GitHub and filesystem origin.
 The new physical 1,519-file copy of the frozen852 corpus is assigned to the sixteen-worker full suite, with a separate physical copy for scoped farm audit and pooled-reducer checks.
 The exact4cab full suite and scoped farm checks have completed successfully; aggregate evidence is linked below.
-GitHub [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][manual run39531148624]] runs that exact head: unit, Windows smoke and native Windows pass; credentialed Linux remains running.
+GitHub [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][manual run39531148624]] runs that exact head: unit, Windows smoke and native Windows pass; credentialed Linux also passed (6,301 passed, 2,744 skipped, four expected failures and one non-strict unexpected pass).
 Original integration852 and its failed CI evidence remain unchanged.
 
 The exact4cab local suite passes:8764 passed,276 skipped,nine expected failures,one non-strict unexpected pass,1222 warnings,zero failures/errors or credential skips in765.96seconds.
@@ -172,7 +172,7 @@ The last three use the frozen852 comparison base for focused diffs and must be u
 Nutrition is directly development-based: all seventeen changed files are byte-identical to the reviewed source, and fifteen focused controls passed again there.
 No new PR merge is authorized.
 
-Final-source unit, Windows smoke and native Windows checks pass in run39531148624; credentialed Linux is still running.
+Exact4cab unit, Windows smoke, native Windows and credentialed Linux checks all pass in run39531148624.
 Native shocks/assets retain the exact expected digests; [[file:validation/followup-windows-native-summary.json][native evidence]].
 The scoped three-feature farm audit retains all76 non-runtime records/metrics and all29 Class B findings, with zero new structural/error/failure pairs.
 Sixty removed runtime warnings are classified45 cache-rebuild, six Make fallback and nine baseline Nigeria candidate-failure messages; the latter cause is not inferred.
@@ -210,6 +210,22 @@ New [[https://github.com/ligon/LSMS_Library/actions/runs/39533863014][manual CI3
 The4cab evidence and run39531148624 remain an exact earlier-batch control, never a claim about the later rate fix.
 The final-source packaging dry-run passes: both archives contain all11753 tracked package files with exact bytes, version0.15.0.post396.dev0+532d58700, and installed config discovery passes with network/data builds forbidden. All processes stopped and worktree clean. [[file:rate-packaging/REPORT.org][Final-source packaging]]. No release/tag/shared environment change.
 No further merge or release authorization has arrived.
+
+* Completed earlier remote gate and release preparation
+
+The exact4cab [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][credentialed GitHub run]] completed successfully: 6,301 passed, 2,744 skipped, four expected failures, one non-strict unexpected pass, zero failures/errors, 1,219 warnings in 5,048.88 seconds; 9,050 collected cases.
+The data-job checkout SHA is verified; Uganda nutrition actually executed and passed, rather than skipping.
+The credential gate and Uganda build passed; no runtime credential-failure/skip indicator was emitted.
+Remote console output does not enumerate every skip reason, so the entire remote skip population is not claimed individually adjudicated.
+The actual runner BLAS kernel remains unobserved.
+[[file:ci-followup-4cab/REPORT.org][Exact-head reconciliation]], [[file:ci-followup-4cab/verification.json][aggregate evidence and private-log identity]].
+These results cover4cab, before #1160; the distinct final532 credentialed run remains pending.
+
+[[file:release-drafts/RELEASE_NOTES_DRAFT.md][Draft release notes]] and [[file:release-drafts/MIGRATION_DRAFT.md][migration notes]] cover only the approved increment, not the entire history sincev0.15.0 or a release announcement.
+The migration note records country-axis changes, explicit invalid-input refusals, automatic harmonized-cache rewarming and decimal-comma interpretation.
+The release-closure audit is checking full current issue bodies/comments against the actualv0.15.0 tag, development and the proposed batch; #778's remaining trust-policy note is retained.
+The [[file:reliability/policy-current.json][fresh read-only protection snapshot]] confirms only unit-tests is required on development; #932 remains unapplied.
+No further merge, release, tag, protection or shared-cache promotion action is authorized.
 
 * Environment and reproducibility
 

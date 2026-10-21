@@ -1,0 +1,9 @@
+{
+  "job_id": 118997075291,
+  "not_ready": true,
+  "observed_at": "2026-10-21T03:11:09.652521+00:00",
+  "returncode": 1,
+  "scope": "one-off running-job log capability probe; final job gate remains pending",
+  "stderr_bytes": 13,
+  "stdout_bytes": 215
+}

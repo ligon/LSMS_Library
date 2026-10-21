@@ -1,6 +1,18 @@
 #+title: Handoff -- framework campaign, 2026-10-20
 
-* Active checkpoint -- 2026-10-20 19:52 PDT
+* Latest remote checkpoint -- 2026-10-20 20:46 PDT
+
+Main docs branch unchanged; final source532 immutable.
+Earlier exact4cab remote run39531148624 COMPLETED SUCCESS:6301passed2744skipped4xfail1xpass1219warnings5048.88s,9050collected.
+Actualcheckout verified; nutritioncase executesPASS(marker. at49/53); credentialgate/UgabuildPASS, credentialindicatorcounts0; allremote skipreasonsnotenumerated.
+Public aggregate/controller export=ci-followup-4cab/, distinctfrompending532.
+Final532run39533863014/data119005820593 remainsrunning; unit/smoke/nativePASS, gate/buildPASS.
+contracts owns read-only45sobserver39231; keepallsourcefrozen/noresubmission.
+Draftrelease/migrationnotes exportedrelease-drafts/ (scopeapprovedincrementonly, Linuxpendingtimestamp; fourmanifestsourcepathscorrectedbyparent).
+reliabilityfinalreleaseclosureaudit pending;23post-v0.15alreadylanded+9approvedfixissuecandidates=32potentialafterlanding,778partialstaysopen. Verifyfinalreportbeforeclaim.
+Noadditionalmerge/release/protectionauthorization; nextfinish532CI/evidence, thenonebatchmergeoverridequestionwithskillquote.
+
+* Earlier active checkpoint -- 2026-10-20 19:52 PDT
 
 Sue/GPT-6, job40255479 on n0071.savio3,32cores93GiB,>2d20h left.
 Main docs branch=docs/framework-campaign-20261020, previouspublishedc30f8aa47; newfinal artifacts are being checkpointed now.
