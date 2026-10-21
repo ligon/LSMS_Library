@@ -27,9 +27,9 @@ the variety/visit/obs grain, and the existing duplicate-entry policy.
 
 - `CONTENTS.org:1208`: "CS07's =Quantity= is a WEIGHT"; Price is the reported
   price for that quantity, not an additive measure or a per-unit price.
-- `CONTENTS.org:1305`: "They stay =obs= 4-6 for now"; representing the 30
+- `CONTENTS.org:1303` at baseline: "They stay =obs= 4-6 for now"; representing the 30
   nonrepeat second-entry observations is a decision for the maintainer.
-- `CONTENTS.org:1311` and open GH #1088 already interpret nominal `9999.9`
+- `CONTENTS.org:1307` at baseline and open GH #1088 already interpret nominal `9999.9`
   as a quantity missing code. This interpretation is an existing ruling,
   not new independent instrument confirmation in this task.
 - Precision qualification: `float32(9999.0)` is exactly `9999.0`.
@@ -86,6 +86,22 @@ expanding the Price filter.
 
 ## Phase 3: Verification
 
-Pending the approved implementation and paired validation. Private read-only
-evidence is in `control/isa-backlog-20261021/Niger/1088/diagnosis.json` and
-`negative-baseline.log` on allocation 40255479; only aggregates are reported.
+- `_COMMUNITY_QUANTITY_SENTINELS` / quantity mask: OK (sections 2, 4-5).
+  Extends existing exact membership; no new normalizer or Price-policy change.
+- `_finish_community_prices` and `_COMMUNITY_PRICE_CONTENT`: OK (sections 3-4).
+  Paired actual cold API builds and fresh-process warm replay retain 46,043
+  rows, every key, all other columns, and 45,967 other Quantity values.
+  Exactly 76 quantities become NA; duplicate-content drops remain 0 / 17 /
+  117, and the 30 nonrepeat second-record rows remain.
+- Cache blast radius: all 23 declared Niger table hashes move, because the
+  country module is a shared build input. Controls: 0 of 24 Mali and 0 of
+  25 Tanzania table hashes move. No shared cache is cleared or promoted.
+- Feature assembly: OK (sections 3-4). A verified fresh Mali release-cache
+  parquet, physically copied privately, contributes 40,218 rows beside
+  Niger's 46,043; all 86,261 rows have unique canonical keys. Audit reports
+  zero failures/errors and three existing contract warnings (cluster-level
+  tables have no household `i`; Mali does not record `obs`).
+- The source interpretation limitation and open second-record representation
+  decision remain as stated in section 6. Full numeric/code and cold/warm
+  evidence is summarized in `slurm_logs/isa_backlog_2026-10-21/Niger/1088/`;
+  raw source copies and returned frames stay private.
