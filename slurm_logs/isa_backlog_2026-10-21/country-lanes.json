@@ -54,8 +54,8 @@
       "active_private_review": "/local/job40255479/control/isa-backlog-20261021/review-1058-Burkina_Faso",
       "active_review_status": "PASS;44tests, exact source/native/walked/public/Feature/warm/scanner/hash; explicit Senegal tier and non-source symlink receipt limits",
       "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1194",
-      "active_ci": "in_progress; run39683305731",
-      "combined_review": "Active at4227e3a802c7349b11f41ec70a924d712159e587 against actualglobal14, including earlier1123 input/sample/cluster preservation"
+      "active_ci": "success; run39683305731",
+      "combined_review": "PASS global15/actual14;57tests,35fullframes/process,4180GPS pairs/prior183input gains preserved,fullattrs/scanner/currentmetadata/warm0writes"
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
@@ -286,9 +286,10 @@
       "active_control_with_1062": "/local/job40255479/worktrees/isa-Uganda-1078-with1062",
       "active_control_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Uganda/1078",
-      "active_scope": "Read-only exact9NaN-to-zero current-hash writer attribution under f8 vs reviewed1062; verified physical historical evidence copied; no fix approved",
+      "active_scope": "Read-only historical signature and actual writer/timing attribution underf8 vs reviewed1062; normal warm persistence confirmed; final proposal/FCT controls/freeze pending",
       "active_historical_delta": "Independent historical comparison confirms exact sixQuantity and threeExpenditure NaN-to-zero cells,2011-12 only; allotherfullframes/attrs exact, same storeded5c69e8hash",
-      "active_hypothesis": "Unconfirmed: Wave.food_acquired reads script result then separately checks external parquet; a concurrent normal eviction could trigger legacy sum and zero all-NA cells. Actual unchanged-code timing/concurrent writer attribution still required; no fix approved."
+      "active_reproduced_mechanism": "Confirmed controlled unchanged-code race underboth f8 and reviewed1062: two existing tests PASS; actual normal hashless-wave eviction makes separately observed external parquet absent, triggering legacy sum. Final last writer produces exact historical9NaN-to-zero cells/current expected hash/full8wavecoverage. Ordinary fresh warm reads persist corruption with0writes/57privatefiles per root. Original historical full-suite interleaving unidentified.",
+      "active_cache_healing_concern": "Wave.food_acquired untagged and absent from actual current build closures. A repair confined to that method would not heal already-corrupt current-hash caches. Grounded proposal/versioning scope pending; no implementation approved."
     }
   },
   "shared_lanes": {
@@ -313,7 +314,7 @@
     "1081": {
       "path": "/local/job40255479/worktrees/isa-framework-1081-fix",
       "branch": "fix/1081-preserve-categorical-errors-20261021",
-      "status": "independent-review-active",
+      "status": "reviewed-pr-awaiting-human",
       "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "scope": "Explicit three existing typed categorical errors: minimal imports/two bare re-raise clauses only; UnitsUnavailable byte-exact and generic/Feature/label policies unchanged",
       "dedup": "Live issue/zero comments and100recent userPRs checked; no implementation match",
@@ -337,17 +338,30 @@
       "API_hashes_evaluated": 549,
       "measured_framework_fingerprint_changes": 0,
       "framework_fingerprints_evaluated": 39,
-      "author_status": "Final clean FS-published/quiescent.235tests,166desiredprobes,5valuation and6Featurecontrols/head;68full API comparisons,60parquets/root0warmwrites;0/549hashes and0/39tags.Independent review active; no PR or PASS yet.",
+      "author_status": "Final clean FS-published/quiescent. Independent PASS atbfbb againstf8; normal current-hash L2, no source-cold claim. Five new-doc filesystem-mode differences qualified; Git/runtime/test exact.",
       "frozen_head": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
       "reviewer": "niger_lane",
       "review_path": "/local/job40255479/worktrees/isa-review-1081",
-      "private_review": "/local/job40255479/control/isa-backlog-20261021/review-1081"
+      "private_review": "/local/job40255479/control/isa-backlog-20261021/review-1081",
+      "review_verdict": "PASS235tests0skip;166controls/head+72independent cause/context probes;68fullframe comparisons;120copy receipts;zero warm writes;actual0/549hashes+0/39tags",
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1195",
+      "ci": "success; run39685546468"
+    },
+    "1135": {
+      "status": "read-only-diagnosis-active",
+      "owner": "niger_lane",
+      "path": "/local/job40255479/worktrees/isa-framework-1135",
+      "branch": "diagnose/1135-cluster-warning-size-20261021",
+      "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "private_evidence": "/local/job40255479/control/isa-backlog-20261021/framework1135-diagnosis",
+      "private_context": "/local/job40255479/control/isa-backlog-20261021/framework1135-live-context.json",
+      "scope": "Settled H2SPAN/noH3threshold. First line: each flagged boundary clusters-renumbered count and linked-household change share net of movers. No implementation; schema/provenance/hash scope diagnosis."
     }
   },
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "4227e3a802c7349b11f41ec70a924d712159e587",
+    "head": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
     "included_prs": [
       1172,
       1173,
@@ -363,9 +377,10 @@
       1191,
       1192,
       1193,
-      1194
+      1194,
+      1195
     ],
-    "status": "Fifteen reviewed PRs integrated cleanly; new Burkina cross-feature coexistence review active, do not mutate frozen head",
+    "status": "Sixteen reviewed PRs integrated cleanly; frozen new d527 for bounded shared handler/healthy API coexistence against actualglobal15",
     "public_prs_merged": false,
     "unit_session": 28550,
     "unit_exit_code": 0,
@@ -383,7 +398,7 @@
     "cohort_excluded_all_country_cases": 2,
     "api_review_completed": true,
     "api_review_verdict": "PASS: nine Country calls and four Features exactly match complete frozen corrected reference frames/attrs; fresh-process warm writes zero of1519parquets",
-    "source_head_frozen": "4227e3a802c7349b11f41ec70a924d712159e587",
+    "source_head_frozen": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
     "cohort_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "api_tested_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "current_head_validation_completed": false,
@@ -406,8 +421,8 @@
     "six_cohort_session": 23070,
     "six_cohort_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
     "current_head_validation_owner": "mali_lane",
-    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/burkina-fifteen-review",
-    "current_head_validation_status": "Active against actualglobal14; prior1123 non-doc blobs preserved exactly.Healthy plot/input/sample/cluster scopes and source-gated cold/warm/Feature checks pending.",
+    "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/framework-sixteen-review",
+    "current_head_validation_status": "Active; exact9addedproduction lines reconstruct entireactual15country.py; all6new blobs equalbfbb. No earlier PASS inherited.",
     "eleven_increment": {
       "head": "7886f7ece49767b2357a2f559c474e0eb710561f",
       "verdict": "PASS",
@@ -438,7 +453,7 @@
       "tracked_paths_unchanged": 14992,
       "evidence": "integration/uganda-twelve-review/"
     },
-    "public_branch_head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "public_branch_head": "4227e3a802c7349b11f41ec70a924d712159e587",
     "thirteen_increment": {
       "head": "5dde66645a444b025aa69682838cdf7c033a6e88",
       "control": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
@@ -472,6 +487,33 @@
       "scanner_exact_records": 11,
       "scanner_expected_count_only_records": 4,
       "evidence": "integration/malawi-fourteen-review/"
+    },
+    "fifteen_increment": {
+      "head": "4227e3a802c7349b11f41ec70a924d712159e587",
+      "control": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+      "verdict": "PASS",
+      "tests_passed": 57,
+      "skipped": 0,
+      "explicit_deselected": 4,
+      "complete_frames_per_process": 35,
+      "processes": 4,
+      "GPS_pairs_preserved": 4180,
+      "input_lines_recovered_preserved": 183,
+      "input_rows": 22877,
+      "plot_Feature_rows": 33608,
+      "input_Feature_rows": 47212,
+      "parquets_per_root": 31,
+      "current_country_hashes_full_coverage": 12,
+      "current_YAML_wave_hashes": 12,
+      "legitimate_hashless_script_companions": 7,
+      "warm_changes": 0,
+      "scanner_GPS": 13,
+      "scanner_inputs": 6,
+      "scanner_fail_error_skip": 0,
+      "immutable_source_roots": 9,
+      "immutable_prior_evidence_roots": 6,
+      "consumers_remaining": 0,
+      "evidence": "integration/burkina-fifteen-review/"
     }
   }
 }

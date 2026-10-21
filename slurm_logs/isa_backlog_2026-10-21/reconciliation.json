@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T22:07:33.683216+00:00",
+  "observed_at": "2026-10-21T22:21:35.547208+00:00",
   "actions": [
     {
       "issue": 822,
@@ -162,6 +162,22 @@
     {
       "issue": 1058,
       "action": "Independent44-test PASS; PR1194 open awaitinghumanmerge. Actual4180pairs/7350parcels/19784public/33608Feature and all13scanner records verified;24BFhash moves only. Live issue records implementation and completed negative held-country source checks. New global15 coexistence with prior1123 in progress; no public merge."
+    },
+    {
+      "issue": 1081,
+      "action": "Independent PASS atbfbb;rootread final review/verdict/commands/release+diff;public PR1195awaitinghumanmerge. Liveissue corrected to reviewed scope. Source-cold notclaimed;mode and initiallauncher qualifications retained."
+    },
+    {
+      "issue": 1078,
+      "action": "Read-only confirmed actual controlled race onf8 and1062 with exact9historic missing-to-zero cells, valid current hashes/full8wavecoverage, both named testsPASS. Fresh ordinary warm reads persist badvalues withoutwrites. Historical original interleaving unidentified;untagged producer/healing concern reported;proposal pending/no implementation."
+    },
+    {
+      "issue": 1135,
+      "action": "Activated separate immutablef8 read-only diagnosis under settledhumanH2SPAN/noH3threshold;precise per-boundary first-line size/schema/provenance/hash scope to ground beforeimplementation. No human decision reopened."
+    },
+    {
+      "issue": 1058,
+      "action": "Bounded global15 PASS at4227 againstactual653f:57tests,35completeframes/process,fullattrs,prior1123 gains and allGPS exact;31parquetmetadata/root current or legitimatehashless,0warmwrites,13GPS+6inputscanner exact. Rootread finalproof,published4227public andupdatedPR1194,then clean-merged1195into newfrozen16head d527 with no inheritedPASS/publicmerge."
     }
   ],
   "verified_issue_metadata": [
@@ -303,7 +319,16 @@
       "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
       "runtime": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
       "review": "PASS44tests/source-native-walked-public/full13frames+attrs/Feature/warm/scanner/hash; Senegal2freshcountry+2freshYAML+2legitimatehashless; one non-source symlink final-onlyreceipt qualified",
-      "ci": "in_progress; run39683305731"
+      "ci": "success; run39683305731"
+    },
+    {
+      "number": 1195,
+      "issue": 1081,
+      "head": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "runtime": "ca3e5cc119896983b49f50a6b9dade6a5f825131",
+      "base": "development",
+      "review": "PASS235tests0skip/166handler controls perhead/72extra cause-context/68fullframe/fullattrs/0warm writes/actual0of549and0of39",
+      "ci": "success; run39685546468"
     }
   ]
 }

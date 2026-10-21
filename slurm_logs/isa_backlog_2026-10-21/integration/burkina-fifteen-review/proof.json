@@ -1,0 +1,292 @@
+{
+  "released_utc": "2026-10-21T22:20:23.640207+00:00",
+  "candidate_head": "4227e3a802c7349b11f41ec70a924d712159e587",
+  "actual_global14_head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+  "verdict": "PASS",
+  "source_heads_bytes_modes_clean_exact": {
+    "/local/job40255479/worktrees/isa-integration": "4227e3a802c7349b11f41ec70a924d712159e587",
+    "/local/job40255479/worktrees/isa-baseline-fourteen-Burkina": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso": "20a5541867ef0b991b01031cd4c766681b537fc0",
+    "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso-base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1058-fix": "20a5541867ef0b991b01031cd4c766681b537fc0",
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1058": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "/local/job40255479/worktrees/isa-baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1123": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+    "/local/job40255479/worktrees/isa-Burkina_Faso": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb"
+  },
+  "protected_tracked_roots": 9,
+  "immutable_prior_evidence_roots": 6,
+  "symlink_targets_modes_mtimes_exact": true,
+  "source_MD5_SHA_copy_receipts_verified": true,
+  "tracked_edits_git_refs_GitHub_mutations": 0,
+  "in_tree_parquets": 0,
+  "task_consumers_remaining": 0,
+  "candidate_preexisting_real_dvc_tmp_btime_exact": true,
+  "baseline_private_metadata_target_exact": "/local/job40255479/control/isa-backlog-20261021/integration/burkina-fifteen-review/baseline-dvc-tmp",
+  "held_source_only_no_acquisition": true,
+  "shared_cache_mutations_stamps_bypasses": 0,
+  "fresh_warm_cache_bytes_modes_mtimes_changes": 0,
+  "all_data_values_attrs_keys_order_comparison_normalization": false,
+  "artifacts": {
+    "REVIEW.org": {
+      "sha256": "f1dad98c7a19357b25b157625c2518bc777e5dfed38b62624d326f44a20d43ca",
+      "bytes": 12206,
+      "mode": 420,
+      "mtime_ns": 1792621169406335327
+    },
+    "REPRODUCE.sh": {
+      "sha256": "c33e26321c40cb64dda4924b188bd60790d10a47228496afebbcfe9da8806d48",
+      "bytes": 3545,
+      "mode": 420,
+      "mtime_ns": 1792621169404335316
+    },
+    "review-checks.json": {
+      "sha256": "573bb76336deaa40aeeae4e4b8f4a88d3a9df3e7b7c4b7e45ef2d119f6699f73",
+      "bytes": 10148,
+      "mode": 420,
+      "mtime_ns": 1792621061878706076
+    },
+    "boundary.json": {
+      "sha256": "3f263228418bcbec3622247e4155df5d519f06c57f8eecf8f1534837292f74bf",
+      "bytes": 1300,
+      "mode": 420,
+      "mtime_ns": 1792620623467086629
+    },
+    "preparation.json": {
+      "sha256": "e44e4f78279a281b0b15ebed17f7388aa4ced29d4453434a2f10e25f2f3ec7b3",
+      "bytes": 334,
+      "mode": 420,
+      "mtime_ns": 1792620582624859315
+    },
+    "reference-provenance.json": {
+      "sha256": "c2ce608ffe2e13e9fc6902090861552f3e80a906341eb635fd990fdd867b6385",
+      "bytes": 6074,
+      "mode": 420,
+      "mtime_ns": 1792620822239301053
+    },
+    "source-oracle.json": {
+      "sha256": "a4f2348c07f0d72afd152b650feff2fcae30f48bce27895f20f1288d4ac24359",
+      "bytes": 992,
+      "mode": 420,
+      "mtime_ns": 1792620751510854471
+    },
+    "source-check.json": {
+      "sha256": "2dcbc062306e5e6a159a0df43c1398d889516218d9d7a7a62a9cf0bbe426aea2",
+      "bytes": 1586,
+      "mode": 420,
+      "mtime_ns": 1792620758500894880
+    },
+    "protected-before.json": {
+      "sha256": "a268d4ea2804468e41a1d38b32b625405a67e42aae76593da7bf682413910ad5",
+      "bytes": 2258,
+      "mode": 420,
+      "mtime_ns": 1792620483020290327
+    },
+    "protected-after.json": {
+      "sha256": "9dcb2ccb7b71c141850f78dde0d0d90d316ff88e57e25caf05e0c93fc482a6f5",
+      "bytes": 2256,
+      "mode": 420,
+      "mtime_ns": 1792621114166012817
+    },
+    "protected-before-private.json": {
+      "sha256": "37d5c2f1a33d854913b33ec66e63d62361f19dc4a999ad0d5bf66807111f4976",
+      "bytes": 31364149,
+      "mode": 420,
+      "mtime_ns": 1792620482997290201
+    },
+    "protected-after-private.json": {
+      "sha256": "37d5c2f1a33d854913b33ec66e63d62361f19dc4a999ad0d5bf66807111f4976",
+      "bytes": 31364149,
+      "mode": 420,
+      "mtime_ns": 1792621114143012682
+    },
+    "copy-receipts-private.json": {
+      "sha256": "42e2c4d4fc96d31c242230ce07d571b81be9f5aaa5d436c6f71373c5204f025d",
+      "bytes": 31561,
+      "mode": 420,
+      "mtime_ns": 1792620582622859304
+    },
+    "source-manifest-private.json": {
+      "sha256": "d566cd09b53a557525ca8edbc33c3e91ef528f45d78741af853a15efe99c9208",
+      "bytes": 10650,
+      "mode": 420,
+      "mtime_ns": 1792620582620859293
+    },
+    "comparator-current-hashes.json": {
+      "sha256": "c0c30a107d9b726b69d704992382599ae39d2643382d806d02da47facef16d57",
+      "bytes": 10869,
+      "mode": 420,
+      "mtime_ns": 1792620582621859298
+    },
+    "baseline-current-cache-metadata-private.json": {
+      "sha256": "42ad44cffa33f1050572c8bcaccdb35c81fc4bc4bad0b556ab1b392fe4055075",
+      "bytes": 15623,
+      "mode": 420,
+      "mtime_ns": 1792620931408940938
+    },
+    "candidate-current-cache-metadata-private.json": {
+      "sha256": "e7022089983ff2e6b3b8f30b62eb261c841554d8ac90ba1485de6d3ed0950c17",
+      "bytes": 15624,
+      "mode": 420,
+      "mtime_ns": 1792620940555994605
+    },
+    "candidate-GPS-tests-private.xml": {
+      "sha256": "4a702afa4021c95fb3f21c03748f3109e24c2c4c6f2b50e94f8c2616fb2bed3c",
+      "bytes": 5976,
+      "mode": 420,
+      "mtime_ns": 1792620845508437351
+    },
+    "candidate-input-tests-private.xml": {
+      "sha256": "ca69a58d261e0a54193dcbb2a3fbb356d620b417ae21f2f34aa3e25bb02e2fbb",
+      "bytes": 2120,
+      "mode": 420,
+      "mtime_ns": 1792620855111493601
+    },
+    "baseline-GPS-tests-private.xml": {
+      "sha256": "434fd8e815c052726a24dc19d31b176553344b32e2b5a0bc1c99ff2c7044e063",
+      "bytes": 40725,
+      "mode": 420,
+      "mtime_ns": 1792620829666344557
+    },
+    "input-collection-private.log": {
+      "sha256": "0643283323926c04fc06eae13072194030726f2ad0d9e74fa255f98273d72d6f",
+      "bytes": 1398,
+      "mode": 420,
+      "mtime_ns": 1792621045726611424
+    },
+    "api-audit-private.log": {
+      "sha256": "b758eb7c1b7ff6452b01f849f1bf914876b29eb436967a6172deeb48551fd7b2",
+      "bytes": 2755,
+      "mode": 420,
+      "mtime_ns": 1792620857599508174
+    },
+    "adapt_source_inputs.py": {
+      "sha256": "d6b72a248dbb5129b131e5c46e3999c6e4bb1a4f4caa66d22e5c10d84e738bd6",
+      "bytes": 1084,
+      "mode": 420,
+      "mtime_ns": 1792620640004179550
+    },
+    "bootstrap.py": {
+      "sha256": "90098ee3a2c2c42b73e93f2009663f714cf070e4635d71ff3355e9f25814106a",
+      "bytes": 1584,
+      "mode": 420,
+      "mtime_ns": 1792620437605040659
+    },
+    "boundary.py": {
+      "sha256": "b6dd74d2838599599612c5eb93440c51afa1dc020e35d419a7c9c3bcef062293",
+      "bytes": 4211,
+      "mode": 420,
+      "mtime_ns": 1792620577070828403
+    },
+    "build_verify.py": {
+      "sha256": "8781b3c1423d114788d756706266fa00241c73d3b25d303af95f91cec8e7cac1",
+      "bytes": 9566,
+      "mode": 420,
+      "mtime_ns": 1792620552061690290
+    },
+    "cache_metadata.py": {
+      "sha256": "f76fe7fe8e2e614837fc9216e3cf88c7a0053c0c5e826c22cb5beb14e0ad171e",
+      "bytes": 1159,
+      "mode": 420,
+      "mtime_ns": 1792620926405911584
+    },
+    "common.py": {
+      "sha256": "6f52b0081e80961f15a9602446e9d8a31bea3c70ec7964d496de37f4695ea94d",
+      "bytes": 2043,
+      "mode": 420,
+      "mtime_ns": 1792620437649040900
+    },
+    "extend_build.py": {
+      "sha256": "045844dbd6133d6cd4d616fe5f2f66d4173745c101719db21984c47e56f3fe86",
+      "bytes": 5259,
+      "mode": 420,
+      "mtime_ns": 1792620552021690071
+    },
+    "finish_checks-initial-failed.py": {
+      "sha256": "f9659e608764029344f363e250dba2b5f009ab4961e4596b3c7bd19ed4ad29ad",
+      "bytes": 8137,
+      "mode": 420,
+      "mtime_ns": 1792621011114408556
+    },
+    "finish_checks-second-failed.py": {
+      "sha256": "d506645a95530e45e6dd88e5afec5f6811286c807dbdb578116377ff3d8f0adf",
+      "bytes": 8924,
+      "mode": 420,
+      "mtime_ns": 1792621054879665061
+    },
+    "finish_checks.py": {
+      "sha256": "c8ed4c766874b3dcd8a4d6767d8142947b0288cd6f639159c9dc82474f2f7503",
+      "bytes": 8919,
+      "mode": 420,
+      "mtime_ns": 1792621054879665061
+    },
+    "prepare-initial-failed.py": {
+      "sha256": "142f90390f04694c3b131ed271240955f4ba4aa6c1ea780a136a0d0169459d92",
+      "bytes": 3873,
+      "mode": 420,
+      "mtime_ns": 1792620577070828403
+    },
+    "prepare.py": {
+      "sha256": "7d2680ab64393d5bc4ee74f6bb4764a5b605483a5dbd039d784e879866ed03f3",
+      "bytes": 3901,
+      "mode": 420,
+      "mtime_ns": 1792620577070828403
+    },
+    "protect.py": {
+      "sha256": "ef344e38e48aea45a129bd82ad807ecf93b82319799cda76b1eeb4af11bbb99c",
+      "bytes": 1962,
+      "mode": 420,
+      "mtime_ns": 1792620453187126321
+    },
+    "provenance-initial-failed.py": {
+      "sha256": "4f143df73de72d9d0c729c951637828d9f93098eb6bb8d9f3e5df9c01e9bcbf8",
+      "bytes": 3843,
+      "mode": 420,
+      "mtime_ns": 1792620818349278418
+    },
+    "provenance.py": {
+      "sha256": "08cdcf6abebe4bbc85571e01941bfc4e15cabdbab13bab1ab945d5a482fb893b",
+      "bytes": 3914,
+      "mode": 420,
+      "mtime_ns": 1792620818349278418
+    },
+    "release_review.py": {
+      "sha256": "426d82a68f57c791453a7729f0b84436ce7ec5a9f674b2369e24eac2504638c7",
+      "bytes": 5517,
+      "mode": 420,
+      "mtime_ns": 1792621222987645391
+    },
+    "sitecustomize.py": {
+      "sha256": "d305699a609d73629efdce60f69b081faca6edbe82e5210cc211c82b7c212dbf",
+      "bytes": 2809,
+      "mode": 420,
+      "mtime_ns": 1792620437649040900
+    },
+    "source_inputs.py": {
+      "sha256": "ddf7df5c48d9a9a74cfe1a509251258e6193da1845cc5056709b79c4a2bfbbed",
+      "bytes": 9172,
+      "mode": 420,
+      "mtime_ns": 1792620640044179776
+    },
+    "source_oracle.py": {
+      "sha256": "ff24a37571b102d3c6dad8f8e52ade3f9ded9e42c3688f08a4c00f238fa74182",
+      "bytes": 3871,
+      "mode": 420,
+      "mtime_ns": 1792620437649040900
+    },
+    "test_burkina_faso_plot_gps.py": {
+      "sha256": "5b297fbcb4bd72be5107115657d128cfa906a216fb93f569d7921d188588f896",
+      "bytes": 8202,
+      "mode": 420,
+      "mtime_ns": 1792618956126838727
+    },
+    "test_independent_edges.py": {
+      "sha256": "5e95073bfbdb39efc95c0ea9f840da6bfc06fadc93142b037d7c1dbc3a934fb6",
+      "bytes": 3462,
+      "mode": 420,
+      "mtime_ns": 1792620437649040900
+    }
+  },
+  "scope_limit": "35 complete frames in four cold/warm processes; four BF tables with held healthy comparators; standalone source-pinned 549/39 receipts carried, no new full census or full suite",
+  "freeze_released": true
+}
