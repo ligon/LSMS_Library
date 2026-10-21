@@ -90,6 +90,29 @@ python /local/job40255479/control/isa-backlog-20261021/Ethiopia/1118/validate.py
 TASK_PHASE=candidate python /local/job40255479/control/isa-backlog-20261021/Ethiopia/1118/audit.py
 #+end_src
 
+The exact 58-test producer selection, using the same checkout/data environment, is:
+
+#+begin_src sh :eval no :tangle no :results output
+python -m pytest -q -n 2 --dist=loadfile \
+ tests/test_gh1118_ethiopia_plot_input_units.py \
+ tests/test_867_nitrogen_content.py \
+ tests/test_gh637_uganda_plot_inputs_season.py \
+ tests/test_962_unit_sentinel.py::test_no_unclassified_missing_unit_spelling_is_minted \
+ tests/test_863_transforms.py::test_fertilizer_rate_nitrogen_per_hectare \
+ tests/test_863_transforms.py::test_fertilizer_rate_product_basis_is_the_raw_kilograms \
+ tests/test_863_transforms.py::test_fertilizer_rate_sums_inputs_and_areas_to_the_same_land_grain \
+ tests/test_863_transforms.py::test_fertilizer_rate_zero_area_plot_is_dropped_not_infinite \
+ tests/test_863_transforms.py::test_fertilizer_rate_bad_nutrient_and_bad_on_raise \
+ tests/test_863_transforms.py::test_fertilizer_rate_missing_area_column_raises \
+ tests/test_863_transforms.py::test_nitrogen_kg_warns_when_every_fertilizer_label_is_unmatched \
+ tests/test_863_transforms.py::test_nitrogen_kg_normalises_the_trailing_fertilizer_word \
+ tests/test_863_transforms.py::test_nitrogen_kg_does_not_fuzzy_match_an_unknown_fertilizer \
+ tests/test_863_transforms.py::test_fertilizer_rate_warns_on_an_empty_grain_join \
+ tests/test_863_transforms.py::test_fertilizer_rate_parcel_default_bridges_the_two_vocabularies \
+ -k 'not test_malawi_warm_d_compound_is_matched_at_8_percent' \
+  > "$TASK_DATA/ethiopia-1118-tests-private.log" 2>&1
+#+end_src
+
 The runners assert exact checkout import/config/data/cwd identity and an active offline socket guard.
 The first verifier stopped only after capturing all cold frames because it initially required the expected Feature alignment count to stay unchanged.
 =finalize-cold.py= checked those original saved cold captures with that one metadata delta explicitly accounted for; no cold capture was replaced to fix the expectation.
