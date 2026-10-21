@@ -30,7 +30,7 @@ Raw logs/XML/events remain private under =control/framework-campaign/rate-valida
 
 * Other gates
 
-Independent #1160 review passes387 tests with explicit skipped/deselected cases,and actual Malawi/Uganda pooled/separate controls; see [[file:../1160-review/REPORT.org]].
+Independent #1160 review passes387 tests with explicit skipped/deselected cases,and actual Malawi/Uganda pooled/separate controls; see [[file:../1160-review/REVIEW.org]].
 Parcel-policy differences under #1110 remain explicit,including the existing Malawi no-op docstring contradiction.
 Final-source packaging passes with all11753 tracked package files byte-identical in wheel/sdist and installed config-only smoke; see [[file:../rate-packaging/REPORT.org]].
 Unit,Windows smoke and credentialed native Windows pass in GitHub run39533863014; [[file:windows-native-summary.json]] records exact native digests.
