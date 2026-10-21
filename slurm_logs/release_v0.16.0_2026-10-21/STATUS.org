@@ -22,7 +22,8 @@ The known19 source/wiring gaps, five tenure findings and scientific/provenance/e
 * Supplementary CI and execution decision
 
 Sue retired the additional duplicate-master-CI wait after the user challenged idle waiting.
-The real Makefile pytest step had returned zero; its extra waiting adapter was stopped, and the unchanged remaining annotated-tag command was executed explicitly.
+The pytest call inside the Makefile adapter returned zero; the wrapping adapter was later stopped during its added CI wait, so make exited 2.
+The remaining unchanged annotated-tag command was then executed explicitly using the completed validation evidence.
 The old extra-gate summary was retained without relabeling it as passed.
 No GitHub job was cancelled and no test result was waived.
 See =execution/RELEASE_DECISION.json=.
