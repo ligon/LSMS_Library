@@ -54,8 +54,17 @@ No real-country assessment is necessary for this identity-only counterexample.
 ## §6 Open questions for parent
 
 The user's country-preserving rule and fail-closed boundaries resolve the scientific choice; no additional human choice is required.
-Surface this ledger to parent before implementation; proposed diagnostic refinement is limited to pooled unmatched keys.
+Parent reviewed, surfaced and authorized this ledger before implementation, including the pooled-only unmatched diagnostic refinement.
 
 ### Phase 3 -- verification
 
-Pending implementation and anchored checks.
+- fertilizer_rate -- OK (sections 2-4): existing numerator/area arithmetic and parcel helpers reused; country participates in existing keys. Paired presence and null validation precede filtering; index precedence and accepted area-key columns are preserved without mutation.
+- Empty pooled parcel key -- OK (sections 4-5): regression exposed float inference for an empty numerator comprehension; normalize only the country-present empty key, preserving country-less behavior.
+- Diagnostics/docstrings/guide -- OK (sections 3-5): describe the presence-based two-input identity rule and distinguish unmatched country/land keys without changing the legacy warning.
+- Regression proof -- OK (section 5): unchanged 4cab source gives80fail/7pass; final focused selection gives347pass/2private-cache Nigeria skips, zero failures/errors. The first candidate's two empty-parcel failures are separately recorded, not counted as passing validation.
+- Cache reach -- OK (section 4): actual before/after549country/2139wave/39tagged hashes show zero changes/errors; no parquet was written.
+- API audit -- OK (section 5): strict audit and diff whitespace checks pass.
+
+Runtime/test/guide commit: 5125d0faa3e8074c289c5dd839cf1690d3e7a570, Sue + GPT-6 attribution, SUCODER published.
+Aggregate evidence/repro: slurm_logs/framework_campaign_2026-10-20/1160/REPORT.org, verification.json, reproduce.py, negative_control.py and run.sh.
+Full integration and exact-head credentialed/native CI are parent gates; no scientific or parcel policy is added.
