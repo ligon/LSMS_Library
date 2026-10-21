@@ -92,6 +92,9 @@ CANONICAL_FEATURES = [
     "food_prices",
     "food_quantities",
     "plot_features",
+    "crop_production",
+    "plot_labor",
+    "plot_inputs",
     "interview_date",
     "shocks",
     "assets",
@@ -439,6 +442,28 @@ def _assembly_invariants(
     findings: list[Finding] = []
     canon = _canonical_index_levels(feature)
 
+    # A positive Country build disappearing whole differs from a collapse
+    # inside retained countries (ledger 1124-1125-feature-audit §3/§4).
+    # An empty frame has no participants; a malformed nonempty index cannot
+    # tell us which countries survived, so leave attribution unknown there.
+    present = None
+    if isinstance(result, pd.DataFrame):
+        if result.empty:
+            present = set()
+        elif "country" in result.index.names:
+            present = set(result.index.get_level_values("country"))
+    if check_rows and not kwargs and present is not None:
+        for country, rows in per_country_rows.items():
+            if rows > 0 and country not in present:
+                findings.append(Finding(
+                    phase=phase, feature=feature, country=country,
+                    check="country_exclusion", status="warn", severity="B",
+                    expected=False, kwargs=dict(kwargs),
+                    detail=(f"{country} built {rows} rows but is absent from "
+                            "the baseline Feature() assembly"),
+                    metrics={"country_rows": rows, "dropped": rows},
+                ))
+
     if not isinstance(result, pd.DataFrame) or result.empty:
         findings.append(Finding(
             phase=phase, feature=feature, check="assembly_nonempty",
@@ -448,6 +473,14 @@ def _assembly_invariants(
         return findings
 
     names = list(result.index.names)
+
+    if "country" not in names:
+        findings.append(Finding(
+            phase=phase, feature=feature, check="missing_country_level",
+            status="fail", severity="B", expected=False, kwargs=dict(kwargs),
+            detail=f"Feature() index lacks required country level: {names}",
+            metrics={"names": names, "nrows": len(result)},
+        ))
 
     # (1) any unnamed index level -> full (GH#325) or partial collapse
     if None in names:
@@ -486,10 +519,8 @@ def _assembly_invariants(
     # for the no-kwarg assembly pass: kwarg variants (units modes especially)
     # legitimately change cardinality, so a delta there is kwarg semantics, not
     # an assembly defect -- captured separately in phase2_kwargs.
-    if check_rows and per_country_rows:
-        present = [c for c in per_country_rows if c in result.index.get_level_values("country").unique()] \
-            if "country" in names else list(per_country_rows)
-        expected_rows = sum(per_country_rows[c] for c in present)
+    if check_rows and per_country_rows and present is not None:
+        expected_rows = sum(rows for c, rows in per_country_rows.items() if c in present)
         got = len(result)
         if got < expected_rows:
             findings.append(Finding(
