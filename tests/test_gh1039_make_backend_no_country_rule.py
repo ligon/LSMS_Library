@@ -258,11 +258,10 @@ def test_barren_subset_is_empty_on_both_backends(fakeland2, monkeypatch, backend
     fallback asked make for a target it has no rule for.  The default backend
     serves 0.  Both must serve 0; the make backend must not touch ``var/``.
 
-    (The default backend's 0 is reached a different way here: the planted
-    hashless parquet grades stale, the barren subset falls through to the
-    country fallback, and ``_restrict_to_waves`` filters what make hands
-    back -- CLAUDE.md's "accidentally correct" #866 case.  Only the make side
-    is this fix.)"""
+    Before GH #1099 the default backend reached 0 accidentally: the planted
+    hashless parquet fell through to the country fallback and the requested
+    wave restriction filtered what make handed back.  Both backends now
+    recognize absence without asking the country fallback."""
     monkeypatch.setenv("LSMS_BUILD_BACKEND", backend)
     c = fakeland2.build()
     fakeland2.plant_var()
@@ -305,6 +304,128 @@ def test_barren_subset_with_a_country_builder_keeps_the_legacy_fallback(fakeland
     it should is #1039-a's business)."""
     c = fakeland2.build(country_script=_COUNTRY_SCRIPT)
     assert _x(_barren(c)) == COUNTRY_X
+
+
+@pytest.mark.parametrize("backend", ["dvc", "make"])
+@pytest.mark.parametrize("cache_state", ["cold", "all", "partial", "stale", "no_cache"])
+def test_absent_subset_is_typed_and_preserves_other_cached_waves(
+        fakeland2, monkeypatch, backend, cache_state):
+    """GH #1099: absence is independent of the cache, whose other waves survive.
+
+    The earlier default-backend test plants an existing country parquet, so
+    make can accidentally serve it and the final restriction returns zero.
+    These cases include a genuinely cold root and a coverage-short manifest.
+    """
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", backend)
+    c = fakeland2.build(makefile=None)
+    before = None
+    expected = pd.DataFrame({"t": [WAVE], "i": ["h1"], "x": [2.0]}).set_index(["t", "i"])
+    if cache_state != "cold":
+        fakeland2.var.parent.mkdir(parents=True, exist_ok=True)
+        C.to_parquet(
+            expected, fakeland2.var,
+            cache_hash="old-hash" if cache_state == "stale" else c._table_cache_hash(TABLE, c.waves),
+            cache_waves=[WAVE] if cache_state == "partial" else c.waves,
+        )
+        before = fakeland2.var.read_bytes()
+    if cache_state == "no_cache":
+        monkeypatch.setenv("LSMS_NO_CACHE", "1")
+
+    result = _barren(c)
+    expected = c._finalize_result(expected.iloc[:0], c._materialization_entry(TABLE), TABLE)
+    pd.testing.assert_frame_equal(result, expected)
+    if before is None:
+        assert not fakeland2.var.exists(), "an absent-wave answer populated var/"
+    else:
+        assert fakeland2.var.read_bytes() == before, "an empty subset replaced other waves' cache"
+
+
+def test_absent_subset_keeps_required_source_failure(fakeland2, monkeypatch):
+    """A declared wave with an unreadable source is not an absent table."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    c = fakeland2.build(makefile=None)
+
+    def unavailable(self, request):
+        raise FileNotFoundError("required source is unavailable")
+
+    monkeypatch.setattr(C.Wave, "grab_data", unavailable)
+    with pytest.raises(FileNotFoundError, match="required source is unavailable"):
+        c.build_me(waves=[WAVE])
+
+
+def test_absent_subset_does_not_accept_unknown_table_or_wave(fakeland2, monkeypatch):
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    c = fakeland2.build(makefile=None)
+    with pytest.raises(AttributeError, match="not_a_table"):
+        c.not_a_table(waves=[BARREN])
+    with pytest.raises(KeyError, match="2099 is not a valid wave"):
+        c.build_me(waves=["2099"])
+
+
+def test_absent_subset_does_not_turn_a_failed_full_build_into_empty(fakeland2, monkeypatch):
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    (fakeland2.country_dir / WAVE / "_" / f"{TABLE}.py").unlink()
+    c = fakeland2.build(makefile=None)
+    with pytest.raises(RuntimeError, match="Could not materialize"):
+        c.build_me()
+
+
+@pytest.mark.parametrize("assume_fresh", [False, True])
+def test_covered_subset_cache_hit_does_not_construct_waves(
+        fakeland2, monkeypatch, assume_fresh):
+    """GH #1099's absence check must remain behind both cache-hit gates."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    c = fakeland2.build(makefile=None)
+    c.assume_cache_fresh = assume_fresh
+    frame = pd.DataFrame({"t": [WAVE], "i": ["h1"], "x": [2.0]}).set_index(["t", "i"])
+    fakeland2.var.parent.mkdir(parents=True, exist_ok=True)
+    cache_hash = c._table_cache_hash(TABLE, c.waves)
+    C.to_parquet(frame, fakeland2.var, cache_hash=cache_hash, cache_waves=c.waves)
+    # Hash computation already inspects wave config by design; isolate any
+    # additional declaration traversal introduced on the cache-hit path.
+    monkeypatch.setattr(C.Country, "_table_cache_hash", lambda self, *args: cache_hash)
+
+    def no_wave(self, wave):
+        raise AssertionError("a covered cache hit constructed a wave")
+
+    monkeypatch.setattr(C.Country, "__getitem__", no_wave)
+    result = c.build_me(waves=[WAVE])
+    expected = c._finalize_result(frame, c._materialization_entry(TABLE), TABLE)
+    pd.testing.assert_frame_equal(result, expected)
+
+
+@pytest.mark.parametrize("backend", ["dvc", "make"])
+@pytest.mark.parametrize("country_makefile", [False, True])
+def test_absent_subset_without_make_preserves_unknown_country_rules(
+        fakeland2, monkeypatch, backend, country_makefile):
+    """No make cannot prove a rule absent; no Makefile can (GH #1099 review).
+
+    The make backend keeps its existing no-executable-builder policy, while
+    the new default-backend guard must preserve an uninspectable country rule.
+    """
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", backend)
+    c = fakeland2.build(
+        makefile=_MAKEFILE_MULTI_TARGET if country_makefile else None,
+        maker=country_makefile,
+    )
+    real_which, real_run = C.shutil.which, C.subprocess.run
+
+    def no_make(command, *args, **kwargs):
+        return None if command == "make" else real_which(command, *args, **kwargs)
+
+    def run_without_make(command, *args, **kwargs):
+        if isinstance(command, list) and command and command[0] == "make":
+            raise FileNotFoundError("make is unavailable")
+        return real_run(command, *args, **kwargs)
+
+    monkeypatch.setattr(C.shutil, "which", no_make)
+    monkeypatch.setattr(C.subprocess, "run", run_without_make)
+    if country_makefile and backend == "dvc":
+        with pytest.raises(RuntimeError, match="Could not materialize"):
+            _barren(c)
+    else:
+        _assert_empty_and_shaped(_barren(c))
+    assert not fakeland2.var.exists()
 
 
 def test_empty_declared_frame_has_the_declared_shape():
@@ -357,8 +478,8 @@ def test_country_script_keeps_the_make_route(fakeland):
         "the in-tree catch-all target materialised in the config tree"
 
 
-def test_default_backend_is_unchanged(fakeland, monkeypatch):
-    """The predicate is never consulted off the make backend."""
+def test_full_default_backend_build_does_not_probe_country_builder(fakeland, monkeypatch):
+    """The predicate is unnecessary for a full default-backend wave build."""
     monkeypatch.delenv("LSMS_BUILD_BACKEND")
     c = fakeland.build()
     called = []

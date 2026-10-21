@@ -1,0 +1,86 @@
+[
+  {
+    "state": "cold",
+    "shape": [
+      0,
+      3
+    ],
+    "index": [
+      "i",
+      "t",
+      "animal"
+    ],
+    "dtypes": {
+      "HeadCount": "Float64",
+      "HeadAcquired": "Float64",
+      "HeadSold": "Float64"
+    },
+    "cached_waves": null,
+    "cache_preserved": true
+  },
+  {
+    "state": "partial",
+    "shape": [
+      0,
+      3
+    ],
+    "index": [
+      "i",
+      "t",
+      "animal"
+    ],
+    "dtypes": {
+      "HeadCount": "Float64",
+      "HeadAcquired": "Float64",
+      "HeadSold": "Float64"
+    },
+    "cached_waves": [
+      "2018-19"
+    ],
+    "cache_preserved": true
+  },
+  {
+    "state": "all",
+    "shape": [
+      0,
+      3
+    ],
+    "index": [
+      "i",
+      "t",
+      "animal"
+    ],
+    "dtypes": {
+      "HeadCount": "Float64",
+      "HeadAcquired": "Float64",
+      "HeadSold": "Float64"
+    },
+    "cached_waves": [
+      "2018-19",
+      "2021-22"
+    ],
+    "cache_preserved": true
+  },
+  {
+    "state": "no_cache",
+    "shape": [
+      0,
+      3
+    ],
+    "index": [
+      "i",
+      "t",
+      "animal"
+    ],
+    "dtypes": {
+      "HeadCount": "Float64",
+      "HeadAcquired": "Float64",
+      "HeadSold": "Float64"
+    },
+    "cached_waves": [
+      "2018-19",
+      "2021-22"
+    ],
+    "cache_preserved": true
+  }
+]
