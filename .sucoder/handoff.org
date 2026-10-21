@@ -1,5 +1,22 @@
 #+title: Handoff -- v0.16.0 release, 2026-10-21
 
+* Tag and GitHub Release published; PyPI upload active -- 2026-10-21
+
+The maintainer challenged idle waiting on the duplicate GitHub Linux job.
+Sue retired that agent-added wait, using the completed6388-pass credentialed run39533863014 at532 plus exact12421-input identity and the fresh8851-pass master local suite/native platform checks.
+No test result was waived or relabeled; the duplicate master run39604418333 continues.
+Only the already-finished Makefile pytest adapter's extra waiting process was stopped; its historical extra-gate summary stays pending/false.
+The remaining unchanged annotated-tag command was executed explicitly after verification.
+See =execution/RELEASE_DECISION.json=; this supersedes the earlier two-gate execution plan without rewriting its historical records.
+
+Annotated v0.16.0 is pushed to filesystem origin and GitHub at master097283459f80016b0f00a51b814a0cb964a42789.
+The GitHub Release is published and actual release-event publish workflow39612460165 is running from that exact tag.
+No fallback dispatch was needed.
+The windows_ci agent is verifying actual PyPI archives/package bytes/metadata plus the offline installed-configuration smoke as soon as upload appears.
+Root must verify the publisher, review actual artifacts and record final status; do not claim the duplicate Linux run has passed before its own completion.
+
+Sue
+
 * Local release suite and platform jobs PASS; Linux gate pending -- 2026-10-21
 
 Actual make release at master097 passed: 8,851/276skip/9xfail/1non-strictXPASS; zero failures/errors and zero changes among all 9,137 outcome/reason records versus532.
