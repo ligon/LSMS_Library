@@ -56,8 +56,11 @@ predicates, identifiers, grain, curation, or other countries.
 - No unlisted nonnull raw unit codes in the four held modules. Seed OTHER
   (5) and liquid OTHER (4) have no unit-specification text in these extracts.
   The 2020 agriculture questionnaire blob is absent; do not acquire it.
-- Only the modern long-rainy-season AG_SEC_3A/4A scripts are in scope.
-  No 2008-15 edits or rebuilds. UPHI back-casting, disjoint 2014 subpanels,
+- Only the modern long-rainy-season AG_SEC_3A/4A input behavior is in scope.
+  No 2008-15 source/configuration edits. The unchanged all-wave sample
+  prerequisite rebuilds from held cover sources because the country-module
+  hash moves and the normal public API joins sample across waves.
+  UPHI back-casting, disjoint 2014 subpanels,
   2019 Extended / 2020 Refresh plus urban booster remain as documented.
 - All microdata, IDs, full logs and caches stay in physical private task
   storage; reads use sanctioned helpers, network is actively blocked.

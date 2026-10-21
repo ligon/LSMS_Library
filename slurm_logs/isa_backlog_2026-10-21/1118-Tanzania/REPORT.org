@@ -64,10 +64,12 @@ Script-path wave parquets remain hashless by existing design; the country parque
 
 The healthy unit comparator is the held, rebuilt Uganda cache from the frozen Ethiopia lane, whose Uganda configuration matches the release baseline.
 Its current hash grades fresh, its 84,216-row full frame equals that lane's reference, and it has zero missing/blank units.
-All 27 copied Uganda parquets remain byte-identical.
+All 26 copied Uganda parquets remain byte-identical.
 This is a unit-health comparator, not a claim that Uganda has no unrelated audit warnings.
 Normal =Feature('plot_inputs')(['Tanzania', 'Uganda'])= returns all 93,914 rows.
 Each complete country part equals the matching ordinary Country call, accounting explicitly for declared crop-to-j aliases, sentinel levels and the default Feature currency-index option.
+The complete before/after Feature data, index, ordering and dtypes are exact because Feature already filled missing units.
+Its sole attrs change is =canonical_alignment.promoted.Tanzania.u= from 408 to 0; every other attribute is exact.
 
 The final 16 new synthetic tests pass.
 The wider scoped selection passed 243 tests before three additional quantity parameters were added to the new tests; =make api-audit= also passed.
@@ -132,7 +134,7 @@ python bench/feature_audit/scan.py --features plot_inputs --countries Tanzania U
 python -m pytest -q -n 4 --dist=loadfile -m 'not requires_s3' tests/test_1118_tanzania_plot_input_units.py tests/test_962_unit_sentinel.py tests/test_feature_canonical_index.py tests/test_863_transforms.py tests/test_867_nitrogen_content.py > "$TASK_EVIDENCE/reproduce-tests.log" 2>&1
 #+end_src
 
-For a repeated cold proof, use a new physically private =LSMS_DATA_DIR= with verified copies of the seven listed L1 blobs and the 27 Uganda comparator parquets, no Tanzania parquets, then run =verify_api.py cold= followed by =verify_api.py warm= in separate processes.
+For a repeated cold proof, use a new physically private =LSMS_DATA_DIR= with verified copies of the seven listed L1 blobs and the 26 Uganda comparator parquets, no Tanzania parquets, then run =verify_api.py cold= followed by =verify_api.py warm= in separate processes.
 Keep the private baseline/reference pickles in =TASK_EVIDENCE=; neither shared caches nor repository raw-data directories are writable verification targets.
 
 Sue
