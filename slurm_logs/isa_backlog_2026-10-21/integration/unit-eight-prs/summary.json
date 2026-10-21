@@ -1,0 +1,18 @@
+{
+  "source_head": "dd0dddcb052f8ce9b0c7401b281ac60df47933ad",
+  "exit_code": 0,
+  "seconds": 140.842,
+  "tracked_content_modes_unchanged": true,
+  "head_unchanged": true,
+  "clean_status": true,
+  "workers": 16,
+  "credential_free": true,
+  "offline_guard": true,
+  "network_namespace": "unshare -rn",
+  "full_credentialed_corpus": false,
+  "cases": 9416,
+  "outcomes": {
+    "skipped": 4455,
+    "passed": 4961
+  }
+}

@@ -35,7 +35,7 @@
       "runtime_review_head": "286108cf7ecc1a6e1e07150b8eec8411f5326b05",
       "review_verdict": "PASS;58focused+6independent controls, zero skips; documentation-only descendant confirmed",
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1181",
-      "ci": "in progress; run39654218629",
+      "ci": "success; run39654218629",
       "residual_issues": [
         1183,
         1184
@@ -175,13 +175,13 @@
       "runtime_review_head": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
       "review_verdict": "PASS;230tests,zero skips;source/default/Code/Feature/cache;doc-only descendantPASS",
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1182",
-      "ci": "in progress; run39654667663"
+      "ci": "success; run39654667663"
     }
   },
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "dd0dddcb0",
+    "head": "dd0dddcb052f8ce9b0c7401b281ac60df47933ad",
     "included_prs": [
       1172,
       1173,
@@ -192,11 +192,15 @@
       1181,
       1182
     ],
-    "status": "Eight reviewed PRs combined; credential-free offline suite running; six-PR266-test PASS only applies5906e87155",
+    "status": "PASS:4961passes/4455skips credential-free offline full-suite at eight-PR head; separate six-PR266data-focused PASS",
     "public_prs_merged": false,
     "test_session": 23070,
-    "completed": false,
+    "completed": true,
     "last_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
-    "unit_session": 28550
+    "unit_session": 28550,
+    "unit_exit_code": 0,
+    "unit_passed": 4961,
+    "unit_skipped": 4455,
+    "unit_seconds": 140.842
   }
 }

@@ -175,14 +175,14 @@
       "issue": 1118,
       "head": "9e698a3677da8097da42fec90c90525cdaaf3e68",
       "review": "PASS at286108;58focused+6independentcontrols; report-only descendant confirmed",
-      "ci": "in progress; run39654218629"
+      "ci": "success;run39654218629"
     },
     {
       "number": 1182,
       "issue": 1077,
       "head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
       "review": "PASS230tests/source/Code/Feature/hash; runtime3f520 plus doc-only descendantPASS",
-      "ci": "in progress;run39654667663"
+      "ci": "success;run39654667663"
     }
   ]
 }
