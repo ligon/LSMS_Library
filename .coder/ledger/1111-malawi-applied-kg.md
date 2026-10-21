@@ -43,7 +43,7 @@ Addresses #1111; does not close the whole issue.
 - Full numeric inorganic Quantity sum remains 2,899,339.95. Expected N delta is approximately +187,959.85248 kg under unchanged factors/shares; report measured floating precision.
 - No framework/dependency/fixture/golden/curation change, no application axis, no missing-unit #1118 repair, no seed-purchase unit repair.
 - Sanctioned held-only readers, physically private L1/L2, active socket guard plus unshare -rn; exact checkout/import/config identity, mounted image Python, numeric/build/make threads 1, at most four loadfile workers.
-- Actual baseline/candidate normal target-cold and fresh-process warm proofs; healthy current-hash Uganda comparator; scanner findings individually reconciled; all549 source-table hashes and39 framework fingerprints measured.
+- Actual baseline/candidate normal target-cold and fresh-process warm proofs; healthy current-hash Uganda comparator; scanner findings individually reconciled; all 549 API table hashes and 39 framework fingerprints measured.
 - Separate #1109 composition proof is root-owned after freeze/integration or explicit approval of an isolated combined country configuration. Do not edit or silently inherit reviewed de9 code.
 
 ## §5 Reuse decisions
@@ -54,7 +54,7 @@ Addresses #1111; does not close the whole issue.
 | Fertilizer u | Extend driver projection | Typed Kilogramme constant before unchanged assembly; timing is not a unit |
 | Grouping | Reuse | Existing additive full-key contract, not a new grain policy |
 | Organic / missing units / purchases | Reuse unchanged | Independent issues and explicit branch boundary |
-| Cache invalidation | Reuse hashes | Wave script-only input edits should be narrow; measure actual inventory |
+| Cache invalidation | Reuse hashes | Actual measurement changes all26 Malawi hashes: Wave._input_hash folds every wave Python input into every table; no framework or other-country change |
 
 ## §6 Open decisions
 
@@ -64,4 +64,31 @@ Root handles live issue/PR and separate composition after this lane freezes for 
 
 ## Phase 3 verification
 
-Pending implementation and measured evidence. Sue (GPT-6).
+Implementation uses the existing source-selected totals, typed kg labels and unchanged reducer (§2-4).
+Actual hash scope disproves the frozen read-only diagnosis's tentative narrower-footprint hypothesis.
+The existing `Wave._input_hash`, `lsms_library/country.py:1317-1328`, says "content-hash EVERY build INPUT in the wave + country _/ dirs" and executes:
+
+```python
+for d in (wave_dir, self.country.file_path / "_"):
+    if not d.is_dir():
+        continue
+    for p in sorted(d.glob("*")):
+        if p.suffix.lower() in _BUILD_INPUT_SUFFIXES:
+            parts.append(f"binp:{p.name}=" + (cached_file_hash(p) or "none"))
+```
+
+Consequently all 26 Malawi API hashes change: 22 nonderived entries and four runtime-derived entries (`food_expenditures`, `food_prices`, `food_quantities`, `household_characteristics`).
+The complete 549-key f8 inventory exactly matches the independent frozen Burkina #1123 baseline, including values; all 523 other-country hashes and all 39 framework fingerprints remain exact.
+Earlier 22-key receipts are not rewritten or silently reinterpreted here.
+Normal candidate flow rebuilt the unchanged sample prerequisite across all five held waves, without a read-gate bypass, assumed-fresh serve or stale re-stamp.
+Separate physically fresh f8 and candidate all-wave sample builds produce identical complete frames/dtypes/attrs, all six sample cache frames, and all 18 complete categorical warning records; fresh-process warm serving makes zero L2 writes.
+The main target-cold candidate's six categorical events are pre-existing source-label omissions, not new source losses; their reported columns are unused by sample and remain raw on decoder failure.
+
+Independent source expectations account for 33,193 selected application slots and 1,765,763.95 kg in these two waves.
+All 235 newly coalesced pairs preserve each source contribution, the exact existing sum, and every other payload/null mask; all other frames/attrs/dtypes and f8's 11,075 organic zero rows remain exact.
+Normal Country rows are 180,184 -> 179,949 (nonorganic subset 169,109 -> 168,874); inorganic numeric Quantity remains 2,899,339.95.
+The unchanged nitrogen calculation gives 840,235.7795800001 -> 1,028,195.63206 kg, a binary-float delta 187,959.85247999988, within 1.17e-10 of the expected decimal delta.
+Actual-driver negatives: baseline 10 fail / 2 pass, candidate 12 pass, dangerous late-label mutant 12 fail; bounded regressions 101 pass.
+All 15 scanner records are individually reconciled in the report, with no new finding; phase 2 has no plot_inputs kwargs in the actual harness.
+Source-safe receipts and runnable commands: `slurm_logs/isa_backlog_2026-10-21/Malawi/1111/`.
+Root-owned #1109 composition remains pending; this branch has not inherited de9 organic code. Sue (GPT-6).
