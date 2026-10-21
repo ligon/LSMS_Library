@@ -662,13 +662,15 @@ The v0.16.0 release is complete; the eight-country backlog goal is active.
 See =slurm_logs/isa_backlog_2026-10-21/STATUS.org= and =country-lanes.json=.
 
 PR #1170 is the draft campaign evidence.
-Six independently reviewed country PRs await human merge:
+Seven independently reviewed country PRs and one shared fix await human merge:
 - Nigeria #1034: PR #1172, head =3e6582987=, 78 focused tests and CI passed; earlier runtime/source snapshot =6fda46bc= remains preserved.
 - Uganda #1062: PR #1173, head =4ef24fb=; partial-cache/Make defect in the first candidate was fixed and independently re-reviewed.
 - Malawi #1109: PR #1175, head =de9c2734b=; 72 original-baseline tests, actual source quantities/units and public-finalizer conservation verified. Residual #1174.
 - Niger #1088: PR #1176, head =d602f8d63=; 67 tests, cold/warm source conservation and scoped Feature audit passed.
 - Mali #822: PR #1180, head =aba2badfe=; independent 39-test/source/old-obs3/cold/warm PASS at runtime =23d338e50=. Residual #1179; CI run =39649319628= passed.
-All six GitHub PR CI runs passed. This does not claim a credentialed corpus rebuild.
+- Ethiopia #1118: PR #1181, head =9e698a367=; independent 58 focused tests plus six controls, source/cold/warm/Feature/hash PASS at runtime =286108cf7=. Documentation-only descendant confirmed; CI =39654218629= running.
+- Shared #1077: PR #1182, head =780f67986=; independent 230 tests and complete source/Code/Feature/cache PASS at runtime =3f520e09f=. Documentation-only descendant confirmed; CI =39654667663= running.
+The first six GitHub PR CI runs passed. This does not claim a credentialed corpus rebuild.
 No public PR is merged automatically.
 
 Nigeria #1144 passed independent full review at =1e6111e2b= (116 tests, zero skips).
@@ -680,16 +682,22 @@ Mali #822 independent review passed; both source runtime and documentation-only 
 Burkina_Faso #1148 diagnosis is frozen at =a63d26d7f= and merged into this documentation branch only.
 Live #1148/#851 now distinguish source conflicts and unknowns from approved Phase II integration.
 No production denominator or replacement historical percentage was chosen.
-Ethiopia #1118 froze at =286108cf7= after author58tests/cold-warm/source-use proof; independent reviewer =mali_lane= is active in =isa-review-1118-Ethiopia=.
+Ethiopia #1118 review is FINAL PASS at =286108cf7=; the report-only descendant =9e698a367= is published as PR #1181.
+Ethiopia source-grounded purchase-answer and all-missing purchase-sum residuals are filed as #1183 and #1184, respectively; they do not block the unit fix.
+Reviewer =mali_lane= now diagnoses Mali #1121 labor-source casing, read-only in the country lane; implementation needs root-approved boundary and a separate focused checkout.
 Tanzania #1118 froze at =0c8d9645ec35d65eb252fc6abcd7e7c2e777b89b= after normal cold/fresh-warm proofs, final 16 new tests and an earlier broader 243-test selection.
 Independent reviewer =review_malawi_1109= is active in =isa-review-1118-Tanzania=; all 9,698 rows remain, exactly 408 units change.
 Supporting unchanged all-wave sample builds are allowed held-only; no hidden stale-sample bypass.
 The six existing mixed-unit duplicate groups remain unchanged for #637; reconcile the aggregate source evidence after independent review.
 The Tanzania ledger's old "No 2008-15 edits or rebuilds" wording needs a documentation-only qualification for the authorized supporting sample rebuild.
-Shared #1077 froze at =3f520e09ff2d21501e30d8ac657f7f8ea571152d=; independent reviewer =niger_lane= is active in =isa-review-1077=.
-Author 230 tests passed; independent 230-test and held-source checks are passing, with final audit accounting pending.
-The pre-existing Uganda CONTENTS claim that per-wave unit columns are unused at runtime needs qualification: the build decoder ignores them, but query-time label selection can use them.
-Validation-only integration branch =isa/integration-20261021= at =5906e8715= combines six reviewed PRs.
+Shared #1077 full review passed at =3f520e09ff2d21501e30d8ac657f7f8ea571152d=; the documentation-only descendant =780f67986= also passed narrow tree/all549hash/all39fingerprint confirmation.
+The corrected Uganda CONTENTS now distinguishes the build decoder from query-time label selection.
+Reviewer =niger_lane= now diagnoses Burkina_Faso #1123 destructive plot-input collapse, read-only; no implementation approved yet.
+Validation-only integration branch =isa/integration-20261021= at =dd0dddcb0= combines eight reviewed PRs after adding Ethiopia and shared1077.
+Credential-free offline full-suite execution =28550= is active against that immutable head with16loadfileworkers and private empty data/config roots.
+Launcher and private logs/XML: =control/isa-backlog-20261021/integration/unit-eight-prs/=.
+Do not mutate the integration tree while its pytest children are running.
+The completed 266-test result below belongs to the preceding six-PR head =5906e8715=; do not relabel the eight-PR head as tested yet.
 A physically private 1,519-file L2 and 2,733-blob held ISA L1 were prepared; no acquisition.
 The 11-file cohort selection PASSED266tests with zero skips/failures/errors in corrected exec session =23070= under eight loadfile workers.
 The initial =10257= launcher stopped before tests on an incorrect socket-class assertion; terminal failure evidence is retained.
@@ -697,7 +705,7 @@ Private log/XML under =control/isa-backlog-20261021/integration/=; safe summary 
 The #1077 guard has a genuine Uganda build caller: 28 Uganda hashes move; 521 other-country hashes and 39 tagged fingerprints stay unchanged.
 A guard-only candidate invented labels for actual null inputs through missing lookup keys; root approved filtering only actual-null source rows before dictionary construction.
 Keep original nonmissing/literal-string mappings and targets unchanged; verify no fabricated labels before publication.
-Ethiopia reviewer also identified a separate possible missing-purchase-flag conversion; source counts and quantity/retention effects are being checked before any residual filing. Leave #1118 unchanged.
+The source-grounded Ethiopia residuals have independent synthetic reproductions and exact separate caller/grouping effects; preserve both boundaries when diagnosing future fixes.
 Rotate through three workers beside root; keep each review snapshot immutable.
 
 Private source/frame/log evidence is under =/local/job40255479/control/isa-backlog-20261021/=.

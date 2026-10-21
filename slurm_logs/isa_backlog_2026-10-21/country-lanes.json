@@ -6,29 +6,40 @@
     "Burkina_Faso": {
       "path": "/local/job40255479/worktrees/isa-Burkina_Faso",
       "branch": "isa/Burkina_Faso-20261021",
-      "status": "diagnosis-complete-source-adjudication-pending",
-      "owner": "burkina_lane",
+      "status": "diagnosis-next-issue",
+      "owner": "niger_lane",
       "initial_issue": 1148,
       "dependency": "Approved #851 Phase II is not implemented at baseline; source-status evidence remains conflicting",
       "frozen_head": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb",
       "result": "Source-status evidence contradictions and unknown masks recorded; production unchanged",
-      "next_issue": 1123
+      "next_issue": 1123,
+      "active_issue": 1123,
+      "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1123",
+      "previous_issue_status": "1148 diagnosis source-adjudication pending; production unchanged"
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
       "branch": "isa/Ethiopia-20261021",
-      "status": "independent-review",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "review_nigeria_1034",
       "initial_issue": 1118,
       "scope": "Ethiopia missing plot-input units only; standing U_UNKNOWN ruling",
       "diagnosis_rows": 180900,
       "missing_unit_rows": 37370,
       "approved_boundary": "Final u null/whitespace-only -> existing U_UNKNOWN; every Applied use-only row and non-unit payload preserved",
-      "frozen_head": "286108cf7ecc1a6e1e07150b8eec8411f5326b05",
+      "frozen_head": "9e698a3677da8097da42fec90c90525cdaaf3e68",
       "review_path": "/local/job40255479/worktrees/isa-review-1118-Ethiopia",
       "reviewer": "mali_lane",
       "author_tests_passed": 58,
-      "documentation_head": "9e698a3677da8097da42fec90c90525cdaaf3e68"
+      "documentation_head": "9e698a3677da8097da42fec90c90525cdaaf3e68",
+      "runtime_review_head": "286108cf7ecc1a6e1e07150b8eec8411f5326b05",
+      "review_verdict": "PASS;58focused+6independent controls, zero skips; documentation-only descendant confirmed",
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1181",
+      "ci": "in progress; run39654218629",
+      "residual_issues": [
+        1183,
+        1184
+      ]
     },
     "Malawi": {
       "path": "/local/job40255479/worktrees/isa-Malawi",
@@ -52,7 +63,7 @@
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
       "branch": "isa/Mali-20261021",
-      "status": "reviewed-pr-awaiting-human",
+      "status": "diagnosis-next-issue",
       "owner": "mali_lane",
       "initial_issue": 822,
       "frozen_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
@@ -62,7 +73,11 @@
       "runtime_review_head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1180",
       "residual_issue": 1179,
-      "ci": "success; run39649319628"
+      "ci": "success; run39649319628",
+      "active_issue": 1121,
+      "active_owner": "mali_lane",
+      "previous_issue_status": "822 reviewedPR1180 awaitinghuman",
+      "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Mali/1121"
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -148,32 +163,40 @@
       "path": "/local/job40255479/worktrees/isa-framework-1077",
       "branch": "fix/1077-nonfinite-label-keys-20261021",
       "owner": "triage_east",
-      "status": "independent-review",
+      "status": "reviewed-pr-awaiting-human",
       "scope": "Finite numeric-label-key guard; country configuration untouched",
       "precode_ledger": "3e9b7dd0a",
       "cache_scope": "28 Uganda hashes move through existing build import; 521 others and39tagged unchanged",
       "additional_finding": "Finite guard alone permits null-input label fabrication; source-null rows must be filtered before lookup construction",
-      "frozen_head": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+      "frozen_head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
       "reviewer": "niger_lane",
       "review_path": "/local/job40255479/worktrees/isa-review-1077",
-      "author_tests": 230
+      "author_tests": 230,
+      "runtime_review_head": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+      "review_verdict": "PASS;230tests,zero skips;source/default/Code/Feature/cache;doc-only descendantPASS",
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1182",
+      "ci": "in progress; run39654667663"
     }
   },
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
+    "head": "dd0dddcb0",
     "included_prs": [
       1172,
       1173,
       1175,
       1176,
       1178,
-      1180
+      1180,
+      1181,
+      1182
     ],
-    "status": "PASS:266tests zero skips/failures/errors across11files",
+    "status": "Eight reviewed PRs combined; credential-free offline suite running; six-PR266-test PASS only applies5906e87155",
     "public_prs_merged": false,
     "test_session": 23070,
-    "completed": true
+    "completed": false,
+    "last_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
+    "unit_session": 28550
   }
 }

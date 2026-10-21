@@ -21,7 +21,8 @@ Shared framework changes require a separate coordinated lane.
 The #1077 numeric-label-key fix is in that lane, leaving country configurations untouched.
 Its existing Uganda build caller moves 28 Uganda hashes; the tagged fingerprints and other countries stay unchanged.
 A finite guard alone fabricated labels for null inputs; the lookup must first discard rows with missing source keys.
-The complete candidate at =3f520e09f= passed 230 author tests and exact Uganda default/cold/warm proofs; independent review is active.
+The complete runtime at =3f520e09f= passed independent review: 230 tests, exact Uganda default/cold/warm proofs, successful Code selection and complete Feature-finding accounting.
+PR [[https://github.com/ligon/LSMS_Library/pull/1182][1182]] at =780f67986= adds a separately reviewed documentation-only qualification; CI is running.
 =country-lanes.json= records paths, owners, frozen heads, review verdicts and PRs.
 
 | Country | Current result or next step |
@@ -30,9 +31,9 @@ The complete candidate at =3f520e09f= passed 230 author tests and exact Uganda d
 | Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. |
 | Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. |
 | Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. |
-| Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report. Exact unknown masks and genuine policy/source questions are documented. Production unchanged; #851 integration remains pending. |
-| Ethiopia | Country-scoped #1118 diagnosis confirmed 37,370 use-only null-unit rows out of 180,900; author validation passed 58 tests at =286108cf7=; independent review active, including a documentation-only reproduction amendment =9e698a367=. #1171 remains the separate nutrition follow-up. |
-| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI passed. Residual #1179 owns unresolved units. |
+| Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report. Exact unknown masks and genuine policy/source questions are documented. Production unchanged; #851 integration remains pending. A separate #1123 destructive-input-collapse diagnosis is active. |
+| Ethiopia | #1118 independent review passed 58 focused tests and six reviewer controls, source/cold/warm/Feature conservation and full fingerprint checks. PR [[https://github.com/ligon/LSMS_Library/pull/1181][1181]] at =9e698a367= preserves 180,900 rows and normalizes 37,370 units. CI is running. #1171 remains the separate nutrition follow-up. |
+| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI passed. Residual #1179 owns unresolved units. Diagnosis of the separate #1121 labor-source casing is active. |
 | Tanzania | #1118 normalization frozen at =0c8d9645e=: 408 missing units among 9,698 retained rows. Final 16 new tests pass; the earlier broader selection passed 243. Independent review is active in =isa-review-1118-Tanzania=. Preserve UPHI back-casting and live WAITING caveats. |
 
 * Evidence that changed the fixes
@@ -71,6 +72,10 @@ The historical impact percentages are not a verified status-based remeasurement.
 #1171 splits the Ethiopia nutrition Make-prerequisite diagnosis from #1062; no live Ethiopia corruption is claimed.
 #1062 now describes the reviewed Uganda implementation and completed current source census; dangling non-ISA derived-food recipes remain #218.
 No PR has been merged automatically.
+Ethiopia source review split missing seed-purchase answers (#1183) from all-missing holder/crop purchase sums (#1184).
+Both behaviors predate the unit fix; source-routing and retention questions must be diagnosed separately.
+The full-output missing-flag effects are 4,426 W1 and 60 W2 rows; the narrower original positive-control subset was 4,421 W1 plus 60 W2.
+The unchanged-decoder W2 all-missing-sum effect is 265 source groups / 187 attached amounts, with no row loss under that grouping-only diagnostic.
 
 * Resources and reproducibility
 
