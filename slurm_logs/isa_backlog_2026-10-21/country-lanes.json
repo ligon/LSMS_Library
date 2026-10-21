@@ -6,7 +6,7 @@
     "Burkina_Faso": {
       "path": "/local/job40255479/worktrees/isa-Burkina_Faso",
       "branch": "isa/Burkina_Faso-20261021",
-      "status": "implementing-approved-source-projection",
+      "status": "independent-review-active",
       "owner": "niger_lane",
       "initial_issue": 1148,
       "dependency": "Approved #851 Phase II is not implemented at baseline; source-status evidence remains conflicting",
@@ -46,8 +46,13 @@
       "diagnosis_verdict": "COMPLETE; 4180 coordinate pairs on 7350 retained parcels, not 8467 raw rows; 1117 null parcel placeholders excluded; no coordinate headers in held Mali/Niger/Senegal extracts",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058-fix",
       "active_precode_ledger": "b5ced85c571bc4d5b430371d1f92ace336c24a3f",
-      "active_runtime_head": "7eee549b1",
-      "active_author_status": "Baseline15newtests:12fail/3pass; existing13+fullcold/warm baseline/hash inventory exact; candidate final cold verification active after preserved private native-vs-union-column proof mismatch"
+      "active_runtime_head": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
+      "active_author_status": "Final clean/quiescent FS-published;36pass0skip, baseline12fail/3pass, source/full13frames/Feature/hash/scanner/freshwarm proof complete",
+      "active_frozen_head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "active_reviewer": "mali_lane",
+      "active_review_path": "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso",
+      "active_private_review": "/local/job40255479/control/isa-backlog-20261021/review-1058-Burkina_Faso",
+      "active_review_status": "Independent review active; no PASS or PR claimed yet"
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
@@ -291,7 +296,7 @@
     "1081": {
       "path": "/local/job40255479/worktrees/isa-framework-1081-fix",
       "branch": "fix/1081-preserve-categorical-errors-20261021",
-      "status": "approved-bounded-implementation",
+      "status": "author-runtime-verification-active",
       "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "scope": "Explicit three existing typed categorical errors: minimal imports/two bare re-raise clauses only; UnitsUnavailable byte-exact and generic/Feature/label policies unchanged",
       "dedup": "Live issue/zero comments and100recent userPRs checked; no implementation match",
@@ -306,7 +311,16 @@
         "errors": 0
       },
       "diagnosis_existing_tests_passed": 162,
-      "diagnosis_handler_probes": 166
+      "diagnosis_handler_probes": 166,
+      "precode_ledger": "12346145ab715c28b604f3cc8cdfba7d82db7072",
+      "runtime_head": "ca3e5cc119896983b49f50a6b9dade6a5f825131",
+      "author_tests": 235,
+      "author_skips": 0,
+      "measured_API_hash_changes": 0,
+      "API_hashes_evaluated": 549,
+      "measured_framework_fingerprint_changes": 0,
+      "framework_fingerprints_evaluated": 39,
+      "author_status": "Ledger/runtime FS-published;235tests+166desired probes+5valuation controls pass; normal healthy full API/warm checks active; no final freeze or independent PASS yet"
     }
   },
   "integration": {
@@ -371,7 +385,7 @@
     "six_cohort_tested_head": "5906e87155e03e27cb493daaa2b8ec989516f3e2",
     "current_head_validation_owner": "review_nigeria_1034",
     "current_head_validation_path": "/local/job40255479/control/isa-backlog-20261021/integration/malawi-fourteen-review",
-    "current_head_validation_status": "Active against actual global13 baseline; exact two reviewed driver blobs and preserved organic helper root-verified before dispatch",
+    "current_head_validation_status": "Preparation terminal-success; actual global13/global14 Country/native/raw and matched parent expectations pass, organic/N/Uganda exact; final dedicated default Feature cold-entry/warm/129tests/oracle/scanner/freeze proof active",
     "eleven_increment": {
       "head": "7886f7ece49767b2357a2f559c474e0eb710561f",
       "verdict": "PASS",
