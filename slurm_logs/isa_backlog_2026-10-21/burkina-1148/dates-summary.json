@@ -1,0 +1,80 @@
+{
+  "emc2014_p2_revenus_27022014.dta": {
+    "date_columns": [
+      "A11",
+      "A11M",
+      "A11A"
+    ],
+    "households": 10621,
+    "complete_components": 10615,
+    "incomplete_components": 0,
+    "all_components_missing": 6,
+    "date_conflict_hh": 0,
+    "component_ranges": {
+      "A11": [
+        1.0,
+        31.0
+      ],
+      "A11M": [
+        4.0,
+        6.0
+      ],
+      "A11A": [
+        14.0,
+        14.0
+      ]
+    }
+  },
+  "emc2014_p2_transfert_recu_27022015.dta": {
+    "date_columns": [
+      "A11JOUR",
+      "A11MOIS",
+      "A11ANNEE"
+    ],
+    "households": 10621,
+    "complete_components": 10615,
+    "incomplete_components": 0,
+    "all_components_missing": 6,
+    "date_conflict_hh": 0,
+    "component_ranges": {
+      "A11JOUR": [
+        1.0,
+        31.0
+      ],
+      "A11MOIS": [
+        4.0,
+        6.0
+      ],
+      "A11ANNEE": [
+        14.0,
+        14.0
+      ]
+    }
+  },
+  "emc2014_p2_transfert_verse_27022015.dta": {
+    "date_columns": [
+      "A11JOUR",
+      "A11MOIS",
+      "A11ANNEE"
+    ],
+    "households": 10621,
+    "complete_components": 10615,
+    "incomplete_components": 0,
+    "all_components_missing": 6,
+    "date_conflict_hh": 0,
+    "component_ranges": {
+      "A11JOUR": [
+        1.0,
+        31.0
+      ],
+      "A11MOIS": [
+        4.0,
+        6.0
+      ],
+      "A11ANNEE": [
+        14.0,
+        14.0
+      ]
+    }
+  }
+}
