@@ -1,0 +1,43 @@
+{
+  "observed_at": "2026-10-21T16:14:41.742847+00:00",
+  "actions": [
+    {
+      "issue": 822,
+      "action": "narrowed to remaining2014-15 readings1-2 after independent duplicate/source review"
+    },
+    {
+      "issue": 1089,
+      "action": "closed duplicate of822; no implementation claimed",
+      "comment_url": "https://github.com/ligon/LSMS_Library/issues/1089#issuecomment-6320344229"
+    },
+    {
+      "issue": 1171,
+      "action": "opened Ethiopia diagnosis residual split from1062",
+      "parent_comment_url": "https://github.com/ligon/LSMS_Library/issues/1062#issuecomment-6320609557"
+    }
+  ],
+  "verified_issue_metadata": [
+    {
+      "number": 822,
+      "state": "OPEN",
+      "title": "Mali 2014-15 community_prices: restore readings 1-2 on the existing obs axis",
+      "updatedAt": "2026-10-21T15:56:36Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/822"
+    },
+    {
+      "number": 1089,
+      "state": "CLOSED",
+      "title": "Mali community_prices reads only relev\u00e9 3 of three",
+      "updatedAt": "2026-10-21T15:56:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1089"
+    },
+    {
+      "number": 1171,
+      "state": "OPEN",
+      "title": "Ethiopia nutrition: diagnose the legacy food_acquired Make prerequisite and unused FCT target",
+      "updatedAt": "2026-10-21T16:08:19Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1171"
+    }
+  ],
+  "implementation_prs_merged": 0
+}

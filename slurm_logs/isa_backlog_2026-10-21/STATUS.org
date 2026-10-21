@@ -50,4 +50,25 @@ Record exact residuals for partial work and human decisions/acquisition.
 
 No fix is claimed complete at this checkpoint.
 
+* Country ownership -- maintainer steering, 2026-10-21
+
+The maintainer requested country-specific worktrees and parallel ownership.
+Use one durable working lane per country so related issues share source knowledge, fixtures and a country rebuild.
+Nigeria, Malawi and Uganda are active; Burkina_Faso, Ethiopia, Mali, Niger and Tanzania have their own worktrees queued from the same baseline.
+The first three existing worktrees will move to country-named paths only after their owners report no running processes.
+Do not move a live checkout underneath a test or build.
+Keep focused issue/cohort commits and PRs; review immutable frozen commits in separate worktrees while a country lane advances.
+Shared framework edits remain a separate coordinated lane.
+The available collaboration interface supports three worker agents alongside the scrum master, so country lanes rotate through those slots.
+
+* Verification finding -- Malawi #1109
+
+The proposed one-line min_count fix passed synthetic tests but failed the actual cold API check.
+Making every all-missing Quantity nullable removed all 11,075 organic-use rows plus 437 other all-missing records at the API's dropna boundary.
+No passing/fixed claim was made.
+The revised country-scoped design reuses the existing optional Applied field to carry the explicitly reported organic-use flag, corrects organic Quantity only, and preserves nonorganic behavior pending source diagnosis.
+This needs new exact row/index and numeric controls before independent review.
+
+Sue
+
 Sue

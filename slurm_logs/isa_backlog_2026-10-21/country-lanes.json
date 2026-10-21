@@ -1,0 +1,58 @@
+{
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "worker_concurrency": 3,
+  "policy": "Country ownership; immutable separate review snapshots; no live worktree moves; shared framework changes separate",
+  "lanes": {
+    "Burkina_Faso": {
+      "path": "/local/job40255479/worktrees/isa-Burkina_Faso",
+      "branch": "isa/Burkina_Faso-20261021",
+      "status": "queued"
+    },
+    "Ethiopia": {
+      "path": "/local/job40255479/worktrees/isa-Ethiopia",
+      "branch": "isa/Ethiopia-20261021",
+      "status": "queued"
+    },
+    "Malawi": {
+      "path": "/local/job40255479/worktrees/isa-Malawi",
+      "branch": "isa/Malawi-20261021",
+      "status": "verification-before-move",
+      "owner": "triage_west",
+      "current_path": "/local/job40255479/worktrees/isa-1109",
+      "initial_issue": 1109
+    },
+    "Mali": {
+      "path": "/local/job40255479/worktrees/isa-Mali",
+      "branch": "isa/Mali-20261021",
+      "status": "queued"
+    },
+    "Niger": {
+      "path": "/local/job40255479/worktrees/isa-Niger",
+      "branch": "isa/Niger-20261021",
+      "status": "queued"
+    },
+    "Nigeria": {
+      "path": "/local/job40255479/worktrees/isa-Nigeria",
+      "branch": "isa/Nigeria-20261021",
+      "status": "independent-review",
+      "owner": "triage_east",
+      "frozen_head": "6fda46bc5437758bd650cf4016f0782a124281cf",
+      "review_path": "/local/job40255479/worktrees/isa-review-1034",
+      "initial_issue": 1034
+    },
+    "Tanzania": {
+      "path": "/local/job40255479/worktrees/isa-Tanzania",
+      "branch": "isa/Tanzania-20261021",
+      "status": "queued"
+    },
+    "Uganda": {
+      "path": "/local/job40255479/worktrees/isa-Uganda",
+      "branch": "isa/Uganda-20261021",
+      "status": "independent-review",
+      "owner": "triage_panel",
+      "frozen_head": "58ccfc2ca03644006a5ddcf6bd399de81a25a415",
+      "review_path": "/local/job40255479/worktrees/isa-review-1062",
+      "initial_issue": 1062
+    }
+  }
+}
