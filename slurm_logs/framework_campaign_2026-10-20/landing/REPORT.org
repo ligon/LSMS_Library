@@ -6,7 +6,7 @@
 The maintainer explicitly authorized the nine reviewed implementation PRs and evidence PR1158 after final validation.
 All nine implementation PRs are merged into development at =1933434b84de82ac72b3921a7fd8fe5c00154754=.
 GitHub, the local development-sync worktree and filesystem origin agree at that commit.
-Evidence PR1158 is being updated from this actual development tree and remains authorized for merge.
+Evidence PR1158 is also merged at =db00a79f17f841649f2b96827c5b9b4e858ce2f8=; its full tree equals the reviewed evidence publication4fd0c0ad5, and its changes are limited to326 campaign-report/handoff paths.
 
 | PR | Merge commit |
 |----+--------------|
@@ -33,12 +33,20 @@ New unit and Windows smoke checks passed before each retargeted PR merged.
 The earlier reviewed532 proof remains8,851 local passes and6,388 credentialed Linux passes, plus successful native Windows; the full semantic/corpus limitations remain unchanged.
 No duplicate full data run is needed for byte-identical runtime/test/build inputs.
 
-* Final development CI and durable live status
+* Completed development CI and report-only push filtering
 
-The implementation push workflow is [[https://github.com/ligon/LSMS_Library/actions/runs/39547934263][39547934263]] at193; it is still pending/in progress at this report snapshot.
-The final evidence merge also triggers development CI. Its actual merge SHA, workflow link and final result will be recorded in the durable PR1158 description after completion.
-That live record is [[https://github.com/ligon/LSMS_Library/pull/1158][PR1158]]; query GitHub for current development rather than treating this snapshot as the final workflow conclusion.
-PR-event data jobs and ordinary development data jobs are still skipped by policy; exact-source manual data evidence is recorded separately in ci-final-532.
+The last code-changing development workflow [[https://github.com/ligon/LSMS_Library/actions/runs/39547934263][39547934263]] at193 completed SUCCESS.
+Unit tests, Windows smoke, native Windows script build and DVC remote reachability all pass.
+The native log proves checkout193 and exact Uganda results: shocks14457rows/10columns/8waves/digest0ab2ea4c79dd; assets116808rows/1column/8waves/digest9202ed542a14.
+[[file:implementation-development-ci-final.json][Final job conclusions and private-log identity]].
+
+The evidence merge does NOT trigger another push workflow: every changed report/handoff path matches the existing workflow's paths-ignore.
+This corrects the earlier prediction of a final evidence-push run; no infrastructure failure or pending job is inferred from its absence.
+Its own fresh PR unit and Windows checks passed before merge.
+[[file:evidence-publication-verification.json][326-path GitHub scope check]], [[file:final-development-verification.json][merged evidence/source synchronization proof]].
+No executable/configuration/test/build/audit input changed after the successful code CI.
+Ordinary development and PR-event data jobs remain skipped by policy; exact532 manual data6388 passes are separate evidence and not an enforced PR data gate.
+The current final bookkeeping outcome is also recorded in [[https://github.com/ligon/LSMS_Library/pull/1158][PR1158]].
 
 * Scope and operations
 

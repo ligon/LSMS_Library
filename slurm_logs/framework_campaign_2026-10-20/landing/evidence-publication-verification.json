@@ -1,0 +1,9 @@
+{
+  "evidence_pr": 1158,
+  "head": "4fd0c0ad5f2f2e9ffbb4e3edc20a80e77422b91c",
+  "development_base": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+  "github_files": 326,
+  "all_paths_and_blobs_match_local": true,
+  "only_campaign_reports_and_handoff": true,
+  "no_runtime_test_config_build_change": true
+}
