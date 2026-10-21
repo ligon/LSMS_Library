@@ -22,13 +22,13 @@ Shared framework changes require a separate coordinated lane.
 
 | Country | Current result or next step |
 |---------+-----------------------------|
-| Nigeria | #1034 independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]], frozen =6fda46bc=; temporarily draft while a wider suite's W1-only label assumption is reproduced and strengthened. Original CI succeeded with credentialed data jobs skipped. #1144 source-backed quarter decoder now in implementation. |
+| Nigeria | #1034 PR [[https://github.com/ligon/LSMS_Library/pull/1172][1172]] at =3e6582987= passed 78 tests and CI. #1144 independent review passed 116 tests at =1e6111e2b=; a documentation-only correction is being confirmed before its stacked PR. |
 | Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. |
 | Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. |
-| Niger | #1088 cold/warm source-backed fix frozen =d602f8d63=; independent review active. |
-| Burkina_Faso | Worktree queued; source/recall and plot-key issues prioritised in triage. |
+| Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. |
+| Burkina_Faso | #1148 source-status diagnosis active. Held status carriers disagree with each other and the survey report; the current API is Phase I, with #851 implementation still pending. |
 | Ethiopia | Worktree queued; #1171 is the diagnosis-only sibling-prerequisite follow-up. |
-| Mali | Worktree queued; #822 narrowed to missing price readings, duplicate #1089 closed. |
+| Mali | #822 implementation in cold/warm validation: preserve three native observation slots and both passages; proposed recovery is 115,713 readings. Duplicate #1089 closed. |
 | Tanzania | Worktree queued; preserve documented UPHI back-casting and live WAITING caveats. |
 
 * Evidence that changed the fixes
@@ -49,6 +49,16 @@ Nigeria #1144 diagnosis found the W2 quarter table itself swaps PP/PH meanings f
 The unchanged-table proposal would introduce 2,135 new PH errors and was rejected.
 =1144-design.md= approves source-backed quarter corrections and retention of unqualified source labels instead of inferred freshness, shell or cob attributes.
 The complete no-argument crop/community mapping and Preferred/Aggregate curation remain invariants.
+Independent review reproduced all 20,499 raw item-key changes, exact raw measurements, disclosed derived and join effects, and complete Feature finding accounting (441 to 445 records; zero failures/errors/skips).
+The separate W4-PH qualifier diagnosis is [[https://github.com/ligon/LSMS_Library/issues/1177][#1177]].
+
+Mali #822 also found missing Stata unit dictionaries on two passage-2 reading columns.
+The approved design uses the same community instrument's recorded numeric codebook, without borrowing food units or changing existing eligibility.
+The unchanged exclusions for 129 positive-price rows with unplaced units require a separate diagnosis; their meaning is not inferred here.
+
+Burkina Faso #1148 cannot use food-row presence as an interview count.
+Accepted-status households can have no served food rows, nonaccepted statuses can coexist with positive expenditures, and retained carriers disagree with the official report.
+The historical impact percentages are not a verified status-based remeasurement.
 
 * Reconciliation
 

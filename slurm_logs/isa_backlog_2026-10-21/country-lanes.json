@@ -6,7 +6,10 @@
     "Burkina_Faso": {
       "path": "/local/job40255479/worktrees/isa-Burkina_Faso",
       "branch": "isa/Burkina_Faso-20261021",
-      "status": "queued"
+      "status": "read-only-source-diagnosis",
+      "owner": "burkina_lane",
+      "initial_issue": 1148,
+      "dependency": "Approved #851 Phase II is not implemented at baseline; source-status evidence remains conflicting"
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
@@ -35,38 +38,47 @@
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
       "branch": "isa/Mali-20261021",
-      "status": "queued"
+      "status": "implementation-validation",
+      "owner": "mali_lane",
+      "initial_issue": 822
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
       "branch": "isa/Niger-20261021",
-      "status": "independent-review",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "niger_lane",
       "initial_issue": 1088,
       "frozen_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
       "review_path": "/local/job40255479/worktrees/isa-review-1088",
-      "review_verdict": "pending"
+      "review_verdict": "PASS; 67 tests, zero skips",
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1176",
+      "ci": "GitHub PR CI success on d602f8d63; local source/data verification independent"
     },
     "Nigeria": {
       "path": "/local/job40255479/worktrees/isa-Nigeria",
       "branch": "isa/Nigeria-20261021",
-      "status": "implementing-next-issue",
+      "status": "reviewed-next-pr-preparation",
       "owner": "triage_east",
-      "frozen_head": "6fda46bc5437758bd650cf4016f0782a124281cf",
-      "review_path": "/local/job40255479/worktrees/isa-review-1034",
+      "frozen_head": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
+      "review_path": "/local/job40255479/worktrees/isa-review-1144",
       "initial_issue": 1034,
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1172",
-      "review_verdict": "PASS",
+      "review_verdict": "1144 PASS: 116 tests, zero skips; 1034 source and test PASS",
       "next_issue": 1144,
-      "ci": "GitHub PR CI success on frozen 6fda46bc; credentialed data jobs skipped",
-      "pr1172_draft_reason": "Wider suite exposed W1-only container-label assumption; separate stronger per-round test amendment being reproduced/reviewed. Runtime6f immutable.",
+      "ci": "PR1172 new-head CI success at3e658;78 local tests and independent review PASS",
       "test_amendment": {
         "head": "3e6582987",
         "review_path": "/local/job40255479/worktrees/isa-review-1034-v2",
-        "review": "pending",
+        "review": "PASS",
         "runtime_config_unchanged": true,
-        "GH1035_passed": 25
-      }
+        "GH1035_passed": 25,
+        "expanded_tests": 78,
+        "skipped": 0
+      },
+      "frozen_1034_head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "pr1172_state": "ready for human merge",
+      "documentation_head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "residual_issue": 1177
     },
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",

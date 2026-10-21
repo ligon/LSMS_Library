@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T16:44:19.694087+00:00",
+  "observed_at": "2026-10-21T17:39:00Z",
   "actions": [
     {
       "issue": 822,
@@ -38,6 +38,18 @@
     {
       "issue": 1109,
       "action": "source-corrected scope; independent original-baseline PASS, reviewed PR1175 pending human merge; residual1174 linked"
+    },
+    {
+      "issue": 1034,
+      "action": "preserved6f snapshot, independently reviewed test-only amendment3e658, fast-forwarded original PRhead; runtime/configall24hashesidentical; no public merge"
+    },
+    {
+      "issue": 1177,
+      "action": "Filed separate W4-PH qualifier diagnosis after independent #1144 review; 20 maize and 340 milk rows, no instrument or curation adjudication claimed"
+    },
+    {
+      "issue": 1088,
+      "action": "Independent source/cold/warm/Feature PASS; reviewed PR1176 pending human merge"
     }
   ],
   "verified_issue_metadata": [
@@ -68,9 +80,9 @@
     {
       "number": 1172,
       "issue": 1034,
-      "head": "6fda46bc5437758bd650cf4016f0782a124281cf",
-      "review": "PASS",
-      "ci": "success; credentialed data jobs skipped"
+      "head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "review": "Source PASS6f plus test-only amendment PASS3e658;78passed",
+      "ci": "success on3e658; returned ready after independent78-test review"
     },
     {
       "number": 1173,
@@ -84,6 +96,13 @@
       "issue": 1109,
       "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
       "review": "PASS vs originalf8",
+      "ci": "success; no credentialed corpus rebuild"
+    },
+    {
+      "number": 1176,
+      "issue": 1088,
+      "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "review": "PASS; 67 tests, zero skips",
       "ci": "success; no credentialed corpus rebuild"
     }
   ]
