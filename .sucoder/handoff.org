@@ -662,7 +662,7 @@ The v0.16.0 release is complete; the eight-country backlog goal is active.
 See =slurm_logs/isa_backlog_2026-10-21/STATUS.org= and =country-lanes.json=.
 
 PR #1170 is the draft campaign evidence.
-Four independently reviewed country PRs await human merge:
+Five independently reviewed country PRs await human merge:
 - Nigeria #1034: PR #1172, head =3e6582987=, 78 focused tests and CI passed; earlier runtime/source snapshot =6fda46bc= remains preserved.
 - Uganda #1062: PR #1173, head =4ef24fb=; partial-cache/Make defect in the first candidate was fixed and independently re-reviewed.
 - Malawi #1109: PR #1175, head =de9c2734b=; 72 original-baseline tests, actual source quantities/units and public-finalizer conservation verified. Residual #1174.
@@ -671,11 +671,13 @@ All four GitHub PR CI runs passed; this does not claim a credentialed corpus reb
 No public PR is merged automatically.
 
 Nigeria #1144 passed independent full review at =1e6111e2b= (116 tests, zero skips).
-A documentation-only correction at =a1ba246f5= is awaiting narrow confirmation; then publish a stacked PR based on #1172's branch.
+The documentation-only correction at =a1ba246f5= passed narrow review.
+Stacked PR #1178 is open against #1172's branch; CI run =39645861519= is in progress.
+After a human merges #1172, retarget #1178 to development; do not auto-merge.
 The live W4-PH qualifier residual is #1177; preserve the 20 maize and 340 milk rows until instrument adjudication.
 Mali #822 is in actual cold/warm validation, implementing the approved three-reading design in =822-design.md=.
 Burkina_Faso #1148 is read-only source-status diagnosis: retained carriers conflict with each other and the survey report; current baseline has no Phase II period API despite the old issue premise.
-Ethiopia and Tanzania worktrees remain queued.
+Ethiopia #1118 country-only missing plot-input unit diagnosis is active; Tanzania remains queued.
 Rotate through three workers beside root; keep each review snapshot immutable.
 
 Private source/frame/log evidence is under =/local/job40255479/control/isa-backlog-20261021/=.

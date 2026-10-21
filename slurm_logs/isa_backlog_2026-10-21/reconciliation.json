@@ -50,6 +50,10 @@
     {
       "issue": 1088,
       "action": "Independent source/cold/warm/Feature PASS; reviewed PR1176 pending human merge"
+    },
+    {
+      "issue": 1144,
+      "action": "Linked reviewed stacked PR1178 and source-backed W2 corrections; split W4-PH instrument qualifier diagnosis to1177, no merge or nutrition-feature claim"
     }
   ],
   "verified_issue_metadata": [
@@ -104,6 +108,16 @@
       "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
       "review": "PASS; 67 tests, zero skips",
       "ci": "success; no credentialed corpus rebuild"
+    },
+    {
+      "number": 1178,
+      "issue": 1144,
+      "head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "runtime_review_head": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
+      "review": "PASS; 116 tests, zero skips; documentation-only amendment PASS",
+      "base": "fix/1034-nigeria-w3-unit-labels-20261021",
+      "dependency_pr": 1172,
+      "ci": "in progress"
     }
   ]
 }
