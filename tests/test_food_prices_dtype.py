@@ -1,127 +1,60 @@
-"""Regression test: food_prices and food_quantities must return float64 columns.
+"""Runtime-derived food prices and quantities must have floating payloads.
 
-Root cause (fixed 2026-04-14): kgs_per_other_units.json contains mixed
-int/float/empty-string values.  pd.Series(dict) infers object dtype when
-values are mixed; divide/multiply on an object-typed Series produces object
-dtype in the result; to_parquet then converts object columns to string via
-astype('string[pyarrow]').  Fix: pd.to_numeric(..., errors='coerce') forces
-float64 before the arithmetic.
-
-This test reads the cached parquet directly (dtype check) AND exercises
-the Country API call (for the _finalize_result path) — skipped when the
-cache is absent.
+Mixed values in kg-factor inputs once produced object arithmetic that was
+serialized as strings. Check the canonical API payloads, not derived parquets:
+normal food_prices/food_quantities calls do not persist those tables.
 """
-import os
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
+import lsms_library as ll
 from lsms_library.paths import data_root
 
-pytestmark = pytest.mark.requires_s3
-
-
-# ---------------------------------------------------------------------------
-# Skip guard — both tests need the Uganda food_acquired cache to be warm
-# ---------------------------------------------------------------------------
 
 def _uganda_food_cache_exists() -> bool:
-    root = data_root("Uganda")
-    return (root / "var" / "food_prices.parquet").exists() or (
-        root / "var" / "food_acquired.parquet"
-    ).exists()
+    root = data_root("Uganda") / "var"
+    return all((root / f"{table}.parquet").is_file()
+               for table in ("food_acquired", "sample"))
 
 
-_SKIP_NO_CACHE = pytest.mark.skipif(
+def _assert_canonical_float(frame: pd.DataFrame, column: str) -> None:
+    # Reuse the existing predicate on required canonical fields (ledger sections 2-3).
+    assert not frame.empty, "Derived food table returned an empty DataFrame"
+    assert column in frame.columns, f"Missing canonical {column} column"
+    assert pd.api.types.is_float_dtype(frame[column]), (
+        f"{column} is {frame[column].dtype}; expected a floating dtype"
+    )
+
+
+@pytest.mark.requires_s3
+@pytest.mark.skipif(
     not _uganda_food_cache_exists(),
-    reason="Uganda food_prices / food_quantities parquet not cached; requires data build",
+    reason="Requires cached Uganda food_acquired and sample source tables",
 )
-
-# Expected float64 columns for each table
-_PRICE_COLS = [
-    "market",
-    "farmgate",
-    "market_away",
-    "market_home",
-    "market_own",
-    "unitvalue_away",
-    "unitvalue_home",
-    "unitvalue_inkind",
-    "unitvalue_own",
-]
-
-_QUANTITY_COLS = [
-    "quantity_away",
-    "quantity_home",
-    "quantity_inkind",
-    "quantity_own",
-]
+@pytest.mark.parametrize("table,column", [
+    ("food_prices", "Price"),
+    ("food_quantities", "Quantity"),
+])
+def test_uganda_food_api_dtype_float(table, column):
+    country = ll.Country("Uganda", preload_panel_ids=False, verbose=False)
+    _assert_canonical_float(getattr(country, table)(), column)
 
 
-# ---------------------------------------------------------------------------
-# Cache-level dtype test (reads parquet directly; bypasses _finalize_result)
-# ---------------------------------------------------------------------------
-
-@_SKIP_NO_CACHE
-def test_food_prices_cache_dtype_float64():
-    """Cached food_prices.parquet must store numeric columns as float64, not string."""
-    path = data_root("Uganda") / "var" / "food_prices.parquet"
-    try:  # the read is the check; a concurrent rebuild may delete it (GH #778)
-        df = pd.read_parquet(path)
-    except FileNotFoundError:
-        pytest.skip("food_prices.parquet not in cache (absent, or mid-rebuild)")
-    for col in _PRICE_COLS:
-        if col in df.columns:
-            assert pd.api.types.is_float_dtype(df[col]), (
-                f"food_prices column '{col}' is {df[col].dtype}; expected float64. "
-                "Root cause: kgs_per_other_units.json mixed-type values produce object "
-                "dtype in pd.Series(dict), which to_parquet converts to string."
-            )
+@pytest.mark.parametrize("column", ["Price", "Quantity"])
+@pytest.mark.parametrize("fault", ["missing", "object", "string"])
+def test_canonical_float_rejects_invalid_payload(column, fault):
+    if fault == "missing":
+        frame = pd.DataFrame({"unrelated": [1.0]})
+    elif fault == "object":
+        frame = pd.DataFrame({column: pd.Series([1.0], dtype=object)})
+    else:
+        frame = pd.DataFrame({column: pd.Series(["1.0"], dtype="string")})
+    with pytest.raises(AssertionError):
+        _assert_canonical_float(frame, column)
 
 
-@_SKIP_NO_CACHE
-def test_food_quantities_cache_dtype_float64():
-    """Cached food_quantities.parquet must store numeric columns as float64, not string."""
-    path = data_root("Uganda") / "var" / "food_quantities.parquet"
-    try:  # the read is the check; a concurrent rebuild may delete it (GH #778)
-        df = pd.read_parquet(path)
-    except FileNotFoundError:
-        pytest.skip("food_quantities.parquet not in cache (absent, or mid-rebuild)")
-    for col in _QUANTITY_COLS:
-        if col in df.columns:
-            assert pd.api.types.is_float_dtype(df[col]), (
-                f"food_quantities column '{col}' is {df[col].dtype}; expected float64."
-            )
-
-
-# ---------------------------------------------------------------------------
-# API-level dtype test (exercises Country.__getattr__ + _finalize_result)
-# ---------------------------------------------------------------------------
-
-@_SKIP_NO_CACHE
-def test_food_prices_api_dtype_float64():
-    """Country('Uganda').food_prices() must return float64 price columns."""
-    import lsms_library as ll
-    uganda = ll.Country("Uganda", preload_panel_ids=False, verbose=False)
-    fp = uganda.food_prices()
-    assert not fp.empty, "food_prices() returned empty DataFrame"
-    for col in _PRICE_COLS:
-        if col in fp.columns:
-            assert pd.api.types.is_float_dtype(fp[col]), (
-                f"food_prices() column '{col}' is {fp[col].dtype}; expected float64."
-            )
-
-
-@_SKIP_NO_CACHE
-def test_food_quantities_api_dtype_float64():
-    """Country('Uganda').food_quantities() must return float64 quantity columns."""
-    import lsms_library as ll
-    uganda = ll.Country("Uganda", preload_panel_ids=False, verbose=False)
-    fq = uganda.food_quantities()
-    assert not fq.empty, "food_quantities() returned empty DataFrame"
-    for col in _QUANTITY_COLS:
-        if col in fq.columns:
-            assert pd.api.types.is_float_dtype(fq[col]), (
-                f"food_quantities() column '{col}' is {fq[col].dtype}; expected float64."
-            )
+@pytest.mark.parametrize("column", ["Price", "Quantity"])
+@pytest.mark.parametrize("dtype", ["float64", "Float64"])
+def test_canonical_float_accepts_float_payload(column, dtype):
+    frame = pd.DataFrame({column: pd.Series([1.0], dtype=dtype)})
+    _assert_canonical_float(frame, column)
