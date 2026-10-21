@@ -1,0 +1,25 @@
+#+TITLE: Independent scope audit of published follow-up drafts
+#+AUTHOR: Sue
+#+DATE: 2026-10-20
+
+PASS for the four published draft heads.
+
+| PR | Head | Base | Paths | Result |
+|----+------+------+-------+--------|
+| 1161 | 6553e01d6 | development | 17 | Exact paths/blobs match reviewed nutrition worker98822 |
+| 1162 | f7eb194d7 | integration/framework-v016-40255479 | 11 | Exact paths/blobs match reviewed cache worker |
+| 1163 | 44f6cd2e7 | integration/framework-v016-40255479 | 39 | Exact paths/blobs match reviewed provenance worker |
+| 1164 | 45f80dcb5 | integration/framework-v016-40255479 | 12 | Exact paths/blobs match reviewed pooled-reducer worker |
+
+Every GitHub changed-file blob SHA was compared with the corresponding reviewed local worker blob, 79 files total.
+No missing/extra file or original-five fix buried in a follow-up diff was found.
+All four drafts have the expected branch/base/head identities.
+The nutrition fresh-development publication has the same 17 changed file bytes as its original worker, and the path preimages at ad1 and852 were independently identical.
+No executable test, source/branch/worktree change, commit or GitHub mutation was performed by this auditor.
+
+PR checks were in progress at the retained read-only API snapshot; their skipped data/native jobs are not passes.
+Parent separately reports exact4cab combined unit/windows-smoke success, native/data checks active, final local full suite pending, and farm/real pooled checks complete without new structural findings.
+No merged/CI/release outcome is inferred from this scope audit.
+See [[file:scope-audit.json]], [[file:published-prs.json]] and [[file:plan.json]].
+
+Sue.

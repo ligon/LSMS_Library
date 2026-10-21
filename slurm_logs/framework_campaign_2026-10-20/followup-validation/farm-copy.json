@@ -1,0 +1,11 @@
+{
+  "source": "/local/job40255479/followup-suite-data",
+  "target": "/local/job40255479/followup-farm-data",
+  "files": 1519,
+  "bytes": 341221428,
+  "bytes_match_prepared_manifest": true,
+  "all_l2_inodes_distinct": true,
+  "source_size_mtime_inode_unchanged": true,
+  "only_symlink": "dvc-cache",
+  "state": "prepared; no API executed"
+}

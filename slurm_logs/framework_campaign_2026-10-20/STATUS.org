@@ -144,9 +144,17 @@ Follow-up checkpoint:
 
 All four follow-up increments are integrated and frozen at =4cab5f0db7d375ad543e652f61f43bd28fa94ecd= on =integration/framework-followup-40255479=, published to GitHub and filesystem origin.
 The new physical 1,519-file copy of the frozen852 corpus is assigned to the sixteen-worker full suite, with a separate physical copy for scoped farm audit and pooled-reducer checks.
-Those checks are now authorized to run at the exact frozen source; no result is claimed while pending.
-GitHub [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][manual run39531148624]] is queued on that exact head, including credentialed Linux data tests and native Windows.
+The exact4cab full suite and scoped farm checks have completed successfully; aggregate evidence is linked below.
+GitHub [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][manual run39531148624]] runs that exact head: unit, Windows smoke and native Windows pass; credentialed Linux remains running.
 Original integration852 and its failed CI evidence remain unchanged.
+
+The exact4cab local suite passes:8764 passed,276 skipped,nine expected failures,one non-strict unexpected pass,1222 warnings,zero failures/errors or credential skips in765.96seconds.
+All16 workers reported and source stayed unchanged.
+Independent parent XML comparison confirms198 new passing cases,five replaced/renamed prior passing cases,nine skip-to-pass transitions,and no other outcome change; all expected-failure identities remain the same.
+No new skip or changed remaining skip/xfail reason appears.
+The candidate XPASS is directly observed as Pakistan cluster-grain; its exact baseline XPASS identity remains unavailable from the old JUnit.
+All18 exported artifacts pass manifest verification; raw logs/XML/events/findings remain private.
+[[file:followup-validation/REPORT.org][Full follow-up validation]], [[file:followup-validation/parent-case-reconciliation.json][independent parent case accounting]].
 
 Follow-up review PRs are published as drafts:
 
@@ -176,6 +184,16 @@ This is an untagged development artifact with existing image dependencies, not a
 
 The reducer review separately reproduces inherited [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]]: fertilizer_rate discards country again in its numerator/area grouping.
 It produces the same erroneous pooled rate on both old/new sources; no rate implementation was included in the approved two-reducer fix.
+
+* Additional approved correctness fix -- #1160
+
+After the independent rate counterexample, the maintainer explicitly approved fixing #1160 before0.16.0 using the same country-preserving rule.
+framework_reliability owns the new isolated =/local/job40255479/worktrees/1160-pooled-rate=, branch =fix/1160-pooled-rate-40255479=, based on frozen4cab.
+Country must remain in both numerator and area/output identity, with explicit refusal for mismatched country-axis presence and null labels; country-less behavior, nutrient shares and parcel policy stay unchanged.
+The agent must reuse existing reducers/key helpers, pin both nutrient/land modes and column/index/collision/empty controls, provide untouched-base failures, measure complete hash impact and stop all writers before independent review.
+windows_ci will independently review the final frozen worker source; no executable review starts before that freeze.
+No #1160 implementation or final validation result is claimed yet, and the4cab evidence remains an exact earlier-batch control.
+No further merge or release authorization has arrived.
 
 * Environment and reproducibility
 

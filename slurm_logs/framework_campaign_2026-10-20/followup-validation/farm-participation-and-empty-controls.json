@@ -1,0 +1,20 @@
+{
+  "nonruntime_records": 76,
+  "nonruntime_complete_records_including_metrics_exactly_equal_852": true,
+  "input_countries": 14,
+  "pooled_input_rows": 792775,
+  "reducer_empty_output_countries": {
+    "nitrogen_kg": [
+      "GhanaLSS",
+      "Guinea-Bissau"
+    ],
+    "seed_kg": [
+      "GhanaLSS",
+      "Guinea-Bissau"
+    ]
+  },
+  "empty_output_control": "Each reducer exactly equals concatenated separate single-country Feature calls, including these empty outputs; retained-country identity is not a promise to manufacture rows after filtering/nonconvertible-unit paths. No source-science diagnosis is claimed.",
+  "additional_assembly_exclusions": [],
+  "inherited_visible_assembly_exclusion": "EthiopiaRHS crop_production, coarse frame without plot or plot_id",
+  "removed_nigeria_warnings_cause": "Nine exact baseline-only Makefile candidate failure messages name Nigeria; why those candidate subprocesses failed was not established in the earlier run and is not inferred here."
+}

@@ -1,0 +1,117 @@
+{
+  "source_commit": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "baseline_commit": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "counts": {
+    "error": 0,
+    "failed": 0,
+    "passed": 8764,
+    "skipped": 276,
+    "warnings": 1222,
+    "xfailed": 9,
+    "xpassed": 1
+  },
+  "baseline_counts": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 8562,
+    "skipped": 285,
+    "xfailed": 9,
+    "xpassed": 1
+  },
+  "pytest_seconds": 765.96,
+  "controller_seconds": 767.1865059947595,
+  "collection": {
+    "baseline_cases": 8857,
+    "candidate_cases": 9050,
+    "new_passing_nodeids": 198,
+    "old_nodeids_replaced_or_renamed": 5,
+    "net_additional_cases": 193,
+    "new_by_module": {
+      "tests/test_gh1040_wave_read_gates.py": 17,
+      "tests/test_gh1093_declared_unit_consumers.py": 2,
+      "tests/test_gh1159_pooled_reducers.py": 87,
+      "tests/test_uganda_invariance_hash_variants.py": 15,
+      "tests/test_wave_provenance.py": 77
+    },
+    "removed_nodeids": [
+      "tests/test_gh1093_declared_unit_consumers.py::test_country_finalize_attaches_input_declaration_and_feature_keeps_it",
+      "tests/test_wave_provenance.py::TestOverrideCorrectionThroughMain::test_a_stamped_wrong_entry_is_corrected_idno_and_all",
+      "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_an_override_rerun_at_the_same_id_is_checked_too",
+      "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_ethiopia_w5_idno_change_is_refused",
+      "tests/test_wave_provenance.py::TestReleaseChangeIsNotAReStamp::test_nigeria_w5_v02_in_the_catalog_leaves_v01_record_intact"
+    ],
+    "replacement_explanation": "One declared-factor/Feature test expands to two colliding/distinct-household cases; four provenance tests are renamed/reworked around approved held-versus-queued release and acquisition-only primary correction contracts."
+  },
+  "skip_delta": {
+    "baseline": 285,
+    "candidate": 276,
+    "removed": 9,
+    "new": 0,
+    "changed_remaining_reasons": 0,
+    "skip_to_pass": [
+      {
+        "nodeid": "tests/test_gh866_stale_country_parquet_not_laundered.py::test_a_poisoned_country_parquet_is_REBUILT_not_served[Nigeria/plot_inputs]",
+        "old_reason": "Nigeria/plot_inputs not warm"
+      },
+      {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2005-06/_/food_acquired.parquet]",
+        "old_reason": "Parquet not built: 2005-06/_/food_acquired.parquet"
+      },
+      {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2009-10/_/food_acquired.parquet]",
+        "old_reason": "Parquet not built: 2009-10/_/food_acquired.parquet"
+      },
+      {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2010-11/_/food_acquired.parquet]",
+        "old_reason": "Parquet not built: 2010-11/_/food_acquired.parquet"
+      },
+      {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2011-12/_/food_acquired.parquet]",
+        "old_reason": "Parquet not built: 2011-12/_/food_acquired.parquet"
+      },
+      {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2013-14/_/food_acquired.parquet]",
+        "old_reason": "Parquet not built: 2013-14/_/food_acquired.parquet"
+      },
+      {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2015-16/_/food_acquired.parquet]",
+        "old_reason": "Parquet not built: 2015-16/_/food_acquired.parquet"
+      },
+      {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2018-19/_/food_acquired.parquet]",
+        "old_reason": "Parquet not built: 2018-19/_/food_acquired.parquet"
+      },
+      {
+        "nodeid": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[2019-20/_/food_acquired.parquet]",
+        "old_reason": "Parquet not built: 2019-20/_/food_acquired.parquet"
+      }
+    ],
+    "interpretation": "Eight Uganda raw food_acquired wave invariance cases and the Nigeria plot_inputs poisoned-cache control now execute and pass. Initial private corpus/cache state and test ordering differ from852; no unmeasured causal attribution to a particular fix."
+  },
+  "xfail_delta": {
+    "baseline": 9,
+    "candidate": 9,
+    "same_nodeids_and_reasons": true,
+    "families": {
+      "existing_602_unharmonized_plot_tenure": 5,
+      "source_has_no_sampling_weights": 4
+    }
+  },
+  "xpass": {
+    "baseline_count": 1,
+    "candidate_count": 1,
+    "candidate_directly_recorded_case": "tests/test_pakistan_cluster_features.py::test_extraction_is_cluster_grain",
+    "baseline_identity_limit": "Baseline terminal count is one non-strict XPASS, but JUnit encodes it as PASS and its node identity was not retained; no exact baseline XPASS identity comparison is claimed.",
+    "scope_limit": "This non-strict expected-failure marker passing verifies the wave artifact exists, omits household i, has300rows and a unique index. It does not certify GH740 resolved, broader source validity or cross-wave cluster identity."
+  },
+  "import_identity_test": {
+    "nodeid": "tests/test_categorical_mapping_resolution.py::test_import_is_from_the_expected_checkout",
+    "outcome": "ordinary PASS, not XPASS",
+    "expected_root_set": true
+  },
+  "pass_delta_reconciles": "8764-8562 =198 new passing IDs -5 replaced/renamed old IDs +9 old skips now passing =202",
+  "credential_skips": 0,
+  "all_16_workers_reported": true,
+  "source_unchanged": true,
+  "raw_survey_records_exported": false
+}

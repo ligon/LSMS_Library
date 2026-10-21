@@ -95,6 +95,13 @@ PackagingPASSexact4cabwheel+sdist0.15.0.post392.dev0+4cab5f0db;all11753packagefi
 Rootupdatedoriginal1154--57bodieswithtruthfulcompleted852evidence/knownsingleCIfailure/1161repair/finalCIpending. Draft1158stillpendingfinalvalidation.
 Optionalquestionpending:implement#1160before0.16usingcountry-preservingruleorDeferdocumentedlimitation. Noanswer/authorizationyet; noimplementation. Do nottreatelapsedtime/preselectionasapproval. #932rulesetstillunappliedanduser-ownedrepoqueueunavailable;#851originnewercf117notoldGitHub8288.
 
+** Local4cab validation complete; #1160 approved -- 2026-10-20 19:25 PDT
+
+Localexact4cabPASS8764/276skip/9xfail/1xpass/1222warnings765.96s,0fail/error/credentialskips;all16workersexited0/sourceunchanged. Export18artifactsverifiedmanifest55fbf514...copyfollowup-validation/. RootindependentXMLcaseaccountPASS8857→9050,198newpass−5oldpass+9unskip,nootheroutcomechange;xfailIDsunchanged;baselineXPASSidentityunclaimed.
+Publicationplan/scopeauditcopiedfollowup-pr-plan/;all79GitHubfileblobsverifiedagainstworkerheads. AllfournewdraftPRunit/smokechecksPASS. Theirbodiesnowrecordlocal4cabPASSandremotecredentialedLinuxpending. #1159issuebodyrecordsretentionruling/pending1164;#778bodyrecordspending1162/unchangedtrustnote/Addressesnotclosure.
+USERANSWER:fix#1160before0.16country-preserving. reliabilityassignednewworktree1160-pooled-rate at4cab,CPU8-11,focusedimplementation+baselinecontrols/hashimpact/ledger/attributedcommits. NoGHwritesbyworker. windows_ciownsindependentreviewCPU16-19afterFINALwholeworkerfreeze/allwritersstopped. Rootmustnotlabel4cabCIastestoflater1160code. contractsownsremoteCI39531148624observation/datajob118997075291;currentunit/smoke/nativePASS,credentialgate/UgabuildPASS,datafullsuiteactive.
+Next:finish1160implementation/review,integratenewfrozenhead,appropriatefinalvalidation+PR;finish4cabCIwithoutdiscardingitsresult;humanmergepermissionstillneededunderbacklogskill. Neverautomergeorrelease.
+
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.
   Fixes #958 (all five defects) and #960 (docs).  #957 closed (done 2026-09-22).

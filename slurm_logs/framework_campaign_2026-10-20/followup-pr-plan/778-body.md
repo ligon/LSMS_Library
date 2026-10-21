@@ -1,0 +1,11 @@
+When an assumed-fresh country parquet disappears between the existence/footer check and its data read, the loader now falls through to the ordinary cache/build path. Only `FileNotFoundError` from the two data reads is handled; corruption, permission, mapping and genuine source errors retain their existing behavior.
+
+The remaining Guyana and India cold-build controls and Togo forced-build control now use physical private L2 copies with only L1 linked. Existing already-private GhanaLSS and synthetic controls are unchanged. Original corpus bytes remain unchanged, and cold Guyana/India execution still works without a warm source cache.
+
+Validation: 190 focused tests passed; independent review passed 67 controls. The final old-gate negative control produces six failures and eleven passing error controls. Complete cache inventories show no changes across 549 country hashes, 2,139 wave entries and 39 table fingerprints. Aggregate evidence and runnable probes are in `slurm_logs/framework_campaign_2026-10-20/778/`.
+
+Addresses #778's two actionable remaining items. Its carried note about trusting unstamped country-script output is unchanged and remains separate from this disappearance fix. The corruption/`LSMS_NO_CACHE` policy decision in #1071 is also unchanged; the disproven partial-aggregate theory is not revived.
+
+Dependency: this draft targets `integration/framework-v016-40255479` at `852ac2bfc` so the original fixes in #1154–#1157 do not appear in its diff. After those land, update this publication branch from development and retarget the PR. Do not merge into the temporary comparison base.
+
+Final combined validation passed at `4cab5f0db`: 8,764 passed, 276 skipped, nine expected failures, one non-strict unexpected pass, zero failures/errors or credential skips, in 765.96 seconds. All nine former skips now execute and pass; no new skip or changed skip/xfail reason appears. The scoped farm audit has no new structural/error/failure findings and retains its documented RHS exclusion; real pooled seed/nitrogen controls and all three warm checks pass. Unit, Windows smoke and credentialed native Windows also passed. Credentialed Linux [run 39531148624](https://github.com/ligon/LSMS_Library/actions/runs/39531148624) is still **PENDING**. No skipped or pending data job is called green, and no release is proposed.
