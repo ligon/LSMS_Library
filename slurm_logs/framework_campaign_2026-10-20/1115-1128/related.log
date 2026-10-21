@@ -1,0 +1,119 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+.....................F.................................................. [ 84%]
+...................................................                      [100%]
+=================================== FAILURES ===================================
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values2] _
+[gw0] linux -- Python 3.11.6 /local/job40255479/venv_img/bin/python
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x14888ae37510>
+key = 'PROVENANCE_NOTE', values = ['first fact', '']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if key != 'PROVENANCE_RECORDED':
+            text += '#+PROVENANCE_RECORDED: 2026-10-20\n'
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+>       rendered = pv.render_source_org(rec)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_wave_provenance.py:2377: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+prov = WaveProvenance(country='Example', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, ...overs=[], latest_idno=None, latest_doi=None, latest_seen=None, scalar_keywords={'PROVENANCE_NOTE': ['first fact', '']})
+
+    def render_source_org(prov: WaveProvenance) -> str:
+        """Render a :class:`WaveProvenance` as ``SOURCE.org`` text.
+    
+        The recorded URL is emitted as the first ``http(s)://`` in the file so the
+        legacy reader (``data_access._read_source_url``) keeps finding it.
+    
+        Lossless with :func:`parse_source_org` (GH #1115): every key the record
+        holds is emitted -- ``extra`` after the known keys, every occurrence of a
+        repeated one, an empty value as a bare ``#+KEY:`` -- and the notes are
+        carried as parsed.
+        """
+        body = prov.url if prov.url else URL_PLACEHOLDER
+        lines = ["SOURCE", "", body, ""]
+    
+        if prov.is_worldbank:
+            cat_id = ", ".join(prov.catalog_ids)
+        elif prov.source == SOURCE_EXTERNAL:
+            cat_id = _ID_NONE
+        else:
+            cat_id = _ID_UNKNOWN
+        lines.append(f"#+CATALOG_ID: {cat_id}")
+    
+        # Entries this release SUBSUMES but whose files we do not hold.  Emitted
+        # only for a WB record: "covers" without a holding is meaningless.
+        if prov.is_worldbank and prov.covers:
+            lines.append(f"#+CATALOG_COVERS: {', '.join(prov.covers)}")
+    
+        for key, val in (("CATALOG_IDNO", prov.idno),
+                         ("CATALOG_TITLE", prov.title),
+                         ("CATALOG_YEARS", prov.years),
+                         ("CATALOG_REPOSITORY", prov.repository),
+                         ("CATALOG_DOI", prov.doi),
+                         ("CATALOG_URL", prov.url),
+                         ("CATALOG_LATEST_IDNO", prov.latest_idno),
+                         ("CATALOG_LATEST_DOI", prov.latest_doi),
+                         ("CATALOG_LATEST_SEEN", prov.latest_seen)):
+            if val:
+                lines.append(f"#+{key}: {val}")
+    
+        lines.append(f"#+PROVENANCE_SOURCE: {prov.source}")
+        if prov.method:
+            lines.append(f"#+PROVENANCE_METHOD: {prov.method}")
+        if prov.validation:
+            lines.append(f"#+PROVENANCE_VALIDATION: {prov.validation}")
+        recorded = prov.recorded or _dt.date.today().isoformat()
+        lines.append(f"#+PROVENANCE_RECORDED: {recorded}")
+        # A superseded URL equal to the current one carries no information and
+        # would mask the URL it was meant to record.  Drop it.
+        if prov.superseded_url and (prov.superseded_url.rstrip("/")
+                                    != (prov.url or "").rstrip("/")):
+            lines.append(f"#+PROVENANCE_SUPERSEDED_URL: {prov.superseded_url}")
+        if prov.note:
+            lines.append(f"#+PROVENANCE_NOTE: {prov.note}")
+        for key, values in prov.scalar_keywords.items():
+            field_name = _SCALAR_FIELDS.get(key)
+            if field_name is None or not values:
+                raise ValueError(f"Invalid preserved scalar keyword: {key}")
+            current = getattr(prov, field_name) or ""
+            last = values[-1]
+            if key == "PROVENANCE_SOURCE":
+                current, last = current.lower(), last.lower()
+            if current != last:
+>               raise ValueError(
+                    f"Cannot rewrite repeated or empty #+{key}: without "
+                    "explicit provenance curation")
+E               ValueError: Cannot rewrite repeated or empty #+PROVENANCE_NOTE: without explicit provenance curation
+
+lsms_library/provenance.py:529: ValueError
+=============================== warnings summary ===============================
+tests/test_data_access.py::TestAutoUnlockS3::test_returns_false_on_bad_gpg_file
+  /local/job40255479/worktrees/1115-1128-provenance/tests/test_data_access.py:310: RuntimeWarning: LSMS_Library: your World Bank API key validated, but unlocking the S3 read cache failed.
+    Falling back to direct World Bank downloads -- slower, but functional; nothing is blocked.
+    Tried: s3_reader_creds.enc (MISSING, needs the `cryptography` package) and s3_reader_creds.gpg (present, needs the `gpg` binary).
+    If `cryptography` is missing, `pip install cryptography` restores the fast path.
+    See https://github.com/ligon/LSMS_Library/issues/741
+    assert _auto_unlock_s3(dvc_dir) is False
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values2]
+1 failed, 338 passed, 1 warning in 68.29s (0:01:08)
