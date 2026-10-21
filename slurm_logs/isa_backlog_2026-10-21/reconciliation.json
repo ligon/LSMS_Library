@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T17:57:00Z",
+  "observed_at": "2026-10-21T17:53:09.895618+00:00",
   "actions": [
     {
       "issue": 822,
@@ -62,6 +62,14 @@
     {
       "issue": 851,
       "action": "Retitled as approved Phase II implementation/integration, preserving existing maintainer rulings; no repeat decision request or merge claim"
+    },
+    {
+      "issue": 1034,
+      "action": "Linked reviewed PR1172 and corrected broad harvest-file claim: unwired s10bq2b has labels, wired PH fields do not; original source snapshot and test-only review preserved"
+    },
+    {
+      "issue": 1088,
+      "action": "Updated live issue with independently reviewed PR1176, exact cold/warm invariants and pending human landing"
     }
   ],
   "verified_issue_metadata": [

@@ -28,7 +28,7 @@ The #1077 finite numeric-label-key guard is in that lane, leaving country config
 | Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. |
 | Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. |
 | Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report. Exact unknown masks and genuine policy/source questions are documented. Production unchanged; #851 integration remains pending. |
-| Ethiopia | Country-scoped #1118 missing plot-input unit diagnosis active under the existing U_UNKNOWN ruling; #1171 remains the separate nutrition follow-up. |
+| Ethiopia | Country-scoped #1118 diagnosis confirmed 37,370 use-only null-unit rows out of 180,900; minimal build normalization is approved under the existing U_UNKNOWN ruling; #1171 remains the separate nutrition follow-up. |
 | Mali | #822 frozen =23d338e50=: restores 115,713 readings; owner cold/warm/old-obs3 conservation and 39 tests passed. Independent review active. Duplicate #1089 closed. |
 | Tanzania | Worktree queued; preserve documented UPHI back-casting and live WAITING caveats. |
 

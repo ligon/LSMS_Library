@@ -17,10 +17,13 @@
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
       "branch": "isa/Ethiopia-20261021",
-      "status": "diagnosis",
+      "status": "implementation",
       "owner": "review_nigeria_1034",
       "initial_issue": 1118,
-      "scope": "Ethiopia missing plot-input units only; standing U_UNKNOWN ruling"
+      "scope": "Ethiopia missing plot-input units only; standing U_UNKNOWN ruling",
+      "diagnosis_rows": 180900,
+      "missing_unit_rows": 37370,
+      "approved_boundary": "Final u null/whitespace-only -> existing U_UNKNOWN; every Applied use-only row and non-unit payload preserved"
     },
     "Malawi": {
       "path": "/local/job40255479/worktrees/isa-Malawi",
