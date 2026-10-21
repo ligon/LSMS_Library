@@ -1,0 +1,65 @@
+{
+  "comma_labels": {
+    "Bidon de 0,5 L": {
+      "kg_factors": [
+        5.0
+      ],
+      "native_quantity_sum": 7.0,
+      "rows": 3,
+      "sources": {
+        "metric": 3
+      }
+    },
+    "Bidon de 1,5 L": {
+      "kg_factors": [
+        5.0
+      ],
+      "native_quantity_sum": 89.82,
+      "rows": 120,
+      "sources": {
+        "metric": 120
+      }
+    },
+    "Sac (2,5 Kg)": {
+      "kg_factors": [
+        5.0
+      ],
+      "native_quantity_sum": 3.0,
+      "rows": 3,
+      "sources": {
+        "metric": 3
+      }
+    }
+  },
+  "country": "Benin",
+  "factor_sources": {
+    "item_unit": 35881,
+    "item_unit_tight": 164,
+    "metric": 20255,
+    "none": 97,
+    "unit": 131533
+  },
+  "food_acquired_rows": 187930,
+  "head": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "kilograms": {
+    "2018-19": {
+      "finite_sum": 159860.6098289145,
+      "median": 0.3125,
+      "nonnull": 187241,
+      "rows": 187241
+    }
+  },
+  "package": "/local/job40255479/worktrees/baseline-976fc840d/lsms_library/__init__.py",
+  "phase": "before",
+  "price_rows": 132811,
+  "prices": {
+    "2018-19": {
+      "finite_sum": 175604440.6459643,
+      "median": 718.75,
+      "nonnull": 132811,
+      "rows": 132811
+    }
+  },
+  "private_root": "/local/job40255479/1143-private/before-Benin",
+  "quantity_rows": 187338
+}

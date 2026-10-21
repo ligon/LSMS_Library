@@ -1,0 +1,59 @@
+#+TITLE: GH #1160 -- country-preserving fertilizer rates
+#+AUTHOR: Sue
+
+* Result
+
+Runtime/test/guide commit =5125d0faa3e8074c289c5dd839cf1690d3e7a570= fixes the inherited pooled-rate defect on frozen base =4cab5f0db7d375ad543e652f61f43bd28fa94ecd=.
+The baseline's one country-less 0.276 kg N/ha becomes country A 0.46 and B 0.23, exactly matching separate ordinary calls.
+Product rates likewise become A 1 and B 0.5 kg/ha.
+No release, merge, GitHub write or protection change was performed.
+
+* Contract and scope
+
+=fertilizer_rate= reuses =nitrogen_kg=, existing declared mass factors and existing parcel/key helpers.
+Country participates in numerator and area grouping, the inner join and the returned index whenever both inputs carry country as an index level or column.
+This applies to one labeled country and empty results; attrs alone do not manufacture an axis.
+Country on only one input is refused, with no inference/broadcasting, and null country labels raise before nutrient/positive-area filtering.
+Index labels override a redundant country column, including a contradictory null column.
+Area frames retain support for local keys supplied entirely as columns.
+A wholly unmatched pooled join warns about country/land identity, without promising that a different parcel mode can fix mismatched countries.
+The country-less warning remains unchanged.
+
+A both-empty pooled parcel input exposed inherited float inference for the numerator's empty list of parcel keys.
+The fix normalizes that empty key to string only when country is present; it does not change country-less empty/error behavior.
+Parcel bridge policy (#1110), nitrogen shares (#867), unit defaults, area deduplication, price pooling and other transforms remain separate.
+The Area denominator is still the existing sum of positive canonical hectares.
+
+* Validation
+
+- Untouched 4cab transformation source with separately committed ledger: 80 failures, seven passes, zero errors across 87 new controls.
+- First candidate: 85 passes, two failures, both the empty pooled parcel dtype case described above.
+- Final focused suite: 347 passes, two skips, zero failures/errors, two existing missing-local-key NutrientCoverageWarnings, 9.38 seconds.
+- Skips are both Nigeria warm-parquet guards: =test_unit_sold_populated_only_in_w1_w2= and =test_api_frame_serves_unit_sold_through_finalize=, reason =no warm Nigeria crop_production parquet (absent, or mid-rebuild)=.
+- =requires_s3= cases were excluded by the explicit marker expression; excluded tests and cache-gated skips are not passes.
+- =scripts/api_surface_audit.py --strict=: exit 0; =git diff --check=: clean.
+
+New synthetic controls cover both nutrient modes, both land grains, independent reversed row orders, all index/column pairings, colliding local IDs, country-wise equivalence, one/empty/null/one-sided/unmatched/partially matched country labels, redundant country columns, canonical/legacy plot names, accepted area-column layouts, per-country declared factors, input/attrs immutability and the existing additive-area behavior.
+No country microdata or new scientific assumption is needed for these identity checks.
+The full suite and exact-head native/credentialed CI remain parent integration gates.
+
+* Cache and identity
+
+The actual before/after census reused =../1159/hash_reach.py= in separate private-root processes.
+All 549 country-table hashes, 2,139 wave hashes and 39 tagged table closures are unchanged, with zero census errors.
+No parquet was created in either census root, the focused-test root or the country's source tree.
+Raw XML/logs and complete hash manifests remain private at =/local/job40255479/control/framework-campaign/1160-private/=; =verification.json= records their SHA256 values and aggregate results.
+Baseline transformation SHA256 is =7296587e5bf141e08236da16c29c08f971d24641ea6678ca1673456fc0572394=; candidate is =cb973473420759f35b2046e0da618fdbddc278c78708038792b0e85856e1b4d0=.
+Package, countries-root and data-root real paths were asserted against this worktree and private =/local= data roots.
+No shared L2 or immutable corpus root was used through the API.
+
+* Reproduction
+
+Use =/local/job40255479/venv_img/bin/python=, cwd =/local/job40255479/worktrees/1160-pooled-rate=, =PYTHONPATH=$PWD= and =LSMS_COUNTRIES_ROOT=$PWD/lsms_library/countries=.
+Pin OPENBLAS_NUM_THREADS, OMP_NUM_THREADS, MKL_NUM_THREADS, LSMS_BUILD_WORKERS and LSMS_MAKE_JOBS to one.
+=run.sh= records the public synthetic probe and runs the exact final eight-file focused selection with four loadfile workers on CPUs 8-11.
+Supply fresh private =LSMS_DATA_DIR= and =REVIEW_OUTPUT= directories under =/local=; the script redirects raw output there.
+=reproduce.py= is the small numeric/index identity probe, and =negative_control.py --tests <candidate>= runs final regressions from an explicitly unchanged 4cab checkout with separately configured private data.
+The historical negative proof was performed before runtime edits; its source bytes were checked against 4cab, even though the task ledger had already advanced HEAD to 85779ed37.
+
+Sue

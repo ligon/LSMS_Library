@@ -3326,6 +3326,26 @@ The recorded nominal-container, residual-code and nutrient-provenance limits
 remain; the curated conversion JSON still is not the API's kg-factor input.
 No baseline generator or wholesale fixture refresh was used.
 
+*Exact nutrition fingerprint portability [2026-10-20].*
+On unchanged exact-852 food-quantity and FCT operands, OpenBLAS 0.3.31.188.0
+SkylakeX -> Haswell -> SkylakeX reproduces approved =12d25...50e3a= ->
+=f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6= ->
+the approved hash again.
+Only eight floating-point cells in one 2019-20 row differ, by at most two
+ULPs (maximum absolute difference =3.637978807091713e-12=); index, ordering,
+columns, dtypes and input hashes are identical.
+The failed exact-852 Linux CI run =39519191762= reported that same alternate
+hash, but did not record its BLAS kernel or retain the parquet, so the kernel
+attribution is a local counterfactual, not an observation of its hardware.
+The invariance fixture retains the approved primary hash and permits only
+this measured exact alternate via =content_hash_variants=; structure checks
+and every other entry's exact hash remain in force.
+Future unmeasured fingerprints still fail; this is not a general numerical-equality
+rule or a refresh of the scientific baseline.
+The #967 approval, nominal-container and source-provenance limits above, and
+the separate #788 coupled FCT/nutrition metadata caveat remain unchanged.
+See [[file:../../../../slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org][the reversible CPU-kernel diagnosis and verification]].
+
 *Consequence, stated plainly*: =test_uganda_invariance.py= is NOT a
 reliable net for a change to a Uganda parquet's shape or content.  To
 verify a baseline entry, build the table explicitly and compare

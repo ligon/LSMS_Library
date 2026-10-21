@@ -1,0 +1,189 @@
+{
+  "api_audit": "strict PASS exit0",
+  "baseline_ledger_head": "85779ed37",
+  "baseline_runtime": "4cab5f0db7d375ad543e652f61f43bd28fa94ecd",
+  "cache_hash_reach": {
+    "country": {
+      "changed": 0,
+      "changed_cells": [],
+      "total": 549
+    },
+    "tagged": {
+      "changed": 0,
+      "changed_cells": [],
+      "total": 39
+    },
+    "wave": {
+      "changed": 0,
+      "changed_cells": [],
+      "total": 2139
+    }
+  },
+  "census_errors": {},
+  "limits": [
+    "No live-country microdata builds or acquisition calls",
+    "Full suite and exact-head credentialed/native CI not run by this worker",
+    "Parcel bridge policy, nutrient shares, area deduplication, unit defaults and other pooled transforms unchanged",
+    "First candidate had85pass2fail on both-empty pooled parcel dtype; resolved within country-present route before final347pass run"
+  ],
+  "no_data_parquets_written": true,
+  "private_evidence_root": "/local/job40255479/control/framework-campaign/1160-private",
+  "private_evidence_sha256": {
+    "api-audit.log": "b758eb7c1b7ff6452b01f849f1bf914876b29eb436967a6172deeb48551fd7b2",
+    "baseline.xml": "ba99c448b87d4d5114b0e460e5b8446573ebb56592c6af7ae76e2115fcde434e",
+    "candidate-new.xml": "319cfd115f96e3452bfe71c4f656f215a63bf34c95e2076becb02ee0b8139088",
+    "focused.xml": "f477e2d01033b56ce0e4137e2b5c3a255cd4a408ea1b894734e6b5fed103b9c0",
+    "hash-after.json": "6bf4083686d3f76dc906a3a42d07477770a5de00f8e5c106f405c97a513038f4",
+    "hash-before.json": "6bf4083686d3f76dc906a3a42d07477770a5de00f8e5c106f405c97a513038f4"
+  },
+  "probe": {
+    "cases": {
+      "N/parcel/column": {
+        "index_names": [
+          "country",
+          "t",
+          "i",
+          "parcel"
+        ],
+        "rates": {
+          "A": 0.46,
+          "B": 0.23
+        },
+        "rows": 2
+      },
+      "N/parcel/index": {
+        "index_names": [
+          "country",
+          "t",
+          "i",
+          "parcel"
+        ],
+        "rates": {
+          "A": 0.46,
+          "B": 0.23
+        },
+        "rows": 2
+      },
+      "N/plot/column": {
+        "index_names": [
+          "country",
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "rates": {
+          "A": 0.46,
+          "B": 0.23
+        },
+        "rows": 2
+      },
+      "N/plot/index": {
+        "index_names": [
+          "country",
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "rates": {
+          "A": 0.46,
+          "B": 0.23
+        },
+        "rows": 2
+      },
+      "product/parcel/column": {
+        "index_names": [
+          "country",
+          "t",
+          "i",
+          "parcel"
+        ],
+        "rates": {
+          "A": 1.0,
+          "B": 0.5
+        },
+        "rows": 2
+      },
+      "product/parcel/index": {
+        "index_names": [
+          "country",
+          "t",
+          "i",
+          "parcel"
+        ],
+        "rates": {
+          "A": 1.0,
+          "B": 0.5
+        },
+        "rows": 2
+      },
+      "product/plot/column": {
+        "index_names": [
+          "country",
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "rates": {
+          "A": 1.0,
+          "B": 0.5
+        },
+        "rows": 2
+      },
+      "product/plot/index": {
+        "index_names": [
+          "country",
+          "t",
+          "i",
+          "plot_id"
+        ],
+        "rates": {
+          "A": 1.0,
+          "B": 0.5
+        },
+        "rows": 2
+      }
+    },
+    "countries_root": "/local/job40255479/worktrees/1160-pooled-rate/lsms_library/countries",
+    "data_root": "/local/job40255479/1160-tests",
+    "head": "5125d0faa3e8074c289c5dd839cf1690d3e7a570",
+    "package": "/local/job40255479/worktrees/1160-pooled-rate/lsms_library/__init__.py"
+  },
+  "requires_s3": "excluded by -m not requires_s3; not counted as passes",
+  "runtime_commit": "5125d0faa3e8074c289c5dd839cf1690d3e7a570",
+  "source_sha256": {
+    "baseline": "7296587e5bf141e08236da16c29c08f971d24641ea6678ca1673456fc0572394",
+    "candidate": "cb973473420759f35b2046e0da618fdbddc278c78708038792b0e85856e1b4d0"
+  },
+  "suites": {
+    "baseline": {
+      "errors": 0,
+      "failed": 80,
+      "passed": 7,
+      "skipped": [],
+      "total": 87
+    },
+    "candidate-new": {
+      "errors": 0,
+      "failed": 2,
+      "passed": 85,
+      "skipped": [],
+      "total": 87
+    },
+    "focused": {
+      "errors": 0,
+      "failed": 0,
+      "passed": 347,
+      "skipped": [
+        {
+          "reason": "no warm Nigeria crop_production parquet (absent, or mid-rebuild)",
+          "test": "tests.test_nigeria_sold_unit.TestBuiltTable::test_unit_sold_populated_only_in_w1_w2"
+        },
+        {
+          "reason": "no warm Nigeria crop_production parquet (absent, or mid-rebuild)",
+          "test": "tests.test_nigeria_sold_unit.TestBuiltTable::test_api_frame_serves_unit_sold_through_finalize"
+        }
+      ],
+      "total": 349
+    }
+  }
+}

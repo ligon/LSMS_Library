@@ -1,0 +1,39 @@
+#+title: Independent review of GH #1099, round 2
+#+author: Sue
+#+date: 2026-10-20
+
+* Verdict
+
+PASS at =94e82dfa3ff3f31c96d5a1c1db2865914d3ff144=; no remaining findings in approved scope.
+The earlier =1099-review.org/json= FAIL is retained as historical evidence.
+All verifier processes have finished; no source was edited or committed by the reviewer.
+
+* Repair verification
+
+The new absent_subset_frame guard treats a country Makefile with no make executable as unknown rule authority and retains the existing route.
+The helper _has_country_builder itself is unchanged, so the make backend's former operational policy is preserved.
+This directly repairs the previous false empty-success regression without broadening builder rules.
+
+Independently repeated the original synthetic private-country reproduction against exact baseline aggregation method =976fc840d= and the repaired candidate.
+Both now raise the expected RuntimeError beginning "Could not materialize Fakeland/build_me" for a cold default-backend strict subset, genuine country rule-only builder and missing make.
+The four default/make by Makefile/no-Makefile regression controls pass: default with rule retains RuntimeError; the other three retain their intended empty answers.
+
+* Independent validation
+
+Six-file routing/cache/fingerprint selection: 180 passed, 10 skipped, 22 warnings in 79.89 seconds.
+Used exact package/config import identity assertions, private data root =/local/job40255479/1099-independent-review-round2=, BLAS/OMP/MKL and build workers pinned to one, CPUs20-23, four xdist workers/loadfile.
+
+The selection covers cold/all/partial/stale/no-cache typed empty answers and byte-preserved cached data/manifest; ordinary and assumed-fresh covered hits reject extra wave traversal; real script/rule builders retain their paths.
+Unknown tables and waves, failed full-country builds and explicitly unavailable declared sources keep their errors.
+No source exception is interpreted as absent configuration; JSON/full/unsupported request exclusions remain intact.
+The empty helper and finalizer are reused with no parallel schema constructor.
+
+The producer's 19-case negative control reports five failures/fourteen passes on the original aggregation method; its construction was inspected.
+The reviewer independently repeated the specific earlier no-make failure on exact baseline and repaired code, and ran every new control in the six-file suite.
+The producer's Senegal source probe and full corpus cold build were not repeated here.
+Cache invalidation through tagged aggregation remains an intentional, documented consequence; producer hash samples were inspected rather than regenerated.
+
+Senegal country guidance from round one remains applicable: population/vague and mojibake caveats do not authorize questionnaire-absence claims or mapping edits.
+No new country source fact was introduced by this repair.
+
+-- Sue

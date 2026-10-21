@@ -1,0 +1,53 @@
+#+title: Windows Uganda shocks digest reconciliation
+#+author: Sue
+#+date: 2026-10-20
+
+* Result
+
+The Windows result is the current Linux result: =shocks= has 14,457 rows, 10 columns, eight waves and digest =0ab2ea4c79dd=.
+The previous expectation, =64a53fa7af55=, predates the GH #805 cp1252 reader correction.
+Replacing only =etc<U+2026>)= with =etc<U+0085>)= in =HowCoped0=, =HowCoped1= and =HowCoped2= reproduces that previous digest exactly.
+The counts are 862, 756 and 394 cells, respectively (2,012 total), matching =lsms_library/countries/Uganda/_/CONTENTS.org='s encoding entry.
+=decode-delta.json= records per-wave counts and schemas without individual records or household identifiers.
+
+The verifier asserts identical index values, index order, column names, column order, dtypes and every other value.
+It then applies the forward replacement and checks exact frame equality with the current result.
+This is exact counterfactual accounting of the reversible label change, not a comparison with a separately cold-built historical pre-#805 frame.
+=assets= stays at 116,808 rows, one column, eight waves and digest =9202ed542a14=.
+No source data, runtime decoder, table compiler or other baseline changes.
+
+* Isolation and validation
+
+Base: =976fc840d12ba40f1602b7dff58b81548632b2a9= on =development=.
+Code and configs both come from the isolated =fix/windows-shocks-digest-20261020= worktree; import identity is asserted in the verifier.
+Each cold run starts with a new private =LSMS_DATA_DIR=, linking only the shared content-addressed =dvc-cache= directory (L1).
+No shared L2 parquet is read, written or cleared.
+The second cold run checks the corrected expectation using a separate private cache.
+
+- Before :: Private =/local/job40255479/windows-ci-logs/cold-build-before.log=, exit 1, precisely the old shocks expectation fails; assets passes.
+- After :: Private =/local/job40255479/windows-ci-logs/cold-build-after.log=, corrected expectations pass for both tables.
+- Focused tests :: Private =/local/job40255479/windows-ci-logs/focused-tests.log=, 69 passed in 9.62 seconds (cp1252 reader and Windows portability).
+- Counterfactual :: =verify_decode_delta.py= produces =decode-delta.json= and asserts the old and new digests, schemas and exact roundtrip.
+
+The cold runs retain existing categorical-mapping warnings for =h1bq1= and =h1bq3= and the existing single null =Shock= key in Uganda 2005-06.
+These are outside this expectation correction.
+Actual Windows CI remains necessary to verify the installed wheel and conda toolchain on Windows.
+
+* Reproduce
+
+Run from the checkout, with its Python environment activated.
+Create a fresh private data directory and link only its =dvc-cache= to shared L1; the recipe does this under =TMPDIR=.
+On this allocation the reviewed private cache is =/local/job40255479/windows-ci-data=, and Python is =/local/job40255479/venv_img/bin/python=.
+The verifier accepts any explicit private =LSMS_DATA_DIR= and rejects the configured production cache and default shared cache.
+
+#+begin_example
+export PYTHONPATH="$PWD"
+export LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_DATA_DIR="$(mktemp -d "${TMPDIR:-/tmp}/windows-ci-proof.XXXXXX")"
+ln -s "$HOME/.local/share/lsms_library/dvc-cache" "$LSMS_DATA_DIR/dvc-cache"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+export EXPECT='Uganda:shocks=14457:0ab2ea4c79dd,Uganda:assets=116808:9202ed542a14'
+python scripts/windows_build_check.py Uganda:shocks Uganda:assets
+python slurm_logs/framework_campaign_2026-10-20/windows/verify_decode_delta.py
+python -m pytest -q tests/test_gh805_cp1252_reader.py tests/test_windows_portability.py
+#+end_example

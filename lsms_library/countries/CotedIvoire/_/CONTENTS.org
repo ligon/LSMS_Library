@@ -711,6 +711,17 @@ and do not include MonthsSpent or equivalent fields.
 
 * Unit handling for =food_acquired=
 
+** Correction and decimal-comma parsing (GH #1143, 2026-10-20)
+
+The older description below says "No =u= table is wired into =_/categorical_mapping.org=".
+The current file does declare =#+name: u= (line 7) and maps =Sac (0,9 kg)= to =Sac (0,9 Kg)= (line 50); that earlier statement does not describe the current wiring.
+No mapping was changed in GH #1143.
+The shared metric parser now reads this label as 0.9 kg rather than the trailing 9.
+Private cold builds measure 36 changed quantity rows and 23 changed =food_prices()= rows, reducing kilograms by 229.23; =food_acquired= is exactly unchanged.
+Aggregate evidence is in =slurm_logs/framework_campaign_2026-10-20/1143/=.
+
+** Earlier encoding repair
+
 The =u= (unit) index level on =food_acquired= carries clean canonical
 French unit names (=Kg=, =Litre=, =Sachet=, =Unité=, =Cuillière=,
 =Régime=, =Boîte de tomate=, ...) -- 52 distinct values total.  No

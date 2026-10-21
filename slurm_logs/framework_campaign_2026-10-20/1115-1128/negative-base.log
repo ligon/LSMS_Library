@@ -1,0 +1,414 @@
+FFFFFFFFFFFFFFFFF                                                        [100%]
+=================================== FAILURES ===================================
+_____ TestRoundTripIsLossless.test_unknown_keys_in_the_record_are_rendered _____
+
+self = <tests.test_wave_provenance.TestRoundTripIsLossless object at 0x14625d6dc450>
+
+    def test_unknown_keys_in_the_record_are_rendered(self):
+        text = pv.render_source_org(pv.WaveProvenance(
+            country="X", wave="2020", source=pv.SOURCE_EXTERNAL,
+            url="https://example.org/x", recorded="2026-10-19",
+            extra={"SECONDARY_SOURCE": ["https://doi.org/10.7910/DVN/E5QP0F"],
+                   "LICENSE_SPDX": "CC0-1.0"}))      # a str renders too
+>       assert "#+SECONDARY_SOURCE: https://doi.org/10.7910/DVN/E5QP0F\n" \
+            in text
+E       AssertionError: assert '#+SECONDARY_SOURCE: https://doi.org/10.7910/DVN/E5QP0F\n' in 'SOURCE\n\nhttps://example.org/x\n\n#+CATALOG_ID: none\n#+CATALOG_URL: https://example.org/x\n#+PROVENANCE_SOURCE: external\n#+PROVENANCE_RECORDED: 2026-10-19\n'
+
+../1115-1128-provenance/tests/test_wave_provenance.py:1787: AssertionError
+_____ TestRoundTripIsLossless.test_a_repeated_unknown_key_keeps_every_line _____
+
+self = <tests.test_wave_provenance.TestRoundTripIsLossless object at 0x14625d6dca50>
+
+    def test_a_repeated_unknown_key_keeps_every_line(self):
+        """``extra`` used to keep the LAST value of a repeated key, so the
+        first ``#+SECONDARY_SOURCE:`` line vanished on render (red team r1)."""
+        text = ("SOURCE\n\nhttps://example.org/x\n\n"
+                "#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n"
+                "#+PROVENANCE_RECORDED: 2026-10-19\n"
+                "#+SECONDARY_SOURCE: https://a.example/one\n"
+                "#+SECONDARY_SOURCE: https://b.example/two\n")
+        prov = pv.parse_source_org(text, "X", "2020")
+>       assert prov.extra == {"SECONDARY_SOURCE": ["https://a.example/one",
+                                                   "https://b.example/two"]}
+E       AssertionError: assert {'SECONDARY_S....example/two'} == {'SECONDARY_S...example/two']}
+E         
+E         Differing items:
+E         {'SECONDARY_SOURCE': 'https://b.example/two'} != {'SECONDARY_SOURCE': ['https://a.example/one', 'https://b.example/two']}
+E         Use -v to get more diff
+
+../1115-1128-provenance/tests/test_wave_provenance.py:1805: AssertionError
+_ TestRoundTripIsLossless.test_an_empty_valued_key_does_not_swallow_the_next_line _
+
+self = <tests.test_wave_provenance.TestRoundTripIsLossless object at 0x14625d6dd090>
+
+    def test_an_empty_valued_key_does_not_swallow_the_next_line(self):
+        """``\\s*`` after the colon spanned the newline under MULTILINE, so
+        ``#+EMPTY_KEY:`` took the next line as its value and BOTH lines
+        vanished from the render (red team r1).  The value ends at its line."""
+        text = ("SOURCE\n\nhttps://example.org/x\n\n"
+                "#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n"
+                "#+PROVENANCE_RECORDED: 2026-10-19\n"
+                "#+EMPTY_KEY:\n#+SPACED_KEY: value\n")
+        prov = pv.parse_source_org(text, "X", "2020")
+>       assert prov.extra == {"EMPTY_KEY": [""], "SPACED_KEY": ["value"]}
+E       AssertionError: assert {'EMPTY_KEY':...D_KEY: value'} == {'EMPTY_KEY':...Y': ['value']}
+E         
+E         Differing items:
+E         {'EMPTY_KEY': '#+SPACED_KEY: value'} != {'EMPTY_KEY': ['']}
+E         Right contains 1 more item:
+E         {'SPACED_KEY': ['value']}
+E         Use -v to get more diff
+
+../1115-1128-provenance/tests/test_wave_provenance.py:1822: AssertionError
+________ TestRoundTripIsLossless.test_the_url_comes_from_the_body_only _________
+
+self = <tests.test_wave_provenance.TestRoundTripIsLossless object at 0x14625d6ddc90>
+
+    def test_the_url_comes_from_the_body_only(self):
+        """No URL in the body and none recorded: the record has no URL, even
+        with one in an unknown key or in the notes."""
+        text = ("SOURCE\n\n(source URL not recorded)\n\n"
+                "#+CATALOG_ID: none\n"
+                "#+SECONDARY_SOURCE: https://doi.org/10.7910/DVN/E5QP0F\n"
+                "#+PROVENANCE_SOURCE: external\n\n"
+                f"{pv.NOTES_HEADING}\nSee https://example.org/elsewhere\n")
+        prov = pv.parse_source_org(text, "GhanaSPS", "2017-18")
+>       assert prov.url is None
+E       AssertionError: assert 'https://doi.org/10.7910/DVN/E5QP0F' is None
+E        +  where 'https://doi.org/10.7910/DVN/E5QP0F' = WaveProvenance(country='GhanaSPS', wave='2017-18', source='external', catalog_id=None, idno=None, title=None, years=No...://example.org/elsewhere', extra={'SECONDARY_SOURCE': 'https://doi.org/10.7910/DVN/E5QP0F'}, catalog_ids=[], covers=[]).url
+
+../1115-1128-provenance/tests/test_wave_provenance.py:1861: AssertionError
+_ TestRoundTripIsLossless.test_keyword_lines_in_the_notes_stay_where_they_were_written _
+
+self = <tests.test_wave_provenance.TestRoundTripIsLossless object at 0x14625d6de290>
+
+    def test_keyword_lines_in_the_notes_stay_where_they_were_written(self):
+        notes = ("* Mixed vintage\n\nTen files came from Dataverse:\n\n"
+                 "#+SECONDARY_SOURCE: https://doi.org/10.7910/DVN/E5QP0F\n"
+                 "#+SECONDARY_SOURCE_LICENSE: CC0 1.0\n\n"
+                 "They are additions, not replacements.")
+        text = pv.render_source_org(pv.WaveProvenance(
+            country="GhanaSPS", wave="2017-18", source=pv.SOURCE_EXTERNAL,
+            recorded="2026-07-12", note="EGC-ISSER.", notes=notes))
+        prov = pv.parse_source_org(text, "GhanaSPS", "2017-18")
+>       assert prov.notes == notes               # verbatim, blank lines kept
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert '* Mixed vint...replacements.' == '* Mixed vint...replacements.'
+E         
+E           * Mixed vintage
+E         - 
+E           Ten files came from Dataverse:
+E         - 
+E         - #+SECONDARY_SOURCE: https://doi.org/10.7910/DVN/E5QP0F
+E         - #+SECONDARY_SOURCE_LICENSE: CC0 1.0
+E         - 
+E           They are additions, not replacements.
+
+../1115-1128-provenance/tests/test_wave_provenance.py:1878: AssertionError
+________ TestRoundTripIsLossless.test_the_placeholder_is_not_reingested ________
+
+self = <tests.test_wave_provenance.TestRoundTripIsLossless object at 0x14625d6de890>
+
+    def test_the_placeholder_is_not_reingested(self):
+        """It used to come back as the first line of the notes on the next
+        render (GhanaSPS/2017-18, five other shipped files)."""
+        first = pv.render_source_org(pv.WaveProvenance(
+            country="GhanaSPS", wave="2013-14", source=pv.SOURCE_EXTERNAL,
+            recorded="2026-07-12"))
+        assert pv.URL_PLACEHOLDER in first
+        prov = pv.parse_source_org(first, "GhanaSPS", "2013-14")
+>       assert prov.notes is None
+E       AssertionError: assert '(source URL not recorded)' is None
+E        +  where '(source URL not recorded)' = WaveProvenance(country='GhanaSPS', wave='2013-14', source='external', catalog_id=None, idno=None, title=None, years=No...d='2026-07-12', note=None, superseded_url=None, notes='(source URL not recorded)', extra={}, catalog_ids=[], covers=[]).notes
+
+../1115-1128-provenance/tests/test_wave_provenance.py:1892: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values0] _
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x14625d6f72d0>
+key = 'PROVENANCE_NOTE', values = ['first fact', 'second fact']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if key != 'PROVENANCE_RECORDED':
+            text += '#+PROVENANCE_RECORDED: 2026-10-20\n'
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+>       assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+E       AssertionError: assert ['second fact'] == ['first fact', 'second fact']
+E         
+E         At index 0 diff: 'second fact' != 'first fact'
+E         Right contains one more item: 'second fact'
+E         Use -v to get more diff
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values1] _
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x14625d6f7550>
+key = 'PROVENANCE_NOTE', values = ['same fact', 'same fact']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if key != 'PROVENANCE_RECORDED':
+            text += '#+PROVENANCE_RECORDED: 2026-10-20\n'
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+>       assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+E       AssertionError: assert ['same fact'] == ['same fact', 'same fact']
+E         
+E         Right contains one more item: 'same fact'
+E         Use -v to get more diff
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values2] _
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x14625d6f77d0>
+key = 'PROVENANCE_NOTE', values = ['first fact', '']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if key != 'PROVENANCE_RECORDED':
+            text += '#+PROVENANCE_RECORDED: 2026-10-20\n'
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+>       assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+E       AssertionError: assert ['first fact'] == ['first fact', '']
+E         
+E         Right contains one more item: ''
+E         Use -v to get more diff
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_IDNO-values3] _
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x14625d6f7a50>
+key = 'CATALOG_IDNO', values = ['held-one', 'held-two']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if key != 'PROVENANCE_RECORDED':
+            text += '#+PROVENANCE_RECORDED: 2026-10-20\n'
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+>       assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+E       AssertionError: assert ['held-two'] == ['held-one', 'held-two']
+E         
+E         At index 0 diff: 'held-two' != 'held-one'
+E         Right contains one more item: 'held-two'
+E         Use -v to get more diff
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_TITLE-values4] _
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x14625d6f7cd0>
+key = 'CATALOG_TITLE', values = ['']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if key != 'PROVENANCE_RECORDED':
+            text += '#+PROVENANCE_RECORDED: 2026-10-20\n'
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+>       assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+E       AssertionError: assert [] == ['']
+E         
+E         Right contains one more item: ''
+E         Use -v to get more diff
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2378: AssertionError
+_ TestPreservedKnownScalars.test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_RECORDED-values5] _
+
+self = <tests.test_wave_provenance.TestPreservedKnownScalars object at 0x14625d6f7f50>
+key = 'PROVENANCE_RECORDED', values = ['']
+
+    @pytest.mark.parametrize('key,values', [
+        ('PROVENANCE_NOTE', ['first fact', 'second fact']),
+        ('PROVENANCE_NOTE', ['same fact', 'same fact']),
+        ('PROVENANCE_NOTE', ['first fact', '']),
+        ('CATALOG_IDNO', ['held-one', 'held-two']),
+        ('CATALOG_TITLE', ['']),
+        ('PROVENANCE_RECORDED', ['']),
+    ])
+    def test_round_trip_keeps_each_known_scalar_occurrence(self, key, values):
+        text = ('SOURCE\n\nhttps://example.org/source\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if key != 'PROVENANCE_RECORDED':
+            text += '#+PROVENANCE_RECORDED: 2026-10-20\n'
+        text += ''.join(f'#+{key}: {value}\n' for value in values)
+        rec = pv.parse_source_org(text, 'Example', '2020')
+        rendered = pv.render_source_org(rec)
+>       assert [line.partition(':')[2].strip() for line in rendered.splitlines()
+                if line.startswith(f'#+{key}:')] == values
+E       AssertionError: assert ['2026-10-20'] == ['']
+E         
+E         At index 0 diff: '2026-10-20' != ''
+E         Use -v to get more diff
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2378: AssertionError
+_ TestPrimarySourceRouting.test_additional_bare_body_urls_are_preserved_as_notes[https://example.org/secondary] _
+
+self = <tests.test_wave_provenance.TestPrimarySourceRouting object at 0x14625d6f8750>
+secondary = 'https://example.org/secondary'
+
+    @pytest.mark.parametrize("secondary", ["https://example.org/secondary",
+                                            "https://example.org/primary"])
+    def test_additional_bare_body_urls_are_preserved_as_notes(self, secondary):
+        text = ("SOURCE\n\nhttps://example.org/primary\n" + secondary
+                + "\n\n#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n"
+                  "#+PROVENANCE_RECORDED: 2026-10-20\n")
+        record = pv.parse_source_org(text, "X", "2020")
+        assert record.url == "https://example.org/primary"
+>       assert record.notes == secondary
+E       AssertionError: assert None == 'https://example.org/secondary'
+E        +  where None = WaveProvenance(country='X', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, reposi...alidation=None, recorded='2026-10-20', note=None, superseded_url=None, notes=None, extra={}, catalog_ids=[], covers=[]).notes
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2416: AssertionError
+_ TestPrimarySourceRouting.test_additional_bare_body_urls_are_preserved_as_notes[https://example.org/primary] _
+
+self = <tests.test_wave_provenance.TestPrimarySourceRouting object at 0x14625d6f8950>
+secondary = 'https://example.org/primary'
+
+    @pytest.mark.parametrize("secondary", ["https://example.org/secondary",
+                                            "https://example.org/primary"])
+    def test_additional_bare_body_urls_are_preserved_as_notes(self, secondary):
+        text = ("SOURCE\n\nhttps://example.org/primary\n" + secondary
+                + "\n\n#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n"
+                  "#+PROVENANCE_RECORDED: 2026-10-20\n")
+        record = pv.parse_source_org(text, "X", "2020")
+        assert record.url == "https://example.org/primary"
+>       assert record.notes == secondary
+E       AssertionError: assert None == 'https://example.org/primary'
+E        +  where None = WaveProvenance(country='X', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, reposi...alidation=None, recorded='2026-10-20', note=None, superseded_url=None, notes=None, extra={}, catalog_ids=[], covers=[]).notes
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2416: AssertionError
+_ TestPrimarySourceRouting.test_explicit_primary_does_not_discard_a_different_body_url _
+
+self = <tests.test_wave_provenance.TestPrimarySourceRouting object at 0x14625d6f8c10>
+
+    def test_explicit_primary_does_not_discard_a_different_body_url(self):
+        text = ("SOURCE\n\nhttps://example.org/older-source\n\n"
+                "#+CATALOG_ID: none\n#+CATALOG_URL: https://example.org/primary\n"
+                "#+PROVENANCE_SOURCE: external\n#+PROVENANCE_RECORDED: 2026-10-20\n")
+        record = pv.parse_source_org(text, "X", "2020")
+        assert record.url == "https://example.org/primary"
+>       assert record.notes == "https://example.org/older-source"
+E       AssertionError: assert None == 'https://example.org/older-source'
+E        +  where None = WaveProvenance(country='X', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, reposi...alidation=None, recorded='2026-10-20', note=None, superseded_url=None, notes=None, extra={}, catalog_ids=[], covers=[]).notes
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2427: AssertionError
+_ TestPrimarySourceRouting.test_secondary_catalog_link_is_never_acquisition_routing[metadata] _
+
+self = <tests.test_wave_provenance.TestPrimarySourceRouting object at 0x14625d6f9490>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-44/test_secondary_catalog_link_is0/countries')
+region = 'metadata'
+
+    @pytest.mark.parametrize('region', ['metadata', 'notes'])
+    def test_secondary_catalog_link_is_never_acquisition_routing(self, countries, region):
+        from lsms_library import data_access as da
+        text = ('SOURCE\n\n(source URL not recorded)\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if region == 'notes':
+            text += f'\n{pv.NOTES_HEADING}\n'
+        text += '#+SECONDARY_SOURCE: https://microdata.worldbank.org/catalog/6410\n'
+        _write_source(countries, 'Example', '2020', text)
+>       assert pv.parse_source_org(text, 'Example', '2020').url is None
+E       AssertionError: assert 'https://microdata.worldbank.org/catalog/6410' is None
+E        +  where 'https://microdata.worldbank.org/catalog/6410' = WaveProvenance(country='Example', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, ... not recorded)', extra={'SECONDARY_SOURCE': 'https://microdata.worldbank.org/catalog/6410'}, catalog_ids=[], covers=[]).url
+E        +    where WaveProvenance(country='Example', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, ... not recorded)', extra={'SECONDARY_SOURCE': 'https://microdata.worldbank.org/catalog/6410'}, catalog_ids=[], covers=[]) = <function parse_source_org at 0x14625ed11120>('SOURCE\n\n(source URL not recorded)\n\n#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n#+SECONDARY_SOURCE: https://microdata.worldbank.org/catalog/6410\n', 'Example', '2020')
+E        +      where <function parse_source_org at 0x14625ed11120> = pv.parse_source_org
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2439: AssertionError
+_ TestPrimarySourceRouting.test_secondary_catalog_link_is_never_acquisition_routing[notes] _
+
+self = <tests.test_wave_provenance.TestPrimarySourceRouting object at 0x14625d6f95d0>
+countries = PosixPath('/local/job40255479/tmp/pytest-of-ligon/pytest-44/test_secondary_catalog_link_is1/countries')
+region = 'notes'
+
+    @pytest.mark.parametrize('region', ['metadata', 'notes'])
+    def test_secondary_catalog_link_is_never_acquisition_routing(self, countries, region):
+        from lsms_library import data_access as da
+        text = ('SOURCE\n\n(source URL not recorded)\n\n'
+                '#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n')
+        if region == 'notes':
+            text += f'\n{pv.NOTES_HEADING}\n'
+        text += '#+SECONDARY_SOURCE: https://microdata.worldbank.org/catalog/6410\n'
+        _write_source(countries, 'Example', '2020', text)
+>       assert pv.parse_source_org(text, 'Example', '2020').url is None
+E       AssertionError: assert 'https://microdata.worldbank.org/catalog/6410' is None
+E        +  where 'https://microdata.worldbank.org/catalog/6410' = WaveProvenance(country='Example', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, ...one, notes=None, extra={'SECONDARY_SOURCE': 'https://microdata.worldbank.org/catalog/6410'}, catalog_ids=[], covers=[]).url
+E        +    where WaveProvenance(country='Example', wave='2020', source='external', catalog_id=None, idno=None, title=None, years=None, ...one, notes=None, extra={'SECONDARY_SOURCE': 'https://microdata.worldbank.org/catalog/6410'}, catalog_ids=[], covers=[]) = <function parse_source_org at 0x14625ed11120>('SOURCE\n\n(source URL not recorded)\n\n#+CATALOG_ID: none\n#+PROVENANCE_SOURCE: external\n\n* Notes (preserved from the original SOURCE.org)\n#+SECONDARY_SOURCE: https://microdata.worldbank.org/catalog/6410\n', 'Example', '2020')
+E        +      where <function parse_source_org at 0x14625ed11120> = pv.parse_source_org
+
+../1115-1128-provenance/tests/test_wave_provenance.py:2439: AssertionError
+=========================== short test summary info ============================
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestRoundTripIsLossless::test_unknown_keys_in_the_record_are_rendered
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestRoundTripIsLossless::test_a_repeated_unknown_key_keeps_every_line
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestRoundTripIsLossless::test_an_empty_valued_key_does_not_swallow_the_next_line
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestRoundTripIsLossless::test_the_url_comes_from_the_body_only
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestRoundTripIsLossless::test_keyword_lines_in_the_notes_stay_where_they_were_written
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestRoundTripIsLossless::test_the_placeholder_is_not_reingested
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values0]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values1]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_NOTE-values2]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_IDNO-values3]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[CATALOG_TITLE-values4]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPreservedKnownScalars::test_round_trip_keeps_each_known_scalar_occurrence[PROVENANCE_RECORDED-values5]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPrimarySourceRouting::test_additional_bare_body_urls_are_preserved_as_notes[https://example.org/secondary]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPrimarySourceRouting::test_additional_bare_body_urls_are_preserved_as_notes[https://example.org/primary]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPrimarySourceRouting::test_explicit_primary_does_not_discard_a_different_body_url
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPrimarySourceRouting::test_secondary_catalog_link_is_never_acquisition_routing[metadata]
+FAILED ../1115-1128-provenance/tests/test_wave_provenance.py::TestPrimarySourceRouting::test_secondary_catalog_link_is_never_acquisition_routing[notes]
+17 failed, 137 deselected in 1.40s

@@ -22,6 +22,13 @@ run clears it.  No entry currently carries a null: the two that did (GH #772)
 were regenerated once data access was available.  The mechanism is kept for
 the next fix that lands without it.
 
+An optional ``content_hash_variants`` list permits only measured exact raw
+fingerprints in addition to the primary hash.  Uganda nutrition's Haswell
+OpenBLAS result differs from its approved SkylakeX result by at most two
+float64 ULPs in eight cells (ledger ``uganda-nutrition-cpu-hash.md`` sections
+3-4).  This finite allowance does not round values, relax structural checks,
+or accept an unmeasured exact fingerprint.  A null primary remains unpinned.
+
 A parquet whose ``lsms_cache_waves`` manifest does not cover the waves its
 baseline entry was taken over is skipped, not compared (GH #1113): it is a
 correct partial build left by a subset request (GH #891), and under xdist
@@ -239,8 +246,10 @@ def test_parquet_matches_baseline(uganda_root, uganda_waves, rel_path):
 
     # Check content hash
     if baseline_entry["content_hash"] is not None:
-        assert actual["content_hash"] == baseline_entry["content_hash"], (
+        accepted_hashes = [baseline_entry["content_hash"],
+                           *baseline_entry.get("content_hash_variants", [])]
+        assert actual["content_hash"] in accepted_hashes, (
             f"{rel_path}: content hash mismatch (data differs):\n"
             f"  actual:   {actual['content_hash']}\n"
-            f"  expected: {baseline_entry['content_hash']}"
+            f"  expected exact hash(es): {accepted_hashes}"
         )

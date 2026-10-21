@@ -1,0 +1,86 @@
+{
+  "assets": {
+    "digest": "9202ed542a14",
+    "normalized_hash_sha256": "2a39a764acd62c79c23903c50dfa8b5f89c28b0aefb63a844e567dc86d22d302",
+    "shape": [
+      116808,
+      1
+    ]
+  },
+  "base_commit": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "data_root": "/local/job40255479/windows-ci-data",
+  "package": "/local/job40255479/worktrees/windows-ci/lsms_library/__init__.py",
+  "shared_l1_only": "/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/dvc-cache",
+  "shocks": {
+    "change": "Only HowCoped0/1/2: etc<U+0085>) -> etc<U+2026>)",
+    "changed_by_wave": {
+      "HowCoped0": {
+        "2010-11": 209,
+        "2011-12": 108,
+        "2013-14": 340,
+        "2015-16": 205
+      },
+      "HowCoped1": {
+        "2010-11": 241,
+        "2011-12": 162,
+        "2013-14": 220,
+        "2015-16": 133
+      },
+      "HowCoped2": {
+        "2010-11": 165,
+        "2011-12": 103,
+        "2013-14": 102,
+        "2015-16": 24
+      }
+    },
+    "changed_cells": 2012,
+    "columns": [
+      "Year",
+      "Onset",
+      "Duration",
+      "AffectedIncome",
+      "AffectedAssets",
+      "AffectedProduction",
+      "AffectedConsumption",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2"
+    ],
+    "counterfactual_old_decoding": {
+      "digest": "64a53fa7af55",
+      "normalized_hash_sha256": "ae08efee08219851b2f2dc65e75d48cd4836f72dfd8f47f2d5cde2a5d1515980"
+    },
+    "current": {
+      "digest": "0ab2ea4c79dd",
+      "normalized_hash_sha256": "8920461aa61f20c150b7595c6e1a74baa4a5d4e12420a8e805f744b82a4add34"
+    },
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "string",
+      "HowCoped1": "string",
+      "HowCoped2": "string",
+      "Onset": "Float64",
+      "Year": "Float64"
+    },
+    "exact_index_columns_dtypes_other_values_unchanged": true,
+    "exact_roundtrip_frame_equal": true,
+    "index_dtypes": [
+      "str",
+      "str",
+      "str"
+    ],
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      14457,
+      10
+    ]
+  }
+}

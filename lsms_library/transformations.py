@@ -1598,28 +1598,72 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
 # -- 4x and 16x overstatements of a half- and quarter-kilo packet.  Same shape
 # as the plural bug GH #850 fixed: a regex that reads PART of a
 # self-describing label and asserts the result.
+#
+# The number group also admits a COMMA (GH #1143), and for the same reason.
+# Without it ``Bouteille de 1,5 L`` matched the ``5`` adjacent to ``L`` and was
+# served 5.0 kg, ``Sac (0,9 kg)`` 9.0 kg and ``12,5 cl`` 0.05 kg -- the
+# French-style decimal comma every EHCVM unit vocabulary uses.  The regex only
+# CAPTURES a comma token; :func:`_metric_number` decides what it means
+# (decimal or thousands) and refuses anything else, so the parser returns
+# ``None`` rather than reading a part of a number it cannot read whole.  The
+# token captures separators even when malformed: validation belongs to
+# _metric_number, and must see the whole token rather than a suffix after a
+# repeated comma, slash or whitespace (ledger 1143-decimal-comma §3/§4).
+# The left boundary forbids beginning at a digit or punctuation suffix.
+_METRIC_NUMBER = r'(?<![\d.,])(\d[\d.,]*(?:\s*/+\s*[\d.,]*)*)'
+
 _EXPLICIT_METRIC_PATTERNS = (
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:kilogrammes?|kilograms?|kgs?)\b',
                 re.IGNORECASE), 1, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:grammes?|grams?|gms?|grs?|g)\b',
                 re.IGNORECASE), 1/1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*milligrammes?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*milligrammes?\b',
                 re.IGNORECASE), 1e-6, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*tonnes?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*tonnes?\b',
                 re.IGNORECASE), 1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:lbs?|pounds?)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:lbs?|pounds?)\b',
                 re.IGNORECASE), 0.453592, False),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*millilitres?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*millilitres?\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*centilitres?\b',
+    (re.compile(_METRIC_NUMBER + r'\s*centilitres?\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*ml\b',
+    (re.compile(_METRIC_NUMBER + r'\s*ml\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*cl\b',
+    (re.compile(_METRIC_NUMBER + r'\s*cl\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
+    (re.compile(_METRIC_NUMBER + r'\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
                 re.IGNORECASE), 1, True),
 )
+
+# The two comma grammars (GH #1143).  Disjoint by construction: a decimal
+# comma has exactly one comma and one or two digits after it; a thousands
+# separator has every group after a comma exactly three digits long and no
+# leading ``0,``.  A leading-zero comma is decimal at any precision, as in
+# ``0,125`` (ledger 1143-decimal-comma §3). A token that is neither (``1,5000``,
+# ``1,50,000``) is ambiguous and is refused, never guessed.
+_DECIMAL_COMMA = re.compile(r'(?:\d+,\d{1,2}|0,\d+)')
+_THOUSANDS_COMMA = re.compile(r'(?!0,)\d{1,3}(?:,\d{3})+')
+
+
+def _metric_scalar(text):
+    """Value of one number token (no fraction): dot-decimal or comma-aware.
+
+    >>> _metric_scalar('1,5'), _metric_scalar('12,5'), _metric_scalar('1,25')
+    (1.5, 12.5, 1.25)
+    >>> _metric_scalar('1,500'), _metric_scalar('10,000')
+    (1500.0, 10000.0)
+    >>> _metric_scalar('0,500')
+    0.5
+    """
+    t = str(text).strip()
+    if ',' not in t:
+        return float(t)
+    if '.' not in t:
+        if _DECIMAL_COMMA.fullmatch(t):
+            return float(t.replace(',', '.'))
+        if _THOUSANDS_COMMA.fullmatch(t):
+            return float(t.replace(',', ''))
+    raise ValueError(f"ambiguous comma in metric number {t!r}")
 
 
 def _metric_number(text):
@@ -1631,15 +1675,18 @@ def _metric_number(text):
     (``Packet(1/2lt / 1/2kg)``, ``Packet -medium (1/4kg)``).  Before this the
     pattern captured only the digits adjacent to the unit token, so those read
     as 2 kg and 4 kg -- a 4x and a 16x overstatement.
+
+    A comma is read by :func:`_metric_scalar` (GH #1143): ``'1,5'`` -> 1.5,
+    ``'1,500'`` -> 1500.0, and an ambiguous comma raises ``ValueError``.
     """
     t = str(text).strip()
     if '/' in t:
         num, _, den = t.partition('/')
-        d = float(den.strip())
+        d = _metric_scalar(den)
         if d == 0:
             raise ZeroDivisionError(t)
-        return float(num.strip()) / d
-    return float(t)
+        return _metric_scalar(num) / d
+    return _metric_scalar(t)
 
 
 def _parse_explicit_metric(s, *, volume_as_mass=True):
@@ -1696,6 +1743,27 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     0.25
     >>> _parse_explicit_metric('3/4 kg')
     0.75
+
+    Decimal commas (GH #1143).  The EHCVM unit vocabularies spell sizes the
+    French way; before the fix each of these read only the digits adjacent to
+    the unit token (5.0, 9.0, 5.0 and 0.05).
+
+    >>> _parse_explicit_metric('Bouteille de 1,5 L')
+    1.5
+    >>> _parse_explicit_metric('Sac (0,9 Kg)')
+    0.9
+    >>> _parse_explicit_metric('Filet (2,5Kg)')
+    2.5
+    >>> _parse_explicit_metric('12,5cl(demi walatt)')
+    0.125
+
+    A comma followed by three-digit groups is a thousands separator; a comma
+    that fits neither grammar is refused rather than partly read.
+
+    >>> _parse_explicit_metric('1,500 kg')
+    1500.0
+    >>> _parse_explicit_metric('0,125 kg')
+    0.125
     """
     if not isinstance(s, str):
         return None
@@ -1704,6 +1772,11 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
             continue
         m = pattern.search(s)
         if m:
+            # Refuse numeric suffixes after whitespace / exponent notation,
+            # preserving numbered labels ("1001. 12,5 cl") and the existing
+            # inner size in multiplier labels ("2x500g") (ledger §3/§4).
+            if re.search(r'(?:[\d,]\s+|\d[eE][\s+-]*)$', s[:m.start()]):
+                return None
             try:
                 return _metric_number(m.group(1)) * scale
             except (ValueError, IndexError, ZeroDivisionError, TypeError):
@@ -4092,7 +4165,8 @@ def _shipped_factor_lookup(df, shipped_factors):
 #: ``population`` / ``recall`` / ``derivations`` records are, so a pooled
 #: ``Feature`` frame's record is the plain union of its countries' records
 #: (``feature._ATTRS_CARRIERS``) and each row can be served its OWN country's
-#: table.  Written by ``Country._finalize_result`` on ``crop_production`` from
+#: table.  Written by ``Country._finalize_result`` on ``crop_production`` and
+#: ``plot_inputs`` from
 #: ``Country._unit_kg_factors`` -- the country's merged ``u`` and ``u_kg``
 #: categorical tables, the same composition the food ladder is handed -- and
 #: read by :func:`harvest_kg_factors` when its ``unit_kg`` is left ``None``.
@@ -4171,7 +4245,7 @@ def _declared_kg_factors(df, unit_kg):
             table = next(iter(tables.values()))
         else:
             warnings.warn(
-                f"harvest_kg_factors: the declared unit_kg record names "
+                f"the declared unit_kg record names "
                 f"{sorted(tables)} but the frame has no 'country' level or "
                 f"column and no attrs['country'] among them, so no row can be "
                 f"matched to its country's table and NONE is applied.  Keep "
@@ -4186,6 +4260,23 @@ def _declared_kg_factors(df, unit_kg):
         if rows.any():
             out[rows] = _as_float(units[rows].map(table))
     return _valid_factor(out), origin
+
+
+def _kg_factor_series_with_declared(df, *, volume_as_mass=True, unit_kg=None):
+    """Existing unit-factor fallback, overlaid with each row's declaration.
+
+    Reuses the resolver and precedence of the crop ladder (GH #1093,
+    ledger ``1093-declared-unit-factors.md`` sections 2-4).  Kept separate
+    from ``_kg_factor_series`` because ``harvest_kg_factors`` needs that
+    unmodified fallback to construct its own reported/shipped/audit layers.
+    ``None`` reads attrs; an explicit empty mapping suppresses that record.
+    A declaration never supplies a unit to a missing-unit sentinel.
+    """
+    fallback = _kg_factor_series(df, volume_as_mass=volume_as_mass)
+    declared, _ = _declared_kg_factors(df, unit_kg)
+    declared = np.where(_unit_sentinel_mask(df), np.nan, declared)
+    return pd.Series(np.where(np.isnan(declared), fallback.to_numpy(), declared),
+                     index=df.index, dtype='float64')
 
 
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
@@ -5330,7 +5421,30 @@ def _warn_nitrogen_coverage(tally, total_mass, n_rows):
             NutrientCoverageWarning, stacklevel=3)
 
 
-def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
+def _plot_input_country_index(df):
+    """Keep country identity before plot-input filtering (GH #1159).
+
+    Reuses the column-promotion pattern of ``_with_u_in_index`` and the
+    index-before-column convention of ``_declared_kg_factors``; see ledger
+    ``1159-pooled-reducers.md`` sections 2-4.  Metadata alone adds no axis.
+    """
+    country = _level_or_column(df, 'country')
+    if country is not None:
+        if pd.isna(country).any():
+            raise ValueError(
+                "plot_inputs country labels must be non-null; supply each "
+                "row's country or split into country-less frames")
+        if not any(name in df.index.names for name in ('t', 'i', *_PLOT_LEVELS)):
+            raise ValueError(
+                "plot_inputs must carry local plot identity in its index "
+                "('t', 'i', or 'plot_id'); country alone is not a plot key")
+        if 'country' not in df.index.names:
+            return df.set_index('country', append=True)
+    return df
+
+
+def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
+                unit_kg=None):
     """Kilograms of nitrogen applied per plot (WB ``nitrogen_kg``).
 
     MECHANICAL reduction (GAP 2).  For each fertilizer input row, convert
@@ -5348,13 +5462,22 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
         product).  Defaults to :data:`_NITROGEN_CONTENT`.
     volume_as_mass : bool, default True
         Forwarded to the unit→kg conversion.
+    unit_kg : mapping, optional
+        Declared unit masses, overriding metric/inferred unit factors.
+        Defaults to ``plot_inputs.attrs['unit_kg']``; an explicit empty
+        mapping disables declarations.  Accepts per-country records as in
+        :func:`harvest_kg_factors`.
 
     Returns
     -------
     pd.DataFrame
-        One ``Nitrogen_kg`` column indexed by ``(t, i, plot_id)``.  Plots with
-        fertilizer input but no convertible-unit row sum to 0; plots with no
-        fertilizer at all are absent.  ``attrs['nitrogen_input_match']``
+        One ``Nitrogen_kg`` column indexed by ``(t, i, plot_id)``.  If the
+        input carries ``country`` as an index level or column, the index is
+        ``(country, t, i, plot_id)``, including for one country or an empty
+        result.  Country labels must be non-null; country metadata alone
+        does not add an axis.  Rows without a convertible quantity do not
+        contribute; plots with no contributing fertilizer rows are absent.
+        ``attrs['nitrogen_input_match']``
         carries the label-join tally -- ``matched_rows`` /
         ``unmatched_rows`` / ``matched_labels`` / ``unmatched_labels``
         (label -> row count, descending), and ``refused_organic_rows`` /
@@ -5399,7 +5522,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     explicit ``nitrogen_content`` to reproduce a particular country's table.
     """
     content = _NITROGEN_CONTENT if nitrogen_content is None else nitrogen_content
-    df = plot_inputs.copy()
+    df = _plot_input_country_index(plot_inputs.copy())
     if 'Quantity' not in df.columns:
         raise ValueError("plot_inputs must have a 'Quantity' column")
 
@@ -5417,17 +5540,10 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     n_share, _match_tally = _nitrogen_shares(inp, content)
     n_share.index = df.index
 
-    # Resolve a kg quantity.  Uganda keeps the unit in a *column* ``u``; the
-    # shared factor machinery wants ``u`` in the index, so temporarily
-    # promote it when needed.
-    if 'u' in (df.index.names or []):
-        kg_per_unit = _kg_factor_series(df, volume_as_mass=volume_as_mass)
-    elif 'u' in df.columns:
-        tmp = df.set_index('u', append=True)
-        kg_per_unit = _kg_factor_series(tmp, volume_as_mass=volume_as_mass)
-        kg_per_unit.index = df.index
-    else:
+    if 'u' not in (df.index.names or []) and 'u' not in df.columns:
         raise ValueError("plot_inputs must carry a 'u' unit level or column")
+    kg_per_unit = _kg_factor_series_with_declared(
+        df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     qty = pd.to_numeric(df['Quantity'], errors='coerce')
     n_kg = qty * kg_per_unit * n_share
@@ -5437,7 +5553,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
 
     out = pd.DataFrame({'Nitrogen_kg': n_kg}).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level]
+    group_by = [n for n in ['country', 't', 'i', plot_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
     res = _canonicalise_plot_level(res, plot_level)
@@ -5450,7 +5566,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     return res
 
 
-def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
+def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True, unit_kg=None):
     """Kilograms of seed applied per plot (WB ``seed_kg``).
 
     MECHANICAL reduction (GAP 2).  Filters ``plot_inputs`` to seed rows,
@@ -5467,11 +5583,18 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
         Preferred Label).
     volume_as_mass : bool, default True
         Forwarded to the unit→kg conversion.
+    unit_kg : mapping, optional
+        Declared unit masses, as in :func:`nitrogen_kg`.  ``None`` reads
+        ``plot_inputs.attrs['unit_kg']``; ``{}`` disables declarations.
 
     Returns
     -------
     pd.DataFrame
-        One ``Seed_kg`` column indexed by ``(t, i, plot_id)``.
+        One ``Seed_kg`` column indexed by ``(t, i, plot_id)``.  If the
+        input carries ``country`` as an index level or column, the index is
+        ``(country, t, i, plot_id)``, including for one country or an empty
+        result.  Country labels must be non-null; country metadata alone
+        does not add an axis.
 
     Notes
     -----
@@ -5480,7 +5603,7 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
     matching the WB ``seed_kg`` which is also NaN there.  Otherwise shares
     the metric-unit conversion caveat of :func:`harvest_kg`.
     """
-    df = plot_inputs
+    df = _plot_input_country_index(plot_inputs)
     if 'Quantity' not in df.columns:
         raise ValueError("plot_inputs must have a 'Quantity' column")
     if 'input' in (df.index.names or []):
@@ -5492,20 +5615,16 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
         raise ValueError("plot_inputs must have an 'input' level or column")
 
     seed = seed.copy()
-    if 'u' in (seed.index.names or []):
-        kg_per_unit = _kg_factor_series(seed, volume_as_mass=volume_as_mass)
-    elif 'u' in seed.columns:
-        tmp = seed.set_index('u', append=True)
-        kg_per_unit = _kg_factor_series(tmp, volume_as_mass=volume_as_mass)
-        kg_per_unit.index = seed.index
-    else:
+    if 'u' not in (seed.index.names or []) and 'u' not in seed.columns:
         raise ValueError("plot_inputs must carry a 'u' unit level or column")
+    kg_per_unit = _kg_factor_series_with_declared(
+        seed, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     qty = pd.to_numeric(seed['Quantity'], errors='coerce')
     kg = qty * kg_per_unit
     out = pd.DataFrame({'Seed_kg': kg}).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level]
+    group_by = [n for n in ['country', 't', 'i', plot_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
     res = _canonicalise_plot_level(res, plot_level)
@@ -6719,6 +6838,11 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         One column -- ``Nitrogen_kg_per_ha`` or ``Fertilizer_kg_per_ha``,
         named for the numerator so the basis cannot be lost -- indexed by
         ``(t, i, plot_id)`` (or ``(t, i, parcel)`` for ``on='parcel'``).
+        If both inputs carry a ``country`` index level or column, country
+        is retained as the first grouping, joining and output level, even
+        for one country or empty results. Country labels must be non-null;
+        country on only one input is refused. Index labels take precedence
+        over a redundant column; attrs alone do not supply country.
 
     Notes
     -----
@@ -6750,6 +6874,19 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         raise ValueError(
             f"fertilizer_rate on= must be 'plot' or 'parcel', got {on!r}")
 
+    # GH #1160 / ledger sections 2-4: country is part of both land keys.
+    # Validate identity before nutrient or positive-area filtering. The
+    # numerator's existing helper validates its own non-null country labels.
+    input_country = _level_or_column(plot_inputs, 'country')
+    area_country = _level_or_column(plot_features, 'country')
+    if (input_country is None) != (area_country is None):
+        raise ValueError(
+            "fertilizer_rate: country labels must be present on both "
+            "plot_inputs and plot_features, or absent from both")
+    if area_country is not None and pd.isna(area_country).any():
+        raise ValueError(
+            "fertilizer_rate: plot_features country labels must be non-null")
+
     if nutrient == 'N':
         num = nitrogen_kg(plot_inputs, volume_as_mass=volume_as_mass)
         num_col, out_col = 'Nitrogen_kg', 'Nitrogen_kg_per_ha'
@@ -6770,7 +6907,12 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
             "fertilizer_rate: the fertilizer numerator has no 'plot_id' level "
             "to join area on")
 
-    pf = plot_features.reset_index()
+    # Preserve accepted area keys in columns. Only remove a redundant
+    # country column when the index is the authoritative identity source.
+    pf = plot_features
+    if 'country' in pf.index.names and 'country' in pf.columns:
+        pf = pf.drop(columns='country')
+    pf = pf.reset_index()
     plot_key = _resolve_plot_level(pf.columns)
     if plot_key is None:
         raise ValueError(
@@ -6778,7 +6920,8 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     if area_col not in pf.columns:
         raise ValueError(f"plot_features must have a {area_col!r} column")
 
-    base = [k for k in ['t', 'i'] if k in num.columns and k in pf.columns]
+    base = [k for k in ['country', 't', 'i']
+            if k in num.columns and k in pf.columns]
 
     if on == 'parcel':
         num['_land'] = [
@@ -6792,6 +6935,12 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         num['_land'] = num[num_key].astype(str)
         pf['_land'] = pf[plot_key].astype(str)
 
+    # An empty parcel comprehension otherwise infers float, unlike the
+    # string keys returned by both parcel helpers. Preserve the pooled
+    # empty-result contract without changing country-less behavior.
+    if input_country is not None and num.empty:
+        num['_land'] = num['_land'].astype(str)
+
     keys = base + ['_land']
     fert = num.groupby(keys, dropna=False)[num_col].sum().reset_index()
 
@@ -6804,17 +6953,27 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         # Silent emptiness is the failure this guard exists for: both sides
         # have rows, the inner merge matched none, and the result is a
         # correctly-shaped frame with nothing in it.
-        warnings.warn(
-            f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer land "
-            f"key(s) and the {len(area):,} area land key(s) have NO value in "
-            "common, so the result is empty. The two features use different "
-            "plot vocabularies -- e.g. Uganda's ag modules key plots "
-            "'{hhid}-{parcel}-{plot}' while plot_features keys them "
-            f"'{{parcel}}_{{suffix}}'. Examples -- fertilizer: "
-            f"{sorted(map(str, fert['_land'].unique()))[:3]}; area: "
-            f"{sorted(map(str, area['_land'].unique()))[:3]}. Try "
-            f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
-            PlotGrainMismatchWarning, stacklevel=2)
+        if 'country' in base:
+            warnings.warn(
+                f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer "
+                f"country/land key(s) and the {len(area):,} area country/land "
+                "key(s) have NO value in common, so the result is empty. "
+                "Check both country labels and land vocabularies. Examples "
+                f"-- fertilizer: {list(fert[keys].head(3).itertuples(index=False, name=None))}; "
+                f"area: {list(area[keys].head(3).itertuples(index=False, name=None))}.",
+                PlotGrainMismatchWarning, stacklevel=2)
+        else:
+            warnings.warn(
+                f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer land "
+                f"key(s) and the {len(area):,} area land key(s) have NO value in "
+                "common, so the result is empty. The two features use different "
+                "plot vocabularies -- e.g. Uganda's ag modules key plots "
+                "'{hhid}-{parcel}-{plot}' while plot_features keys them "
+                f"'{{parcel}}_{{suffix}}'. Examples -- fertilizer: "
+                f"{sorted(map(str, fert['_land'].unique()))[:3]}; area: "
+                f"{sorted(map(str, area['_land'].unique()))[:3]}. Try "
+                f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
+                PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged[out_col] = merged[num_col] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=[out_col])
@@ -7075,6 +7234,7 @@ def median_price_valuation(item_df, geo_levels, *,
                            threshold=10,
                            weight_col=None,
                            volume_as_mass=True,
+                           unit_kg=None,
                            price_col='_unit_price',
                            out_col='Value'):
     """Value item rows at a geography-ladder *median unit price* (WB valuation).
@@ -7195,6 +7355,11 @@ def median_price_valuation(item_df, geo_levels, *,
         ``tests/test_median_price_valuation.py``.  See :func:`_weighted_median`.
     volume_as_mass : bool, default True
         Forwarded to the kg conversion of ``qty_col`` when ``kg_qty`` is None.
+    unit_kg : mapping, optional
+        Declared unit masses for converting ``qty_col`` when ``kg_qty`` is
+        None, as in :func:`harvest_kg_factors`.  Defaults to
+        ``item_df.attrs['unit_kg']``; ``{}`` suppresses that record.
+        An explicit ``kg_qty`` remains authoritative and ignores this option.
     price_col : str, default '_unit_price'
         Name for the imputed-price column added to the returned frame.
     out_col : str, default 'Value'
@@ -7268,8 +7433,8 @@ def median_price_valuation(item_df, geo_levels, *,
             raise ValueError(f"item_df must have a {qty_col!r} column "
                              "(or pass kg_qty)")
         sold_native = pd.to_numeric(df[qty_col], errors='coerce')
-        sold_kg = sold_native * _kg_factor_series(
-            df, volume_as_mass=volume_as_mass)
+        sold_kg = sold_native * _kg_factor_series_with_declared(
+            df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     # Step 1: observed unit price; zero/inf priced rows excluded from the pool.
     with np.errstate(divide='ignore', invalid='ignore'):
