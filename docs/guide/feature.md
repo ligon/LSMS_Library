@@ -42,6 +42,15 @@ Mali     2014-15  1003  1           M    45   0           0         consanguinea
 Uganda   2019-20  4001  1           M    52   0           0         consanguineal
 ```
 
+`transformations.seed_kg` and `transformations.nitrogen_kg` retain this
+country identity when reducing pooled `plot_inputs` to plots. Their output
+index is `(country, t, i, plot_id)` whenever the input carries a `country`
+index level or column, including one selected country and empty results.
+Country labels must be non-null. Ordinary country-less inputs return
+`(t, i, plot_id)`; `attrs['country']` alone does not add an index level.
+This contract covers these two reducers; other transforms have their own
+documented grouping and joining contracts.
+
 ## Design Decisions
 
 ### Lazy Loading
