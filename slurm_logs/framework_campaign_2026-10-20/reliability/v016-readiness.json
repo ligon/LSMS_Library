@@ -380,5 +380,21 @@
   ],
   "heavy_tests_launched": false,
   "github_writes": false,
-  "source_or_git_mutations": false
+  "source_or_git_mutations": false,
+  "current_checkpoint": {
+    "observed_utc": "2026-10-21T01:56:55.481735+00:00",
+    "supersedes_original_ci_snapshot": true,
+    "source_852_ci": "failed one Uganda nutrition raw hash;6107passed,2744skipped,4xfail,1xpass",
+    "diagnosis": "identical operands under measured BLAS kernels reproduce both exact hashes,8cells,max2ULP; actualCIkernel notlogged",
+    "repair": "optional exact nutrition-only variant;primary approved hash retained;implementation/review inprogress",
+    "new_delegated_scope": [
+      778,
+      1115,
+      1128,
+      1159
+    ],
+    "followup_integration": "2ff4bc737 (reviewed778+1159;provenance notyetintegrated)",
+    "provenance_review": "round2 at44f6cd2e7 inprogress afterguardfix",
+    "no_release_or_protection_change": true
+  }
 }

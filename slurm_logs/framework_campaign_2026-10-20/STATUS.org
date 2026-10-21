@@ -81,11 +81,14 @@ Another 125 local frame comparisons cover 16,139,392 rows with equal index/cell 
 The audit's order-only country set differs from the serialized cold corpus set and is recorded separately.
 Evidence: [[file:1124-1125/canonical/README.org][paired canonical report and reproduction]], [[file:reliability/interview-delta-independent-review.org][independent interview review]], [[file:reliability/non-interview-delta-independent-review.org][independent remaining-warning review]].
 
-* Verification still running
+* GitHub validation hold
 
-- Exact-head GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], source =852=; native Windows, unit and smoke pass, credentialed Linux data job still runs.
+- Exact-head GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], source =852=; native Windows, unit and smoke pass. Credentialed Linux completed with one failure, 6,107 passes, 2,744 skips, four expected failures and one non-strict unexpected pass in 5,374.11 seconds. The credential gate passed.
+- Failure :: Uganda raw =var/nutrition.parquet= shape/columns/index/dtypes match, but content hash =f3d3c34d...89fd6= differs from approved =12d25f6e...50e3a=. The local cold raw frame retains the approved hash. Both GitHub runs have matching installed dependency versions; no raw CI parquet artifact exists.
+  Fixed operands reproduce the exact failed hash under Haswell and the approved hash under SkylakeX, reversibly, with only eight cells/two ULPs changed. Parent independently reproduced the complete sequence.
+  An isolated test-only repair is being implemented at =/local/job40255479/worktrees/uganda-nutrition-cpu-hash=: preserve primary12d25 and accept only the measured exact nutrition variant, retaining all structural/other-entry checks. No production arithmetic changes or full baseline regeneration. [[file:nutrition-ci-diagnosis/REPORT.org][Diagnosis]], [[file:nutrition-ci-diagnosis/parent-review.json][parent replay]]. [[file:validation/combined-linux-data-summary.json][Exact failure summary]].
 
-Do not change integration HEAD or its source while these validators run.
+Preserve integration852 as the exact diagnosis control; new work is isolated on the follow-up branch.
 No source fix was made for the pre-existing roster ordering or Mali dtype behavior.
 
 * Changes and remaining decisions
@@ -135,8 +138,11 @@ No GitHub PR merge, release or protection change is authorized by the dispatch.
 Follow-up checkpoint:
 
 - #1159 :: Frozen =45f80dcb5= (runtime =da84c7c79=), producer 260 focused passes and 71 baseline failures; parent independent review passes the same 260 plus sixteen additional controls. All 549/2139/39 hashes are unchanged. [[file:1159-review/review.org][Independent review]].
-- #778 :: Frozen =3c97f20db= (runtime =2aef1c2ac=), 190 focused passes and six final baseline failures; independent review by windows_ci is running. All 549/2139/39 hashes are unchanged.
-- #1115/#1128 :: Implementation and read-only 130-file census underway; 341 related tests passed before an additional bare-URL note-preservation control. The candidate is not frozen yet. framework_reliability has prepared independent review and awaits a frozen SHA.
+- #778 :: Frozen =f7eb194d7= (runtime =2aef1c2ac=), 190 focused passes and six final baseline failures; independent review passes 67 checks. The report replacement count is corrected from 19 to measured 18 without runtime changes. All 549/2139/39 hashes are unchanged. [[file:778-review/review.org][Independent review]].
+- #1115/#1128 :: Runtime =519437658= / final documentation =13beb2fa5= underwent independent review. One synthetic ambiguous repeated-source record can still lose held catalog identity; round-one review found the unsafe loss, and a narrow explicit-refusal guard is committed at revised frozen =44f6cd2e7=. The unchanged twenty independent controls pass; the broader round-two review is running. Completed checks: 344 related tests, 23 read/write policy tests, strict API audit, unchanged 130-file SOURCE census and zero movement in 549 country/2139 wave/40 table-plus-aggregate fingerprints. An optional broader matrix was interrupted and is recorded separately, not counted as passed. framework_reliability owns independent review.
+
+The reviewed cache and reducer increments are combined in =integration/framework-followup-40255479= at =2ff4bc737=; provenance is not integrated yet.
+A new physical 1,519-file copy of the frozen852 corpus is prepared for the follow-up full suite; no follow-up suite has run yet.
 
 The reducer review separately reproduces inherited [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]]: fertilizer_rate discards country again in its numerator/area grouping.
 It produces the same erroneous pooled rate on both old/new sources; no rate implementation was included in the approved two-reducer fix.

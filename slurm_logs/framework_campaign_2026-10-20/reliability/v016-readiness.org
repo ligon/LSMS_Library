@@ -24,13 +24,15 @@ Both exact =976= and =852= cold corpora completed all 549 requests: 530 successe
 Six intended food tables change; roster ordering and inherited Mali cold/warm typing limits have separate controlled evidence.
 The paired sixteen-feature canonical scans completed with the same six Peru build errors and five known tenure-label failures; all warning differences are classified and independently accepted with explicit limits.
 
-Native Windows passes on exact =852= in [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][run 39519191762]], along with unit and smoke checks; its credentialed Linux data suite is still running.
+Native Windows passes on exact =852= in [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][run 39519191762]], along with unit and smoke checks; its credentialed Linux data suite completed with one Uganda raw nutrition hash failure (6,107 passes).
+Fixed operands reproduce the failed/approved hashes exactly under Haswell/SkylakeX with only eight cells differing by at most two ULPs; an entry-local exact-variant test repair is being implemented and reviewed.
+See [[file:../nutrition-ci-diagnosis/REPORT.org][the diagnosis]] and [[file:../STATUS.org][current follow-up status]].
 The earlier [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][Windows-fix run]] passed all four jobs, including credentialed data tests.
 Windows PR #1153 was explicitly authorized and merged at =ad1e87e10=; actual development push CI also passed.
 
 Before release consideration:
 
-1. Finish exact-head Linux data CI. The completed paired audit retains real errors/failures and increased warning emissions; all differences are independently reconciled.
+1. Review the bounded nutrition CPU-fingerprint repair and rerun exact-head Linux data CI on the final combined source. The completed paired audit retains real errors/failures and increased warning emissions; all differences are independently reconciled.
 2. Resolve the four open implementation PRs through human merge and verify the actual merged source against the validated candidate.
 3. Complete the eventual release-content/issue-closure audit and obtain release instructions before tagging or publishing.
 
@@ -162,7 +164,7 @@ Do not spend this release pass reimplementing the23 landed issues merely because
 
 Read-only evidence synthesis only; no new heavy tests, source edits, git mutations, GitHub writes or shared-cache writes.
 CI states are a timestamped snapshot and may complete after this report.
-The parent has completed the local suite, matched corpus and native Windows validation; only exact-head Linux data CI remains pending in this updated assessment.
+The parent has completed the local suite, matched corpus and native Windows validation; exact-head Linux data CI failed the hardware-sensitive nutrition fingerprint and its bounded repair is pending review/revalidation in this updated assessment.
 A later successful assessment still requires the maintainer's release instruction.
 
 -- Sue

@@ -9,5 +9,5 @@
   ],
   "log_sha256": "09f701d9883dcc448ee9eb977be88a546af06993e21bf702a9fc7ac7e50f59a6",
   "log_private_path": "/local/job40255479/control/framework-campaign/combined-windows-native.log",
-  "linux_data_job": "still running; not described as passed"
+  "linux_data_job": "completed: failure in Uganda raw nutrition fingerprint; see combined-linux-data-summary.json"
 }

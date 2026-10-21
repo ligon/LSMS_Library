@@ -11,5 +11,5 @@
   "development_merge_commit": "ad1e87e1025dec98fe70734f4e60d12824fd31dd",
   "filesystem_origin_development_synced": true,
   "frozen_five_issue_candidate_data_run": 39519191762,
-  "candidate_data_run_state": "still running"
+  "candidate_data_run_state": "completed: failure in Uganda raw nutrition fingerprint; see combined-linux-data-summary.json"
 }
