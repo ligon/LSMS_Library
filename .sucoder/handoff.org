@@ -29,6 +29,18 @@ The main checkout is on the documentation branch =docs/framework-campaign-202610
 Next: finish Windows CI, all five fixes and independent reviews; validate their combined source; present concrete PRs for human merge under backlog-workflow.
 Older checkpoints below are historical and may have been superseded by the October 18-20 development campaign.
 
+
+** 17:05 PDT continuation
+
+Baseline full suite passed: 8369/279skip/9xfail/1pre-existingxpass, no failures/errors or credential skips.
+Windows native CI is green; manual run39515878586 Linux data job is still running.
+PRs1153 Windows,1154 unit factors,1155 empty subsets are open for human merge; no merge override has arrived.
+Parser dc7e3db91 is under round-two independent review; harness RHS bounded test correction is under review.
+Internal integration/framework-v016-40255479 at2970c8886 contains the first three reviewed fixes.
+Cold baseline corpus uses frozen baseline-976fc840d, /local/job40255479/corpus-baseline-data and corpus-baseline-out, exec23742.
+Once all remaining fixes pass review, merge them into integration with --no-commit then ordinary attributed commit (plain git merge does not trigger publish hook), freeze source, run combined cold corpus and full suite against independent L2 roots.
+Main untracked validation wrapper and baseline summary are included in this checkpoint commit.
+
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.
   Fixes #958 (all five defects) and #960 (docs).  #957 closed (done 2026-09-22).

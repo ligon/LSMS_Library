@@ -4,7 +4,7 @@
 * Scope
 
 The maintainer requested synchronization with GitHub development, a repair of the Windows CI failure, and an evaluation of additional framework work before attempting v0.16.0.
-No release has been requested at this checkpoint.
+The maintainer approved implementing #1143, #1093, #1099, #1124 and #1125; no release has been requested.
 
 * Source and environment
 
@@ -36,7 +36,7 @@ The complete copy manifest is [[file:validation/private-copy.json][validation/pr
 
 Uganda's =CONTENTS.org= documents GH #805 changing =HowCoped0/1/2= in 862, 756, and 394 cells from U+0085 to U+2026, retaining all 14,457 rows.
 The old Windows expected digest predates that change.
-The current Linux cold build independently reproduces the Windows digest =0ab2ea4c79dd=; exact counterfactual accounting is still being verified.
+Two Linux cold builds reproduce =0ab2ea4c79dd=; independent exact counterfactual accounting verifies that reversing only those 2,012 label cells recovers the old digest.
 
 The active development ruleset requires only =unit-tests= and has no merge-queue rule.
 The merged #932 workflow therefore does not yet enforce credentialed tests before every development merge.
@@ -68,3 +68,31 @@ Routine PRs remain for human merge under the backlog-workflow skill.
 * Attribution
 
 Sue, GPT-6.
+
+* Implementation checkpoint -- 17:05 PDT
+
+Native credentialed Windows, unit tests and Windows smoke passed in =39515878586=; its separate Linux data job remains running.
+PR #1153 remains open; an explicit maintainer override was requested for the backlog skill's human-merge rule and has not yet arrived.
+
+Baseline full suite completed: 8,369 passed, 279 skipped, nine expected failures, one pre-existing non-strict unexpected pass, zero failures/errors in 893.14 seconds.
+No credential-gate skip occurred; [[file:validation/baseline-summary.json][the aggregate summary]] records skip categories and private log/XML identities.
+This is the exact pre-fix development baseline, not combined-candidate validation.
+
+#1093 is independently reviewed and open as [[https://github.com/ligon/LSMS_Library/pull/1154][PR #1154]], head =eaf7b9913=.
+It recovers 706 usable Ethiopia Quintal sales in the price pool, preserves raw crop/input tables and seed/nitrogen results, and does not invalidate cache hashes.
+#1099 passed independent round-two review after preserving both cache-hit traversal and unavailable-make behavior; [[https://github.com/ligon/LSMS_Library/pull/1155][PR #1155]] is at =f9871610f=.
+Its tagged aggregation edit invalidates country/wave hashes and intentionally requires a corpus re-warm.
+
+#1143 reused the prior unpublished implementation, then repaired token boundaries and the issue's precise zero-prefix grouping grammar.
+Producer head =dc7e3db91= is frozen for independent round-two review: 370 focused cases pass and the six measured live quantity/price outputs remain invariant after the two review corrections.
+The measured correction changes 945 quantity rows and 783 price rows across Senegal, Benin and CotedIvoire, preserving source tables, axes and dtypes.
+
+#1124/#1125 now audit crop_production, plot_labor and plot_inputs and report whole-country exclusions separately from row collapse.
+The 344-record farm audit has no errors; it retains the 17,523-row EthiopiaRHS coarse-grain exclusion as a Class B signal plus existing warnings.
+The warm crop test is being corrected to respect that documented exclusion only while RHS has no plot/plot_id axis or column; all other positive warm countries remain mandatory and RHS read failures remain fatal.
+No production assembly behavior changes in this harness patch.
+
+Internal integration branch =integration/framework-v016-40255479= at =2970c8886= contains Windows, #1093 and #1099; parser/harness will follow after independent reviews.
+The final combined source will be frozen before validation.
+An independent, completely cold 549-request baseline corpus is running through the existing October 14 validator with explicit paths and bounded country processes, using [[file:validation/run_corpus.py][the wrapper]].
+Detailed data fingerprints and logs remain in private node scratch; only aggregate results are committed.
