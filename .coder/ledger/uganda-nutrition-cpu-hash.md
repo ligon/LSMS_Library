@@ -45,4 +45,9 @@ None: parent explicitly authorized this finite, evidence-backed optional variant
 
 ### Phase 3 - verification
 
-Pending targeted controls, baseline negative proof, exact real Haswell/SkylakeX replay, and production/hash immutability check.
+- `test_parquet_matches_baseline` - OK (sections 2-5): only its final finite accepted-hash set extends; structure/coverage and null-primary behavior remain unchanged. Fifteen auth-free actual-test controls pass.
+- Manifest - OK (sections 3-4): primary unchanged, only the measured nutrition alternate added; stripping that one field yields JSON identical to exact852.
+- Numerical counterfactual - OK (section 4): exact primary -> alternate -> primary replay on fixed operands, unchanged structure/order/input hashes, maximum two ULPs. Both real full parquets pass; a deliberately changed value is rejected under both kernels. Exact852 code passes the primary and fails the alternate.
+- Production/cache inputs - OK (section 4): no production arithmetic/config change; 549 country, 2,139 wave and 39 tagged fingerprints unchanged. Additive country note preserves approval and #788 policy.
+- Reinvention search - none: existing fingerprint and complete invariance test reused; no duplicate reader, reducer, tolerance or hash generator.
+- Scope limit - future unmeasured kernels still fail. CI kernel is inferred by exact counterfactual, not directly observed. Aggregates/scripts: `slurm_logs/framework_campaign_2026-10-20/nutrition-cpu/REPORT.org`.
