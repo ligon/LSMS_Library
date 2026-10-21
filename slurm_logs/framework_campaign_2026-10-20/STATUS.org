@@ -148,6 +148,32 @@ Those checks are now authorized to run at the exact frozen source; no result is 
 GitHub [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][manual run39531148624]] is queued on that exact head, including credentialed Linux data tests and native Windows.
 Original integration852 and its failed CI evidence remain unchanged.
 
+Follow-up review PRs are published as drafts:
+
+| PR | Work | Base | Head |
+|----+------+------+------|
+| [[https://github.com/ligon/LSMS_Library/pull/1161][1161]] | Exact measured nutrition fingerprint allowance | development | 6553e01d6 |
+| [[https://github.com/ligon/LSMS_Library/pull/1162][1162]] | #778 cache disappearance / private build controls | integration/framework-v016-40255479 | f7eb194d7 |
+| [[https://github.com/ligon/LSMS_Library/pull/1163][1163]] | #1115/#1128 lossless provenance / held-latest separation | integration/framework-v016-40255479 | 44f6cd2e7 |
+| [[https://github.com/ligon/LSMS_Library/pull/1164][1164]] | #1159 country-preserving seed/nitrogen results | integration/framework-v016-40255479 | 45f80dcb5 |
+
+The last three use the frozen852 comparison base for focused diffs and must be updated from development and retargeted after #1154--#1157 land; do not merge into the comparison base.
+Nutrition is directly development-based: all seventeen changed files are byte-identical to the reviewed source, and fifteen focused controls passed again there.
+No new PR merge is authorized.
+
+Final-source unit, Windows smoke and native Windows checks pass in run39531148624; credentialed Linux is still running.
+Native shocks/assets retain the exact expected digests; [[file:validation/followup-windows-native-summary.json][native evidence]].
+The scoped three-feature farm audit retains all76 non-runtime records/metrics and all29 Class B findings, with zero new structural/error/failure pairs.
+Sixty removed runtime warnings are classified45 cache-rebuild, six Make fallback and nine baseline Nigeria candidate-failure messages; the latter cause is not inferred.
+All1519 private farm L2 files remain byte-identical to the frozen852 seed.
+Three live warm checks pass; fourteen-country plot inputs yield200346 seed rows and75784 nitrogen rows exactly matching separate-country, reversed-order and country-column controls.
+GhanaLSS and Guinea-Bissau yield empty usable outputs under both separate and pooled reducers; no broader coverage claim is made.
+
+Packaging dry-run passes at exact4cab: wheel and sdist resolve0.15.0.post392.dev0+4cab5f0db and contain all11753 tracked package files with exact bytes.
+An installed-wheel, network/build-forbidden config smoke discovers38 countries and Uganda's eight waves/twenty-eight tables.
+This is an untagged development artifact with existing image dependencies, not a tagged release or installed microdata-build test; checkout-only tests are outside the current archive policy.
+[[file:packaging-review/REPORT.org][Packaging evidence]].
+
 The reducer review separately reproduces inherited [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]]: fertilizer_rate discards country again in its numerator/area grouping.
 It produces the same erroneous pooled rate on both old/new sources; no rate implementation was included in the approved two-reducer fix.
 

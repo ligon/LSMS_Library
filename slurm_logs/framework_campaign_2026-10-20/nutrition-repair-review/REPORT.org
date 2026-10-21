@@ -26,9 +26,9 @@ No additional corpus rebuild or full-suite claim is needed or made for this test
 * Independent execution
 Fourteen independent hermetic controls passed using actual synthetic parquet fingerprints and the real invariance test, without replacing its fingerprint function.
 They check accepted entry-local alternate, primary legacy acceptance, absent/empty/arbitrary-list rejection, other-entry isolation, four structural refusals, null debt, coverage skip and error-debt skip.
-See [[file:test_independent_variants.py]] and [[file:independent.log]].
+See [[file:test_independent_variants.py]] and =independent.log= (private evidence).
 Their standalone pytest root does not register the repository's requires_s3 marker, producing14 PytestUnknownMarkWarning messages; no control was skipped and there was no network/data dependency.
-The15 producer controls were independently rerun and passed: [[file:producer-tests.log]].
+The15 producer controls were independently rerun and passed: =producer-tests.log= (private evidence).
 
 Two fresh single-thread processes independently read only the existing private fixed operands and computed the full23777x15 nutrition result.
 Each writes to its own new private review root and calls the actual candidate invariance test without using Country/Feature or a build.
@@ -65,3 +65,5 @@ Unmocked urllib networking is forbidden.
 All subprocesses exited0 before this report was frozen.
 
 Sue
+
+This published aggregate copy retains private evidence names as literal references; raw logs remain in the job control directory.

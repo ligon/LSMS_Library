@@ -2,6 +2,28 @@
 #+author: Sue
 #+date: 2026-10-20
 
+* Current checkpoint -- 2026-10-20 19:13 PDT
+
+The originally recommended follow-up is now implemented and independently reviewed: #778, #1115/#1128 and country-preserving #1159.
+The bounded Uganda nutrition fingerprint repair also passed independent review, retaining the approved primary hash and accepting only the separately measured exact alternate.
+All are integrated at frozen =4cab5f0db7d375ad543e652f61f43bd28fa94ecd=; the original852 candidate and its failed CI run remain diagnosis controls.
+Every changed non-report/non-ledger file is byte-identical to its reviewed increment; see [[file:../validation/followup-integration-identity.json][integration identity]].
+The final local full suite and [[https://github.com/ligon/LSMS_Library/actions/runs/39531148624][credentialed GitHub/native Windows run]] are running, so this checkpoint is not a final green assessment.
+The scoped three-feature farm audit has no new structural/error/failure findings, retains the documented RHS exclusion, and preserves the prepared L2 bytes.
+Actual pooled seed/nitrogen results match separate-country reductions exactly, including country-column and reversed-country-order controls.
+
+Before release consideration, complete final validation, publish/review the focused increments, merge the approved PRs through the human gate, and verify the actual merged source against the validated source.
+Then reconcile the eventual development-to-master contents and exact issue closures; no tag, release, protection change or shared-cache promotion is implied.
+
+The strongest newly identified correctness follow-up is [[https://github.com/ligon/LSMS_Library/issues/1160][#1160]]: fertilizer_rate discards country again after the repaired nitrogen reducer.
+It is independently reproduced on unchanged852 and1159, so the two-reducer fix does not establish pooled fertilizer-rate correctness.
+Choose that bounded follow-up before presenting pooled rates as reliable; its implementation is outside this approved increment.
+#932 is an enforcement choice beyond the completed manual validation, not an automatically authorized repository-setting change.
+#1149 staged acquisition follows the provenance repair; #1134/#1135 are bounded already-ruled sampling improvements; #218 retired routes and the substantial existing #851 period branch can remain separate work.
+The nineteen source/wiring errors, tenure vocabulary findings and source/scientific decisions below remain visible.
+
+The original recommendation and exact852 evidence below are retained as historical context; [[file:../STATUS.org][STATUS.org]] owns the latest execution state.
+
 * Recommendation
 
 Land this candidate as the bounded Windows-plus-five-issue increment after exact-head validation.

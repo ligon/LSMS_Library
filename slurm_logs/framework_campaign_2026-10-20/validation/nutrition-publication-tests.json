@@ -1,0 +1,17 @@
+{
+  "source": "6553e01d6cd9013a2103124dcf7a2c945025a25c",
+  "suites": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "15",
+      "time": "3.955",
+      "timestamp": "2026-10-20T19:12:34.768268-07:00",
+      "hostname": "n0071.savio3"
+    }
+  ],
+  "private_log": "/local/job40255479/control/framework-campaign/nutrition-publication/tests.log",
+  "scope": "Fresh development-based publication of reviewed test-only fix; only fifteen auth-free fingerprint boundary controls."
+}

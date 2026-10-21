@@ -85,6 +85,16 @@ windows_ci is authorized GO fullsuite16loadfile CPU0-7,20-27 plus separate physi
 GitHub fullmanualCI39531148624 queued on exact4cab, nativeWindows enabled. Root monitors; preserve original852failedrun39519191762.
 framework_reliability prepares reviewable incremental PR plan/bodies without GitHub mutations. framework_contracts performs private packaging dry-run without release/tag/publish/sharedvenv changes. No merge authorization beyond1153.
 
+** Published follow-up drafts -- 2026-10-20 19:19 PDT
+
+New drafts:1161 nutritiondirectdevelopment@6553e01d6,1162cache@f7eb194d7,1163provenance@44f6cd2e7,1164pooledreducers@45f80dcb5. Lastthreebaseintegration852forfocusedreviews; do notmergeintothatbase. Afteroriginal1154--57land, mergelivedevelopmentintoeachpublicationbranch, verifydiff/runtimebytes, retargetdevelopmentwithoutforce. Worker/sourcebranchesremainfrozen. All79GitHubfileblobSHAsacross4newPRsmatchreviewedheads;scopeauditPASS.
+Nutritionpublicationisfreshad1+fivecherrypicks;all17filesmatchreviewed98822,15authfreecontrolsPASSagain. No runtime dependencyontheoriginalfivefixes. AllcommitsDurablypublishedorigin/GitHub.
+Final4cabunit,smoke,nativeWindowsSUCCESS;datafullsuiterunning(job118997075291/run39531148624). Native shocks0ab2ea4c79dd/assets9202ed542a14,row/wavecountsunchanged. framework_contractsownsfinalCIobservation/aggregatereconciliation;rootwatchsession40278isrunningtoo. No newdispatchneeded.
+Scopedfarmcomplete:322warnings,0errors/fails;all76nonruntimefullrecords/metricsand29ClassBfindingsmatch852.60removedruntimewarningsfullyclassified45rebuild+6fallback+9NigeriaMakecandidatefailures(causenotinferred).1519farmcachebytesunchanged.3warmchecksPASS.14countries792775pooledinputrows:200346seed/75784Nresultrowsexactseparate/reverse/countrycolumn. GhanaLSS/Guinea-Bissauemptybothroutes,notbroadercoverageclaim. windows_ciownsfullsuite+finalcaseaccounting;stillrunningtailcasesat19:19,no passclaimyet.
+PackagingPASSexact4cabwheel+sdist0.15.0.post392.dev0+4cab5f0db;all11753packagefilesbyteidentical;installedconfigsmokePASSwithoutnetwork/data builds. Allpackagingprocessesstopped/worktreeclean. Evidencecopiedpackaging-review/. Notataggedreleaseorcleannewdependencyresolver/fullinstalleddata test.
+Rootupdatedoriginal1154--57bodieswithtruthfulcompleted852evidence/knownsingleCIfailure/1161repair/finalCIpending. Draft1158stillpendingfinalvalidation.
+Optionalquestionpending:implement#1160before0.16usingcountry-preservingruleorDeferdocumentedlimitation. Noanswer/authorizationyet; noimplementation. Do nottreatelapsedtime/preselectionasapproval. #932rulesetstillunappliedanduser-ownedrepoqueueunavailable;#851originnewercf117notoldGitHub8288.
+
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.
   Fixes #958 (all five defects) and #960 (docs).  #957 closed (done 2026-09-22).
