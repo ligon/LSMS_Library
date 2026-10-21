@@ -3340,7 +3340,7 @@ attribution is a local counterfactual, not an observation of its hardware.
 The invariance fixture retains the approved primary hash and permits only
 this measured exact alternate via =content_hash_variants=; structure checks
 and every other entry's exact hash remain in force.
-Future unmeasured kernels still fail; this is not a general numerical-equality
+Future unmeasured fingerprints still fail; this is not a general numerical-equality
 rule or a refresh of the scientific baseline.
 The #967 approval, nominal-container and source-provenance limits above, and
 the separate #788 coupled FCT/nutrition metadata caveat remain unchanged.

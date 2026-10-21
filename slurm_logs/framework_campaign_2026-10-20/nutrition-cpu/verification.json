@@ -1,0 +1,44 @@
+{
+  "base": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "test_repair_commit": "5f571dcc4",
+  "ledger_commit": "66416b61b",
+  "source_files_sha256": {
+    "tests/test_uganda_invariance.py": "fd3a1ef979a65d3da0a8b5e60c365a92a0a941b50d998fc2057a6ba4ca4f2712",
+    "tests/test_uganda_invariance_hash_variants.py": "b7b5121edd15a9123cf423c44c3711f43be7ce5ae86997d7788b65bdefca813d",
+    "tests/fixtures/uganda_baseline.json": "56b2961b276fac1c68e9b839c84e7f887184e078c8e34b43522fec4855d36788",
+    "lsms_library/countries/Uganda/_/CONTENTS.org": "774d5bc13c35ca5a6d9543766648f88dbc1efe508d73aa388d5ac6e81146256c"
+  },
+  "auth_free_controls": {
+    "passed": 15,
+    "failed": 0,
+    "seconds": 0.18
+  },
+  "exact_852_negative_control": {
+    "passed": 1,
+    "failed": 1,
+    "deselected": 13,
+    "seconds": 0.23,
+    "intentional_failure": "known Haswell exact hash not accepted by old comparison"
+  },
+  "actual_full_nutrition_parquet_controls": {
+    "Haswell": {
+      "invariance": "passed",
+      "changed_value": "rejected"
+    },
+    "SkylakeX": {
+      "invariance": "passed",
+      "changed_value": "rejected"
+    }
+  },
+  "all_original_manifest_fields_unchanged": true,
+  "hash_counts_unchanged": {
+    "country": 549,
+    "wave": 2139,
+    "tagged": 39
+  },
+  "production_arithmetic_changed": false,
+  "baseline_regeneration": false,
+  "future_unmeasured_fingerprints": "still fail",
+  "raw_microdata_in_report": false,
+  "post_test_changes": "documentation-only precision requested by independent reviewer; no functional changes"
+}
