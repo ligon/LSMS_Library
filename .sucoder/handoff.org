@@ -1,20 +1,35 @@
 #+title: Handoff -- framework campaign, 2026-10-20
 
-* Latest landing checkpoint -- all nine fixes merged
+* Completed authorized framework campaign landing -- 2026-10-20
 
-Maintainer explicitly authorized1154--57+1161--65+evidence1158. No further merge approval needed for that batch.
-AllnineimplementationPRsMERGED; development1933434b84de82ac72b3921a7fd8fe5c00154754 synchronizedGitHub/local/origin.
-All14,437candidate532pathsretainmode/type/blob; onlyfourlater1157reviewreportsadded. Full193tree=23c1publicationtree.
-Source532/runtimeworkerrefsremainfrozen; privateandpubliclanding/source-equivalence.json holdsrootproof; independentcontractsSTATICPASScomplete; sixfrozenartifactslanding-independent/.
-RetargetedPRs11/39/12/9taskblobsunchanged;latestunit/windowssmokepassedbeforemerges. No failures.
-Updated778/1159/1160existingstatusheadersonly; allissuesOPEN.32implementedreleaseclosurecandidatesawaitauthorizedmasterrelease;778partial/932enforcementretained.
-Evidence1158isbeingupdatedfromdevelopment/authorizedformergebutnotyetlandedatthissnapshot.
-ImplementationpushCI39547934263at193pending/inprogress. Afterevidencemerge, observeFINALdevelopmentpushunit/smoke/native, recordactualmergeSHA/run/conclusioninPR1158body (durableliveoutcome), and reportfinish.
-ThefinaldocumentationsnapshotdoesnotclaimfutureCIpass; retrieveGHcurrentHEADandPR1158bodyforcompletedstatus.
-No needrepeatfullsuiteifruntime/test/build/auditfilesremainbyteidentical532; manualcandidateCI6388passes/local8851/nativePASS alreadycomplete.
-Nextfinish1158only, verifyfinalruntimeidentityanddevelopmentCI; noadditionalframeworkimplementationorpermissionquestion.
-No release/tag/protection/cachepromotionauthorization; releaseassessment/completehistorynotes/mastermerge remainseparate.
-Allnodeheavyworkdone; nodebilled/idle, suggest sucoder release whenpausing.
+All nine implementation PRs (#1154--#1157 and #1161--#1165), plus evidence PR #1158, merged with explicit maintainer authorization.
+Implementation commit: =1933434b84de82ac72b3921a7fd8fe5c00154754=.
+Evidence merge: =db00a79f17f841649f2b96827c5b9b4e858ce2f8=.
+Later documentation commits may advance development; query its current GitHub ref instead of treating the implementation pin as live status.
+
+Runtime, configuration, tests, scripts, audit, workflows, build and dependency files exactly match validated candidate =532d58700fa46e52a0b390198604eca1dc4de00e=.
+All 14,437 candidate paths retain their mode/type/blob; only four historical PR1157 review reports were added to the implementation tree.
+Independent static review passed; original worker/integration refs remain frozen.
+Reports: =slurm_logs/framework_campaign_2026-10-20/landing/= and =landing-independent/=.
+
+Validation is complete: 8,851 local passes and 6,388 credentialed Linux passes, including nutrition and all 87 new rate cases.
+Code-push CI =39547934263= at193 passed unit, Windows smoke, native Windows and DVC reachability.
+The native log proves checkout193: shocks14,457x10/eight waves/digest0ab2ea4c79dd; assets116,808x1/eight waves/digest9202ed542a14.
+Evidence PR1158 also passed its fresh unit/Windows checks; its326 changed paths contain only reports and the handoff.
+Report-only development pushes match the existing workflow's paths-ignore: no separate post-evidence push run is expected.
+The earlier prediction of another push run was wrong and is corrected in landing/REPORT.org.
+The durable PR1158 description records the completed live source/CI outcome.
+
+All32 scoped closure candidates are implemented pending an authorized master release merge.
+#778 retains its trust-mode question; #932 enforcement stays open.
+Only existing status headers for778/1159/1160 were updated; no issue was closed.
+The19 known source/wiring gaps, five tenure findings, #1110 science/land-grain policy and #1149 staging remain explicit.
+
+Next release work: reconcile complete notes sincev0.15.0, prepare the development-to-master release PR with one closing keyword per verified issue, then obtain the release instruction.
+No release/tag, protection change or shared-cache promotion is authorized by this batch.
+Main checkout may remain on the completion-docs branch; =/local/job40255479/worktrees/development-sync= holds development.
+GitHub/local/tracking/filesystem-origin development were verified atdb00; verify the later notes-only tip when resuming.
+All heavy work is done. The node remains billed; suggest =sucoder release= when pausing.
 
 * Earlier active landing -- maintainer authorized the batch, 2026-10-20 21:52 PDT
 

@@ -4,14 +4,15 @@
 * Current landing -- 2026-10-20
 
 The maintainer explicitly authorized the reviewed batch and all nine implementation PRs are merged:1154--1157 and1161--1165.
-Development is =1933434b84de82ac72b3921a7fd8fe5c00154754=, synchronized across GitHub/local/filesystem origin.
+The implementation landed at =1933434b84de82ac72b3921a7fd8fe5c00154754=; evidence PR1158 merged at =db00a79f17f841649f2b96827c5b9b4e858ce2f8=, synchronized across GitHub/local/filesystem origin.
 All runtime/configuration/test/audit/build files are byte-identical to validated532; only four review reports differ.
 The candidate passed8,851 local tests and6,388 credentialed Linux tests, plus native Windows, with no failures/errors.
 All87 new fertilizer-rate cases and Uganda nutrition actually executed and passed.
 [[file:landing/REPORT.org][Landing record]], [[file:landing/source-equivalence.json][source identity]].
 
-Evidence PR1158 is authorized and being updated/merged; final development CI is observed after that merge.
-Its durable PR description will record the actual final merge SHA/run/conclusion; the report below preserves earlier dated verification snapshots.
+All ten authorized PRs are merged. The last code-changing development [[https://github.com/ligon/LSMS_Library/actions/runs/39547934263][CI run]] passed, including native Windows and DVC reachability.
+The evidence PR's fresh unit and Windows checks also passed. Its report-only development push matches the existing paths-ignore, so no separate post-evidence push run is expected.
+No runtime/test/build/configuration/audit content changed after the tested implementation. The report below preserves earlier dated verification snapshots.
 All32 scoped closure candidates are implemented pending a separately authorized master release merge;778 and932 stay open for retained scope.
 Draft release notes cover the approved increment, not the entire history sincev0.15.0.
 No release/tag, protection change, shared-cache promotion or issue closure is included.

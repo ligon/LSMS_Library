@@ -1,0 +1,71 @@
+{
+  "run_id": 39547934263,
+  "event": "push",
+  "source_sha": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/ligon/LSMS_Library/actions/runs/39547934263",
+  "jobs": [
+    {
+      "id": 119050447895,
+      "name": "windows-smoke",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 119050447974,
+      "name": "unit-tests",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 119050447985,
+      "name": "dvc-remote-reachability",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 119050448002,
+      "name": "windows-script-build",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 119050448982,
+      "name": "dvc-lock-check",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119050449076,
+      "name": "docs",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119050449188,
+      "name": "refresh-dvc-locks",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119050449215,
+      "name": "data-tests",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "native_actual_checkout": [
+    "1933434b84de82ac72b3921a7fd8fe5c00154754"
+  ],
+  "native_results": [
+    "RESULT Uganda:shocks rows=14457 cols=10 waves=8 digest=0ab2ea4c79dd (66s)",
+    "RESULT Uganda:assets rows=116808 cols=1 waves=8 digest=9202ed542a14 (56s)"
+  ],
+  "native_private_log_sha256": "af71c5dafdbeabcaa56fa750482d8d87707e4493325c52932033d80205c9d8c9",
+  "native_private_log_bytes": 138732,
+  "data_tests_scope": "Ordinary development push skips data-tests; exact byte-identical532 manual run6388 passed is separate evidence.",
+  "evidence_merge": "db00a79f17f841649f2b96827c5b9b4e858ce2f8",
+  "evidence_push_scope": "No run triggered: all changed paths match existing paths-ignore.",
+  "recorded_at": "2026-10-21T05:21:58.354974+00:00"
+}

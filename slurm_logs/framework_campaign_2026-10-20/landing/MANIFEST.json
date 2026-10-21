@@ -1,7 +1,10 @@
 {
-  "REPORT.org": "ada4a6d2c8f3d4d61e757620b37e9750383f4a3ef8c169a956019b1230b15f17",
+  "REPORT.org": "2b978db2ea75265beddd10c5366348c7c24e27f561836ed5cbe977248861d278",
   "api-author-note.txt": "9bd49f500b3345de1bda43323fc703ef78dc9814aab79d2df7258fae9bfe1197",
+  "evidence-publication-verification.json": "bca058ba7b00c2121b57c8cde68a5b423be3c310399b535424da0e9a5e272bf7",
+  "final-development-verification.json": "1cab4758f13e90b79d6437de070f577f9aed0130e3a91009e3521e72948ff6ce",
   "followup-checks.json": "96785a8a43ae758b6157ce5c956ebc07c176a1d5e5bfeb9ddf188140d53ff24b",
+  "implementation-development-ci-final.json": "97010583b389da9ab7a4ffb5e77ee2f0dde85c9f68be6bcdeaf77cb7baa947a1",
   "implementation-development-ci.json": "bc7576f75e37913cd37b63d33595e6a47ba9113835d0d7414337a41354ddd5cf",
   "issue-status-updates.jsonl": "86ee9e01fe9921c67e63d8078455b9c148af9ac7c066068e35fe9eeec9b0bd81",
   "merge_publications.py": "1ee8137c0942f0d97e2e376a445bfbc1a04568819578b515520a9411173b9ffc",
