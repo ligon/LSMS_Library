@@ -4682,13 +4682,21 @@ class Country:
                                           self.name, method_name, waves=waves)
 
                 if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
-                    df_cached = get_dataframe(parquet_path)
+                    try:
+                        df_cached = get_dataframe(parquet_path)
+                    except FileNotFoundError:
+                        # GH #778: another builder/clear can remove the cache
+                        # after the exists/footer checks. Use the ordinary path.
+                        return None
                     df_cached = map_index(df_cached)
                     df_cached = self._restrict_to_waves(df_cached, waves)
                     _replay_dates()
                     return df_cached
                 if covered is None and set(waves) == set(self.waves):
-                    df_cached = get_dataframe(parquet_path)
+                    try:
+                        df_cached = get_dataframe(parquet_path)
+                    except FileNotFoundError:
+                        return None
                     df_cached = map_index(df_cached)
                     _replay_dates()
                     return df_cached
