@@ -110,16 +110,20 @@ Nigeria declares no nutrition feature, so no nutrition verification is claimed.
 
 * Tests and Feature audit
 
-The full focused selection yields 115 passed, one inherited dependency failure, zero skips, under four loadfile workers.
+The owner's original focused selection yielded 115 passed, one inherited dependency failure, zero skips, under four loadfile workers.
 All 36 new item regressions pass; against immutable 6f they yield 31 failures and five already-correct controls.
 The cases cover opposite PP/PH collisions, all eight quarters, numeric code forms, missing/unknown/NaN keys, absent/W5 quarters, exact-match priority, ambiguous aliases, source Q/E conservation and W1 derivation-input keys.
 
 The inherited failure is test_gh1035_nigeria_w1_stated_weights.py::test_kg_ladder_on_the_sized_labels.
-It assumed W1 container names appeared exclusively in 2011Q1, while #1034 correctly gives those same native names to twelve 2015Q3 rows.
+It assumed W1 container names appeared exclusively in 2011Q1, while #1034 correctly gives those same native names to eleven 2015Q3 rows.
+The twelfth #1034 relabel is Basin (Large), whose spelling differs from W1's Basin (Big/Large), so it is outside this shared-name test guard.
 The identical assertion fails at frozen 6f; all other GH1035 cases pass.
 Root owns a separate #1034 test amendment that scopes card rules to W1 and adds later shared-label no-survey_kg/no-W1-card-KEY assertions.
 The exact private proposed patch has SHA256 8145796ca742bb7fd0cf7230df3bd74a11aa4f1841cca620b3b6f48727149f1f; the amended case passes against this candidate.
-No amendment or change to an existing test, fixture or golden is committed in #1144.
+The separately reviewed #1034 test amendment at 3e658298753db4f2934ea1b703415a1bdfa9f6af is now integrated through merge 1e6111e2b0580e045084d3c077c258469f8d7dc0.
+The complete Nigeria library tree is identical before and after that integration.
+Independent review of the integrated head passed the complete six-file selection: 116 tests, zero skips, failures or errors.
+No existing test, fixture or golden changes originate in the #1144 implementation.
 
 Feature phases 1 and 2 cover all four food features for Nigeria plus Uganda on separate roots.
 Baseline: 441 records, 438 warnings, three passes; candidate: 445 records, 442 warnings, three passes.
