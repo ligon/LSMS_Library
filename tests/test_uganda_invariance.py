@@ -27,7 +27,7 @@ fingerprints in addition to the primary hash.  Uganda nutrition's Haswell
 OpenBLAS result differs from its approved SkylakeX result by at most two
 float64 ULPs in eight cells (ledger ``uganda-nutrition-cpu-hash.md`` sections
 3-4).  This finite allowance does not round values, relax structural checks,
-or accept an unmeasured CPU/kernel result.  A null primary remains unpinned.
+or accept an unmeasured exact fingerprint.  A null primary remains unpinned.
 
 A parquet whose ``lsms_cache_waves`` manifest does not cover the waves its
 baseline entry was taken over is skipped, not compared (GH #1113): it is a
