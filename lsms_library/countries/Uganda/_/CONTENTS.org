@@ -3602,3 +3602,32 @@ after: =shocks= =HowCoped0/1/2= 862 / 756 / 394 cells "etc<U+0085>)" ->
 condition and the GSEC15b units are decoded on numeric codes).  The =u=
 table's 2009-10 wave-label column, which recorded the raw =Fish <U+0096>...=
 spellings, was re-keyed to the en dash (inert: =u= is keyed on =Code=).
+
+* Food producer provenance during concurrent rebuilds (GH #1078, 2026-10-21)
+
+Uganda's script-produced food waves exposed a framework read-to-existence
+race.  A normal concurrent country rebuild can remove a hashless wave
+parquet after another process has read its correct canonical frame.
+=Wave.food_acquired= used the path's later existence to decide whether to
+apply its legacy sum reducer.  The missing path made it reduce the already
+canonical 2011-12 frame, turning six genuine missing Quantities and three
+missing Expenditures into zeros under a normal current country hash.
+Both actual sample/currency tests still passed in a controlled two-process
+reproduction; a fresh process then served those nine zeros from the cache.
+
+The producer route now travels privately with each =grab_data= result.
+Reading a script/YAML parquet or successfully materializing YAML output
+does not become an in-memory producer when its path is subsequently
+removed.  Legitimate in-memory output retains the existing legacy reducer;
+an unrelated old cache path does not change that provenance.  No public
+DataFrame attribute carries this internal origin, and no source value,
+unit, category, household identity or nutrition arithmetic is changed.
+The content-producing food method is versioned so corrupt current-hash
+country caches can rebuild normally.  The =grab_data= plumbing also moves
+the existing all-table build fingerprint, a broad cache invalidation cost.
+
+The controlled reproductions on f8 and reviewed #1062 match the exact
+historical nine-cell signature.  The original historical full-suite
+writer and interleaving remain unidentified.  #1062's requested-output
+sibling correction is separate from this framework producer mechanism;
+its independent evidence must not be read as resolving #1078.
