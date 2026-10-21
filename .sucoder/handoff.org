@@ -31,7 +31,7 @@ Remaining validators:
 - Paired 16-feature canonical audits, phases 1/2, run under =/local/job40255479/canonical-audit-compare/=.
   Agent =windows_ci= owns them, with three workers per audit on CPUs 0--3 / 4--7, private physical caches and shared L1 only.
   Both scans and all warning classification have completed; six Peru errors, five tenure failures and thirteen source skips remain identical.
-  All8,731 warning additions are accounted for; framework_reliability is independently reviewing the633 non-interview additions.
+  All8,731 warning additions are accounted for; framework_reliability independently accepted both interview and remaining633 classifications with explicit limits.
   Aggregate evidence and28 verified artifact hashes are copied into1124-1125/canonical/.
   Do not restart the validators or mutate their preserved cache/source evidence.
 
@@ -44,7 +44,7 @@ Never edit the shared mirror's working tree.
 Original corpus roots are immutable; every replay uses a new physical copy.
 
 New independently verified issue #1159 tracks pooled seed/nitrogen reducers dropping country identity and summing colliding local plot IDs on both sources.
-The maintainer must choose country preservation or explicit pooled-input refusal; no implementation was added.
+The maintainer subsequently chose COUNTRY-PRESERVING pooled results and authorized delegation of the next pass; implementation is now assigned in a separate worktree.
 The #932 protection proposal remains unapplied; this personal-account repository cannot use the assumed organization merge queue.
 Requiring genuine PR-event data checks needs separate permission.
 #851 has substantial existing unlanded work; do not reimplement it.
@@ -56,6 +56,19 @@ Release/tag/publish, protection changes and shared-cache promotion are outside t
 
 Campaign details: [[file:../slurm_logs/framework_campaign_2026-10-20/STATUS.org][STATUS.org]].
 Older checkpoints below are historical.
+
+** Newly authorized parallel follow-up
+
+The maintainer asked to delegate the next work now and ruled #1159: retain country in pooled results.
+All three worktrees are based on unchanged852; original integration stays frozen.
+
+- framework_reliability: =/local/job40255479/worktrees/778-cache-race=, branch =fix/778-cache-race-40255479=, CPUs8--11; implement remaining #778 only, preserving corruption policy.
+- framework_contracts: =/local/job40255479/worktrees/1115-1128-provenance=, branch =fix/1115-1128-provenance-40255479=, CPUs12--15; reuse existing unlanded613611578 and apply all newest rulings, code-only without live catalog/acquisition writes.
+- windows_ci: =/local/job40255479/worktrees/1159-pooled-reducers=, branch =review/1159-pooled-reducers-40255479=, CPUs16--19; implement country-preserving seed/nitrogen reduction identity, no unrelated scientific changes.
+
+Each uses the extracted interpreter, exact import/config identity, private writable L2, numerical/build threads one and <=4 loadfile pytest workers.
+They commit with attribution and verify origin publication; no GitHub push/PR/merge until parent coordinates independent review and dependencies.
+Next: finish original candidate CI/evidence, review and validate each new increment, then integrate/test the follow-up candidate. No release or protection changes.
 
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.

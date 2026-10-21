@@ -4,8 +4,10 @@
 
 * Recommendation
 
-Keep this candidate bounded to Windows plus the approved five issues.
-Finish the exact-head validation before adding more framework scope.
+Land this candidate as the bounded Windows-plus-five-issue increment after exact-head validation.
+For the next pre-release pass, recommend #778 and the #1159 pooled-reducer contract/fix, with provenance #1115/#1128 in parallel.
+The maintainer subsequently authorized parallel #778, #1115/#1128 and #1159 work; #1159 now has an explicit country-preserving ruling.
+These are separate follow-up increments, with current dispatch details in [[file:../STATUS.org][STATUS.org]].
 The five fixes have independent review; the current evidence supports a release-candidate assessment, not a claim that0.16.0 is ready to publish.
 No release, merge, tag, issue closure or protection change is authorized by this report.
 
@@ -20,7 +22,7 @@ The exact =852= local full suite passed: 8,562 passed, 285 skipped, nine expecte
 Independent case reconciliation and the separate eight-case Uganda cache-population supplement are linked from [[file:../STATUS.org][STATUS.org]].
 Both exact =976= and =852= cold corpora completed all 549 requests: 530 successes and the same nineteen normalized full error messages.
 Six intended food tables change; roster ordering and inherited Mali cold/warm typing limits have separate controlled evidence.
-The paired sixteen-feature canonical scans completed with the same six Peru build errors and five known tenure-label failures; all warning differences are classified, with independent review of the 633 non-interview additions pending.
+The paired sixteen-feature canonical scans completed with the same six Peru build errors and five known tenure-label failures; all warning differences are classified and independently accepted with explicit limits.
 
 Native Windows passes on exact =852= in [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][run 39519191762]], along with unit and smoke checks; its credentialed Linux data suite is still running.
 The earlier [[https://github.com/ligon/LSMS_Library/actions/runs/39515878586][Windows-fix run]] passed all four jobs, including credentialed data tests.
@@ -28,7 +30,7 @@ Windows PR #1153 was explicitly authorized and merged at =ad1e87e10=; actual dev
 
 Before release consideration:
 
-1. Finish exact-head Linux data CI and the final paired audit classification, retaining real errors/failures and increased warning emissions.
+1. Finish exact-head Linux data CI. The completed paired audit retains real errors/failures and increased warning emissions; all differences are independently reconciled.
 2. Resolve the four open implementation PRs through human merge and verify the actual merged source against the validated candidate.
 3. Complete the eventual release-content/issue-closure audit and obtain release instructions before tagging or publishing.
 
@@ -141,7 +143,8 @@ The complete per-candidate residual notes remain in the JSON.
 * New inherited reducer contract decision
 
 [[https://github.com/ligon/LSMS_Library/issues/1159][#1159]] independently reproduces pooled seed/nitrogen reducers dropping country identity and merging colliding country-local plot IDs at both976 and852, even with metric units.
-Before promising pooled reducer safety, choose country-preserving results or explicit refusal of pooled input.
+The maintainer has now chosen country-preserving results; the separate follow-up worktree is implementing that contract.
+Recommend resolving this silent-collision contract and its implementation before the next release.
 No remedy is included in the five approved fixes; PR#1154 links this residual without claiming its unit-factor propagation fixes reduction identity.
 
 * Next priorities after this bounded pass
@@ -159,7 +162,7 @@ Do not spend this release pass reimplementing the23 landed issues merely because
 
 Read-only evidence synthesis only; no new heavy tests, source edits, git mutations, GitHub writes or shared-cache writes.
 CI states are a timestamped snapshot and may complete after this report.
-The parent has completed the local suite, matched corpus and native Windows validation; exact-head Linux data CI and independent acceptance of the remaining warning classification remain pending in this updated assessment.
+The parent has completed the local suite, matched corpus and native Windows validation; only exact-head Linux data CI remains pending in this updated assessment.
 A later successful assessment still requires the maintainer's release instruction.
 
 -- Sue

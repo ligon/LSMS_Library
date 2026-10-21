@@ -76,15 +76,14 @@ There are no new assembly findings or error/failure pairs; these retained failur
 Warnings increase from 3,256 to 11,987: all 8,098 added interview-date records and the other 633 net additions are classified.
 The extra Class B roster warning is Peru's documented person-id repair and matches both cold controls.
 Rebuild exposure accounts for repeated parsing/source warnings; the existing reaggregation warning's quantity change equals the measured parser delta.
-Independent interview review verifies complete non-runtime records and 27 exact date frames covering 690,030 rows; the remaining warning classification is undergoing independent review.
+Independent interview review verifies complete non-runtime records and 27 exact date frames covering 690,030 rows; independent review also accepts the remaining 633-warning accounting with its explicit limits.
 Another 125 local frame comparisons cover 16,139,392 rows with equal index/cell values and four order-only roster differences.
 The audit's order-only country set differs from the serialized cold corpus set and is recorded separately.
-Evidence: [[file:1124-1125/canonical/README.org][paired canonical report and reproduction]], [[file:reliability/interview-delta-independent-review.org][independent interview review]].
+Evidence: [[file:1124-1125/canonical/README.org][paired canonical report and reproduction]], [[file:reliability/interview-delta-independent-review.org][independent interview review]], [[file:reliability/non-interview-delta-independent-review.org][independent remaining-warning review]].
 
 * Verification still running
 
 - Exact-head GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], source =852=; native Windows, unit and smoke pass, credentialed Linux data job still runs.
-- Canonical warning review :: Both scans and classification have completed; the independent review of the 633 non-interview additions is pending. Raw findings remain private.
 
 Do not change integration HEAD or its source while these validators run.
 No source fix was made for the pre-existing roster ordering or Mali dtype behavior.
@@ -99,11 +98,12 @@ Raw crop/input tables and existing seed/nitrogen totals are unchanged; declared 
 The documented exclusion of 17,523 coarse EthiopiaRHS crop rows remains a visible Class B audit warning; the warm-test allowance expires if plot/plot_id appears and never masks read failures or another lost country.
 
 New independently verified [[https://github.com/ligon/LSMS_Library/issues/1159][#1159]] tracks inherited cross-country plot-key collisions in seed/nitrogen reducers.
-It reproduces with metric units at both =976= and =852=; the maintainer must choose country-preserving pooled results or explicit pooled-input refusal.
-It is linked from PR #1154 and is outside the five approved implementations; no remedy was silently chosen.
+It reproduces with metric units at both =976= and =852= and is linked from PR #1154 as outside the first five implementations.
+The maintainer has now explicitly chosen country-preserving pooled results and authorized the separate follow-up implementation described below.
 
 Recommend keeping this candidate bounded while final gates finish.
-Afterward, the next reproduced correctness priority is #778's assumed-fresh disappearance race and cache-mutating tests, followed by provenance #1115/#1128 and staged acquisition #1149.
+For the next pre-release pass, recommend #778's assumed-fresh disappearance race/cache-mutating tests and the #1159 pooled-reducer contract/fix, with provenance #1115/#1128 in parallel.
+Staged acquisition #1149 follows the provenance pair; sampling #1134/#1135 is another bounded already-ruled increment.
 The existing substantial #851 period branch needs recovery/integration/disclosure/review rather than duplicate implementation, and is a separate feature increment.
 The [[file:reliability/v016-readiness.org][readiness assessment]] lists 28 potential release-closure issues from the reviewed scope, supporting PRs and retained residuals; this is not an exhaustive release closure audit.
 
@@ -113,6 +113,24 @@ Skipped jobs must not become the required gate; =strict=false= and role 5 bypass
 No protection/permission change was made.
 The nightly schedule becomes active only after reaching default master.
 Official eligibility and required-check sources are linked in the readiness assessment.
+
+* Parallel follow-up authorized, 2026-10-20
+
+After the release-priority discussion, the maintainer asked to delegate the next work now.
+Three isolated worktrees start from the unchanged frozen852 candidate:
+
+| Track | Worktree | Agent | CPU range |
+|-------+----------+-------+-----------|
+| #778 remaining cache race / mutating tests | /local/job40255479/worktrees/778-cache-race | framework_reliability | 8--11 |
+| #1115/#1128 provenance | /local/job40255479/worktrees/1115-1128-provenance | framework_contracts | 12--15 |
+| #1159 pooled reducers | /local/job40255479/worktrees/1159-pooled-reducers | windows_ci | 16--19 |
+
+The maintainer explicitly chose retaining country identity in pooled seed/nitrogen results for #1159.
+That ruling permits the reducer implementation; no nutrient-share or price-pooling choice is included.
+The provenance agent must reuse and finish the existing unlanded =origin/fix/1128-1115-provenance-latest= branch, including the newest release-unknown ruling, rather than duplicate it.
+All three agents must test their changes, measure cache impact, commit durably and undergo independent review before PR/landing.
+They may edit only their own new worktree; the original852 integration and its completed evidence remain frozen.
+No GitHub PR merge, release or protection change is authorized by the dispatch.
 
 * Environment and reproducibility
 
