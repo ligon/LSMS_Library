@@ -31,7 +31,9 @@ Keep Applied=True, organic-only keyed sum(min_count=1), optional-field compatibi
   The fields were unmaterialized, not unasked.
 - The organic unit dictionary agrees across all seven sources: 2 Kilogram, 10 Bucket, 11 Wheelbarrow, 12 Ox cart, 13 Other (Specify).
   Reuse canonical spellings; do not borrow inorganic/food codebooks.
-  Five recorded code-1 rows and one code-3 row remain normalized raw codes; eight truly missing units become U_UNKNOWN.
+  Five recorded code-1 rows and one code-3 row retain their raw identities as source-qualified `Organic unit code 1` / `Organic unit code 3`; eight truly missing units become U_UNKNOWN.
+  The first literal-numeric fallback failed the public boundary: Country applies Malawi food u aliases to raw 1/3 and silently changes them to Kilogramme/90 kg Bag.
+  Root approved the source-qualified fallback on 2026-10-21 after that measured collision; no framework or food mapping changes are authorized.
 - Evidence: campaign control `review-1109/source-semantics.json`, `source-amounts.json`, `source-organic-unit-counts.json`; safe aggregate evidence accompanies final verification.
 - Schema/IO follows STANDING sections 3-4 and `lsms_library/data_info.yml`.
   Organic N refusal remains #867; disputed inorganic applied-unit interpretation remains #1111.
@@ -40,7 +42,7 @@ Keep Applied=True, organic-only keyed sum(min_count=1), optional-field compatibi
 
 - Retain raw ag_d36==1 gate and nullable Applied=True; missing/negative flags produce no row.
 - Numeric amounts are neither imputed nor rescaled; observed zero stays zero and missing stays NA.
-- Decode only the organic field's five evidenced codes; unlisted recorded identity stays raw, free-text Other stays a separate inventory without interpretation.
+- Decode only the organic field's five evidenced codes; unlisted recorded identity stays source-qualified and unlabelled, free-text Other stays a separate inventory without interpretation.
 - Preserve whole row count modulo organic unit rekeying; preserve exact nonorganic index, fields, reducers and order, including the 437 records.
 - Keep native (t,i,plot_id,input,crop,u), dropna=False and organic-only keyed overlay.
   Optional absent amount/unit columns remain supported.
@@ -67,5 +69,7 @@ Update #1118 organic amount/unit denominators in report only; do not claim the w
 
 ## Phase 3 - verification
 
-Pending c08 negative controls, source-backed helper/finalizer tests, actual per-row cold source accounting, exact nonorganic/nitrogen comparison and pooled Feature checks.
+c08 negative control: 15 failures / 12 passes; first amendment: 71 targeted/warm/declaration tests pass, exact nonorganic/nitrogen and pooled preservation.
+Public per-row accounting rejected literal numeric fallback because unrelated food aliases reinterpret six units.
+Pending source-qualified fallback, actual Country regression and final source/public accounting.
 Earlier c08 checks established mechanical preservation under a false source premise; this amendment supersedes that interpretation.
