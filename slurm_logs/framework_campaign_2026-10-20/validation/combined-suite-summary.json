@@ -137,11 +137,36 @@
     {
       "case": "tests.test_feature_canonical_index::test_warm_corpus_assembly_loses_no_rows",
       "skipped": false,
-      "failed": false
+      "failed": false,
+      "seconds": 175.331
+    },
+    {
+      "case": "tests.test_feature_canonical_index::test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_labor]",
+      "skipped": false,
+      "failed": false,
+      "seconds": 259.784
+    },
+    {
+      "case": "tests.test_feature_canonical_index::test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_inputs]",
+      "skipped": false,
+      "failed": false,
+      "seconds": 196.905
     }
   ],
   "log_sha256": "badd090183c782b7dc7eb16774d715239863f7c9be276c61d467cee20f170519",
   "junit_sha256": "209bc73e3e32f318cbe045e9e2092a9b2a8c2e7c9a533c9df5d76c5803470186",
   "private_copy_manifest_sha256": "9f4e62987678284b2d51df87fe62abb5c68bcd31e79c2d9952a6c30a09bf0a90",
-  "independent_skip_review": "pending"
+  "independent_skip_review": "PASS: ../reliability/independent-review.org/json; all changed outcomes accounted for, no credential skips.",
+  "supplement": {
+    "scope": "8 Uganda food_acquired wave-invariance checks skipped for missing files in full run",
+    "passed": 8,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0,
+    "new_private_cache": "/local/job40255479/uganda-invariance-review-data",
+    "api_population_seconds_including_tests": 33.602,
+    "pytest_seconds": 2.94,
+    "evidence": "../reliability/uganda-wave-supplement.json"
+  },
+  "xpass_identity_limit": "Both runs report count1; exact testcase identity is unavailable in these nonverbose XML/log artifacts."
 }

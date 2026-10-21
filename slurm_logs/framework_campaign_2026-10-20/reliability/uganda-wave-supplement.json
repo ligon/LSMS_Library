@@ -1,0 +1,86 @@
+{
+  "source": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "data_root": "/local/job40255479/uganda-invariance-review-data",
+  "source_copy_root": "/local/job40255479/corpus-baseline-data",
+  "shared_only": "L1 dvc-cache symlink",
+  "copied_files": 172,
+  "copy_bytes_sha256_equal": true,
+  "copy_distinct_inodes": true,
+  "wave_copies_preserved_in_private_backup": true,
+  "population": [
+    {
+      "wave": "2005-06",
+      "rows": 40749,
+      "columns": 3,
+      "seconds": 3.793,
+      "parquet_recreated": true
+    },
+    {
+      "wave": "2009-10",
+      "rows": 38107,
+      "columns": 3,
+      "seconds": 3.425,
+      "parquet_recreated": true
+    },
+    {
+      "wave": "2010-11",
+      "rows": 35489,
+      "columns": 3,
+      "seconds": 3.367,
+      "parquet_recreated": true
+    },
+    {
+      "wave": "2011-12",
+      "rows": 38983,
+      "columns": 3,
+      "seconds": 3.446,
+      "parquet_recreated": true
+    },
+    {
+      "wave": "2013-14",
+      "rows": 50703,
+      "columns": 3,
+      "seconds": 3.408,
+      "parquet_recreated": true
+    },
+    {
+      "wave": "2015-16",
+      "rows": 50108,
+      "columns": 3,
+      "seconds": 3.485,
+      "parquet_recreated": true
+    },
+    {
+      "wave": "2018-19",
+      "rows": 53288,
+      "columns": 3,
+      "seconds": 4.395,
+      "parquet_recreated": true
+    },
+    {
+      "wave": "2019-20",
+      "rows": 48144,
+      "columns": 3,
+      "seconds": 3.809,
+      "parquet_recreated": true
+    }
+  ],
+  "pytest_exit_code": 0,
+  "tests": 8,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 33.602,
+  "case_ids": [
+    "tests.test_uganda_invariance::test_parquet_matches_baseline[2005-06/_/food_acquired.parquet]",
+    "tests.test_uganda_invariance::test_parquet_matches_baseline[2009-10/_/food_acquired.parquet]",
+    "tests.test_uganda_invariance::test_parquet_matches_baseline[2010-11/_/food_acquired.parquet]",
+    "tests.test_uganda_invariance::test_parquet_matches_baseline[2011-12/_/food_acquired.parquet]",
+    "tests.test_uganda_invariance::test_parquet_matches_baseline[2013-14/_/food_acquired.parquet]",
+    "tests.test_uganda_invariance::test_parquet_matches_baseline[2015-16/_/food_acquired.parquet]",
+    "tests.test_uganda_invariance::test_parquet_matches_baseline[2018-19/_/food_acquired.parquet]",
+    "tests.test_uganda_invariance::test_parquet_matches_baseline[2019-20/_/food_acquired.parquet]"
+  ],
+  "fixture_or_baseline_edits": false,
+  "source_copy_unchanged": true
+}
