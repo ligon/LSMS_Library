@@ -1,0 +1,68 @@
+[
+  {
+    "country": "Benin",
+    "index_order_equal": false,
+    "column_order_equal": true,
+    "shape": [
+      42343,
+      7
+    ],
+    "canonical_exact_frame_equal": true,
+    "baseline_corpus_fingerprint_reproduced": true,
+    "baseline_replay_dtype_changes": {},
+    "combined_corpus_fingerprint_reproduced": true,
+    "combined_replay_dtype_changes": {}
+  },
+  {
+    "country": "Burkina_Faso",
+    "index_order_equal": false,
+    "column_order_equal": true,
+    "shape": [
+      146517,
+      7
+    ],
+    "canonical_exact_frame_equal": true,
+    "baseline_corpus_fingerprint_reproduced": true,
+    "baseline_replay_dtype_changes": {},
+    "combined_corpus_fingerprint_reproduced": true,
+    "combined_replay_dtype_changes": {}
+  },
+  {
+    "country": "Mali",
+    "index_order_equal": false,
+    "column_order_equal": true,
+    "shape": [
+      220732,
+      7
+    ],
+    "canonical_exact_frame_equal": true,
+    "baseline_corpus_fingerprint_reproduced": false,
+    "baseline_replay_dtype_changes": {
+      "MonthsSpent": {
+        "cold": "object",
+        "warm": "string"
+      }
+    },
+    "combined_corpus_fingerprint_reproduced": false,
+    "combined_replay_dtype_changes": {
+      "MonthsSpent": {
+        "cold": "object",
+        "warm": "string"
+      }
+    }
+  },
+  {
+    "country": "Togo",
+    "index_order_equal": false,
+    "column_order_equal": true,
+    "shape": [
+      27480,
+      7
+    ],
+    "canonical_exact_frame_equal": true,
+    "baseline_corpus_fingerprint_reproduced": true,
+    "baseline_replay_dtype_changes": {},
+    "combined_corpus_fingerprint_reproduced": true,
+    "combined_replay_dtype_changes": {}
+  }
+]

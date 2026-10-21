@@ -1,0 +1,15 @@
+{
+  "workflow_run": 39515878586,
+  "head_sha": "1d3e8dfdf264c40cc4ce4eb9a1f77b9d71634ad6",
+  "workflow_conclusion": "success",
+  "data_job": 118947782323,
+  "data_job_conclusion": "success",
+  "credential_gate_assertion": "passed",
+  "pytest_summary": "= 5911 passed, 2742 skipped, 4 xfailed, 1 xpassed, 1215 warnings in 3274.03s (0:54:34) =",
+  "log_sha256": "ae98c7d6e0b7ffe574df5f2ac717f9a6f0505547a80f524366530d91e079c7ae",
+  "merge_pr": 1153,
+  "development_merge_commit": "ad1e87e1025dec98fe70734f4e60d12824fd31dd",
+  "filesystem_origin_development_synced": true,
+  "frozen_five_issue_candidate_data_run": 39519191762,
+  "candidate_data_run_state": "still running"
+}

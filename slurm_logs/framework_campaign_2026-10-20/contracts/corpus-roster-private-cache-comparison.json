@@ -1,0 +1,166 @@
+[
+  {
+    "country": "Benin",
+    "shape_before": [
+      42343,
+      4
+    ],
+    "shape_after": [
+      42343,
+      4
+    ],
+    "exact_frame_equal": false,
+    "index_equal": false,
+    "index_names_equal": true,
+    "index_dtypes_before": [
+      "str",
+      "str",
+      "str"
+    ],
+    "index_dtypes_after": [
+      "str",
+      "str",
+      "str"
+    ],
+    "column_order_equal": true,
+    "column_names_before": [
+      "Sex",
+      "Relationship",
+      "Age",
+      "MonthsSpent"
+    ],
+    "column_names_after": [
+      "Sex",
+      "Relationship",
+      "Age",
+      "MonthsSpent"
+    ],
+    "canonical_frame_equal": true,
+    "files_stable": true,
+    "served_row_position_mismatch_count": 14491,
+    "served_rows": 42343
+  },
+  {
+    "country": "Burkina_Faso",
+    "shape_before": [
+      150678,
+      4
+    ],
+    "shape_after": [
+      150678,
+      4
+    ],
+    "exact_frame_equal": false,
+    "index_equal": false,
+    "index_names_equal": true,
+    "index_dtypes_before": [
+      "str",
+      "str",
+      "str"
+    ],
+    "index_dtypes_after": [
+      "str",
+      "str",
+      "str"
+    ],
+    "column_order_equal": true,
+    "column_names_before": [
+      "Sex",
+      "Age",
+      "Relationship",
+      "MonthsSpent"
+    ],
+    "column_names_after": [
+      "Sex",
+      "Age",
+      "Relationship",
+      "MonthsSpent"
+    ],
+    "canonical_frame_equal": true,
+    "files_stable": true,
+    "served_row_position_mismatch_count": 17627,
+    "served_rows": 146517
+  },
+  {
+    "country": "Mali",
+    "shape_before": [
+      220732,
+      4
+    ],
+    "shape_after": [
+      220732,
+      4
+    ],
+    "exact_frame_equal": false,
+    "index_equal": false,
+    "index_names_equal": true,
+    "index_dtypes_before": [
+      "str",
+      "str",
+      "str"
+    ],
+    "index_dtypes_after": [
+      "str",
+      "str",
+      "str"
+    ],
+    "column_order_equal": true,
+    "column_names_before": [
+      "Sex",
+      "Age",
+      "Relationship",
+      "MonthsSpent"
+    ],
+    "column_names_after": [
+      "Sex",
+      "Age",
+      "Relationship",
+      "MonthsSpent"
+    ],
+    "canonical_frame_equal": true,
+    "files_stable": true,
+    "served_row_position_mismatch_count": 6474,
+    "served_rows": 220732
+  },
+  {
+    "country": "Togo",
+    "shape_before": [
+      27480,
+      4
+    ],
+    "shape_after": [
+      27480,
+      4
+    ],
+    "exact_frame_equal": false,
+    "index_equal": false,
+    "index_names_equal": true,
+    "index_dtypes_before": [
+      "str",
+      "str",
+      "str"
+    ],
+    "index_dtypes_after": [
+      "str",
+      "str",
+      "str"
+    ],
+    "column_order_equal": true,
+    "column_names_before": [
+      "Sex",
+      "Relationship",
+      "Age",
+      "MonthsSpent"
+    ],
+    "column_names_after": [
+      "Sex",
+      "Relationship",
+      "Age",
+      "MonthsSpent"
+    ],
+    "canonical_frame_equal": true,
+    "files_stable": true,
+    "served_row_position_mismatch_count": 4882,
+    "served_rows": 27480
+  }
+]
