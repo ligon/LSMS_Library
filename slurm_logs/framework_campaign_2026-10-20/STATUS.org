@@ -96,3 +96,32 @@ Internal integration branch =integration/framework-v016-40255479= at =2970c8886=
 The final combined source will be frozen before validation.
 An independent, completely cold 549-request baseline corpus is running through the existing October 14 validator with explicit paths and bounded country processes, using [[file:validation/run_corpus.py][the wrapper]].
 Detailed data fingerprints and logs remain in private node scratch; only aggregate results are committed.
+
+* Frozen combined candidate -- 17:08 PDT
+
+All approved issues have independent PASS reviews and open PRs:
+
+| PR | Scope | Head |
+|----+-------+------|
+| [[https://github.com/ligon/LSMS_Library/pull/1153][1153]] | Windows expectation after verified cp1252 repair | 1d3e8dfdf |
+| [[https://github.com/ligon/LSMS_Library/pull/1154][1154]] | #1093 declared unit-factor propagation | eaf7b9913 |
+| [[https://github.com/ligon/LSMS_Library/pull/1155][1155]] | #1099 absent-subset empty parity | f9871610f |
+| [[https://github.com/ligon/LSMS_Library/pull/1156][1156]] | #1143 whole decimal-comma metric tokens | 1070a4d03 |
+| [[https://github.com/ligon/LSMS_Library/pull/1157][1157]] | #1124/#1125 audit/test participation | d84061818 |
+
+Integration source is frozen at =852ac2bfcd5f798533f56e7efa1f77db80c0138f=, published to origin and GitHub branch =integration/framework-v016-40255479=.
+The final harness PR adds independent review documents after the implementation tip =ca5bb83ca= already integrated here; production, tests and audit code are identical.
+An integration smoke passed 188 parser/declared-factor tests in 5.48 seconds before the harness merge.
+
+Final combined checks are running independently:
+
+- Cold corpus :: =corpus-combined-data= and =corpus-combined-out= under /local/job40255479, eight country processes on CPUs8--15; exec19447.
+- Full suite :: =combined-suite-data=, a separate verified physical 1,519-file copy of the frozen corpus with shared L1 only, 16 loadfile workers on CPUs16--31; exec30937.
+  BLAS/OMP/MKL, build and make workers are one; each test has600-second thread timeout.
+  Import/config identity is explicit and LSMS_EXPECTED_ROOT enables the suite's own identity assertion.
+- GitHub :: [[https://github.com/ligon/LSMS_Library/actions/runs/39519191762][39519191762]], exact integration head, credentialed Linux data tests plus native Windows build.
+- Feature audit :: Same strengthened canonical scanner against baseline976 and combined852 runtime in separate physical L2 copies, phases1/2.
+  Starts on CPUs0--7 after the independent baseline corpus completes; no shared writable L2.
+
+Do not move the integration branch while any verifier is running: the corpus driver asserts its exact source SHA.
+No PR has been merged and no release or repository-protection change has been made.

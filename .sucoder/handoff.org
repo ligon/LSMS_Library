@@ -41,6 +41,17 @@ Cold baseline corpus uses frozen baseline-976fc840d, /local/job40255479/corpus-b
 Once all remaining fixes pass review, merge them into integration with --no-commit then ordinary attributed commit (plain git merge does not trigger publish hook), freeze source, run combined cold corpus and full suite against independent L2 roots.
 Main untracked validation wrapper and baseline summary are included in this checkpoint commit.
 
+
+** Frozen final verification -- 17:08 PDT
+
+All five approved issues independently reviewed; PRs1153--1157 open, no merges authorized.
+Integration source852ac2bfcd5f798533f56e7efa1f77db80c0138f is FROZEN and on GitHub/origin.
+Final fullsuite exec30937 (CPUs16--31, combined-suite-data); finalcoldcorpus exec19447 (CPUs8--15, corpus-combined-data/out).
+Existing baselinecoldcorpus exec23742 continues on0--7. Once complete, paired canonicalFeatureaudits use0--7 and separate physicalroots under canonical-audit-compare.
+ManualCI39519191762 runs credentialed data/nativeWindows on exact852head; Windows-onlybranch manual39515878586 data job still pending atcheckpoint.
+Do not change integrationHEAD or source during validators. Main docs branch remains safe to update.
+Next: finish all validators, independentcorpuscomparison, aggregateevidence/status, finalrelease-scopeassessment; humanmergeapprovalstillpending.
+
 * Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
 - Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.
   Fixes #958 (all five defects) and #960 (docs).  #957 closed (done 2026-09-22).
