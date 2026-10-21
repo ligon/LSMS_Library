@@ -5,14 +5,19 @@ Combine income from different sources to make 'total' household income.
 
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
+import lsms_library as ll
 import pandas as pd
 import numpy as np
 
 income_sources = [('earnings',['Earnings']),
                   ('enterprise_income',['profits'])]
 
+uga = ll.Country('Uganda')
 income = None
 for source,cols in income_sources:
+    # GH #1062: materialize through the authoritative builder, then retain
+    # the raw pre-finalize operands (ledger sections 2/4).
+    getattr(uga, source)()
     per_source = get_dataframe(f'../var/{source}.parquet')[cols].sum(axis=1)
     # Collapse duplicate (t, i) rows: source tables carry per-activity rows
     # (multiple enterprises or labor activities per household).  Income is

@@ -1,0 +1,111 @@
+#+TITLE: GH #1062 -- Uganda country builds preserve sibling caches
+#+AUTHOR: Sue
+
+* Change and boundary
+
+Baseline =f8d236694=; working branch =fix/1062-uganda-sibling-writes-20261021=.
+The task ledger is =.coder/ledger/1062-uganda-sibling-writes.md=; =DESIGN.md= records the dispatcher's concrete boundary and approved Make-target adjustment.
+
+=nutrition.py= now selects =fct= or =nutrition= (direct invocation defaults to nutrition) and writes exactly that requested country output.
+The existing quantities, kg filter, source sum, common-food intersection, FCT and nutrient matrix product remain unchanged.
+Separate Make rules pass the requested target and no longer run the legacy country food compiler as a prerequisite.
+
+=income.py= materializes each input through its existing Country API, discards that finalized return, then reads the verified raw country parquet with the existing sanctioned reader.
+Its source sums, duplicate grouping, household union and zero/null suppression are unchanged.
+The listed earnings and enterprise-income Make targets call the framework with =LSMS_BUILD_BACKEND=dvc= pinned in that subprocess, preserving Make-all reachability and preventing make-backend recursion.
+Historical concatenation scripts and their numeric regression assertions remain; their income IO stub now supplies the materialization boundary.
+
+The country documentation records the correction and preserves its historical coupled-write evidence.
+The older authority-open wording is superseded by the explicit GH #788 maintainer ruling of 2026-10-17/18.
+This change does not alter FCT sources, the live API fallback, credentials, density/factor policy, dependency files, fixtures or baselines.
+
+* Verification
+
+** Synthetic and existing tests
+
+The seven original actual-script/Make-dry-run controls fail against the baseline for the expected coupled output or bypassed materialization.
+After the change, all *19 focused tests pass*: ten new side-effect/target controls and nine existing GH #772 earnings/enterprise/income cases.
+New controls retain real numeric operations, distinguish finalized API answers from raw operands, verify direct/default output selection, exercise Make-all reachability and pin the subprocess backend against recursive make dispatch.
+No numeric assertion was removed or loosened.
+
+Command (from this checkout, with the mounted image interpreter and explicit PYTHONPATH/config root):
+#+begin_src sh
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 \
+  /local/job40255479/venv_img/bin/python -m pytest \
+  tests/test_gh1062_uganda_sibling_writes.py \
+  tests/test_gh772_uganda_earnings_shape.py -q
+#+end_src
+
+** Paired real survey builds
+
+Baseline and candidate used separate physical Uganda L2 copies and a private local L1 seed containing 588 already-held blobs (483,097,209 bytes).
+The L1 count and byte total remained identical after verification; no new raw source was acquired.
+Imports and countries_root realpaths were asserted separately in both checkouts, using one BLAS thread and =LSMS_BUILD_WORKERS=1=.
+Every relevant stale table rebuilt through its ordinary route; source scripts consumed the seeded L1.
+
+All *14 paired raw/served frames* compare exactly with =pandas.testing.assert_frame_equal(check_exact=True)= for =food_acquired=, =sample=, =earnings=, =enterprise_income=, =income=, =fct= and =nutrition=.
+Values, household IDs, ordering, index names, columns and dtypes agree.
+The seven final candidate raw frames still equal their initial candidate snapshots after all order checks and Feature scanning.
+No raw frame or identifier is committed; =frame-comparisons.json= records only the comparisons.
+
+| served table      | rows    | columns |
+|-------------------+---------+---------|
+| food_acquired     | 355,571 |       3 |
+| sample            |  24,362 |       6 |
+| earnings          |  22,447 |       1 |
+| enterprise_income |  13,935 |       6 |
+| income            |  14,740 |       1 |
+| fct               |      15 |     113 |
+| nutrition         |  23,777 |      15 |
+
+** Call orders and sibling provenance
+
+The candidate completes *13 fresh-process call-order checks* covering warm requests, forced requested-table rebuilds, alternating FCT/nutrition and income/input requests, explicit make-backend earnings/enterprise builds and proper wave-subset reads.
+Every step preserves all watched unrequested siblings' SHA-256 bytes, mtime, cache hash and wave-coverage metadata.
+Every requested output retains a framework hash and wave-coverage footer, including the two make-backend wrapper cases.
+
+The baseline completes five identical initial controls, each demonstrating the defect: FCT requests rewrite =food_acquired= and =nutrition=; nutrition requests rewrite =food_acquired= and =fct=.
+After those five failures the remaining baseline order run was stopped; all candidate checks completed.
+This is a direct side-effect comparison, not inference from numerical equality.
+See =base-order-summary.json= and =candidate-order-summary.json=.
+
+** Hash blast radius and Feature audit
+
+Across all *549 country-table hashes*, exactly the *28 Uganda hashes* change; all 521 non-Uganda hashes and all 39 build-transform fingerprints remain identical.
+The Makefile edit therefore costs one Uganda re-warm, with no framework/corpus invalidation.
+See =hash-summary.json=.
+
+The existing Feature audit harness was run on baseline and candidate for =earnings enterprise_income income fct nutrition= with =--countries Uganda=.
+Both produce the same 11 warning records and no differential finding; =base-audit-summary.json= and =candidate-audit-summary.json= preserve feature/check/status/severity counts.
+This harness does not register new canonical schemas or adjudicate pre-existing warnings.
+The direct exact frame/order controls are the regression evidence for this IO defect.
+No full suite or corpus rebuild was run for this country-only change.
+
+* Reproducing the private comparisons
+
+=run_builds.py= writes raw/served snapshots and safe aggregate summaries beneath =EVIDENCE_OUT= using the caller's =LSMS_DATA_DIR=.
+Run it once per checkout with distinct physical L2 roots; set PYTHONPATH and LSMS_COUNTRIES_ROOT to the same checkout and assert cwd there.
+=compare_builds.py= takes =BASE_EVIDENCE= and =CANDIDATE_EVIDENCE= and emits only exact-equality statuses.
+=verify_orders.py= uses the same environment and moves each forced requested output into its private evidence directory before rebuilding; it never removes a shared cache.
+=hash_inventory.py= writes the complete config/build inventory to =HASH_OUT=; =census.py= writes source rule rows to =CENSUS_OUT=.
+Only L1 may be seeded/read jointly; L2 snapshots must be physical and separate.
+The runtime image is =/local/job40255479/venv_img/bin/python= for this allocation.
+
+The audit command is:
+#+begin_src sh
+python bench/feature_audit/scan.py \
+  --features earnings enterprise_income income fct nutrition \
+  --countries Uganda --out "$EVIDENCE_OUT/feature-audit.jsonl"
+#+end_src
+
+* Residual scope
+
+The current source census finds five other-country rules consuming a var sibling: Afghanistan, CotedIvoire, Ethiopia, Guatemala and Togo.
+The old CLAUDE.md count of 13 rules across 12 countries predates later retirements; it is historical context, not the present census.
+Ethiopia's nutrition rule is the separate ISA follow-up: it still invokes a legacy country food compiler as a prerequisite, and names an undeclared FCT target its script does not write.
+No Ethiopia build or edit was performed here.
+The other three derived-food rules name removed scripts, and Guatemala has a different legacy nutrition prerequisite chain; those are source findings, not claimed live corruptions.
+=residuals.json= supplies exact titles/bodies and tiers for separate issue ownership.
+
+GH #771's FCT/API reproducibility work remains separate, and GH #1078's nine-cell concurrent-suite corruption is not claimed resolved without its own reproducer.
+No shared-cache promotion or deletion, acquisition, dependency/lock modification, baseline refresh or GitHub write occurred.
