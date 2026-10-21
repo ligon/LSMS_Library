@@ -19,7 +19,7 @@ zero-cache-cost premise was contradicted by its Uganda build consumer (below).
 |---|---|---|---|
 | Numeric spelling augmentation | `lsms_library/country.py:407` | `tests/test_u_code_leak.py` | Extend finite-value guard only |
 | Categorical key resolver | `lsms_library/country.py:481` | `tests/test_categorical_key_resolver.py`, label-selection tests | Reuse unchanged |
-| Query-time mappings | `lsms_library/country.py:3510` | `tests/test_label_selection.py` | Reuse actual mapping path |
+| Query-time mappings | `lsms_library/country.py:3449,3535` | `tests/test_label_selection.py`, `tests/test_gh1077_nonfinite_label_keys.py` | Filter actual missing resolved source keys; reuse mapping path |
 | Food label contract | `.claude/skills/add-feature/food-acquired/aggregate-labels/SKILL.md` | Label selection and passthrough tests | Preserve |
 | Uganda food build caller | `lsms_library/countries/Uganda/_/uganda.py:361,386`, `food_acquired` imports/calls `_augment_numeric_code_keys(harmonized_unit_labels())` | Private held-L1 before/after rebuild required | Preserve genuine build fingerprint dependency |
 
@@ -65,8 +65,8 @@ changed np.nan/None/pd.NA into 807089 via the missing 2005-06 dictionary key.
 The caller must therefore drop only actual missing resolved source keys
 before `set_index`, while preserving all nonmissing keys and null targets.
 This is the issue's skip-NaN-key scope; it is not new label curation. The
-intermediate probe remains private failure evidence. No caller fix has yet
-been implemented at this ledger checkpoint.
+intermediate probe remains private failure evidence. The caller fix is now
+implemented and verified with zero fabricated null labels in both paths.
 
 Measured correction to the root-authored initial premise: the helper is also
 called while building Uganda food, so a guard edit changes its country-level
@@ -80,7 +80,54 @@ remaining count discrepancy stays qualified rather than invented.
 
 ## Verification
 
-Pending implementation, targeted tests, metadata census, public replay,
-fingerprint comparison and independent review.
+Implementation: `e7ea575fd7d8de1cb353badc20a7e4d1dceabf67`. Safe report and
+aggregates: `slurm_logs/isa_backlog_2026-10-21/1077/REPORT.org` and
+`validation.json`. Independent review remains the publication gate.
+
+- **OK (sections 2-5):** repeat symbol/call-site search confirms reuse of the
+  original numeric augmentation and mapping caller. Numpy was already
+  imported. The key resolver, curation, schema and fingerprint policy are
+  unchanged; no parallel resolver or replacement estimator was introduced.
+- **OK (sections 3-4):** the helper preserves every supplied original key/value,
+  including nonfinite keys, while skipping their numeric aliases. Finite,
+  fractional, collision, literal-string and nonmissing infinity behavior is
+  covered. The caller drops only actual missing resolved SOURCE keys and
+  preserves null targets, declared-key precedence and kg/Value sentinels.
+- **OK (section 4):** 230 targeted tests pass, zero fail/skip, with four
+  loadfile workers. The final 119 new regressions give 118 failures and one
+  already-correct Niger control on immutable f8. Isolating the original caller
+  with the finite guard retained gives 52 failures and 67 passes, proving the
+  caller filter is necessary beyond the exception fix.
+- **OK (sections 2-4):** all 34 current real table/target paths succeed, and
+  all 34 column plus 34 index null-input probes preserve nulls. The
+  finite-only counterfactual's 21/8 fabricated outputs and Uganda metadata
+  code 807089 example are retained as safe failure evidence. Nonmissing
+  literal nan/inf controls and target-null rows remain distinct.
+- **OK (sections 2-4):** held-L1-only offline cold Uganda builds preserve the
+  complete 355,571-row raw country and each of eight raw wave frames,
+  values/index/logical attrs exactly. Default/Preferred public results match
+  exactly across revisions. Code selection succeeds without changing any
+  payload, non-u key or attr, including a separate fresh process's default,
+  Code, default-after-Code, Preferred and new-Country Code requests. Warm
+  replays write no parquet. The pickle-byte oracle was corrected to logical
+  attrs equality on the preserved first-cold snapshots, not by dropping attrs.
+- **OK (sections 2, 4):** measured cache scope is exactly 28 Uganda table
+  hashes changed, 521 other-country hashes exact and all 39 tagged framework
+  fingerprints exact. The genuine `uganda.food_acquired` build import is
+  preserved, never excluded. No country/source file was edited.
+- **OK (sections 3-4):** scoped Feature before/after grids have 21 EXACT
+  unchanged default/Preferred/Aggregate finding records. The Code request
+  removes its load-failure warning and empty-assembly failure and now emits
+  five existing quantity/null-key/cluster diagnostics. Candidate has zero
+  fail/error/skip; all raw warnings/logs/snapshots remain private.
+
+The initial zero-cache-cost premise was a **CONTRADICTION** to the existing
+Uganda build caller and was corrected with root approval before rebuilding.
+The finite-only proposal's missing-input relabeling was a **CONTRADICTION**
+to source preservation and was fixed at dictionary construction with root
+approval. No remaining runtime contradiction or reinvention was found against
+this final ledger. The historical 36-cell total remains qualified; Niger's
+intentional self-key exclusion and null-target curation are separate contracts,
+not unimplemented #1077 exception fixes.
 
 Sue
