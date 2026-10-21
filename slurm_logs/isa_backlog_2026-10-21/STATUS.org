@@ -77,6 +77,7 @@ Use image generation =20261019T221223Z= at =/local/job40255479/venv_img= with ex
 Pin numerical threads to one and =LSMS_BUILD_WORKERS=1=; budget xdist workers and use =--dist=loadfile=.
 Every source-backed comparison uses physically separate writable L2 copies and relevant held L1 blobs, with no acquisition or shared-cache mutation.
 The strict API/skill audit passes all 15 hand-authored skills.
+A separate validation-only integration branch combines the five reviewed PRs at =1d388ba36=; combined checks are being prepared.
 No full-suite/corpus rebuild has been claimed for these focused country PRs.
 Private raw inputs, frame snapshots and detailed logs stay under =/local/job40255479/control/isa-backlog-20261021/=.
 Only source-safe aggregate evidence is committed.

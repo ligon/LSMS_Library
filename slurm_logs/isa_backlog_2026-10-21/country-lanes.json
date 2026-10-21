@@ -130,5 +130,19 @@
       "scope": "Finite numeric-label-key guard; country configuration untouched",
       "precode_ledger": "3e9b7dd0a"
     }
+  },
+  "integration": {
+    "path": "/local/job40255479/worktrees/isa-integration",
+    "branch": "isa/integration-20261021",
+    "head": "1d388ba36f068f38025d63fef52476ff9a9ab155",
+    "included_prs": [
+      1172,
+      1173,
+      1175,
+      1176,
+      1178
+    ],
+    "status": "validation preparation; no combined test result claimed",
+    "public_prs_merged": false
   }
 }

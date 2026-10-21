@@ -681,6 +681,8 @@ Live #1148/#851 now distinguish source conflicts and unknowns from approved Phas
 No production denominator or replacement historical percentage was chosen.
 Ethiopia #1118 country-only missing plot-input unit diagnosis is active; Tanzania remains queued.
 Shared #1077 finite numeric-label-key guard is active with =triage_east= at =isa-framework-1077=; precode ledger =3e9b7dd0a=.
+Validation-only integration branch =isa/integration-20261021= at =1d388ba36= combines the five reviewed PRs; no combined suite result is claimed yet.
+Mali ledger whitespace was fixed on the mutable lane at =aba2badfe=; reviewer is confirming its documentation-only relation to frozen =23d338e50=.
 Rotate through three workers beside root; keep each review snapshot immutable.
 
 Private source/frame/log evidence is under =/local/job40255479/control/isa-backlog-20261021/=.
