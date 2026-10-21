@@ -190,3 +190,23 @@ The predicted24-table Mali re-warm remains unmeasured until the patch exists.
 Safe frozen diagnosis is in =1091-Mali-diagnosis/=; no candidate PASS or PR exists yet, and Niger/Tanzania remain separate #1091 residuals.
 
 Sue
+
+* Source findings -- 2026-10-21 23:25 UTC
+
+Mali's approved writer committed its ledger first at =337f84321=.
+The actual parent-versus-working-candidate hash census completed before rebuilding:24Mali hashes change,525other hashes and39framework fingerprints remain exact.
+Final candidate tests and source review remain pending.
+
+Uganda's private #849 factor-only scenario preserves all133331existing rows and nonfactor payloads.
+It exposes115requested-wave groups with conflicting positive reported factors;113retain multiple screened factors.
+For112groups with comparable known units/conditions and valid quantities/factors, multiplying the summed quantity by the first factor differs from summing the source contributions: net10710.9000002kg and absolute26602.0999998kg.
+Six already-wired2018control groups have a separate pre-existing discrepancy.
+The full source diagnosis is still active; these interim findings do not authorize averaging, a new total layer, a grain change or unqualified colmap promotion.
+
+The World Bank publicly serves four Nigeria instruments inspected in a separate root-owned research copy.
+Three match the exact declared DVC MD5s: W4 household questionnaire, W5 household questionnaire and W5 interviewer manual.
+Both manuals relate the nonmoving answer to the previous-wave/listing dwelling; that supports the flag interpretation but leaves exact address-round alignment,20unknown statuses and physical-cluster identity unresolved.
+The live #1135 follow-up links those documents; frozen held-source evidence remains unchanged.
+Safe documentation and receipts are in =1135-public-instruments/=; PDFs, full extracted text and the private reader remain outside Git.
+
+Sue

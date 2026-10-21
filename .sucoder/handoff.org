@@ -828,3 +828,36 @@ Archive7quiescent-followup-23h10.tar.gz SUCCESSrootexec34338CLOSED;741files/2roo
 Latest23:13UTC: reportcheckpoint2598fe126ca085f8e862724a108966df91e62ab6FSpublished/GHpushed;PR1170bodyupdated23:09Z. Bothrootcommitsession67489 andGithubpush55705SUCCESS/CLOSED. Mainf8/campaigndocsstatuscleanatcheckpoint; no publicimplementationmerge.
 Mali1091READONLYCOMPLETEaba,proofreleased23:11:33/zero consumers;12cold6warm,all155931native/oldobs3exact;wrongMakeunsupported155931andsoleid_converted attr omission measured/strictstopretained. RootFULLreadDIAGNOSIS/PROPOSAL/TESTPLAN/LEDGERDRAFT/REPRODUCE/validation/proof andactualscriptMake/scheme; APPROVEDnewwriter isa-Mali-1091-fix branchfix/1091-mali-community-builder-20261021 onaba/privateMali/1091-fix exactignoredDVCtmp prepared23:12:24. mali_lane writesLEDGERFIRST thenonlydeletecountryconcat+explicitvarrule/recipe+boundedcomments;retainwave102-103/script,scheme/materialize:make,finalizer/core/science. Newtests,oldnegativecontrols/fullsource155931/rawlayers/fullattrs/defaultMake/subset coldpopulatedwarm/CLIactualMake/FeatureNiger/scanner/actual549/39scope BEFOREsourcebuild. Prediction24Mali/525other/39same mustmeasure;unexpectedstop. Correctunsupportedempties/publicMakefullDEFAULTattrs inclid_converted andnoCOUNTRYwrite are explicitintendedchanges. NoGHwrites/PRuntilrootindiePASS;futureSTACKbasePR1180actualfix/822-mali-community-readings-20261021. OtherNiger/Tz1091remain;issue notclosed/narrowedyet. Olddiag7safeexports+manifest now1091-Mali-diagnosis/sourceexact,rawprivate.
 Ug849prep43declaredheldsources verifiedMD5/SHA/size/mode/mtime,129physicalcopies/3roots,0gaps. Ordinarybaselinecropcoldactive;12proposedfactor-onlycolmapkeys passedpurehelperprivately, no modulemutation/promotion. Preserve2015Value_soldguard/x100/sourcecoalescenceconflictcounts. All1078rootsimmutable. Independent1078 own47sources/1288authorfiles verified,actual549/39/1362scope independentlyconfirmed, ordinarynineNaNhealing completefullframe/attrs,26coldframecontrolsfinishing; no protectedwrite/IPattempts. No finalPASSyet; no re-fullsuite. Rootqueued218Malawi2deadregistrationscontext forlaterworker (notdispatched), remainingnonISA/frameworkscopeexplicit.
+
+
+** Source findings checkpoint -- 2026-10-21 23:25 UTC
+
+Mali writer ledger337f8432193902c0d6f3d6251ff911606d0955b6 published first.
+Its working production allowlist remains exact; actual census before source rebuild moves24Mali hashes, leaves525other hashes/39framework fingerprints exact.
+Niger full notes1557lines read; held comparator gate/private preparation precedes API/tests.
+No candidate PASS yet.
+
+Ug849 readonly scenario preserves133331rows/allnonfactor payload and exposes115raw positive-factor-conflict groups;113have multiple screened factors,112fully comparable known-unit/condition/allvalid operands.
+Their first-factor-times-summedQuantity versus per-source contribution sums differ net+10710.9000002kg/absolute26602.0999998kg.
+The2018already-wired6groups separately have-2090kg pre-existing net discrepancy.
+Whole12-key private projection29.0933M->42.0351Mkg is not approved API output or a completed fix.
+Root requires full perwave source/slot/key/coverage/dispersion/screen counts, frozen final report, concrete native-grain follow-up; no averaging/unknown-factor masking/reported_total/newaxis implementation approved.
+Live prior-art/dedup context queued-849-carrier-prior-art.json includes637/current859ruling; no exact carrier owner found, don't silently extend original637tail.
+
+Independent1078 adds its own actual f8 race counterfactual: both tests pass, bad A reproduces exact historical9zeros; candidate bothwriters fullframe/attrs correct and two serial orders pass.
+All26cold/warm matched pairs and73-file warm0writes hold, BOTHsource Niger strictdtype residual reproduced;217rawscannerrecords match.
+Stronger scanner-zero-write assertion stopped because grid normally adds12previouslyabsent wave cluster_features caches/head (8Ug+4Niger) from terminally gated held sources, all73priorfiles unchanged.
+Root approved finishing exact new12payload/fullattrs/currenthash receipts under same scoped prerequisite authority; preserve original harness stop, do NOTclaim scannerzero-write or repeat fullsuite.
+Final independent verdict/quiescence still pending.
+
+Root public-instrument research is separate from every frozen1135/other evidence root: root-public-instruments-1135/.
+Four official public PDFs fetched without microdata/authentication;3match declared DVC MD5 exactly (W4questionnaire da641e8..., W5questionnaire c096dce..., W5manual4c0f81...).
+Extra W4manual cae7dc8... is official but undeclared here.
+Web PDF reader refused octet-stream; local pdftotext unavailable (preserved tool stop), so root fetched pure-Python pypdf6.21.2 wheel into PRIVATE pdf-reader only, verified PyPI wheel SHA1d44d1a3a200f25062adff0085b02040e4646431ac2ccac22e42679e91466084, no venv/dependency edit.
+PDF extraction session82643 completed SUCCESS/CLOSED. Full texts remain private; rotated-table extraction warnings qualify unrelated questionnaire pages, the relevant manual cover text is explicit.
+Read W4manualpp24/25,W5pp5/19/20/21/22/23 and question covers. Prior-wave/listing dwelling language supports nonmovement interpretation but does not establish exact prefilled round/full movement history or resolve20unknown statuses/allphysicalK. W5 has old date examples and apparently inconsistent routing wording, retained as caution against treating manual as a complete numeric oracle.
+Safe exports1135-public-instruments/PUBLIC-INSTRUMENTS.org,public-proof.json,pdf-reader-receipt.json. No PDFs/text/thirdparty code in Git, no old diagnosis/cache/source changes.
+LIVE1135 follow-up appended23:23:23UTC with direct primary links, original ruling/historicalbody preserved; no numeric records/formatter implementation approved.
+No root running exec sessions at this checkpoint.
+
+Sue

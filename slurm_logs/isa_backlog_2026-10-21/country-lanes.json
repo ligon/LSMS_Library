@@ -189,7 +189,14 @@
         "Make frameworkwave route writes noCOUNTRYparquet"
       ],
       "active_predicted_hash_scope_not_yet_measured": "24Mali/525otherunchanged/39frameworkunchanged; mustmeasurebefore sourcebuild",
-      "active_future_PR_base": "fix/822-mali-community-readings-20261021 (PR1180); rootwillopenafterindependentPASS; no publicmerge"
+      "active_future_PR_base": "fix/822-mali-community-readings-20261021 (PR1180); rootwillopenafterindependentPASS; no publicmerge",
+      "active_precode_ledger": "337f8432193902c0d6f3d6251ff911606d0955b6",
+      "active_measured_working_scope": {
+        "Mali_changed": 24,
+        "other_country_unchanged": 525,
+        "framework_unchanged": 39,
+        "status": "Actual own-source parent-vs-working-candidate census terminal before country rebuild; final frozen-source receipts still required"
+      }
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -414,7 +421,8 @@
         967,
         972
       ],
-      "active_prior_work_roots_frozen": true
+      "active_prior_work_roots_frozen": true,
+      "active_interim_finding": "Factor-only private projection preserves133331rows/allnonfactorpayload, but115requested groups have multiplepositivefactors;113retainmultiple screenedfactors,112known-unit/condition groups with allvalidoperands differ in first-factor-times-sum versus per-source sum (net+10710.9000002kg/absolute26602.0999998kg). Six2018controlgroups pre-existing. Full source report/freeze pending, no colmap promotion approved."
     }
   },
   "shared_lanes": {
@@ -487,7 +495,19 @@
       "Nigeria_sources": "Four held cover DTA MD5s terminally gated before reads;6manifest parquets including current sample/full10waves and legitimate hashless panel companion;5declared instrument PDFs absent in both held layouts, not claimed unavailable upstream.",
       "Nigeria_normal_API": "Six default/pair initial+freshwarm calls completeframes/fullattrs/warnings exact;all14private data files and14880trackedfiles/index/head/modes unchanged;zero consumers.",
       "Nigeria_export": "framework1135-Nigeria-counts/; ROOT-QUALIFICATIONS.org distinguishes initial-reference boolean and sorted panel-companion oracle from actual warm fullframe assertions.",
-      "live_issue_reconciled": "2026-10-21T23:02Z title/body now settled implementation/measurement work; historical request and ruling preserved; no policy reopened or partial counts called complete."
+      "live_issue_reconciled": "2026-10-21T23:02Z title/body now settled implementation/measurement work; historical request and ruling preserved; no policy reopened or partial counts called complete.",
+      "public_instruments_followup": {
+        "status": "Four public PDF downloads verified, three match declared DVC MD5 exactly; separate root-owned copies leave frozen held diagnosis/cache unchanged",
+        "evidence": "1135-public-instruments/",
+        "source_links": [
+          "https://microdata.worldbank.org/catalog/3557/download/47668",
+          "https://microdata.worldbank.org/catalog/3557/download/47675",
+          "https://microdata.worldbank.org/catalog/6410/download/180528",
+          "https://microdata.worldbank.org/catalog/6410/download/180535"
+        ],
+        "interpretation": "Manuals support prior-wave/listing-dwelling nonmovement interpretation; do not resolve exact address-round alignment, complete movement history,20unknown statuses or allphysicalK. No numeric record/formatter implementation approved.",
+        "live_issue_updated": "2026-10-21T23:23:23Z"
+      }
     }
   },
   "integration": {
