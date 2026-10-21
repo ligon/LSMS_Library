@@ -1,0 +1,15 @@
+{
+  "source": "/local/job40255479/followup-farm-data",
+  "target": "/local/job40255479/release-v016-seed-data",
+  "files": 1519,
+  "bytes": 341221428,
+  "bytes_equal": true,
+  "all_l2_inodes_distinct": true,
+  "source_hash_stat_identity_unchanged": true,
+  "only_symlink": "dvc-cache",
+  "l1_target": "/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/dvc-cache",
+  "manifest_sha256": "e53acbe4b0f5918e244fc808ee326035ed86c04ec15475e2ff09339ccaaba5f0",
+  "original_532_start_manifest_sha256": "c54c8efa4a64da4d7eca8d24d4b5f838b2cbb1d9c7b8413b794e427a27de2e1d",
+  "matches_original_532_start_file_set_and_bytes": true,
+  "state": "prepared; no package import or API executed"
+}

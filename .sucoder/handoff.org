@@ -1,4 +1,28 @@
-#+title: Handoff -- framework campaign, 2026-10-20
+#+title: Handoff -- v0.16.0 release, 2026-10-21
+
+* Release authorized and preparation in progress -- 2026-10-21
+
+The maintainer instructed "Okay, let's get 0.16.0 out".
+Release documentation, development-to-master merge, annotated tag, GitHub Release, automated PyPI publication and verification are authorized; do not request confirmation again.
+No CI protection, acquisition, shared-cache promotion or scientific-policy change is included.
+
+Release preparation starts from development =acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c=; master and v0.15.0 resolve to =cb44e3522a2426ba03431ca9a218cc63fe03f6c9=.
+All 50 merged PRs since that tag are mapped in =slurm_logs/release_v0.16.0_2026-10-21/notes/=.
+Complete user notes are =docs/releases/v0.16.0.md= and =docs/migration/v0.16.0.md=.
+The strict API/skill audit passed.
+
+Root owns release merges, tag and publication.
+Merge development to master with a MERGE COMMIT and one closing keyword per independently verified issue; retain partial umbrellas.
+Run the actual Makefile release target in a frozen final-master checkout with the prepared private 1,519-file cache seed, extracted image, explicit checkout/config/data identity and 16 loadfile workers.
+The reviewed adapter waits for both the local full suite and the exact automatic master-push CI before returning zero, so make creates no tag on a failed gate.
+Controllers and safe aggregate preparation evidence are in =slurm_logs/release_v0.16.0_2026-10-21/verification-prep/=; full per-file cache manifest and raw outcomes remain private in =/local/job40255479/control/release-v016/=.
+
+No v0.16.0 tag or publication existed at the preparation checkpoint.
+After gates pass, push the annotated tag to origin and GitHub, publish the GitHub Release, observe publish.yml, then verify exact PyPI archives/digests/package payloads and an offline installed-configuration smoke.
+Record actual final SHAs, CI run and publication results before concluding.
+
+Sue
+
 
 * Completed authorized framework campaign landing -- 2026-10-20
 

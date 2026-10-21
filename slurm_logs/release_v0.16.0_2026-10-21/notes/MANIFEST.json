@@ -1,0 +1,50 @@
+{
+  "all_notes_writer_processes_stopped_after_handoff": true,
+  "author": "Sue",
+  "copy_files": [
+    {
+      "bytes": 22680,
+      "path": "RELEASE_NOTES.md",
+      "sha256": "81524af49cf76f6d89a9d2b6756283dc5158f76fa68a16bd215ea0dd599b1d12"
+    },
+    {
+      "bytes": 8310,
+      "path": "MIGRATION_NOTE.md",
+      "sha256": "1ae2c56026e6ef593df79d00b297d7fa3baf90d29493661f9c5fb94b045aaf51"
+    },
+    {
+      "bytes": 66316,
+      "path": "PR_INVENTORY.json",
+      "sha256": "19b7b27bf0a9b31a46badb4e9643120f44b661819912d34092eb5405eb365404"
+    },
+    {
+      "bytes": 3253,
+      "path": "REPRO.md",
+      "sha256": "e364e61200ae77c79dfa241149b00452c0cf1df5e8dbc2c007bb96df8921a9d9"
+    },
+    {
+      "bytes": 5061,
+      "path": "inventory.py",
+      "sha256": "8eefe79f7396d51af977d7d360ca4bf747bffec04b10f4054c18e1bdaa4f2f12"
+    }
+  ],
+  "drafted_utc": "2026-10-21T12:36:07.234210+00:00",
+  "included_as_behavior_or_validation": 47,
+  "mapped_posttag_prs": 50,
+  "no_library_test_data_or_cache_execution": true,
+  "no_repo_or_github_mutation": true,
+  "omitted_documentation_only": [
+    1016,
+    1158,
+    1166
+  ],
+  "only_private_notes_outputs_written": true,
+  "publication_limits": "Tag/PyPI/published-artifact completion not asserted in advance.",
+  "reviewed_development": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c",
+  "suggested_targets": {
+    "MIGRATION_NOTE.md": "docs/migration/v0.16.0.md",
+    "RELEASE_NOTES.md": "docs/releases/v0.16.0.md"
+  },
+  "v015_commit": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "validation_cohorts": "Paired549/16-feature audits976-to852, not cb44-toacbd; final532 suites6388/8851 and later source-byte equivalence recorded separately."
+}

@@ -1,0 +1,50 @@
+{
+  "COPYLIST.txt": {
+    "bytes": 221,
+    "sha256": "83a124b4bff5da51a4d84724bdc8cf719cc84833806cdf60261bbaafbd0accad"
+  },
+  "README.md": {
+    "bytes": 5768,
+    "sha256": "a3d3bae86669b7eb948e9e8f3b7de790b7f926b92341f3822169a1dd3a4cb287"
+  },
+  "STATIC_REVIEW.md": {
+    "bytes": 3320,
+    "sha256": "780d87f290a28493df5d8e304f11d9807f550539e3269f313f89c94fb9a918a4"
+  },
+  "check_ci_gate_synthetic.py": {
+    "bytes": 4552,
+    "sha256": "e772b00b429e7b73a6792a11037fb8f8bf1a284abdd2fa73fe67f73cf9ee4432"
+  },
+  "ci_gate.py": {
+    "bytes": 3052,
+    "sha256": "2b66ba621a139d11639abad9b40732a8c107cf7ce126ccd289a468693be156ae"
+  },
+  "copy-summary.json": {
+    "bytes": 682,
+    "sha256": "2d4927de1914d6e49b9a297ef8ee44a46f3559e3bf1570da499ce717882eaaae"
+  },
+  "installed_smoke.py": {
+    "bytes": 2787,
+    "sha256": "143e7fc07bd50c68ea3bbff8ccf68d878365a1e39627fe0877b6d4bd1a11f904"
+  },
+  "poetry-pytest-only": {
+    "bytes": 6002,
+    "sha256": "ae494eac7dab7562ed5a5739289f17058d581375cc030bcd435bff16e5ac1f44"
+  },
+  "preparation.json": {
+    "bytes": 1792,
+    "sha256": "b1a243c467b2cc63dec8923a78a6dc4dfe1f2af78ba507adce1715a1334ce74c"
+  },
+  "prepare_copy.py": {
+    "bytes": 3412,
+    "sha256": "bc38cfeea5823091a6773998bf1c6b60790f338207ba0b64851efe9fe0179596"
+  },
+  "release_identity.py": {
+    "bytes": 3359,
+    "sha256": "9114da79099c71b85550df254855a16c71d22f0ec81d1889af8b5e4b04731878"
+  },
+  "verify_published.py": {
+    "bytes": 7364,
+    "sha256": "abbd27f844fea9268974d6a66b0196561b3762e71ac2badfce20837179b32e83"
+  }
+}

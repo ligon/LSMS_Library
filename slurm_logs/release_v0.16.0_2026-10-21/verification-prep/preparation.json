@@ -1,0 +1,45 @@
+{
+  "state": "version2 prepared and stopped before final master gate",
+  "source_tested": null,
+  "package_imports": 0,
+  "project_tests_or_builds": 0,
+  "dependency_installs": 0,
+  "git_or_github_mutations": 0,
+  "original_cache_mutations": 0,
+  "version1_artifacts_byte_identical": true,
+  "python_syntax_checks": [
+    "prepare_copy.py",
+    "release_identity.py",
+    "poetry-pytest-only",
+    "ci_gate.py",
+    "check_ci_gate_synthetic.py",
+    "verify_published.py",
+    "installed_smoke.py"
+  ],
+  "synthetic_ci_gate": {
+    "tests": 9,
+    "passed": 9,
+    "seconds": 0.042,
+    "real_ci_requests": 0,
+    "real_project_tests": 0
+  },
+  "cache_copy": {
+    "source": "/local/job40255479/followup-farm-data",
+    "target": "/local/job40255479/release-v016-seed-data",
+    "files": 1519,
+    "bytes": 341221428,
+    "bytes_equal": true,
+    "all_l2_inodes_distinct": true,
+    "source_hash_stat_identity_unchanged": true,
+    "only_symlink": "dvc-cache",
+    "l1_target": "/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/dvc-cache",
+    "manifest_sha256": "e53acbe4b0f5918e244fc808ee326035ed86c04ec15475e2ff09339ccaaba5f0",
+    "original_532_start_manifest_sha256": "c54c8efa4a64da4d7eca8d24d4b5f838b2cbb1d9c7b8413b794e427a27de2e1d",
+    "matches_original_532_start_file_set_and_bytes": true,
+    "state": "prepared; no package import or API executed"
+  },
+  "additional_static_review": "STATIC_REVIEW.md; producer-side review, parent independent review still required",
+  "make_release": "Parent-owned execution; exact master SHA and push CI run required; zero adapter exit only after local suite parity and exact CI success",
+  "artifact_verification": "Prepared only; future PyPI JSON/digests/tagged-payload/offline-installed-config checks; not executed",
+  "author": "Sue"
+}

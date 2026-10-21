@@ -1,0 +1,1875 @@
+{
+  "actual_posttag_pr_count": 50,
+  "excluded_entries": [
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "2e41feda313c28b069259dfbce167e7aacaabada",
+      "pr": 1015,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "pr": 1014,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "7c6265de78225efc953bcaed0144ebda982b8712",
+      "pr": 1013,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "729ff51238ed609ab56a1fc5ff43bda750b9c389",
+      "pr": 1012,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "36a92330513599225e7f2bc4dd90bede3ba03c99",
+      "pr": 1011,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "c67c69279608820f49591f2ddbda577d049abf72",
+      "pr": 1007,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "33189b532c10db913cb7968ead42d0dc6d108bd4",
+      "pr": 1005,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "47ce939afa1f253a5a76e0832620a3cbb6a4b817",
+      "pr": 1004,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+      "pr": 999,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "4c60e696f67af3454810e30829509fac69c366b3",
+      "pr": 998,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "1973242b48ec62ab808bc8f6e0667054fbb0703f",
+      "pr": 997,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "ef0150faef3e792d5fda8f4e54dd4532647d758a",
+      "pr": 996,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "1f27c08036b3f0de84051f794f2c346017cfa85d",
+      "pr": 995,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "cfcb73b3a1998c88bb238daa7376f76c45a9ee96",
+      "pr": 994,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "f9d3cbbc2fd8982d072fe7f0259b34285826e30a",
+      "pr": 993,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "7518eb09a13efd65fb5e9b1d0ee1d25a1d408f72",
+      "pr": 992,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "3f3c05456020aac9c1f4e72bc41dbd88252f24c6",
+      "pr": 991,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "010b84ba065dfece8467015abe206da964c3546b",
+      "pr": 990,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "220043fd1e6d9d768502cd175e12ebc1c77a84f0",
+      "pr": 989,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "331552b5c5ee219721b544cfbcda2c03adf13f13",
+      "pr": 988,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "0398e536f79668371f374ff10f028dfba3ebdf37",
+      "pr": 987,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "99995044246c81bcf884c31027c5a99546c9d647",
+      "pr": 986,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "ed50943988d92a1ca337a9e84e8b3ae085118b1f",
+      "pr": 985,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "c319a25d93709444ba01dbac47b9bbf23d97db62",
+      "pr": 984,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "fe4e34f777bbbae2a0b72e349757f26806990f81",
+      "pr": 983,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "0f648c325042c0674c6d76df7468ce425088fbde",
+      "pr": 982,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "1ea13f2dbae66f9fbf6593c2734325e2402d22c1",
+      "pr": 981,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "d9942cf7e96daee7e799e07174d0da97613d890c",
+      "pr": 980,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "75a4497447b981471580cad7f51bbbaff47603a4",
+      "pr": 979,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "9827c727dcffdf1d6abfb011da29e380f4672b71",
+      "pr": 973,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "15cf4c95ed0ea04a1feb0c7c0ed17b9af06ee12b",
+      "pr": 972,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "c45f8d02cef9539c97cba4d60c7d625ba6c33f60",
+      "pr": 971,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "77ccb51bad5c405dd8cc6421372e7c01889d214a",
+      "pr": 969,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "dd647130802b348eb142370da312e5b651cc1b1e",
+      "pr": 967,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "4c2223aa119381ebcd8aea05fc2f9d26c3026028",
+      "pr": 966,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "2a133a017f32b0e8fdc430a28ebfd9d7af371815",
+      "pr": 965,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "aa3abef8895cb9475377f3c3a327537d9b8f0bf7",
+      "pr": 963,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "2c273527584eacb685171172cc43a7536c734d0c",
+      "pr": 955,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "379b9e07baa82be89c66b50e5905ef1d22263cb7",
+      "pr": 954,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "171502fbb4cf0cd52cb4e7f4f69bad52a078e370",
+      "pr": 952,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "b0e61fa235b690d927525f3bb9b143fd307450db",
+      "pr": 951,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "fee6b983664d888addbc4cd7aec7c74db6536d73",
+      "pr": 950,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "3cf124ca3886e08e98a3e10324270ea8ecdccda6",
+      "pr": 949,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "ff1eb3f6585d4e58471088f7c823a687b3ed833f",
+      "pr": 947,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "9c34eb3d702fd421a5a558e089ffab683337bcbf",
+      "pr": 944,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "3c23299b5dbeeb5b7d713491da839ee6ac8c5875",
+      "pr": 940,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "1528fa937bcf87f146b3af9ebfdbe18b8f912750",
+      "pr": 938,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "ff4c00f2b42b2c88000d4839be9ffdfa5bcf4a16",
+      "pr": 935,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "7086152882068259605b4ea27df0993dc3150a87",
+      "pr": 934,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "6f19bde456ffd87c626e28c346bd6e44e1b1e26d",
+      "pr": 933,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "fcf8598ce8862ecabe81e5b63482552dba1d9a1e",
+      "pr": 930,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "ce1a1221b9f6aa834f725d6f23a6b6b3c2e42060",
+      "pr": 927,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "22232d4f21db8b507fc7cd77dd435c1a68176cc1",
+      "pr": 924,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "bcb00dc8b74777946285c8bd8510c07de70fc72d",
+      "pr": 923,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "6666e0fea268ac8fe228a85543ec0680c4b9c7df",
+      "pr": 922,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "ce41260120f72ef684858dcac799c12ae1689b55",
+      "pr": 921,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "57099324807f072f5f2bc92395ad4ec40480c269",
+      "pr": 918,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "62b2cb6391e4dc0b745dc4aec12ef760ea8e38f2",
+      "pr": 917,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "f959ff64443aba79af0bfbc80d33159415ea2a6e",
+      "pr": 916,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "e7135d2d87ab498577200abbda0a9c79e8969031",
+      "pr": 912,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "61a4f1a09ab6f5fee23219655e7ce9aae6caf30f",
+      "pr": 911,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "fa7ea8f388c2ec252e27872ab0df50ecb4d10552",
+      "pr": 910,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "f435335ed12072cd1a9a5b8891af4aa0f4c07a35",
+      "pr": 906,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "a6d10f64692cdc394f802191329dbd6ff2a6723f",
+      "pr": 904,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "32f9365b212f7e755ac91a0050295120c78f7336",
+      "pr": 903,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "eb2a4290c7c544c005e2e47f5a62d6840718e0dd",
+      "pr": 902,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "db79b427004bc1cacb9862de0b456fe7f7cd99e1",
+      "pr": 901,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "1b318bf57811e4222105cc68a10157c13d179205",
+      "pr": 900,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "3b6a0fda93c2d92e6f74b7597fbfcd3e62335485",
+      "pr": 899,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "90efa3251c87a9ea3a919bac69aa6720f2151614",
+      "pr": 898,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "380bb30ccb31572edf8db0c6dd07dbc509bb3164",
+      "pr": 897,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "99f5e97578d24c9154479c1c6e66bad509b963c3",
+      "pr": 896,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "a90c61cd0826d96fd12c0520b0b7c1b23634b725",
+      "pr": 895,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "a8bac9f2b076fefc210c7423365fb7b9011f15fb",
+      "pr": 893,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "aa4322c19c0f8fedfa4f352fb52abd6d806d7514",
+      "pr": 890,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "44d36a8ef291de25ac3d6e3e058aafe3f23f4bb7",
+      "pr": 889,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "8101fc268f7cbca344d19cb36ff0d0bd7dfdf3f0",
+      "pr": 888,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "00aacbfda7a488ce1cf59891fd8f0670551a6553",
+      "pr": 887,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "00aacbfda7a488ce1cf59891fd8f0670551a6553",
+      "pr": 886,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "2cbcbb046a369d1da1b2e996b8c725927c4b0cb6",
+      "pr": 885,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "814980f83f4f582ccd2645ae8b4ef969d79b1a5d",
+      "pr": 870,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "e6d3dcea9b9f1c8621a4c2a49bede1188dd62613",
+      "pr": 815,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "8ec0bab4e46ee9666cf4bc319a35f0503fa6b2ea",
+      "pr": 807,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "fd52c013eb49cda2ff88ab5df18c5e2c65563b1f",
+      "pr": 796,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "b2d38da885c28d7f6deaf9edf48461bf82cacd81",
+      "pr": 795,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "f72818d0fe039663507d1ca2e3d0b204629ef7c7",
+      "pr": 789,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "a93061af982e0d193df8e519b2dc74f4e38653a6",
+      "pr": 786,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "52819bbc8166bd1575278d19ff751ebee38406b1",
+      "pr": 785,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "71b6ce92d2f4727217dc60cd0c27dd25337c2c15",
+      "pr": 784,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "a25e89aca1277563267ae7b3db1a39fd909ef980",
+      "pr": 779,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "6010a05f70609e4a4c05679f959e0e652622840f",
+      "pr": 776,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "2974cda378a2f0c9d7675d116abc4adcd6887606",
+      "pr": 774,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "7f77a5f00838c8de1928e1b5c787fb4c5f409759",
+      "pr": 773,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "013b9b2ce19eb9557f6fc31c6f4932b520adc007",
+      "pr": 769,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "853ce49699ce539bd61d856a783502c7e37e49a5",
+      "pr": 768,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "11c9da2f2f3682679146a8592a5a879644de0815",
+      "pr": 767,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "38fabb27bfc72500255079009a64a5badde4ef18",
+      "pr": 766,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "98f5cceedda6cee333874178fd026aa409f5d198",
+      "pr": 765,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "f653104a841b90095ad9c99e24c6e48e1d80b837",
+      "pr": 762,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "b9888b00048e16e13befd81132be5388d940c608",
+      "pr": 761,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "9c21ab89d78d1351f7834a5ca43b93bf002065bb",
+      "pr": 760,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "339640654ed6e9187bce3be45e6cc8425645a447",
+      "pr": 759,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "6780a9f3bb56615ac73a6a60ad83c53ba14c2806",
+      "pr": 758,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "20c6ec8d9e08319d5aff7b1dd581a84f75757ae7",
+      "pr": 756,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "0e4c719f318609f5df5ed4c9dcbc4ac0df1de95e",
+      "pr": 755,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "6fd6c213170703cb5e5f54a8541267eb312f3dc2",
+      "pr": 754,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "8725bed2f46a805cdae4ad45b74f28b4e29b5431",
+      "pr": 752,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "bed7c99ac05e219fbed86e5eb2ef7449e2f55e17",
+      "pr": 751,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "b7d102d444d7aa917fcbbed764a56ddfeaec3e18",
+      "pr": 749,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "96004b17eda34bc4c3ff00f28ff985f044fd36e7",
+      "pr": 748,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "9de0936aaa2751a37a0df78bcc8cb4174dd70af5",
+      "pr": 747,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "ad20f6e8a913040ac578b714f1dcf6ac21d1b05a",
+      "pr": 745,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "2a68a7b3af9a58b519cada4db4336063997a32ae",
+      "pr": 744,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "c344aa9b088db920364dbb780e32739f9c74adda",
+      "pr": 743,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "85037f92db54948e6f1197ad54a89f228725bfd3",
+      "pr": 742,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "c0300a4a548375f0cc80616d95f6580107c0798a",
+      "pr": 739,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "617075c19d2e5e2de850cb7cc0549eb687e12536",
+      "pr": 738,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "d298e675e224a6e2a0f6f7f03c1c0543d9a954cd",
+      "pr": 736,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "55097858e26955264a4d7d1026d1e9e1dabf5394",
+      "pr": 735,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "4b005cf532104f67b03e88727b24c0eece0aaec2",
+      "pr": 733,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "e115c69478b6090c9b69c70cc808ca0e73194757",
+      "pr": 729,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "bbb6e2b451cce7e9245dacd7f287e3f7ad650dd2",
+      "pr": 728,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "a56cef64fc93f836c8dbbaec214340f48f7f1469",
+      "pr": 726,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "7e506daf3dc828741017dd0e280b54bbd64fd651",
+      "pr": 725,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "a61e563d2c925d075bc44d96f702d1184c62d3d4",
+      "pr": 723,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "3a727d6f72d3f6803f7f305689d8ba6bb44e928f",
+      "pr": 722,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "5228c1dc20848dd2d6bd40058f64069bd76daa91",
+      "pr": 721,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "30711c019b6bf9a2aed034b347e677ea05940ef0",
+      "pr": 720,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "16b930b5c196cc56cd19a2e44fa3df3197c34673",
+      "pr": 718,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "0e7c9006c864d07a9770be2871d8fed9522a3e29",
+      "pr": 717,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "c7c193ee7d7823b515cec982f0c30e7c4d890460",
+      "pr": 715,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "e0b20125cc7955bd8759d961eb48fa8d1fdfe753",
+      "pr": 714,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "328c7d8bb3a825a9e281a7662c260bec5844895e",
+      "pr": 711,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "99966399bd9f9e7a7c72b1be9d2e0cef3aac8cd5",
+      "pr": 710,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "5df24d96d9ab40149ee1eae58ded7ede07e2a59d",
+      "pr": 708,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "1cb3cb819fcfd9df2953b25c1e3d6fb2f1c055e1",
+      "pr": 707,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "b4d45c1a481413ccc866ffcf4af7895de40721cc",
+      "pr": 704,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "3db1d8f1c6f195402407e18aa3daf62c6eca7fdf",
+      "pr": 697,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "0353e4c88ca3866c464bc8773d3a8191e29201f7",
+      "pr": 696,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "3a9348bfb431af45deae3f001fcf2585aa7f6d39",
+      "pr": 691,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "22c66949d2b35aa01aba1cc5e2e5aa65a4ced10c",
+      "pr": 690,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "78e2bcb90e5a398a4aff703ec377b51e56bd4012",
+      "pr": 688,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "5290f25c7ba540299c2e3f3b3df1e11faa97e05b",
+      "pr": 687,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "fd9efc1b89e08568def55ba5482229582e028310",
+      "pr": 686,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "9329b09e9b32f06e4b8716b212228be372523876",
+      "pr": 682,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "c3beba362a1ad407923368ce38afc821b09545cc",
+      "pr": 678,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "ad951c91a23fe9ddfa2427cd646f9186bd96b10c",
+      "pr": 677,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "7798191ae0b88a0d3e1cff8d463003d45298c50d",
+      "pr": 676,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "b63f49e2af03678a4b189fd3f1caa0a233ee83cd",
+      "pr": 673,
+      "reason": "already in v0.15.0"
+    },
+    {
+      "in_development_ancestry": true,
+      "in_v015_ancestry": true,
+      "merge_sha": "09c8538e072ae4177548a13bd599a7c6ee40a2cc",
+      "pr": 672,
+      "reason": "already in v0.15.0"
+    }
+  ],
+  "github_mutations": false,
+  "included_pr_count": 47,
+  "metadata_entries": 200,
+  "metadata_sha256": "0dd15604584fd49371b5c5b29a6c268d305b7e331409d7c2fb90d83e365fdad7",
+  "migration_target": "docs/migration/v0.16.0.md",
+  "notes_target": "docs/releases/v0.16.0.md",
+  "omitted_doc_only_count": 3,
+  "publication_claims": "No tag/PyPI/upload success is asserted before the release owner verifies it.",
+  "records": [
+    {
+      "base_ref": "development",
+      "body_sha256": "c6616db8ef250f8064ea7e39e05035df0b79346f9fe1fef2f8e5411303aa139a",
+      "included_as_behavior_or_validation": false,
+      "merge_sha": "ab41e389ea010195b647f4e5345f914c707e57c2",
+      "merged_at": "2026-10-15T16:42:58Z",
+      "omitted_doc_only_reason": "Post-v0.15 release-completion documentation; no new0.16 runtime feature. Older publication claims are not repeated as0.16 publication validation.",
+      "pr": 1016,
+      "sections": [],
+      "title": "docs: record verified v0.15.0 release completion",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1016",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "2b04fce3e0d822381c0f5a5fd2691a1e00c25fd182d77296cdc76d0e974a6bc8",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "58e6de00dceae2f6e7220b8979291a1ef465e1f0",
+      "merged_at": "2026-10-18T00:55:34Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1017,
+      "sections": [
+        "Validation, tooling and upgrade notes"
+      ],
+      "title": "venv: per-clone state out of the shared mirror; self-locating shebangs (#958, #960)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1017",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "022eefc280533095a699e09c7c882602cfb15e25b03f9bc6f791612664fe7c2b",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "3e3bd26ee904341d08fe582e5c9136ba24f803fd",
+      "merged_at": "2026-10-18T00:57:44Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1018,
+      "sections": [
+        "Mapping, errors and metadata contracts"
+      ],
+      "title": "Categorical mappings: a level is categorical_mapping.org and/or categorical_mapping/ (#953)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1018",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "d4bced1aec9713af9d564ea750a5aec31e5ef6bd5c4454d43de1e2874618d9ee",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "ba3e58e9a454d65fc3c2df54681d2e8a36bec78a",
+      "merged_at": "2026-10-19T03:17:55Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1019,
+      "sections": [
+        "Readers, dates and cache behavior"
+      ],
+      "title": "readers: keep unreadable binaries out of the text tail; SPSS retry for SPSS only (GH #1002)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1019",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "44679c3a8d3e16880f1593d8690e53486082fe9b2ed0b072b4ab7f4eed96f5aa",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "26517e23127cd9c2c5edd948c027c11e86946295",
+      "merged_at": "2026-10-19T01:43:12Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1020,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "kinship.yml: one key per lookup form -- fold the 4 title-collision groups (GH #974)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1020",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "cc654abf4084e812a4a3a1953fe360d749048aed6868684ccdc8824991f556a3",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "5b64a779640db65a18ed7a05232b994e1ad0cd07",
+      "merged_at": "2026-10-19T01:43:25Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1021,
+      "sections": [
+        "Readers, dates and cache behavior"
+      ],
+      "title": "Retire dead food_prices_quantities_and_expenditures scripts (BF/Senegal/Tanzania) and uncalled prices_and_units (#218, #790)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1021",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "a37637b30389a6a79e728122acacfb00a429063b5d1cced63abe9f7aab0c850c",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "5525e6924acecf3df4f888111e2787569d1064fa",
+      "merged_at": "2026-10-19T01:43:39Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1022,
+      "sections": [
+        "Provenance and credentials"
+      ],
+      "title": "Stop writing S3 credentials into the installed countries tree (GH #1001)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1022",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "22f00f7b3efe48fbc258edfc405c88d8025586ed2552a38a6e2eb841a7a6cbb7",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "6f2fc7259b176d6bd4035abf79d5782f0d1ebbfa",
+      "merged_at": "2026-10-19T01:44:30Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1023,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "Nigeria food_acquired: decode unit codes per wave, not wave-blind (GH #607)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1023",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "ef299b423290cc036387fe47ada6813e53395f9ced1178ba601a43eda19e5df7",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "e10a6a8233010e4afc7c3e91dfa6803a6004625f",
+      "merged_at": "2026-10-19T03:18:08Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1024,
+      "sections": [
+        "Mapping, errors and metadata contracts"
+      ],
+      "title": "get_categorical_mapping: raise TypeError on a bare org-table call (GH #674)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1024",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "7d68efe36f0f31f7e21523de7171f430b1dab11c936bc2865fa74bcb3f6aae11",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "f8e14a7c23d27a53194bad8c188e3c1b03078055",
+      "merged_at": "2026-10-19T01:45:42Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1025,
+      "sections": [
+        "Readers, dates and cache behavior"
+      ],
+      "title": "Parse declared datetime columns per value; warn on unparsed strings (GH #798)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1025",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "0442b8e79df770bce14b860e60cd07c17409a1c971bdd2368ff47f3179db27bf",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "32f8bb2372fd4744143776216e9e50640bc4d2d2",
+      "merged_at": "2026-10-19T01:43:52Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1026,
+      "sections": [
+        "Readers, dates and cache behavior"
+      ],
+      "title": "Tanzania: retire dead country-level `food_acquired.py` that read CONTENTS.org; guard the `_ORG_HASH_SKIP` invariant (#836)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1026",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "acf1b9defa9a654c7924984aa1aced5538bb7fa7da39e6ac21395f0b2a8d26c3",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "6ca9c4db77515db7773fd8eabe957e47ffd5552e",
+      "merged_at": "2026-10-19T03:18:22Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1027,
+      "sections": [
+        "Readers, dates and cache behavior"
+      ],
+      "title": "cache: move the L2-country read gate out of the build fingerprint; say why a rebuild happens (#908, #920a)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1027",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "0b958461e21c32b5eb15e5dd67bc37fc2ebb733e64087027d781d0b6653e5ea3",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "119edd8818170b5a186b82cbdfda88a0afe7e88c",
+      "merged_at": "2026-10-19T01:44:05Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1028,
+      "sections": [
+        "Mapping, errors and metadata contracts"
+      ],
+      "title": "GH #962: state the real residual-code kg contract; guard minted unit spellings across fillna/replace/where/assignment",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1028",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "d22cb1ee929d6f22d4b4aa95ea53f241e124845c8d8b8baaebe6a5fe78e1663e",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "fb2f2ce8e6a3d3c902f7d3f09e882eb862da0b6d",
+      "merged_at": "2026-10-19T01:45:55Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1029,
+      "sections": [
+        "Mapping, errors and metadata contracts"
+      ],
+      "title": "Read-path contracts: Feature carries `labels_unmatched`; `units=` raises `UnitsUnavailableError`; document Price provenance (#787 item 3, #828, #845)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1029",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "e52169c2abdbe27fdeb228352c5f93060ce56f4b6bb16feffdc5489e1d4a4a09",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "dbab68d8c0675f28fa2631cf990e5f44645a3658",
+      "merged_at": "2026-10-19T01:44:17Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1030,
+      "sections": [
+        "Validation, tooling and upgrade notes"
+      ],
+      "title": "tests: isolate gh866/gh809 cache-poisoning tests in a private LSMS_DATA_DIR; read-is-the-check for var/ readers (GH #778)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1030",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "6c67e98025a32c6b47801b0f67656b4f5d21e94942f602ea7a8ade91d233d6b2",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "eba670f5bafda574d9d397a781da80227747553e",
+      "merged_at": "2026-10-19T01:49:10Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1046,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "Nigeria food_acquired: a blank unit code is U_UNKNOWN, not 'None' (GH #1041)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1046",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "91546fd81f9fe10319223a914dc51f8edca56721d74c33c6f686138b0667805a",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "3ff6ddf60ca2bbcef2c595a51d3aee5b31d51ba6",
+      "merged_at": "2026-10-19T01:42:59Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1049,
+      "sections": [
+        "Validation, tooling and upgrade notes",
+        "Remaining data and scientific limits"
+      ],
+      "title": "ci: data-tests gate the development merge queue, run nightly; unit-tests states what it skipped (GH #932)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1049",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "bd7f758bf7cefa2109ef3f69eb808d7f6542b85d753448c58033bbf5976bc08a",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "ddd79800cdde24b5524ca61c82a1e8423d47ef83",
+      "merged_at": "2026-10-19T03:18:36Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1052,
+      "sections": [
+        "Readers, dates and cache behavior"
+      ],
+      "title": "cache: a build degraded by an unreadable dfs: source no longer caches as fresh (GH #675)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1052",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "fbd2f296f8b76bdac75eaae717b8443dc292781af6abc7ad38fcf560dedb33bb",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "c4242f09ad7b502dbe5f219372d043ba8cd35c3b",
+      "merged_at": "2026-10-19T12:42:52Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1053,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "Ethiopia interview_date: map the '##N/A##' placeholder to null (#1038)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1053",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "37459a714d1101f3d43b578fe7f5dfa2edd5a7f8f7cd7dbea4c80e9c2c0deb39",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "2b077d11d698608ea917e5145b4cb4ab0ccc5256",
+      "merged_at": "2026-10-19T12:42:56Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1054,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "Burkina Faso cluster_features: wire 2018-19 GPS; record that 2014 and 2021-22 ship none (#1050)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1054",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "e0a21752974100835e5ed08a840135d061918893006c3b58a86e29aa11b1b10c",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "12f48d83018c3167e12e803a5f38ee4e34e4ad40",
+      "merged_at": "2026-10-19T14:51:38Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1065,
+      "sections": [
+        "Provenance and credentials"
+      ],
+      "title": "CI: S3 reader credentials go to the user-config path, never the countries tree (#1031)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1065",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "eec46efe26e70f906f656af16cb714c8ae30fe00075a2e765b79fe61608b21a6",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "277226e56d4e7433233802ab2c51a19e321d78f3",
+      "merged_at": "2026-10-19T14:51:45Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1067,
+      "sections": [
+        "Country data and unit corrections",
+        "Remaining data and scientific limits"
+      ],
+      "title": "EthiopiaRHS food units: integer codes after 1989; missing units -> Unknown; 1989 code 1 is a quintal (#1044, partial)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1067",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "6f1093252a8fb90c9ffdc3482aca05fda2de5f23a30a803a7b962696ab82c0eb",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "200e504a3869ef4755085f9a448b93df0493dd21",
+      "merged_at": "2026-10-19T14:51:50Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1076,
+      "sections": [
+        "Country data and unit corrections",
+        "Remaining data and scientific limits"
+      ],
+      "title": "Unit codes checked against the questionnaires: GhanaLSS and Malawi (#1042), with @ligon's six rulings",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1076",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "38c144c4b72b4d58f8889f1d41088de92384e0e1fbc7920ccbd9bb5996769216",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "9d4cd807c4221972749e8732f96c597fb12fc8fd",
+      "merged_at": "2026-10-19T17:25:23Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1086,
+      "sections": [
+        "Feature indexes, pooled quantities and sampling metadata"
+      ],
+      "title": "community_prices: add variety + visit + obs index levels, select nothing (#840)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1086",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "e1e783e14b7ac095dd41998e783190cce05d1d3d6239e03c87ffc607f8da5649",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "870dc417976528c149c7e941bd65ddd4d546dcfe",
+      "merged_at": "2026-10-19T17:25:28Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1092,
+      "sections": [
+        "Feature indexes, pooled quantities and sampling metadata"
+      ],
+      "title": "Crop kg ladder reads a country's declared u_kg; Ethiopia's quintal check re-expressed against an external key (#931)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1092",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "1b8f997a1af6657fcbc1b3cf078502183839e655354fda91380ea7e0e32f168e",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "6f9202612930783e4ab9cbe0f0ed1d0856b84cf2",
+      "merged_at": "2026-10-19T17:25:33Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1094,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "Nigeria interview_date (W3 recovered, W4 bound method fixed) and unit codes (float strings, crop and plot_inputs missing units) (#1037, #1047)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1094",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "b3741467fdc48884de7f2845fee43f5015b322601f14b87dc50596d0bf3238e4",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "805f84dd4aa31e923701b8d1796e9a4324bf76c6",
+      "merged_at": "2026-10-19T17:56:15Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1097,
+      "sections": [
+        "Validation, tooling and upgrade notes"
+      ],
+      "title": "deps: fooddatacentral >= 1.0.13 (no top-level tests/ package) (#680)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1097",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "1a86cb54b7b78a4098840da6363a9780e41f9cc9cf53be8489cd14ded829b71b",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "92631d56bad6a088f2ad7a2402005dc5570d5157",
+      "merged_at": "2026-10-19T17:56:21Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1098,
+      "sections": [
+        "Mapping, errors and metadata contracts"
+      ],
+      "title": "Country() refuses an existing directory with no _/data_scheme.yml; acquisition opts in (#915)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1098",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "7bdaf11ef60ea065c342e6cf5637a11bb0d408dffe3896396d91e463631be8cf",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "2f3104c5f52573998f9dec704ab25bda3c13319e",
+      "merged_at": "2026-10-19T20:56:22Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1104,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "kinship: affinity-only conflations are [G, D, null] (#698)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1104",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "8c3d740ba3d1ac5303ed706ae991825895a4508ac629a6e518f86a0161f38d6b",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "e87a551e80c18fa68d20da2fdc477f064f9a35af",
+      "merged_at": "2026-10-19T21:21:02Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1105,
+      "sections": [
+        "Mapping, errors and metadata contracts",
+        "Readers, dates and cache behavior"
+      ],
+      "title": "Corpus bundle 2026-10-19: #805/#831, #928, #1036, #1039, #1040 (+#1070), #1045 (+#1066) -- one re-warm",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1105",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "53e2ba38d508feba6b22e218a55772638ca89bb495426d74470cab4422da5715",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "931934b12205bd3f2ad5e4682fdcb0db69ed4be1",
+      "merged_at": "2026-10-19T21:57:28Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1112,
+      "sections": [
+        "Feature indexes, pooled quantities and sampling metadata",
+        "Remaining data and scientific limits"
+      ],
+      "title": "nitrogen_kg: cited N shares for NPS and Malawi D Compound; organic inputs refused, counted and named (#867)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1112",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "83a574017b74827d990a4ffb1f7ce83aef424f10c87f51c7234200bfb224ff34",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "2070823cf2c387cd82df100c3d8a1828dc473101",
+      "merged_at": "2026-10-19T22:39:56Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1117,
+      "sections": [
+        "Provenance and credentials"
+      ],
+      "title": "backfill_wave_provenance: a failed resolution leaves SOURCE.org intact, and a re-stamp never overwrites a recorded fact (#600)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1117",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "c37cd38d16294e0bc442ab6144f7caff4264a1b202f92ae7af80acbb7ee4bd0c",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "095eab691a4bde6dbcb338d3b6da90824b4136e5",
+      "merged_at": "2026-10-19T23:03:46Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1126,
+      "sections": [
+        "Feature indexes, pooled quantities and sampling metadata"
+      ],
+      "title": "Register plot_labor and plot_inputs in Feature's Index Info (#569)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1126",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "c974ae609cc7eec2c94213df0ce5400d04e9d126ad00b133ae693e8cd4b4e397",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "4c630652cd60f60c5c1bdc1e958b1878f774a706",
+      "merged_at": "2026-10-19T23:12:56Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1132,
+      "sections": [
+        "Validation, tooling and upgrade notes"
+      ],
+      "title": "coverage: verdict vocabulary for dropped cells (correctly-empty / empty-pending-machinery, keyed by tier) (#781)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1132",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "1d8e0d2b300c61869d73e0b65acc4f6988f415f31a27d3f2f3d861356ed4cc50",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "238a4c15d8d691204097649765c58d1a2c6b1d59",
+      "merged_at": "2026-10-20T02:14:32Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1137,
+      "sections": [
+        "Feature indexes, pooled quantities and sampling metadata"
+      ],
+      "title": "sampling.yml loader + per-boundary v-continuity warning (#793, #942)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1137",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "424251d92c95ffe425b5d3b589abdc8f4b8f5008e4dc8b5c30319049e6f2e16f",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "1485a1484d1fc3d5a1246bc3a567ef7cf2765115",
+      "merged_at": "2026-10-20T10:17:12Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1147,
+      "sections": [
+        "Validation, tooling and upgrade notes"
+      ],
+      "title": "test_uganda_invariance: skip a partial-coverage L2 parquet instead of failing on it (#1113)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1147",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "a497d68346f5e97bf28a6f5753af971c924837b0c724865a625d9997402770cb",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "d638956065491d7a140ae90e3541bbf0b9972f82",
+      "merged_at": "2026-10-20T11:45:16Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1151,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "GhanaLSS: recover null declared-index keys; 2016-17 8H screener drops only \"No\" (#1008, #1140)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1151",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "8a5561d03e2ca38982144ceafdb36c8d7254d960ac249bbadb905767dd490707",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+      "merged_at": "2026-10-20T11:45:30Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1152,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "Nigeria W1-PH: serve the container card weight only to fractional quantities (quantity-aware, #1035)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1152",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "9b0587fb589a2237fd1fe29802fa64d849844f9809189c51d6519f99c3fe1d5b",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "ad1e87e1025dec98fe70734f4e60d12824fd31dd",
+      "merged_at": "2026-10-21T00:34:57Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1153,
+      "sections": [
+        "Readers, dates and cache behavior"
+      ],
+      "title": "CI: update Windows shocks digest after the cp1252 repair",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1153",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "a75ac72b059e86c7bfc0e85a2eb570897a07a2b9675de7c46811216ed4644975",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "047d1ff514aefc0dd7536b4a366d2cdc087b48b7",
+      "merged_at": "2026-10-21T04:54:04Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1154,
+      "sections": [
+        "Feature indexes, pooled quantities and sampling metadata"
+      ],
+      "title": "Use declared unit masses in seed, nitrogen and sale valuation",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1154",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "f32965807fcd79981d6756730ff456f63960948b5c9d66326b8c96e9e2abd701",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "f46dc011f766197156236f0b293986156dae03a0",
+      "merged_at": "2026-10-21T04:54:08Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1155,
+      "sections": [
+        "Readers, dates and cache behavior"
+      ],
+      "title": "Return typed empty answers for absent wave subsets",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1155",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "0e06a3dc6d4b5a8f2eb1edae16edf251b241a4d61552be2942213eee22ccb584",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "064a7fb465b98c4a4cfa951235bd903a81a68d87",
+      "merged_at": "2026-10-21T04:54:12Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1156,
+      "sections": [
+        "Country data and unit corrections"
+      ],
+      "title": "Parse decimal-comma metric labels without numeric suffix loss",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1156",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "1170acd7f777382596a3599eceb78836dbf523464314807267e3f07556572984",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "09a413ab4f8e8189980b4c83cdcf28037158e8b1",
+      "merged_at": "2026-10-21T04:54:17Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1157,
+      "sections": [
+        "Validation, tooling and upgrade notes"
+      ],
+      "title": "Detect excluded countries and harden warm farm assembly checks",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1157",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "872f86094e9bc36f64c0e520e6206514c040ffed6a65050a4fa8531ce85b3190",
+      "included_as_behavior_or_validation": false,
+      "merge_sha": "db00a79f17f841649f2b96827c5b9b4e858ce2f8",
+      "merged_at": "2026-10-21T05:18:56Z",
+      "omitted_doc_only_reason": "Campaign evidence/handoff only; cited in validation rather than presented as another behavior change.",
+      "pr": 1158,
+      "sections": [],
+      "title": "Record framework campaign validation and v0.16 assessment",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1158",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "f92de036e4fa6fbb74ea11904061672eebf82af48f260e6e413fc9e492db9ba6",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "ac6de755e99fa53bae7677042df92b654eef2b13",
+      "merged_at": "2026-10-21T04:54:00Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1161,
+      "sections": [
+        "Validation, tooling and upgrade notes"
+      ],
+      "title": "Accept the measured Uganda nutrition fingerprint without weakening invariance checks",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1161",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "5e1560e14ff2a37b0fcac34fa31bb163d883bdb6f2ed14e551859b4ca15e5e12",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "5519de059aa1a33359af3a34a887658271879ed1",
+      "merged_at": "2026-10-21T05:03:00Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1162,
+      "sections": [
+        "Readers, dates and cache behavior",
+        "Validation, tooling and upgrade notes"
+      ],
+      "title": "Recover disappearing assumed-fresh caches and isolate forced rebuild tests",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1162",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "345f420dce6dbc1c6d6e70ebfbb3cd01172bffe051b929d4fe1602f9e63b0b71",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "5bd1a5834e1957aab464f1aa99a0544ce93c6a25",
+      "merged_at": "2026-10-21T05:03:04Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1163,
+      "sections": [
+        "Provenance and credentials",
+        "Remaining data and scientific limits"
+      ],
+      "title": "Preserve SOURCE facts and separate held releases from latest observations",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1163",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "3fa534d5c89dbead9ce28f272319be72aa41e7515596f4b6654ac6fb1bac151d",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "f50611161e9e58bf0676de5d771d4d6f07d0d8a3",
+      "merged_at": "2026-10-21T05:03:09Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1164,
+      "sections": [
+        "Feature indexes, pooled quantities and sampling metadata"
+      ],
+      "title": "Preserve country identity in seed and nitrogen plot reductions",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1164",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "ad7b88b2e8ba38f1601acfa7c63ed9158e70432849a74ea6ad760d22ef539753",
+      "included_as_behavior_or_validation": true,
+      "merge_sha": "1933434b84de82ac72b3921a7fd8fe5c00154754",
+      "merged_at": "2026-10-21T05:09:02Z",
+      "omitted_doc_only_reason": null,
+      "pr": 1165,
+      "sections": [
+        "Feature indexes, pooled quantities and sampling metadata",
+        "Remaining data and scientific limits"
+      ],
+      "title": "Preserve country identity through fertilizer-rate joins",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1165",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    },
+    {
+      "base_ref": "development",
+      "body_sha256": "57fe29477f45d2a4aeec5ff57a4b7d03e9049b4394a5771f44048f89063c68bf",
+      "included_as_behavior_or_validation": false,
+      "merge_sha": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c",
+      "merged_at": "2026-10-21T05:31:14Z",
+      "omitted_doc_only_reason": "Final landing/CI evidence and handoff only; cited in validation, with no runtime/config/test/build change.",
+      "pr": 1166,
+      "sections": [],
+      "title": "docs: finalize framework landing status and CI evidence",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1166",
+      "verified_absent_from_v015": true,
+      "verified_ancestor_of_release_development": true
+    }
+  ],
+  "release": "0.16.0",
+  "reviewed_development": "acbd8eb34710e85d3bf66eb04f13dd0d971d1f3c",
+  "runtime_or_data_execution": false,
+  "scope": "All supplied200merged PR entries checked against both commit ancestries; all50actual posttag merges mapped. This is a change inventory, not automatic issue-closure authority.",
+  "v015_tag": "v0.15.0",
+  "v015_tag_commit": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "v015_tagged_utc": "2026-10-15T15:37:21Z",
+  "validated_implementation": "532d58700fa46e52a0b390198604eca1dc4de00e"
+}
