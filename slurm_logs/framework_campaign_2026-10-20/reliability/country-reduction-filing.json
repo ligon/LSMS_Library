@@ -1,0 +1,11 @@
+{
+  "issue": 1159,
+  "url": "https://github.com/ligon/LSMS_Library/issues/1159",
+  "state": "open",
+  "implementation": "not part of the five approved fixes",
+  "verified_inherited_behavior": true,
+  "baseline": "976fc840d12ba40f1602b7dff58b81548632b2a9",
+  "candidate": "852ac2bfcd5f798533f56e7efa1f77db80c0138f",
+  "decision": "preserve country identity or explicitly refuse pooled inputs",
+  "linked_from_pr": 1154
+}
