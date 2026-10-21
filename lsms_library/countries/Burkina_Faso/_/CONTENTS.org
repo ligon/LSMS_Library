@@ -1388,8 +1388,11 @@ The crop map pooled four native slots on =Seed / Autre crop / Kilogramme=.
 Country kept 22,694 rows, losing 183 native lines in 170 groups: 163 extras
 in 150 conflicting-payload groups and 20 equal-payload pairs.  The latter
 are distinct native input slots too, not duplicate source records.
-The lost quantities total 2,409.58 reported kg; every lost =Purchased= is
-False and every lost =Quantity_purchased= is missing.  No quantity was curated.
+The lost quantities total 2,409.58 reported kg; every lost existing API
+=Purchased= is False and every lost existing API =Quantity_purchased= is
+missing.  These are column names, not verified purchase semantics: the
+bindings read gift/donation fields (see the separate caveat below).
+No quantity was curated.
 
 The named categories now follow the Benin/Togo fix: =Semences d'autres
 céréales= -> =Autre céréale= and =Plants/boutures de tubercules= ->
@@ -1402,7 +1405,8 @@ dictionary.  It now retains the source-qualified identity
 identity fallback, not a physical crop classification.
 
 *The existing =input = Seed= for code 21 is UNVERIFIED legacy curation.*
-It remains unchanged and needs separate source authority.  The two 2018
+It remains unchanged and needs separate source authority in
+[[https://github.com/ligon/LSMS_Library/issues/1187][GH #1187]].  The two 2018
 household questionnaire XLS files and two nomenclature PDFs have sidecars
 but no held blobs; none was acquired.  Do not borrow 2021's meaning:
 its dictionary calls code 21 =Plants d'hévéa, de teck= and code 22
@@ -1418,9 +1422,45 @@ with a unique native household/input key and a changed 22-slot dictionary.
 Adding either wave needs its own source/grain work.
 
 All 22,877 reported 2018-19 lines now survive with their full payloads.
+Conservation here means preserving the existing API bindings and NA masks;
+it does not certify the purchase interpretation of those column names.
 The existing native grain, household namespace, input classification and
 units stay in force.  A Benin/Togo-style uniqueness assertion immediately
 before =to_parquet= refuses future collisions, including equal-payload ones,
 without printing source keys.  The Org edit invalidates all 24 Burkina
 table hashes; other countries and shared framework fingerprints are unchanged.
 The separate #1119 named-crop vocabulary mismatch is not changed here.
+
+* 2026-10-21 -- =plot_inputs= gift/donation fields served under purchase names (GH #1188)
+
+Independent review of the identity repair at =3848778d0e8676c798883c11ea3e33fc88e8a591=
+found a separate source-binding contradiction in =2018-19/_/plot_inputs.py=.
+Its comments say =s16bq05 purchased?= and =s16bq07a quantity purchased=,
+but the held q05 label asks:
+
+#+begin_quote
+16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de don?
+#+end_quote
+
+=s16bq07a= records gift/donation quantity, with its own unit =s16bq07b=.
+The purchase flag is =s16bq08=, and purchased quantity is =s16bq09a= with
+its own unit =s16bq09b=.  The builder currently binds =Purchased= to q05
+and =Quantity_purchased= to q07a, while the row unit =u= comes from used
+quantity's =s16bq03b=.  Thus these API names do not establish purchase
+semantics, and preserving their values does not correct the binding.
+
+On all 22,877 applied source rows, gift yes is 802 and purchase yes 7,689;
+the flags differ on 8,297 rows.  Gift quantity is positive/nonmissing on
+801 rows, purchase quantity on 7,689; values or missingness differ on
+8,371 rows.  Among records with both relevant units known, gift and used
+units differ on 23 rows, purchase and used units on 193 rows.
+Of the 183 recovered native lines, 18 report purchases and positive purchase
+quantity despite their existing API =Purchased=False= and missing
+=Quantity_purchased=.  No source yes/no eligibility change follows from
+these comparisons.
+
+[[https://github.com/ligon/LSMS_Library/issues/1188][GH #1188]] owns the separate purchase/gift routing and unit diagnosis;
+[[https://github.com/ligon/LSMS_Library/issues/1187][GH #1187]] owns unlabelled code 21's source meaning and legacy Seed classification.
+The reviewed identity implementation remains unmerged at this writing.
+It preserves all current bindings, units and grain; this documentation
+amendment neither rebinds fields nor chooses a physical-unit representation.

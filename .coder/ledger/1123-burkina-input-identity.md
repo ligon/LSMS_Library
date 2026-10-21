@@ -29,8 +29,9 @@ input=Seed classification explicitly as unverified legacy curation.
 
 Inherit `.coder/ledger/STANDING.md` sections 3-4, repository guidance and
 `lsms_library/data_info.yml`. BF `data_scheme.yml:223-233` declares household x
-input grain with no plot_id: one row per reported applied input. Purchased is a
-measured attribute, not an identity key. Country retains native grain; Feature
+input grain with no plot_id: one row per reported applied input. Purchased is an
+existing API attribute, not an identity key or verified purchase interpretation.
+Country retains native grain; Feature
 adds the registered farm-level/season sentinels. An observed-row selector
 cannot restore an identity the crop map erased.
 
@@ -94,8 +95,9 @@ Implementation: `69ed4d2028a6f989a8ac45d117a5cffc60a831fd`.
 Source-safe evidence and residual drafts:
 `slurm_logs/isa_backlog_2026-10-21/Burkina_Faso/1123/`.
 The ledger was committed first in `d780445e8`; the ordinary publishing hook
-published every implementation/evidence commit. Independent review remains
-the next gate.
+published every implementation/evidence commit. Independent full review passed
+at `3848778d0e8676c798883c11ea3e33fc88e8a591`; the implementation remains
+unmerged. The documentation-only clarification below awaits narrow review.
 
 - **OK (sections 2-5):** repeat call-site search confirms existing extraction,
   ehcvm_i, mapping lookup, native grain, normalizer and Feature machinery are
@@ -131,10 +133,29 @@ the next gate.
   normalized records are exact. No fail/error/skip or unrun kwarg grid is
   claimed. Raw frames and warning examples remain private.
 
-No remaining runtime CONTRADICTION or REINVENTION against this ledger was
+No identity-conservation CONTRADICTION or REINVENTION against this ledger was
 found. The corrected code-21 comment and historical sample-count discrepancy
 are quoted in the report rather than declaring country documentation stale.
 The old a63/#1148 worktree, other-country #1123 work, source authority and
 #1119 vocabulary alignment remain outside this implementation.
+
+### Independent-review semantic caveat (documentation only)
+
+The full source/runtime review remains pinned to 3848778d/runtime 69ed4d.
+It found an existing source-semantic contradiction outside the identity repair:
+the script calls q05/q07a purchase fields, while held metadata identifies them
+as gift/donation flag and quantity. Actual purchase fields are q08/q09a, with
+their own quantity unit q09b. Preserving Purchased/Quantity_purchased means
+preserving the existing API bindings and NA masks, not verifying purchase
+semantics. Of the 183 recovered source lines, 18 report actual purchases.
+[#1188](https://github.com/ligon/LSMS_Library/issues/1188) owns separate
+field/unit-routing diagnosis; no binding, physical-unit or grain correction is
+included here. [#1187](https://github.com/ligon/LSMS_Library/issues/1187) owns
+unlabelled 2018 code 21's source meaning and unverified legacy Seed classification.
+The dispatcher narrows/files residuals during PR readiness with the Burkina
+implementation explicitly reviewed but unmerged, without claiming production
+resolution. No source/API/test rerun is required for this documentation-only
+descendant; all 549 hashes and 39 framework fingerprints must have zero
+additional movement from 3848778d, and runtime/config/test blobs must be exact.
 
 Sue

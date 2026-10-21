@@ -3,13 +3,19 @@
 Implementation `69ed4d2028a6f989a8ac45d117a5cffc60a831fd`, based on
 `f8d236694c26fe9e709c5548f02c70f74ea72c33`. The ledger was committed first
 in `d780445e8`. Both commits were published by the ordinary post-commit hook.
-Independent review is the next gate.
+Independent full review passed at
+`3848778d0e8676c798883c11ea3e33fc88e8a591`; that source/runtime evidence
+remains pinned to this head and the runtime commit above. The implementation
+is reviewed but unmerged. This documentation amendment records the review's
+separate gift/purchase finding; its narrow review is pending.
 
 The actual fresh held-source Country build now retains **22,877 input lines**,
 up from **22,694**: all **183** previously lost native lines return with full
 payloads. This includes **163** extras in **150** conflicting-payload groups
 and **20** equal-payload extras from distinct native input slots. The historical
 163-row grain stamp measures the conflicting subset, not the entire loss.
+Payload conservation preserves the existing API columns and their bindings;
+`Purchased` and `Quantity_purchased` are names, not verified purchase semantics.
 
 ## Exact change
 
@@ -46,7 +52,7 @@ instrument sidecars lack held blobs; none was acquired.
 
 All other mapping cells, including the input map and bare 20, are unchanged.
 No identifier, input classification, quantity, unit, schema, axis or shared
-selector/reducer changes. The 2018 builder now checks native-key uniqueness
+selector/reducer changes. The 2018 builder now checks declared-index uniqueness
 immediately before `to_parquet`; its error exposes scope/count and no source
 keys. Equal-payload future duplicates also fail before writing.
 
@@ -73,10 +79,26 @@ The nine new tests independently reconstruct native source identities from the
 served labels and compare every real source measurement and unit.
 
 All recovered lines are reported in `Kilogramme` and total **2,409.58 reported
-kg**. Every recovered Purchased flag is False; Quantity_purchased is missing.
+kg**. Every recovered existing API `Purchased` flag is False and existing API
+`Quantity_purchased` is missing; 18 of those source records actually report
+purchases and positive purchase quantity. The identity repair preserves these
+bindings, rather than certifying their purchase interpretation.
 The amount includes 931.60 kg on unlabelled code 21; this is a reported amount,
 not a certification that the legacy Seed classification is physically correct.
 The existing public `Kilogramme -> Kg` spelling is unchanged.
+
+Independent source review found a separate contradiction: the builder comments
+call `s16bq05` "purchased?" and `s16bq07a` "quantity purchased", but held q05
+asks "Avez-vous obtenu [INTRANT] sous forme de cadeau ou de don?". Q07a is
+gift/donation quantity with unit q07b. Purchase flag/quantity are q08/q09a,
+with purchase unit q09b; the current API row unit is used quantity's q03b.
+On all 22,877 applied rows, gift yes is 802 versus purchase yes 7,689, with
+8,297 flag differences. Gift quantity is positive/nonmissing on 801 rows,
+purchase quantity on 7,689; values or missingness differ on 8,371 rows.
+Gift/used units differ on 23 rows and purchase/used units on 193, among rows
+with both relevant units known. [#1188](https://github.com/ligon/LSMS_Library/issues/1188)
+owns the separate field/unit routing diagnosis. This patch changes no binding,
+unit, eligibility or grain; full retained payload means the current binding.
 
 Complete sample and cluster public frames, pre-final country frames and all
 six raw wave frames compare exactly across revisions, including indexes,
@@ -141,10 +163,16 @@ The separate old Burkina/#1148 worktree remains clean at
 was changed. No fixture, golden, dependency, lock, acquisition, DVC CLI,
 shared-cache mutation, cache promotion or assumed-fresh route was used.
 
-This partially addresses #1123. `DRAFT-ISSUES.md` narrows its remaining
-Niger/Senegal/CotedIvoire scope and separately drafts source authority for
-unlabelled BF code 21. #1119's named-crop vocabulary mismatch is not changed.
-No GitHub writes were made.
+This reviewed but unmerged implementation partially addresses #1123; no
+production resolution is claimed. The dispatcher narrows its remaining
+Niger/Senegal/CotedIvoire scope during the same PR readiness phase, with that
+status explicit. `DRAFT-ISSUES.md` records that wording and the separate
+residuals: [#1187](https://github.com/ligon/LSMS_Library/issues/1187) for unlabelled
+code 21's meaning and unverified legacy Seed classification, and #1188 for
+gift/purchase routing. The old unsupported code-21 comment is already corrected;
+this does not establish its physical meaning. #1119's named-crop vocabulary
+mismatch remains separate. No GitHub writes were made by this author; the
+dispatcher filed #1187 and #1188.
 
 Commands and private evidence locations are in `REPRODUCE.md`; source-safe
 assertions and source MD5s are in `validation.json`.
