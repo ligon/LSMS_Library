@@ -116,7 +116,7 @@ The cases cover opposite PP/PH collisions, all eight quarters, numeric code form
 
 The inherited failure is test_gh1035_nigeria_w1_stated_weights.py::test_kg_ladder_on_the_sized_labels.
 It assumed W1 container names appeared exclusively in 2011Q1, while #1034 correctly gives those same native names to eleven 2015Q3 rows.
-The twelfth #1034 relabel is Basin (Large), whose spelling differs from W1's Basin (Big/Large), so it is outside this shared-name test guard.
+The twelfth #1034 relabel is Basin Large, whose spelling differs from W1's Basin Big/Large, so it is outside this shared-name test guard.
 The identical assertion fails at frozen 6f; all other GH1035 cases pass.
 Root owns a separate #1034 test amendment that scopes card rules to W1 and adds later shared-label no-survey_kg/no-W1-card-KEY assertions.
 The exact private proposed patch has SHA256 8145796ca742bb7fd0cf7230df3bd74a11aa4f1841cca620b3b6f48727149f1f; the amended case passes against this candidate.
