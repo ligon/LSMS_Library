@@ -110,13 +110,20 @@
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
       "branch": "isa/Tanzania-20261021",
-      "status": "implementation",
+      "status": "independent-review",
       "owner": "burkina_lane",
       "initial_issue": 1118,
       "scope": "Tanzania missing plot-input units only; source diagnosis before implementation",
       "missing_unit_rows": 408,
       "diagnosis_rows": 9698,
-      "approved_boundary": "Retain known units without amounts; fill null/blank units after unchanged duplicate collapse"
+      "approved_boundary": "Retain known units without amounts; fill null/blank units after unchanged duplicate collapse",
+      "frozen_head": "0c8d9645ec35d65eb252fc6abcd7e7c2e777b89b",
+      "review_path": "/local/job40255479/worktrees/isa-review-1118-Tanzania",
+      "reviewer": "review_malawi_1109",
+      "author_new_tests_passed": 16,
+      "author_prior_broader_selection_passed": 243,
+      "author_prior_selection_precedes_three_additional_parameters": true,
+      "precode_ledger": "963d45f21a7049b7ed4a558c4f823b44de6017a9"
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",

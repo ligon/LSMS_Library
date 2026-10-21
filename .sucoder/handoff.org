@@ -681,9 +681,14 @@ Burkina_Faso #1148 diagnosis is frozen at =a63d26d7f= and merged into this docum
 Live #1148/#851 now distinguish source conflicts and unknowns from approved Phase II integration.
 No production denominator or replacement historical percentage was chosen.
 Ethiopia #1118 froze at =286108cf7= after author58tests/cold-warm/source-use proof; independent reviewer =mali_lane= is active in =isa-review-1118-Ethiopia=.
-Tanzania #1118 confirmed408missing-unit records of9698; root approved final post-collapse normalization and retention of known units without an amount.
-Author =burkina_lane= is implementing in =isa-Tanzania=. Supporting unchanged all-wave sample builds are allowed held-only; no hidden stale-sample bypass.
-Shared #1077 finite numeric-label-key guard is active with =triage_east= at =isa-framework-1077=; precode ledger =3e9b7dd0a=.
+Tanzania #1118 froze at =0c8d9645ec35d65eb252fc6abcd7e7c2e777b89b= after normal cold/fresh-warm proofs, final 16 new tests and an earlier broader 243-test selection.
+Independent reviewer =review_malawi_1109= is active in =isa-review-1118-Tanzania=; all 9,698 rows remain, exactly 408 units change.
+Supporting unchanged all-wave sample builds are allowed held-only; no hidden stale-sample bypass.
+The six existing mixed-unit duplicate groups remain unchanged for #637; reconcile the aggregate source evidence after independent review.
+The Tanzania ledger's old "No 2008-15 edits or rebuilds" wording needs a documentation-only qualification for the authorized supporting sample rebuild.
+Shared #1077 froze at =3f520e09ff2d21501e30d8ac657f7f8ea571152d=; independent reviewer =niger_lane= is active in =isa-review-1077=.
+Author 230 tests passed; independent 230-test and held-source checks are passing, with final audit accounting pending.
+The pre-existing Uganda CONTENTS claim that per-wave unit columns are unused at runtime needs qualification: the build decoder ignores them, but query-time label selection can use them.
 Validation-only integration branch =isa/integration-20261021= at =5906e8715= combines six reviewed PRs.
 A physically private 1,519-file L2 and 2,733-blob held ISA L1 were prepared; no acquisition.
 The 11-file cohort selection PASSED266tests with zero skips/failures/errors in corrected exec session =23070= under eight loadfile workers.
@@ -691,7 +696,8 @@ The initial =10257= launcher stopped before tests on an incorrect socket-class a
 Private log/XML under =control/isa-backlog-20261021/integration/=; safe summary committed. Source seed1519file hashes remain exact.
 The #1077 guard has a genuine Uganda build caller: 28 Uganda hashes move; 521 other-country hashes and 39 tagged fingerprints stay unchanged.
 A guard-only candidate invented labels for actual null inputs through missing lookup keys; root approved filtering only actual-null source rows before dictionary construction.
-Keep original nonmissing/literal-string mappings and targets unchanged; verify no fabricated labels before independent review/publication.
+Keep original nonmissing/literal-string mappings and targets unchanged; verify no fabricated labels before publication.
+Ethiopia reviewer also identified a separate possible missing-purchase-flag conversion; source counts and quantity/retention effects are being checked before any residual filing. Leave #1118 unchanged.
 Rotate through three workers beside root; keep each review snapshot immutable.
 
 Private source/frame/log evidence is under =/local/job40255479/control/isa-backlog-20261021/=.
