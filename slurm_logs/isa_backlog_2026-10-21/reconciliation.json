@@ -98,6 +98,14 @@
     {
       "issue": 1184,
       "action": "Filed separate all-missing W2holder/crop purchase-sum diagnosis;265sourcegroups/187attachedzeroamounts under unchangeddecoder; no policy change"
+    },
+    {
+      "issue": 1118,
+      "action": "Linked independently reviewed TanzaniaPR1185; Ethiopia documentation-only source-caveat descendant1bce independently confirmed. Other-country scopes remain open; historical counts qualified."
+    },
+    {
+      "issue": 637,
+      "action": "Added independently source-confirmed six2020Tanzania mixed-unit groups as existing audit-tail defect; no reducer rewrite or closure claimed"
     }
   ],
   "verified_issue_metadata": [
@@ -173,9 +181,9 @@
     {
       "number": 1181,
       "issue": 1118,
-      "head": "9e698a3677da8097da42fec90c90525cdaaf3e68",
+      "head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
       "review": "PASS at286108;58focused+6independentcontrols; report-only descendant confirmed",
-      "ci": "success;run39654218629"
+      "ci": "success;run39657028262"
     },
     {
       "number": 1182,
@@ -183,6 +191,13 @@
       "head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
       "review": "PASS230tests/source/Code/Feature/hash; runtime3f520 plus doc-only descendantPASS",
       "ci": "success;run39654667663"
+    },
+    {
+      "number": 1185,
+      "issue": 1118,
+      "head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "review": "PASS246tests/source/normalcold/freshwarm/Feature/hash; runtime0c8 plusdoc-onlydescendantPASS",
+      "ci": "success;run39657075627"
     }
   ]
 }

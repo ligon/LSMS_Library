@@ -6,7 +6,7 @@
     "Burkina_Faso": {
       "path": "/local/job40255479/worktrees/isa-Burkina_Faso",
       "branch": "isa/Burkina_Faso-20261021",
-      "status": "diagnosis-next-issue",
+      "status": "implementation-next-issue",
       "owner": "niger_lane",
       "initial_issue": 1148,
       "dependency": "Approved #851 Phase II is not implemented at baseline; source-status evidence remains conflicting",
@@ -15,7 +15,13 @@
       "next_issue": 1123,
       "active_issue": 1123,
       "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1123",
-      "previous_issue_status": "1148 diagnosis source-adjudication pending; production unchanged"
+      "previous_issue_status": "1148 diagnosis source-adjudication pending; production unchanged",
+      "active_path": "/local/job40255479/worktrees/isa-Burkina_Faso-1123",
+      "active_branch": "fix/1123-burkina-input-identity-20261021",
+      "approved_boundary": "Three source-preserving crop map cells plus pre-write uniqueness guard; retain unverified legacy Seed classification; no shared reducer/axis/payload change",
+      "diagnosis_source_rows": 22877,
+      "diagnosis_served_rows": 22694,
+      "diagnosis_lost_lines": 183
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
@@ -27,19 +33,20 @@
       "diagnosis_rows": 180900,
       "missing_unit_rows": 37370,
       "approved_boundary": "Final u null/whitespace-only -> existing U_UNKNOWN; every Applied use-only row and non-unit payload preserved",
-      "frozen_head": "9e698a3677da8097da42fec90c90525cdaaf3e68",
+      "frozen_head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
       "review_path": "/local/job40255479/worktrees/isa-review-1118-Ethiopia",
       "reviewer": "mali_lane",
       "author_tests_passed": 58,
-      "documentation_head": "9e698a3677da8097da42fec90c90525cdaaf3e68",
+      "documentation_head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
       "runtime_review_head": "286108cf7ecc1a6e1e07150b8eec8411f5326b05",
       "review_verdict": "PASS;58focused+6independent controls, zero skips; documentation-only descendant confirmed",
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1181",
-      "ci": "success; run39654218629",
+      "ci": "success;run39657028262",
       "residual_issues": [
         1183,
         1184
-      ]
+      ],
+      "source_caveat_documentation_review": "PASS;21CONTENTS lines only,all other14884treeentries and549hashes/39fingerprints unchanged"
     },
     "Malawi": {
       "path": "/local/job40255479/worktrees/isa-Malawi",
@@ -63,7 +70,7 @@
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
       "branch": "isa/Mali-20261021",
-      "status": "diagnosis-next-issue",
+      "status": "independent-review-next-issue",
       "owner": "mali_lane",
       "initial_issue": 822,
       "frozen_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
@@ -77,7 +84,16 @@
       "active_issue": 1121,
       "active_owner": "mali_lane",
       "previous_issue_status": "822 reviewedPR1180 awaitinghuman",
-      "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Mali/1121"
+      "diagnosis_path": "/local/job40255479/control/isa-backlog-20261021/Mali/1121",
+      "active_path": "/local/job40255479/worktrees/isa-Mali-1121",
+      "active_branch": "fix/1121-mali-labor-source-20261021",
+      "approved_boundary": "Three Preferred Labels to existing lowercase family/hired/other; helpers,drivers,all other payload/grain preserved",
+      "active_precode_ledger": "23b6fde3a",
+      "active_frozen_head": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "active_runtime_head": "3990052090e2f56049f6d5116a82ff4cfef97aeb",
+      "active_review_path": "/local/job40255479/worktrees/isa-review-1121-Mali",
+      "active_reviewer": "burkina_lane",
+      "active_author_tests": 335
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -125,20 +141,24 @@
     "Tanzania": {
       "path": "/local/job40255479/worktrees/isa-Tanzania",
       "branch": "isa/Tanzania-20261021",
-      "status": "independent-review",
+      "status": "reviewed-pr-awaiting-human",
       "owner": "burkina_lane",
       "initial_issue": 1118,
       "scope": "Tanzania missing plot-input units only; source diagnosis before implementation",
       "missing_unit_rows": 408,
       "diagnosis_rows": 9698,
       "approved_boundary": "Retain known units without amounts; fill null/blank units after unchanged duplicate collapse",
-      "frozen_head": "0c8d9645ec35d65eb252fc6abcd7e7c2e777b89b",
+      "frozen_head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
       "review_path": "/local/job40255479/worktrees/isa-review-1118-Tanzania",
       "reviewer": "review_malawi_1109",
       "author_new_tests_passed": 16,
       "author_prior_broader_selection_passed": 243,
       "author_prior_selection_precedes_three_additional_parameters": true,
-      "precode_ledger": "963d45f21a7049b7ed4a558c4f823b44de6017a9"
+      "precode_ledger": "963d45f21a7049b7ed4a558c4f823b44de6017a9",
+      "runtime_review_head": "0c8d9645ec35d65eb252fc6abcd7e7c2e777b89b",
+      "review_verdict": "PASS;246tests, zero skips; full source/cold/warm/Feature/hash; documentation-only descendant PASS",
+      "open_pr": "https://github.com/ligon/LSMS_Library/pull/1185",
+      "ci": "success;run39657075627"
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
@@ -181,7 +201,7 @@
   "integration": {
     "path": "/local/job40255479/worktrees/isa-integration",
     "branch": "isa/integration-20261021",
-    "head": "dd0dddcb052f8ce9b0c7401b281ac60df47933ad",
+    "head": "483b4aa117c2c05ac00bf023adab97e47782df46",
     "included_prs": [
       1172,
       1173,
@@ -190,9 +210,10 @@
       1178,
       1180,
       1181,
-      1182
+      1182,
+      1185
     ],
-    "status": "PASS:4961passes/4455skips credential-free offline full-suite at eight-PR head; separate six-PR266data-focused PASS",
+    "status": "PASS:656tests/zero skips across18files; combined normal-API full-frame review active",
     "public_prs_merged": false,
     "test_session": 23070,
     "completed": true,
@@ -201,6 +222,16 @@
     "unit_exit_code": 0,
     "unit_passed": 4961,
     "unit_skipped": 4455,
-    "unit_seconds": 140.842
+    "unit_seconds": 140.842,
+    "cohort_session": 62910,
+    "unit_tested_head": "dd0dddcb052f8ce9b0c7401b281ac60df47933ad",
+    "api_review_path": "/local/job40255479/control/isa-backlog-20261021/integration/api-nine-review",
+    "api_reviewer": "review_malawi_1109",
+    "cohort_exit_code": 0,
+    "cohort_passed": 656,
+    "cohort_skipped": 0,
+    "cohort_seconds": 270.243,
+    "cohort_excluded_all_country_cases": 2,
+    "api_review_completed": false
   }
 }

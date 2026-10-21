@@ -31,10 +31,10 @@ PR [[https://github.com/ligon/LSMS_Library/pull/1182][1182]] at =780f67986= adds
 | Uganda | #1062 amendment independently passed; PR [[https://github.com/ligon/LSMS_Library/pull/1173][1173]], frozen =4ef24fb=, awaiting human merge. |
 | Malawi | #1109 independently passed against original baseline; PR [[https://github.com/ligon/LSMS_Library/pull/1175][1175]], frozen =de9c2734b=. Nonorganic diagnosis is #1174. |
 | Niger | #1088 independently passed 67 tests, cold/warm conservation and scoped Feature audit; PR [[https://github.com/ligon/LSMS_Library/pull/1176][1176]] at =d602f8d63= passed CI and awaits human merge. |
-| Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report. Exact unknown masks and genuine policy/source questions are documented. Production unchanged; #851 integration remains pending. A separate #1123 destructive-input-collapse diagnosis is active. |
-| Ethiopia | #1118 independent review passed 58 focused tests and six reviewer controls, source/cold/warm/Feature conservation and full fingerprint checks. PR [[https://github.com/ligon/LSMS_Library/pull/1181][1181]] at =9e698a367= preserves 180,900 rows and normalizes 37,370 units. CI passed. #1171 remains the separate nutrition follow-up. |
-| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI passed. Residual #1179 owns unresolved units. Diagnosis of the separate #1121 labor-source casing is active. |
-| Tanzania | #1118 normalization frozen at =0c8d9645e=: 408 missing units among 9,698 retained rows. Final 16 new tests pass; the earlier broader selection passed 243. Independent review is active in =isa-review-1118-Tanzania=. Preserve UPHI back-casting and live WAITING caveats. |
+| Burkina_Faso | #1148 diagnosis frozen =a63d26d7f=: retained statuses conflict with each other and the report; #851 integration remains pending. #1123 diagnosis proves 183 lost native lines out of 22,877, including 20 equal-payload extras. A three-cell source-identity repair and pre-write guard are approved and implementing in a fresh f8 checkout. Code21's legacy Seed classification remains unverified. |
+| Ethiopia | #1118 independent review passed 58 focused tests and six reviewer controls, source/cold/warm/Feature conservation and full fingerprint checks. PR [[https://github.com/ligon/LSMS_Library/pull/1181][1181]] at =1bce11cc8= preserves 180,900 rows and normalizes 37,370 units; the separately reviewed source-caveat documentation moves no hashes. Latest CI passed. #1171 remains the nutrition follow-up. |
+| Mali | #822 independently passed 39 tests and exact source/cold/warm/old-obs3 checks. PR [[https://github.com/ligon/LSMS_Library/pull/1180][1180]] at =aba2badfe= restores 115,713 readings; CI passed. Residual #1179 owns unresolved units. #1121 is frozen at =6e97eaeb4= after 335 tests and exact 52,057-row casing-only conservation; independent review is active. |
+| Tanzania | #1118 independently passed 246 tests and full source/cold/warm/Feature/hash checks. PR [[https://github.com/ligon/LSMS_Library/pull/1185][1185]] at =e75be9c56= retains 9,698 rows and normalizes 408 units; documentation-only corrections passed narrow review and CI passed. All 11 scanner findings are matched, with only the alignment detail changing 408 to 0. |
 
 * Evidence that changed the fixes
 
@@ -84,6 +84,11 @@ All tracked contents/modes, HEAD and clean status stayed unchanged.
 See =integration/unit-eight-prs/= for the exact command, private-root environment, immutable summary and limits.
 This run used 16 loadfile workers, empty private data/config roots, an active socket guard and =unshare -rn=; it makes no claim about skipped data-dependent cases.
 All eight public PR CI runs also passed.
+The ninth reviewed fix, Tanzania PR #1185, and the Ethiopia documentation descendant also passed their latest CI.
+The combined nine-PR source head is =483b4aa117c2c05ac00bf023adab97e47782df46=.
+The 18-file offline held-source cohort passed 656 tests with zero skips/failures/errors at that head; the separate combined normal-API full-frame review is still active.
+Exactly two all-country canonical corpus cases are explicitly outside this ISA cohort, while its synthetic canonical guards remain included.
+The original launcher annotation said three; =integration/cohort-nine/scope-correction.json= records the exact two-case parameterization without changing the command or result.
 
 Node =n0071.savio3=, job =40255479=: 32 allocated cores and 93 GiB RAM, about 55 hours remaining at bootstrap.
 Start usage: 68,980.77 of 1,500,000 SUs; 59,090.57 CPU-hours.
