@@ -1,0 +1,29 @@
+{
+  "scope": "coverage12",
+  "manifest_sha256": "a58e9587be0a5673e21e9600c6e9b5b39d75dc69148e4d3146a7db2eb772d075",
+  "manifest_entries": 223,
+  "source_head_clean_exact": true,
+  "source_tracked_physical_receipts_exact": 14880,
+  "coverage_source_original_and_copy_receipts_exact": 177,
+  "original_review_and_shell_sources_exact": 115,
+  "Git_blob_source_copies_exact": 62,
+  "prior_frozen_packets_verified": 6,
+  "prior_frozen_packet_files_verified": 464,
+  "authority_original_and_copy_receipts_verified": 35,
+  "selected_original_and_distinct_copy_receipts_verified": 109,
+  "historical_metadata_gaps_retained_from_narrow_authorizations": true,
+  "assigned_PRs": 12,
+  "static_overlapping_locators": 6950,
+  "helper_definitions_not_runtime_pairs": 55,
+  "authority_holds": [
+    1172,
+    1173,
+    1186
+  ],
+  "preserved_complete_unused_domain_findings": 7,
+  "preserved_API9_typed_record_pair_findings": 4,
+  "remaining_consumers": 0,
+  "package_imports_or_payload_decodes_by_this_checker": 0,
+  "terminal_checker_exit_expected": 0,
+  "signed": "Sue"
+}
