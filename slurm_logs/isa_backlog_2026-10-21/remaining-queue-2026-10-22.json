@@ -1,13 +1,13 @@
 {
-  "captured_at_UTC": "2026-10-22T21:23:27.634333+00:00",
+  "captured_at_UTC": "2026-10-22T22:01:19.731922+00:00",
   "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
-  "method": "Complete gh issue open limit500 and PR open limit100 refresh; all114 queued issue numbers OPEN and all30 known implementation PR heads/base branch names exact. New1215policy update was read back separately after this inventory. Original creation-base SHAs are historical, not assertions that development never advances.",
+  "method": "Complete gh issue open limit500 and PR open limit100 refresh; all114 scope records OPEN and all32 implementation exact head SHAs/base branch names verified. Original base SHAs remain historical creation/stack prerequisites.",
   "repository_open_issues": 173,
   "isa_related_open_issue_records": 114,
-  "pr_linked_issue_records": 28,
-  "active_issue_records": 2,
+  "pr_linked_issue_records": 29,
+  "active_issue_records": 1,
   "other_open_issue_records": 84,
-  "open_unmerged_implementation_prs": 31,
+  "open_unmerged_implementation_prs": 32,
   "initial_in_scope_still_open": 96,
   "new_campaign_issue_records": 18,
   "original_duplicate_now_closed": 1089,
@@ -2010,14 +2010,16 @@
       "title": "Constructed empty tables: implement the approved declaration-order rule",
       "url": "https://github.com/ligon/LSMS_Library/issues/1215",
       "github_state": "open",
-      "queue_state": "ACTIVE",
+      "queue_state": "PR_OPEN_AWAIT_HUMAN_MERGE",
       "countries": [
         "Uganda",
         "Shared framework"
       ],
-      "implementation_prs": [],
-      "residual": "Four new zero-row column-order failures exposed by1204routing repair; preserve all strictfindings and choose a stable public empty-column contract across cold/covered-cache/Make.",
-      "current_active_scope": "Independent8normalactors48methodcalls0;92strict=54publicPASS+28nativePASS+10orderFAIL(7approvedcrosshead,3parentbackend); candidatebackendPASS, both22WARNscannersbyteexact. Finalprotection/seal/rootacceptancepending. Originalfirstloaderstop and independenthistorical6PKLsource-snapshotSHAreadscopeexception retained; no directhistoricalreads repeated.",
+      "implementation_prs": [
+        1220
+      ],
+      "residual": "Declaration order reviewed and root-accepted in1220. Empty explicit-field types remain separate1218.",
+      "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Reuse existing schema/empty/native ordering machinery; measure affected scope before framework edit. Closed1099row/errorbehavior and1204rawcoverage are different owners; no normalizedcomparison or native-data changes.",
       "scope_recheck_required_before_dispatch": true
@@ -2319,6 +2321,15 @@
       "base": "fix/1119-burkina-seed-crop-labels-20261022",
       "base_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
       "url": "https://github.com/ligon/LSMS_Library/pull/1219"
+    },
+    {
+      "number": 1220,
+      "state": "open",
+      "merged": false,
+      "head_sha": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+      "base": "fix/1204-uganda-crop-wave-coverage-20261022",
+      "base_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1220"
     }
   ],
   "signed": "Sue",
@@ -2327,5 +2338,5 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-22T21:43:13.672153+00:00"
+  "active_progress_updated_at_UTC": "2026-10-22T22:01:19.731922+00:00"
 }

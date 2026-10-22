@@ -2,9 +2,9 @@
 #+AUTHOR: Sue
 
 * Snapshot
-Captured 2026-10-22T21:23:27.634333+00:00.
-There are114ISA-related open issue records:28with campaign PRs,twoactive,and84other open records.
-All31implementation PRs are OPEN and unmerged at the recorded exact heads/base branch names.
+Captured 2026-10-22T22:01:19.731922+00:00.634333+00:00.
+There are114ISA-related open issue records:29with campaign PRs,oneactive,and84other open records.
+All32implementation PRs are OPEN and unmerged at the recorded exact heads/base branch names.
 Umbrellas,decisions andpartial repairs overlap; these are not114distinct unimplemented bugs.
 The original inventory had97in-scope records;96remain open,duplicate1089is closed,and18campaignfollowups were added.
 Current development0671019 is a dependency-lock-only certifi update after testedf8; mounted runtime remains pinned.
@@ -12,16 +12,16 @@ Initial triage guidance must be rechecked against live issues and complete count
 
 * Active work
 
-** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Constructed empty tables: implement the approved declaration-order rule
-Countries: Uganda, Shared framework.
-User-approved declaration order implemented atf7c vs actuala417. Author13new+88supportingPASS; parent6FAIL7PASS. Ten genuine actors0;44strict=38PASS+6approved empty-orderFAIL;22WARN/head ordered byte-exact. Author sealed and root-authenticated; independent exact genuine review released;37providers authenticated,148copy staging next. Independent63PASS vs parent57PASS6FAIL; two additional isolated axis controls pass, genuine review held for release. All549/39/1362fingerprints move.
-Remaining scope: Complete independent genuine validation of the approved contract across cold/covered-cache/Make; preserve every strict finding.
-
 ** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
 Countries: Burkina_Faso, Shared framework.
 Ledger-first phase0root-authenticated fd577. Implementation7eb596c223 changes only emptyhelper/GH1039tests/ledger on1215f7; runtime held for exact guard/calibration plan. Truef7control and fixedBF657config prepared separately, preserving populated behavior.
 
 * Reviewed changes awaiting human merge
+** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Preserve declaration order in constructed empty tables
+Countries: Uganda, Shared framework.
+PRs: [[https://github.com/ligon/LSMS_Library/pull/1220][#1220]], stacked on1217 at a417.
+Independent root acceptance:48 genuine calls;92 strict comparisons=82PASS/10retained orderFAIL;22WARN/head byte-exact. Sealer/postexit0; historical6PKL source-snapshot exception retained. Human merge outstanding; optional explicit-field types remain1218.
+
 ** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
 Countries: Burkina_Faso.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1219][#1219]], stacked on1203 at3dc.

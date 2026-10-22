@@ -1,0 +1,122 @@
+{
+  "status": "NO_REMAINING_SOURCE_BLOCKER_WITHIN_REVIEWED_V2_RUNTIME_BOUNDARY",
+  "at_ns_NEW": 1792706442673991032,
+  "input_plan_sha256": "67ec88613a1586253e4af9143745d1886059fe6295c3cdf648031d721f439d33",
+  "input_diff_sha256": "9d9daabe684fdb256c2833b0a58b4d2105d618877b6dd3650f9828f5632590a1",
+  "closed_prior_findings": [
+    {
+      "id": "RG1",
+      "assessment": "CLOSED_IN_SOURCE_ACTUAL_CALIBRATION_HELD",
+      "citations": [
+        "guard-v2/sitecustomize.py:76",
+        "guard-v2/sitecustomize.py:131",
+        "guard-v2/sitecustomize.py:152",
+        "guard-v2/sitecustomize.py:168",
+        "guard-v2/sitecustomize.py:172"
+      ],
+      "evidence": "Read audit reuses the saved os.open context for both str/bytes paths and int descriptors. path_context binds dir_fd anchors and resolves regular FD endpoints via proc/fstat. Held payload suffixes and both private known L1 layouts are denied in predata; necessary directory metadata is allowed. Only fstat-proved owned anonymous FIFO/socket IPC bypasses endpoint checks. The unmodified write/two-endpoint/directory/noop/network/DNS protections remain."
+    },
+    {
+      "id": "RG2",
+      "assessment": "CLOSED_IN_SOURCE_ACTUAL_CHILD_CONTROLS_HELD",
+      "citations": [
+        "guard-v2/sitecustomize.py:32",
+        "guard-v2/sitecustomize.py:55",
+        "guard-v2/sitecustomize.py:273",
+        "identity1218_v2.py:37",
+        "identity_plugin1218_v2.py:22"
+      ],
+      "evidence": "One actor_root_allowed predicate is used by startup, SourceIdentity, main and worker checks. Exact physical/lexical declared roots remain accepted; only synthetic profile permits lexical AND physical descendants of this actor/tmp. Native/fixed BF roots keep exact equality. Synthetic Make-like child inherits TASK_DATA_ROOT while redirecting both fixture roots; other-actor data and outside config negatives remain121."
+    },
+    {
+      "id": "RG3",
+      "assessment": "CLOSED_IN_SOURCE_ACTUAL_SOURCE_EPOCH_HELD",
+      "citations": [
+        "source_epoch_before_v2.py:12",
+        "source_epoch_before_v2.py:18",
+        "source_epoch_before_v2.py:20",
+        "source_epoch_before_v2.py:29",
+        "source_epoch_before_v2.py:36"
+      ],
+      "evidence": "Every source-epoch Git subprocess carries --no-optional-locks and explicit GIT_OPTIONAL_LOCKS=0. All3 exact HEADs and exact3 historical PKL names per root are asserted. Those files take metadata-only branches before receipt opens; no independent historical path lstat/open/hash was needed here. Actual source epoch must complete0 before imports."
+    }
+  ],
+  "original_importlib_spec": {
+    "citations": [
+      "guard-v2/sitecustomize.py:254",
+      "guard-v2/sitecustomize.py:262",
+      "guard-v2/sitecustomize.py:283"
+    ],
+    "assessment": "Original PathFinder spec is returned; no loader proxy or spec.loader assignment. Original resource-reader/data APIs remain intact by source construction, not an executed smoke result."
+  },
+  "old_vs_v2_expected_controls": {
+    "unmeasured": true,
+    "actors": 4,
+    "per_actor_denial_controls": 5,
+    "per_actor_healthy_controls": 6,
+    "old_controls_expected_pass": 0,
+    "v2_controls_expected_pass": 5,
+    "old_child_exits": [
+      121,
+      121,
+      121
+    ],
+    "v2_child_exits": [
+      0,
+      121,
+      121
+    ],
+    "parent_actor_expected_exit": {
+      "old": 1,
+      "v2": 0
+    },
+    "read_prefix_denial_rows_expected": 12,
+    "read_prefix_extra_source_bound_IPv6_expected": 2,
+    "core_seed_rows_expected": 46,
+    "core_extra_source_bound_IPv6_expected": 2,
+    "total_predicted_rows": 62,
+    "citations": [
+      "read_discriminators_v2.py:23",
+      "read_discriminators_v2.py:41",
+      "read_discriminators_v2.py:72",
+      "read_discriminators_v2.py:81",
+      "read_discriminators_v2.py:105",
+      "launch_read_discriminators_v2.py:24",
+      "gate_read_discriminators_v2.py:12",
+      "gate_read_discriminators_v2.py:35",
+      "gate_read_discriminators_v2.py:51",
+      "gate_read_discriminators_v2.py:73",
+      "gate_calibration_v2.py:10",
+      "gate_calibration_v2.py:54",
+      "gate_calibration_v2.py:70"
+    ],
+    "assessment": "The gate requires original launch/boot/PID/time/UID/source receipts, preimport saved controls and exact old/new outcomes, not just return1. It discriminates the old wrong-endpoint opaque-dirfd row from the old allowed four reads and new five real endpoint denials. Every row must be uniquely assigned or source-bound to an independently Popen-bound successful fixture child. Calibration checks exact saved14-row prefix then independently classifies48-row suffix. Any mismatch stops; old failures are never relabelled passes."
+  },
+  "runtime_acceptance_conditions": [
+    "This report releases nothing. Root must authenticate exact current pins and explicitly release ordered operations; every command remains authorized_execution=false in the source plan.",
+    "Accept expected old actor1 only after its complete saved result/preimport/boot/source/PID/time records satisfy gate_read_discriminators_v2 actual0; a generic setup1 is not equivalent. Do not use unconditional && or coerce expected1 to0.",
+    "Actual source epoch must finish0 and bind all3HEADs/exact3 opaque names before product imports. Current actual HEAD/clean metadata is recorded by root/prior critic; this V2 review executed no Git commands and does not claim a fresh independent Git query.",
+    "Actual two main calibrations and both gates must finish with exact measured classifications; predicted14+48/62 counts are not results. Preserve every unexpected denial/stack/stop and never assume all nonseeds harmless.",
+    "Both native-config full549/39/1362 maps must save before assertions and actual all-move/API/data-file gates must pass before tests or later genuine builds. Empty metadata directories stay a separate measured property.",
+    "Parent pytest expected1 alone is insufficient: root must authenticate actual57 collected cases, meaningful semantic failure nodes, complete JUnit and controller/every-worker identities, with --noconftest/importlib/2loadfile workers and BLAS/build/Make1 qualifications. Unexpected setup/collection errors do not prove the counterfactual.",
+    "All genuine six-provider/four-root/24-copy/25,343,300-byte/56-return operations remain held behind a separate release. Fixed BF657 is an explicit supported configuration composition, not an exact historical BF combined package.",
+    "The guard is Python audit/wrappers plus namespace and exact before/after receipts, not a kernel-wide filesystem or syscall sandbox. No actual calibration/test/source epoch/data result follows from this static review."
+  ],
+  "V2_controllers_exact": 15,
+  "original_controllers_retained_exact": 14,
+  "independent_full_diff_reconstruction_byte_exact": true,
+  "reviewer_operations": {
+    "authored_helper_execution": 0,
+    "project_numerical_imports": 0,
+    "calibration_or_runtime": 0,
+    "pytest": 0,
+    "fingerprint_census": 0,
+    "API_Make_Feature_scanner": 0,
+    "Git_commands_or_mutations": 0,
+    "genuine_provider_or_historical_path_lstat_open_hash_copy_decode": 0,
+    "archive_activity": 0,
+    "frozen1215_or_oldcritic_mutations": 0
+  },
+  "only_output_prefix": "/local/job40255479/control/isa-backlog-20261021/review1218-v2-static",
+  "signed": "Sue (GPT-6)"
+}
