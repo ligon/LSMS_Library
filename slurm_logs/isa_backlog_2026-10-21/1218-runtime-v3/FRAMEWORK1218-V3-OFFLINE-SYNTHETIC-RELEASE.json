@@ -1,0 +1,160 @@
+{
+  "status": "ROOT_CONDITIONAL_V3_OFFLINE_SYNTHETIC_CONTINUATION_RELEASE",
+  "at_ns": 1792707122713102801,
+  "plan_sha256": "9ff1453f9a46ed26567562f8826ae9da160e09e6e3a85f3ea5fea7e8e199c0e4",
+  "new_controller_pins": {
+    "calibration_offline_v3.py": {
+      "sha256": "43aece92fd793e297332278664625a1d6cf164d4e2cb7cd6c9627ebcf553e09b",
+      "st_ctime_ns": 1792706911557920363,
+      "st_dev": 64770,
+      "st_gid": 501,
+      "st_ino": 4338116,
+      "st_mode": 33152,
+      "st_mtime_ns": 1792706911557920363,
+      "st_nlink": 1,
+      "st_size": 6273,
+      "st_uid": 43292
+    },
+    "gate_calibration_offline_v3.py": {
+      "sha256": "dfa93e64baf6bde9a2bb4588f3a77346b21b4736e46115fc71cb819f994336f8",
+      "st_ctime_ns": 1792706911674920980,
+      "st_dev": 64770,
+      "st_gid": 501,
+      "st_ino": 4338114,
+      "st_mode": 33152,
+      "st_mtime_ns": 1792706911674920980,
+      "st_nlink": 1,
+      "st_size": 7186,
+      "st_uid": 43292
+    },
+    "gate_read_offline_continuation_v3.py": {
+      "sha256": "e342f89e0a9b5732315aff98e87ee4928f6533127918d04fa8268ff3caf67362",
+      "st_ctime_ns": 1792706944513094092,
+      "st_dev": 64770,
+      "st_gid": 501,
+      "st_ino": 4338113,
+      "st_mode": 33152,
+      "st_mtime_ns": 1792706944513094092,
+      "st_nlink": 1,
+      "st_size": 12677,
+      "st_uid": 43292
+    },
+    "launch_offline_v3.py": {
+      "sha256": "805fd6ab9ce962cc1edc13380e4cacfb4f239be3208f60784d683fbb91313f85",
+      "st_ctime_ns": 1792706835681517514,
+      "st_dev": 64770,
+      "st_gid": 501,
+      "st_ino": 4338109,
+      "st_mode": 33152,
+      "st_mtime_ns": 1792706835681517514,
+      "st_nlink": 1,
+      "st_size": 2346,
+      "st_uid": 43292
+    },
+    "launch_positive_continuation_v3.py": {
+      "sha256": "20590bdfd84a884bdaf12d29396a376976299e1f2e677f5a6947e6a1fbf3cf0e",
+      "st_ctime_ns": 1792706944513094092,
+      "st_dev": 64770,
+      "st_gid": 501,
+      "st_ino": 4338112,
+      "st_mode": 33152,
+      "st_mtime_ns": 1792706944513094092,
+      "st_nlink": 1,
+      "st_size": 4248,
+      "st_uid": 43292
+    },
+    "launch_read_offline_v3.py": {
+      "sha256": "93b221ce68eb13321fbe3a9d9cc2f4a9ab5404e04eded73446d1050bec91d598",
+      "st_ctime_ns": 1792706835721517727,
+      "st_dev": 64770,
+      "st_gid": 501,
+      "st_ino": 4338110,
+      "st_mode": 33152,
+      "st_mtime_ns": 1792706835721517727,
+      "st_nlink": 1,
+      "st_size": 2312,
+      "st_uid": 43292
+    },
+    "positive_child_offline_v3.py": {
+      "sha256": "b21b6f98a93ed6ae5f67908c9e8c0ea94326de0f587af610290991986dea96cd",
+      "st_ctime_ns": 1792706835755517908,
+      "st_dev": 64770,
+      "st_gid": 501,
+      "st_ino": 4338111,
+      "st_mode": 33152,
+      "st_mtime_ns": 1792706835755517908,
+      "st_nlink": 1,
+      "st_size": 1782,
+      "st_uid": 43292
+    }
+  },
+  "diff_sha256": "328722969279597685448b4aa340d4b5df1d3ce3c9b877dfffabe2c711c3f84b",
+  "old_v2_15_original14_shared2_and_7eb_production_full_receipts_exact": true,
+  "completed_sourceepoch_full_receipt_exact": true,
+  "original_guard_prefix_rows": 8,
+  "offline_only_auth_exception": "Exactly LSMS_SKIP_AUTH=1 for never-run native metadata and synthetic actors; existing documented import auth suppression, no credentials supplied/fabricated, no pytest skips. Genuine profile refused.",
+  "ordered_scope": [
+    "Only original stopped positive import child continuation; same exact fixtures/newPID/records, every original file includingctime unchanged",
+    "Only never-run candidate old/v2 read controls then full source/PID/endpoint gate retaining base-v2 actor1 and original child1",
+    "Never-run two core23seed calibrations with literal original uid_map/gid_map boot fields; only owner metadata translated through actual maps, all other receipt fields and SHA exact",
+    "Complete549/39/1362 native maps/API/materialization gate BEFORE synthetic test copies/collection",
+    "Same57planned regression cells bothheads plus bounded support, actual JUnit/collection/everyworker/source proof; parent1 must be semantic rather than generic"
+  ],
+  "no_completed_sourceepoch_baseold_or_basev2_read_healthy_negative_control_replays": true,
+  "original_eight_guard_rows_retained": true,
+  "later16prefix_48suffix_64total_counts_are_predictions": true,
+  "source_only_unexecuted_v2_UID_gate_defect_not_failed_actor": true,
+  "root_metadata_stop": "deaefe searched source epoch only at P top level; exact reviewed helper writes source-pins/source-before-private.json. Corrected locator only; no runtime/product replay.",
+  "V2_release_conditions_and_synthetic_cache_fixture_exception_remain": {
+    "status": "ROOT_CONDITIONAL_SYNTHETIC_RUNTIME_RELEASE_1218_V2",
+    "at_ns": 1792706505435393478,
+    "plan_sha256": "67ec88613a1586253e4af9143745d1886059fe6295c3cdf648031d721f439d33",
+    "candidate": "7eb596c223055d45c4f45cffdba4f7eb6aee76e4",
+    "actual_framework_parent": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+    "root_pin_gate_sha256": "d289320aa693d12aaa9034eea7ba149abe55dd1406c121b4f1ea2284747bd1cd",
+    "independent_source_only_review": {
+      "REVIEW.md": "7b627a9a05403acb9e32718e954c26dbb91747618a79fa22c364fc3ca89c722a",
+      "FINDINGS.json": "07199b2b534c5fb199c3511f20d8848b90f50d1e702a2a1af0f2d60b3ba34425",
+      "FINAL-PINS.json": "4f14a7066c2acb44b53000d8855a10c11bb790f102b5642162b34e7b9784650d"
+    },
+    "ordered_scope": [
+      "metadata source epoch exact3HEADs and exact3 historical names, Python does not open historical payloads; untraced Git internals qualified",
+      "four original old/v2 read/startup controls, old exit1 only accepted with exact expected counterfactuals and gate0",
+      "two core calibrations23seeds/head plus negativechildren and separately authenticated14prefix/48suffix gates; counts predictions until measured",
+      "two native549country/39framework/1362wave metadata censuses, actual all-move/API/policy gate before tests",
+      "identical candidate synthetic test copies against both heads:57 planned regression cells and bounded supporting selection from pinned plan; actual collection/JUnit/worker/source identity checks"
+    ],
+    "stop_on_unexpected": true,
+    "expected_exit1_is_not_semantic_proof": true,
+    "preserve_all_original_stops_counterfactual_failures_sources_and_tool_records": true,
+    "no_completed_stage_replay_to_repair_packaging": true,
+    "synthetic_only_exception": {
+      "original_GH1039_cache_flag_functions": [
+        "test_absent_subset_is_typed_and_preserves_other_cached_waves",
+        "test_covered_subset_cache_hit_does_not_construct_waves"
+      ],
+      "allow_original_synthetic_NO_CACHE_and_assume_fresh_cells": true,
+      "allow_original_manual_synthetic_parquet_cache_fixtures": true,
+      "genuine_flags_or_manual_stamp_promotion": false
+    },
+    "resource_limits": {
+      "total_pytest_workers_at_most": 2,
+      "dist": "loadfile",
+      "BLAS_OMP_MKL_BUILD": 1,
+      "make_j": 1,
+      "no_conftest": true,
+      "plugin_autoload": false,
+      "mounted_runtime_generation": "20261019T221223Z"
+    },
+    "genuine_stage": "SEPARATELY_HELD: no provider authentication/copies/decodes/API or extra normal data root until later root release",
+    "historical_payload_direct_opens_authorized": 0,
+    "no_acquisition_network_shared_cache_mutation_or_runtime_update": true,
+    "source_runtime_identity_and_private_HOME_XDG_DVC_gates_required": true,
+    "signed": "Sue (GPT-6)"
+  },
+  "genuine_stage": "SEPARATELY_HELD_NO_PROVIDER_AUTH_COPIES_DECODES_API_OR_NORMAL_ROOT_CREATION",
+  "historical_source_direct_payload_reads_authorized": 0,
+  "Git_internals_untraced_qualified": true,
+  "stop_on_any_unexpected_event_outcome_or_source_change": true,
+  "signed": "Sue (GPT-6)"
+}

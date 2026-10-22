@@ -1,0 +1,27 @@
+{
+  "status": "ROOT_FINITE_PLAN_PREAUTHENTICATION_PASS_PENDING_SOURCE_REVIEW",
+  "plan_sha256": "f157b0a08cdfcc340f55791b10fa6543ec031f6b71d2dc84d726d8c23dab93e7",
+  "included_files": 1977,
+  "included_bytes": 462361511,
+  "excluded_entries": 671,
+  "raw_L1_copies_excluded_metadata_only": 172,
+  "raw_L1_bytes_not_opened": 203112512,
+  "source_directories": 1455,
+  "private_proof_parquets": 156,
+  "private_serialized_operands": 451,
+  "static_inputs": 75,
+  "input_modes_qualification": "343 original inputs0644 beneath exact0700 C ancestor; preserved without chmod. Original root predicate8ce85b was overstrict and stopped before durable writes.",
+  "old_archives": 31,
+  "old_durable_files": 102,
+  "four_new_names_absent": true,
+  "unknown_process_axes": "Retained UNKNOWN; no universal no-consumer claim.",
+  "at_ns": 1792706971710056674,
+  "source_roots": [
+    "uganda1215-order-fix",
+    "review-Burkina_Faso-1188",
+    "framework1218-empty-types/phase0-static",
+    "root-evidence-followup32",
+    "review1218-runtime-gates"
+  ],
+  "signed": "Sue (GPT-6)"
+}
