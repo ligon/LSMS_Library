@@ -73,10 +73,48 @@ by root, not reproduced here. No production edits or runtime are released.
 No new human policy question: literal explicit types are already authorized in
 scope. Root decisions still required before production/runtime: final PR base
 and GH1215 prerequisite; precise source-only config composition/private DVC tmp;
-bounded provider/copy plan; guard/census/test/genuine releases. Current full GH1218
-body is requested from root because the local issue listing contains title only.
+bounded provider/copy plan; guard/census/test/genuine releases. The full GH1218 body was supplied by root and read locally (SHA256
+6828890f5826a491901780cb0dd40a3ddba1c94472c4569aa4db1a2ed97ed9e2).
 
 ### Phase3 - verification
 
-Pending implementation/runtime release. All source mechanisms above are static
-observations and proposals; no runtime success or reproduction is claimed.
+Static diagnosis complete; implementation/runtime remain held for root review.
+
+- `_empty_declared_frame` proposal - OK (sections2,4,5): replace its final
+  expression return at1068 with the same index assignment, then payload-only
+  type projection and the unchanged enforcer call, then return. Only dict values
+  carrying a string `type` are unwrapped; unknown/missing/non-string types remain
+  ignored, as the existing enforcer dictates. Required and optional dict forms
+  get identical type treatment, different existing membership semantics.
+- Index collision - OK (section4): payload projection iterates `columns` after
+  excluding `levels`, so a numeric declaration on an index name cannot recast
+  existing string index storage/codes/names/order. Existing structural keys and
+  malformed scheme behavior stay unchanged; no new validation policy.
+- Canonical precedence - OK (sections2-4): country-local coercion stays before
+  global canonical coercion in finalize. Current global `household_roster.Age`
+  is float (`data_info.yml:363-369`), notwithstanding older AGENTS Int64 prose.
+  Test that actual canonical declaration, not a fake Columns registration.
+- GH1215 combined controls - OK (sections2-4): intentionally replace its direct
+  helper all-object assertion with exact six declared nullable payload types;
+  keep every order/index assertion. Existing Uganda API types remain unchanged.
+- Base - recommended GH1215 prerequisite/f7 foundation; root to select a final
+  clean publication base and actual old-framework control without reset/force.
+  Do not merge BF657 country ancestry into the framework PR.
+- Genuine proposal - six manifest-bound provider metadata records total
+  6,335,825 declared bytes; four new private roots require24 distinct binary
+  copies /25,343,300 bytes. No provider was opened/hashed/copied/decoded here.
+  Root should prepare a new BF657 detached config checkout/private DVC tmp;
+  same literal config with old/new package heads is explicit supported
+  composition, not exact historical BF-parent combined-package evidence.
+- Future verification - corrected pre-import guards and meaningful old-framework
+  dtype controls first; full549/39/1362 native-config hash measurement before
+  rebuild. Broad movement is predicted because helper reaches ALL-scoped
+  `_aggregate_wave_data`; actual counts and cost must gate genuine work.
+- Prior guidance contradictions - old skill no-auto-hash/.pth/core-first claims
+  conflict with current source/current AGENTS. Current canonical Age float also
+  conflicts with AGENTS' older Int64 example. Preserve/source-cite these, do not
+  redesign types or grain to reconcile historical prose.
+
+No production edit, package/numerical import, build fingerprint census, test,
+provider hash/copy/decode, API, network or acquisition was performed. Source/Git/
+AST and frozen JSON/source metadata only. No runtime reproduction is claimed.
