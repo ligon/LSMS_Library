@@ -1,0 +1,14 @@
+{
+  "at_UTC": "2026-10-22T22:34:21.398770+00:00",
+  "tracker_PR1170_frozen_head": "59cc6b693e431b812c2676f3c9233b54dd2f7d7b",
+  "root_continuation_branch": "docs/isa-backlog-20261022-merge-progress",
+  "user_authorized_destination": "development",
+  "merge_owner": "malawi_1209",
+  "exact_implementation_heads_stack_bases_verified": 32,
+  "current_head_CI_unit_windows_success": 32,
+  "skipped_jobs_per_run": 6,
+  "data_tests": "SKIPPED",
+  "consistency_review": "active, overlaps identified and full country documentation being read",
+  "actual_merges_reported": 0,
+  "signed": "Sue"
+}
