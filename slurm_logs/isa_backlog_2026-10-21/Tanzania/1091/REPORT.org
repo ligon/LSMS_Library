@@ -75,8 +75,9 @@ This is a country-wide re-warm cost for review; other Tanzania tables were not r
 The CONTENTS-only descendant is excluded by the existing hash machinery; no registry or schema lever changes.
 
 Strict source-memory/native index missing-value dtype differences at parquet serialization remain visible; matched writer-stage native controls are exact.
-Cold unsupported requests now follow the existing no-builder empty contract: object Description, versus the old fallback's string Description.
-Covered-cache empties retain string Description and id_converted; full comparisons across those different routes remain qualified.
+On the measured fresh roots with no country cache, unsupported strict-subset requests follow the existing no-builder empty contract: object Description, versus the old fallback's string Description.
+Default reads served from the measured full-coverage country cache instead return filtered zero-row slices retaining cached string Description and id_converted; full comparisons across these routes remain qualified.
+Both routes return zero rows; partial-coverage misses and union rebuilds were not separately replayed, and no universal empty representation is claimed for them.
 JSON serialization changes typed sampling/population/recall record/container forms; exact artifact comparisons use actual matched serialization controls, without attr stripping or dtype normalization.
 These measured existing-contract consequences are not new framework repairs.
 

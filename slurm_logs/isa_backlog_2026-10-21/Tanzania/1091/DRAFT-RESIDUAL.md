@@ -11,9 +11,11 @@ variety, own price/basis and eligibility. Separate #113 household-price fallback
 WAITING #114 split-off/panel caveats, #637 plot-input duplicate-unit work and the
 missing 2020 population statement remain outside this retirement.
 
-The accepted route consequences remain visible: cold unsupported object versus
-covered-cache string Description/id_converted, typed JSON attr serialization,
+The accepted route consequences remain visible: measured fresh-root/no-country-cache strict-subset object versus
+Default full-coverage cache-slice string Description/id_converted, typed JSON attr serialization,
 and natural Make native eviction/rewrites while preserving the country cache.
+Both empty routes return zero rows; partial-coverage misses/union rebuilds were
+not separately replayed and have no universal representation claim.
 All 25 Tanzania API hashes move; other Tanzania outputs were not rebuilt.
 The separate reviewed 408 plot-input replacement proof remains code/receipt
 identity only, with no agriculture staging or new output claim.

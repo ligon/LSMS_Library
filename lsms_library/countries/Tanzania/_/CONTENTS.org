@@ -2158,7 +2158,9 @@ No household join, reducer, crosswalk, Quantity column or unit factor is added.
 The authoritative default country cache contains normalized frames with =id_converted=.
 Make now creates no country cache and preserves an existing verified one, while ordinary hashless native eviction/rebuild can delete an unrequested native sibling.
 Default warm reads change no cache bytes, modes or mtimes in the measured requests; Make's natural writes are recorded separately.
-Cold unsupported requests use the existing declared-empty/finalizer contract (=object= Description), whereas covered-cache slices retain =string= Description and =id_converted=.
+For the measured fresh roots without a country cache, an unsupported strict subset uses the existing declared-empty/finalizer contract (=object= Description).
+Default reads served from the measured full-coverage country cache instead return a filtered zero-row slice retaining cached =string= Description and =id_converted=.
+Both routes return zero rows; representation depends on route/coverage, and these measurements do not generalize every partial-coverage miss or union rebuild.
 These route distinctions and API-to-parquet JSON attr record/container type changes are measured explicitly, without normalization to force equality.
 
 The older geography-only statement calls a link "infeasible without a lossy, unverifiable crosswalk", while the later implemented crosswalk records the 2020 cluster as "BAKED INTO the community admin codes".

@@ -4687,7 +4687,8 @@
     "Retain strict source/native serialization and empty Description/id_converted differences; JSON record type changes are compared at matched stages.",
     "Preserved candidate preparation deleted-file snapshot stop and CLI wrapper-path stop; no production/read-gate changes or raw diagnostics exported.",
     "First candidate public/Feature observations were not replayed after CLI stop; only missing first CLI controls resumed in another process with separate endpoints.",
-    "Original source snapshots contain normalized representations for four convenience links per head; they never recorded literal target bytes. Separate final literal-reader receipts compare to immutable Git and original physical modes; stopped freezer and both originals remain preserved."
+    "Original source snapshots contain normalized representations for four convenience links per head; they never recorded literal target bytes. Separate final literal-reader receipts compare to immutable Git and original physical modes; stopped freezer and both originals remain preserved.",
+    "Empty representation claims are limited to measured fresh-root/no-country-cache strict subsets and Default full-coverage cache slices. Both return zero rows; partial-coverage misses/union rebuilds were not separately replayed and are not assigned a universal representation."
   ],
   "runtime_pin": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
   "parent_pin": "99c824079da480ab2646e499c06ac70e457ff271",
