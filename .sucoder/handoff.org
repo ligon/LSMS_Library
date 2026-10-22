@@ -1114,3 +1114,23 @@ Uganda residual query metadata is in queued-Uganda-1198-review/RESIDUAL-DEDUP-QU
 No root command remains running. Goal active; no public merge or issue closure.
 
 Sue
+
+* BF author release, Uganda review and next Malawi task -- 2026-10-22T03:07:30.841474+00:00
+
+The previous goal turn made concrete progress: accepted/published the bounded18 source and Mali documentation qualification, verified new-head CI and public bodies, froze Uganda, prepared its independent review, and verified sixteen private archives.
+BF1119 author is now frozen at 3dc9d28510dd783c648413987011832669f8bcf7, runtime c5134f57f76bc53e84df6c3398ffc9a3781e9e1c.
+Root read the full report and actual two-cell/test diffs, verified READY digest,594-entry manifest digest and six safe-export hashes; independent acceptance is still required.
+Actual author prebuild scope is24BF/525others/39framework. Supplemental12wave hashes were measured after builds; the timing omission and wrong-accessor stop remain explicit.
+Its six scanner occurrences were compared after explicit path-prefix normalization, without a raw-byte-equality claim. Existing household seed_kg remains unchanged; join evidence is crop-label existence at(t,i,crop), with no parcel allocation.
+Separate BF candidate/actualcfd review control, private metadata targets and full brief are prepared, unassigned; plan for niger_lane after19 release.
+The BF author review_nigeria_1034 now independently reviews Uganda1198. It has read full current country history and all source/test/contract documents; no verdict or PR.
+Tanzania reviewer reports27passes/20parentfails7passes and normal source/cold/warm proof; remaining populated/CLI/Feature/scanner stages are active.
+Nineteen-change reviewer reports114passes/12parentfails5passes and independent46043-source oracle with all76 masks/30late observations; matrices active, no verdict.
+Live218 remains open, unchanged sinceOct18 with zero comments. Root confirmed the two raw Malawi registrations still exist and personally traced the existing automatic Country/Feature derivation and retired-family docs.
+Prepared releasef8 Malawi218 candidate/control/metadata targets and narrow writer brief; no edits/tests/builds. It is independent of1109/1111 and preserves their source/proofs.
+After Tanzania review release, mali_lane can take that next writer task; other218/nonISA/framework cleanup remains residual.
+Seventeenth owner-only archive preserves frozen BF1119:528files,14564732compressedbytes,SHA4cbfdc571fff6a912d8ac752ae3d715350448dfa742a5cef415af541e089a3af.
+All members/source-after/access modes/durable launcher/fsync verified; raw sources/duplicate cache trees excluded, derived frames private.
+No root process remains running; all three worker slots active. Goal active, no public merge or issue closure.
+
+Sue

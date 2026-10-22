@@ -66,13 +66,31 @@
         "parent_live_state": "open/unmerged/exactcfd at preparation",
         "control": "/local/job40255479/worktrees/isa-Burkina_Faso-1119-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1119",
-        "status": "Author runtime/source/scanner validation complete, final docs/ledger/freeze active; no independent verdict/PR.",
+        "status": "Author frozen/quiescent; independent review prepared/unassigned.",
         "boundary": "Two harmonize_seed_crop Preferred Label cells only after actual reproduction; broader marker decision and non-ISA countries residual",
         "brief": "queued-1119-Burkina_Faso/NEXT-WRITER-BRIEF.md",
         "owner": "review_nigeria_1034",
         "interim_result": "131focusedPASS0skip;actualparent5FAIL4PASS;52strictframes;4430onlycrop-label changes;22877lines/code21=602 preserved;normalwarm0writes;seed_kg exact;6scannerWARN individually multiset-exact.",
         "postbuild_wave_census_qualification": "549API/39framework measured before builds; separate relevant-wave inventory captured after builds, preserving initial wrong-accessor stop. No prebuild wave census claim.",
-        "latest_live_parent_scope_receipt": "BF1119-live-parent-scope-0248.json"
+        "latest_live_parent_scope_receipt": "BF1119-live-parent-scope-0248.json",
+        "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+        "runtime_head": "c5134f57f76bc53e84df6c3398ffc9a3781e9e1c",
+        "precode_ledger": "0e9f1f696153562b62d3a3d2d389e309b96c9238",
+        "author_READY_sha256": "602e7bbd416d1bcb73b1bb9c55004e96a0ecc510ffe2959b50d6617363643552",
+        "author_manifest_entries": 594,
+        "author_manifest_sha256": "62cadf6a6080969f3aebe056fd4bfcfe54d0a6fde1604306019a62a93a1cbe57",
+        "root_author_manifest_digest_and_six_safe_export_hashes_verified": true,
+        "private_archive": "private-evidence-durability-seventeenth.json",
+        "actual_prebuild_scope": "24BF/525otherAPI/39frameworkexact;12wave hashes measured after builds",
+        "scanner_qualification": "Six complete occurrences match after explicit checkout/data path-prefix normalization; raw-byte equality not claimed.",
+        "independent_review": {
+          "path": "/local/job40255479/worktrees/isa-review-Burkina_Faso-1119",
+          "control": "/local/job40255479/worktrees/isa-review-Burkina_Faso-1119-base",
+          "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Burkina_Faso-1119",
+          "brief": "queued-Burkina_Faso-1119-review/NEXT-REVIEW-BRIEF.md",
+          "review_assigned": false,
+          "tests_builds": 0
+        }
       }
     },
     "Ethiopia": {
@@ -147,7 +165,21 @@
       "active_ci": "success; run39678420581",
       "composition_evidence": "/local/job40255479/control/isa-backlog-20261021/review-1111-Malawi-composition",
       "composition_capture_limit": "First cold public Feature was not serialized after private currency-argument expectation mismatch; all persisted cold raw frames and passed Country preserved, full default post-cold capture and fresh-process warm proof exact",
-      "combined_review": "PASS at653f against actual5dde;129tests/full pair/organic/native/Country/defaultFeature/N/Uganda/scanner/warm; independent cold Feature captures now serialized at new source pin; earlier fd235 limit preserved"
+      "combined_review": "PASS at653f against actual5dde;129tests/full pair/organic/native/Country/defaultFeature/N/Uganda/scanner/warm; independent cold Feature captures now serialized at new source pin; earlier fd235 limit preserved",
+      "queued_218": {
+        "issue": 218,
+        "path": "/local/job40255479/worktrees/isa-Malawi-218",
+        "branch": "fix/218-malawi-derived-registrations-20261022",
+        "base_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "control": "/local/job40255479/worktrees/isa-Malawi-218-base",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/218",
+        "status": "Prepared unassigned writer task; no edits/tests/build/verdict",
+        "boundary": "Remove only two raw null derived registrations; preserve automatic Country/Feature food-derived methods and all output semantics. Other218/nonISA/shared cleanup remains residual.",
+        "independence": "Starts releasef8, independent of unmerged1109/1111 plot-input patches; normal future composition still required.",
+        "root_static_prior_art": "CLAUDE698,Country.data_scheme/_materialization_entry/_FOOD_DERIVED,Feature source discovery and Malawi retirement note1653ff personally read; static raw-key search finds only Malawi2.",
+        "brief": "queued-Malawi-218/NEXT-WRITER-BRIEF.md",
+        "root_prepared_metadata_targets": true
+      }
     },
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
@@ -431,7 +463,8 @@
         "builds_tests": 0,
         "gate": "Different agent after Uganda1198 author release; source/copy/hash/coverage gates precede APIs",
         "reviewer": "mali_lane"
-      }
+      },
+      "active_independent_interim": "25Tanzania/524others/39framework actual prebuild; source gates and both-head40cold/warm calls complete; candidate27PASS,parent20FAIL7PASS0errors/skips. Populated/CLI/Feature/scanner/58existing controls active; no verdict."
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
@@ -579,7 +612,7 @@
       ],
       "active_prior_work_roots_frozen": true,
       "active_interim_finding": "First ordinary default/Make cold builds133761 rows; source oracle complete/native/public133761,403 old null-key exclusions,928 null-v. Default fresh warm0/144 cache files. Make warm17 byte/mode-identical mtime changes retained as a stopped zero-write expectation; actual parent counterpart pending. Whole harvest/median/real-area yield/tests remain active.",
-      "active_status": "Author frozen/quiescent at6e735; separate independent review prepared but unassigned.",
+      "active_status": "Independent review assigned to review_nigeria_1034 after BFauthor release; no verdict/PR.",
       "active_private_addendum": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum",
       "active_exact_addendum_result": "85 exact saved-artifact checks and seven comparator negative controls pass; unsaved constructor/currency/Feature/finalizer scope gaps explicit. Original sources and reports remain unchanged.",
       "factor_mapping_issue": 849,
@@ -652,8 +685,9 @@
         "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1198",
         "brief": "queued-Uganda-1198-review/NEXT-REVIEW-BRIEF.md",
         "root_prepared_metadata_targets": true,
-        "review_assigned": false,
-        "tests_builds": 0
+        "review_assigned": true,
+        "tests_builds": 0,
+        "reviewer": "review_nigeria_1034"
       },
       "active_author_counterfactual": "39cases:36FAIL/3PASS/0ERROR/SKIP; row-loss and API-contract/TypeError causes separately classified",
       "active_residual_drafts": "Make strict subsets and parcel-yield coverage; not filed or fixed, preliminary dedup metadata retained privately",
@@ -1101,7 +1135,7 @@
         "dispatch_gate": "Released18 rootacceptance plus bounded Mali wording review",
         "status": "Independent bounded19 review assigned after root18/runtime+docsacceptance",
         "reviewer": "niger_lane",
-        "interim_result": "Actual prebuild549/39:23Niger moves,526others/39framework exact;12path/blobs/modesexact and unchangedMali waves;406physical held copies terminally gated;healthyMali155931/current/full4coverage. Tests/matrices active; no verdict."
+        "interim_result": "Candidate114PASS0skip;identical17actual18controls12meaningfulFAIL5PASS0error/skip; independent source46043/76masks43/32/1/30late; both-head backend matrices active. No verdict."
       }
     },
     "eighteen_increment": {
