@@ -1154,7 +1154,7 @@
     },
     "1196": {
       "issue": 1196,
-      "status": "EXPANDED_RUNTIME_SOURCE_COLD_FRESHWARM_AND_DEEP_SAVED_CHECKS_COMPLETE; AUTHOR_FREEZE_PENDING",
+      "status": "AUTHOR_FROZEN_ROOT_GATED; INDEPENDENT_REVIEW_ASSIGNED",
       "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
       "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
@@ -1200,11 +1200,24 @@
       "actual_expansion_scope": "549/549API,39/39framework,1362/1362wave move vsbothbd80/f8; exactkeysets;0dataendpointchanges",
       "expanded_runtime": "7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1",
       "new_evidence": "Both Default+Make cold/freshwarm Niger239877/Ug4805 completed;47newPASS+72affectedPASS; actualbd8026FAIL21PASS; deep329=256exact72intendedpolicy1qualifiedsingleton;22hashonlyfooters;27scanner26WARN1oldFAIL;2CLI6stageframes, no unexpected difference",
-      "singleton_qualification": "Ug2019Default824x5 versusMake824x3,unusedlevels andvStringNApolicy differ alreadybd80; nativewriter/footerrecordsstr whilepooledcountryfooterrecordsstring, no cast/normalization."
+      "singleton_qualification": "Ug2019Default824x5 versusMake824x3,unusedlevels andvStringNApolicy differ alreadybd80; nativewriter/footerrecordsstr whilepooledcountryfooterrecordsstring, no cast/normalization.",
+      "author_final_head": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+      "author_READY_sha256": "1813d467c38f328bfa22c7bb7e26bef73377223cb5e1f24fc6443c0f1077bc87",
+      "author_manifest_entries": 859,
+      "author_manifest_sha256": "6b015771211cde0249c2f394e61c2587d84a8bb0a516634a77a566bf27f37420",
+      "author_safe_evidence": "1196-author-final/",
+      "independent_review": {
+        "owner": "review_acquisition_1149",
+        "source": "/local/job40255479/worktrees/isa-review-1196-index",
+        "control": "/local/job40255479/worktrees/isa-review-1196-index-base",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/review-1196-index",
+        "brief": "queued-1196-independent/NEXT-REVIEWER-BRIEF.md",
+        "status": "ASSIGNED; no independent verdict yet"
+      }
     },
     "1206": {
       "issue": 1206,
-      "owner": "validation_reassess; root acceptance/publication",
+      "owner": "validation_reassess retains later10/integrations; acquisition_1149 owns first12; root accepts/publishes",
       "status": "CRITICAL_AND_CORRECTED_OBJECT_V3_ROOT_ACCEPTED; FULL_RETROSPECTIVE_ACTIVE",
       "primary_diagnostic": "1206-comparator-validation/ROOT-SYNTHETIC-PROOF.json",
       "scope": "Full affected frozen-cohort saved-evidence reassessment; prioritize20and1196, inventory22implementation-review cohorts and17/18/19integration; noAPI/source/testreplay",
@@ -1230,8 +1243,8 @@
         "source": "/local/job40255479/worktrees/isa-review-comparator-values-second",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment-second",
         "prepared": true,
-        "assigned": false,
-        "primary_still_owns_all22": true,
+        "assigned": true,
+        "primary_still_owns_all22": false,
         "proposed_PRs": [
           1172,
           1173,
@@ -1246,7 +1259,23 @@
           1189,
           1191
         ],
-        "corrected_helper_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94"
+        "corrected_helper_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+        "owner": "acquisition_1149",
+        "assigned_PRs": [
+          1172,
+          1173,
+          1175,
+          1176,
+          1178,
+          1180,
+          1181,
+          1182,
+          1185,
+          1186,
+          1189,
+          1191
+        ],
+        "assignment": "assigned-second-numeric-critic/ROOT-EXPLICIT-ASSIGNMENT.md"
       },
       "corrected_object_v3": {
         "evidence": "1206-object-v3-supplement/",
@@ -1270,11 +1299,29 @@
         "actual_mismatch": false,
         "all_campaign_result": false
       },
-      "Mali1199_ruling": "1206-object-v3-supplement/ROOT-MALI1199-CONTENT-REASSESSMENT-RULING.json"
+      "Mali1199_ruling": "1206-object-v3-supplement/ROOT-MALI1199-CONTENT-REASSESSMENT-RULING.json",
+      "primary_retained_PRs": [
+        1192,
+        1193,
+        1194,
+        1195,
+        1197,
+        1199,
+        1200,
+        1201,
+        1202,
+        1203
+      ],
+      "sealed_pending_root_acceptance": [
+        1199,
+        1201,
+        1203
+      ],
+      "actual_implementation_PRs_open_unmerged": 25
     },
     "1149": {
       "issue": 1149,
-      "status": "ROOT_ACCEPTED_COMPLETE_CODE_ONLY_REPAIR; PR_PUBLICATION_PENDING",
+      "status": "PR_OPEN_INDEPENDENTLY_REVIEWED_ROOT_ACCEPTED",
       "candidate": "/local/job40255479/worktrees/isa-1149-acquisition",
       "control": "/local/job40255479/worktrees/isa-1149-acquisition-base",
       "branch": "fix/1149-staged-reacquisition-20261022",
@@ -1329,7 +1376,13 @@
         "independent_READY": "d6b06c9230efbcdc8beaa6b6246931dd6442b8fd2626813e8f1b04faa5dffc27",
         "independent_manifest_entries": 1151,
         "independent_manifest_sha256": "00b54088f4212f620c99af0dac9b8c9a2ed97521207712739ab13d090b7cb872"
-      }
+      },
+      "PR": 1211,
+      "PR_url": "https://github.com/ligon/LSMS_Library/pull/1211",
+      "PR_head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+      "PR_base": "development",
+      "PR_body_readback_exact": true,
+      "public_implementation_merged": false
     }
   },
   "integration": {
