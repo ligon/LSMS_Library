@@ -485,3 +485,9 @@ Fresh GitHub metadata verifies all25 implementation PRs OPEN/unmerged at expecte
 Goal stays active. No implementation merge, real acquisition, cache promotion or all-country/full-suite verdict. Next: finish independent1196review, root-accept finished1206subcohorts, continue actionablecountryissues, archive newly frozen outputs in25. Source21 still prepared/unassigned; actual20 NigerCROP hash/fullcoverage gate remains required.
 
 Sue
+
+* Final public readbacks -- 2026-10-22T13:19:29.915355+00:00
+
+All25 implementation PRs remain OPEN/unmerged at expectedheads; seven stackedbases match prerequisiteheads. PR1170 current25table/accepted1149/corrected1206/current1196/verified24archives body and issue1196 authorcandidate/independent-scope body read back exactly at source8683af50d. Archive24 and all rootcommit/push/verifierhandles terminal0; no rootbackgroundprocess torestart. Threeworkerlanes remainactive. First1175 strongercomplete-index findings are retained; numerical/attrs diagnostics and source-bound domain classification continue, no full-frame PASS inferred. Goalactive/noimplementationmerge.
+
+Sue
