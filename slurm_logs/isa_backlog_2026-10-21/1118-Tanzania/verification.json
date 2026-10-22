@@ -1,0 +1,655 @@
+{
+  "cold": {
+    "phase": "cold",
+    "rows": 9698,
+    "rows_by_wave": {
+      "2019-20": 1774,
+      "2020-21": 7924
+    },
+    "u_replacements": {
+      "2019-20": 86,
+      "2020-21": 322
+    },
+    "all_nonunit_fields_index_dtypes_attrs_equal": true,
+    "full_frame_expected_equal": true,
+    "seconds": 13.681,
+    "ordinary_country": true,
+    "cache": {
+      "Tanzania/var/plot_inputs.parquet": {
+        "hash": "d87abbc91a1ac78eb0520f0aa8b649168ba74d772feb558fced199b179395912",
+        "waves": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "Tanzania/2019-20/_/plot_inputs.parquet": {
+        "hash": null,
+        "waves": null
+      },
+      "Tanzania/2020-21/_/plot_inputs.parquet": {
+        "hash": null,
+        "waves": null
+      }
+    },
+    "comparator_pre_read_grade": "fresh",
+    "comparator": {
+      "country": "Uganda",
+      "rows": 84216,
+      "unit_missing": 0,
+      "unknown": 43653
+    },
+    "feature": {
+      "rows": 93914,
+      "row_conserved": true,
+      "full_country_parts_equal": true,
+      "index": [
+        "country",
+        "t",
+        "v",
+        "i",
+        "plot_id",
+        "input",
+        "j",
+        "u",
+        "season",
+        "currency"
+      ]
+    },
+    "sanity": {
+      "Tanzania": [
+        {
+          "check": "not_empty",
+          "status": "pass"
+        },
+        {
+          "check": "has_named_index",
+          "status": "pass"
+        },
+        {
+          "check": "index_levels_match_scheme",
+          "status": "warn"
+        },
+        {
+          "check": "no_null_index_levels",
+          "status": "warn"
+        },
+        {
+          "check": "has_time_index",
+          "status": "pass"
+        },
+        {
+          "check": "has_household_index",
+          "status": "pass"
+        },
+        {
+          "check": "reasonable_size",
+          "status": "pass"
+        },
+        {
+          "check": "no_all_null_columns",
+          "status": "pass"
+        },
+        {
+          "check": "no_constant_columns",
+          "status": "pass"
+        },
+        {
+          "check": "declared_columns_present",
+          "status": "pass"
+        },
+        {
+          "check": "dtype_consistency",
+          "status": "pass"
+        },
+        {
+          "check": "value_constraints",
+          "status": "pass"
+        },
+        {
+          "check": "declared_spellings",
+          "status": "pass"
+        },
+        {
+          "check": "low_duplicate_rate",
+          "status": "pass"
+        },
+        {
+          "check": "no_float_stringified_index",
+          "status": "pass"
+        },
+        {
+          "check": "ids_format_id_canonical",
+          "status": "pass"
+        },
+        {
+          "check": "index_overlap_with_spine",
+          "status": "pass"
+        }
+      ],
+      "Uganda": [
+        {
+          "check": "not_empty",
+          "status": "pass"
+        },
+        {
+          "check": "has_named_index",
+          "status": "pass"
+        },
+        {
+          "check": "index_levels_match_scheme",
+          "status": "warn"
+        },
+        {
+          "check": "no_null_index_levels",
+          "status": "pass"
+        },
+        {
+          "check": "has_time_index",
+          "status": "pass"
+        },
+        {
+          "check": "has_household_index",
+          "status": "pass"
+        },
+        {
+          "check": "reasonable_size",
+          "status": "pass"
+        },
+        {
+          "check": "no_all_null_columns",
+          "status": "pass"
+        },
+        {
+          "check": "no_constant_columns",
+          "status": "pass"
+        },
+        {
+          "check": "declared_columns_present",
+          "status": "pass"
+        },
+        {
+          "check": "dtype_consistency",
+          "status": "pass"
+        },
+        {
+          "check": "value_constraints",
+          "status": "pass"
+        },
+        {
+          "check": "declared_spellings",
+          "status": "pass"
+        },
+        {
+          "check": "low_duplicate_rate",
+          "status": "pass"
+        },
+        {
+          "check": "no_float_stringified_index",
+          "status": "pass"
+        },
+        {
+          "check": "ids_format_id_canonical",
+          "status": "pass"
+        },
+        {
+          "check": "index_overlap_with_spine",
+          "status": "pass"
+        }
+      ]
+    },
+    "parquets_after": [
+      "Tanzania/2008-15/_/sample.parquet",
+      "Tanzania/2019-20/_/plot_inputs.parquet",
+      "Tanzania/2019-20/_/sample.parquet",
+      "Tanzania/2020-21/_/plot_inputs.parquet",
+      "Tanzania/2020-21/_/sample.parquet",
+      "Tanzania/var/plot_inputs.parquet",
+      "Tanzania/var/sample.parquet"
+    ]
+  },
+  "warm": {
+    "phase": "warm",
+    "rows": 9698,
+    "rows_by_wave": {
+      "2019-20": 1774,
+      "2020-21": 7924
+    },
+    "u_replacements": {
+      "2019-20": 86,
+      "2020-21": 322
+    },
+    "all_nonunit_fields_index_dtypes_attrs_equal": true,
+    "full_frame_expected_equal": true,
+    "seconds": 1.532,
+    "ordinary_country": true,
+    "cache": {
+      "Tanzania/var/plot_inputs.parquet": {
+        "hash": "d87abbc91a1ac78eb0520f0aa8b649168ba74d772feb558fced199b179395912",
+        "waves": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "Tanzania/2019-20/_/plot_inputs.parquet": {
+        "hash": null,
+        "waves": null
+      },
+      "Tanzania/2020-21/_/plot_inputs.parquet": {
+        "hash": null,
+        "waves": null
+      }
+    },
+    "comparator_pre_read_grade": "fresh",
+    "comparator": {
+      "country": "Uganda",
+      "rows": 84216,
+      "unit_missing": 0,
+      "unknown": 43653
+    },
+    "feature": {
+      "rows": 93914,
+      "row_conserved": true,
+      "full_country_parts_equal": true,
+      "index": [
+        "country",
+        "t",
+        "v",
+        "i",
+        "plot_id",
+        "input",
+        "j",
+        "u",
+        "season",
+        "currency"
+      ]
+    },
+    "sanity": {
+      "Tanzania": [
+        {
+          "check": "not_empty",
+          "status": "pass"
+        },
+        {
+          "check": "has_named_index",
+          "status": "pass"
+        },
+        {
+          "check": "index_levels_match_scheme",
+          "status": "warn"
+        },
+        {
+          "check": "no_null_index_levels",
+          "status": "warn"
+        },
+        {
+          "check": "has_time_index",
+          "status": "pass"
+        },
+        {
+          "check": "has_household_index",
+          "status": "pass"
+        },
+        {
+          "check": "reasonable_size",
+          "status": "pass"
+        },
+        {
+          "check": "no_all_null_columns",
+          "status": "pass"
+        },
+        {
+          "check": "no_constant_columns",
+          "status": "pass"
+        },
+        {
+          "check": "declared_columns_present",
+          "status": "pass"
+        },
+        {
+          "check": "dtype_consistency",
+          "status": "pass"
+        },
+        {
+          "check": "value_constraints",
+          "status": "pass"
+        },
+        {
+          "check": "declared_spellings",
+          "status": "pass"
+        },
+        {
+          "check": "low_duplicate_rate",
+          "status": "pass"
+        },
+        {
+          "check": "no_float_stringified_index",
+          "status": "pass"
+        },
+        {
+          "check": "ids_format_id_canonical",
+          "status": "pass"
+        },
+        {
+          "check": "index_overlap_with_spine",
+          "status": "pass"
+        }
+      ],
+      "Uganda": [
+        {
+          "check": "not_empty",
+          "status": "pass"
+        },
+        {
+          "check": "has_named_index",
+          "status": "pass"
+        },
+        {
+          "check": "index_levels_match_scheme",
+          "status": "warn"
+        },
+        {
+          "check": "no_null_index_levels",
+          "status": "pass"
+        },
+        {
+          "check": "has_time_index",
+          "status": "pass"
+        },
+        {
+          "check": "has_household_index",
+          "status": "pass"
+        },
+        {
+          "check": "reasonable_size",
+          "status": "pass"
+        },
+        {
+          "check": "no_all_null_columns",
+          "status": "pass"
+        },
+        {
+          "check": "no_constant_columns",
+          "status": "pass"
+        },
+        {
+          "check": "declared_columns_present",
+          "status": "pass"
+        },
+        {
+          "check": "dtype_consistency",
+          "status": "pass"
+        },
+        {
+          "check": "value_constraints",
+          "status": "pass"
+        },
+        {
+          "check": "declared_spellings",
+          "status": "pass"
+        },
+        {
+          "check": "low_duplicate_rate",
+          "status": "pass"
+        },
+        {
+          "check": "no_float_stringified_index",
+          "status": "pass"
+        },
+        {
+          "check": "ids_format_id_canonical",
+          "status": "pass"
+        },
+        {
+          "check": "index_overlap_with_spine",
+          "status": "pass"
+        }
+      ]
+    },
+    "warm_parquet_writes": 0,
+    "parquets_after": [
+      "Tanzania/2008-15/_/sample.parquet",
+      "Tanzania/2019-20/_/plot_inputs.parquet",
+      "Tanzania/2019-20/_/sample.parquet",
+      "Tanzania/2020-21/_/plot_inputs.parquet",
+      "Tanzania/2020-21/_/sample.parquet",
+      "Tanzania/var/plot_inputs.parquet",
+      "Tanzania/var/sample.parquet"
+    ]
+  },
+  "hash_scope": {
+    "country_cells_checked": 549,
+    "framework_tables_checked": 39,
+    "changed_country_cells": {
+      "Tanzania/sample": [
+        "5d0f683f25787a46e150d4a3e678a6d8cae8ff2d847fef7efe27781c98f8724d",
+        "eeea642943e436206a85078f0f573a7483a4c7ff3a7f2b09437b6f8a11005cac"
+      ],
+      "Tanzania/cluster_features": [
+        "583964c23d5721179485aff9c2d5245409468d88488a69d747698e7cb369f734",
+        "2d49fd92021ed3c58b9a6e0ef9aa21a725545ed9a4b44be772a483091ad6f7b5"
+      ],
+      "Tanzania/shocks": [
+        "05fd017344e33039f4c97d6a4e700e3a5a51d025808f5dd41b6bec828ed61359",
+        "31e962fa7e160d48353b370e7034a4828b01682e75bab8bff46e19d928ee740c"
+      ],
+      "Tanzania/household_roster": [
+        "bd8376f0eeab95b959d848936f462a8d81cba32c50ff2827aecf053eb4c22480",
+        "7ed1ce1b5f9c2fcc0f8ccdf2ab4bc82cd04260296b908b96935a03e28c98e0ce"
+      ],
+      "Tanzania/individual_education": [
+        "9ff8d39607f520647704d7adf5be1bbc8ad62e0517bee738651611c722d6b304",
+        "7f5ff0ef5f8204ab894e1f6437b61a3f5ca4f63e16b0332fbdc8e777bb0045f6"
+      ],
+      "Tanzania/anthropometry": [
+        "e4ed3891b98472d6c4c9fd3697e6a67a78689459b62e5c4ee85368a422e09f48",
+        "17c1d2ebe0d345e674d83d30f59fdfa0a0ffc207987ecbafb8e1e477c0a27701"
+      ],
+      "Tanzania/life_satisfaction": [
+        "6133f565d8ae543fe3aacb4b4581946af9d861b1109d9044559dbc7118618610",
+        "e05e3d1416372ac88cff039a84c8a7c8f0f371c9a84637189fea66942326ba5b"
+      ],
+      "Tanzania/food_coping": [
+        "67a84e238c5c0726ea69ac5092e8fd13a42d1866fd18ced3a98284af822dbd13",
+        "77e92db14931b43ec861a4253c56a1c46de3e464bf5a13d17230600c8a4f19fa"
+      ],
+      "Tanzania/interview_date": [
+        "7238a4764723aeda6f843c1ca89792d5a87281e05afa61e603adeffc78c4742f",
+        "6f117ead9cebe63bf8ccfbad35c05ede4b30aabd14fdb398923350ca73bb23e7"
+      ],
+      "Tanzania/food_acquired": [
+        "4f0aa6551cfb1b16c63a27ae9eb05198cac7fef2aff803d71c101ef40d148bd6",
+        "85a03495af78a8e6bce5b2b724506677f0d4f15751a7440b3c3a457536f24155"
+      ],
+      "Tanzania/panel_ids": [
+        "2f76541c44ec7b40db6f14a08b80846c15fa88eec8b69a95dfba8cb17c7de3a3",
+        "a4aac2c73be8b8f2416016226fc97dbf058c2befe3df06f1205313410df389b4"
+      ],
+      "Tanzania/assets": [
+        "f810fcbee67faa1cc19455eda555a07dc75e7e20db4d4d85b5c11f64689ecfc4",
+        "bde582c9bdc123c29109ac6a2c68d5cbb8ae9c25ce9d0b32678e4ecbb41c3cb4"
+      ],
+      "Tanzania/housing": [
+        "b13b3978fc7d80f48e20961f765be1e7a0a54f1a2667cabda476707ddf2c1221",
+        "f45d97859cddc688fdc09ef5de6936dccc15ac46b7190bdd066ef6c31d1dc0e6"
+      ],
+      "Tanzania/plot_features": [
+        "fb758dcd3c24684fb5de5ffa0442ec9d12f84db480ef9fe6352b6880cf1d1925",
+        "51db2ac357aad7348ba09e4af2847d81cda54b015207a8a4c4f1d6c61f0ff1ba"
+      ],
+      "Tanzania/crop_production": [
+        "d6d420c8b08a4d586969b9b36a255a21cb6ea4dc4427930a88f1751c6d0387b1",
+        "ea7a949b7b69110f4e4033490278aeca69fb244cc7a1ca7f77449bd256be05ae"
+      ],
+      "Tanzania/plot_inputs": [
+        "01d2f6ae94c99f5317964d23cc2897117befe3c1b1074ffc3b8bd46aad7cd26f",
+        "d87abbc91a1ac78eb0520f0aa8b649168ba74d772feb558fced199b179395912"
+      ],
+      "Tanzania/plot_labor": [
+        "d5a750431738543538e457b10e6d7cd2924af454e541698257d1256cd0ec21b1",
+        "c250dff8f98f4ab52bbb0e1ebd38b69817e3736a0c7cc29aefac2fafcbe6f721"
+      ],
+      "Tanzania/people_last7days": [
+        "95e43411cdfbca2bf9b3bad1971743b5969b37e71d38e1ceac06eb764cff5439",
+        "58e70504ad0f8a20bfebe6e73ab74346859872fce0e9cddc56c34e71e051c2f6"
+      ],
+      "Tanzania/livestock": [
+        "06adc25b105a65d178526aa2cb2ca10696c020709378bc7f0375d9d01383ce10",
+        "701b75c07eae49d6dda233318fa11d2c8438054abf592b8ffb32f8faef1a035f"
+      ],
+      "Tanzania/community_prices": [
+        "f5b6d5d4ded592a001cc80ee23c889ae2411ab34c5c726482acd0e44e6d6cb7c",
+        "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+      ],
+      "Tanzania/community_cluster_xwalk": [
+        "c4fcf2f6f8f1c145f231a7750be15b805e5565196f05c742d202a008b765706d",
+        "c653f79c2633059627e442f90b4ebca704ef645bdb2bc42a51c209766e472e1c"
+      ],
+      "Tanzania/food_expenditures": [
+        "2e6133f100d179621adf91662d0cfd5323574a1020e6ab30dfe24dd6eadf7c01",
+        "df6246e62c125ca565dc3bd4476fda52c48cb920bc65adb123ea954e7772b6fd"
+      ],
+      "Tanzania/food_prices": [
+        "0e1d1fee83024f8fdc1ef7a697658d53ea27d11943756fc4fc4f615675be1858",
+        "fbb9550bc1f91f45c5bc75694b81395c8a1fcd087fe9553a4ff60f2520cd011f"
+      ],
+      "Tanzania/food_quantities": [
+        "78f3a4464fc8752dc758ad15782ad60fa691e016ec2126ab7ebdbae14753cef1",
+        "fa9efa02908837e8831b5349d656a8aa17ebc49a4c9534a831f27683c312bc43"
+      ],
+      "Tanzania/household_characteristics": [
+        "c3d7f6aa3a82d6d86eded3bbc55e562264336be4c0b1a4622ac994b4387487fe",
+        "f77307014bd0f85b62a9a0aab96ccb0c009de52fa7b250f7872dd34ae12b3aeb"
+      ]
+    },
+    "changed_framework_tables": []
+  },
+  "mixed_unit_conservation": {
+    "groups": 6,
+    "source_members": 14,
+    "before_after_helper_full_frame_attrs_equal": true,
+    "before_after_country_full_frame_attrs_equal": true,
+    "reducer_unchanged": true
+  },
+  "comparator_parquets_verified_unchanged": 26,
+  "tests": {
+    "new_tests": 16,
+    "scoped_suite_before_extra_three_parameters": 243,
+    "baseline_negative_expected_failures": 14,
+    "baseline_unchanged_behavior_passes": 2,
+    "early_fill_mutant_expected_failures": 1,
+    "api_audit": "passed"
+  },
+  "audit": {
+    "countries": [
+      "Tanzania",
+      "Uganda"
+    ],
+    "feature": "plot_inputs",
+    "phases": [
+      1,
+      2
+    ],
+    "phase2_kwarg_grid_entries": 0,
+    "status_counts": {
+      "warn": 11
+    },
+    "findings": [
+      {
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "classification": "Tanzania null crop keys"
+      },
+      {
+        "phase": "1a-sanity",
+        "country": "Tanzania",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "severity": "C",
+        "classification": "index_levels_match_scheme"
+      },
+      {
+        "phase": "1a-sanity",
+        "country": "Tanzania",
+        "check": "no_null_index_levels",
+        "status": "warn",
+        "severity": "C",
+        "classification": "no_null_index_levels"
+      },
+      {
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "classification": "Uganda pre-finalize null keys"
+      },
+      {
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "classification": "Uganda cluster identity"
+      },
+      {
+        "phase": "1a-sanity",
+        "country": "Uganda",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "severity": "C",
+        "classification": "index_levels_match_scheme"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "classification": "Tanzania null crop keys"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "classification": "Uganda pre-finalize null keys"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "classification": "Uganda cluster identity"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "classification": "declared canonical alignment"
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "classification": "undocumented population Tanzania 2020-21"
+      }
+    ]
+  }
+}
