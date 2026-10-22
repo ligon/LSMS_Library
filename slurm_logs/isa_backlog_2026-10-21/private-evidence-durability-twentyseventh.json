@@ -1,0 +1,22 @@
+{
+  "status": "ARCHIVE27_DURABLE_VERIFIED",
+  "archive_sha256": "1a7a7369fcefb0d25dbad9d1a631d65a891783142e7312eba2d362bdd0478ccf",
+  "archive_bytes": 733844565,
+  "included_source_bytes": 4873986554,
+  "roots": 19,
+  "files_verified": 1968,
+  "excluded_entries": 31,
+  "source_after_exact": true,
+  "archive_member_verifier_terminal_exit": 0,
+  "active_consumers": [],
+  "durable_files_owner0600_destination_access0700_existing_SGID_preserved": true,
+  "launcher_sha256": "892d3cbb3653c94207179f16271b3a16852d958806d418237ab890ae0bb8827d",
+  "verifier_sha256": "1b84580fa42f63c2117cd0bafb3ac64fd59fdf5ef3797ffb761d0778fd1c771b",
+  "manifest_sha256": "ba0ce6c9f8fbaeb64a11427e166819a7c893c5da1e405b288144e992b8ad5e0d",
+  "plan_sha256": "a65ecfa25ebb9579319c361e65428d63b4294852866a2b74327b53052bf548e4",
+  "archive1_pending_packets_are_archival_only_not_root_validation": true,
+  "no_product_import_decode_Git_or_acquisition": true,
+  "signed": "Sue",
+  "root_compressed_digest_manifest_controllers_modes_and_verifier_record_checked": true,
+  "verified_archive_count": 27
+}

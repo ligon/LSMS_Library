@@ -1433,3 +1433,33 @@ The node still has more than32hours left and no deadline warning at14:13UTC.
 No real acquisition, shared-cache mutation, schema/exclusion shortcut, automatic merge or all-PR/full-suite/corpus verdict is authorized or claimed.
 
 Sue
+
+* Current campaign checkpoint -- 2026-10-22 16:06 UTC
+
+Goal ACTIVE; no implementation PR merged. There are26OPENimplementation PRs at the last live inventory.
+Previous source709bd75e96d3df4ef91b3fa4b935a12726a73ac4was FS/GitHub-published with six later10safe packets and the75-entry/34metadata-pair registry.
+Root accepted1193standalone/composed251strict+2NEWrecipes+4key predicates; separate14has135strict+1NEWrecipe+2key predicates+4inline sets.
+Root accepted1197provenance150strict+2originalNAqualifications and separate nine original source-row predicate sets, not nine full-frame pairs.
+Root accepted1202persisted274strict+4originalvNAqualifications plus separately scoped attrs/CLI controls; nine exact6eNEWpure recipes include duplicate targets, not recovered memories.
+All original source/fixture/expected/fresh-return gaps, suite failures, Make/area/warning/XML limitations and old holds remain.
+Tracker1170, issue1206and PR1193/1197/1202new bodies read back exactly; proof is primary10-followup-publication-readbacks.json.
+
+Root archive1173/1186gate48160completed0: six strict NEWUganda consistency pairs/one retained unused-domain+21attrs-presence failure, zero original reference pairs recovered; Mali12originalpublicstrict pairs.
+See1206-pr1173-Uganda-archive1/,1206-pr1186-Mali-archive1/and root-checkers/1206-archive1-1173-1186-root.py.
+No product defect is inferred from differing saved subset/all-wave stages; no full equality replaces the failures.
+
+Archive27is complete and root-receipt-verified:1968members/19roots/733844565compressed bytes, SHA1a7a7369fcefb0d25dbad9d1a631d65a891783142e7312eba2d362bdd0478ccf.
+Full safe receipt private-evidence-durability-twentyseventh.json;31runtime/raw/cache exclusions are explicit, four text source-snapshot exceptions retained, destinationSGIDunchanged.
+Archive27includes frozen later10/registry/P3/root records; it predates root1173/1186decision, whose checker and safe decision are committed here.
+No root verifier/archive process remains live after48160and66819returned0.
+
+Active agents:
+- review_malawi_1209: independent1209allfunctionalactorsdone;56Country/24Feature/10native strict,98footers,163literal scanner records,16warning sequences after checkout-path-only substitution. Full protection remains streaming, then seal/postexit. Await immutableREADY before rootacceptance/newPR.
+- malawi_1209: NEWGH1210source128cc095a62cbd210e30d2256359acfe53d4a2c5, normal commits FS-published; author28tests/actualf8 16invalidfailures+1iteratorbehaviorchange/11pass;56strictvalid/nativepairs; candidate105cachepathsexact versus five deleted parent wavefiles. Protection4319is still streaming frozen1209/218and ownprovider/copy receipts; no newAPI/testprefix. Await finalREADY/manifest.
+- acquisition_1149: NEWindependent1210PHASE0staticreviewonly. Read C/REVIEW-INVALID-WAVE1210-BRIEF.md. Explicit required HOLD before project/numpy/pandasimports/tests/providerCOPY/decode until authorREADY/manifest and rootphase1release. Sources W/isa-review-invalid-wave-1210and-base are detached128cc095/f8, task C/review-invalid-wave-1210, exact new per-sourceDVCtmp links already prepared with stdlib. No reviewdataactorsyet.
+
+Next concrete actions: finish current GitHub readbacks; receive and root-gate1209independentseal, publish stackedPRon exact1208 d29; receive1210authorseal, verify and release independentphase1. Do not restart protection handles or completeddata/tests. Continue Uganda1204/1205and other actionablebacklog after these fixes; source21stillprepared/unassigned and actual20NigerCROPcurrent-hash/fullcoverage prerequisite remains.
+Three agents and allocation40255479remain active, with about31hours left. No idle/release recommendation while this work continues.
+All merges remain human-owned; no actualacquisition/shared-cachepromotion/newvenv/fingerprint-exclusion/all-country-full-suite verdict.
+
+Sue

@@ -681,3 +681,25 @@ Independent GH1210 review is still pending.
 Archive27 is being prepared from frozen releases under a root-approved scope; compression is not yet authorized and26remains the verified archive count.
 
 Sue
+
+* Archive-backed scopes classified and archive27 verified -- 2026-10-22 16:06 UTC
+
+Root archive-backed1173/1186 verifier returned0 after all172new packet entries,14880source entries,687old frozen entries and25authenticated original/copy products passed byte/physical gates.
+Uganda1173 provides seven NEW saved consistency pairs: six strict passes and one preserved full-axis failure, with zero original reference pairs recovered.
+The subset view retains3110unused household labels and seven unused waves from the saved all-wave operand; code widths remain int16/int8.
+An independent typed-attrs check retains21extra outside-subset wave-record nodes across population/sampling/recall.
+Actual decoder, original row-selection expression and unchanged per-frame annotation source bind both differences; no full equality or product defect is inferred.
+Mali1186 provides twelve original public strict comparisons and the original pure rename/count/key/total predicates.
+Original raw/native/helper/Make/test/expected memories and all earlier frozen holds remain unchanged.
+Archive1 authority establishes historical content/size/mode only, without exact original nanosecond-mtime/inode/nlink continuity.
+Safe outputs and the root metadata checker are published separately from original private frames.
+
+Archive27 writer35152 and standalone verifier returned0; root separately verified compressed digest, manifest, controllers, modes and verifier result.
+It includes1968files/19roots/4873986554source bytes with31explicit runtime/data/cache exclusions and exactly four approved source-snapshot text exceptions.
+Compressed size733844565; SHA2561a7a7369fcefb0d25dbad9d1a631d65a891783142e7312eba2d362bdd0478ccf.
+Manifestba0ce6c9f8fbaeb64a11427e166819a7c893c5da1e405b288144e992b8ad5e0d; launcher892d3cbb3653c94207179f16271b3a16852d958806d418237ab890ae0bb8827d; verifier1b84580fa42f63c2117cd0bafb3ac64fd59fdf5ef3797ffb761d0778fd1c771b.
+All included members/source-after/controller receipts, owner0600files, destination02700SGID/access0700and fsync checks pass.
+Archives1-26are unchanged; archival of a pending packet did not itself approve it.
+The root1173/1186acceptance was created after that archive froze; its public decision/checker are committed here.
+
+Sue
