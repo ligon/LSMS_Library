@@ -1291,3 +1291,42 @@ The pre-change private cold/fresh-process warm diagnosis retained 52,057 Mali ro
 The mapping is one-to-one: the intended change is source case only, with no amount, key, row, attribute, eligibility or reducer change.
 GhanaSPS's seven instrument-specific labels and GhanaLSS exchange/hired remain the separate Tier C part of #1121.
 See =.coder/ledger/1121-mali-labor-source.md= and =slurm_logs/isa_backlog_2026-10-21/Mali/1121/=.
+
+* 2026-10-21 -- community-price country concatenator retired (GH #1091, Mali portion)
+
+The framework is the sole country aggregator, under the settled GH #788 ruling.
+The country =_/community_prices.py= and its explicit var rule are retired; the
+2014-15 wave script, wave Make pattern and =materialize: make= declaration remain.
+Native =obs=1/2/3=, variety CODE, passage visit, Price, Poids(KG) Quantity,
+Description and the existing eligibility rules are unchanged from GH #822.
+The native wave still carries its deliberate =i==v= compatibility shim; the
+framework drops that redundant level to the seven declared public levels.
+
+The old Make country route returned all 155,931 rows of 2014-15 even for an
+unsupported 2017-18, 2018-19 or 2021-22 request, including their combined subset.
+Default returned zero, but a cold unsupported request still built the full
+2014-15 raw country frame and stamped only the requested unsupported coverage.
+That actual-row-wave/manifest mismatch is historical defect evidence, not a
+valid subset product.  Both backends now use the existing declared empty frame
+for unsupported subsets and the existing wave aggregation for supported data.
+
+Old Make public attrs lacked only =id_converted=True= relative to default.
+The authoritative full default attrs are now also the Make expectation; this
+explicit attrs change is distinct from unchanged values, order, dtypes and
+null masks.  The Make wave route writes no framework country cache, though it
+still reads/writes native wave caches normally; it is not a cache bypass.
+Country aggregation is available through Country/CLI materialize, while a
+direct request for the removed country var target has no rule.
+
+Empty unsupported outputs use the existing declared shape: visit/obs have
+string index dtypes, rather than the integer dtypes left by filtering the old
+full table.  Description is object at the API and becomes StringDtype through
+the unchanged generic parquet writer.  These are explicit empty-output
+consequences; supported API frames and matched CLI artifacts retain their
+separate full-frame and attrs comparisons.
+
+The retired Make comment said all EHCVM price files had "no grappe key".
+The current scheme and the earlier note in this file already distinguish the
+unwired 2018-19 grappe-grain s05 module from the 2021-22 region-grain file.
+GH #821 remains separate; this retirement wires no additional source.
+Niger and Tanzania remain separate GH #1091 country scopes.

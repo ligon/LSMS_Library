@@ -1,0 +1,150 @@
+# Prior-Art Ledger - GH1091 Mali community builder retirement
+
+Approved implementation based on reviewed #822/PR1180 at
+aba2badfe2f701a8b3793f1243fd8ed4fce18a53.
+Root read the complete diagnosis/proposal/test plan and approved the exact
+Mali-only script/rule retirement before this ledger-first commit.
+Search tier: ripgrep/git floor and direct Python/Make route inspection.
+Inherits `.coder/ledger/STANDING.md`, `CLAUDE.md`, canonical `data_info.yml`
+and `.coder/ledger/822-mali-community-price-readings.md`.
+
+## §1 Task, restated
+
+Retire only Mali's concatenate-only country community_prices builder in
+favor of existing framework wave aggregation, under settled #788 authority.
+Base on reviewed #822/PR1180, preserving155931 rows and native obs1/2/3;
+do not use f8's known incomplete40218-row result as the preservation oracle.
+Niger and Tanzania remain separate #1091 residual scopes.
+
+## §2 Existing machinery
+
+| Machinery | Source anchor | Existing controls | Decision |
+|---|---|---|---|
+| Country concatenator | Mali/_/community_prices.py:21-39 | actual Make cold/warm diagnosis | retire; no scientific operation exists |
+| Wave rule | Mali/_/Makefile:102-103 | actual default/Make source builds | retain byte-for-byte |
+| Country var rule | Mali/_/Makefile:105-106 | fresh-empty-root make -n | retire only this rule/recipe |
+| Native slot assembly | Mali/2014-15/_/community_prices.py:44-91 | test_mali_community_price_readings.py and source-backed822 proof | reuse unchanged |
+| Finalizer/i==v shim | Mali/_/mali.py:825-879 | test_community_prices_variety.py and822 controls | reuse unchanged |
+| _has_country_builder | country.py:4893 | test_gh1039_make_backend_no_country_rule.py | reuse actual predicate; no framework edit |
+| load_from_waves/absent_subset_frame | country.py:5008/:5249 |1039/1099 behavior, actual subset probes | reuse authoritative aggregation |
+| Required-column gate | country.py:5848 and _is_script_path:4867 | test_gh808_script_path_predicate.py | preserve materialize:make and wave script |
+| CLI materialize | cli.py:_load_table/_materialize/materialize | existing CLI tests | calls Country; no second concatenator |
+| IO/cache policy | STANDING.md §2/§4 | source/copy/current metadata gates | sanctioned get_dataframe/get_data_file/to_parquet only |
+
+Precedents: #1021/merge5b64a7796 removes dead derived scripts/rules;
+#1026/bad9b5dc7 removes Tanzania food_acquired.py/country rule while retaining
+its wave pattern; #808/d68f4b193 demonstrates dependency cleanup and retained
+script-path schema guard. These establish a method, not another country's
+measured source semantics.
+
+## §3 Definitions in force
+
+- #788 comments6244122374/6259387154: framework authoritative, one builder per
+  table, one country re-warm per retirement. This is settled, not a decision
+  request. #840/merged1086 accepted variety/visit/obs; do not reopen the grain.
+- Mali CONTENTS:1248-1268 and822 ledger: native obs1/2/3, variety CODE,
+  passage visit,155931 eligible rows, old obs3 exactly40218.
+- CONTENTS:801: Quantity is Poids(KG), Price is the lot quote. No new PDF read.
+- Scheme:329-383 declares seven public levels, optional Description and
+  materialize:make; native wave shim i==v is deliberately dropped by framework.
+
+## §4 Invariants and baseline caveats
+
+- STANDING.md §4 sanctioned IO, pre-finalize cache and id_converted rules.
+- Preserve all source rows, quantities/prices, units, descriptions, variety,
+  passage, obs; no reducer/index/mapping/source-eligibility change.
+- All-wave and supported2014-15 public values must match the complete reviewed
+  822 oracle, in actual order with exact axes/dtypes/null masks and logical attrs.
+- Existing Make public output lacks only id_converted=True relative to default.
+  This is a measured pre-existing attrs difference, not normalized equivalence.
+  Framework-authoritative expected attrs are the DEFAULT full attrs; a later
+  Make route change must report the explicit id_converted addition.
+- Default COUNTRY raw has seven levels/id_converted=True/current hash/coverage;
+  Make's COUNTRY script raw has eight shim levels/attrs{}/no hash or coverage.
+  Raw-layer equality is scoped honestly; do not declare these complete frames
+  equal after dropping metadata or silently stripping the shim.
+- Unsupported strict subsets must return declared empty frames; baseline Make
+  may return unrelated2014-15 data. Never require preserving that defect.
+- Current Make backend can write script-produced COUNTRY caches. After country
+  retirement its framework wave route should write NO COUNTRY cache, while
+  legitimately reading/writing wave caches. It is not a cache bypass.
+
+## §5 Reuse decision
+
+Delete duplicated aggregation and reuse the existing framework. No new helper,
+generic var recipe, manual stamp, independent CLI concatenator or framework edit.
+Retain materialize:make because the wave script remains the source builder.
+No data_scheme edit is required; comments should be corrected only in the
+Makefile already being edited and in CONTENTS, not unrelated stale prose.
+
+## §6 Approved boundary and residual
+
+Root approved deletion of the country concatenator, removal of only its
+explicit var rule/recipe and bounded adjacent comment correction, a dated
+CONTENTS note, focused tests and safe task evidence. Retain the exact wave
+pattern/script, scheme materialize:make, finalizer/driver/framework, units,
+measurements, eligibility, IDs and variety/visit/obs grain.
+
+Intended old-Make changes are explicit: unsupported subsets become declared
+empty; supported full attrs equal authoritative DEFAULT including
+id_converted=True; the Make framework wave route writes no COUNTRY cache.
+No attrs stripping, payload normalization or wrong-wave preservation.
+
+Niger/Tanzania remain conditional residual scopes of #1091. No GitHub writes,
+public PR or integration change is authorized here. Root opens a stacked PR
+on actual1180 only after independent review; do not close #1091.
+
+### Phase 3 diagnosis verification
+
+OK (sections2-5):12 normal empty-target cold requests and6 fresh-process warm requests preserve complete native frames;18 native/18 raw country comparisons are exact against their separately identified822 layer oracles.
+OK (sections3-4): supported public payload/full DEFAULTattrs are exact822; baseline Make differs solely by absent id_converted=True, explicitly retained as a finding.
+CONTRADICTION (section4): existing Make serves155931 unrelated2014-15 rows for every unsupported strict request and the combined subset; no product equivalence is accepted.
+OK (sections2/5): actual fresh-empty Make rule probe is positive, all has no community dependency, and both deletion/removal are necessary to select existing wave aggregation.
+OK (sections3-4):18 source-backed native frames retain obs1=66699/obs2=49014/obs3=40218 and passage counts66159/89772.
+OK (section4): both actual Feature argument variants preserve all payload/common recursively typed attrs, with sole id_converted delta visible; actual CLI forwarding reproduces supported/default and unsupported/Make behavior.
+Postchange tests,549/39inventory and independent review remain FUTURE gates; protection/quiescence receipts accompany the final read-only release.
+This ledger is committed FIRST on the approved focused writer based on
+reviewed822, before production/tests. Phase3 implementation verification
+will be recorded after measured source, hash, backend, attrs and subset gates.
+
+### Phase 3 implementation verification
+
+- OK (sections 2-5): the exact country script/rule is retired; the wave
+  pattern, wave script, scheme, finalizer, driver and framework are unchanged.
+- OK (sections 3-4): 40 actual runtime stages (20 initial and 20 fresh-process
+  warm) preserve supported 155931-row frames in exact order, axes, dtypes,
+  masks and recursively typed attrs against the reviewed 822 parent DEFAULT.
+  Native shim and COUNTRY layers are compared against their separate oracles.
+  All three obs counts and both passage counts remain exact.
+- OK (section 4): both backends return zero rows for each unsupported strict
+  subset and their combination, in empty and populated states. No community
+  source build or cache write occurs for these requests. Existing Make's
+  missing id_converted=True is intentionally corrected to DEFAULT full attrs.
+- OK (sections 2/4): Make writes no new COUNTRY parquet. Its two supported
+  fresh-process warm calls naturally rebuild the hashless native wave file,
+  preserving bytes/size/mode; DEFAULT warm calls write no cache files.
+- OK (sections 2/4): 111 focused pytest cases pass with zero skips/errors;
+  the one explicitly deselected requires_s3-marked 822 public test function
+  separately passes with physically held sources. The 28 new controls yield
+  24 meaningful failures and four passes on untouched aba2badfe.
+- OK (section 4): actual Mali/Niger Country and default/explicit currency=None
+  Feature frames (201974 rows each) match parent full frames and typed attrs;
+  Niger's current-hash/full-coverage cache is byte/mode/mtime unchanged.
+  Both complete scanner phases yield the same two raw WARN records, byte-exact.
+- OK (section 4): 42 physical copies of two held sources pass sidecar MD5 and
+  copy SHA/size/mode/mtime/inode gates before APIs. No acquisition occurs.
+- OK (section 5): the actual inventory, measured before rebuilding, changes
+  exactly 24 Mali hashes; 525 other-country hashes and all 39 tagged framework
+  fingerprints remain exact. This is not an output claim for the other tables.
+- QUALIFIED (sections 2/4): CLI stages remain distinct. Supported pre-write API
+  frames match parent API; post-read artifacts match parent artifacts with
+  complete typed attrs and footer metadata. Unchanged JSON attrs serialization
+  can change Python container types across those stages. Unsupported API
+  matches the actual declared-empty factory/finalizer; visit/obs are str rather
+  than the old filtered table's int64. The unchanged parquet writer converts
+  its empty object Description to StringDtype. No frame/attrs normalization or
+  framework/writer edit is used to declare equality.
+- OK (section 4): strict API audit passes; original diagnosis/822 evidence and
+  all three protected source trees remain exact. Final clean publication and
+  zero-consumer receipts accompany READY for independent review. Independent
+  review and composition remain required; this is not an author PASS.
