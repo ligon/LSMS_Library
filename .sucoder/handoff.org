@@ -1037,3 +1037,21 @@ Previous goal turn was progress: Niger1200PR/CI/indie acceptance, Tanzania concr
 This turn revalidated liveagenthandles/currentcleanrepos and preparesnextcountrytask while those specificworkers continue.
 
 Sue
+
+* Mali empty-result wording qualification and current lanes -- 2026-10-22T02:23:36.259365+00:00
+
+Original1199/9e and bounded18/f9 runtime proofs remain at their exact heads.
+Reviewer found two overbroad Mali CONTENTS paragraphs: unsupported results are zero rows, but dtypes/attrs depend on route and available cache coverage.
+Root prepared documentation-only b4ad74d5da39f939a7c2ecec030891cb82c02ade and18descendant471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3, FS-published only.
+Each separate metadata-only census measured549API/39framework hashes unchanged, tests/other paths/modes exact,0network/denials/parquets; no API/test/decode replay.
+Independent wording review pending; public1199 remains9e and its priorCI pertains onlyto9e.
+New source19descendant2566a3e490c0aefe03ab31d538d7d04e9b77c77e versus471 has exact12Niger670-vsd602 path/blobs/modes.
+New detached control/private metadata targets and queued-nineteen-docs brief prepared; old60/f9 checkouts/brief remain unchanged.
+No19reviewer/build/verdict/publication; gate on released18rootacceptance and bounded wording review.
+Uganda1198 corrected source/backends/fullframes and scanner complete; author finaldocs/ledger/freeze pending,392PASS10unrelatedSKIP.
+Tanzania1091 runtimeccc/source/CLI/scanner complete,85PASS; finalfreeze exposed literal-link baseline and overwritten partial-aggregate evidence limitations, both retained explicitly.
+No independent Uganda/Tanzania implementation review or newPR yet; three agents still assigned.
+All19existingPRs remainopen/unmerged/exactheads/bases at01:49:18UTC snapshot; no newerCI claim.
+No public merge/issueclosure; goal active.
+
+Sue

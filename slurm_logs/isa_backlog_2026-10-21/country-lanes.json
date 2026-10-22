@@ -220,7 +220,19 @@
       "active_review_verdict": "PASS111 focused tests,24meaningful parent failures/fourpasses,40candidate stages,full source/native/public/typed-attrs/CLI/Feature/scanner/hash controls; exact handling and metadata-access qualifications retained.",
       "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1199",
       "active_ci": "success; run39699773895",
-      "active_publication": "Root accepted complete independent source and comparator proof; final exact head pushed and PR1199 opened. No public PR merged and no global18 composition proof."
+      "active_publication": "Root accepted complete independent source and comparator proof; final exact head pushed and PR1199 opened. No public PR merged and no global18 composition proof.",
+      "pending_documentation_qualification": {
+        "candidate": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+        "original_public_PR1199_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+        "public_PR1199_head_advanced": false,
+        "scope": "Two CONTENTS paragraphs qualify empty-result route/coverage-dependent dtypes and attrs",
+        "API_hashes_unchanged": 549,
+        "framework_fingerprints_unchanged": 39,
+        "data_API_decode_test_replay": 0,
+        "independent_wording_review": "pending",
+        "original_runtime_proofs_preserved": true,
+        "proof": "1091-Mali-documentation-qualification/"
+      }
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -353,7 +365,7 @@
       "active_branch": "fix/1091-tanzania-community-builder-20261022",
       "active_baseline": "99c824079da480ab2646e499c06ac70e457ff271 (ledger-only descendant; runtime/tests exacte75)",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix",
-      "active_status": "Root approved concrete two-path retirement; isolated implementation dispatched, no candidate verdict/PR",
+      "active_status": "Author runtime/source/scanner matrices complete, final docs/ledger/freeze pending; no finalREADY or independent review.",
       "active_precode_ledger": "aa62795ce (prefix; committed before diagnosis functions)",
       "active_CONTENTS_read": "Complete2142lines incl WAITING114; blob9424a5042b9880d6c48aba17af0e8d3cadc45ccb",
       "active_source_boundary": "Community modules plus gated healthy comparator only; reviewed408plot_inputs normalization retained through immutable source/prior proof, no new AG staging or plot-input build.",
@@ -393,7 +405,10 @@
         "framework_total_unchanged": 39,
         "precode_ledger": "aa9745963 (prefix; before production changes)",
         "final_candidate_verdict": null
-      }
+      },
+      "active_runtime_head": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
+      "active_final_interim": "85focusedPASS; identical27parent controls20FAIL7PASS0error/skip;20cold20warm20populated candidate requests;17699source rows/healthyMali40218/pooled57917/current matchedCLI/scanner4exactWARN.",
+      "active_evidence_limits": "Bootstrap readlink normalized literal convenience-link text; separate raw Git-blob corrective receipt required. Original partial aggregate JSON overwritten before archive; surviving per-call frames/endpoints/log/script support checks, reconstruction explicitly not original. Both freezer stops retained; no data/API/test replay."
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
@@ -541,7 +556,7 @@
       ],
       "active_prior_work_roots_frozen": true,
       "active_interim_finding": "First ordinary default/Make cold builds133761 rows; source oracle complete/native/public133761,403 old null-key exclusions,928 null-v. Default fresh warm0/144 cache files. Make warm17 byte/mode-identical mtime changes retained as a stopped zero-write expectation; actual parent counterpart pending. Whole harvest/median/real-area yield/tests remain active.",
-      "active_status": "Implementation and source-backed validation active; no independent verdict or PR yet",
+      "active_status": "Author finishing docs/ledger/freeze; corrected final matrices and scanner complete; no finalREADY or independent review yet.",
       "active_private_addendum": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum",
       "active_exact_addendum_result": "85 exact saved-artifact checks and seven comparator negative controls pass; unsaved constructor/currency/Feature/finalizer scope gaps explicit. Original sources and reports remain unchanged.",
       "factor_mapping_issue": 849,
@@ -599,7 +614,9 @@
           "cause": "Old canonical declaration expectations require scoped production_obs/sentinel update; original stopped outcomes retained"
         },
         "identity_edge_correction_and_affected_reverification": "active; declared production_slot, not iteration position, must define locator collision"
-      }
+      },
+      "active_final_interim": "392PASS10explicitunrelatedSKIP0FAIL/ERROR;133761rows bothbackends;85completeframes/source science operands;Default warm0/144,Make17mtime-only changes matchingactualparent;scanner51to41WARN,22unchanged29removed19added,0FAIL/ERROR/cachewrites.",
+      "active_evidence_limits": "Original34-pass XML overwritten by later39-pass XML; original log survives, oldXML bytes absent. Currency actual saved APIs versus artifact-only reconstruction must remain distinguished. Existing unsupported2005countrybuilder and parcel-join/documentation issues are separate residuals; no repair here."
     }
   },
   "shared_lanes": {
@@ -980,12 +997,24 @@
       "path": "/local/job40255479/worktrees/isa-integration-eighteen",
       "branch": "isa/integration-eighteen-20261022",
       "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/mali-eighteen-review",
-      "status": "Independent bounded Mali1199 composition review dispatched; no18verdict/GitHub publication",
+      "status": "Runtime/source matrices complete; reviewer final seal pending. Two CONTENTS overstatements require separately reviewed documentation descendant; no18 GitHub publication.",
       "merge_resolution": "Complete prior17Mali CONTENTS prefix plus exact reviewed1199 addition; all nine other changed blobs/modes exact1199",
       "root_prepared_metadata_targets": true,
       "reviewer": "niger_lane",
       "brief": "integration/mali-eighteen-review/NEXT-REVIEW-BRIEF.md",
-      "interim_result": "111focusedPASS0skip; identical28actual17controls24meaningfulFAIL4PASS0error/skip; actual24Mali/525others/39framework prebuildscope; source oracle155931 and current correctedNiger46043/76masks/30lateobs. Runtime matrices remain active; no verdict."
+      "interim_result": "111focusedPASS0skip; actual17 identical28 controls24FAIL4PASS0error/skip; 48candidate stages/28parent controls,155931 native readings,177 artifact inputs,2 exact scannerWARN,40 exact warning multisets. Final release/rootacceptance pending.",
+      "pending_documentation_descendant": {
+        "head": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+        "branch": "isa/integration-eighteen-docs-20261022",
+        "path": "/local/job40255479/worktrees/isa-integration-eighteen-docs",
+        "base": "f9feb3c807aff5206134c37768992302ceb431fa",
+        "tests_and_other_blobs_modes_exact": true,
+        "API_hashes_unchanged": 549,
+        "framework_fingerprints_unchanged": 39,
+        "wording_review": "pending",
+        "data_API_decode_test_replay": 0,
+        "proof": "1091-Mali-documentation-qualification/DOC-QUALIFICATION-INTEGRATION18-PROOF.json"
+      }
     },
     "pending_nineteen": {
       "head": "60d2281abfff72bc9dccb6256cffac623f42e28f",
@@ -994,10 +1023,26 @@
       "path": "/local/job40255479/worktrees/isa-integration-nineteen",
       "branch": "isa/integration-nineteen-20261022",
       "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/niger-nineteen-review",
-      "status": "Prepared source snapshot only; no reviewer/test/API build/verdict/GitHub publication. Await released root acceptance of18 before dispatch.",
+      "status": "Historical source-only preparation retained; superseded for future dispatch by documentation-qualified source preparation below. No original19 reviewer/build/verdict/publication.",
       "source_proof": "All twelve changed blobs/modes exactly match reviewed670de9c versus actuald602; merge clean, no conflict.",
       "root_prepared_metadata_targets": true,
-      "next_brief": "integration/niger-nineteen-review/NEXT-REVIEW-BRIEF.md"
+      "next_brief": "integration/niger-nineteen-review/NEXT-REVIEW-BRIEF.md",
+      "documentation_descendant_preparation": {
+        "head": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+        "control": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+        "branch": "isa/integration-nineteen-docs-20261022",
+        "path": "/local/job40255479/worktrees/isa-integration-nineteen-docs",
+        "control_path": "/local/job40255479/worktrees/isa-integration-nineteen-docs-base",
+        "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/niger-nineteen-docs-review",
+        "source_proof": "Exact12Niger path/blob/mode delta670vsd602; only exact two-paragraph Mali documentation differs from old60; Mali CONTENTS equals471.",
+        "root_prepared_metadata_targets": true,
+        "review_assigned": false,
+        "tests_builds": 0,
+        "verdict": null,
+        "GitHub_publication": false,
+        "next_brief": "queued-nineteen-docs/NEXT-REVIEW-BRIEF.md",
+        "dispatch_gate": "Released18 rootacceptance plus bounded Mali wording review"
+      }
     }
   }
 }
