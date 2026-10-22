@@ -185,3 +185,80 @@ implementation. Safe evidence lives in
   25 Tanzania/524 others/39 framework hash scope is explicitly unmeasured
   until an actual approved patch. No broad corpus/suite or multi-country
   composition claim; stop for ROOT review before implementation.
+
+## Approved implementation phase - 2026-10-22 UTC
+
+Root accepted the frozen diagnosis/proposal after reading the actual Make DAG,
+source oracle, strict comparisons and safe-export implementation. The decision
+is pinned privately at `Tanzania/1091-fix/ROOT-ENGINEERING-DECISION.md`.
+Implementation starts from clean `99c824079da480ab2646e499c06ac70e457ff271`;
+its runtime/tests equal reviewed PR1185
+`e75be9c56fa6c318ce32cea5a8be6d448578bed1`. The separate parent checkout stays
+immutable, and the completed diagnosis/evidence stays frozen.
+
+The current CONTENTS blob is exactly
+`9424a5042b9880d6c48aba17af0e8d3cadc45ccb`; carry the complete 2142-line
+reading and named/quoted findings in section 3, including TODO/WAITING/LOGBOOK.
+Live PR1185 is open/unmerged on its actual
+`fix/1118-tanzania-unknown-units-20261021` branch at e75; do not imply a merge.
+
+### Production allowlist and reuse
+
+- Delete only the 45-line `Tanzania/_/community_prices.py` country concat.
+- Remove only original Make145-149 (two sole-use discovery variables, blank,
+  explicit country rule and recipe). Preserve blank150, wave151-152,
+  generic154-155 and every other Make byte.
+- Reuse `_has_country_builder`, authoritative wave aggregation, finalizer,
+  required Price guard, sanctioned IO/hash/coverage machinery from section 2.
+  No new concatenator, selector patch, Quantity addition or science policy.
+- Keep both native scripts, tanzania.py, units/maps, eligibility, own price/
+  basis, native interview v/i==v, variety/grain, IDs, xwalk, schemas/materialize,
+  framework and dependencies byte-exact. Keep the separate reviewed 408-unit
+  plot-input proof without AG staging or plot-input rebuild.
+- Additional tracked scope: one meaningful targeted test file, this ledger,
+  a dated CONTENTS addition at the actual file end, and safe aggregate reports.
+
+### Required measurements before acceptance
+
+Measure all 549 API hashes and 39 framework fingerprints against the exact
+immutable parent in separate source-asserted processes BEFORE source rebuilds.
+The predicted 25 Tanzania/524 other/39 framework split is not a result until
+measured. Preserve any country-wide re-warm cost; do not change registry/schema.
+
+New tests use actual source Makefile/country-script presence, six logical waves
+and the real four-to-one older folder map, two distinct native script outputs,
+real selectors/exists/Make and no fabricated absence. Run the same new test
+file unchanged on parent/candidate; meaningful parent failures must have zero
+fixture errors. Cover supported/unsupported/combined/mixed requests, optional
+Description and required Price without Quantity, protected existing country
+cache, generic/wave/all DAGs, full native grain and attrs.
+
+Fresh physical held sources pass terminal MD5/SHA/size/mode/mtime/nlink/inode
+gates before any decoding/API. Use both backends at cold, separate-process
+new-object warm and genuinely current populated stages, all six logical waves.
+Persist endpoints before assertions; classify added/deleted/modified files.
+Default zero writes require receipts. Natural Make hashless native eviction/
+rewrites are measured, while Make must neither create nor serve/overwrite a
+country cache on the new wave route.
+
+All frame comparisons retain strict dtypes/classes, axis names/order/unused
+levels/codes, nulls and recursively typed full attrs, including immutable record
+`_FIELDS` presence/values; pandas float tolerance is not enough. Use exact
+checks with rtol=atol=0. Preserve measured empty Description/id_converted and
+JSON attr serialization distinctions without normalization. Reuse the direct
+source oracle, all native/walked/normalized/raw/public layers, separate default/
+currency=None Feature controls, current full-coverage healthy comparator, CLI
+prewrite/postread/complete Arrow controls and individual scanner accounting.
+
+### Operational boundary and final stop
+
+Only the new candidate/parent ignored DVC tmp resolutions are metadata-write
+exceptions. All data/config/XDG/temp and diagnostics are new/private, mounted
+image with exact cwd/package/countries/config/data identities, offline/write
+guards plus unshare -rn, numeric/build/Make threads one, at most two explicit
+loadfile pytest workers. No acquisition, DVC CLI, shared mutation, cache bypass/
+clear/stamp, source/fixture/golden/dependency change or broad suite/corpus build.
+Keep safe exports separate from private basenames. Report substantive unexpected
+behavior before expansion. Freeze a clean attributed published author head,
+strict evidence and zero consumers for a DIFFERENT independent reviewer;
+no author PASS, GitHub write, public merge or issue closure.
