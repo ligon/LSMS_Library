@@ -1,0 +1,12 @@
+{
+  "status": "ROOT_PRIVATE_TRACE_IDENTIFIER_EXPORT_SCAN_PASS",
+  "trace_sha256": "0224b6b293a73d638017878064035a4f3bfb364e334cd3690336bf14be154971",
+  "whole_trace_identifier_candidates_scanned": 40,
+  "reported_identifiers_in_earlier_filtered_tool_output": 4,
+  "exact_allowlisted_safe_files_scanned": 8,
+  "matching_safe_export_files": [],
+  "identifiers_repeated_or_exported": false,
+  "scope": "All quoted32hex and8+-digit identifier tokens from the authenticated WHOLE private failure trace. This superset differs from the four identifiers displayed by an earlier filtered reader. No payload decode.",
+  "root_initial_privacy_helper_stop": "Original inline helper chunk3828b6 exit1 wrongly required whole-trace token set equal4filtered-output identifiers; no mutation/output of identifiers. Original tool input/return remains in tool history. Diagnostic chunkaa5171 printed counts/lengths only.",
+  "signed": "Sue"
+}
