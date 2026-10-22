@@ -19,9 +19,9 @@ from lsms_library.paths import countries_root
 
 UNKNOWN_21 = 'Unknown [Burkina_Faso 2018-19 s16bq01=21]'
 CROP_BY_CODE = {
-    11: 'Mil', 12: 'Sorgho', 13: 'Maïs en grain', 14: 'Riz Paddy',
+    11: 'Mil', 12: 'Sorgho', 13: 'Maïs', 14: 'Riz Paddy',
     15: 'Autre céréale', 16: 'Coton', 17: 'Sésame',
-    18: 'Niébé/Haricots secs', 19: 'Autre tubercule',
+    18: 'Niébé', 19: 'Autre tubercule',
     20: 'Autre crop', 21: UNKNOWN_21,
 }
 INPUT_BY_CODE = {
