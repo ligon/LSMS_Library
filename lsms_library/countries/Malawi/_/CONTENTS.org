@@ -3094,3 +3094,30 @@ The existing =Wave._input_hash= content-hashes every Python build input in each 
 This actual measurement disproves the earlier read-only diagnosis's tentative narrower-footprint hypothesis; its frozen receipts are not rewritten.
 Normal serving consequently rebuilds the unchanged =sample= prerequisite across all five waves when its old hash is present; this was run using held cover-page inputs, without a read-gate bypass or stale re-stamp.
 Physically fresh baseline and candidate sample builds preserve all 57,118 rows, every wave/cache frame, dtypes and attrs, and the same 18 categorical warning records; fresh-process warm serving writes nothing.
+
+* 2026-10-22 -- derived food registrations (GH #218, Malawi-only)
+
+The remaining null =food_expenditures= and =food_prices= entries in
+=_/data_scheme.yml= are removed.
+The retired-family note above already says these products "now derive from
+food_acquired"; the raw registrations were still present despite that decision.
+The public products remain available: =Country.data_scheme= appends
+=food_expenditures=, =food_prices= and =food_quantities= from the existing
+=food_acquired= declaration, and =Feature= discovers them through that source.
+The public method order and empty materialization metadata are unchanged.
+
+This registration cleanup preserves the distinctions recorded above:
+2013-14 is panel-only, the later waves combine cross-sectional and tracking
+populations, IHS2 derives metric factors from its unit labels, and IHS3+
+conversion tables are region-keyed.
+It changes no source, identifier, factor, unit, valuation or reduction rule.
+GH #218 remains open for the other countries and shared cleanup.
+
+A separate existing Make limitation was measured on release f8 and this cleanup:
+the country =_/food_acquired.py= still expects pre-canonical =u_consumed= /
+=quantity_consumed= columns, while all five wave scripts now emit the canonical
+=(t, i, j, u, s)= table.
+The Default API serves 971,531 food rows; the country Make route raises
+=RuntimeError= after the concatenator's =KeyError: 'units'=.
+The same failure affects its three derived callers and is left for a separate
+builder diagnosis; removing these two registrations changes neither outcome.
