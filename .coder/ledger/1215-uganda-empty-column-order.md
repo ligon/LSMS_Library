@@ -13,14 +13,16 @@ uses another order. Establish the existing contract and all affected callers,
 then propose a bounded boundary and meaningful checks. This is a Tier C
 schema-order proposal, not authority to change production, schema, or tests.
 
-## §2 Existing machinery (initial grounding; source anchors to be resolved)
+## §2 Existing machinery (source anchors at a417)
 
 | machinery | source authority | role | coverage status | decision |
 |---|---|---|---|---|
-| `Country._empty_declared_frame` and every caller | `country.py`, named by the root brief | existing typed-empty constructor | inspect GH1099 tests before proposing changes | reuse/possibly extend |
-| Required/optional declared-column enumeration | `data_info.yml`, country `data_scheme.yml`, `country.py` | schema membership and existing ordered declarations | inspect static definitions and tests | reuse |
-| Raw-to-public projection and `_finalize_result` | `STANDING.md` §2/§4; `country.py` | post-read coercion, metadata, ID walk and sample join | existing integration surface; no runtime in this phase | reuse |
-| Uganda native crop assembly | `Uganda/_/CONTENTS.org`, final GH1204 section | requested native waves on Default and Make | original 1204 strict residuals remain failures | reuse |
+| Module-level `_empty_declared_frame` | `country.py:1050` | required-then-optional typed-empty constructor | GH1039 test431; only required x followed by optional y, so order policy is not discriminated | reuse/possibly extend |
+| `_required_scheme_columns`, `_optional_scheme_columns` | `country.py:1020/1038` | existing ordered membership within each group | GH323 site4 test181; null-read optional test232 | reuse without changing membership/audit semantics |
+| `absent_subset_frame`, `load_from_waves` | `country.py:5004/5249`; constructor calls5027/5403 | only two production constructor callers | GH1099 matrix310 and error/lazy-hit controls; GH1204 barren test146 | preserve routing/cache/error boundary |
+| `_finalize_result`, `_restrict_to_waves`, cache reads | `country.py:3815/4357/4434/4637` | ordinary finalization; cache row restriction preserves column order | existing GH1099 strict one-field empty controls | preserve |
+| Native crop projection | `countries/Uganda/_/uganda.py:1568/1645`; scheme127 | explicit eight-column order equals original declaration order | native producer source; existing GH1204 fixture is not the exact eight-column order oracle | reuse as independent order authority |
+| `Feature.__call__`, `_harmonize_country_frame` | `feature.py:1081/695/1186` | skips empties, may drop nonempty all-NA columns, concatenates native columns | canonical-index/assembly tests | preserve; not a typed-empty schema oracle |
 
 ## §3 Definitions & conventions in force
 
@@ -54,21 +56,36 @@ schema-order proposal, not authority to change production, schema, or tests.
 
 | quantity | decision | reason |
 |---|---|---|
-| Column identity/order authority | reuse | trace existing ordered declarations/writers before proposing policy |
-| Empty dtype/index construction | reuse/possibly extend | existing constructor and GH1099 are the regression boundary |
-| Metadata/Feature verification | reuse | propose bounded existing surfaces; no new public grain or oracle |
-| Static census | new private analysis only | enumerate source declarations/callers without importing the package or parsing YAML tags |
+| Column identity/order authority | reuse | actual Uganda declaration and explicit native projection agree; no universal native-order promise found |
+| Empty dtype/index construction | reuse/possibly extend | recommend original entry iteration restricted to existing required/optional membership; root Tier C decision remains pending |
+| Metadata/Feature verification | reuse | bounded same-request attrs, typed axes, optional-presence and synthetic healthy controls; no new public grain |
+| Static census | new private analysis only | stdlib lexical inventory38 scheme files/448 entries;48 optional-bearing;33 order-sensitive across21 countries; no runtime reachability inference |
 
 ## §6 Open questions for root
 
-- Which ordering is already promised by contract/tests, and where do native
-  writers intentionally differ from declaration order?
-- Would preserving original declaration order be a coherent empty-only rule
-  across all callers, including optional-only/no-column/index declarations?
-- What bounded parent-failing controls and healthy metadata/Feature checks are
-  needed before a separate implementation release?
+- Choose narrow original-declaration order in the existing constructor, or a
+  larger explicit public-empty normalization contract. The first aligns the
+  motivating Uganda paths, but cannot promise every native/cached writer has
+  the same order or optional membership.
+- The constructor is reachable from the all-table tagged aggregator and is not
+  fingerprint-excluded; actual549/39/1362 hash cost is unmeasured and must be
+  assessed before any separately released data build.
+- The concrete proposal and bounded actual-parent/healthy/metadata/Feature
+  controls are in the private PHASE0.md. No implementation/runtime is released.
 
 ### Phase 3 - verification
 
-Pending static diagnosis. This initial grounding ledger is committed before
-nontrivial source analysis; the final ledger will cite exact source anchors.
+- OK (anchored on §2/§5): recommendation reuses ordered schema membership and
+  existing typed-empty construction; no new constructor or schema hardcoding.
+- OK (anchored on §3/§4): no production/schema/test/data change; all original
+  author four strict failures remain failures. No package/numerical import,
+  payload read/copy, API, test, build or acquisition was performed.
+- CONTRADICTION retained (anchored on §3): historic2018-only factors versus
+  dated newly-wired rounds, universal parcel-match claim versus held-area
+  qualification, and source-season shorthand versus actual module chronology.
+  They authorize no scientific/identity rewrite in an order task.
+- Static census v1 stopped at the existing CLAUDE->AGENTS link before schema
+  analysis; v2 explicitly binds that link and target and completes0. Both
+  sources, original terminal1/stderr and corrected terminal0 are retained.
+- Initial ledger commit467b3b59c preceded analysis; this final ledger records
+  the bounded proposal only. Root owns the unresolved Tier C decision.
