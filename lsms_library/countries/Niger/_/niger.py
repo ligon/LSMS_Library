@@ -1352,6 +1352,13 @@ def _item_labels(item_series, item_map):
 
 # Price sentinels meaning "no answer / not recorded" in the CS07 grids.
 _COMMUNITY_PRICE_SENTINELS = (9999.0, 99999.0)
+# Quantity additionally carries the nominal 9999.9 missing code (GH #1088;
+# ledger 1088, section 4).  The held 2014 columns are Stata doubles holding
+# 9999.900390625, the promoted float32 representation; their earlier storage
+# history is unknown.  Match both exact forms, without rounding other weights
+# or extending the Price filter.
+_COMMUNITY_QUANTITY_SENTINELS = _COMMUNITY_PRICE_SENTINELS + (
+    9999.9, float(np.float32(9999.9)))
 # Unit Preferred Labels that mark the product as absent / missing in the
 # cluster — these rows carry no surveyed price and are dropped.
 #
@@ -1452,11 +1459,11 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
     for slot, (pcol, qcol, ucol) in enumerate(triples, start=1):
         price = pd.to_numeric(df[pcol], errors='coerce').astype('Float64')
         qty = pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
-        # Quantity 0 / 9999 / 99999 are "no answer" markers, not a measured
+        # Quantity 0 / 9999 / 9999.9 / 99999 are "no answer" markers, not a measured
         # basis — null them (the surveyed Price row is still kept; only the
         # missing quantity basis is dropped, per the reported-only rule).
         qty = qty.where((qty > 0)
-                        & (~qty.isin(_COMMUNITY_PRICE_SENTINELS)), pd.NA)
+                        & (~qty.isin(_COMMUNITY_QUANTITY_SENTINELS)), pd.NA)
         u = _unit_labels(df[ucol].astype(str).str.strip(), unit_map)
         piece = pd.DataFrame({
             'v': v.values, 'j': j.values, 'u': u.values,
