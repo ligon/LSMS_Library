@@ -5,8 +5,8 @@
   "repository_open_issues": 173,
   "isa_related_open_issue_records": 114,
   "pr_linked_issue_records": 27,
-  "active_issue_records": 2,
-  "other_open_issue_records": 85,
+  "active_issue_records": 3,
+  "other_open_issue_records": 84,
   "open_unmerged_implementation_prs": 30,
   "initial_in_scope_still_open": 96,
   "new_campaign_issue_records": 18,
@@ -419,7 +419,9 @@
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Wire both2018 s05 price readings, size-resolved unit mapping, and correct false absence comment; leave2021 region-grain module as distinct design.",
-      "scope_recheck_required_before_dispatch": true
+      "scope_recheck_required_before_dispatch": true,
+      "current_dispatch_assessment": "Mali2018community price wiring remains viable; direct currentCONTENTS901-946 contradict issue proposal to copy2014Poids denominator. Source2018declaredfields shown in notes are unit-size/code and two recordedPrices, not2014weight fields. Preserve native size labels; do not fabricateWeight/Quantity or unit crosswalk. Use actual pre-code ledger, full country docs and source-field diagnosis.",
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
     },
     {
       "number": 822,
@@ -453,7 +455,9 @@
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Wire both s05 readings with size-resolved unit crosswalk, native variety/visit/obs; correct false no-file comment.",
-      "scope_recheck_required_before_dispatch": true
+      "scope_recheck_required_before_dispatch": true,
+      "current_dispatch_assessment": "Niger2018community price wiring viable but countryCONTENTS1183-1206 explicitly defers while native size-qualified unit crosswalk is missing. Quote/reconcile that note; preserving native reported labels and delivering downstream comparability are separate claims. Do not infer2014weight basis.",
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
     },
     {
       "number": 824,
@@ -1459,7 +1463,9 @@
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Fill every missing unit with existing U_UNKNOWN at build, including native Malawi u index; retain use/cost records with no quantity. Nigeria dropping non-input rows is optional separate decision, not needed to fill.",
-      "scope_recheck_required_before_dispatch": false
+      "scope_recheck_required_before_dispatch": false,
+      "current_dispatch_assessment": "Mali and Malawi remaining null-unit normalization are stronger next mechanical candidates under settled1041. Stack Malawi after1175/1193; preserve source eligibility, unchanged known units and postcollapse grain. Nigeria fill-vs-drop remains a separate source-eligibility decision.",
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
     },
     {
       "number": 1119,
@@ -1613,7 +1619,9 @@
       "current_active_scope": null,
       "initial_triage_tier": "A",
       "initial_triage_approach": "Keep SPAN and no threshold. Add measured cluster-renumber counts and linked-household change share net of movers to boundary records and warning first line; test Nigeria 2016Q1->2018Q3 and a 100% boundary.",
-      "scope_recheck_required_before_dispatch": true
+      "scope_recheck_required_before_dispatch": true,
+      "current_dispatch_assessment": "Initial A classification is historical; current source measurements do not satisfy the complete settled measurement contract. Do not dispatch an all-unknown formatter patch or treat moved-prefix filtering as all-movers removal.",
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
     },
     {
       "number": 1136,
@@ -1848,7 +1856,7 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Author657final/runtime3d frozen and root-authenticated;967entries/29788sources/6providers25copies exact. Original398PASS60FAIL retained plus56additive storagePASS;4emptydtype failures1218 remain. Independent calibration/fullmaps/14synthetic+397supportingPASS; Exact guard read-policy adapter approved; realdata conditionally released after fresh synthetic-only capability gate,24copies25343300bytes. No completed independent data result yet.",
+      "current_active_scope": "Author657/runtime3d frozen and root-authenticated. Independent 14 targeted+397 support PASS; eight normal actors0/40 calls, 151 original comparisons=111PASS+40prewriter-storageFAIL; four additional parent-based empty references retain2DefaultPASS+2Make dtypeFAIL owned1218. Final protection passed; seal/root authentication pending.",
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": true
@@ -2007,7 +2015,7 @@
       ],
       "implementation_prs": [],
       "residual": "Four new zero-row column-order failures exposed by1204routing repair; preserve all strictfindings and choose a stable public empty-column contract across cold/covered-cache/Make.",
-      "current_active_scope": "Human declaration-order policy implemented atf7c on actuala417.13new+88supportingPASS; actualparent6FAIL7PASS. Actual549/39/1362hashes allmove. Rootreleased37providers/4roots/148copies177769212bytes; providerprep0, firstDefaultsequenceactors active. Full data grid/freeze/independentreview pending.",
+      "current_active_scope": "User-approved declaration order atf7c vs actuala417. Author13new+88supportPASS, parent6FAIL7PASS;10normal actors0;44strict38PASS+6approved empty-orderFAIL;22WARN/head ordered bytes exact. Author sealed and root-authenticated bbc76ab1; independent genuine release pending. Independent63PASS vs parent57PASS6FAIL; original30fault+2positive controls and2additional isolated axis controls pass; genuine review held for release. All549/39/1362fingerprints move.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Reuse existing schema/empty/native ordering machinery; measure affected scope before framework edit. Closed1099row/errorbehavior and1204rawcoverage are different owners; no normalizedcomparison or native-data changes.",
       "scope_recheck_required_before_dispatch": true
@@ -2017,14 +2025,14 @@
       "title": "Constructed empty tables ignore declared types of country-local optional fields",
       "url": "https://github.com/ligon/LSMS_Library/issues/1218",
       "github_state": "open",
-      "queue_state": "OPEN_UNASSIGNED",
+      "queue_state": "ACTIVE",
       "countries": [
         "Burkina_Faso",
         "Shared framework"
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": null,
+      "current_active_scope": "Ledger-first static plan at d60275ada; explicit country-local types on constructed empties only, using existing coercion. Production/runtime held for root review; prerequisite1215 and fixed BF657 config composition planned.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Honor explicit optional types on constructed-empty results using existing dtype machinery, preserving populated outputs. Four root-authenticated BF author cases; independent static account accepted; independent genuine runtime validation still required.",
       "scope_recheck_required_before_dispatch": true
@@ -2308,5 +2316,5 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-22T20:23:00.229631+00:00"
+  "active_progress_updated_at_UTC": "2026-10-22T21:01:19.011997+00:00"
 }

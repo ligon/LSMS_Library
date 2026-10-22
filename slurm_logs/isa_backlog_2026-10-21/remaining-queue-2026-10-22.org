@@ -3,7 +3,7 @@
 
 * Snapshot
 Captured 2026-10-22T19:50:20.193068+00:00.
-There are114ISA-related open issue records:27with campaign PRs,twoactive,and85other open records.
+There are114ISA-related open issue records:27with campaign PRs,threeactive,and84other open records.
 All30implementation PRs are OPEN and unmerged at the recorded exact heads/base branch names.
 Umbrellas,decisions andpartial repairs overlap; these are not114distinct unimplemented bugs.
 The original inventory had97in-scope records;96remain open,duplicate1089is closed,and18campaignfollowups were added.
@@ -13,12 +13,16 @@ Initial triage guidance must be rechecked against live issues and complete count
 * Active work
 ** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
 Countries: Burkina_Faso.
-Author657final/runtime3d frozen and root-authenticated;967entries/29788sources/6providers25copies exact. Original398PASS60FAIL retained plus56additive storagePASS;4emptydtype failures1218 remain. Independent calibration/fullmaps/14synthetic+397supportingPASS; Exact guard read-policy adapter approved; realdata conditionally released after fresh synthetic-only capability gate,24copies25343300bytes. No completed independent data result yet.
+Author657final/runtime3d frozen and root-authenticated. Independent14targeted+397supportingPASS; eight normal actors0/40calls. Original151comparisons=111PASS+40prewriter-storageFAIL; four new parent-based empty references retain2DefaultPASS+2Make dtypeFAIL owned1218. Final6provider/24copy/source/cache/footer protection passed; independent seal/root authentication pending. Author398PASS60FAIL and56additive storagePASS remain separate historical accounting.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Constructed empty tables: implement the approved declaration-order rule
 Countries: Uganda, Shared framework.
-Human declaration-order policy implemented atf7c on actuala417.13new+88supportingPASS; actualparent6FAIL7PASS. Actual549/39/1362hashes allmove. Rootreleased37providers/4roots/148copies177769212bytes; providerprep0, firstDefaultsequenceactors active. Full data grid/freeze/independentreview pending.
-Remaining scope: Four new zero-row column-order failures exposed by1204routing repair; preserve all strictfindings and choose a stable public empty-column contract across cold/covered-cache/Make.
+User-approved declaration order implemented atf7c vs actuala417. Author13new+88supportingPASS; parent6FAIL7PASS. Ten genuine actors0;44strict=38PASS+6approved empty-orderFAIL;22WARN/head ordered byte-exact. Author sealed and root-authenticated; independent genuine release pending. Independent63PASS vs parent57PASS6FAIL; two additional isolated axis controls pass, genuine review held for release. All549/39/1362fingerprints move.
+Remaining scope: Complete independent genuine validation of the approved contract across cold/covered-cache/Make; preserve every strict finding.
+
+** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
+Countries: Burkina_Faso, Shared framework.
+Ledger-first static plan atd60275ada; use existing coercion for explicit types on constructed empties only. Production/runtime held for root plan review. Prerequisite1215 and fixedBF657 config composition avoid importing the country repair chain.
 
 * Reviewed changes awaiting human merge
 ** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
@@ -89,6 +93,8 @@ Remaining scope: 2010/2019 enumerator-kg repair reviewed. Literal questionnaire/
 Countries: Ethiopia, Malawi, Mali, Nigeria, Tanzania.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1181][#1181]], [[https://github.com/ligon/LSMS_Library/pull/1185][#1185]].
 Remaining scope: Ethiopia/Tanzania PRs reviewed. Malawi/Mali/Nigeria unit normalization remains; other countries outside ISA are separate.
+Fresh dispatch assessment (2026-10-22): Mali and Malawi are mechanical candidates under the settled #1041 ruling, after reconciling Malawi with #1175/#1193.
+Nigeria's fill-versus-drop source-eligibility decision remains separate; old null-unit counts are historical.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1119][#1119]] #569 residual A: the "not crop-specific" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
@@ -228,10 +234,14 @@ Initial triage route: Wire W1-W3 PH section12 only after questionnaire/source-ke
 ** [[https://github.com/ligon/LSMS_Library/issues/821][#821]] Mali 2018-19 ships a grappe-grain community price module (s05_co_mli2018.dta, 549/549 grappes) that community_prices never wires; data_scheme.yml wrongly says EHCVM waves have no grappe key
 Countries: Mali.
 Initial triage route: Wire both2018 s05 price readings, size-resolved unit mapping, and correct false absence comment; leave2021 region-grain module as distinct design.
+Fresh dispatch assessment (2026-10-22): the current country notes describe two 2018 price fields and size-qualified units, without the 2014 weight fields mentioned in the issue proposal.
+Authenticate the native fields first; do not fabricate Quantity/Weight or a unit crosswalk.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/823][#823]] Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504/504 grappes); data_scheme.yml says the wave has none -- twin of Mali #821, check the other six EHCVM countries
 Countries: Niger.
 Initial triage route: Wire both s05 readings with size-resolved unit crosswalk, native variety/visit/obs; correct false no-file comment.
+Fresh dispatch assessment (2026-10-22): CONTENTS.org explicitly defers this table while the size-qualified unit crosswalk is missing.
+Quote and reconcile that recorded decision; native label preservation and downstream comparability are separate deliverables.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/824][#824]] Complete sold-unit audits and use Unit_sold in farmgate consumers
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
@@ -424,6 +434,8 @@ Initial triage route: Implement existing option-A ruling: not-stated tag only fo
 ** [[https://github.com/ligon/LSMS_Library/issues/1135][#1135]] ClusterIdentityWarning: implement the settled first-line size ruling and verify net-of-movers counts
 Countries: Ethiopia, Nigeria, Tanzania, Uganda.
 Initial triage route: Keep SPAN and no threshold. Add measured cluster-renumber counts and linked-household change share net of movers to boundary records and warning first line; test Nigeria 2016Q1->2018Q3 and a 100% boundary.
+Fresh dispatch assessment (2026-10-22): current source evidence does not satisfy the complete settled measurement contract, and no all-unknown formatter patch is approved.
+The moved-prefix filter is not an all-mover classifier; twenty Nigeria W5 movement statuses remain unknown, and all twelve boundaries still need physical-cluster measurements.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1136][#1136]] #793 residual: curate design fields beyond Uganda (NADA DDI probe, per-country evidence, missing strata)
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
@@ -467,7 +479,3 @@ Countries: Malawi.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1206][#1206]] Campaign validation: finish exact numeric and object-type saved-result reassessment
 Countries: Cross-country validation.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
-Countries: Burkina_Faso, Shared framework.
-Initial triage route: Honor explicit optional declaration types on constructed-empty results using existing dtype machinery, preserving populated outputs. Four BF author cases; source-only independent account accepted; fresh independent runtime validation still required.

@@ -1,6 +1,33 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T20:22:00+00:00
+* Current task -- 2026-10-22T21:15:00+00:00
+
+LSMS-ISA goal ACTIVE; NEVER auto-merge. Main clean developmentf8; GitHub development067 is lock-only certifi, mounted runtime unchanged.
+Queue114open records=27PRlinked+3active+84other;30implementation PRs OPEN/unmerged at last full inventory.
+Three active scopes: BF1188 independent freeze, shared1215 independent genuine review, shared1218 ledger-first planning.
+
+1215author frozenf7c vs actuala417 ROOT-authenticated by verify_1215_author_root_v3.py: original session52159/finalac561d actual0; C/1215-AUTHOR-ROOT-AUTHENTICATION.json SHAbbc76ab1a0f0478255cd8871cdee95be1458b5309460e8c878d90b292fa8468e.
+All1498files/30links/1228dirs;29827tracked source receipts (3historical binary files/head unopened metadata-only);37providers+148copies177769212bytes freshly MD5/SHA/magic/physical exact.
+Author13new+88supportPASS; parent6FAIL7PASS. All549/39/1362fingerprints move. Ten normal actors0;44strict38PASS6approved empty-orderFAIL;22WARN/head ordered fullJSONLbyteexact. Never rename strictFAIL as PASS.
+Sealer15242/80d51d and separatefullpostexit65267/89b801actual0, exact original tool records retained. Four safe exports+allowlist/rootauth/two rootchecker stops published in1215-author/.
+Root checker v1 static locator assumed class instead of module helper; v2 compared whole stat including atime on first shared provider; both retained. v3 compares exact protected fields. No product/API/decoding replay.
+Root inspection268055 printed nested private warning examples. Exact original truncated returned container recovered privately under root-1215-output-scope-268055 (returnSHAc4af4c436cf4b732d596bb747e79cee42ae49a50f2a67b12e66a9e0e00495639); no unreturned-tail recovery claimed. Do not repeat identifiers. All9published material files screened against54private literals,0matches.
+Independent review_malawi_1209: candidate63PASS, parent57PASS6FAIL from complete2-file13new+50existing catalog; author88support separate. Original30faults+2positives retained with twoconfounded-axis seeds; two NEW isolated domain/order controls actual0 session93027/d88a00 preserve represented tuples/dtypes and reject full domains. Exact genuine plan next, held untilrootrelease.
+
+BF1188author657/runtime3d/rootauthdfca2 already publisheda58db20cd and archived31. Independent malawi_1209:14targeted+397supportPASS; actualparent7FAIL7PASS. Own raw oracle,8normal actors0/40calls,151original comparisons111PASS+40prewriter-storageFAIL (40writer/readbackPASS already inside151);4NEW parent-based empty controls2DefaultPASS2Make dtypeFAIL remain1218. Two scannerJSONLs4records/head BYTEEXACT.
+Final6providers+24copies25343300bytes/29788source/cache/footer protections passed; finalpolicy/sealer/postexit now pending, no furtherdata/test actors. Preserve156predataabsentrawdenials plus52phantomparquetdenials(source-backed effect INFERENCE, no historical per-open stacks/individualabsencelstat),16existingmkdirnoops; original capability-v1assertstop and extra16probev2replay retained.
+
+1218acquisition_1149 owns W/isa-framework-1218 branchfix/1218-typed-empty-optional-fields-20261022 and C/framework1218-empty-types. FIRSTledger d60275ada published; production/runtime HELD. Full current issue saved ownP/GH1218-CURRENT-ISSUE.json SHA6828890f5826a491901780cb0dd40a3ddba1c94472c4569aa4db1a2ed97ed9e2.
+Plan existing dtype machinery on empty-only explicitdict.type projection; preserve populated/global canonical/index/membership. Basef7 with separately bound fixedBF657 config for old/new genuine composition, no BFchain merge. Proposed6providers/4roots24copies25343300bytes/eightactors requires rootreview before runtime.
+
+PR1214CI39822550698 resolved: unit119977316030 andWindows119977316502SUCCESS, sixSKIPPEDincldata. Old inconsistent snapshot retained; fresh1214-ci-final-observed.json committedbfcb0b12f. PR1214 and1170 bodies exactreadback; final publication receipt pending.
+Fresh frontier next-ISA-frontier-recheck-20261022.json:1135stillmovement-sourcegated, no newpolicyquestion;1118Mali/Malawi mechanicalunits strongestnext after currentprereqs;821Mali2018S05has no2014Poidsfields,823Nigerrecordedsizeunitcrosswalkhold must be reconciled. Two rawblobs onlylstatmetadata, not authenticated/decoded.
+Archive31 accepted (C/ARCHIVE31-ROOT-ACCEPTANCE.json),1-31preserved. Author1215/independentBF/independent1215/new1218NOTarchived31. Prepare32onlyfrozen prefixes after exactplan approval; do notarchive live data trees.
+Allocation40255479 about26hoursleft; no warning. Stay sourcebound, private guarded runtime, no acquisition/sharedcache writes/NO_CACHE/assume flags on genuine data, no hidden budget expansions. No full30PR/corpus verdict.
+
+Sue
+
+* Earlier task -- 2026-10-22T20:22:00+00:00
 
 LSMS-ISA backlog goal remains ACTIVE; never auto-merge.
 Main is clean developmentf8; publication development067 is only a poetry.lock certifi update, not a newly certified dependency runtime.
