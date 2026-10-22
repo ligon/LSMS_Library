@@ -3,8 +3,8 @@
 Item-level (t, i, plot, input, crop, u) feature -- one row per input
 applied to a plot.  Sources (Full_Sample/Agriculture):
   * ag_mod_d -- plot-level input module.  Inorganic fertilizer in two
-    slots (ag_d39a type / ag_d39d applied-qty / ag_d39e unit; ag_d39f
-    type / ag_d39i applied-qty / ag_d39j unit), organic-fertilizer flag
+    slots (ag_d39a type / ag_d39d enumerator-total kg; ag_d39f
+    type / ag_d39i enumerator-total kg), organic-fertilizer flag
     ag_d36, agrochemical types ag_d41a/d gated by ag_d40.  Plot key
     ag_d00 (the same R{n} key as plot_features' ag_c00 and
     crop_production's ag_g0b).
@@ -20,6 +20,8 @@ See lsms_library/countries/Malawi/_/malawi.py.
 import sys
 
 sys.path.append('../../_/')
+import pandas as pd
+
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
                     _seed_block, _seed_purchase_block, assemble_plot_inputs)
@@ -38,11 +40,18 @@ g['hhid'] = g['case_id'].apply(format_id)
 g['plotkey'] = g['ag_g0b'].apply(format_id)
 h['hhid'] = h['case_id'].apply(format_id)
 
+# Q39 (IHS3 agriculture questionnaire p.13) labels d/i TOTAL KGs and
+# e/j MONTH. Keep the selected totals, with kg identity before grouping
+# (ledger #1111 sections 3-4); the native b/c and g/h pairs are separate.
+fertilizer = _fertilizer_block(
+    d, hhid='hhid', plotkey='plotkey',
+    type1='ag_d39a', qty1='ag_d39d', unit1=None,
+    type2='ag_d39f', qty2='ag_d39i', unit2=None, t=WAVE)
+fertilizer['u'] = pd.Series('Kilogramme', index=fertilizer.index,
+                            dtype='string')
+
 pieces = [
-    _fertilizer_block(d, hhid='hhid', plotkey='plotkey',
-                      type1='ag_d39a', qty1='ag_d39d', unit1='ag_d39e',
-                      type2='ag_d39f', qty2='ag_d39i', unit2='ag_d39j',
-                      t=WAVE),
+    fertilizer,
     _organic_block(d, hhid='hhid', plotkey='plotkey', flag='ag_d36', t=WAVE),
     _pesticide_block(d, hhid='hhid', plotkey='plotkey', gate='ag_d40',
                      slots=[('ag_d41a', 'ag_d41b', 'ag_d41c'),

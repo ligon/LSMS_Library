@@ -154,8 +154,8 @@ def _map_codes(series, code_map):
 def plot_features_for_wave(t, source, colmap, id_fn=None):
     """Build canonical ``plot_features`` for one Burkina Faso EHCVM wave.
 
-    Mirrors ``Mali/_/mali.py:plot_features_for_wave`` exactly except for
-    the household-id formatter.  Returns a DataFrame indexed by
+    Uses the Mali EHCVM area/tenure pattern with Burkina's household-id
+    formatter and optional parcel coordinates. Returns a DataFrame indexed by
     ``(t, i, plot_id)`` with columns ``Area`` (hectares float),
     ``AreaUnit`` ('hectares'), ``Tenure``, ``TenureSystem``,
     ``SoilType`` (str), and ``Irrigated`` (nullable bool).
@@ -176,8 +176,11 @@ def plot_features_for_wave(t, source, colmap, id_fn=None):
     Each wave's ``plot_features.py`` passes the formatter matching its own
     ``sample()``; the default is :func:`ehcvm_i` (the canonical EHCVM id).
 
-    Latitude / Longitude are deferred — EHCVM s16a has no decimal-degree
-    parcel GPS (s16aq47 is an area, not a coordinate).
+    Optional ``latitude`` / ``longitude`` colmap keys supply independent
+    nullable-float coordinates on the same retained source rows. Missing keys
+    leave that wave unchanged; a declared missing source column raises.
+    Burkina 2021-22 records these in s16aq46; 2018-19 has no coordinates.
+    s16aq47 is an area, not a coordinate.
     """
     if id_fn is None:
         id_fn = ehcvm_i
@@ -250,6 +253,10 @@ def plot_features_for_wave(t, source, colmap, id_fn=None):
         'SoilType':     soil_type.values,
         'Irrigated':    irrigated.values,
     })
+    for source_key, output_name in [('latitude', 'Latitude'),
+                                    ('longitude', 'Longitude')]:
+        if source_key in c:
+            df[output_name] = pd.array(src[c[source_key]], dtype='Float64')
     df = df.set_index(['t', 'i', 'plot_id'])
     return df
 

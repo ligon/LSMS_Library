@@ -1,0 +1,72 @@
+[
+  {
+    "step": 0,
+    "requested": "fct",
+    "backend": "dvc",
+    "forced": false,
+    "subset": false,
+    "seconds": 51.703,
+    "changed_siblings": [
+      "food_acquired",
+      "nutrition"
+    ],
+    "requested_hash_present": true,
+    "requested_coverage_present": true
+  },
+  {
+    "step": 1,
+    "requested": "nutrition",
+    "backend": "dvc",
+    "forced": false,
+    "subset": false,
+    "seconds": 51.666,
+    "changed_siblings": [
+      "food_acquired",
+      "fct"
+    ],
+    "requested_hash_present": true,
+    "requested_coverage_present": true
+  },
+  {
+    "step": 2,
+    "requested": "fct",
+    "backend": "dvc",
+    "forced": true,
+    "subset": false,
+    "seconds": 48.443,
+    "changed_siblings": [
+      "food_acquired",
+      "nutrition"
+    ],
+    "requested_hash_present": true,
+    "requested_coverage_present": true
+  },
+  {
+    "step": 3,
+    "requested": "nutrition",
+    "backend": "dvc",
+    "forced": true,
+    "subset": false,
+    "seconds": 47.975,
+    "changed_siblings": [
+      "food_acquired",
+      "fct"
+    ],
+    "requested_hash_present": true,
+    "requested_coverage_present": true
+  },
+  {
+    "step": 4,
+    "requested": "fct",
+    "backend": "dvc",
+    "forced": true,
+    "subset": false,
+    "seconds": 48.356,
+    "changed_siblings": [
+      "food_acquired",
+      "nutrition"
+    ],
+    "requested_hash_present": true,
+    "requested_coverage_present": true
+  }
+]

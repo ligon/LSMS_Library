@@ -2101,14 +2101,16 @@ class TestAcquisitionWritesTheHeldRelease:
 
     def test_a_file_already_in_data_is_not_recorded_as_the_new_release(
             self, countries, wb, caplog):
-        """``_extract_all_from_zip`` never overwrites: a.dta stays v01's.  The
-        directory is then a mix, so the record must not claim v02."""
+        """A differing raw file without a sidecar is unverified. It stays
+        untouched at its resolved zip-relative path, so it cannot certify v02.
+        GH1149 permits replacement only through a matching held sidecar."""
         from lsms_library import data_access as da
         before = _record("Nigeria", "2023-24", **NGA_W5_QUEUED)
         _write_source(countries, "Nigeria", "2023-24", before)
-        (countries / "Nigeria" / "2023-24" / "Data").mkdir(parents=True)
-        (countries / "Nigeria" / "2023-24" / "Data" / "a.dta") \
-            .write_bytes(b"release-1")
+        data = (countries / "Nigeria" / "2023-24" / "Data"
+                / "NGA_2023_GHSP-W5_v02_M_Stata")
+        data.mkdir(parents=True)
+        (data / "a.dta").write_bytes(b"release-1")
         with caplog.at_level("WARNING", logger="lsms_library.data_access"):
             da.populate_and_push("Nigeria", "2023-24")
 
@@ -2570,20 +2572,21 @@ class TestAcquisitionCompletionBoundaries:
 
     def test_partial_extraction_cannot_record_a_complete_release(
             self, countries, wb, monkeypatch):
-        import builtins
+        import os
         from lsms_library import data_access as da
         before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
         _write_source(countries, 'Nigeria', '2023-24', before)
-        actual_open = builtins.open
-        def fail_second(path, mode='r', *args, **kwargs):
-            if mode == 'wb' and Path(path).name == 'b.dta':
+        actual_replace = os.replace
+        def fail_second(src, dst, *args, **kwargs):
+            if Path(dst).name == 'b.dta':
                 raise OSError('simulated disk failure')
-            return actual_open(path, mode, *args, **kwargs)
-        monkeypatch.setattr(builtins, 'open', fail_second)
+            return actual_replace(src, dst, *args, **kwargs)
+        monkeypatch.setattr(os, 'replace', fail_second)
         da.add_wave('Nigeria', '6410', wave='2023-24', push=False,
                     confirm=False, verbose=False)
         assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
-        assert (countries / 'Nigeria/2023-24/Data/a.dta').exists()
+        assert (countries / 'Nigeria/2023-24/Data'
+                / 'NGA_2023_GHSP-W5_v02_M_Stata/a.dta').exists()
 
 
 class TestQueueFactsSurviveMissingCatalogMetadata:

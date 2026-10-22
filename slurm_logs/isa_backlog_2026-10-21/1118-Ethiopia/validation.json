@@ -1,0 +1,134 @@
+{
+  "verdict": "PASS (author validation; independent review pending)",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "pre_code_ledger_commit": "7c0198e2eef8432f96e170cb11138131a8a7d944",
+  "scope": "Ethiopia plot_inputs_for_wave final missing/whitespace-only unit normalization to existing U_UNKNOWN only",
+  "public_rows": 180900,
+  "unit_payload_changes": 37370,
+  "null_units_before": 37370,
+  "null_units_after": 0,
+  "blank_units_before": 0,
+  "blank_units_after": 0,
+  "unchanged_nonblank_Kg_rows": 143530,
+  "unchanged_Kg_rows_without_Quantity": 40977,
+  "changes_by_input": {
+    "Compost": 4295,
+    "Manure": 27261,
+    "Other Organic": 2651,
+    "Pesticide": 3163
+  },
+  "changes_by_wave": {
+    "2011-12": 9141,
+    "2013-14": 8881,
+    "2015-16": 8879,
+    "2018-19": 5567,
+    "2021-22": 4902
+  },
+  "source_integrity": {
+    "source_sidecars": 48,
+    "unique_physical_blobs": 47,
+    "unique_bytes": 161128465,
+    "md5_matches_sidecar": true,
+    "separate_inodes_no_symlinks": true,
+    "grounded_use_fields": 25,
+    "five_wave_yes_no_metadata_confirmed": true
+  },
+  "source_use_counts_match_all_five_helpers": true,
+  "five_helpers_complete_expected_frames_and_attrs_exact": true,
+  "cold_country_complete_expected_frame_and_attrs_exact": true,
+  "fresh_process_warm_equals_cold": true,
+  "warm_cache_proof": {
+    "parquets_compared": 38,
+    "bytes_hashes_and_mtimes_unchanged": true,
+    "fresh_python_process": true
+  },
+  "all_changed_rows_Applied_true_Quantity_and_Quantity_purchased_missing": true,
+  "all_nonunit_values_keys_multiplicities_dtypes_and_Country_attrs_exact": true,
+  "nitrogen_output_complete_frame_and_attrs_exact": true,
+  "nitrogen_kg_sum_before": 500847.2208579673,
+  "nitrogen_kg_sum_after": 500847.2208579673,
+  "feature": {
+    "rows": 265116,
+    "complete_frame_exact": true,
+    "all_other_attrs_exact": true,
+    "metadata_delta": {
+      "canonical_alignment.promoted.Ethiopia.u": {
+        "before": 37370,
+        "after": 0
+      }
+    }
+  },
+  "comparator": {
+    "country": "Uganda",
+    "source": "private held AGSEC inputs; copied stale L2 was rebuilt, not restamped or trusted",
+    "rows": 84216,
+    "null_units": 0,
+    "blank_units": 0,
+    "before_after_complete_frame_and_attrs_exact": true
+  },
+  "table_hashes": {
+    "Ethiopia": {
+      "changed": 25,
+      "total": 25
+    },
+    "Uganda": {
+      "changed": 0,
+      "total": 28
+    }
+  },
+  "targeted_tests": {
+    "passed": 58,
+    "skipped": 0,
+    "failed": 0,
+    "errors": 0,
+    "workers": 2,
+    "dist": "loadfile",
+    "new_cases": 14,
+    "baseline_new_cases": {
+      "failed": 8,
+      "passed": 6
+    }
+  },
+  "feature_audit": {
+    "normalization": "checkout and private-data root paths; elapsed/duration metric fields only",
+    "before_count": 13,
+    "after_count": 12,
+    "before_status": {
+      "warn": 13
+    },
+    "after_status": {
+      "warn": 12
+    },
+    "unchanged_records": 11,
+    "removed_records": 2,
+    "added_records": 1,
+    "removed_groups": {
+      "Ethiopia|no_constant_columns": 1,
+      "None|runtime_warning": 1
+    },
+    "added_groups": {
+      "None|runtime_warning": 1
+    },
+    "complete_multiset_accounted": true,
+    "deltas": [
+      {
+        "removed": 1,
+        "added": 0,
+        "country": "Ethiopia",
+        "check": "no_constant_columns",
+        "reason": "u has two recorded payloads, Kg and Unknown, instead of one non-null value Kg plus nulls."
+      },
+      {
+        "removed": 1,
+        "added": 1,
+        "country": "ALL",
+        "check": "runtime_warning",
+        "reason": "Only promoted Ethiopia u fill count text changes from 37370 to 0; all other record fields and text match."
+      }
+    ]
+  },
+  "cold_verification_note": "Expected Feature canonical_alignment.promoted.Ethiopia.u change was initially asserted unchanged; complete captured frames and Country attrs already passed. This step accounts for that single metadata delta.",
+  "data_limits": "Held section3/4/5 input sources plus covers/sample, five Ethiopia waves and Uganda plot_inputs comparator; no blanket country/corpus suite. Other Ethiopia features were not rebuilt.",
+  "private_evidence_root": "/local/job40255479/control/isa-backlog-20261021/Ethiopia/1118",
+  "identity_and_isolation": "Exact package/config/cwd identity, private data roots and physically copied L1 with active offline socket guard; numerical/build/make threads1."
+}
