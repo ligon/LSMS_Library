@@ -55,6 +55,7 @@ import pytest
 import yaml
 from importlib.resources import files
 
+from lsms_library.local_tools import source_fingerprint
 from lsms_library.paths import countries_root
 
 TABLE = "crop_production"
@@ -321,7 +322,7 @@ def test_sold_unit_and_condition_are_canonicalised(uganda_module, in_wave_dir):
     ucodes = list(unit_map)[:3]
     ccodes = list(condition_map)[:3]
     df5a = _frame(uganda_module, unit_sold_codes=ucodes, condition_sold_codes=ccodes)
-    out = uganda_module.crop_production_for_wave("2013-14", df5a, None, None, _colmap())
+    out = uganda_module.crop_production_for_wave("2013-14", df5a, None, None, _colmap(), source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     assert list(out[UNIT_SOLD]) == [unit_map[c] for c in ucodes]
     assert list(out[CONDITION_SOLD]) == [condition_map[c] for c in ccodes]
     # and they are the SAME strings the index levels carry
@@ -341,7 +342,7 @@ def test_unmapped_sold_code_is_NA_not_a_sentinel(uganda_module, in_wave_dir):
     bogus = 999999
     df5a = _frame(uganda_module, unit_sold_codes=[bogus],
                   condition_sold_codes=[bogus])
-    out = uganda_module.crop_production_for_wave("2013-14", df5a, None, None, _colmap())
+    out = uganda_module.crop_production_for_wave("2013-14", df5a, None, None, _colmap(), source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     assert out[UNIT_SOLD].isna().all()
     assert out[CONDITION_SOLD].isna().all()
     assert "Unknown" not in set(out[UNIT_SOLD].dropna())
@@ -356,7 +357,7 @@ def test_wave_without_a_sold_condition_column_yields_all_NA(uganda_module, in_wa
     unit_map = uganda_module._harvest_unit_map()
     df5a = _frame(uganda_module, unit_sold_codes=list(unit_map)[:2])
     out = uganda_module.crop_production_for_wave(
-        "2011-12", df5a, None, None, _colmap(condition_sold=None))
+        "2011-12", df5a, None, None, _colmap(condition_sold=None), source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     assert out[CONDITION_SOLD].isna().all()
     assert out[UNIT_SOLD].notna().all()
 
@@ -368,19 +369,12 @@ def test_named_but_absent_sold_column_raises(uganda_module, in_wave_dir):
     df5a = _frame(uganda_module, unit_sold_codes=list(unit_map)[:1])
     with pytest.raises(uganda_module.CropColmapError):
         uganda_module.crop_production_for_wave(
-            "2013-14", df5a, None, None, _colmap(unit_sold="a5aq7z"))
+            "2013-14", df5a, None, None, _colmap(unit_sold="a5aq7z"), source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
 
 
-def test_duplicate_rows_disagreeing_on_the_sold_unit_are_blanked(uganda_module,
+def test_distinct_observations_keep_their_disagreeing_sold_units(uganda_module,
                                                                  in_wave_dir):
-    """A summed ``Quantity_sold`` across two sold units is in no unit.
-
-    The de-duplication block sums ``Quantity_sold`` over rows sharing the
-    whole declared index.  Where those rows report DIFFERENT sold units the
-    sum has no single denominator, so ``reduce_to_agreed(on_conflict='na')``
-    blanks the label rather than picking a winner -- and warns.  Nothing is
-    dropped: the row and its summed quantities are served as before.
-    """
+    """GH1198 retains each record's own quantity and sold-unit pairing."""
     in_wave_dir("2013-14")
     unit_map = uganda_module._harvest_unit_map()
     u1, u2 = list(unit_map)[:2]
@@ -389,29 +383,24 @@ def test_duplicate_rows_disagreeing_on_the_sold_unit_are_blanked(uganda_module,
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         out = uganda_module.crop_production_for_wave(
-            "2013-14", df5a, None, None, _colmap())
-    assert len(out) == 1, "the two source rows share the whole declared index"
-    assert out[UNIT_SOLD].isna().all(), (
-        "disagreeing sold units must blank the label, not pick the first"
-    )
-    assert float(out["Quantity_sold"].iloc[0]) == 6.0, (
-        "the pre-existing sum is unchanged -- only the label is withheld"
-    )
-    assert any("grain conflict" in str(w.message) for w in caught), (
-        "the blanking must be loud (GrainConflictWarning)"
-    )
+            "2013-14", df5a, None, None, _colmap(), source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
+    assert len(out) == 2 and out.index.is_unique
+    assert list(out[UNIT_SOLD]) == [unit_map[u1], unit_map[u2]]
+    assert list(out['Quantity_sold']) == [3.0, 3.0]
+    assert out['Quantity_sold'].sum() == 6.0
+    assert not any('grain conflict' in str(w.message) for w in caught)
 
 
 def test_agreeing_duplicate_rows_keep_the_label(uganda_module, in_wave_dir):
-    """Agreement is lossless and silent -- the other half of the contract."""
+    """Equal served payloads still represent two source observations."""
     in_wave_dir("2013-14")
     unit_map = uganda_module._harvest_unit_map()
     u1 = list(unit_map)[0]
     df5a = _frame(uganda_module, unit_sold_codes=[u1, u1], hhids=["1000000001"] * 2)
     out = uganda_module.crop_production_for_wave(
-        "2013-14", df5a, None, None, _colmap())
-    assert len(out) == 1
-    assert out[UNIT_SOLD].iloc[0] == unit_map[u1]
+        "2013-14", df5a, None, None, _colmap(), source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
+    assert len(out) == 2 and out.index.is_unique
+    assert list(out[UNIT_SOLD]) == [unit_map[u1], unit_map[u1]]
 
 
 # ---------------------------------------------------------------------------
@@ -558,7 +547,7 @@ def test_built_wave_carries_a_populated_sold_unit(uganda_module, wave, filename,
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             out = uganda_module.crop_production_for_wave(
-                wave, df5a, None, None, uganda_module.CROP_COLMAPS[wave])
+                wave, df5a, None, None, uganda_module.CROP_COLMAPS[wave], source_refs={'A': source_fingerprint(countries_root() / 'Uganda' / wave / subdir / filename)})
     finally:
         os.chdir(prev)
     assert UNIT_SOLD in out.columns and CONDITION_SOLD in out.columns
@@ -597,8 +586,11 @@ def test_built_wave_carries_a_populated_sold_unit(uganda_module, wave, filename,
 #: +2,725 rows, 1,079 of them sale rows knowing both units): 40,083 -> 41,162;
 #: 0.9606 -> 0.9614 (by wave-season still 92.0-98.0%, "3.9% disagree" holds);
 #: 162 -> 165.  2009-10 is untouched by #848 and its coverage did not move.
-SALE_ROWS_KNOWING_BOTH = 41_162         # Quantity_sold > 0, u != Unknown, Unit_sold notna
-AGREEMENT_SHARE = 0.9614                # Unit_sold == u on those rows
+# GH1198, 2026-10-22: source-cold native observations retain their own sold
+# labels and quantities, including the old reducer's blanked/conflicting rows.
+# Actual parent/current counts: 41,162 -> 41,241; paired-field oracle exact.
+SALE_ROWS_KNOWING_BOTH = 41_241         # Quantity_sold > 0, u != Unknown, Unit_sold notna
+AGREEMENT_SHARE = 0.9613                # Unit_sold == u on those rows
 LARGEST_DISAGREEMENT_CELL = 165         # PRICED rows, u='Sack (100 kgs)' Unit_sold='Kg'
 W2009_10_A_COVERAGE = 0.968             # Unit_sold non-null / sale rows
 

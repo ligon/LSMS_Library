@@ -3653,3 +3653,70 @@ historical nine-cell signature.  The original historical full-suite
 writer and interleaving remain unidentified.  #1062's requested-output
 sibling correction is separate from this framework producer mechanism;
 its independent evidence must not be read as resolving #1078.
+
+* Native crop observations retained (GH #1198, 2026-10-22)
+
+=production_obs= follows =season= in the native crop index.
+The old seven-level sum/first reducer combined distinct harvest and sale
+records, including equal served payloads; its "just de-duplication of repeated
+identical source rows" comment did not describe those records.
+The earlier *OPEN GRAIN QUESTION* above correctly identified the missing level.
+The new coordinate preserves each eligible record before the existing explicit
+=harvest_kg= transformation reduces quantities converted with their own factors.
+
+- 2011-12 uses =productionID= / =production2ID=; 2013-14 and 2015-16 use
+  =Production_ID= / =Production2_ID=. These serve =reported:<ID>= after the
+  existing identifier formatter.
+- 2018-19 and 2019-20 use =slot:1= / =slot:2= for the actual mapped CONDITION
+  slot. Reordering the column-map list does not rename the slot. These are
+  not calendar seasons: A/B are module names, and the 2015-16 A module covers
+  the second season of 2014 while B covers the first season of 2015.
+  The existing scheme's "A (first season) / B (second season)" shorthand
+  must not be interpreted as calendar order in every wave.
+- 2009-10 and 2010-11 use the explicitly CONSTRUCTED
+  =row:<source-fingerprint>:<physical-zero-based-ordinal>=. A missing reported
+  ID value uses =missing-id:row:...=; a missing declared ID COLUMN raises.
+  Loaders pass the same literal source path they read to the existing
+  =local_tools.source_fingerprint=. Its =dvc:= identity contains the source
+  name and SHA256 of the declared sidecar, NOT the raw DTA MD5.
+  The coordinate is tied to the release and physical row order, not a panel
+  entity. Synthetic helper callers must provide explicit synthetic references.
+- Repeated IDs/slots suffix EVERY occurrence with its =/row:...= locator,
+  including identical payloads. Repeating one physical source/row/slot is a
+  loud uniqueness error. Source positions are captured before selection and
+  crop-roster joins; a DataFrame's own index is not the physical coordinate.
+- The legacy null-key boundary is preserved exactly: the old reducer dropped
+  null old-key records only when the OLD seven-level index was nonunique.
+  A wholly unique old index retains its null record. The held sources still
+  exclude the same 403 records (360 in 2009-10, 43 in 2011-12); the sample join
+  still retains all 928 eligible public records with missing =v=.
+
+Held-source normal default/Make builds retain 133,761 observations, versus
+133,331 old keys. No factor mapping, unit/condition decoding, sample join,
+identifier walk, eligibility screen or 2015 sale-value x100 correction changes.
+In particular the swapped 2013 variable labels, 2018 missing A harvest-unit
+source and mixed legacy/WB slot names remain the recorded survey caveats.
+GH #849's twelve proposed factor bindings are separate.
+With current factor wiring, whole-harvest output still has 78,571 rows; retained
+records change the total by 2,091 kg through their own factors and existing
+median pools. There is no new =production_observation= attrs carrier.
+Feature uses the declared =unresolved_observation= sentinel for countries
+whose served rows do not resolve this axis; that asserts no native row count.
+
+Two measured caveats remain outside this fix.
+The country Make builder returns all seven supported waves for either
+=waves=['2018-19']= or the unsupported =waves=['2005-06']=, on both heads;
+default public output returns only the requested wave or zero rows respectively.
+Warm Make calls rewrite native cache files on both heads.
+The author's private run measured 17 byte-identical files with changed mtimes
+and unchanged modes; the independent review measured the same 17 paths
+changing from 0644 to 0600 as well as changing mtimes.
+These are separate observations, not a general guarantee that
+warm Make preserves modes or performs zero writes; no payload change or
+permission repair is part of #1198.
+Separately, =transformations.py= says "on Uganda the parcel key matches on
+100% of crop rows." Actual held-area controls on BOTH heads match 14,022 of
+40,409 converted harvest parcel keys, with zero literal-plot matches.
+The full real parcel-yield frames are unchanged by #1198. This contradicts
+that blanket coverage claim; its remaining ID/area routing requires separate
+diagnosis, not an inferred repair here.
