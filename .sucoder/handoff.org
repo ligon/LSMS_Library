@@ -993,3 +993,19 @@ Uganda1198 source/native/public cold133761 and defaultwarm0/144 are interim pass
 Tanzania1091 concrete retirement proposal remains read-only until final freeze/root review.
 
 Sue
+
+* Tanzania retirement authorized -- 2026-10-22T01:32:30.004463+00:00
+
+Root accepted frozen read-only diagnosis99c824079da480ab2646e499c06ac70e457ff271, runtime/tests exacte75be9c56.
+1216-entry private manifest0d0519b90e77e918b695815d7174d942b4fe1a12ce777510c0521b0d92315784; seven safe reports plusREADY/rootdecision copied byte-exact.
+Source17699=3076+14623,60requests,58existing tests and4scannerWARN are diagnosis results, not candidate proof.
+Approved only45-line country concatenator+originalMake145-149 retirement; current candidate/parent checkouts start99c and own exactprivate DVC metadata targets.
+Writer review_nigeria_1034 dispatched to isa-Tanzania-1091-fix; ledger revision must commit before code, actualhashcensus before sourcebuild, different-agent review beforePR.
+Other schema/science/units/IDs/source predicates and generic/wave rules remain scope boundaries.
+Niger1200 CI39705606211 completed success: unit-tests/windows-smoke passed; six other jobs skipped.
+Thirteenth archive of frozenNigerreview:743includedfiles,37671534B,SHA8e705305be5bf267e19ebc49b93aae9e6ca850abfb1f496cc0ec668692858fd0.
+Fourteenth archive of frozenTanzaniadiagnosis:1004files,19133955B,SHA52b4f89817fd07f0ab52920845ad1f02830f1d32a53c6315137914b02adbb68e.
+Both owner-only,allincludedmembers/sourceafter verified; rawextensions/duplicatecachetrees excluded, confidentialderivedframes remainprivate.
+No public merge or issue closure; goal active.
+
+Sue

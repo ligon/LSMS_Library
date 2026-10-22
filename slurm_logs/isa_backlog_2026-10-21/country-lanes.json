@@ -225,7 +225,7 @@
       "active_branch": "fix/1091-niger-community-builder-20261021",
       "active_baseline": "d602f8d63520e521a730f85551b366c4d45d9a35",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Niger/1091-fix",
-      "active_status": "Independent PASS accepted by root; PR1200 open awaiting CI/human merge",
+      "active_status": "IndependentPASS;PR1200open/exact-headCIgreen/awaitinghumanmerge",
       "active_interim_result": "Final independent evidence/root acceptance supersede the earlier pending status; all original author qualifications remain. Source670de9c, actual parentd602f8d, no public merge or composition claim.",
       "diagnosis_1091": {
         "path": "/local/job40255479/control/isa-backlog-20261021/Niger/1091",
@@ -252,7 +252,7 @@
       "active_no_final_independent_PASS": false,
       "active_review_verdict": "PASS114 focused tests;12 meaningful parent failures/five passes; complete independent source/matrix/Feature/CLI/scanner/hash controls, explicit evidence limits retained",
       "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1200",
-      "active_ci": "in_progress;run39705606211",
+      "active_ci": "success;run39705606211 (unit-tests/windows-smoke success; six other configured jobs skipped)",
       "active_review_manifest_entries": 1437,
       "active_review_manifest_sha256": "9bf86ab634b8913e2e5bfcbadec051de05206b2475cef0b6db58e7f274402808",
       "active_root_acceptance": "1091-Niger-independent/ROOT-ACCEPTANCE.md"
@@ -331,18 +331,45 @@
         "branch": "diagnose/1091-tanzania-community-builder-20261021",
         "baseline": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
         "private_evidence": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091",
-        "status": "Prepared exact ignored metadata target; not yet dispatched"
+        "status": "Diagnosis frozen; superseded by isolated approved implementation below"
       },
       "active_issue": 1091,
       "active_owner": "review_nigeria_1034",
-      "active_path": "/local/job40255479/worktrees/isa-Tanzania-1091",
-      "active_branch": "diagnose/1091-tanzania-community-builder-20261021",
-      "active_baseline": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
-      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091",
-      "active_status": "Read-only source/Make-DAG diagnosis active; no implementation authorized",
+      "active_path": "/local/job40255479/worktrees/isa-Tanzania-1091-fix",
+      "active_branch": "fix/1091-tanzania-community-builder-20261022",
+      "active_baseline": "99c824079da480ab2646e499c06ac70e457ff271 (ledger-only descendant; runtime/tests exacte75)",
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix",
+      "active_status": "Root approved concrete two-path retirement; isolated implementation dispatched, no candidate verdict/PR",
       "active_precode_ledger": "aa62795ce (prefix; committed before diagnosis functions)",
       "active_CONTENTS_read": "Complete2142lines incl WAITING114; blob9424a5042b9880d6c48aba17af0e8d3cadc45ccb",
-      "active_source_boundary": "Community modules plus gated healthy comparator only; reviewed408plot_inputs normalization retained through immutable source/prior proof, no new AG staging or plot-input build."
+      "active_source_boundary": "Community modules plus gated healthy comparator only; reviewed408plot_inputs normalization retained through immutable source/prior proof, no new AG staging or plot-input build.",
+      "active_parent_control": "/local/job40255479/worktrees/isa-Tanzania-1091-fix-base",
+      "active_root_decision": "1091-Tanzania-diagnosis/ROOT-ENGINEERING-DECISION.md",
+      "active_production_boundary": "Delete only45-line country concatenator and originalMake145-149; retain native builders, generic/wave rules/shared vars/schemas/science/IDs/units/framework exact",
+      "active_hash_scope_prediction_only": {
+        "Tanzania": 25,
+        "other_API_exact": 524,
+        "framework_exact": 39
+      },
+      "diagnosis_1091": {
+        "head": "99c824079da480ab2646e499c06ac70e457ff271",
+        "runtime": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+        "status": "Frozen,rootacceptedforboundedimplementation",
+        "manifest_entries": 1216,
+        "manifest_sha256": "0d0519b90e77e918b695815d7174d942b4fe1a12ce777510c0521b0d92315784",
+        "source_rows": 17699,
+        "source_wave_rows": [
+          3076,
+          14623
+        ],
+        "normal_probes": 60,
+        "existing_tests_passed": 58,
+        "scanner_WARN": 4,
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091",
+        "candidate_builds": 0,
+        "safe_exports": "1091-Tanzania-diagnosis/",
+        "limits": "No first coldFeature; serialization/empty/Makewrite distinctions; source-cwd/Poetry/auxiliaryunpickle/text-only launch stops retained.408plotinputproof is prior-only,notcommunitycount."
+      }
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",

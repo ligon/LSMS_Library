@@ -1,0 +1,190 @@
+#+TITLE: GH1091 Tanzania community-price country builder diagnosis
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Status and source pin
+
+DIAGNOSIS_COMPLETE_PROPOSAL_AWAITS_ROOT_REVIEW.
+The runtime is reviewed PR1185 =e75be9c56fa6c318ce32cea5a8be6d448578bed1=; only the new task ledger is committed on the diagnosis branch.
+The ledger was published before analysis at =aa62795ce=, with the source-scope clarification at =55d560742=.
+Final clean source head, full tracked byte/mode receipts, runtime/test tree equality and quiescence are recorded in READY and the freeze proof.
+No production patch, candidate build, candidate fingerprint census, GitHub write, merge or issue closure occurred.
+GH788's framework authority and GH840/1086's native representation remain settled; no new authority or grain decision is requested.
+
+The current country builder causes a concrete interface defect: explicit Make returns all 17,699 modern-wave rows for every requested subset, including unsupported older waves.
+The default API selects the correct rows, but an unsupported cold request still invokes the country fallback and builds unrequested modern data.
+A minimal two-file retirement is proposed separately; implementation remains stopped for ROOT review.
+
+* Country notes read and retained
+
+The complete current CONTENTS was read, including TODO/WAITING/LOGBOOK: 2,142 lines, Git blob =9424a5042b9880d6c48aba17af0e8d3cadc45ccb=.
+The actual panel distinction matters: UPD4 back-casts descendant split-offs into earlier waves, UPHI is a Round4 panel identity, and r_hhid is the interviewed round household.
+A unique key alone does not prove correct panel grain.
+The live WAITING #114 retains the silent exact-duplicate wave-drop caveat; its country-script history was explicitly updated after GH836.
+No household key was changed here.
+
+The four older logical waves share the 2008-15 folder through wave_folder_map.
+2014-15 pools Extended and Refresh panels; 2019-20 follows Extended, whereas 2020-21 follows Refresh plus the 545-household urban booster.
+Their zero household overlap is by design.
+The community table's v is its native interview__key, not sample's household sampling-cluster v.
+The helper carries a redundant i==v compatibility shim; framework normalization removes it without a household join.
+Source item code variety preserves separately priced items merged by j; Description retains the questionnaire label.
+Price is the reported village amount cm_f063 divided by its own positive quantity basis cm_f062, per native cm_f061 unit.
+District-capital prices remain a separate instrument and are excluded.
+
+Relevant documentary contrasts remain quoted rather than silently rewritten.
+The geography-only section calls the link "infeasible without a lossy, unverifiable crosswalk", while the later result says the 2020 survey cluster is "BAKED INTO the community admin codes" and documents a separate implemented confidence-tagged crosswalk.
+The schema's older region-only paragraph contrasts with its adjacent implemented crosswalk section too.
+The community price v remains native under either reading; no household link or xwalk was rebuilt.
+The top panel note says "This inconsistency is unresolved", while the dated WAITING update narrows the food-specific residue to a silent, asserted lossless drop.
+Neither statement authorizes incidental grain repair.
+The documented empty 2020 population statement is also retained; it appears in the actual scanner findings.
+
+PR1185's 408 replacements belong to plot_inputs: 86 and 322, with the existing 19 no-amount records preserved by that reviewed fix.
+They are not community-price observations.
+Exact reviewed helper/wave/country/test blobs and prior source/proof receipts were pinned here; no AG module was staged and no plot-input API was rebuilt.
+
+* Held-source and process gates
+
+Only two new source modules were staged: CM_SEC_F_ID.dta and cm_sec_f_id.dta.
+Their DVC sidecars, declared MD5/size and held SHA256/MD5/size/mode/mtime were verified before decoding.
+Both held DVC layouts were searched.
+Forty distinct-inode, nonsymlink, nlink1 physical source copies supplied the 20 target-cold roots.
+Two later populated roots received four further source copies and six harmonized cache copies only after a genuine current-hash/full-six-wave-coverage gate.
+Each copied byte/mode/mtime and physical-identity receipt is private.
+
+Healthy Mali's 40,218-row country cache was physically copied only after exact expected-hash and full-four-wave-coverage checks at this Tanzania source pin.
+Its Mali config tree matches the immutable provenance pin; compatibility was measured, not inferred from a corrected Niger cache.
+This is a gated warm comparator, not a new Mali source rebuild.
+Its complete public frames/typed attrs are exact across independent processes, and its cache bytes/mode/mtime remain exact.
+
+Every main source/API/CLI probe used the mounted image, matching cwd/PYTHONPATH/package/countries/data realpaths, private config/XDG/temp/DVC paths, unshare -rn and the active socket/write guard.
+Numeric, build and Make threads were one; the focused pytest run used two loadfile workers.
+Only the exact prepared ignored DVC tmp target was a checkout metadata-write exception.
+No acquisition, DVC CLI, shared-cache write/clear, bypass, manual stamp, in-tree payload, framework/global schema edit or unrelated food/FCT build occurred.
+
+* Actual Make DAG and callers
+
+The country script is 45 lines and only concatenates its two existing modern native parquets; it has no source transform or ID walk.
+Make145-146 defines the community-only discovery variables, used solely by the explicit country target and recipe at148-149.
+The independent wave rule151-152 is separate.
+The generic154-155 rule can also run the country script through the in-tree community_prices.parquet target.
+Shared COUNTRY, LSMS_DATA_ROOT, VAR_DIR, rounds/source/parquet and other targets are separate inputs and must remain.
+
+Actual fresh-empty-root make -n for the country var target returns three commands: both modern wave scripts, then the country concatenator.
+Each supported wave target returns its own script command.
+The generic in-tree country target runs the country script too.
+The older-folder wave pattern reports a recipe despite no corresponding script; current API declaration checks, not dry-run success alone, establish unsupported waves.
+The real Make all target contains both native community outputs among 45 Python commands, but no community country var target; it was dry-run only, with no unrelated features built.
+
+A populated-root make -n still returns all three community commands.
+Its relative in-tree wave prerequisites do not exist because sanctioned IO writes the real outputs under the private data root.
+Consequently ordinary Make calls rebuild both waves and the country output even when those out-of-tree files already exist.
+The generic CLI materializer delegates to Country; it is not an independent country-specific scientific producer.
+Removing just the country script or just the explicit rule would leave a builder route or a broken prerequisite; both must be retired.
+
+* Independent source measurements
+
+| Wave | Raw rows | Retained rows | Excluded by existing eligibility | Coarse cells | Multi-variety coarse groups | Price-disagreeing coarse groups |
+|------+----------+---------------+----------------------------------+--------------+-----------------------------+--------------------------------|
+| 2019-20 | 5148 | 3076 | 2072 | 2769 | 261 | 243 |
+| 2020-21 | 25376 | 14623 | 10753 | 13062 | 1281 | 1149 |
+
+All 52 source item codes survive across eligible records in each wave.
+The complete source-key grain is unique; no eligible observation is selected by a first reducer.
+An independent field-binding oracle preserves the exact existing positive-price, positive-basis and resolved item/unit/key predicates.
+There are 3,077 / 14,625 positive price-and-basis rows before the final resolved-unit check, yielding 3,076 / 14,623 served rows.
+Every retained Price equals its own reported price/basis at zero numeric tolerance.
+The actual helper equals the oracle in memory; actual writer-stage controls equal every native value, mask, axis/code/dtype/order and typed attr.
+Walked key values remain unchanged, and the normalized concat equals the actual authoritative raw default country frame exactly.
+
+* Request matrix
+
+The following results hold at each of the three actual stages: target-cold, separate-process/new-object warm, and already-populated.
+There are 20 normal cold probes, 20 independent warm probes and 20 populated probes, ten request sets for each backend.
+
+| Request | Default rows | Make rows |
+|---------+--------------+-----------|
+| All six logical waves | 17699 | 17699 |
+| 2019-20 only | 3076 | 17699 |
+| 2020-21 only | 14623 | 17699 |
+| Both modern waves | 17699 | 17699 |
+| 2008-09 only | 0 | 17699 |
+| 2010-11 only | 0 | 17699 |
+| 2012-13 only | 0 | 17699 |
+| 2014-15 only | 0 | 17699 |
+| All four older waves | 0 | 17699 |
+| 2008-09 plus 2019-20 | 3076 | 17699 |
+
+Every cold/fresh-warm same-request full frame is exact, including full recursively typed attrs and MultiIndex internals, with check_exact=True and rtol=atol=0.
+Default's unsupported cold fallback writes a country cache containing all 17,699 native modern rows with coverage for the requested older wave(s), then serves an empty filtered API frame.
+This extra raw layer is distinct from the normalized all-wave default cache; it is not evidence that old waves have community prices.
+The full matrix preserves its raw/native/public references and footer state rather than equating those layers.
+
+* Warm writes, raw layers and attrs
+
+All ten default fresh-warm and ten default populated calls changed zero data-root L1/L2 bytes, modes or mtimes.
+Each Make fresh-warm call rewrote both native wave parquets and the country parquet: three changed mtimes with exact bytes/size/modes.
+The first populated Make call replaced a genuinely verified normalized country cache with the hashless native concatenation, removing its current-hash/coverage footer and restoring the redundant i shim.
+Later populated Make calls again rewrote those same three files.
+The hashless result is stale to a normal default country read; no current stamp was fabricated here.
+
+The old raw Make country frame exactly equals the concat of both native wave frames.
+The authoritative raw default country frame is normalized and carries id_converted.
+The full-wave public default and Make payloads are exact; their sole full-attrs difference is default's id_converted flag.
+Thus supported Make attrs must be tested against authoritative default after any retirement, not against the old native country layer.
+
+Strict source-memory/native comparisons fail on the v/i/j/u/variety string-index missing-value dtype declaration, from pandas NA to nan during parquet serialization; their values/masks and attrs agree diagnostically, while the actual matched writer-stage comparisons are strictly exact.
+No normalization converts that failure into a full-frame pass.
+Cold unsupported default frames and covered-cache slices differ only by id_converted in full attrs.
+The existing pure declared-empty/finalizer contract instead has object Description, while the old fallback empties have string Description; Price and the empty index types match.
+It matches the old cold empty attrs and lacks the covered-cache id_converted flag.
+That helper experiment is a measured existing function contract, not a candidate API or candidate-hash proof.
+
+* CLI, Feature and scanner
+
+The actual CLI on a populated default source cache returns 3,076 rows for 2019-only and zero for 2008-only.
+On Make it returns 17,699 for either: 14,623 wrong-wave rows for 2019-only and 17,699 for 2008-only.
+Eight independent CLI artifacts have exact complete Arrow footer/schema metadata and file bytes against actual matched API serialization controls.
+API-to-artifact typed attr differences from JSON record/container serialization remain explicit, not stripped.
+The changed keys are sampling/population and, for nonempty results, recall; every other typed attr is exact at that comparison stage.
+These are new artifact observations on already populated API caches; they are not first source-cold CLI/Feature claims.
+
+Default and currency=None Feature observations are independently argument-matched: Tanzania plus Mali has 57,917 rows, and Make Tanzania-only has 17,699.
+All complete first/fresh warm pooled frames, keys, dtypes, axes, ordering and typed attrs match within their respective arguments.
+The healthy Mali portion is preserved.
+No current output from the independent Niger or Mali retirement is composed into this snapshot.
+
+The scoped phases 1/2 scanner emits four warning records, zero failure/error/skip records, each accounted individually in validation.json with its complete-record digest.
+Two record the legitimate absence of household i on native community tables.
+One records declared Feature sentinel alignment for Tanzania visit/obs and Mali obs, without row loss.
+One records the missing held 2020-21 Tanzania population statement.
+There is no community_prices phase2 kwargs grid; no nonexistent variant coverage is claimed.
+
+* Tests, excluded launches and limits
+
+The existing community-variety/GH1039 selection gives 58 passes, zero skips/failures/errors; actual built-data marker cases were deselected and are not counted.
+These existing tests are not substitutes for the proposed retirement-specific baseline-negative controls.
+The following make api-audit step exited 2 while Poetry attempted environment creation; the guard prevented checkout cache/venv-reference operations.
+The exact existing audit script passed once with the mounted interpreter, without dependency or guard changes and without repeating pytest.
+Both attempts are preserved separately.
+
+An initial private source-helper call used checkout cwd and failed curation lookup with KeyError.
+Its script/log/exception artifacts are preserved; the corrected call used the actual Tanzania/_ context, with no production or expected-data change.
+A later auxiliary read-only artifact inspection omitted the exact runner/import environment and failed ModuleNotFoundError while unpickling class metadata.
+Its generic non-record traceback reached tool output; no frame, ID, coordinate or source-warning content was printed, and no API/source/test call or cache mutation occurred.
+The command/script and incident qualification are retained; the original stdout/stderr was not captured as a private file.
+Only existing artifacts were inspected subsequently through the guarded runner.
+A final text-only export update also failed before writing because its cwd was the checkout; its generic non-record traceback and the later metadata-only missing-interpreter invocation are separately recorded.
+Neither invocation performed a source/frame/API/test/cache operation.
+The corrected export update used this explicit private root.
+
+No broad suite, corpus sweep, other table source rebuild or candidate code was run.
+The predicted 25 Tanzania API hash changes, 524 other exact hashes and 39 exact framework fingerprints are predictions from existing build-input machinery and the reviewed inventory, not measured candidate results.
+The actual future source patch must measure its census before rebuilding and retain the material Tanzania re-warm cost.
+The 408 plot-input invariant is prior-proof/code identity only; no new unit count was inferred from community data.
+All raw frames, IDs, coordinates, full warnings, tracebacks and detailed cache/record evidence remain private, apart from the explicitly disclosed generic auxiliary tool traceback.
+Root reports PR1185 remains open and unmerged at the exact runtime pin on fix/1118-tanzania-unknown-units-20261021; this diagnosis does not claim a merged parent.
+Final safe artifacts use a dedicated safe-exports directory; no private aggregate basename was overwritten.
+
+Signed: Sue.

@@ -1,0 +1,123 @@
+#+TITLE: GH1091 Tanzania minimal retirement proposal
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Concrete production boundary
+
+This is a proposal at immutable runtime e75be9c56fa6c318ce32cea5a8be6d448578bed1, not an implementation or candidate result.
+The framework authority is already settled by GH788.
+ROOT review of this concrete boundary is the next stop; no human is asked to decide authority or grain again.
+
+Delete only =lsms_library/countries/Tanzania/_/community_prices.py=, the 45-line concatenate-only country script.
+Remove only original Make145-149, retaining the blank150 and independent wave151-152 and generic154-155 bytes exactly:
+
+#+begin_src diff
+-community_prices = $(shell find $(rounds) -name community_prices.py)
+-community_prices_parquet := $(community_prices:.py=.parquet)
+-
+-$(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parquet)
+-	python community_prices.py
+#+end_src
+
+These two discovery variables have no other use.
+Keep shared COUNTRY/LSMS_DATA_ROOT/VAR_DIR/rounds/source/parquet and every other target.
+The Make all target still builds both native community wave outputs through its independent source list and wave rule.
+Leave both wave scripts, tanzania.py, item/unit maps, price-basis division, eligibility, IDs, schemas/materialize:make, xwalk, framework and dependencies byte-exact.
+Add no concatenator, selector patch, fallback, source field, Quantity column, unit factor or global lever.
+
+Additional allowed paths for a future approved writer are one new targeted test file, the task ledger, a dated additive CONTENTS note and safe aggregate evidence only.
+No baseline/fixture/golden/dependency change is needed.
+Deleting only the script leaves a real Make rule with a missing prerequisite, which the actual selector correctly classifies as a broken builder.
+Deleting only the rule leaves the country script and generic route, so it remains a country builder.
+After both removals, the existing selector must be measured as false under a real fresh-empty-root Make probe; that result is predicted, not fabricated or measured in this diagnosis.
+
+* Expected behavior and explicit route consequences
+
+The two supported singleton results must match the authoritative existing default frames exactly:3,076 and 14,623 rows.
+All and modern-combined requests retain all 17,699 observations, all 52 source codes per wave, every reported price/basis result and the current native grain.
+Unsupported requests return zero; a mixed request includes only the supported source rows.
+Do not preserve the old Make wrong-wave rows as acceptance references.
+Supported Make should match default's complete typed attrs, including id_converted, through the existing walked/normalized wave route.
+
+Default's normal verified country cache remains the authoritative layer.
+The corrected Make wave route should create no country cache and should not read or overwrite an existing country cache.
+It can naturally evict/rewrite hashless native wave files, including an unrequested existing native file when the existing framework eviction descends; measure actual bytes/modes/mtimes/deletions per state.
+Do not suppress that policy or promise blanket Make zero writes.
+
+Cold absent requests should follow the existing declared-empty/finalizer contract, avoiding the old unnecessary modern-country fallback.
+The measured contract has object Description, while old fallback empties have string Description; a covered default cache slice also retains id_converted.
+Keep these distinctions explicit and test the actual candidate at each matched stage.
+No empty dtype or JSON-attrs framework repair is included.
+CLI prewrite API and postread artifact layers require separately matched controls: sampling/population/recall records and containers serialize to JSON forms.
+Do not strip attrs, normalize dtypes or loosen numeric tolerance to make comparisons pass.
+
+* Fingerprints and operational cost -- prediction only
+
+The current country Makefile is a shared hashed build input.
+Using the reviewed inventory, predict 25 Tanzania API hash changes, 524 unchanged other API hashes and 39 unchanged framework fingerprints.
+Deleting the country script is also a community-price input change.
+This diagnosis contains no actual patched census and does not assert those predictions as measurements.
+An approved writer must enumerate all 549/39 in separate exact-source processes against e75 before any source rebuild.
+Do not change registry exclusions or schema to conceal the country-wide cost.
+Normal old-hash Tanzania caches should invalidate naturally on subsequent default reads; preserve that provenance rather than clear/stamp them.
+No other 25-table source rebuilding is authorized by this proposal's current read-only stage.
+
+The reviewed PR1185 plot-input runtime/test blobs and prior 408-unit receipts must remain exact.
+No new AG staging or plot-input rebuild is needed to verify that code boundary in this retirement.
+All new source validation can remain scoped to the two community modules plus a genuinely current/full-coverage healthy comparator.
+
+* Meaningful baseline-negative tests
+
+Use a new =tests/test_gh1091_tanzania_community_builder.py= built on the existing GH1039 real Make/script pattern.
+Copy the actual Tanzania Makefile and actual country-script presence into a private config fixture.
+Declare all six logical waves and the actual four-to-one 2008-15 wave_folder_map explicitly, so an empty wave list cannot falsely pass.
+Provide two distinct real script-written modern native frames with i==v before j, source variety and different prices.
+Leave the older folder without a community script/declaration.
+Use real Path.exists, source selectors, Make DAGs and sanctioned parquet operations; do not patch absence or selector booleans.
+
+- Prove fresh-empty-root no country rule/script after removal, including the surviving generic pattern; retain both modern wave plans.
+- Exercise both backends across all, both supported singletons, modern-only, each older singleton, older-combined and mixed requests, at cold/populated/new-object fresh-warm stages.
+- Include a wrong existing country var payload and show Make does not serve or overwrite it after selecting the wave route.
+- Retain script-path required Price enforcement and optional Description behavior; Tanzania declares no Quantity column here.
+- Retain source variety and both distinct native prices, without a first reducer or canonical-label merge.
+- Assert full typed attrs, column/index dtypes, MultiIndex levels/codes/order and zero float tolerance, not only row counts or pandas defaults.
+
+Run the unchanged new test file against immutable e75 and the real candidate in separate exact-source processes.
+Record meaningful parent failures/candidate passes, zero fixture errors and genuine skips; no new tests have been executed or claimed here.
+The existing 58-case cohort is already green but does not cover this retirement defect.
+
+* Source-backed acceptance after a real patch
+
+Replay the frozen independent source oracle and compare every current eligible observation/Price/Description/key/mask to the candidate at native writer, walked, normalized, raw country and public stages.
+Keep actual current reference frames private; do not promote them to new goldens or use old Make subsets as truth.
+Both actual wave builders and Make all dry-run/source routes must remain available.
+The candidate must actually demonstrate its no-country-builder routing; a pure helper experiment is not that proof.
+
+Re-run normal target-cold and fresh-process/new-object warm requests in new private roots, with terminal source gates before dependent probes.
+Use a candidate-current verified country cache for populated Make preservation checks; copying an old e75 cache does not make it current after the Make hash changes.
+Capture per-call receipts before assertions and persist them even on failure.
+Verify default zero cache changes where expected, natural Make native changes where observed, full hash/coverage and no new country var file on the wave-only route.
+
+Compare actual CLI prewrite API to the authoritative matched e75 default request and postread output to actual matched serialized controls with full Arrow footers/schema metadata.
+Do not compare old wrong-wave Make artifacts as unchanged expectations.
+Keep default and currency=None Feature references separately argument-matched; 57,917 warm pooled rows are the current baseline, not a first cold Feature snapshot.
+Reconcile all four current scanner records individually; there is no community_prices phase2 kwargs grid.
+Preserve the current source-memory/native dtype strict failures as serialization-stage facts.
+
+* Proposed dated CONTENTS addition
+
+Append at the actual file end after all existing subsections, only after the candidate is verified.
+Record the removed country orchestration, real Make subset defect, retained native interview token v/i==v shim, source-code variety and own-quantity price basis.
+Record the authoritative normalized default attrs versus old native raw country layer, the cold/covered empty Description/id_converted distinction, and natural hashless Make writes.
+Quote the older geography-only region limitation beside the later implemented confidence-tagged crosswalk rather than deleting either history.
+State that 408 units is the separate unchanged PR1185 plot-input invariant and 17,699 is the community count.
+Keep WAITING #114 and Extended/Refresh/back-casting caveats intact.
+
+* Stop and residual scope
+
+Implementation is not authorized in this diagnosis.
+ROOT can approve the concrete two-path retirement and routine engineering details after reviewing these measurements; no scientific or grain decision is pending.
+Reconcile independently reviewed Niger/Mali changes separately, then obtain independent acceptance of the eventual Tanzania patch before any public merge/issue closure.
+The remaining unrelated #113 consumer fallback, #114 panel caveat, #637 plot-input duplicate units, old-wave source availability and 2020 population documentation remain unchanged.
+
+Signed: Sue.

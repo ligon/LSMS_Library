@@ -1,0 +1,3815 @@
+{
+  "status": "BASELINE_DIAGNOSIS_COMPLETE_NO_CANDIDATE",
+  "observed_counts": {
+    "community": 17699,
+    "2019-20": 3076,
+    "2020-21": 14623,
+    "healthy_Mali": 40218,
+    "Feature_both_argument_variants": 57917,
+    "collected_pytest_passed": 58,
+    "matrix_cold": 20,
+    "matrix_fresh_warm": 20,
+    "populated": 20
+  },
+  "matrix": {
+    "default-all": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": null,
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "default-2019": {
+      "cold_rows": 3076,
+      "warm_rows": 3076,
+      "waves": {
+        "2019-20": 3076
+      },
+      "requested": [
+        "2019-20"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2019-20"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 3076
+      }
+    },
+    "default-2020": {
+      "cold_rows": 14623,
+      "warm_rows": 14623,
+      "waves": {
+        "2020-21": 14623
+      },
+      "requested": [
+        "2020-21"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2020-21"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 14623
+      }
+    },
+    "default-modern": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2019-20",
+        "2020-21"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2019-20",
+            "2020-21"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "default-2008": {
+      "cold_rows": 0,
+      "warm_rows": 0,
+      "waves": {},
+      "requested": [
+        "2008-09"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "default-2010": {
+      "cold_rows": 0,
+      "warm_rows": 0,
+      "waves": {},
+      "requested": [
+        "2010-11"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2010-11"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "default-2012": {
+      "cold_rows": 0,
+      "warm_rows": 0,
+      "waves": {},
+      "requested": [
+        "2012-13"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2012-13"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "default-2014": {
+      "cold_rows": 0,
+      "warm_rows": 0,
+      "waves": {},
+      "requested": [
+        "2014-15"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2014-15"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "default-older": {
+      "cold_rows": 0,
+      "warm_rows": 0,
+      "waves": {},
+      "requested": [
+        "2008-09",
+        "2010-11",
+        "2012-13",
+        "2014-15"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "default-mixed": {
+      "cold_rows": 3076,
+      "warm_rows": 3076,
+      "waves": {
+        "2019-20": 3076
+      },
+      "requested": [
+        "2008-09",
+        "2019-20"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {},
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2019-20"
+          ],
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 3076
+      }
+    },
+    "make-all": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": null,
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-2019": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2019-20"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-2020": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2020-21"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-modern": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2019-20",
+        "2020-21"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-2008": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2008-09"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-2010": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2010-11"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-2012": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2012-13"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-2014": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2014-15"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-older": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2008-09",
+        "2010-11",
+        "2012-13",
+        "2014-15"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    },
+    "make-mixed": {
+      "cold_rows": 17699,
+      "warm_rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "requested": [
+        "2008-09",
+        "2019-20"
+      ],
+      "strict_cold_warm_exact": true,
+      "warm_changed": {
+        "Tanzania/2019-20/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/2020-21/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Tanzania/var/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      },
+      "country_footer_cold": {
+        "Tanzania/var/community_prices.parquet": {
+          "hash": null,
+          "coverage": null,
+          "expected_hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7"
+        }
+      },
+      "cold_country_cache_rows": {
+        "Tanzania/var/community_prices.parquet": 17699
+      }
+    }
+  },
+  "source": {
+    "status": "COMPLETE",
+    "source": {
+      "2019-20": {
+        "raw_rows": 5148,
+        "retained_rows": 3076,
+        "excluded_rows": 2072,
+        "positive_price": 3079,
+        "positive_basis": 3077,
+        "positive_price_and_basis": 3077,
+        "missing_community_key": 0,
+        "blank_community_key": 0,
+        "unresolved_item": 0,
+        "unresolved_unit": 1895,
+        "community_keys": 94,
+        "source_varieties": 52,
+        "source_code_to_label_pairs": 52,
+        "unit_code_label_pairs": 6,
+        "coarse_cells": 2769,
+        "coarse_multivariety_groups": 261,
+        "coarse_price_disagreement_groups": 243,
+        "full_source_key_unique": true,
+        "positive_source_price_divided_by_own_basis_exact": true,
+        "source_helper_full_frame_exact": true,
+        "all_retained_native_values_masks_axes_attrs_exact_at_writer_stage": true
+      },
+      "2020-21": {
+        "raw_rows": 25376,
+        "retained_rows": 14623,
+        "excluded_rows": 10753,
+        "positive_price": 14639,
+        "positive_basis": 14673,
+        "positive_price_and_basis": 14625,
+        "missing_community_key": 0,
+        "blank_community_key": 0,
+        "unresolved_item": 0,
+        "unresolved_unit": 10457,
+        "community_keys": 484,
+        "source_varieties": 52,
+        "source_code_to_label_pairs": 52,
+        "unit_code_label_pairs": 6,
+        "coarse_cells": 13062,
+        "coarse_multivariety_groups": 1281,
+        "coarse_price_disagreement_groups": 1149,
+        "full_source_key_unique": true,
+        "positive_source_price_divided_by_own_basis_exact": true,
+        "source_helper_full_frame_exact": true,
+        "all_retained_native_values_masks_axes_attrs_exact_at_writer_stage": true
+      }
+    },
+    "strict_source_oracles_and_writer_stage_native_controls": true,
+    "normalized_concat_raw_exact": true,
+    "memory_native_exact": {
+      "2019-20": false,
+      "2020-21": false
+    },
+    "data_root_changes": 0
+  },
+  "tests": {
+    "exitcode": 0,
+    "passed": 58,
+    "failed": 0,
+    "skipped": 0,
+    "setup_teardown_errors": 0,
+    "actual_built_cases_deselected_not_counted": true,
+    "api_audit_returncode": 2
+  },
+  "api_audit_direct": {
+    "returncode": 0,
+    "same_existing_Make_target_script": true,
+    "mounted_interpreter_explicit": true,
+    "no_virtualenv_or_dependency_change": true,
+    "original_Make_target_returncode": 2,
+    "original_guarded_virtualenv_attempt_preserved": true
+  },
+  "scanner": {
+    "records": 4,
+    "statuses": {
+      "warn": 4
+    },
+    "individual_accounting": [
+      {
+        "ordinal": 0,
+        "check": "has_household_index",
+        "country": "Mali",
+        "status": "warn",
+        "reason": "Native community/interview table has no household i",
+        "complete_record_SHA256": "9bcc97ac72c13c11e8ed366f6c12e53249491d14713acd32dfc190ade81b4067",
+        "top_level_keys": [
+          "phase",
+          "feature",
+          "check",
+          "status",
+          "country",
+          "kwargs",
+          "severity",
+          "expected",
+          "detail",
+          "metrics",
+          "fingerprint"
+        ]
+      },
+      {
+        "ordinal": 1,
+        "check": "has_household_index",
+        "country": "Tanzania",
+        "status": "warn",
+        "reason": "Native community/interview table has no household i",
+        "complete_record_SHA256": "353699c0c348d7a6e15ff90b7aa2f9dcf07c2bfda23123c19d7107499c5c22bd",
+        "top_level_keys": [
+          "phase",
+          "feature",
+          "check",
+          "status",
+          "country",
+          "kwargs",
+          "severity",
+          "expected",
+          "detail",
+          "metrics",
+          "fingerprint"
+        ]
+      },
+      {
+        "ordinal": 2,
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "reason": "Declared Feature sentinel alignment: Tanzania visit/obs, Mali obs; no row loss",
+        "complete_record_SHA256": "6719da59ea32d5e812d3adc99a0f45c38573192e9b77e9a7a6128a2ed0e6db02",
+        "top_level_keys": [
+          "phase",
+          "feature",
+          "check",
+          "status",
+          "country",
+          "kwargs",
+          "severity",
+          "expected",
+          "detail",
+          "metrics",
+          "fingerprint"
+        ]
+      },
+      {
+        "ordinal": 3,
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "reason": "Tanzania2020-21 population statement absent in held documentation; unchanged metadata",
+        "complete_record_SHA256": "da3effc9629a3cf9032b656c66167fa358c0e0ad6ec18c8ac4ef98b0a339d06e",
+        "top_level_keys": [
+          "phase",
+          "feature",
+          "check",
+          "status",
+          "country",
+          "kwargs",
+          "severity",
+          "expected",
+          "detail",
+          "metrics",
+          "fingerprint"
+        ]
+      }
+    ],
+    "phase2_grid_scenarios": 0
+  },
+  "candidate_hash_scope_PREDICTION_ONLY": {
+    "Tanzania_API_hashes_expected_to_change": 25,
+    "other_API_hashes_expected_exact": 524,
+    "framework_fingerprints_expected_exact": 39,
+    "not_measured_candidate": true,
+    "no_patch_or_census_or_other_table_build": true
+  },
+  "runtime_source": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+  "ledger_first_commit": "aa62795ce",
+  "strict_comparison_policy": {
+    "check_exact": true,
+    "rtol": 0,
+    "atol": 0,
+    "typed_full_attrs": true,
+    "MultiIndex_levels_codes_dtypes_and_sortorder": true,
+    "diagnostic_dtype_relaxation_never_counted_as_strict_pass": true
+  },
+  "layers": {
+    "2019-20-memory-vs-native": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 94
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 94
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "i",
+          "name_b": "i",
+          "a": {
+            "name": "i",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 94
+          },
+          "b": {
+            "name": "i",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 94
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "j",
+          "name_b": "j",
+          "a": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 42
+          },
+          "b": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "u",
+          "name_b": "u",
+          "a": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 5
+          },
+          "b": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "variety",
+          "name_b": "variety",
+          "a": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 52
+          },
+          "b": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 52
+          }
+        }
+      ]
+    },
+    "2019-20-native-vs-walked": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [
+        "id_converted"
+      ],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "2019-20-walked_key_values_unchanged": true,
+    "2020-21-memory-vs-native": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 484
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 484
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "i",
+          "name_b": "i",
+          "a": {
+            "name": "i",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 484
+          },
+          "b": {
+            "name": "i",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 484
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "j",
+          "name_b": "j",
+          "a": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 42
+          },
+          "b": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "u",
+          "name_b": "u",
+          "a": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 5
+          },
+          "b": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "variety",
+          "name_b": "variety",
+          "a": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "missing_value_type": "NAType",
+              "missing_value_repr": "<NA>"
+            },
+            "cardinality": 52
+          },
+          "b": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 52
+          }
+        }
+      ]
+    },
+    "2020-21-native-vs-walked": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [
+        "id_converted"
+      ],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "2020-21-walked_key_values_unchanged": true,
+    "raw_default_vs_raw_Make": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [
+        "id_converted"
+      ],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "index_names_a": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety"
+      ],
+      "index_names_b": [
+        "t",
+        "v",
+        "i",
+        "j",
+        "u",
+        "variety"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "j",
+          "name_b": "i",
+          "a": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          },
+          "b": {
+            "name": "i",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "u",
+          "name_b": "j",
+          "a": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          },
+          "b": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "variety",
+          "name_b": "u",
+          "a": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 52
+          },
+          "b": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          }
+        }
+      ]
+    },
+    "native_concat_vs_raw_Make": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "public_default_vs_public_Make": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [
+        "id_converted"
+      ],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    }
+  },
+  "populated": {
+    "default-all": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-2019": {
+      "rows": 3076,
+      "waves": {
+        "2019-20": 3076
+      },
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-2020": {
+      "rows": 14623,
+      "waves": {
+        "2020-21": 14623
+      },
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-modern": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-2008": {
+      "rows": 0,
+      "waves": {},
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": false,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": false,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [
+          "id_converted"
+        ],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-2010": {
+      "rows": 0,
+      "waves": {},
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": false,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": false,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [
+          "id_converted"
+        ],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-2012": {
+      "rows": 0,
+      "waves": {},
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": false,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": false,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [
+          "id_converted"
+        ],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-2014": {
+      "rows": 0,
+      "waves": {},
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": false,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": false,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [
+          "id_converted"
+        ],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-older": {
+      "rows": 0,
+      "waves": {},
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": false,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": false,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [
+          "id_converted"
+        ],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "default-mixed": {
+      "rows": 3076,
+      "waves": {
+        "2019-20": 3076
+      },
+      "changed": [],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-all": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-2019": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-2020": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-modern": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-2008": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-2010": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-2012": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-2014": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-older": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    },
+    "make-mixed": {
+      "rows": 17699,
+      "waves": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "changed": [
+        "Tanzania/2019-20/_/community_prices.parquet",
+        "Tanzania/2020-21/_/community_prices.parquet",
+        "Tanzania/var/community_prices.parquet"
+      ],
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      },
+      "cold_vs_populated": {
+        "strict_full_frame_axes_typed_attrs_exact": true,
+        "pandas_strict_payload_exact": true,
+        "diagnostic_values_with_dtype_checks_disabled_exact": true,
+        "typed_attrs_exact": true,
+        "attrs_only_in_a": [],
+        "attrs_only_in_b": [],
+        "attrs_common_changed_keys": [],
+        "axis_dtype_or_cardinality_changes": []
+      }
+    }
+  },
+  "cross_backend_comparisons": {
+    "default-all-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-2019-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-2020-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-modern-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-2008-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-2010-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-2012-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-2014-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-older-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "default-mixed-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": true,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "make-all-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [
+        "id_converted"
+      ],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "make-2019-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [
+        "id_converted"
+      ],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [
+        "sampling",
+        "population",
+        "recall"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "t",
+          "name_b": "t",
+          "a": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 1
+          },
+          "b": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 2
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 94
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        }
+      ]
+    },
+    "make-2020-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [
+        "id_converted"
+      ],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [
+        "sampling",
+        "population",
+        "recall"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "t",
+          "name_b": "t",
+          "a": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 1
+          },
+          "b": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 2
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 484
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        }
+      ]
+    },
+    "make-modern-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": true,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [
+        "id_converted"
+      ],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": []
+    },
+    "make-2008-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [
+        "recall"
+      ],
+      "attrs_common_changed_keys": [
+        "population_resolution",
+        "sampling",
+        "sampling_resolution",
+        "population"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "t",
+          "name_b": "t",
+          "a": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 2
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "j",
+          "name_b": "j",
+          "a": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "u",
+          "name_b": "u",
+          "a": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "variety",
+          "name_b": "variety",
+          "a": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 52
+          }
+        }
+      ]
+    },
+    "make-2010-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [
+        "recall"
+      ],
+      "attrs_common_changed_keys": [
+        "population_resolution",
+        "sampling",
+        "sampling_resolution",
+        "population"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "t",
+          "name_b": "t",
+          "a": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 2
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "j",
+          "name_b": "j",
+          "a": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "u",
+          "name_b": "u",
+          "a": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "variety",
+          "name_b": "variety",
+          "a": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 52
+          }
+        }
+      ]
+    },
+    "make-2012-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [
+        "recall"
+      ],
+      "attrs_common_changed_keys": [
+        "population_resolution",
+        "sampling",
+        "sampling_resolution",
+        "population"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "t",
+          "name_b": "t",
+          "a": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 2
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "j",
+          "name_b": "j",
+          "a": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "u",
+          "name_b": "u",
+          "a": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "variety",
+          "name_b": "variety",
+          "a": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 52
+          }
+        }
+      ]
+    },
+    "make-2014-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [
+        "recall"
+      ],
+      "attrs_common_changed_keys": [
+        "population_resolution",
+        "sampling",
+        "sampling_resolution",
+        "population"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "t",
+          "name_b": "t",
+          "a": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 2
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "j",
+          "name_b": "j",
+          "a": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "u",
+          "name_b": "u",
+          "a": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "variety",
+          "name_b": "variety",
+          "a": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 52
+          }
+        }
+      ]
+    },
+    "make-older-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [
+        "recall"
+      ],
+      "attrs_common_changed_keys": [
+        "population_resolution",
+        "sampling",
+        "sampling_resolution",
+        "population"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "t",
+          "name_b": "t",
+          "a": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 2
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "j",
+          "name_b": "j",
+          "a": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "j",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 42
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "u",
+          "name_b": "u",
+          "a": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "u",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 5
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "variety",
+          "name_b": "variety",
+          "a": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 0
+          },
+          "b": {
+            "name": "variety",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 52
+          }
+        }
+      ]
+    },
+    "make-mixed-vs-default-authoritative": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": false,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [
+        "id_converted"
+      ],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [
+        "sampling",
+        "population",
+        "recall"
+      ],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "index",
+          "name_a": "t",
+          "name_b": "t",
+          "a": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 1
+          },
+          "b": {
+            "name": "t",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 2
+          }
+        },
+        {
+          "axis": "index",
+          "name_a": "v",
+          "name_b": "v",
+          "a": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 94
+          },
+          "b": {
+            "name": "v",
+            "dtype": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=nan)>",
+              "storage": "pyarrow",
+              "missing_value_type": "float",
+              "missing_value_repr": "nan"
+            },
+            "cardinality": 578
+          }
+        }
+      ]
+    }
+  },
+  "pure_empty_contract": {
+    "not_a_candidate_API": true,
+    "baseline_cold_older_vs_existing_helper": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": true,
+      "attrs_only_in_a": [],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "column",
+          "name": "Description",
+          "a": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "missing_value_type": "NAType",
+            "missing_value_repr": "<NA>"
+          },
+          "b": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "missing_value_type": "NoneType",
+            "missing_value_repr": "None"
+          }
+        }
+      ]
+    },
+    "baseline_populated_older_vs_existing_helper": {
+      "strict_full_frame_axes_typed_attrs_exact": false,
+      "pandas_strict_payload_exact": false,
+      "diagnostic_values_with_dtype_checks_disabled_exact": true,
+      "typed_attrs_exact": false,
+      "attrs_only_in_a": [
+        "id_converted"
+      ],
+      "attrs_only_in_b": [],
+      "attrs_common_changed_keys": [],
+      "axis_dtype_or_cardinality_changes": [
+        {
+          "axis": "column",
+          "name": "Description",
+          "a": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "missing_value_type": "NAType",
+            "missing_value_repr": "<NA>"
+          },
+          "b": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "missing_value_type": "NoneType",
+            "missing_value_repr": "None"
+          }
+        }
+      ]
+    }
+  },
+  "extras": {
+    "default-first": {
+      "status": "COMPLETE",
+      "backend": "default",
+      "stage": "first",
+      "rows": {
+        "public-Tanzania": 17699,
+        "public-Mali": 40218,
+        "Feature-default": 57917,
+        "Feature-currency-None": 57917,
+        "CLI-api-2019": 3076,
+        "CLI-artifact-2019": 3076,
+        "CLI-api-2008": 0,
+        "CLI-artifact-2008": 0
+      },
+      "per_call_changed_counts": {
+        "public-Tanzania": 0,
+        "public-Mali": 0,
+        "Feature-default": 0,
+        "Feature-currency-None": 0,
+        "CLI-api-2019": 0,
+        "CLI-api-2008": 0
+      },
+      "CLI": {
+        "2019": {
+          "rows": 3076,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true
+        },
+        "2008": {
+          "rows": 0,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true
+        }
+      },
+      "first_fresh_strict": {},
+      "not_a_cold_Feature_claim": true,
+      "CLI_API_to_artifact_attrs": {
+        "2019": {
+          "strict_full_frame_axes_typed_attrs_exact": false,
+          "pandas_strict_payload_exact": true,
+          "diagnostic_values_with_dtype_checks_disabled_exact": true,
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ],
+          "axis_dtype_or_cardinality_changes": []
+        },
+        "2008": {
+          "strict_full_frame_axes_typed_attrs_exact": false,
+          "pandas_strict_payload_exact": true,
+          "diagnostic_values_with_dtype_checks_disabled_exact": true,
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population"
+          ],
+          "axis_dtype_or_cardinality_changes": []
+        }
+      }
+    },
+    "default-fresh": {
+      "status": "COMPLETE",
+      "backend": "default",
+      "stage": "fresh",
+      "rows": {
+        "public-Tanzania": 17699,
+        "public-Mali": 40218,
+        "Feature-default": 57917,
+        "Feature-currency-None": 57917,
+        "CLI-api-2019": 3076,
+        "CLI-artifact-2019": 3076,
+        "CLI-api-2008": 0,
+        "CLI-artifact-2008": 0
+      },
+      "per_call_changed_counts": {
+        "public-Tanzania": 0,
+        "public-Mali": 0,
+        "Feature-default": 0,
+        "Feature-currency-None": 0,
+        "CLI-api-2019": 0,
+        "CLI-api-2008": 0
+      },
+      "CLI": {
+        "2019": {
+          "rows": 3076,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true
+        },
+        "2008": {
+          "rows": 0,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true
+        }
+      },
+      "first_fresh_strict": {
+        "public-Tanzania-first-vs-fresh": true,
+        "public-Mali-first-vs-fresh": true,
+        "Feature-default-first-vs-fresh": true,
+        "Feature-currency-None-first-vs-fresh": true,
+        "CLI-api-2019-first-vs-fresh": true,
+        "CLI-2019-artifact-first-vs-fresh": true,
+        "CLI-api-2008-first-vs-fresh": true,
+        "CLI-2008-artifact-first-vs-fresh": true
+      },
+      "not_a_cold_Feature_claim": true,
+      "CLI_API_to_artifact_attrs": {
+        "2019": {
+          "strict_full_frame_axes_typed_attrs_exact": false,
+          "pandas_strict_payload_exact": true,
+          "diagnostic_values_with_dtype_checks_disabled_exact": true,
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ],
+          "axis_dtype_or_cardinality_changes": []
+        },
+        "2008": {
+          "strict_full_frame_axes_typed_attrs_exact": false,
+          "pandas_strict_payload_exact": true,
+          "diagnostic_values_with_dtype_checks_disabled_exact": true,
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population"
+          ],
+          "axis_dtype_or_cardinality_changes": []
+        }
+      }
+    },
+    "make-first": {
+      "status": "COMPLETE",
+      "backend": "make",
+      "stage": "first",
+      "rows": {
+        "public-Tanzania": 17699,
+        "Feature-default": 17699,
+        "Feature-currency-None": 17699,
+        "CLI-api-2019": 17699,
+        "CLI-artifact-2019": 17699,
+        "CLI-api-2008": 17699,
+        "CLI-artifact-2008": 17699
+      },
+      "per_call_changed_counts": {
+        "public-Tanzania": 3,
+        "Feature-default": 3,
+        "Feature-currency-None": 3,
+        "CLI-api-2019": 3,
+        "CLI-api-2008": 3
+      },
+      "CLI": {
+        "2019": {
+          "rows": 17699,
+          "wrong_wave_rows": 14623,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true
+        },
+        "2008": {
+          "rows": 17699,
+          "wrong_wave_rows": 17699,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true
+        }
+      },
+      "first_fresh_strict": {},
+      "not_a_cold_Feature_claim": true,
+      "CLI_API_to_artifact_attrs": {
+        "2019": {
+          "strict_full_frame_axes_typed_attrs_exact": false,
+          "pandas_strict_payload_exact": true,
+          "diagnostic_values_with_dtype_checks_disabled_exact": true,
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ],
+          "axis_dtype_or_cardinality_changes": []
+        },
+        "2008": {
+          "strict_full_frame_axes_typed_attrs_exact": false,
+          "pandas_strict_payload_exact": true,
+          "diagnostic_values_with_dtype_checks_disabled_exact": true,
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ],
+          "axis_dtype_or_cardinality_changes": []
+        }
+      }
+    },
+    "make-fresh": {
+      "status": "COMPLETE",
+      "backend": "make",
+      "stage": "fresh",
+      "rows": {
+        "public-Tanzania": 17699,
+        "Feature-default": 17699,
+        "Feature-currency-None": 17699,
+        "CLI-api-2019": 17699,
+        "CLI-artifact-2019": 17699,
+        "CLI-api-2008": 17699,
+        "CLI-artifact-2008": 17699
+      },
+      "per_call_changed_counts": {
+        "public-Tanzania": 3,
+        "Feature-default": 3,
+        "Feature-currency-None": 3,
+        "CLI-api-2019": 3,
+        "CLI-api-2008": 3
+      },
+      "CLI": {
+        "2019": {
+          "rows": 17699,
+          "wrong_wave_rows": 14623,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true
+        },
+        "2008": {
+          "rows": 17699,
+          "wrong_wave_rows": 17699,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true
+        }
+      },
+      "first_fresh_strict": {
+        "public-Tanzania-first-vs-fresh": true,
+        "Feature-default-first-vs-fresh": true,
+        "Feature-currency-None-first-vs-fresh": true,
+        "CLI-api-2019-first-vs-fresh": true,
+        "CLI-2019-artifact-first-vs-fresh": true,
+        "CLI-api-2008-first-vs-fresh": true,
+        "CLI-2008-artifact-first-vs-fresh": true
+      },
+      "not_a_cold_Feature_claim": true,
+      "CLI_API_to_artifact_attrs": {
+        "2019": {
+          "strict_full_frame_axes_typed_attrs_exact": false,
+          "pandas_strict_payload_exact": true,
+          "diagnostic_values_with_dtype_checks_disabled_exact": true,
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ],
+          "axis_dtype_or_cardinality_changes": []
+        },
+        "2008": {
+          "strict_full_frame_axes_typed_attrs_exact": false,
+          "pandas_strict_payload_exact": true,
+          "diagnostic_values_with_dtype_checks_disabled_exact": true,
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ],
+          "axis_dtype_or_cardinality_changes": []
+        }
+      }
+    }
+  },
+  "source_gates": {
+    "new_held_modules": 2,
+    "initial_physical_source_copies": 40,
+    "populated_additional_source_copies": 4,
+    "sidecars": 2,
+    "AG_modules_staged": 0,
+    "plot_inputs_rebuilt": false,
+    "compatible_current_full_coverage_Mali_cache": true,
+    "Mali_source_rebuild_claimed": false
+  },
+  "reviewed1185_invariant": {
+    "unit_replacements_prior_proof": {
+      "2019-20": 86,
+      "2020-21": 322,
+      "total": 408
+    },
+    "actual_community_count_is_independent": 17699,
+    "runtime_tests_exact_reviewed_blobs": true,
+    "no_new_AG_measurement": true
+  },
+  "excluded_attempts": [
+    {
+      "kind": "source helper harness cwd",
+      "error": "KeyError during curation lookup from checkout root",
+      "preserved": "attempt1-source-layers/",
+      "correction": "Use the actual Tanzania/_ context; no product or expected-data change."
+    },
+    {
+      "kind": "make api-audit tooling",
+      "result": 2,
+      "mounted_existing_script_result": 0,
+      "no_dependency_or_guard_change": true
+    },
+    {
+      "kind": "auxiliary saved-artifact unpickle launch",
+      "exception": "ModuleNotFoundError",
+      "successful_decode_API_source_test_cache_write": false,
+      "original_tool_traceback_only": true,
+      "guarded_readonly_followup_complete": true
+    },
+    {
+      "kind": "final text-only packaging cwd",
+      "exception": "FileNotFoundError",
+      "failure_before_write": true,
+      "data_operation": false,
+      "original_tool_traceback_only": true
+    },
+    {
+      "kind": "metadata-only shell interpreter lookup",
+      "exitcode": 127,
+      "script_executed": false,
+      "data_operation": false
+    }
+  ],
+  "discovery": {
+    "country_builder": true,
+    "calls": {
+      "country-var": {
+        "returncode": 0,
+        "community_python_commands": [
+          "(cd ../2019-20/_ && python community_prices.py)",
+          "(cd ../2020-21/_ && python community_prices.py)",
+          "python community_prices.py"
+        ],
+        "python_commands": 3,
+        "produced_no_files": true
+      },
+      "modern2019": {
+        "returncode": 0,
+        "community_python_commands": [
+          "(cd ../2019-20/_ && python community_prices.py)"
+        ],
+        "python_commands": 1,
+        "produced_no_files": true
+      },
+      "modern2020": {
+        "returncode": 0,
+        "community_python_commands": [
+          "(cd ../2020-21/_ && python community_prices.py)"
+        ],
+        "python_commands": 1,
+        "produced_no_files": true
+      },
+      "older-folder": {
+        "returncode": 0,
+        "community_python_commands": [
+          "(cd ../2008-15/_ && python community_prices.py)"
+        ],
+        "python_commands": 1,
+        "produced_no_files": true
+      },
+      "in-tree-country": {
+        "returncode": 0,
+        "community_python_commands": [
+          "(cd . && python ./community_prices.py)"
+        ],
+        "python_commands": 1,
+        "produced_no_files": true
+      },
+      "all-target": {
+        "returncode": 0,
+        "community_python_commands": [
+          "(cd ../2019-20/_ && python community_prices.py)",
+          "(cd ../2020-21/_ && python community_prices.py)"
+        ],
+        "python_commands": 45,
+        "produced_no_files": true
+      }
+    },
+    "source_scope_only": true
+  },
+  "warm_DAG": {
+    "status": "ACTUAL_POPULATED_DRYRUN",
+    "returncode": 0,
+    "country_target_exists": true,
+    "community_commands": [
+      "(cd ../2019-20/_ && python community_prices.py)",
+      "(cd ../2020-21/_ && python community_prices.py)",
+      "python community_prices.py"
+    ],
+    "in_tree_wave_targets_exist": {
+      "2019-20": false,
+      "2020-21": false
+    },
+    "actual_out_of_tree_wave_outputs_exist": {
+      "2019-20": true,
+      "2020-21": true
+    },
+    "data_root_changed": []
+  },
+  "limits": [
+    "No production patch or candidate build; hash scope is a prediction, not a measured candidate census.",
+    "58 existing focused cases do not replace the proposed discriminating baseline-negative retirement tests.",
+    "Feature observations are explicitly warm pooled; no first cold Feature snapshot claimed.",
+    "CLI new artifacts are compared to matched API/serialization stages; API input caches were already populated.",
+    "408 plot-input replacements are an exact reviewed-code/prior-receipt invariant, not new source work.",
+    "Two source modules only; no older-wave community acquisition, household link, food/FCT build, science/grain/label change or multi-country composition.",
+    "Excluded auxiliary unpickle and text-only cwd failures emitted generic non-record tool tracebacks; no successful data/source/API/test/cache operation is claimed for either failed invocation. The metadata-only bare-python script never executed."
+  ],
+  "private_root": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091",
+  "signed": "Sue (GPT-6)",
+  "auxiliary_saved_artifact_inspection_incident": {
+    "classification": "Excluded auxiliary inspection launch outside verified runner",
+    "command": "/local/job40255479/venv_img/bin/python - (inline script preserved as attempt1-aux-aggregate-inspection.py)",
+    "cwd": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091",
+    "explicit_runner_PYTHONPATH_import_assertions": false,
+    "exception_type": "ModuleNotFoundError",
+    "missing_module": "lsms_library",
+    "failure_stage": "Unpickling existing private Feature artifact's class metadata",
+    "exitcode": 1,
+    "frame_record_ID_coordinate_warning_output": false,
+    "generic_traceback_reached_tool_output": true,
+    "original_stdout_stderr_not_captured_to_private_file": true,
+    "data_API_source_decode_or_test_call": false,
+    "cache_write_or_mutation": false,
+    "main_probes_source_frames_receipts_untouched": true,
+    "correction": "Read existing artifacts only via guarded exact-source run.sh; no API/source/test replay."
+  },
+  "artifact_tally": {
+    "warm_DAG": {
+      "status": "ACTUAL_POPULATED_DRYRUN",
+      "returncode": 0,
+      "country_target_exists": true,
+      "community_commands": [
+        "(cd ../2019-20/_ && python community_prices.py)",
+        "(cd ../2020-21/_ && python community_prices.py)",
+        "python community_prices.py"
+      ],
+      "in_tree_wave_targets_exist": {
+        "2019-20": false,
+        "2020-21": false
+      },
+      "actual_out_of_tree_wave_outputs_exist": {
+        "2019-20": true,
+        "2020-21": true
+      },
+      "data_root_changed": []
+    },
+    "CLI_attr_delta": {
+      "default-first": {
+        "2019": {
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ]
+        },
+        "2008": {
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population"
+          ]
+        }
+      },
+      "default-fresh": {
+        "2019": {
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ]
+        },
+        "2008": {
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population"
+          ]
+        }
+      },
+      "make-first": {
+        "2019": {
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ]
+        },
+        "2008": {
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ]
+        }
+      },
+      "make-fresh": {
+        "2019": {
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ]
+        },
+        "2008": {
+          "typed_attrs_exact": false,
+          "attrs_only_in_a": [],
+          "attrs_only_in_b": [],
+          "attrs_common_changed_keys": [
+            "sampling",
+            "population",
+            "recall"
+          ]
+        }
+      }
+    },
+    "memory_native_dtype_changed_levels": {
+      "2019-20": [
+        "v",
+        "i",
+        "j",
+        "u",
+        "variety"
+      ],
+      "2020-21": [
+        "v",
+        "i",
+        "j",
+        "u",
+        "variety"
+      ]
+    },
+    "cold_unsupported_cached_country": {
+      "Tanzania/var/community_prices.parquet": {
+        "rows": 17699,
+        "index": [
+          "t",
+          "v",
+          "i",
+          "j",
+          "u",
+          "variety"
+        ],
+        "attrs": [],
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09"
+        ]
+      }
+    },
+    "Feature_sentinel_counts": {
+      "Tanzania": {
+        "rows": 17699,
+        "visit1": 17699,
+        "obs1": 17699
+      },
+      "Mali": {
+        "rows": 40218,
+        "visit1": 16851,
+        "obs1": 40218
+      }
+    },
+    "denied_categories": [
+      {
+        "event": "DENIED-os.mkdir",
+        "basename": "pytest-cache-files-cd89nk3f",
+        "is_checkout_path": true
+      },
+      {
+        "event": "DENIED-os.symlink",
+        "basename": "python3.11",
+        "is_checkout_path": false
+      }
+    ]
+  },
+  "live_PR1185_status_reported_by_root_not_requeried": {
+    "status": "open and unmerged",
+    "head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+    "branch": "fix/1118-tanzania-unknown-units-20261021"
+  }
+}

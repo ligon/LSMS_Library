@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-22T01:26:27.975827+00:00",
+  "observed_at": "2026-10-22T01:32:30.004463+00:00",
   "actions": [
     {
       "issue": 822,
@@ -274,6 +274,10 @@
     {
       "issue": 1091,
       "action": "Root accepted frozen independent Niger-only review at670de9c,1437manifestentries. OpenedPR1200 stacked on actual1176d602; all author/review limitations retained. No closure/merge. Actual18 bounded composition separately dispatched to niger_lane."
+    },
+    {
+      "issue": 1091,
+      "action": "Tanzania read-only diagnosis frozen99c/exacte75runtime:17699source rows,60normalrequests,58existingtests,4scannerWARN. Rootapproved ONLYcountryconcat+Make145-149 retirement; writer dispatched with new candidate/actual-parent checkouts, no candidate proof or PR yet. Niger1200exact-headCI39705606211success. Umbrella remainsopen/unmerged."
     }
   ],
   "verified_issue_metadata": [
@@ -457,7 +461,7 @@
       "base": "fix/1088-niger-quantity-sentinel-20261021",
       "dependency_pr": 1176,
       "review": "IndependentPASS114tests,12meaningfulparentfailures/fivepasses; source oracle46043/30late/76masks, strict fullframes/typedattrs/scanner/CLI. Explicit original aggregate/auxiliary and independent receipt/seal limits retained.",
-      "ci": "in_progress;run39705606211",
+      "ci": "success;run39705606211;unit-tests/windows-smoke passed;other six jobs skipped",
       "partial_residual": "Umbrella1091 stays open: Mali1199 and Niger1200 await human merge; Tanzania diagnosis/implementation separate."
     }
   ]
