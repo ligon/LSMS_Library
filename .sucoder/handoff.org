@@ -1313,3 +1313,68 @@ Fresh GitHub metadata verifies all25 implementation PRs OPEN/unmerged at expecte
 Goal stays active. No implementation merge, real acquisition, cache promotion or all-country/full-suite verdict. Next: finish independent1196review, root-accept finished1206subcohorts, continue actionablecountryissues, archive newly frozen outputs in25. Source21 still prepared/unassigned; actual20 NigerCROP hash/fullcoverage gate remains required.
 
 Sue
+
+* PR1212 and four validation classifications published -- 2026-10-22 14:13 UTC
+
+Previous goal turn was PROGRESS: root accepted the complete1196 independent review, published PR1212 and assigned Malawi1209.
+This turn also makes authoritative progress: root accepted three frozen country supplements, classified the Nigeria1192 index findings, authenticated nine earlier content digests and verified archive25.
+The goal remains active; no implementation PR was merged.
+The fresh14:13 GitHub inventory verifies all26 implementation PRs OPEN and unmerged at their exact expected heads/bases.
+The campaign source before this final receipt/handoff commit is32a2ec2bb59fa413286acc16ef2af8b4f409cf0e, published to both origins.
+
+PR1212 is OPEN at ee520afeb11ea028a76a371e0c89dc2aba6ad0a4, tested runtime7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1, development basef8d236694c26fe9e709c5548f02c70f74ea72c33.
+Root verified1,113 independent manifest entries,89,298 tracked receipts,1,935 old entries,17 providers and68 copies;149 tests pass and actualf8 controls give23 failures/1 pass.
+Eight data actors pass,44 candidate cold/warm pairs are exact, and570 overlapping groups give438 strict/130 policy-qualified/2 pre-existing singleton qualifications.
+All549/39/1362 fingerprints move; no corpus-wide output claim.
+CI39789045996 succeeded: unit-tests and windows-smoke passed; six jobs including data-tests skipped.
+Independent safe reports and acceptance are in slurm_logs/isa_backlog_2026-10-21/1196-independent/.
+
+The root three-country checker exited0: Tanzania1201 has322 positives(307 strict/15 qualified),30 negatives and16 byte controls; Mali1199 has209 positives(208/1),3 separate attrs-only groups,10 negatives and6 footer/byte controls; Burkina1203 has192 full frames,1 narrower payload diagnostic,5 negatives and4 footer/byte controls.
+All4,789 historical entries,1,072 new entries and813 selected products were gated.
+Mali's historicalmtime gap and every missing memory/stopped-stage limit remain explicit.
+These use the existing shared corrected-v3 calibration, not new42-control runs for each country.
+Reports/root receipts are1206-pr1201-Tanzania/,1206-pr1199-Mali/ and1206-pr1203-Burkina_Faso/; related PR bodies,1206 and1170 read back exactly.
+
+Root1192 classification checker exited0 and is published in1206-pr1192-Nigeria/.
+The original checker remains25 strict passes/12 strict findings.
+Eight findings are full unused domains inherited from actual gained unit keys; four producer expectations have local versus pooled domains/code widths and never asserted attrs.
+Two NEW pure Feature reconstructions bind the complete axes and payloads; no operands were normalized.
+The earlier unqualified axis metadata preservation claim is withdrawn in PR1192,issue1095 and1206/tracker1170.
+Original source-gain/helper/warm/adversarial/fixture memory remains unavailable.
+
+ROOT-API9-SHA256-CONTENT-BASELINE-RULING.json permits NEW comparisons of exactly nine named historical harmonized products after root verified the tracked framework16 proof -> snapshot -> API9 manifest/producer and each original's current authenticated content SHA.
+Historical original size/mode/mtime are absent; new physical receipts describe only the new interval and no other outputs in those roots gain authority.
+The second critic's API9 packet reports14 strict passes/four typed-record failures, nine separate warm-vs-initial strict pairs and one Code projection pass.
+The four failures are PopulationRecord/RecallRecord versus plain parquet dictionaries; all stored field values/types match, but _FIELDS presence differs.
+This packet is frozen pending root classification, with original failures retained and no record coercion.
+
+Three workers remain active.
+malawi_1209 owns the local food-builder retirement on actual PR1208 head d29a56783d08a8a647e2622150a4ee5fbdd7246a.
+Its five-path patch removes the obsolete country script/var rule, preserves native wave rules and adds a phony wave-only target; no framework or scientific edits.
+Six focused tests pass; parent4fail/2pass discriminates the repair.
+Actual26of549country and97of1362wave hashes change, all Malawi; other1265wave keys and39framework hashes stay exact.
+Nineteen binary providers x two L1 layouts x ten private roots give380 binary copies, no sidecar copies; eight roots are conforming and two diagnostic.
+The first two all-wave actors omitted LSMS_MAKE_JOBS and stay diagnostic; corrected roots assert LSMS_MAKE_JOBS=1, actual helper None and MAKEFLAGS=-j1.
+Default source-cold/fresh-warm all/singleton checks complete with16 strict endpoint pairs; Make/derived/audit work continues.
+Earlier relative-output denials and synthetic test stops must remain in the author history.
+
+acquisition_1149 is finishing the bounded12-PR assertion/authority registry and will stop after frozen API9/1180-author packets and the handoff.
+Its1175,1189,1191,1180-author and API9 packets remain pending root acceptance; do not label all earlier12 covered.
+Use that worker slot for independent Malawi1209 review once the author supplies a frozen source/runtime pin.
+validation_reassess retains the later10 plus integrations:1193 standalone/composed284+4 and integration14 165+5 entries,1197 259+4,1194 110+4 are frozen pending root acceptance.
+1195/1202 and a NEW1197 source-detail supplement continue; source-detail authority was traced through17 to authenticated old receipts.
+Keep all original holds, pre-decode metadata-schema stops, source-product actor143 stop and missing memory explicit.
+
+Archive25 writer94223 and verifier16137 both exited0; no root archive process remains.
+Ten frozen roots/2,544 files/4,045,639,544 input bytes produce578,226,314 archive bytes, SHA bef3c42324c24fabbac19843d6a14d4980e5e23151b69abb5652b9fa90a39071.
+Manifest733ff7c8d74189cce09f5a3d142f2ec2b546683d8888b67c07005e563bd2ac3b; launchercbbf6b51cdb948c05b468285b3f15218333b051c47db6648be44d351c423b2f1; verifiere0a72e59858bece8981caf16e6566c3200d8e109b39d0e0cb7547a81408ee7c3.
+All members/source-after/owner/mode/fsync checks pass; launcher and executed verifier are durable owner-only files.
+Runtime data/raw trees are excluded; selected operands-* trees retain country-named subdirectories.
+Later critic packets and root1192 classification require archive26; do not rewrite25.
+
+Next: independently review Malawi1209 when frozen, continue the remaining root cohort acceptances and exact public residuals, then address separate1210 and other actionable country issues.
+Source21 remains prepared/unassigned; actual20 Niger CROP current-hash/full-coverage gate remains mandatory before its integration work.
+The node still has more than32hours left and no deadline warning at14:13UTC.
+No real acquisition, shared-cache mutation, schema/exclusion shortcut, automatic merge or all-PR/full-suite/corpus verdict is authorized or claimed.
+
+Sue
