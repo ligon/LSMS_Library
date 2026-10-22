@@ -109,9 +109,33 @@ hash inventories must precede any approved scoped source build; no corpus rebuil
 
 ### Phase3 verification
 
-Pending implementation authorization. No product patch or data result is
-claimed by this ledger. The frozen diagnosis's absent source-memory operands,
-writer JSON boundary, static-only fingerprint predictions and sealing/guard
-qualifications remain explicit in its pinned reports.
+Stage2 is explicitly authorized by private ROOT-STAGE2-APPROVAL.json. Applied
+the exact reviewed patch SHA256
+6fa0329189b79af399be0bcd89e2367b71041ebe39b648a1c88145906d879482.
+Actual prebuild census, at local_tools SHA256
+0a5f4ce56d471f7db7b925b3bebabd85c6d5de19ffe46579bbd39b9566db52f6,
+moves549/549 API,39/39 framework and1362/1362 declared-wave hashes with exact
+key sets and zero data endpoint changes. No source/API output claim follows.
+
+Focused v1:87cases,85PASS/2FAIL,0skip; original XML/source retained. The two
+failures were an incorrect test expectation for Arrow's unknown-dtype error
+and a fault fixture treating a string temp path as Path. Narrow v2:4PASS,
+only those two corrections plus two new nullable-Float64 exact-comparator
+negatives; no replay of the85passing nodes. Actual-parent public-IO cohort:
+24cases,23 dtype-assertion failures/1already-NaN positive,0errors/skips.
+
+Pandas frame equality with check_exact/zero tolerances accepts tiny nullable
+Float64 changes in this image. New checks add per-column ExtensionArray and
+NumPy exact operands/masks; private strict comparator also covers nested
+Series attrs. Original comparator/results remain preserved and qualified.
+
+Held-source gate:17declared sources (Niger2/Uganda15),68physical copies across
+four parent/candidate Default/Make empty-L2 roots; declared MD5 and full copy
+receipts terminally passed before any decode/API. Actual Niger Make is now
+required, replacing the historical source-only limitation for this new cohort.
+Normal source-cold/warm, full frames/attrs and scoped scanner proof remain
+pending; no author PASS. Frozen diagnosis source-memory/JSON/guard/sealing
+qualifications remain at their original pins. The stage1 manifest includes
+the root's approval file; do not claim it predates that file's creation.
 
 Sue
