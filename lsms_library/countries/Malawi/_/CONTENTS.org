@@ -3061,3 +3061,17 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
     2019-20, whose unit column is not read (=unit2=None=).  Under the
     #1041 ruling a missing unit is =Unknown=, not NULL.  Drafted as a
     residual.
+
+* 2026-10-22 -- reject invalid food waves before cache maintenance (GH #1210)
+
+On release f8, a Default food request containing an unknown wave deleted all five hashless native food parquets before raising the wave-selection =KeyError=.
+A supported wave followed by an unknown wave had the same effect; the country parquet and L1 blobs survived.
+The framework now validates the complete explicit selection before cache maintenance or derived-table pre-work, reusing the existing invalid-wave error without constructing valid waves for that check.
+Valid absent/stale country-cache requests still rebuild hashless waves, and covered warm all-wave and supported singleton requests remain reads.
+
+Explicit iterators are prepared once; this also replaces the parent's exhausted-iterator empty result with the requested data, a measured behavior change.
+The list, tuple, order, duplicate and empty-request controls retain their tested behavior; a string is still treated as an iterable, not a new scalar-wave API.
+Derived calls now reject the selection before valuation lookups or legacy fallbacks; their earlier error timing is intentional.
+
+The tagged framework entry edit moves all 549 country, 39 framework and 1,362 declared-wave fingerprints in the measured inventory, even though the bounded Malawi valid-output comparisons are exact.
+The old null food registrations, obsolete country Make builder, string-policy and scientific/unit residuals are separate from this fix.
