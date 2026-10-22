@@ -1,0 +1,25 @@
+{
+  "status": "FIRST_DEVELOPMENT_MERGE_AND_SCOPE_RECONCILED",
+  "at_UTC": "2026-10-22T22:53:15.201933+00:00",
+  "repository_open_issues": 172,
+  "open_scope_records": 113,
+  "PRlinked": 28,
+  "exclusively_active": 1,
+  "other_open": 84,
+  "accepted_implementation_heads": 32,
+  "open_implementation_PRs": 31,
+  "merged_implementation_PRs": 1,
+  "closed_issue": 1077,
+  "merged_PR": 1182,
+  "merge_SHA": "b42b3bf68d4ada33a57a128a61d276c18103a423",
+  "accepted_head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+  "exact_issue_body_and_closed_completed_readback": true,
+  "collections": {
+    "prs-live-after-first-merge.json": "063ba1e67d55a6205f2bfd958663ec33cd4a0859b16db7525dcbeb867a1f4354",
+    "open-issues-live-after-first-merge.json": "b3e5c7d5430ffcbda4d55413fe62e5051a2658877b4c731b63086800353b4b3d"
+  },
+  "combined_source_root_acceptance_SHA256": "3bf9a5677d0125590664033064cfd2c1b84ee509575638cb4739fe29f4e3d3e4",
+  "combined_integration_tests": "Original actor still running; actual guard-policy failures under classification. No combined PASS claim or further remote merges.",
+  "qualification": "Development merges expressly authorized. This metadata refresh does not repeat any product/data test or certify a new runtime/release.",
+  "signed": "Sue"
+}

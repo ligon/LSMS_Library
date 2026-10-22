@@ -2,30 +2,42 @@
 #+AUTHOR: Sue
 
 * Snapshot
-Captured 2026-10-22T22:01:19.731922+00:00.634333+00:00.
-There are114ISA-related open issue records:29with campaign PRs,oneactive,and84other open records.
-All32implementation PRs are OPEN and unmerged at the recorded exact heads/base branch names.
-Umbrellas,decisions andpartial repairs overlap; these are not114distinct unimplemented bugs.
-The original inventory had97in-scope records;96remain open,duplicate1089is closed,and18campaignfollowups were added.
-Current development0671019 is a dependency-lock-only certifi update after testedf8; mounted runtime remains pinned.
+Captured 2026-10-22T22:53:15.201933+00:00.
+There are 113 ISA-related open issue records: 28 with campaign PRs, one exclusively active, and 84 other open records.
+Of the 32 accepted implementation PRs, one is merged and 31 remain open at the observed heads.
+Umbrellas, decisions and partial repairs overlap; these are not 113 distinct unimplemented bugs.
+The original inventory had 97 in-scope records; 95 remain open, duplicate #1089 and resolved #1077 are closed, and 18 campaign followups were added.
+PR #1182 merged into development as b42b3bf68; root verified its parents and accepted content.
+The clean combined source at 718b8af4 contains all 32 accepted heads, but integration tests are still pending.
+The mounted runtime remains pinned; the pre-existing development advance 0671019 changed only poetry.lock.
 Initial triage guidance must be rechecked against live issues and complete country notes before dispatch.
+
+* Resolved in development
+
+** [[https://github.com/ligon/LSMS_Library/issues/1077][#1077]] Nonfinite label keys and missing-input label fabrication
+PR [[https://github.com/ligon/LSMS_Library/pull/1182][#1182]] merged as b42b3bf68; issue closed completed on 2026-10-22.
+Unit and Windows CI passed, and the bounded integration selection passed 230 tests with no skips.
+Root verified the exact merge parents and accepted library/config/test content; only the prior poetry.lock advance differs.
+Release publication is separate.
 
 * Active work
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
 Countries: Burkina_Faso, Shared framework.
-Ledger-first phase0root-authenticated fd577. Implementation7eb596c223 changes only emptyhelper/GH1039tests/ledger on1215f7; runtime held for exact guard/calibration plan. Truef7control and fixedBF657config prepared separately, preserving populated behavior.
+Source 2f83bb2 adds explicit nullable-dtype serialization after the real BooleanDtype fingerprint failure in 7eb; the original failure and unsaved maps remain documented.
+Root authorized identical 16 metadata test cells on the actual f7 parent and 25 on the candidate; results are pending.
+Fresh amended census, original empty-table/supporting tests, and genuine data work remain held.
 
-* Reviewed changes awaiting human merge
+* Reviewed changes in the authorized development merge queue
 ** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Preserve declaration order in constructed empty tables
 Countries: Uganda, Shared framework.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1220][#1220]], stacked on1217 at a417.
-Independent root acceptance:48 genuine calls;92 strict comparisons=82PASS/10retained orderFAIL;22WARN/head byte-exact. Sealer/postexit0; historical6PKL source-snapshot exception retained. Human merge outstanding; optional explicit-field types remain1218.
+Independent root acceptance:48 genuine calls;92 strict comparisons=82PASS/10retained orderFAIL;22WARN/head byte-exact. Sealer/postexit0; historical6PKL source-snapshot exception retained. Authorized development merge pending; optional explicit-field types remain1218.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
 Countries: Burkina_Faso.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1219][#1219]], stacked on1203 at3dc.
-Independent14targeted+397supportingPASS, actualparent7FAIL7PASS; all22877source rows checked. Original151strict=111PASS+40prewriter-storageFAIL; four additional empty references2DefaultPASS2MakeFAIL remain1218. Guarded execution and original SDK/harness/source/cache protection qualifications are preserved in the root acceptance. Human merge outstanding.
+Independent14targeted+397supportingPASS, actualparent7FAIL7PASS; all22877source rows checked. Original151strict=111PASS+40prewriter-storageFAIL; four additional empty references2DefaultPASS2MakeFAIL remain1218. Guarded execution and original SDK/harness/source/cache protection qualifications are preserved in the root acceptance. Authorized development merge pending.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
 Countries: Malawi.
@@ -55,10 +67,6 @@ PRs: [[https://github.com/ligon/LSMS_Library/pull/1194][#1194]].
 ** [[https://github.com/ligon/LSMS_Library/issues/1062][#1062]] Uganda: Makefile recipes rewrite sibling var/ tables without a hash (fct by nutrition, earnings by income) -- apply the #788 ruling
 Countries: Uganda.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1173][#1173]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1077][#1077]] Label selection: handle nonfinite keys and prevent missing-input label fabrication
-Countries: Ethiopia, Mali, Nigeria, Niger, Tanzania, Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1182][#1182]].
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1078][#1078]] Uganda food cache: confirmed producer race writes nine missing values as zero under current hash
 Countries: Uganda.
@@ -97,6 +105,8 @@ PRs: [[https://github.com/ligon/LSMS_Library/pull/1181][#1181]], [[https://githu
 Remaining scope: Ethiopia/Tanzania PRs reviewed. Malawi/Mali/Nigeria unit normalization remains; other countries outside ISA are separate.
 Fresh dispatch assessment (2026-10-22): Mali and Malawi are mechanical candidates under the settled #1041 ruling, after reconciling Malawi with #1175/#1193.
 Nigeria's fill-versus-drop source-eligibility decision remains separate; old null-unit counts are historical.
+Mali phase0 source/metadata review is complete at ledger24278; exact runtime controllers are being prepared.
+Provider payloads remain held, and meaningful unmapped units must be distinguished from source absence before a fill.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1119][#1119]] #569 residual A: the "not crop-specific" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
