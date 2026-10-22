@@ -1,0 +1,528 @@
+{
+  "status": "implementation_verified_independent_review_pending",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "ledger_first_commit": "d780445e8",
+  "runtime_commit": "69ed4d2028a6f989a8ac45d117a5cffc60a831fd",
+  "author": "Sue",
+  "scope": "Burkina_Faso 2018-19 plot_inputs source identity only",
+  "code21_classification": "input=Seed is unverified legacy, unchanged; qualified crop target is identity fallback only",
+  "new_tests": {
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0
+  },
+  "immutable_f8_counterfactual": {
+    "failed": 8,
+    "passed": 1
+  },
+  "scoped_existing_comparator_tests": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "deselected": 4
+  },
+  "api_audit": {
+    "passed": true,
+    "target": "make api-audit",
+    "interpreter": "mounted image via explicit private POETRY adapter"
+  },
+  "source_receipts": [
+    {
+      "sidecar": "Burkina_Faso/2014/Data/emc2014_p1_logement_27022015.dta.dvc",
+      "md5": "8925253ab9c8c6479fb927b8f6c7130e",
+      "held": true,
+      "bytes": 510816
+    },
+    {
+      "sidecar": "Burkina_Faso/2014/Data/emc2014_welfare.dta.dvc",
+      "md5": "0b0e21c43e914bb9d6c061a3cf70552b",
+      "held": true,
+      "bytes": 923269
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/ehcvm_ponderations_bfa2018.dta.dvc",
+      "md5": "c44fd6b15c2ae0a4a29eb9c3e89f32ac",
+      "held": true,
+      "bytes": 6192
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/grappe_gps_bfa2018.dta.dvc",
+      "md5": "f80ba40b68a33f6d7b3f1799402f5731",
+      "held": true,
+      "bytes": 40793
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/s00_me_bfa2018.dta.dvc",
+      "md5": "0adebc92d8366c791dd6fe7151b17951",
+      "held": true,
+      "bytes": 1403162
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/s16b_me_bfa2018.dta.dvc",
+      "md5": "32eb603ade5ae97b1844c00a2923fd31",
+      "held": true,
+      "bytes": 988943
+    },
+    {
+      "sidecar": "Burkina_Faso/2021-22/Data/ehcvm_panel_ponderations_bfa2021.dta.dvc",
+      "md5": "5f145ca83eb1e06744849ccbee4d80a4",
+      "held": true,
+      "bytes": 9075
+    },
+    {
+      "sidecar": "Burkina_Faso/2021-22/Data/s00_me_bfa2021.dta.dvc",
+      "md5": "38a4d4bf48065fef16f808918e11ae22",
+      "held": true,
+      "bytes": 3005184
+    }
+  ],
+  "unacquired_instrument_gaps": [
+    {
+      "sidecar": "Burkina_Faso/2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague1.xls.dvc",
+      "md5": "b4b6edb0eaead5615c218be15c20f175",
+      "held": false
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague2.xls.dvc",
+      "md5": "5120acd2332832b4033f2d1c9aad0ed3",
+      "held": false
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Documentation/bfa_ehcvm1_nomenclature_vague1.pdf.dvc",
+      "md5": "33ff5d72b5e14ce60d9eadd7168d6e30",
+      "held": false
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Documentation/bfa_ehcvm1_nomenclature_vague2.pdf.dvc",
+      "md5": "bb180644aa5d61af8099c1ebeb8fcda7",
+      "held": false
+    }
+  ],
+  "physical_preparation": {
+    "BF_L2_absent_before_each_cold_build": true,
+    "BF_L2_seeded_or_restamped": false,
+    "held_BF_blobs": 8,
+    "held_bytes": 6887434,
+    "physical_comparator_cache_files": 12,
+    "comparator_source": "quiescent #1123 diagnosis; hashes and full wave coverage verified before copying"
+  },
+  "runtime_file_sha256": {
+    "lsms_library/countries/Burkina_Faso/2018-19/_/plot_inputs.py": "b0609a8be475d18044f271dfbabd4765e5cfbae5671989a2862d7a6346c991d4",
+    "lsms_library/countries/Burkina_Faso/_/categorical_mapping.org": "77c7c1d94f6447ca2d0f35c58686e29fb3f545aca3096b435845100de9512991",
+    "lsms_library/countries/Burkina_Faso/_/CONTENTS.org": "952a8f2609212b5f8b55e9cbeb8da776e054e20e54a6ff2e591eeafeb63f626c",
+    "tests/test_burkina_faso_plot_inputs_identity.py": "ea75cd5c827ef37d7e798354bfd11fb0098ad4383eb64ca02bb6c5b135b96d8f"
+  },
+  "evidence": {
+    "baseline_cold": {
+      "tag": "baseline",
+      "mode": "cold",
+      "package": "/local/job40255479/worktrees/isa-baseline/lsms_library/__init__.py",
+      "calls": {
+        "sample": {
+          "rows": 20648,
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "cluster_features": {
+          "rows": 2035,
+          "warning_classes": {
+            "GrainCollapseWarning": 1
+          }
+        },
+        "plot_inputs": {
+          "rows": 22694,
+          "warning_classes": {
+            "GrainCollapseWarning": 1,
+            "NullReadWarning": 1
+          }
+        }
+      },
+      "hashes": {
+        "sample": {
+          "expected": "bf228e0c542b527d54a92b927da8944803a23787ccedbb54173fe3cc40e5b90d",
+          "stored": "bf228e0c542b527d54a92b927da8944803a23787ccedbb54173fe3cc40e5b90d",
+          "coverage": [
+            "2014",
+            "2018-19",
+            "2021-22"
+          ]
+        },
+        "cluster_features": {
+          "expected": "141a6b0a6f4ce75a6d900492c6e197b09a993f700e8ccd8d31cfa7b6c65be417",
+          "stored": "141a6b0a6f4ce75a6d900492c6e197b09a993f700e8ccd8d31cfa7b6c65be417",
+          "coverage": [
+            "2014",
+            "2018-19",
+            "2021-22"
+          ]
+        },
+        "plot_inputs": {
+          "expected": "5326b7ac84dcb906a568707e92528cf8f96f99e21aab8c1412252f76abc08238",
+          "stored": "5326b7ac84dcb906a568707e92528cf8f96f99e21aab8c1412252f76abc08238",
+          "coverage": [
+            "2014",
+            "2018-19",
+            "2021-22"
+          ]
+        }
+      },
+      "BF_L2_initially_physically_absent": true,
+      "current_wave_counts": {
+        "2018-19": 22694
+      },
+      "subset_rows": {
+        "2014": 0,
+        "2021-22": 0
+      },
+      "comparators_full_frames_exact": true,
+      "comparator_cache_bytes_exact": true,
+      "seconds": 7.256870621815324
+    },
+    "candidate_cold": {
+      "tag": "candidate",
+      "mode": "cold",
+      "package": "/local/job40255479/worktrees/isa-Burkina_Faso-1123/lsms_library/__init__.py",
+      "calls": {
+        "sample": {
+          "rows": 20648,
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "cluster_features": {
+          "rows": 2035,
+          "warning_classes": {
+            "GrainCollapseWarning": 1
+          }
+        },
+        "plot_inputs": {
+          "rows": 22877,
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        }
+      },
+      "hashes": {
+        "sample": {
+          "expected": "462e0b96a366f1cd8d46cdbc43d9d683caef704d69c03de30b826fe38a62d995",
+          "stored": "462e0b96a366f1cd8d46cdbc43d9d683caef704d69c03de30b826fe38a62d995",
+          "coverage": [
+            "2014",
+            "2018-19",
+            "2021-22"
+          ]
+        },
+        "cluster_features": {
+          "expected": "8d5cdf5ea4f0ee52ad4344c128c9458afb2c268946d66d98cc5c3d140e1ecc16",
+          "stored": "8d5cdf5ea4f0ee52ad4344c128c9458afb2c268946d66d98cc5c3d140e1ecc16",
+          "coverage": [
+            "2014",
+            "2018-19",
+            "2021-22"
+          ]
+        },
+        "plot_inputs": {
+          "expected": "40bca1eecd39726090f27c13a647122df8254a2e1da914ab5bbd0d0c053791bb",
+          "stored": "40bca1eecd39726090f27c13a647122df8254a2e1da914ab5bbd0d0c053791bb",
+          "coverage": [
+            "2014",
+            "2018-19",
+            "2021-22"
+          ]
+        }
+      },
+      "BF_L2_initially_physically_absent": true,
+      "current_wave_counts": {
+        "2018-19": 22877
+      },
+      "subset_rows": {
+        "2014": 0,
+        "2021-22": 0
+      },
+      "comparators_full_frames_exact": true,
+      "comparator_cache_bytes_exact": true,
+      "seconds": 7.630594484508038
+    },
+    "baseline_fresh_process_warm": {
+      "tag": "baseline",
+      "mode": "warm",
+      "package": "/local/job40255479/worktrees/isa-baseline/lsms_library/__init__.py",
+      "calls": {
+        "plot_inputs": {
+          "rows": 22694,
+          "warning_classes": {
+            "GrainCollapseWarning": 1,
+            "NullReadWarning": 1
+          }
+        },
+        "sample": {
+          "rows": 20648,
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "cluster_features": {
+          "rows": 2035,
+          "warning_classes": {
+            "GrainCollapseWarning": 1
+          }
+        }
+      },
+      "hashes": {},
+      "new_Country_exact": true,
+      "all_warm_parquet_bytes_and_mtimes_exact": true,
+      "seconds": 1.923233486711979
+    },
+    "candidate_fresh_process_warm": {
+      "tag": "candidate",
+      "mode": "warm",
+      "package": "/local/job40255479/worktrees/isa-Burkina_Faso-1123/lsms_library/__init__.py",
+      "calls": {
+        "plot_inputs": {
+          "rows": 22877,
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "sample": {
+          "rows": 20648,
+          "warning_classes": {
+            "NullReadWarning": 1
+          }
+        },
+        "cluster_features": {
+          "rows": 2035,
+          "warning_classes": {
+            "GrainCollapseWarning": 1
+          }
+        }
+      },
+      "hashes": {},
+      "new_Country_exact": true,
+      "all_warm_parquet_bytes_and_mtimes_exact": true,
+      "seconds": 1.971946001984179
+    },
+    "complete_frame_checks": {
+      "supporting_frames_exact": {
+        "sample": {
+          "rows": 20648,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "sample-raw": {
+          "rows": 20648,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "wave-2018-19-sample": {
+          "rows": 7010,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "wave-2021-22-sample": {
+          "rows": 3227,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "wave-2014-sample": {
+          "rows": 10411,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "cluster_features": {
+          "rows": 2035,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "cluster_features-raw": {
+          "rows": 2035,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "wave-2014-cluster_features": {
+          "rows": 10800,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "wave-2018-19-cluster_features": {
+          "rows": 7010,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        },
+        "wave-2021-22-cluster_features": {
+          "rows": 3227,
+          "all_values_index_dtypes_logical_attrs_exact": true
+        }
+      },
+      "comparator_frames_exact": {
+        "Benin": 10605,
+        "Togo": 13730
+      },
+      "restored_rows": {
+        "rows": 183,
+        "reported_Quantity_Kilogramme": 2409.58,
+        "Purchased_false": 183,
+        "Quantity_purchased_all_missing": true,
+        "all_original_wave_payloads_and_other_keys_exact": true,
+        "changed_crop_labels": 877,
+        "all_original_selected_and_lost_rows_present": true
+      },
+      "sample_per_wave_rows": {
+        "2014": 10411,
+        "2018-19": 7010,
+        "2021-22": 3227
+      },
+      "cluster_features_per_wave_rows": {
+        "2014": 900,
+        "2018-19": 585,
+        "2021-22": 550
+      },
+      "candidate_Country_rows": 22877
+    },
+    "actual_hash_mapping_audit_accounting": {
+      "actual_country_cells": 549,
+      "changed_BF_cells": [
+        "Burkina_Faso/sample",
+        "Burkina_Faso/cluster_features",
+        "Burkina_Faso/household_roster",
+        "Burkina_Faso/individual_education",
+        "Burkina_Faso/subjective_well_being",
+        "Burkina_Faso/panel_ids",
+        "Burkina_Faso/food_acquired",
+        "Burkina_Faso/assets",
+        "Burkina_Faso/housing",
+        "Burkina_Faso/shocks",
+        "Burkina_Faso/plot_features",
+        "Burkina_Faso/food_security",
+        "Burkina_Faso/food_coping",
+        "Burkina_Faso/months_food_inadequate",
+        "Burkina_Faso/interview_date",
+        "Burkina_Faso/crop_production",
+        "Burkina_Faso/plot_inputs",
+        "Burkina_Faso/livestock",
+        "Burkina_Faso/plot_labor",
+        "Burkina_Faso/people_last7days",
+        "Burkina_Faso/food_expenditures",
+        "Burkina_Faso/food_prices",
+        "Burkina_Faso/food_quantities",
+        "Burkina_Faso/household_characteristics"
+      ],
+      "other_country_hashes_exact": 525,
+      "framework_fingerprints_exact": 39,
+      "exact_three_mapping_cells": [
+        {
+          "source": "Semences d'autres c\u00e9r\u00e9ales",
+          "before": "Autre crop",
+          "after": "Autre c\u00e9r\u00e9ale"
+        },
+        {
+          "source": "Plants/boutures de tubercules",
+          "before": "Autre crop",
+          "after": "Autre tubercule"
+        },
+        {
+          "source": "21",
+          "before": "Autre crop",
+          "after": "Unknown [Burkina_Faso 2018-19 s16bq01=21]"
+        }
+      ],
+      "legacy_input_map_exact": true,
+      "Feature_audit": {
+        "unchanged_full_records": 6,
+        "removed": 2,
+        "added": 0,
+        "removed_checks": {
+          "runtime_warning": 2
+        },
+        "added_checks": {},
+        "removed_preexisting_BF_input_grain_warnings": 2,
+        "existing_other_full_records_exact": 6,
+        "full_delta_accounted": true,
+        "paths_only_normalized_for_common_records": true
+      },
+      "comparator_Feature_frames_and_logical_attrs_exact": true
+    },
+    "baseline_Feature": {
+      "rows": 47029,
+      "country_rows": {
+        "Benin": 10605,
+        "Burkina_Faso": 22694,
+        "Togo": 13730
+      },
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "i",
+        "plot_id",
+        "input",
+        "j",
+        "u",
+        "season"
+      ],
+      "all_Country_values_preserved_after_canonical_alignment": true,
+      "additional_Feature_row_loss": 0,
+      "all_parquet_bytes_and_mtimes_unchanged": true,
+      "warning_classes": {
+        "GrainCollapseWarning": 1,
+        "NullReadWarning": 1,
+        "UserWarning": 1
+      }
+    },
+    "candidate_Feature": {
+      "rows": 47212,
+      "country_rows": {
+        "Benin": 10605,
+        "Burkina_Faso": 22877,
+        "Togo": 13730
+      },
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "i",
+        "plot_id",
+        "input",
+        "j",
+        "u",
+        "season"
+      ],
+      "all_Country_values_preserved_after_canonical_alignment": true,
+      "additional_Feature_row_loss": 0,
+      "all_parquet_bytes_and_mtimes_unchanged": true,
+      "warning_classes": {
+        "NullReadWarning": 1,
+        "UserWarning": 1
+      }
+    },
+    "baseline_audit_summary": {
+      "records": 8,
+      "status_counts": {
+        "warn": 8
+      },
+      "check_counts": {
+        "index_levels_match_scheme": 3,
+        "runtime_warning": 5
+      },
+      "phase_requests": [
+        "1",
+        "2"
+      ],
+      "phase2_grid_available": false
+    },
+    "candidate_audit_summary": {
+      "records": 6,
+      "status_counts": {
+        "warn": 6
+      },
+      "check_counts": {
+        "index_levels_match_scheme": 3,
+        "runtime_warning": 3
+      },
+      "phase_requests": [
+        "1",
+        "2"
+      ],
+      "phase2_grid_available": false
+    }
+  },
+  "limits": [
+    "No physical crop meaning established for native 2018 code21",
+    "2014/2021-22 plot_inputs coverage remains absent; zero-row subset behavior retained",
+    "Current source-backed sample counts differ from historical CONTENTS figures equally at f8 and candidate; no sample policy change",
+    "Other #1123 countries and #1119 vocabulary alignment remain separate",
+    "No GitHub write, acquisition, fixture/golden/dependency/lock change, shared runtime edit, or shared cache mutation"
+  ]
+}

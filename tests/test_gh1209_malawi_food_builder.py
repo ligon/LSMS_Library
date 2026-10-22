@@ -58,7 +58,7 @@ def test_native_wave_assembly_preserves_requested_food(tmp_path, monkeypatch,
     c._updated_ids_cache = {}
     seen = []
 
-    def native_wave(self, request):
+    def native_wave(self, request, *, _with_origin=False):
         assert request == "food_acquired", request
         seen.append(self.year)
         frame = pd.DataFrame({
@@ -68,12 +68,12 @@ def test_native_wave_assembly_preserves_requested_food(tmp_path, monkeypatch,
             "Quantity": [0.0, 2.5], "Expenditure": [0.0, float("nan")],
             "Quantity_kg": [0.0, 2.5],
         }).set_index(["t", "i", "j", "u", "s"])
-        # Native scripts write this parquet before returning. Its presence
-        # also tells Wave.food_acquired to keep already-canonical columns.
+        # Model the native script-parquet producer, whose explicit provenance
+        # tells Wave.food_acquired to keep already-canonical columns.
         out = data_root("Malawi") / self.year / "_" / "food_acquired.parquet"
         out.parent.mkdir(parents=True, exist_ok=True)
         frame.to_parquet(out)
-        return frame
+        return (frame, "parquet") if _with_origin else frame
 
     # Keep API metadata/finalization real, without asking a second table for
     # microdata. This test is about assembly, not the already-tested v join.

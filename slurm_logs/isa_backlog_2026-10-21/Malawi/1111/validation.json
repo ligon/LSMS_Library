@@ -1,0 +1,699 @@
+{
+  "base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "ledger_first_commit": "63c2c4315",
+  "runtime": {
+    "Country_before_rows": 180184,
+    "Country_after_rows": 179949,
+    "newly_coalesced": 235,
+    "full_Country_expected_projection_exact": true,
+    "unaffected_full_frame_order_dtypes_attrs_exact": true,
+    "untouched_wave_frames": [
+      {
+        "wave": "2013-14",
+        "rows": 16188,
+        "frame_order_dtypes_attrs_exact": true
+      },
+      {
+        "wave": "2016-17",
+        "rows": 52494,
+        "frame_order_dtypes_attrs_exact": true
+      }
+    ],
+    "f8_organic_11075_zero_rows_exact": true,
+    "all_fields_and_nonunit_keys_accounted": true,
+    "Feature_before_rows": 264400,
+    "Feature_after_rows": 264165,
+    "full_Feature_expected_projection_dtypes_attrs_exact": true,
+    "Uganda_full_frame_attrs_exact": true,
+    "Uganda_files_byte_exact": [
+      "var/plot_inputs.parquet",
+      "var/sample.parquet"
+    ],
+    "inorganic_numeric_Quantity_before_after": 2899339.95,
+    "Nitrogen_before": 840235.7795800001,
+    "Nitrogen_after": 1028195.63206,
+    "Nitrogen_delta": 187959.85247999988,
+    "decimal_expected_delta": 187959.85248,
+    "floating_difference_from_decimal": -1.1641532182693481e-10,
+    "analysis_precision_abs_check": 1e-08,
+    "protected_source_blobs_exact": {
+      "lsms_library/countries/Malawi/_/malawi.py": "f9a361c755fdef551eff28269a9f69caad36e3d5e5edb31d599d757585a5b86b",
+      "lsms_library/countries/Malawi/2013-14/_/plot_inputs.py": "a5c48cea7a53fa2084e86af667a17729843f023e1f7a9f947a4748eeb29e90f7",
+      "lsms_library/countries/Malawi/2016-17/_/plot_inputs.py": "de6bfb0d9d1ffe6f37e8a821677ac75092a0f0af598dddd4d63d0ece5111a788",
+      "lsms_library/countries/Malawi/_/data_scheme.yml": "1cb45a23abb97fe6dbc95c077b41a905122d92086e189742912e183bf3a39400"
+    },
+    "separate_organic_composition_pending_root": true
+  },
+  "source": {
+    "documents": [
+      {
+        "source": "Malawi/2010-11/Documentation/IHS3.Agriculture.Questionnaire.FINAL.pdf",
+        "md5": "d6e0d71486fd6ae4d7dda5b8e1854278",
+        "sha256": "0ce93b854e3130fd0d92b035b31d7c74a279376ecd60313547b83f220f749ec0",
+        "page": 13,
+        "primary_roles_verified": true
+      },
+      {
+        "source": "Malawi/2019-20/Documentation/malawi_fifth _integrated_household_survey_2019_2020_agriculture_questionnaire.pdf",
+        "md5": "86cc1f419c1320eb969d11a6d24a63e0",
+        "sha256": "5e075a86b4ec218103b31ce6d6dc8da8f3679a83969316a9a8a203bad2335347",
+        "page": 10,
+        "primary_roles_verified": true
+      }
+    ],
+    "sources": [
+      {
+        "source": "Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_d.dta",
+        "slot": 1,
+        "rows": 11364,
+        "quantity_field": "ag_d39d",
+        "quantity_sum": 662587.5,
+        "quantity_missing": 8,
+        "quantity_zero": 0,
+        "native_quantity_field": "ag_d39b",
+        "native_unit_field": "ag_d39c",
+        "timing_field": "ag_d39e",
+        "metadata_roles_verified": true
+      },
+      {
+        "source": "Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_d.dta",
+        "slot": 2,
+        "rows": 5285,
+        "quantity_field": "ag_d39i",
+        "quantity_sum": 306767.0,
+        "quantity_missing": 4,
+        "quantity_zero": 0,
+        "native_quantity_field": "ag_d39g",
+        "native_unit_field": "ag_d39h",
+        "timing_field": "ag_d39j",
+        "metadata_roles_verified": true
+      },
+      {
+        "source": "Malawi/2019-20/Data/Cross_Sectional/ag_mod_d.dta",
+        "slot": 1,
+        "rows": 8602,
+        "quantity_field": "ag_d39d",
+        "quantity_sum": 409435.15,
+        "quantity_missing": 0,
+        "quantity_zero": 11,
+        "native_quantity_field": "ag_d39b",
+        "native_unit_field": "ag_d39c",
+        "timing_field": "ag_d39e",
+        "metadata_roles_verified": true
+      },
+      {
+        "source": "Malawi/2019-20/Data/Cross_Sectional/ag_mod_d.dta",
+        "slot": 2,
+        "rows": 3962,
+        "quantity_field": "ag_d39j",
+        "quantity_sum": 199327.55,
+        "quantity_missing": 0,
+        "quantity_zero": 2,
+        "native_quantity_field": "ag_d39h",
+        "native_unit_field": "ag_d39i",
+        "timing_field": null,
+        "metadata_roles_verified": true
+      },
+      {
+        "source": "Malawi/2019-20/Data/Panel/ag_mod_d_19.dta",
+        "slot": 1,
+        "rows": 2763,
+        "quantity_field": "ag_d39d",
+        "quantity_sum": 128137.75,
+        "quantity_missing": 0,
+        "quantity_zero": 4,
+        "native_quantity_field": "ag_d39b",
+        "native_unit_field": "ag_d39c",
+        "timing_field": "ag_d39e",
+        "metadata_roles_verified": true
+      },
+      {
+        "source": "Malawi/2019-20/Data/Panel/ag_mod_d_19.dta",
+        "slot": 2,
+        "rows": 1217,
+        "quantity_field": "ag_d39j",
+        "quantity_sum": 59509.0,
+        "quantity_missing": 0,
+        "quantity_zero": 1,
+        "native_quantity_field": "ag_d39h",
+        "native_unit_field": "ag_d39i",
+        "timing_field": null,
+        "metadata_roles_verified": true
+      }
+    ],
+    "source_application_rows": 33193,
+    "candidate_target_groups": 32917,
+    "baseline_target_groups": 33152,
+    "newly_coalesced": 235,
+    "source_quantity_total": 1765763.95,
+    "all_current_quantities_equal_source_group_sums": true,
+    "baseline_and_candidate_group_amounts_exact": true,
+    "retention_zero_missing_unchanged": true,
+    "groups": [
+      {
+        "wave": "2010-11",
+        "newly_coalesced_groups": 51,
+        "members": 102,
+        "source_quantity_sum": 4670.0,
+        "all_affirmative_positive_same_source": true
+      },
+      {
+        "wave": "2019-20",
+        "newly_coalesced_groups": 184,
+        "members": 368,
+        "source_quantity_sum": 17322.0,
+        "all_affirmative_positive_same_source": true
+      }
+    ],
+    "235_payload_null_masks_exact": true,
+    "native_pairs_retained_in_private_evidence_without_using_them_as_total_units": true
+  },
+  "census": {
+    "api": [
+      {
+        "side": "baseline",
+        "Country_rows": 180184,
+        "nonorganic_rows": 169109,
+        "inorganic_rows": 54339,
+        "inorganic_by_wave": [
+          {
+            "wave": "2010-11",
+            "inorganic_rows": 16611,
+            "Gram_rows": 8292,
+            "null_u_rows": 6217,
+            "numeric_Quantity_sum": 969354.5
+          },
+          {
+            "wave": "2013-14",
+            "inorganic_rows": 5186,
+            "Gram_rows": 1804,
+            "null_u_rows": 91,
+            "numeric_Quantity_sum": 280549.0
+          },
+          {
+            "wave": "2016-17",
+            "inorganic_rows": 16001,
+            "Gram_rows": 1317,
+            "null_u_rows": 5371,
+            "numeric_Quantity_sum": 853027.0
+          },
+          {
+            "wave": "2019-20",
+            "inorganic_rows": 16541,
+            "Gram_rows": 1889,
+            "null_u_rows": 5365,
+            "numeric_Quantity_sum": 796409.45
+          }
+        ]
+      },
+      {
+        "side": "candidate",
+        "Country_rows": 179949,
+        "nonorganic_rows": 168874,
+        "inorganic_rows": 54104,
+        "inorganic_by_wave": [
+          {
+            "wave": "2010-11",
+            "inorganic_rows": 16560,
+            "Gram_rows": 0,
+            "null_u_rows": 0,
+            "numeric_Quantity_sum": 969354.5
+          },
+          {
+            "wave": "2013-14",
+            "inorganic_rows": 5186,
+            "Gram_rows": 1804,
+            "null_u_rows": 91,
+            "numeric_Quantity_sum": 280549.0
+          },
+          {
+            "wave": "2016-17",
+            "inorganic_rows": 16001,
+            "Gram_rows": 1317,
+            "null_u_rows": 5371,
+            "numeric_Quantity_sum": 853027.0
+          },
+          {
+            "wave": "2019-20",
+            "inorganic_rows": 16357,
+            "Gram_rows": 0,
+            "null_u_rows": 0,
+            "numeric_Quantity_sum": 796409.45
+          }
+        ]
+      }
+    ],
+    "unchanged_selected_source_eligibility": [
+      {
+        "wave": "2010-11",
+        "source_application_slots": 16649,
+        "Quantity_missing": 12,
+        "Quantity_zero": 0,
+        "source_use_yes": 16616,
+        "source_use_no": 20,
+        "source_use_missing": 13
+      },
+      {
+        "wave": "2019-20",
+        "source_application_slots": 16544,
+        "Quantity_missing": 0,
+        "Quantity_zero": 18,
+        "source_use_yes": 16544,
+        "source_use_no": 0,
+        "source_use_missing": 0
+      }
+    ]
+  },
+  "sample": {
+    "sample_rows": 57118,
+    "all_four_public_frames_order_dtypes_attrs_exact": true,
+    "sample_cache_frames": [
+      {
+        "path": "Malawi/2010-11/_/sample.parquet",
+        "rows": 12271,
+        "four_roots_full_frame_order_dtypes_attrs_exact": true
+      },
+      {
+        "path": "Malawi/2013-14/_/sample.parquet",
+        "rows": 4000,
+        "four_roots_full_frame_order_dtypes_attrs_exact": true
+      },
+      {
+        "path": "Malawi/2016-17/_/sample.parquet",
+        "rows": 14955,
+        "four_roots_full_frame_order_dtypes_attrs_exact": true
+      },
+      {
+        "path": "Malawi/var/sample.parquet",
+        "rows": 57118,
+        "four_roots_full_frame_order_dtypes_attrs_exact": true
+      },
+      {
+        "path": "Malawi/2004-05/_/sample.parquet",
+        "rows": 11280,
+        "four_roots_full_frame_order_dtypes_attrs_exact": true
+      },
+      {
+        "path": "Malawi/2019-20/_/sample.parquet",
+        "rows": 14612,
+        "four_roots_full_frame_order_dtypes_attrs_exact": true
+      }
+    ],
+    "fresh_cold_full_warning_records_order_exact": true,
+    "fresh_cold_warnings_each": 18,
+    "fresh_cold_warning_counts": [
+      {
+        "category": "RuntimeWarning",
+        "message": "Issue with categorical mapping: hh_a22",
+        "count": 5
+      },
+      {
+        "category": "RuntimeWarning",
+        "message": "Issue with categorical mapping: hh_a23",
+        "count": 5
+      },
+      {
+        "category": "RuntimeWarning",
+        "message": "Issue with categorical mapping: hh_a37",
+        "count": 4
+      },
+      {
+        "category": "RuntimeWarning",
+        "message": "Issue with categorical mapping: hh_a40",
+        "count": 4
+      }
+    ],
+    "main_candidate_six_warnings_preexisting_full_category_message_records": true,
+    "main_six_warning_counts": [
+      {
+        "category": "RuntimeWarning",
+        "message": "Issue with categorical mapping: hh_a22",
+        "count": 2
+      },
+      {
+        "category": "RuntimeWarning",
+        "message": "Issue with categorical mapping: hh_a23",
+        "count": 2
+      },
+      {
+        "category": "RuntimeWarning",
+        "message": "Issue with categorical mapping: hh_a37",
+        "count": 1
+      },
+      {
+        "category": "RuntimeWarning",
+        "message": "Issue with categorical mapping: hh_a40",
+        "count": 1
+      }
+    ],
+    "fresh_process_warm_zero_writes_all_four_roots": true
+  },
+  "categorical_source_bindings": [
+    {
+      "source": "Malawi/2016-17/Data/Panel/hh_mod_a_filt_16.dta",
+      "column": "hh_a22",
+      "label": "SUPERVISOR VISIT1",
+      "absent_value_label_set": "hh_a22",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2016-17/Data/Panel/hh_mod_a_filt_16.dta",
+      "column": "hh_a23",
+      "label": "ENUMERATOR VISIT1",
+      "absent_value_label_set": "hh_a23",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2016-17/Data/Panel/hh_mod_a_filt_16.dta",
+      "column": "hh_a37",
+      "label": "ENUMERATOR VISIT2",
+      "absent_value_label_set": "hh_a37",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2016-17/Data/Panel/hh_mod_a_filt_16.dta",
+      "column": "hh_a40",
+      "label": "SUPERVISOR VISIT2",
+      "absent_value_label_set": "hh_a40",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2019-20/Data/Cross_Sectional/hh_mod_a_filt.dta",
+      "column": "hh_a22",
+      "label": "SUPERVISOR",
+      "absent_value_label_set": "hh_a22",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2019-20/Data/Cross_Sectional/hh_mod_a_filt.dta",
+      "column": "hh_a23",
+      "label": "ENUMERATOR",
+      "absent_value_label_set": "hh_a23",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2019-20/Data/Panel/hh_mod_a_filt_19.dta",
+      "column": "hh_a22",
+      "label": "SUPERVISOR",
+      "absent_value_label_set": "hh_a22",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2019-20/Data/Panel/hh_mod_a_filt_19.dta",
+      "column": "hh_a23",
+      "label": "ENUMERATOR",
+      "absent_value_label_set": "hh_a23",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2019-20/Data/Panel/hh_mod_a_filt_19.dta",
+      "column": "hh_a37",
+      "label": "A37. ENUMERATOR",
+      "absent_value_label_set": "hh_a37",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    },
+    {
+      "source": "Malawi/2019-20/Data/Panel/hh_mod_a_filt_19.dta",
+      "column": "hh_a40",
+      "label": "A40. SUPERVISOR",
+      "absent_value_label_set": "hh_a40",
+      "cause": "Stata variable names a value-label set absent from file; ligonlibrary.dataframes.from_dta leaves raw column unchanged",
+      "used_by_declared_sample": false
+    }
+  ],
+  "hash_scope": {
+    "actual_country_hashes": 549,
+    "actual_framework_fingerprints": 39,
+    "trusted_f8_full_keyset_and_values_exact": true,
+    "trusted_inventory": "/local/job40255479/control/isa-backlog-20261021/review-1123-Burkina_Faso/baseline-hashes.json",
+    "trusted_inventory_sha256": "beebfd5841612ed29da663b82f4b4a1843188df4bb6dc0b66b5ad3153a4e2128",
+    "changed_Malawi_API_hashes": [
+      "Malawi/sample",
+      "Malawi/cluster_features",
+      "Malawi/household_roster",
+      "Malawi/individual_education",
+      "Malawi/subjective_well_being",
+      "Malawi/food_security",
+      "Malawi/panel_ids",
+      "Malawi/housing",
+      "Malawi/food_acquired",
+      "Malawi/interview_date",
+      "Malawi/shocks",
+      "Malawi/assets",
+      "Malawi/plot_features",
+      "Malawi/food_coping",
+      "Malawi/months_food_inadequate",
+      "Malawi/crop_production",
+      "Malawi/plot_inputs",
+      "Malawi/livestock",
+      "Malawi/anthropometry",
+      "Malawi/plot_labor",
+      "Malawi/people_last7days",
+      "Malawi/community_prices",
+      "Malawi/food_expenditures",
+      "Malawi/food_prices",
+      "Malawi/food_quantities",
+      "Malawi/household_characteristics"
+    ],
+    "nonderived_Malawi_keys": [
+      "Malawi/sample",
+      "Malawi/cluster_features",
+      "Malawi/household_roster",
+      "Malawi/individual_education",
+      "Malawi/subjective_well_being",
+      "Malawi/food_security",
+      "Malawi/panel_ids",
+      "Malawi/housing",
+      "Malawi/food_acquired",
+      "Malawi/interview_date",
+      "Malawi/shocks",
+      "Malawi/assets",
+      "Malawi/plot_features",
+      "Malawi/food_coping",
+      "Malawi/months_food_inadequate",
+      "Malawi/crop_production",
+      "Malawi/plot_inputs",
+      "Malawi/livestock",
+      "Malawi/anthropometry",
+      "Malawi/plot_labor",
+      "Malawi/people_last7days",
+      "Malawi/community_prices"
+    ],
+    "derived_Malawi_keys": [
+      "Malawi/food_expenditures",
+      "Malawi/food_prices",
+      "Malawi/food_quantities",
+      "Malawi/household_characteristics"
+    ],
+    "unchanged_other_country_hashes": 523,
+    "unchanged_framework_fingerprints": 39,
+    "cause": "Wave._input_hash content-hashes every Python build input from wave_/ and country_/ for every table; two wave driver edits propagate through all Malawi country hashes",
+    "prior_22_key_receipts_not_rewritten": true
+  },
+  "scanner": {
+    "records_each": 15,
+    "phases_requested": [
+      1,
+      2
+    ],
+    "phase2_grid_for_plot_inputs": [],
+    "phase2_has_no_variants": true,
+    "no_errors_or_new_findings": true,
+    "all_findings": [
+      {
+        "record": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Pre-existing required Improved all-null in 2010/2013; unchanged. No optional/schema weakening."
+      },
+      {
+        "record": 2,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": false,
+        "account": "Pre-existing null crop/u warning. Crop 67888 -> 67653 through 235 coalescences; u 28724 -> 17142 through this repair. Other nulls remain outside scope."
+      },
+      {
+        "record": 3,
+        "phase": "1a-sanity",
+        "check": "null_content",
+        "country": "Malawi",
+        "status": "warn",
+        "exact_record_unchanged": false,
+        "account": "Pre-existing Improved null-content finding, same two waves; only reported full-frame row denominator 180184 -> 179949."
+      },
+      {
+        "record": 4,
+        "phase": "1a-sanity",
+        "check": "index_levels_match_scheme",
+        "country": "Malawi",
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Pre-existing automatic v index exceeds Malawi declared index; unchanged framework finalization."
+      },
+      {
+        "record": 5,
+        "phase": "1a-sanity",
+        "check": "no_null_index_levels",
+        "country": "Malawi",
+        "status": "warn",
+        "exact_record_unchanged": false,
+        "account": "Crop null rate 37.7% -> 37.6%, exact counts 67888 -> 67653; 235 coalescences, no row-use filtering."
+      },
+      {
+        "record": 6,
+        "phase": "1a-sanity",
+        "check": "no_constant_columns",
+        "country": "Malawi",
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Purchased constant missing column; source/eligibility unchanged; separate wiring/grain issue."
+      },
+      {
+        "record": 7,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Uganda pre-existing null plot_id (1) and v (729), exact unchanged; no missing units."
+      },
+      {
+        "record": 8,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Uganda documented cross-wave cluster warning, unchanged complete text."
+      },
+      {
+        "record": 9,
+        "phase": "1a-sanity",
+        "check": "index_levels_match_scheme",
+        "country": "Uganda",
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Uganda pre-existing automatic v index exceeds declared index, unchanged."
+      },
+      {
+        "record": 10,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Assembly repeats finding 1; unchanged."
+      },
+      {
+        "record": 11,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": false,
+        "account": "Assembly repeats finding 2; only expected null-count changes."
+      },
+      {
+        "record": 12,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Assembly repeats finding 7; unchanged."
+      },
+      {
+        "record": 13,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Assembly repeats finding 8; unchanged."
+      },
+      {
+        "record": 14,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Existing canonical alignment: Uganda u promoted from column with zero fills; Malawi unknown_season sentinel. Complete text/attrs exact."
+      },
+      {
+        "record": 15,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "exact_record_unchanged": true,
+        "account": "Existing four-population-universe comparability warning; complete text/attrs exact."
+      }
+    ]
+  },
+  "immutable_lanes": {
+    "reviewed-organic": {
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "status": "",
+      "tracked_contents_modes_exact": true,
+      "git_index_modes_exact": true,
+      "files_checked": 14910
+    },
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "",
+      "tracked_contents_modes_exact": true,
+      "git_index_modes_exact": true,
+      "files_checked": 14880
+    }
+  },
+  "tests": {
+    "new_baseline_failed": 10,
+    "new_baseline_passed": 2,
+    "new_candidate_passed": 12,
+    "late_label_mutant_failed": 12,
+    "bounded_regressions_passed": 101
+  },
+  "private_evidence_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/1111-fix",
+  "private_reproduction_script_sha256": {
+    "run.sh": "d748b5f4a9b98e9b9eaf7b5b274a7013297fc6f3ec81b53cfe11dfe561a43fd4",
+    "prepare.py": "f599dcad5a7e276cd20086c19caad9570925aeff3583b0fc9f20d25cf4c1f209",
+    "runtime.py": "ec3632a7302de22bcd928ffc32abadd73f888a318afdf4f08f429fd42f968604",
+    "source_expected.py": "ec7a69b7a70c19d3cbdc67092b9ac06bb2ecae5ced88b6c26222b6ea09f51f49",
+    "compare_runtime.py": "87406711ee000a27305323c637da7bfbe92165a889f40d95450f0adb4b903603",
+    "sample_runtime.py": "a76572637e9cc164a75850320d99955ad6afdcda7510baabb0576b9a33b929a7",
+    "sample_checks.py": "e9373023bb2cfa3d95c8c81ff1ed29141a8da0c28e6e4cba598e70a6c735a87e",
+    "compare_samples.py": "244bcffcff41adcc1e8061499b27ca17fb142d62448dce8e9e43db1924773122",
+    "final_census.py": "467a6c76d9cf4816f083d6e34bae3bb86380084670d5813c06be11cbfc81e44f",
+    "hash_inventory.py": "a2ec0ab00d9f5adf6934124b27d581fe6847a0913f2684336b0945aae26b2699",
+    "hash_scope.py": "bb12dd81a6ea4bcf94e48d8fd1ee20a2f01185696e31f92dce134b857eb9e458",
+    "compare_audits.py": "c6bff8d922403763de47cd6364eb7290252fe27bfb31f288e82e40fdaa1d4b6e",
+    "immutable_freeze.py": "ca0b20b746b9db1ed6e251b30fafa7872d8dd3ad137646d196f60f60f254738a",
+    "late_label_plugin.py": "ab82b689d8d9418a816e9f95e805544795aaf893a8c49405a02bfc46f012d2e0",
+    "offline/sitecustomize.py": "c5c5fdb9afb5f1fea1b6620063b6f1b56151ebfad537c57663e79ace4d6247f3"
+  },
+  "verified_runtime_code_sha256": {
+    "lsms_library/countries/Malawi/2010-11/_/plot_inputs.py": "64c5771c0d94db2ebcf86c94e2030a58d0cc5f878c11d013f3956d8571998c13",
+    "lsms_library/countries/Malawi/2019-20/_/plot_inputs.py": "958c18c40c38e8ec3fb708393c2f724d889319cb5df39cc490c4b9a32db9728b",
+    "tests/test_1111_malawi_applied_kg.py": "3a1e491e57fb1b403cbd4482ba25e2b23444d3d2f82010a44fc3bb9e5df3c8eb"
+  },
+  "cold_subprocess_performance_warnings": {
+    "count_each": 10,
+    "source_operations_messages_exact_ignoring_checkout_and_moved_lines": true
+  }
+}

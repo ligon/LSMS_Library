@@ -15,6 +15,12 @@ Create a nutrition DataFrame for households based on food consumption quantities
 """
 
 
+# GH #1062; see .coder/ledger/1062-uganda-sibling-writes.md sections 2/4.
+# The framework stamps only the requested table, so never write its sibling.
+target = sys.argv[1] if len(sys.argv) > 1 else 'nutrition'
+if target not in {'fct', 'nutrition'}:
+    raise ValueError("Expected target 'fct' or 'nutrition'")
+
 uga = ll.Country('Uganda')
 q = uga.food_quantities()
 
@@ -60,9 +66,11 @@ final_q = q.unstack('j').loc[:,common_cols].replace(np.nan,0)
 final_fct = final_fct.loc[:,common_cols].replace(np.nan,0)
 final_fct.index.name = 'Nutrient'
 
-to_parquet(final_fct, '../var/fct.parquet')
+if target == 'fct':
+    to_parquet(final_fct, '../var/fct.parquet')
 
-n = final_q@final_fct.T
+if target == 'nutrition':
+    n = final_q@final_fct.T
 
-n.index.name = 'Nutrient'
-to_parquet(n, '../var/nutrition.parquet')
+    n.index.name = 'Nutrient'
+    to_parquet(n, '../var/nutrition.parquet')
