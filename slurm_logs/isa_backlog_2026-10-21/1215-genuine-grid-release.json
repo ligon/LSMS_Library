@@ -1,0 +1,35 @@
+{
+  "status": "ROOT_RELEASED_EXACT_GENUINE_GH1215_AUTHOR_GRID",
+  "at_UTC": "2026-10-22T20:08:48.801497+00:00",
+  "plan_sha256": "489263fa3bccc1f2eb25bae6925cd9e52046ac5750bd3c700f33812852168405",
+  "source_head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "guard_sha256": "101c53a63869be7cbd371feb02a1f296d4c9ecfd889abbce550bd7af10b9abe4",
+  "providers": 37,
+  "normal_roots": 4,
+  "distinct_binary_copies": 148,
+  "binary_copy_bytes": 177769212,
+  "permitted_runtime_actors": "4 sequence +4 fresh warm/Feature +2 scoped unmodified Default scanners; no fifth data root",
+  "predata_actual_invalidation": {
+    "country": 549,
+    "framework": 39,
+    "wave": 1362
+  },
+  "new_candidate_pass": 13,
+  "new_actual_parent_fail": 6,
+  "new_actual_parent_pass": 7,
+  "supporting_pass": 88,
+  "required_gates": [
+    "Fresh exact provider MD5/SHA/magic/full physical and current sidecar/SOURCE bindings before copies or decodes; missing legacy size remains explicitly absent",
+    "Each copy regular0600 nonsymlink nlink1 distinct inode; exact one measured DVC layout; read-only path preflight, no get_data_file materialization",
+    "Preimport guard, unshare-rn, own HOME/XDG/data/DVC dirs asserted, exact package/config/cwd/rootdir and source-before/after per actor; pins and loadfile<=2",
+    "Full strict complete axes/types/masks/typed attrs and footer/coverage/physical caches, all failures retained; no normalization or comparator weakening",
+    "Cold barren may build sample; no false zero-all-cache-write claim; Make warm behavior measured, no universal no-write claim",
+    "No network/acquisition/credentials/DVC CLI/shared writes/NO_CACHE/assume/stamp/promotion/in-tree payloads/FCTnutrition or historical491 replay",
+    "Own comparator calibration and originals/stops remain retained; no full corpus or optional dtype verdict; independent review remains required"
+  ],
+  "checker_sha256": "5c5d5c4f5c0c33b316757334b1f4b4d9b5cc6a556c598f2409e10245fe18ae57",
+  "user_approved_policy": "Constructed empty columns follow declaration order; populated outputs unchanged",
+  "root_metadata_only_no_provider_payload_access": true,
+  "signed": "Sue"
+}

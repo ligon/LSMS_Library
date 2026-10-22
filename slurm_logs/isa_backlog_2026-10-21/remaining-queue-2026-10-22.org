@@ -13,11 +13,11 @@ Initial triage guidance must be rechecked against live issues and complete count
 * Active work
 ** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
 Countries: Burkina_Faso.
-Author3d narrow repair completed8normalactors and16candidate tests; exact parent synthetic7FAIL7PASS/held1FAIL1PASS. Original398/458PASS+60FAIL preserved;56storage-stage controls pass additively, four real optional-empty dtype failures owned1218. Final source/documentation protection/seal pending; independent guards/census/synthetic active, real payloads held until authentication.
+Author657final/runtime3d frozen and root-authenticated;967entries/29788sources/6providers25copies exact. Original398PASS60FAIL retained plus56additive storagePASS;4emptydtype failures1218 remain. Independent calibration/fullmaps/14synthetic+397supportingPASS; Exact guard read-policy adapter approved; realdata conditionally released after fresh synthetic-only capability gate,24copies25343300bytes. No completed independent data result yet.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Constructed empty tables: implement the approved declaration-order rule
 Countries: Uganda, Shared framework.
-Human approved declaration-order-only constructor policy; ledger-first implementation/guarded metadata and synthetic checks released in own checkout. Populated order/dtype policy unchanged; genuine held-source grid awaits concrete gate/budget release.
+Human declaration-order policy implemented atf7c on actuala417.13new+88supportingPASS; actualparent6FAIL7PASS. Actual549/39/1362hashes allmove. Rootreleased37providers/4roots/148copies177769212bytes; providerprep0, firstDefaultsequenceactors active. Full data grid/freeze/independentreview pending.
 Remaining scope: Four new zero-row column-order failures exposed by1204routing repair; preserve all strictfindings and choose a stable public empty-column contract across cold/covered-cache/Make.
 
 * Reviewed changes awaiting human merge

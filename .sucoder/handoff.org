@@ -1,6 +1,54 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T15:21:31.806794+00:00
+* Current task -- 2026-10-22T20:22:00+00:00
+
+LSMS-ISA backlog goal remains ACTIVE; never auto-merge.
+Main is clean developmentf8; publication development067 is only a poetry.lock certifi update, not a newly certified dependency runtime.
+There are30 implementation PRs OPEN/unmerged; queue114open scope records =27PR-linked+2active+85other, including overlapping umbrellas/decisions/acquisition work.
+PR1170 has exact current30PR/114queue body readback;1216/1217 CI bodies also read back exactly.
+
+Uganda1205 is reviewed/root-accepted in PR1216, head884775a46, stacked on1207; independent65PASS, parent6FAIL27PASS;14520old yields exact plus13235recovered=27755, converted denominator31959 and explicit exclusions.
+Uganda1204 is reviewed/root-accepted in PR1217, heada417b69d7, stacked on1207;8regressions+170supporting+2synthetictransportPASS,59normalactors0;109/113strictPASS with4newempty-orderFAIL owned1215.
+Both exact-head CI unit/windows jobs pass; six other jobs includingdata-tests skipped. No full30PR/corpus verdict.
+
+User explicitly chose declaration order for1215; no permission question remains.
+Author acquisition_1149 owns W/isa-Uganda-1215, sourcef7c33dd64 vs actuala417, private C/uganda1215-order-fix.
+New13PASS+88supportingPASS; actuala4176FAIL7PASS. Guarded calibration/predata full549/39/1362allmove; source/type/science/optional-required membership unchanged.
+Root exact genuine release is C/UGANDA1215-GENUINE-RELEASE.json;37providers freshly authenticated/148distinct0600nlink1copies177769212bytes in4freshL1roots.
+Default sequence actors19976base/7929candidate terminal0; supported15630/all133761rows, candidate cold/partial/all-cache barren order exact,9coldsamplecache writes/no crop, later barren crop bytes/physical unchanged.
+All10approved normal-grid actors are now terminal0, including Make/freshwarm/Feature and both unmodified scanners26056/68469;22WARN each, not an all-pass audit.
+Full strict/ordered22record comparison actor57758 remains active; all original operands saved, do not restart completed actors.
+Author diagnostic6a791a printed raw warning-example IDs; exact private trace/output-scope exception and identifier privacy scan required before safe exports, never repeat those IDs.
+review_malawi_1209 now owns independent1215PHASE0 STATIC/METADATA ONLY, own detached W/isa-review-Uganda-1215=f7c and -base=a417, own C/review-Uganda-1215.
+Root prepared mounted venv/private source tmp links/prior guard3ada; imports/runtime/provider payloads held until concrete plan and gated release, finalauthor authentication required before independent genuine data.
+
+Burkina1188 author frozen657fed11a, runtime3d39096d5, actualparent3dc9d2851; finaldelta ONLY ledger+CONTENTS.
+Root authenticated967opaque entries/29788tracked sources/6providers25privatecopies26332243bytes including quarantined budget exception.
+Original398PASS60FAIL remain;56additional persisted-native storage checksPASS,4trueoptional-emptydtypeFAIL remain1218. Author16testsPASS/8normalactors0; independent data verdict still required before PR.
+Exact9safeexports/root authentication and3rootchecker stops publisheda58db20cd under1188-author/.
+Independent malawi_1209 owns W/isa-review-Burkina_Faso-1188 tested3d and -base3dc, C/review-Burkina_Faso-1188.
+Independent calibration/full549/39/1362maps,14synthetics vs trueparent7FAIL7PASS and397supportingPASS; retain156absent-source read denials,12laterIPv6binds and stopped precollection/control metadata checks.
+Root approved minimal readpolicy guard377e85... plan8c8469...; P/ROOT-DATA-READ-RELEASE.json SHA757ffa868fa6827d3a6f9f784cecf83af9b79bd041eb39046a35f51eeb6348b9.
+Fresh capability-v1(PID102895,14962/da8b9a) completed16syntheticprobes but terminal1 on an overstrict empty-directory assertion; ordinary import had created one empty dvc-cache directory.
+Before root steering to avoid probe replay arrived, capability-v2(PID113900,30470/72ab6e) repeated16probes and terminal0; preserve this extra replay explicitly, both17row logs and v1source/streams remain.
+DATA-CAPABILITY-GATE.json SHA16e9b869468f65c6d82c1d1479043f77eee55bedc463b78f37a4b5737a69c2ac binds exact newguard/release/plan/runtime/DVC/source identity. Incidental wrong0644mode expectation stop also retained; no chmod.
+Existing release now permits other3bound identity boots then fresh6providerMD5SHAphysicalmagic and24exclusivecopies25343300bytes/4normalroots; no further capability replay, get_data_file materialization or fifthroot. No original calibration/census/test/supporting replay.
+Root adapter-checker AST-list TypeError retained; v2actual0 chunk79b083. No prior payload access.
+
+Archive31 independently ROOT-ACCEPTED, C/ARCHIVE31-ROOT-ACCEPTANCE.json; rootchecker56862/chunk226e13actual0.
+Archive326181834bytes SHA1cc296cdc30b662eebe914d8e2362018d7bdeb11ca2f96bded131d996df2f115, manifest385744cfc8598ba5fc6d8e02e25fc3ac7d306bdb9b9a17def78e1e6a80c5a6d7.
+It preserves independentUg1204, static1215, BF1188author and29file root snapshot:2386included/692excluded,241parquets/585serialized operands, two raw-source-derived table pickles PRIVATE only.
+Original writer65825/a484a6/PID82005actual0, childverifier0(PIDunknown), separate postexit54540/f250ac/PID90848actual0; root full member/source-after hashes/PAX ns/mode/uid/gid/dirs/file sets/terminal chain independently checked.
+Exact tool record SHA68ef885cc6ae93b4575687114531e57a9ada3bb0df2b687b8d47694e17400dd4; archives1-31 remain preserved.
+Current1215runtime/independentBF/independent1215 prefixes are not in archive31. Do not execute old controllers/overwrite originals.
+
+Next: finish1215author grid/comparisons/freeze/rootauth, release independent1215calibration/census/synthetics after PHASE0; watch BF freshcapability then independent raw oracle/grid; implement1218empty-only dtype wiring after ledger/prior-art plan on BF source without changing populated policy; later actionable country lanes remain821/823 subject to fresh issue/docs check.
+Keep settled851/894/1134 decisions; do not re-ask. Nigeria1033 is gated by W4 unit vocabulary; science/acquisition residuals stay explicit.
+Allocation40255479 still has about27hours; no deadline warning. Preserve every original failure/qualification; no all-country/full-suite certification.
+
+Sue
+
+* Earlier task -- 2026-10-22T15:21:31.806794+00:00
 
 ISA backlog goal ACTIVE; main clean development f8. Campaign docs/isa-backlog-20261021 evidence published407a4e160c4a0a161f006e18f4a2e436b3d508ea with first12 registry, recovered archive1 authority,1194/1195 acceptances and archive26 durability.
 26 implementation PRs are open/unmerged at last exact inventory; never auto-merge.

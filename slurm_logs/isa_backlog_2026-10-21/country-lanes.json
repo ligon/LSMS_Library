@@ -129,13 +129,19 @@
         "actual_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
         "actual_parent_PR": 1203,
         "ledger": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
-        "status": "COMMITTED_NARROW_REPAIR_AUTHOR_VERIFICATION_ACTIVE",
+        "status": "AUTHOR_FROZEN_ROOT_AUTHENTICATED_INDEPENDENT_DATA_REVIEW_PENDING",
         "scope": "Keep native used Quantity/u and all22,877 rows; purchase=q08/q09a, add own Unit_purchased and gift flag/quantity/unit as four optional country-local columns; retain native acquisition labels and nullable types. No code21/science/grain/framework/map change.",
         "production_or_schema_edits_released": true,
         "provider_payload_copy_decode_imports_released": true,
         "source_first_result": "Reported source diagnosis reproduced all22,877 rows and native keys; guarded implementation proceeds; not independently reviewed.",
-        "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
-        "postedit_scope": "Author reports actual549/39/1362 maps:24BFcountry changes,18BF2018waves;all525other-country/39framework/1344other-wave hashes exact. Root read source of existing all-wave-input invalidation rule."
+        "source_head": "657fed11a63354886772d0f978cec8adb2ad647e",
+        "postedit_scope": "Author reports actual549/39/1362 maps:24BFcountry changes,18BF2018waves;all525other-country/39framework/1344other-wave hashes exact. Root read source of existing all-wave-input invalidation rule.",
+        "tested_runtime": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+        "root_authentication": "1188-author/ROOT-AUTHENTICATION.json",
+        "author_manifest_entries": 967,
+        "author_final_delta": "Ledger and CONTENTS only",
+        "independent_predata": "Calibration/fullmaps/14synthetic+397supportingPASS. Minimal exact read-adapter release approved; newcapabilityv1terminal1 after16goodprobes on harmless emptydir expectation, v2repeated16beforelatestrootsteering and terminal0. All original sources/streams/17+17guardrows retained; no further replay. Other3identityboots then authorized6provider/24copy25343300bytes work active; no completed genuine runtime result yet.",
+        "author_validation_limits": "Original398PASS60FAIL retained,56 additive persisted-native stagePASS,4true optional-empty dtype failures1218.25author rawcopies26332243bytes include quarantined budget exception. No independent data acceptance yet."
       }
     },
     "Ethiopia": {
@@ -1119,14 +1125,35 @@
         "private_root": "/local/job40255479/control/isa-backlog-20261021/uganda1215-order-static",
         "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
         "ledger_first_commit": "467b3b59c",
-        "status": "HUMAN_APPROVED_DECLARATION_ORDER_IMPLEMENTATION_ACTIVE",
+        "status": "SOURCE_COMMITTED_GUARDED_SYNTHETICS_PASS_BOUNDED_GENUINE_GRID_ACTIVE",
         "production_or_runtime_released": false,
         "scope": "Ledger-first static column-order contract diagnosis at actuala417 parent; no production/schema edit or runtime released. Concrete order alternatives and affected callers required before design decision.",
         "private_runtime_prefix": "/local/job40255479/control/isa-backlog-20261021/uganda1215-order-fix",
         "user_decision": "Use declaration order (Recommended)",
         "source_and_calibration_census_synthetic_released": true,
         "genuine_payloads_or_normal_grid_released": false,
-        "static_root_decision": "1215-static/ROOT-STATIC-DECISION.json"
+        "static_root_decision": "1215-static/ROOT-STATIC-DECISION.json",
+        "source_head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+        "user_approved_policy": "Constructed empty columns follow declaration order; preserve populated behavior and separate optional dtype policy.",
+        "candidate_new_tests_pass": 13,
+        "actual_parent_new_tests_fail": 6,
+        "actual_parent_new_tests_pass": 7,
+        "supporting_tests_pass": 88,
+        "measured_invalidation": {
+          "country": 549,
+          "framework": 39,
+          "wave": 1362
+        },
+        "genuine_release": "1215-genuine-grid-release.json",
+        "genuine_preparation": "Fresh37provider/148copy177769212 gates0; all10normalgrid actors0 including both scopedscanners22WARN each. Complete strict+ordered22record comparison57758active, no final data verdict. Diagnostic6a791a raw-ID output exception is private; final aggregate exports require identifier scan.",
+        "independent_review_required": true,
+        "independent_review": {
+          "owner": "review_malawi_1209",
+          "path": "/local/job40255479/worktrees/isa-review-Uganda-1215",
+          "actual_parent_path": "/local/job40255479/worktrees/isa-review-Uganda-1215-base",
+          "private_prefix": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1215",
+          "status": "PHASE0_STATIC_METADATA_ONLY; runtime and genuine payloads held pending plan/gates/finalauthor authentication"
+        }
       }
     }
   },
@@ -1945,23 +1972,24 @@
     "ci_qualification": "1214-ci-metadata-qualification.json"
   },
   "latest_archive_checkpoint": {
-    "archive_count": 30,
-    "receipt": "private-evidence-durability-thirtieth.json",
+    "archive_count": 31,
+    "receipt": "private-evidence-durability-thirtyfirst.json",
     "covers": [
-      "frozen Uganda1204 author",
-      "frozen Uganda1205 author",
-      "independent Uganda1205 runtime and terminal precision supplement",
-      "51 root/static source receipts and their frozen55-file root copy packet"
+      "frozen independent Uganda1204",
+      "frozen source-only Uganda1215 policy packet",
+      "frozen Burkina1188 author packet",
+      "25 exact selected original root receipts and frozen29file snapshot"
     ],
-    "native_parquet_operands_retained": 290,
-    "serialized_operands_retained": 166,
-    "exclusions": 866,
-    "scope": "Archival preserves existing evidence and original failures; it supplies no additional product validation. Live Uganda1204 review, Burkina1188 and Uganda1215 static roots excluded."
+    "native_parquet_operands_retained": 241,
+    "serialized_operands_retained": 585,
+    "exclusions": 692,
+    "scope": "Archival preserves existing evidence and all strict failures; supplies no new product/science acceptance. Two source-derived raw-table pickles are private proof operands. Current1215 runtime, independentBF1188 and independent1215 phase0 remain outside archive31."
   },
   "new_optional_empty_dtype_residual": {
     "issue": 1218,
     "status": "OPEN_UNASSIGNED",
-    "scope": "Constructed empty types; existing explicit declarations, populated behavior unchanged.",
-    "evidence": "Author BF1188 live normal cases + independently authenticated static source account; runtime independent acceptance pending."
-  }
+    "scope": "Constructed empty explicit optional types using existing dtype machinery; preserve populated outputs and optional absence.",
+    "evidence": "Root-authenticated BF1188 author packet plus independently authenticated static mechanism; independent genuine runtime review pending."
+  },
+  "active_progress_updated_at_UTC": "2026-10-22T20:24:37.836190+00:00"
 }
