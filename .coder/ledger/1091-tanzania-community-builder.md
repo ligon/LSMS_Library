@@ -302,11 +302,13 @@ no author PASS, GitHub write, public merge or issue closure.
   Sixteen CLI artifacts pass matched full Arrow/schema/byte controls. Four
   scanner warning records are individually accounted and complete multisets
   match exactly; no CP phase2 kwargs grid. No first-cold Feature claim.
-- LIMIT (section 4): cold unsupported output follows the existing no-builder
-  object Description contract; old fallback/covered-cache string Description
-  and covered id_converted, source/native dtype serialization and JSON attrs
+- LIMIT (section 4): measured fresh-root/no-country-cache strict-subset output follows the
+  existing no-builder object Description contract; old fallback and measured
+  Default full-coverage cache-slice string Description/id_converted, source/native dtype serialization and JSON attrs
   type distinctions remain explicit full-comparison qualifications. No dtype
-  normalization, attr stripping or global repair was used.
+  normalization, attr stripping or global repair was used. Partial-coverage
+  misses/union rebuilds were not separately replayed; no universal empty
+  representation is claimed for them.
 - LIMIT (section 4): preserve preparation's approved-deleted-file snapshot stop
   before staging/decode/API. Preserve the later CLI wrapper-path stop, its
   endpoints/log/script and original partial aggregate. Earlier first public/
