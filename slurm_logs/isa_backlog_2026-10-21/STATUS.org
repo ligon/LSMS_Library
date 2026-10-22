@@ -14,8 +14,9 @@ Existing rulings in issues such as #851, #894 and #1134 are binding implementati
 
 * Current checkpoint -- 2026-10-22T13:39:00+00:00
 
-There are 25 published implementation PRs, all unmerged at the last complete checkpoint.
-The independent GH1196 repair is now root accepted and being published as the next PR.
+There are 26 published implementation PRs, all freshly verified OPEN and unmerged in =publication-26-safe.json=.
+The independent GH1196 repair is root accepted and published as [[https://github.com/ligon/LSMS_Library/pull/1212][PR1212]].
+All table heads and seven prerequisite branch bases match; tracker1170 and issue1196 read back exactly after publication.
 Its candidate =ee520afeb11ea028a76a371e0c89dc2aba6ad0a4= preserves tested runtime =7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1=.
 The independent review passes 149 tests; actual-release controls give 23 meaningful dtype failures and one pass.
 All eight held-source actors and 44 candidate cold/warm full-frame pairs pass.
