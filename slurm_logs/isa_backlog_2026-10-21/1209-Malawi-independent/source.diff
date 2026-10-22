@@ -1,0 +1,302 @@
+diff --git a/.coder/ledger/1209-malawi-food-builder.md b/.coder/ledger/1209-malawi-food-builder.md
+new file mode 100644
+index 000000000..2f7ea0b37
+--- /dev/null
++++ b/.coder/ledger/1209-malawi-food-builder.md
+@@ -0,0 +1,89 @@
++# Prior-Art Ledger - GH #1209 Malawi food builder
++
++Search tier: git + ripgrep (no GitNexus or memory server exposed).
++Actual parent: d29a56783d08a8a647e2622150a4ee5fbdd7246a (PR #1208).
++
++## §1 Task, restated
++
++Retire Malawi's obsolete country food concatenator so that the Make backend
++uses the same canonical native-wave assembly as the Default backend.
++Preserve all wave extraction, source, label, unit, quantity and valuation rules.
++
++## §2 Existing machinery
++
++| machinery | anchor | behavior and coverage | decision |
++|---|---|---|---|
++| `Country._has_country_builder` | `lsms_library/country.py:4893` | probes the country script and Make var target under an empty root; `tests/test_gh1039_make_backend_no_country_rule.py` covers both routes | reuse |
++| `Country._aggregate_wave_data` | `lsms_library/country.py:5819` | Make falls through to `load_from_waves` when no country builder exists; same tests | reuse |
++| Malawi native wave scripts | `lsms_library/countries/Malawi/*/_/food_acquired.py` | five canonical `(t,i,j,u,s)` outputs, using `malawi.food_acquired_to_canonical`; unit cleanup and GH1042 tests | reuse unchanged |
++| retired country script | `lsms_library/countries/Malawi/_/food_acquired.py:14` at parent | hardcodes five waves and expects retired wide aliases, then lowercases/reduces/replaces zeros; current Make fails at `units` | remove duplicate |
++| native-wave Make rule | `lsms_library/countries/Malawi/_/Makefile:21` at parent | builds data-root wave parquets; no wave Makefiles exist | preserve |
++| runtime food derivation | `lsms_library/country.py:6240`, `transformations.py:2932` | expenditures, prices and quantities derive from `food_acquired`; parent PR1208 removed raw registrations | reuse |
++| Feature assembly | `lsms_library/feature.py`, `bench/feature_audit/README.md` | forwards food kwargs and carries metadata; scoped unmodified scanner | reuse |
++
++## §3 Definitions & conventions in force
++
++- Inherit `STANDING.md` §3 and `CLAUDE.md` "Derived Tables".
++- Canonical food schema: `lsms_library/data_info.yml:58`, `:1022`.
++- Malawi `CONTENTS.org` "derived food registrations" already records this
++  Make failure; there is no contradictory current food-builder decision.
++- Malawi notes distinguish panel-only 2013, combined XS/tracking later waves,
++  IHS2 label-derived factors and IHS3+ region-keyed factors. Preserve them.
++- The GH1042 rulings and accepted suffixed-unit residuals remain in force.
++
++## §4 Invariants & assumptions
++
++- Inherit `STANDING.md` §4: sanctioned I/O, pre-finalize caches, API `v` join,
++  derived-table discovery, and `id_converted` propagation.
++- No country food script or var Make rule may remain: either makes the GH1039
++  predicate select the obsolete route.
++- Direct `make food_acquired` builds native wave parquets only; the framework
++  owns country assembly. It must not claim to write a var aggregate.
++- A Makefile edit can move every Malawi table and wave hash. Measure the full
++  country/framework/wave scope before data; do not claim food-only invalidation.
++- GH1210 invalid-wave eviction and scientific/unit residuals are separate.
++
++## §5 Reuse decision
++
++| behavior | decision | reason |
++|---|---|---|
++| country food assembly | reuse GH1039 `load_from_waves` | already authoritative and tested; no framework change needed |
++| wave extraction and transforms | reuse unchanged | canonical source detail is already available |
++| direct Make entry point | extend local Makefile with phony wave target | makes the retained native rules accessible without duplicate country assembly |
++| regression coverage | extend with Malawi route/request tests | must distinguish parent failures from candidate behavior |
++
++## §6 Open questions for the human
++
++None blocking. Root approved the local retirement scope and will own
++independent review and publication. Protected private verification is mandatory.
++
++### Phase 3 - verification
++
++- `OK` (sections 2/4): the actual predicate is false on the candidate and
++  true on d29; the direct Make dry run names each native wave exactly once.
++- `OK` (sections 2/3): six candidate route/request/preservation tests pass.
++  On the actual parent, four route tests fail and both Default assembly
++  tests pass. Thirteen existing focused tests pass.
++- `OK` (section 4): the complete pre-build inventory compares 549 country,
++  39 framework and 1,362 declared-wave keys. Exactly 26 Malawi country and
++  97 Malawi wave hashes move; every other key is unchanged.
++- `OK` (sections 2/4): guarded held-source checks pass 56 strict Country
++  pairs, 24 strict Feature pairs and ten native-parquet pairs, including
++  complete axes, unused levels/codes, storage, null policies and typed attrs.
++  No normalization is needed. All 16 parent Make Country endpoints fail;
++  its 12 Feature requests degrade empty. Candidate Make restores ten
++  nonempty Feature results and preserves the two expected no-Price empties.
++- `OK` (section 4): direct Make retains the existing singleton wave and
++  builds the other four native waves, without a country food parquet.
++  The unmodified scoped scanners have 163 literally equal records each:
++  158 warnings, three passes and two pre-existing price-unit failures.
++- The first two Default all-wave runs remain diagnostic only: their
++  wrapper omitted `LSMS_MAKE_JOBS`. Fresh L1-only v2 roots provide the
++  conforming evidence. Both denied relative-output inventory attempts,
++  early test-axis/fixture stops and two unguarded metadata-status utility
++  calls are retained and disclosed in the private author report. There
++  is no zero-denial or zero-outside-write claim.
++- Full private evidence is under the owner-only
++  `/local/job40255479/control/isa-backlog-20261021/Malawi/1209` prefix.
++
++Sue
+diff --git a/lsms_library/countries/Malawi/_/CONTENTS.org b/lsms_library/countries/Malawi/_/CONTENTS.org
+index f5bdcf14d..a7f3deea8 100644
+--- a/lsms_library/countries/Malawi/_/CONTENTS.org
++++ b/lsms_library/countries/Malawi/_/CONTENTS.org
+@@ -3088,3 +3088,17 @@ The Default API serves 971,531 food rows; the country Make route raises
+ =RuntimeError= after the concatenator's =KeyError: 'units'=.
+ The same failure affects its three derived callers and is left for a separate
+ builder diagnosis; removing these two registrations changes neither outcome.
++
++* 2026-10-22 -- retire the obsolete country food builder (GH #1209)
++
++The separate builder diagnosis above is resolved by removing =_/food_acquired.py= and its country =var/food_acquired.parquet= Make rule.
++That concatenator still expected the retired wide columns and applied reductions that the canonical wave outputs no longer require.
++The existing =Country._has_country_builder= route now selects framework wave assembly under the Make backend, as it already does under the Default backend.
++All five native wave scripts and their Make rule are retained.
++
++Direct =make -C Malawi/_ food_acquired= builds the five native wave parquets under =data_root()= only.
++It does not produce a country =var/food_acquired.parquet=; use =Country('Malawi').food_acquired()= for the assembled table and runtime-derived food products.
++The Makefile is an input to every Malawi table's fingerprint, so this local retirement requires a country-wide re-warm, with the exact measured scope recorded in the task validation.
++
++No source, acquisition-source split, unit ruling, quantity, expenditure, conversion factor, identifier or weight changes here.
++The invalid-wave eviction defect (GH #1210) and the scientific and unit residuals recorded above remain separate.
+diff --git a/lsms_library/countries/Malawi/_/Makefile b/lsms_library/countries/Malawi/_/Makefile
+index a0eb12fc6..30cdb582a 100644
+--- a/lsms_library/countries/Malawi/_/Makefile
++++ b/lsms_library/countries/Malawi/_/Makefile
+@@ -12,18 +12,20 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
+ # _ROSTER_DERIVED — no country-level parquet is built or consulted.
+ # See GH #218.
+ 
+-all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet $(VAR_DIR)/community_prices.parquet
++all: $(parquet) food_acquired $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet $(VAR_DIR)/community_prices.parquet
+ 
+-food_acquired = $(shell find $(rounds) -name food_acquired.py)
+ # Wave-level parquets live in data_root, not in-tree
+ food_acquired_parquet := $(foreach r,$(rounds),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(notdir $(r))/_/food_acquired.parquet)
+ 
++# GH #1209: build the native waves here; Country assembles them through the
++# existing no-country-builder route (ledger 1209-malawi-food-builder, section 2).
++# This target does not write a country-level var/food_acquired.parquet.
++.PHONY: food_acquired
++food_acquired: $(food_acquired_parquet)
++
+ $(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/food_acquired.parquet:
+ 	(cd ../$(*)/_/ && python food_acquired.py)
+ 
+-$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
+-	python food_acquired.py
+-
+ # --- non-FIES food security (GH #332) -------------------------------------
+ # food_coping and months_food_inadequate are built only for the four IHS3+/
+ # IHPS waves carrying Module H (2010-11, 2013-14, 2016-17, 2019-20).  Each
+diff --git a/lsms_library/countries/Malawi/_/food_acquired.py b/lsms_library/countries/Malawi/_/food_acquired.py
+deleted file mode 100644
+index 42115bcc1..000000000
+--- a/lsms_library/countries/Malawi/_/food_acquired.py
++++ /dev/null
+@@ -1,35 +0,0 @@
+-#!/usr/bin/env python
+-"""
+-Concatenate wave-level food_acquired parquets into a single country-level file.
+-
+-Wave-level parquets have index (j, t, i); the market index 'm' is added at the
+-API level by _add_market_index() via cluster_features.
+-"""
+-from lsms_library.local_tools import to_parquet, get_dataframe
+-
+-import pandas as pd
+-import numpy as np
+-
+-years = ['2004-05', '2010-11', '2013-14', '2016-17', '2019-20']
+-fa = []
+-
+-for t in years:
+-    df = get_dataframe('../' + t + '/_/food_acquired.parquet').squeeze()
+-    df = df.rename({'u_consumed': 'units'}, axis=1).reset_index()
+-    df['units'] = df['units'].str.lower()
+-    # There may be occasional repeated reports of purchases of same food
+-    df = df.groupby(['j', 't', 'i', 'units']).agg({
+-        'quantity_consumed': 'sum',
+-        'expenditure': 'sum',
+-        'quantity_bought': 'sum',
+-        'price per unit': 'first',
+-    })
+-    fa.append(df)
+-
+-fa = pd.concat(fa)
+-fa = fa.replace(np.inf, 0)
+-fa = fa.replace(0, np.nan)
+-
+-fa = fa.reset_index().set_index(['j', 't', 'i', 'units'])
+-
+-to_parquet(fa, '../var/food_acquired.parquet')
+diff --git a/tests/test_gh1209_malawi_food_builder.py b/tests/test_gh1209_malawi_food_builder.py
+new file mode 100644
+index 000000000..381ec3756
+--- /dev/null
++++ b/tests/test_gh1209_malawi_food_builder.py
+@@ -0,0 +1,108 @@
++"""GH1209: Malawi's canonical waves are assembled by the framework.
++
++The real Malawi registry and Makefile choose the route. Synthetic wave frames
++keep the regression independent of microdata and preserve the source axis,
++native units, zero values and exact kilogram products the old assembler lost.
++Actual held-source cold/warm comparisons are recorded separately.
++"""
++from __future__ import annotations
++
++import shutil
++import subprocess
++
++import pandas as pd
++import pytest
++
++import lsms_library.country as C
++from lsms_library.paths import data_root
++
++
++needs_make = pytest.mark.skipif(shutil.which("make") is None,
++                                reason="GNU make not on PATH")
++
++
++@needs_make
++def test_malawi_has_no_country_food_builder():
++    c = C.Country("Malawi", preload_panel_ids=False)
++    assert c._has_country_builder("food_acquired") is False
++
++
++@needs_make
++def test_direct_make_food_target_builds_native_waves_only(tmp_path):
++    c = C.Country("Malawi", preload_panel_ids=False)
++    root = tmp_path / "data"
++    result = subprocess.run(
++        ["make", "-n", f"LSMS_DATA_ROOT={root}", "food_acquired"],
++        cwd=c.file_path / "_", capture_output=True, text=True, check=True,
++    )
++    lines = [line for line in result.stdout.splitlines()
++             if "python food_acquired.py" in line]
++    assert len(lines) == len(c.waves)
++    for wave in c.waves:
++        assert f"../{wave}/_/" in result.stdout
++    assert "var/food_acquired.parquet" not in result.stdout
++    assert not root.exists(), "a dry-run Make probe wrote data"
++
++
++@pytest.mark.parametrize("backend", ["dvc", "make"])
++@pytest.mark.parametrize("waves", [None, ["2013-14"]])
++@needs_make
++def test_native_wave_assembly_preserves_requested_food(tmp_path, monkeypatch,
++                                                       backend, waves):
++    monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "data"))
++    monkeypatch.setenv("LSMS_BUILD_BACKEND", backend)
++    monkeypatch.setenv("LSMS_BUILD_WORKERS", "1")
++    data_root.cache_clear()
++    c = C.Country("Malawi", preload_panel_ids=False)
++    c._panel_ids_attempted = True
++    c._updated_ids_cache = {}
++    seen = []
++
++    def native_wave(self, request):
++        assert request == "food_acquired", request
++        seen.append(self.year)
++        frame = pd.DataFrame({
++            "t": [self.year, self.year], "i": ["house", "house"],
++            "j": ["Rice", "Rice"], "u": ["Cup", "kg"],
++            "s": ["purchased", "produced"],
++            "Quantity": [0.0, 2.5], "Expenditure": [0.0, float("nan")],
++            "Quantity_kg": [0.0, 2.5],
++        }).set_index(["t", "i", "j", "u", "s"])
++        # Native scripts write this parquet before returning. Its presence
++        # also tells Wave.food_acquired to keep already-canonical columns.
++        out = data_root("Malawi") / self.year / "_" / "food_acquired.parquet"
++        out.parent.mkdir(parents=True, exist_ok=True)
++        frame.to_parquet(out)
++        return frame
++
++    # Keep API metadata/finalization real, without asking a second table for
++    # microdata. This test is about assembly, not the already-tested v join.
++    monkeypatch.setattr(C.Wave, "grab_data", native_wave)
++    monkeypatch.setattr(C.Country, "_join_v_from_sample", lambda self, df, *a, **k: df)
++    run = C.subprocess.run
++
++    def probe_only(command, *args, **kwargs):
++        if isinstance(command, list) and command and command[0] == "make" and "-n" in command:
++            return run(command, *args, **kwargs)
++        raise AssertionError("selected the retired country food builder")
++
++    monkeypatch.setattr(C.subprocess, "run", probe_only)
++    try:
++        result = c.food_acquired(waves=waves, currency=None)
++        requested = c.waves if waves is None else waves
++        assert seen == requested
++        assert len(result) == 2 * len(requested)
++        # Country._finalize_result orders household i before wave t.
++        assert list(result.index.names) == ["i", "t", "j", "u", "s"]
++        assert result.index.is_unique
++        assert list(result.columns) == ["Quantity", "Expenditure", "Quantity_kg"]
++        assert set(result.index.get_level_values("t")) == set(requested)
++        assert set(result.index.get_level_values("s")) == {"purchased", "produced"}
++        assert set(result.index.get_level_values("u")) == {"Cup", "kg"}
++        purchased = result.xs("purchased", level="s")
++        assert (purchased[["Quantity", "Expenditure", "Quantity_kg"]] == 0).all().all()
++        produced = result.xs("produced", level="s")
++        assert (produced[["Quantity", "Quantity_kg"]] == 2.5).all().all()
++        assert produced["Expenditure"].isna().all()
++    finally:
++        data_root.cache_clear()

@@ -730,3 +730,35 @@ Other backlog remains, including Uganda1204/1205 and prepared/unassigned integra
 Do not mark the overall campaign complete, merge automatically or restart existing protection/seal/data actors.
 
 Sue
+
+* Malawi1209 accepted;1210independent runtime and Uganda tasks advance -- 2026-10-22 16:31 UTC
+
+Previous goal turn PROGRESS published six later10packets, two archive-backed classifications, archive27and exact26-PR readbacks.
+This turn root accepted Malawi1209source47b3c5d76371acc457c5553ebf8adfb1859e115b on actual1208parentd29a56783d08a8a647e2622150a4ee5fbdd7246a.
+Independent6regressions/13existingtests pass;4FAIL2PASScontrols exercise parent CONFIG under byte-identical library code, while pytest imported the candidate package path.
+Root independently verified the actual base Make cwd and complete package diff; no exact-parent pytest package identity is claimed or retroactively manufactured.
+All56Country/24Feature/10native pairs pass strict,49fault controls reject,98footers/currentcoverage and two parent-cache stale grades pass.
+163literal scanner records retain158WARN/3PASS/two knownPriceFAIL;16warning pairs match only after exact checkout-path replacement, not literally.
+DirectMake keepsoneexistingwave,buildsfourmissingnativewaves and writesnoaggregate.
+All26Malawi country/97Malawi wave hashes move; other523country/1265wave and39framework fingerprints stay exact.
+Root rehashed29779source receipts/602non-L1entries and checked all906physical metadata;304raw-copy full hashes rely on independently observed full protection/postexit0, not redundant root raw rehash.
+Sealer34361and separate full postexit99254observed0; root acceptance/report/parent-config qualification are1209-Malawi-independent/.
+Author diagnostics, two unguarded metadata utilities and unknown temporary-basename history remain; no global zero-outside-write/science/corpus claim.
+Source branch publication and stacked PR creation are next; no human merge.
+
+Root authenticated GH1210author handoff128cc095a62cbd210e30d2256359acfe53d4a2c5 on actualf8:1159physical entries/931non-L1hashes checked,228raw-copy hashes separately full-postexit-verified.
+Exact285byte six-denial log and unresolveddir_fd/per-event/endpoint history remain; protection4319last-assert1 plus metadata90716qualification0 are preserved.
+Sealer50484/fullpostexit7930observed0; author safe report and root HANDOFF (not production acceptance) are1210-author/.
+Independentacquisition_1149phase1is now released under REVIEW-INVALID-WAVE1210-BRIEF.md, exact new detached sources/private roots.
+Both fingerprint censuses show549/39/1362moves with declarations/exclusions unchanged.
+Two initial controllers stopped before workers at a kernel-pipe guard; v1streams remain and v2only permits pipe/socket descriptors with filesystem boundary intact, no test outcomes from those stops.
+
+Two fresh Uganda lanes start from reviewed1207head491daf5654b9ee45332bec97e1296ae821ff46d5.
+review_malawi_1209owns1204 on fix/1204-uganda-crop-wave-coverage-20261022 with separate exactparent checkout and C/uganda1204-fix.
+malawi_1209owns1205diagnosis on docs/1205-uganda-area-diagnosis-20261022 and C/uganda1205-diagnosis.
+Root prepared ignoredDVCtmp links with stdlib; full country notes/ledger-first/source-bound proposal precede data or production changes.
+1204must fix raw/public truthfulcoverage for supported and barren requests without a posthocfilter;1205must partition source-backed area nonmatches without imputation or guessed keys.
+Historical14022/40409pre-factor counts are not forced at491; dated849notes report14520parcelmatches at that newer stage.
+Both briefs/activephase gates are retained in control; no new global integration/suite/corpus or acquisition claim.
+
+Sue

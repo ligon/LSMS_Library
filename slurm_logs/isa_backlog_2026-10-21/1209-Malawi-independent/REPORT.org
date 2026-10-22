@@ -1,0 +1,66 @@
+#+title: Independent Malawi GH1209 review
+#+author: Sue
+#+date: 2026-10-22
+
+* Scope deviations
+
+No tracked edits, Git/GitHub writes, acquisition, cache bypass, cache planting or additional data actors.
+All independent writes stay within the assigned private prefix or the root-prepared private DVC-temp exceptions.
+The root clarified provider-gate wording: all frozen author evidence and source bytes were authenticated before project imports; external original providers were independently authenticated after guarded no-held-data stages and before copying or decoding.
+Completed no-data stages were not replayed for that wording difference.
+The author's two unguarded metadata-status utilities and missing temporary-basename history remain disclosed; this report makes no global zero-outside-write claim.
+
+* Verdict and source route
+
+PASS for the committed, scoped food-builder retirement.
+Candidate 47b3c5d76371acc457c5553ebf8adfb1859e115b is reviewed against actual parent d29a56783d08a8a647e2622150a4ee5fbdd7246a.
+The five-path diff is the task ledger, Malawi CONTENTS and Makefile, obsolete country-script deletion, and six regression tests.
+The native wave scripts and framework source are unchanged.
+The actual country-builder predicate becomes false, so Make reuses the existing framework wave assembly.
+The native direct-Make target retains its existing singleton output, builds four missing waves and writes no aggregate country food parquet.
+The measured invalidation is country-wide: 26 of 549 country and 97 of 1362 wave fingerprints change, all Malawi; every other key and all 39 framework fingerprints remain exact.
+The two actual parent food footers grade stale under candidate expected hashes, and the source-bound read gate refuses stale content before its data read.
+No cache was planted or promoted to establish this mechanism.
+
+* Independent evidence
+
+Six candidate regressions pass; actual-parent controls produce four failures and two Default passes.
+Thirteen existing focused tests pass, with no skips or errors.
+The one-worker loadfile regressions run on two source sides, and neither worker remains when the subsequent test starts.
+The exact comparator rejects 49 seeded faults, including tiny and nextafter doubles, nullable Float64, object-EA nested scalar types, altered unused domains/code storage, string storage/null policy and typed attrs.
+All 56 Country, 24 Feature and ten native pairs pass strictly, with no normalization.
+The Country grid covers acquisition plus the three runtime-derived callers, all waves and supported 2013-14, cold and fresh-process warm, parent/candidate Default and candidate Default/Make.
+All 16 parent Make Country endpoints fail as RuntimeError; the candidate returns the preserved products.
+The 12 parent Make Feature requests degrade empty; candidate Make restores ten nonempty results while preserving the two expected no-Price empties.
+Complete axes, unused domains, codes/code widths, masks, exact nonmissing values, dtypes, string storage/null policy and typed attrs are checked.
+Current footer hashes/coverage, literal scanner records and warning order are protected separately.
+The unmodified scanners each return 163 literally equal ordered records: 158 warnings, three passes and two existing price-mode assembly_nonempty failures.
+The 16 Default warning pairs match after only exact checkout-path substitution; full warning payloads stay private.
+
+All package/data actors use the mounted interpreter, offline namespace, active pre-import socket/write guards, matching source/config/data identities and private roots.
+Build, BLAS and Make are explicitly serial; LSMS_MAKE_JOBS=1 and the actual helper returns None.
+Nineteen original binary Stata providers pass genuine binary MD5, SHA256, declared-size and physical authentication before copying/decoding.
+The eight fresh L1-only roots hold 304 distinct, nonsymlink, nlink1 physical copies.
+Source, runtime, provider, copied binary, endpoint and frozen author evidence receipts pass final protection.
+Commands, child statuses and exact source/runtime pins accompany this report.
+
+* Documented conventions and retained qualifications
+
+The complete current 3104-line Malawi CONTENTS was read before source work, including TODO entries.
+It records panel-only 2013, combined cross-sectional/tracking samples later, IHS2 metric factors from labels and region-keyed IHS3+ factors.
+Those distinctions and the settled unit rulings remain unchanged.
+The historical heading "** DONE food_acquired.py" and its old var-parquet example remain above the dated retirement addendum; the new explicit direct-Make/native/API contract supplies the current instruction.
+No historical heading was silently treated as a current requirement to retain the obsolete script.
+Git/ripgrep and AST source reading substitute for unavailable GitNexus/memory tools.
+The existing per-task ledger and standing baseline anchor the reuse checks; no transform or new scientific method is introduced.
+
+The author tested dirty source on the parent checkout; final-protection receipts bind those tested bytes to the committed candidate.
+This independent run executes the clean detached candidate.
+Author diagnostic all-wave actors lacking LSMS_MAKE_JOBS, two denied relative outputs, early synthetic axis/fixture stops, and metadata utility exceptions remain retained.
+The accidental ledger hooksPath override was subsequently covered by the standard implementation publication; history is not rewritten here.
+
+GH1210 invalid-wave eviction, GH1196 string-null-policy behavior, the missing-Price modes, and scientific/unit residuals are separate.
+Strict equality on this selected grid is not scientific validation or a full-corpus verdict.
+This independent verdict is an input to root acceptance and human merge; no PR or merge is performed here.
+
+Sue

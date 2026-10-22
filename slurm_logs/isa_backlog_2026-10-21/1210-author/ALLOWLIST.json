@@ -1,0 +1,82 @@
+{
+  "scope": "Aggregate-only author exports; all unlisted evidence is private.",
+  "files": {
+    "REPORT.org": {
+      "sha256": "4426de9adc058f0d6165b5bb5d0329d6ea0d60f64b0705176ec5004e8d7ce18d",
+      "bytes": 10070,
+      "mode": 384,
+      "mtime_ns": 1792685644565012186,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 12584380,
+      "symlink": false,
+      "link": null
+    },
+    "RESIDUALS.md": {
+      "sha256": "874a0b6918123da94f55c7786fcbc02a1911917b324ad950483b6337a9c4801a",
+      "bytes": 1244,
+      "mode": 384,
+      "mtime_ns": 1792684703883759730,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 12584381,
+      "symlink": false,
+      "link": null
+    },
+    "commands.json": {
+      "sha256": "c94f8085b4ee7add6994da0b620c3fab5aa81cfc7aaabff9c38581c6a7f68703",
+      "bytes": 12265,
+      "mode": 384,
+      "mtime_ns": 1792685601066771062,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 12584378,
+      "symlink": false,
+      "link": null
+    },
+    "pins.json": {
+      "sha256": "e352494102ea67bbbf918338662945ec8b4877698ee3597410b247bed02f36d2",
+      "bytes": 2624,
+      "mode": 384,
+      "mtime_ns": 1792685601086771173,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 12584377,
+      "symlink": false,
+      "link": null
+    },
+    "protection.json": {
+      "sha256": "4a0edbc5ba82e01c35f5b01addc2e99961146df229bd1ca5fbe3d57d7f1eda73",
+      "bytes": 1933,
+      "mode": 384,
+      "mtime_ns": 1792685645632018081,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 12584387,
+      "symlink": false,
+      "link": null
+    },
+    "source.diff": {
+      "sha256": "4aeb2d7acc15fb8ad6c6e6d6d9e082e63ede3641dd6017ffc2883c9e8885ca98",
+      "bytes": 18913,
+      "mode": 384,
+      "mtime_ns": 1792684567244066223,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 12584379,
+      "symlink": false,
+      "link": null
+    },
+    "validation.json": {
+      "sha256": "fa611ca9971e86e7d919e85846baa8030a7d2e942b08b5568ea330a4bf657208",
+      "bytes": 6226,
+      "mode": 384,
+      "mtime_ns": 1792685601066771062,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 12584376,
+      "symlink": false,
+      "link": null
+    }
+  }
+}

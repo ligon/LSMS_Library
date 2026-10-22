@@ -1,0 +1,585 @@
+{
+  "note": "Frozen paths are exclusive-create evidence and must not be replayed; new runs require new authenticated private L1 roots. Each launch uses the clean run.sh environment and pre-import guard/identity assertions.",
+  "actors": [
+    {
+      "tag": "artifacts",
+      "role": "candidate",
+      "label": "artifacts",
+      "script": "artifacts.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "artifacts.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 5.315380811691284
+    },
+    {
+      "tag": "base-default-all-cold",
+      "role": "base",
+      "label": "base-default-all",
+      "script": "probe.py",
+      "arguments": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 241.1713671684265
+    },
+    {
+      "tag": "base-default-all-warm",
+      "role": "base",
+      "label": "base-default-all",
+      "script": "probe.py",
+      "arguments": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 44.5452241897583
+    },
+    {
+      "tag": "base-default-one-cold",
+      "role": "base",
+      "label": "base-default-one",
+      "script": "probe.py",
+      "arguments": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 23.152773141860962
+    },
+    {
+      "tag": "base-default-one-feature",
+      "role": "base",
+      "label": "base-default-one",
+      "script": "feature-probe.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "feature-probe.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 27.879655122756958
+    },
+    {
+      "tag": "base-default-one-warm",
+      "role": "base",
+      "label": "base-default-one",
+      "script": "probe.py",
+      "arguments": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.697710037231445
+    },
+    {
+      "tag": "base-inventory",
+      "role": "base",
+      "label": "base-inventory",
+      "script": "inventory.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "inventory.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 55.03680872917175
+    },
+    {
+      "tag": "base-make-all-cold",
+      "role": "base",
+      "label": "base-make-all",
+      "script": "probe.py",
+      "arguments": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 213.63784551620483
+    },
+    {
+      "tag": "base-make-all-warm",
+      "role": "base",
+      "label": "base-make-all",
+      "script": "probe.py",
+      "arguments": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 41.670377016067505
+    },
+    {
+      "tag": "base-make-one-cold",
+      "role": "base",
+      "label": "base-make-one",
+      "script": "probe.py",
+      "arguments": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 211.2260308265686
+    },
+    {
+      "tag": "base-make-one-feature",
+      "role": "base",
+      "label": "base-make-one",
+      "script": "feature-probe.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "feature-probe.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 134.1020233631134
+    },
+    {
+      "tag": "base-make-one-warm",
+      "role": "base",
+      "label": "base-make-one",
+      "script": "probe.py",
+      "arguments": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 43.17142987251282
+    },
+    {
+      "tag": "base-scanner",
+      "role": "base",
+      "label": "base-default-all",
+      "script": "scanner.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "scanner.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 259.81051421165466
+    },
+    {
+      "tag": "calibration",
+      "role": "candidate",
+      "label": "calibration",
+      "script": "calibrate.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "calibrate.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 5.264191627502441
+    },
+    {
+      "tag": "candidate-default-all-cold",
+      "role": "candidate",
+      "label": "candidate-default-all",
+      "script": "probe.py",
+      "arguments": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 226.22336173057556
+    },
+    {
+      "tag": "candidate-default-all-warm",
+      "role": "candidate",
+      "label": "candidate-default-all",
+      "script": "probe.py",
+      "arguments": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 45.13935589790344
+    },
+    {
+      "tag": "candidate-default-one-cold",
+      "role": "candidate",
+      "label": "candidate-default-one",
+      "script": "probe.py",
+      "arguments": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 22.370662689208984
+    },
+    {
+      "tag": "candidate-default-one-feature",
+      "role": "candidate",
+      "label": "candidate-default-one",
+      "script": "feature-probe.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "feature-probe.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 28.508273601531982
+    },
+    {
+      "tag": "candidate-default-one-warm",
+      "role": "candidate",
+      "label": "candidate-default-one",
+      "script": "probe.py",
+      "arguments": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.451630353927612
+    },
+    {
+      "tag": "candidate-direct-make",
+      "role": "candidate",
+      "label": "candidate-make-one",
+      "script": "direct-make.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "direct-make.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 156.63860940933228
+    },
+    {
+      "tag": "candidate-inventory",
+      "role": "candidate",
+      "label": "candidate-inventory",
+      "script": "inventory.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "inventory.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 54.65752553939819
+    },
+    {
+      "tag": "candidate-make-all-cold",
+      "role": "candidate",
+      "label": "candidate-make-all",
+      "script": "probe.py",
+      "arguments": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 707.2533650398254
+    },
+    {
+      "tag": "candidate-make-all-warm",
+      "role": "candidate",
+      "label": "candidate-make-all",
+      "script": "probe.py",
+      "arguments": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 702.7952909469604
+    },
+    {
+      "tag": "candidate-make-one-cold",
+      "role": "candidate",
+      "label": "candidate-make-one",
+      "script": "probe.py",
+      "arguments": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 49.352285623550415
+    },
+    {
+      "tag": "candidate-make-one-feature",
+      "role": "candidate",
+      "label": "candidate-make-one",
+      "script": "feature-probe.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "feature-probe.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 148.26098203659058
+    },
+    {
+      "tag": "candidate-make-one-warm",
+      "role": "candidate",
+      "label": "candidate-make-one",
+      "script": "probe.py",
+      "arguments": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 46.76027226448059
+    },
+    {
+      "tag": "candidate-scanner",
+      "role": "candidate",
+      "label": "candidate-default-all",
+      "script": "scanner.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "scanner.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 254.77420783042908
+    },
+    {
+      "tag": "candidate-tests",
+      "role": "candidate",
+      "label": "candidate-tests",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--no-purge",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-candidate",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-candidate.xml",
+        "/local/job40255479/worktrees/isa-review-Malawi-1209/tests/test_gh1209_malawi_food_builder.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--no-purge",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-candidate",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-candidate.xml",
+        "/local/job40255479/worktrees/isa-review-Malawi-1209/tests/test_gh1209_malawi_food_builder.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 15.22465181350708
+    },
+    {
+      "tag": "comparisons",
+      "role": "candidate",
+      "label": "comparisons",
+      "script": "compare.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "compare.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 108.65326476097107
+    },
+    {
+      "tag": "existing-tests",
+      "role": "candidate",
+      "label": "existing-tests",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--no-purge",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-existing",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-existing.xml",
+        "tests/test_malawi_unit_cleanup.py",
+        "tests/test_gh1039_make_backend_no_country_rule.py",
+        "-k",
+        "test_no_country_rule_builds_from_waves_cold or test_real_country_builders or test_drops_leading_count_of_one or test_preserves_magnitudes_no_order_of_magnitude_error or test_extract_kg_conversion_grams_are_thousandths or test_extract_kg_conversion_is_aligned_to_its_input"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--no-purge",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-existing",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-existing.xml",
+        "tests/test_malawi_unit_cleanup.py",
+        "tests/test_gh1039_make_backend_no_country_rule.py",
+        "-k",
+        "test_no_country_rule_builds_from_waves_cold or test_real_country_builders or test_drops_leading_count_of_one or test_preserves_magnitudes_no_order_of_magnitude_error or test_extract_kg_conversion_grams_are_thousandths or test_extract_kg_conversion_is_aligned_to_its_input"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 16.085536003112793
+    },
+    {
+      "tag": "parent-tests",
+      "role": "base",
+      "label": "parent-tests",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--no-purge",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-parent",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-parent.xml",
+        "/local/job40255479/worktrees/isa-review-Malawi-1209/tests/test_gh1209_malawi_food_builder.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--no-purge",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-parent",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/pytest-parent.xml",
+        "/local/job40255479/worktrees/isa-review-Malawi-1209/tests/test_gh1209_malawi_food_builder.py"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 15.360339403152466
+    },
+    {
+      "tag": "prepare",
+      "role": "candidate",
+      "label": "preparation",
+      "script": "prepare.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "prepare.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 166.2354142665863
+    },
+    {
+      "tag": "runtime",
+      "role": "candidate",
+      "label": "runtime",
+      "script": "runtime.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/review-1209-Malawi/run.sh",
+        "runtime.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 5.271501302719116
+    }
+  ],
+  "provider_gate_order": "Frozen author copies/source before package imports; external original providers genuine MD5/SHA/physical checks before copies/decodes, with root clarification."
+}
