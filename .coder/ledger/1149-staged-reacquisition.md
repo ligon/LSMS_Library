@@ -217,4 +217,42 @@ measurement. No new Country/Feature data call is necessary to prove this cleanup
 delta; independent delta acceptance remains with root. Final receipts must
 protect both old manifests and original source endpoints, then freeze the new
 source/checker/test pins, seven safe exports, full manifest and zero-consumer
-post-exit verification. Amendment results are pending. Sue.
+post-exit verification.
+
+### Amendment verification
+
+- Runtime/tests commit21f5cb7f9: the only product change wraps expected/confirmed
+  assignment pairs in current-key cleanup and a bare re-raise at both sites.
+  Removing exactly those two AST wrappers makes the entire data_access module
+  equal the actualfb parent. No extraction, sidecar, hash, provenance, return,
+  confirmation, normal push or country scientific rule was redesigned.
+- One new parametrized regression contributes4 cases: None and Path(None)
+  returns at each public entrypoint. Removing that function's AST makes the
+  entire affected test module equal fb. Every case verifies original TypeError
+  args, unchanged SOURCE bytes and unrelated receipt identity before asserting
+  current-key removal. The four physically copied controls on actualfb fail
+  only at that last assertion; current committed runtime passes them.
+- Current affected suite270PASS,0FAIL/ERROR/SKIP:49 staged acquisition,
+  157 provenance,41 data access,17 in-tree source policy,6 runtime-write policy.
+  The single mocked bad-GPG RuntimeWarning remains as before. Parent/candidate
+  XMLs and all failure logs are distinct new artifacts.
+- Actual549 country,39 framework and1362 declared-wave fingerprints have exact
+  keysets and0 movements versus actualfb, with0 data-endpoint changes. Both
+  census stderr streams retain the same three non-ISA Peru no-_/directory
+  diagnostic lines, qualified by their distinct checkout paths.
+- No Country/Feature/CLI data call, raw/L1 copy, acquisition or source-cold build
+  ran in this amendment. Prior author/reviewer warm results stay pinned to fb;
+  they are not relabelled as measurements on the new runtime.
+- Before imports,5932 original author/reviewer manifest entries and exact
+  pathsets were verified, alongside89292 tracked source receipts over six
+  checkouts. Final protection re-verifies every old artifact and every
+  unrelated source byte/mode/mtime/inode/link endpoint; no old verdict changes.
+- A setup metadata KeyError followed successful guard/bootstrap copying:
+  reviewer metadata calls its checkout key `source`, unlike the new root's
+  `checkout`. The unchanged original helper and tool stderr remain recorded;
+  no package import, test or product edit preceded the corrected read.
+- The original six human requirements and exact real-name versus unavailable
+  original-archive-path qualifications remain in the independently frozen fb
+  review. Root still owns new delta acceptance, publication and human merge.
+
+Sue.
