@@ -1,0 +1,96 @@
+#+TITLE: GH1091 Tanzania community-price builder retirement
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-22
+
+* Result and boundary
+
+AUTHOR_VALIDATED_AWAITS_INDEPENDENT_REVIEW.
+Runtime/tests are pinned at =cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270=, based on =99c824079da480ab2646e499c06ac70e457ff271= whose runtime equals reviewed PR1185 =e75be9c56fa6c318ce32cea5a8be6d448578bed1=.
+PR1185 remains open/unmerged on =fix/1118-tanzania-unknown-units-20261021=; no composition or public merge is claimed.
+The implementation ledger was committed and published first at =aa9745963=.
+
+Delete only the 45-line country =Tanzania/_/community_prices.py= and original Make145-149.
+Every other Make byte is exact, including the independent wave/generic rules, shared variables and all-target discovery.
+Both native scripts, helper, source mappings, eligibility, own price/basis, IDs, grain, units, schema/materialize flag, xwalk, framework and dependencies remain exact.
+No Quantity column or factor is added.
+The actual fresh-root selector finds no country builder; country-var and generic country targets have no rule, while both native waves and real Make all dry-runs remain available.
+
+* Country grounding
+
+The initial CONTENTS blob exactly matched the complete prior 2,142-line reading, including TODO/WAITING/LOGBOOK.
+NPS split-off back-casting, the live WAITING #114 caveat and the Extended/Refresh distinction remain: four older logical waves share 2008-15, 2014-15 pools both panels, 2019-20 follows Extended and 2020-21 follows Refresh plus the urban booster.
+Community v is native interview__key, not sample household-cluster v; its native i==v shim is removed by existing normalization.
+Variety retains the source item code and Description its questionnaire label.
+Price remains village cm_f063 divided by its own positive cm_f062 basis per native cm_f061; district-capital prices remain excluded.
+
+The older geography-only account calls linking "infeasible without a lossy, unverifiable crosswalk", whereas the later implemented crosswalk calls the 2020 cluster "BAKED INTO the community admin codes".
+Both dated accounts and the older schema contrast remain; neither authorizes a household join or xwalk change here.
+The separate reviewed 408 plot-input unit replacements, 86 plus 322, retain exact source/test blobs and prior receipts; no AG modules or plot-input outputs were rebuilt.
+The new dated CONTENTS note is appended at the actual file end.
+
+* Actual source and subset proofs
+
+Only two declared community modules were staged from held DVC blobs after MD5/SHA/size/mode/mtime and physical-copy gates; both held layouts were checked.
+There are 80 initial and eight later raw physical copies across separate parent/candidate roots, each nonsymlink/nlink1/distinct-inode, with terminal preparation before decoding.
+The healthy Mali cache was genuinely current/full-four-wave-coverage at the compatible source pin before physical copying; no Mali source rebuild is claimed.
+All processes used exact checkout/package/countries/data/config identities, mounted image, private paths, offline socket/write guards plus unshare -rn, one numeric/build/Make thread and at most two explicit loadfile test workers.
+
+The independent held-source oracle retains 3,076 of 5,148 raw 2019-20 rows and 14,623 of 25,376 raw 2020-21 rows: 17,699 eligible readings.
+All 52 source codes per wave and their own price/basis values remain exact.
+The 261/1,281 multi-variety coarse groups and 243/1,149 price-disagreeing coarse groups remain separated; no first reducer is introduced.
+Source/helper/writer/native/walked/normalized/raw-country and authoritative public frames are compared at matched stages with exact values, classes, masks, dtypes, order, unused axis levels/codes and recursively typed attrs, including immutable record _FIELDS presence/values.
+Every positive comparison uses check_exact=True and rtol=atol=0.
+
+Each head ran 20 target-cold, 20 fresh-process/new-object warm and 20 populated requests: 120 core requests.
+The ten request sets cover all six logical waves, both supported singletons, modern combined, each older singleton, older combined and mixed older/modern.
+Candidate default and Make return 17,699 for all/modern combined, 3,076 for 2019-only/mixed, 14,623 for 2020-only, and zero for unsupported sets.
+The parent Make returns all 17,699 for every request and is a negative control, not an acceptance reference.
+All same-request cold/warm comparisons are fully strict-exact.
+
+Default warm/populated calls change zero data-root bytes, modes or mtimes.
+Candidate Make creates no country cache and preserves the bytes/mode/mtime/hash/coverage of a genuinely verified populated country cache for every request.
+Its natural native operations are recorded as additions/deletions/modifications; a populated 2019-only request deletes one unrequested native sibling and rewrites its requested native file.
+No blanket Make zero-write claim is made.
+The authoritative raw default frames are exact across heads; their complete Arrow metadata differs only in the expected lsms_cache_hash.
+
+* Feature, CLI, scanner and tests
+
+Full Tanzania+Mali Feature frames contain 57,917 rows and preserve healthy Mali's 40,218 rows exactly, separately for default currency and currency=None.
+Candidate Make Tanzania-only Feature frames match argument-matched authoritative parent default frames, including full typed attrs.
+These are first/fresh warm pooled observations; no first-cold Feature snapshot is claimed.
+Sixteen successful CLI artifacts have exact matched complete Arrow footer/schema metadata and bytes; prewrite API and postread artifact stages remain distinct.
+The actual phases1/2 scanner emits four warnings and zero fail/error/skip records; the full parent/candidate record multisets are exact.
+Each record is accounted in validation.json: two legitimate native community tables without household i, declared Feature sentinel alignment and the missing Tanzania2020 population statement.
+There is no community_prices phase2 kwargs grid.
+
+The same unchanged new test file passes 27/27 on the candidate and produces 20 failures plus seven passes on the actual parent, with zero fixture errors or skips.
+The existing focused cohort passes 58/58; the existing API audit script passes with the mounted interpreter.
+Eleven existing built-data assertion bodies run successfully per head against the prepared held caches; they are explicitly separate from the 85 candidate pytest cases.
+No broad suite, other-table source rebuild or corpus sweep was run.
+
+* Material cost and retained distinctions
+
+The actual prebuild census measures 549 API cells: all 25 Tanzania hashes move, 524 other cells remain exact and all 39 framework fingerprints remain exact.
+This is a country-wide re-warm cost for review; other Tanzania tables were not rebuilt.
+The CONTENTS-only descendant is excluded by the existing hash machinery; no registry or schema lever changes.
+
+Strict source-memory/native index missing-value dtype differences at parquet serialization remain visible; matched writer-stage native controls are exact.
+Cold unsupported requests now follow the existing no-builder empty contract: object Description, versus the old fallback's string Description.
+Covered-cache empties retain string Description and id_converted; full comparisons across those different routes remain qualified.
+JSON serialization changes typed sampling/population/recall record/container forms; exact artifact comparisons use actual matched serialization controls, without attr stripping or dtype normalization.
+These measured existing-contract consequences are not new framework repairs.
+
+* Preserved stops, freeze and review
+
+Candidate preparation initially stopped while snapshotting the approved deleted country script, before staging/decoding/API; the explicit-deletion snapshot correction and original attempt are preserved.
+The first candidate extras stage completed valid public/Feature/API controls before its CLI subprocess failed to find the private wrapper at a per-head path.
+That failed CLI invocation never opened the wrapper, issued no CLI API call and changed no cache; its endpoints, log, script and original partial aggregate are archived.
+Only the missing first CLI tail resumed through the corrected shared path in another guarded process; prior successful first public/Feature observations were not replayed.
+No production/test change followed runtime pin cccdc1b5b.
+The frozen diagnosis retains its original auxiliary launch and absent-first-cold-Feature qualifications.
+
+Safe exports are allowlisted separately from private frames/IDs/coordinates/warnings/tracebacks and full receipts.
+Final READY supplies the clean documentation-descendant head, exact runtime/test blobs/modes, complete source/reference receipts, immutable manifest and zero-consumer proof.
+A different reviewer must accept this author result before any public PR acceptance, merge or issue closure.
+
+Signed: Sue.
