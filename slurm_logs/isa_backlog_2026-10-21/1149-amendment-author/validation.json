@@ -1,0 +1,42 @@
+{
+  "cohorts": {
+    "candidate": {
+      "tests": 270,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "xml": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/candidate.xml",
+        "mode": 384,
+        "mtime_ns": 1792655657003244084,
+        "bytes": 40008,
+        "inode": 10362266,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "f29434a7b52bf29503b4f3adb0a58a39642e5e15b410c67c4b0e27d6be06f855"
+      }
+    },
+    "parent-controls": {
+      "tests": 4,
+      "failures": 4,
+      "errors": 0,
+      "skips": 0,
+      "xml": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/parent-controls.xml",
+        "mode": 384,
+        "mtime_ns": 1792655545030653037,
+        "bytes": 15836,
+        "inode": 10362242,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "8a2d16402f96ccc409ff2cb31108a81915241af7eaf02728d940a88f4b1b5b39"
+      }
+    }
+  },
+  "all4actualfb_failures_only_current_receipt_retention": true,
+  "original_TypeError_args_SOURCE_bytes_unrelated_entry_pass_before_last_assertion": true,
+  "current_source_270PASS_no_merged_cohort_claim": true,
+  "parent_tests_physically_copied": true
+}

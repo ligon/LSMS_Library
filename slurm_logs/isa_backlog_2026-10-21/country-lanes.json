@@ -1154,7 +1154,7 @@
     },
     "1196": {
       "issue": 1196,
-      "status": "ROOT_APPROVED_BOTH_WAVE_ROUTES_EXPANSION_APPLIED; NEW_TARGETED_CONTROLS_RUNNING",
+      "status": "EXPANDED_RUNTIME_SOURCE_COLD_FRESHWARM_AND_DEEP_SAVED_CHECKS_COMPLETE; AUTHOR_FREEZE_PENDING",
       "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
       "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
@@ -1197,12 +1197,15 @@
       "expansion_ledger_first": "29cb3cf8d",
       "expansion_patch_sha256": "942527406d9abaa3a58e853b11255ef5740de4d59a982ca028dd72dce7b26c31",
       "original795_stop_receipts_root_verified": true,
-      "actual_expansion_scope": "549/549API,39/39framework,1362/1362wave changed vsBOTHbd80andf8;exactkeysets,0dataendpointchanges;no newcandidate sourcebuild yet"
+      "actual_expansion_scope": "549/549API,39/39framework,1362/1362wave move vsbothbd80/f8; exactkeysets;0dataendpointchanges",
+      "expanded_runtime": "7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1",
+      "new_evidence": "Both Default+Make cold/freshwarm Niger239877/Ug4805 completed;47newPASS+72affectedPASS; actualbd8026FAIL21PASS; deep329=256exact72intendedpolicy1qualifiedsingleton;22hashonlyfooters;27scanner26WARN1oldFAIL;2CLI6stageframes, no unexpected difference",
+      "singleton_qualification": "Ug2019Default824x5 versusMake824x3,unusedlevels andvStringNApolicy differ alreadybd80; nativewriter/footerrecordsstr whilepooledcountryfooterrecordsstring, no cast/normalization."
     },
     "1206": {
       "issue": 1206,
       "owner": "validation_reassess; root acceptance/publication",
-      "status": "CRITICAL20_AND1196_SUPPLEMENT_ROOT_ACCEPTED; FULL_RETROSPECTIVE_ACTIVE",
+      "status": "CRITICAL_AND_CORRECTED_OBJECT_V3_ROOT_ACCEPTED; FULL_RETROSPECTIVE_ACTIVE",
       "primary_diagnostic": "1206-comparator-validation/ROOT-SYNTHETIC-PROOF.json",
       "scope": "Full affected frozen-cohort saved-evidence reassessment; prioritize20and1196, inventory22implementation-review cohorts and17/18/19integration; noAPI/source/testreplay",
       "actual_product_mismatch_found": false,
@@ -1242,12 +1245,36 @@
           1186,
           1189,
           1191
-        ]
-      }
+        ],
+        "corrected_helper_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94"
+      },
+      "corrected_object_v3": {
+        "evidence": "1206-object-v3-supplement/",
+        "root_acceptance": "1206-object-v3-supplement/ROOT-ACCEPTANCE.json",
+        "positive_groups": 1160,
+        "qualified_groups": 8,
+        "cohorts": {
+          "17": 196,
+          "18": 265,
+          "19": 603,
+          "1200": 96
+        },
+        "negative_calibrations": 42,
+        "physical_operands": 1154,
+        "old_manifest_entries_verified": 12632,
+        "empty_original_memory_gaps": 38,
+        "additional18_Feature_memory_gaps": 2,
+        "new_object_EA_blocks": 39,
+        "actual_object_cell_pairs": 32,
+        "actual_object_cell_types": "builtins.str",
+        "actual_mismatch": false,
+        "all_campaign_result": false
+      },
+      "Mali1199_ruling": "1206-object-v3-supplement/ROOT-MALI1199-CONTENT-REASSESSMENT-RULING.json"
     },
     "1149": {
       "issue": 1149,
-      "status": "AUTHOR_FROZEN_ROOT_PREPARATION_VERIFIED; INDEPENDENT_REVIEW_ASSIGNED",
+      "status": "HUMAN_SIX_CONTRACT_FIRST_REVIEW_ESTABLISHED; AMENDED_AUTHOR_FROZEN; INDEPENDENT_DELTA_REVIEW_ACTIVE",
       "candidate": "/local/job40255479/worktrees/isa-1149-acquisition",
       "control": "/local/job40255479/worktrees/isa-1149-acquisition-base",
       "branch": "fix/1149-staged-reacquisition-20261022",
@@ -1277,7 +1304,26 @@
         "control": "/local/job40255479/worktrees/isa-review-1149-acquisition-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition",
         "brief": "queued-1149-review/NEXT-REVIEW-BRIEF.md",
-        "status": "ASSIGNED; no independentverdict yet"
+        "status": "FROZEN_NEEDS_NARROW_DISPATCH_CLEANUP",
+        "READY_sha256": "aac79aacbcd34eb7482348ac32a7a734e92b14d146ea62cadb6fa4894e3b9e63",
+        "manifest_entries": 1918,
+        "manifest_sha256": "5ffc80cd88184122d4dd923299017d652b58f1409ea690ab3431ac3031f9c4a0",
+        "safe_evidence": "1149-independent-first/",
+        "own_tests": "266PASS; actualf8 coherent47cases45FAIL2PASS; extra2cleanupFAILbothheads",
+        "human_six_contract": "established in synthetic and bounded warm scope",
+        "qualification": "InvalidNone completion gap pre-existing; normal helper promiseslist; SOURCE unchanged"
+      },
+      "amendment": {
+        "head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+        "runtime": "21f5cb7f91152c5a86eba8cfd264dd24124b523a",
+        "branch": "fix/1149-staged-reacquisition-v2-20261022",
+        "tests": "270PASS; actualfb4expectedcleanupFAIL",
+        "actual_fingerprints": "549/39/1362 allunchanged",
+        "safe_evidence": "1149-amendment-author/",
+        "review": "queued-1149-amendment-review/",
+        "owner": "review_acquisition_1149",
+        "status": "INDEPENDENT_DELTA_REVIEW_ACTIVE",
+        "new_data_API_or_real_acquisition": false
       }
     }
   },
@@ -1658,7 +1704,7 @@
       "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
       "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022",
       "private_archive": "private-evidence-durability-twentysecond.json",
-      "additional_numeric_verification": "GH1206 separate saved-artifact nullableFloat64 reassessment pending; original report/root receipts stay unchanged"
+      "additional_numeric_verification": "Root accepted critical433groups supplement; original overwritten-child-log limits remain."
     },
     "twenty_increment": {
       "head": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
@@ -1687,7 +1733,7 @@
       "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
       "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022",
       "private_archive": "private-evidence-durability-twentysecond.json",
-      "additional_numeric_verification": "GH1206 separate saved-artifact nullableFloat64 reassessment pending; original report/root receipts stay unchanged"
+      "additional_numeric_verification": "Root accepted critical433groups supplement; original overwritten-child-log limits remain."
     },
     "pending_twentyone": {
       "head": "bd235a6d494434061dedacc8359351f5a4fb64aa",

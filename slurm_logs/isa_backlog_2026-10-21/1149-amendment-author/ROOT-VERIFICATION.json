@@ -1,0 +1,34 @@
+{
+  "status": "ROOT_VERIFIED_AMENDMENT_AUTHOR_FREEZE_FOR_INDEPENDENT_DELTA_REVIEW",
+  "at_UTC": "2026-10-22T12:39:22.137181+00:00",
+  "manifest_entries": 1135,
+  "safe_exports": 7,
+  "exact_pathset": true,
+  "source": {
+    "head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+    "runtime": "21f5cb7f91152c5a86eba8cfd264dd24124b523a",
+    "base": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+    "branch": "fix/1149-staged-reacquisition-v2-20261022",
+    "clean_FS_published": true,
+    "only_ledger_descendant": true
+  },
+  "counts": {
+    "candidate": {
+      "tests": 270,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "parent-controls": {
+      "tests": 4,
+      "failures": 4,
+      "errors": 0,
+      "skips": 0
+    }
+  },
+  "root_personally_read_complete_production_test_diff": true,
+  "full_six_contract_still_owned_by_original_independent_review": true,
+  "no_new_warm_claim": true,
+  "no_payload_decode_API_or_test_replay": true,
+  "signed": "Sue"
+}

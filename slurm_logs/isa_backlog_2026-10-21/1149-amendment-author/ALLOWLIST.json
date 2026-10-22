@@ -1,0 +1,12 @@
+{
+  "safe_exports": [
+    "REPRODUCE.md",
+    "REVIEW.org",
+    "checker-sources.json",
+    "proof.json",
+    "validation.json",
+    "verdict.json"
+  ],
+  "allowlist_itself_safe": true,
+  "full_failure_logs_and_synthetic_operands_private": true
+}

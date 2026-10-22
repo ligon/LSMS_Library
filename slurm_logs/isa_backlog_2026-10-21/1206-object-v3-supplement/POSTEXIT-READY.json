@@ -1,0 +1,18 @@
+{
+  "status": "FROZEN_CORRECTED_OBJECT_V3_POSTEXIT_ATTESTATION",
+  "manifest_entries": 2,
+  "manifest_sha256": "1aa0b6cbcf0f0ff414e26ac83cd561cea4ae638356bf85559fbc2ea69c5a3fda",
+  "safe_export_allowlist": {
+    "POSTEXIT-safe.json": {
+      "sha256": "bcd0a779635d2c1f6be4e28d1a2c44daa8b4fd5b9e7ce2c7a94059f798795c3e",
+      "bytes": 530,
+      "mode": 384,
+      "mtime_ns": 1792656194718176773,
+      "inode": 55845294,
+      "device": 64770,
+      "nlink": 1,
+      "symlink": false
+    }
+  },
+  "signed": "Sue"
+}
