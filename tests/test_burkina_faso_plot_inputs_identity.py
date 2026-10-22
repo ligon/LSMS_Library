@@ -58,11 +58,18 @@ def _run_script(monkeypatch, codes, *, seed_override=None, purchased=False,
         's16bq03b': [np.nan if missing_unit else 1] * len(codes),
         's16bq05': [1 if purchased else 2] * len(codes),
         's16bq07a': [0.75 if purchased else np.nan] * len(codes),
+        's16bq07b': [2 if purchased else np.nan] * len(codes),
+        's16bq08': [1 if purchased else 2] * len(codes),
+        's16bq09a': [0.75 if purchased else np.nan] * len(codes),
+        's16bq09b': [2 if purchased else np.nan] * len(codes),
     })
     labelled = numeric.copy()
     labelled['s16bq01'] = labelled['s16bq01'].map(SOURCE_LABELS)
     labelled['s16bq03b'] = np.nan if missing_unit else 'Kilogramme'
     labelled['s16bq05'] = 'Oui' if purchased else 'Non'
+    labelled['s16bq07b'] = 'Kilogramme' if purchased else np.nan
+    labelled['s16bq08'] = 'Oui' if purchased else 'Non'
+    labelled['s16bq09b'] = 'Kilogramme' if purchased else np.nan
     maps = {name: dict(values) for name, values in _maps().items()}
     if seed_override:
         maps['harmonize_seed_crop'].update(seed_override)
@@ -174,8 +181,12 @@ def test_every_real_native_line_and_full_payload_survives(actual_country):
         'u': labelled['s16bq03b'].astype('string').replace(
             {'Kilogramme': 'Kg'}).to_numpy(),
         'Quantity': pd.array(raw['s16bq03a'], dtype='Float64'),
-        'Purchased': pd.array(raw['s16bq05'].map({1: True, 2: False}), dtype='boolean'),
-        'Quantity_purchased': pd.array(raw['s16bq07a'], dtype='Float64'),
+        'Purchased': pd.array(raw['s16bq08'].map({1: True, 2: False}), dtype='boolean'),
+        'Quantity_purchased': pd.array(raw['s16bq09a'], dtype='Float64'),
+        'Unit_purchased': pd.array(labelled['s16bq09b'].astype('string'), dtype='string'),
+        'Received_as_gift': pd.array(raw['s16bq05'].map({1: True, 2: False}), dtype='boolean'),
+        'Quantity_received_as_gift': pd.array(raw['s16bq07a'], dtype='Float64'),
+        'Unit_received_as_gift': pd.array(labelled['s16bq07b'].astype('string'), dtype='string'),
     }).set_index(['i', '_native_code']).sort_index()
     got = actual.set_index(['i', '_native_code'])[expected.columns].sort_index()
     assert got.index.is_unique
