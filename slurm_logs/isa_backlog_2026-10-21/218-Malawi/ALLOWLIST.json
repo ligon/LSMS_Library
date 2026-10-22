@@ -1,0 +1,36 @@
+{
+  "safe_exports": [
+    {
+      "name": "REPORT.org",
+      "sha256": "ba588e11702305ceb584ec1240867fa8e5d2572c8da10d88b3a8cb385987e667",
+      "bytes": 8518
+    },
+    {
+      "name": "validation.json",
+      "sha256": "824a315efea0ba487153e7248bd664890161574bc1819dc64b577ad0dcba4b06",
+      "bytes": 4728
+    },
+    {
+      "name": "proof.json",
+      "sha256": "a13e1327e3af02e1556c2ba6b33b60159703821a106fab1ca71d4c032aead39b",
+      "bytes": 3297
+    },
+    {
+      "name": "REPRODUCE.sh",
+      "sha256": "71717bf724fc6be784c50536391b8570695ce70e56d258aeb26513fa2212fa8b",
+      "bytes": 5228
+    },
+    {
+      "name": "RESIDUALS.md",
+      "sha256": "2f411ae44848b19d3853c8e9d2fa42ef5a65ce8a1d0588efa92e04c1f9a50eec",
+      "bytes": 3599
+    },
+    {
+      "name": "scanner-occurrences.json",
+      "sha256": "ed574838186151de5de7918b044ab1dbd194926026c68b5cf2dd9cd3c50557f2",
+      "bytes": 57505
+    }
+  ],
+  "additional_safe_manifest": "ALLOWLIST.json",
+  "raw_data_or_warning_text_exported": false
+}

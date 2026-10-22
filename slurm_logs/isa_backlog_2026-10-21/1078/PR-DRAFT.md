@@ -1,0 +1,9 @@
+Fixes #1078 by carrying private per-result producer provenance from `Wave.grab_data` into `Wave.food_acquired`. A concurrent normal rebuild can remove a wave parquet after another process has read it; the old later-existence check then applied the legacy reducer to an already canonical frame and wrote six missing Quantities and three missing Expenditures as zero. The actual producer now determines the route. Default DataFrame returns/attrs and the legitimate non-parquet reducer are preserved.
+
+The food producer is explicitly versioned, and ordinary candidate reads of a physically copied genuinely corrupt current-hash f8 cache restore all nine NaNs with complete frame/attrs equality. This has a **broad operational cost**: the already all-table-tagged shared loader changes all 549 enumerated country API hashes, 39 framework fingerprints and all 2,109 non-null API-wave hashes. A coordinated rebuild window is required; no whole-corpus rebuild was performed. Registry exclusions and global schema are unchanged.
+
+Author validation: 64 focused tests pass, plus six real source-test executions across both serial orders and a controlled two-process schedule. Both actual concurrent writers produce the complete correct frame. Twenty-six complete baseline/candidate frames match strictly at cold and again fresh warm; healing and warm cache inventories show zero writes. Scanner findings match all 217 records (214 warnings, three passes). A pre-existing Niger public food unit-index cold/warm dtype mismatch is separately documented and not normalized. Full suite and final verdict belong to independent review.
+
+The original historical full-suite writer/interleaving remains unidentified. This f8-based proof does not establish composition with #1062 or campaign changes. See REPORT.org, validation.json and the separate dtype residual draft. Full records, household keys and traces remain private.
+
+Sue

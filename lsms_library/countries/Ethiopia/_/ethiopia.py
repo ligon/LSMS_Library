@@ -1924,6 +1924,8 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
         Quantity (float), u (str), Purchased (boolean),
         Quantity_purchased (float), Improved (boolean).
     """
+    from lsms_library.transformations import U_UNKNOWN
+
     c = colmap
     crop_map = _eth_crop_label_map()
     pieces = []
@@ -2168,6 +2170,9 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
     out['Improved'] = out['Improved'].astype('boolean')
     out['Applied'] = out['Applied'].astype('boolean')
     out['u'] = out['u'].astype('string')
+    # #1118 / #1041: use-only observations remain inputs even without an
+    # amount, but an absent unit is the existing sentinel (ledger §3/§4).
+    out['u'] = out['u'].mask(out['u'].isna() | out['u'].str.strip().eq(''), U_UNKNOWN)
     out = out.set_index(['t', 'i', 'plot_id', 'input', 'j'])
     out = out[['Quantity', 'u', 'Purchased', 'Quantity_purchased',
                'Improved', 'Applied']]

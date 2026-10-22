@@ -1,0 +1,42 @@
+{
+  "pooled_rows": 264400,
+  "Uganda_rows": 84216,
+  "Malawi_rows": 180184,
+  "all_nonorganic_Malawi_and_all_Uganda_rows_exact": true,
+  "organic_other_index_and_measure_values_order_dtypes_exact": true,
+  "warnings_before": 15,
+  "warnings_after": 15,
+  "failures_after": 0,
+  "errors_after": 0,
+  "scanner_check_identities_and_statuses_exact": true,
+  "scanner_changed_details_or_metrics": [
+    {
+      "record": 1,
+      "identity": [
+        "1a-sanity",
+        null,
+        "runtime_warning",
+        "warn",
+        "C"
+      ],
+      "before_detail": "Malawi/plot_inputs: declared index level(s) carried NaN key(s): level 'crop' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 67,888 NaN row(s)); level 'u' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 28,724 NaN row(s)). These row(s) are SERVED and will vanish in the first groupby (pandas' groupby defaults to dropna=True): called a deletion when _normalize_dataframe_index runs (GH #323's nan_key_rows), silent data loss when only a consumer groupby runs (GH #847). Fix is country-level (a sentinel like Niger's 'Unknown'/'Manquant' fixed at GH #842 for the u axis), not this guard's. Set LSMS_READ_STRICT=1 to make this fatal.",
+      "after_detail": "Malawi/plot_inputs: declared index level(s) carried NaN key(s): level 'crop' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 67,888 NaN row(s)); level 'u' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 17,649 NaN row(s)). These row(s) are SERVED and will vanish in the first groupby (pandas' groupby defaults to dropna=True): called a deletion when _normalize_dataframe_index runs (GH #323's nan_key_rows), silent data loss when only a consumer groupby runs (GH #847). Fix is country-level (a sentinel like Niger's 'Unknown'/'Manquant' fixed at GH #842 for the u axis), not this guard's. Set LSMS_READ_STRICT=1 to make this fatal.",
+      "before_metrics": {},
+      "after_metrics": {}
+    },
+    {
+      "record": 10,
+      "identity": [
+        "1b-assembly",
+        null,
+        "runtime_warning",
+        "warn",
+        "C"
+      ],
+      "before_detail": "Malawi/plot_inputs: declared index level(s) carried NaN key(s): level 'crop' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 67,888 NaN row(s)); level 'u' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 28,724 NaN row(s)). These row(s) are SERVED and will vanish in the first groupby (pandas' groupby defaults to dropna=True): called a deletion when _normalize_dataframe_index runs (GH #323's nan_key_rows), silent data loss when only a consumer groupby runs (GH #847). Fix is country-level (a sentinel like Niger's 'Unknown'/'Manquant' fixed at GH #842 for the u axis), not this guard's. Set LSMS_READ_STRICT=1 to make this fatal.",
+      "after_detail": "Malawi/plot_inputs: declared index level(s) carried NaN key(s): level 'crop' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 67,888 NaN row(s)); level 'u' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 17,649 NaN row(s)). These row(s) are SERVED and will vanish in the first groupby (pandas' groupby defaults to dropna=True): called a deletion when _normalize_dataframe_index runs (GH #323's nan_key_rows), silent data loss when only a consumer groupby runs (GH #847). Fix is country-level (a sentinel like Niger's 'Unknown'/'Manquant' fixed at GH #842 for the u axis), not this guard's. Set LSMS_READ_STRICT=1 to make this fatal.",
+      "before_metrics": {},
+      "after_metrics": {}
+    }
+  ]
+}
