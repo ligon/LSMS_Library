@@ -24,9 +24,9 @@ plan before any held-source copy, decode or project/data import.
 | `yield_kg` | `lsms_library/transformations.py:4888` | `tests/test_plot_id_canonical.py:156,191`; declared-unit/shipped-factor tests | Reuse the exact current public route; no alternate yield estimator. |
 | `_parcel_from_crop_plot` / `_parcel_from_feature_plot` | `transformations.py:4860,4877` | Synthetic parcel-mode tests above; historical held-source controls in GH1198/849 notes | Reuse exactly for measured route keys; their real coverage is the question. |
 | `harvest_kg_factors` / `harvest_kg` | `transformations.py:4282,4698` | `tests/test_crop_kg_factor.py`, `test_shipped_factors.py`, `test_gh849_uganda_reported_factors.py` | Reuse current per-observation conversion and explicit reduction. |
-| `uganda.id_walk` | `countries/Uganda/_/uganda.py:679` | `tests/test_id_walk.py` | Reuse the wave-specific household walk; do not infer prefix substitutions. |
+| `local_tools.id_walk` (Default); `uganda.id_walk` (country Make compiler) | `local_tools.py:3636`; `countries/Uganda/_/uganda.py:679` | `tests/test_id_walk.py` | Reuse the wave-specific household walk; do not infer prefix substitutions. |
 | `plot_features_for_wave` | `countries/Uganda/_/uganda.py:864` | Existing area/schema checks and held-area controls; no current-stage coverage proof yet | Trace source declarations, area preference and eligibility before interpreting absence. |
-| `crop_production_for_wave` / `CROP_COLMAPS` | `countries/Uganda/_/uganda.py:1260,1821` | `tests/test_gh1198_uganda_production_observations.py`, `test_gh849_uganda_reported_factors.py` | Preserve release/physical-row identity, slots, conditional old-null boundary and all measures. |
+| `crop_production_for_wave` / `CROP_COLMAPS` | `countries/Uganda/_/uganda.py:1260,1844` | `tests/test_gh1198_uganda_production_observations.py`, `test_gh849_uganda_reported_factors.py` | Preserve release/physical-row identity, slots, conditional old-null boundary and all measures. |
 | Table declarations | `countries/Uganda/_/data_scheme.yml:88,133` | Schema/plot-axis tests | Reuse declared `(t,i,plot_id)` area and native crop grain. |
 | Sanctioned IO, freshness and API finalization | `STANDING.md` sections 2/4; `CLAUDE.md` | Existing library tests | Use normal readers/builders with isolated guarded roots after approval. |
 
@@ -96,3 +96,53 @@ review while preparing only independent metadata/guard work.
 
 Pending source diagnosis, root-reviewed bounded data stage and independent
 review. No acceptance, current data counts or repair is claimed by this ledger.
+
+## Addendum - Source-backed wiring defect and approved boundary
+
+The preceding plan records the initial diagnosis-only scope.
+Root subsequently approved the bounded held-source diagnosis and, after
+reviewing its exhaustive result, the following narrow runtime repair.
+This addendum precedes production edits.
+
+At source491 plus the ledger-first commit309215e28, the normal Default cold
+and fresh-process warm runs return exactly equal complete sample, area, crop,
+harvest and both yield-mode frames; warm data-file receipts do not change.
+The current42,481 converted route keys partition into14,520 exact positive
+matches,438 exact-but-ineligible keys,27,521 directly witnessed native-household
+prefix failures and2 source parcels absent from the area rosters.
+These are route keys, not additive extra yields.
+The prefix-failure group has21,165 positive-area,6,348 ineligible-area and8
+absent-area witnesses.
+The source constructor at Uganda/_/uganda.py:1430-1435 concatenates explicit
+formatted household, parcel and plot fields; the Default walk changes only i
+and retains the embedded native household.
+The current-i-only extractor therefore fails after valid panel walking.
+All56,841 retained unique native plot tuples invert exactly from the right
+to their source components, and all140,961 associated raw rows have nonempty
+ASCII-decimal parcel/plot suffixes.
+
+Reuse that checked constructor inverse only for an Uganda-marked Country
+operand when the existing current-i prefix branch misses.
+Require a nonempty native-household head and two ASCII-decimal suffixes;
+otherwise preserve the unchanged-string fallback.
+An explicit country axis/column must disable the new fallback even when a
+pooled frame carries a stale scalar country attr.
+`yield_kg` alone passes existing country metadata; `fertilizer_rate` remains
+under GH1110.
+Do not rewrite observed plot identifiers, introduce fields/grain, choose a
+key from area matches, impute area, or change conversion/eligibility/aggregation.
+Actual491 runtime-byte discriminator tests and an independent raw-column
+saved-operand oracle must verify the change, together with full fingerprint
+scope and strict unchanged operand/harvest/literal-route controls.
+Independent review and publication remain root-owned.
+
+Private reproducibility and qualification records are in the authorized
+`uganda1205-diagnosis` evidence prefix: `REPAIR-BOUNDARY.md`, the full partition,
+source ancestry, provider/copy receipts, actor streams and preserved diagnostic
+stops.
+The original ancestry actor stopped on the2013 loader's mapping variable name;
+its corrected successor completed without replaying the cold/warm actors.
+The reviewed comparator's standalone DatetimeIndex frequency limitation is
+retained; full-frame frequency controls pass, and actual axes are non-datetime
+MultiIndexes.
+No all-history zero-denial or outside-write claim is made.
