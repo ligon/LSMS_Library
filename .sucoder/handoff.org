@@ -1463,3 +1463,30 @@ Three agents and allocation40255479remain active, with about31hours left. No idl
 All merges remain human-owned; no actualacquisition/shared-cachepromotion/newvenv/fingerprint-exclusion/all-country-full-suite verdict.
 
 Sue
+
+* Final live publication/readback checkpoint -- 2026-10-22 16:12 UTC
+
+Fresh GitHub metadata verifies all26implementation PRs OPEN/unmerged at unchanged exact heads/bases.
+Tracker1170,issue1206and PR1173/1186bodies match the final qualified text exactly; public proof is archive27-publication-readbacks.json.
+Source d9560685ce3143b8b6c0b17e7ea3b90d1a0ca621 is FS/GitHub-published; this receipt commit adds no implementation.
+The goal remains ACTIVE and no root verifier/archive process remains.
+
+Independent1209final protection12966returned0:29779tracked source receipts,1085author entries,19providers/304copies and endpoints/cache receipts exact, zero observed guard/network attempts in this independent task.
+Sealer34361is active; separate full postexit follows only after observed sealer0.
+Author1210protection4319ended1 at its LAST assumed-zero guard-log assertion after its earlier source/frozen/provider/copy checks passed.
+Six retained relative remove/rmdir denials are associated with existing-test cleanup by source/time context only; original dir_fd/resolved endpoints/per-event timestamps are unavailable.
+Root requires exact log SHA/bytes/rows and unresolved attribution, preserved terminal1/source/trace, no zero-denial or zero-outside-write claim.
+Author will not rerun the completed full protection prefix: only stdlib metadata qualification, necessary seal and separate postexit remain.
+No project/data/test/API prefix or source edits are authorized to manufacture the missing event history.
+
+Independent1210phase0has completed static entry-order review and full Malawi notes; no project imports/tests/provider copies/decodes yet.
+The public guard follows existing argument checks and precedes valuation/derived fallback; internal validation precedes panel-ID/cache/Make work.
+The iterator behavior change is separately disclosed.
+Inherited IHS2-factor and2013GPS/cluster prose tensions are reported without silently rewriting country decisions.
+Root must receive/authenticate immutable authorREADY/manifest before releasing phase1under REVIEW-INVALID-WAVE1210-BRIEF.md.
+
+Next: root-accept1209after immutable independentREADY; publish a PR stacked on exact1208d29, then release independent1210runtime review after the author's final packet.
+Other backlog remains, including Uganda1204/1205 and prepared/unassigned integration21.
+Do not mark the overall campaign complete, merge automatically or restart existing protection/seal/data actors.
+
+Sue
