@@ -1,0 +1,71 @@
+{
+  "status": "EXACT_HEAD_CI_SUCCESS_WITH_SIX_SKIPPED_JOBS",
+  "at_UTC": "2026-10-22T21:30:56.417563+00:00",
+  "PR": 1219,
+  "run": {
+    "check_suite_id": 108027817416,
+    "conclusion": "success",
+    "created_at": "2026-10-22T21:21:28Z",
+    "event": "pull_request",
+    "head_branch": "fix/1188-burkina-input-purchase-routing-20261022",
+    "head_sha": "657fed11a63354886772d0f978cec8adb2ad647e",
+    "id": 39856584211,
+    "run_attempt": 1,
+    "status": "completed",
+    "updated_at": "2026-10-22T21:25:16Z"
+  },
+  "jobs": [
+    {
+      "id": 120096251088,
+      "name": "unit-tests",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 120096251533,
+      "name": "windows-smoke",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 120096253136,
+      "name": "windows-script-build",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120096253203,
+      "name": "data-tests",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120096253248,
+      "name": "dvc-remote-reachability",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120096253274,
+      "name": "docs",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120096253447,
+      "name": "dvc-lock-check",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120096254647,
+      "name": "refresh-dvc-locks",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "API_metadata_sha256": "a92cced75dc623a78285619ec3c1001a0cbd5620166fdb1428aa79bbb53e6011",
+  "capability_qualification": "Connector commit-filtered run/jobs read supplied statuses but normalized run omitted head_sha; direct read-only GitHub API verified exact commit head/event/branch/attempt.",
+  "limits": "unit-tests and windows-smoke success; six jobs includingdata-tests skipped. No full-data/corpus/combined31PR verdict or runtime dependency update.",
+  "signed": "Sue"
+}

@@ -169,7 +169,16 @@
           "actual_parent_FAIL": 7,
           "actual_parent_PASS": 7,
           "PR": 1219,
-          "CI": "NOT_YET_OBSERVED"
+          "CI": {
+            "run_id": 39856584211,
+            "head_sha": "657fed11a63354886772d0f978cec8adb2ad647e",
+            "status": "completed",
+            "conclusion": "success",
+            "unit_tests": "success",
+            "windows_smoke": "success",
+            "other_skipped": 6,
+            "data_tests": "skipped"
+          }
         }
       }
     },
@@ -1178,7 +1187,7 @@
         "independent_review_required": true,
         "independent_review": {
           "owner": "review_malawi_1209",
-          "status": "GENUINE_GRID_RELEASED_FRESH37_PROVIDER_AND148_COPY_GATES_COMPLETE_NORMAL_GRID_NEXT",
+          "status": "FIRST_CORRECTED_COLD_SEQUENCE0_REMAINING_GRID_ACTIVE",
           "candidate_tests_PASS": 63,
           "actual_parent_PASS": 57,
           "actual_parent_FAIL": 6,
@@ -1191,7 +1200,19 @@
           "roots": 4,
           "normal_grid_actors_planned": 8,
           "scanner_actors_planned": 2,
-          "full_data_verdict": false
+          "full_data_verdict": false,
+          "original_firstnormal_instrumentation_stop": {
+            "exit_code": 1,
+            "method_invocations": 0,
+            "results": 0
+          },
+          "resource_loader_addendum_sha256": "eb0e7cbbc14d94e998da624c1702c4a28e21144565b107edb2d29fd181830bd0",
+          "new_metadata_resource_controls": 2,
+          "first_cold_rows": {
+            "supported": 15630,
+            "all": 133761,
+            "barren": 0
+          }
         },
         "author_root_authentication_sha256": "bbc76ab1a0f0478255cd8871cdee95be1458b5309460e8c878d90b292fa8468e"
       }
@@ -2044,7 +2065,8 @@
     "source_head": "7eb596c223055d45c4f45cffdba4f7eb6aee76e4",
     "actual_parent": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
     "fixed_BF_config": "657fed11a63354886772d0f978cec8adb2ad647e",
-    "root_phase0_authentication_sha256": "fd577ba87aff54d220901e6f6d17cf808455e63ac310993e79900372dfafee63"
+    "root_phase0_authentication_sha256": "fd577ba87aff54d220901e6f6d17cf808455e63ac310993e79900372dfafee63",
+    "runtime_guard_review": "HELD_CONCRETE_READ_DESCRIPTOR_FIXTURE_CHILD_DATA_AND_SOURCE_EPOCH_GAPS_BEFORE_EXECUTION_V2_DRAFTING"
   },
-  "active_progress_updated_at_UTC": "2026-10-22T21:23:27.634333+00:00"
+  "active_progress_updated_at_UTC": "2026-10-22T21:34:09.108096+00:00"
 }
