@@ -215,6 +215,14 @@ MEDIUM=, =152. BASIN LARGE= (and =161. BUNDLE MEDIUM=), and all 12 rows are
 in 2015Q3 (post-planting).  Left as =other specify (13x)= here (W3 out of
 scope for #607).
 
+*Resolved 2026-10-21 (GH #1034).*  The =2015-16= column now decodes =131= as =Sack/Bag Medium=, =151= as =Basin Medium=, =152= as =Basin Large= and =161= as =Bundle Medium=, without adding kilogram factors.
+The two rounds share this column; the twelve served rows affected are all in 2015Q3 (=131= three, =151= eight, =152= one), and no wired post-harvest source uses these codes.
+The raw quantities, expenditures and row counts are unchanged.
+
+*Qualification to the correction above.*  Re-reading the held Stata metadata shows that the post-harvest TOTAL-consumption unit =s10bq2b= also carries all four labels.
+The post-harvest columns the build actually reads (=s10bq3b=, =s10bq6b=, =s10bq7b=) do not, and contribute no rows on these codes.
+Thus "no label in the post-harvest file" was too broad; it was a statement about the wired fields, not every unit column in that file.
+
 ** A blank unit code is =Unknown=, not ='None'= (GH #1041, 2026-10-18)
 
 =food_acquired_for_wave= used to fill a NaN raw unit code with the literal
