@@ -66,7 +66,7 @@
         "parent_live_state": "open/unmerged/exactcfd at preparation",
         "control": "/local/job40255479/worktrees/isa-Burkina_Faso-1119-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1119",
-        "status": "Root accepted independently reviewed bounded two-cell fix; PR publication pending; issue1119 remains partial/open",
+        "status": "Reviewed partial PR1203 OPEN/unmerged, stacked on actual1189cfd; CI39722612561 in progress at checkpoint",
         "boundary": "Two harmonize_seed_crop Preferred Label cells only after actual reproduction; broader marker decision and non-ISA countries residual",
         "brief": "queued-1119-Burkina_Faso/NEXT-WRITER-BRIEF.md",
         "owner": "review_nigeria_1034",
@@ -100,8 +100,26 @@
           "warnings_scanner": "76completewarningpairs;6WARNoccurrences and actual own JSONL bytes exact",
           "actual_prebuild": "24BF/525otherAPI/39frameworkexact;12waves beforebuild",
           "comparator_boundary": "Default Benin/Togo current/fullcoverage warm only; Make BF-only; no comparator source-cold",
-          "preservation": "29779sourceendpoints/143physicalcopies/594authorpayloads exact;zero consumers"
-        }
+          "preservation": "29779sourceendpoints/143physicalcopies/594authorpayloads exact;zero consumers",
+          "private_archive": "private-evidence-durability-twentieth.json"
+        },
+        "public_PR": {
+          "number": 1203,
+          "url": "https://github.com/ligon/LSMS_Library/pull/1203",
+          "state": "open",
+          "merged": false,
+          "head_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+          "base": "fix/1123-burkina-input-identity-20261021",
+          "base_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+          "body_readback_exact": true,
+          "ci": {
+            "id": 39722612561,
+            "status": "in_progress",
+            "conclusion": null,
+            "data_suite_pass": false
+          }
+        },
+        "issue_remains_open": true
       }
     },
     "Ethiopia": {
@@ -742,7 +760,7 @@
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-fix",
         "brief": "queued-Uganda-849/NEXT-WRITER-BRIEF.md",
         "writer_assigned": true,
-        "edits_tests_builds": "active; no verdict",
+        "edits_tests_builds": "Bothbackendcold133761rows atparent085/candidate7a8; private factor oracle and downstream verification active; no final verdict",
         "gate": "Root1198 runtime+doc acceptance completed",
         "boundary": "Exactly12 reported-factor map entries at retained native grain, preserving existing numeric coercion/nonpositive normalization and all helper/screen/science logic; raw source values are separate private oracles.",
         "owner": "review_nigeria_1034",
@@ -753,7 +771,9 @@
         "candidate_new_tests": "24PASS;actualparent20FAIL4PASS0ERROR/SKIP",
         "actual_prebuild": "28Uganda/521otherAPI/39frameworkexact;171declared-wave/224API-wave changes allUganda",
         "execution_qualification": "Two two-worker data-free cohorts briefly overlapped:up to4workers; retained, no replay; subsequent cohorts max2total",
-        "inventory_stop": "Initial empty-inventory check encountered already-gated healthy Niger caches; original retained; unique metadata retry checks Uganda-empty only"
+        "inventory_stop": "Initial empty-inventory check encountered already-gated healthy Niger caches; original retained; unique metadata retry checks Uganda-empty only",
+        "runtime_head": "7a8fd22492255cc2c4d020b7a16f99249f588977",
+        "source_oracle_stop": "Original categorical lookup cwd stop retained; corrected expectation reads each actual wave directory, no production/helper change"
       },
       "documentation_qualification": {
         "accepted_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
@@ -835,7 +855,19 @@
           "849": "open",
           "1198": "open"
         },
-        "signed": "Sue"
+        "signed": "Sue",
+        "residual_owners": [
+          1204,
+          1205,
+          1196
+        ]
+      },
+      "residual_ownership": {
+        "Make_wave_coverage": 1204,
+        "parcel_area_coverage": 1205,
+        "dtype_observations": 1196,
+        "dtype_shared_cause_established": false,
+        "receipt": "Uganda-residual-ownership-1204-1205-1196.json"
       }
     }
   },
@@ -1327,7 +1359,9 @@
       "brief": "queued-twenty/NEXT-REVIEW-BRIEF.md",
       "healthy_comparator_boundary": "Current19/fullcoverage Mali155931 and Niger46043; never leaf Mali40218 or an old pooled Feature",
       "status": "Assigned bounded Tanzania increment review on actual19; no runtime verdict yet",
-      "reviewer": "niger_lane"
+      "reviewer": "niger_lane",
+      "actual_prebuild": "25Tanzania/524otherAPI/39frameworkexact;14relevantwavecells,6Tanzania changes",
+      "execution_qualification": "Dependent preparation gates launched before census completion stopped before copies/decode/API; originals retained; resumed only never-started preparation after terminal0 scope receipt"
     }
   }
 }

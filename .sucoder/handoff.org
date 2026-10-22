@@ -1171,3 +1171,13 @@ Uganda849 writer7a8fd2249 has24newpasses/parent20FAIL4PASS and actualprebuild28/
 Goal remains active; user merges only.
 
 Sue
+
+* ISA22 PRs and residual ownership -- 2026-10-22 04:34:04 UTC
+
+All22 implementation PRs freshly OPEN/unmerged/exact expected heads; public-pr-checkpoint-twentytwo.json. NewBF1203 is partial1119, stacked1189cfd; CI39722612561 in progress at this checkpoint.
+BF independent root archived owner-only as twentieth archive b0d6d944d37658764128a5283e48012c50ecef3c3847550b30c843785b5e5040,27066878bytes/985files; receipt private-evidence-durability-twentieth.json.
+Deduplicated/filed Uganda1204 country-fallback wave coverage and1205 parcel-area coverage diagnosis. Existing1196 now explicitly owns distinct NigerMultiIndex/u and UgandaIndex/v observations, with no assumed shared cause. All three OPEN/body readbacks exact. PR1202 and1198 link residual owners; no new implementation or closure.
+Actual20 prebuild25/524/39exact,14wavecells/6Tanzaniachanges; early dependent gates stopped before staging/decode/API and are retained. Preparation resumes only after terminal census/scope receipt.
+Ug849 runtime7a8fd22492255cc2c4d020b7a16f99249f588977 published; bothbackendcold133761rows per head. Sourceoracle cwd stop retained; expected mappings read from actual wave directories. Writer validation remains active.
+
+Sue
