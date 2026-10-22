@@ -6,12 +6,14 @@ Inherits [STANDING.md](STANDING.md), the repository CLAUDE.md and data_info.yml.
 
 ## §1 Task, restated
 
-Design and privately test a lossless observation coordinate for Uganda
-crop_production. No production, canonical-schema or public-axis change is
-approved. Preserve each eligible native production record/condition slot and
-its quantity, own reported factor, sales fields and attributes before the
-analyst's harvest reduction. Equal factors and partial reports also retain
-identity. GH849's factor-column wiring remains separate.
+Implement the root-approved GH1198 observation coordinate for Uganda
+crop_production on design head989fbf3d98439be802d1f9cebd8ab5197c56b002.
+The 2026-10-22 ROOT-ENGINEERING-DECISION.md supersedes the private metadata
+proposal: append string production_obs after season, preserve every eligible
+native record/condition slot, and declare unresolved_observation for other
+countries without asserting that their served row is one native observation.
+Keep quantities, factors, sales and existing typed attrs at matched stages.
+GH849's twelve factor mappings remain separate and unchanged from f8.
 
 ## §2 Existing machinery
 
@@ -23,6 +25,7 @@ identity. GH849's factor-column wiring remains separate.
 | _align_to_canonical_levels / _harmonize_country_frame | feature.py:277,649 | Reuse canonical union/sentinel alignment and extra-level/drop controls; tests/test_feature_canonical_index.py. A country-only coordinate is insufficient. |
 | harvest_kg_factors / harvest_kg / yield_kg | transformations.py:4282,4698,4888 | Reuse reported-factor screens, ladder, survey medians and explicit analyst reduction; tests/test_shipped_factors.py and test_crop_kg_factor.py. No new conversion estimator. |
 | get_dataframe / get_data_file | local_tools.py; STANDING §2/§4 | Reuse sanctioned source access only if decoding is needed. Saved raw/native artifacts may instead be copied with exact receipts. |
+| source_fingerprint / format_id | local_tools.py:2954; Uganda/_/uganda.py | Reuse declared-sidecar identity and native identifier formatting. Actual loaders pass explicit references from the same literal source paths they read; synthetic callers provide explicit synthetic references. |
 
 ## §3 Definitions and conventions
 
@@ -49,7 +52,8 @@ identity. GH849's factor-column wiring remains separate.
 
 ## §4 Invariants and assumptions
 
-- STANDING §4 applies. Source/config/runtime/fixtures stay exact f8. No cache
+- STANDING §4 applies. Only the root-approved helper/callers/crop declarations,
+  canonical axis/sentinel/docs, tests and country notes may change. No cache
   stamp, bypass, acquisition, shared-cache mutation or promoted private parquet.
 - Retain EVERY eligible observation, even equal payloads, absent factors or
   missing native IDs. A physical row ordinal is CONSTRUCTED/source-order and
@@ -59,8 +63,22 @@ identity. GH849's factor-column wiring remains separate.
   classification, not automatic deletion. Future ID conflicts stay explicit.
 - Existing null-key losses360/43 and 2015 sales x100 remain separate. No
   Quantity/factor/unit/eligibility correction is included in this phase.
-- Feature drops undeclared extras and collapses; proposed declaration must be
-  tested through actual existing normalization/alignment with copied metadata.
+- Feature drops undeclared extras and collapses; the approved declaration must
+  be tested through actual Country/Feature normalization and alignment.
+- No production_observation attrs carrier is introduced. Existing metadata
+  machinery remains authoritative; canonical_alignment may record the new
+  declared sentinel. Unequal unregistered attrs do not survive natural concat.
+- Capture physical zero-based row positions before selection/join/melt. Tokens
+  row:<source-fingerprint>:<ordinal> identify the same declared release/order;
+  dvc fingerprints contain the source name and SHA256 of the declared sidecar,
+  not raw MD5. Nonempty constructed identities reject missing: fingerprints.
+- Missing declared native-ID columns raise CropColmapError; missing values use
+  constructed fallback. Duplicate IDs/slots suffix EVERY occurrence, including
+  equal payloads. Repeated identical (source,row,slot) locators fail loudly.
+- Preserve all403 old null-key exclusions and928 eligible null-v records.
+- Before builds, measure all549 API/39 framework/API-wave hashes independently.
+  Use physically private gated held L1 sources, normal empty-L2 cold builds and
+  separate fresh-process warm checks; at most two loadfile workers/threads1.
 - Explicit zero-tolerance full-frame, axis, dtype, mask and recursive typed
   attrs comparisons; pandas default floating tolerances are insufficient.
 
@@ -69,19 +87,23 @@ identity. GH849's factor-column wiring remains separate.
 | Quantity | Decision | Reason |
 |---|---|---|
 | Source decoding, slots, screens | reuse | Pure helper and frozen source oracles already encode them. |
-| Observation coordinate | new design only | Existing seven keys omit native production/slot identity; no existing crop coordinate represents it. |
-| Country / Feature alignment | extend privately | Deep-copy declarations and call current hooks; no new global flag. |
+| Observation coordinate | extend | Native IDs/actual slots/explicit release-row tokens fill the missing instrument grain; remove only the final lossy reducer. |
+| Country / Feature alignment | extend declarations | Existing hooks consume the new axis and honest unresolved sentinel; no framework code/flag/carrier. |
 | Per-row kg then harvest/yield | reuse | Existing transformations implement both conversion and analyst reduction. |
-| Comparator | synthetic unless gated | Do not claim a healthy Niger real-cache comparator without full current-hash/coverage receipts. |
+| Comparator | reuse real gated operands | Actual healthy comparator requires full current-hash/coverage receipts and matching arguments; synthetic controls are labelled separately. |
 
-## §6 Open engineering decisions for root
+## §6 Approved boundary and remaining verification
 
-Root must review the concrete coordinate name/type/provenance, missing/duplicate
-ID behavior and honest unresolved sentinel before any public-schema change.
-This phase will test one minimal design and report measured downstream effects
-or precise executable remaining controls; no vague policy blocker is asserted.
+Root approved the revised implementation in the 2026-10-22 task brief and
+ROOT-ENGINEERING-DECISION.md, after reading the full frozen design. This ledger
+update is committed BEFORE production edits or new analysis. No additional
+survey decision is required. Production callers, source references, native
+identity collisions, real area/yield controls, both backend subset behavior,
+typed attrs, scanner findings and cold/warm dtype behavior require measurement.
+Report an unheld prerequisite or existing Make subset defect before expanding
+scope. Independent review precedes any PR; this lane has no GitHub writes.
 
-### Phase 3 verification
+### Prior frozen design verification (not implementation acceptance)
 
 - OK (§2/§4): all-record private projection retains133761 nonnull-key native
   observations,430 more than133331 baseline keys;403 existing null-key rows
