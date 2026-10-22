@@ -184,7 +184,7 @@ implementation. Safe evidence lives in
   it. Exact script/call/incident are retained; original stdout/stderr was not
   captured privately. Subsequent tally used only existing artifacts through
   the guarded identity-asserted runner.
-- OK (sections 3/6): reviewed PR1185 runtime/test blobs and prior408 unit
+- OK (sections 3/6): reviewed PR1185 runtime/test blobs and prior 408 unit
   receipts are pinned; zero AG staging/plot_inputs rebuild. Source/runtime
   remains e75, with only this ledger changed in the checkout. The predicted
   25 Tanzania/524 others/39 framework hash scope is explicitly unmeasured
@@ -282,7 +282,7 @@ no author PASS, GitHub write, public merge or issue closure.
   including the generic country route. Both wave rules and real Make all
   dry-runs remain available. The same unchanged new test file gives parent
   20 failures/7 passes versus candidate 27 passes, zero errors/skips. Existing
-  focused58 and direct mounted API audit pass. Eleven existing held-data
+  focused 58 and direct mounted API audit pass. Eleven existing held-data
   assertion bodies pass per head, separately from pytest case counts.
 - OK (sections 3/4): two held modules pass terminal MD5/SHA/physical-copy gates
   in fresh parent/candidate roots (80 initial plus eight populated raw copies).
@@ -291,12 +291,12 @@ no author PASS, GitHub write, public merge or issue closure.
   positive comparisons include unused levels/codes, classes/dtypes/order/nulls
   and typed attrs with immutable record `_FIELDS` presence/values at zero
   numeric tolerance. No source eligibility or native grain changed.
-- OK (section 4): each head runs20cold/20fresh-process-new-object-warm/
-  20populated requests. All candidate subsets are correct on both backends;
+- OK (section 4): each head runs 20 cold / 20 fresh-process/new-object warm /
+  20 populated requests. All candidate subsets are correct on both backends;
   cold/warm full frames are exact. Default warm/populated zero writes are
   measured. Make creates no country cache and preserves a genuinely current
   populated one, while natural native modifications/deletions are classified.
-- OK (section 4): current/full-coverage Mali40218 and Tanzania+Mali Feature57917
+- OK (section 4): current/full-coverage Mali 40218 and Tanzania+Mali Feature 57917
   full frames match separately for default/None currency. Candidate Make
   Tanzania-only Features match authoritative argument-matched default frames.
   Sixteen CLI artifacts pass matched full Arrow/schema/byte controls. Four
