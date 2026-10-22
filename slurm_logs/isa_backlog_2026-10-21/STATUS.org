@@ -31,7 +31,7 @@ No combined20 verdict, full-suite pass or GitHub source publication is claimed y
 Uganda1202 has not yet been composed into that source.
 
 Uganda residual owners are1204 (country fallback wave coverage),1205 (parcel-area linkage/coverage), and1196 (distinct Niger/u and Uganda/v dtype observations; common cause unproved).
-Twenty verified owner-only archives preserve completed private evidence; active roots remain separate.
+Twenty-one verified owner-only archives preserve completed private evidence; active roots remain separate.
 The historical global17 full selection remains5148PASS/4459SKIP/13FAIL/0ERROR, with its doc-child guard/mtime and stale-eight limitations; no later bounded increment erases that result.
 Detailed current paths, pins, owners and qualifications are in =country-lanes.json=; dated sections below retain their original checkpoints.
 

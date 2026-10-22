@@ -1203,3 +1203,9 @@ Ug849 writer416PASS/10skip, source/Feature/CLI/scanner/90warmchecks pass; new na
 Bounded20 candidate85PASS/actual19newcontrols20FAIL7PASS; final parenttail/accounting pending. Populated backend-only child logs overwrote earlier per-key logs; originals unavailable, unique fullframes/endpoints/structured main warnings preserved, no replay/fullchild-warning claim.
 
 Sue
+
+* Malawi author evidence durable -- 2026-10-22
+
+Twenty-first owner-only archive verifies561files/2160380400sourcebytes,246007940archivebytes,SHAf6cde2800f50c7ee28450f7a48cee7a463029827f0f789bf8dad13bd2538bc9a. Allmembers/source-after/owner/modes/fsync/durablelauncherverified; rawextensions and duplicateL1/L2/tempdata excluded. Only frozenMalawi/218 included; active roots separate. Receipt private-evidence-durability-twentyfirst.json. No independent Malawi verdict yet.
+
+Sue

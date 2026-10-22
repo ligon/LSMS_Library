@@ -238,7 +238,8 @@
           "assigned": false,
           "tests_builds": 0,
           "verdict": null
-        }
+        },
+        "private_archive": "private-evidence-durability-twentyfirst.json"
       }
     },
     "Mali": {
