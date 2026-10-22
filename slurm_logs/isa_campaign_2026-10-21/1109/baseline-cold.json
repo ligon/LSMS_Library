@@ -1,0 +1,30 @@
+{
+  "source_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "shape": [
+    180184,
+    4
+  ],
+  "organic_rows": 11075,
+  "organic_quantity_null": 0,
+  "organic_quantity_zero": 11075,
+  "quantity_dtype": "Float64",
+  "nitrogen_shape": [
+    33466,
+    1
+  ],
+  "nitrogen_total": 840235.7795800001,
+  "warnings": {
+    "RuntimeWarning": 18,
+    "NullReadWarning": 1,
+    "NullIndexKeyWarning": 1,
+    "NutrientCoverageWarning": 1
+  },
+  "seconds": 73.58,
+  "wave_counts": {
+    "2010-11": 46627,
+    "2013-14": 16188,
+    "2016-17": 52494,
+    "2019-20": 64875
+  },
+  "in_tree_parquets": 0
+}
