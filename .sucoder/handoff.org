@@ -1561,3 +1561,13 @@ PR1216 exact-head CI39836472369 passed unit-tests/windows-smoke; six jobs includ
 Uganda1204 independent READY90150bdb/finalmanifestd1c74be6 sealed; root authentication pending. Four empty-column-order failures remain1215; original oracle-stage and private trace-output qualifications retained.
 Uganda1215 ledger-first static proposal467b3b59c on actuala417 is active; code/runtime unreleased pending concrete schema-order decision.
 Burkina1188 author3d39096d5 has14syntheticPASS/actualparent7FAIL7PASS reported; normal four-root builds active after preserved source-copy preflight stop and root-authorized quarantine. Independent BF static reviewer now owns immutable3d/3dc snapshots; runtime remains held pending author freeze/authentication.
+
+* 2026-10-22T19:53:36.982786+00:00 Uganda1217 published; ordering policy approved
+PR1217 is OPEN at exacta417 head against491 parent after root86543/chunk328892terminal0;109of113strictPASS andfournewempty-column-orderFAIL retained1215.
+Its CI39840558700 and1216CI39836472369 each completed unit-tests/windows-smoke success;sixjobs includingdata-tests skipped.
+User explicitly selected declaration order for constructed-empty frames; source/runtime release C/UGANDA1215-IMPLEMENTATION-RELEASE.md uses newC/uganda1215-order-fix and detachedactuala417base.
+Frozenstatic1215packetaf425bb7/2de89c7a has24entries; source epoch666 is allowed to advance after approval. No claim its old external sourcephysicalbaseline stays forevercurrent.
+Newissue1218ownsfourBFoptional-emptydtypefailures; unchanged populated outputs are part of the proposed fix boundary. Queue114=27PRlinked+twoactive+85other;30implementation PRs awaithumanmerge.
+IndependentBFcalibrations original4187529/4187530passed;predata549/39/1362metadataandsynthetic checks released;realproviders/dataheldpendingfinalauthorfreeze/rootauthentication.
+AuthorBFall8normalactorsand16candidatecasesreportedcomplete;original458matrix398PASS60FAIL preserved plus56stage-correctnativeproofPASS;fourrealemptydtypeFAIL1218. Finalprotection/sealawaited.
+Nextrootactions: finish tracker1170refresh;authenticate frozenBFauthor then releaseindependentfourrootgenuineplan;review1215guard/census/synthetic/provide37provider148copybudget;preparearchive31forfrozenUG1204independent/static1215/newrootreceipts;implement1218afterBFauthorhandoff.

@@ -1061,7 +1061,7 @@
         "path": "/local/job40255479/worktrees/isa-Uganda-1204",
         "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
         "ledger": "a53f71bad6a26307eb83d051b57a6cdd9c9424cc",
-        "status": "ROOT_AUTHENTICATED_AUTHOR_INDEPENDENT_RUNTIME_RELEASED",
+        "status": "ROOT_ACCEPTED_OPEN_PR_WITH_KNOWN1215_RESIDUAL",
         "source_head": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
         "source_status": "Root89473terminal0 authenticates1839manifest files,29825tracked source receipts,37genuine binaryproviders/444copies and exact8exports. Root first optional-size assertion preserved;27legacy sidecars omit size. Production independent acceptance pending.",
         "targeted": "8candidatePASS/actual491parent7FAIL1PASS;existing170PASS/APIaudit0",
@@ -1081,7 +1081,12 @@
           "state": "open",
           "publication_receipt": "1215-empty-order-publication.json",
           "root_dedup": "1204-author-handoff/empty-order-dedup-root.json"
-        }
+        },
+        "pr": 1217,
+        "root_independent_acceptance": "1204-independent/ROOT-ACCEPTANCE.json",
+        "validation": "Independent109/113strictPASS,fournewempty-orderFAIL retained;8targeted/170supporting/2syntheticPASS;actual4917FAIL1PASS;59originalactors0;all real held grainledgers empty.",
+        "ci_run": 39840558700,
+        "ci": "Unit-tests/windows-smoke completed success,sixjobs includingdata-tests skipped."
       },
       "current_1205": {
         "owner": "acquisition_1149",
@@ -1114,9 +1119,14 @@
         "private_root": "/local/job40255479/control/isa-backlog-20261021/uganda1215-order-static",
         "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
         "ledger_first_commit": "467b3b59c",
-        "status": "STATIC_CONTRACT_DIAGNOSIS_ONLY",
+        "status": "HUMAN_APPROVED_DECLARATION_ORDER_IMPLEMENTATION_ACTIVE",
         "production_or_runtime_released": false,
-        "scope": "Ledger-first static column-order contract diagnosis at actuala417 parent; no production/schema edit or runtime released. Concrete order alternatives and affected callers required before design decision."
+        "scope": "Ledger-first static column-order contract diagnosis at actuala417 parent; no production/schema edit or runtime released. Concrete order alternatives and affected callers required before design decision.",
+        "private_runtime_prefix": "/local/job40255479/control/isa-backlog-20261021/uganda1215-order-fix",
+        "user_decision": "Use declaration order (Recommended)",
+        "source_and_calibration_census_synthetic_released": true,
+        "genuine_payloads_or_normal_grid_released": false,
+        "static_root_decision": "1215-static/ROOT-STATIC-DECISION.json"
       }
     }
   },
@@ -1903,18 +1913,17 @@
     }
   },
   "current_queue_refresh": {
-    "recorded_at_UTC": "2026-10-22T19:12:15.403653+00:00",
+    "recorded_at_UTC": "2026-10-22T19:50:20.193068+00:00",
     "queue": "remaining-queue-2026-10-22.json",
-    "open_issue_records": 113,
-    "implementation_prs": 29,
+    "open_issue_records": 114,
+    "implementation_prs": 30,
     "active": [
-      1204,
       1188,
       1215
     ],
     "interpretation": "Explicit current ownership; older per-lane active fields are historical task records.",
-    "pr_linked_issue_records": 26,
-    "other_open_issue_records": 84
+    "pr_linked_issue_records": 27,
+    "other_open_issue_records": 85
   },
   "current_invalid_wave_1210": {
     "owner": "acquisition_1149",
@@ -1948,5 +1957,11 @@
     "serialized_operands_retained": 166,
     "exclusions": 866,
     "scope": "Archival preserves existing evidence and original failures; it supplies no additional product validation. Live Uganda1204 review, Burkina1188 and Uganda1215 static roots excluded."
+  },
+  "new_optional_empty_dtype_residual": {
+    "issue": 1218,
+    "status": "OPEN_UNASSIGNED",
+    "scope": "Constructed empty types; existing explicit declarations, populated behavior unchanged.",
+    "evidence": "Author BF1188 live normal cases + independently authenticated static source account; runtime independent acceptance pending."
   }
 }
