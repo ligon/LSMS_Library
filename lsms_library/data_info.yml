@@ -6,6 +6,15 @@ Single Index:
   pid: individual id
   plot_id: plot id
   int_t: interview date
+  # Opaque crop-observation coordinate within the full native key (GH1198).
+  # reported:<ID> is an instrument ID; slot:<n> is a mapped condition slot.
+  # row:<source-fingerprint>:<ordinal> is CONSTRUCTED, zero-based release order.
+  # A dvc fingerprint is source name plus SHA256 of its declared sidecar, not
+  # raw MD5. Missing IDs use missing-id:row:...; repeated IDs/slots suffix
+  # EVERY occurrence with /row:... . These are not persistent panel entities.
+  # unresolved_observation means a served row does not resolve this axis; it
+  # does not assert one native observation or a particular reducer.
+  production_obs: native crop observation or explicitly unresolved coordinate
   # `visit` -- recall occasion.  An INTEGER ordinal of the enumerator call the
   # observation was collected at, for the surveys that revisit a household
   # several times within one wave (GhanaLSS food_acquired; EHCVM
@@ -104,7 +113,7 @@ Index Info:
     # Ethiopia / GhanaSPS / Tanzania already declare on crop_production; `plot`
     # was Uganda's spelling and is now an ALIAS.  See
     # `.coder/ledger/crop-production-plot-id.md`.
-    crop_production: (t, v, i, plot_id, j, u, condition, season)
+    crop_production: (t, v, i, plot_id, j, u, condition, season, production_obs)
     # GH #569 (ruling @ligon, 2026-10-18): "`plot_labor` keeps `stage` and
     # `worker` as index levels, with a sentinel where a country lacks them."
     # Twelve of the fifteen declaring countries emit (t, i, plot_id, source);
@@ -274,6 +283,7 @@ Index Info:
   #               `obs = 3` -- a served value that will move.
   missing_level_sentinels:
     crop_production:
+      production_obs: unresolved_observation
       u: Unknown
       condition: unknown_condition
       season: unknown_season

@@ -1304,10 +1304,12 @@ They stay =obs= 4-6 for now -- today's representation, the GhanaLSS
 convention -- and the choice among serving them as obs 4-6, a separate
 =record= level, or a flag column is a *DECISION for @ligon*, drafted as a
 residual of #840.
-- *The 9999 quantity sentinel arrives as float32 =9999.9=, which
-  =_COMMUNITY_PRICE_SENTINELS= (=9999.0=, =99999.0=) does not catch*: 76 served
-  2014-15 rows carry =Quantity = 9999.900391=.  NOT fixed here (it changes
-  =Quantity=, which #840 does not touch); residual drafted with #840.
+- *Quantity's nominal =9999.9= missing code (GH #1088, 2026-10-21).* The held 2014-15 quantity columns are Stata doubles containing exactly =9999.900390625=, equal to =float(np.float32(9999.9))=; =float32(9999.0)= is exactly =9999.0=, so the earlier wording here conflated two nominal codes.
+  Their earlier precision history is unproven, and the numeric columns have no missing-code value labels.
+  The relevant questionnaire PDFs are not held in the local L1 cache and were not acquired; treating nominal =9999.9= as missing follows the existing #1088 / country-documentation ruling, rather than new independent instrument confirmation.
+  The quantity-read mask now recognizes exactly =9999.9= and =9999.900390625= alongside the existing =9999.0= / =99999.0= codes; it neither rounds nearby weights nor extends the Price filter.
+  Paired held-source replay changes exactly 76 served 2014-15 quantities to NA (43 / 32 / 1 by source slot; 21 clusters, five varieties), retaining every key, Price and other column and all 46,043 rows.
+  The existing duplicate-entry outcomes and the 15 + 15 =obs > 3= rows are unchanged, including the four second-record quantities of 1 against a first-record missing code described above.
 - *=cs07q01= "Riz" decodes to =j = 'Autre Riz local'=* for BOTH its varieties,
   "Riz thailandais vendu en vrac au kilo" (=7031=) and "Riz local vendu en vrac
   au kilo" (=7032=).  The =variety= level now tells them apart; the =j= label
@@ -1555,3 +1557,80 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-10-21 -- community_prices uses the framework country builder (GH #1091)
+
+The framework is authoritative under the GH #788 ruling of 2026-10-17,
+reaffirmed 2026-10-18.
+The country =_/community_prices.py= concatenator and its explicit Make target
+are retired; the independent wave pattern and its =niger.py= /
+=categorical_mapping.org= prerequisites remain unchanged.
+Both ECVMA source scripts, their eligibility and duplicate-entry policy, and
+the GH #1088 exact quantity mask are unchanged.
+All 46,043 readings remain: 32,352 in 2011-12 and 13,691 in 2014-15,
+including the 30 nonrepeat second-entry slots after the 134 exact melted
+repeats were removed under GH #840.
+No variety, visit, observation, unit, price, quantity or ID is reinterpreted.
+
+This changes the old explicit Make subset behavior deliberately.
+The retired country target returned BOTH wired waves even for a supported
+singleton or an unsupported EHCVM request.
+Both backends now return 32,352 / 13,691 for the respective supported
+singletons and zero for 2018-19, 2021-22 or their combination.
+The API and CLI remain country materialization entry points; the retired
+country Make target is no longer an alternate country builder.
+The default route writes its verified normalized country cache.
+Explicit Make aggregates the waves and writes no new country parquet;
+normal hashless-wave eviction can rewrite the requested native wave files
+on a warm Make call, without changing their data.
+
+The native wave parquets carry the redundant =i == v= shim described in
+=_finish_community_prices=; the framework removes it before serving the
+declared seven-level index.
+Consequently the old schema comment saying the API renames =j= to =i=
+does not describe these measured outputs: they carry =j=, not =i=.
+The authoritative default layer carries =attrs['id_converted']=; the old
+hashless native country concatenation did not.
+Corrected supported Make results follow the authoritative layer, including
+that flag.
+Raw wave, normalized country, public API and serialized CLI artifacts are
+separate comparison stages, not interchangeable frames.
+
+Zero-row states also retain existing framework distinctions.
+A cold absent request uses the declared-empty helper, whose =visit= / =obs=
+levels are strings and =Description= is object; a covered country-cache
+slice inherits integer levels, string Description and =id_converted=.
+These differences are recorded rather than coerced away.
+CLI parquet serialization turns immutable population records into dicts;
+matched artifact-stage controls preserve that existing behavior.
+The food cold/warm =u= StringDtype difference is separately owned by
+GH #1196 and is not repaired here.
+
+Coverage contradictions in the older prose remain visible.
+The removed Make comment said "only the two ECVMA waves have an EA-level
+community price module", and the helper still says 2018 "ships no community
+price file at all".
+The section above, "2018-19 DOES ship a cluster-grain community price file",
+already explains why the latter claim is false: its grappe module exists
+but remains unwired.
+This retirement adds no EHCVM source and makes no new absence verdict.
+Likewise the older open-decision wording about the nonrepeat tail does not
+reopen the accepted GH #840 / PR #1086 variety/visit/obs representation.
+
+Cache cost, measured before rebuilding: all 549 API hashes were compared
+with the reviewed GH #1088 parent; 23 Niger hashes move, 526 other hashes
+and all 39 framework fingerprints stay exact.
+This is one Niger re-warm from shared country build inputs, not a claim
+that 23 physical outputs were rebuilt.
+Full-frame, source, cold/warm, CLI and Feature evidence is recorded in
+=slurm_logs/isa_backlog_2026-10-21/Niger/1091/=.
+
+* Parquet index policy: food units (GH #1196, 2026-10-22)
+
+The held 2018-19 and 2021-22 food sources produce 239,877 public rows in the f8-based verification cohort.
+The =u= diagnostic concerns one level of the complete MultiIndex, not a separate plain-Index table.
+Its written pandas metadata records =numpy_type="string"=, but Arrow 25 with pandas 3 reconstructed that index field as the NaN-policy =str= dtype.
+The generic parquet reader now restores each physical index field's recorded =string= versus =str= missing policy, preserving the storage already read.
+Both Default country-cache reads and Make wave-cache reads use that repair.
+Unit labels, values, missing masks, source eligibility, index grain and the questionnaire interpretation above are unchanged.
+This does not combine different container sizes or expose the last-purchase quantity as a new observation.

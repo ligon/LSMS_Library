@@ -1795,6 +1795,37 @@ Longitude are therefore NOT emitted.
 - =Tanzania/2019-20/_/plot_features.py=, =Tanzania/2020-21/_/plot_features.py= :: per-wave scripts.
 - =Tanzania/_/plot_features.py= :: country concatenator (concat + id_walk).
 
+* plot_inputs: total units and duplicate crops (GH #1118, #637)
+
+The two modern waves use long-rainy-season =AG_SEC_3A= plot inputs and =AG_SEC_4A= seed records.
+The 2019-20 key is =(sdd_hhid, plotnum)=; 2020-21 uses =(y5_hhid, plot_id)=.
+The helper's grain is =(t, i, plot_id, input, crop)=; non-seed inputs deliberately have no crop value.
+The country concatenator applies the existing UPHI ID walk and the API joins =v= from =sample()=.
+The older four rounds remain deferred for this feature.
+
+Total seed quantity/unit are =ag4a_10_1/2=.
+Purchased seed quantity/unit, =ag4a_10c_1/2=, are a separate channel: a known purchase unit does not establish the total-quantity unit.
+In the held 2020-21 extract, two records with missing/OTHER total units have a known purchase unit.
+The total-unit decoder agrees with both extracts' Stata dictionaries: seed code 5 and herbicide/pesticide code 4 mean OTHER (SPECIFY).
+No unit-specification text field is present in these held extracts.
+The 2019 agriculture questionnaire confirms the liquid menu on PDF page 9; the 2020 questionnaire blob was not held during the 2026-10-21 check.
+
+Under the existing [[https://github.com/ligon/LSMS_Library/issues/1041][#1041]] ruling, an absent or whitespace-only unit becomes =U_UNKNOWN= (=Unknown=), with or without a quantity.
+A recorded nonblank unit remains informative when quantity is absent.
+Normalization follows duplicate reduction so an early missing unit cannot displace a later recorded unit selected by =first=.
+Three held 2020-21 duplicate groups have precisely that missing-first, recorded-later pattern.
+The previous helper comment, "u is meaningless where there is no quantity", contradicted that ruling; #1118 removes its quantity-dependent blanking.
+The held-source build has 1,774 / 7,924 rows in 2019-20 / 2020-21, with 86 / 322 missing units normalized; all 19 records without total quantities remain.
+
+The existing duplicate reducer is a separate [[https://github.com/ligon/LSMS_Library/issues/637][#637]] residual.
+It sums reported quantities with =min_count=1= and selects the first nonmissing unit when native crop codes share a canonical label, or both inorganic slots name one product.
+The held 2019-20 sources contribute 1,787 rows, reduced to 1,774 in 13 duplicate groups; none has conflicting known units.
+The held 2020-21 sources contribute 8,035 rows, reduced to 7,924 in 101 duplicate groups.
+Six 2020-21 Seed/Pulses groups contain conflicting units: two bucket/kg, one bucket/small cup, two kg/large cup, and one kg/small cup.
+These quantities are incommensurable; the current summed quantity with a first unit remains a defect for #637, preserved by the scoped #1118 correction.
+Their complete before/after helper and Country frames, including attrs, were equal in private verification.
+No IDs or raw group members are recorded here.
+
 * Cluster id renumbering at round 3 (GH #942)
 
 *UPD4 round 3 (2012-13) renumbers 82 of the 409 NPS clusters, whole clusters
@@ -2109,3 +2140,31 @@ recorded =KeyError('m')=; the column check now fails one step earlier).
 The script was written for the pre-GH #169 table in which =j= was the household and =i= the item; the canonical table swaps them back, so even its index assumptions were stale.  Removing the =!make= registrations does not change dispatch: =Country.data_scheme= auto-surfaces the three tables from =food_acquired=, and the derivation was already tried first.
 
 Served tables before and after the removal are frame-equal (196,293 / 196,280 / 251,717 rows; waves 2008-09 ... 2020-21, the four =2008-15/= rounds included).
+
+* 2026-10-22 -- Community prices use framework wave aggregation (GH #1091)
+
+The concatenate-only country =_/community_prices.py= and its five-line Make variable/country-rule block are retired.
+The independent wave rule, generic pattern and Make =all= source discovery remain unchanged.
+The existing framework selector now finds no country builder and assembles only requested supported waves on both backends.
+Previously explicit Make returned both modern waves even for an unsupported older-wave request.
+This is the Tanzania portion of GH #1091; independent acceptance and other country sites remain separate.
+
+Held-source author checks retain all 17,699 eligible readings: 3,076 in 2019-20 and 14,623 in 2020-21.
+Native =v= remains =interview__key=, with the helper's redundant =i==v= shim removed by existing framework normalization.
+It is not the household sample cluster identifier.
+Source-code =variety=, questionnaire =Description=, native units and each row's own =cm_f063/cm_f062= price basis remain unchanged; district-capital prices remain excluded.
+No household join, reducer, crosswalk, Quantity column or unit factor is added.
+
+The authoritative default country cache contains normalized frames with =id_converted=.
+Make now creates no country cache and preserves an existing verified one, while ordinary hashless native eviction/rebuild can delete an unrequested native sibling.
+Default warm reads change no cache bytes, modes or mtimes in the measured requests; Make's natural writes are recorded separately.
+For the measured fresh roots without a country cache, an unsupported strict subset uses the existing declared-empty/finalizer contract (=object= Description).
+Default reads served from the measured full-coverage country cache instead return a filtered zero-row slice retaining cached =string= Description and =id_converted=.
+Both routes return zero rows; representation depends on route/coverage, and these measurements do not generalize every partial-coverage miss or union rebuild.
+These route distinctions and API-to-parquet JSON attr record/container type changes are measured explicitly, without normalization to force equality.
+
+The older geography-only statement calls a link "infeasible without a lossy, unverifiable crosswalk", while the later implemented crosswalk records the 2020 cluster as "BAKED INTO the community admin codes".
+Both dated accounts remain; this retirement changes neither that crosswalk nor the community identifier.
+The Extended/Refresh split, split-off back-casting and live WAITING #114 caveats remain unchanged.
+The separate reviewed 408 plot-input unit replacements (86 plus 322) are preserved by exact source/test identity; no agriculture sources or plot-input outputs were rebuilt here.
+Changing the shared country Makefile moves all 25 enumerated Tanzania API cache hashes; other tables were not rebuilt for this check.

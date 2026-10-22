@@ -7,6 +7,7 @@ import sys
 sys.path.append('../../_')
 sys.path.append('../../../_')
 from lsms_library.local_tools import format_id, id_walk, RecursiveDict, get_dataframe, update_id, DVCFS
+from lsms_library.transformations import U_UNKNOWN
 from collections import defaultdict
 
 country = 'Tanzania'
@@ -1465,9 +1466,6 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     rows += [org, inorg1, inorg2, herb, pest]
     df = pd.concat([r for r in rows if r is not None and len(r)], ignore_index=True)
 
-    # u is meaningless where there is no quantity.
-    df['u'] = df['u'].where(df['Quantity'].notna(), pd.NA)
-
     df['t'] = t
     df = df.set_index(['t', 'i', 'plot_id', 'input', 'crop'])
     # Collapse the rare exact-duplicate (t,i,plot,input,crop) -- a plot listing
@@ -1487,6 +1485,11 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
             'Purchased': 'max', 'Quantity_purchased': _sum1,
             'Improved': 'max',
         })
+    # Normalize after 'first' has selected any recorded unit in a duplicate
+    # group.  A recorded unit remains informative without a quantity (#1118).
+    missing_u = (df['u'].isna()
+                 | df['u'].astype('string').str.strip().eq('').fillna(False))
+    df.loc[missing_u, 'u'] = U_UNKNOWN
     df = df[PLOT_INPUTS_COLUMNS]
     return df
 

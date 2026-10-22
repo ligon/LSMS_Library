@@ -831,7 +831,9 @@ The preferred labels include native units (=Kg=, =Gram=, =Litre=, =Akendo (Small
 =food_acquired()= renames the =u= index through this map; source-specific missing-unit handling then distinguishes =Unknown= from =Value= before the canonical parquet is written.
 
 The =u= table also retains the per-wave variant columns (=2005-06=, =2009-10=, ..., =2019-20=) that document the raw unit labels in each wave's Stata metadata.
-These extra columns are unused at runtime but preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
+These extra columns preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
+The =Code -> Preferred Label= build decoder does not use them.
+Query-time label selection uses the shared categorical-key resolver and can read them as source keys or requested targets.
 
 The legacy =_/unitlabels.csv= /=_/unitlabels.py= pipeline (which
 emitted a 2-column projection of the same data) was retired in
@@ -2049,6 +2051,26 @@ can leave FCT hashless again. This is a bounded cache disposition,
 not a repair of the general #788 builder-authority/sibling-write issue,
 which remains open. The October 15 #967 approval remains in force;
 no nutrition value, factor policy or fixture changes here.
+
+*** Requested-output builds preserve sibling caches (GH #1062, 2026-10-21)
+
+The authority question in the historical entries above was decided by the maintainer on 2026-10-17 and reaffirmed on 2026-10-18 (GH #788): the framework is authoritative for tables assembled from waves.
+The coupled-output defect is corrected here without changing the FCT or nutrition arithmetic.
+=nutrition.py fct= writes only =var/fct.parquet=, while =nutrition.py nutrition= (also the direct-invocation default) writes only =var/nutrition.parquet=.
+Both retain the existing food intersection and nutrient matrix; neither rewrites its companion.
+Their separate Make targets no longer run the legacy country =food_acquired= compiler as a prerequisite, because quantities already come from the normal Country API.
+
+=income.py= first asks the framework to materialize =earnings= and =enterprise_income=, then reads their verified raw country parquets with =get_dataframe=.
+Each sibling call temporarily selects =LSMS_BUILD_BACKEND=dvc= so that valid existing one-wave caches expand to the requested all-wave coverage even when income inherits the make backend.
+The exact original backend value (or absent key) is restored with =try/finally= before the raw read, including when materialization raises.
+Independent review found that pinning only the Make wrapper was insufficient: Make skips a valid partial target that already exists, serving 1,810 rows of 2011-12 as the all-wave income table instead of 14,740 rows over eight waves.
+Its original source sums, duplicate-key aggregation and household-union arithmetic remain unchanged; the finalized API return is deliberately not an operand.
+The Make targets for those two inputs are thin API calls with =LSMS_BUILD_BACKEND=dvc= pinned in the subprocess, so a make-backend request cannot recurse into itself.
+The historical concatenation scripts and their regression tests remain as reference; normal Make rules no longer run them.
+
+The Makefile edit moves every Uganda table's content hash and no other country's hash.
+This routing correction does not adjudicate the FCT source notes or live-API fallback (GH #771), and does not establish that GH #1078's nine-cell concurrent-suite corruption is repaired.
+See =.coder/ledger/1062-uganda-sibling-writes.md= and the scoped verification report in =slurm_logs/isa_backlog_2026-10-21/1062/=.
 
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
@@ -3602,3 +3624,184 @@ after: =shocks= =HowCoped0/1/2= 862 / 756 / 394 cells "etc<U+0085>)" ->
 condition and the GSEC15b units are decoded on numeric codes).  The =u=
 table's 2009-10 wave-label column, which recorded the raw =Fish <U+0096>...=
 spellings, was re-keyed to the en dash (inert: =u= is keyed on =Code=).
+
+* Food producer provenance during concurrent rebuilds (GH #1078, 2026-10-21)
+
+Uganda's script-produced food waves exposed a framework read-to-existence
+race.  A normal concurrent country rebuild can remove a hashless wave
+parquet after another process has read its correct canonical frame.
+=Wave.food_acquired= used the path's later existence to decide whether to
+apply its legacy sum reducer.  The missing path made it reduce the already
+canonical 2011-12 frame, turning six genuine missing Quantities and three
+missing Expenditures into zeros under a normal current country hash.
+Both actual sample/currency tests still passed in a controlled two-process
+reproduction; a fresh process then served those nine zeros from the cache.
+
+The producer route now travels privately with each =grab_data= result.
+Reading a script/YAML parquet or successfully materializing YAML output
+does not become an in-memory producer when its path is subsequently
+removed.  Legitimate in-memory output retains the existing legacy reducer;
+an unrelated old cache path does not change that provenance.  No public
+DataFrame attribute carries this internal origin, and no source value,
+unit, category, household identity or nutrition arithmetic is changed.
+The content-producing food method is versioned so corrupt current-hash
+country caches can rebuild normally.  The =grab_data= plumbing also moves
+the existing all-table build fingerprint, a broad cache invalidation cost.
+
+The controlled reproductions on f8 and reviewed #1062 match the exact
+historical nine-cell signature.  The original historical full-suite
+writer and interleaving remain unidentified.  #1062's requested-output
+sibling correction is separate from this framework producer mechanism;
+its independent evidence must not be read as resolving #1078.
+
+* Native crop observations retained (GH #1198, 2026-10-22)
+
+=production_obs= follows =season= in the native crop index.
+The old seven-level sum/first reducer combined distinct harvest and sale
+records, including equal served payloads; its "just de-duplication of repeated
+identical source rows" comment did not describe those records.
+The earlier *OPEN GRAIN QUESTION* above correctly identified the missing level.
+The new coordinate preserves each eligible record before the existing explicit
+=harvest_kg= transformation reduces quantities converted with their own factors.
+
+- 2011-12 uses =productionID= / =production2ID=; 2013-14 and 2015-16 use
+  =Production_ID= / =Production2_ID=. These serve =reported:<ID>= after the
+  existing identifier formatter.
+- 2018-19 and 2019-20 use =slot:1= / =slot:2= for the actual mapped CONDITION
+  slot. Reordering the column-map list does not rename the slot. These are
+  not calendar seasons: A/B are module names, and the 2015-16 A module covers
+  the second season of 2014 while B covers the first season of 2015.
+  The existing scheme's "A (first season) / B (second season)" shorthand
+  must not be interpreted as calendar order in every wave.
+- 2009-10 and 2010-11 use the explicitly CONSTRUCTED
+  =row:<source-fingerprint>:<physical-zero-based-ordinal>=. A missing reported
+  ID value uses =missing-id:row:...=; a missing declared ID COLUMN raises.
+  Loaders pass the same literal source path they read to the existing
+  =local_tools.source_fingerprint=. Its =dvc:= identity contains the source
+  name and SHA256 of the declared sidecar, NOT the raw DTA MD5.
+  The coordinate is tied to the release and physical row order, not a panel
+  entity. Synthetic helper callers must provide explicit synthetic references.
+- Repeated IDs/slots suffix EVERY occurrence with its =/row:...= locator,
+  including identical payloads. Repeating one physical source/row/slot is a
+  loud uniqueness error. Source positions are captured before selection and
+  crop-roster joins; a DataFrame's own index is not the physical coordinate.
+- The legacy null-key boundary is preserved exactly: the old reducer dropped
+  null old-key records only when the OLD seven-level index was nonunique.
+  A wholly unique old index retains its null record. The held sources still
+  exclude the same 403 records (360 in 2009-10, 43 in 2011-12); the sample join
+  still retains all 928 eligible public records with missing =v=.
+
+Held-source normal default/Make builds retain 133,761 observations, versus
+133,331 old keys. No factor mapping, unit/condition decoding, sample join,
+identifier walk, eligibility screen or 2015 sale-value x100 correction changes.
+In particular the swapped 2013 variable labels, 2018 missing A harvest-unit
+source and mixed legacy/WB slot names remain the recorded survey caveats.
+GH #849's twelve proposed factor bindings are separate.
+With current factor wiring, whole-harvest output still has 78,571 rows; retained
+records change the total by 2,091 kg through their own factors and existing
+median pools. There is no new =production_observation= attrs carrier.
+Feature uses the declared =unresolved_observation= sentinel for countries
+whose served rows do not resolve this axis; that asserts no native row count.
+
+Two measured caveats remain outside this fix.
+The country Make builder returns all seven supported waves for either
+=waves=['2018-19']= or the unsupported =waves=['2005-06']=, on both heads;
+default public output returns only the requested wave or zero rows respectively.
+Warm Make calls rewrite native cache files on both heads.
+The author's private run measured 17 byte-identical files with changed mtimes
+and unchanged modes; the independent review measured the same 17 paths
+changing from 0644 to 0600 as well as changing mtimes.
+These are separate observations, not a general guarantee that
+warm Make preserves modes or performs zero writes; no payload change or
+permission repair is part of #1198.
+Separately, =transformations.py= says "on Uganda the parcel key matches on
+100% of crop rows." Actual held-area controls on BOTH heads match 14,022 of
+40,409 converted harvest parcel keys, with zero literal-plot matches.
+The full real parcel-yield frames are unchanged by #1198. This contradicts
+that blanket coverage claim; its remaining ID/area routing requires separate
+diagnosis, not an inferred repair here.
+
+* Reported harvest rates at native observation grain (GH #849, 2026-10-22)
+
+The five previously unwired rounds now carry their own reported kg-per-unit
+fields through the existing builder: =a5aq6d=/=a5bq6d= in 2010-11, 2011-12,
+2013-14 and 2015-16, and =s5aq06d_1=/=s5aq06d_2=/=s5bq06d_1=/=s5bq06d_2=
+in 2019-20.
+These are twelve mapping additions, not a new factor estimator.
+The three 2018-19 bindings and the unwired 2009-10 map remain unchanged;
+this does not adjudicate an additional 2009-10 source carrier.
+The retained 133,761 native observations, source fingerprints, actual slots,
+production IDs or explicit release-row observations, 403 conditional old-null
+exclusions and 928 public null-=v= records remain exact.
+All non-=KgFactor= values, units, conditions, quantities, sales, dates and
+metadata remain exact at their corresponding serialization stages.
+
+Raw and served factors are different layers.
+The helper already applies =pd.to_numeric(errors='coerce')= and
+=kgf.where(kgf > 0, np.nan)=; this work preserves both operations.
+Raw literals remain in the private source oracle, while nonnumeric and
+nonpositive reports remain missing in the served frame.
+Positive over-cap, year-like and Kg-not-one reports are retained in the
+reported column and rejected only by the unchanged downstream screen.
+The new mappings add 82,103 nonmissing reported values at the retained grain.
+
+The earlier note says the move "would be small and in the right direction"
+and immediately cautions that "small" must be measured.
+The normal held-source parent/candidate comparison measures harvest_kg
+29,095,413.407893993 -> 42,026,694.99297963 kg (+12,931,281.585085638), with
+78,571 -> 88,980 plot-crop output rows.
+The rejected historical scalar-carrier projection of about 42.035M kg is
+not this result: each retained observation is converted before aggregation.
+The layer counts are now reported 96,747, survey_median 4,840, metric 23,406,
+none 8,768, with 439 implausible reports rejected; shipped/inferred remain zero.
+The new reports also change fine/coarse median support for other records in
+the same round, rather than only the cells whose own factor was added.
+
+Agreement is measured against nominal label-derived factors, with
+=volume_as_mass=True= and no price inference or declared factor table.
+Among rows with finite positive factors on both sides, the screened-report
+10% / 20% agreement counts are 9,667 / 11,252 of 15,085 (2010-11),
+5,625 / 7,390 of 10,758 (2011-12), 5,214 / 6,081 of 9,526 (2013-14),
+8,508 / 9,671 of 13,542 (2015-16), and 8,052 / 9,465 of 12,602 (2019-20).
+These denominators do not require a reported Quantity.
+Unit/condition dispersion and screen counts are retained in the task report;
+no disagreement is rescaled, averaged, relabelled or hidden by an exception.
+The #829 2015 sales-release WAITING entry and the settled 2018-19 slot-label
+adjudication above retain their existing meanings.
+
+The real area frame remains 42,841 rows, exact to the parent.
+Parcel yield has 14,022 -> 14,520 matched output keys, including 498 newly
+convertible keys and 7,335 changed shared values; literal plot yield remains
+empty on both heads.
+This does not repair the existing #1205 area/key coverage limitation.
+The #1204 country-Make subset-routing defect also remains.
+Cold/warm support =cluster_features.v= still changes from pyarrow StringDtype
+=na_value=pd.NA= to =na_value=np.nan= with zero null values on both heads,
+the distinct Uganda manifestation recorded in #1196; no common cause is proved.
+
+Normal DEFAULT warm reads, new Country objects, matched Feature and CLI calls
+leave private cache bytes, modes and mtimes exact.
+In this separate GH849 run, warm Make changed the same 17 byte-identical paths
+from 0600 to 0644 and changed mtimes on both parent and candidate.
+This is a separate observation from the prior GH1198 opposite-direction
+measurement; it implies no initial-copy provenance or universal mode guarantee.
+Populated DEFAULT subsets recompute sampling/population/recall metadata, so
+filtering an already-finalized all-wave frame is not a full-attrs oracle.
+The original strict subset comparison stop is retained in the task evidence.
+See =slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/= for the safe report,
+source-grounded aggregates, exact hash scope, tests and explicit evidence limits.
+
+* Parquet index policy: cluster keys (GH #1196, 2026-10-22)
+
+The held eight-wave cluster cohort serves 4,805 rows with no null =v= values.
+The reported =Index/v= diagnostic described the extracted level; the complete public frame has a MultiIndex.
+In the verified native wave parquets, 2009-10 records =v= as =numpy_type="string"= and the other seven waves record =str=.
+The all-wave country union records =string=.
+The generic parquet reader preserves each field's recorded missing policy instead of Arrow 25/pandas 3 replacing =string= with =str=.
+It does not impose one policy on all native waves.
+
+A 2019-20 singleton therefore retains its native =str= policy through Make, while a Default request filters the all-wave country union and retains =string=.
+The same existing route difference also leaves Default with two all-null optional GPS columns and unused all-wave index levels, whereas Make serves the three native columns and the requested wave's levels.
+Those complete frames are not identical and were not normalized to claim equality.
+The recorded native 2019-20 writer input, prepared frame, footer and returned Make subset agree; the country footer and returned Default subset also agree.
+The reader repair leaves the EA/GPS-bin/parish conventions, missing-Region caveat, source joins and cluster reducers unchanged.

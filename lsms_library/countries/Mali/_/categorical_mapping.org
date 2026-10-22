@@ -629,9 +629,9 @@
 #+name: harmonize_labor_source
 | Code   | Preferred Label | 2014-15 | 2017-18 |
 |--------+-----------------+---------+---------|
-| family | Family          | x       | x       |
-| hired  | Hired           | x       | x       |
-| other  | Other           | x       | x       |
+| family | family          | x       | x       |
+| hired  | hired           | x       | x       |
+| other  | other           | x       | x       |
 
 # harmonize_industry — the wage-work industry (`Industry` column) taxonomy
 # for people_last7days (GAP 3b, parity loop).  The WB MLI_EACI*.do code

@@ -57,6 +57,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from lsms_library.local_tools import source_fingerprint
 from lsms_library.paths import countries_root
 
 # The crop-stand column each wave must be wired to.
@@ -281,7 +282,7 @@ def test_recode_pure_stand_is_false_mixed_is_true(uganda_module, in_2009_10_wave
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         out = uganda_module.crop_production_for_wave(
-            "2009-10", df5a, None, df4a, COLMAP_2009_10)
+            "2009-10", df5a, None, df4a, COLMAP_2009_10, source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     got = out.reset_index().set_index("i")["intercropped"]
     assert got.loc["1000000000"] is False or got.loc["1000000000"] == False  # noqa: E712
     assert bool(got.loc["1000000001"]) is True
@@ -297,7 +298,7 @@ def test_recode_missing_code_stays_na(uganda_module, in_2009_10_wave_dir):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         out = uganda_module.crop_production_for_wave(
-            "2009-10", df5a, None, df4a, COLMAP_2009_10)
+            "2009-10", df5a, None, df4a, COLMAP_2009_10, source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     got = out.reset_index().set_index("i")["intercropped"]
     assert bool(got.loc["1000000000"]) is True
     assert pd.isna(got.loc["1000000001"]), "missing crop stand must stay NA"
@@ -368,7 +369,7 @@ def test_season_b_reads_agsec4b_not_agsec4a(uganda_module, in_2009_10_wave_dir):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         out = uganda_module.crop_production_for_wave(
-            "2009-10", df5a, df5b, df4a, _season_b_colmap(), df4b=df4b)
+            "2009-10", df5a, df5b, df4a, _season_b_colmap(), df4b=df4b, source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     got = out.reset_index().set_index(["i", "season"])["intercropped"]
     assert not bool(got.loc[("1000000000", "A")]), "season A must read a4aq7"
     assert bool(got.loc[("1000000000", "B")]), "season B must read a4bq7, not a4aq7"
@@ -385,7 +386,7 @@ def test_season_b_without_a_roster_is_na_never_borrowed(uganda_module,
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         out = uganda_module.crop_production_for_wave(
-            "2009-10", df5a, df5b, df4a, _season_b_colmap(with_b_block=False))
+            "2009-10", df5a, df5b, df4a, _season_b_colmap(with_b_block=False), source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     got = out.reset_index().set_index(["i", "season"])["intercropped"]
     assert bool(got.loc[("1000000000", "A")])
     assert pd.isna(got.loc[("1000000000", "B")]), (
@@ -399,7 +400,7 @@ def test_season_b_frame_missing_is_na(uganda_module, in_2009_10_wave_dir):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         out = uganda_module.crop_production_for_wave(
-            "2009-10", df5a, df5b, df4a, _season_b_colmap(), df4b=None)
+            "2009-10", df5a, df5b, df4a, _season_b_colmap(), df4b=None, source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     got = out.reset_index().set_index(["i", "season"])["intercropped"]
     assert bool(got.loc[("1000000000", "A")])
     assert pd.isna(got.loc[("1000000000", "B")])

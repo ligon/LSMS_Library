@@ -54,6 +54,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from lsms_library.local_tools import source_fingerprint
 from lsms_library.paths import countries_root
 
 SENTINEL = 99999
@@ -205,7 +206,7 @@ def test_qty_sentinel_exact_value_only(uganda_module, in_2009_10_wave_dir):
     }
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap)
+        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap, source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
 
     qty_by_hhid = out.reset_index().set_index("i")["Quantity"]
     assert pd.isna(qty_by_hhid.loc["1000000000"]), "99999 must become NaN"
@@ -241,7 +242,7 @@ def test_qty_sentinel_only_row_is_dropped(uganda_module, in_2009_10_wave_dir):
     }
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap)
+        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap, source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
 
     assert len(out) == 0, (
         "a sentinel-only row (no other reported measure) must be dropped by "
@@ -272,7 +273,7 @@ def test_qty_sentinel_row_with_a_sale_survives(uganda_module, in_2009_10_wave_di
     }
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap)
+        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap, source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
 
     assert len(out) == 1, "a row with a reported sale must survive"
     assert pd.isna(out["Quantity"].iloc[0]), "Quantity itself is still nulled"
@@ -297,7 +298,7 @@ def test_qty_sentinel_absent_is_a_no_op(uganda_module, in_2009_10_wave_dir):
     }
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap)
+        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap, source_refs={'A': 'synthetic:test-A', 'B': 'synthetic:test-B'})
     qty_by_hhid = out.reset_index().set_index("i")["Quantity"]
     assert qty_by_hhid.loc["1000000000"] == 99999, (
         "without qty_sentinel declared, 99999 must pass through untouched"
@@ -336,7 +337,7 @@ def test_2009_10_no_99999_quantity_sentinel_remains(uganda_module, in_2009_10_wa
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         df = uganda_module.crop_production_for_wave(
-            "2009-10", df5a, df5b, df4a, uganda_module.CROP_COLMAPS["2009-10"])
+            "2009-10", df5a, df5b, df4a, uganda_module.CROP_COLMAPS["2009-10"], source_refs={'A': source_fingerprint(root / 'AGSEC5A.dta'), 'B': source_fingerprint(root / 'AGSEC5B.dta')})
 
     assert (df["Quantity"] == SENTINEL).sum() == 0, (
         "a 99999 sentinel survived the strip"
@@ -351,9 +352,11 @@ def test_2009_10_no_99999_quantity_sentinel_remains(uganda_module, in_2009_10_wa
     # Pre-fix Quantity sum was 310,664,565.84 (~300x every other wave);
     # post-fix 967,662.84, now the same order of magnitude as 2010-11
     # (708,149.50) and 2011-12 (1,128,560.35).
-    assert len(df) == 22408, (
-        f"row count changed: {len(df)} (expected 22,408 -- 25,485 raw minus "
-        f"the 3,077 sentinel-only rows the 'no measure reported' filter drops)"
+    # GH1198 (2026-10-22): 141 formerly coalesced native records are retained.
+    # Sentinel eligibility, 360 existing null-key exclusions and all quantities
+    # remain the same; the preceding historical count describes the old grain.
+    assert len(df) == 22549, (
+        f"row count changed: {len(df)} (expected 22,549 native observations)"
     )
     hh = df.index.get_level_values('i')
     assert hh.nunique() == 2323, f"household count changed: {hh.nunique()} (expected 2,323)"

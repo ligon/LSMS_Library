@@ -1683,6 +1683,86 @@ def _read_sas_xport(f, fn, encoding: str | None) -> pd.DataFrame:
     return pd.read_sas(f, format='xport', encoding=encoding or 'latin-1')
 
 
+def _restore_parquet_index_string_policy(df, pandas_metadata):
+    """Restore only the recorded string NA policy of physical index fields.
+
+    Arrow reconstructs index fields before its data-column extension-dtype
+    restoration. Bind physical descriptors to positions, not logical names:
+    those can be absent or duplicated. Keep the storage Arrow actually read.
+    Missing/ambiguous mappings and non-physical (e.g. range) descriptors are
+    left alone; this is not a metadata repair or a general index cast.
+    """
+    if not isinstance(pandas_metadata, dict):
+        return df
+    fields = pandas_metadata.get('index_columns')
+    columns = pandas_metadata.get('columns')
+    if (not isinstance(fields, list) or not fields
+            or not all(isinstance(field, str) for field in fields)
+            or len(fields) != df.index.nlevels
+            or len(set(fields)) != len(fields)
+            or not isinstance(columns, list)):
+        return df
+
+    by_field = {}
+    for column in columns:
+        if not isinstance(column, dict):
+            return df
+        field = column.get('field_name')
+        if not isinstance(field, str) or field not in fields:
+            continue
+        if field in by_field:
+            return df
+        by_field[field] = column
+    if len(by_field) != len(fields):
+        return df
+
+    index = df.index
+    levels = index.levels if isinstance(index, pd.MultiIndex) else [index]
+    positions = []
+    replacements = []
+    for position, field in enumerate(fields):
+        recorded = by_field[field].get('numpy_type')
+        level = levels[position]
+        if (recorded not in ('string', 'str')
+                or not isinstance(level.dtype, pd.StringDtype)):
+            continue
+        dtype = pd.StringDtype(
+            storage=level.dtype.storage,
+            na_value=pd.NA if recorded == 'string' else np.nan,
+        )
+        if level.dtype != dtype:
+            positions.append(position)
+            replacements.append(level.astype(dtype))
+
+    if positions:
+        if isinstance(index, pd.MultiIndex):
+            # Only NA policy changes: level labels/order/length are identical.
+            # Do not recode, prune unused levels or re-infer code dtypes.
+            df.index = index.set_levels(
+                replacements, level=positions, verify_integrity=False,
+            )
+        else:
+            df.index = replacements[0]
+    return df
+
+
+def _read_parquet_with_index_policy(f, *, read_errors=(), **kwargs):
+    """Read an already-open parquet stream and its same-file index policy.
+
+    Return (frame, None), or (None, error) for only the caller's existing
+    payload-read errors. Footer/metadata/restoration errors stay outside
+    that catch. Callers retain their own miss, format and fallback policy.
+    No source lookup, path reopening, audit or non-parquet parser runs here.
+    """
+    try:
+        df = pd.read_parquet(f, **kwargs)
+    except read_errors as error:
+        return None, error
+    import pyarrow.parquet as pq
+    metadata = pq.read_schema(f).pandas_metadata
+    return _restore_parquet_index_string_policy(df, metadata), None
+
+
 def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
@@ -1833,12 +1913,15 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                         NotImplementedError) as exc:
                     raise ValueError(f'{fn} claims SPSS but cannot be decoded') from exc
 
-        try:
-            return pd.read_parquet(f, engine='pyarrow')
-        except (ArrowInvalid,) as exc:
+        df, parquet_error = _read_parquet_with_index_policy(
+            f, engine='pyarrow', read_errors=(ArrowInvalid,),
+        )
+        if parquet_error is not None:
             if Path(fn).suffix.lower() == '.parquet':
-                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from exc
-            failure = exc
+                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from parquet_error
+            failure = parquet_error
+        else:
+            return df
 
         # Stata -- only when the header says so (GH #712).  Handed a file
         # that is NOT Stata, ``StataReader`` reads a garbage header and dies

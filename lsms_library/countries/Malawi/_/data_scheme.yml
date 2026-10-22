@@ -273,7 +273,8 @@ Data Scheme:
     # for the four IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20);
     # GAP 2.  One reported row per input applied to a plot.  Sources:
     # Module D (ag_mod_d) -- inorganic fertilizer in two slots (type +
-    # applied quantity + unit), an organic-fertilizer used? flag (ag_d36),
+    # applied quantity + unit), organic-fertilizer use/quantity/unit
+    # (ag_d36/ag_d37a/ag_d37b),
     # and pesticide/herbicide/fungicide/fumigant types + qty + unit gated
     # by ag_d40; Module G (ag_mod_g) -- seed planted per plot-crop
     # (ag_g04a/b) with the improved-seed flag ag_g0f in IHS4/IHS5; Module H
@@ -284,13 +285,17 @@ Data Scheme:
     # Insecticide/Herbicide/Fungicide/Fumigant/Other Pesticide, Seed).
     # `crop` is the harmonize_crop->harmonize_food label for seed rows
     # (NaN for fertilizer/pesticide).  `u` is the reported native unit
-    # label (NaN where the survey records no quantity basis, e.g. organic
-    # fertilizer).  crop / u are in the index because a plot may carry
+    # label. Organic units use their own ag_d37b dictionary; missing units
+    # are Unknown and unlisted recorded codes are source-qualified raw
+    # identities (Organic unit code N). crop / u are in
+    # the index because a plot may carry
     # several seed crops or a fertilizer in several units.  Reported item
     # columns only: Quantity, native u, Purchased (bool, True where a
     # purchased seed quantity is attached), Quantity_purchased, Improved
-    # (bool, seed rows).  Aggregates (seed_kg, nitrogen_kg,
-    # inorganic/organic/pesticide any-flags) are transformations, NOT
+    # (bool, seed rows).  Applied is the reported organic-use flag (ag_d36),
+    # True on organic rows and missing for other input types.
+    # Aggregates (seed_kg, nitrogen_kg,
+    # household inorganic/organic/pesticide any-flags) are transformations, NOT
     # stored columns.  2004-05 (IHS2) deferred: household-level aggregated
     # ag file, no plot-input roster.  See _/malawi.py:assemble_plot_inputs.
     index: (t, i, plot_id, input, crop, u)
@@ -298,6 +303,9 @@ Data Scheme:
     Purchased: bool
     Quantity_purchased: float
     Improved: bool
+    Applied:
+      type: bool
+      optional: true
     materialize: make
   livestock:
     # Item-level (t, i, animal) livestock-roster feature for the four
@@ -485,5 +493,3 @@ Data Scheme:
     NumberOfUnits: float
     Available: bool
     materialize: make
-  food_expenditures:
-  food_prices:
