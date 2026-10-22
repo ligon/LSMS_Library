@@ -160,3 +160,61 @@ Author evidence is under the owner-only framework1149-fix private root; final
 safe allowlist, checker pins, source protection and immutable release manifest
 are provided to the dispatcher. Independent review and human merge remain.
 Sue.
+
+## Narrow completion-cleanup amendment (2026-10-22)
+
+Base: fb1571035eac6f0f67e4496fd58d4b101b164ce9 in a NEW isolated checkout.
+Original author/reviewer sources, verdicts and evidence remain read-only.
+The independent review established the six human Option C requirements in its
+synthetic and bounded-warm scope; this amendment addresses the additional
+dispatcher invalid-receipt cleanup requirement, not a new scientific decision.
+
+### Grounding and reuse
+
+The two exact sites are `populate_and_push` receipt validation near1822 and
+`add_wave` near2463 in `lsms_library/data_access.py`. Their existing exception
+handlers clear only the current `(country,wave)` receipt if push invocation
+raises; `None` raises the original TypeError later during receipt validation,
+leaving SOURCE unchanged but retaining that receipt. Independent adversarial
+controls fail on both fb and actual release f8. The normal push helper promises
+`list[Path]`, so no ordinary-helper regression or false-held stamp is inferred.
+
+Reuse the existing acquisition mapping, cleanup/pop and re-raise behavior.
+Extend cleanup to expected/confirmed-path validation exceptions at both sites;
+do not coerce invalid results, redesign helpers, alter success/partial/duplicate/
+wrong-receipt behavior or touch unrelated receipt entries. Add the two None
+regressions and a directly relevant invalid-Path-element variant using existing
+synthetic acquisition fixtures. Preserve the exception, its args and SOURCE
+facts before asserting that the current receipt was removed.
+
+Complete prior personal country readings are carried only through exact current
+blob identity: Nigeria2166 lines blob e548594c034362bc5bf08e08b3d447444ef6c8db;
+Ethiopia2350 lines blob21d795f41c9a294511a4abe37f2dd80d7fd3f828.
+Both new paths and original frozen source have these same blobs.
+Nigeria's nested W5v01/v02 acquisition gap, amended quantity-aware W1 unit rule
+and WAITING nonfood recall caveat remain. Ethiopia's heldv02/renamed plot file
+and the recorded "coordinates are **CONFIDENTIAL** anyway" versus1127's
+"The redaction is in a different file" contradiction remain unadjudicated.
+No country source or policy edit belongs in this amendment.
+
+Independent evidence pins: review FINAL-READY SHA
+aac79aacbcd34eb7482348ac32a7a734e92b14d146ea62cadb6fa4894e3b9e63;
+1918-entry manifest5ffc80cd88184122d4dd923299017d652b58f1409ea690ab3431ac3031f9c4a0.
+Root's bounded acceptance requests this narrow amendment before release.
+
+### Verification plan and limits
+
+Commit this plan before implementation; preserve actual-fb failures with copied
+controls before changing runtime. Use new private offline guarded roots and
+exact prepared DVCtmp exceptions, thread/build counts1 and max2 loadfile pytest
+workers. Measure actual549/39/1362 fingerprints (expected0moves) before data
+calls; rerun the affected five-file266 cohort plus added controls on committed
+runtime. No source-cold acquisition, real payloads, credentials, shared cache,
+cache bypass, dependencies, exclusions, GitHub or nested agents.
+
+Earlier warm evidence remains pinned to fb; it is not automatically a new-runtime
+measurement. No new Country/Feature data call is necessary to prove this cleanup
+delta; independent delta acceptance remains with root. Final receipts must
+protect both old manifests and original source endpoints, then freeze the new
+source/checker/test pins, seven safe exports, full manifest and zero-consumer
+post-exit verification. Amendment results are pending. Sue.
