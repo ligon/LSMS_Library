@@ -134,7 +134,7 @@
     "Mali": {
       "path": "/local/job40255479/worktrees/isa-Mali",
       "branch": "isa/Mali-20261021",
-      "status": "approved-country-only-builder-retirement-underway",
+      "status": "Reviewed PRs await human merge; no active Mali writer",
       "owner": "mali_lane",
       "initial_issue": 822,
       "frozen_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
@@ -164,13 +164,13 @@
         "active_ci": "success;run39661144364"
       },
       "active_issue": 1091,
-      "active_owner": "root (PR preparation)",
+      "active_owner": "human review / merge",
       "active_path": "/local/job40255479/worktrees/isa-Mali-1091-fix",
       "active_branch": "fix/1091-mali-community-builder-20261021",
       "active_baseline": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Mali/1091-fix",
-      "active_scope": "Root FULLread concreteproposal/ledger/tests/proof;approvedledgerFIRST thenonlyremoveMali countryconcat+explicitvarrule/recipe/adjacentcomments;retainwavepattern,scheme,finalizer,framework. Newmeaningfultests/fullsource/subset/attrs/Feature/scanner/actual549/39scope gates before independent review. No code/PRPASS yet.",
-      "active_interim_result": "Author111 focused passes; new baseline controls24fail4pass. Forty runtime stages preserve155931supported rows; unsupported requests are declared empty. Independent verdict pending.",
+      "active_scope": "Remove only the duplicate country concatenator and explicit country Make rule. Wave builder, scheme, framework, source eligibility, units and native grain retained. Independent bounded review passes.",
+      "active_interim_result": "Final independent PASS:111 focused tests;24 meaningful parent failures/four passes;40 candidate backend/subset stages; exact complete source/native/public/typed-attrs/CLI/Feature/scanner controls.",
       "diagnosis_1091": {
         "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
         "status": "COMPLETE/frozen/quiescent",
@@ -188,22 +188,25 @@
         "Make public fullattrs equal authoritativeDEFAULT inclid_converted=True",
         "Make frameworkwave route writes noCOUNTRYparquet"
       ],
-      "active_future_PR_base": "fix/822-mali-community-readings-20261021 (PR1180); rootwillopenafterindependentPASS; no publicmerge",
+      "active_future_PR_base": "fix/822-mali-community-readings-20261021 (PR1180) at aba2badfe2f701a8b3793f1243fd8ed4fce18a53; already open, merge parent first",
       "active_precode_ledger": "337f8432193902c0d6f3d6251ff911606d0955b6",
       "active_measured_working_scope": {
         "Mali_changed": 24,
         "other_country_unchanged": 525,
         "framework_unchanged": 39,
-        "status": "Actual own-source parent-vs-working-candidate census terminal before country rebuild; final frozen-source receipts still required"
+        "status": "Actual pre-build census verified independently against final frozen runtime/tests."
       },
-      "active_status": "Independent PASS complete; stacked PR preparation",
+      "active_status": "Independent PASS; stacked PR1199 open and CI-green",
       "active_frozen_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
       "active_runtime_head": "fdadc0698efcd300f5f09c21b60c30f570f96621",
       "active_review_path": "/local/job40255479/worktrees/isa-review-Mali-1091",
       "active_private_review": "/local/job40255479/control/isa-backlog-20261021/review-Mali-1091",
       "active_actual_hash_scope": "24 Mali hashes change;525 other-country hashes and39 framework fingerprints exact; measured before source builds.",
       "precode_prediction_historical": "24Mali/525otherunchanged/39frameworkunchanged; mustmeasurebefore sourcebuild",
-      "active_review_verdict": "PASS111 focused tests,24meaningful parent failures/fourpasses,40candidate stages,full source/native/public/typed-attrs/CLI/Feature/scanner/hash controls; exact handling and metadata-access qualifications retained."
+      "active_review_verdict": "PASS111 focused tests,24meaningful parent failures/fourpasses,40candidate stages,full source/native/public/typed-attrs/CLI/Feature/scanner/hash controls; exact handling and metadata-access qualifications retained.",
+      "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1199",
+      "active_ci": "success; run39699773895",
+      "active_publication": "Root accepted complete independent source and comparator proof; final exact head pushed and PR1199 opened. No public PR merged and no global18 composition proof."
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -222,8 +225,8 @@
       "active_branch": "fix/1091-niger-community-builder-20261021",
       "active_baseline": "d602f8d63520e521a730f85551b366c4d45d9a35",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Niger/1091-fix",
-      "active_status": "Writer approved and active; frozen diagnosis complete",
-      "active_interim_result": "Old Make returns all46043 rows for each supported singleton and absent-wave request. Default correctly filters32352/13691/0. Current food cold/warm u dtype residual is1196; no source edits.",
+      "active_status": "Author runtime/tests frozen; final docs/freeze pending independent review",
+      "active_interim_result": "114 focused tests pass; new parent controls12 meaningful failures/five passes.72 strict matched-stage complete-frame/typed-attrs and72 axis controls; source-backed cold/fresh-warm/populated matrix and three full Arrow/artifact controls. Independent review remains pending. Original auxiliary unrecorded cache delta remains unidentified and excluded from zero-write claims.",
       "diagnosis_1091": {
         "path": "/local/job40255479/control/isa-backlog-20261021/Niger/1091",
         "source_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
@@ -236,7 +239,8 @@
         "source_edits": false
       },
       "active_approved_boundary": "Delete only country concatenator and country Make block/sole-use variable; retain wave rules, helpers, schema, measurements, masks, grain and framework. Actual candidate hash census and independent review required.",
-      "active_actual_hash_scope": "Measured before source rebuild:23 Niger API hashes change,526 other-country hashes and39 framework fingerprints exact."
+      "active_actual_hash_scope": "Measured before source rebuild:23 Niger API hashes change,526 other-country hashes and39 framework fingerprints exact.",
+      "active_runtime_head": "6be6576607f1862b603d123acfb74ace4026fd3f"
     },
     "Nigeria": {
       "path": "/local/job40255479/worktrees/isa-Nigeria",
@@ -318,7 +322,7 @@
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
       "branch": "isa/Uganda-20261021",
-      "status": "849-read-only-country-diagnosis-and1078-independent-framework-review",
+      "status": "Reviewed PRs await human merge; native production-record design/private prototype active",
       "owner": "triage_panel",
       "frozen_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
       "review_path": "/local/job40255479/worktrees/isa-review-1062-v2",
@@ -407,9 +411,9 @@
         "active_runtime_head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
         "active_reviewer": "niger_lane",
         "active_review_path": "/local/job40255479/worktrees/isa-review-1078",
-        "active_review_status": "Independent immutable runtime prephase active; no final author/docs pin or independent source verdict yet",
+        "active_review_status": "Original independent review plus bounded explicit exactness/denial-attribution addendum accepted by root; full selection remains failed as separately recorded.",
         "active_author_interim_validation": "64targetedPASS0skip; natural ordinary-gate healing restores all9missing values/fullframe/attrs/full8wavecoverage.26baseline-candidate fullframes at each matched cold/warm stage exact. Actual scheduledpair+2serialorders6executionsPASS, bothwriters fullframe/attrs correct;217raw scanner records exact. Final immutable receipts/docs pending.",
-        "active_cold_warm_residual": "Both f8 and a4 Niger food_acquired have pre-existing StringDtype u-level na_value pd.NA-to-floatNaN cold/warm difference. Preserved strict failures; no normalization or blanket cold-warm dtype equivalence claim. Residual draft/dedup pending.",
+        "active_cold_warm_residual": "Pre-existing Niger u-level StringDtype missing sentinel difference is open issue1196; preserved on both heads, no normalization.",
         "active_independent_full_suite": {
           "runtime_head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
           "passed": 4689,
@@ -436,14 +440,17 @@
           }
         },
         "active_frozen_head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
-        "active_status": "Author READY/quiescent; independent source phase active after immutable runtime prephase",
+        "active_status": "Independent scoped PASS; PR1197 open and CI-green",
         "runtime_library_tree": "cc18a441cca4c69a24c2f24d513f4f23c3937d86",
         "runtime_tests_tree": "9b685fc972bbbcec464bf6176963e4f0773ba674",
         "root_independently_verified_runtime_and_tests_Git_trees_modes_exact_to_a4": true,
         "final_author_manifest_files": 1288,
         "final_author_manifest_sha256": "deaffb7411f164ece2316aa393bf4f51cdab617e9fdf607f2360b9ba76421b43",
         "active_author_consumers": 0,
-        "no_final_independent_verdict_or_PR_yet": true
+        "no_final_independent_verdict_or_PR_yet": false,
+        "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1197",
+        "active_ci": "success; run39696155414",
+        "composition_status": "Separate global17 review active; no combined PASS yet."
       },
       "active_issue": 1198,
       "active_owner": "niger_lane",
@@ -451,19 +458,20 @@
       "active_branch": "diagnose/1198-uganda-production-records-20261021",
       "active_baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Uganda/1198",
-      "active_scope": "Read-only actualsource five-wave reported-harvest-factor diagnosis and private deepcopied colmap counterfactuals before promotion;current core screen/precedence/no reported_total preserved.2018control,perwaveagreement10/20%,kgmovement,unitdispersion/outliers/coverage required. No tracked config edit or implementation approved.",
+      "active_scope": "Design and private source-preserving observation-coordinate prototype for1198, grounded in frozen849 reports. Preserve all native paired values and existing screens; assess Country/Feature/median/yield behavior. No production/schema/public-axis change authorized in this phase.",
       "active_parent_PRs_verified_merged": [
         967,
         972
       ],
       "active_prior_work_roots_frozen": true,
-      "active_interim_finding": "First-factor/summed-quantity carrier loses native production pairing. Actual IDs/slots support preservation; unkeyed2010 and Feature assembly need explicit observation contract. No factor-only promotion or implementation approved.",
+      "active_interim_finding": "Private source projection retains133761 eligible observations versus133331 baseline, with403 existing null-key exclusions separately accounted. Original index levels/codes and paired fields pass strict checks. Public contract and whole derived effects remain under design review.",
       "active_status": "Native production-record design and private source-grain prototype active; production/schema edits unapproved",
       "active_private_addendum": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum",
       "active_exact_addendum_result": "85 exact saved-artifact checks and seven comparator negative controls pass; unsaved constructor/currency/Feature/finalizer scope gaps explicit. Original sources and reports remain unchanged.",
       "factor_mapping_issue": 849,
       "carrier_owner": "https://github.com/ligon/LSMS_Library/issues/1198",
-      "source_diagnosis_private": "/local/job40255479/control/isa-backlog-20261021/Uganda/849"
+      "source_diagnosis_private": "/local/job40255479/control/isa-backlog-20261021/Uganda/849",
+      "active_precode_ledger": "4332afede (prefix; ledger committed before prototype)"
     }
   },
   "shared_lanes": {
@@ -785,10 +793,20 @@
       "head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
       "control": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
       "additional_PR": 1197,
-      "status": "Independent bounded review active; no PASS or GitHub publication",
+      "status": "Independent bounded source/race/healing/1062 review active; no PASS or GitHub publication",
       "owner": "mali_lane",
       "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/framework-seventeen-review",
-      "prior_global16_source_unchanged": true
+      "prior_global16_source_unchanged": true,
+      "interim_focused_tests_passed": 438,
+      "full_selection": {
+        "passed": 5148,
+        "skipped": 4459,
+        "failed": 13,
+        "errors": 0,
+        "status": "FAIL retained",
+        "attribution": "Nine known protected tracked-timestamp failures; four warning-text glob failures also fail in a narrow matching actual16 counterpart. Correct warning category/message, but temporary-prefix nodeid differs from glob. Later return-code assertion was not reached. No assertion normalization or full-suite repeat."
+      },
+      "interim_source_cohort": "44 complete frames per head at cold and fresh-warm;174 files/head unchanged on fresh warm. Final strict review, healing and1062 orders remain pending."
     }
   }
 }

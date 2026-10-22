@@ -923,3 +923,20 @@ Unarchived newly completed root: review-Mali-1091 (1190manifest entries); archiv
 Main development remains clean f8;17publicPRs all green at last17head checkpoint, latestcompletedcombinedproof remains16d527. No PR merged automatically; goal active.
 
 Sue
+
+* Active checkpoint -- 2026-10-22 00:34 UTC
+
+This section supersedes earlier active-state notes; their proof pins and failures remain historical.
+Campaign has18open implementation PRs, none merged. New Mali1091 PR1199 is stacked on exact1180/aba, final9e8ebeabb, CI39699773895SUCCESS.
+Root read and accepted full independent source/comparator/runtime/CLI/freeze proof; safe review exports were already published at4426267d1.
+Umbrella1091 live title/body now records settled788/840/1086 authority and remaining Niger/Tanzania/human merges, preserving historical draft.
+
+Active workers: mali_lane reviews global17 at7ec versus actual16d527; review_nigeria_1034 finishes Niger1091 author docs/freeze at runtime6be6576607f1862b603d123acfb74ace4026fd3f; niger_lane performs1198 design/private prototype on f8 with first ledger4332afede.
+Global17:438focused passes, full5148pass4459skip13fail0error retained. Nine protected timestamp cases; four warning glob failures reproduced in narrow actual16 counterpart, correct warning category/message, private prefix mismatch; later returncode assertion not reached. No full suite repeat.44cold/freshwarm frames/head and174warm files/head complete; final race/healing/1062-order/strict freeze review pending. Global16d527 remains latest public combinedPASS;7ec remains validation-only, not GitHub published.
+Niger author114passes, baseline12meaningful fails/fivepasses;72frame/typedattrs and72axis controls,3exact artifact/Arrowfooter controls. Original auxiliary unrecorded delta unidentified; later zero-write controls cannot explain it. Await final source/docs equivalence and freeze then assign a DIFFERENT independent reviewer in fresh roots. Eventual stack1176 actual fix/1088-niger-quantity-sentinel-20261021 atd602. No extra API repeats.
+Ug1198 private projection133761eligible observations versus133331baseline plus403existing null-key exclusions; strict original levels/codes and99paired-field controls pass. Current undeclared-extra Feature drops coordinate; interpret with existing collapse before proposing contract. Whole conversion/median/yield effects pending. No production/schema edits authorized yet. Source IDs/full logs stay private; wrappers may emit only class/source-line/aggregate counts/dtype names, never raw exception text or failure-log tails.
+
+Archive10 review-Mali-1091 is durable:898files,89770166bytes,SHA cbe66610d13e12d840e27563f4f236e6cf73994b3ff33de177e10fe8f6b5cec8; full member/source-after verification, root compressedSHA/modes/fsync/launcher verified. Safe private-evidence-durability-tenth.json. Archives1..9 remain unchanged; active roots are not archived as quiescent.
+Allocation has roughly46h37m left, main development stillf8clean. No root background exec at checkpoint. GoalACTIVE; many queued country issues remain. Next root: publish campaign checkpoint/body, review final global17 and Niger evidence when ready, review1198 concrete design before choosing implementation, dispatch Tanzania1091 when a slot frees. Never merge public PRs automatically or treat global17 unit failures as PASS.
+
+Sue

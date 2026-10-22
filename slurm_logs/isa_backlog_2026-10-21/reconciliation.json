@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-21T23:54:53.767835+00:00",
+  "observed_at": "2026-10-22T00:34:00Z",
   "actions": [
     {
       "issue": 822,
@@ -250,6 +250,10 @@
     {
       "issue": 1091,
       "action": "Mali independent PASS fully read by root, including actual comparator/source oracle/runtime/CLI and freeze receipts; preparing stacked PR on verified live1180head. Niger writer measured23/526/39 before rebuild; distinct13FAIL global17 full-suite result remains under narrow attribution outside this task."
+    },
+    {
+      "issue": 1091,
+      "action": "Opened independently reviewed Mali PR1199, stacked on exact live1180head, and verified CI success. Reconciled umbrella title/body with settled788/840/1086 authority, unmerged Mali work and remaining Niger/Tanzania; historical draft preserved. No issue closed and no public merge."
     }
   ],
   "verified_issue_metadata": [
@@ -412,6 +416,17 @@
       "ci": "success; run39696155414",
       "coordinated_rebuild_window_required": true,
       "composition_with_current_global16_verified": false
+    },
+    {
+      "number": 1199,
+      "issue": 1091,
+      "head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "runtime": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+      "base": "fix/822-mali-community-readings-20261021",
+      "dependency_pr": 1180,
+      "review": "Independent PASS111 tests;24 meaningful parent failures/four passes;40 candidate stages; complete strict source/native/public/typed-attrs/CLI/Feature/scanner/hash proof with explicit qualifications.",
+      "ci": "success; run39699773895",
+      "partial_residual": "Umbrella1091 remains open for Niger/Tanzania and human merge of all three countries."
     }
   ]
 }

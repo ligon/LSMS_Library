@@ -305,3 +305,32 @@ All included members/source-after receipts, durable private manifest/launcher an
 The safe receipt is =private-evidence-durability-ninth.json=.
 
 Sue
+
+* Publication checkpoint -- 2026-10-22 00:34 UTC
+
+Mali's independently reviewed builder retirement is PR [[https://github.com/ligon/LSMS_Library/pull/1199][1199]], stacked on exact parent PR1180 at =aba2badfe2f701a8b3793f1243fd8ed4fce18a53=.
+Final head is =9e8ebeabb0e996684d325d05987763a8c3581cc8=; CI run39699773895 completed successfully.
+There are now eighteen open implementation PRs; the prior seventeen exact heads were CI-green at their recorded checkpoint, and no PR has been merged automatically.
+The live #1091 umbrella now separates reviewed but unmerged Mali work, Niger author validation and pending Tanzania diagnosis.
+It retains the original issue as history and names the settled framework/native-grain rulings, without reopening them.
+
+Niger1091 runtime/tests are frozen at =6be6576607f1862b603d123acfb74ace4026fd3f=.
+Author validation reports114focused passes,12meaningful parent failures/five passes,72strict matched-stage full-frame/typed-attrs controls and72axis controls.
+Final documentation/freeze and a different independent reviewer remain pending.
+The original auxiliary assertion's unrecorded cache delta remains unidentified; later zero-write receipts do not explain it retroactively.
+
+Global17's thirteen full-selection failures remain preserved.
+The four warning-text glob failures also occur in the narrow matched actual16 counterpart; the warning category/message are correct but the nodeid contains a private temporary prefix.
+The later return-code assertion was not reached, so no return-code assertion pass is claimed.
+Fresh-warm cohorts completed on both actual heads; controlled race and ordinary healing/1062-order review continue.
+Global16 remains the latest completed combined PASS; no global17 or18 PASS is claimed.
+
+Uganda1198's source-preserving private projection retains133761eligible observations versus133331baseline, with403existing null-key exclusions separately accounted.
+Strict paired-field and original-axis controls pass; existing Feature collapse and whole derived effects remain under investigation.
+Production/schema remain unchanged and no public observation contract has yet been chosen.
+
+Archive10 completed with898included files and89770166compressed bytes, SHA256 =cbe66610d13e12d840e27563f4f236e6cf73994b3ff33de177e10fe8f6b5cec8=.
+All included members and source-after receipts were verified; root separately verified compressed SHA, owner-only modes and fsynced private manifest/launcher.
+The safe receipt is =private-evidence-durability-tenth.json=; derived frames remain private and duplicate cache/raw-source extensions are excluded.
+
+Sue
