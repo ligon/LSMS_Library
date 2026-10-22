@@ -48,7 +48,7 @@ nested PP/PH directories; v02 adds `NGA_HouseholdGeovariables_Y5.dta` and
 `sect3d_harvestw5.dta`. Preserve PP/PH layout and all scientific rules, including
 the amended1035 quantity-aware card rule and WAITING nonfood recall caveat.
 
-Ethiopia idiosyncrasy (`Ethiopia/_/CONTENTS.org:1116`): W5 records v02 and the
+Ethiopia idiosyncrasy (`Ethiopia/_/CONTENTS.org:1077`): W5 records v02 and the
 old `eth_plotgeovariables_y5.dta` name, while v03 replaces it with
 `Pub_ETH_PlotGeovariables_Y5.dta`. A documented contradiction is not silently
 adjudicated: CONTENTS says "whose coordinates are **CONFIDENTIAL** anyway";
@@ -98,6 +98,65 @@ acquisition or data validation is claimed.
 
 ### Phase3 verification
 
-Pending implementation. Baseline synthetic failure and all targeted positive,
-failure, fingerprint and scoped warm audit evidence must be recorded before
-author acceptance. Sue.
+Implementation commit: f85a871fb (full SHA in the private source receipts).
+All source/scientific country config, provenance and sidecars remain unchanged.
+
+- `_extract_all_from_zip` - OK (sections2-5): complete staging/comparison before
+  placement, unique recursive case-insensitive matching, archive-relative new
+  paths, destination/parent collisions and escapes refused, revised and every
+  leftover sidecar reported before placement. Atomic per-file replacement
+  protects a hardlinked held blob. This is not whole-release rollback.
+- Checksums - OK (sections2/3): reuse installed DVC `fobj_md5` with explicit raw
+  or legacy text-aware algorithm. Literal byte comparison, not checksum equality
+  alone, verifies an existing raw file without rewriting it.
+- `_AcquiredRelease`, `_acquired_data_files`, callers and held-release gate - OK
+  (sections2/4): actual written or byte-verified membership drives nested pushes
+  and provenance; unverified skips, errors, partial/wrong push receipts or raised
+  pushes preserve SOURCE facts. Empty/failed calls clear their completion record.
+  A local push-only fallback still cannot certify a downloaded release.
+- Confirmation/source-primary facts - OK (sections3/4): existing controls and
+  new decline/partial tests pass. No acquisition or source authority decision
+  is supplied by these synthetic tests.
+- Member fixtures - OK (sections3/4):174 exact held-sidecar names/SHA receipts
+  plus cited additions/removal, with synthetic bytes and archive directory names.
+  The product reproduces104unchanged/2revised/2new Nigeria and67unchanged/
+  1removed/1new Ethiopia. This is not an actual downloaded-release comparison.
+- Tests:266 passed,0 failed/error/skipped in the current committed-source
+  five-file selection (45 staged acquisition,157 provenance,41 data access,
+  17 in-tree source policy,6 runtime-write policy). One expected mocked bad-GPG
+  warning remains. Actual-parent controls are separate immutable cohorts:
+  minimal nested1FAIL;43 identical new/changed cases41FAIL2PASS; later4 new
+  empty/failed completion controls4FAIL. These are not one combined parent run.
+- Earlier failures remain: first candidate259cases256PASS3FAIL (one fault-fixture
+  construction error, two controls tied to flat/direct-open placement); those
+  three corrected controls3PASS, then262PASS, then current266PASS after the
+  final two-line failure-cleanup/provenance wording change. No old XML/log was
+  overwritten. Earlier tested source bytes reconstructed after that last change
+  match the independently saved SHA; original source metadata was not invented.
+- Fingerprints: actual549 Country,39 framework and1362 declared-wave keysets
+  match parent exactly,0 hash moves,0 data-endpoint writes, including a census
+  bound to current committed product source. No hash exclusions were changed.
+- Scoped warm audit: two independently copied Nigeria/Ethiopia sample caches
+  are current/full-coverage, with a SHA-bound Nigeria internal panel companion
+  (no country-hash claim for that companion).12 strict comparisons across the
+  saved cross-head and separate-process groups pass, including typed attrs,
+  axes/codes/unused levels, masks and explicit EA/nonmissing numeric checks.
+  Nine negative controls reject tiny/nextafter, nested Series, mask/dtype/attrs/
+  order/unused-level faults. Nigeria49770/Ethiopia25914/Feature75684 rows.
+- Audit limits: phase1 sample only (no sample phase2 grid), all5 ordered scanner
+  records are the same5 existing WARNs byte-for-byte. Six main warning pairs
+  (10 occurrences/head) have literal category/message equality; filenames only
+  are qualified by the known checkout prefixes, with line numbers equal.
+  The first already-warm cohort predates the final two-line acquisition-only
+  change; the separately pinned follow-up uses current product source.
+  All warm byte/mode/mtime/inode endpoints remain unchanged. No raw/L1 payloads
+  were copied and no country source-cold build or broad output audit occurred.
+- API surface audit: strict success with0 data-endpoint writes. Skill guidance
+  reflects the implemented contract; no country idiosyncrasy or scientific
+  definition changed. New-file retirement and real978/1127 acquisition/content
+  review remain separate authorized workflows for the dispatcher.
+
+Author evidence is under the owner-only framework1149-fix private root; final
+safe allowlist, checker pins, source protection and immutable release manifest
+are provided to the dispatcher. Independent review and human merge remain.
+Sue.
