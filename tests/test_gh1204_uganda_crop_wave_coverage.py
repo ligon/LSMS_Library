@@ -24,6 +24,8 @@ SUPPORTED = '2018-19'
 BARREN = '2005-06'
 NATIVE_INDEX = ['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season',
                 'production_obs']
+NATIVE_COLUMNS = ['Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold',
+                  'Condition_sold', 'harvest_month', 'intercropped', 'KgFactor']
 
 
 @needs_make
@@ -64,12 +66,17 @@ def native_crop(tmp_path, monkeypatch):
             'plot_id': ['plot'] * 3, 'j': ['Maize'] * 3, 'u': ['Kg'] * 3,
             'condition': ['fresh'] * 3, 'season': ['A'] * 3,
             'production_obs': ['slot:1', 'slot:2', 'slot:3'],
-            'Quantity': [2.5, 2.5, 0.0], 'KgFactor': [1.0, 1.0, 1.0],
+            # Match crop_production_for_wave's explicit final projection,
+            # independently of the empty constructor's grouping policy.
+            'Quantity': [2.5, 2.5, 0.0],
             'Quantity_sold': [1.0, 1.0, 0.0], 'Value_sold': [9.0, 9.0, 0.0],
+            'Unit_sold': pd.array(['Kg', 'Kg', None], dtype='string'),
+            'Condition_sold': pd.array(['fresh', 'fresh', None], dtype='string'),
             'harvest_month': pd.array([6, 6, None], dtype='Int64'),
             'intercropped': pd.array([False, False, None], dtype='boolean'),
-            'Unit_sold': ['Kg', 'Kg', None],
+            'KgFactor': [1.0, 1.0, 1.0],
         }).set_index(NATIVE_INDEX)
+        assert list(frame.columns) == NATIVE_COLUMNS
         frame.attrs['transport_marker'] = {'flag': True, 'integer': 1}
         # Synthetic audit payload tests transport through the real wave read.
         # It makes no claim about Uganda's current native source observations.
@@ -173,4 +180,41 @@ def test_alternating_requests_keep_raw_coverage_true(native_crop, monkeypatch, b
         assert len(pd.read_parquet(var)) == 21
         assert lt.read_parquet_cache_waves(var) == country().waves
     else:
+        assert not var.exists()
+
+
+@needs_make
+@pytest.mark.parametrize('backend', ['dvc', 'make'])
+@pytest.mark.parametrize('prior', ['cold', 'supported', 'all'])
+def test_barren_crop_order_matches_native_declaration_without_cache_writes(
+        native_crop, monkeypatch, backend, prior):
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
+    country, built, var = native_crop
+    if prior != 'cold':
+        populated = country().crop_production(
+            waves=[SUPPORTED] if prior == 'supported' else None, currency=None)
+        assert list(populated.columns) == NATIVE_COLUMNS
+        assert len(populated) == (3 if prior == 'supported' else 21)
+    before_built = list(built)
+    before = {
+        path: (path.read_bytes(), path.stat().st_mode, path.stat().st_mtime_ns)
+        for path in var.parent.parent.rglob('*.parquet')
+    }
+    empty = country().crop_production(waves=[BARREN], currency=None)
+    assert empty.empty and list(empty.columns) == NATIVE_COLUMNS
+    assert built == before_built
+    assert set(var.parent.parent.rglob('*.parquet')) == set(before)
+    for path, receipt in before.items():
+        assert (path.read_bytes(), path.stat().st_mode, path.stat().st_mtime_ns) == receipt
+    assert empty.Quantity.dtype == pd.Float64Dtype()
+    assert empty.Quantity_sold.dtype == pd.Float64Dtype()
+    assert empty.Value_sold.dtype == pd.Float64Dtype()
+    assert empty.KgFactor.dtype == pd.Float64Dtype()
+    assert empty.harvest_month.dtype == pd.Int64Dtype()
+    assert empty.intercropped.dtype == pd.BooleanDtype()
+    assert empty.Unit_sold.dtype == pd.StringDtype()
+    assert empty.Condition_sold.dtype == pd.StringDtype()
+    assert 'production_obs' in empty.index.names
+    assert empty.attrs['country'] == 'Uganda'
+    if backend == 'make' or prior == 'cold':
         assert not var.exists()
