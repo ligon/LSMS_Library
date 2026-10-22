@@ -128,11 +128,12 @@
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188",
         "actual_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
         "actual_parent_PR": 1203,
-        "ledger": "7eb9cfe34",
-        "status": "STATIC_SOURCE_SCHEMA_DIAGNOSIS_ONLY_RUNTIME_HELD",
-        "scope": "Correct gift/purchase field semantics while preserving each measured quantity with its own unit; no flag-only shortcut, pooling, grain/source eligibility/code21 classification changes. Concrete representation decision pending static transport/source census.",
-        "production_or_schema_edits_released": false,
-        "provider_payload_copy_decode_imports_released": false
+        "ledger": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+        "status": "SOURCE_DIAGNOSIS_REPRODUCED_NARROW_IMPLEMENTATION_RELEASED",
+        "scope": "Keep native used Quantity/u and all22,877 rows; purchase=q08/q09a, add own Unit_purchased and gift flag/quantity/unit as four optional country-local columns; retain native acquisition labels and nullable types. No code21/science/grain/framework/map change.",
+        "production_or_schema_edits_released": true,
+        "provider_payload_copy_decode_imports_released": true,
+        "source_first_result": "Reported source diagnosis reproduced all22,877 rows and native keys; guarded implementation proceeds; not independently reviewed."
       }
     },
     "Ethiopia": {
@@ -1071,26 +1072,34 @@
         "independent_phase1": "RELEASED after own guard calibration terminal0; root prepared exact mounted-image and private DVCtmp links",
         "private_author_READY": "5febb754720e182cc0834ca2f8b4f45fbb91dba1406b8b88e0dfe72497de9f08",
         "private_author_manifest": "920a0d87c1473651e0704b2988648178853a6981949e51840520e2814b610d54",
-        "root_author_handoff": "1204-author-handoff/ROOT-HANDOFF.json"
+        "root_author_handoff": "1204-author-handoff/ROOT-HANDOFF.json",
+        "empty_order_followup": {
+          "issue": 1215,
+          "url": "https://github.com/ligon/LSMS_Library/issues/1215",
+          "state": "open",
+          "publication_receipt": "1215-empty-order-publication.json",
+          "root_dedup": "1204-author-handoff/empty-order-dedup-root.json"
+        }
       },
       "current_1205": {
         "owner": "acquisition_1149",
         "path": "/local/job40255479/worktrees/isa-Uganda-1205",
         "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
         "ledger": "309215e28bc12924ea22a7d15cf0b4c89591e696",
-        "status": "FROZEN_AUTHOR_ROOT_AUTHENTICATED_INDEPENDENT_RUNTIME_REVIEW",
+        "status": "INDEPENDENT_AND_ROOT_ACCEPTED_PR_PUBLICATION_PENDING",
         "provider_metadata_root_gate": "Uganda1205-provider-census-root.json",
         "provider_count": 53,
         "provider_bytes": 49160847,
-        "source_stage": "Root87223 terminal0 authenticates302manifest files,53genuine binary providers and53private copies; author seal32130/postexit86007 exact. Independent reviewer completed guarded phase0 and is released for phase1.",
+        "source_stage": "Author frozen and root-authenticated; independent runtime and precision supplement authenticated by root94839 terminal0.",
         "static_critic": "acquisition_1149",
         "static_private": "review-Uganda1205-static",
-        "source_oracle_interim": "Author restores13235yieldkeys to27755 of31959true converted-source keys, preserving all14520oldkeys/values. All549/39/1362fingerprints unchanged. These are author claims awaiting independent verification.",
+        "source_oracle_interim": "Independently verified27,755 yields versus14,520 at actual491; all13,235 added,zero prior keys lost, full old values preserved. Denominator31,959; remaining3,918 missing-area+276 nonpositiveGPS+10 absent-parcel.",
         "source_head": "884775a461d769fd4bb5181005ca3238513b5b01",
         "author": "malawi_1209",
         "root_author_handoff": "1205-author-handoff/ROOT-HANDOFF.json",
         "independent_review_path": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1205",
-        "independent_progress": "Candidate65PASS/actual491new33sixFAIL27PASS; full549/39/1362fingerprints unchanged,53genuineproviders/106copies. Allsupporting5crossheadframes and12coldwarmframes strict, warmtrees physically unchanged. Rawcolumnoracle27755yields/31959convertedparcels;14520oldkeys/values exact,+13235/0lost. Unserved4204=3918bothareareportsmissing+276nonpositivechosenGPSarea+10missingparcel;0HHrosterabsence/0postdivisiondrop. Literal48orderedscannerwarnings match. Finalprotection/sealpending."
+        "independent_progress": "Independent65candidatePASS; actual-parent33new tests6FAIL27PASS. All549/39/1362fingerprints unchanged;48ordered scanner warnings unchanged. Main451files plus23supplement frozen; metadata limitations retained.",
+        "root_acceptance": "1205-independent/ROOT-ACCEPTANCE.json"
       }
     }
   },
@@ -1877,9 +1886,9 @@
     }
   },
   "current_queue_refresh": {
-    "recorded_at_UTC": "2026-10-22T17:28:43.364859+00:00",
+    "recorded_at_UTC": "2026-10-22T18:55:36.298257+00:00",
     "queue": "remaining-queue-2026-10-22.json",
-    "open_issue_records": 112,
+    "open_issue_records": 113,
     "implementation_prs": 28,
     "active": [
       1204,
@@ -1888,7 +1897,7 @@
     ],
     "interpretation": "Explicit current ownership; older per-lane active fields are historical task records.",
     "pr_linked_issue_records": 25,
-    "other_open_issue_records": 84
+    "other_open_issue_records": 85
   },
   "current_invalid_wave_1210": {
     "owner": "acquisition_1149",

@@ -2,27 +2,27 @@
 #+AUTHOR: Sue
 
 * Snapshot
-Captured 2026-10-22T17:28:43.364859+00:00.
-There are 112 ISA-related open issue records: 25 with campaign PRs, three active, and 84 other open records.
+Captured 2026-10-22T18:55:36.298257+00:00.
+There are 113 ISA-related open issue records: 25 with campaign PRs, three active, and 85 other open records.
 All 28 implementation PRs are OPEN and unmerged.
-Umbrellas, decisions and partial repairs overlap; these are not 112 distinct confirmed bugs.
-The original inventory had 97 in-scope records; 96 remain open, duplicate #1089 is now closed, and 16 campaign follow-ups were added.
-All 112 records remain open in the complete 171-issue refresh; no new issue numbers were found.
+Umbrellas, decisions and partial repairs overlap; these are not 113 distinct confirmed bugs.
+The original inventory had 97 in-scope records; 96 remain open, duplicate #1089 is now closed, and 17 campaign follow-ups were added.
+The complete172-issue refresh confirms all113queue records OPEN, including new ordering residual1215; all28implementation PRheads/bases remain unchanged, OPEN/unmerged.
 Development0671019 adds only a certifi dependency-lock update after the tested release; existing mounted runtime was not changed.
 Initial triage tiers and approaches are routing guidance and must be rechecked against live issues and complete country notes before dispatch.
 
 * Active work
 ** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
 Countries: Burkina_Faso.
-Static source/schema diagnosis active at actualPR1203parent after ledger-first7eb9cfe34. Preserve gift/purchase quantities with their own native units; runtime and production/schema edits held pending concrete boundary.
+Source-first diagnosis reproduced on all22,877 native rows; narrow implementation released for corrected purchase fields plus four optional gift/purchase quantity-unit columns. Independent review still pending.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1204][#1204]] Uganda crop_production: country fallback violates requested wave coverage
 Countries: Uganda.
-Authora417fix frozen after59heldactors and finalprotection;8candidatePASS/actualparent7FAIL1PASS,existing170PASS. Four newlyexposedzero-row column-orderdifferences retained. Root-authenticated frozenauthor; independent runtime released after ownguardcalibration.
+Independent review running: requested-wave coverage repair reproduced, four new empty-column-order differences retained under1215. Author frozen/root-authenticated; final independent verdict pending.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1205][#1205]] Uganda yield_kg: diagnose incomplete parcel-area matches and correct the 100% coverage claim
 Countries: Uganda.
-Author884fix frozen and root-authenticated; independent runtime review released after phase0. Author reports13235restoredyieldkeys, preserving14520prior keys/values; not independently accepted.
+Independent review and root acceptance complete at884775a461d7;65candidate testsPASS, actual parent new tests6FAIL27PASS. Restores13,235 yield keys, preserves all14,520 prior keys/values; PR publication pending.
 
 * Reviewed changes awaiting human merge
 ** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
@@ -463,3 +463,7 @@ Countries: Malawi.
 ** [[https://github.com/ligon/LSMS_Library/issues/1206][#1206]] Campaign validation: finish exact numeric and object-type saved-result reassessment
 Countries: Cross-country validation.
 
+
+** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Uganda crop_production: empty result column order depends on cache coverage and backend
+Countries: Uganda, Shared framework.
+Four newlyexposedzero-row column-order strictfailures from1204repair are preserved. Closed1099 fixes emptyrow/errorbehavior; this separate owner needs a stable public column-order contract across cold/covered-cache/Make. Author runtime/rootauth and independent staticreview support filing; independent runtime review remains in progress.

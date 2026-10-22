@@ -1,18 +1,18 @@
 {
-  "captured_at_UTC": "2026-10-22T17:28:43.364859+00:00",
+  "captured_at_UTC": "2026-10-22T18:55:36.298257+00:00",
   "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
-  "method": "Complete gh issue list state=open limit500; connector collection returned only its first100 records and search returned empty, so not used for complete enumeration. Every known27 implementation PR also individually read back via connector.",
-  "repository_open_issues": 171,
-  "isa_related_open_issue_records": 112,
+  "method": "Complete gh issue list state=open limit500; complete gh PR list state=open limit100. All113 queue issue numbers remain open and all28 known implementation PRs remain open at the exact saved head SHAs and base branch names. Prior connector exact PR readbacks retained.",
+  "repository_open_issues": 172,
+  "isa_related_open_issue_records": 113,
   "pr_linked_issue_records": 25,
   "active_issue_records": 3,
-  "other_open_issue_records": 84,
+  "other_open_issue_records": 85,
   "open_unmerged_implementation_prs": 28,
   "initial_in_scope_still_open": 96,
-  "new_campaign_issue_records": 16,
+  "new_campaign_issue_records": 17,
   "original_duplicate_now_closed": 1089,
   "limitations": [
-    "Issue records overlap across umbrellas and countries;112 is not112 distinct confirmed bugs.",
+    "Issue records overlap across umbrellas and countries;113 is not113 distinct confirmed bugs.",
     "PR-linked does not mean fully implemented: explicit partial scopes remain.",
     "Open unassigned includes source-authority/design/acquisition/validation/enhancement tasks, not only ready code fixes.",
     "Initial triage approach/tier retained as historical routing guidance; live issue plus country notes must be reread before dispatch.",
@@ -1848,7 +1848,7 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Static source/schema diagnosis after ledger-first7eb9cfe34 at actualPR1203parent; usage/purchase/gift quantities require independent native-unit fields. No production edit or payload runtime released.",
+      "current_active_scope": "Source-first diagnosis reproduced on all22,877 native rows; narrow implementation released for corrected purchase fields plus four optional gift/purchase quantity-unit columns. Independent review still pending.",
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": true
@@ -1917,7 +1917,7 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Root-authenticated frozenauthora417; independent runtime released after ownguardcalibration. Four newlyexposedempty-column-order strictfailures remain explicit.",
+      "current_active_scope": "Independent review running: requested-wave coverage repair reproduced, four new empty-column-order differences retained under1215. Author frozen/root-authenticated; final independent verdict pending.",
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": false
@@ -1933,7 +1933,7 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Author884fix frozen and root-authenticated; independent runtime review released after phase0. Author reports13235restoredyieldkeys; not independently accepted.",
+      "current_active_scope": "Independent review and root acceptance complete at884775a461d7;65candidate testsPASS, actual parent new tests6FAIL27PASS. Restores13,235 yield keys, preserves all14,520 prior keys/values; PR publication pending.",
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": false
@@ -1990,6 +1990,23 @@
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1215,
+      "title": "Uganda crop_production: empty result column order depends on cache coverage and backend",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1215",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda",
+        "Shared framework"
+      ],
+      "implementation_prs": [],
+      "residual": "Four new zero-row column-order failures exposed by1204routing repair; preserve all strictfindings and choose a stable public empty-column contract across cold/covered-cache/Make.",
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Reuse existing schema/empty/native ordering machinery; measure affected scope before framework edit. Closed1099row/errorbehavior and1204rawcoverage are different owners; no normalizedcomparison or native-data changes.",
+      "scope_recheck_required_before_dispatch": true
     }
   ],
   "implementation_prs": [
@@ -2252,5 +2269,5 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-22T18:18:48.271234+00:00"
+  "active_progress_updated_at_UTC": "2026-10-22T18:55:36.298257+00:00"
 }
