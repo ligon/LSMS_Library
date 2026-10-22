@@ -210,7 +210,7 @@
         "base_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
         "control": "/local/job40255479/worktrees/isa-Malawi-218-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/218",
-        "status": "ROOT_ACCEPTED_BOUNDED; PR publication pending",
+        "status": "INDEPENDENT_AND_ROOT_ACCEPTED; OPEN_PR_AWAITS_HUMAN_MERGE",
         "boundary": "Remove only two raw null derived registrations; preserve automatic Country/Feature food-derived methods and all output semantics. Other218/nonISA/shared cleanup remains residual.",
         "independence": "Starts releasef8, independent of unmerged1109/1111 plot-input patches; normal future composition still required.",
         "root_static_prior_art": "CLAUDE698,Country.data_scheme/_materialization_entry/_FOOD_DERIVED,Feature source discovery and Malawi retirement note1653ff personally read; static raw-key search finds only Malawi2.",
@@ -246,7 +246,15 @@
           "public_safe_evidence": "218-Malawi-independent/",
           "root_acceptance": "218-Malawi-independent/ROOT-ACCEPTANCE.json"
         },
-        "private_archive": "private-evidence-durability-twentyfirst.json"
+        "private_archive": "private-evidence-durability-twentyfirst.json",
+        "open_pr": 1208,
+        "pr_url": "https://github.com/ligon/LSMS_Library/pull/1208",
+        "residual_ownership": {
+          "1209": "Existing canonical-wave versus legacy country-Make builder failure",
+          "1210": "Invalid-wave request evicts five native companions beforeKeyError",
+          "218": "Remaining nonISA/shared retired-family cleanup",
+          "1196": "Shared string-index read policy; JSON typedattrs remain deliberate"
+        }
       }
     },
     "Mali": {
@@ -789,7 +797,7 @@
         "gate": "Root1198 runtime+doc acceptance completed",
         "boundary": "Exactly12 reported-factor map entries at retained native grain, preserving existing numeric coercion/nonpositive normalization and all helper/screen/science logic; raw source values are separate private oracles.",
         "owner": "review_nigeria_1034",
-        "status": "ROOT_ACCEPTED_BOUNDED; PR publication pending",
+        "status": "INDEPENDENT_AND_ROOT_ACCEPTED; OPEN_PR_AWAITS_HUMAN_MERGE",
         "parent_preparation_receipt": "queued-Uganda-849/root-doc-parent-fastforward.json",
         "nonpositive_clarification": "queued-Uganda-849/ROOT-NONPOSITIVE-CLARIFICATION.json",
         "runtime_head_prefix": "7a8fd2249",
@@ -824,7 +832,9 @@
           "public_safe_evidence": "849-Uganda-independent/",
           "root_acceptance": "849-Uganda-independent/ROOT-ACCEPTANCE.json"
         },
-        "private_archive": "private-evidence-durability-twentysecond.json"
+        "private_archive": "private-evidence-durability-twentysecond.json",
+        "open_pr": 1207,
+        "pr_url": "https://github.com/ligon/LSMS_Library/pull/1207"
       },
       "documentation_qualification": {
         "accepted_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
@@ -1044,7 +1054,7 @@
     },
     "1196": {
       "issue": 1196,
-      "status": "Bounded read-only diagnosis accepted; exact generic-reader repair in stage2 implementation/targeted verification, no independent fix verdict/PR yet",
+      "status": "REPAIR_ACTIVE; DEFAULT23PAIRSPASS; MAKE14STRICTFAILURES_UNDER_SAVED_ARTIFACT_CLASSIFICATION; NO_ACCEPTED_FIX_PR",
       "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
       "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
@@ -1087,14 +1097,26 @@
     "1206": {
       "issue": 1206,
       "owner": "validation_reassess; root acceptance/publication",
-      "status": "VALIDATION_REASSESSMENT_ACTIVE",
+      "status": "CRITICAL20_AND1196_SUPPLEMENT_ROOT_ACCEPTED; FULL_RETROSPECTIVE_ACTIVE",
       "primary_diagnostic": "1206-comparator-validation/ROOT-SYNTHETIC-PROOF.json",
       "scope": "Full affected frozen-cohort saved-evidence reassessment; prioritize20and1196, inventory22implementation-review cohorts and17/18/19integration; noAPI/source/testreplay",
       "actual_product_mismatch_found": false,
       "source_API_test_replay": false,
       "prepared_source": "/local/job40255479/worktrees/isa-review-comparator-values",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment",
-      "assigned": true
+      "assigned": true,
+      "critical_safe_evidence": "1206-critical-numeric-supplement/",
+      "critical_groups": 433,
+      "critical_full_strict": 407,
+      "critical_qualified": 26,
+      "groups_overlap_unique_pairs_not_claimed": true,
+      "critical_mismatches": 0,
+      "remaining_earlier_implementation_review_cohorts": 22,
+      "remaining_integration_cohorts": [
+        17,
+        18,
+        19
+      ]
     },
     "1149": {
       "issue": 1149,

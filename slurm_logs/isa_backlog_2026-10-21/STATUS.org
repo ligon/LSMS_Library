@@ -12,36 +12,34 @@ The 37 partial records carry exact residual titles and bodies in =triage.json=; 
 =summary.json= records the tier and dependency ordering; unresolved enhancement/acquisition choices are reported for the maintainer.
 Existing rulings in issues such as #851, #894 and #1134 are binding implementation context, not unanswered questions to ask again.
 
-* Current checkpoint -- 2026-10-22 06:24:38 UTC
+* Current checkpoint -- 2026-10-22T06:53:02.010069+00:00
 
-At 2026-10-22 06:24:38 UTC, all twenty-two independently reviewed implementation PRs were freshly verified OPEN and unmerged at their recorded heads.
-=public-pr-status-user-checkpoint.json= records that fresh check; the earlier checkpoint is retained.
-All eight countries have reviewed changes; shared fixes have coordinated branches.
-Human merge remains the next public landing step.
-Newest PRs1201/1202/1203 have exact-head unit/windows CI success; six other jobs including data-tests were skipped in each run.
-Held-source verification is separate evidence, not a credentialed CI data-suite pass.
+All24 independently reviewed implementation PRs are freshly verified OPEN/unmerged at their expected heads in =public-pr-checkpoint-twentyfour.json=.
+New Uganda1207 carries the12reported-factor bindings at native grain and stacks1202; root accepted416PASS/10genuineSKIP plus stronger saved-value/source checks.
+New Malawi1208 removes only two obsolete registrations; root accepted51PASS/209strong comparisons and unchanged205scanner findings, including2existingFAIL.
+Safe independent reports/root gates are =849-Uganda-independent/= and =218-Malawi-independent/=.
+No human merge has occurred through this campaign.
 
-Uganda849 and Malawi218 have each completed independent PASS reviews in separate checkouts; root acceptance has passed; PR publication is next.
-Uganda849 has416PASS/10genuine skips and source-backed verification of the twelve reported-factor bindings and12.931Mkg downstream effect.
-Malawi218 has51PASS and stronger209saved-value checks; existing Make/scanner/request caveats remain.
-Shared1196 reader repair remains active. A new independent validation worker is reassessing earlier saved numeric evidence under1206.
-1196 bounded read-only diagnosis is root accepted: both retained cases first lose recorded string NA policy in installed Arrow index extraction. Root approved the exact generic-reader patch; actual549API/39framework/1362wave changes and targeted controls are measured, physical17held-source gates precede source builds. No independently accepted fix or PR yet.
-Both complete public frames are MultiIndex; the earlier Index label described an extracted level, and historical overstatements remain corrected additively.
+The1206 critical numeric supplement is independently frozen and root accepted:433executed overlapping groups,407full-strict and26explicit stage qualifications,0mismatch,12rejected negative controls,16savedCLIbytecontrols.
+Original162main/152source-bound cache/76direct-cache families are covered. Fourteen new retained-artifact reads are not recovered original memory.
+Safe proof is =1206-critical-numeric-supplement/=.
+Earlier22implementation-review cohorts and integrations17/18/19 still require separate retrospective reassessment;1206 remains OPEN.
+Old NA/JSON/writer-index/empty/id_converted and overwritten populated-child-log limits remain; no API/source/test replay or old evidence rewrite.
 
-Bounded combined source20 =de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2= is root accepted against actual19 =2566a3e490c0aefe03ab31d538d7d04e9b77c77e= and GitHub published.
-It adds exactly Tanzania1201:85PASS, actual-parent20FAIL/7PASS,162main and152source-bound cache comparisons (families not asserted disjoint),92 exact warning pairs and five byte-exact scanner WARN records.
-It uses current Mali155931/Niger46043 and Feature219673; the footprint is25Tanzania/524otherAPI/39framework exact.
-Earlier per-key populated child logs were overwritten by backend-only names; unique full frames/endpoints/statuses/main structured warnings survive, while missing original child bytes/occurrences remain unavailable.
-The bounded verdict does not claim complete populated-child log equality, a full20 suite or a corpus rebuild.
-Separate source21 bd235a6d494434061dedacc8359351f5a4fb64aa adds reviewedUganda1202 to actual20, preserving30exact leaf blobs/modes plus both documentation histories. It is source-only prepared/UNASSIGNED, with zero imports/tests/builds or runtime verdict; source20 stays frozen.
+Shared1196 generic-reader repair remains active. Default candidate23/23 cold/warm pairs pass; actual Make verification retained14strict mismatches and is classifying saved operands.
+No full Make acceptance, independently accepted repair or PR is claimed.
+Code-only1149 writer acquisition_1149 has ledger-first7b5bca233 and262synthetic/acquisition-provenance tests PASS; actual-parent controls and scoped held-warm gates continue.
+No actual WB/S3 acquisition or country data rewiring is authorized in that task.
 
-Uganda residual owners are1204 (country fallback wave coverage),1205 (parcel-area linkage/coverage) and1196 (index-level dtype roundtrips).
-Twenty-two verified owner-only archives preserve completed private evidence; active roots remain separate. Archive22 preserves frozen combined20 and Uganda849author:2545files,265780108archivebytes, SHAba9c76b9d1ea2c5628f58cef91b1b088d79a2493a14a296b9df54f82a1a0e927.
-New validation owner1206, assigned to an independent reviewer: independently reproduced pandas exact-frame comparison accepting nullableFloat64 tiny/nextafter differences. Active reviews use explicit EA/NumPy comparisons; earlier affected frozen exact-value claims, including combined20, need separate saved-artifact reassessment. No actual product mismatch has been found and no old evidence/API/test is rewritten or replayed.
-Historical global17 remains5148PASS/4459SKIP/13FAIL/0ERROR, with its doc-child guard/mtime and stale-eight limitations.
-No later bounded increment erases that result.
-Next code-only1149 acquisition repair is assigned to acquisition_1149; ledger-first7b5bca233 published at releasef8; no actual WB/S3 acquisition or data rewiring. Refreshed priority/dependency notes are in =next-actionable-queue-refreshed.json=.
-Detailed current paths, pins, owners and qualifications are in =country-lanes.json=; dated sections below retain their original checkpoints.
+Malawi residual owners1209(country food Make builder) and1210(invalid-wave native evictions) are OPEN/readback exact.
+Uganda1204(subset routing),1205(area/key coverage),1196(index policy) and remaining218 cleanup stay separate.
+Source21bd235 remains prepared/UNASSIGNED, adding reviewedUganda1202 to accepted source20de38; strong numeric supplement for critical20 is now accepted.
+Its healthy Niger CROP comparator still needs actual20 hash/fullcoverage verification; no older46376row cache substitution or stamp.
+
+Twenty-two owner-only private archives are fully verified; archive23 is currently writing six frozen roots after a successful8GiB-bound dry gate.
+Historical global17 remains5148PASS/4459SKIP/13FAIL/0ERROR with recorded doc-child guard/mtime/stale8 limits.
+This is no all-green full24-suite/corpus claim.
+Earlier dated checkpoints below remain historical; detailed owners/pins are in =country-lanes.json=.
 
 * Country lanes and review
 
@@ -59,8 +57,8 @@ PR [[https://github.com/ligon/LSMS_Library/pull/1182][1182]] at =780f67986= adds
 | Country | Current result or next step |
 |---------+-----------------------------|
 | Nigeria | Reviewed PRs1172(W3units),1178(later food-unit mappings, stacked1172),1192(community units). All OPEN; source authority and qualifier residuals stay separate. |
-| Uganda | Reviewed PRs1173(derived-output/prerequisite authority),1191(derived-method tests),1202(native production_obs).1202 preserves133761records; source and documentary reviews PASS.849's12factor mappings are frozen at491; independent PASS/root acceptance completed on actual085 parent, publication pending. |
-| Malawi | Reviewed1175 preserves recorded organic quantities;1193 retains source-covered kg declarations and stacks1175.218 removes only two obsolete raw derived registrations; author frozen atd29/815verifiedpayloads, different independent reviewer completed PASS with51tests; root accepted, publication pending. Existing scanner/Make/request caveats remain. |
+| Uganda | Reviewed1173/1191/1202 and new1207.1207stacks1202, carrying12reported-factor bindings at native grain;416PASS/10SKIP and independent/root source-backed acceptance.1204/1205/1196residuals remain. |
+| Malawi | Reviewed1175/1193 and new1208.1208removes two obsolete raw-derived registrations;51PASS/209strong saved checks and independent/root acceptance. Broader218, Make1209 and invalid-wave1210 remain OPEN. |
 | Niger | Reviewed1176 quantity sentinel and1200 community builder retirement, stacked1176. Bothbackend requested-wave proof preserves46043readings/30late/76masks. Bounded19 composition independently accepted. |
 | Burkina_Faso | Reviewed1189 native input slots,1194 parcel coordinates,1203 two seed-crop labels(stacked1189).1203 preserves22877lines/602qualifiedunknowns, changes4430labels only; broader1119/1187/1188 remain OPEN. |
 | Ethiopia | Reviewed1181 missing input-unit identities retains180900rows. Nutrition1171 and source/purchase/grain residuals remain separate.820 section12 is tierC design, not an automatically assigned feature addition. |

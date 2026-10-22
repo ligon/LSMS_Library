@@ -1,0 +1,33 @@
+{
+  "status": "ROOT_ACCEPT_BOUNDED_CRITICAL_NUMERIC_SUPPLEMENT",
+  "recorded_at_UTC": "2026-10-22T06:49:04.118245+00:00",
+  "critical_READY_sha256": "63419e4e8f4559e34f411d346eefce85906877057641696351a92fc75affa91a",
+  "critical_manifest_sha256": "ff982bd1561f6f79151f18a0b048cfb694990514a8ef5562fceb4f32795bd309",
+  "attestation_READY_sha256": "408ae7ced1fdbf4b3ce86ac223f633dc264ca68bea3d2229101ac9f849acd82c",
+  "attestation_manifest_sha256": "598f1016f1dca1c0454176ac8735e34af82906caffe5a527817a8d865b910bb3",
+  "all_new_manifest_entries_verified": 452,
+  "old_manifest_entries_unchanged": 2910,
+  "safe_exports_verified": 8,
+  "checker_sources_verified": 13,
+  "executed_groups": 433,
+  "full_strict": 407,
+  "qualified_stages": 26,
+  "groups_overlap_unique_pair_count_not_claimed": true,
+  "mismatches": 0,
+  "negative_controls_rejected": 12,
+  "original_162_main_and_152_source_bound_and_76_direct_cache_families_covered": true,
+  "saved_CLI_byte_controls": 16,
+  "all_campaign_result": false,
+  "remaining_implementation_review_cohorts": 22,
+  "remaining_integration_cohorts": 3,
+  "root_read_actual_comparator_pair_selection_qualification_and_postexit_sources": true,
+  "root_verification_stdlib_JSON_receipts_and_static_sources_only": true,
+  "no_payload_decode_API_source_or_test_replay": true,
+  "preserved_limits": [
+    "NA-policy, JSON typed attrs, unused writer index levels, empty Description dtype and id_converted qualifications remain explicit.",
+    "Fourteen additional retained-native/raw parquet pairs are new artifact-stage reads, not recovered original prewrite or map_index memory.",
+    "Combined20 overwritten populated-child-log history remains missing.",
+    "No all-campaign numeric verdict, full suite, production fix, merge or issue closure."
+  ],
+  "signed": "Sue"
+}
