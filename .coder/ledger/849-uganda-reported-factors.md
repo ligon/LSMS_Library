@@ -100,12 +100,15 @@ projection is rejected historical evidence, never the expected new total.
 Root explicitly assigned this bounded writer after accepting1198 runtime and
 085 documentary qualification; no new survey or scientific decision is needed.
 Before production, confirm held fields again and report substantive surprises.
-One concrete brief inconsistency was sent to root: the sentence requesting raw
-zero/negative retention conflicts with unchanged builder1522-1536, which masks
-nonpositive values. Proposed boundary is to keep that existing normalization,
-retain exact raw operands privately and test/report it, while positive suspect
-values remain served raw and conversion screens stay unchanged. Production
-waits for root clarification; independent preparation can continue.
+Root checked builder1522-1536 and approved the explicit clarification before
+production: preserve its existing pd.to_numeric(errors='coerce') and
+kgf.where(kgf>0,np.nan) exactly. The prior brief's raw-zero/negative served-
+value sentence was incorrect. Literal source values remain in private raw
+oracles; served KgFactor retains existing nonnumeric/nonpositive normalization
+and finite/nonfinite behavior. Positive over-cap/year/Kg-not-one reports
+follow the existing helper and downstream screen. No helper/science repair.
+The original brief and ledger-first commit795501c69 remain historical evidence.
+Proceed after terminal held-source confirmation; no further approval is needed.
 
 ### Phase3 verification
 
