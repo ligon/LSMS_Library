@@ -22,7 +22,8 @@ schema-order proposal, not authority to change production, schema, or tests.
 | `absent_subset_frame`, `load_from_waves` | `country.py:5004/5249`; constructor calls5027/5403 | only two production constructor callers | GH1099 matrix310 and error/lazy-hit controls; GH1204 barren test146 | preserve routing/cache/error boundary |
 | `_finalize_result`, `_restrict_to_waves`, cache reads | `country.py:3815/4357/4434/4637` | ordinary finalization; cache row restriction preserves column order | existing GH1099 strict one-field empty controls | preserve |
 | Native crop projection | `countries/Uganda/_/uganda.py:1568/1645`; scheme127 | explicit eight-column order equals original declaration order | native producer source; existing GH1204 fixture is not the exact eight-column order oracle | reuse as independent order authority |
-| `Feature.__call__`, `_harmonize_country_frame` | `feature.py:1081/695/1186` | skips empties, may drop nonempty all-NA columns, concatenates native columns | canonical-index/assembly tests | preserve; not a typed-empty schema oracle |
+| `Feature.__call__`, `_harmonize_country_frame` | `feature.py:1076/695/1186` | skips empties, may drop nonempty all-NA columns, concatenates native columns | canonical-index/assembly tests | preserve; not a typed-empty schema oracle |
+| Optional dict dtype enforcement | `country.py:7103/7141/7163`; `tests/test_table_structure.py:68/110` | country coercer skips dict type specs; global canonical types can rescue only known fields | existing tests document extended dict syntax; no new runtime here | separate actionable dtype proposal, not order implementation |
 
 ## §3 Definitions & conventions in force
 
@@ -72,6 +73,11 @@ schema-order proposal, not authority to change production, schema, or tests.
   assessed before any separately released data build.
 - The concrete proposal and bounded actual-parent/healthy/metadata/Feature
   controls are in the private PHASE0.md. No implementation/runtime is released.
+- Root's BF1188 author observation is separately qualified: four new optional
+  fields are absent from actual parent3dc9d285. Read-only detached3d39096
+  declarations/tests bind their names/types; no independent runtime result is
+  claimed. Owned a417 static census finds101 optional dict fields,20 globally
+  typed and81 without global type coverage. These are not81 observed failures.
 
 ### Phase 3 - verification
 
