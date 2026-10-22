@@ -1085,3 +1085,32 @@ Uganda author freeze is still active; Tanzania independent review is queued for 
 Fifteenth private evidence archive is verified; no public merge or issue closure. Goal active.
 
 Sue
+
+* New-head CI and independent review rotation -- 2026-10-22T02:49:33.586886+00:00
+
+Mali1199 CI39712187800 passed at exact b4ad74d5da39f939a7c2ecec030891cb82c02ade: unit tests and Windows smoke succeeded; six jobs, including data tests, skipped.
+PR1199 and campaign1170 bodies were updated and separately fetched byte-exact; issue1091 remains open with its historical text preserved and current Mali/Tanzania status reconciled.
+Parent1180 was freshly confirmed open, unmerged and exact aba. No public PR merge occurred.
+Uganda1198 author released clean 6e735eca93e3f68e63d79ce65ac71607ee9493bf, runtime929149222e43a8fe500cc08420cdc68357170af3.
+Root read the full report/residuals, verified READY/4122-entry manifest digest and all ten export receipt hashes; independent implementation acceptance is still pending.
+Separate Uganda review candidate/actual989 control, exact private metadata targets and full queued brief are prepared, unassigned. Its residual drafts remain unfiled pending independent verification and deduplication.
+The released author mali_lane now independently reviews Tanzania1091; its complete current country reading and NPS caveats are reported before source work.
+Niger reviewer reports the19 prebuild scope and source/copy/current155931-Mali gates passed; focused tests and actual18 matrices are active. No19 verdict or public source publication.
+Burkina Faso1119 author reports131passes, actual-parent5fail/4pass,52complete-frame checks,4430 label-only changes,22877 preserved lines and six exact scanner warnings. Final docs/freeze remain active.
+The missing prebuild relevant-wave enumeration is explicitly recorded; later exact-source metadata measurement is post-build. Original wrong accessor and Feature-currency expected-construction stops survive without API replay.
+Fresh parent1189/issue1119 scope receipt confirms the open exact cfd parent, unchanged issue and zero comments. Two label cells and matching test expectations remain the boundary.
+Three workers remain active; goal active, no public merge or issue closure.
+
+Sue
+
+* Sixteenth archive and next independent task -- 2026-10-22T02:51:20.018609+00:00
+
+The sixteenth owner-only archive covers frozen Uganda1198 author evidence, root Mali documentation hash proof and its separate independent documentation review.
+It contains 895 files / 219261255 compressed bytes, SHA25646c526d7b965a44916c0f1ea44f530354bad53c5de2a1a4e703d6d17d1447e22.
+All included members, source-after receipts, access modes, launcher and directory fsync were verified. Raw sources and duplicate cache trees are excluded; derived frames remain private.
+Current workers are Burkina Faso1119 author, Tanzania1091 independent review and nineteen-change composition review.
+After the Burkina author releases a clean READY, assign that different agent to the prepared Uganda1198 review; it has not started.
+Uganda residual query metadata is in queued-Uganda-1198-review/RESIDUAL-DEDUP-QUERIES.json; direct879/1146 reconciliation and independent verification remain before any filing.
+No root command remains running. Goal active; no public merge or issue closure.
+
+Sue
