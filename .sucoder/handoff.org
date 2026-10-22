@@ -971,3 +971,11 @@ Ug1198actualprebuild28Uganda/521othercountryexact/39frameworkexact;171declaredUg
 Next root: finishstaging/check/commit/pushcampaignsafeexports+metadataandupdate1170/1197bodies topublicbounded17/active1198/Nigerindie/Tzdiag/queued18. Mainf8clean;45h+left/no warning. GoalACTIVE/no publicmerge.
 
 Sue
+
+* Publication complete -- 2026-10-22 01:14 UTC
+
+Campaign e7b7e09401749b649427b8629d3ddf0e2643dbb9 is FS-published/GitHub-pushed and clean before this status-only checkpoint. PR1170 and1197 bodies now describe the separate bounded17PASS/full13FAIL and exact limits; both public bodies fetched/verified byteexact. Eighteen exact PR heads freshlyverifiedopen/unmerged/individuallymergeable; their previous successfulCIreceipts remain recorded, CI notrefreshedinthisread. No root backgroundexec remains. Publicproof links pin e7b7.
+Active1198writer reports59heldStata crop/sample/cluster/area prereqs/531physicalcopies terminalgated,41sidecarswithoutdeclaredsizequalified; fourbackend/controlrootsinitiallyL2empty. Post-whitespace-ID boundary-fixcensus remains28Uganda/521otherexact/39frameworkexact,171declaredwave/224APIwavechanged; normaldefaultcoldrunningunder guard. Nigerindiefinisheswarnings/scanner/finalreceipts plus onlypreviouslyunexecuted actual-parent unsupportedcoldwarmpair. Tanzaniareadonlyproposalpending;58focusedpasses,17699communityrows,wrongMake subset proof.
+Queued18review sourcef9feb3c807aff5206134c37768992302ceb431fa is cleanFSonly, privateintegration/mali-eighteen-review/NEXT-REVIEW-BRIEF.md; assign after a slot frees. No18PASS orGHpublication. GoalACTIVE; many actionable tasks remain. No publicmerges.
+
+Sue
