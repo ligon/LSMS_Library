@@ -1,6 +1,22 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T21:19:39.620705+00:00
+* Current task -- 2026-10-22T21:23:27.634333+00:00
+
+LSMS-ISA goal ACTIVE; NEVER auto-merge. Main cleanf8, dependency-onlydevelopment067 does not change pinned runtime.
+Current COMPLETE live refresh:31implementationPRs OPEN/unmerged with exact current heads/base names,173repoOPENissues,114scopeOPENrecords=28PRlinked+2active+84other. All114stillOPEN; old30PRheads/basenames unchanged.
+NEWPR1219 BF1188 country purchase/gift wiring OPEN/unmerged exact657fed11a63354886772d0f978cec8adb2ad647e, basePR1203branchfix/1119-burkina-seed-crop-labels-20261022 exact3dc9d28510dd783c648413987011832669f8bcf7. Body/head/base/state readback EXACT. Evidence928de01919ea1960ea95473ce0192a3a6d4c137d. CI notyetobserved.
+Independentrootacceptance0f4124979cbdcb6f0f6496f1d0d4dbf909abfd45f988601b65da3cbebb4a9aba:14targeted397supportPASS, trueparent7FAIL7PASS;22877appliedrows/602code21;151strict111PASS40prewriterFAIL (40writerreadbackPASSalreadyinside111),4NEWempty2DefaultPASS2MakeFAIL1218. FourWARN/head raw3028byteJSONLexactSHA3e395b68...;2effd253...iscomparisonDOCUMENThash. Allguard/capability/lifecycle/metadata/rootstops+missingpostexitselfrecord retained; originaltool/harnesscapture03a369f1 exact. NoallstrictPASS/fullcorpus/scienceverdict.
+
+Active review_malawi_1209 owns independent1215f7/a417 at C/review-Uganda-1215. Exactgenuinereleasec194be1/startupaddendum663413b; guard993+startup3c2+closedentryba034unchanged. Fresh37provider0(97614/4363ec),148copy0(14130/686e51),4actualresolutionpreflights0(98406/24f602),185distinctinodes177769212copybytes/4L1-onlyroots. Firstpreflightsetup1usedmetadataroot, correctedbefore resolver/API; no provider/stagingreplay. Next8normalactors48calls+2scanners,64public28nativeplanned. Rootauthbbc76authorpacket alreadyacceptedwith6approvedorderFAIL.
+Active acquisition_1149 owns1218source7eb596c223055d45c4f45cffdba4f7eb6aee76e4 basef7, exactlyhelper/GH1039tests/ledger. Rootphase0fd577; ownC/framework1218-empty-types. Runtime/imports/tests/census/genuine HELDpendingfinalguard/calibration/testpins. TrueframeworkbaseW/isa-framework-1218-base=f7; NEWfixedBFconfigW/isa-config-Burkina_Faso-1218=657, bothownprivateDVCtmp; nofrozenlinksmodified. Source/configcompositionexplicit, notexactoldBFcombinedparent. Historicalstaticpostexit9aaPRE-EDITonly.
+Idle malawi_1209 finished frozenBFreview. Nextarchive32PREPARATIONonlyafterrootgivesexact3frozenroots+finiteimmutable root snapshot plan; no durablewriter untilrootexactplanSHA approval. Currentliveindependent1215/1218runtimeexcluded. Archives1–31preserved; newfrozen1215author/BF1188indep/1218phase0notyetdurableprivatearchive.
+
+Root next: commit/push31PRqueue/readbackreceipt, update1170+1188+1218bodies exactly; observe1219CI without rerun. Prepare32snapshot/brief for idleagent. Review1218guard/cal/testrelease; watchindependent1215firstcold actors. Further1118Mali/Malawi units are strongest mechanicalnext;1135sourcegated;821/823needweight/sizeunitbasis reconciliation. No goal completion/pause/block; data/science residuals remain.
+Allocation40255479about25h45left, no warning. Keepalloriginal failures and exact privacy qualifications; neveremitrawIDs/fullwarnings orreplay actors torepair packaging.
+
+Sue
+
+* Earlier task -- 2026-10-22T21:19:39.620705+00:00
 
 LSMS-ISA goal ACTIVE; NEVER auto-merge. Main clean developmentf8; GitHub development067 is lock-only certifi, mounted runtime unchanged.
 Queue114open records=27PRlinked+3active+84other;30implementation PRs OPEN/unmerged at last full inventory.

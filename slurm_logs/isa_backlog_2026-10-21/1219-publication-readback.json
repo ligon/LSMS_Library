@@ -1,0 +1,19 @@
+{
+  "number": 1219,
+  "url": "https://github.com/ligon/LSMS_Library/pull/1219",
+  "head": "fix/1188-burkina-input-purchase-routing-20261022",
+  "head_sha": "657fed11a63354886772d0f978cec8adb2ad647e",
+  "base": "fix/1119-burkina-seed-crop-labels-20261022",
+  "base_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "state": "open",
+  "merged": false,
+  "status": "EXACT_1219_HEAD_BASE_BODY_STATE_READBACK",
+  "at_UTC": "2026-10-22T21:24:08.633539+00:00",
+  "body_sha256": "fe9e6727e1720c6df1f2064910773aad91b8472870f13feb93e68e91fc791f7e",
+  "body_bytes": 2812,
+  "body_exact": true,
+  "evidence_commit": "928de01919ea1960ea95473ce0192a3a6d4c137d",
+  "root_acceptance_sha256": "0f4124979cbdcb6f0f6496f1d0d4dbf909abfd45f988601b65da3cbebb4a9aba",
+  "CI": "NOT_YET_OBSERVED",
+  "signed": "Sue"
+}

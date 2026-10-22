@@ -129,7 +129,7 @@
         "actual_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
         "actual_parent_PR": 1203,
         "ledger": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
-        "status": "AUTHOR_FROZEN_ROOT_AUTHENTICATED_INDEPENDENT_DATA_REVIEW_PENDING",
+        "status": "ROOT_ACCEPTED_PR1219_OPEN_AWAIT_HUMAN_MERGE_WITH_1218_RESIDUAL",
         "scope": "Keep native used Quantity/u and all22,877 rows; purchase=q08/q09a, add own Unit_purchased and gift flag/quantity/unit as four optional country-local columns; retain native acquisition labels and nullable types. No code21/science/grain/framework/map change.",
         "production_or_schema_edits_released": true,
         "provider_payload_copy_decode_imports_released": true,
@@ -141,7 +141,36 @@
         "author_manifest_entries": 967,
         "author_final_delta": "Ledger and CONTENTS only",
         "independent_predata": "Calibration/fullmaps/14synthetic+397supportingPASS. Minimal exact read-adapter release approved; newcapabilityv1terminal1 after16goodprobes on harmless emptydir expectation, v2repeated16beforelatestrootsteering and terminal0. All original sources/streams/17+17guardrows retained; no further replay. Other3identityboots then authorized6provider/24copy25343300bytes work active; no completed genuine runtime result yet.",
-        "author_validation_limits": "Original398PASS60FAIL retained,56 additive persisted-native stagePASS,4true optional-empty dtype failures1218.25author rawcopies26332243bytes include quarantined budget exception. No independent data acceptance yet."
+        "author_validation_limits": "Original398PASS60FAIL retained,56 additive persisted-native stagePASS,4true optional-empty dtype failures1218.25author rawcopies26332243bytes include quarantined budget exception. No independent data acceptance yet.",
+        "PR": 1219,
+        "independent_review": {
+          "status": "ROOT_ACCEPTED_WITH_RECORDED_RESIDUAL_EXECUTION_QUALIFICATIONS",
+          "owner": "malawi_1209",
+          "candidate": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+          "actual_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
+          "final_source": "657fed11a63354886772d0f978cec8adb2ad647e",
+          "evidence_commit": "928de01919ea1960ea95473ce0192a3a6d4c137d",
+          "root_acceptance_sha256": "0f4124979cbdcb6f0f6496f1d0d4dbf909abfd45f988601b65da3cbebb4a9aba",
+          "original_strict": {
+            "total": 151,
+            "PASS": 111,
+            "FAIL": 40,
+            "writer_readback_PASS_already_inside111": 40
+          },
+          "new_empty_references": {
+            "Default_PASS": 2,
+            "Make_FAIL": 2,
+            "residual_issue": 1218
+          },
+          "scanners_each_WARN": 4,
+          "source_rows": 22877,
+          "targeted_PASS": 14,
+          "supporting_PASS": 397,
+          "actual_parent_FAIL": 7,
+          "actual_parent_PASS": 7,
+          "PR": 1219,
+          "CI": "NOT_YET_OBSERVED"
+        }
       }
     },
     "Ethiopia": {
@@ -1125,7 +1154,7 @@
         "private_root": "/local/job40255479/control/isa-backlog-20261021/uganda1215-order-static",
         "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
         "ledger_first_commit": "467b3b59c",
-        "status": "SOURCE_COMMITTED_GUARDED_SYNTHETICS_PASS_BOUNDED_GENUINE_GRID_ACTIVE",
+        "status": "AUTHOR_ROOT_AUTHENTICATED_INDEPENDENT_GENUINE_REVIEW_ACTIVE",
         "production_or_runtime_released": false,
         "scope": "Ledger-first static column-order contract diagnosis at actuala417 parent; no production/schema edit or runtime released. Concrete order alternatives and affected callers required before design decision.",
         "private_runtime_prefix": "/local/job40255479/control/isa-backlog-20261021/uganda1215-order-fix",
@@ -1149,11 +1178,22 @@
         "independent_review_required": true,
         "independent_review": {
           "owner": "review_malawi_1209",
-          "path": "/local/job40255479/worktrees/isa-review-Uganda-1215",
-          "actual_parent_path": "/local/job40255479/worktrees/isa-review-Uganda-1215-base",
-          "private_prefix": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1215",
-          "status": "PHASE0_STATIC_METADATA_ONLY; runtime and genuine payloads held pending plan/gates/finalauthor authentication"
-        }
+          "status": "GENUINE_GRID_RELEASED_FRESH37_PROVIDER_AND148_COPY_GATES_COMPLETE_NORMAL_GRID_NEXT",
+          "candidate_tests_PASS": 63,
+          "actual_parent_PASS": 57,
+          "actual_parent_FAIL": 6,
+          "historical_author_supporting_count_separate": 88,
+          "genuine_release_sha256": "c194be1c414f83c77779a28631520a7b9ed03cec0dd6ad85c8fcb05d50137b70",
+          "startup_addendum_sha256": "663413b505416faf0c62e716c299c384f4061612c922e99a28472373940adfbd",
+          "providers": 37,
+          "copies": 148,
+          "copy_bytes": 177769212,
+          "roots": 4,
+          "normal_grid_actors_planned": 8,
+          "scanner_actors_planned": 2,
+          "full_data_verdict": false
+        },
+        "author_root_authentication_sha256": "bbc76ab1a0f0478255cd8871cdee95be1458b5309460e8c878d90b292fa8468e"
       }
     }
   },
@@ -1940,17 +1980,17 @@
     }
   },
   "current_queue_refresh": {
-    "recorded_at_UTC": "2026-10-22T19:50:20.193068+00:00",
+    "recorded_at_UTC": "2026-10-22T21:23:27.634333+00:00",
     "queue": "remaining-queue-2026-10-22.json",
     "open_issue_records": 114,
-    "implementation_prs": 30,
+    "implementation_prs": 31,
     "active": [
-      1188,
-      1215
+      1215,
+      1218
     ],
     "interpretation": "Explicit current ownership; older per-lane active fields are historical task records.",
-    "pr_linked_issue_records": 27,
-    "other_open_issue_records": 85
+    "pr_linked_issue_records": 28,
+    "other_open_issue_records": 84
   },
   "current_invalid_wave_1210": {
     "owner": "acquisition_1149",
@@ -1997,9 +2037,14 @@
   },
   "new_optional_empty_dtype_residual": {
     "issue": 1218,
-    "status": "OPEN_UNASSIGNED",
+    "status": "ACTIVE_MINIMAL_IMPLEMENTATION7eb596c_RUNTIME_HELD_FOR_GUARD_PLAN",
     "scope": "Constructed empty explicit optional types using existing dtype machinery; preserve populated outputs and optional absence.",
-    "evidence": "Root-authenticated BF1188 author packet plus independently authenticated static mechanism; independent genuine runtime review pending."
+    "evidence": "Root-authenticated BF1188 author packet plus independently authenticated static mechanism; independent genuine runtime review pending.",
+    "owner": "acquisition_1149",
+    "source_head": "7eb596c223055d45c4f45cffdba4f7eb6aee76e4",
+    "actual_parent": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+    "fixed_BF_config": "657fed11a63354886772d0f978cec8adb2ad647e",
+    "root_phase0_authentication_sha256": "fd577ba87aff54d220901e6f6d17cf808455e63ac310993e79900372dfafee63"
   },
-  "active_progress_updated_at_UTC": "2026-10-22T20:24:37.836190+00:00"
+  "active_progress_updated_at_UTC": "2026-10-22T21:23:27.634333+00:00"
 }

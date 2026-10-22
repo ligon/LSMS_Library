@@ -2,18 +2,15 @@
 #+AUTHOR: Sue
 
 * Snapshot
-Captured 2026-10-22T19:50:20.193068+00:00.
-There are114ISA-related open issue records:27with campaign PRs,threeactive,and84other open records.
-All30implementation PRs are OPEN and unmerged at the recorded exact heads/base branch names.
+Captured 2026-10-22T21:23:27.634333+00:00.
+There are114ISA-related open issue records:28with campaign PRs,twoactive,and84other open records.
+All31implementation PRs are OPEN and unmerged at the recorded exact heads/base branch names.
 Umbrellas,decisions andpartial repairs overlap; these are not114distinct unimplemented bugs.
 The original inventory had97in-scope records;96remain open,duplicate1089is closed,and18campaignfollowups were added.
 Current development0671019 is a dependency-lock-only certifi update after testedf8; mounted runtime remains pinned.
 Initial triage guidance must be rechecked against live issues and complete country notes before dispatch.
 
 * Active work
-** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
-Countries: Burkina_Faso.
-Author657final/runtime3d frozen and root-authenticated. Independent14targeted+397supportingPASS; eight normal actors0/40calls. Original151comparisons=111PASS+40prewriter-storageFAIL; four new parent-based empty references retain2DefaultPASS+2Make dtypeFAIL owned1218. Independent sealed and ROOT-ACCEPTED0f412497; PR preparation follows evidence publication. Author398PASS60FAIL and56additive storagePASS remain separate historical accounting.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Constructed empty tables: implement the approved declaration-order rule
 Countries: Uganda, Shared framework.
@@ -25,6 +22,11 @@ Countries: Burkina_Faso, Shared framework.
 Ledger-first phase0root-authenticated fd577. Implementation7eb596c223 changes only emptyhelper/GH1039tests/ledger on1215f7; runtime held for exact guard/calibration plan. Truef7control and fixedBF657config prepared separately, preserving populated behavior.
 
 * Reviewed changes awaiting human merge
+** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
+Countries: Burkina_Faso.
+PRs: [[https://github.com/ligon/LSMS_Library/pull/1219][#1219]], stacked on1203 at3dc.
+Independent14targeted+397supportingPASS, actualparent7FAIL7PASS; all22877source rows checked. Original151strict=111PASS+40prewriter-storageFAIL; four additional empty references2DefaultPASS2MakeFAIL remain1218. Guarded execution and original SDK/harness/source/cache protection qualifications are preserved in the root acceptance. Human merge outstanding.
+
 ** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
 Countries: Malawi.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1208][#1208]].
