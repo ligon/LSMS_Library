@@ -1,0 +1,13 @@
+{
+  "artifact": "proposed.patch",
+  "sha256": "6fa0329189b79af399be0bcd89e2367b71041ebe39b648a1c88145906d879482",
+  "original_cached_diff_check_exit": 2,
+  "reported_lines": [
+    5,
+    6,
+    72,
+    75,
+    88
+  ],
+  "qualification": "Five literal unified-diff context lines contain the required leading space. Preserve the reviewed patch bytes; cached whitespace check passes when only this exact artifact is excluded. No source payload altered."
+}

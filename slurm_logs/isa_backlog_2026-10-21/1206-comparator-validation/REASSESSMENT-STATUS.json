@@ -1,0 +1,14 @@
+{
+  "status": "ACTIVE_SEPARATE_ARTIFACT_ONLY_VALUE_REASSESSMENT",
+  "owner": "root",
+  "issue": 1206,
+  "diagnostic_only": true,
+  "old_reports_and_operands_immutable": true,
+  "actual_old_country_product_mismatch_found": false,
+  "active_Uganda849": "New explicit EA/NumPy comparator reports saved source/native/derived/CLI/subset/Feature checks exact; final seal pending",
+  "active_Malawi218": "New comparator reports209saved comparisons/177uniqueorderedpairs exact,15faultcontrols; full final seal pending",
+  "old_frozen_campaign_reviews": "Zero-tolerance nullableFloat64 value claims require supplemental reassessment; original scopes/checker pins remain historical, no blanket invalid-product conclusion",
+  "pending_combined20_addendum": true,
+  "no_old_API_source_or_pytest_replay": true,
+  "signed": "Sue"
+}

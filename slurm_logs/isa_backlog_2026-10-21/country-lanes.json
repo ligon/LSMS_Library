@@ -210,7 +210,7 @@
         "base_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
         "control": "/local/job40255479/worktrees/isa-Malawi-218-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/218",
-        "status": "Author frozen/root verified815; independent review ASSIGNED and running, no acceptance or PR",
+        "status": "Independent PASS reported/frozen; root final acceptance and PR publication pending",
         "boundary": "Remove only two raw null derived registrations; preserve automatic Country/Feature food-derived methods and all output semantics. Other218/nonISA/shared cleanup remains residual.",
         "independence": "Starts releasef8, independent of unmerged1109/1111 plot-input patches; normal future composition still required.",
         "root_static_prior_art": "CLAUDE698,Country.data_scheme/_materialization_entry/_FOOD_DERIVED,Feature source discovery and Malawi retirement note1653ff personally read; static raw-key search finds only Malawi2.",
@@ -236,9 +236,12 @@
           "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Malawi-218",
           "brief": "queued-Malawi-218-review/NEXT-REVIEW-BRIEF.md",
           "assigned": true,
-          "tests_builds": "Own51PASS,parent1FAIL1PASS,actual prebuild26/523/39/97wave exact. Default source-cold full/single returns and both Make error controls measured; warm/Feature/CLI/scanner/final seal active.",
-          "verdict": null,
-          "reviewer": "review_nigeria_1034"
+          "tests_builds": "Final51PASS,parent1expectedFAIL1PASS; own source-cold and Make-error controls, Feature/scanner and protected evidence checks completed",
+          "verdict": "PASS_REPORTED_PENDING_ROOT_ACCEPTANCE",
+          "reviewer": "review_nigeria_1034",
+          "strict_value_reassessment": "209strongsavedcomparisons/177uniqueorderedpairs exact;15calibrations. Existing Make/scanner/invalid-wave and missing per-call childFD qualifications remain.",
+          "READY_sha256": "36439ba6049b54df8f0a59a6a3260efca630019d6ff103a6a8db5c54f756c2b7",
+          "manifest_entries": 1458
         },
         "private_archive": "private-evidence-durability-twentyfirst.json"
       }
@@ -783,7 +786,7 @@
         "gate": "Root1198 runtime+doc acceptance completed",
         "boundary": "Exactly12 reported-factor map entries at retained native grain, preserving existing numeric coercion/nonpositive normalization and all helper/screen/science logic; raw source values are separate private oracles.",
         "owner": "review_nigeria_1034",
-        "status": "Author491 frozen/root verified1858 receipts and19safe exports; independent niger_lane review ASSIGNED, no independent verdict or PR",
+        "status": "Independent PASS reported/frozen; root final acceptance and PR publication pending",
         "parent_preparation_receipt": "queued-Uganda-849/root-doc-parent-fastforward.json",
         "nonpositive_clarification": "queued-Uganda-849/ROOT-NONPOSITIVE-CLARIFICATION.json",
         "runtime_head_prefix": "7a8fd2249",
@@ -808,8 +811,12 @@
           "assigned": true,
           "reviewer": "niger_lane",
           "brief": "queued-Uganda-849-review/NEXT-REVIEW-BRIEF.md",
-          "verdict": null,
-          "interim": "Own416PASS/10genuineSKIP,parent20FAIL4PASS; own exact133761raw-slot/source-stage oracle,+12931281.585085638kg and parcel+498keys/7335shared values reproduced; warm/scanner/CLI/subset/seal active, no final acceptance"
+          "verdict": "PASS_REPORTED_PENDING_ROOT_ACCEPTANCE",
+          "interim": "Final416PASS/10genuineSKIP,parent20FAIL4PASS; source-stage oracle and12.931Mkg downstream effect independently reproduced; no public849PR yet",
+          "strict_value_reassessment": "375strong assertions across99+246+30groups; overlapping operands, not375unique pairs. Earlier264source-group count included18self-sanitychecks excluded from final246. Four known vNA metadata exceptions separately qualified.",
+          "READY_sha256": "4505b86a7b9d5082bd6c7b8845f2ee9ee56a73f9735abe8bf6f833b1a25565cb",
+          "manifest_entries": 2125,
+          "manifest_sha256": "dfef539aa8ffca3ff81acd1ffaba3da390b5f1c5903de47ca3410beb2997778f"
         },
         "private_archive": "private-evidence-durability-twentysecond.json"
       },
@@ -1031,7 +1038,7 @@
     },
     "1196": {
       "issue": 1196,
-      "status": "Root accepted bounded read-only diagnosis; same retained Arrow index-reader loss demonstrated for both cases. Different source root is stage1 private patch proposal only; no production edit/fix accepted.",
+      "status": "Bounded read-only diagnosis accepted; exact generic-reader repair in stage2 implementation/targeted verification, no independent fix verdict/PR yet",
       "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
       "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
@@ -1059,11 +1066,42 @@
         "control": "/local/job40255479/worktrees/isa-1196-index-fix-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-fix",
         "owner": "mali_lane",
-        "stage": "PRIVATE_PATCH_PROPOSAL_ONLY",
+        "stage": "STAGE2_APPROVED_PRODUCT_PATCH_APPLIED_TARGETED_TESTS_SOURCE_GATES_ACTIVE",
         "ledger_first": "ee533e09af4b29408985a0c7a1abf815c5c385d1",
-        "product_edits_authorized": false,
-        "tests_builds": 0
+        "product_edits_authorized": true,
+        "tests_builds": 0,
+        "approval": "queued-1196-index-fix/ROOT-STAGE2-APPROVAL.json",
+        "exact_patch_sha256": "6fa0329189b79af399be0bcd89e2367b71041ebe39b648a1c88145906d879482",
+        "actual_prebuild": "549/549API,39/39framework,1362/1362declaredwave changes; no data endpoint changes",
+        "targeted_tests": "Original87cases85PASS2fixtureFAIL preserved; narrow correction4PASS includes2correctedcontrols+2newnullable-comparator negatives, no85passednode replay. Actualparent24IO cases23meaningfuldtypeFAIL1PASS.",
+        "sources": "All17declared held sources available; four-root physical gate running before decode/API, actual NigerMake now required aswell.",
+        "stage1_chronology": "Manifest includes rootapproval FILE; sealing-before-approval claim is limited to receipt/read of explicit proceed MESSAGE, no product/import before proceed."
       }
+    },
+    "1206": {
+      "issue": 1206,
+      "owner": "validation_reassess; root acceptance/publication",
+      "status": "VALIDATION_REASSESSMENT_ACTIVE",
+      "primary_diagnostic": "1206-comparator-validation/ROOT-SYNTHETIC-PROOF.json",
+      "scope": "Full affected frozen-cohort saved-evidence reassessment; prioritize20and1196, inventory22implementation-review cohorts and17/18/19integration; noAPI/source/testreplay",
+      "actual_product_mismatch_found": false,
+      "source_API_test_replay": false,
+      "prepared_source": "/local/job40255479/worktrees/isa-review-comparator-values",
+      "private_root": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment",
+      "assigned": true
+    },
+    "1149": {
+      "issue": 1149,
+      "status": "PREPARED_UNASSIGNED",
+      "candidate": "/local/job40255479/worktrees/isa-1149-acquisition",
+      "control": "/local/job40255479/worktrees/isa-1149-acquisition-base",
+      "branch": "fix/1149-staged-reacquisition-20261022",
+      "private_root": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix",
+      "brief": "queued-1149-acquisition/NEXT-WRITER-BRIEF.md",
+      "ledger": ".coder/ledger/1149-staged-reacquisition.md",
+      "ruling": "OptionC already decided",
+      "tests_builds": 0,
+      "actual_acquisition_authorized": false
     }
   },
   "integration": {
@@ -1442,7 +1480,8 @@
       "manifest_sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
       "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
       "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022",
-      "private_archive": "private-evidence-durability-twentysecond.json"
+      "private_archive": "private-evidence-durability-twentysecond.json",
+      "additional_numeric_verification": "GH1206 separate saved-artifact nullableFloat64 reassessment pending; original report/root receipts stay unchanged"
     },
     "twenty_increment": {
       "head": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
@@ -1470,7 +1509,8 @@
       "manifest_sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
       "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
       "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022",
-      "private_archive": "private-evidence-durability-twentysecond.json"
+      "private_archive": "private-evidence-durability-twentysecond.json",
+      "additional_numeric_verification": "GH1206 separate saved-artifact nullableFloat64 reassessment pending; original report/root receipts stay unchanged"
     },
     "pending_twentyone": {
       "head": "bd235a6d494434061dedacc8359351f5a4fb64aa",
