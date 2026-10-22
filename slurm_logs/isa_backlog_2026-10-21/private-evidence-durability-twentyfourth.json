@@ -1,0 +1,28 @@
+{
+  "verified_at_UTC": "2026-10-22T13:13:15.466126+00:00",
+  "archive_name": "quiescent-followup-twentyfourth.tar.gz",
+  "archive_sha256": "c49ade4f4444bf60b92f9e68f61f073b9164a1a356e46e43478883106641ba45",
+  "archive_bytes": 562309240,
+  "included_files": 1537,
+  "included_source_bytes": 5458220397,
+  "roots": [
+    "framework1149-fix",
+    "review-1149-acquisition",
+    "framework1149-amendment",
+    "comparator-object-dtype-root",
+    "comparator-values-reassessment/corrected-object-v3",
+    "comparator-values-reassessment/corrected-object-v3-attestation"
+  ],
+  "excluded_entries": 65,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "635689c8dcc7a7a6ab44a39674a81da6d1aaa0ee421ce8fbe6a77bc3eebf229d",
+  "private_full_manifest_sha256": "7066ffe85271c5e8931a02ad01f03b9fbcb54cb39f75f18d4c8691bc4e768346",
+  "private_evidence_not_exported_to_Git": true
+}

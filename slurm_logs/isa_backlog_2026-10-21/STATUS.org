@@ -477,3 +477,11 @@ Primary has frozen Tz1201(322positive/30negative/16CLI), Mali1199content-v2(209f
 Archive24 six-root dry terminal0:1537files/5458220397inputbytes/65exclusions. Existing writer handle80748 is confirmed live; final member/source/checksum verdict and durable receipt NOT YET available. Do not restart it or claim24archives verified. Last fully verified archive remains23. Source21 is prepared/unassigned; goal active.
 
 Sue
+
+* Archive24 verified; campaign continues -- 2026-10-22T13:16:17.876519+00:00
+
+Archive24 write and receipt verification both returned0. Six frozen roots /1,537files /5,458,220,397inputbytes /65exclusions produce562,309,240archivebytes, SHA256 c49ade4f4444bf60b92f9e68f61f073b9164a1a356e46e43478883106641ba45. Manifest7066ffe85271c5e8931a02ad01f03b9fbcb54cb39f75f18d4c8691bc4e768346; launcher635689c8dcc7a7a6ab44a39674a81da6d1aaa0ee421ce8fbe6a77bc3eebf229d. All archive members, source-after receipts, ownership/0600files/0700directory, durablelauncher and fsync checks passed. There are now24fullyverifiedarchives; next25unused. No rootarchive/test process remains.
+Fresh GitHub metadata verifies all25 implementation PRs OPEN/unmerged at expected heads.1196 independent current tests149PASS, actualf8IO23dtypeFAIL/1PASS, own13comparator faults reject, own549/39/1362 allmove; four NEW cold roots(twoheads x twobackends) running after17binarysource receipt gates. Primary1192 saved strictchecker retained12axisdomain findings versus25full-axisPASS; numericcolumns/masks/usedlabels agree but source-bound fullaxis characterization remains active. Do not call full index equality or automatically normalize/qualify unexplained domains. Missing old-payload authority in first12 remains a hold; source-only snapshots are not saved-data receipts.
+Goal stays active. No implementation merge, real acquisition, cache promotion or all-country/full-suite verdict. Next: finish independent1196review, root-accept finished1206subcohorts, continue actionablecountryissues, archive newly frozen outputs in25. Source21 still prepared/unassigned; actual20 NigerCROP hash/fullcoverage gate remains required.
+
+Sue
