@@ -10,7 +10,13 @@ payload type declarations while retaining the GH1215 original declaration order,
 required/optional membership, and existing string index shape. Populated frames,
 optional absence, science, row eligibility, canonical precedence, and country
 extraction stay unchanged. The independent Burkina Faso observation is supplied
-by root, not reproduced here. No production edits or runtime are released.
+by root, not reproduced here. Root approved the original empty-only edit and
+conditional guarded runtime. The actual candidate census exposed a required
+fingerprint-serialization prerequisite, now explicitly authorized in scope.
+The current five-path scope is country.py, its existing GH1039 tests,
+_build_registry.py, existing test_build_transform_hash.py, and this ledger;
+the original production authorization covered only the first two and this ledger.
+Runtime for the amended source and all genuine data work remain held.
 
 ## §2 Existing machinery (this task's area)
 
@@ -24,11 +30,17 @@ by root, not reproduced here. No production edits or runtime are released.
 | `_finalize_result` dtype calls | `lsms_library/country.py:3952` | declared then canonical coercion on every API read | existing API tests | unchanged |
 | constructed-empty callers | `lsms_library/country.py:5028`, `:5404` | absent-subset and no-wave results | GH1039/1099/1204/1215 | cover both callers |
 | interleaved GH1215 order control | `tests/test_gh1039_make_backend_no_country_rule.py:443` | order/index plus old object-payload expectation | source control, not run here | intentionally update explicit-type expectation |
+| `_ser`, `_CONST_TYPES`, `_closure_parts` | `lsms_library/_build_registry.py:406`, `:443`, `:492` | deterministic constants and transitive build dependency discovery | `tests/test_build_transform_hash.py` unknown/pattern/closure controls | extend explicit dtype support without excluding the coercer or map |
+| nullable dtype state | mounted pandas `core/arrays/string_.py:194-232`; `boolean.py:44`; `integer.py:249`; `floating.py:183` | Boolean/Int64/Float64 are fixed nullable families; String has storage and NA-versus-NaN state | proposed serializer controls, unexecuted | serialize actual supported state, not arbitrary repr |
 
 ## §3 Definitions & conventions in force
 
 - Inherit `.coder/ledger/STANDING.md` §§3-4, `CLAUDE.md` (symlink to `AGENTS.md`),
   and `lsms_library/data_info.yml`; do not create global fake column definitions.
+- Reuse `.coder/ledger/780-ghanalss-fingerprint.md` sections2-5: extend both
+  deterministic serialization and standalone constant recognition; retain the
+  else-reject rule and complete dependency closure. Existing pattern handling
+  and all previously supported constant encodings remain unchanged.
 - GH1215 OptionA: constructed-empty declaration order; no universal cold/warm
   complete-axis or dtype equality promise. Baseline is f7c33dd64d4b2d6e9a62838c33cc30d07863d706.
 - Frozen BF source is 657fed11a63354886772d0f978cec8adb2ad647e; its complete
@@ -57,6 +69,16 @@ by root, not reproduced here. No production edits or runtime are released.
   BF composition; never label it exact-parent combined-package evidence.
 - Preserve frozen1215/BF roots. No imports/tests/census/provider hashes/copies or
   raw decode in phase0. Future broad549/39/1362 fingerprints precede any rebuild.
+- The actual nullable dtype objects in `_SCHEME_DTYPE_MAP` must remain build
+  dependencies. Support only BooleanDtype, Int64Dtype, Float64Dtype and
+  StringDtype explicitly; String storage and missing-value semantics are distinct
+  inputs. Unknown dtype families, subclasses and arbitrary objects remain
+  rejected. Do not rewrite the dtype map, broaden populated coercion, omit the
+  coercer, use a name-only callable fallback, or stringify arbitrary objects.
+- Candidate62105/50be60 is an original census failure, not an expected success.
+  No complete candidate map JSON was saved; earlier local maps are unavailable.
+  Completed base census/calibrations/controls must not be replayed. A failed
+  candidate stage may resume only under new source/runtime authorization.
 
 ## §5 Reuse decision
 
@@ -67,13 +89,16 @@ by root, not reproduced here. No production edits or runtime are released.
 | canonical override | reuse unchanged | finalize already applies canonical last |
 | fixture/API machinery | extend | existing GH1039 fake-country no-builder routes are meaningful old-framework controls |
 | real BF check | proposed composition | use fixed authenticated BF657 declaration/scripts with both framework heads; no BF country-chain merge |
+| nullable dtype build constants | extend `_ser` and `_CONST_TYPES` | first actual candidate census reaches the existing map through the new empty-only enforcer call and exposes unsupported dtype objects |
+| hash tests | extend existing `test_build_transform_hash.py` | reuse its stable/different/nested/standalone/real-closure/hash-seed and unknown-rejection patterns |
 
 ## §6 Open questions for the human
 
-No new human policy question: literal explicit types are already authorized in
-scope. Root decisions still required before production/runtime: final PR base
-and GH1215 prerequisite; precise source-only config composition/private DVC tmp;
-bounded provider/copy plan; guard/census/test/genuine releases. The full GH1218 body was supplied by root and read locally (SHA256
+No new human policy question: literal explicit types and the narrow serializer
+prerequisite are already authorized. Root selected exact GH1215 f7c as prerequisite
+and BF657 as a deliberate supported configuration override. Root still reviews
+amended source pins and guarded tests before any further runtime; genuine work
+has a separate release. The full GH1218 body was supplied by root and read locally (SHA256
 6828890f5826a491901780cb0dd40a3ddba1c94472c4569aa4db1a2ed97ed9e2).
 
 ### Phase3 - verification
@@ -146,3 +171,32 @@ binds the pre-edit9aa source epoch. Original metadata postexit v1 stopped on an
 incorrect optional-exclusion set assertion; its source/failure was preserved.
 A separate external corrected metadata postexit completed0 before production
 edits; the old frozen packet was never rewritten. No data/runtime replay.
+
+### Approved fingerprint prerequisite amendment (source-only)
+
+The original candidate7eb596c223055d45c4f45cffdba4f7eb6aee76e4 census,
+tool session62105 terminal50be60, exited1 at build_transforms_fingerprint ->
+_closure_parts -> _ser with `TypeError: build constant of un-serialisable type
+'BooleanDtype'`. The new `_empty_declared_frame` calls the unchanged enforcer,
+which references the existing nullable dtype map. This is a genuine unsupported
+build constant, not evidence to remove that dependency or to weaken the census.
+
+No fingerprints-private.json was written. Earlier country/wave locals were not
+saved and are unavailable; their counts/values are not recovered or claimed.
+The separate candidate failure metadata report is pinned SHA256
+88d2e65f4ff4290705a36a79565e19d12805d389df39a453d5f27cd176894910.
+It authenticates original PID/time/source and1459 guard rows, including1458
+denied missing-reference attempts and one denied import probe. Endpoint absence
+is current metadata, not invented historical absence or a zero-attempt claim.
+
+Before this amendment, five literal7eb source files were copied into the private
+source-only snapshot. Its READY is SHA256
+621fc331611e0ae58358479a8f72354c3510d2fa96d3e449051b282114ae8a72;
+manifest9900cecac2802f539d08ee8cce84b8a129d0eb4e116c42ff63716cf93bd5e2b3.
+Original7eb remains in Git, and prior runtime sources/streams/results are intact.
+
+Planned controls cover each map dtype, nested/standalone constants, String's
+four storage/missing-value combinations, fresh-instance/hash-seed determinism,
+real map mutation reaching the build closure, unsupported families/custom
+subclasses and the existing arbitrary-object rejection. These controls and
+the amended source are unexecuted; runtime/genuine work remains held.
