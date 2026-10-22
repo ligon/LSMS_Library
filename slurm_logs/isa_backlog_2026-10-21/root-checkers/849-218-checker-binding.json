@@ -1,0 +1,8 @@
+{
+  "checker": "verify_849_218_root.py",
+  "sha256": "4800db0a62ba44a37be2c2b9c0a3318d38863fd18441e96d8347115a8e7810d2",
+  "ROOT_reports": {
+    "849": "78fdee1ce6ece4f9c9df12f88cd027c139bb146a22c338a49146619aac117bde",
+    "218": "b3475d40bcb5381764702a196a872c9fdc47ac2c5788b13bdd4b0db5c4b919e1"
+  }
+}

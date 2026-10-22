@@ -1245,3 +1245,9 @@ Sue
 Fresh GitHub metadata verifies22implementationPRs stillOPEN/unmerged at expectedheads. IndependentUg849PASS416/10skip andMalawi218PASS51 nowFROZEN, awaiting rootacceptance/publication. Ugfinal375strongassertions=99+246+30overlappinggroups, old264included18selfchecks; no originalcount rewritten. Malawi1458manifest/READY36439ba6.1196authorruntimebd80FSpublished/sourcecoldprefix retained after invalid nonmonetary currency caller, continuation onlyunexecutedcalls. Newvalidation_reassess assigned full1206saved-evidencefollowup, prioritizes20/1196then affected22reviewcohorts+17/18/19; held ledger untilthisrootcheckpointcommit. Goalactive, no merge,22archives.
 
 Sue
+
+* Root accepts849andMalawi218 -- 2026-10-22T06:38:09.673635+00:00
+
+Root stdlib-only verifier verify_849_218_root.py terminal0: all2125Uganda/1458Malawi reviewmanifest entries and completepathsets,6/8safeexports, original2author manifests1858/815, allchecker pins/sourceGit/ownOSreceipts/copyMD5+SHA/inodes, actualJUnit416PASS10SKIP/51PASS andparent20FAIL4PASS/1FAIL1PASS, actualhashcensus/AST/two-keydiff, savedstrongproof375groups/209checks andliteral scanner/warning evidence checked. No API/decode/testreplay. Exactpublicreports now849-Uganda-independent and218-Malawi-independent. Runtimeauthorheads491/d29 stillclean; PRpublication pending. Uganda dated doc causewording is originalauthor scope; later1196Arrowdiagnosis will be qualified inPRbody.1149workeracquisition_1149 ledgerFIRST7b5bca233published, fullNigeria/Ethiopiagrounding/currentrulings, no actualacq. Critic1206reports329+12criticalgroups PASS, finalcriticalseal pending. Metadata-only earlier list-vs-dict diagnostic stopped while printing safe scanner allowlist, no frozen artifact changed.
+
+Sue

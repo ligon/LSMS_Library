@@ -1,0 +1,82 @@
+{
+  "source_pins": {
+    "candidate": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+    "runtime_tests": "299fb8675e785fd392b1259ab1f4fb535eb69c34",
+    "actual_parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+  },
+  "prebuild_API_hashes": {
+    "total": 549,
+    "Malawi_changed": 26,
+    "other_country_exact": 523
+  },
+  "framework_exact": 39,
+  "Malawi_wave_hashes_exact": 97,
+  "strict_frame_checks": 209,
+  "unique_ordered_operand_pairs": 177,
+  "strict_comparator": {
+    "path": "common_strict.py",
+    "sha256": "6f984078f00b0aa4a3e4561c3218070877b65c31111fda1eb16a46d5fe721f11"
+  },
+  "checker_pins": {
+    "amend-package-history.py": "7acad9edd1a52e078cb4be6dd1a57c834e65ddd3f32f5e46cd154ae067fb1e15",
+    "argument-controls.py": "2095acd56949ca7f91cd1dcb204a8f518833aa7bfc5a15dc8e5e0801ad80b211",
+    "assembly-diagnostic.py": "fd18f8516b316d78564fab12fc1f8f1ab0272e71bb0e86a3dd84c88fb51d5367",
+    "assembly-oracle-v2.py": "294b365b75aef6baadf9da1dbc491ba69a5f9d96529886411bdeb3d706e577a5",
+    "assembly-oracle.py": "0ac8ba29e079dc9860cc28c2a80344d612b4894c84dfa0824f7c2529cd908e48",
+    "capture.py": "890627904473596bf3f0d2bcda4eeb38d673cdfe6efa56e7198aeb34608e480c",
+    "capture_passive.py": "78a0e04588fd834c2ac56e5728de161152bdc59e617466c69a9fe4a4843e41fc",
+    "cli-check.py": "e31d44d4d1a2c50eba72d2815747d81a8b344c79f94c38759730824f09820c8f",
+    "cli-stage-diagnostic-v2.py": "d72ef95552e50ae782e2d713d1b05d2e6d3e692b428cb51b19c43ea510104150",
+    "cli-stage-diagnostic.py": "e2217675b230e4147811b220686f6afa8dbc9fc85398ac76d5075b6b268b6a3c",
+    "common.py": "f7aa1f0bd4458fea4f0be6983c3d272221515cc16fe745bf3ca126b953050a93",
+    "common_strict.py": "6f984078f00b0aa4a3e4561c3218070877b65c31111fda1eb16a46d5fe721f11",
+    "common_v2.py": "6d9133fc26261a1d515325528bef4ad9b5011b2269dd8c0432e2e60067537c9a",
+    "compare-stages.py": "7211c291f01e2e0b0023863a1d1834f99b988eb91689cfc4fe78f93e551171fa",
+    "dtype-controls.py": "804533da2080652b9508ca9e6fd2a45c5db91d2d3d86ddb83c839f907f244bcf",
+    "entry.py": "3dfc10a0f9cdcc3719d5b1d6ca3c5b172a6d44d2b1a05ead1bc35044b03ffa00",
+    "features.py": "1481dd5d5602b77a79c8c47604650e5f70296e69fda7b4c02b8a048637f96ee6",
+    "inventory.py": "595e7e66195c9a73b6eb2cf9659d414b3d5e6afd6626c6db6ac452fc992300f8",
+    "metadata-controls.py": "41ac5dbfda2d40b2b59c8677e86f393e84131e0cddfa393c8e890514d9862b37",
+    "package-review.py": "64b858ee0afde490088d22e6f2f050a2e13c0fce16c2b6ef746a8b08b5feea85",
+    "parent-test_gh218_derived_registrations.py": "36741584c253204d8ab512aecd234567c8473d5b5f9092a453e8d5b5a1f0d425",
+    "prefix-check.py": "c870a5791dff288805cb79032f4cb2cf0a2fa1fc90072253b59ace62b03427e6",
+    "prepare.py": "111e23aa07f41e8d6e49fd2fd52c2828803c9331e53051c4bf97cbf789f39d9b",
+    "probe.py": "0f4c88281adaf51d87e486673c14fc502b8111ee851a149a8c192ad4b95249a0",
+    "protect-final-v2.py": "832fe1ac600e11699f7706f02de6349763616f78525139d5500393a2b200ebc9",
+    "protect-final.py": "324c8c2eb292246e4f43658e6c9acd6f9aeca683b41c189c3e34e0e4e0e33868",
+    "recheck-strict.py": "990a88fb990615a1e3cdc8b9753f1cea297b9ca4dea21765d75fc81309916bb1",
+    "run.sh": "74d59cafba57f366047bdaaba6eccf19462143ec500b84252dbede9e6211d6c7",
+    "scanner-check.py": "12417ab405e6b2eab930b14525170a4bbec37d4c080ce1d71b90b4853e14b4a5",
+    "scanner.py": "cfac03c1ebdbe475bac5108c106f7141650a22e8429aea22df4e1a856efde426",
+    "scope.py": "55974afe536d6445549320723c6860f246adbe83342c2947b6f09eb97253fcbd",
+    "seal-review.py": "25e769c55fd5dda1e0bac0759097e5aa7172d8a91c01ada5608f6f69f9ab7edf",
+    "sitecustomize.py": "0a2ed419aa3d8256b40f39507ccf9ed553f0046f7f76a3189c8d888505504e4c",
+    "snapshot-helper.py": "c724fa6442e1c7b9768a2a135351e1c11c154187d162248ebf2336203885f52b",
+    "strict-basic-controls.py": "2321fa78fbed35fb397ad61a3dfcefcf18ab0ef1e87915ec04f12228cf1e6c8b",
+    "strict-dtype-controls.py": "85551c590b3649138262731b4a9e1749d5374518108fdcb3b97ecef520a06259",
+    "strict-history.py": "dfef4ebdd7fe5ee827ee55482f3a9e108545976ba2fb8f421bd3a591c793a129",
+    "strict-negative-controls.py": "062ab9aa16d942747567b61a3cda2932295358503309c10f8360d3dd667a4b0b",
+    "strict-v2-controls.py": "2c40e88acf9b28745550432f6db71204864437979758e0e2406fcda6d878411e",
+    "tests.py": "1189d74d2c5258952d6a4a1686b7090f94d59056e5eda9f456d387b95cf03597",
+    "v2-dtype-controls.py": "9cf4c4f01249832c6bbeae10539d2c6751472e79670e78f8191c3241aec9690c",
+    "v2-metadata-controls.py": "2ffad28a688155a3fd1a287e881d324b9f70b4136dfefa88c1439411527a175d",
+    "warm-probe.py": "c989f2f532876f5b8c5c1a31599b08041881a0d915013394274854ed06897560",
+    "warning-check-v2.py": "d555e9aedd0180964c1b93e8136a5dcee3ef49f92632ea776d7b2d28a62e7fa7",
+    "warning-check.py": "68addb5906a98983d44c529b7fb4d7fc553acee735c1559263ef0369b62a8153",
+    "warning-diagnostic.py": "9e03c479c5debbe06529cd6a3a3da1a35d452b15a105bb2422a97d626dd2237c"
+  },
+  "author_manifest": {
+    "entries": 815,
+    "sha256": "b60023a579e8850a1ba2d1d2a002ae2871d01be872c25f8708f8dc6198cb234f"
+  },
+  "own_frozen_manifest_and_quiescence": "Final READY.json and seal-review-proof.json follow only after complete export creation.",
+  "strict_historical_diagnostic_and_cross_stage_classifications": {
+    "historical_diagnostic_pairs": 16,
+    "diagnostic_equal": 14,
+    "diagnostic_wrong_grain_expected_rejections": 2,
+    "intentional_CLI_cross_stage_pairs": 6,
+    "intentional_CLI_expected_rejections": 6,
+    "original_first_assembly_expected_operand": "Absent; not re-created or claimed original.",
+    "all_classifications_confirmed": true
+  }
+}

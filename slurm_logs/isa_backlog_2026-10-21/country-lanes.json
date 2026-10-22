@@ -210,7 +210,7 @@
         "base_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
         "control": "/local/job40255479/worktrees/isa-Malawi-218-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/218",
-        "status": "Independent PASS reported/frozen; root final acceptance and PR publication pending",
+        "status": "ROOT_ACCEPTED_BOUNDED; PR publication pending",
         "boundary": "Remove only two raw null derived registrations; preserve automatic Country/Feature food-derived methods and all output semantics. Other218/nonISA/shared cleanup remains residual.",
         "independence": "Starts releasef8, independent of unmerged1109/1111 plot-input patches; normal future composition still required.",
         "root_static_prior_art": "CLAUDE698,Country.data_scheme/_materialization_entry/_FOOD_DERIVED,Feature source discovery and Malawi retirement note1653ff personally read; static raw-key search finds only Malawi2.",
@@ -237,11 +237,14 @@
           "brief": "queued-Malawi-218-review/NEXT-REVIEW-BRIEF.md",
           "assigned": true,
           "tests_builds": "Final51PASS,parent1expectedFAIL1PASS; own source-cold and Make-error controls, Feature/scanner and protected evidence checks completed",
-          "verdict": "PASS_REPORTED_PENDING_ROOT_ACCEPTANCE",
+          "verdict": "PASS_BOUNDED_ROOT_ACCEPTED",
           "reviewer": "review_nigeria_1034",
           "strict_value_reassessment": "209strongsavedcomparisons/177uniqueorderedpairs exact;15calibrations. Existing Make/scanner/invalid-wave and missing per-call childFD qualifications remain.",
           "READY_sha256": "36439ba6049b54df8f0a59a6a3260efca630019d6ff103a6a8db5c54f756c2b7",
-          "manifest_entries": 1458
+          "manifest_entries": 1458,
+          "root_accepted": true,
+          "public_safe_evidence": "218-Malawi-independent/",
+          "root_acceptance": "218-Malawi-independent/ROOT-ACCEPTANCE.json"
         },
         "private_archive": "private-evidence-durability-twentyfirst.json"
       }
@@ -786,7 +789,7 @@
         "gate": "Root1198 runtime+doc acceptance completed",
         "boundary": "Exactly12 reported-factor map entries at retained native grain, preserving existing numeric coercion/nonpositive normalization and all helper/screen/science logic; raw source values are separate private oracles.",
         "owner": "review_nigeria_1034",
-        "status": "Independent PASS reported/frozen; root final acceptance and PR publication pending",
+        "status": "ROOT_ACCEPTED_BOUNDED; PR publication pending",
         "parent_preparation_receipt": "queued-Uganda-849/root-doc-parent-fastforward.json",
         "nonpositive_clarification": "queued-Uganda-849/ROOT-NONPOSITIVE-CLARIFICATION.json",
         "runtime_head_prefix": "7a8fd2249",
@@ -811,12 +814,15 @@
           "assigned": true,
           "reviewer": "niger_lane",
           "brief": "queued-Uganda-849-review/NEXT-REVIEW-BRIEF.md",
-          "verdict": "PASS_REPORTED_PENDING_ROOT_ACCEPTANCE",
+          "verdict": "PASS_BOUNDED_ROOT_ACCEPTED",
           "interim": "Final416PASS/10genuineSKIP,parent20FAIL4PASS; source-stage oracle and12.931Mkg downstream effect independently reproduced; no public849PR yet",
           "strict_value_reassessment": "375strong assertions across99+246+30groups; overlapping operands, not375unique pairs. Earlier264source-group count included18self-sanitychecks excluded from final246. Four known vNA metadata exceptions separately qualified.",
           "READY_sha256": "4505b86a7b9d5082bd6c7b8845f2ee9ee56a73f9735abe8bf6f833b1a25565cb",
           "manifest_entries": 2125,
-          "manifest_sha256": "dfef539aa8ffca3ff81acd1ffaba3da390b5f1c5903de47ca3410beb2997778f"
+          "manifest_sha256": "dfef539aa8ffca3ff81acd1ffaba3da390b5f1c5903de47ca3410beb2997778f",
+          "root_accepted": true,
+          "public_safe_evidence": "849-Uganda-independent/",
+          "root_acceptance": "849-Uganda-independent/ROOT-ACCEPTANCE.json"
         },
         "private_archive": "private-evidence-durability-twentysecond.json"
       },
@@ -1092,7 +1098,7 @@
     },
     "1149": {
       "issue": 1149,
-      "status": "PREPARED_UNASSIGNED",
+      "status": "LEDGER_FIRST_IMPLEMENTATION_ACTIVE",
       "candidate": "/local/job40255479/worktrees/isa-1149-acquisition",
       "control": "/local/job40255479/worktrees/isa-1149-acquisition-base",
       "branch": "fix/1149-staged-reacquisition-20261022",
@@ -1101,7 +1107,11 @@
       "ledger": ".coder/ledger/1149-staged-reacquisition.md",
       "ruling": "OptionC already decided",
       "tests_builds": 0,
-      "actual_acquisition_authorized": false
+      "actual_acquisition_authorized": false,
+      "owner": "acquisition_1149",
+      "assigned": true,
+      "ledger_first_commit_prefix": "7b5bca233",
+      "actual_acquisition": false
     }
   },
   "integration": {

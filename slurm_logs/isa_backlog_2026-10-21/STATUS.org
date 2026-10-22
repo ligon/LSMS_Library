@@ -21,7 +21,7 @@ Human merge remains the next public landing step.
 Newest PRs1201/1202/1203 have exact-head unit/windows CI success; six other jobs including data-tests were skipped in each run.
 Held-source verification is separate evidence, not a credentialed CI data-suite pass.
 
-Uganda849 and Malawi218 have each completed independent PASS reviews in separate checkouts; root final acceptance and publication remain pending.
+Uganda849 and Malawi218 have each completed independent PASS reviews in separate checkouts; root acceptance has passed; PR publication is next.
 Uganda849 has416PASS/10genuine skips and source-backed verification of the twelve reported-factor bindings and12.931Mkg downstream effect.
 Malawi218 has51PASS and stronger209saved-value checks; existing Make/scanner/request caveats remain.
 Shared1196 reader repair remains active. A new independent validation worker is reassessing earlier saved numeric evidence under1206.
@@ -40,7 +40,7 @@ Twenty-two verified owner-only archives preserve completed private evidence; act
 New validation owner1206, assigned to an independent reviewer: independently reproduced pandas exact-frame comparison accepting nullableFloat64 tiny/nextafter differences. Active reviews use explicit EA/NumPy comparisons; earlier affected frozen exact-value claims, including combined20, need separate saved-artifact reassessment. No actual product mismatch has been found and no old evidence/API/test is rewritten or replayed.
 Historical global17 remains5148PASS/4459SKIP/13FAIL/0ERROR, with its doc-child guard/mtime and stale-eight limitations.
 No later bounded increment erases that result.
-Next code-only1149 acquisition repair is prepared/UNASSIGNED at releasef8; no actual WB/S3 acquisition or data rewiring. Refreshed priority/dependency notes are in =next-actionable-queue-refreshed.json=.
+Next code-only1149 acquisition repair is assigned to acquisition_1149; ledger-first7b5bca233 published at releasef8; no actual WB/S3 acquisition or data rewiring. Refreshed priority/dependency notes are in =next-actionable-queue-refreshed.json=.
 Detailed current paths, pins, owners and qualifications are in =country-lanes.json=; dated sections below retain their original checkpoints.
 
 * Country lanes and review
@@ -59,8 +59,8 @@ PR [[https://github.com/ligon/LSMS_Library/pull/1182][1182]] at =780f67986= adds
 | Country | Current result or next step |
 |---------+-----------------------------|
 | Nigeria | Reviewed PRs1172(W3units),1178(later food-unit mappings, stacked1172),1192(community units). All OPEN; source authority and qualifier residuals stay separate. |
-| Uganda | Reviewed PRs1173(derived-output/prerequisite authority),1191(derived-method tests),1202(native production_obs).1202 preserves133761records; source and documentary reviews PASS.849's12factor mappings are frozen at491; independent PASS reported on actual085 parent, pending root acceptance/PR. |
-| Malawi | Reviewed1175 preserves recorded organic quantities;1193 retains source-covered kg declarations and stacks1175.218 removes only two obsolete raw derived registrations; author frozen atd29/815verifiedpayloads, different independent reviewer completed PASS with51tests; pending root acceptance/PR. Existing scanner/Make/request caveats remain. |
+| Uganda | Reviewed PRs1173(derived-output/prerequisite authority),1191(derived-method tests),1202(native production_obs).1202 preserves133761records; source and documentary reviews PASS.849's12factor mappings are frozen at491; independent PASS/root acceptance completed on actual085 parent, publication pending. |
+| Malawi | Reviewed1175 preserves recorded organic quantities;1193 retains source-covered kg declarations and stacks1175.218 removes only two obsolete raw derived registrations; author frozen atd29/815verifiedpayloads, different independent reviewer completed PASS with51tests; root accepted, publication pending. Existing scanner/Make/request caveats remain. |
 | Niger | Reviewed1176 quantity sentinel and1200 community builder retirement, stacked1176. Bothbackend requested-wave proof preserves46043readings/30late/76masks. Bounded19 composition independently accepted. |
 | Burkina_Faso | Reviewed1189 native input slots,1194 parcel coordinates,1203 two seed-crop labels(stacked1189).1203 preserves22877lines/602qualifiedunknowns, changes4430labels only; broader1119/1187/1188 remain OPEN. |
 | Ethiopia | Reviewed1181 missing input-unit identities retains180900rows. Nutrition1171 and source/purchase/grain residuals remain separate.820 section12 is tierC design, not an automatically assigned feature addition. |

@@ -1,0 +1,66 @@
+{
+  "status": "ROOT_ACCEPT_BOUNDED_INDEPENDENT_REVIEW",
+  "country": "Malawi",
+  "issue": 218,
+  "recorded_at_UTC": "2026-10-22T06:35:54.706198+00:00",
+  "candidate": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "actual_parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "READY_sha256": "36439ba6049b54df8f0a59a6a3260efca630019d6ff103a6a8db5c54f756c2b7",
+  "manifest_sha256": "94d5e89a4fe8f3706cda0181222a2c235e5eb137184015ef2f318254437a4a83",
+  "all_manifest_payloads_verified": 1458,
+  "complete_frozen_pathset_verified": true,
+  "safe_exports_verified": 8,
+  "actual_checker_pins_verified": 46,
+  "tracked_source_endpoints_verified": 29769,
+  "source_snapshot_scope": "All Git blobs/modes and own frozen OS receipts; no unrecorded source mtime claim",
+  "physical_copies": {
+    "origins": 32,
+    "copies": 204,
+    "all_receipts_MD5s_and_distinct_inodes_exact": true
+  },
+  "candidate_JUnit": {
+    "pass": 51
+  },
+  "actual_parent_JUnit": {
+    "fail": 1,
+    "pass": 1
+  },
+  "actual_prebuild_hash_scope": {
+    "API_total": 549,
+    "Malawi_API_changed": 26,
+    "other_API_exact": 523,
+    "framework_exact": 39,
+    "Malawi_wave_exact": 97
+  },
+  "evidence": {
+    "strong_checks": 209,
+    "unique_ordered_pairs": 177,
+    "negative_calibrations": 15,
+    "scanner_records": 205,
+    "scanner_statuses": {
+      "warn": 200,
+      "pass": 3,
+      "fail": 2
+    },
+    "scanner_bytes_exact": true,
+    "warning_qualified_pairs": 67,
+    "warning_occurrences_per_head": 353,
+    "historical_classifications": {
+      "exact": 14,
+      "expected_rejections": 8
+    }
+  },
+  "root_read_actual_runtime_test_comparator_pair_selection_and_seal_sources": true,
+  "root_verification_only_hashes_reads_JSON_XML_and_static_AST": true,
+  "no_API_pickle_source_decode_or_test_replay": true,
+  "public_PR_or_merge_or_issue_closure": false,
+  "preserved_limits": [
+    "Two preexisting scanner FAIL findings remain FAIL; Make country food builder errors remain.",
+    "Original first assembly expected operand was in memory only and is absent; later reconstructed expectations are separately named.",
+    "Inherited Make child FDs survive in full outer logs; per-call stdout/stderr strings were not captured.",
+    "Original pandas comparator exact-zero calls had a nullable Float64 precision gap; separate explicit EA/NumPy/typed-object reassessment passed.",
+    "CLI generic postread differs from API v NA representation and recursive population/recall attrs on BOTH heads; matched stages/oracles pass.",
+    "All failed metadata/artifact-only checkers and their qualifications remain; no source/API/pytest replay."
+  ],
+  "signed": "Sue"
+}

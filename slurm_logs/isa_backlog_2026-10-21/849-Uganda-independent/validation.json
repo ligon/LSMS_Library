@@ -1,0 +1,100 @@
+{
+  "verdict": "PASS_BOUNDED",
+  "pins": {
+    "candidate": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+    "parent": "0854303bc5f60daa698b2927fc3b193822a4c090",
+    "runtime": "7a8fd22492255cc2c4d020b7a16f99249f588977",
+    "tested_tests": "66bfa1eb16442ceb6d455dfaa5726f181d713abd"
+  },
+  "tests": {
+    "candidate": {
+      "total": 426,
+      "pass": 416,
+      "skip": 10,
+      "fail": 0,
+      "error": 0
+    },
+    "parent_identical_new_file": {
+      "total": 24,
+      "pass": 4,
+      "fail": 20,
+      "error": 0,
+      "skip": 0
+    },
+    "all426_author_node_identities_exact": true,
+    "skip_nodes_exact": 10,
+    "skip_messages_literal_equal": 3,
+    "skip_texts_literal_equal": 0,
+    "skip_text_qualification": "Only source-checkout/private-cache prefixes differ after exact separately recorded comparison; original raw reasons/XML preserved.",
+    "parent_failure_categories": {
+      "test_source_report_stays_with_its_own_native_quantity": 12,
+      "test_actual_wide_slots_keep_equal_and_partial_reports": 2,
+      "test_suspect_positive_reports_are_not_repaired_in_builder": 3,
+      "test_kg_not_one_is_kept_then_screened_by_existing_ladder": 1,
+      "test_declared_report_column_missing_is_loud": 2
+    }
+  },
+  "hashes": {
+    "country_hashes": {
+      "total": 549,
+      "changed": 28,
+      "unchanged": 521
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "changed": 0,
+      "unchanged": 39
+    },
+    "wave_hashes": {
+      "total": 1362,
+      "changed": 171,
+      "unchanged": 1191
+    },
+    "api_wave_hashes": {
+      "total": 2139,
+      "changed": 224,
+      "unchanged": 1915
+    }
+  },
+  "comparisons": {
+    "matched_head_subset_CLI": 99,
+    "saved_source_native_public_raw_warm_derived": 246,
+    "currency_Feature_assembly": 30,
+    "distinct_comparison_stages_total": 375,
+    "known_support_v_metadata_qualified_pairs": 4,
+    "explicit_EA_NumPy_masks_typed_attrs": true,
+    "negative_controls": {
+      "tiny_float": true,
+      "nextafter": true,
+      "dtype": true,
+      "null_mask": true,
+      "attr_type": true,
+      "attr_presence": true,
+      "order": true,
+      "unused_level": true
+    }
+  },
+  "warnings": {
+    "main_literal_pairs": 60,
+    "source_oracle_literal_pairs": 7,
+    "derived_literal_pairs": 3,
+    "all_main_pairs_literal_true": true,
+    "scanner_parent": 41,
+    "scanner_candidate": 41,
+    "scanner_all_warn": true,
+    "scanner_full_records_literal_exact": true,
+    "phase2_kwargs": [],
+    "path_normalization": null
+  },
+  "limits": [
+    "#1196 v dtype manifestation, not normalized",
+    "#1204 Make subset routing unchanged",
+    "#1205 real-area/key coverage unchanged",
+    "Author8490600->0644 and prior1198 0644->0600 are separate observations, not reproduced universal mode guarantees",
+    "Original1198 overwritten XML and first-failed-Make warning-list gaps retained",
+    "Historical GLOBAL17 13 failures/doc-child guard/mtime and stale8 qualifications retain original pins",
+    "Own literal skip comparisons, known-v full-frame assertion, nullable-float negative and warning-packaging TypeError stops retained; no API/test/source replay",
+    "Mounted pandas frame-assert nullable Float64 escape closed in NEW review checker; old evidence unchanged",
+    "No broad Uganda corpus, full suite, Niger source-cold or Make-pooled proof"
+  ]
+}
