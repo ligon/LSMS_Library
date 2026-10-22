@@ -1490,3 +1490,12 @@ Other backlog remains, including Uganda1204/1205 and prepared/unassigned integra
 Do not mark the overall campaign complete, merge automatically or restart existing protection/seal/data actors.
 
 Sue
+
+* Queue refresh and Malawi publication 2026-10-22T16:47:51.474415+00:00
+Sue. Turn classification: PROGRESS.
+Campaign head before this note: dcf19925f4f319d170fe5cfa99cef7ba3176efd4.
+PR1213 is OPEN/unmerged at47b3c5d76371acc457c5553ebf8adfb1859e115b, stacked on1208d29; independent/root acceptance complete. CI39815466875 unit/windows success, six skipped including data.
+Live queue112 records =24PR-linked+3active+85other; all27 implementation PRs individually read back OPEN/unmerged. No merge or full-campaign claim.
+Active owners: acquisition_1149 independently reviews1210; review_malawi_1209 authors1204; malawi_1209 diagnoses1205. Root released1204 narrow builder retirement after pinned source/map checks;1205 bounded diagnosis requires exact provider census/gates before copying/decoding.
+Next: finish workers, independent reviews, preserve/seal/archive new1209/1210 packets (archive27 does not cover them), then choose next per-country issues from remaining-queue-2026-10-22.org. Tracker1170 and issue1209 publication updates are prepared this turn.
+Goal stays ACTIVE; no paused/blocked/completed state.
