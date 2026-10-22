@@ -1,0 +1,26 @@
+{
+  "status": "ROOT_AUTHENTICATED_STATIC_DECISION_PACKET_ONLY",
+  "at_UTC": "2026-10-22T19:41:19.450511+00:00",
+  "pins": {
+    "READY.json": "af425bb7c6fd1c073bf8b2507c210f753cba2a4421b84ad069b6cf335ad8a034",
+    "MANIFEST.private.json": "2de89c7a583f5e477c655384319e687fd9e906798a077b75cc9ac26a500f8c8a",
+    "EXPORT-ALLOWLIST-DRAFT.json": "3da2a548fc6765089bd747df73affe52ea87673d756d61191aefcfdc9fe854cb"
+  },
+  "frozen_entries": 24,
+  "exact_safe_export_files": [
+    "proposal-safe.json",
+    "EXPORT-DRAFT.md",
+    "optional-dtype-census-safe.json"
+  ],
+  "source_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "ledger_head": "666bde649144ef57c434de593caa998519aa3330",
+  "original_source_commit_equivalence_except_ledger": true,
+  "source_epoch_qualification": "Original static source-after scope is its recorded seal interval. User subsequently authorized phase1 changes in the writer; no forever-current physical continuity claim is made.",
+  "product_imports_payloads_tests_dynamic_census": 0,
+  "human_decision": "Use declaration order (Recommended)",
+  "approved_scope": "Only constructed empty column order follows original declaration membership; populated outputs and optional dtype policy unchanged.",
+  "static_potential_order_changes": 33,
+  "static_potential_countries": 21,
+  "not_measured_runtime_failures": true,
+  "signed": "Sue"
+}
