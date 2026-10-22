@@ -407,6 +407,35 @@ def test_no_acquired_members_leave_no_completion_receipt(
     assert ("Nigeria", "2023-24") not in da._ACQUIRED_RELEASES
 
 
+@pytest.mark.parametrize("entrypoint", ["add_wave", "populate_and_push"])
+@pytest.mark.parametrize("invalid_receipt", [None, [None]], ids=["none", "invalid-path"])
+def test_invalid_push_receipt_clears_only_current_completion_and_reraises(
+        acquisition, download, monkeypatch, entrypoint, invalid_receipt):
+    """Invalid helper returns retain their original TypeError and SOURCE facts.
+
+    The helper normally promises a list of paths; this defensive cleanup is
+    separate from the six staged-placement requirements (GH1149 ledger).
+    """
+    root, source, before = acquisition
+    download["payload"] = _zip([("nested/a.dta", b"synthetic-release")])
+    unrelated = ("Ethiopia", "2021-22")
+    unrelated_receipt = object()
+    monkeypatch.setattr(da, "_ACQUIRED_RELEASES", {unrelated: unrelated_receipt})
+    monkeypatch.setattr(da, "push_to_cache_batch", lambda *args, **kwargs: invalid_receipt)
+    with pytest.raises(TypeError) as caught:
+        if entrypoint == "populate_and_push":
+            da.populate_and_push("Nigeria", "2023-24")
+        else:
+            da.add_wave("Nigeria", "6410", wave="2023-24", confirm=False,
+                        push=True, verbose=False)
+    expected = ("'NoneType' object is not iterable" if invalid_receipt is None
+                else "expected str, bytes or os.PathLike object, not NoneType")
+    assert caught.value.args == (expected,)
+    assert source.read_bytes() == before.encode()
+    assert da._ACQUIRED_RELEASES[unrelated] is unrelated_receipt
+    assert ("Nigeria", "2023-24") not in da._ACQUIRED_RELEASES
+
+
 @pytest.mark.parametrize("failure", ["staging", "placement"])
 def test_partial_failure_never_records_complete_release(acquisition, download, monkeypatch, failure):
     root, source, before = acquisition

@@ -1819,8 +1819,12 @@ def populate_and_push(country: str, wave: str,
     # The held release moves only here and in add_wave (GH #1128) -- and here
     # only once the remote holds every file, so the record never names a
     # release the shared store does not have.
-    expected = {f.resolve() for f in data_files}
-    confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in pushed}
+    try:
+        expected = {f.resolve() for f in data_files}
+        confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in pushed}
+    except BaseException:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
+        raise
     if confirmed == expected:
         _record_acquired_release(country, wave)
     else:
@@ -2459,8 +2463,12 @@ def add_wave(country: str, catalog_id: str,
     # Ledger section 4: a requested push is part of acquisition success, while
     # push=False deliberately records a complete local download.  Neither a
     # failed/partial push nor a same-length list of other files certifies it.
-    expected = {f.resolve() for f in data_files}
-    confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in result}
+    try:
+        expected = {f.resolve() for f in data_files}
+        confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in result}
+    except BaseException:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
+        raise
     if not push or confirmed == expected:
         held = _record_acquired_release(country, wave, entry=entry)
         if held is not None:
