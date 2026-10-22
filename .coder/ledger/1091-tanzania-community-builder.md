@@ -311,7 +311,10 @@ no author PASS, GitHub write, public merge or issue closure.
   representation is claimed for them.
 - LIMIT (section 4): preserve preparation's approved-deleted-file snapshot stop
   before staging/decode/API. Preserve the later CLI wrapper-path stop, its
-  endpoints/log/script and original partial aggregate. Earlier first public/
+  endpoints/log/script and original per-call frames. The archive glob missed
+  the partial summary aggregate before resumption; its original bytes/size/SHA
+  are unavailable. Completed aggregate, both freezer failures and a distinctly
+  named NOT-ORIGINAL reconstruction are retained for independent assessment. Earlier first public/
   Feature/API controls succeeded; the failed CLI invocation never opened its
   wrapper or touched caches. Only the missing first CLI tail resumed in a
   separate guarded process, without replaying earlier successful observations.
@@ -328,3 +331,10 @@ no author PASS, GitHub write, public merge or issue closure.
   modes against immutable Git plus the original physical modes. No source
   link rewrite, API/source decode or test replay is needed. Independent review
   must use the literal-reader helper, not treat normalized receipts as literal.
+
+- LIMIT (section 4): freezer2 exposed the missed partial-aggregate archive.
+  Correct every earlier archive claim: seven original per-call observations
+  and endpoints/log/script survive, but the overwritten partial JSON bytes,
+  size and SHA were not recorded. A reconstruction from surviving summaries
+  is explicitly NOT ORIGINAL. Independent review must assess this gap; no
+  source/API/test work is replayed and no runtime changes are authorized.
