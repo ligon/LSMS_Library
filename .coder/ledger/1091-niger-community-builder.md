@@ -153,6 +153,14 @@ The full report and aggregate validation live at
   observations show zero changes/full native equality, but cannot explain
   that original delta. It is separate from the normal validated matrix.
   No further auxiliary repeats were run to obtain zero writes.
+- LIMIT (anchored on section 4): first-freeze export packaging replaced the
+  private detailed aggregate validation.json with its safe export before the
+  first manifest. Its original final size/SHA were not recorded. The safe
+  replacement and both freeze attempts remain; a separately named aggregate
+  reconstruction uses unchanged per-probe artifacts, without claiming original
+  bytes. No API/source/test replay was used. The corrected freeze inventories
+  its exact path boundary and isolates safe exports; independent instructions,
+  REPORT, READY and residual text disclose this qualification.
 - OK (anchored on section 6): Tanzania remains residual and Mali is
   independently handled. No multi-country completion, composition, GitHub
   write or final independent PASS is claimed. Final freeze receipts prove
