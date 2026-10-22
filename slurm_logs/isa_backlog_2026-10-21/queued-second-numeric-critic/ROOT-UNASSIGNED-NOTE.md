@@ -1,0 +1,1 @@
+Prepared source/private metadata only. No agent is assigned. The first critic owns all22earlier PR cohorts until root explicitly dispatches a second critic. Read the primary full brief plus proposed second-critic brief/authoritative records/helperpins before any import or decode.

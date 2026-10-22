@@ -1,0 +1,138 @@
+{
+  "cohorts": {
+    "parent-minimal": {
+      "total": 1,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "receipt": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/parent-minimal.xml",
+        "mode": 384,
+        "mtime_ns": 1792650880293176658,
+        "bytes": 2493,
+        "inode": 53618097,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "e43351401a0b0c18aefbe57a5e4499a828afef899934cc0d1d24030b35cb3379"
+      }
+    },
+    "candidate-v1": {
+      "total": 259,
+      "failures": 3,
+      "errors": 0,
+      "skips": 0,
+      "receipt": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/candidate-v1.xml",
+        "mode": 420,
+        "mtime_ns": 1792651414243265513,
+        "bytes": 45144,
+        "inode": 53618142,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "5052fa6a84abe06aa319b5ca40a39d06b03b2bca38748d1dcf17981e9980e00e"
+      }
+    },
+    "candidate-v2": {
+      "total": 3,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "receipt": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/candidate-v2.xml",
+        "mode": 384,
+        "mtime_ns": 1792651509111778901,
+        "bytes": 707,
+        "inode": 53618150,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "bc00ce471bc2002e591facf537d31f65bef2bca7cd3bef6b9166318216c95470"
+      }
+    },
+    "candidate-final": {
+      "total": 262,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "receipt": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/candidate-final.xml",
+        "mode": 384,
+        "mtime_ns": 1792651659035573173,
+        "bytes": 38698,
+        "inode": 53618159,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "bc8800c9fdfcb01fe76c8a23d7d6bea004ab00319451e5c7ff772ddf150dfd50"
+      }
+    },
+    "candidate-current": {
+      "total": 266,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "receipt": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/candidate-current.xml",
+        "mode": 384,
+        "mtime_ns": 1792652174559394248,
+        "bytes": 39330,
+        "inode": 53618197,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "87ba2037b889ac05003ba3e86aeb21c95d53e929eb06afff097e4a4920b410ab"
+      }
+    },
+    "parent-final": {
+      "total": 43,
+      "failures": 41,
+      "errors": 0,
+      "skips": 0,
+      "receipt": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/parent-final.xml",
+        "mode": 384,
+        "mtime_ns": 1792651702411805890,
+        "bytes": 105306,
+        "inode": 53618163,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "a6ca02f8a5e312c04cb9972342211c4728216ad015f9bee084bf19461f11e816"
+      }
+    },
+    "parent-four": {
+      "total": 4,
+      "failures": 4,
+      "errors": 0,
+      "skips": 0,
+      "receipt": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/parent-four.xml",
+        "mode": 384,
+        "mtime_ns": 1792652307010144950,
+        "bytes": 9954,
+        "inode": 53618214,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "e003ac7f425fae28efcb128f906abb0747d9e47e2b23cd450570d68d1247c96f"
+      }
+    }
+  },
+  "parent_47_distinct_cases": "43 earlier cases41FAIL2PASS plus4 later cases4FAIL; separate XMLs, not one47case invocation",
+  "current_266_file_counts": {
+    "staged_reacquisition": 45,
+    "wave_provenance": 157,
+    "data_access": 41,
+    "intree_source_policy": 17,
+    "no_runtime_config_writes": 6
+  },
+  "expected_mocked_bad_GPG_warning": 1,
+  "strict_api_surface_audit": {
+    "strict": true,
+    "terminal_success": true,
+    "script_sha256": "6825f6f22dee8c49c772e09260c475a689be9eaba90a6bccbd47761588021697",
+    "zero_data_endpoint_changes": true
+  }
+}

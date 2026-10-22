@@ -1,0 +1,16 @@
+{
+  "artifact_v2_safe_summary_wrapper": {
+    "terminal": 1,
+    "error": "TypeError",
+    "cause": "summary selector included integer common_column_count with per-column dictionaries",
+    "scope": "stdlib JSON-only display after guarded comparator exited0",
+    "corrected_unique_display": "excluded non-dictionary entries; no comparator/API replay"
+  },
+  "private_cwd_git_status_wrapper": {
+    "terminal": 128,
+    "cause": "git status/rev-parse run from the private non-repository directory",
+    "scope": "read-only git inspection only",
+    "corrected": "separate exact candidate and parent cwd status/head checks"
+  },
+  "original_tool_outputs": "remain in session transcript; no pre-existing private raw log was captured for these two wrappers"
+}

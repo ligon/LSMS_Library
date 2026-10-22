@@ -1154,7 +1154,7 @@
     },
     "1196": {
       "issue": 1196,
-      "status": "REPAIR_ACTIVE; DEFAULT23PAIRSPASS; MAKE14STRICTFAILURES_UNDER_SAVED_ARTIFACT_CLASSIFICATION; NO_ACCEPTED_FIX_PR",
+      "status": "ROOT_APPROVED_BOTH_WAVE_ROUTES_EXPANSION_APPLIED; NEW_TARGETED_CONTROLS_RUNNING",
       "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
       "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
@@ -1193,7 +1193,11 @@
         "sources": "All17declared held sources available; four-root physical gate running before decode/API, actual NigerMake now required aswell.",
         "stage1_chronology": "Manifest includes rootapproval FILE; sealing-before-approval claim is limited to receipt/read of explicit proceed MESSAGE, no product/import before proceed."
       },
-      "make_saved_classification": "12indexNApolicy bypasses;2preexisting Uganda singleton differences include5vs3columns,824rows andunusedlevels; full classification/proposedparquet-only helper pending"
+      "make_saved_classification": "12indexNApolicy bypasses;2preexisting Uganda singleton differences include5vs3columns,824rows andunusedlevels; full classification/proposedparquet-only helper pending",
+      "expansion_ledger_first": "29cb3cf8d",
+      "expansion_patch_sha256": "942527406d9abaa3a58e853b11255ef5740de4d59a982ca028dd72dce7b26c31",
+      "original795_stop_receipts_root_verified": true,
+      "actual_expansion_scope": "549/549API,39/39framework,1362/1362wave changed vsBOTHbd80andf8;exactkeysets,0dataendpointchanges;no newcandidate sourcebuild yet"
     },
     "1206": {
       "issue": 1206,
@@ -1218,11 +1222,32 @@
         18,
         19
       ],
-      "critical_private_archive": "private-evidence-durability-twentythird.json"
+      "critical_private_archive": "private-evidence-durability-twentythird.json",
+      "proposed_second_critic": {
+        "source": "/local/job40255479/worktrees/isa-review-comparator-values-second",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment-second",
+        "prepared": true,
+        "assigned": false,
+        "primary_still_owns_all22": true,
+        "proposed_PRs": [
+          1172,
+          1173,
+          1175,
+          1176,
+          1178,
+          1180,
+          1181,
+          1182,
+          1185,
+          1186,
+          1189,
+          1191
+        ]
+      }
     },
     "1149": {
       "issue": 1149,
-      "status": "AUTHOR_FINAL_EVIDENCE_FREEZE_PENDING; NO_INDEPENDENT_REVIEW_OR_PR",
+      "status": "AUTHOR_FROZEN_ROOT_PREPARATION_VERIFIED; INDEPENDENT_REVIEW_ASSIGNED",
       "candidate": "/local/job40255479/worktrees/isa-1149-acquisition",
       "control": "/local/job40255479/worktrees/isa-1149-acquisition-base",
       "branch": "fix/1149-staged-reacquisition-20261022",
@@ -1239,7 +1264,21 @@
       "runtime_head_prefix": "f85a871fb",
       "candidate_tests": "266PASS/0SKIP;1expectedmockedwarning",
       "parent_controls": "43finalcases41expectedFAIL2PASS,plus4newcompletionreceiptcases4expectedFAIL in separate cohort",
-      "actual_hash_scope": "0of549API/39framework/1362wave moves"
+      "actual_hash_scope": "0of549API/39framework/1362wave moves",
+      "source_head": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+      "runtime_tests_head": "f85a871fb8772b0bf1c296927e739ea0f7211214",
+      "author_READY_sha256": "8b6dab49f9d877103ad498ae9f48c2cd516e628a32b7afdb47541fbbfd1f3ffd",
+      "author_manifest_entries": 4014,
+      "author_manifest_sha256": "1473e07580fcb9f203b1cea218bc91d1129b251816ce6d97559eef916910f435",
+      "author_safe_evidence": "1149-author/",
+      "independent_review": {
+        "owner": "review_acquisition_1149",
+        "source": "/local/job40255479/worktrees/isa-review-1149-acquisition",
+        "control": "/local/job40255479/worktrees/isa-review-1149-acquisition-base",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition",
+        "brief": "queued-1149-review/NEXT-REVIEW-BRIEF.md",
+        "status": "ASSIGNED; no independentverdict yet"
+      }
     }
   },
   "integration": {

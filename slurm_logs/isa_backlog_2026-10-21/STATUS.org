@@ -27,7 +27,7 @@ Safe proof is =1206-critical-numeric-supplement/=.
 Earlier22implementation-review cohorts and integrations17/18/19 still require separate retrospective reassessment;1206 remains OPEN.
 Old NA/JSON/writer-index/empty/id_converted and overwritten populated-child-log limits remain; no API/source/test replay or old evidence rewrite.
 
-Shared1196 generic-reader repair remains active. Default candidate23/23 cold/warm pairs pass; actual Make verification retained14strict mismatches and is classifying saved operands.
+Shared1196 originalbd80Default23/23pass/Make14strictstops remain frozen. Root approved exact shared parquet-only expansion across generic/YAML/script paths after verifying795old receipts. Ledger-first29cb3cf8d, exactpatchapplied, actual549/39/1362allmove versusBOTHbd80andf8 with0dataendpointchanges; new targetederror/race/script controls running before sourcebuilds.
 No full Make acceptance, independently accepted repair or PR is claimed.
 Code-only1149 writer acquisition_1149 has ledger-first7b5bca233 and262synthetic/acquisition-provenance tests PASS; actual-parent controls and scoped held-warm gates continue.
 No actual WB/S3 acquisition or country data rewiring is authorized in that task.

@@ -1,0 +1,10 @@
+{
+  "status": "ROOT_APPROVAL_CONDITIONS_MET",
+  "original795_full_SHA_MD5_size_mode_mtime_inode_device_nlink_symlink_receipts_verified": true,
+  "candidate_bd80_clean_and_two_source_pins_exact": true,
+  "bd80_control_checkout_metadata_prepared_and_terminal": true,
+  "exact_patch_sha256": "942527406d9abaa3a58e853b11255ef5740de4d59a982ca028dd72dce7b26c31",
+  "author_may_proceed_with_exact_approved_expansion_and_tests": true,
+  "independent_acceptance_or_PR_claimed": false,
+  "signed": "Sue"
+}
