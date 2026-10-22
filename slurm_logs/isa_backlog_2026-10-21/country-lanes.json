@@ -1046,14 +1046,20 @@
         "path": "/local/job40255479/worktrees/isa-Uganda-1204",
         "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
         "ledger": "a53f71bad6a26307eb83d051b57a6cdd9c9424cc",
-        "status": "Author implementing country wave-coverage routing; phase0/root source gate accepted; runtime proof pending."
+        "status": "Author implementing country wave-coverage routing; phase0/root source gate accepted; runtime proof pending.",
+        "source_head": "69bcbd5ff",
+        "source_status": "Root inspected narrow Make/doc diff; test-fixture correction committed; new exact-parent tests and fingerprint census in progress. No held-provider staging yet."
       },
       "current_1205": {
         "owner": "malawi_1209",
         "path": "/local/job40255479/worktrees/isa-Uganda-1205",
         "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
         "ledger": "309215e28bc12924ea22a7d15cf0b4c89591e696",
-        "status": "Read-only source/native/API area-coverage diagnosis; bounded data stage conditional on provider authentication."
+        "status": "Read-only source/native/API area-coverage diagnosis; bounded data stage conditional on provider authentication.",
+        "provider_metadata_root_gate": "Uganda1205-provider-census-root.json",
+        "provider_count": 53,
+        "provider_bytes": 49160847,
+        "source_stage": "Worker reports actual binary authentication and distinct-copy gates terminal0; no root scientific acceptance yet."
       }
     }
   },
@@ -1856,6 +1862,15 @@
     "author_head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
     "status": "Frozen author repair; independent held-source runtime review in progress; no PR yet.",
     "tests": "Independent candidate28PASS/actual release17FAIL11PASS; existing21PASS/APIaudit0. Held-source grid and strong comparisons still in progress.",
-    "scope": "Framework fingerprints all549country/39framework/1362waves move; no corpus output certification."
+    "scope": "Framework fingerprints all549country/39framework/1362waves move; no corpus output certification.",
+    "review_interim": "Reviewer reports all50strict pairs/4cold/4warm/2scanners/directbad-mixed controls completed; root found circular guard PID classification. Original sealed v1 remains immutable, additive sibling attribution/current-pin supplement pending; no final root acceptance."
+  },
+  "latest_archive_checkpoint": {
+    "archive_count": 28,
+    "receipt": "private-evidence-durability-twentyeighth.json",
+    "covers": "Malawi1209author/independent,1210author,rootgatecopies",
+    "excludes": "live independent1210 and both Uganda tasks",
+    "native_parquet_operands_retained": 50,
+    "raw_cache_runtime_exclusions": 1868
   }
 }
