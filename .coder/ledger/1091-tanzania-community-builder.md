@@ -1,4 +1,4 @@
-# Prior-Art Ledger - GH1091 Tanzania community builder diagnosis
+# Prior-Art Ledger - GH1091 Tanzania community builder retirement
 
 Sue (GPT-6), 2026-10-21. Search tier: ripgrep + git floor.
 Baseline: reviewed Tanzania PR1185 head
@@ -9,13 +9,15 @@ This ledger is committed before new diagnosis functions or analysis.
 
 ## Section 1: Task, restated
 
-Diagnose the Tanzania community-price country concatenator and actual Make
-DAG, including normal default/Make all, supported-singleton, unsupported and
-combined requests at target-cold, fresh-process warm and populated stages.
-Produce a concrete minimal retirement proposal and discriminating test plan;
-do not implement a candidate. GH788 settles framework authority. GH840/1086
-settles the source variety/visit/observation representation. No science,
-eligibility, unit basis, identifiers, grain or household crosswalk changes.
+Retire only the Tanzania community-price country concatenator and original
+five-line Make discovery/country-rule block, reusing authoritative framework
+wave aggregation and the existing selector. Verify real both-backend subsets,
+source fidelity, full typed attrs/axes, native writes and healthy assembly.
+The completed read-only diagnosis is frozen separately at 99c824079; root
+approved this concrete implementation boundary before the published pre-code
+ledger revision aa9745963. GH788 settles framework authority and GH840/1086
+native variety/visit/observation representation. No science, eligibility, unit
+basis, identifiers, grain, household crosswalk or framework changes.
 
 ## Section 2: Existing machinery
 
@@ -79,8 +81,10 @@ constraints over older skill examples suggesting cache clears or NO_CACHE.
 
 ## Section 4: Invariants and validation boundary
 
-- Read-only production/config/tests. The only tracked edit authorized now is
-  this task ledger. No candidate patch or candidate build is authorized.
+- Production is limited to the approved country-script deletion and five Make
+  lines. Additional tracked scope is one new targeted test file, this ledger,
+  a dated CONTENTS addition at the actual end and safe aggregate reports.
+  All remaining runtime/config/schema/framework/dependency bytes stay exact.
 - New private root only; never reuse or mutate the frozen Niger/1078/849/Mali
   source or evidence roots. Safe exports get a dedicated safe-exports/
   directory; never overwrite a private aggregate basename.
@@ -113,18 +117,19 @@ Reuse existing authoritative wave aggregation, fresh Make discovery, required
 column guards, source helpers and cache machinery. No new concatenator,
 grain/ID design, selector or scientific transform is needed. Diagnostic
 wrappers and independent source/count receipts are private analysis only.
-The concrete eventual removal allowlist and baseline-negative tests will be
-proposed after measurement, not inferred from Niger or Mali.
+The removal allowlist was approved from measured Tanzania evidence, not inferred
+from Niger or Mali. Reuse the existing GH1039 real-selector/Make test pattern;
+the new file preserves explicit six-wave/folder-map coverage and full equality.
 
 ## Section 6: Open scope and stop
 
 No new human authority/grain decision is requested: framework authority is
-settled. Finish the read-only diagnosis/proposal and stop for ROOT review
-before implementation. Source gaps or contradictions are evidence to report,
-not permission to acquire, infer a fallback or extend scope.
+settled. Author validation is complete and frozen for a different independent
+reviewer before public acceptance. Source gaps or contradictions are evidence
+to report, not permission to acquire, infer a fallback or extend scope.
 No GitHub write, public merge or issue closure.
 
-## Phase 3: Verification
+## Frozen diagnosis verification (prior phase)
 
 Read-only diagnosis complete; concrete proposal awaits ROOT review before any
 implementation. Safe evidence lives in
@@ -262,3 +267,55 @@ Keep safe exports separate from private basenames. Report substantive unexpected
 behavior before expansion. Freeze a clean attributed published author head,
 strict evidence and zero consumers for a DIFFERENT independent reviewer;
 no author PASS, GitHub write, public merge or issue closure.
+
+## Implementation verification - author complete, independent review pending
+
+- OK (sections 2/5): published runtime/test pin
+  `cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270` removes exactly 45+5 lines in the
+  two approved production paths. All surviving Make bytes, both source
+  builders/helper/mappings/IDs/schema/xwalk/framework and reviewed 408-unit
+  plot-input runtime/tests remain exact. No new concatenator or selector.
+- OK (section 4): actual prebuild inventory measures 549 API cells: 25
+  Tanzania hashes move, 524 others and 39 framework fingerprints remain exact.
+  This country-wide re-warm cost remains explicit; other tables were not built.
+- OK (sections 2/4): actual fresh Make discovery finds no country builder,
+  including the generic country route. Both wave rules and real Make all
+  dry-runs remain available. The same unchanged new test file gives parent
+  20 failures/7 passes versus candidate 27 passes, zero errors/skips. Existing
+  focused58 and direct mounted API audit pass. Eleven existing held-data
+  assertion bodies pass per head, separately from pytest case counts.
+- OK (sections 3/4): two held modules pass terminal MD5/SHA/physical-copy gates
+  in fresh parent/candidate roots (80 initial plus eight populated raw copies).
+  Direct source oracles retain 3076/14623 readings with exact own price/basis,
+  variety, native/writer/walked/normalized/raw/default/public frames. All
+  positive comparisons include unused levels/codes, classes/dtypes/order/nulls
+  and typed attrs with immutable record `_FIELDS` presence/values at zero
+  numeric tolerance. No source eligibility or native grain changed.
+- OK (section 4): each head runs20cold/20fresh-process-new-object-warm/
+  20populated requests. All candidate subsets are correct on both backends;
+  cold/warm full frames are exact. Default warm/populated zero writes are
+  measured. Make creates no country cache and preserves a genuinely current
+  populated one, while natural native modifications/deletions are classified.
+- OK (section 4): current/full-coverage Mali40218 and Tanzania+Mali Feature57917
+  full frames match separately for default/None currency. Candidate Make
+  Tanzania-only Features match authoritative argument-matched default frames.
+  Sixteen CLI artifacts pass matched full Arrow/schema/byte controls. Four
+  scanner warning records are individually accounted and complete multisets
+  match exactly; no CP phase2 kwargs grid. No first-cold Feature claim.
+- LIMIT (section 4): cold unsupported output follows the existing no-builder
+  object Description contract; old fallback/covered-cache string Description
+  and covered id_converted, source/native dtype serialization and JSON attrs
+  type distinctions remain explicit full-comparison qualifications. No dtype
+  normalization, attr stripping or global repair was used.
+- LIMIT (section 4): preserve preparation's approved-deleted-file snapshot stop
+  before staging/decode/API. Preserve the later CLI wrapper-path stop, its
+  endpoints/log/script and original partial aggregate. Earlier first public/
+  Feature/API controls succeeded; the failed CLI invocation never opened its
+  wrapper or touched caches. Only the missing first CLI tail resumed in a
+  separate guarded process, without replaying earlier successful observations.
+  Both corrections are private harness changes; runtime/tests stay pinned ccc.
+- OK (section 6): safe exports are separate from private payload basenames;
+  raw frames, IDs, coordinates, warnings and tracebacks remain private. Final
+  READY/proof freezes source/reference receipts and zero consumers. No broad
+  suite/corpus, AG/FCT/food build, acquisition, bypass, shared cache mutation,
+  GitHub write, public merge, issue closure or author PASS is claimed.
