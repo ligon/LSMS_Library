@@ -4686,7 +4686,8 @@
     "Only two community modules and current/full-coverage warm Mali cache staged; no other table corpus rebuild.",
     "Retain strict source/native serialization and empty Description/id_converted differences; JSON record type changes are compared at matched stages.",
     "Preserved candidate preparation deleted-file snapshot stop and CLI wrapper-path stop; no production/read-gate changes or raw diagnostics exported.",
-    "First candidate public/Feature observations were not replayed after CLI stop; only missing first CLI controls resumed in another process with separate endpoints."
+    "First candidate public/Feature observations were not replayed after CLI stop; only missing first CLI controls resumed in another process with separate endpoints.",
+    "Original source snapshots contain normalized representations for four convenience links per head; they never recorded literal target bytes. Separate final literal-reader receipts compare to immutable Git and original physical modes; stopped freezer and both originals remain preserved."
   ],
   "runtime_pin": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
   "parent_pin": "99c824079da480ab2646e499c06ac70e457ff271",
@@ -4731,6 +4732,20 @@
       "prior_successful_first_public_Feature_API_calls_preserved_not_replayed": true,
       "missing_CLI_tail_resumed_in_separate_guarded_process": true,
       "separate_endpoints_and_original_partial_aggregate_archived": true
+    },
+    {
+      "stage": "first strict freeze",
+      "reason": "Initial source snapshot used Path.readlink().as_posix for four tracked convenience links per head, normalizing literal target bytes.",
+      "original_snapshots_and_stopped_freezer_preserved": true,
+      "original_snapshot_literal_bytes_claimed": false,
+      "correction": "Separate literal os.readlink receipts checked against immutable Git blob/mode, plus exact original physical modes.",
+      "source_link_rewrite_or_API_decode_test_replay": false,
+      "paths": [
+        "Kyrgyz Republic",
+        "Serbia and Montenegro",
+        "South Africa",
+        "_"
+      ]
     }
   ],
   "historical_diagnosis_qualification": "Frozen diagnosis retains its original auxiliary unpickle/text-only launch qualifications and absent first-cold Feature snapshot; it is not rewritten by these author results.",

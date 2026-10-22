@@ -25,6 +25,12 @@ operation. Its missing tail resumed separately without replaying those first
 observations. Original diagnosis qualifications remain frozen. No first-cold
 Feature, broad-suite or whole-corpus coverage is claimed.
 
+Also preserve the first strict-freeze stop: four convenience links per head
+were initially hashed through Path.as_posix, not as literal targets. Separate
+os.readlink receipts verify immutable Git blob/mode and original physical modes;
+original snapshots and stopped freezer remain. No link rewrite or API/test
+replay occurred. Independent review must use the literal-reader helper.
+
 Eventual PR must stack on the actual open/unmerged PR1185 branch
 fix/1118-tanzania-unknown-units-20261021 at e75be9c56fa6c318ce32cea5a8be6d448578bed1
 until its human merge. No GitHub write, public merge or issue closure occurred.

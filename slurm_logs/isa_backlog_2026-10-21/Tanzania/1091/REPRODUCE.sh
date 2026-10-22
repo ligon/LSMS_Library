@@ -23,6 +23,9 @@ R=/local/job40255479/worktrees/isa-Tanzania-1091-fix
 #11existing held assertion bodies, direct mounted audit and phases1/2 scanner.
 # Candidate also runs existing58focused cases with2loadfileworkers/threads1.
 # bash "$P/run.sh" candidate analysis "$P/analyze-composition.py"
+# Preserve normalized-link source snapshots and stopped freeze-final.py.
+# Final freeze-final-v2.py uses separate literal os.readlink/Git receipts;
+# never rewrite links or present the original snapshots as literal bytes.
 # Read-only checks below are safe on the frozen checkout:
 git -C "$R" rev-parse HEAD
 git -C "$R" status --short

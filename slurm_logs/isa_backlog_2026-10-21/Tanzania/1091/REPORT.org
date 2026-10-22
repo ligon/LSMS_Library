@@ -86,6 +86,9 @@ Candidate preparation initially stopped while snapshotting the approved deleted 
 The first candidate extras stage completed valid public/Feature/API controls before its CLI subprocess failed to find the private wrapper at a per-head path.
 That failed CLI invocation never opened the wrapper, issued no CLI API call and changed no cache; its endpoints, log, script and original partial aggregate are archived.
 Only the missing first CLI tail resumed through the corrected shared path in another guarded process; prior successful first public/Feature observations were not replayed.
+The first strict freezer stopped because initial source snapshots hashed four convenience symlink targets per head through Path.readlink().as_posix, which normalized literal target bytes.
+Those original snapshots did not record literal link bytes; both originals and the stopped freezer are preserved.
+Separate corrective receipts use literal os.readlink bytes against immutable Git blob/mode and the original physical modes, without rewriting links or replaying APIs/tests.
 No production/test change followed runtime pin cccdc1b5b.
 The frozen diagnosis retains its original auxiliary launch and absent-first-cold-Feature qualifications.
 
