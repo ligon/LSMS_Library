@@ -1773,18 +1773,27 @@ class Wave:
         return None
 
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
-    def grab_data(self, request: str) -> pd.DataFrame:
+    def grab_data(self, request: str, *, _with_origin: bool = False) -> pd.DataFrame | tuple[pd.DataFrame, str]:
         '''
         get data from the data file
         Input:
             request: str, the request data name (e.g. 'cluster_features', 'household_roster', 'food_acquired', 'interview_date')
         Output:
             df: pd.DataFrame, the data requested
+
+        ``_with_origin`` is private producer plumbing for ``food_acquired``.
+        It returns (frame, origin) without adding public DataFrame attributes.
+        Origin describes the route that supplied this result, not whether its
+        cache path still exists (GH #1078; task ledger sections 2 and 4).
         '''
+        def result(frame, origin):
+            return (frame, origin) if _with_origin else frame
+
         if request not in self.data_scheme:
             warnings.warn(f"Data scheme does not contain {request} for {self.name}")
-            return pd.DataFrame()
+            return result(pd.DataFrame(), 'missing')
         data_info = self.resources.get(request, None)
+        origin = 'memory'
 
         # --- L2-wave cache check (YAML-path only) ---
         # Script-path tables (data_info is None) already get L2-wave parquets
@@ -1807,7 +1816,7 @@ class Wave:
             # hit is returned as stored -- no map_index, no t filter, no write.
             df_cached = self._read_l2_wave_cache(request, cache_path)
             if df_cached is not None:
-                return df_cached
+                return result(df_cached, 'parquet')
 
         def check_adding_t(df):
             index_list = df.index.names
@@ -2157,7 +2166,7 @@ class Wave:
                 makefile_path = self.file_path.parent /'_'/ "Makefile"
                 if not makefile_path.exists():
                     warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
-                    return pd.DataFrame()
+                    return result(pd.DataFrame(), 'missing')
 
                 cwd_path = self.file_path.parent / "_"
                 relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
@@ -2176,9 +2185,10 @@ class Wave:
 
             if parquet_fn is None:
                 logger.warning(f"Parquet file for {request} still missing after running Makefile.")
-                return pd.DataFrame()
+                return result(pd.DataFrame(), 'missing')
 
             df = pd.read_parquet(parquet_fn)
+            origin = 'parquet'
             # GH #868: the wave script ran out of process; whatever its
             # reducer reported lives only in the stamp it wrote.
             _replay_wave_stamp(parquet_fn, self.country.name, request, self.year)
@@ -2221,6 +2231,7 @@ class Wave:
                                 datetime_audit=wave_datetime_audit(
                                     self.country.name, request, self.year),
                                 build_drops=wave_drops)
+                origin = 'materialized'
                 _mark_degraded_written(
                     (self.country.name, request, self.year), wave_drops)
             except (OSError, ValueError, ArrowInvalid) as exc:
@@ -2232,7 +2243,7 @@ class Wave:
                     f'{self.country.name}/{self.year}/{request}: {exc}'
                 )
 
-        return df
+        return result(df, origin)
 
     # This cluster_features method is explicitly defined because additional processing is required after calling grab_data.
     # GH #871: tagged so SITE 2 is in a fingerprint.  Measured before this tag:
@@ -2303,15 +2314,18 @@ class Wave:
         return df
     
     # Food acquired method is explicitly defined because potentially categorical mapping is required after calling grab_data.
+    # GH #1078: this content-producing compatibility route must invalidate
+    # already-corrupt current-hash country caches as well as prevent new ones.
+    @build_transform(tables=['food_acquired'])
     def food_acquired(self) -> pd.DataFrame:
-        df = self.grab_data('food_acquired')
+        df, origin = self.grab_data('food_acquired', _with_origin=True)
         if df.empty:
             return df
-        # if food_acquired data is loaded from a parquet file, we assume its unit and food label are already mapped.
-        # GH #803: only a data_root parquet counts.  An in-tree file is not
-        # an input -- not even as an existence test that steers behaviour.
-        external_parquet = self._script_parquet_candidates('food_acquired')[0]
-        if external_parquet.exists():
+        # Use the actual producer, not a later existence check: a concurrent
+        # normal rebuild may already have evicted the script cache we read.
+        # Successful YAML materialization also supplied a completed frame;
+        # failed/disabled writes remain memory producers (ledger section 4).
+        if origin in ('parquet', 'materialized'):
             return df
         #Customed
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
