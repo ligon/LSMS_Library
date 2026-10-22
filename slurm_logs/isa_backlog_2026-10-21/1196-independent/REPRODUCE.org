@@ -1,0 +1,23 @@
+#+TITLE: Independent GH1196 review commands and evidence
+#+AUTHOR: Sue
+
+These commands already ran in the private review prefix; frozen outputs must never be rerun or overwritten.
+New reviewers need new worktrees, root-prepared exact ignored metadata exceptions and new private roots.
+
+The exact launcher is run.sh, entry.py and sitecustomize.py, pinned in proof.json and the final manifest.
+All runtime uses /local/job40255479/venv_img/bin/python under unshare -rn, exact source identity, private paths, active guards and threads/build workers one.
+The complete source/test arguments are in tests-candidate-command.json and tests-actualf8-command.json.
+Candidate pytest used two loadfile workers once; actual-f8 controls ran afterward with two, with no overlapping pytest run.
+
+Order: preflight.py (original failed path-set check retained, corrected version terminal zero); candidate/base hash-census.py; calibrate.py; candidate tests and actual-f8 copied controls; prepare-held.py; four collect.py cold actors; four fresh-process collect.py warm actors; actual candidate/base scoped-scanner.py and cli-capture.py; compare.py corrected module import (570 pairs); footer-author.py (22 frozen footer pairs); extras-compare.py corrected literal schema expectation; source-review.py and post-protect.py.
+No actual data actor was restarted to repair an artifact checker.
+All process outputs have distinct retained stdout/stderr names; the documented first host-Python metadata-only setup exception is a transcribed tool-result boundary.
+
+results/{candidate,base}-{default,make}/{cold,warm}/ contains native/raw/public/Feature frames, writer incoming/prepared frames, full warning records, endpoint receipts, current hashes/coverage and imported-module provenance.
+comparison-private.json contains every full or separately qualified check and the immutable input receipts; original strict stops remain private.
+source-gates-before-copy-private.json records all declaration/physical/size-omission/binary-MD5 gates before the first source copy.
+protection-before-private.json and protection-after-private.json pin old evidence and six complete source snapshots.
+The final manifest also pins checker source and all failed versions.
+Only seven safe-exports files may be published; rows, identifiers, coordinates, complete warning messages and traces remain private.
+
+Sue

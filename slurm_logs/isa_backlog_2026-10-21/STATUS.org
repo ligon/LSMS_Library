@@ -12,7 +12,32 @@ The 37 partial records carry exact residual titles and bodies in =triage.json=; 
 =summary.json= records the tier and dependency ordering; unresolved enhancement/acquisition choices are reported for the maintainer.
 Existing rulings in issues such as #851, #894 and #1134 are binding implementation context, not unanswered questions to ask again.
 
-* Current checkpoint -- 2026-10-22T06:53:02.010069+00:00
+* Current checkpoint -- 2026-10-22T13:39:00+00:00
+
+There are 25 published implementation PRs, all unmerged at the last complete checkpoint.
+The independent GH1196 repair is now root accepted and being published as the next PR.
+Its candidate =ee520afeb11ea028a76a371e0c89dc2aba6ad0a4= preserves tested runtime =7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1=.
+The independent review passes 149 tests; actual-release controls give 23 meaningful dtype failures and one pass.
+All eight held-source actors and 44 candidate cold/warm full-frame pairs pass.
+The 570 overlapping comparison groups comprise 438 full exact, 130 recorded-policy qualifications and two pre-existing Uganda singleton qualifications, with no unexplained differences.
+The scoped scanner retains 26 warnings and one existing failure.
+All 549 country, 39 framework and 1,362 declared-wave fingerprints move; this is a measured invalidation cost, not corpus-wide output coverage.
+Root verified the complete 1,113-entry independent manifest, 89,298 tracked source receipts, 1,935 old frozen entries, 17 providers and 68 distinct copies without replaying data or tests.
+See =1196-independent/= for the seven safe exports and root acceptance.
+
+PR1211 exact-head CI run 39782394614 succeeded: unit-tests and windows-smoke passed; six other jobs, including data-tests, were skipped.
+That is separate from local acquisition-control evidence; no real release refresh ran.
+Two critics continue the disjoint 12/10 earlier-cohort saved-evidence reassessment under GH1206.
+Frozen PR1175 and PR1192 findings preserve full-axis failures, with explicit source-bound domain characterizations; root classification remains pending.
+Tanzania, Mali and Burkina Faso numeric supplements also remain pending root acceptance.
+No broad all-PR suite or corpus verdict is claimed.
+
+Malawi GH1209 is now explicitly assigned in an isolated worktree on actual PR1208 head =d29a56783d08a8a647e2622150a4ee5fbdd7246a=.
+The agent must reuse current wave assembly to repair the obsolete country food builder, preserve source semantics and requested-wave behavior, and pass independent review.
+GH1210 invalid-wave cache eviction remains a separate defect.
+Job40255479 still holds the exclusive 32-core node, with more than 33 hours remaining at the latest inventory.
+
+* Historical checkpoint -- 2026-10-22T06:53:02.010069+00:00
 
 All24 independently reviewed implementation PRs are freshly verified OPEN/unmerged at their expected heads in =public-pr-checkpoint-twentyfour.json=.
 New Uganda1207 carries the12reported-factor bindings at native grain and stacks1202; root accepted416PASS/10genuineSKIP plus stronger saved-value/source checks.
