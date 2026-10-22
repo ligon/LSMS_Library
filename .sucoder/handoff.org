@@ -1,6 +1,23 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T21:23:27.634333+00:00
+* Current task -- 2026-10-22T21:41:22.156800+00:00
+
+LSMS-ISA goal ACTIVE; NEVERauto-merge.31implementationPRs OPEN/unmerged,114scopeOPENrecords=28PRlinked+2active+84other. Currentcomplete31head/base collections173repoissues retained. Maincleanf8; mounted20261019runtimeunchanged, development067lock-onlycertifi.
+PR1219BF1188 exact657on1203exact3dc OPEN/unmerged/bodyreadbackEXACT. Independentrootaccepted0f4124979cbdcb6f0f6496f1d0d4dbf909abfd45f988601b65da3cbebb4a9aba, evidence928de01919ea1960ea95473ce0192a3a6d4c137d;151strict111PASS40prewriterFAIL,4NEWempty2PASS2MakeFAIL1218 preserved. ExactCI39856584211unit/windowsSUCCESS,6SKIPPEDincludingdata. CIbody1219and1170readbackEXACT, receiptpublication-1219-CI-and-tracker-readback.json; publicevidence238dabe78211f659b8159aa8788a73f64fe9e45c.
+
+Active review_malawi_1209 independent1215 sourcef7/a417 atC/review-Uganda-1215: all8normalactors48methodcalls0, group75559/856869. Oldfirstloader1oneattribute-resolutionattempt/0methodinvocations remains. Twonewmetadataresourcecontrols0; startup1535/closed031/originalguard993 and releasec194be1/addenda663413+eb0e7 remainexact.37providers/148copies177769212bytes/185inodes,4roots, noextra/stagingreplay. RawpartialcountryoperandsretainedBEFOREunion.
+Originalstrictreader62625/b224fe0:92groups=82PASS(54public+28native)+10FAIL(7crossheadapprovedorder+3actualparentDefault-vs-Makebarrenorder). CandidatebackendcomparisonsPASS; allfailedgroups completeindex/typedattrs/membership/eightnamedarraysPASSasnarrowerchecksONLY. Nosort/cast/normalization/no populated mismatch. Twooriginalscanners+fullprotection/seal/rootacceptancepending.
+IMPORTANT independenthistoricalsource-snapshotexception: itsoriginalhostsource-before helper63931/7433dc0 at2026-10-22T20:28:41.531425+00:00 directlySHA-read3historicalMalawipicklesPERHEAD,2210706bytesEACH=6632118perhead/13264236total6files; nodecode/copy/valueoutput. These areNOT37Ugproviderendpoints. Author3UNOPENEDclaim appliesONLYauthor. OriginalhelperPopenPID/pre-PopenreceiptUNKNOWN, notinvented. v3qualification31c7198f1fce6135748bb79aeeaba9ca339ddd80a9d83a0e282d2bedb1dfaf52. Finalprotection/rootcheckermustNOTdirectreopenhistorical6files; useoriginalsavedSHA+fullphysical/GitblobidentityNEWinterval, untracedGitinternalsqualified. Initialnarrowsuffixinventorywasexit0empty/incomplete, NOTanactorstop.
+
+Active acquisition_1149 owns1218minimalproduction7eb596c223055d45c4f45cffdba4f7eb6aee76e4 onf7, exactlyhelper/GH1039tests/ledger. Allruntime/import/tests/census/genuineHELD. Independentv1sourcegatecriticfrozenC/review1218-runtime-gates:REVIEWda3a223...,FINDINGSd6a691...,FINALPINSd04ce29...; all14controllers/3HEADs/3productionpinsmatch. ConcreteRG1readfd/dir_fd/extensionlessownL1holes,RG2syntheticfixtureMakechilddataredirectfailsstartup,RG3metadataGitoptionalindexwrites; exact3HEAD+3opaque-namegatealsorequired. AuthorpreparingADDITIVEversionedv2guard/calibration/gates/launcher/runtime_common/identities/plan, preservingold14/8b72/7eb; noactorsexecuted. Exactopaquenames slurm_logs/2026-06-16_ehcvm_interview_date/{malawi_baseline,malawi_retrofit,malawi_retrofit2}.pkl mustremainUNOPENEDin1218. Nativefull549/39/1362metadatahashesbeforetests/build,57staticnewcasesNOTcollected/passed. Genuine6providers/24copies25343300bytes4roots separatelyheld, fixedBF657configcompositionexplicit.
+
+Active malawi_1209 nowarchive32PREPARATIONONLY underC/archive32-control, briefC/ARCHIVE32-PREPARATION-BRIEF.md. Fivefrozenarchiveprefixes:author1215;independentBF1188;1218phase0-staticONLY;root42snapshot;critic4staticfiles. No normalcacheroot added. root42COPYmanifestc73181b60c73d5569532e3834f4c94b348031dd65255891a75a5f040d6ba97be. Live1215independent/1218runtimeEXCLUDED. Exactfiniteplan/launcher/verifier/rootapprovalSHA requiredBEFOREwriter. No durablewriter approvedyet. Archives1–31preserved, source-derivedfullrawtablepicklesPRIVATEproofoperands retained,172rawL1copies/excludedruntimeboundmetadata. No oldcontroller/API/test/census/rawproviderbyte replay.
+
+Nextroot: review1218v2pins+discriminatorsbeforeconditionalcalibrationrelease; finishindependent1215scanners/protection/freeze/rootauth thenopenstackedPRon1217; approvearchive32exactplanandindependentlyverifyartifact/member/source-afterchain. Further1118Mali/Malawiunitsnextmechanical;1135sourcegated;821/823size/weightbasisreconciliation.31PRcombined/fullcorpusverdictNOTestablished. Allocation40255479about25h20left/no warning. Keepallfailuresandprivacyqualifications.
+
+Sue
+
+* Earlier task -- 2026-10-22T21:23:27.634333+00:00
 
 LSMS-ISA goal ACTIVE; NEVER auto-merge. Main cleanf8, dependency-onlydevelopment067 does not change pinned runtime.
 Current COMPLETE live refresh:31implementationPRs OPEN/unmerged with exact current heads/base names,173repoOPENissues,114scopeOPENrecords=28PRlinked+2active+84other. All114stillOPEN; old30PRheads/basenames unchanged.
