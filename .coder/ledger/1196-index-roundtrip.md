@@ -35,8 +35,12 @@ contract. Find a discriminating minimal regression before proposing a fix.
 - STANDING.md §4: pandas3 string/ID/categorical missing values use pd.NA.
 - Country CONTENTS owns release-specific identifiers and caveats. Read complete
   CURRENT Niger and Uganda files, including TODO/WAITING/LOGBOOK, before analysis.
-- The two measured axes differ: Niger is a MultiIndex level u; Uganda is a plain
-  Index v with4805 rows/zero null v. Equal symptom does not prove equal cause.
+- The observations concern Niger's u and Uganda's v levels; Uganda has4805
+  rows/zero null v. The saved diagnostic's pandas.Index class describes the
+  EXTRACTED v level (dtype-details.py:6-7), not the complete public frame index.
+  Bind full-frame and level classes separately at every actual stage.
+  The initial468d ledger overstated this distinction; its git history and
+  original private brief remain preserved. Equal symptom does not prove cause.
 
 ## §4 Invariants and assumptions
 
