@@ -118,3 +118,31 @@ Static diagnosis complete; implementation/runtime remain held for root review.
 No production edit, package/numerical import, build fingerprint census, test,
 provider hash/copy/decode, API, network or acquisition was performed. Source/Git/
 AST and frozen JSON/source metadata only. No runtime reproduction is claimed.
+
+### Approved production source epoch (runtime still held)
+
+Root accepted the frozen phase0 proposal and approved only country.py, the existing
+GH1039 tests, and this ledger. Base is exact GH1215 f7c prerequisite, stacked until
+human merge. Root prepared the exact f7 framework base and a NEW detached BF657
+config checkout, each with private DVC tmp; frozen BF/1215 roots remain unchanged.
+
+- Implemented the existing set_index assignment followed by a fresh payload-only
+  projection and unchanged enforcer. Dict.type strings unwrap; missing/unknown/
+  malformed type declarations stay ignored. Original input scheme is untouched.
+- Intentionally replaced GH1215's direct-helper all-object assertion with the six
+  existing declared nullable targets; kept original declaration order and index
+  assertions. Added direct scalar/required/implicit-required/optional recognized
+  types, unknown/missing/malformed types, bare lists, index collision, canonical
+  priority, populated dict/absence, normal absent subset and separate declared
+  wave/no-results controls. These are unexecuted regression sources, not passes.
+- stdlib AST parsing and Git diff whitespace check pass. AST equality against f7
+  confirms the shared dtype enforcer/canonical enforcer and both membership/index
+  parsers are unchanged. No project/numerical imports, tests, fingerprint census,
+  provider operations or genuine actors have run. Guard/calibration/test plan and
+  exact source pins must be reviewed before any runtime release.
+
+Frozen phase0 READY e48a938be5fd064fc79646680a81e99e8a107340dca738821d701efc157b637e
+binds the pre-edit9aa source epoch. Original metadata postexit v1 stopped on an
+incorrect optional-exclusion set assertion; its source/failure was preserved.
+A separate external corrected metadata postexit completed0 before production
+edits; the old frozen packet was never rewritten. No data/runtime replay.

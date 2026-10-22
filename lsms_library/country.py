@@ -1052,8 +1052,8 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
 
     The declared index levels (``str``, as a built index's are) as its index
     and every declared column, required and ``optional: true``, in original
-    declaration order as an object column for ``_finalize_result``'s canonical
-    dtypes to coerce.  It answers
+    declaration order with its explicitly declared dtype (GH #1218).
+    Canonical dtypes still take priority in ``_finalize_result``.  It answers
     a request whose waves all lack the table on a no-builder route
     (GH #1039/#1099): 0 rows, as a warm cache would serve, shaped so
     that ``Country._assert_built_required_columns`` reads it as a well-formed
@@ -1065,7 +1065,18 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
     columns = [c for c in entry if c in declared and c not in levels]
     empty = pd.DataFrame({c: pd.Series(dtype="str" if c in levels else object)
                           for c in levels + columns})
-    return empty.set_index(levels) if levels else empty
+    empty = empty.set_index(levels) if levels else empty
+    # Interpret extended type declarations only for constructed empty payloads.
+    # Keep the existing string index and populated-frame coercion unchanged.
+    payload_types = {}
+    for c in columns:
+        value = entry[c]
+        if isinstance(value, dict) and isinstance(value.get("type"), str):
+            payload_types[c] = value["type"]
+        else:
+            payload_types[c] = value
+    _enforce_declared_dtypes(empty, payload_types)
+    return empty
 
 
 class Wave:
