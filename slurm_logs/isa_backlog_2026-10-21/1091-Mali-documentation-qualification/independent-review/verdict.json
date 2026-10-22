@@ -1,0 +1,53 @@
+{
+  "verdict": "PASS",
+  "scope": "two-paragraph documentation descendants only",
+  "pairs": [
+    {
+      "label": "standalone",
+      "base": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "candidate": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "only_path": "lsms_library/countries/Mali/_/CONTENTS.org",
+      "insertions": 8,
+      "deletions": 8,
+      "other_tracked_blobs_and_Git_modes_exact": true,
+      "tests_tree_exact": true,
+      "actual_checkout_files_Git_blob_verified": 14897,
+      "clean": true,
+      "root_measured_inventory_receipts_verified": true,
+      "API_hashes_exact": 549,
+      "framework_fingerprints_exact": 39,
+      "reviewer_reran_metadata_inventory": false,
+      "data_API_test_or_decode_replay": false
+    },
+    {
+      "label": "integration18",
+      "base": "f9feb3c807aff5206134c37768992302ceb431fa",
+      "candidate": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+      "only_path": "lsms_library/countries/Mali/_/CONTENTS.org",
+      "insertions": 8,
+      "deletions": 8,
+      "other_tracked_blobs_and_Git_modes_exact": true,
+      "tests_tree_exact": true,
+      "actual_checkout_files_Git_blob_verified": 15032,
+      "clean": true,
+      "root_measured_inventory_receipts_verified": true,
+      "API_hashes_exact": 549,
+      "framework_fingerprints_exact": 39,
+      "reviewer_reran_metadata_inventory": false,
+      "data_API_test_or_decode_replay": false
+    }
+  ],
+  "exact_two_block_replacements": true,
+  "corrected_note_identical_between_standalone_and_integration18": true,
+  "entire_actual17_country_prefix_and1121_note_preserved": true,
+  "wording_matches_observed_cold_partial_coverage_and_fully_covered_states": true,
+  "does_not_claim_every_coverage_miss_uses_factory": true,
+  "original18_frozen_manifest_entries_reverified": 1885,
+  "original18_READY_and_manifest_unchanged": true,
+  "root_measured_hash_evidence_reconciled_not_recomputed": true,
+  "no_library_import_Country_Feature_decode_API_or_test": true,
+  "outbound_IP": 0,
+  "unexpected_write_denials": 0,
+  "private_parquets": 0,
+  "signer": "Sue"
+}

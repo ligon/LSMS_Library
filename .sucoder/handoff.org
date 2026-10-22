@@ -1055,3 +1055,33 @@ All19existingPRs remainopen/unmerged/exactheads/bases at01:49:18UTC snapshot; no
 No public merge/issueclosure; goal active.
 
 Sue
+
+* Bounded eighteen runtime accepted; review rotation -- 2026-10-22T02:33:24.058141+00:00
+
+Released18 runtimePASS remains pinnedf9 vsactual17/7ec; two Mali wording paragraphs still require bounded docreview.
+Root read full report/actual checker sources and independently rehashed all1885manifest payloads plus excluded controls/checker pins, parsed111PASS vs24FAIL4PASS, verified24/525/39hashscope and two byte-exact scannerWARN/all40warningfields true.
+READY SHA3e1b1311ee2477ea09f337606b96805684c634e2c92a8dbdba948875a66d0a59; manifest2406d10a2c013a08df6da2336a2fdc2643213e88981c3f1b2167c6f87284ea02.
+Final seal retained first privatefont-metadata stop; no test/API/data replay. Sourcepublication and19dispatch remain gated on separatewordingreview.
+Tanzaniaauthor frozenfa457f90edbedfd7282eaf988c8231e4e87ba082/runtimeccc,2894manifest2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f, zero consumers.
+Root verified READY/manifestSHA/sixsafe-export hashes; authorresult still requires independent review and both evidence limitations remain explicit.
+SeparateTanzania candidate/control and exactmetadata targets/brief prepared; queuedfor differentagent afterUgandaauthor release, notyetassigned.
+Tanzaniaauthor review_nigeria_1034 rotated to preparedBF1119 writer; noTanzania source/proof mutation authorized.
+Fifteenth private archive covers only frozenTanzaniaauthor and18review:3456files,161863486compressedbytes,SHA5579b6346bfb26139ca09a8807911238cdd3eb98e43a7e830f2e020b608e77b2.
+Allmembers/sourceafter/owner-onlymodes/fsync/durablelauncher verified; rawextensions/duplicatecachetrees excluded, derivedframes remainprivate.
+No public merge/issueclosure; goal active.
+
+Sue
+
+* Mali wording accepted and source published -- 2026-10-22T02:36:21.503833+00:00
+
+Root accepted the separate documentation review after reading all reports and both actual checker sources, then independently verifying its READY and all 12 manifest entries.
+The two replacements are exact in b4ad74d5da39f939a7c2ecec030891cb82c02ade and 471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3; all other blobs/modes/tests and 549 API / 39 framework hashes remain unchanged.
+Original runtime evidence remains pinned to 9e and f9. No data, API, decode or test replay occurred for the wording correction.
+PR1199 was freshly verified open, unmerged and based on aba; its source branch was fast-forwarded to b4 on FS origin and GitHub, leaving the frozen local 9e checkout untouched.
+Public metadata confirms exact b4 / aba and mergeability. New CI39712187800 is in progress; the old green run remains evidence only for 9e.
+The new integration18 documentation branch was pushed at exact 471. This publishes bounded runtime plus separately verified documentation evidence, without claiming a full18 suite or corpus pass.
+Reviewer niger_lane has started the prepared nineteen-change increment at 2566 versus 471 in its new private root. The historical 60 / f9 preparation stays untouched.
+Uganda author freeze is still active; Tanzania independent review is queued for that different agent afterward. Burkina Faso1119 grounding is complete and ledger-first publication is underway; exactly two matching old-label test expectations are authorized alongside the two map cells.
+Fifteenth private evidence archive is verified; no public merge or issue closure. Goal active.
+
+Sue

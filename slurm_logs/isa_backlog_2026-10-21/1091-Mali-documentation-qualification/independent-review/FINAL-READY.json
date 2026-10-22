@@ -1,0 +1,55 @@
+{
+  "status": "FINAL_READY_FROZEN",
+  "verdict": "PASS",
+  "pairs": [
+    {
+      "label": "standalone",
+      "base": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "candidate": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "only_path": "lsms_library/countries/Mali/_/CONTENTS.org",
+      "insertions": 8,
+      "deletions": 8,
+      "other_tracked_blobs_and_Git_modes_exact": true,
+      "tests_tree_exact": true,
+      "actual_checkout_files_Git_blob_verified": 14897,
+      "clean": true,
+      "root_measured_inventory_receipts_verified": true,
+      "API_hashes_exact": 549,
+      "framework_fingerprints_exact": 39,
+      "reviewer_reran_metadata_inventory": false,
+      "data_API_test_or_decode_replay": false
+    },
+    {
+      "label": "integration18",
+      "base": "f9feb3c807aff5206134c37768992302ceb431fa",
+      "candidate": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+      "only_path": "lsms_library/countries/Mali/_/CONTENTS.org",
+      "insertions": 8,
+      "deletions": 8,
+      "other_tracked_blobs_and_Git_modes_exact": true,
+      "tests_tree_exact": true,
+      "actual_checkout_files_Git_blob_verified": 15032,
+      "clean": true,
+      "root_measured_inventory_receipts_verified": true,
+      "API_hashes_exact": 549,
+      "framework_fingerprints_exact": 39,
+      "reviewer_reran_metadata_inventory": false,
+      "data_API_test_or_decode_replay": false
+    }
+  ],
+  "manifest": "/local/job40255479/control/isa-backlog-20261021/integration/mali-eighteen-doc-review/private-final-manifest.json",
+  "manifest_entries": 12,
+  "manifest_SHA256": "2979f29e85c9559d7344b06b40e0cce2343d9abce19e9482c09719432d333228",
+  "safe_allowlist": [
+    "safe-exports/REVIEW.org",
+    "safe-exports/verdict.json",
+    "safe-exports/REPRODUCE.md"
+  ],
+  "zero_consumers": true,
+  "zero_API_test_decode_replay": true,
+  "outbound_IP": 0,
+  "write_denials": 0,
+  "private_parquets": 0,
+  "original18_root_unchanged": true,
+  "signer": "Sue"
+}

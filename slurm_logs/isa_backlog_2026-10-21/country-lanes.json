@@ -66,9 +66,10 @@
         "parent_live_state": "open/unmerged/exactcfd at preparation",
         "control": "/local/job40255479/worktrees/isa-Burkina_Faso-1119-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1119",
-        "status": "Prepared unassigned task; no edits/tests/build/verdict",
+        "status": "Writer review_nigeria_1034 assigned after Tanzaniaauthor release; grounding/ledger pending before production.",
         "boundary": "Two harmonize_seed_crop Preferred Label cells only after actual reproduction; broader marker decision and non-ISA countries residual",
-        "brief": "queued-1119-Burkina_Faso/NEXT-WRITER-BRIEF.md"
+        "brief": "queued-1119-Burkina_Faso/NEXT-WRITER-BRIEF.md",
+        "owner": "review_nigeria_1034"
       }
     },
     "Ethiopia": {
@@ -211,28 +212,32 @@
         "status": "Actual pre-build census verified independently against final frozen runtime/tests."
       },
       "active_status": "Independent PASS; stacked PR1199 open and CI-green",
-      "active_frozen_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "active_frozen_head": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
       "active_runtime_head": "fdadc0698efcd300f5f09c21b60c30f570f96621",
       "active_review_path": "/local/job40255479/worktrees/isa-review-Mali-1091",
       "active_private_review": "/local/job40255479/control/isa-backlog-20261021/review-Mali-1091",
       "active_actual_hash_scope": "24 Mali hashes change;525 other-country hashes and39 framework fingerprints exact; measured before source builds.",
       "precode_prediction_historical": "24Mali/525otherunchanged/39frameworkunchanged; mustmeasurebefore sourcebuild",
-      "active_review_verdict": "PASS111 focused tests,24meaningful parent failures/fourpasses,40candidate stages,full source/native/public/typed-attrs/CLI/Feature/scanner/hash controls; exact handling and metadata-access qualifications retained.",
+      "active_review_verdict": "Original9e runtime PASS plus independent two-paragraph documentation-only b4 PASS; all549/39 hashes unchanged, no data/test replay.",
       "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1199",
-      "active_ci": "success; run39699773895",
+      "active_ci": "in_progress;run39712187800 atb4ad74d5da39f939a7c2ecec030891cb82c02ade",
       "active_publication": "Root accepted complete independent source and comparator proof; final exact head pushed and PR1199 opened. No public PR merged and no global18 composition proof.",
       "pending_documentation_qualification": {
         "candidate": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
         "original_public_PR1199_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
-        "public_PR1199_head_advanced": false,
+        "public_PR1199_head_advanced": true,
         "scope": "Two CONTENTS paragraphs qualify empty-result route/coverage-dependent dtypes and attrs",
         "API_hashes_unchanged": 549,
         "framework_fingerprints_unchanged": 39,
         "data_API_decode_test_replay": 0,
-        "independent_wording_review": "pending",
+        "independent_wording_review": "PASS; 12-entry frozen doc-review manifest2979f29e85c9559d7344b06b40e0cce2343d9abce19e9482c09719432d333228",
         "original_runtime_proofs_preserved": true,
-        "proof": "1091-Mali-documentation-qualification/"
-      }
+        "proof": "1091-Mali-documentation-qualification/ROOT-DOC-ACCEPTANCE.json",
+        "status": "Independent narrow PASS; published1199headb4, original9e runtime evidence retained",
+        "public_PR1199_head": "b4ad74d5da39f939a7c2ecec030891cb82c02ade"
+      },
+      "active_original_runtime_reviewed_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "active_original9e_CI": "success;run39699773895, retained at oldhead only"
     },
     "Niger": {
       "path": "/local/job40255479/worktrees/isa-Niger",
@@ -365,7 +370,7 @@
       "active_branch": "fix/1091-tanzania-community-builder-20261022",
       "active_baseline": "99c824079da480ab2646e499c06ac70e457ff271 (ledger-only descendant; runtime/tests exacte75)",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix",
-      "active_status": "Author runtime/source/scanner matrices complete, final docs/ledger/freeze pending; no finalREADY or independent review.",
+      "active_status": "Author frozen/quiescent; queued different-agent independent review, not yet assigned.",
       "active_precode_ledger": "aa62795ce (prefix; committed before diagnosis functions)",
       "active_CONTENTS_read": "Complete2142lines incl WAITING114; blob9424a5042b9880d6c48aba17af0e8d3cadc45ccb",
       "active_source_boundary": "Community modules plus gated healthy comparator only; reviewed408plot_inputs normalization retained through immutable source/prior proof, no new AG staging or plot-input build.",
@@ -408,7 +413,20 @@
       },
       "active_runtime_head": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
       "active_final_interim": "85focusedPASS; identical27parent controls20FAIL7PASS0error/skip;20cold20warm20populated candidate requests;17699source rows/healthyMali40218/pooled57917/current matchedCLI/scanner4exactWARN.",
-      "active_evidence_limits": "Bootstrap readlink normalized literal convenience-link text; separate raw Git-blob corrective receipt required. Original partial aggregate JSON overwritten before archive; surviving per-call frames/endpoints/log/script support checks, reconstruction explicitly not original. Both freezer stops retained; no data/API/test replay."
+      "active_evidence_limits": "Bootstrap readlink normalized literal convenience-link text; separate raw Git-blob corrective receipt required. Original partial aggregate JSON overwritten before archive; surviving per-call frames/endpoints/log/script support checks, reconstruction explicitly not original. Both freezer stops retained; no data/API/test replay.",
+      "active_frozen_head": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "active_author_READY_sha256": "426b8706993e83c13124322c93c3e1562f285d852f3edf5f2bc8d73eddf44cc9",
+      "active_author_manifest_entries": 2894,
+      "active_author_manifest_sha256": "2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f",
+      "queued_independent_review": {
+        "path": "/local/job40255479/worktrees/isa-review-Tanzania-1091",
+        "control": "/local/job40255479/worktrees/isa-review-Tanzania-1091-base",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Tanzania-1091",
+        "brief": "queued-Tanzania-1091-review/NEXT-REVIEW-BRIEF.md",
+        "review_assigned": false,
+        "builds_tests": 0,
+        "gate": "Different agent after Uganda1198 author release; source/copy/hash/coverage gates precede APIs"
+      }
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
@@ -997,7 +1015,7 @@
       "path": "/local/job40255479/worktrees/isa-integration-eighteen",
       "branch": "isa/integration-eighteen-20261022",
       "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/mali-eighteen-review",
-      "status": "Runtime/source matrices complete; reviewer final seal pending. Two CONTENTS overstatements require separately reviewed documentation descendant; no18 GitHub publication.",
+      "status": "Completed bounded runtime review atf9 and separately accepted documentation descendant471; current source branch published, no public PR merge.",
       "merge_resolution": "Complete prior17Mali CONTENTS prefix plus exact reviewed1199 addition; all nine other changed blobs/modes exact1199",
       "root_prepared_metadata_targets": true,
       "reviewer": "niger_lane",
@@ -1011,9 +1029,25 @@
         "tests_and_other_blobs_modes_exact": true,
         "API_hashes_unchanged": 549,
         "framework_fingerprints_unchanged": 39,
-        "wording_review": "pending",
+        "wording_review": "PASS",
         "data_API_decode_test_replay": 0,
-        "proof": "1091-Mali-documentation-qualification/DOC-QUALIFICATION-INTEGRATION18-PROOF.json"
+        "proof": "1091-Mali-documentation-qualification/DOC-QUALIFICATION-INTEGRATION18-PROOF.json",
+        "GitHub_publication": true
+      },
+      "runtime_release": {
+        "verdict": "PASS_BOUNDED_RUNTIME_WITH_REQUIRED_DOC_QUALIFICATION",
+        "READY_sha256": "3e1b1311ee2477ea09f337606b96805684c634e2c92a8dbdba948875a66d0a59",
+        "manifest_entries": 1885,
+        "manifest_sha256": "2406d10a2c013a08df6da2336a2fdc2643213e88981c3f1b2167c6f87284ea02",
+        "root_all1885payloads_and_controls_and_checker_sources_verified": true,
+        "candidate_tests": "111PASS0FAIL/ERROR/SKIP",
+        "actual17controls": "24FAIL4PASS0ERROR/SKIP",
+        "saved_artifact_inputs": 177,
+        "scanner": "2WARNfullrecords/bytesexact",
+        "warning_multisets_literal_true": 40,
+        "public_safe_exports": "integration/mali-eighteen-review/",
+        "private_archive": "private-evidence-durability-fifteenth.json",
+        "limits": "No full18suite/corpus; original17full13FAIL/doc-child/stale8/1196 retained; five review harness stops incl private-font firstseal stop preserved."
       }
     },
     "pending_nineteen": {
@@ -1036,13 +1070,28 @@
         "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/niger-nineteen-docs-review",
         "source_proof": "Exact12Niger path/blob/mode delta670vsd602; only exact two-paragraph Mali documentation differs from old60; Mali CONTENTS equals471.",
         "root_prepared_metadata_targets": true,
-        "review_assigned": false,
+        "review_assigned": true,
         "tests_builds": 0,
         "verdict": null,
         "GitHub_publication": false,
         "next_brief": "queued-nineteen-docs/NEXT-REVIEW-BRIEF.md",
-        "dispatch_gate": "Released18 rootacceptance plus bounded Mali wording review"
+        "dispatch_gate": "Released18 rootacceptance plus bounded Mali wording review",
+        "status": "Independent bounded19 review assigned after root18/runtime+docsacceptance",
+        "reviewer": "niger_lane"
       }
+    },
+    "eighteen_increment": {
+      "runtime_head": "f9feb3c807aff5206134c37768992302ceb431fa",
+      "actual17": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+      "published_head": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+      "branch": "isa/integration-eighteen-docs-20261022",
+      "path": "/local/job40255479/worktrees/isa-integration-eighteen-docs",
+      "status": "PASS_BOUNDED_RUNTIME_PLUS_DOCUMENTATION_QUALIFICATION",
+      "runtime_review": "integration/mali-eighteen-review/ROOT-RUNTIME-ACCEPTANCE.json",
+      "doc_review": "1091-Mali-documentation-qualification/ROOT-DOC-ACCEPTANCE.json",
+      "full18suite_or_corpus": false,
+      "public_PRs_merged": false,
+      "private_archive": "private-evidence-durability-fifteenth.json"
     }
   }
 }

@@ -1,0 +1,16 @@
+{
+  "verdict": "PASS",
+  "scope": "bounded GLOBAL18 runtime coexistence",
+  "candidate": "f9feb3c807aff5206134c37768992302ceb431fa",
+  "baseline": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+  "documentation_correction_required_before_unqualified_prose": true,
+  "documentation_paths": [
+    "lsms_library/countries/Mali/_/CONTENTS.org:1310",
+    "lsms_library/countries/Mali/_/CONTENTS.org:1321"
+  ],
+  "runtime_blockers": [],
+  "source_or_API_replay_needed_for_doc_only_descendant": false,
+  "publication_and_merge": "root-owned; no authorization implied",
+  "release": "runtime/data consumers finished; final seal additionally verifies zero consumers",
+  "signer": "Sue"
+}
