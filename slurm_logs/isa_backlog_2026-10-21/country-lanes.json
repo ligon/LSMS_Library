@@ -991,6 +991,20 @@
       "residual_issue": 1196,
       "composition_with_1062_or_global16_verified": false,
       "execution_qualification": "Preliminary unguarded attrs-type census is explicitly qualified; subsequent artifact checks guarded, original receipts preserved."
+    },
+    "1196": {
+      "issue": 1196,
+      "status": "Prepared/unassigned read-only diagnosis; no experiments/verdict or implementation",
+      "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
+      "brief": "queued-1196-index-diagnosis/NEXT-DIAGNOSIS-BRIEF.md",
+      "ledger": ".coder/ledger/1196-index-roundtrip.md",
+      "root_prepared_exact_ignored_metadata": true,
+      "assigned": false,
+      "scope": "Distinct Niger food_acquired MultiIndex/u and Uganda cluster_features Index/v cold-warm dtype observations; shared cause unestablished; source/cause diagnosis only",
+      "imports_tests_decode_APIs": 0,
+      "product_changes": 0
     }
   },
   "integration": {

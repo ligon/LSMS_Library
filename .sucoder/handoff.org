@@ -1187,3 +1187,9 @@ Sue
 Exact-head39722612561 SUCCESS:unit-tests/windows-smoke pass; six other jobs including data-tests skipped. PR1203 and campaign1170 latest body independently readback exact; no credentialed CI data claim. All22 implementation heads remain unmerged at the04:34 fresh check.
 
 Sue
+
+* Queued dtype diagnosis -- 2026-10-22
+
+Read-only1196 diagnosis checkout prepared atreleasef8; exact private metadata target and initial git-tracked ledger/brief recorded. UNASSIGNED:zero imports/tests/decodes/APIs/product changes. Wait for a released worker. Both observed axis classes need separate causal proof; no shared cause or production normalization assumed. Root owns any later implementation boundary.
+
+Sue
