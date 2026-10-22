@@ -1,0 +1,364 @@
+{
+  "status": "PASS_MEANINGFUL_DISCRIMINATION",
+  "candidate": {
+    "pass": 392,
+    "skip": 10,
+    "fail": 0,
+    "error": 0
+  },
+  "parent": {
+    "pass": 3,
+    "fail": 36,
+    "error": 0,
+    "skip": 0
+  },
+  "categories": [
+    {
+      "status": "fail",
+      "category": "actual_loader_literal_source_binding_contract",
+      "count": 7
+    },
+    {
+      "status": "fail",
+      "category": "actual_parent_old_signature_native_row_loss",
+      "count": 4
+    },
+    {
+      "status": "fail",
+      "category": "canonical_observation_axis_contract",
+      "count": 1
+    },
+    {
+      "status": "fail",
+      "category": "new_private_helper_call_contract_TypeError_negative",
+      "count": 1
+    },
+    {
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "count": 23
+    },
+    {
+      "status": "pass",
+      "category": "existing_null_or_empty_contract_pass",
+      "count": 3
+    }
+  ],
+  "cases": [
+    {
+      "test": "test_every_eligible_record_retains_its_own_complete_payload[distinct]",
+      "status": "fail",
+      "category": "actual_parent_old_signature_native_row_loss",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_every_eligible_record_retains_its_own_complete_payload[equal]",
+      "status": "fail",
+      "category": "actual_parent_old_signature_native_row_loss",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_every_eligible_record_retains_its_own_complete_payload[partial]",
+      "status": "fail",
+      "category": "actual_parent_old_signature_native_row_loss",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_every_eligible_record_retains_its_own_complete_payload[sale-only]",
+      "status": "fail",
+      "category": "actual_parent_old_signature_native_row_loss",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_reported_id_is_stable_under_reordering",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[None]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[nan]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[missing2]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[  ]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[.]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_named_missing_id_column_is_loud",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_repeated_id_suffixes_every_occurrence[True]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_repeated_id_suffixes_every_occurrence[False]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_physical_positions_precede_filtering_and_ignore_dataframe_labels",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_constructed_release_and_order_semantics",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_actual_condition_slots_remain_distinct_even_with_equal_payload",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_repeated_slot_suffixes_all_source_rows",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_reordered_condition_declarations_keep_actual_slot_bindings",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_duplicate_declared_slot_is_loud_even_with_distinct_condition_keys",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_duplicate_physical_source_row_slot_is_an_error",
+      "status": "fail",
+      "category": "new_private_helper_call_contract_TypeError_negative",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_constructed_identity_requires_verifiable_explicit_source[None]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_constructed_identity_requires_verifiable_explicit_source[]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_constructed_identity_requires_verifiable_explicit_source[  ]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_constructed_identity_requires_verifiable_explicit_source[missing:AGSEC5A.dta]",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_missing_source_reference_does_not_guess_from_wave",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_unique_old_key_with_null_is_retained",
+      "status": "pass",
+      "category": "existing_null_or_empty_contract_pass",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_duplicate_null_old_keys_keep_the_old_exclusion",
+      "status": "pass",
+      "category": "existing_null_or_empty_contract_pass",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_nonunique_old_index_keeps_its_existing_null_key_boundary",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_empty_input_needs_no_constructed_identity",
+      "status": "pass",
+      "category": "existing_null_or_empty_contract_pass",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_conversion_uses_each_observations_own_factor_before_harvest_sum",
+      "status": "fail",
+      "category": "other_observation_identity_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2009-10]",
+      "status": "fail",
+      "category": "actual_loader_literal_source_binding_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2010-11]",
+      "status": "fail",
+      "category": "actual_loader_literal_source_binding_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2011-12]",
+      "status": "fail",
+      "category": "actual_loader_literal_source_binding_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2013-14]",
+      "status": "fail",
+      "category": "actual_loader_literal_source_binding_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2015-16]",
+      "status": "fail",
+      "category": "actual_loader_literal_source_binding_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2018-19]",
+      "status": "fail",
+      "category": "actual_loader_literal_source_binding_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2019-20]",
+      "status": "fail",
+      "category": "actual_loader_literal_source_binding_contract",
+      "error": false,
+      "skip": false
+    },
+    {
+      "test": "test_canonical_axis_has_honest_unresolved_sentinel",
+      "status": "fail",
+      "category": "canonical_observation_axis_contract",
+      "error": false,
+      "skip": false
+    }
+  ],
+  "candidate_skips": [
+    {
+      "class": "tests.test_863_transforms",
+      "test": "test_malawi_warm_livestock_sales_value"
+    },
+    {
+      "class": "tests.test_863_transforms",
+      "test": "test_malawi_warm_food_acquired_hdds_partition_guard_bites"
+    },
+    {
+      "class": "tests.test_863_transforms",
+      "test": "test_malawi_warm_food_acquired_hdds_scores_in_range"
+    },
+    {
+      "class": "tests.test_863_transforms",
+      "test": "test_malawi_warm_fertilizer_rate"
+    },
+    {
+      "class": "tests.test_863_transforms",
+      "test": "test_malawi_warm_nitrogen_kg_resolves_the_fertilizer_labels"
+    },
+    {
+      "class": "tests.test_863_transforms",
+      "test": "test_malawi_warm_crop_revenue_by_crop_sums_back_to_the_household"
+    },
+    {
+      "class": "tests.test_863_transforms",
+      "test": "test_malawi_warm_crop_diversity"
+    },
+    {
+      "class": "tests.test_feature_canonical_index",
+      "test": "test_warm_corpus_assembly_loses_no_rows"
+    },
+    {
+      "class": "tests.test_feature_canonical_index",
+      "test": "test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_labor]"
+    },
+    {
+      "class": "tests.test_feature_canonical_index",
+      "test": "test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_inputs]"
+    }
+  ]
+}

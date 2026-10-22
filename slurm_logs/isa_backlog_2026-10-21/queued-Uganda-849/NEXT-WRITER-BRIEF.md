@@ -1,12 +1,18 @@
 # Queued Uganda849 reported-factor wiring
 
-UNASSIGNED. Candidate isa-Uganda-849-fix, branch
+ASSIGNED after root acceptance of the frozen1198 runtime and its separately
+reviewed documentation qualification. Candidate isa-Uganda-849-fix, branch
 fix/849-uganda-reported-factors-20261022, and separate actual parent
-isa-Uganda-849-fix-base start at1198 final6e735eca93e3f68e63d79ce65ac71607ee9493bf.
+isa-Uganda-849-fix-base now start at0854303bc5f60daa698b2927fc3b193822a4c090.
+Runtime/test source remains1198 final6e735eca93e3f68e63d79ce65ac71607ee9493bf
+(runtime929149222); only the excluded warm-Make CONTENTS paragraph differs.
 The private root is Uganda/849-fix. No ledger, product edit, test or build
-has begun. DO NOT START until root accepts the separate1198 independent
-review and explicitly assigns this task. No1198 PR exists at preparation;
-the eventual849 PR must stack on its freshly verified actual public branch.
+has begun. Root fast-forwarded only these unused clean prepared checkouts;
+original6e/73ad/085 review sources/evidence remain immutable. The original
+6e preparation/brief is preserved separately; root-doc-parent-fastforward.json
+records the unchanged metadata links and accepted current parent. Root owns
+parent PR publication and the later849 stack; an unmerged public parent is
+not permission to change the reviewed source boundary.
 
 FIRST read complete CURRENT Uganda/_/CONTENTS.org, including WAITING/TODO/
 LOGBOOK, name actual idiosyncrasies and quote contradictions. Exact blob
@@ -68,8 +74,11 @@ before dependent calls. Keep raw IDs/records/coords/warnings/traces private.
 Read current factor/native observation/shipped factor/Feature tests. Add
 meaningful regression controls that fail on the actual1198 parent for the
 missing mappings and use actual source field-to-observation pairing. Keep
-invalid/zero/negative/year/over-cap/Kg-not-one source reports raw in KgFactor,
-then verify unchanged screening at conversion. Different/equal/partial
+the existing helper numeric coercion and kgf.where(kgf>0,np.nan)
+(Uganda/_/uganda.py1522-1536) EXACT: literal nonnumeric/nonpositive source
+values stay in private raw oracles, while served KgFactor follows that
+unchanged normalization. Positive over-cap/year/Kg-not-one and nonfinite
+behavior follow the current helper and unchanged downstream screen. Different/equal/partial
 reports and actual wide slots must remain separate through Country/Feature.
 Do not write a redundant test that merely copies the implementation map.
 

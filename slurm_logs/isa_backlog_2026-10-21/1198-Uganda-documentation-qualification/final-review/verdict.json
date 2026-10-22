@@ -1,0 +1,19 @@
+{
+  "verdict": "PASS",
+  "candidate_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "base_head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "findings": [],
+  "scope": {
+    "country_hashes": {
+      "total": 549,
+      "identical": 549,
+      "changed": 0
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "identical": 39,
+      "changed": 0
+    }
+  },
+  "signed": "Sue"
+}

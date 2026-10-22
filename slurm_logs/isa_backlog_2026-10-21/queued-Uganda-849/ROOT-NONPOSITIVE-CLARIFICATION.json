@@ -1,0 +1,10 @@
+{
+  "recorded_at_UTC": "2026-10-22T04:06:33.016062+00:00",
+  "reason": "Original brief incorrectly required literal nonpositive reports in served KgFactor despite existing helper normalization.",
+  "source": "Uganda/_/uganda.py:1522-1536",
+  "decision": "Preserve existing numeric coercion and positive mask; raw-source values retained separately in private oracle, no helper/science change.",
+  "prior_brief_SHA256": "8cf5e5629237f692ca2ec0fce19f83259da2b98bb7819552978bb3b04bf1af7f",
+  "current_brief_SHA256": "42221408ad17801070d5747d3b9fac34256b815db3bb60ee5a968be0469e0085",
+  "writer_told_to_proceed_after_existing_source_gates": true,
+  "signed": "Sue"
+}

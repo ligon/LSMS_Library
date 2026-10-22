@@ -1143,3 +1143,18 @@ mali_lane now writes prepared Malawi218; niger_lane independently reviews BF1119
 All19 existing implementation PRs refetched OPEN/unmerged/exact heads at03:32UTC. Ethiopia820 static triage remains tierC/W1-W3, no implementation.
 
 Sue
+
+* Uganda runtime and documentary qualification accepted -- 2026-10-22 04:07 UTC
+
+Root accepted1198 runtime6e/929 after independent1908-entry verification,392PASS10SKIP/36FAIL3PASS controls, source133761/Feature180137/+2091kg and all scanner occurrences. Final documentary085 independently preserves all549API/39framework hashes and every other tracked blob/mode. Original73ad NEEDS_FIX wording proof52entries and finalPASS45entries remain distinct; final wording states observed0644to0600+mtime directly, with no copied-L2 inference.
+Final085 is published to the original public1198 source ref; local frozen author6e remains unchanged. Parent PR preparation remains pending. Only unused clean849 candidate/control were fast-forwarded to085; reviewer is now assigned849 writer. Exactly12maps, existing nonpositive normalization unchanged; original mistaken brief and explicit clarification remain preserved.
+Tanzania PR1201 atfa passed CI39718698178 unit/Windows smoke; six other jobs including data were skipped. Issue1091 remains OPEN and describes all3 reviewed country PRs awaiting human merge. Combined20de38 versus19control2566 is prepared/FS-durable with exact9path leaf delta, UNASSIGNED/no builds/verdict. Its healthy Mali/Niger references must be current155931/46043.
+mali_lane writes Malawi218; existing Make failure is a separate matched-parent exception, all5foodwaves supported. niger_lane finishes BF1119 independent proof; source/native unit dictionary expectation stop is retained and corrected artifact-only. Both active roots remain unarchived.
+
+Sue
+
+* Private evidence durability checkpoint -- 2026-10-22 04:08 UTC
+
+All19 owner-only private archives are verified. Archive18 retains frozen Tanzania independent plus bounded19 proof (3184files, SHA028eeb4160a9361568f9b7b33e87f5de7df8e6d778c7702216f574811a759d8c); archive19 retains frozen Uganda runtime and both documentary reviews (1088files, SHAddc4f303b680f92c2be5ed2c2a796c1b0c3bf71ff72ea61d79233afbf83898c8). Source-after/member/digest/owner/mode/fsync receipts passed. Active Malawi/BF/849 roots are not archived.
+
+Sue

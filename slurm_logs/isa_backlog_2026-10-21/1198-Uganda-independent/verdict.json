@@ -1,0 +1,16 @@
+{
+  "verdict": "PASS",
+  "source": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "parent": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+  "runtime_tests": "929149222e43a8fe500cc08420cdc68357170af3",
+  "blocking_findings": [],
+  "nonblocking_qualifications": [
+    "Uganda cluster_features/v StringDtype NA-to-NaN representation on both heads and both backends",
+    "Make17 byte-identical paths change mode0644-to0600 and mtime on both heads",
+    "CLI JSON attrs record-type and v dtype serialization changes measured at matched stages",
+    "Existing crop subset routing and real-area coverage residuals remain separate",
+    "Original author XML overwrite and first failed-Make missing warning list remain unrecovered",
+    "Initial source-label review interpretation corrected using existing explicit adjudication and independently matched saved date counts"
+  ],
+  "signed": "Sue"
+}
