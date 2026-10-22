@@ -508,6 +508,128 @@ def test_standalone_pattern_is_in_closure(monkeypatch):
     assert R._closure_parts(uses_pattern, set()) != before
 
 
+# GH1218: nullable types are actual build constants after empty-only enforcement.
+@pytest.mark.parametrize('factory', ['BooleanDtype', 'Int64Dtype', 'Float64Dtype', 'StringDtype'])
+def test_nullable_dtype_serialization_is_stable_and_nested(factory):
+    import pandas as pd
+
+    make = getattr(pd, factory)
+    value = make()
+    encoded = R._ser(value, set(), [])
+    assert encoded == R._ser(make(), set(), [])
+    assert factory in encoded and ' at 0x' not in encoded
+    assert encoded in R._ser({'declared': [value]}, set(), [])
+    assert encoded != R._ser(value.name, set(), [])
+
+
+def test_string_dtype_storage_and_missing_semantics_are_distinct():
+    import pandas as pd
+
+    encodings = {}
+    for storage in ('python', 'pyarrow'):
+        for missing_name, missing in (('NA', pd.NA), ('NaN', float('nan'))):
+            value = pd.StringDtype(storage=storage, na_value=missing)
+            encoded = R._ser(value, set(), [])
+            encodings[storage, missing_name] = encoded
+            assert encoded == R._ser(pd.StringDtype(storage=storage, na_value=missing), set(), [])
+    assert len(set(encodings.values())) == 4
+
+
+@pytest.mark.parametrize('before_spec,after_spec', [
+    ('BooleanDtype', 'Int64Dtype'),
+    ('Int64Dtype', 'Float64Dtype'),
+    ('Float64Dtype', 'BooleanDtype'),
+    ('string-python-NA', 'string-pyarrow-NA'),
+    ('string-python-NA', 'string-python-NaN'),
+])
+def test_standalone_nullable_dtype_changes_reach_closure(monkeypatch, before_spec, after_spec):
+    import sys
+    import pandas as pd
+
+    def make(spec):
+        if spec.startswith('string-'):
+            _, storage, missing = spec.split('-')
+            return pd.StringDtype(storage=storage, na_value=pd.NA if missing == 'NA' else float('nan'))
+        return getattr(pd, spec)()
+
+    module = sys.modules[__name__]
+    monkeypatch.setattr(module, '_GH1218_DTYPE', make(before_spec), raising=False)
+
+    def uses_dtype():
+        return _GH1218_DTYPE
+
+    before = R._closure_parts(uses_dtype, set())
+    assert any('._GH1218_DTYPE=' in part for part in before)
+    monkeypatch.setattr(module, '_GH1218_DTYPE', make(after_spec))
+    assert R._closure_parts(uses_dtype, set()) != before
+
+
+def test_empty_constructor_dtype_map_is_in_build_closure_and_value_sensitive(monkeypatch):
+    import pandas as pd
+    from lsms_library import country
+
+    R.clear_caches()
+    try:
+        parts = R._closure_parts(country.Country._aggregate_wave_data, set())
+        assert any(p.startswith('lsms_library.country._empty_declared_frame=') for p in parts)
+        assert any(p.startswith('lsms_library.country._enforce_declared_dtypes=') for p in parts)
+        assert any(p.startswith('lsms_library.country._SCHEME_DTYPE_MAP=') for p in parts)
+        before = R.build_transforms_fingerprint('household_roster')
+        with monkeypatch.context() as patch:
+            patch.setitem(country._SCHEME_DTYPE_MAP, 'bool', pd.Int64Dtype())
+            R.clear_caches()
+            assert R.build_transforms_fingerprint('household_roster') != before
+    finally:
+        R.clear_caches()
+
+
+@pytest.mark.parametrize('factory', ['Int32Dtype', 'Float32Dtype', 'CategoricalDtype'])
+def test_nullable_dtype_serialiser_rejects_other_families(factory):
+    import pandas as pd
+
+    with pytest.raises(TypeError, match='un-serialisable type'):
+        R._ser(getattr(pd, factory)(), set(), [])
+
+
+def test_nullable_dtype_serialiser_rejects_custom_subclasses(monkeypatch):
+    import sys
+    import pandas as pd
+
+    class CustomStringDtype(pd.StringDtype):
+        pass
+
+    value = CustomStringDtype(storage='python')
+    with pytest.raises(TypeError, match='CustomStringDtype'):
+        R._ser(value, set(), [])
+    monkeypatch.setattr(sys.modules[__name__], '_GH1218_CUSTOM_DTYPE', value, raising=False)
+
+    def uses_custom_dtype():
+        return _GH1218_CUSTOM_DTYPE
+
+    with pytest.raises(TypeError, match='CustomStringDtype'):
+        R._closure_parts(uses_custom_dtype, set())
+
+
+def test_nullable_dtype_serialization_stable_across_hashseeds():
+    import subprocess
+    import sys
+
+    code = (
+        'import pandas as pd; from lsms_library import _build_registry as R;'
+        "values=[pd.BooleanDtype(),pd.Int64Dtype(),pd.Float64Dtype()]+"
+        "[pd.StringDtype(storage=s,na_value=n) for s in ('python','pyarrow') "
+        "for n in (pd.NA,float('nan'))];"
+        "print(R._ser({'nested':values},set(),[]))"
+    )
+    outputs = []
+    for seed in ('0', '1'):
+        result = subprocess.run([sys.executable, '-B', '-c', code], capture_output=True,
+                                text=True, env=dict(os.environ, PYTHONHASHSEED=seed))
+        assert result.returncode == 0, result.stderr
+        outputs.append(result.stdout.strip())
+    assert outputs[0] == outputs[1] and ' at 0x' not in outputs[0]
+
+
 def test_country_framework_closures_are_serializable():
     """The real Ghana nutrition closure failed on its metric pattern tuple."""
     from lsms_library.paths import countries_root
