@@ -2,26 +2,23 @@
 #+AUTHOR: Sue
 
 * Snapshot
-Captured 2026-10-22T16:47:51.474415+00:00.
-There are 112 ISA-related open issue records: 24 with campaign PRs, three active, and 85 other open records.
-All 27 implementation PRs are OPEN and unmerged.
+Captured 2026-10-22T17:28:43.364859+00:00.
+There are 112 ISA-related open issue records: 25 with campaign PRs, two active, and 85 other open records.
+All 28 implementation PRs are OPEN and unmerged.
 Umbrellas, decisions and partial repairs overlap; these are not 112 distinct confirmed bugs.
 The original inventory had 97 in-scope records; 96 remain open, duplicate #1089 is now closed, and 16 campaign follow-ups were added.
-Current GitHub states were enumerated independently of the truncated connector collection.
+All 112 records remain open in the complete 171-issue refresh; no new issue numbers were found.
+Development0671019 adds only a certifi dependency-lock update after the tested release; existing mounted runtime was not changed.
 Initial triage tiers and approaches are routing guidance and must be rechecked against live issues and complete country notes before dispatch.
 
 * Active work
 ** [[https://github.com/ligon/LSMS_Library/issues/1204][#1204]] Uganda crop_production: country fallback violates requested wave coverage
 Countries: Uganda.
-Author implementing country wave-coverage routing; phase0/root source gate accepted; runtime proof pending.
+Authora417fix frozen after59heldactors and finalprotection;8candidatePASS/actualparent7FAIL1PASS,existing170PASS. Four newlyexposedzero-row column-orderdifferences retained. Independent phase0assigned; runtimeheld pendingroot handoffauthentication.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1205][#1205]] Uganda yield_kg: diagnose incomplete parcel-area matches and correct the 100% coverage claim
 Countries: Uganda.
-Read-only source/native/API area-coverage diagnosis; bounded data stage conditional on provider authentication.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1210][#1210]] Malawi: invalid food wave request evicts native caches before raising
-Countries: Malawi, Shared framework.
-Frozen author repair; independent held-source runtime review in progress; no PR yet.
+Author884fix frozen and root-authenticated; independent runtime review released after phase0. Author reports13235restoredyieldkeys, preserving14520prior keys/values; not independently accepted.
 
 * Reviewed changes awaiting human merge
 ** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
@@ -127,6 +124,11 @@ PRs: [[https://github.com/ligon/LSMS_Library/pull/1202][#1202]].
 ** [[https://github.com/ligon/LSMS_Library/issues/1209][#1209]] Malawi: country food_acquired Make builder expects retired wave columns
 Countries: Malawi.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1213][#1213]].
+
+** [[https://github.com/ligon/LSMS_Library/issues/1210][#1210]] Malawi: invalid food wave request evicts native caches before raising
+Countries: Malawi, Shared framework.
+PRs: [[https://github.com/ligon/LSMS_Library/pull/1214][#1214]].
+Remaining scope: Root accepted bounded repair; PR1214 awaits human merge. Iterator/error timing and broad fingerprint invalidation are explicit. Independent private proofs durable in archive29.
 
 * Remaining unassigned issue records
 ** [[https://github.com/ligon/LSMS_Library/issues/226][#226]] feat: principled auto-aggregation script for harmonize_food's Aggregate Label column

@@ -1,0 +1,44 @@
+{
+  "verified_at": "2026-10-22T17:45:43.797Z",
+  "pr": {
+    "number": 1214,
+    "state": "open",
+    "merged": false,
+    "mergeable": true,
+    "head_sha": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+    "base_sha": "06710190305e0057d9e19d42059753d4cc0db012",
+    "body_readback_exact": true
+  },
+  "tracker1170_body_readback_exact": true,
+  "issue1210_body_readback_exact": true,
+  "public_independent_evidence_commit": "a3ff2b05c4fdb75756bdea20458963c0bb5c496e",
+  "actual_development_advance": {
+    "commit": "06710190305e0057d9e19d42059753d4cc0db012",
+    "files": [
+      "poetry.lock"
+    ],
+    "library_configs_tests_unchanged": true,
+    "mounted_dependency_environment_not_updated": true
+  },
+  "CI": {
+    "workflow_runs": [
+      {
+        "id": 39822550698,
+        "name": "CI",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 2932,
+        "jobs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39822550698/jobs",
+        "logs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39822550698/logs",
+        "workflow_id": 209110098
+      }
+    ]
+  },
+  "open_unmerged_implementation_PRs": 28,
+  "live_ISA_open_issue_records": 112,
+  "PR_linked_issue_records": 25,
+  "active_issue_records": 2,
+  "other_open_issue_records": 85,
+  "private_independent_archive29_pending": true,
+  "signed": "Sue"
+}

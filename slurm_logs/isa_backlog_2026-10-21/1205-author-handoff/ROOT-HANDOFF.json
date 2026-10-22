@@ -1,0 +1,19 @@
+{
+  "status": "ROOT_AUTHENTICATED_UGANDA1205_AUTHOR_HANDOFF_NOT_PRODUCTION_ACCEPTANCE",
+  "at_UTC": "2026-10-22T17:43:29.033270+00:00",
+  "source_head": "884775a461d769fd4bb5181005ca3238513b5b01",
+  "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "READY_sha256": "08f1c4b622e7de3fb455580cd7455d712d2e54dd4be4bb5d489114bd96d81a1e",
+  "manifest_sha256": "06ce0a721a28472c0dacf696c3f7201c5f5e7697e1e6744bea27586ac414cdf4",
+  "allowlist_sha256": "8bbf8b49cc1e616ea2c17cc0ae181c944126ffed25ac2086bc6d3ee96a705f37",
+  "complete_manifest_files_content_and_physical_checked": 302,
+  "raw_private_L1_entries_rehashed": 53,
+  "genuine_current_binary_providers_MD5_SHA_and_physical_checked": 53,
+  "allowlisted_files": 20,
+  "observed_original_seal_postexit_records_sha256": "87977d7321e63e7760e23f7e77781eb52b4486356cd873adaca2201d8777539d",
+  "author_tests_and_source_oracle_are_claims_for_independent_verification": true,
+  "diagnostic_stops_frequency_scope_and_private_output_exception_retained": true,
+  "root_no_project_import_payload_decode_API_test_or_data_build_replay": true,
+  "root_checker_sha256": "057f1268c3b8a09b3a684929b9455294744f07437c905ea4262d98a5d1cacedb",
+  "signed": "Sue"
+}

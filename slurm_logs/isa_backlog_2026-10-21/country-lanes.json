@@ -1046,20 +1046,38 @@
         "path": "/local/job40255479/worktrees/isa-Uganda-1204",
         "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
         "ledger": "a53f71bad6a26307eb83d051b57a6cdd9c9424cc",
-        "status": "Author implementing country wave-coverage routing; phase0/root source gate accepted; runtime proof pending.",
-        "source_head": "69bcbd5ff",
-        "source_status": "Root inspected narrow Make/doc diff; test-fixture correction committed; new exact-parent tests and fingerprint census in progress. No held-provider staging yet."
+        "status": "FROZEN_AUTHOR_INDEPENDENT_PHASE0_RUNTIME_HELD",
+        "source_head": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+        "source_status": "Author reports sealer99339 and separatepostexit88691 terminal0; READY/1839entrymanifest/allowlist frozen, root handoff authentication pending. Later source delta from tested69bcbd5ff is ledger only.",
+        "targeted": "8candidatePASS/actual491parent7FAIL1PASS;existing170PASS/APIaudit0",
+        "copies": "37providers/444distinctcopies/12roots/533307636bytes",
+        "static_qualifications": "Guard setup/fixture/IPv6 probe history retained; root has not accepted runtime yet.",
+        "held_comparison": "61/65 strict pairs pass. Four zero-row column-order differences are newly exposed observable Uganda behavior versus actual491; values/dtypes/attrs equality is narrower diagnosis, not full-frame equivalence.",
+        "source_audit": "12-root exact footprints/177 footers;21 native-footer pairs and22 literal ordered scanner records exact. Held grain ledgers empty; nonempty transport covered only by targeted synthetic tests.",
+        "independent_reviewer": "malawi_1209",
+        "independent_review_path": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1204",
+        "independent_phase1": "HELD until root handoff authentication and DVC/image preparation; no data/test imports yet",
+        "private_author_READY": "5febb754720e182cc0834ca2f8b4f45fbb91dba1406b8b88e0dfe72497de9f08",
+        "private_author_manifest": "920a0d87c1473651e0704b2988648178853a6981949e51840520e2814b610d54"
       },
       "current_1205": {
-        "owner": "malawi_1209",
+        "owner": "acquisition_1149",
         "path": "/local/job40255479/worktrees/isa-Uganda-1205",
         "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
         "ledger": "309215e28bc12924ea22a7d15cf0b4c89591e696",
-        "status": "Read-only source/native/API area-coverage diagnosis; bounded data stage conditional on provider authentication.",
+        "status": "FROZEN_AUTHOR_ROOT_AUTHENTICATED_INDEPENDENT_RUNTIME_REVIEW",
         "provider_metadata_root_gate": "Uganda1205-provider-census-root.json",
         "provider_count": 53,
         "provider_bytes": 49160847,
-        "source_stage": "Worker reports actual binary authentication and distinct-copy gates terminal0; no root scientific acceptance yet."
+        "source_stage": "Root87223 terminal0 authenticates302manifest files,53genuine binary providers and53private copies; author seal32130/postexit86007 exact. Independent reviewer completed guarded phase0 and is released for phase1.",
+        "static_critic": "acquisition_1149",
+        "static_private": "review-Uganda1205-static",
+        "source_oracle_interim": "Author restores13235yieldkeys to27755 of31959true converted-source keys, preserving all14520oldkeys/values. All549/39/1362fingerprints unchanged. These are author claims awaiting independent verification.",
+        "source_head": "884775a461d769fd4bb5181005ca3238513b5b01",
+        "author": "malawi_1209",
+        "root_author_handoff": "1205-author-handoff/ROOT-HANDOFF.json",
+        "independent_review_path": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1205",
+        "independent_progress": "Own full549/39/1362fingerprints unchanged; both census terminal1 at empty dvc-cache directory assertion after complete outputs, separately qualified without replay. Candidate65PASS, actual491 new33 sixFAIL27PASS.53genuine providers and106distinctcopies authenticated; both normal cold actors running. Decimal/provider setup stops retained."
       }
     }
   },
@@ -1846,35 +1864,44 @@
     }
   },
   "current_queue_refresh": {
-    "recorded_at_UTC": "2026-10-22T16:47:51.474415+00:00",
+    "recorded_at_UTC": "2026-10-22T17:28:43.364859+00:00",
     "queue": "remaining-queue-2026-10-22.json",
     "open_issue_records": 112,
-    "implementation_prs": 27,
+    "implementation_prs": 28,
     "active": [
       1204,
-      1205,
-      1210
+      1205
     ],
-    "interpretation": "Explicit current ownership; older per-lane active fields are historical task records."
+    "interpretation": "Explicit current ownership; older per-lane active fields are historical task records.",
+    "pr_linked_issue_records": 25,
+    "other_open_issue_records": 85
   },
   "current_invalid_wave_1210": {
     "owner": "acquisition_1149",
     "author_head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
-    "status": "INDEPENDENT_AND_ROOT_ACCEPTED_PR_PUBLICATION_PENDING",
-    "tests": "Independent candidate28PASS/actual release17FAIL11PASS; existing21PASS/APIaudit0. Held-source grid and strong comparisons still in progress.",
+    "status": "ROOT_ACCEPTED_OPEN_PR_HUMAN_MERGE",
+    "tests": "Independent28candidatePASS/actual release17FAIL11PASS;existing21PASS/APIaudit0; all scoped runtime proofs complete and root accepted.",
     "scope": "Framework fingerprints all549country/39framework/1362waves move; no corpus output certification.",
     "review_interim": "Root78135terminal0 verifies359runtime+27supplement entries and29762tracked source receipts; 50strict pairs, fourcold/warm roots, invalid105-path preservation, 24literalwarningpairs and163literalorderedscannerrecords. Retained12calibration+2startup denials and original calibrationPID record gap; original five nestedpins exact.",
-    "nested_pins_root_check": "All five original full content/physical receipts exact, mode0600. Earlier peer anticipation of mismatch was independently disproven; no packaging defect. Preserved diagnostic stop/supplement pending.",
+    "nested_pins_root_check": "All five original full content/physical receipts exact, mode0600. Earlier anticipated mismatch disproven; no packaging defect. Diagnostic stop retained.",
     "root_acceptance": "1210-independent/ROOT-ACCEPTANCE.json",
     "independent_runtime_READY": "b1878041c931bf71426f5f865ea2d9ebb01b6e279ede5fd2085a08eb17616765",
-    "supplement_READY": "5c1550fa983140b4b183235c5001207a0b52a95b28a0b83adc01bc381faabb29"
+    "supplement_READY": "5c1550fa983140b4b183235c5001207a0b52a95b28a0b83adc01bc381faabb29",
+    "pr": 1214,
+    "head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+    "actual_creation_base": "06710190305e0057d9e19d42059753d4cc0db012",
+    "ci_run": 39822550698,
+    "ci": "Run metadata completed/success conflicts with unit job stillin_progress in connector and direct gh api. Windows success; six skipped. No completed unit/full-data-suite claim.",
+    "private_independent_archival": "Archive29 completed/root75559 verified compressedSHA/exact plan/approval/manifest/terminal proofs;416members/source-after verifier0.",
+    "ci_qualification": "1214-ci-metadata-qualification.json"
   },
   "latest_archive_checkpoint": {
-    "archive_count": 28,
-    "receipt": "private-evidence-durability-twentyeighth.json",
-    "covers": "Malawi1209author/independent,1210author,rootgatecopies",
-    "excludes": "live independent1210 and both Uganda tasks",
-    "native_parquet_operands_retained": 50,
-    "raw_cache_runtime_exclusions": 1868
+    "archive_count": 29,
+    "receipt": "private-evidence-durability-twentyninth.json",
+    "covers": "Frozen independent1210 runtime/additive guard-attribution supplement/root receipts",
+    "excludes": "All live Uganda author/review prefixes and runtime caches",
+    "native_parquet_operands_retained": 20,
+    "public_serialized_operands_retained": 48,
+    "raw_cache_runtime_exclusions": 549
   }
 }
