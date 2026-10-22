@@ -1,0 +1,16 @@
+{
+  "status": "POSTEXIT_PR1199_NEW_CONTENT_RECEIPTS_EXACT_WITH_HISTORICAL_MTIME_GAP",
+  "READY_sha256": "ba8e4e5b1d78085596329ca7f65db98aa1be986c64e95ce5d008b9b4ee9b5dd0",
+  "manifest_sha256": "b9da253fa7d3b1dc7cf1965c5b188992e29a0dbadef1bbebc393c2800d4938c5",
+  "manifest_entries": 274,
+  "original_content_entries": 1190,
+  "historical_mtime_absent_entries": 1190,
+  "actual_historical_mtime_continuity_established": false,
+  "new_current_original_copy_receipts_exact": true,
+  "physical_product_copies": 193,
+  "source_clean": true,
+  "zero_active_payload_consumers": true,
+  "write_denials": 0,
+  "network_denials": 0,
+  "signed": "Sue"
+}

@@ -1,0 +1,20 @@
+{
+  "status": "PASS_BOUNDED_PR1201_SAVED_NUMERIC_SUPPLEMENT_PENDING_ROOT_ACCEPTANCE",
+  "PR": 1201,
+  "positive_frame_groups": 322,
+  "main_and_producer_groups": 315,
+  "original_author_archive_pairs": 7,
+  "qualified_groups": 15,
+  "full_strict_groups": 307,
+  "original_negative_stage_wrongwave_pairs_retained": 30,
+  "nonself_fullbyte_controls": 16,
+  "old_manifest_entries": 2426,
+  "author_receipt_entries": 37,
+  "physical_saved_operands": 416,
+  "helper_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+  "all42_fault_controls_reject": true,
+  "original_fixture_inmemory_pair_gaps_retained": true,
+  "source_API_test_replays": 0,
+  "all_campaign_result": false,
+  "signed": "Sue"
+}
