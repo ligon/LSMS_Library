@@ -1969,7 +1969,17 @@
     "ci_run": 39822550698,
     "ci": "Run metadata completed/success conflicts with unit job stillin_progress in connector and direct gh api. Windows success; six skipped. No completed unit/full-data-suite claim.",
     "private_independent_archival": "Archive29 completed/root75559 verified compressedSHA/exact plan/approval/manifest/terminal proofs;416members/source-after verifier0.",
-    "ci_qualification": "1214-ci-metadata-qualification.json"
+    "ci_qualification": "1214-ci-metadata-qualification.json",
+    "ci_final_observed": {
+      "run": 39822550698,
+      "head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+      "unit_tests": "completed/success",
+      "windows_smoke": "completed/success",
+      "other_jobs": "six skipped including data-tests",
+      "receipt": "1214-ci-final-observed.json",
+      "old_discrepancy_record_retained": true,
+      "rerun_triggered": false
+    }
   },
   "latest_archive_checkpoint": {
     "archive_count": 31,
