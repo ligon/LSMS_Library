@@ -66,13 +66,13 @@
         "parent_live_state": "open/unmerged/exactcfd at preparation",
         "control": "/local/job40255479/worktrees/isa-Burkina_Faso-1119-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1119",
-        "status": "Author frozen/quiescent; independent review prepared/unassigned.",
+        "status": "Root accepted independently reviewed bounded two-cell fix; PR publication pending; issue1119 remains partial/open",
         "boundary": "Two harmonize_seed_crop Preferred Label cells only after actual reproduction; broader marker decision and non-ISA countries residual",
         "brief": "queued-1119-Burkina_Faso/NEXT-WRITER-BRIEF.md",
         "owner": "review_nigeria_1034",
         "interim_result": "131focusedPASS0skip;actualparent5FAIL4PASS;52strictframes;4430onlycrop-label changes;22877lines/code21=602 preserved;normalwarm0writes;seed_kg exact;6scannerWARN individually multiset-exact.",
         "postbuild_wave_census_qualification": "549API/39framework measured before builds; separate relevant-wave inventory captured after builds, preserving initial wrong-accessor stop. No prebuild wave census claim.",
-        "latest_live_parent_scope_receipt": "BF1119-live-parent-scope-0248.json",
+        "latest_live_parent_scope_receipt": "BF1119-live-parent-scope-before-publication.json",
         "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
         "runtime_head": "c5134f57f76bc53e84df6c3398ffc9a3781e9e1c",
         "precode_ledger": "0e9f1f696153562b62d3a3d2d389e309b96c9238",
@@ -89,8 +89,18 @@
           "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Burkina_Faso-1119",
           "brief": "queued-Burkina_Faso-1119-review/NEXT-REVIEW-BRIEF.md",
           "review_assigned": true,
-          "tests_builds": "Starting independent review after accepted19 freeze",
-          "reviewer": "niger_lane"
+          "tests_builds": "Completed independent review;131PASS;actualparent5FAIL4PASS",
+          "reviewer": "niger_lane",
+          "status": "PASS_BOUNDED_PARTIAL_BF1119_ROOT_ACCEPTED",
+          "manifest_entries": 1173,
+          "manifest_sha256": "437a0580aa838b1f108caaba90e1fbdade24c88658a337b012b3a2cee7762565",
+          "READY_sha256": "1773a6b1771a5a3e3b67692ec8028bc3520692e2c0b0124c62b2e56773e219fc",
+          "root_acceptance": "1119-Burkina_Faso-independent/ROOT-ACCEPTANCE.json",
+          "strict_frames": "195savedinputs/184exactpairs/7negativecontrols",
+          "warnings_scanner": "76completewarningpairs;6WARNoccurrences and actual own JSONL bytes exact",
+          "actual_prebuild": "24BF/525otherAPI/39frameworkexact;12waves beforebuild",
+          "comparator_boundary": "Default Benin/Togo current/fullcoverage warm only; Make BF-only; no comparator source-cold",
+          "preservation": "29779sourceendpoints/143physicalcopies/594authorpayloads exact;zero consumers"
         }
       }
     },
@@ -181,14 +191,19 @@
         "base_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
         "control": "/local/job40255479/worktrees/isa-Malawi-218-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/218",
-        "status": "Writer assigned after accepted Tanzania1091 freeze; no verdict",
+        "status": "Writer source/tests and normal Default/Feature checks pass; final CLI/footer/protection/seal pending; no independent verdict",
         "boundary": "Remove only two raw null derived registrations; preserve automatic Country/Feature food-derived methods and all output semantics. Other218/nonISA/shared cleanup remains residual.",
         "independence": "Starts releasef8, independent of unmerged1109/1111 plot-input patches; normal future composition still required.",
         "root_static_prior_art": "CLAUDE698,Country.data_scheme/_materialization_entry/_FOOD_DERIVED,Feature source discovery and Malawi retirement note1653ff personally read; static raw-key search finds only Malawi2.",
         "brief": "queued-Malawi-218/NEXT-WRITER-BRIEF.md",
         "root_prepared_metadata_targets": true,
         "writer_assigned": true,
-        "owner": "mali_lane"
+        "owner": "mali_lane",
+        "runtime_head_prefix": "299fb8675",
+        "candidate_tests": "51PASS0SKIP;parentpolicy1FAIL/publiccontrol1PASS",
+        "actual_prebuild": "26Malawi/523otherAPI/39frameworkexact;all97Malawi wave hashes unchanged",
+        "scanner": "205records/head,orderedrawandfullmultisetexact:200WARN/3PASS/2preexistingFAIL/0ERROR",
+        "retained_residuals": "Both-head Make legacy food builder RuntimeError; invalid wave evicts five native companions; no repair in218"
       }
     },
     "Mali": {
@@ -630,7 +645,7 @@
       ],
       "active_prior_work_roots_frozen": true,
       "active_interim_finding": "First ordinary default/Make cold builds133761 rows; source oracle complete/native/public133761,403 old null-key exclusions,928 null-v. Default fresh warm0/144 cache files. Make warm17 byte/mode-identical mtime changes retained as a stopped zero-write expectation; actual parent counterpart pending. Whole harvest/median/real-area yield/tests remain active.",
-      "active_status": "Root accepted frozen1198 runtime plus separately reviewed documentary qualification; final085 source published, PR preparation pending",
+      "active_status": "Reviewed production observation carrier PR1202 OPEN at085; exact-head CI39720922853 unit/windows success, six jobs skipped incldata; awaiting human merge",
       "active_private_addendum": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum",
       "active_exact_addendum_result": "85 exact saved-artifact checks and seven comparator negative controls pass; unsaved constructor/currency/Feature/finalizer scope gaps explicit. Original sources and reports remain unchanged.",
       "factor_mapping_issue": 849,
@@ -731,9 +746,14 @@
         "gate": "Root1198 runtime+doc acceptance completed",
         "boundary": "Exactly12 reported-factor map entries at retained native grain, preserving existing numeric coercion/nonpositive normalization and all helper/screen/science logic; raw source values are separate private oracles.",
         "owner": "review_nigeria_1034",
-        "status": "Assigned after runtime+doc acceptance; new ledger/source gates precede code",
+        "status": "Writer active at retained085 parent;12maps/tests published, source-backed default builds in progress",
         "parent_preparation_receipt": "queued-Uganda-849/root-doc-parent-fastforward.json",
-        "nonpositive_clarification": "queued-Uganda-849/ROOT-NONPOSITIVE-CLARIFICATION.json"
+        "nonpositive_clarification": "queued-Uganda-849/ROOT-NONPOSITIVE-CLARIFICATION.json",
+        "runtime_head_prefix": "7a8fd2249",
+        "candidate_new_tests": "24PASS;actualparent20FAIL4PASS0ERROR/SKIP",
+        "actual_prebuild": "28Uganda/521otherAPI/39frameworkexact;171declared-wave/224API-wave changes allUganda",
+        "execution_qualification": "Two two-worker data-free cohorts briefly overlapped:up to4workers; retained, no replay; subsequent cohorts max2total",
+        "inventory_stop": "Initial empty-inventory check encountered already-gated healthy Niger caches; original retained; unique metadata retry checks Uganda-empty only"
       },
       "documentation_qualification": {
         "accepted_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
@@ -746,7 +766,77 @@
         "final_PASS_manifest_entries": 45,
         "root_acceptance": "1198-Uganda-documentation-qualification/ROOT-DOC-ACCEPTANCE.json"
       },
-      "public_source_head": "0854303bc5f60daa698b2927fc3b193822a4c090"
+      "public_source_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "public_carrier_PR": {
+        "number": 1202,
+        "url": "https://github.com/ligon/LSMS_Library/pull/1202",
+        "state": "open",
+        "merged": false,
+        "head": "fix/1198-uganda-production-observations-20261022",
+        "head_sha": "0854303bc5f60daa698b2927fc3b193822a4c090",
+        "base": "development",
+        "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "body_readback_exact": true,
+        "ci": {
+          "runs": [
+            {
+              "id": 39720922853,
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ],
+          "jobs": [
+            {
+              "name": "unit-tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "windows-smoke",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "windows-script-build",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "dvc-lock-check",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "refresh-dvc-locks",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "docs",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "data-tests",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "dvc-remote-reachability",
+              "status": "completed",
+              "conclusion": "skipped"
+            }
+          ],
+          "credentialed_data_suite_pass": false
+        },
+        "independent_runtime": "1198-Uganda-independent/ROOT-RUNTIME-ACCEPTANCE.json",
+        "independent_documentation": "1198-Uganda-documentation-qualification/ROOT-DOC-ACCEPTANCE.json",
+        "issue_status_bodies_readback": {
+          "849": "open",
+          "1198": "open"
+        },
+        "signed": "Sue"
+      }
     }
   },
   "shared_lanes": {
@@ -1231,12 +1321,13 @@
       "exact_leaf_nine_path_mode_blob_delta": true,
       "filesystem_origin_published": true,
       "GitHub_published": false,
-      "review_assigned": false,
-      "tests_builds": 0,
+      "review_assigned": true,
+      "tests_builds": "Assigned; own prebuild gates precede data/tests",
       "verdict": null,
       "brief": "queued-twenty/NEXT-REVIEW-BRIEF.md",
       "healthy_comparator_boundary": "Current19/fullcoverage Mali155931 and Niger46043; never leaf Mali40218 or an old pooled Feature",
-      "status": "Prepared/unassigned; no combined20 runtime verdict"
+      "status": "Assigned bounded Tanzania increment review on actual19; no runtime verdict yet",
+      "reviewer": "niger_lane"
     }
   }
 }

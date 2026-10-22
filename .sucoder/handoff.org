@@ -1158,3 +1158,16 @@ Sue
 All19 owner-only private archives are verified. Archive18 retains frozen Tanzania independent plus bounded19 proof (3184files, SHA028eeb4160a9361568f9b7b33e87f5de7df8e6d778c7702216f574811a759d8c); archive19 retains frozen Uganda runtime and both documentary reviews (1088files, SHAddc4f303b680f92c2be5ed2c2a796c1b0c3bf71ff72ea61d79233afbf83898c8). Source-after/member/digest/owner/mode/fsync receipts passed. Active Malawi/BF/849 roots are not archived.
 
 Sue
+
+* ISA backlog checkpoint -- 2026-10-22 04:27:19 UTC
+
+Uganda production observation carrier PR1202 is OPEN at0854303bc5f60daa698b2927fc3b193822a4c090, with exact-head CI39720922853 unit/windows SUCCESS; six jobs including data-tests skipped.
+All21 implementation PRs were independently OPEN/unmerged/exact at04:12:37UTC; receipt public-pr-checkpoint-twentyone.json. No human merge has occurred.
+BF1119 independent bounded review/root verification PASS:1173 payloads,131tests,actualparent5FAIL4PASS,184exactpairs/195inputs; exactly4430labels change and22877lines survive. Six scannerWARN and76warningpairs exact; broader1119/1187/1188 remain open.
+Safe review at1119-Burkina_Faso-independent; root acceptance is not yet a PR or merge. Parent1189 remains OPEN/exactcfd at fresh publication reconciliation.
+Released reviewer niger_lane is assigned actual20 de38/control2566 using integration/tanzania-twenty-review/NEXT-REVIEW-BRIEF.md; no20runtime verdict yet. Use current19 Mali155931/Niger46043 held warm, never leafMali40218.
+Malawi218 writer completes CLI/footer/freeze after51tests; scanner retains both-head2FAIL/200WARN/3PASS. Existing Make error and invalid-wave evictions are residuals, not scope expansions.
+Uganda849 writer7a8fd2249 has24newpasses/parent20FAIL4PASS and actualprebuild28/521/39; source-backed builds active. Brief nonpositive-helper normalization correction and bounded four-worker data-free overlap remain explicit.
+Goal remains active; user merges only.
+
+Sue

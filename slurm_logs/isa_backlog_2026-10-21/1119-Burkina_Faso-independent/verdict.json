@@ -1,0 +1,74 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent Burkina_Faso1119 two seed-crop Preferred Label cells on actual reviewed1123 parent; partial issue scope.",
+  "candidate": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "actual_parent": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "runtime_tests": "c5134f57f76bc53e84df6c3398ffc9a3781e9e1c",
+  "production_cells_changed": 2,
+  "old_test_expected_values_changed": 2,
+  "new_cases": 9,
+  "candidate_tests": {
+    "pass": 131,
+    "fail": 0,
+    "error": 0,
+    "skip": 0
+  },
+  "actual_parent_new_cases": {
+    "fail": 5,
+    "pass": 4,
+    "error": 0,
+    "skip": 0
+  },
+  "direct_unchanged_real_source_bodies_per_head": 2,
+  "source_inputs": 22877,
+  "unknown_code21": 602,
+  "changed_crop_labels": 4430,
+  "named_rows": [
+    2274,
+    2156
+  ],
+  "native_public_crop_rows": [
+    15593,
+    15587
+  ],
+  "sample_cluster_rows": [
+    20648,
+    2035
+  ],
+  "household_seed_kg_rows": 4229,
+  "healthy_default_Benin_Togo": [
+    10605,
+    13730
+  ],
+  "pooled_default_and_currency_None_Feature_rows": 47212,
+  "Make_Feature_scope": "Burkina_Faso only; no Make-pooled comparator/source-cold proof",
+  "strict_input_pickles": 195,
+  "strict_pair_checks": 184,
+  "negative_controls_rejected": 7,
+  "full_warning_multiset_pairs": 76,
+  "scanner_warn_records_each": 6,
+  "scanner_other_statuses": 0,
+  "API_hash_scope": {
+    "total": 549,
+    "BF_changed": 24,
+    "others_exact": 525
+  },
+  "framework_exact": 39,
+  "independent_relevant_wave_prebuild_hashes_changed": 12,
+  "author_relevant_wave_census_timing": "post-build; unchanged historical limitation",
+  "source_file_endpoints_exact": 29779,
+  "author594_payloads_exact": true,
+  "unexpected_denials": 0,
+  "guarded_IP_attempts": 0,
+  "no_product_defect_found_within_boundary": true,
+  "limits": [
+    "No full suite/corpus/other20BF-output claim.",
+    "Healthy Benin/Togo are current/full-coverage L2 only, no raw reconstruction or Make-pooled descent.",
+    "GH1187 source meaning/legacy Seed classification and1188 gift/purchase/unit routing unchanged.",
+    "Original author currency-expected-construction and wrong-accessor stops preserved; author wave census remains post-build.",
+    "Reviewer preparation/handling, missing comparator label, negative-control setup, native/read-time unit-layer and side-specific-footer expectation stops preserved; no API/source reruns to erase them.",
+    "Country/native/public and CLI serialization layers remain distinct; exact comparisons at matching stages, no normalization or attr stripping."
+  ],
+  "reviewer": "Sue / GPT-6",
+  "terminal_release": "FINAL-READY.json after immutable seal"
+}

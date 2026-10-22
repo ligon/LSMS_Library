@@ -1,0 +1,55 @@
+{
+  "recorded_at_UTC": "2026-10-22T04:26:31.805957+00:00",
+  "verdict": "ROOT_ACCEPT_BOUNDED_PARTIAL_BF1119",
+  "candidate": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "actual_parent": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "READY_sha256": "1773a6b1771a5a3e3b67692ec8028bc3520692e2c0b0124c62b2e56773e219fc",
+  "manifest_sha256": "437a0580aa838b1f108caaba90e1fbdade24c88658a337b012b3a2cee7762565",
+  "all_manifest_payloads_verified": 1173,
+  "safe_exports_verified": 6,
+  "root_read_full_review_actual_exact_source_oracles_artifact_cli_build_warnings_preparation_guard_freeze_seal_sources": true,
+  "root_independent_JUnit": {
+    "candidate": {
+      "pass": 131
+    },
+    "base": {
+      "fail": 5,
+      "pass": 4
+    }
+  },
+  "root_independent_prebuild_scope": {
+    "BF_changed": 24,
+    "other_API_exact": 525,
+    "framework_exact": 39,
+    "BF_wave_changed": 12
+  },
+  "strict_pairs": 184,
+  "saved_inputs": 195,
+  "negative_controls": 7,
+  "warning_pairs": 76,
+  "scanner": {
+    "WARN": 6,
+    "other": 0,
+    "complete_records_and_literal_bytes_exact": true
+  },
+  "source_inputs": 22877,
+  "qualified_unknown": 602,
+  "labels_changed": 4430,
+  "native_public_crop": [
+    15593,
+    15587
+  ],
+  "household_seed_kg": 4229,
+  "source_endpoints": 29779,
+  "physical_copies": 143,
+  "author_payloads": 594,
+  "limits": [
+    "Partial GH1119 only; Senegal/Guinea-Bissau/shared marker policy,1187/1188 remain open.",
+    "Healthy Benin/Togo and pooled Features are default held-current/full-coverage L2; Make BF-only, no comparator source-cold.",
+    "Independent prebuild wave census does not repair author post-build timing; author currency/accessor stops retained.",
+    "All independent preparation/inline-handling/warm/control/oracle-layer/footer-side stops retained; no API replay to erase evidence.",
+    "No full suite/corpus/other20BF outputs or broad source/scientific certification."
+  ],
+  "GitHub_publication_or_merge_or_issue_closure": false,
+  "signed": "Sue"
+}
