@@ -217,12 +217,24 @@
       "ci": "GitHub PR CI success on d602f8d63; local source/data verification independent",
       "active_issue": 1091,
       "active_owner": "review_nigeria_1034",
-      "active_path": "/local/job40255479/worktrees/isa-Niger-1091",
-      "active_branch": "diagnose/1091-niger-community-builder-20261021",
+      "active_path": "/local/job40255479/worktrees/isa-Niger-1091-fix",
+      "active_branch": "fix/1091-niger-community-builder-20261021",
       "active_baseline": "d602f8d63520e521a730f85551b366c4d45d9a35",
-      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Niger/1091",
-      "active_status": "Read-only country-builder diagnosis in progress",
-      "active_interim_result": "Old Make returns all46043 rows for each supported singleton and absent-wave request. Default correctly filters32352/13691/0. Current food cold/warm u dtype residual is1196; no source edits."
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Niger/1091-fix",
+      "active_status": "Writer approved and active; frozen diagnosis complete",
+      "active_interim_result": "Old Make returns all46043 rows for each supported singleton and absent-wave request. Default correctly filters32352/13691/0. Current food cold/warm u dtype residual is1196; no source edits.",
+      "diagnosis_1091": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/Niger/1091",
+        "source_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+        "status": "Complete and frozen",
+        "private_manifest_entries": 690,
+        "private_manifest_sha256": "0ee725660357c646add06ad5d625210d5f0d5dad1cf6fb1fa7f952023db4e2a7",
+        "actual_runtime_calls": 36,
+        "tests_passed": 97,
+        "separate_actual_built_assertions": 12,
+        "source_edits": false
+      },
+      "active_approved_boundary": "Delete only country concatenator and country Make block/sole-use variable; retain wave rules, helpers, schema, measurements, masks, grain and framework. Actual candidate hash census and independent review required."
     },
     "Nigeria": {
       "path": "/local/job40255479/worktrees/isa-Nigeria",
@@ -432,7 +444,7 @@
         "no_final_independent_verdict_or_PR_yet": true
       },
       "active_issue": 849,
-      "active_owner": "mali_lane (artifact-only addendum)",
+      "active_owner": "root (reconciliation and engineering assignment)",
       "active_path": "/local/job40255479/worktrees/isa-Uganda-849",
       "active_branch": "diagnose/849-uganda-reported-kgfactor-20261021",
       "active_baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
@@ -444,8 +456,9 @@
       ],
       "active_prior_work_roots_frozen": true,
       "active_interim_finding": "First-factor/summed-quantity carrier loses native production pairing. Actual IDs/slots support preservation; unkeyed2010 and Feature assembly need explicit observation contract. No factor-only promotion or implementation approved.",
-      "active_status": "Frozen849 source diagnosis; new artifact-only exactness addendum active",
-      "active_private_addendum": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum"
+      "active_status": "Frozen source diagnosis and exact saved-artifact addendum complete; lossless carrier implementation queued",
+      "active_private_addendum": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum",
+      "active_exact_addendum_result": "85 exact saved-artifact checks and seven comparator negative controls pass; unsaved constructor/currency/Feature/finalizer scope gaps explicit. Original sources and reports remain unchanged."
     }
   },
   "shared_lanes": {
@@ -760,6 +773,17 @@
       "published": true,
       "limits": "Bounded normal current-hash L2; separately documented held-source Ethiopia prerequisite extension. No new full suite, broad549 census, whole-country cold or unbuilt-output claim. Earlier hashes and source proofs retain their own pins.",
       "evidence": "integration/framework-sixteen-review/"
+    },
+    "pending_seventeen": {
+      "path": "/local/job40255479/worktrees/isa-integration-seventeen",
+      "branch": "isa/integration-seventeen-20261021",
+      "head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+      "control": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+      "additional_PR": 1197,
+      "status": "Independent bounded review active; no PASS or GitHub publication",
+      "owner": "mali_lane",
+      "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/framework-seventeen-review",
+      "prior_global16_source_unchanged": true
     }
   }
 }

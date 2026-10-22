@@ -255,3 +255,31 @@ At the 23:58 UTC live checkpoint, all seventeen exact public heads remain open, 
 PR1197 CI run39696155414 completed successfully.
 =public-pr-checkpoint-global17.json= records each actual head, base, state and successful run.
 Global16 remains the latest completed combined proof.
+
+* Country and integration checkpoint -- 2026-10-22 00:10 UTC
+
+Niger's source-backed #1091 diagnosis is complete; safe reports are in =1091-Niger-diagnosis/=.
+The 36 actual cold, fresh warm and populated calls show Make returning all46043 rows even for supported singleton and absent-wave requests.
+Root read the complete proposal and approved only the duplicate country concatenator/Make block retirement in a new writer based on reviewed1088.
+Native source grain, all30 second-entry observations, the76 quantity masks and wave builders remain binding invariants.
+Cold/covered-cache empty attrs/dtype and generic artifact serialization differences remain explicit matched-stage qualifications.
+
+Uganda #849's original source reports are in =849-Uganda-diagnosis/=.
+The separate =849-Uganda-exact-addendum/= confirms85 exact saved-artifact checks plus seven comparator negative controls.
+It verifies the112 comparable source-product carrier discrepancies without changing any source or scenario frame.
+Unsaved default-constructor returns, explicit currency=None/Feature pairs and a recreated finalizer return remain outside that artifact proof.
+Root independently verified the comparator function AST against the already reviewed exact-value pattern.
+A lossless native-observation repair is the concrete remaining engineering task; the unsafe factor-only scenario is not promoted.
+
+The validation-only seventeen-change source is =7ecf8e95fef567554fe93870ba95abddd1955a86= on =isa/integration-seventeen-20261021=.
+It is a clean FS-published merge of actual global16 and standalone1078 in a separate worktree; the public verified global16 branch remains unchanged.
+A new independent bounded review is active with its own candidate/base checkouts, source gates and private caches.
+It must establish actual1078/1062 interaction and exact source/frame preservation before publication; no seventeen-change PASS is claimed.
+Tanzania1091 remains queued in its prepared checkout.
+
+The eighth owner-only archive completed:2592 included files,499305331 compressed bytes, SHA256 =b74bba64ffd1a10d01b5db1897495b469a8c704bdd81617bc380f46333e300c4=.
+Every included member and included-source-after receipt verified.
+Four MD5/SHA-gated public Nigeria instrument PDFs are an explicit private-archive exception; duplicate caches/raw-source extensions/parser tree are excluded, while confidential derived frames remain owner-only.
+The safe receipt is =private-evidence-durability-eighth.json=.
+
+Sue

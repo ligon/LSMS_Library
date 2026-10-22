@@ -1,0 +1,98 @@
+[
+  {
+    "wave": "2010-11",
+    "season": "A",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "a5aq6d"
+  },
+  {
+    "wave": "2010-11",
+    "season": "B",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "a5bq6d"
+  },
+  {
+    "wave": "2011-12",
+    "season": "A",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "a5aq6d"
+  },
+  {
+    "wave": "2011-12",
+    "season": "B",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "a5bq6d"
+  },
+  {
+    "wave": "2013-14",
+    "season": "A",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "a5aq6d"
+  },
+  {
+    "wave": "2013-14",
+    "season": "B",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "a5bq6d"
+  },
+  {
+    "wave": "2015-16",
+    "season": "A",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "a5aq6d"
+  },
+  {
+    "wave": "2015-16",
+    "season": "B",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "a5bq6d"
+  },
+  {
+    "wave": "2019-20",
+    "season": "A",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "s5aq06d_1"
+  },
+  {
+    "wave": "2019-20",
+    "season": "A",
+    "slot": 2,
+    "key": "kg_factor",
+    "from": null,
+    "to": "s5aq06d_2"
+  },
+  {
+    "wave": "2019-20",
+    "season": "B",
+    "slot": 1,
+    "key": "kg_factor",
+    "from": null,
+    "to": "s5bq06d_1"
+  },
+  {
+    "wave": "2019-20",
+    "season": "B",
+    "slot": 2,
+    "key": "kg_factor",
+    "from": null,
+    "to": "s5bq06d_2"
+  }
+]

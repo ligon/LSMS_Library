@@ -1,0 +1,328 @@
+{
+  "definition": "Each declared harvest slot is one source observation; all DTA slots and retained source records are separate from canonical coalesced row counts",
+  "per_slot": [
+    {
+      "wave": "2010-11",
+      "season": "A",
+      "slot": 1,
+      "source_rows": 13873,
+      "reported_factor_finite_positive": 10928,
+      "reported_factor_equals_Quantity": 206,
+      "reported_factor_gt_MAX": 10,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 51,
+      "factor_positive_Quantity_zero": 3,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2010-11",
+      "season": "B",
+      "slot": 1,
+      "source_rows": 9413,
+      "reported_factor_finite_positive": 9402,
+      "reported_factor_equals_Quantity": 231,
+      "reported_factor_gt_MAX": 14,
+      "reported_factor_equals_Quantity_and_gt_MAX": 1,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2011-12",
+      "season": "A",
+      "slot": 1,
+      "source_rows": 12361,
+      "reported_factor_finite_positive": 7963,
+      "reported_factor_equals_Quantity": 177,
+      "reported_factor_gt_MAX": 20,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2011-12",
+      "season": "B",
+      "slot": 1,
+      "source_rows": 10348,
+      "reported_factor_finite_positive": 7125,
+      "reported_factor_equals_Quantity": 143,
+      "reported_factor_gt_MAX": 49,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2013-14",
+      "season": "A",
+      "slot": 1,
+      "source_rows": 10774,
+      "reported_factor_finite_positive": 6603,
+      "reported_factor_equals_Quantity": 169,
+      "reported_factor_gt_MAX": 52,
+      "reported_factor_equals_Quantity_and_gt_MAX": 1,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 6
+    },
+    {
+      "wave": "2013-14",
+      "season": "B",
+      "slot": 1,
+      "source_rows": 10424,
+      "reported_factor_finite_positive": 6664,
+      "reported_factor_equals_Quantity": 181,
+      "reported_factor_gt_MAX": 34,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 8
+    },
+    {
+      "wave": "2015-16",
+      "season": "A",
+      "slot": 1,
+      "source_rows": 10678,
+      "reported_factor_finite_positive": 10675,
+      "reported_factor_equals_Quantity": 161,
+      "reported_factor_gt_MAX": 12,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 2
+    },
+    {
+      "wave": "2015-16",
+      "season": "B",
+      "slot": 1,
+      "source_rows": 8971,
+      "reported_factor_finite_positive": 6610,
+      "reported_factor_equals_Quantity": 114,
+      "reported_factor_gt_MAX": 11,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 5
+    },
+    {
+      "wave": "2018-19",
+      "season": "A",
+      "slot": 1,
+      "source_rows": 7153,
+      "reported_factor_finite_positive": 7123,
+      "reported_factor_equals_Quantity": 196,
+      "reported_factor_gt_MAX": 57,
+      "reported_factor_equals_Quantity_and_gt_MAX": 12,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2018-19",
+      "season": "B",
+      "slot": 1,
+      "source_rows": 7041,
+      "reported_factor_finite_positive": 7026,
+      "reported_factor_equals_Quantity": 98,
+      "reported_factor_gt_MAX": 22,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2018-19",
+      "season": "B",
+      "slot": 2,
+      "source_rows": 7041,
+      "reported_factor_finite_positive": 934,
+      "reported_factor_equals_Quantity": 13,
+      "reported_factor_gt_MAX": 3,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2019-20",
+      "season": "A",
+      "slot": 1,
+      "source_rows": 8429,
+      "reported_factor_finite_positive": 6970,
+      "reported_factor_equals_Quantity": 72,
+      "reported_factor_gt_MAX": 8,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2019-20",
+      "season": "A",
+      "slot": 2,
+      "source_rows": 8429,
+      "reported_factor_finite_positive": 936,
+      "reported_factor_equals_Quantity": 9,
+      "reported_factor_gt_MAX": 1,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2019-20",
+      "season": "B",
+      "slot": 1,
+      "source_rows": 9356,
+      "reported_factor_finite_positive": 7357,
+      "reported_factor_equals_Quantity": 86,
+      "reported_factor_gt_MAX": 16,
+      "reported_factor_equals_Quantity_and_gt_MAX": 1,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    },
+    {
+      "wave": "2019-20",
+      "season": "B",
+      "slot": 2,
+      "source_rows": 9356,
+      "reported_factor_finite_positive": 921,
+      "reported_factor_equals_Quantity": 6,
+      "reported_factor_gt_MAX": 3,
+      "reported_factor_equals_Quantity_and_gt_MAX": 0,
+      "factor_positive_Quantity_missing": 0,
+      "factor_positive_Quantity_zero": 0,
+      "factor_positive_outside_existing_measure_crop_eligibility": 0
+    }
+  ],
+  "per_wave": [
+    {
+      "wave": "2010-11",
+      "all_DTA_slots_summed": {
+        "source_rows": 23286,
+        "reported_factor_finite_positive": 20330,
+        "reported_factor_equals_Quantity": 437,
+        "reported_factor_gt_MAX": 24,
+        "reported_factor_equals_Quantity_and_gt_MAX": 1,
+        "factor_positive_Quantity_missing": 51,
+        "factor_positive_Quantity_zero": 3,
+        "factor_positive_outside_existing_measure_crop_eligibility": 0
+      },
+      "retained_source_records_before_coalescence": {
+        "rows": 21051,
+        "reported_factor_finite_positive": 20330,
+        "reported_factor_equals_Quantity": 437,
+        "reported_factor_gt_MAX": 24,
+        "reported_factor_equals_Quantity_and_gt_MAX": 1,
+        "factor_positive_Quantity_missing": 51
+      }
+    },
+    {
+      "wave": "2011-12",
+      "all_DTA_slots_summed": {
+        "source_rows": 22709,
+        "reported_factor_finite_positive": 15088,
+        "reported_factor_equals_Quantity": 320,
+        "reported_factor_gt_MAX": 69,
+        "reported_factor_equals_Quantity_and_gt_MAX": 0,
+        "factor_positive_Quantity_missing": 0,
+        "factor_positive_Quantity_zero": 0,
+        "factor_positive_outside_existing_measure_crop_eligibility": 0
+      },
+      "retained_source_records_before_coalescence": {
+        "rows": 20243,
+        "reported_factor_finite_positive": 15088,
+        "reported_factor_equals_Quantity": 320,
+        "reported_factor_gt_MAX": 69,
+        "reported_factor_equals_Quantity_and_gt_MAX": 0,
+        "factor_positive_Quantity_missing": 0
+      }
+    },
+    {
+      "wave": "2013-14",
+      "all_DTA_slots_summed": {
+        "source_rows": 21198,
+        "reported_factor_finite_positive": 13267,
+        "reported_factor_equals_Quantity": 350,
+        "reported_factor_gt_MAX": 86,
+        "reported_factor_equals_Quantity_and_gt_MAX": 1,
+        "factor_positive_Quantity_missing": 0,
+        "factor_positive_Quantity_zero": 0,
+        "factor_positive_outside_existing_measure_crop_eligibility": 14
+      },
+      "retained_source_records_before_coalescence": {
+        "rows": 17646,
+        "reported_factor_finite_positive": 13253,
+        "reported_factor_equals_Quantity": 350,
+        "reported_factor_gt_MAX": 86,
+        "reported_factor_equals_Quantity_and_gt_MAX": 1,
+        "factor_positive_Quantity_missing": 0
+      }
+    },
+    {
+      "wave": "2015-16",
+      "all_DTA_slots_summed": {
+        "source_rows": 19649,
+        "reported_factor_finite_positive": 17285,
+        "reported_factor_equals_Quantity": 275,
+        "reported_factor_gt_MAX": 23,
+        "reported_factor_equals_Quantity_and_gt_MAX": 0,
+        "factor_positive_Quantity_missing": 0,
+        "factor_positive_Quantity_zero": 0,
+        "factor_positive_outside_existing_measure_crop_eligibility": 7
+      },
+      "retained_source_records_before_coalescence": {
+        "rows": 19639,
+        "reported_factor_finite_positive": 17278,
+        "reported_factor_equals_Quantity": 275,
+        "reported_factor_gt_MAX": 23,
+        "reported_factor_equals_Quantity_and_gt_MAX": 0,
+        "factor_positive_Quantity_missing": 0
+      }
+    },
+    {
+      "wave": "2018-19",
+      "all_DTA_slots_summed": {
+        "source_rows": 21235,
+        "reported_factor_finite_positive": 15083,
+        "reported_factor_equals_Quantity": 307,
+        "reported_factor_gt_MAX": 82,
+        "reported_factor_equals_Quantity_and_gt_MAX": 12,
+        "factor_positive_Quantity_missing": 0,
+        "factor_positive_Quantity_zero": 0,
+        "factor_positive_outside_existing_measure_crop_eligibility": 0
+      },
+      "retained_source_records_before_coalescence": {
+        "rows": 15630,
+        "reported_factor_finite_positive": 15083,
+        "reported_factor_equals_Quantity": 307,
+        "reported_factor_gt_MAX": 82,
+        "reported_factor_equals_Quantity_and_gt_MAX": 12,
+        "factor_positive_Quantity_missing": 0
+      }
+    },
+    {
+      "wave": "2019-20",
+      "all_DTA_slots_summed": {
+        "source_rows": 35570,
+        "reported_factor_finite_positive": 16184,
+        "reported_factor_equals_Quantity": 173,
+        "reported_factor_gt_MAX": 28,
+        "reported_factor_equals_Quantity_and_gt_MAX": 1,
+        "factor_positive_Quantity_missing": 0,
+        "factor_positive_Quantity_zero": 0,
+        "factor_positive_outside_existing_measure_crop_eligibility": 0
+      },
+      "retained_source_records_before_coalescence": {
+        "rows": 17046,
+        "reported_factor_finite_positive": 16184,
+        "reported_factor_equals_Quantity": 173,
+        "reported_factor_gt_MAX": 28,
+        "reported_factor_equals_Quantity_and_gt_MAX": 1,
+        "factor_positive_Quantity_missing": 0
+      }
+    }
+  ]
+}

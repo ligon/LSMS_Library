@@ -894,3 +894,18 @@ Sue
 At23:58UTC all17 exact public heads are freshly verified open/unmerged/mergeable/CI-success; see public-pr-checkpoint-global17.json.
 PR1197 CI39696155414 is SUCCESS. PR1170 body now reflects17publicPRs and source-backed current country work.
 Do not confuse the17head metadata checkpoint with global17 integration; global16 d527 remains latest combined PASS.
+
+* Active work -- 2026-10-22 00:10 UTC
+
+Previously public campaign head1d9dc902d contains17head metadata and corrected whitespace.
+Current pending exports add frozen Niger1091 diagnosis/approval, Uganda849 source diagnosis+85-check strict addendum, archive8 durable receipt and this checkpoint.
+Mali independent reviewer niger_lane has111tests,24baseline negative causes,40candidate stages,fullpairedFeature/scanner/CLI passing; actual parent source cases are finishing. Retain its raw-log handling and optional variable-label metadata qualifications.
+Niger writer review_nigeria_1034 is approved ONLY countryconcat+Makeblock/solevar removal, newledger FIRST, on fix/1091-niger-community-builder-20261021 at d602. Protect frozen690-entry diagnosis.
+Global17 independent reviewer mali_lane now owns candidate7ecf8e95fef567554fe93870ba95abddd1955a86 versus actual16d527, new private integration/framework-seventeen-review and exact percheckout DVCtmp targets. Actualsource/race/healing/1062orders gates required; no17PASS/publicbranch yet.
+Uganda849 addendum is frozen52entries SHA939b450191680dee00f92fb8bc7a1ae9d1f99a5f6fc575b0ff4bc0d221565e56; root read full report/checker and independently verified reused comparator AST. Next file/dedup native-production carrier owner, reconcile849 merged prerequisites, then assign full-record lossless Country/Feature engineering after source-key/design prototype. No factor-only promotion.
+Tanzania1091 prepared but not yet dispatched; retain its separate priority after immediate shared composition check.
+Archive8 exec55915 FINISHEDSUCCESS: durable quiescent-followup-23h55.tar.gz SHA b74bba64ffd1a10d01b5db1897495b469a8c704bdd81617bc380f46333e300c4,499305331bytes,2592files,6roots. Launchers/private manifest fsynced and owner-only, all included members/source-after verified. Four exact public PDFs included privately; derived frames remain confidential.
+Unarchived completed roots now Uganda/849, Uganda/849-exact-addendum and Niger/1091; preserve them in the next bounded owner-only archive. Never archive active Niger writer/Mali review/global17 as quiescent.
+No running root exec handles at this checkpoint; docs push11449 completed to1d9dc902d, merge86001 completed FS-published7ec. Main development remains f8; no public PR merged. Goal active.
+
+Sue
