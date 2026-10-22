@@ -92,7 +92,60 @@ required before publication; root supplies live-state coordination.
 
 ## Verification
 
-Pending source reproduction and the actual prebuild inventory. No candidate
-or completed fix is claimed by this grounding ledger.
+- **OK (sections 2-5):** held-source reproduction confirms 2,274 maize and
+  2,156 cowpea seed records use targets absent from the native crop source.
+  Native crop labels are the proposed existing targets (2,671 / 2,898 rows).
+  Production commit `c5134f57f76bc53e84df6c3398ffc9a3781e9e1c` changes exactly
+  those two Preferred cells; keys and every other table/cell/comment are exact.
+  Existing test changes exactly two expected labels; no assertion is removed.
+- **OK (sections 3-4):** nine held sources per head were physically copied
+  with terminal MD5/SHA/size/mode/mtime/inode/nlink gates before decode/build.
+  Twelve comparator caches per head passed actual current/full-coverage gates.
+  Two normal cold builds retain 22,877 input lines and all 602 code21 lines.
+  The unmodified real-source assertion bodies pass twice per head; quantities,
+  current bindings, units, masks, native identities and multiplicities survive.
+- **OK (sections 2-4):** 52 strict full-frame comparisons cover raw/native,
+  Country, seed_kg, support/comparator and argument-matched Feature frames.
+  Exactly 4,430 labels change; values, types, axes/unused levels/codes/order,
+  masks and recursively typed full attrs are otherwise exact. Crop production
+  remains 15,587 public / 15,593 native rows; no other-wave coverage is added.
+  Seed_kg is unchanged on 4,229 household keys, without parcel allocation.
+- **OK (sections 2-4):** default and currency=None Feature each retain 47,212
+  rows. Healthy Benin/Togo Country frames stay exact at 10,605 / 13,730 input
+  rows. Full scanner six-warning multisets are individually exact, with no
+  failure/error/skip and no nonexistent phase-2 kwargs grid claimed.
+  Fresh-process warm and new objects leave every private data byte/mode/mtime
+  exact, with genuine current hashes and full manifests.
+- **OK (sections 2-5):** 131 focused pytest cases pass, zero skipped; the
+  identical new tests on the actual parent give five failures/four passes,
+  zero fixture errors. Two credential-gated built tests are explicitly
+  deselected from pytest and their complete assertion bodies pass directly
+  against held-source Country at both heads. API audit and diff checks pass.
+- **TIMING QUALIFICATION (section 4):** all 549 API hashes and 39 framework
+  tags were measured before source API builds: 24 BF change, 525 others and
+  all framework tags exact. Separate 12 relevant-wave hashes were omitted
+  then; their actual config-only enumeration was AFTER scoped builds, with
+  unchanged runtime/config bytes. All 12 move. No prebuild wave census claim
+  or output claim for the other 20 Burkina tables is made.
+- **RETAINED HARNESS STOPS:** first pure Feature expected construction omitted
+  the existing default currency axis. Original operands/script/trace remain;
+  v2 uses matched parent currency records and existing alignment machinery,
+  with no API replay or attr normalization. First supplemental wave-hash
+  probe used a nonexistent Country.wave accessor; distinct v2 uses existing
+  Country.__getitem__. Both attempts remain private. No private aggregate was
+  overwritten or reconstructed.
+
+At the actual household/crop existence projection, matching maize seed rows
+rise 0 -> 2,251/2,274 and cowpea 0 -> 2,097/2,156. The remaining 23/59 have
+no matching crop record; no harvest or plot identity is fabricated. Residual
+markers, other countries, GH1187, GH1188 and absent waves remain excluded.
+Root's fresh live-state receipt `BF1119-live-parent-scope-0248.json` (SHA256
+`3833b7fa64abd62976c65bee9e63d512ca4796908941eb70c3ab091901e9b0a6`, 1,262
+bytes) confirms PR1189 open/unmerged at the actual cfd parent and issue1119
+open with its unchanged two-cell request and zero comments.
+No anchored CONTRADICTION or REINVENTION is identified within this narrow
+patch. Author validation awaits a different independent reviewer, rather than
+claiming final acceptance. Safe reports live under the task's slurm_logs path;
+full records/logs and final source/reference receipts remain private.
 
 Sue
