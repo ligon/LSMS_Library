@@ -1,0 +1,93 @@
+{
+  "status": "PASS",
+  "source_pins": {
+    "candidate": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+    "parent": "d602f8d63520e521a730f85551b366c4d45d9a35",
+    "runtime_tests": "6be6576607f1862b603d123acfb74ace4026fd3f",
+    "candidate_tests_tree": "a2c9ba05f0faf6625885bc6a0bd5f3bd71bece43",
+    "candidate_package_tree": "00cb01e7c1ca727dcefd5ed04d3de49d951a5276"
+  },
+  "immutable_tree_summary": {
+    "/local/job40255479/worktrees/isa-review-Niger-1091": {
+      "head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "tracked_files": 14893,
+      "all_tracked_content_git_mode_fs_mode_exact": true,
+      "clean_tracked_status": true,
+      "in_tree_parquets": 0
+    },
+    "/local/job40255479/worktrees/isa-review-Niger-1091-base": {
+      "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "tracked_files": 14885,
+      "all_tracked_content_git_mode_fs_mode_exact": true,
+      "clean_tracked_status": true,
+      "in_tree_parquets": 0
+    },
+    "/local/job40255479/worktrees/isa-Niger-1091-fix": {
+      "head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "tracked_files": 14893,
+      "all_tracked_content_git_mode_fs_mode_exact": true,
+      "clean_tracked_status": true,
+      "in_tree_parquets": 0
+    }
+  },
+  "hash_scope": {
+    "API_total": 549,
+    "Niger_changed": 23,
+    "other_unchanged": 526,
+    "framework_total_unchanged": 39
+  },
+  "source_preparation": {
+    "sources": 11,
+    "sidecars": 11,
+    "physical_copies": 160,
+    "terminal_before_decode": true,
+    "copies_source_endpoints_exact": true,
+    "current_Mali_rows": 40218,
+    "source_cold_Mali": false
+  },
+  "exact_assertion_counts": {
+    "matrix_cold_warm": 12,
+    "supported_vs_actual_parent_default": 6,
+    "native_matched_parent": 16,
+    "unsupported_vs_existing_empty_contract": 6,
+    "source_oracle_native": 2,
+    "native_walked_normalized_raw": 2,
+    "raw_country_parent": 1,
+    "matched_science_Feature_CLI": 16,
+    "CLI_Arrow_footer_schema_bytes": 5,
+    "Make_CLI": 2,
+    "Make_Feature_parent": 2,
+    "populated_parent_controls": 9,
+    "populated_empty_helper": 3,
+    "cross_stage_full_exact": 14,
+    "1196_sole_dtype_exception_exact_elsewhere": 2
+  },
+  "matched_warning_probes": 28,
+  "scanner_records": 3,
+  "mode_qualification": [
+    {
+      "path": "slurm_logs/isa_backlog_2026-10-21/Niger/1091/proof.json",
+      "review": "0o600",
+      "writer": "0o644",
+      "same_git_mode": true,
+      "same_bytes": true
+    },
+    {
+      "path": "slurm_logs/isa_backlog_2026-10-21/Niger/1091/validation.json",
+      "review": "0o600",
+      "writer": "0o644",
+      "same_git_mode": true,
+      "same_bytes": true
+    }
+  ],
+  "author_payloads_unchanged": 1701,
+  "protected_old_manifest_counts": [
+    690,
+    241,
+    1190
+  ],
+  "own_LSMS_data_root_parquets": 40,
+  "synthetic_pytest_temp_parquets": 104,
+  "live_task_consumers": 0,
+  "full_private_receipts": true
+}

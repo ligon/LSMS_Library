@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-22T00:34:00Z",
+  "observed_at": "2026-10-22T01:26:27.975827+00:00",
   "actions": [
     {
       "issue": 822,
@@ -270,6 +270,10 @@
     {
       "issue": 1078,
       "action": "Root accepted released independent bounded functional17 review at7ec against actual16, independently reconstructed entire country.py and verified raw236scannerrecords/9620JUnitoutcomes. Published NEW isa/integration-seventeen branch; old16branch unchanged. Full13FAIL/doc-childguard-mtime/stale8companions/1196/broadhashcost remain explicit. No PR merged."
+    },
+    {
+      "issue": 1091,
+      "action": "Root accepted frozen independent Niger-only review at670de9c,1437manifestentries. OpenedPR1200 stacked on actual1176d602; all author/review limitations retained. No closure/merge. Actual18 bounded composition separately dispatched to niger_lane."
     }
   ],
   "verified_issue_metadata": [
@@ -444,6 +448,17 @@
       "review": "Independent PASS111 tests;24 meaningful parent failures/four passes;40 candidate stages; complete strict source/native/public/typed-attrs/CLI/Feature/scanner/hash proof with explicit qualifications.",
       "ci": "success; run39699773895",
       "partial_residual": "Umbrella1091 remains open for Niger/Tanzania and human merge of all three countries."
+    },
+    {
+      "number": 1200,
+      "issue": 1091,
+      "head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "runtime": "6be6576607f1862b603d123acfb74ace4026fd3f",
+      "base": "fix/1088-niger-quantity-sentinel-20261021",
+      "dependency_pr": 1176,
+      "review": "IndependentPASS114tests,12meaningfulparentfailures/fivepasses; source oracle46043/30late/76masks, strict fullframes/typedattrs/scanner/CLI. Explicit original aggregate/auxiliary and independent receipt/seal limits retained.",
+      "ci": "in_progress;run39705606211",
+      "partial_residual": "Umbrella1091 stays open: Mali1199 and Niger1200 await human merge; Tanzania diagnosis/implementation separate."
     }
   ]
 }

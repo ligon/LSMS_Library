@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-10-22T01:26:27.975827+00:00",
+  "number": 1200,
+  "url": "https://github.com/ligon/LSMS_Library/pull/1200",
+  "state": "open",
+  "merged": false,
+  "mergeable": true,
+  "head": "fix/1091-niger-community-builder-20261021",
+  "head_sha": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+  "base": "fix/1088-niger-quantity-sentinel-20261021",
+  "base_sha": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "ci_run": 39705606211,
+  "ci_status": "in_progress",
+  "CI_observation_scope": "This new head only; prior18PR CI was not refreshed by this receipt."
+}
