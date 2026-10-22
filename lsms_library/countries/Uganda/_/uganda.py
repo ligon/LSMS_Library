@@ -1720,10 +1720,10 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None,
 # conversion factor into kg", beside every harvest record.  It is a
 # SURVEY-REPORTED kilograms-per-unit rate, independent of the unit label, so
 # it is the only kg basis available for 2018-19 season A (no unit column).
-# Wired for 2018-19 only.  EVERY OTHER WAVE ALSO SHIPS IT and is deliberately
-# left unwired here: nothing consumed a per-row factor before GH #842, so
-# wiring a wave whose kilograms already resolve through its unit label would
-# MOVE those kilograms, and that needs its own before/after.  Measured
+# GH #849 adds the twelve source bindings for 2010-11, 2011-12, 2013-14,
+# 2015-16 and 2019-20 after GH #1198 preserves native observations. The three
+# 2018-19 bindings and the unwired 2009-10 map remain unchanged. Reports use
+# the existing builder normalization and downstream screen. Earlier measured
 # non-null / rows: 2009-10 10 137/15 403 + 9 756/15 273; 2010-11 10 934/13 873
 # + 9 403/9 413; 2011-12 7 963/12 361 + 7 125/10 348; 2013-14 6 603/10 774 +
 # 6 665/10 424; 2015-16 10 675/10 678 + 6 610/8 971; 2019-20 (s5{a,b}q06d_1)
@@ -1877,12 +1877,12 @@ CROP_COLMAPS = {
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
                               'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
                               'condition_sold': 'a5aq7b', 'value_sold': 'a5aq8',
-                              'month': None}]},
+                              'month': None, 'kg_factor': 'a5aq6d'}]},
         'B': {'production_id': None, 'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
-                              'month': None}]},
+                              'month': None, 'kg_factor': 'a5bq6d'}]},
         # 2010-11 AGSEC4A ships ['HHID','prcid','pltid','cropID',
         # 'a4aq7'..'a4aq14'] and has NO `a4aq3` -- the seed-use column this
         # entry named until 2026-07 does not exist here, so the flag silently
@@ -1908,7 +1908,7 @@ CROP_COLMAPS = {
                               # an explicit None rather than by omission.
                               'condition_sold': None,
                               'value_sold': 'a5aq8',
-                              'month': 'a5aq6f'}]},
+                              'month': 'a5aq6f', 'kg_factor': 'a5aq6d'}]},
         'B': {'production_id': 'production2ID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
@@ -1920,7 +1920,7 @@ CROP_COLMAPS = {
                               # an explicit None rather than by omission.
                               'condition_sold': None,
                               'value_sold': 'a5bq8',
-                              'month': 'a5bq6f'}]},
+                              'month': 'a5bq6f', 'kg_factor': 'a5bq6d'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
                       'flag': 'a4aq8', 'crop': 'cropID'},
         'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
@@ -1932,13 +1932,13 @@ CROP_COLMAPS = {
                               'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
                               'condition_sold': 'a5aq7b',
                               'value_sold': 'a5aq8',
-                              'month': 'a5aq6f'}]},
+                              'month': 'a5aq6f', 'kg_factor': 'a5aq6d'}]},
         'B': {'production_id': 'Production2_ID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b',
                               'value_sold': 'a5bq8',
-                              'month': 'a5bq6f'}]},
+                              'month': 'a5bq6f', 'kg_factor': 'a5bq6d'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
                       'flag': 'a4aq8', 'crop': 'cropID'},
         'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
@@ -1950,13 +1950,13 @@ CROP_COLMAPS = {
                               'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
                               'condition_sold': 'a5aq7b',
                               'value_sold': 'a5aq8',
-                              'month': 'a5aq6f'}]},
+                              'month': 'a5aq6f', 'kg_factor': 'a5aq6d'}]},
         'B': {'production_id': 'Production2_ID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b',
                               'value_sold': 'a5bq8',
-                              'month': 'a5bq6f'}]},
+                              'month': 'a5bq6f', 'kg_factor': 'a5bq6d'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
                       'flag': 'a4aq8', 'crop': 'cropID'},
         'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
@@ -2007,27 +2007,26 @@ CROP_COLMAPS = {
                   {'production_slot': 1, 'qty': 's5aq06a_1', 'unit': 's5aq06b_1', 'condition': 's5aq06c_1',
                    'qty_sold': 's5aq07a_1', 'unit_sold': 's5aq07c_1',
                    'condition_sold': 's5aq07b_1', 'value_sold': 's5aq08_1',
-                   'month': 's5aq06f_1'},
+                   'month': 's5aq06f_1', 'kg_factor': 's5aq06d_1'},
                   {'production_slot': 2, 'qty': 's5aq06a_2', 'unit': 's5aq06b_2', 'condition': 's5aq06c_2',
                    'qty_sold': 's5aq07a_2', 'unit_sold': 's5aq07c_2',
                    'condition_sold': 's5aq07b_2', 'value_sold': 's5aq08_2',
-                   'month': 's5aq06f_2'},
+                   'month': 's5aq06f_2', 'kg_factor': 's5aq06d_2'},
               ]},
         'B': {'production_id': None, 'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [
                   {'production_slot': 1, 'qty': 's5bq06a_1', 'unit': 's5bq06b_1', 'condition': 's5bq06c_1',
                    'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
                    'condition_sold': 's5bq07b_1', 'value_sold': 's5bq08_1',
-                   'month': 's5bq06f_1'},
+                   'month': 's5bq06f_1', 'kg_factor': 's5bq06d_1'},
                   # Slot 2 (GH #848), labelled "(2019, condition2)" in the
-                  # file: the same shape as season A's slot 2 above.  No
-                  # `kg_factor` on EITHER 2019-20 slot, deliberately -- this
-                  # wave's q6d (s5bq06d_1 / s5bq06d_2, 7 366 / 921 non-null)
-                  # is #849's scope and needs its own before/after.
+                  # file: the same shape as season A's slot 2 above.
+                  # GH #849 carries each slot's own q6d report, before
+                  # any explicit per-observation kg conversion/aggregation.
                   {'production_slot': 2, 'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
                    'qty_sold': 's5bq07a_2', 'unit_sold': 's5bq07c_2',
                    'condition_sold': 's5bq07b_2', 'value_sold': 's5bq08_2',
-                   'month': 's5bq06f_2'},
+                   'month': 's5bq06f_2', 'kg_factor': 's5bq06d_2'},
               ]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
                       'flag': 's4aq08', 'crop': 'cropID'},
