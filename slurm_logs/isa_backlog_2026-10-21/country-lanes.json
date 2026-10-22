@@ -66,7 +66,7 @@
         "parent_live_state": "open/unmerged/exactcfd at preparation",
         "control": "/local/job40255479/worktrees/isa-Burkina_Faso-1119-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1119",
-        "status": "Reviewed partial PR1203 OPEN/unmerged, stacked on actual1189cfd; CI39722612561 in progress at checkpoint",
+        "status": "Reviewed partial PR1203 OPEN/unmerged, stacked on actual1189cfd; exact-headCI39722612561 unit/windows SUCCESS, six others skipped incldata",
         "boundary": "Two harmonize_seed_crop Preferred Label cells only after actual reproduction; broader marker decision and non-ISA countries residual",
         "brief": "queued-1119-Burkina_Faso/NEXT-WRITER-BRIEF.md",
         "owner": "review_nigeria_1034",
@@ -117,7 +117,8 @@
             "status": "in_progress",
             "conclusion": null,
             "data_suite_pass": false
-          }
+          },
+          "ci_final": "Burkina1203-CI-final.json"
         },
         "issue_remains_open": true
       }

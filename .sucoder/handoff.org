@@ -1181,3 +1181,9 @@ Actual20 prebuild25/524/39exact,14wavecells/6Tanzaniachanges; early dependent ga
 Ug849 runtime7a8fd22492255cc2c4d020b7a16f99249f588977 published; bothbackendcold133761rows per head. Sourceoracle cwd stop retained; expected mappings read from actual wave directories. Writer validation remains active.
 
 Sue
+
+* BF1203 CI completion -- 2026-10-22 04:38:02 UTC
+
+Exact-head39722612561 SUCCESS:unit-tests/windows-smoke pass; six other jobs including data-tests skipped. PR1203 and campaign1170 latest body independently readback exact; no credentialed CI data claim. All22 implementation heads remain unmerged at the04:34 fresh check.
+
+Sue
