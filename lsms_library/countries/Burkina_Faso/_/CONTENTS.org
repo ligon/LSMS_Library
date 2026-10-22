@@ -1494,3 +1494,23 @@ these comparisons.
 The reviewed identity implementation remains unmerged at this writing.
 It preserves all current bindings, units and grain; this documentation
 amendment neither rebinds fields nor chooses a physical-unit representation.
+
+* 2026-10-22 -- seed crop names match the native harvest vocabulary (GH #1119)
+
+Only two =harmonize_seed_crop= Preferred Label cells change: =Semences de maïs= now maps to =Maïs= and =Semences de haricots/niébé= to =Niébé=.
+The accents in this paragraph reproduce the exact source labels.
+The held 2018-19 input source has 2,274 applied maize-seed records and 2,156 cowpea-seed records.
+Its crop-production source uses =Maïs= on 2,671 records and =Niébé= on 2,898; neither old seed target occurs there.
+All original mapping keys and all other cells remain unchanged, including the source-qualified code-21 identity from GH #1123.
+
+The 22,877 input records retain their full existing payloads, units and native identities.
+The 15,587 public crop-production records are unchanged.
+At the actual =(t,i,crop)= projection, maize seed records with a corresponding crop record rise from zero to 2,251 of 2,274, and cowpea from zero to 2,097 of 2,156.
+This is a household/crop existence check: the input roster has no parcel axis, so these totals must not be allocated to crop parcels.
+The existing =seed_kg= result remains exact at its household =(t,i)= grain (4,229 rows).
+The 2014 and 2021-22 input/crop subset requests remain empty; no new wave is wired.
+
+This does not adjudicate code 21's physical meaning or legacy Seed classification (GH #1187), gift/purchase routing (GH #1188), or shared farm-level/not-crop-specific/missing marker policy.
+Senegal and Guinea-Bissau work remains outside this Burkina Faso partial fix.
+The Org file is a whole-country build input: all 24 Burkina API hashes change, with 525 other-country hashes and all 39 framework fingerprints exact.
+Only the four scoped Burkina tables were actually rebuilt; this is not evidence for all other outputs.
