@@ -423,8 +423,8 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
             f = float(ks)
         except (TypeError, ValueError):
             continue
-        if f != int(f):
-            continue  # genuine non-integer; not a unit code
+        if not np.isfinite(f) or f != int(f):
+            continue  # nonfinite or genuine non-integer; not a unit code
         i = int(f)
         for variant in (str(i), f"{i}.0"):
             extra.setdefault(variant, v)
@@ -3530,7 +3530,9 @@ class Country:
             source = _categorical_key_column(table, exclude=(target,))
             if source is None:
                 return None
-            rdict = table.set_index(source)[target].to_dict()
+            # A missing source key cannot label a missing observation. Keep
+            # null targets and nonmissing literal keys (including 'nan').
+            rdict = table.dropna(subset=[source]).set_index(source)[target].to_dict()
             # Numeric-code tables (e.g. a `Code` column 1, 2, 3) don't match
             # data that arrives as float-strings ('1.0') -- the documented
             # "format_id is applied to idxvars but not myvars" gotcha, which
