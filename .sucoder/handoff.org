@@ -1,6 +1,6 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T21:15:00+00:00
+* Current task -- 2026-10-22T21:19:39.620705+00:00
 
 LSMS-ISA goal ACTIVE; NEVER auto-merge. Main clean developmentf8; GitHub development067 is lock-only certifi, mounted runtime unchanged.
 Queue114open records=27PRlinked+3active+84other;30implementation PRs OPEN/unmerged at last full inventory.
@@ -24,6 +24,14 @@ PR1214CI39822550698 resolved: unit119977316030 andWindows119977316502SUCCESS, si
 Fresh frontier next-ISA-frontier-recheck-20261022.json:1135stillmovement-sourcegated, no newpolicyquestion;1118Mali/Malawi mechanicalunits strongestnext after currentprereqs;821Mali2018S05has no2014Poidsfields,823Nigerrecordedsizeunitcrosswalkhold must be reconciled. Two rawblobs onlylstatmetadata, not authenticated/decoded.
 Archive31 accepted (C/ARCHIVE31-ROOT-ACCEPTANCE.json),1-31preserved. Author1215/independentBF/independent1215/new1218NOTarchived31. Prepare32onlyfrozen prefixes after exactplan approval; do notarchive live data trees.
 Allocation40255479 about26hoursleft; no warning. Stay sourcebound, private guarded runtime, no acquisition/sharedcache writes/NO_CACHE/assume flags on genuine data, no hidden budget expansions. No full30PR/corpus verdict.
+
+
+Root later checkpoint: BF1188 ROOT acceptance C/1188-INDEPENDENT-ROOT-ACCEPTANCE.json SHA0f4124979cbdcb6f0f6496f1d0d4dbf909abfd45f988601b65da3cbebb4a9aba; packet452fbe... originalchecker23412/1b6b9c0 and finaltoolchainfa8c540.
+AgentSDKvaluecaptureb10db3e8 explicitly uses NEW kind/tool envelopes, not originalharness lines. Root separately recovered all3literaloriginalcall/returnpairs03a369f1e53f47859214431a15c780c860a119c0a388a1c9d150d03a2e411c15; eachSDKvalueexact. Originalsealer6e8397/PID2106290; postexit52803/146c69/PID2111800. Postexit childselfrecordabsent, notinvented.
+Scanner object qualification: raw3028byteJSONL SHA3e395b68... onbothheads;2effd253... is comparisonDOCUMENT hash. Root stopped wrongdigestobject andsavedexactcorrection. Original151=111PASS40FAIL and fourNEWempty2PASS2MakeFAIL unchanged. Other root metadata scalar/textrepresentation stops retained; noAPI/datareplay.
+1215independent exactgenuine plan e5b26fa... sourceauthoritycfd547... released C/REVIEW-UGANDA1215-GENUINE-RELEASE.json SHAc194be1c414f83c77779a28631520a7b9ed03cec0dd6ad85c8fcb05d50137b70; addendum663413b505416faf0c62e716c299c384f4061612c922e99a28472373940adfbd approves untouchedguard993+startup3c2+fatalclosedentryba0345.
+Independent37provider freshgates actual0(97614/4363ec/PID223582),44442303bytes; no copies/API atthatcheckpoint. Next148distinct0600copies177769212bytes,4L1roots;8normalactors48calls+2scanners,64public28nativeplanned, preserveactualrawpartialbeforeunion. No oldactorreplay.
+1218phase0eightfiles/rootauthfd577; approvedminimalproduction7eb596c223055d45c4f45cffdba4f7eb6aee76e4 exactly3paths. Runtime heldpendingguard/cal/testpins. BaseW/isa-framework-1218-base=f7,newfixedBFconfigW/isa-config-Burkina_Faso-1218=657 bothownDVCtmp. Historicalphase0postexitbelongs9aaPRE-EDITonly.
 
 Sue
 

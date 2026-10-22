@@ -13,16 +13,16 @@ Initial triage guidance must be rechecked against live issues and complete count
 * Active work
 ** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
 Countries: Burkina_Faso.
-Author657final/runtime3d frozen and root-authenticated. Independent14targeted+397supportingPASS; eight normal actors0/40calls. Original151comparisons=111PASS+40prewriter-storageFAIL; four new parent-based empty references retain2DefaultPASS+2Make dtypeFAIL owned1218. Final6provider/24copy/source/cache/footer protection passed; independent seal/root authentication pending. Author398PASS60FAIL and56additive storagePASS remain separate historical accounting.
+Author657final/runtime3d frozen and root-authenticated. Independent14targeted+397supportingPASS; eight normal actors0/40calls. Original151comparisons=111PASS+40prewriter-storageFAIL; four new parent-based empty references retain2DefaultPASS+2Make dtypeFAIL owned1218. Independent sealed and ROOT-ACCEPTED0f412497; PR preparation follows evidence publication. Author398PASS60FAIL and56additive storagePASS remain separate historical accounting.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Constructed empty tables: implement the approved declaration-order rule
 Countries: Uganda, Shared framework.
-User-approved declaration order implemented atf7c vs actuala417. Author13new+88supportingPASS; parent6FAIL7PASS. Ten genuine actors0;44strict=38PASS+6approved empty-orderFAIL;22WARN/head ordered byte-exact. Author sealed and root-authenticated; independent genuine release pending. Independent63PASS vs parent57PASS6FAIL; two additional isolated axis controls pass, genuine review held for release. All549/39/1362fingerprints move.
+User-approved declaration order implemented atf7c vs actuala417. Author13new+88supportingPASS; parent6FAIL7PASS. Ten genuine actors0;44strict=38PASS+6approved empty-orderFAIL;22WARN/head ordered byte-exact. Author sealed and root-authenticated; independent exact genuine review released;37providers authenticated,148copy staging next. Independent63PASS vs parent57PASS6FAIL; two additional isolated axis controls pass, genuine review held for release. All549/39/1362fingerprints move.
 Remaining scope: Complete independent genuine validation of the approved contract across cold/covered-cache/Make; preserve every strict finding.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
 Countries: Burkina_Faso, Shared framework.
-Ledger-first static plan atd60275ada; use existing coercion for explicit types on constructed empties only. Production/runtime held for root plan review. Prerequisite1215 and fixedBF657 config composition avoid importing the country repair chain.
+Ledger-first phase0root-authenticated fd577. Implementation7eb596c223 changes only emptyhelper/GH1039tests/ledger on1215f7; runtime held for exact guard/calibration plan. Truef7control and fixedBF657config prepared separately, preserving populated behavior.
 
 * Reviewed changes awaiting human merge
 ** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)

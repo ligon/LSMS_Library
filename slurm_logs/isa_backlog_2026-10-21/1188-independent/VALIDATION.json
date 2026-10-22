@@ -1,0 +1,33 @@
+{
+  "synthetic_candidate_PASS": 14,
+  "actual_parent_FAIL": 7,
+  "actual_parent_PASS": 7,
+  "supporting_PASS": 397,
+  "xdist_workers": 1,
+  "distribution": "loadfile",
+  "noconftest_scoped": true,
+  "full_suite_claim": false,
+  "predata_fingerprints": {
+    "country_total": 549,
+    "changed_BF": 24,
+    "other_exact": 525,
+    "framework_total": 39,
+    "framework_changed": 0,
+    "wave_total": 1362,
+    "changed_BF_2018": 18,
+    "other_wave_exact": 1344,
+    "public_ordered_API_equal": true,
+    "complete_wave_metadata_multisets_equal": true
+  },
+  "provider_budget": {
+    "providers": 6,
+    "bytes_per_set": 6335825,
+    "fresh_L1_roots": 4,
+    "binary_copies": 24,
+    "binary_copy_bytes": 25343300,
+    "sidecar_copies": 0,
+    "distinct_original_and_copy_inodes": 30
+  },
+  "source_runtime_provider_copy_protection": "Exact endpoint hashes and physical receipts passed; literal source links and guard sources preserved.",
+  "terminal_evidence_boundary": "Observed sealer and separate read-only postexit terminal records are finalized separately from the immutable payload manifest."
+}
