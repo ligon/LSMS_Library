@@ -2,15 +2,18 @@
 #+AUTHOR: Sue
 
 * Snapshot
-Captured 2026-10-22T22:53:15.201933+00:00.
-There are 113 ISA-related open issue records: 28 with campaign PRs, one exclusively active, and 84 other open records.
-Of the 32 accepted implementation PRs, one is merged and 31 remain open at the observed heads.
-Umbrellas, decisions and partial repairs overlap; these are not 113 distinct unimplemented bugs.
-The original inventory had 97 in-scope records; 95 remain open, duplicate #1089 and resolved #1077 are closed, and 18 campaign followups were added.
-PR #1182 merged into development as b42b3bf68; root verified its parents and accepted content.
-The clean combined source at 718b8af4 contains all 32 accepted heads, but integration tests are still pending.
-The mounted runtime remains pinned; the pre-existing development advance 0671019 changed only poetry.lock.
-Initial triage guidance must be rechecked against live issues and complete country notes before dispatch.
+Captured 2026-10-22T23:10:58+00:00 from complete remote PR and open-issue collections.
+There are 107 ISA-related open issue records: 22 linked to campaign PRs, one exclusively active, and 84 other open records.
+Nine of the 32 implementation PRs are merged; 23 remain open at this checkpoint.
+The seven fully resolved issues closed so far are #822, #1034, #1062, #1077, #1088, #1109 and #1144.
+Partial issues retain their residual work.
+The original inventory had 97 in-scope records; 89 remain open, duplicate #1089 and seven completed issues are closed, and 18 campaign followups were added.
+These overlapping records are not 107 distinct unimplemented bugs.
+The captured development tip is 48856358513baa89a44aefb108b8f447497788a6.
+Root accepted the scoped combined-source checks and 1,691 distinct passing cases with 102 normal skips across original and failure-only continuations.
+Original failures remain preserved; this is not a single-run, full-data, corpus or new-release verdict.
+PR #1186 has a mechanical country-note merge repair at 683cdef0 awaiting fresh CI.
+The mounted runtime remains pinned; initial tiers require live issue and country-note reconciliation before dispatch.
 
 * Resolved in development
 
@@ -20,13 +23,26 @@ Unit and Windows CI passed, and the bounded integration selection passed 230 tes
 Root verified the exact merge parents and accepted library/config/test content; only the prior poetry.lock advance differs.
 Release publication is separate.
 
+The following complete repairs also landed; their original review qualifications remain in the linked issue bodies.
+
+- [[https://github.com/ligon/LSMS_Library/issues/822][#822]]: PR #1180, merge 94098ff45.
+- [[https://github.com/ligon/LSMS_Library/issues/1034][#1034]]: PR #1172, merge 5f2d198db.
+- [[https://github.com/ligon/LSMS_Library/issues/1062][#1062]]: PR #1173, merge 801e47978.
+- [[https://github.com/ligon/LSMS_Library/issues/1088][#1088]]: PR #1176, merge c598082ee.
+- [[https://github.com/ligon/LSMS_Library/issues/1109][#1109]]: PR #1175, merge ec067f800.
+- [[https://github.com/ligon/LSMS_Library/issues/1144][#1144]]: PR #1178, merge 989c7abb0.
+
 * Active work
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
 Countries: Burkina_Faso, Shared framework.
-Source 2f83bb2 adds explicit nullable-dtype serialization after the real BooleanDtype fingerprint failure in 7eb; the original failure and unsaved maps remain documented.
-Root authorized identical 16 metadata test cells on the actual f7 parent and 25 on the candidate; results are pending.
-Fresh amended census, original empty-table/supporting tests, and genuine data work remain held.
+Source 2f83bb2 passes all 25 dtype metadata tests; the actual parent gives 13 meaningful failures and three passes.
+The new candidate census completes with all 549/39/1,362 hashes changed and exact ordered API/source materialization policy.
+The original parent empty-table run retains 39 dtype failures, seven Make-child startup blockers and 11 passes.
+The exact original child assertion/PID/environment are unknown.
+A new stdlib-only Make diagnostic measured the serial recipe flag spelling.
+Root released a versioned guard continuation for only the seven blocked parent cases and the never-run 57 candidate cases; results are pending.
+Supporting and genuine data work remain held.
 
 * Reviewed changes in the authorized development merge queue
 ** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Preserve declaration order in constructed empty tables
@@ -44,10 +60,6 @@ Countries: Malawi.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1208][#1208]].
 Remaining scope: Malawi registration repair reviewed. Remaining named Makefile cleanup is outside ISA.
 
-** [[https://github.com/ligon/LSMS_Library/issues/822][#822]] Mali 2014-15 community_prices: restore readings 1-2 and declare native observation slots
-Countries: Mali.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1180][#1180]].
-
 ** [[https://github.com/ligon/LSMS_Library/issues/849][#849]] Uganda: wire reported kg factors in the remaining five waves after preserving native production records
 Countries: Uganda.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1207][#1207]].
@@ -56,17 +68,9 @@ PRs: [[https://github.com/ligon/LSMS_Library/pull/1207][#1207]].
 Countries: Uganda.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1191][#1191]].
 
-** [[https://github.com/ligon/LSMS_Library/issues/1034][#1034]] Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but served as 'other specify (13x)'
-Countries: Nigeria.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1172][#1172]].
-
 ** [[https://github.com/ligon/LSMS_Library/issues/1058][#1058]] Burkina Faso 2021 plot_features: expose 4,180 reported GPS pairs on 7,350 retained parcels
 Countries: Burkina_Faso, Mali, Niger.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1194][#1194]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1062][#1062]] Uganda: Makefile recipes rewrite sibling var/ tables without a hash (fct by nutrition, earnings by income) -- apply the #788 ruling
-Countries: Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1173][#1173]].
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1078][#1078]] Uganda food cache: confirmed producer race writes nine missing values as zero under current hash
 Countries: Uganda.
@@ -76,10 +80,6 @@ PRs: [[https://github.com/ligon/LSMS_Library/pull/1197][#1197]].
 Countries: Ethiopia.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1195][#1195]].
 
-** [[https://github.com/ligon/LSMS_Library/issues/1088][#1088]] Niger CS07: recognize the stored 9999.9 missing-quantity code without changing Price
-Countries: Niger.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1176][#1176]].
-
 ** [[https://github.com/ligon/LSMS_Library/issues/1091][#1091]] Retire duplicate country community-price builders in Mali, Niger and Tanzania
 Countries: Mali, Niger, Tanzania.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1199][#1199]], [[https://github.com/ligon/LSMS_Library/pull/1200][#1200]], [[https://github.com/ligon/LSMS_Library/pull/1201][#1201]].
@@ -88,11 +88,6 @@ PRs: [[https://github.com/ligon/LSMS_Library/pull/1199][#1199]], [[https://githu
 Countries: Nigeria.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1192][#1192]].
 Remaining scope: Ten held unit labels recovered by PR. Future unresolved-label retention/collision representation remains a design residual.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1109][#1109]] Malawi organic fertilizer: restore reported quantities and units; retain missing amounts without fabricating zero
-Countries: Malawi.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1175][#1175]].
-Remaining scope: Organic repair reviewed. Nonorganic missing-quantity diagnosis is separately owned by1174.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1111][#1111]] Malawi applied fertilizer: correct timing-derived units while retaining enumerator kg totals
 Countries: Malawi.
@@ -122,10 +117,6 @@ Remaining scope: Mali casing PR reviewed. Shared labor-source taxonomy remains a
 Countries: Burkina_Faso, Niger.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1189][#1189]].
 Remaining scope: Burkina identity PR reviewed. Niger identity-collapse diagnosis remains; Senegal/CotedIvoire outside ISA.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1144][#1144]] Nigeria food_acquired j is decoded wave-blind: W1 'Other vegetables' served as 'Leaves', 'Leaves' as 'Dry Pepper' (item twin of #607)
-Countries: Nigeria.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1178][#1178]].
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1149][#1149]] add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively
 Countries: Nigeria, Ethiopia.

@@ -1,0 +1,31 @@
+{
+  "status": "NINE_MERGES_SEVEN_COMPLETED_ISSUES_AND_107_OPEN_SCOPE_RECORDS",
+  "captured_at_UTC": "2026-10-22T23:10:58+00:00",
+  "repository_open_issues": 166,
+  "open_scope_records": 107,
+  "PRlinked": 22,
+  "exclusively_active": 1,
+  "other": 84,
+  "implementation_PRs_merged": 9,
+  "implementation_PRs_open": 23,
+  "completed_scope_issues": [
+    1077,
+    822,
+    1034,
+    1062,
+    1088,
+    1109,
+    1144
+  ],
+  "root_closure_readback": true,
+  "collections": {
+    "prs-live-nine-merge-closure-checkpoint.json": "1bbb1cb1e9a7c43645ca392898d39e02a30cbe2e469f4aa76fff15a0cd5eb442",
+    "open-issues-live-nine-merge-closure-checkpoint.json": "2d84b2e14bef4da6d25f5566da76e072570e4d28c776e0202d0521ab055b2e90"
+  },
+  "limitations": [
+    "Issue records overlap across countries and partial umbrellas;107openrecords are not107distinctconfirmedbugs.",
+    "Nine verified development merges and seven completed issue closures are recorded. Distinct1691PASS/102normalSKIP outcomes aggregate immutable original and failure-only continuations; no single-run/full-data/new-release verdict.",
+    "Seven completed scope records are retained separately. The other59repository issue headlines were not newly body-retriaged here. Later merge/closure activity may advance this dated checkpoint."
+  ],
+  "signed": "Sue"
+}
