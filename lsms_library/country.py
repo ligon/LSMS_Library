@@ -1075,6 +1075,12 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
             payload_types[c] = value["type"]
         else:
             payload_types[c] = value
+    # Empty calendars need no value inference (GH #1218; ledger sections 2/4).
+    for c, declared_type in payload_types.items():
+        target = (_SCHEME_DTYPE_MAP.get(declared_type)
+                  if isinstance(declared_type, str) else None)
+        if isinstance(target, str) and target == "to_datetime":
+            empty[c] = _to_datetime_mixed(empty[c], where=c)
     _enforce_declared_dtypes(empty, payload_types)
     return empty
 
