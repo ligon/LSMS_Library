@@ -369,6 +369,16 @@
         "candidate_builds": 0,
         "safe_exports": "1091-Tanzania-diagnosis/",
         "limits": "No first coldFeature; serialization/empty/Makewrite distinctions; source-cwd/Poetry/auxiliaryunpickle/text-only launch stops retained.408plotinputproof is prior-only,notcommunitycount."
+      },
+      "active_actual_candidate_scope": {
+        "working_candidate": true,
+        "before_source_rebuild": true,
+        "API_total": 549,
+        "Tanzania_changed": 25,
+        "other_API_unchanged": 524,
+        "framework_total_unchanged": 39,
+        "precode_ledger": "aa9745963 (prefix; before production changes)",
+        "final_candidate_verdict": null
       }
     },
     "Uganda": {
@@ -547,7 +557,35 @@
         "before_source_API_builds": true,
         "all_kg_factor_mappings_exact_f8": true
       },
-      "active_parent_control_path": "/local/job40255479/worktrees/isa-Uganda-1198-fix-base"
+      "active_parent_control_path": "/local/job40255479/worktrees/isa-Uganda-1198-fix-base",
+      "active_downstream_interim": {
+        "source_snapshot": "working candidate before declared-slot identity edge correction; not final reviewed head",
+        "native_rows": 133761,
+        "harvest_rows": 78571,
+        "current_wiring_harvest_kg": 29095413.407893993,
+        "parent_harvest_kg": 29093322.407893993,
+        "difference_kg": 2091,
+        "fine_count_changes": 7,
+        "fine_median_changes": 1,
+        "coarse_count_changes": 2,
+        "coarse_median_changes": 0,
+        "support_threshold_crossings": 0,
+        "real_area_rows": 42841,
+        "real_area_exact_parent": true,
+        "positive_area_rows": 37636,
+        "matched_parcel_keys_both_heads": 14022,
+        "converted_land_keys_both_heads": 40409,
+        "literal_plot_key_matches_both_heads": 0,
+        "complete_yield_frames_exact_parent": true,
+        "area_doc_contradiction": "Existing100percentparcelmatch claim contradicted on both heads; bounded residual pending, no area/ID fix",
+        "focused_before_expected_declaration_updates": {
+          "pass": 322,
+          "fail": 3,
+          "skip": 0,
+          "cause": "Old canonical declaration expectations require scoped production_obs/sentinel update; original stopped outcomes retained"
+        },
+        "identity_edge_correction_and_affected_reverification": "active; declared production_slot, not iteration position, must define locator collision"
+      }
     }
   },
   "shared_lanes": {
@@ -932,7 +970,20 @@
       "merge_resolution": "Complete prior17Mali CONTENTS prefix plus exact reviewed1199 addition; all nine other changed blobs/modes exact1199",
       "root_prepared_metadata_targets": true,
       "reviewer": "niger_lane",
-      "brief": "integration/mali-eighteen-review/NEXT-REVIEW-BRIEF.md"
+      "brief": "integration/mali-eighteen-review/NEXT-REVIEW-BRIEF.md",
+      "interim_result": "111focusedPASS0skip; identical28actual17controls24meaningfulFAIL4PASS0error/skip; actual24Mali/525others/39framework prebuildscope; source oracle155931 and current correctedNiger46043/76masks/30lateobs. Runtime matrices remain active; no verdict."
+    },
+    "pending_nineteen": {
+      "head": "60d2281abfff72bc9dccb6256cffac623f42e28f",
+      "control": "f9feb3c807aff5206134c37768992302ceb431fa",
+      "additional_PR": 1200,
+      "path": "/local/job40255479/worktrees/isa-integration-nineteen",
+      "branch": "isa/integration-nineteen-20261022",
+      "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/niger-nineteen-review",
+      "status": "Prepared source snapshot only; no reviewer/test/API build/verdict/GitHub publication. Await released root acceptance of18 before dispatch.",
+      "source_proof": "All twelve changed blobs/modes exactly match reviewed670de9c versus actuald602; merge clean, no conflict.",
+      "root_prepared_metadata_targets": true,
+      "next_brief": "integration/niger-nineteen-review/NEXT-REVIEW-BRIEF.md"
     }
   }
 }

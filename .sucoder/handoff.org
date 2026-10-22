@@ -1009,3 +1009,19 @@ Both owner-only,allincludedmembers/sourceafter verified; rawextensions/duplicate
 No public merge or issue closure; goal active.
 
 Sue
+
+* Source-only nineteen-change preparation -- 2026-10-22T01:38:21.305396+00:00
+
+Prepared60d2281abfff72bc9dccb6256cffac623f42e28f onisa/integration-nineteen-20261022, FS-published only; actual18f9 control atisa-integration-nineteen-base.
+Clean merge ofPR1200; all12changed blobs/modes exactly match670de9cvsd602; no conflict, no test/API build/verdict/GitHub publication.
+Exactprivate candidate/base DVC metadata targets and NEXT-REVIEW-BRIEF.md prepared inintegration/niger-nineteen-review.
+Await released18rootacceptance before dispatch; healthyMali must now be current/full4coverage155931, not old40218 comparator.
+Actual18review has111PASS/24negativeFAIL4PASS, actual24Mali/525others/39frameworkscope and source oracle/currentNiger gates; matrices still active.
+Tanzania writer ledgeraa9745963 preceded production; prebuild25/524/39actual, no source rebuild at that update.
+Uganda current-wiring harvest+2091kg/zero supportcrossings and exactreal42841area/yield controls passed on the pre-edge-correction snapshot.
+Existing parcelkey100percentdocclaim is contradicted equally on bothheads:14022/40409 parcel matches and0literalplot; residual draft only.
+Writer corrects declared-slot locator collision guard and three required canonical test expectations, retaining stopped325-case322PASS/3FAIL outcomes; affected proof must be reverified after helper change.
+Campaignb775dfe11 is GitHub-pushed; PR1170/issue1091 public bodies fetched and verified exact,19PRs recorded,14private archives verified.
+Goal remainsactive; no public merge or issue closure.
+
+Sue
