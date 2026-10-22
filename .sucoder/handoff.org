@@ -1,6 +1,39 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T13:16:17.876519+00:00
+* Current task -- 2026-10-22T14:52:19.587362+00:00
+
+The eight-country ISA backlog goal remains ACTIVE; no implementation PR is merged.
+Main development remains clean f8d236694c26fe9e709c5548f02c70f74ea72c33.
+Campaign docs/isa-backlog-20261021 published6810683dd16f1a2e04ed34e9ba220fb51a719f4f with newly root-accepted1175/API9/precision reports; prior5e65bdf8e contains1189/1191/1180-author acceptances.
+All26 implementation PRs freshly match expected heads/bases, OPEN/unmerged.
+Four affected PR descriptions,1170 and1206 read back exactly after qualifications.
+Never auto-merge; no full26-PR suite or corpus verdict.
+
+Current workers: validation_reassess finishes later10 packets (1202 persisted278 groups plus nine exact-source NEW pure recipes terminal0, release seal pending); malawi_1209 seals author evidence; review_malawi_1209 independently reviews frozen source47b3c5d76371acc457c5553ebf8adfb1859e115b against d29a56783d08a8a647e2622150a4ee5fbdd7246a.
+Reviewer initially metadata/source/guard only until root supplies final author READY/manifest.
+Root prepared detached isa-review-Malawi-1209 and -base with private exact .dvc/tmp links; full brief is control/isa-backlog-20261021/REVIEW-MALAWI1209-BRIEF.md.
+Author56 strict Country/24 strict Feature/10 native comparisons pass, scanner163 records unchanged with2 known failures, direct Make retains1/builds4 native waves and no aggregate.
+Preserve diagnostic omitted-Make-worker runs, status-tool temporary-write history gap, ledger hook exception, guard/test stops and warning-path substitution qualifiers.
+Independent verdict still required before root acceptance/new PR.
+
+First12 critic acquisition_1149 completed and stopped.
+Its coverage12 frozen READY3b3f55718abb05e814c7eb2f9e7200d89c7ecdd6fd999b394b40c6ea4d9f4943, manifest a58e9587be0a5673e21e9600c6e9b5b39d75dc69148e4d3146a7db2eb772d075 (223 entries) await ROOT acceptance.
+PR1172/1173/1186 no-decode authority holds and all original memory gaps remain.
+Later1193 standalone/integration14,1194,1195 and1197 main/source-detail packets are sealed pending root review; pins live in critic messages/control.
+The new1175/API9 root verifier and exact twelve-role source binder both terminal0.
+Do not rerun original APIs/tests/data merely to repair artifact checkers.
+
+Archive25 is complete/durable, SHA bef3c42324c24fabbac19843d6a14d4980e5e23151b69abb5652b9fa90a39071; no archive26 exists yet.
+Next archive must cover new critic packets/root1192 and current acceptances after frozen metadata dry run, excluding runtime/raw trees while retaining selected operands-*.
+Job40255479 holds32 cores and about32h20m at checkpoint, no warning.
+Source21 remains prepared/unassigned; GH1210 and other actionable A/B issues remain, with acquisition/design residuals separate.
+
+Next concrete action: receive/verify Malawi1209 author freeze; release reviewer data/tests after authenticated READY; independently root-check sealed first12/later10 packets; archive26 and publish remaining bounded acceptances.
+Keep goal active; do not repeat terminal-zero work or reuse unverified warm caches.
+
+Sue
+
+* Earlier task -- 2026-10-22T13:16:17.876519+00:00
 
 The ISA backlog goal is ACTIVE. Main is clean development at f8d236694c26fe9e709c5548f02c70f74ea72c33; campaign branch docs/isa-backlog-20261021 records evidence for draft PR1170. There are25 open implementation PRs, all unmerged; newest PR1211 is the independently accepted code-only GH1149 repair at4f9344f42. Never auto-merge.
 Three assigned workers: review_acquisition_1149 independently reviews GH1196 ee520afeb/runtime7f4b222 (149tests pass, own cold actors running); validation_reassess owns the later10 PR cohorts plus17/18/19; acquisition_1149 owns first12 saved-evidence cohorts. Corrected object comparator only;42calibrations and root-accepted1160supplement, no all-campaign verdict. Preserve every frozen old source/artifact and missing-memory/mtime/stream qualification.

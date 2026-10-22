@@ -12,7 +12,7 @@ The 37 partial records carry exact residual titles and bodies in =triage.json=; 
 =summary.json= records the tier and dependency ordering; unresolved enhancement/acquisition choices are reported for the maintainer.
 Existing rulings in issues such as #851, #894 and #1134 are binding implementation context, not unanswered questions to ask again.
 
-* Current checkpoint -- 2026-10-22T14:50 UTC
+* Current checkpoint -- 2026-10-22T14:52:19.587362+00:00
 
 All 26 implementation PRs remain OPEN and unmerged at their expected heads and prerequisite bases.
 The fresh inventory is =publication-26-with-second-supplements-safe.json=.
@@ -42,6 +42,15 @@ The previously accepted1189/1191/1180-author packets remain separate; their miss
 The first12 critic has sealed its bounded registry and stopped; root has not yet accepted that final registry.
 The later10 critic continues, and1206 remains OPEN.
 No all-campaign suite, corpus verdict, human merge or goal completion is claimed.
+
+Source commit47b3c5d76371acc457c5553ebf8adfb1859e115b now freezes the five-path Malawi1209 fix over actual parent d29a56783d08a8a647e2622150a4ee5fbdd7246a.
+Its normal implementation hook published both implementation and ledger commits; the earlier ledger-only hook exception remains recorded.
+Root read the full diff and prepared detached candidate/control reviewer checkouts with private DVC/tmp paths.
+Independent agent review_malawi_1209 is assigned; initially only metadata/source/guard work is permitted until the final author READY/manifest seal arrives.
+The planned direct Make check has passed: one retained native wave, four built, no aggregate var output.
+The independent data/test verdict is still pending.
+Four affected implementation PR descriptions, tracker1170 and issue1206 now exactly read back with the newly published qualifications.
+See =publication-second-supplements-readback-safe.json=.
 
 * Earlier checkpoint -- 2026-10-22T13:39:00+00:00
 
