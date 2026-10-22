@@ -1,0 +1,58 @@
+[
+  {
+    "name": "raw-earnings.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "raw-enterprise_income.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "raw-fct.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "raw-food_acquired.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "raw-income.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "raw-nutrition.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "raw-sample.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "served-earnings.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "served-enterprise_income.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "served-fct.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "served-food_acquired.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "served-income.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "served-nutrition.parquet",
+    "status": "equal"
+  },
+  {
+    "name": "served-sample.parquet",
+    "status": "equal"
+  }
+]

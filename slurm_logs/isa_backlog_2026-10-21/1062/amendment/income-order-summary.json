@@ -1,0 +1,90 @@
+[
+  {
+    "step": 0,
+    "requested": "income",
+    "backend": "dvc",
+    "forced": false,
+    "subset": false,
+    "seconds": 9.337,
+    "changed_siblings": [],
+    "raw_three_frames_exact": true,
+    "served_exact": true
+  },
+  {
+    "step": 1,
+    "requested": "income",
+    "backend": "make",
+    "forced": false,
+    "subset": false,
+    "seconds": 3.615,
+    "changed_siblings": [],
+    "raw_three_frames_exact": true,
+    "served_exact": true
+  },
+  {
+    "step": 2,
+    "requested": "income",
+    "backend": "dvc",
+    "forced": true,
+    "subset": false,
+    "seconds": 8.399,
+    "changed_siblings": [],
+    "raw_three_frames_exact": true,
+    "served_exact": true
+  },
+  {
+    "step": 3,
+    "requested": "earnings",
+    "backend": "make",
+    "forced": true,
+    "subset": false,
+    "seconds": 33.456,
+    "changed_siblings": [],
+    "raw_three_frames_exact": true,
+    "served_exact": true
+  },
+  {
+    "step": 4,
+    "requested": "income",
+    "backend": "make",
+    "forced": true,
+    "subset": false,
+    "seconds": 8.485,
+    "changed_siblings": [],
+    "raw_three_frames_exact": true,
+    "served_exact": true
+  },
+  {
+    "step": 5,
+    "requested": "enterprise_income",
+    "backend": "make",
+    "forced": true,
+    "subset": false,
+    "seconds": 30.93,
+    "changed_siblings": [],
+    "raw_three_frames_exact": true,
+    "served_exact": true
+  },
+  {
+    "step": 6,
+    "requested": "income",
+    "backend": "dvc",
+    "forced": false,
+    "subset": false,
+    "seconds": 8.845,
+    "changed_siblings": [],
+    "raw_three_frames_exact": true,
+    "served_exact": true
+  },
+  {
+    "step": 7,
+    "requested": "income",
+    "backend": "dvc",
+    "forced": false,
+    "subset": true,
+    "seconds": 3.818,
+    "changed_siblings": [],
+    "raw_three_frames_exact": true,
+    "served_exact": true
+  }
+]
