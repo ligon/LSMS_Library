@@ -1,0 +1,206 @@
+{
+  "status": "DESIGN_AND_PRIVATE_PROTOTYPE_COMPLETE_FOR_ROOT_ENGINEERING_REVIEW",
+  "source_baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "ledger_first": "4332afede90648d2438ba0844151840e8fc80d82",
+  "production_schema_config_test_changes": 0,
+  "physical_copies": 101,
+  "copied_L2_parquets": 17,
+  "new_DTA_decode_or_source_cold_build": false,
+  "observation_projection": {
+    "native_rows": 133761,
+    "baseline_rows": 133331,
+    "recovered": 430,
+    "independent_paired_field_checks": 99,
+    "normalization_retains": 133761,
+    "finalizer_retains": 133761,
+    "Feature_declared_retains": 133761,
+    "Feature_undeclared_rows": 132405,
+    "synthetic_comparator_only": true,
+    "zero_tolerance_full_frame_and_typed_attrs": true
+  },
+  "source_full_row_repeats_all_14_frames": 0,
+  "equal_complete_helper_payload_groups": 33,
+  "existing_null_key_exclusions": 403,
+  "private_controls": 35,
+  "whole_frame_kg": {
+    "baseline": 29093322.407893993,
+    "native_current_wiring": 29095413.407893993,
+    "native_source_factor_projection": 42026694.99297963
+  },
+  "Feature_route_accounting": {
+    "current_baseline_Feature_rows": 133331,
+    "proposed_declared_rows": 133761,
+    "undeclared_route_rows": 132405,
+    "old_key_coalescence_extras": 430,
+    "served_null_v_rows_dropped_only_when_undeclared_route_collapses": 928,
+    "other_null_key_counts": {
+      "t": 0,
+      "i": 0,
+      "plot_id": 0,
+      "j": 0,
+      "u": 0,
+      "condition": 0,
+      "season": 0
+    },
+    "all_native_observations_preserved_by_declaration": true,
+    "baseline_kg": 29093322.407893993,
+    "native_current_wiring_kg": 29095413.407893993,
+    "old_factor_only_collapsed_projection_kg": 42035114.892979845,
+    "native_factor_projection_kg": 42026694.99297963,
+    "native_minus_old_scalar_factor_projection_kg": -8419.900000214577,
+    "not_derived_by_subtracting_conflict_subtotal": true
+  },
+  "median_pool_semantics": "one screened eligible observation; no Quantity/HH weighting; min_reports5",
+  "real_yield_unmeasured": true,
+  "yield_control": "existing transform; synthetic fixed2ha only",
+  "comparator": "synthetic; no real Niger-cache claim",
+  "exact_checks": "check_exact=True,rtol=0,atol=0,full axes/codes/dtypes/masks/order/recursively typed attrs",
+  "runtime_hash_scope": "prediction only; no candidate production patch",
+  "unsafe_examples_exported": false,
+  "safe_export_files": [
+    "DESIGN.md",
+    "PROTOTYPE.md",
+    "REPRODUCE.md",
+    "validation.json"
+  ],
+  "ledger_verification_commit": "74e6031ab",
+  "immutable_proof": {
+    "status": "PASS",
+    "head_before_final_docs": "4332afede90648d2438ba0844151840e8fc80d82",
+    "library_tree": "c2f788bcf0d98c006f56541aaf6698333c818ad6",
+    "test_tree": "9e117068202819a40343e064433f8725a60f19b5",
+    "runtime_config_tests_exact_f8": true,
+    "tracked_file_count": 14881,
+    "all_tracked_bytes_git_modes_filesystem_exec_modes_exact": true,
+    "physical_input_copies_before_after_exact": 101,
+    "current_L2_parquets_bytes_modes_mtimes_exact": 17,
+    "protected_manifests_before_after_exact": true,
+    "old_manifest_entries_verified": {
+      "849": 344,
+      "849-exact-addendum": 52,
+      "review-Mali-1091": 1190,
+      "review-1078-unit-attribution-ready-allowlist": 14
+    },
+    "network_connect_attempts": 0,
+    "write_guard_events": {},
+    "unexpected_write_denials": 0,
+    "in_tree_parquets": 0,
+    "new_DTA_inputs": 0
+  },
+  "complete_warning_messages_private": true,
+  "full_attrs_controls": {
+    "public-proposed-private.pkl": {
+      "complete_typed_attrs_exact_to_baseline_plus_declared_provenance": true,
+      "attrs_keys": [
+        "production_observation",
+        "id_converted",
+        "country",
+        "unit_kg",
+        "population",
+        "population_resolution",
+        "sampling",
+        "sampling_resolution",
+        "recall"
+      ],
+      "observation_dtype": "string"
+    },
+    "public-current-wiring-private.pkl": {
+      "complete_typed_attrs_exact_to_baseline_plus_declared_provenance": true,
+      "attrs_keys": [
+        "production_observation",
+        "id_converted",
+        "country",
+        "unit_kg",
+        "population",
+        "population_resolution",
+        "sampling",
+        "sampling_resolution",
+        "recall"
+      ],
+      "observation_dtype": "string"
+    },
+    "feature-prepared-private.pkl": {
+      "complete_typed_attrs_exact_to_baseline_plus_declared_provenance": true,
+      "attrs_keys": [
+        "production_observation",
+        "id_converted",
+        "country",
+        "unit_kg",
+        "population",
+        "population_resolution",
+        "sampling",
+        "sampling_resolution",
+        "recall"
+      ],
+      "observation_dtype": "string"
+    }
+  },
+  "old_source_pin_checks": {
+    "isa-review-Mali-1091": {
+      "head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "tracked_clean": true,
+      "library_tree": "35955163a5f61a24e3dffd1463684b618e9fd01b",
+      "tests_tree": "f76314b4cedce21b2a558f8909e0ae4c43ea6b6c"
+    },
+    "isa-review-Mali-1091-base": {
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "tracked_clean": true,
+      "library_tree": "48e7d509c0b32f13140f70a155c78b8d5118cdf8",
+      "tests_tree": "80ff8822de9e0b8d3573534b9fbb87609f2dcfc2"
+    },
+    "isa-review-1078-unit-attribution": {
+      "head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+      "tracked_clean": true,
+      "library_tree": "cc18a441cca4c69a24c2f24d513f4f23c3937d86",
+      "tests_tree": "9b685fc972bbbcec464bf6176963e4f0773ba674"
+    },
+    "isa-review-1078": {
+      "head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+      "tracked_clean": true,
+      "library_tree": "cc18a441cca4c69a24c2f24d513f4f23c3937d86",
+      "tests_tree": "9b685fc972bbbcec464bf6176963e4f0773ba674"
+    },
+    "isa-Uganda-849": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_clean": true,
+      "library_tree": "c2f788bcf0d98c006f56541aaf6698333c818ad6",
+      "tests_tree": "9e117068202819a40343e064433f8725a60f19b5"
+    }
+  },
+  "successful_run_emitted_warning_categories": {
+    "prototype-v4-private.log": {
+      "ClusterIdentityWarning": 3,
+      "NullReadWarning": 2,
+      "QuantityImplausibleWarning": 14,
+      "NullIndexKeyWarning": 2
+    },
+    "downstream-v2-private.log": {
+      "GrainCollapseWarning": 5,
+      "NullReadWarning": 1,
+      "QuantityImplausibleWarning": 7,
+      "NullIndexKeyWarning": 1,
+      "ClusterIdentityWarning": 1
+    },
+    "controls-v2-private.log": {},
+    "alignment-v3-private.log": {
+      "GrainCollapseWarning": 5,
+      "NullReadWarning": 1,
+      "QuantityImplausibleWarning": 7,
+      "NullIndexKeyWarning": 1,
+      "ClusterIdentityWarning": 1
+    },
+    "attrs-private.log": {}
+  },
+  "caught_full_warning_message_files_private": {
+    "undeclared-route-warnings-private.txt": {
+      "sha256": "36896753c4f7d1efc6a1dd4247717e4c4732ebee08a35d61f4064bdb48ab2297",
+      "bytes": 809,
+      "categories_not_separately_recorded": true
+    },
+    "alignment-warnings-private.txt": {
+      "sha256": "36896753c4f7d1efc6a1dd4247717e4c4732ebee08a35d61f4064bdb48ab2297",
+      "bytes": 809,
+      "categories_not_separately_recorded": true
+    }
+  }
+}
