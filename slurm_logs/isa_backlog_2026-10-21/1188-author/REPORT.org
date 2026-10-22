@@ -1,0 +1,86 @@
+#+TITLE: Burkina Faso GH1188 author handoff
+#+DATE: 2026-10-22T19:50:19.048171+00:00
+
+* Result and scope
+
+The native 2018-19 input builder now reads purchase flag/quantity from q08/q09a, paired with its own q09b Unit_purchased.
+The q05/q07a gift answers remain under Received_as_gift and Quantity_received_as_gift, paired with q07b Unit_received_as_gift.
+These are exactly four new optional country-local payload columns with explicit native nullable types.
+Quantity and u retain used quantity/unit, and each acquisition variable uses its own decoded labels plus exact curated formatter keys.
+There is no inferred cart-code equivalence, missing-as-zero/false/unit fill, unit conversion, monetary field, new axis, reducer, shared schema/framework/map change or new input wave.
+
+Final source is =657fed11a63354886772d0f978cec8adb2ad647e=; tested runtime is =3d39096d55bc2b2a8a4e387e9d939aabe8951ecd=; actual parent is =3dc9d28510dd783c648413987011832669f8bcf7=.
+The final follow-up changes only CONTENTS and the per-task ledger.
+The exact six-path delta is in source.diff; the native script, local scheme, both regression files and framework sources remain bound to the tested runtime.
+Root owns independent review/publication and the human owns merge.
+
+* Source and behavior proof
+
+Fresh genuine provider MD5/SHA/magic/physical/sidecar gates preceded copies and decoding.
+Source-first diagnosis reproduces all 22,877 applied native rows, unique nonmissing keys/order, 602 unlabelled code21 records, 802 gift yes versus 7,689 purchase yes, 8,297 flag and 8,371 quantity/mask differences, and own-unit differences23/193.
+The historical recovered183 projection contains18 actual purchases; actual3dc parent already preserves all22,877 rows.
+The unverified code21 Seed classification, source-qualified crop token, current seed crop labels and every mapping cell remain unchanged.
+
+Four normal roots use six authenticated L1 providers each: candidate/parent x Default/Make.
+All eight cold/separate-fresh-warm actors complete supported, all-wave and unsupported requests, including BF-only Feature assembly and unchanged seed_kg/nitrogen_kg outputs.
+Source/native/public values, masks, ordered identities/axes, types, typed attrs and footer grain/production metadata have full private operands and strict checks.
+All280 footer snapshots have expected hashes and true coverage manifests.
+Final normal footprint is24L1 files plus20harmonized parquets, comprising6parquets per Default root and4per Make root.
+No GPS, housing, crop-production or other-wave input provider was needed; the scanner dependency spine was checked before execution.
+Only input/sample outputs were rebuilt, not every table whose hash changes.
+
+Initial full-strict artifact proof retains398passes and60failures across458comparisons.
+Fifty-six failures compare pre-write nullable-string index dtypes with persisted nan-string index dtypes, on both sources.
+Root approved only those56 additional storage-stage comparisons: independently source-built expected operands pass through the exact unchanged writer/readback in new private artifacts outside the normal cache roots.
+All56 additional full-strict persisted comparisons, including complete Arrow schema metadata, pass.
+Native key tuple order and full payload values/masks/types/attrs survive expected serialization exactly; all44normal cache files remain unchanged.
+All original56failures stay failures, with original operands/source/streams retained.
+No actual-frame casting, attrs transplantation, dtype-check disabling, cache stamping/promotion or replay of the398completed checks/API/grid/raw decode occurred.
+
+Four genuine full-strict discrepancies remain: unsupported2014/2021 Country requests x cold/freshwarm return the same seven-column order, but Default retains new optional string/boolean/Float64/string types while Make returns object for those four fields.
+The actual parent has only old3columns, whose corresponding types agree; it does not have an identical four-field failure.
+The existing empty constructor and scalar-only type coercer explain this newly exposed interface gap.
+The precise residual and static fallback assessment are separate exports; no workaround is included in the BF repair.
+Held nonempty Feature results retain all four fields; the recorded all-NA pruning observation is synthetic only.
+
+* Tests, audit and invalidation
+
+Disjoint bounded candidate selections pass14synthetic and2held cases.
+Actual-parent controls give7FAIL7PASS synthetic and1FAIL1PASS held; the changed full-source oracle now rejects the old gift-as-purchase binding and missing acquisition fields.
+The seven retained synthetic identity/duplicate-guard cases and held code21 test remain meaningful on the parent.
+Controller and both workers assert exact respective package/Country/config roots and private DVC helpers.
+--noconftest omits repository credential detection/skip hooks for these guarded held selections; this is not standard full-suite evidence and uses no auth injection.
+
+The unchanged BF-only Feature scanners return zero with four byte-identical warning records each and no failure/error.
+The existing sample-strata warning remains; no country configuration is changed to silence it.
+The API-audit target's unchanged program returns zero under the already mounted interpreter, without a Poetry environment operation.
+Actual pre-harmonization inventories cover549Country hashes,39framework fingerprints and1,362declared wave pairs.
+All24Burkina Country hashes and all18declared2018-19 wave hashes move through existing scheme/whole-wave-module inputs.
+The other525Country hashes,1,344wave hashes and all39framework fingerprints remain exact.
+
+* Retained stops and source-copy budget exception
+
+The original metadata Makefile allowlist stop, staging empty-directory assertion, source label-set lookup stop, numpy-key JSON stop, overly narrow wave-scope expectation and native prewrite comparison failures remain in their original sources/streams/operands.
+The first source probe's raw locals and first stopped postedit hash dictionaries were unsaved, explicitly qualified.
+Source v3 reuses saved table operands with metadata-only continuation; completed API/test/grid prefixes were not rerun for packaging.
+
+One added get_data_file layout probe made an extra local988,943-byte source copy before the first normal Country/Wave/Feature call or L2 write.
+This exceeded the initial24-copy budget; the original preflight must not be called L1-only.
+Root approved one additive quarantine rename after full MD5/SHA/physical binding to the provider and all24staged copies.
+Device/inode/bytes/mode/mtime/nlink1 and every directory were preserved; nothing was deleted.
+The actual total is25private binary source copies /26,332,243bytes, including the quarantined exception.
+Read-only _dvc_cache_path preflight then bound all four ordinary six-L1 roots before the never-started normal grid; no fifth root or acquisition was introduced.
+
+The guard retains51non-calibration denied socket.bind calls as unattributed original PID/address records, plus seeded network denials and24outside-prefix existing-directory no-op attempts.
+The inherited guard does not capture original call stacks; no zero-network-attempt claim is made.
+Raw rows, household identities, full logs, source operands and private physical receipts remain outside the safe export allowlist.
+
+* Freeze chain
+
+seal.py generates final full source/provider/copy/cache protection, the protection export, exact safe allowlist, complete private manifest and READY after this report is written.
+Original Popen/controller/source/time provenance is included; completed sealer stdout and actual terminal status remain external tool evidence.
+postexit.py is a separate full read-only verification of the frozen manifest, all source hashes/physical receipts and all6providers/25private binary source copies, with no task file writes.
+Actual observed terminal-zero results, rather than this prospective description, determine freeze completion.
+Independent review remains required; no GitHub write or merge is performed here.
+
+Sue
