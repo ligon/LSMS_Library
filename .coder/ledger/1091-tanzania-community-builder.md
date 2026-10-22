@@ -70,7 +70,7 @@ constraints over older skill examples suggesting cache clears or NO_CACHE.
   crosswalk section. Quote that contrast, do not silently erase either or
   rewrite the crosswalk. Native v remains authoritative for these prices.
 - PR1185's 408-unit correction concerns plot_inputs, not community prices:
-  86 in2019-20 and322 in2020-21, including19 no-amount records. Its existing
+  86 in 2019-20 and 322 in 2020-21, including 19 no-amount records. Its existing
   conflicting-unit duplicate groups belong to #637, not this retirement.
   Root clarified that the original brief conflated these counts. Retain this
   as an immutable prior-proof invariant; stage only the two community price
@@ -126,4 +126,62 @@ No GitHub write, public merge or issue closure.
 
 ## Phase 3: Verification
 
-Pending terminal preparation and bounded actual baseline measurements.
+Read-only diagnosis complete; concrete proposal awaits ROOT review before any
+implementation. Safe evidence lives in
+`/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/safe-exports/`.
+
+- OK (sections 2/5): actual fresh and populated Make DAGs show both wave
+  prerequisites and the country concatenator, plus the independent generic
+  in-tree route. The country file is 45 concatenate-only lines; Make145-149
+  is the sole-use variable/country-rule block. Proposal deletes only those
+  two runtime paths, retaining wave151-152/generic154-155/shared variables.
+  No implementation or selector patch was made.
+- OK (sections 3/4): two held source modules/sidecars passed terminal MD5/SHA/
+  size/mode/mtime gates, with 40 initial and four later physical source
+  copies. The healthy Mali cache was genuinely current/full-coverage at the
+  compatible source pin before copying, not assumed fresh.
+- OK (sections 3/4): independent source binding retains 3,076/14,623 rows
+  (17,699), all source-code varieties and exact own-price/own-basis values.
+  Actual writer-stage native frames and normalized default country concat
+  are fully exact at zero numeric tolerance. Coarse conflicts261/1281 and
+  price disagreements243/1149 remain distinguished by variety; no first
+  reducer, household link, unit policy or xwalk repair was introduced.
+- OK (section 4): 20 cold,20 independent fresh-warm and20 populated request
+  probes completed. Default respects all ten request sets; Make returns
+  all17,699 rows for every one. All same-request cold/warm full frames,
+  MultiIndex internals and recursively typed attrs are exact. Default warm/
+  populated writes zero data-root cache changes; Make rewrites all three
+  files and overwrites a verified populated country cache with hashless
+  native output. All per-call receipts precede comparisons/assertions.
+- LIMIT (section 4): strict layer distinctions remain. Native source-memory
+  index dtype declarations differ at parquet serialization; native/walked
+  values agree but the latter adds id_converted. Public all-wave default/
+  Make differ only by that attr. Existing empty-helper Description is object,
+  versus string from the old fallback; covered-cache slices carry the flag.
+  CLI JSON serialization changes typed sampling/population/recall containers,
+  with eight exact matched full Arrow footer/schema/file-byte controls.
+  No relaxed dtype diagnostic is counted as a strict pass.
+- OK (section 4): first/fresh warm pooled Feature frames match separately
+  for default/currency=None (57,917 Tanzania+Mali;17,699 Make Tanzania-only).
+  The four actual scanner records are individually classified, zero fail/
+  error/skip records; there is no community_prices phase2 kwargs grid.
+  No first cold Feature snapshot or Mali source rebuild is claimed.
+- OK (sections 2/4): existing focused pytest selection58pass/0skip/0fail.
+  A following make api-audit attempt was guarded during Poetry environment
+  setup and returned2; the exact existing audit script passed once with the
+  mounted interpreter. No dependency/guard change or pytest repeat occurred.
+- LIMIT (section 4): an initial source-helper harness used the wrong cwd and
+  failed curation lookup; preserved/corrected with no product/expected-data
+  change. An auxiliary saved-artifact unpickle launch omitted the verified
+  runner/import environment and failed ModuleNotFoundError. Its generic
+  traceback reached tool output, without records/IDs/coords/source warnings;
+  no successful decode, API/source/test call or cache mutation is claimed for
+  it. Exact script/call/incident are retained; original stdout/stderr was not
+  captured privately. Subsequent tally used only existing artifacts through
+  the guarded identity-asserted runner.
+- OK (sections 3/6): reviewed PR1185 runtime/test blobs and prior408 unit
+  receipts are pinned; zero AG staging/plot_inputs rebuild. Source/runtime
+  remains e75, with only this ledger changed in the checkout. The predicted
+  25 Tanzania/524 others/39 framework hash scope is explicitly unmeasured
+  until an actual approved patch. No broad corpus/suite or multi-country
+  composition claim; stop for ROOT review before implementation.
