@@ -33,7 +33,7 @@ eligibility, unit basis, identifiers, grain or household crosswalk changes.
 | Both modern wave scripts | `Tanzania/{2019-20,2020-21}/_/community_prices.py` | Read own CM_SEC_F_ID, raw codes plus aligned item labels; sanctioned IO | Preserve |
 | Sanctioned IO/hash/coverage | `local_tools.py`, `Country._table_cache_hash`, `Wave._input_hash` | Existing gates and native legacy script cache contracts; STANDING sections 2/4 | Reuse |
 | Relevant tests/audit | `tests/test_community_prices_variety.py`, `tests/test_gh1039_make_backend_no_country_rule.py`, `bench/feature_audit/` | Existing source-code grain, Make routing and Feature checks | Reuse narrowly if prerequisites gated |
-| Reviewed unit correction | ledger `1118-tanzania-plot-input-units.md`, source/API evidence under `slurm_logs/.../1118-Tanzania/` | PR1185 normalized 86+322 missing plot-input units, preserving 9698 rows | Verify held-source control; do not alter |
+| Reviewed unit correction | ledger `1118-tanzania-plot-input-units.md`, source/API evidence under `slurm_logs/.../1118-Tanzania/` | PR1185 normalized 86+322 missing plot-input units, preserving 9698 rows | Verify exact reviewed blobs/prior receipts only; no AG staging/rebuild |
 
 ## Section 3: Definitions and country idiosyncrasies
 
@@ -72,6 +72,10 @@ constraints over older skill examples suggesting cache clears or NO_CACHE.
 - PR1185's 408-unit correction concerns plot_inputs, not community prices:
   86 in2019-20 and322 in2020-21, including19 no-amount records. Its existing
   conflicting-unit duplicate groups belong to #637, not this retirement.
+  Root clarified that the original brief conflated these counts. Retain this
+  as an immutable prior-proof invariant; stage only the two community price
+  modules, and measure their actual counts independently. No AG source work
+  or plot_inputs API rebuild is authorized in this diagnosis.
 
 ## Section 4: Invariants and validation boundary
 
