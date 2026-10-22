@@ -1025,3 +1025,15 @@ Campaignb775dfe11 is GitHub-pushed; PR1170/issue1091 public bodies fetched and v
 Goal remainsactive; no public merge or issue closure.
 
 Sue
+
+* Next country task prepared -- 2026-10-22T01:44:47.243270+00:00
+
+Prepared1119BFcandidate/base at reviewed1123cfd0782766068da6dc7e7605334e957f988a4ab1, exactignored metadata targets underBurkina_Faso/1119.
+Live1189stillopen/unmerged onfix/1123-burkina-input-identity-20261021, exactcfd; live1119unchanged/open with0comments.
+Queuedbrief restricts mechanicaltwoPreferredLabelcells after baseline/CONTENTS/prior-art checks; shared marker decision/Senegal/Guinea-Bissau remainresidual.
+No writer assigned, no productedit/test/APIbuild/verdict yet.
+Three activeagents remainUganda1198,Tanzania1091and bounded18Mali composition;19review waits18release/rootacceptance.
+Previous goal turn was progress: Niger1200PR/CI/indie acceptance, Tanzania concrete approval, source19preparation and14durablearchives published.
+This turn revalidated liveagenthandles/currentcleanrepos and preparesnextcountrytask while those specificworkers continue.
+
+Sue

@@ -55,7 +55,21 @@
       "active_review_status": "PASS;44tests, exact source/native/walked/public/Feature/warm/scanner/hash; explicit Senegal tier and non-source symlink receipt limits",
       "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1194",
       "active_ci": "success; run39683305731",
-      "combined_review": "PASS global15/actual14;57tests,35fullframes/process,4180GPS pairs/prior183input gains preserved,fullattrs/scanner/currentmetadata/warm0writes"
+      "combined_review": "PASS global15/actual14;57tests,35fullframes/process,4180GPS pairs/prior183input gains preserved,fullattrs/scanner/currentmetadata/warm0writes",
+      "queued_1119": {
+        "issue": 1119,
+        "path": "/local/job40255479/worktrees/isa-Burkina_Faso-1119",
+        "branch": "fix/1119-burkina-seed-crop-labels-20261022",
+        "base_head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+        "actual_parent_PR": 1189,
+        "actual_parent_branch": "fix/1123-burkina-input-identity-20261021",
+        "parent_live_state": "open/unmerged/exactcfd at preparation",
+        "control": "/local/job40255479/worktrees/isa-Burkina_Faso-1119-base",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1119",
+        "status": "Prepared unassigned task; no edits/tests/build/verdict",
+        "boundary": "Two harmonize_seed_crop Preferred Label cells only after actual reproduction; broader marker decision and non-ISA countries residual",
+        "brief": "queued-1119-Burkina_Faso/NEXT-WRITER-BRIEF.md"
+      }
     },
     "Ethiopia": {
       "path": "/local/job40255479/worktrees/isa-Ethiopia",
