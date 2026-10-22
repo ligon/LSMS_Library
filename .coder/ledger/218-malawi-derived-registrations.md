@@ -112,7 +112,53 @@ public merge or closure; freeze for another agent's independent review.
 
 ## Phase3 verification
 
-Pending implementation and measured bounded controls. No source output,
-fingerprint scope, baseline-negative test count or author PASS is claimed yet.
+Runtime/tests are frozen at `299fb8675e785fd392b1259ab1f4fb535eb69c34`,
+FS-published after ledger-first `61f2236e91ab51eb3e7f09aa2a029d380dac147e`.
+The production diff is exactly the two null-key deletions. All other helpers,
+Make rules, scientific inputs and framework code remain unchanged.
+
+The actual prebuild census measured 549 public API cells: 26 Malawi hashes
+change, 523 other-country hashes and all39 framework fingerprints do not.
+All97 Malawi wave hashes, public discovery/order and materialization metadata
+are unchanged. Malawi was the sole raw-derived-registration offender.
+
+The focused selection passed51 with zero skips. The actual-parent new-test
+control failed the registration policy and passed public API conservation;
+no fixture/signature/credential error is counted as a product negative.
+Strict API audit passed; eight exact-comparator fault controls were rejected.
+
+Four separate private roots passed19-held-source/two-layout physical-copy
+gates and compatible Niger L2 gates before dependent decoding/builds. Default
+source-cold food/sample and lazy panel-ID companions were built normally.
+The four additionally staged geo prerequisites were not consumed: market=Region
+uses sample.Region, and no Malawi cluster rebuild is claimed.
+All72 saved matched-stage frame pairs (including five native waves), full
+typed attrs/axes/dtypes/masks/order, and eleven current-cache frame checks pass
+at exact zero tolerance. Native Make bytes bind exactly to all ten Default
+pre-invalid receipts. Three CLI artifact pairs preserve full post-read frames,
+footers and parquet bytes. The two COUNTRY footers differ only in measured
+current hashes, including their serialized ARROW:schema copy; exact hash-only
+reconstruction passes without metadata stripping.
+
+Default fresh-process warm data receipts are exact for all62 files per head;
+Feature, scanner and CLI stages write zero data-cache files. Healthy Niger's
+13 copied parquets and all32 distinct copy origins remain exact. Other Malawi
+table outputs and whole-country source-cold coverage are not claimed.
+
+The unmodified scanner's205 ordered/full-multiset records match exactly:
+200WARN/3PASS/2FAIL/0ERROR. Both existing FAILs are reported-price modes whose
+assembly is empty because neither country records Price. Seventy Default
+endpoint category/message multisets match; seven Make endpoints retain raw
+path-bearing inequality, with exact literal checkout/data-path reconstruction.
+Make child stderr and scanner message strings remain private; complete warning
+category/stack equality is not claimed for those captures.
+
+Separate residuals are retained: Make's pre-canonical country concatenator
+raises RuntimeError on both heads/all derived callers; an invalid wave raises
+KeyError and evicts five hashless food companions on both heads. Neither is
+repaired. Original footer/launcher/symlink-checker stops remain immutable;
+no completed API prefix was replayed. Safe report, reproduction and residual
+drafts accompany the ledger. This is author READY for independent review,
+not acceptance or closure of GH218.
 
 Sue (GPT-6).
