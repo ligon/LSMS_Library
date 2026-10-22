@@ -1,6 +1,6 @@
 # Prior-Art Ledger - GH1215 Uganda empty-column order
 
-**Author:** Sue (GPT-6). **Phase:** static proposal only; no implementation is authorized.
+**Author:** Sue (GPT-6). **Phase:** user-approved Option A implementation.
 **Source parent:** `a417b69d71c460ab33f6a494b4df5d67cd792de5`.
 **Search tier:** direct source reads, ripgrep, git, and stdlib AST/text inspection.
 No GitNexus or memory connector is available in this session.
@@ -10,8 +10,10 @@ No GitNexus or memory connector is available in this session.
 Diagnose why the existing typed-empty country response can enumerate required
 columns before optional columns while Uganda's native/covered-cache response
 uses another order. Establish the existing contract and all affected callers,
-then propose a bounded boundary and meaningful checks. This is a Tier C
-schema-order proposal, not authority to change production, schema, or tests.
+then implement the user-approved Option A: constructed empties preserve
+declaration order using unchanged required/optional membership. The frozen
+static packet predates that decision. Populated ordering and optional dtype
+policy remain unchanged.
 
 ## §2 Existing machinery (source anchors at a417)
 
@@ -42,9 +44,12 @@ schema-order proposal, not authority to change production, schema, or tests.
 
 ## §4 Invariants & assumptions
 
-- Inherit `STANDING.md` §4. No raw reads, package imports, API calls, tests,
-  builds, data copies, acquisition, cache/venv operations, or runtime replay.
-- Only this ledger and the assigned private prefix may be written.
+- Inherit `STANDING.md` §4 and root's implementation release. Approved source
+  paths are the narrow country helper/docstring, GH1039/GH1204 regression tests,
+  Uganda CONTENTS and this ledger. Frozen static evidence stays immutable.
+- Guard calibration precedes the full metadata fingerprint census and bounded
+  synthetic tests. Genuine37-provider/four-root data work is held for a concrete
+  budget/gate release. No acquisition, shared cache or old-prefix replay.
 - Preserve dtype/index names, optional membership, attrs, native grain and all
   pre-existing failure evidence. Stable column order alone is not full-frame
   equality or cold/warm equivalence.
@@ -58,21 +63,22 @@ schema-order proposal, not authority to change production, schema, or tests.
 | quantity | decision | reason |
 |---|---|---|
 | Column identity/order authority | reuse | actual Uganda declaration and explicit native projection agree; no universal native-order promise found |
-| Empty dtype/index construction | reuse/possibly extend | recommend original entry iteration restricted to existing required/optional membership; root Tier C decision remains pending |
+| Empty dtype/index construction | extend order only | user approved original entry iteration restricted to existing required/optional membership; no dtype-coercion edit |
 | Metadata/Feature verification | reuse | bounded same-request attrs, typed axes, optional-presence and synthetic healthy controls; no new public grain |
 | Static census | new private analysis only | stdlib lexical inventory38 scheme files/448 entries;48 optional-bearing;33 order-sensitive across21 countries; no runtime reachability inference |
 
-## §6 Open questions for root
+## §6 Approved boundary and remaining runtime gates
 
-- Choose narrow original-declaration order in the existing constructor, or a
-  larger explicit public-empty normalization contract. The first aligns the
-  motivating Uganda paths, but cannot promise every native/cached writer has
-  the same order or optional membership.
+- On2026-10-22 the user explicitly selected "Use declaration order
+  (Recommended)". Root released Option A and the exact minimal source/test/doc
+  edits. No universal native/cached order or optional-membership promise follows.
 - The constructor is reachable from the all-table tagged aggregator and is not
   fingerprint-excluded; actual549/39/1362 hash cost is unmeasured and must be
   assessed before any separately released data build.
 - The concrete proposal and bounded actual-parent/healthy/metadata/Feature
-  controls are in the private PHASE0.md. No implementation/runtime is released.
+  controls remain in frozen private PHASE0.md. Root released guarded calibration,
+  the predata census and bounded synthetic tests in a new mutable prefix.
+  Genuine payload work awaits its concrete37-provider/148-copy budget gate.
 - Root's BF1188 author observation is separately qualified: four new optional
   fields are absent from actual parent3dc9d285. Read-only detached3d39096
   declarations/tests bind their names/types; no independent runtime result is
@@ -83,9 +89,9 @@ schema-order proposal, not authority to change production, schema, or tests.
 
 - OK (anchored on §2/§5): recommendation reuses ordered schema membership and
   existing typed-empty construction; no new constructor or schema hardcoding.
-- OK (anchored on §3/§4): no production/schema/test/data change; all original
-  author four strict failures remain failures. No package/numerical import,
-  payload read/copy, API, test, build or acquisition was performed.
+- Static phase OK (anchored on §3/§4): the frozen packet contains no production,
+  schema/test/data change or new runtime result; all four original author strict
+  failures remain failures. New implementation verification is pending.
 - CONTRADICTION retained (anchored on §3): historic2018-only factors versus
   dated newly-wired rounds, universal parcel-match claim versus held-area
   qualification, and source-season shorthand versus actual module chronology.
@@ -93,5 +99,8 @@ schema-order proposal, not authority to change production, schema, or tests.
 - Static census v1 stopped at the existing CLAUDE->AGENTS link before schema
   analysis; v2 explicitly binds that link and target and completes0. Both
   sources, original terminal1/stderr and corrected terminal0 are retained.
-- Initial ledger commit467b3b59c preceded analysis; this final ledger records
-  the bounded proposal only. Root owns the unresolved Tier C decision.
+- Initial ledger commit467b3b59c preceded analysis; static ledger666bde649 and
+  its24-entry packet were sealed before applying the later user decision.
+  Source changes reuse both membership helpers and preserve dtype/index and
+  populated-frame behavior; interleaved and real-schema tests are now written
+  but have not yet run. No numerical/project imports precede active guards.
