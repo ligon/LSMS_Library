@@ -1,6 +1,110 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T23:08:50.144364+00:00
+* Current task -- 2026-10-22T23:31:01.988500+00:00
+
+The user expressly authorized reviewing and merging outstanding PRs into development.
+
+The latest complete root remote readback is 2026-10-22T23:37:25.890173+00:00: 26 implementation PRs merged and 6 open.
+Remaining PRs: #1212, #1213, #1214, #1216, #1217, #1220.
+Latest scoped merge SHA: 79a374e0b7257aa22a1380da807666d0336de042.
+This supersedes the earlier 22-merge checkpoint below; exact metadata are in merge-progress-current-checkpoint.json.
+Root separately verified thirteen completed issue closures; #1091 is authorized for closure after all three named country PRs land, with exact references.
+The merger continues independently; do not wait for routine root permission.
+Independent source review of #1218 at 2f is now frozen in C/review1218-framework-static-v1: FINAL-PINS e53d5429c02405209d39ff5ece2b9f46ff7e9f4959c9496ec5c4b15cb7c7b65f, REVIEW.md 39fb7933421b48b643ff47e9a197c158636acd0a88a64cafd4e21d3d191715ad, SOURCE-PINS e6ea58da3435480df74381816f4d8fc29be97b960c0713459d2c9beffb5bb52c.
+The reviewer found no additional non-calendar blocker, qualifies unsupported standalone dtype closure selection as inherited, and awaits the minimal calendar patch.
+No runtime or payload operations ran in that review.
+Author acquisition_1149 preserved the exact 2f snapshot and committed ledger-first 56e1e39fe, then the six-line helper-only calendar amendment at 5fdbb937d653cd6b72c0ba9419388bedeacdb32f.
+Root read the exact patch; CALENDAR-AMENDED-SOURCE-REVIEW-PINS-private.json SHA256 a956ae076d810a9502a3b83a98c08b7b06677d9d496febbdb5a74088f94201b4 binds the five-path scope, original snapshot and unchanged tests/registry/shared populated coercion.
+The independent reviewer is reactivated for that exact amendment; the author is preparing candidate-only controllers, without executing them.
+No runtime on the new 5f revision has run; require exact new pins and review before release, and do not replay the saved f7 base census or parent controls.
+Mali's frozen packet of 51 files still needs root's own source review and exact finite release; no Mali actor has run.
+The goal is active; do not ask again for permission.
+The main checkout remains clean at f8; never edit the shared mirror working tree.
+
+The root complete remote checkpoint (15135a, exit 0) confirms 22 of 32 implementation PRs merged, ten open.
+The captured development tip is 7080ad52e87fffe9617bf88bdedfaa159dd938a3.
+Remaining: #1199, #1202, #1207, #1208, #1212, #1213, #1214, #1216, #1217 and #1220.
+Exact merged heads/SHAs/timestamps are in slurm_logs/isa_backlog_2026-10-21/merge-progress-twenty-two-PRs.json.
+Merger malawi_1209 continues under the existing authorization, with live-tip merge-tree, no-marker, exact-head CI, expected-head and server parent/tree readback gates.
+Internal remote hold is lifted; there is no need for routine per-PR root approval.
+
+Mechanical repairs #1199 at 4cd29a8d (28 PASS), #1202 at 165a16c5 (118 PASS / three normal skips), and #1208 at 6f83359b (two PASS) were pushed only to their own PR branches for fresh CI.
+#1212's first preparation stopped before commit on a duplicate metadata basename; its staged/unmerged state was preserved.
+A one-shot continuation committed a55d2248 with 123 reader/producer tests passing and country.py SHA256 484e9cb9 byte-exact outside the approved three-line conflict.
+Its push is held until #1202 lands, then only additive current-development note composition is needed.
+Never push the combined 32-PR history or the old erroneous 30c4 local history into a PR branch.
+Fixture adapters apply only to their own #1213/#1214 files, with all assertions retained and fresh CI.
+PR #1170's original branch remains frozen at 59cc6b693e431b812c2676f3c9233b54dd2f7d7b and may merge last.
+Root docs are on docs/isa-backlog-20261022-merge-progress, last pushed at 458a66303 before this checkpoint.
+
+The scoped integration result remains 1,691 distinct PASS and 102 normal SKIP across immutable original and failure-only continuations, with no single-run/full-data claim.
+Root source/test acceptances are 3bf9a567... and 5cc062186f55c25e433f418f21375a2df10f711842e035a4607673491b5bd1d2.
+Seven fully resolved issues have verified completed closures: #822, #1034, #1062, #1077, #1088, #1109 and #1144.
+The latest complete issue checkpoint at 23:10:58 UTC has 166 repository open issues and 107 ISA scope records (22 PR-linked, one exclusively active, 84 others).
+Queue JSON/Org retain that dated issue checkpoint and nine-merge PR state; the new 22-merge record supersedes its PR count.
+The merger will reconcile further fully resolved issues and retain/narrow partial residuals.
+Root also verified completed closures #1006, #1058, #1081, #1078, #1149 and #1188, bringing the verified completed issue total to thirteen.
+The dated queue JSON/Org still show the earlier seven-closure checkpoint; refresh complete issue collections after the merge batch.
+For #1091, the actual current scope names only Mali/Niger/Tanzania and requires all three reviewed/merged; close completed once #1199 lands, with all three exact merge references.
+Do not retain an old provisional residual that the live issue does not name.
+PR #1170's body has the verified nine-merge/seven-closure checkpoint; update it after the next actual merge batch.
+
+#1218 source remains clean 2f83bb2 with five tracked paths, published to the durable mirror.
+Metadata tests give actual-parent13 FAIL / three PASS and candidate25 PASS.
+The fresh amended candidate census saved all maps and measured 549/39/1,362 changed hashes against the saved f7 maps, with exact ordered API/source policy.
+The original parent57 run remains 39 dtype FAIL / seven Make startup blockers / 11 PASS.
+The separate seven-case continuation is now classified as four dtype FAIL / three PASS; its saved v4 gate passed39a761.
+The unexpected all-dvc pass follows the existing typed warm-cache filter route, bound by source/order evidence rather than an invented branch trace.
+Ten startup records comprise three package importers/probes and seven pandas-only recipe children; do not require package notes/probes from the latter.
+Original failed child assertions/PIDs/environments remain unknown, and the old five/two predicted gate failure is preserved.
+
+The never-run candidate57 actor62249/952ae8 (PID441227) actually exited1: 45 PASS / 12 calendar dtype FAIL, zero errors/skips or startup failures.
+The twelve failures are datetime/date/timestamp declarations across four forms, returning object instead of the existing pandas calendar dtype.
+Their original swallowed inner exception was not recorded.
+Failure packet P/CANDIDATE57-CALENDAR-FAILURE-METADATA-private.json SHA256 0a93c5d14cb05f5e9f62630fb39881558ca5f7b04ab779453da59166cdc2c3c2 retains 99 source/terminal/startup/opaque synthetic receipts.
+Success gates v4/v5 have not run against this failure.
+The v5 range-label correction was source-reviewed (88513f), with original-f7 source pinned separately from candidate source.
+
+Root released ONE new pure-synthetic calendar diagnostic, not a test/API/census replay.
+Release C/FRAMEWORK1218-CALENDAR-DIAGNOSTIC-V2-RELEASE.json SHA256 800344c2fe4d8d8fe0d6492d028f2020658ec40b597ad7997d2f4a24cea63b33; root259839 authenticated14 exact bindings after full source review.
+Plan P/CALENDAR-DIAGNOSTIC-v2-REVIEW-PLAN.json SHA256 928b52f3da8c3af4e89d371e6cbd37466a9344936f84c727bd8da52f4df8cd6d.
+Its four operations directly observe the empty parser, existing enforcer, optional constructor, and one synthetic ISO control, with country-function exception tracing.
+Each observation is saved immediately; data files and harmless empty metadata directories are recorded separately.
+V1 remains unexecuted because root caught its overstrict directory assertion and late persistence before runtime.
+The one diagnostic completed44550/ae8c19, PID455736, exit0, with all four immediate observations retained.
+New measured cause: empty MultiIndex calendar parsing raises ValueError('cannot join with no overlapping index names') at year_last = was_str & parts[0].notna(); the enforcer catches it and preserves object.
+The tiny populated ISO control returns exact datetime64[us]; data files remain zero with one empty DVC-cache directory.
+Diagnostic handoff SHA256 917506e2476e49f51369b2c8c1f2a29ec7e62107f2533de1d93641eb8b65eb59 binds31 receipts and exact original tool strings.
+The original failed57 inner exception remains unrecorded; this new observation does not recover it.
+Root authorized SOURCE-ONLY ledger-first amendment and a minimal constructed-empty calendar initialization via existing map and _to_datetime_mixed before the unchanged enforcer.
+Author must preserve the exact2f snapshot and return new source/diff/pins before runtime; the independent reviewer is awaiting that patch.
+Any correction is ledger-first and constructed-empty-only through existing calendar machinery, preserving populated coercion and all twelve test oracles.
+A new product revision can justify fresh targeted regression checks; packaging alone cannot justify replay.
+Supporting tests must deselect already-completed cases where appropriate; all genuine six providers/24 copies/four roots remain held.
+
+Mali #1118's runtime preparation is now frozen and awaits ROOT SOURCE REVIEW, with zero actors/imports/tests/census/provider bytes/normal roots.
+D=C/mali1118-fix/runtime-preparation-v1.
+FINAL-PINS SHA256 ee3357eb143f4867a58782cd30d6307e89a90ca17832f90f07c3e3dc2492f446; RUNTIME-PLAN afbe2d0e269e6b66e889e6a612b5650923d1de8e853ec96689b3d1e96550fe8f; guard a382f93409cb91790ad9ac957c2ccc518b41899c7d61bff1e183036574c06012; report a52c7b90a86c9fd60d4476284f746e0d73e68a20b709628bb83280b7ba653db0.
+There are 51 final manifest files, 23 active controller/binding/test files and 17 AST-only Python files.
+Candidate24278b6 and true basef8 remain clean; all15 phase0 files are unchanged.
+External additive qualification P/RUNTIME-PREPARATION-QUALIFICATIONS.json SHA256 a1e25c3f65b543bfd6c0062adeeea3c9827eaf357f8e92357d9dfb84aab3cd43 says the 30 fault pairs serialize while two positives are recorded deepcopy assertions, not separately serialized operands.
+Proposed14 sequential source/calibration/fullmap/parent25/candidate18support/comparator stages use one actor tree, at most two workers, all pools1; no genuine release yet.
+Four roots/14 providers/56 copies/133288392 bytes remain a separate proposal, with source-first meaningful-unmapped versus raw-absence classification before a production fill.
+
+While that packet awaits root review, review_malawi_1209 has a new narrow independent SOURCE-ONLY #1218 review task in a separate prefix/checkout.
+No imports/tests/censuses/provider payloads are authorized for that review; it covers source2f versus f7, the five-path diff and a later calendar patch.
+The reviewer reports an inherited scope limit: unsupported dtype families reject when _ser is reached directly/nested, while standalone unknown families are ignored by the old closure-selection mechanism; supported-family subclasses enter selection and reject by exact dispatch.
+Keep this distinction; do not claim global unknown-family closure rejection or broaden this patch into closure-selection redesign.
+Mali ownership and its frozen packet stay with this agent.
+A future Uganda #1133 phase0 brief remains prepared but NOT dispatched.
+
+Archive32 remains accepted; live #1218, independent #1215 and newer root receipts are not yet covered.
+Do not replay product actors for packaging.
+No infrastructure repair or resource release is needed while active work continues; poll the deadline file at natural checkpoints.
+
+Sue
+
+* Earlier task -- 2026-10-22T23:08:50.144364+00:00
 
 The user expressly authorized consistency checks and merges into development.
 The goal remains active; do not ask again for merge permission.
