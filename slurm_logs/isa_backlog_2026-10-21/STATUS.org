@@ -334,3 +334,87 @@ All included members and source-after receipts were verified; root separately ve
 The safe receipt is =private-evidence-durability-tenth.json=; derived frames remain private and duplicate cache/raw-source extensions are excluded.
 
 Sue
+
+* Country handoff and engineering decision -- 2026-10-22 00:57 UTC
+
+Niger1091 author is frozen at =670de9cc073f6a1436aaf9b55cf6371a244f232d=; runtime/tests remain =6be6576607f1862b603d123acfb74ace4026fd3f=.
+Root independently verified full test/package tree boundaries and final manifest SHA.
+The separate reviewer =niger_lane= now uses new detached candidate/base worktrees and private physical roots.
+Safe author exports are in =1091-Niger-author/=.
+The original auxiliary cache delta remains unidentified; the overwritten private aggregate's original final size/SHA were never recorded.
+Both freezes and unchanged per-probe evidence survive; the separately named reconstruction is not original bytes and grants no broader proof.
+
+Tanzania1091 is now an active read-only diagnosis by =review_nigeria_1034=.
+Complete2142line CONTENTS and ledger-first =aa62795ce= precede analysis.
+Its community oracle measures17699retained readings, independently of the earlier9698plot-input rows.
+The reviewed408unit correction belongs to plot_inputs and is retained through source/prior receipts; no AG files or plot-input build were added to this diagnosis.
+Actual Make/subset/layer consequences and a concrete proposal remain pending.
+
+Uganda1198's design/prototype is frozen at =989fbf3d98439be802d1f9cebd8ab5197c56b002=, with runtime/config/schema/tests exactf8.
+Safe original reports are in =1198-Uganda-design/=.
+Root read the complete proposal and actual prototype/checker sources and approved an isolated implementation under =1198-root-engineering-decision.md=.
+The declared =production_obs= string coordinate preserves reported IDs, real slots and constructed source-row identities; Feature adds an honest unresolved sentinel.
+The revised implementation reuses =source_fingerprint= with explicit loader identity/physical positions and introduces no new provenance attrs contract.
+The private prototype manually attached combined attrs; natural concat/Feature would otherwise drop that record.
+A new clean implementation checkout is prepared; the writer starts after global17 review release.
+Real source-cold, current comparator, plot/parcel area/yield and actual hash-scope gates remain.
+
+Root has read global17's bounded functional review and actual checker/coordination sources, and independently confirmed all236raw scanner occurrences,203common/14removed/8added food accounting plus25roster records, and all9620full-selection outcomes.
+The functional report passes its bounded Uganda/Niger source scope; final manifest/release is still pending.
+The full selection remains5148passed/4459skipped/13failed, with no full-suite PASS.
+One documentation timestamp changed while bytes/mode/Git stayed exact; the existing generator child removes the private audit path from PYTHONPATH.
+No per-child event attribution or complete child Python-guard coverage is claimed; no timestamp restoration or test repeat occurred.
+Global16 remains the latest public combined proof pending root publication of the released17evidence.
+
+Live839 now distinguishes Tanzania's already-DONE/superseded quantity note from Mali's remaining false YAML comment.
+The source-only queue refresh also retains Burkina1119seed joins and Malawi218dead registrations as future work, without new runtime claims.
+Archive11 is verified:893included files,103289390compressed bytes, SHA256 =23d59e5214e63795298b49a5bcb82e4690b2deebd894a0ef7406a3dfca3e8381=.
+All members/included-source-after receipts and root owner-only/hash/fsync checks pass; safe receipt =private-evidence-durability-eleventh.json=.
+
+Sue
+
+* Bounded integration publication -- 2026-10-22 01:03 UTC
+
+Global17 is released and root-accepted for its bounded Uganda/Niger functional composition at =7ecf8e95fef567554fe93870ba95abddd1955a86= against actual16 =d527249ba9d3eaebf190a075e39043e36d2dbb85=.
+The NEW public branch is [[https://github.com/ligon/LSMS_Library/tree/isa/integration-seventeen-20261021][isa/integration-seventeen-20261021]]; the prior public16branch remains unchanged.
+Safe fifteen-file evidence is in =integration/framework-seventeen-review/= with =ROOT-ACCEPTANCE.json=.
+Root independently reconstructed the entire previous country.py by replacing only the two standalone1078methods and their exact adjacent comment, verified the twelve-path source union, all236raw scanner occurrences/safe digests and all9620JUnit outcomes.
+
+The bounded source proof has438focused passes,44complete frame pairs at cold and freshwarm,50ordered frame pairs,16full14740-income references and32cross-order comparisons.
+The actual old16race writes exactly six Quantity and three Expenditure missing values as zero; both17writers preserve complete frames and normal cache healing restores exactly those nine cells.
+Warm inventories preserve174main files perhead,133files in each of four ordered roots and120healing files.
+All236scanner occurrences match complete raw multisets,232WARN/fourPASS, with standalone differences explicitly reconciled.
+
+The full selection remains FAIL:5148passed,4459skipped,13failed,zeroerrors.
+Nine protected timestamp failures and four baseline-reproduced warning-prefix glob failures remain separate from functional acceptance.
+One documentation mtime changes under an existing generator child's lost Python audit path; bytes/mode/Git stay exact, but no full guard/event-attribution claim is made.
+Eight unrequested/unserved copied16cluster companions remain stale,1196dtype remains explicit, and the historical corrupt writer is unidentified.
+All549API/39framework/1362wave hashes move; a coordinated rebuild window remains necessary, with no rebuilt-output claim for37other countries or unrestricted all17/18 claim.
+The final private manifest pins6468files; zero data consumers remain and10320protected prior files are exact.
+
+The Uganda1198 writer =mali_lane= has started in its NEW checkout under the revised root decision and published ledger-first =9144f5085= before production edits.
+Niger's independent review and Tanzania's read-only diagnosis continue in separate roots.
+The twelfth owner-only archive is running; its receipt will be recorded only after terminal verification.
+No public PR is merged automatically.
+
+Sue
+
+* Durable release and next snapshot -- 2026-10-22 01:09 UTC
+
+Archive12 completed:3331included files,524515130compressed bytes, SHA256 =d5388b73a05e34b63799146d29774f9561dc8ca6688dfe0964f2e39a96c1e1d7=.
+All included members/source-after receipts and root compressedSHA/owner-only/fsync/launcher checks pass; safe receipt =private-evidence-durability-twelfth.json=.
+The frozen global17 evidence is durable; no archive contains a claim that confidential derived frames were made public.
+
+A separate eighteen-change validation snapshot is FS-published at =f9feb3c807aff5206134c37768992302ceb431fa=, adding reviewed Mali PR1199 to actual17.
+The only merge conflict was between the additive Mali1121and1091 notes; the final file preserves the entire prior17byte prefix and exact1091 addition.
+An initial leading-blank-line resolver assertion stopped before write; an ungated add staged unresolved markers, which the cached check caught before commit.
+The corrected resolver and all nine other changed blob/mode checks passed before the ordinary merge commit.
+No reviewer, candidate18test/build,18PASS or GitHub source18publication exists yet.
+The queued review must use actual corrected Niger1088/current17 hashes, rather than an older author comparator as if it were current.
+
+Uganda1198prebuild measurement is28changed Uganda hashes/521other hashes exact,39framework fingerprints exact.
+Of1362declared-wave hashes,171Uganda hashes move; of2139API-wave pairs,224Uganda pairs move.
+AST/value comparison confirms every existing factor mapping remains exactf8 after removing only new identity fields.
+Source preparation and focused controls precede normal builds; no prototype scenario total is forced into code.
+
+Sue

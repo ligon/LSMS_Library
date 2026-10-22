@@ -254,6 +254,22 @@
     {
       "issue": 1091,
       "action": "Opened independently reviewed Mali PR1199, stacked on exact live1180head, and verified CI success. Reconciled umbrella title/body with settled788/840/1086 authority, unmerged Mali work and remaining Niger/Tanzania; historical draft preserved. No issue closed and no public merge."
+    },
+    {
+      "issue": 839,
+      "action": "Reconciled live title/body after exact f8 source inspection: Tanzania quantity note is already DONE with explicitly superseded history; Mali stale YAML comment remains. Original issue retained as history. No new microdata/implementation/closure/hash measurement claimed."
+    },
+    {
+      "issue": 1091,
+      "action": "Niger final author670de9cc is clean/published; root verified tests and package-equivalence boundaries and manifestSHA. Different-agent independent review started in new detached candidate/base roots. Author lost-delta and overwritten-aggregate qualifications retained. Tanzania read-only diagnosis started after complete CONTENTS/ledger-first; no implementation yet."
+    },
+    {
+      "issue": 1198,
+      "action": "Root read complete frozen design and actual prototype/checker sources. Approved revised production_obs and unresolved sentinel contract; reuse existing source_fingerprint with explicit loader refs and physical positions, no new provenance attrs promise. New isolated implementation checkout prepared; writer queued after global17 release; source-cold/real-comparator/real-area/yield and actual hash gates remain."
+    },
+    {
+      "issue": 1078,
+      "action": "Root accepted released independent bounded functional17 review at7ec against actual16, independently reconstructed entire country.py and verified raw236scannerrecords/9620JUnitoutcomes. Published NEW isa/integration-seventeen branch; old16branch unchanged. Full13FAIL/doc-childguard-mtime/stale8companions/1196/broadhashcost remain explicit. No PR merged."
     }
   ],
   "verified_issue_metadata": [
@@ -415,7 +431,8 @@
       "review": "PASS scoped source/race/healing/healthy plus bounded exactness/attribution addendum; full-suite FAIL4689pass4453skip9protected-utime failures; separate9case private-operand pass",
       "ci": "success; run39696155414",
       "coordinated_rebuild_window_required": true,
-      "composition_with_current_global16_verified": false
+      "composition_with_current_global16_verified": true,
+      "composition_scope": "Bounded Uganda/Niger source/race/healing/1062/default/Feature review at7ec; no unrestricted all17/corpus claim; full selection FAIL13 and explicit isolation limits."
     },
     {
       "number": 1199,

@@ -1,0 +1,62 @@
+{
+  "counts": {
+    "skipped": 4459,
+    "passed": 5148,
+    "failed": 13
+  },
+  "failed_nodes": [
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[Burkina_Faso]"
+    },
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[Ethiopia]"
+    },
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[EthiopiaRHS]"
+    },
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[GhanaLSS]"
+    },
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[Mali]"
+    },
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[Niger]"
+    },
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[Senegal]"
+    },
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[Tanzania]"
+    },
+    {
+      "class": "tests.test_panel_ids_persistence",
+      "name": "test_make_never_regenerates_the_crosswalk[Uganda]"
+    },
+    {
+      "class": "tests.test_conftest_net",
+      "name": "test_unmarked_missing_credentials_skip_loudly[False-call]"
+    },
+    {
+      "class": "tests.test_conftest_net",
+      "name": "test_unmarked_missing_credentials_skip_loudly[False-setup]"
+    },
+    {
+      "class": "tests.test_conftest_net",
+      "name": "test_unmarked_missing_credentials_skip_loudly[True-call]"
+    },
+    {
+      "class": "tests.test_conftest_net",
+      "name": "test_unmarked_missing_credentials_skip_loudly[True-setup]"
+    }
+  ],
+  "single_fresh_full_selection": true
+}

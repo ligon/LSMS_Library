@@ -1,0 +1,21 @@
+{
+  "only_exportable_directory": "safe-exports",
+  "files": [
+    "ALLOWLIST.json",
+    "COHORT.md",
+    "REPRODUCE.md",
+    "REVIEW.org",
+    "cache-metadata.json",
+    "comparator-provenance.json",
+    "doc-guard-gap.json",
+    "exact-comparator.py",
+    "focused-counts.json",
+    "full-selection.json",
+    "hash-scope.json",
+    "healing-delta-proof.json",
+    "proof.json",
+    "scanner-proof.json",
+    "verdict.json"
+  ],
+  "private_frames_IDs_sources_masks_warnings_traces_credentials_logs_not_exportable": true
+}

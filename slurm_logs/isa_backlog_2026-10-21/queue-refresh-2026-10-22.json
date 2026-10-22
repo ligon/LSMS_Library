@@ -1,0 +1,42 @@
+{
+  "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "kind": "Source-only queue refresh; no new microdata execution or hash census",
+  "issues": [
+    {
+      "number": 839,
+      "live_state": "open",
+      "action": "Reconciled title/body: Tanzania quantity note already DONE and historical absence claims superseded; Mali config comment remains false.",
+      "remaining": "Replace only stale Mali food-acquired comment, preserving parsed YAML/runtime, coordinate country rewarm and measure scope.",
+      "source": [
+        "lsms_library/countries/Tanzania/_/CONTENTS.org:578",
+        "lsms_library/countries/Mali/_/data_scheme.yml:59",
+        "lsms_library/countries/Mali/2014-15/_/data_info.yml:100",
+        "lsms_library/countries/Mali/2014-15/_/mapping.py:54"
+      ],
+      "new_fix_PR": false
+    },
+    {
+      "number": 1119,
+      "live_state": "open",
+      "action": "Mechanical Burkina_Faso maize/cowpea seed-label join mismatch remains in harmonize_seed_crop. Initial triage dependency1123 still applies.",
+      "remaining": "Country-only source-backed correction after current lanes free; shared non-crop marker choice and non-ISA Senegal/Guinea-Bissau work remain separate.",
+      "source": [
+        "lsms_library/countries/Burkina_Faso/_/categorical_mapping.org:618"
+      ],
+      "production_changed": false
+    },
+    {
+      "number": 218,
+      "live_state": "open",
+      "action": "Malawi still registers empty food_expenditures and food_prices derived tables.",
+      "remaining": "Remove only dead Malawi registrations while preserving derived Country/Feature availability; other-country Makefiles and framework/docs references remain umbrella residual.",
+      "source": [
+        "lsms_library/countries/Malawi/_/data_scheme.yml:488"
+      ],
+      "production_changed": false
+    }
+  ],
+  "newly_closed": [],
+  "new_agents_dispatched": false,
+  "recorded_at_UTC": "2026-10-22T00:41:38.818247+00:00"
+}

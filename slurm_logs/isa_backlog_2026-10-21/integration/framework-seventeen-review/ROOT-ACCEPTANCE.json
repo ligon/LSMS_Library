@@ -1,0 +1,142 @@
+{
+  "accepted_at_UTC": "2026-10-22T01:00:55.384501+00:00",
+  "candidate17": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+  "actual16_control": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+  "decision": "ACCEPT_BOUNDED_UGANDA_NIGER_FUNCTIONAL_COMPOSITION_WITH_EXPLICIT_LIMITS",
+  "source_publication": "New isa/integration-seventeen-20261021 branch authorized; previous verified16 branch remains unchanged",
+  "source_publication_completed": true,
+  "root_read_complete_review_and_actual_checker_coordination_sources": true,
+  "root_independent_entire_country_py_reconstruction_byte_exact_actual16": true,
+  "root_independent_two_new_methods_exact_standalone1078": true,
+  "root_independent_twelve_path_source_union_exact": true,
+  "root_independent_READY_and_6468_entry_manifest_SHA_verified": true,
+  "READY_sha256": "3c65328e946952349f34fdb6c987d277a7215bf1d5579142c49490c64ae8fe0c",
+  "private_final_manifest_sha256": "f559b1677e5ccbf237caf0b4a96a050c4d69bd0fec91f27a9d62ce8fc05e30cd",
+  "root_independent_raw_scanner_multisets": {
+    "occurrences": 236,
+    "warn": 232,
+    "pass": 4,
+    "safe_digest_multiplicities_match": true,
+    "standalone_food": 217,
+    "current_food": 211,
+    "common": 203,
+    "removed": 14,
+    "added": 8,
+    "new_roster": 25
+  },
+  "root_independent_JUnit_counts": {
+    "full_cases": 9620,
+    "full_passed": 5148,
+    "full_skipped": 4459,
+    "full_failed": 13,
+    "full_errors": 0,
+    "full_identity_outcome_sha256": "eb4fdbb42ad4df92ae5d058dad77d705990b7c4c9653197ce513d006cb81d5e4",
+    "focused_passed": 438,
+    "actual16_negative_failed": 14,
+    "actual16_narrow_warning_counterpart_failed": 4
+  },
+  "full_suite_verdict": "FAIL13 retained; no repeated full selection",
+  "limits": [
+    "One tracked doc mtime changed with unchanged bytes/mode/Git state; existing generator child removes private guard path. No exact child event attribution or complete child Python audit coverage.",
+    "Eight unrequested/unserved copied16 cluster YAML companions remain unchanged and stale in the healing root.",
+    "Pre-existing Niger cold/warm u StringDtype sentinel difference remains1196, without normalization.",
+    "Controlled producer signature does not identify the original historical writer.",
+    "All549API/39framework/1362wave hashes move; coordinated rebuild window required. No rebuilt-output proof for37other countries.",
+    "Previous sixteen-country-fix evidence retains its own exact heads; no unrestricted17 or18/full-corpus claim."
+  ],
+  "no_public_PR_merged": true,
+  "exports": [
+    {
+      "file": "ALLOWLIST.json",
+      "sha256": "2be642275e3738a45a2b7b14b6ac55e2154a8460785d9abf6229a940e20b579a",
+      "bytes": 523,
+      "byte_exact": true
+    },
+    {
+      "file": "COHORT.md",
+      "sha256": "02cfbb190357ac0334d92a319332677f421b3f0bd7af475b44eb1d482289b570",
+      "bytes": 7012,
+      "byte_exact": true
+    },
+    {
+      "file": "REPRODUCE.md",
+      "sha256": "4272cd0f430191ae2f9bd47e96ec7e855306f4a59d9babdcd9eb24ef30c6fc23",
+      "bytes": 5495,
+      "byte_exact": true
+    },
+    {
+      "file": "REVIEW.org",
+      "sha256": "2a07dfec2fef15c60d7ed851efcaee0dc86d22e8b4e852b282b018562250aaa5",
+      "bytes": 14589,
+      "byte_exact": true
+    },
+    {
+      "file": "cache-metadata.json",
+      "sha256": "6399cdcc42c76af1d872ff7749797f2b1bb8e6e64273b2d0a4845df894116d3f",
+      "bytes": 1729,
+      "byte_exact": true
+    },
+    {
+      "file": "comparator-provenance.json",
+      "sha256": "aca6ee8a50b588fb80273ac847ef91990bb4814172a3cfec5e369ecbe4d36800",
+      "bytes": 569,
+      "byte_exact": true
+    },
+    {
+      "file": "doc-guard-gap.json",
+      "sha256": "912bdde759e8bee026311478f9a8cebf91cc39d94c45950c3200bc0deddd4846",
+      "bytes": 1057,
+      "byte_exact": true
+    },
+    {
+      "file": "exact-comparator.py",
+      "sha256": "7919c6fafdaf926d24501d72cca4c96e4e2deb131aa19749a89b8fb79d8949ed",
+      "bytes": 4379,
+      "byte_exact": true
+    },
+    {
+      "file": "focused-counts.json",
+      "sha256": "cd8929ef50545122e44b5cb014f07bf816ce4f897133cde61d3f3b13d0dc0181",
+      "bytes": 1318,
+      "byte_exact": true
+    },
+    {
+      "file": "full-selection.json",
+      "sha256": "e5ad7e811fde9598bc3cdc9c95ffa680f7578cee0455a8ef65dda370adc18d0d",
+      "bytes": 1843,
+      "byte_exact": true
+    },
+    {
+      "file": "hash-scope.json",
+      "sha256": "8f47394c11baba07b842777987112b6c59d43c4ac913b5e3facab2ba8b2bbbab",
+      "bytes": 394,
+      "byte_exact": true
+    },
+    {
+      "file": "healing-delta-proof.json",
+      "sha256": "0ac1b160acc62d8c6639ee0080e7463ae2422d6dfb4cf1392ea89e18a3cfded9",
+      "bytes": 787,
+      "byte_exact": true
+    },
+    {
+      "file": "proof.json",
+      "sha256": "ead4332fa18d545969c8ebe6655ea360ec0121d110d359f2c9ebc0bf46193e32",
+      "bytes": 7649,
+      "byte_exact": true
+    },
+    {
+      "file": "scanner-proof.json",
+      "sha256": "7d8084d1f11caad9c000386b0ce768a055ab8f77731dee49d86839f789ea49ef",
+      "bytes": 63030,
+      "byte_exact": true
+    },
+    {
+      "file": "verdict.json",
+      "sha256": "047d417cbf358ad0d2002b962f2d40bd6ffd48d1eaa7606b9f6e7fc8ba8294d6",
+      "bytes": 1745,
+      "byte_exact": true
+    }
+  ],
+  "public_source": "https://github.com/ligon/LSMS_Library/tree/isa/integration-seventeen-20261021",
+  "published_source_head": "7ecf8e95fef567554fe93870ba95abddd1955a86"
+}

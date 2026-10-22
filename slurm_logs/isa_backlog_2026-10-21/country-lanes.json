@@ -220,12 +220,12 @@
       "open_pr": "https://github.com/ligon/LSMS_Library/pull/1176",
       "ci": "GitHub PR CI success on d602f8d63; local source/data verification independent",
       "active_issue": 1091,
-      "active_owner": "review_nigeria_1034",
+      "active_owner": "niger_lane (independent reviewer)",
       "active_path": "/local/job40255479/worktrees/isa-Niger-1091-fix",
       "active_branch": "fix/1091-niger-community-builder-20261021",
       "active_baseline": "d602f8d63520e521a730f85551b366c4d45d9a35",
       "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Niger/1091-fix",
-      "active_status": "Author runtime/tests frozen; final docs/freeze pending independent review",
+      "active_status": "Author frozen; different-agent independent review active",
       "active_interim_result": "114 focused tests pass; new parent controls12 meaningful failures/five passes.72 strict matched-stage complete-frame/typed-attrs and72 axis controls; source-backed cold/fresh-warm/populated matrix and three full Arrow/artifact controls. Independent review remains pending. Original auxiliary unrecorded cache delta remains unidentified and excluded from zero-write claims.",
       "diagnosis_1091": {
         "path": "/local/job40255479/control/isa-backlog-20261021/Niger/1091",
@@ -240,7 +240,16 @@
       },
       "active_approved_boundary": "Delete only country concatenator and country Make block/sole-use variable; retain wave rules, helpers, schema, measurements, masks, grain and framework. Actual candidate hash census and independent review required.",
       "active_actual_hash_scope": "Measured before source rebuild:23 Niger API hashes change,526 other-country hashes and39 framework fingerprints exact.",
-      "active_runtime_head": "6be6576607f1862b603d123acfb74ace4026fd3f"
+      "active_runtime_head": "6be6576607f1862b603d123acfb74ace4026fd3f",
+      "active_frozen_head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "active_review_path": "/local/job40255479/worktrees/isa-review-Niger-1091",
+      "active_private_review": "/local/job40255479/control/isa-backlog-20261021/review-Niger-1091",
+      "active_author_manifest_sha256": "237003a67682a1a354406df29d6fe31fbcfffdfe90569a1a7749999ff65e635b",
+      "active_author_qualifications": [
+        "Original auxiliary unrecorded cache delta remains unidentified.",
+        "Private final aggregate was overwritten before its first manifest; original final SHA/size unavailable. Replacement and both freezes retained; separate artifact-only reconstruction is not original bytes."
+      ],
+      "active_no_final_independent_PASS": true
     },
     "Nigeria": {
       "path": "/local/job40255479/worktrees/isa-Nigeria",
@@ -317,7 +326,17 @@
         "baseline": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
         "private_evidence": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091",
         "status": "Prepared exact ignored metadata target; not yet dispatched"
-      }
+      },
+      "active_issue": 1091,
+      "active_owner": "review_nigeria_1034",
+      "active_path": "/local/job40255479/worktrees/isa-Tanzania-1091",
+      "active_branch": "diagnose/1091-tanzania-community-builder-20261021",
+      "active_baseline": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091",
+      "active_status": "Read-only source/Make-DAG diagnosis active; no implementation authorized",
+      "active_precode_ledger": "aa62795ce (prefix; committed before diagnosis functions)",
+      "active_CONTENTS_read": "Complete2142lines incl WAITING114; blob9424a5042b9880d6c48aba17af0e8d3cadc45ccb",
+      "active_source_boundary": "Community modules plus gated healthy comparator only; reviewed408plot_inputs normalization retained through immutable source/prior proof, no new AG staging or plot-input build."
     },
     "Uganda": {
       "path": "/local/job40255479/worktrees/isa-Uganda",
@@ -450,28 +469,51 @@
         "no_final_independent_verdict_or_PR_yet": false,
         "active_open_pr": "https://github.com/ligon/LSMS_Library/pull/1197",
         "active_ci": "success; run39696155414",
-        "composition_status": "Separate global17 review active; no combined PASS yet."
+        "composition_status": "Bounded Uganda/Niger functional composition PASS at7ec versus actual16; published separately, full selection FAIL13 and explicit isolation/cache/dtype limits."
       },
       "active_issue": 1198,
-      "active_owner": "niger_lane",
-      "active_path": "/local/job40255479/worktrees/isa-Uganda-1198",
-      "active_branch": "diagnose/1198-uganda-production-records-20261021",
-      "active_baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
-      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Uganda/1198",
-      "active_scope": "Design and private source-preserving observation-coordinate prototype for1198, grounded in frozen849 reports. Preserve all native paired values and existing screens; assess Country/Feature/median/yield behavior. No production/schema/public-axis change authorized in this phase.",
+      "active_owner": "mali_lane",
+      "active_path": "/local/job40255479/worktrees/isa-Uganda-1198-fix",
+      "active_branch": "fix/1198-uganda-production-observations-20261022",
+      "active_baseline": "989fbf3d98439be802d1f9cebd8ab5197c56b002 (library/config/tests f8)",
+      "active_private_evidence": "/local/job40255479/control/isa-backlog-20261021/Uganda/1198-fix",
+      "active_scope": "Implement declared production_obs string coordinate and honest unresolved Feature sentinel. Pass explicit loader source fingerprints/physical positions. First fix adds no new provenance attrs carrier; retain existing typed attrs. Keep849 mappings separate. See1198-root-engineering-decision.md.",
       "active_parent_PRs_verified_merged": [
         967,
         972
       ],
       "active_prior_work_roots_frozen": true,
       "active_interim_finding": "Private source projection retains133761 eligible observations versus133331 baseline, with403 existing null-key exclusions separately accounted. Original index levels/codes and paired fields pass strict checks. Public contract and whole derived effects remain under design review.",
-      "active_status": "Native production-record design and private source-grain prototype active; production/schema edits unapproved",
+      "active_status": "Revised contract approved; isolated implementation active after ledger-first commit",
       "active_private_addendum": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum",
       "active_exact_addendum_result": "85 exact saved-artifact checks and seven comparator negative controls pass; unsaved constructor/currency/Feature/finalizer scope gaps explicit. Original sources and reports remain unchanged.",
       "factor_mapping_issue": 849,
       "carrier_owner": "https://github.com/ligon/LSMS_Library/issues/1198",
       "source_diagnosis_private": "/local/job40255479/control/isa-backlog-20261021/Uganda/849",
-      "active_precode_ledger": "4332afede (prefix; ledger committed before prototype)"
+      "active_precode_ledger": "9144f5085 (prefix; revised implementation contract before production edits)",
+      "active_design_head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+      "active_design_ledger_first": "4332afede90648d2438ba0844151840e8fc80d82",
+      "active_design_manifest_sha256": "c336abbaad17d4b9dadab19f6c5abd00319aa55f118162ad773525faa49cc223",
+      "active_implementation_path": "/local/job40255479/worktrees/isa-Uganda-1198-fix",
+      "active_implementation_branch": "fix/1198-uganda-production-observations-20261022",
+      "active_implementation_private": "/local/job40255479/control/isa-backlog-20261021/Uganda/1198-fix",
+      "active_production_edits_started": false,
+      "active_root_decision": "1198-root-engineering-decision.md",
+      "active_design_path": "/local/job40255479/worktrees/isa-Uganda-1198",
+      "active_writer_started": true,
+      "active_candidate_hash_scope_measured": true,
+      "active_actual_candidate_scope": {
+        "Country_API_total": 549,
+        "Uganda_changed": 28,
+        "other_Country_unchanged": 521,
+        "framework_total_unchanged": 39,
+        "declared_wave_total": 1362,
+        "Uganda_declared_wave_changed": 171,
+        "API_wave_total": 2139,
+        "Uganda_API_wave_changed": 224,
+        "before_source_API_builds": true,
+        "all_kg_factor_mappings_exact_f8": true
+      }
     }
   },
   "shared_lanes": {
@@ -617,7 +659,7 @@
       1194,
       1195
     ],
-    "status": "PASS bounded sixteen-PR coexistence review against actual global15; frozen source is public; no public PR merged",
+    "status": "Verified public16 branch preserved; independently reviewed17 bounded Uganda/Niger increment published separately; no public PR merged",
     "public_prs_merged": false,
     "unit_session": 28550,
     "unit_exit_code": 0,
@@ -787,13 +829,13 @@
       "limits": "Bounded normal current-hash L2; separately documented held-source Ethiopia prerequisite extension. No new full suite, broad549 census, whole-country cold or unbuilt-output claim. Earlier hashes and source proofs retain their own pins.",
       "evidence": "integration/framework-sixteen-review/"
     },
-    "pending_seventeen": {
+    "seventeen_increment": {
       "path": "/local/job40255479/worktrees/isa-integration-seventeen",
       "branch": "isa/integration-seventeen-20261021",
       "head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
       "control": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
       "additional_PR": 1197,
-      "status": "Independent bounded source/race/healing/1062 review active; no PASS or GitHub publication",
+      "status": "Released independent bounded Uganda/Niger functional PASS; root accepted exact limits and published NEW branch; full selection remains FAIL13",
       "owner": "mali_lane",
       "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/framework-seventeen-review",
       "prior_global16_source_unchanged": true,
@@ -806,7 +848,55 @@
         "status": "FAIL retained",
         "attribution": "Nine known protected tracked-timestamp failures; four warning-text glob failures also fail in a narrow matching actual16 counterpart. Correct warning category/message, but temporary-prefix nodeid differs from glob. Later return-code assertion was not reached. No assertion normalization or full-suite repeat."
       },
-      "interim_source_cohort": "44 complete frames per head at cold and fresh-warm;174 files/head unchanged on fresh warm. Final strict review, healing and1062 orders remain pending."
+      "interim_source_cohort": "44 complete frames per head at cold and fresh-warm;174 files/head unchanged on fresh warm. Final strict review, healing and1062 orders remain pending.",
+      "isolation_qualification": "Exactly one tracked-source mtime-only delta reported across10trees: candidate docs/guide/data-methods.md, bytes/size/mode/Git exact. Existing doc-generator test replaces PYTHONPATH and invokes an unconditional identical-content write; per-child audit absent, so complete child guard coverage/exact event attribution not claimed. Preserved stop; no restore/repeat. Final review pending.",
+      "verdict": "PASS_BOUNDED_FUNCTIONAL_COMPOSITION_WITH_EXPLICIT_ISOLATION_LIMITS",
+      "full_suite_verdict": "FAIL13",
+      "published": true,
+      "public_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-seventeen-20261021",
+      "source_candidate_head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+      "private_manifest_entries": 6468,
+      "private_manifest_sha256": "f559b1677e5ccbf237caf0b4a96a050c4d69bd0fec91f27a9d62ce8fc05e30cd",
+      "zero_consumers_at_release": true,
+      "evidence": "integration/framework-seventeen-review/",
+      "main_frames_per_head_each_stage": 44,
+      "main_warm_files_per_root": 174,
+      "ordered_actual16_17_frame_pairs": 50,
+      "known_full_income_comparisons": 16,
+      "forward_reverse_comparisons": 32,
+      "ordered_warm_files_each_root": 133,
+      "healed_cells": {
+        "Quantity": 6,
+        "Expenditure": 3
+      },
+      "healing_warm_files": 120,
+      "scanner_occurrences": 236,
+      "scanner_warn": 232,
+      "scanner_pass": 4,
+      "unrequested_unserved_stale_companions": 8,
+      "raw_scanner_multisets_root_independently_verified": true,
+      "full_JUnit_outcomes_root_independently_verified": true,
+      "no_other37_country_rebuilt_output_claim": true,
+      "no_unrestricted_all17_or18_claim": true
+    },
+    "latest_additive_review": {
+      "head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+      "scope": "Bounded Uganda/Niger1078/1062 functional composition on actual16 source union",
+      "verdict": "PASS_BOUNDED_FUNCTIONAL_COMPOSITION_WITH_EXPLICIT_ISOLATION_LIMITS",
+      "public_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-seventeen-20261021",
+      "full_selection": "FAIL13 retained",
+      "prior_public16_branch_unchanged": true
+    },
+    "pending_eighteen": {
+      "head": "f9feb3c807aff5206134c37768992302ceb431fa",
+      "control": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+      "additional_PR": 1199,
+      "path": "/local/job40255479/worktrees/isa-integration-eighteen",
+      "branch": "isa/integration-eighteen-20261022",
+      "private_review": "/local/job40255479/control/isa-backlog-20261021/integration/mali-eighteen-review",
+      "status": "Prepared source snapshot only; no reviewer/test/API build or18PASS/GitHub publication",
+      "merge_resolution": "Complete prior17Mali CONTENTS prefix plus exact reviewed1199 addition; all nine other changed blobs/modes exact1199",
+      "root_prepared_metadata_targets": true
     }
   }
 }

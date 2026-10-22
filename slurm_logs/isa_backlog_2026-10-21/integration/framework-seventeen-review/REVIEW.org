@@ -1,0 +1,154 @@
+#+TITLE: GLOBAL17 independent bounded composition review
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Verdict and exact source boundary
+
+PASS for the bounded Uganda/Niger functional composition at candidate =7ecf8e95fef567554fe93870ba95abddd1955a86= against actual GLOBAL16 =d527249ba9d3eaebf190a075e39043e36d2dbb85=.
+This is not a full-suite PASS, an all-country output claim, or authorization to publish integration17.
+The original full selection remains FAIL: 5,148 passed, 4,459 skipped, 13 failed and zero errors.
+A tracked documentation mtime change and the child guard inheritance gap remain explicit isolation limits below.
+
+The exact twelve changed paths equal standalone1078 =d46795c303e2409ddb8ed5e4c62efca4e87ca347=.
+The two changed Wave methods match the standalone patch, including the private producer return and food tag.
+Replacing only those methods and removing the exact adjacent two-line 1078 comment reconstructs the entire GLOBAL16 country.py byte-for-byte.
+Every other prior16 source/test/config blob remains unchanged, except the additive Uganda CONTENTS note; other added blobs equal the standalone source.
+Existing 1081 typed rethrows and 1077/1062 behavior therefore remain in the actual reviewed source union.
+No production/test/config edit, Git/ref mutation or GitHub write was issued.
+The full-selection documentation write path is qualified below.
+
+* Country contracts and contradictions
+
+The complete prior Uganda 3,604-line f8 CONTENTS reading, including TODO/WAITING/LOGBOOK, was retained with exact original blob verification and the complete new 1006/1062/1078 hunks read.
+The resulting current 3,655-line document has SHA256 b4719d46fc9eab28060e923b62698d9a20ab76199b53459784b6c21348ad9c00.
+Uganda's native food scripts already produce canonical frames and deliberately hashless wave parquets.
+Its 2009-10 cluster identity mixes original EAs with synthetic 0.05-degree GPS bins; later parish and district/parish identities differ.
+Household Region is therefore required for the hybrid-v market control.
+The recorded claim Region "is complete for every household" coexists with "three have missing Region" in 2019-20.
+The refresh claim "each wave" coexists with "This same sample was used for the UNPS 2015/16 (Wave 5)".
+These documentary tensions do not authorize identifier, Region, sampling or retention changes.
+Native production records, A/B seasons, reported factors, WAITING 829 and 2019 GPS gaps remain separate caveats; no 849 work occurred here.
+
+Niger's complete current 1,559-line CONTENTS, including tasks/history, was read anew, SHA256 154971a0ddaa4ccb7579e2dde8d49e5d047adb277459f17342253f6e0189667a.
+Its pre-EHCVM GRAPPE/MENAGE/EXTENSION distinguishes in-place, moved and split households; EHCVM seasonal halves are not panel rounds.
+Its unit dictionary is explicitly keyed by Original Label despite also containing a Code column.
+"each grappe is visited in exactly one vague" coexists with the later "divided each enumeration area into two equal groups" design description.
+The historical empty unit-price behavior does not supersede the current typed-error policy.
+No new survey idiosyncrasy requiring a country-note edit was established; the producer-race, missing-Region and hashless-cache cautions already have recorded notes.
+
+* Physical sources, exact metadata and API frames
+
+Before decode or normal builds, 63 held Stata sources were independently gated against both source trees' declared DVC MD5s and physically copied with SHA/size/mode/mtime/inode/nlink checks.
+They comprise the 47 food/sample/roster/cluster prerequisites and 16 additional earnings/enterprise operands.
+Thirty-three sidecars omit size; actual byte-size receipts were used without inventing a declared size.
+Both legacy and files/md5 L1 layouts were gated; all 1,100 final L1 copies recheck exactly.
+The main cold roots started with no L2 and used normal builders, not stamps, cache bypasses or shared data.
+No acquisition, DVC CLI, shared-cache change, external FDC API use or in-tree payload was requested.
+
+Independent exact-pin inventories precede builds: all 549 Country hashes, 39 framework fingerprints and 1,362 declared wave hashes change.
+This broad invalidation is real; no corpus rebuild or rebuilt-output claim is made for 37 other countries.
+All 390 cache occurrences were classified: 50 current COUNTRY/full-coverage, 180 current YAML-wave, 152 legitimate hashless script-wave and the 8 unrequested stale companions described below.
+Hashless script output was never re-stamped or described as embedded-current-hash data.
+
+All 44 complete actual16/17 frame pairs match at cold and again at fresh-process/new-object warm.
+The 26 applicable standalone source-backed references also match at each stage.
+This includes native/raw/public food, sample, roster, household characteristics, market Region, default derived food and Feature outputs.
+Feature default currency and explicit currency=None are distinct argument-matched comparisons; Aggregate requests retain their intended structured Niger degradation.
+Every comparison uses check_exact=True, rtol=atol=0, exact axes/levels/codes/order/dtypes/masks and recursively typed full attrs, including immutable records' declared fields and stored mappings.
+The copied comparator function AST is pinned; seven deliberate payload/attr/dtype/null/order perturbations are rejected.
+Uganda food has 355,571 rows and Niger 239,877; native food coverage is eight and two waves respectively, with complete eight/four-wave country manifests including zero-food waves.
+Each main freshwarm leaves all 174 data-root files' bytes/modes/mtimes unchanged.
+The sole cross-stage strict dtype exception is Niger public food u, pd.NA to NaN StringDtype missing-sentinel metadata, already owned by 1196.
+Both strict failures are saved, every other property is exact, and no returned/stored frame is normalized.
+
+* Actual 1062 interaction and requested outputs
+
+Source order 1 is FCT -> nutrition -> FCT -> income -> food.
+The complementary source order is income -> food -> nutrition -> FCT -> nutrition -> food.
+These actual sequences are recorded rather than claiming a different order was run.
+Each income control first creates valid 2011-12-only earnings/enterprise sibling caches, then requests Make-backend all-wave income.
+All 14,740 rows/eight waves return; the 1,810-row partial shadow does not survive.
+The inherited backend is restored, raw verified operands remain the inputs and requested FCT/nutrition writes preserve their sibling and existing food cache.
+Actual Make/default income API frames match completely.
+
+There are 50 complete actual16/17 ordered-frame pairs,16 exact comparisons to the frozen full 14,740-income references and32 complete forward/complementary-order output comparisons.
+All four freshwarm ordered roots preserve 133 data files each without byte/mode/mtime changes.
+The 20 existing 1062 controls separately exercise requested-target absence, raw-versus-finalized operands, wrapper reachability, valid-subset expansion and backend restoration on both source-fault branches, including originally absent/empty/make environment values.
+No source measurement stage was rerun after the final metadata qualification.
+
+* Controlled race and natural healing
+
+The real existing sample-market and currency tests run unchanged with actual normal eviction and Arrow writers.
+GLOBAL16's A reads the correct native frame, resumes after the real external path becomes absent, reaches the legacy reducer once and writes exactly six Quantity and three Expenditure NaNs as zero under its current hash/full eight-wave manifest.
+B remains correct; both tests passing is diagnostic, not acceptance of the bad data.
+GLOBAL17 uses the same schedule: both actual Arrow inputs, real output parquets and last-A final cache match the entire correct frame/full typed attrs, without reaching that legacy reducer.
+Both original serial test orders also pass and preserve complete food frames.
+These are eight passing executions of two actual source test nodes, not eight distinct tests.
+The original historical writer/interleaving remains unknown.
+
+A new physical copy of this genuine controlled bad GLOBAL16 cache was read normally by candidate17.
+Its actual16hash grades stale and the ordinary source-backed rebuild heals the entire 355,571-row frame/full attrs and eight-wave coverage.
+The direct saved before/after masks prove exactly 9 changed cells:6 Quantity and3 Expenditure zeros become NaN; every other value/key/axis/dtype/order/typed attr is exact.
+Total missing counts are separate: Quantity 21 -> 27, Expenditure 31 -> 34, Price 29,755 -> 29,755.
+The independent sanctioned2011source oracle confirms missing operands and positive counterpart measures for all 9 cells, from 38,743 raw rows.
+A fresh-process/new-object healing read is exact and leaves all 120 data files unchanged.
+
+Eight copied cluster_features YAML wave companions in the healing root were not requested or served by food/default-Feature healing.
+They retain their genuine actual16hashes, complete payloads and exact copied byte/mode/mtime receipts.
+They are stale under candidate17 and explicitly excluded from every current-candidate-cache claim.
+The first overbroad all-cache-current stop is retained; no rebuild or stamp was used to conceal this natural partial invalidation.
+All requested COUNTRY outputs and served YAML prerequisites meet their actual current hashes/full coverage.
+
+* Complete scanner accounting
+
+All 236 raw record occurrences match byte-for-byte as complete multisets between actual16 and17:232 WARN and4 PASS, zero fail/error/skip.
+Every record digest and multiplicity is pinned; no raw record or warning text was normalized.
+The known standalone food sweep had 217 occurrences; the current food subset has 211 plus 25 roster occurrences.
+Exactly 203 standalone food occurrences remain identical.
+The 14 displaced occurrences are present verbatim in this review's earlier cold warnings:4 missing-v drop warnings,2 categorical-field warnings and8 fresh grain-conflict warnings.
+Eight cached-format grain warnings occur verbatim in the freshwarm capture and replace the fresh-format occurrences during scanning.
+All 12 native cluster complete frames/full attrs and grain footers match the standalone references.
+Uganda's 8 cluster waves were naturally built by the earlier Region controls; the scanner normally adds the 4 Niger cluster YAML wave caches.
+Their frames/attrs and actual current hashes match, while all 174 pre-existing files remain unchanged.
+The scanner is not claimed zero-write; the earlier 174-file freshwarm proof is separate.
+The original overstrong standalone-record equality stop and exact replacement accounting are preserved.
+
+* Tests and full-selection isolation limits
+
+The focused 438-test selection passes with zero skip/failure:64 producer/hash/getattr cases,235 categorical 1081 cases,119 numeric-key cases and20 Uganda 1062 cases.
+All 14 copied 1078 controls meaningfully fail on actual16 without editing its tree.
+The strict API surface audit passes.
+
+One new credential-free full selection used 8 explicit loadfile workers, with actual conftest credential detector false before collection and absent AWS/reader credential files.
+It remains FAIL: 5,148 pass, 4,459 skip, 13 failure, 0 error.
+Nine failures are the protected tracked panel_ids.py timestamp operations.
+The four remaining failures are unchanged test_conftest_net warning-text globs: their nested sessions satisfy 1 skip/1 warning assertions and emit UnmarkedS3TestWarning, but include a private temp prefix before test_probe.py.
+The exact four-case actual16 counterpart also fails, with identical category/post-nodeid message and source/reporter blobs.
+The later child-returncode assertion is not reached; no claim is made that it executed.
+No second full selection, failure-to-skip change, test weakening or source-copy test workaround occurred.
+
+The final source census finds exactly one additional isolation effect: candidate docs/guide/data-methods.md retains SHA256 d98771404bbf8910f44f9e44a38208731a2dd351cb2af4ef256469381d9bffcb,15,876 bytes/mode 0600/Git state, but its mtime changes from 1792627304992203363 to 1792628417310398853.
+The existing passing test at tests/test_api_discoverability.py:55-59 launches scripts/gen_data_method_docs.py with PYTHONPATH replaced by REPO, removing the private sitecustomize path.
+The generator reads GhanaLSS method docstrings without invoking a data method and unconditionally OUT.write_text at line 116.
+The observed timestamp is consistent with this source path during the full run; no per-child write audit/PID was captured, so exact retrospective event attribution or complete Python guard coverage is not claimed.
+The ordinary exec inherits the network namespace, but that does not restore the lost Python socket/write guard.
+No timestamp restoration, generator rerun or source edit was performed.
+The original source-mtime stop is preserved; bytes/modes/Git cleanliness are not described as mtime immutability.
+Normal source-build subprocess handling preserves inherited guard paths, and the separately guarded source cohorts retain their explicit proofs.
+
+* Protection, limits and release
+
+All 10 source trees retain exact HEAD, logical index, tracked bytes/modes and clean state, with the single candidate doc-mtime exception above.
+All other tracked source timestamps match.
+All 10,320 files across 8 protected old private roots retain exact names/bytes/modes/mtimes, including 1078 author/review/addendum,849 original/addendum, Mali1091 writer evidence andGLOBAL16/staging evidence.
+All 330 recorded reference operand receipts recheck, and both exact root-prepared ignored DVC metadata links remain private.
+The guard logs record zero IP attempts and 24 full-unit denied operations; the doc-child gap is not retroactively filled by those logs.
+All failed harness logs are retained, including source-union reconstruction, sidecar-size omission/partial-copy quarantine, sysfs-versus-network-namespace, scanner priming, stale companions and doc-mtime checks.
+There are zero active data consumers at release.
+
+Only this safe-exports directory is exportable under the final allowlist.
+Full frames, masks, household IDs, source operands, warnings, traces, credential configuration and detailed logs remain private.
+Source reports, checker code and all saved operands are pinned by the private final manifest.
+Root must inspect these exact scope/isolation limits before deciding publication; no all17 unrestricted coexistence or PR merge is asserted here.
+
+Sue

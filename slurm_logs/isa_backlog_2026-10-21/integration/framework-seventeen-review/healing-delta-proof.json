@@ -1,0 +1,27 @@
+{
+  "status": "SUCCESS",
+  "rows": 355571,
+  "total_missing_before_bad16": {
+    "Quantity": 21,
+    "Expenditure": 31,
+    "Price": 29755
+  },
+  "total_missing_after_healed17": {
+    "Quantity": 27,
+    "Expenditure": 34,
+    "Price": 29755
+  },
+  "restored_NaN_cell_deltas": {
+    "Quantity": 6,
+    "Expenditure": 3,
+    "Price": 0
+  },
+  "actual_changed_cells": 9,
+  "exact_expected_nine_cell_set": true,
+  "every_other_value_axes_dtype_mask_order_full_typed_attrs_exact": true,
+  "full_before_after_masks_saved_private": true,
+  "masks_sha256": {
+    "healing-before-full-nullmask-private.pkl": "cad4699cb74f17a05c843eff483dee04d07b7bc06ea4f5242e681f2965d5b9fb",
+    "healing-after-full-nullmask-private.pkl": "f6e99a96d0433b934a16c01a012e7c11197ce854aa4567b3e82f0fdc5443ae61"
+  }
+}

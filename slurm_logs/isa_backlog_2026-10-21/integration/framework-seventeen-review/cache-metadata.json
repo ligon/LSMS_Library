@@ -1,0 +1,55 @@
+{
+  "actual16": {
+    "side": "baseline",
+    "parquets": 156,
+    "scenario_counts": {
+      "cold": 52,
+      "timed-pair": 26,
+      "order-forward": 39,
+      "order-reverse": 39
+    },
+    "tiers": {
+      "COUNTRY": 22,
+      "HASHLESS_SCRIPT_WAVE": 64,
+      "YAML_WAVE": 70
+    },
+    "every_country_currenthash_and_fullcoverage": true,
+    "every_YAML_wave_actualcurrenthash": true,
+    "script_hashless_not_stamped_or_claimed_currenthash": true,
+    "baseline_timed_bad_payload_is_diagnostic_not_accepted_data": true
+  },
+  "actual17": {
+    "side": "candidate",
+    "parquets": 234,
+    "scenario_counts": {
+      "cold": 52,
+      "timed-pair": 26,
+      "order-forward": 39,
+      "order-reverse": 39,
+      "healing": 26,
+      "market-then-currency": 26,
+      "currency-then-market": 26
+    },
+    "tiers": {
+      "COUNTRY": 28,
+      "HASHLESS_SCRIPT_WAVE": 88,
+      "UNREQUESTED_UNSERVED_COPIED_16_YAML_STALE": 8,
+      "YAML_WAVE": 110
+    },
+    "every_country_currenthash_and_fullcoverage": true,
+    "every_served_YAML_wave_actualcurrenthash": true,
+    "unrequested_unserved_stale_healing_companions": [
+      "Uganda/2005-06/_/cluster_features.parquet",
+      "Uganda/2009-10/_/cluster_features.parquet",
+      "Uganda/2010-11/_/cluster_features.parquet",
+      "Uganda/2011-12/_/cluster_features.parquet",
+      "Uganda/2013-14/_/cluster_features.parquet",
+      "Uganda/2015-16/_/cluster_features.parquet",
+      "Uganda/2018-19/_/cluster_features.parquet",
+      "Uganda/2019-20/_/cluster_features.parquet"
+    ],
+    "all_cache_files_current_claim": false,
+    "script_hashless_not_stamped_or_claimed_currenthash": true,
+    "baseline_timed_bad_payload_is_diagnostic_not_accepted_data": false
+  }
+}
