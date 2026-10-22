@@ -653,3 +653,31 @@ Sue
 All25 implementation PRs remain OPEN/unmerged at expectedheads; seven stackedbases match prerequisiteheads. PR1170 current25table/accepted1149/corrected1206/current1196/verified24archives body and issue1196 authorcandidate/independent-scope body read back exactly at source8683af50d. Archive24 and all rootcommit/push/verifierhandles terminal0; no rootbackgroundprocess torestart. Threeworkerlanes remainactive. First1175 strongercomplete-index findings are retained; numerical/attrs diagnostics and source-bound domain classification continue, no full-frame PASS inferred. Goalactive/noimplementationmerge.
 
 Sue
+
+* Root accepts later-country saved evidence and metadata registry -- 2026-10-22 15:50 UTC
+
+All26implementation PRs remain open for human merge at the last GitHub readback.
+Root accepted six newly frozen bounded packets without decoding payloads or replaying source/API/tests.
+Malawi1193 has251strict standalone/composed groups plus two explicitly NEW saved-member recipes and four original key/amount predicates.
+Its separate integration14 supplement has135strict groups, one NEW recipe, two key/amount predicates, four inline predicate sets and the remaining saved scalar checks.
+The earlier missing-authority hold remains unchanged; the NEW authenticated chain resolves only the available saved evidence.
+Shared1197 has150strict groups and two original unit-NA qualifications, plus a separate nine source-row predicate sets (six Quantity-NA/three Expenditure-NA), not nine full-frame comparisons.
+Its original suite remains4689PASS/4453SKIP/9FAIL, with original guard-attribution/interleaving and missing-memory limits.
+Uganda1202 has274strict groups plus four original v-NA qualifications, three partial attrs predicates, two full CLI footer/schema/byte controls and two preserved cross-stage strict rejections.
+Nine separate exact6e pure saved-operand recipes pass; duplicate bare/index targets are not independent datasets or recovered memories.
+The original missing median arrays, fixtures, source/header/eligibility, Make subset/mode/mtime, area-routing, warning and overwritten-XML limitations remain.
+
+The later10 registry metadata gate passes75entries and34distinct release/postexit metadata pairs.
+Frozen child statuses remain as of their snapshot; an additive root map supplies current bounded decisions.
+PR1200 approval remains the corrected96numeric groups, not an assertion of full packet acceptance.
+Older1199/1200/1201postexit READY count fields are absent; registry counts are observed manifest lengths, not historical declarations.
+No all22/all-country/full-suite verdict is inferred; overlapping counts are not summed.
+Root preserved both metadata-only verifier stops (1202 virtual prefix and registry expected-name typo); no separately saved failure streams are invented.
+
+Independent Malawi1209 has56strict Country and24strict Feature comparisons, with unchanged163scanner records (158WARN/3PASS/two known price failures).
+Its final direct-Make/protection/seal steps remain in progress, so no new implementation PR is claimed here.
+GH1210 author source is frozen at128cc095a62cbd210e30d2256359acfe53d4a2c5; bounded author checks preserve105cache paths for invalid/mixed requests versus five removed wave files on actualf8.
+Independent GH1210 review is still pending.
+Archive27 is being prepared from frozen releases under a root-approved scope; compression is not yet authorized and26remains the verified archive count.
+
+Sue

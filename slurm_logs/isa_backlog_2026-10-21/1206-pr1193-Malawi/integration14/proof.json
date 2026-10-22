@@ -1,0 +1,21 @@
+{
+  "status": "NEW_BOUNDED_SAVED_1193_INTEGRATION14_NUMERIC_SUPPLEMENT",
+  "PR": 1193,
+  "strict_full_frame_groups": 135,
+  "NEW_pair_member_recipe_full_frames": 1,
+  "exact_original_normalized_key_amount_predicates": 2,
+  "inline_saved_frame_predicate_sets": 4,
+  "remaining_saved_producer_scalar_predicates": "PASS",
+  "strict_findings": 0,
+  "all646_original_historical_SHA_bytes_mode_mtime_exact": true,
+  "physical_owneronly_nonsymlink_singlelink_distinctinode_copies": 85,
+  "complete21_source_census_and61_assertion_mapping_records": true,
+  "all_authority_links_included": true,
+  "initial_authority_hold_discovery_and_stopped_predecode_receipt_schema_v1_preserved": true,
+  "unsaved_main10_and_dedicated6_fresh_return_memory_gaps": true,
+  "raw_source_header_IDclosure_fixture_memory_not_replayed": true,
+  "earlier_releases_immutable": true,
+  "source_API_test_CLI_cache_replays": 0,
+  "all_campaign_result": false,
+  "signed": "Sue"
+}

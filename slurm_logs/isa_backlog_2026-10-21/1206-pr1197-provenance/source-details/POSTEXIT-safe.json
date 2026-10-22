@@ -1,0 +1,10 @@
+{
+  "status": "POSTEXIT_NEW1197_SOURCE_DETAILS",
+  "READY_sha256": "da565b90ec39d08e117bd987da07a200b909c9a832120b7ab04d16d34e34794c",
+  "manifest_sha256": "a80bfed657e2c9796ca21450fea0b0c29aae3e62a10bc1bb2b50040671ae3b64",
+  "manifest_entries": 65,
+  "all3618_main_original_and4copy_receipts_exact": true,
+  "source_clean_zero_consumers_zero_denials": true,
+  "old152_release_unchanged": true,
+  "signed": "Sue"
+}

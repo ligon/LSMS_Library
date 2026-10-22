@@ -1,0 +1,8 @@
+{
+  "READY_sha256": "c3617b331974d9568e0e976427b57f7f4a2b31e69e6660b4ec3537beda65aac6",
+  "manifest_sha256": "62bdcf92a54c5fb797fee8b56c793be7f86db628d6dfe84730a970af908fd207",
+  "postexit_READY_sha256": "c2d0b653c2d927d0d4d277c98fcdfdc05bb980c9def6dedfa0c45fa13201af86",
+  "postexit_manifest_sha256": "cc8e9932d42c996fa42b4f2a69e80663d6741f59f7eea111a5860579981a22e2",
+  "safe_exports_only": true,
+  "signed": "Sue"
+}
