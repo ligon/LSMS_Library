@@ -89,6 +89,14 @@ Neither new packet is root accepted or frozen yet, and original unsaved oracles 
 The later10 critic has sealed its75-entry registry and all subpackets, then stopped; those remaining root acceptances are next.
 All implementation PRs still require human merge; no full26-PR or corpus result is claimed.
 
+Publication checkpoint: all26 implementation PRs freshly match exact heads and prerequisite bases, OPEN/unmerged.
+Accepted1194/1195 safe reports, archive26 durability and the source/authority registry are published through407a4e160c4a0a161f006e18f4a2e436b3d508ea.
+Tracker1170, PR1194/1195 and issue1206 bodies read back exactly; issue1206 stays OPEN.
+The new archive-backed Uganda check now also retains a typed-attrs difference, in addition to its complete unused-domain finding; both need actual-stage characterization and remain unaccepted.
+GH1210's measured build footprint moves all549country/39framework/1362wave hashes, with no exclusions changed.
+This invalidation cost is distinct from valid-output equality and calls for no corpus rebuild in this task.
+Root archive26 writer/verifier and root1194/1195 verifier are terminal0; do not restart completed handles.
+
 * Earlier checkpoint -- 2026-10-22T13:39:00+00:00
 
 There are 26 published implementation PRs, all freshly verified OPEN and unmerged in =publication-26-safe.json=.
