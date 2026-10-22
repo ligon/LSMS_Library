@@ -3069,3 +3069,28 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
     2019-20, whose unit column is not read (=unit2=None=).  Under the
     #1041 ruling a missing unit is =Unknown=, not NULL.  Drafted as a
     residual.
+
+* 2026-10-21 -- plot_inputs: enumerator kg totals in two instrument-covered waves (GH #1111, partial)
+
+The held IHS3 agriculture questionnaire, Module D Q39, printed/PDF p.13, distinguishes native quantity/unit pairs =ag_d39b/c= and =ag_d39g/h= from enumerator =TOTAL KGs= in =ag_d39d/i= and =MONTH= in =ag_d39e/j=.
+The held IHS5/IHPS agriculture questionnaire, Module D Q39, printed/PDF p.10, likewise distinguishes native =b/c= and =h/i= from enumerator =TOTAL KGs= in =d/j=; =e= is first-application timing in weeks in both extracts.
+Their held sidecar MD5s are =d6e0d71486fd6ae4d7dda5b8e1854278= and =86cc1f419c1320eb969d11a6d24a63e0=.
+The 2010-11 and 2019-20 drivers already selected those enumerator-total numeric quantities.
+They now label the fertilizer blocks =Kilogramme= before the unchanged additive full-key aggregation, without decoding timing, rescaling an amount, or substituting the native quantity/unit pair.
+Two applications of the same fertilizer on the same plot therefore consolidate when their corrected kg keys agree; the independent source census identified 51 such pairs in 2010 and 184 in 2019, all with affirmative use and positive kg amounts.
+
+This qualifies two earlier claims rather than treating them as authority.
+The preceding unit entry calls =ag_d39c= "acquired-amount" and =e/j= applied units; the shared =_MWI_FERT_UNIT_LABELS= comment also claims those fields use one unit dictionary and treats 11/12 as free-text residuals.
+For the instrument-covered waves, those statements are contradicted by the separate native applied-unit, enumerator-total and timing columns; IHS3 timing codes 11/12 mean November/December.
+The shared helper remains byte-identical because this partial repair changes only the two evidenced drivers.
+The live #1111 C4 questionnaire gate remains for 2016-17 (no agriculture questionnaire sidecar) and 2013-14 (questionnaire MD5 =7240c127062552554f2e03ece6a05f0d= unheld); neither driver is changed on metadata similarity alone.
+
+The earlier organic claim "Module D records no organic quantity" is also contradicted by the reviewed #1109 correction at =de9c2734b8a6bcf1326d0d4285ff9c1db1221767=: held sources carry reported =ag_d37a/b= and their own organic-unit dictionary.
+That correction is independent of this f8-based branch, which preserves its organic code and behavior rather than stacking #1109 implicitly.
+Missing-unit #1118, the #1174 nonorganic zero/missing-use residual, #1106 composition, seed purchase units and a new application axis are outside this change.
+
+Keeping the country helper unchanged does not make cache invalidation table-specific.
+The existing =Wave._input_hash= content-hashes every Python build input in each wave's =_/= directory for every table, so these two driver edits change all 26 Malawi API table hashes (22 nonderived entries plus four runtime-derived entries); all 523 other-country hashes and 39 framework fingerprints remain exact.
+This actual measurement disproves the earlier read-only diagnosis's tentative narrower-footprint hypothesis; its frozen receipts are not rewritten.
+Normal serving consequently rebuilds the unchanged =sample= prerequisite across all five waves when its old hash is present; this was run using held cover-page inputs, without a read-gate bypass or stale re-stamp.
+Physically fresh baseline and candidate sample builds preserve all 57,118 rows, every wave/cache frame, dtypes and attrs, and the same 18 categorical warning records; fresh-process warm serving writes nothing.
