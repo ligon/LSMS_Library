@@ -1,0 +1,18 @@
+{
+  "status": "SOURCE_BOUND_COMPLETE_INDEX_CHARACTERIZATION_PENDING_ROOT_CLASSIFICATION",
+  "PR": 1192,
+  "original_terminal1_and_12_findings_immutable": true,
+  "characterized_full_metadata_groups": 12,
+  "crosshead_groups_full_attrs_exact": 8,
+  "producer_groups_attrs_never_asserted": 4,
+  "all_observed_numeric_values_dtypes_masks_coordinates_exact": true,
+  "all_complete_domains_codes_dtypes_storage_names_sortorder_bound_to_recorded_operations": true,
+  "crosshead_domain_additions_bound_to_saved_gains_and_ten_alias_patch": true,
+  "added_wave_item_is_existing_old_country_item_domain": true,
+  "NEW_source_identical_full_Feature_axis_reconstructions": 2,
+  "originals_copies_terminal1_evidence_preserved": true,
+  "no_actual_axes_normalized_or_unused_levels_removed": true,
+  "source_API_pytest_CLI_cache_replays": 0,
+  "all_campaign_result": false,
+  "signed": "Sue"
+}

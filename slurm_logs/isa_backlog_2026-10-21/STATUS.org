@@ -55,6 +55,27 @@ This does not authenticate other outputs in those roots, and earlier authority h
 See =1206-api9-content-authority.json= for the public scope, with exact private source endpoints retained privately.
 PR1212 CI run39789045996 has successful unit-tests and windows-smoke jobs; six other jobs, including data-tests, are skipped.
 
+Root classified the preserved Nigeria1192 index findings on 2026-10-22T14:04 UTC.
+The strong checker remains 25 full-axis passes and 12 strict findings.
+Eight cross-head differences are complete unused domains inherited from the actual gained unit keys; four producer expectations use country-local versus pooled Feature domains and never asserted attrs.
+The complete domains, codes, code widths, storage and metadata are bound to the actual recorded operations and two new pure Feature reconstructions.
+Observed numeric values, masks, used keys and the eight cross-head full typed attrs are exact; no additional unexplained change is established in the available operands.
+The earlier unqualified claim of complete axis metadata preservation is withdrawn.
+Original source-gain, helper, warm, adversarial and fixture memory gaps remain unavailable.
+See =1206-pr1192-Nigeria/= for the untouched findings packet and additive root classification.
+
+The twenty-fifth private evidence archive is fully verified and durable: ten frozen roots, 2,544 files, 4,045,639,544 source bytes and 578,226,314 compressed bytes.
+SHA256 =bef3c42324c24fabbac19843d6a14d4980e5e23151b69abb5652b9fa90a39071=.
+All included members, source-after receipts, owner/modes, archive/manifest/launcher/verifier hashes and fsync checks pass.
+Runtime cache/raw trees remain excluded, while selected =operands-*= copy trees retain country-named subdirectories.
+This archive includes1149 amendment review,1196 author/independent review, the three country supplements and the frozen root records; later critic packets remain for a subsequent archive.
+
+Malawi1209 has six focused tests passing versus four meaningful parent failures/two preservation passes.
+Actual scope is26of549country hashes and97of1362wave hashes, all Malawi; all39framework and1265other-country wave hashes stay exact.
+The first two all-wave data actors omitted =LSMS_MAKE_JOBS= and remain diagnostic only.
+New private L1-only roots use the explicit serial setting and actual helper assertion for conforming checks.
+Default all-wave/singleton cold/fresh-warm parent/candidate actors pass; Make and derived/API/audit checks continue before independent review.
+
 * Historical checkpoint -- 2026-10-22T06:53:02.010069+00:00
 
 All24 independently reviewed implementation PRs are freshly verified OPEN/unmerged at their expected heads in =public-pr-checkpoint-twentyfour.json=.
