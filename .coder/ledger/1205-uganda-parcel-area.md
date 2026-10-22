@@ -146,3 +146,33 @@ The reviewed comparator's standalone DatetimeIndex frequency limitation is
 retained; full-frame frequency controls pass, and actual axes are non-datetime
 MultiIndexes.
 No all-history zero-denial or outside-write claim is made.
+
+## Phase 3 addendum - Implementation and preservation checks
+
+The narrow decoder preserves the existing current-i branch and uses only the
+Uganda-marked native constructor inverse on a miss.
+Static review added fallback-only vetoes for explicit conflicting area country,
+row-level country identity and absent common household identity; unmarked area
+operands retain the existing DataFrame contract.
+Non-string country metadata cannot authorize the new decoder.
+The prospective canonical-i/raw-parcel census over all retained crop and all
+area witnesses finds zero native-household collisions.
+Its first per-feature key-count display used defaultdict probes and therefore
+showed union counts; the corrected get-only census and original zero-collision
+result are both retained.
+
+Actual491 runtime bytes give three meaningful public-route failures and15
+passing controls, with every controller/worker source identity checked before
+collection.
+The independent raw-column oracle at the final runtime source verifies27,755
+yield keys of31,959 converted source-parcel keys, adding13,235 and losing none.
+All14,520 original-key values remain exact.
+Complete strict comparisons preserve the crop/area operands, harvest and
+literal yield, and compare the whole new result to its source-column oracle.
+The initial oracle's unused-level mismatch and corrected expected output-axis
+construction remain explicit, as do the asymmetric synthetic fixture stops
+that accidentally exercised the preserved anchored branch.
+The tooling-output qualification records one diagnostic traceback read that
+printed source-ID examples; those bytes are private and outside the export
+allowlist.
+Independent review remains pending.

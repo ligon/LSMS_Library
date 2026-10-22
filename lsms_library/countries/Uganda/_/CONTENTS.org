@@ -3739,3 +3739,81 @@ filtering an already-finalized all-wave frame is not a full-attrs oracle.
 The original strict subset comparison stop is retained in the task evidence.
 See =slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/= for the safe report,
 source-grounded aggregates, exact hash scope, tests and explicit evidence limits.
+
+* Parcel yield after household walking (GH #1205, 2026-10-22)
+
+The native crop constructor joins the explicit formatted source household,
+parcel and plot fields as =hhid-parcel-plot=.
+The Default household walk changes =i= but retains the native household
+embedded in =plot_id=.
+The former parcel extractor required the embedded prefix to equal the current
+=i=, so it returned the whole plot string after a valid household walk.
+This is a wiring defect, separate from missing or nonpositive area.
+The source-backed check finds an exact inverse from the right for all 56,841
+retained unique native plot tuples; the parcel and plot suffixes are nonempty
+ASCII-decimal tokens in all 140,961 associated raw harvest rows.
+These checks use the actual source columns, not a guessed household width or
+a choice of key based on improved area matches.
+
+=yield_kg= now uses that native constructor inverse only for a Country operand
+carrying the existing =attrs['country']='Uganda'=, when the current-=i= prefix
+branch misses and the native household and numeric suffix checks pass.
+An explicit country index level or column disables the new fallback, even
+with a stale scalar country attribute.
+It also requires the common household key =i= and rejects an explicit
+conflicting area-country attribute; unmarked area operands retain the declared
+DataFrame contract.
+Unmarked, other-country and malformed identifiers keep the former fallback.
+No source or public =plot_id= is rewritten, and no index field or grain is
+introduced.
+The separate =fertilizer_rate= route remains under GH #1110.
+
+At the post-factor source =491daf5654b9ee45332bec97e1296ae821ff46d5=, the
+133,761 crop observations and 42,841 area rows remain exact.
+The area frame contains 37,636 positive rows and 37,634 positive parcel keys.
+Before this repair, 42,481 converted route keys partition into 14,520 exact
+positive-area matches, 438 exact-but-ineligible keys, 27,521 directly witnessed
+native-household prefix failures and two native parcels absent from the area
+rosters.
+The prefix-failure group has 21,165 positive-area, 6,348 ineligible-area and
+eight absent-area witnesses.
+These are fallback route keys, not additive additional yields: multiple crop
+plots can belong to the same parcel.
+The prospective =(t, canonical_i, raw_parcel)= census over all retained crop
+and all area witnesses finds no keys with multiple native households, so there
+is no household-alias area/harvest collision to adjudicate in this repair.
+
+| Wave    | Former route keys | Former yield keys | Source-parcel keys | Yield keys |
+|---------+-------------------+-------------------+--------------------+------------|
+| 2009-10 |              4400 |              4024 |               4400 |       4024 |
+| 2010-11 |              4230 |              4212 |               4230 |       4212 |
+| 2011-12 |              4249 |              4247 |               4249 |       4247 |
+| 2013-14 |              6671 |              1889 |               4685 |       4685 |
+| 2015-16 |              8419 |                90 |               4946 |       4944 |
+| 2018-19 |              7764 |                 5 |               4799 |       1027 |
+| 2019-20 |              6748 |                53 |               4650 |       4616 |
+| Total   |             42481 |             14520 |              31959 |      27755 |
+
+The result equals the independent oracle that takes parcel identity directly
+from the raw source columns and applies the existing converted-harvest sum,
+positive-area sum, inner join and division.
+It adds 13,235 yield keys, loses none, and leaves every former yield value
+unchanged at its existing key.
+The full crop and area operands, =harvest_kg= and literal-plot yield remain
+exact; the literal route still returns zero rows.
+The remaining 4,204 converted source parcels do not have a matching positive
+area under this existing route.
+The unchanged area preference, 2,500-acre clamp, nonpositive-area screen,
+A/B area sum and factor ladder are not repaired or reinterpreted here.
+The earlier blanket "100% of crop rows" statement was false; coverage depends
+on both convertible harvest and eligible area.
+The pre-factor 14,022/40,409 measurement above remains a historical result,
+not a target for this factor-stage diagnosis.
+
+Normal Default cold and fresh-process warm controls retain six exact complete
+frames and unchanged warm cache bytes, modes and mtimes.
+The first source-oracle comparison stopped because its index join retained
+unused levels whereas the API constructs observed-only levels; the corrected
+expected axes follow that API contract and preserve the actual frames.
+The #1204 Make subset route, #1196 storage difference, #829 release WAITING
+entry and other scientific/unit caveats retain their separate meanings.
