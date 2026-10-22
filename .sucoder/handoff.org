@@ -17,8 +17,8 @@ New13PASS+88supportingPASS; actuala4176FAIL7PASS. Guarded calibration/predata fu
 Root exact genuine release is C/UGANDA1215-GENUINE-RELEASE.json;37providers freshly authenticated/148distinct0600nlink1copies177769212bytes in4freshL1roots.
 Default sequence actors19976base/7929candidate terminal0; supported15630/all133761rows, candidate cold/partial/all-cache barren order exact,9coldsamplecache writes/no crop, later barren crop bytes/physical unchanged.
 All10approved normal-grid actors are now terminal0, including Make/freshwarm/Feature and both unmodified scanners26056/68469;22WARN each, not an all-pass audit.
-Full strict/ordered22record comparison actor57758 remains active; all original operands saved, do not restart completed actors.
-Author diagnostic6a791a printed raw warning-example IDs; exact private trace/output-scope exception and identifier privacy scan required before safe exports, never repeat those IDs.
+Full strict/ordered22record comparison actor57758/d92063 terminal0:44fullcomparisons retain38PASS and6intentional approved empty-orderFAIL; separate complete-index/name-matched-array/dtype/mask/typedattrs diagnosticsPASS, not full equality.14native/8harvest groups and10producer source sets included; ordered22WARN records typed-exact. Do not restart completed actors.
+Author diagnostic6a791a printed raw warning-example IDs; exact original call/return JSONL recovered from own harness under private output-scope-exception-6a791a, four exposed lexemes retained privately. Final aggregate export+source.diff identifier privacy scan required; never repeat those IDs.
 review_malawi_1209 now owns independent1215PHASE0 STATIC/METADATA ONLY, own detached W/isa-review-Uganda-1215=f7c and -base=a417, own C/review-Uganda-1215.
 Root prepared mounted venv/private source tmp links/prior guard3ada; imports/runtime/provider payloads held until concrete plan and gated release, finalauthor authentication required before independent genuine data.
 
