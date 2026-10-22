@@ -17,11 +17,11 @@ identity. GH849's factor-column wiring remains separate.
 
 | Machinery | Source | Existing coverage and decision |
 |---|---|---|
-| crop_production_for_wave / CROP_COLMAPS | countries/Uganda/_/uganda.py:1230,1620 | Reuse pure field decoding, eligibility and dtypes; tests/test_crop_production_kgfactor.py and condition tests. Private projection must intercept before the seven-key sum/first block at1579. |
+| crop_production_for_wave / CROP_COLMAPS | countries/Uganda/_/uganda.py:1230,1620 | Reuse pure field decoding, eligibility and dtypes; tests/test_crop_kg_factor.py and test_uganda_crop_condition.py. Private projection must intercept before the seven-key sum/first block at1579. |
 | Source identity and field oracles | frozen private Uganda/849/{DIAGNOSIS.org,PROPOSAL.md,source-identity.json,all-production-key-audit.json} | Reuse only after receipt gates and guarded physical copies; source release/row/slot locators are evidence, not an approved API. Strict artifact addendum separately accepted. |
 | _normalize_dataframe_index / Country._finalize_result | country.py:8394,3815 | Reuse with deep-copied declaration in private controls; existing grain/index/population tests. Preserve id_walk and id_converted, never invent an ID formatter. |
-| _align_to_canonical_levels / _harmonize_country_frame | feature.py:277,649 | Reuse canonical union/sentinel alignment and extra-level/drop controls; tests/test_feature_canonical_levels.py. A country-only coordinate is insufficient. |
-| harvest_kg_factors / harvest_kg / yield_kg | transformations.py:4282,4698,4888 | Reuse reported-factor screens, ladder, survey medians and explicit analyst reduction; tests/test_harvest_kg_shipped_factors.py and harvest-factor tests. No new conversion estimator. |
+| _align_to_canonical_levels / _harmonize_country_frame | feature.py:277,649 | Reuse canonical union/sentinel alignment and extra-level/drop controls; tests/test_feature_canonical_index.py. A country-only coordinate is insufficient. |
+| harvest_kg_factors / harvest_kg / yield_kg | transformations.py:4282,4698,4888 | Reuse reported-factor screens, ladder, survey medians and explicit analyst reduction; tests/test_shipped_factors.py and test_crop_kg_factor.py. No new conversion estimator. |
 | get_dataframe / get_data_file | local_tools.py; STANDING §2/§4 | Reuse sanctioned source access only if decoding is needed. Saved raw/native artifacts may instead be copied with exact receipts. |
 
 ## §3 Definitions and conventions
@@ -83,5 +83,23 @@ or precise executable remaining controls; no vague policy blocker is asserted.
 
 ### Phase 3 verification
 
-Pending private projection and source-grain census. Production and schema edits
-are forbidden in this phase. Sue (GPT-6).
+- OK (§2/§4): all-record private projection retains133761 nonnull-key native
+  observations,430 more than133331 baseline keys;403 existing null-key rows
+  remain separately excluded. Zero full-source-row repeats across14 source
+  frames;33 equal-helper-payload groups remain separate.
+- OK (§2/§3):99 independent paired-field checks;35 private semantic/mutation
+  controls, including seven exact-comparator negatives. Existing normalization,
+  finalizer and declared Feature alignment retain all projected observations.
+  Current undeclared Feature route collapses428 nonnull rows and deletes928
+  null-v rows; this is evidence for declaring the coordinate, not an ID fix.
+- OK (§2/§5): whole-frame row conversion and explicit harvest reduction plus
+  independent report-count/median oracles use existing machinery. Current-wiring
+  projection changes2018 by2091kg; separate849 factor-wiring measurement is
+  labelled independently. Yield checks use explicitly synthetic areas; actual
+  source-area yields remain a concrete future prerequisite/test.
+- OK (§4):101 physical artifact copies and17 current-cache parquets retain
+  bytes/modes/mtimes. Runtime/config/schema/tests remain exactly f8. No new
+  DTA decode or source-cold build, candidate hash claim, production/schema edit
+  or public observation contract is made. Safe DESIGN/PROTOTYPE/commands are
+  the engineering handoff; original strict stops and handling qualifications
+  remain private and are described there. Sue (GPT-6).
