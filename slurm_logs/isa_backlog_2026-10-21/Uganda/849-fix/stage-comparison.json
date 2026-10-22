@@ -1,0 +1,464 @@
+{
+  "status": "PASS_WITH_EXPLICIT_EXISTING_LIMITS",
+  "strict_matched_stage_checks": 90,
+  "checks": [
+    "default-cold-Uganda-crop-bare",
+    "default-cold-Uganda-crop-None",
+    "default-cold-Uganda-sample",
+    "default-cold-Uganda-plot_features",
+    "default-cold-Uganda-cluster_features",
+    "default-cold-Niger-crop-bare",
+    "default-cold-Niger-crop-None",
+    "default-cold-Niger-crop-index",
+    "default-cold-Niger-sample",
+    "default-cold-Niger-cluster_features",
+    "default-warm-Uganda-crop-bare",
+    "default-warm-Uganda-crop-None",
+    "default-warm-Uganda-sample",
+    "default-warm-Uganda-plot_features",
+    "default-warm-Uganda-cluster_features",
+    "default-warm-new-Country-bare",
+    "default-warm-new-Country-None",
+    "default-warm-Niger-crop-bare",
+    "default-warm-Niger-crop-None",
+    "default-warm-Niger-crop-index",
+    "default-warm-Niger-sample",
+    "default-warm-Niger-cluster_features",
+    "default-2009-10-crop_production-native",
+    "default-2009-10-sample-native",
+    "default-2009-10-plot_features-native",
+    "default-2009-10-cluster_features-native",
+    "default-2010-11-crop_production-native",
+    "default-2010-11-sample-native",
+    "default-2010-11-plot_features-native",
+    "default-2010-11-cluster_features-native",
+    "default-2011-12-crop_production-native",
+    "default-2011-12-sample-native",
+    "default-2011-12-plot_features-native",
+    "default-2011-12-cluster_features-native",
+    "default-2013-14-crop_production-native",
+    "default-2013-14-sample-native",
+    "default-2013-14-plot_features-native",
+    "default-2013-14-cluster_features-native",
+    "default-2015-16-crop_production-native",
+    "default-2015-16-sample-native",
+    "default-2015-16-plot_features-native",
+    "default-2015-16-cluster_features-native",
+    "default-2018-19-crop_production-native",
+    "default-2018-19-sample-native",
+    "default-2018-19-plot_features-native",
+    "default-2018-19-cluster_features-native",
+    "default-2019-20-crop_production-native",
+    "default-2019-20-sample-native",
+    "default-2019-20-plot_features-native",
+    "default-2019-20-cluster_features-native",
+    "make-cold-Uganda-crop-bare",
+    "make-cold-Uganda-crop-None",
+    "make-cold-Uganda-sample",
+    "make-cold-Uganda-plot_features",
+    "make-cold-Uganda-cluster_features",
+    "make-warm-Uganda-crop-bare",
+    "make-warm-Uganda-crop-None",
+    "make-warm-Uganda-sample",
+    "make-warm-Uganda-plot_features",
+    "make-warm-Uganda-cluster_features",
+    "make-warm-new-Country-bare",
+    "make-warm-new-Country-None",
+    "make-2009-10-crop_production-native",
+    "make-2009-10-sample-native",
+    "make-2009-10-plot_features-native",
+    "make-2009-10-cluster_features-native",
+    "make-2010-11-crop_production-native",
+    "make-2010-11-sample-native",
+    "make-2010-11-plot_features-native",
+    "make-2010-11-cluster_features-native",
+    "make-2011-12-crop_production-native",
+    "make-2011-12-sample-native",
+    "make-2011-12-plot_features-native",
+    "make-2011-12-cluster_features-native",
+    "make-2013-14-crop_production-native",
+    "make-2013-14-sample-native",
+    "make-2013-14-plot_features-native",
+    "make-2013-14-cluster_features-native",
+    "make-2015-16-crop_production-native",
+    "make-2015-16-sample-native",
+    "make-2015-16-plot_features-native",
+    "make-2015-16-cluster_features-native",
+    "make-2018-19-crop_production-native",
+    "make-2018-19-sample-native",
+    "make-2018-19-plot_features-native",
+    "make-2018-19-cluster_features-native",
+    "make-2019-20-crop_production-native",
+    "make-2019-20-sample-native",
+    "make-2019-20-plot_features-native",
+    "make-2019-20-cluster_features-native"
+  ],
+  "cluster_features_dtype_facts": [
+    {
+      "side": "base",
+      "backend": "default",
+      "stage": "cold",
+      "rows": 4805,
+      "v_nulls": 0,
+      "index_class": "pandas.Index",
+      "dtype_str": "string",
+      "dtype_repr": "<StringDtype(na_value=<NA>)>",
+      "storage": "pyarrow",
+      "na_value_repr": "<NA>"
+    },
+    {
+      "side": "candidate",
+      "backend": "default",
+      "stage": "cold",
+      "rows": 4805,
+      "v_nulls": 0,
+      "index_class": "pandas.Index",
+      "dtype_str": "string",
+      "dtype_repr": "<StringDtype(na_value=<NA>)>",
+      "storage": "pyarrow",
+      "na_value_repr": "<NA>"
+    },
+    {
+      "side": "base",
+      "backend": "default",
+      "stage": "warm",
+      "rows": 4805,
+      "v_nulls": 0,
+      "index_class": "pandas.Index",
+      "dtype_str": "str",
+      "dtype_repr": "<StringDtype(na_value=nan)>",
+      "storage": "pyarrow",
+      "na_value_repr": "nan"
+    },
+    {
+      "side": "candidate",
+      "backend": "default",
+      "stage": "warm",
+      "rows": 4805,
+      "v_nulls": 0,
+      "index_class": "pandas.Index",
+      "dtype_str": "str",
+      "dtype_repr": "<StringDtype(na_value=nan)>",
+      "storage": "pyarrow",
+      "na_value_repr": "nan"
+    },
+    {
+      "side": "base",
+      "backend": "make",
+      "stage": "cold",
+      "rows": 4805,
+      "v_nulls": 0,
+      "index_class": "pandas.Index",
+      "dtype_str": "string",
+      "dtype_repr": "<StringDtype(na_value=<NA>)>",
+      "storage": "pyarrow",
+      "na_value_repr": "<NA>"
+    },
+    {
+      "side": "candidate",
+      "backend": "make",
+      "stage": "cold",
+      "rows": 4805,
+      "v_nulls": 0,
+      "index_class": "pandas.Index",
+      "dtype_str": "string",
+      "dtype_repr": "<StringDtype(na_value=<NA>)>",
+      "storage": "pyarrow",
+      "na_value_repr": "<NA>"
+    },
+    {
+      "side": "base",
+      "backend": "make",
+      "stage": "warm",
+      "rows": 4805,
+      "v_nulls": 0,
+      "index_class": "pandas.Index",
+      "dtype_str": "str",
+      "dtype_repr": "<StringDtype(na_value=nan)>",
+      "storage": "pyarrow",
+      "na_value_repr": "nan"
+    },
+    {
+      "side": "candidate",
+      "backend": "make",
+      "stage": "warm",
+      "rows": 4805,
+      "v_nulls": 0,
+      "index_class": "pandas.Index",
+      "dtype_str": "str",
+      "dtype_repr": "<StringDtype(na_value=nan)>",
+      "storage": "pyarrow",
+      "na_value_repr": "nan"
+    }
+  ],
+  "warm_operations": [
+    {
+      "side": "base",
+      "backend": "default",
+      "modified": [],
+      "added": [],
+      "deleted": []
+    },
+    {
+      "side": "candidate",
+      "backend": "default",
+      "modified": [],
+      "added": [],
+      "deleted": []
+    },
+    {
+      "side": "base",
+      "backend": "make",
+      "modified": [
+        {
+          "path": "Uganda/2009-10/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2010-11/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/var/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2013-14/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2015-16/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2009-10/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2019-20/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2011-12/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2018-19/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2005-06/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2018-19/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2011-12/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2010-11/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/var/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2013-14/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2015-16/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2019-20/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        }
+      ],
+      "added": [],
+      "deleted": []
+    },
+    {
+      "side": "candidate",
+      "backend": "make",
+      "modified": [
+        {
+          "path": "Uganda/2009-10/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2010-11/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/var/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2013-14/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2015-16/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2009-10/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2019-20/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2011-12/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2018-19/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2005-06/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2018-19/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2011-12/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2010-11/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/var/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2013-14/_/plot_features.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2015-16/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        },
+        {
+          "path": "Uganda/2019-20/_/crop_production.parquet",
+          "bytes_exact": true,
+          "mode_before": "0o600",
+          "mode_after": "0o644",
+          "mtime_changed": true
+        }
+      ],
+      "added": [],
+      "deleted": []
+    }
+  ]
+}

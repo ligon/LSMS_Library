@@ -1,0 +1,88 @@
+{
+  "status": "PASS",
+  "waves": [
+    {
+      "wave": "2009-10",
+      "eligible_before_old_null_boundary": 22909,
+      "retained": 22549,
+      "old_null_excluded": 360,
+      "parent_nonmissing_factor": 0,
+      "candidate_nonmissing_factor": 0,
+      "every_other_payload_axis_dtype_mask_attrs_exact": true,
+      "own_source_row_slot_factor_exact": true
+    },
+    {
+      "wave": "2010-11",
+      "eligible_before_old_null_boundary": 21051,
+      "retained": 21051,
+      "old_null_excluded": 0,
+      "parent_nonmissing_factor": 0,
+      "candidate_nonmissing_factor": 20330,
+      "every_other_payload_axis_dtype_mask_attrs_exact": true,
+      "own_source_row_slot_factor_exact": true
+    },
+    {
+      "wave": "2011-12",
+      "eligible_before_old_null_boundary": 20243,
+      "retained": 20200,
+      "old_null_excluded": 43,
+      "parent_nonmissing_factor": 0,
+      "candidate_nonmissing_factor": 15058,
+      "every_other_payload_axis_dtype_mask_attrs_exact": true,
+      "own_source_row_slot_factor_exact": true
+    },
+    {
+      "wave": "2013-14",
+      "eligible_before_old_null_boundary": 17646,
+      "retained": 17646,
+      "old_null_excluded": 0,
+      "parent_nonmissing_factor": 0,
+      "candidate_nonmissing_factor": 13253,
+      "every_other_payload_axis_dtype_mask_attrs_exact": true,
+      "own_source_row_slot_factor_exact": true
+    },
+    {
+      "wave": "2015-16",
+      "eligible_before_old_null_boundary": 19639,
+      "retained": 19639,
+      "old_null_excluded": 0,
+      "parent_nonmissing_factor": 0,
+      "candidate_nonmissing_factor": 17278,
+      "every_other_payload_axis_dtype_mask_attrs_exact": true,
+      "own_source_row_slot_factor_exact": true
+    },
+    {
+      "wave": "2018-19",
+      "eligible_before_old_null_boundary": 15630,
+      "retained": 15630,
+      "old_null_excluded": 0,
+      "parent_nonmissing_factor": 15083,
+      "candidate_nonmissing_factor": 15083,
+      "every_other_payload_axis_dtype_mask_attrs_exact": true,
+      "own_source_row_slot_factor_exact": true
+    },
+    {
+      "wave": "2019-20",
+      "eligible_before_old_null_boundary": 17046,
+      "retained": 17046,
+      "old_null_excluded": 0,
+      "parent_nonmissing_factor": 0,
+      "candidate_nonmissing_factor": 16184,
+      "every_other_payload_axis_dtype_mask_attrs_exact": true,
+      "own_source_row_slot_factor_exact": true
+    }
+  ],
+  "records": 133761,
+  "null_v": 928,
+  "old_null_exclusions": 403,
+  "independent_factor_literals_not_candidate_map": true,
+  "unchanged_parent_decoder_used_for_identity_eligibility": true,
+  "builder_existing_nonpositive_normalization_exact": true,
+  "mutations_caught": {
+    "other_payload_value": true,
+    "attrs_presence": true,
+    "unused_level": true
+  },
+  "default_native_raw_walked_public_all_complete": true,
+  "make_native_raw_public_all_complete": true
+}

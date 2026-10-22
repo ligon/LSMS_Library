@@ -146,3 +146,58 @@ No author-side final PASS or GitHub publication/merge/closure is implied;
 final freeze and different-agent acceptance remain required.
 
 Sue (GPT-6).
+
+
+## §7 Final measured boundary and qualifications
+
+Both backends' normal source-cold and fresh-process/new-object warm crop
+frames match their own strict oracles. The90 additional matched native/
+support/cold/warm checks and12 saved subset/CLI checks pass, with full axes,
+unused levels/codes, masks, dtypes and recursively typed attrs/_FIELDS.
+Feature bare/default, explicitNone and index arguments are matched separately;
+all180137 rows (healthyNiger46376) and every non-factor payload/full attrs are
+exact, with30 independent currency/assembly/fresh-warm checks. All41 scanner
+records are exact full literal multisets (41warn,0fail/error), no CP phase2
+grid. All54 public warning captures are literal class/full-message multiset
+exact; no path-prefix normalization is used. CLI actual API prewrite and
+independently serialized artifact/Arrow footer/schema/bytes match at their
+respective stages; v NA representation and typed sampling/population/recall
+JSON stage differences are disclosed, not normalized.
+
+DEFAULT cache bytes/modes/mtimes remain exact. In THIS run both Make heads
+change the same17 byte-identical paths0600 ->0644 plus mtime; no additions/
+deletions. This is separate from the prior1198 opposite-direction observation;
+no initial-copy provenance or universal mode-preservation claim follows.
+The4805-row zero-null cluster_features/v cold/warm pd.NA ->np.nan pyarrow
+StringDtype distinction remains, with full same-stage parent/candidate equality.
+Root confirmed #1196 now records the distinct Niger/u and Uganda/v cases,
+with shared cause unproved. #1204 owns subset routing; #1205 owns area coverage.
+
+Populated-current DEFAULT2018/combined returns15630, unsupported2005 zero;
+Make returns all133761/all7 supported waves for each. Actual parent/candidate
+returns match strictly, including full typed attrs. The initial parent-supported
+comparison against a filtered finalized full frame stopped only on attrs:
+sampling/population/recall recompute by request; empty output additionally
+changes sampling_resolution/population_resolution. Actual/endpoints survived,
+but the original in-memory expected filter was not serialized. A separately
+named artifact-only reconstruction uses the surviving full reference and
+pinned unchanged restriction helper; it is NOT the original operand. No API
+prefix replay or metadata stripping is used.
+
+Source-oracle cwd, relative-path launch, nullable-Boolean summary and original
+Niger-presence inventory stops remain, as does the package checker stop before
+any export write when its expected-absent safe directory already existed empty.
+Corrected versions use new names; no private aggregate is overwritten.
+The earlier1198 overwritten XML/missing first-failed-Make warning-list gaps
+remain immutable and unrecovered; this run does not erase them.
+Fresh frozen-reference checks cover author4122, independent1908, docs52/45,
+original849/addendum/Mali1960, GLOBAL17 6468, BF594, Tanzania2894 and606 held
+source/comparator/copy receipts. New source trees have full content/mode/
+HEAD/clean checks, not an invented initial source-mtime baseline.
+
+The safe report and aggregate evidence are in
+slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/. Detailed frames, source rows,
+IDs, warnings/logs and source credentials remain private. Final READY records
+the exact source descendant, runtime/test equivalence, complete private
+manifest, checker/export allowlists and zero consumers. This is an author
+handoff, not independent acceptance, a GitHub write/merge or issue closure.

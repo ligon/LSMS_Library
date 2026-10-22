@@ -1,0 +1,1607 @@
+{
+  "status": "PASS_COMPLETE_CAPTURED_OCCURRENCES",
+  "public_capture_literal_multisets_exact": true,
+  "public_captures": [
+    {
+      "stage": "default-cold",
+      "file": "Niger-cluster_features-warnings-private.pkl",
+      "parent": 3,
+      "candidate": 3,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 3,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 1,
+        "NullReadWarning": 2
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 1,
+        "NullReadWarning": 2
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Niger-crop-None-warnings-private.pkl",
+      "parent": 6,
+      "candidate": 6,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 6,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Niger-crop-bare-warnings-private.pkl",
+      "parent": 7,
+      "candidate": 7,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 7,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Niger-crop-index-warnings-private.pkl",
+      "parent": 6,
+      "candidate": 6,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 6,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Niger-sample-warnings-private.pkl",
+      "parent": 1,
+      "candidate": 1,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 1,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Uganda-cluster_features-warnings-private.pkl",
+      "parent": 17,
+      "candidate": 17,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 17,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "UserWarning": 4,
+        "GrainConflictWarning": 8,
+        "RuntimeWarning": 2,
+        "NullReadWarning": 2,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "UserWarning": 4,
+        "GrainConflictWarning": 8,
+        "RuntimeWarning": 2,
+        "NullReadWarning": 2,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Uganda-crop-None-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Uganda-crop-bare-warnings-private.pkl",
+      "parent": 12,
+      "candidate": 12,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 12,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "RuntimeWarning": 2,
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "RuntimeWarning": 2,
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Uganda-plot_features-warnings-private.pkl",
+      "parent": 9,
+      "candidate": 9,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 9,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-cold",
+      "file": "Uganda-sample-warnings-private.pkl",
+      "parent": 1,
+      "candidate": 1,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 1,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-cold",
+      "file": "Uganda-cluster_features-warnings-private.pkl",
+      "parent": 17,
+      "candidate": 17,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 17,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "UserWarning": 4,
+        "GrainConflictWarning": 8,
+        "RuntimeWarning": 2,
+        "NullReadWarning": 2,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "UserWarning": 4,
+        "GrainConflictWarning": 8,
+        "RuntimeWarning": 2,
+        "NullReadWarning": 2,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-cold",
+      "file": "Uganda-crop-None-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-cold",
+      "file": "Uganda-crop-bare-warnings-private.pkl",
+      "parent": 12,
+      "candidate": 12,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 12,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "RuntimeWarning": 2,
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "RuntimeWarning": 2,
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-cold",
+      "file": "Uganda-plot_features-warnings-private.pkl",
+      "parent": 9,
+      "candidate": 9,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 9,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-cold",
+      "file": "Uganda-sample-warnings-private.pkl",
+      "parent": 1,
+      "candidate": 1,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 1,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Niger-cluster_features-warnings-private.pkl",
+      "parent": 3,
+      "candidate": 3,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 3,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 1,
+        "NullReadWarning": 2
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 1,
+        "NullReadWarning": 2
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Niger-crop-None-warnings-private.pkl",
+      "parent": 6,
+      "candidate": 6,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 6,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Niger-crop-bare-warnings-private.pkl",
+      "parent": 7,
+      "candidate": 7,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 7,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Niger-crop-index-warnings-private.pkl",
+      "parent": 6,
+      "candidate": 6,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 6,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Niger-sample-warnings-private.pkl",
+      "parent": 1,
+      "candidate": 1,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 1,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Uganda-cluster_features-warnings-private.pkl",
+      "parent": 11,
+      "candidate": 11,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 11,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 8,
+        "NullReadWarning": 2,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 8,
+        "NullReadWarning": 2,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Uganda-crop-None-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Uganda-crop-bare-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Uganda-plot_features-warnings-private.pkl",
+      "parent": 9,
+      "candidate": 9,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 9,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "Uganda-sample-warnings-private.pkl",
+      "parent": 1,
+      "candidate": 1,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 1,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "new-Country-None-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "default-warm",
+      "file": "new-Country-bare-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-warm",
+      "file": "Uganda-cluster_features-warnings-private.pkl",
+      "parent": 11,
+      "candidate": 11,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 11,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 8,
+        "NullReadWarning": 2,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 8,
+        "NullReadWarning": 2,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-warm",
+      "file": "Uganda-crop-None-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-warm",
+      "file": "Uganda-crop-bare-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-warm",
+      "file": "Uganda-plot_features-warnings-private.pkl",
+      "parent": 9,
+      "candidate": 9,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 9,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-warm",
+      "file": "Uganda-sample-warnings-private.pkl",
+      "parent": 1,
+      "candidate": 1,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 1,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-warm",
+      "file": "new-Country-None-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "make-warm",
+      "file": "new-Country-bare-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Feature-None-warnings-private.pkl",
+      "parent": 19,
+      "candidate": 19,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 19,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Feature-bare-warnings-private.pkl",
+      "parent": 19,
+      "candidate": 19,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 19,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Feature-index-warnings-private.pkl",
+      "parent": 19,
+      "candidate": 19,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 19,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Niger-None-warnings-private.pkl",
+      "parent": 7,
+      "candidate": 7,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 7,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Niger-bare-warnings-private.pkl",
+      "parent": 7,
+      "candidate": 7,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 7,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Niger-index-warnings-private.pkl",
+      "parent": 7,
+      "candidate": 7,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 7,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Uganda-None-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Uganda-bare-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-initial",
+      "file": "Uganda-index-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Feature-None-warnings-private.pkl",
+      "parent": 19,
+      "candidate": 19,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 19,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Feature-bare-warnings-private.pkl",
+      "parent": 19,
+      "candidate": 19,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 19,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Feature-index-warnings-private.pkl",
+      "parent": 19,
+      "candidate": 19,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 19,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 4,
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 2,
+        "ClusterIdentityWarning": 1,
+        "GrainCollapseWarning": 2,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Niger-None-warnings-private.pkl",
+      "parent": 7,
+      "candidate": 7,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 7,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Niger-bare-warnings-private.pkl",
+      "parent": 7,
+      "candidate": 7,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 7,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Niger-index-warnings-private.pkl",
+      "parent": 7,
+      "candidate": 7,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 7,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "classes_candidate": {
+        "GrainCollapseWarning": 2,
+        "NullReadWarning": 3,
+        "QuantityImplausibleWarning": 1,
+        "NullIndexKeyWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Uganda-None-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Uganda-bare-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "Feature-warm",
+      "file": "Uganda-index-warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "CLI",
+      "file": "warnings-private.pkl",
+      "parent": 10,
+      "candidate": 10,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 10,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "classes_candidate": {
+        "NullReadWarning": 1,
+        "QuantityImplausibleWarning": 7,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "unmatched_message_hashes": []
+    },
+    {
+      "stage": "scanner",
+      "file": "warnings-private.pkl",
+      "parent": 0,
+      "candidate": 0,
+      "literal_class_full_message_multisets_exact": true,
+      "exact_occurrences": 0,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {},
+      "classes_candidate": {},
+      "unmatched_message_hashes": []
+    }
+  ],
+  "derived_captures": [
+    {
+      "file": "warnings-private.pkl",
+      "parent": 0,
+      "candidate": 0,
+      "exact": 0,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {},
+      "classes_candidate": {},
+      "unmatched_hashes": []
+    },
+    {
+      "file": "parcel-warnings-private.pkl",
+      "parent": 0,
+      "candidate": 0,
+      "exact": 0,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {},
+      "classes_candidate": {},
+      "unmatched_hashes": []
+    },
+    {
+      "file": "plot-warnings-private.pkl",
+      "parent": 0,
+      "candidate": 0,
+      "exact": 0,
+      "removed": 0,
+      "added": 0,
+      "classes_parent": {},
+      "classes_candidate": {},
+      "unmatched_hashes": []
+    }
+  ],
+  "scanner": {
+    "parent": 41,
+    "candidate": 41,
+    "full_literal_record_multisets_exact": true,
+    "phase2_grid": [],
+    "records": [
+      {
+        "sha256_full_record": "eeefb14287313f3aab8c7715bb006cd49617a55123944d80a211f11f71b5371a",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "country": "Niger"
+      },
+      {
+        "sha256_full_record": "75828032b413d0ea1b3aeae84472413af7ef1026508ba54ce40088f315728f90",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "country": "Uganda"
+      },
+      {
+        "sha256_full_record": "88c2918fe82fc45fae941e0645ba7d719eb735cf1f602f1505ca21faa24b9716",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "null_content",
+        "status": "warn",
+        "country": "Niger"
+      },
+      {
+        "sha256_full_record": "519c61567c65bf8220a96a0a581fec9268da240b2ecf17f23cc1b2e7fb7cb084",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "null_content",
+        "status": "warn",
+        "country": "Niger"
+      },
+      {
+        "sha256_full_record": "c1b27228e98452745c5358f7ad3584ae1ca6e0e1164393401189cfa9cc526796",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "null_content",
+        "status": "warn",
+        "country": "Uganda"
+      },
+      {
+        "sha256_full_record": "b599337c1bea9e3172083801d3920b42af8f8b858cf0ce1a4bf52beb4c89f133",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "2fdca1b4f480a5e02b440e55ed271f4ce087091e7d22077722b95733373c5354",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "32d8cc54e1145f984d92d0d59225034dab7f56c5ff9f478d7dc5c392d3463704",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "2749e6177abcee230036003ffce26a52ec7d9dfd62368ecc58f03f20ad3b382d",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "03cda8ffbd4a3beda82e849fbe2a7dc54df7ebb975b043ec615411c1cbf1e0ec",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "de05ae4da1bd70478e4a6af44d30cd756f3a38ae9aa30d72e643d3af16473de3",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "870840228549cb465be0204774fbca268076f7b28182632d4508148456eba585",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "d3edd328820875271ca4b7c99971fc7e51bb201540f06032e0aaeaf2a8c731b3",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "876c70308497d96f278639e6c37538092e225a4c57f9920fe03bcfb3ccb8f89f",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "565c6b84ced9e07980b47cff698524876118fc9f25dda43b54d2f0bb559f71da",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "952aca235c1f79db102392df63c1e38882a6306fb356fb542247c2f51c6b5a24",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "30872af81351dab4fe3559588eef846500d7905b16d34522969fec7fd2f094ca",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "35aa9b16ea8eaea072c9b1de86daeec8f8d333839f6ef1a117f885aea94728a4",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "280fa8c8a0c5b9ae0d1c8f759f834936463f780859f50468809dcd00a5e4ac46",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "17ed234eebd207f447f24bb35a2ea4392b50d5cc53cee6c20c7631049778d25d",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "1487d684c132b9733031398e2d75d454c7ac434446d62f08aeb7fde5d3f947e7",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "ec04cba7c9d7c9f630bff890dba1c41fe7f4f1bbfcdc65b5da6c2c8de058c928",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "b27ea45719d07b8fa4b72b84e3e8ae323103ad90dff92388d2402cd34500075c",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "df99183b2af4ef871456fefa469b1ed008fe486fa4462cf06ec0d5f7543dad99",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "0ef46d7cde81015f7887e5712f781ee7225913d7425591692f715b067abb2cf8",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "88547549d11ab81c9759419194dc1a0eff37ab4baa8013691161a00a04cd168d",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "2cb47708b5f3d93905194f211a8381c5088bf92da76f0a63c7e0bf3aada049ea",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "1a308c2e26b4b3cda59b13bd6433becfaf334cd45394de9fecad23d9d8fb722b",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "9739a0a6184b94757b3720b96dc015465a39b70a27e53ebd29d8654468406e86",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "202d0f9ef920d9f4803015d43edd109a1fb413128d47a3ebbe8a1fc8b925dd95",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "a23c32f0b411ec4f242a4c62ca59d4632fc9ff7260b10526470e3733056353b0",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "f7032bf77f4dff61dd1f1e5350a6b84c267bf4433601b6cd84483342d1a34441",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "7461f74862a6626e1ae9425d228731ebe0624deef58b1e4e8c68db4007eaf2d4",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "289fb74fd00e4ff21a6443bfbb2d58575b51aa8ba31179b795585daea0a87099",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "f82fa00891c69e48f15941fb6128fcc5796b8c87f1e4c022a77b5705659edb5c",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "0be9ec5189d8e3b193978ca47851ee9d628ddfea0ddb48c9e1986ddfbf05b66d",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "dc51d3d88277299665aea848ccd439149cdaf093eae77f3929fe89697c84cb9a",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "bf3f32e224ad8f898c848a738c72197e34c09b7b15a86edb77377fe7e82d027d",
+        "multiplicity": 1,
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "16f5390d99df8f156bf8d00bed763a49f642d0bfac55f65de7cdd11b23fba21a",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "b81bc74c8a75b11443b2c2482396a8d1f612f8c308346c9a545b688dcff0406d",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      },
+      {
+        "sha256_full_record": "0a24d61ac94f621866b5deec5d9ada3af730a9968d6084b481fc8bbe716a99b3",
+        "multiplicity": 1,
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null
+      }
+    ]
+  },
+  "path_prefix_normalization": null,
+  "subprocess_stdout_logs_retained_private_not_claimed_as_warningmessage_objects": true
+}
