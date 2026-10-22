@@ -1,0 +1,164 @@
+#+TITLE: Independent bounded GLOBAL19 Niger composition review
+#+AUTHOR: Sue (GPT-6)
+
+* Verdict and source pins
+PASS for the bounded Niger country-builder retirement increment at =2566a3e490c0aefe03ab31d538d7d04e9b77c77e= against actual18 documentation-qualified =471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3=.
+This report does not transfer standalone670/d602 results to these heads or claim an unrestricted nineteen-change validation.
+Root acceptance and publication remain separate actions.
+The terminal =FINAL-READY.json= and immutable manifest establish release after this report.
+
+The exact twelve changed paths, blobs and Git modes match reviewed670 versus its actual d602 parent.
+The production delta is only56 deleted lines:45-line Niger country concatenator plus11 lines of its explicit country Make target/comment.
+Wave rules/prerequisites, shared variables, helpers, schema, measurements, units, IDs, eligibility, food/scientific transforms and framework inputs remain exact.
+Current Mali documentation is exactly471, including its two coverage-qualified paragraphs; no source is edited by this review.
+The ledger =.coder/ledger/1091-niger-community-builder.md= and standing/backlog/cross-country/Feature-audit contracts anchor the review.
+
+* Country grounding and tensions retained
+The complete current Niger CONTENTS1626 lines match the previously fully read670 blob (SHA256 =a25ce239aa77e8a0d9d1da9ff130eab8d8043830e74445f3f9019448cbc1df52=).
+The complete current Mali1332 lines match the fully accounted prior18 reading plus separately read exact two-paragraph qualification (SHA256 =56419d904c82721934072b230ee28553586d88a0d2ad7d79edfd87933b88d24d=).
+TODO, WAITING, LOGBOOK/history and additive1091 notes are included; this is explicit byte-identity carry, not a title-only review.
+AGENTS/CLAUDE, standing ledger, backlog and cross-country/audit guidance match the previously fully read reviewed checkout.
+
+Niger distinguishes ECVMA2011/2014 from EHCVM2018/2021, with EXTENSION in the2014 household key.
+Community readings use native grappe =v= and the redundant native =i == v= shim, then the public declared seven-level index drops =i=.
+Original Label is a real dictionary key, distinct from Code; variety CODE is distinct from Description.
+The accepted GH788/840/1086 authority and variety/visit/obs grain remain settled.
+The134 exact melted repeats are excluded and30 nonrepeat late observations4--6 retained; this patch decides no tail policy.
+The quantity-only GH1088 mask remains exact and is not extended to Price.
+
+The helper at Niger/_/niger.py:1297 says2018-19 "ships no community price file at all", while CONTENTS:1183 says "2018-19 DOES ship a cluster-grain community price file" and :1187 calls the absence claim false.
+The grappe module remains unwired here; this contradiction is evidence, not permission to invent a new absence/wiring conclusion.
+CONTENTS:12 says "each grappe is visited in exactly one vague", while :172--174 describes seasonal2018 visits; the historical design tension is retained.
+CONTENTS:1590--1591 explicitly corrects the old j-to-i schema comment: measured public outputs carry j and no i.
+
+Mali retains EACI2014 two passages with three native Unit/Poids/Prix slots, variety CODE, native i==v, and framework drop-i.
+Price is per lot and Quantity lot weight KG;129 positive-price unresolved-unit entries remain outside the existing filter, not certified valid observations.
+The lower-case labor-source correction1121 and its append note are untouched.
+Its EAC-I versus EHCVM overview and older no-grappe comment have documented tensions; the2018 grappe module and2021 region module remain distinct/unwired.
+Current Mali CONTENTS:1311--1312 guarantees zero unsupported rows and explicitly makes empty representation route/coverage dependent.
+Lines1322--1325 distinguish factory string visit/obs and object Description from covered-cache integer visit/obs, StringDtype Description and id_converted attrs, and match API/artifact stages.
+The present evidence agrees with that qualified wording; no further documentation correction is requested.
+
+* Gates before builds and source provenance
+Separate exact-source processes measured549 API hashes,39 framework fingerprints and all eight relevant Mali/Niger wave hashes BEFORE any review build.
+Exactly23 Niger API hashes move;526 others and all39 framework fingerprints are exact.
+This is an input-hash census, not a claim that23 other Niger outputs were built.
+The current Mali hash is unchanged and independently gated before using its comparator.
+
+Terminal preparation preceded decoding, unpickling and dependent APIs.
+Eleven declared held raw files and eleven actual sidecars were physically copied with MD5/SHA/size where declared/mode/mtime, distinct inode, nlink1 and nonsymlink receipts.
+Both L1 layouts were staged; the oracle has its own independently gated three CS07 sources/six layout copies.
+All406 initial physical copies remain exact at final verification.
+No unmanifested seed raw file, acquisition, DVC CLI, shared-cache write/clear/promotion, assumed-fresh path, read-gate change or manual stamp was used.
+Missing declared sidecar size stays missing.
+
+The healthy Mali comparator is a physical copy of the now-frozen actual18 current/full-four-wave155931-row cache, not the standalone40218 cache.
+Its manifest receipt, footer hash, complete four-wave coverage and unchanged18/19 expected hash were gated before any Feature call.
+Full current Mali frames/typed attrs match that authoritative18 reference, and source/copy receipts remain unchanged.
+No Mali source-cold reconstruction is claimed.
+Corrected1088 Niger references are independently receipt-gated; an old pooled Feature was never accepted merely because its count matched.
+
+* Tests and discriminating parent controls
+The candidate focused selection reports114 PASS,0 FAIL/ERROR/SKIP, under two explicit loadfile workers.
+The identical17 new tests physically copied into a private actual18 test root report12 meaningful FAIL/5 PASS/0 ERROR/SKIP.
+The failures are one country-builder discovery case, nine requested-wave isolation cases and two existing-wrong-country-cache cases; no fixture error accounts for them.
+The unchanged marked built-table tests retain their real credential marker.
+Twelve actual existing assertion bodies were additionally called per head on the gated Niger/Mali frames with no writes; that is a direct held-data control, not a claim that a normal credential-free pytest run passed those marked cases.
+The strict API-audit entry point completed successfully.
+
+* Independent source oracle and native grain
+An independent source loop uses sanctioned readers/dictionaries/ID helpers but never the candidate community helper or finalizer as its expected-row generator.
+It reconstructs all46043 readings:32352 in2011-12 and13691 in2014-15.
+Source visits have23409,34380 and21960 rows; the second2011 file has13478 exact wide repeats, a different layer from the17+117 exact melted repeats removed by standing policy.
+All30 retained late observations and76 exact quantity masks (43/32/1 by source slot) survive.
+Metadata says double; the nominal9999.9 sentinel interpretation is the existing issue/docs ruling, not new questionnaire confirmation or float32(9999).
+No tolerance, rounding, nearby-value clipping, new price mask, inferred units or row-eligibility change is introduced.
+Memory source frames, serialized native frames, native eight-level i==v, walked/normalized seven-level raw country and public frames are separate strict proof layers.
+
+* Both backends, coverage, caches and warm stages
+Both heads were exercised across default/Make, all waves, both supported singletons, each unsupported wave, unsupported combined and mixed supported/unsupported requests.
+Cold then separate-process/new-object warm was repeated for physically populated current/full-coverage roots:112 total saved matrix stages,56 per head.
+Per-call before and complete added/modified/deleted after endpoints were saved BEFORE assertions.
+Candidate both backends return46043 all,32352/13691 singletons, zero unsupported2018/2021/combined and32352 for the measured mixed request.
+Supported candidate full frames match actual18 authoritative default at matching arguments.
+
+Parent Make's full46043 wrong-wave results remain negative evidence; they are not used as supported expectations.
+Parent default unsupported public results are zero, but its legacy fallback creates an eight-level native concatenation containing both supported waves and stamps unsupported-only coverage.
+That raw layer is compared to the matching native/fallback oracle, not forced to equal the authoritative seven-level supported country frame.
+The public zero result and underlying row-wave/coverage mismatch are separate assertions.
+
+Default fresh warm and populated-default calls have zero data-root receipt changes.
+Candidate Make creates no new country parquet and leaves any pre-existing verified country parquet byte/mode/mtime exact.
+Normal hashless-wave rewrites are measured behavior: positive warm Make rewrites requested native files bytes-identically; unsupported Make writes none.
+Among84 populated copied endpoints,76 remain exact, five native files have byte/mode-preserving mtime rewrites and three native files are evicted.
+No deleted endpoint is assumed to exist on both sides.
+Actual make -n under an empty root confirms the country rule is absent, supported wave rules remain and unrelated all/panel prerequisites remain discoverable.
+
+Cold factory and covered-default empty slices are intentionally distinct: string versus integer visit/obs, object versus StringDtype Description and different id_converted presence.
+All contain zero rows; comparisons use the existing declared-empty helper or actual matching covered parent slice, never dtype normalization.
+Coverage follows the actual cold/subset/populated request history, not an imposed full-wave manifest on every cache.
+
+* Whole frames, science, Feature, CLI and warnings
+The exact artifact checker reads440 saved pickle inputs, verifies before/after receipts and rejects seven comparator mutations.
+All comparisons explicitly use check_exact=True, rtol=atol=0 with axis classes, levels, codes, order, masks, dtypes and full recursively TYPED attrs, including immutable-record _FIELDS presence/values.
+There is no attr stripping, scalar/container normalization or reliance on pandas' default float tolerances.
+The pair inventory in proof.json enumerates every control, including176 native-oracle pairs and72 normalized-country-layer pairs.
+
+Matched current Niger/Mali default and currency=None Feature frames have201974 rows, measured from46043+155931 current components.
+Niger-only Features have46043; explicit Make Feature results match actual18 default at the same currency arguments.
+Default currency and currency=None provenance remain separate.
+Food and derived controls retain239877 food_acquired,165027 food_prices,239855 food_quantities and165014 food_expenditures rows with complete matched-head values/axes/full attrs.
+Fresh-process/new-object extra calls have zero data-root changes.
+Both heads independently reproduce issue1196: food u's StringDtype missing sentinel changes from pd.NA cold to NaN warm.
+The strict dtype failure is retained; only that known u dtype comparison is separately qualified while payload, every other level/dtype, codes/masks/order and full attrs are exact.
+Stored and returned frames are never normalized.
+
+Eight actual CLI cases cover both heads/backends at supported and unsupported arguments.
+Prewrite APIs compare to parent APIs, actual postread artifacts compare to the actual unchanged writer controls and matched parent artifacts, including complete Arrow footer/schema/bytes.
+PopulationRecord-to-dict serialization, generic empty Description conversion and factory/cached-slice distinctions are explicit stage differences, not hidden exceptions.
+No current CLI mismatch was observed.
+
+All82 paired category/full-message warning multisets are literally True and collectively asserted, covering primary/populated, extra, CLI and Make-Feature controls.
+There are162 captured warning files; the capture census contains12 NullReadWarning and8 StatedVsInferredKgWarning records.
+Separate standard-log header grouping found17 CacheRebuildWarning and3 UserWarning groups; these are header groups, not unique warning event counts.
+Full warning messages/logs remain private; cross-checkout fileline equality is not claimed.
+The unmodified phase1/2 scanner has exactly two records per head, both WARN has_household_index for native-cluster Mali/Niger tables without i.
+Complete records and JSONL bytes are exact; zero FAIL/ERROR/SKIP and zero scanner data-root changes.
+No community_prices phase2 kwargs grid exists; none is invented or claimed.
+
+* Preserved limitations and handling qualifications
+The historical GLOBAL17 full selection remains5148 PASS/4459 SKIP/13 FAIL/0 ERROR: nine protected panel_ids.py utime failures and four unchanged warning-glob counterpart failures.
+Those four had nested skip/warn success but temp-prefix assertions failed before the later child-returncode assertion; they are not converted into a full-suite PASS.
+The historical docs child replaced PYTHONPATH with REPO and removed private sitecustomize; tracked docs bytes/mode/Git clean remained exact but mtime changed.
+Its network namespace was inherited, without a retroactive per-child Python-guard or PID attribution claim.
+Eight unrequested copied cluster_features wave companions retained actual16 hashes/payloads, were stale at17 and excluded from current17 claims; no restamp/rebuild hid them.
+Those old roots stay immutable and no unrestricted19 composition/other37-country result follows.
+
+Original Niger1091 author's auxiliary direct-Wave zero-write assertion stopped before its delta was recorded; that delta is still unidentified.
+Packaging overwrote the private detailed aggregate validation.json before the first author manifest, so its original final size/SHA remain unavailable; validation-reconstructed-private.json is new artifact-only evidence, not original bytes.
+Author freeze attempts/replacement and accepted standalone reviewer source-resolution/byte-proof/cache-layer qualifications remain historical and unchanged.
+No author API replay was used to explain either gap.
+
+This review's one launcher handling stop is preserved: direct invocation of non-executable run.sh exited126 before Python; the correct bash invocation completed the final receipt checker without any API replay.
+The actual18 pytest counterfactual's SystemExit1 is expected and retains its full private failure evidence.
+No raw failure log/traceback was searched or printed to classify stops; diagnostic wrappers emit only class/source location and safe aggregate facts.
+Safe source/aggregate inspection and shell setup commands are not retroactively described as socket-guarded; preparation, decoding, unpickling, API, pytest, artifact and freeze processes assert exact guard/import/config/data identity inside unshare-rn.
+Numerical/build/Make threads are one, max two explicit loadfile test workers; no broad suite/cohort/source acquisition runs occurred.
+
+* Preservation and release scope
+Final verification rechecks30072 tracked source-file endpoints across both immutable checkouts: bytes, blobs, Git/filesystem modes, mtimes/inodes, head and clean tracked status remain exact; no in-tree parquet exists.
+It rehashes5035 protected payloads from the accepted standalone Niger1437, GLOBAL18 runtime1885, documentation12 and author1701 manifests, plus their control receipts.
+That is explicit direct preservation of those manifests, not an unbounded claim to have freshly rehashed every older campaign root; their earlier accepted receipt chains remain pinned.
+All eleven held sources/sidecars and406 initial copies are unchanged, including healthy Mali source/copies and corrected references.
+Final data inventories contain152 data-root parquets:88 hashless native wave,45 current-hash country,12 stamped wave and7 deliberately negative parent-Make hashless country artifacts.
+There are274 private parquets total:152 data-root,104 synthetic pytest-temp and18 writer-oracle/CLI frame artifacts; no blanket zero-private-parquet claim is made.
+Current-hash country is a hash classification, not a claim that the intentionally wrong parent fallback row-wave contents are healthy.
+The guard recorded132 handled existing-directory probes and zero unexpected write denials or outbound IP attempts in guarded processes.
+Only the two exact ignored DVC metadata links resolving inside this private root are checkout write exceptions.
+
+Full frames, IDs, source rows, warning messages, traces and detailed receipts stay private.
+Only safe-exports/REVIEW.org, verdict.json, proof.json, REPRODUCE.md and checker-sources.json are allowlisted.
+The final immutable manifest pins all payloads/checker code, while FINAL-READY records exclusions, source pins and zero consumers before release.
+No product edit, Git/ref mutation, GitHub write, integration merge or public issue closure is performed.
+
+Sue

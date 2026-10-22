@@ -1134,3 +1134,12 @@ All members/source-after/access modes/durable launcher/fsync verified; raw sourc
 No root process remains running; all three worker slots active. Goal active, no public merge or issue closure.
 
 Sue
+
+* Tanzania leaf and bounded19 accepted -- 2026-10-22 03:43 UTC
+
+Root read actual review/checker sources and independently verified all2426 Tanzania and2842 combined19 manifest entries, safe exports/JUnits/hash/scanner controls. Sourcefa and2566 are GitHub-published and independently refetched exact; no public PR was merged. Tanzania PR preparation remains pending.
+Proofs: =1091-Tanzania-independent/= and =integration/niger-nineteen-review/= under the ISA report directory. Tanzania warning text/category limitation, original author aggregate/link gaps, empty/serialization distinctions and old17/1196 limits stay explicit. No unrestricted19 full-suite result follows.
+mali_lane now writes prepared Malawi218; niger_lane independently reviews BF1119. Uganda1198 final review/seal remains pending; new849 writer is prepared but unassigned until root acceptance. Preserve matched-parent support dtype and Make mode+mtime qualifications; the2018 slot-label concern is already adjudicated in current country notes and was independently reproduced.
+All19 existing implementation PRs refetched OPEN/unmerged/exact heads at03:32UTC. Ethiopia820 static triage remains tierC/W1-W3, no implementation.
+
+Sue
