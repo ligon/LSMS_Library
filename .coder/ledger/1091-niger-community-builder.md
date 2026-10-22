@@ -109,5 +109,51 @@ freeze; substantive unexpected behavior goes back to root before expansion.
 
 ## Phase 3: Verification
 
-Pending actual baseline-negative tests, candidate hash census and scoped
-source-backed cold/warm/Feature/CLI/scanner validation.
+Author validation is complete at runtime/test snapshot
+`6be6576607f1862b603d123acfb74ace4026fd3f`; independent review is pending.
+The full report and aggregate validation live at
+`slurm_logs/isa_backlog_2026-10-21/Niger/1091/`.
+
+- OK (anchored on sections 2/5): only the duplicate country orchestration was
+  deleted. Original Make105-115 alone is removed; the independent wave rule,
+  its prerequisites, other Make bytes, both native builders and framework
+  remain exact. No new transform or selector reinvents existing machinery.
+- OK (anchored on sections 3/4): 11 held sources, 11 sidecars and 44 physical
+  private copies reached terminal MD5/SHA/size/mode/mtime gates before API
+  use. All 46,043 source readings, 30 late obs slots and 76 exact GH1088
+  quantity masks remain intact, with no grain/ID/eligibility/unit changes.
+- OK (anchored on section 4): the actual prebuild census is 23 changed Niger
+  API hashes, 526 unchanged others and 39 unchanged framework fingerprints
+  out of 549/39, not merely the earlier prediction. No other corpus build
+  was implied or performed.
+- OK (anchored on sections 2/4/5): 97 existing focused and 17 new tests pass
+  (114, zero skips). The same new file gives 12 meaningful failures and five
+  passes against the actual parent, zero fixture errors. An initial omitted
+  fixture Waves declaration and its stopped/error run remain excluded and
+  preserved; correcting that fixture did not weaken assertions. Twelve
+  real built-data assertions also pass with nonempty guards retained.
+- OK (anchored on section 4): twelve normal cold, twelve fresh-process warm
+  and twelve populated requests measure the complete both-backend subset
+  matrix. Seventy-two strict matched-stage/full typed-attrs comparisons,
+  72 explicit axis-internal comparisons and three full Arrow footer/schema/
+  artifact-byte controls pass at zero numeric tolerance. Healthy Mali40218,
+  Feature86261, food239877 and its three derived tables remain exact at
+  matched parent stages. All three actual scanner records match individually;
+  community_prices has no phase-2 kwargs grid.
+- OK (anchored on section 4): default warm receipts have zero changes. Make
+  naturally rewrites two/one/zero native wave files for all/singleton/absent
+  requests, with exact bytes/size/modes and changed mtimes, no new country
+  cache. Supported Make full attrs match authoritative parent default attrs.
+  Existing empty-state, native serialization and CLI PopulationRecord-to-dict
+  differences remain explicit strict findings, not normalized comparisons.
+  The food u cold/warm dtype residual stays with GH1196.
+- LIMIT (anchored on section 4): an auxiliary direct-Wave collector asserted
+  zero changes before persisting its receipts and failed; the original delta
+  was lost and remains unidentified. Later per-call and same-collector
+  observations show zero changes/full native equality, but cannot explain
+  that original delta. It is separate from the normal validated matrix.
+  No further auxiliary repeats were run to obtain zero writes.
+- OK (anchored on section 6): Tanzania remains residual and Mali is
+  independently handled. No multi-country completion, composition, GitHub
+  write or final independent PASS is claimed. Final freeze receipts prove
+  source/reference preservation, runtime/test equivalence and quiescence.
