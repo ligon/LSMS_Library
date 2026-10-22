@@ -66,6 +66,8 @@ def native_crop(tmp_path, monkeypatch):
             'production_obs': ['slot:1', 'slot:2', 'slot:3'],
             'Quantity': [2.5, 2.5, 0.0], 'KgFactor': [1.0, 1.0, 1.0],
             'Quantity_sold': [1.0, 1.0, 0.0], 'Value_sold': [9.0, 9.0, 0.0],
+            'harvest_month': pd.array([6, 6, None], dtype='Int64'),
+            'intercropped': pd.array([False, False, None], dtype='boolean'),
             'Unit_sold': ['Kg', 'Kg', None],
         }).set_index(NATIVE_INDEX)
         frame.attrs['transport_marker'] = {'flag': True, 'integer': 1}
@@ -123,6 +125,9 @@ def test_supported_cold_subset_keeps_native_observations_and_audit(
     assert out.index.get_level_values('production_obs').tolist() == ['slot:1', 'slot:2', 'slot:3']
     assert out.Quantity.tolist() == [2.5, 2.5, 0.0]
     assert out.KgFactor.tolist() == [1.0, 1.0, 1.0]
+    assert out.harvest_month.iloc[:2].tolist() == [6, 6]
+    assert out.intercropped.iloc[:2].tolist() == [False, False]
+    assert pd.isna(out.harvest_month.iloc[2]) and pd.isna(out.intercropped.iloc[2])
     assert out.attrs['id_converted'] is True
     assert out.attrs['transport_marker'] == {'flag': True, 'integer': 1}
     assert [r['wave'] for r in C.grain_reports('Uganda', 'crop_production')] == [SUPPORTED]
