@@ -124,6 +124,17 @@ There is no community_prices phase-2 kwargs grid, so no additional grid coverage
 
 * Auxiliary stop and limits
 
+The first freeze packaging step copied safe exports into the private root and replaced its detailed aggregate =validation.json= before creating that freeze's payload manifest.
+The replacement safe file is retained unchanged; the original final aggregate's exact size and SHA were not recorded.
+An earlier listing recorded 32,213 bytes before later metadata enrichment and cannot establish the final overwritten size.
+The complete first READY/proof/manifest/log are preserved, and =packaging-incident-private.json= records the mistake.
+All original frames, warnings, logs, per-probe JSON and receipts remain unchanged.
+A new =validation-reconstructed-private.json= reconstructs aggregate detail only from those existing artifacts; it is explicitly not the original file or a byte-identical recovery.
+No API, source read or test was repeated for that reconstruction.
+Corrected exports live only in =safe-exports/=, and the corrected freeze inventories every change against the first freeze.
+It retains prior source byte-hash receipts and checks source-copy metadata identity without rereading raw sources.
+Independent review must use the immutable per-probe evidence, distinguish both freeze attempts and assess this qualification; see =INDEPENDENT-REVIEW.md=.
+
 An auxiliary direct-Wave/Mali collector asserted zero cache changes before persisting its endpoint receipts, and that assertion failed.
 The original exact changed-entry delta was not retained and remains unidentified.
 Its script/log and full frame outputs are preserved privately; later zero-write observations cannot establish its cause or reconstruct that lost delta.

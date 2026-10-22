@@ -23,5 +23,14 @@ Existing Niger food cold/warm u StringDtype behavior belongs to
 or adjudicated here. The auxiliary direct-Wave collector's original lost
 cache delta remains a validation limit, explicitly preserved in REPORT.org.
 
+The private detailed aggregate validation.json was replaced by the safe export
+during the first freeze, before its manifest. Its final original size/SHA were
+not recorded. Preserve both freeze attempts and the retained replacement;
+validation-reconstructed-private.json is a separate reconstruction from
+unchanged per-probe artifacts, not the original bytes. Independent acceptance
+must assess that packaging qualification as well as the unidentified auxiliary
+delta; see INDEPENDENT-REVIEW.md. No API/source/test replay was used to repair
+the aggregate packaging.
+
 This is dispatcher text, conditional on independent acceptance; no issue or
 GitHub write was made. Sue.

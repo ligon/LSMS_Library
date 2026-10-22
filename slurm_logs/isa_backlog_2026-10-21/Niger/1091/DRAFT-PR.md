@@ -16,6 +16,10 @@ complete Arrow artifact comparisons, food/derived/Feature and healthy Mali
 controls pass. All three scoped scanner records exactly match the parent.
 Detailed private evidence retains an auxiliary collector's unrecorded initial
 cache delta as an explicit limit; subsequent observations do not explain it.
+The first freeze also replaced its private detailed aggregate with the safe
+export. Original per-probe evidence is unchanged; both freeze attempts and a
+separately named reconstruction are retained, without an original-byte claim.
+Independent review must assess both qualifications.
 
 Cache cost was measured before builds: 23 Niger API hashes change, 526 other
 API hashes and 39 framework fingerprints stay exact. Default warm reads make

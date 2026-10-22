@@ -33,8 +33,53 @@
     "proof.json",
     "REPRODUCE.sh",
     "DRAFT-RESIDUAL.md",
-    "DRAFT-PR.md"
+    "DRAFT-PR.md",
+    "INDEPENDENT-REVIEW.md"
   ],
   "original_auxiliary_delta": "unidentified; no zero-write or causal inference from later repeats",
-  "signed": "Sue (GPT-6)"
+  "signed": "Sue (GPT-6)",
+  "packaging_incident": {
+    "original_private_detailed_aggregate_replaced_by_safe_export_before_first_manifest": true,
+    "original_final_size_SHA_available": false,
+    "earlier_pre_enrichment_size": 32213,
+    "first_freeze_control_receipts": {
+      "READY.json": {
+        "sha256": "1e69e5a034479c4969b8fc0b488a37f465fcee2fb9dc40ccba7391354747c4c5",
+        "size": 848,
+        "mtime_ns": 1792629406433499520,
+        "copy": "attempt1-freeze-private/READY.json"
+      },
+      "freeze-proof.json": {
+        "sha256": "b0ec1d0782242dea757e20158e5777bab96eb5f3a4c099291f3064dd5c35433b",
+        "size": 4640,
+        "mtime_ns": 1792629403090479214,
+        "copy": "attempt1-freeze-private/freeze-proof.json"
+      },
+      "payload-manifest-private.json": {
+        "sha256": "11e775f9ea8c670d9d881e6972f385b28e865cd95c0d5c04d9ac937d9ff364b9",
+        "size": 411865,
+        "mtime_ns": 1792629406432499514,
+        "copy": "attempt1-freeze-private/payload-manifest-private.json"
+      },
+      "freeze-final-private.log": {
+        "sha256": "1e69e5a034479c4969b8fc0b488a37f465fcee2fb9dc40ccba7391354747c4c5",
+        "size": 848,
+        "mtime_ns": 1792629406433499520,
+        "copy": "attempt1-freeze-private/freeze-final-private.log"
+      },
+      "replacement_safe_validation": {
+        "sha256": "dc9c20ef67545902a4b0f71edbe4059d520492bc37543d59166746b566b2856e",
+        "size": 21322,
+        "mtime_ns": 1792629403090479214
+      }
+    },
+    "replacement_validation_retained_unchanged": true,
+    "reconstruction": "validation-reconstructed-private.json",
+    "reconstruction_is_not_original_bytes": true,
+    "underlying_original_probe_outputs_unchanged": true,
+    "no_API_source_or_test_replay": true,
+    "first_to_final_inventory": "packaging-change-inventory-private.json",
+    "safe_export_directory": "safe-exports",
+    "independent_review_must_assess": true
+  }
 }
