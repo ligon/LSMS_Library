@@ -1,0 +1,11 @@
+{
+  "author_READY_sha256": "681cf9b6995ffa428c5a411183af264a726a0c3baccdec968ada2df2359c3ca3",
+  "author_manifest_entries": 815,
+  "author_manifest_sha256": "b60023a579e8850a1ba2d1d2a002ae2871d01be872c25f8708f8dc6198cb234f",
+  "final_source": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "runtime_tests": "299fb8675e785fd392b1259ab1f4fb535eb69c34",
+  "actual_parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "root_verified_author_freeze_only": true,
+  "independent_review_assigned": false,
+  "independent_review_verdict": null
+}

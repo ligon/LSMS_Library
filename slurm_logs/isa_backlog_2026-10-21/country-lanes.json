@@ -210,7 +210,7 @@
         "base_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
         "control": "/local/job40255479/worktrees/isa-Malawi-218-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/218",
-        "status": "Writer source/tests and normal Default/Feature checks pass; final CLI/footer/protection/seal pending; no independent verdict",
+        "status": "Author frozen atd29; root verified815payloads/source boundary; independent review prepared/unassigned, no acceptance or PR",
         "boundary": "Remove only two raw null derived registrations; preserve automatic Country/Feature food-derived methods and all output semantics. Other218/nonISA/shared cleanup remains residual.",
         "independence": "Starts releasef8, independent of unmerged1109/1111 plot-input patches; normal future composition still required.",
         "root_static_prior_art": "CLAUDE698,Country.data_scheme/_materialization_entry/_FOOD_DERIVED,Feature source discovery and Malawi retirement note1653ff personally read; static raw-key search finds only Malawi2.",
@@ -222,7 +222,23 @@
         "candidate_tests": "51PASS0SKIP;parentpolicy1FAIL/publiccontrol1PASS",
         "actual_prebuild": "26Malawi/523otherAPI/39frameworkexact;all97Malawi wave hashes unchanged",
         "scanner": "205records/head,orderedrawandfullmultisetexact:200WARN/3PASS/2preexistingFAIL/0ERROR",
-        "retained_residuals": "Both-head Make legacy food builder RuntimeError; invalid wave evicts five native companions; no repair in218"
+        "retained_residuals": "Both-head Make legacy food builder RuntimeError; invalid wave evicts five native companions; no repair in218",
+        "source_head": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+        "runtime_head": "299fb8675e785fd392b1259ab1f4fb535eb69c34",
+        "author_manifest_entries": 815,
+        "author_manifest_sha256": "b60023a579e8850a1ba2d1d2a002ae2871d01be872c25f8708f8dc6198cb234f",
+        "author_READY_sha256": "681cf9b6995ffa428c5a411183af264a726a0c3baccdec968ada2df2359c3ca3",
+        "author_safe_exports": "218-Malawi-author/",
+        "author_root_verification": "218-Malawi-author/ROOT-PREPARATION-VERIFICATION.json",
+        "independent_review": {
+          "path": "/local/job40255479/worktrees/isa-review-Malawi-218",
+          "control": "/local/job40255479/worktrees/isa-review-Malawi-218-base",
+          "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Malawi-218",
+          "brief": "queued-Malawi-218-review/NEXT-REVIEW-BRIEF.md",
+          "assigned": false,
+          "tests_builds": 0,
+          "verdict": null
+        }
       }
     },
     "Mali": {
@@ -761,7 +777,7 @@
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-fix",
         "brief": "queued-Uganda-849/NEXT-WRITER-BRIEF.md",
         "writer_assigned": true,
-        "edits_tests_builds": "Bothbackendcold133761rows atparent085/candidate7a8; private factor oracle and downstream verification active; no final verdict",
+        "edits_tests_builds": "416focusedPASS/10genuineskips;actualparent20FAIL4PASS;normal bothbackendcold/source-oracle/Feature/CLI/scanner checks pass, final subset/warnings/freeze active; no independent verdict",
         "gate": "Root1198 runtime+doc acceptance completed",
         "boundary": "Exactly12 reported-factor map entries at retained native grain, preserving existing numeric coercion/nonpositive normalization and all helper/screen/science logic; raw source values are separate private oracles.",
         "owner": "review_nigeria_1034",
@@ -774,7 +790,10 @@
         "execution_qualification": "Two two-worker data-free cohorts briefly overlapped:up to4workers; retained, no replay; subsequent cohorts max2total",
         "inventory_stop": "Initial empty-inventory check encountered already-gated healthy Niger caches; original retained; unique metadata retry checks Uganda-empty only",
         "runtime_head": "7a8fd22492255cc2c4d020b7a16f99249f588977",
-        "source_oracle_stop": "Original categorical lookup cwd stop retained; corrected expectation reads each actual wave directory, no production/helper change"
+        "source_oracle_stop": "Original categorical lookup cwd stop retained; corrected expectation reads each actual wave directory, no production/helper change",
+        "downstream_author_measurement": "Native-grain harvest42026694.99297963kg vsparent29095413.407893993;delta12931281.585085638. Real parcel-yield14022to14520,+498keys/7335shared values changed; area unchanged. Unreviewed author evidence, not historical42.035M projection.",
+        "warm_qualification": "Default0writes;bothMakeheads17byte-identicalpaths0600to0644+mtime inTHISrun, opposite prior1198 observation, no provenance inference",
+        "subset_expected_operand_qualification": "First stopped parent supported call saved actual/endpoints; filtered expected existed only in memory. Artifact-only reconstructed expectation uniquely named, not original/replayed API"
       },
       "documentation_qualification": {
         "accepted_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
@@ -994,17 +1013,20 @@
     },
     "1196": {
       "issue": 1196,
-      "status": "Prepared/unassigned read-only diagnosis; no experiments/verdict or implementation",
+      "status": "Assigned read-only diagnosis to released Malawi author; grounding/operand shortlist, no cause verdict",
       "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
       "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
       "brief": "queued-1196-index-diagnosis/NEXT-DIAGNOSIS-BRIEF.md",
       "ledger": ".coder/ledger/1196-index-roundtrip.md",
       "root_prepared_exact_ignored_metadata": true,
-      "assigned": false,
-      "scope": "Distinct Niger food_acquired MultiIndex/u and Uganda cluster_features Index/v cold-warm dtype observations; shared cause unestablished; source/cause diagnosis only",
+      "assigned": true,
+      "scope": "Niger food_acquired u and Uganda cluster_features v index LEVEL observations; full-frame classes checked separately, common cause unproved",
       "imports_tests_decode_APIs": 0,
-      "product_changes": 0
+      "product_changes": 0,
+      "owner": "mali_lane",
+      "clarification": "queued-1196-index-diagnosis/ROOT-AXIS-LEVEL-CLARIFICATION.json",
+      "source_of_correction": "Frozen review-Uganda-1198/dtype-details.py:6-7 reports extracted level class"
     }
   },
   "integration": {
@@ -1369,14 +1391,15 @@
       "filesystem_origin_published": true,
       "GitHub_published": false,
       "review_assigned": true,
-      "tests_builds": "Assigned; own prebuild gates precede data/tests",
+      "tests_builds": "85candidatePASS;actual19controls20FAIL7PASS;candidate matrix/tail and152native/raw strictpairs pass, parenttail/finalaccounting ongoing",
       "verdict": null,
       "brief": "queued-twenty/NEXT-REVIEW-BRIEF.md",
       "healthy_comparator_boundary": "Current19/fullcoverage Mali155931 and Niger46043; never leaf Mali40218 or an old pooled Feature",
-      "status": "Assigned bounded Tanzania increment review on actual19; no runtime verdict yet",
+      "status": "Active bounded review; no terminal release/root acceptance/GitHub publication",
       "reviewer": "niger_lane",
       "actual_prebuild": "25Tanzania/524otherAPI/39frameworkexact;14relevantwavecells,6Tanzania changes",
-      "execution_qualification": "Dependent preparation gates launched before census completion stopped before copies/decode/API; originals retained; resumed only never-started preparation after terminal0 scope receipt"
+      "execution_qualification": "Dependent preparation gates launched before census completion stopped before copies/decode/API; originals retained; resumed only never-started preparation after terminal0 scope receipt",
+      "warning_evidence_qualification": "Populated child logs backend-only names overwrote earlier per-key logs. Unique frames/endpoints/aggregate/structured main warnings preserved; original child log bytes/history unavailable; no complete populated-child-warning equality or API replay."
     }
   }
 }

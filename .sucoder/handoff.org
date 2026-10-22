@@ -1193,3 +1193,13 @@ Sue
 Read-only1196 diagnosis checkout prepared atreleasef8; exact private metadata target and initial git-tracked ledger/brief recorded. UNASSIGNED:zero imports/tests/decodes/APIs/product changes. Wait for a released worker. Both observed axis classes need separate causal proof; no shared cause or production normalization assumed. Root owns any later implementation boundary.
 
 Sue
+
+* Malawi218 freeze and review preparation -- 2026-10-22
+
+Author d29a56783d08a8a647e2622150a4ee5fbdd7246a/runtime299fb8675e785fd392b1259ab1f4fb535eb69c34 vsactualf8 frozen; root independently rehashed815payloads and seven-export allowlist. This is author freeze verification, NOT independent acceptance.
+Different-reviewer candidate/base worktrees and exact private DVCtmp targets ready atreview-Malawi-218; AUTHOR-FROZEN-PINS.json and full NEXT brief prepared, UNASSIGNED.
+Released mali_lane is assigned1196 read-only diagnosis. Root corrected an overstated full-frame Index distinction: frozen dtype-details.py:6-7 extracts thevLEVEL. Live issue body corrected/readback; original468dledger and original private brief preserved, addendum tracked. No old evidence/source mutation or cause inference.
+Ug849 writer416PASS/10skip, source/Feature/CLI/scanner/90warmchecks pass; new native-grain total42026694.99297963kg is unreviewed author evidence, not the old unsafe projection. Retain opposite Make mode direction and missing original in-memory subset expected operand.
+Bounded20 candidate85PASS/actual19newcontrols20FAIL7PASS; final parenttail/accounting pending. Populated backend-only child logs overwrote earlier per-key logs; originals unavailable, unique fullframes/endpoints/structured main warnings preserved, no replay/fullchild-warning claim.
+
+Sue

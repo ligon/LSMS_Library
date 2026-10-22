@@ -12,18 +12,18 @@ The 37 partial records carry exact residual titles and bodies in =triage.json=; 
 =summary.json= records the tier and dependency ordering; unresolved enhancement/acquisition choices are reported for the maintainer.
 Existing rulings in issues such as #851, #894 and #1134 are binding implementation context, not unanswered questions to ask again.
 
-* Current checkpoint -- 2026-10-22 04:34 UTC
+* Current checkpoint -- 2026-10-22
 
-Twenty-two independently reviewed implementation PRs are OPEN, unmerged and at their expected heads in =public-pr-checkpoint-twentytwo.json=.
+At04:34UTC, twenty-two independently reviewed implementation PRs were OPEN, unmerged and at their expected heads in =public-pr-checkpoint-twentytwo.json=.
 All eight countries have reviewed changes; shared fixes have their own coordinated branches.
 Human merge remains the next public landing step.
 The newest PRs are Tanzania1201, Uganda1202 and Burkina Faso1203; all three exact-head CI runs passed unit tests and Windows smoke, with six other jobs including data-tests skipped.
 The held-source reviews are separate evidence, not credentialed CI data-suite passes.
 
-Three workers remain active in separate checkouts: Malawi218 cleanup, Uganda849 reported-factor wiring, and the bounded Tanzania combined-source review.
+Three workers remain active in separate checkouts:1196dtype diagnosis, Uganda849 reported-factor wiring, and the bounded Tanzania combined-source review. Malawi218 is frozen for a different independent reviewer; its review checkout is prepared/unassigned.
 The Uganda849 writer has416focused passes/10genuine skips and retains133761observations; final subset/warning/protection checks and independent review remain.
 Malawi218 preserves two existing scanner FAILs (with200WARN/3PASS); it does not claim a green scanner or repair the pre-existing Make food builder.
-The next1196 dtype diagnosis is prepared but UNASSIGNED; its initial ledger and exact release checkout involve no product change or runtime verdict.
+The1196dtype diagnosis is now assigned. Its initial ledger and exact release checkout involve no product change or cause verdict. The original index_class field describes an extracted level; a root tracking overstatement about whole-frame class is corrected in the ledger/issue/addendum, with old pins preserved.
 
 Accepted bounded combined source19 is =2566a3e490c0aefe03ab31d538d7d04e9b77c77e= against actual18 =471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3=.
 Source20 =de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2= is under review against actual19; it uses current held-warm Mali155931/Niger46043, not leaf Mali40218.
@@ -52,7 +52,7 @@ PR [[https://github.com/ligon/LSMS_Library/pull/1182][1182]] at =780f67986= adds
 |---------+-----------------------------|
 | Nigeria | Reviewed PRs1172(W3units),1178(later food-unit mappings, stacked1172),1192(community units). All OPEN; source authority and qualifier residuals stay separate. |
 | Uganda | Reviewed PRs1173(derived-output/prerequisite authority),1191(derived-method tests),1202(native production_obs).1202 preserves133761records; source and documentary reviews PASS.849's12factor mappings are active on the actual085parent, with no independent final verdict. |
-| Malawi | Reviewed1175 preserves recorded organic quantities;1193 retains source-covered kg declarations and stacks1175.218 removes only two obsolete raw derived registrations; writer final checks active. Existing scanner/Make/request caveats remain. |
+| Malawi | Reviewed1175 preserves recorded organic quantities;1193 retains source-covered kg declarations and stacks1175.218 removes only two obsolete raw derived registrations; author frozen atd29/815verifiedpayloads, independent review prepared/unassigned. Existing scanner/Make/request caveats remain. |
 | Niger | Reviewed1176 quantity sentinel and1200 community builder retirement, stacked1176. Bothbackend requested-wave proof preserves46043readings/30late/76masks. Bounded19 composition independently accepted. |
 | Burkina_Faso | Reviewed1189 native input slots,1194 parcel coordinates,1203 two seed-crop labels(stacked1189).1203 preserves22877lines/602qualifiedunknowns, changes4430labels only; broader1119/1187/1188 remain OPEN. |
 | Ethiopia | Reviewed1181 missing input-unit identities retains180900rows. Nutrition1171 and source/purchase/grain residuals remain separate.820 section12 is tierC design, not an automatically assigned feature addition. |
