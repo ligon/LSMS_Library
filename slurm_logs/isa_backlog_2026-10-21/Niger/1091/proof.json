@@ -1,0 +1,40 @@
+{
+  "status": "AUTHOR_BOUNDARY_VERIFIED_PENDING_INDEPENDENT_REVIEW",
+  "runtime_test_snapshot": "6be6576607f1862b603d123acfb74ace4026fd3f",
+  "baseline": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "tests_Git_tree_identical_to_runtime_snapshot": true,
+  "all_runtime_blobs_and_modes_identical_to_runtime_snapshot_except_documentation": true,
+  "only_package_diff_from_runtime_snapshot": [
+    "lsms_library/countries/Niger/_/CONTENTS.org"
+  ],
+  "production_boundary": "country script deleted; only original Make105-115 removed; all other Make bytes exact",
+  "prebuild_census_Make_SHA256_still_exact": true,
+  "source_receipts_unchanged": {
+    "held_sources": 11,
+    "sidecars": 11,
+    "physical_copies": 44
+  },
+  "parent_reference_copies_unchanged": 137,
+  "parent_feature_cache_physical_copy_exact": true,
+  "Mali_source_and_copy_bytes_mode_mtime_unchanged": true,
+  "old_Niger_diagnosis_manifest_files_rehashed_exact": 690,
+  "old_Niger_source_tracked_files_bytes_modes_exact": 14885,
+  "old_Niger_source_head_clean": true,
+  "protected_queued_context_and_Uganda849_1078_READY_receipts_exact": true,
+  "protected_849_1078_full_payload_rehash_claimed": false,
+  "source_guard_events": {
+    "mkdir-existing": 52
+  },
+  "denied_nonexisting_writes": 0,
+  "network_attempts": 0,
+  "safe_exports": [
+    "REPORT.org",
+    "validation.json",
+    "proof.json",
+    "REPRODUCE.sh",
+    "DRAFT-RESIDUAL.md",
+    "DRAFT-PR.md"
+  ],
+  "original_auxiliary_delta": "unidentified; no zero-write or causal inference from later repeats",
+  "signed": "Sue (GPT-6)"
+}

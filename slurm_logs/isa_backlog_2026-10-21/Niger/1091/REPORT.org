@@ -1,0 +1,141 @@
+#+TITLE: GH1091 Niger community-price country builder retirement
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Status and exact boundary
+
+AUTHOR_READY_PENDING_INDEPENDENT_REVIEW; this is author validation, not an independent PASS.
+The runtime/test snapshot is =6be6576607f1862b603d123acfb74ace4026fd3f=, based on reviewed GH1088 =d602f8d63520e521a730f85551b366c4d45d9a35=.
+The task ledger was committed first at =e4aed55125f1aeec553d3203f9a373c87f71fe26=; both ordinary commits printed =SUCODER: published=.
+The final documentation/ledger descendant preserves all runtime/test blobs and modes.
+
+Production changes are deletion of Niger's 45-line =_/community_prices.py= concatenator and removal of exactly original =_/Makefile:105-115=.
+That block contained the obsolete coverage comment, sole-use =COMMUNITY_PRICE_WAVES= variable, explicit country target and recipe.
+The independent wave pattern, its =niger.py= and =categorical_mapping.org= prerequisites, shared variables, all other rules, both wave scripts, native helpers, source mappings, masks, schemas and framework remain byte-exact.
+No replacement concatenator, selector patch, source transform, grain decision or dependency was added.
+The existing no-country-builder route now applies under both backends.
+
+This implements only the approved Niger part of GH1091.
+Mali is independently handled and Tanzania remains a separate country retirement; this report does not close the multi-country issue or compose other fixes.
+Read-only PR1176 metadata confirmed the stack parent is =fix/1088-niger-quantity-sentinel-20261021= at the reviewed parent, not =development=.
+No GitHub writes or public merge were performed.
+
+* Country facts and retained contradictions
+
+The complete 1559-line parent CONTENTS reading was carried only after exact blob verification, =ad87b4f92204a53c4ccf49348af623d5b5d904dc=, including TODO/WAITING/LOGBOOK entries.
+The ledger records the existing GH788 framework authority and accepted GH840/PR1086 native variety/visit/obs representation.
+ECVMA 2011/2014 and EHCVM 2018/2021 have different designs: EHCVM household identity uses =(grappe, menage)= and one vague per grappe, while 2014 ECVMA households require =EXTENSION=.
+Community =v= is native grappe, with no household join.
+The unit dictionary is keyed by =Original Label=, not Code; variety retains source CODE and Description retains the label.
+Native wave frames have a redundant =i == v= shim, which framework normalization removes.
+The accepted duplicate policy removes 134 exact melted repeats while retaining 30 nonrepeat second-entry slots as obs4-6, 15 in each wired wave.
+
+The removed Make comment said "only the two ECVMA waves have an EA-level community price module".
+CONTENTS:1185 says the old absence claim "is false for 2018-19", whereas the untouched helper still says 2018 "ships no community price file at all".
+The existing grappe module remains unwired; this retirement makes no new absence verdict or EHCVM coverage change.
+The old schema j-to-i comment conflicts with the measured j-bearing, no-i public index; the native i==v shim explains the actual route.
+The older open-decision wording about the nonrepeat tail does not reopen the accepted representation.
+A dated additive CONTENTS note records these contradictions and layer consequences; unrelated helper/schema comments are preserved.
+
+* Isolation and source gates
+
+The source checkout and all data/config/temp/cache paths were asserted by realpath in every survey process.
+The mounted image interpreter, =PYTHONPATH=, cwd and =LSMS_COUNTRIES_ROOT= all named this checkout.
+Every data probe ran under =unshare -rn=, the active socket/write guard, private DVC/XDG/config/temp paths and one numeric/build/Make thread.
+At most two loadfile pytest workers were active in total.
+Only the exact root-prepared ignored DVC tmp target was permitted as a checkout metadata exception; an exclusive create of existing frozen metadata produced FileExistsError rather than a write.
+No acquisition, DVC CLI, shared-cache clear/write/promotion, cache bypass, manual stamp, source rewrite or in-tree raw/parquet payload was used.
+
+Preparation reached TERMINAL_SUCCESS before decoding or dependent API probes: 11 held source files, 11 DVC sidecars and 44 physical private copies.
+Receipts include declared MD5, actual MD5/SHA256/size/mode/mtime, distinct inode, nonsymlink and nlink1 checks; both held DVC layouts were searched.
+The copied sources cover three community modules, two food modules and six sample prerequisites.
+Healthy Mali's 40,218-row comparator was copied only after genuine current-hash and full-coverage checks.
+The 137 immutable parent reference frames and two CLI artifacts were physically copied after their frozen manifest gates.
+All frames, IDs, exact warnings, footer payloads and detailed logs remain private.
+
+* Cache scope measured before rebuilding
+
+Separate exact-source processes enumerated all 549 API hashes and all 39 framework fingerprints before any survey or synthetic source build.
+Exactly 23 Niger hashes changed; 526 other API hashes and all 39 framework fingerprints were identical, with no null hashes.
+This cost comes from existing shared country build-input hashing.
+It implies a Niger re-warm, not 23 demonstrated physical table builds; other-country outputs were not broadly rebuilt.
+The final Make SHA and production blobs remain those of this prebuild census.
+No framework exclusion, registry or schema lever was changed.
+
+* Discriminating tests and source-backed matrix
+
+The new 17-case file uses actual copied Niger selectors/Make rules and two distinct real script-written native wave outputs, without fake source absence or Path.exists patches.
+It covers real fresh-empty-root make -n discovery, both backends and six request sets, wrong existing country output, and required Price/Quantity enforcement.
+The same copied tests against the actual parent produced 12 meaningful failures and five passes, with zero fixture errors or skips.
+The candidate's 97 existing focused cases plus 17 new cases all passed: 114 passes, zero skips.
+Twelve existing built-data assertions were also invoked directly against actually gated data with their nonempty guards intact, without pretending credentials existed or bypassing pytest markers.
+
+An initial fixture omitted the native module's explicit Waves declaration; that excluded attempt is preserved with its errors and stop.
+The corrected fixture declares the four actual waves and retains all assertions.
+No product change or weaker expected frame was introduced to make it pass.
+
+| Backend | Request | Cold rows | Fresh-process warm rows | Populated rows |
+|---------+---------+-----------+-------------------------+----------------|
+| Default | All | 46043 | 46043 | 46043 |
+| Make | All | 46043 | 46043 | 46043 |
+| Both | 2011-12 | 32352 | 32352 | 32352 |
+| Both | 2014-15 | 13691 | 13691 | 13691 |
+| Both | 2018-19 | 0 | 0 | 0 |
+| Both | 2021-22 | 0 | 0 | 0 |
+| Both | 2018-19 and 2021-22 | 0 | 0 | 0 |
+
+The matrix used 12 independent normal cold roots, 12 fresh-process/new-object warm probes and 12 populated-root probes.
+Country-builder discovery was false throughout.
+The old parent Make singleton/unsupported route returned both wired waves; those wrong outputs are deliberately corrected rather than treated as references.
+All 46,043 source readings, all 30 obs4-6 readings, all prices and the exact 76 GH1088 quantity masks remain intact.
+The three wired 2014 source quantity columns contain 43, 32 and one exact nominal 9999.9 encodings; none leak as quantities.
+All source-backed old payload, keys, uniqueness, null masks, dtypes, index/column metadata and full recursively typed attrs were compared without normalization.
+
+* Exact layers, attrs and warm writes
+
+Seventy-two strict matched-stage frame comparisons and 72 explicit axis-internal comparisons passed with =check_exact=True= and =rtol=atol=0=.
+They cover native, walked, normalized, raw country, public, populated, food/derived, Feature, CLI prewrite and postread artifact layers, including unused MultiIndex levels, codes and dtypes.
+All three matched CLI artifacts have exact full Arrow footers, schema metadata and complete file bytes, not only pandas payload equality.
+Default and currency=None Feature controls were independently argument-matched: Niger plus healthy Mali has 86,261 rows, and corrected Make Niger-only has 46,043.
+Food has 239,877 rows; prices, quantities and expenditures retain 165,027, 239,855 and 165,014 rows respectively, with exact matched-stage parent payload and attrs.
+
+Default fresh warm and populated calls changed no cache bytes, modes or mtimes.
+Make fresh warm naturally rewrote two native wave parquets for all waves, one for each supported singleton and none for unsupported requests.
+Those rewrites have identical bytes, size and mode, with changed mtimes, and created no country var cache.
+On populated roots Make left the existing verified country cache untouched and used the requested wave route.
+The native wave footers remain hashless/without coverage, as designed for script outputs; the normal default country cache has the exact candidate hash and full four-wave coverage.
+Healthy Mali's cache bytes, mode and mtime stayed exact.
+
+Existing layer distinctions remain explicit.
+The authoritative raw/default country frame is normalized and carries id_converted; the retired hashless native country concatenation had the i==v shim and lacked that attr.
+Supported Make results now exactly match the authoritative parent default layer, including typed attrs.
+A cold unsupported request follows the existing declared-empty helper with string visit/obs and object Description; a covered-cache slice retains integer visit/obs, string Description and id_converted.
+Strict old-empty comparisons remain recorded as differences rather than being coerced.
+Source-memory to serialized native string-index dtype also differs at the existing serialization stage; matched writer-stage controls are exact.
+CLI serialization changes immutable PopulationRecord attrs to dicts; full matched artifact-stage attrs and Arrow metadata are exact.
+The pre-existing food u cold/warm StringDtype missing-value distinction remains a strict failure owned by [[https://github.com/ligon/LSMS_Library/issues/1196][GH1196]], with both matched parent stages exact.
+
+* Scanner accounting
+
+The actual scoped phases 1/2 produced three warning records, each fully identical to its actual parent record, with zero failure/error/skip records.
+Niger and Mali each lack a household i because this is a native cluster table.
+The third record is Mali's canonical obs sentinel1, retaining all 86,261 assembled rows.
+There is no community_prices phase-2 kwargs grid, so no additional grid coverage is claimed.
+
+* Auxiliary stop and limits
+
+An auxiliary direct-Wave/Mali collector asserted zero cache changes before persisting its endpoint receipts, and that assertion failed.
+The original exact changed-entry delta was not retained and remains unidentified.
+Its script/log and full frame outputs are preserved privately; later zero-write observations cannot establish its cause or reconstruct that lost delta.
+A subsequent per-call collector recorded empty changed lists for both Wave calls and Mali, saved full endpoint receipts and proved both native frames exactly equal to their disk frames.
+A same-collector repeat already in flight saved receipts before asserting and also ended with identical endpoints and native frames.
+No further auxiliary API repeats were run to obtain zero writes.
+Read-only final footer/hash/coverage inspection changed no cache files and found no payload or provenance mismatch.
+This auxiliary limit is separate from the completed normal Country/Make cold/warm matrix and is not included in its zero-write claim.
+
+No broad full suite or whole-corpus rebuild was performed for this country-only removal.
+The other 23 Niger API names were hashed, not all built; EHCVM community modules, Tanzania retirement, Mali composition and GH1196 remain outside this change.
+The private freeze proof and final READY receipt identify the clean documentation descendant, exact runtime/test equivalence, source/reference receipts, allowlisted exports and zero live consumers.
+Independent red-team review is required before a final PASS or PR publication.
+
+Signed: Sue.

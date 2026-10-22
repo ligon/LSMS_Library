@@ -1,0 +1,702 @@
+{
+  "status": "AUTHOR_READY_PENDING_INDEPENDENT_REVIEW",
+  "signed": "Sue (GPT-6)",
+  "baseline": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "ledger_first_commit": "e4aed55125f1aeec553d3203f9a373c87f71fe26",
+  "runtime_test_snapshot": "6be6576607f1862b603d123acfb74ace4026fd3f",
+  "production_boundary": {
+    "deleted_country_script_lines": 45,
+    "removed_original_Make_lines": "105-115",
+    "independent_wave_pattern_and_all_other_Make_bytes_exact": true,
+    "framework_native_scripts_mappings_schema_ids_masks_units_unchanged": true
+  },
+  "source_gates": {
+    "held_sources": 11,
+    "sidecars": 11,
+    "physical_private_copies": 44,
+    "terminal_preparation_before_decode": true,
+    "held_MD5_SHA_size_mode_mtime_gated": true,
+    "copies_distinct_inode_nlink1_nonsymlink": true,
+    "parent_frame_copies": 137,
+    "Mali_rows": 40218,
+    "Mali_current_hash_full_coverage_before_copy": true
+  },
+  "hash_scope": {
+    "status": "PASS_MEASURED_BEFORE_REBUILD",
+    "baseline_source": "d602f8d63520e521a730f85551b366c4d45d9a35",
+    "working_candidate_head": "e4aed55125f1aeec553d3203f9a373c87f71fe26",
+    "candidate_Makefile_sha256": "54506c1eb5d0fdd9e38d78d78c2d4273aa205dc24f32b9cea56fc166fc427914",
+    "country_script_absent": true,
+    "api_hashes_total": 549,
+    "api_hashes_changed": 23,
+    "changed_cells": [
+      "Niger/sample",
+      "Niger/cluster_features",
+      "Niger/household_roster",
+      "Niger/individual_education",
+      "Niger/panel_ids",
+      "Niger/food_acquired",
+      "Niger/shocks",
+      "Niger/assets",
+      "Niger/housing",
+      "Niger/food_security",
+      "Niger/subjective_well_being",
+      "Niger/interview_date",
+      "Niger/plot_features",
+      "Niger/crop_production",
+      "Niger/plot_inputs",
+      "Niger/livestock",
+      "Niger/plot_labor",
+      "Niger/people_last7days",
+      "Niger/community_prices",
+      "Niger/food_expenditures",
+      "Niger/food_prices",
+      "Niger/food_quantities",
+      "Niger/household_characteristics"
+    ],
+    "other_api_hashes_exact": 526,
+    "framework_fingerprints_exact": 39,
+    "null_hashes_base": 0,
+    "null_hashes_candidate": 0,
+    "candidate_is_working_tree": true,
+    "no_source_rebuild_yet": true,
+    "time_UTC": "2026-10-22T00:11:32.868066+00:00"
+  },
+  "tests": {
+    "existing_focused_passes": 97,
+    "new_tests": 17,
+    "candidate_total_passes": 114,
+    "candidate_skips": 0,
+    "parent_new_test_failures": 12,
+    "parent_new_test_passes": 5,
+    "parent_fixture_errors": 0,
+    "built_assertions": 12
+  },
+  "excluded_initial_fixture_attempt": {
+    "preserved_private": true,
+    "cause": "Synthetic native module omitted explicit Waves declaration; corrected fixture retains all assertions.",
+    "no_product_change_or_expected_frame_weakening": true
+  },
+  "matrix": {
+    "default-all": {
+      "rows": 46043,
+      "requested": null,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "default-2011": {
+      "rows": 32352,
+      "requested": [
+        "2011-12"
+      ],
+      "waves": {
+        "2011-12": 32352
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "default-2014": {
+      "rows": 13691,
+      "requested": [
+        "2014-15"
+      ],
+      "waves": {
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "default-2018": {
+      "rows": 0,
+      "requested": [
+        "2018-19"
+      ],
+      "waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "default-2021": {
+      "rows": 0,
+      "requested": [
+        "2021-22"
+      ],
+      "waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "default-absent": {
+      "rows": 0,
+      "requested": [
+        "2018-19",
+        "2021-22"
+      ],
+      "waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "make-all": {
+      "rows": 46043,
+      "requested": null,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "make-2011": {
+      "rows": 32352,
+      "requested": [
+        "2011-12"
+      ],
+      "waves": {
+        "2011-12": 32352
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "make-2014": {
+      "rows": 13691,
+      "requested": [
+        "2014-15"
+      ],
+      "waves": {
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "make-2018": {
+      "rows": 0,
+      "requested": [
+        "2018-19"
+      ],
+      "waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "make-2021": {
+      "rows": 0,
+      "requested": [
+        "2021-22"
+      ],
+      "waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    },
+    "make-absent": {
+      "rows": 0,
+      "requested": [
+        "2018-19",
+        "2021-22"
+      ],
+      "waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "country_builder": false
+    }
+  },
+  "matrix_counts": {
+    "cold_roots": 12,
+    "independent_fresh_process_warm": 12,
+    "populated_requests": 12
+  },
+  "strict_comparisons": {
+    "default-all-cold-vs-parent-default": true,
+    "default-all-warm-vs-parent-default": true,
+    "default-all-cold-2011-12-native": true,
+    "default-all-cold-2014-15-native": true,
+    "default-all-warm-2011-12-native": true,
+    "default-all-warm-2014-15-native": true,
+    "default-2011-cold-vs-parent-default": true,
+    "default-2011-warm-vs-parent-default": true,
+    "default-2011-cold-2011-12-native": true,
+    "default-2011-warm-2011-12-native": true,
+    "default-2014-cold-vs-parent-default": true,
+    "default-2014-warm-vs-parent-default": true,
+    "default-2014-cold-2014-15-native": true,
+    "default-2014-warm-2014-15-native": true,
+    "default-2018-cold-vs-actual-empty-contract": true,
+    "default-2018-warm-vs-actual-empty-contract": true,
+    "default-2021-cold-vs-actual-empty-contract": true,
+    "default-2021-warm-vs-actual-empty-contract": true,
+    "default-absent-cold-vs-actual-empty-contract": true,
+    "default-absent-warm-vs-actual-empty-contract": true,
+    "make-all-cold-vs-parent-default": true,
+    "make-all-warm-vs-parent-default": true,
+    "make-all-cold-2011-12-native": true,
+    "make-all-cold-2014-15-native": true,
+    "make-all-warm-2011-12-native": true,
+    "make-all-warm-2014-15-native": true,
+    "make-2011-cold-vs-parent-default": true,
+    "make-2011-warm-vs-parent-default": true,
+    "make-2011-cold-2011-12-native": true,
+    "make-2011-warm-2011-12-native": true,
+    "make-2014-cold-vs-parent-default": true,
+    "make-2014-warm-vs-parent-default": true,
+    "make-2014-cold-2014-15-native": true,
+    "make-2014-warm-2014-15-native": true,
+    "make-2018-cold-vs-actual-empty-contract": true,
+    "make-2018-warm-vs-actual-empty-contract": true,
+    "make-2021-cold-vs-actual-empty-contract": true,
+    "make-2021-warm-vs-actual-empty-contract": true,
+    "make-absent-cold-vs-actual-empty-contract": true,
+    "make-absent-warm-vs-actual-empty-contract": true,
+    "extra-2011-12-native": true,
+    "extra-2011-12-walked": true,
+    "extra-2011-12-normalized": true,
+    "extra-2014-15-native": true,
+    "extra-2014-15-walked": true,
+    "extra-2014-15-normalized": true,
+    "extra-raw-country": true,
+    "cold-feature-default": true,
+    "cold-feature-native": true,
+    "cold-food-acquired": true,
+    "cold-food-prices": true,
+    "cold-food-quantities": true,
+    "cold-food-expenditures": true,
+    "cold-cli-api-control": true,
+    "cold-cli-artifact": true,
+    "warm-feature-default": true,
+    "warm-feature-native": true,
+    "warm-food-acquired": true,
+    "warm-food-prices": true,
+    "warm-food-quantities": true,
+    "warm-food-expenditures": true,
+    "warm-cli-api-control": true,
+    "warm-cli-artifact": true,
+    "Make-feature-only-default": true,
+    "Make-feature-only-native": true,
+    "Make-CLI-prewrite-vs-parent-default-API": true,
+    "populated-default-all": true,
+    "populated-default-2011": true,
+    "populated-default-2014": true,
+    "populated-default-2018": true,
+    "populated-default-2021": true,
+    "populated-default-absent": true
+  },
+  "axis_internal_comparisons": {
+    "default-all-cold-vs-parent-default": true,
+    "default-all-warm-vs-parent-default": true,
+    "default-all-cold-2011-12-native": true,
+    "default-all-cold-2014-15-native": true,
+    "default-all-warm-2011-12-native": true,
+    "default-all-warm-2014-15-native": true,
+    "default-2011-cold-vs-parent-default": true,
+    "default-2011-warm-vs-parent-default": true,
+    "default-2011-cold-2011-12-native": true,
+    "default-2011-warm-2011-12-native": true,
+    "default-2014-cold-vs-parent-default": true,
+    "default-2014-warm-vs-parent-default": true,
+    "default-2014-cold-2014-15-native": true,
+    "default-2014-warm-2014-15-native": true,
+    "default-2018-cold-vs-actual-empty-contract": true,
+    "default-2018-warm-vs-actual-empty-contract": true,
+    "default-2021-cold-vs-actual-empty-contract": true,
+    "default-2021-warm-vs-actual-empty-contract": true,
+    "default-absent-cold-vs-actual-empty-contract": true,
+    "default-absent-warm-vs-actual-empty-contract": true,
+    "make-all-cold-vs-parent-default": true,
+    "make-all-warm-vs-parent-default": true,
+    "make-all-cold-2011-12-native": true,
+    "make-all-cold-2014-15-native": true,
+    "make-all-warm-2011-12-native": true,
+    "make-all-warm-2014-15-native": true,
+    "make-2011-cold-vs-parent-default": true,
+    "make-2011-warm-vs-parent-default": true,
+    "make-2011-cold-2011-12-native": true,
+    "make-2011-warm-2011-12-native": true,
+    "make-2014-cold-vs-parent-default": true,
+    "make-2014-warm-vs-parent-default": true,
+    "make-2014-cold-2014-15-native": true,
+    "make-2014-warm-2014-15-native": true,
+    "make-2018-cold-vs-actual-empty-contract": true,
+    "make-2018-warm-vs-actual-empty-contract": true,
+    "make-2021-cold-vs-actual-empty-contract": true,
+    "make-2021-warm-vs-actual-empty-contract": true,
+    "make-absent-cold-vs-actual-empty-contract": true,
+    "make-absent-warm-vs-actual-empty-contract": true,
+    "extra-2011-12-native": true,
+    "extra-2011-12-walked": true,
+    "extra-2011-12-normalized": true,
+    "extra-2014-15-native": true,
+    "extra-2014-15-walked": true,
+    "extra-2014-15-normalized": true,
+    "extra-raw-country": true,
+    "cold-feature-default": true,
+    "cold-feature-native": true,
+    "cold-food-acquired": true,
+    "cold-food-prices": true,
+    "cold-food-quantities": true,
+    "cold-food-expenditures": true,
+    "cold-cli-api-control": true,
+    "cold-cli-artifact": true,
+    "warm-feature-default": true,
+    "warm-feature-native": true,
+    "warm-food-acquired": true,
+    "warm-food-prices": true,
+    "warm-food-quantities": true,
+    "warm-food-expenditures": true,
+    "warm-cli-api-control": true,
+    "warm-cli-artifact": true,
+    "Make-feature-only-default": true,
+    "Make-feature-only-native": true,
+    "Make-CLI-prewrite-vs-parent-default-API": true,
+    "populated-default-all": true,
+    "populated-default-2011": true,
+    "populated-default-2014": true,
+    "populated-default-2018": true,
+    "populated-default-2021": true,
+    "populated-default-absent": true
+  },
+  "strict_options": {
+    "check_exact": true,
+    "rtol": 0,
+    "atol": 0,
+    "recursive_typed_full_attrs": true,
+    "unused_MultiIndex_levels_codes_dtypes_and_column_metadata": true
+  },
+  "Arrow_artifacts": {
+    "default-cold": {
+      "full_footer_exact": true,
+      "schema_including_metadata_exact": true,
+      "parent_rows": 32352,
+      "candidate_rows": 32352,
+      "parent_sha256": "b114f4133987fefa82cad7fceb5921a0045ad1bae99d4bc0d5e1866ef76f1189",
+      "candidate_sha256": "b114f4133987fefa82cad7fceb5921a0045ad1bae99d4bc0d5e1866ef76f1189"
+    },
+    "make-cold": {
+      "full_footer_exact": true,
+      "schema_including_metadata_exact": true,
+      "parent_rows": 32352,
+      "candidate_rows": 32352,
+      "parent_sha256": "b114f4133987fefa82cad7fceb5921a0045ad1bae99d4bc0d5e1866ef76f1189",
+      "candidate_sha256": "b114f4133987fefa82cad7fceb5921a0045ad1bae99d4bc0d5e1866ef76f1189"
+    },
+    "default-warm": {
+      "full_footer_exact": true,
+      "schema_including_metadata_exact": true,
+      "parent_rows": 32352,
+      "candidate_rows": 32352,
+      "parent_sha256": "b114f4133987fefa82cad7fceb5921a0045ad1bae99d4bc0d5e1866ef76f1189",
+      "candidate_sha256": "b114f4133987fefa82cad7fceb5921a0045ad1bae99d4bc0d5e1866ef76f1189"
+    }
+  },
+  "source_mask_counts": {
+    "nominal_9999_9_cells_by_source_column": {
+      "cs07q05": 43,
+      "cs07q07": 32,
+      "cs07q09": 1
+    },
+    "total": 76,
+    "all_native_parent_masks_exact": true,
+    "retained_late_obs": {
+      "2011-12": 15,
+      "2014-15": 15
+    }
+  },
+  "frame_counts": {
+    "community": 46043,
+    "2011-12": 32352,
+    "2014-15": 13691,
+    "late_obs": 30,
+    "food": 239877,
+    "food_prices": 165027,
+    "food_quantities": 239855,
+    "food_expenditures": 165014,
+    "Niger_Mali_Feature_default_and_currency_None": 86261,
+    "Make_Niger_Feature_default_and_currency_None": 46043
+  },
+  "warm_writes": {
+    "default-all": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    },
+    "default-2011": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    },
+    "default-2014": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    },
+    "default-2018": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    },
+    "default-2021": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    },
+    "default-absent": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    },
+    "make-all": {
+      "changed_paths": [
+        "Niger/2011-12/_/community_prices.parquet",
+        "Niger/2014-15/_/community_prices.parquet"
+      ],
+      "before_after_fields": {
+        "Niger/2011-12/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        },
+        "Niger/2014-15/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      }
+    },
+    "make-2011": {
+      "changed_paths": [
+        "Niger/2011-12/_/community_prices.parquet"
+      ],
+      "before_after_fields": {
+        "Niger/2011-12/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      }
+    },
+    "make-2014": {
+      "changed_paths": [
+        "Niger/2014-15/_/community_prices.parquet"
+      ],
+      "before_after_fields": {
+        "Niger/2014-15/_/community_prices.parquet": {
+          "bytes_exact": true,
+          "mode_exact": true,
+          "size_exact": true,
+          "mtime_exact": false
+        }
+      }
+    },
+    "make-2018": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    },
+    "make-2021": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    },
+    "make-absent": {
+      "changed_paths": [],
+      "before_after_fields": {}
+    }
+  },
+  "populated": {
+    "default-all": {
+      "rows": 46043,
+      "changed_paths": [],
+      "own_cold_exact": true
+    },
+    "default-2011": {
+      "rows": 32352,
+      "changed_paths": [],
+      "own_cold_exact": true
+    },
+    "default-2014": {
+      "rows": 13691,
+      "changed_paths": [],
+      "own_cold_exact": true
+    },
+    "default-2018": {
+      "rows": 0,
+      "changed_paths": [],
+      "own_cold_exact": false
+    },
+    "default-2021": {
+      "rows": 0,
+      "changed_paths": [],
+      "own_cold_exact": false
+    },
+    "default-absent": {
+      "rows": 0,
+      "changed_paths": [],
+      "own_cold_exact": false
+    },
+    "make-all": {
+      "rows": 46043,
+      "changed_paths": [
+        "Niger/2011-12/_/community_prices.parquet",
+        "Niger/2014-15/_/community_prices.parquet"
+      ],
+      "own_cold_exact": true
+    },
+    "make-2011": {
+      "rows": 32352,
+      "changed_paths": [
+        "Niger/2011-12/_/community_prices.parquet",
+        "Niger/2014-15/_/community_prices.parquet"
+      ],
+      "own_cold_exact": true
+    },
+    "make-2014": {
+      "rows": 13691,
+      "changed_paths": [
+        "Niger/2011-12/_/community_prices.parquet",
+        "Niger/2014-15/_/community_prices.parquet"
+      ],
+      "own_cold_exact": true
+    },
+    "make-2018": {
+      "rows": 0,
+      "changed_paths": [],
+      "own_cold_exact": true
+    },
+    "make-2021": {
+      "rows": 0,
+      "changed_paths": [],
+      "own_cold_exact": true
+    },
+    "make-absent": {
+      "rows": 0,
+      "changed_paths": [],
+      "own_cold_exact": true
+    }
+  },
+  "existing_stage_distinctions": [
+    "declared-empty cold versus covered-cache slice dtypes and id_converted",
+    "source-memory versus native parquet string-index missing-value dtype",
+    "CLI PopulationRecord serialized as dict",
+    "food u cold/warm StringDtype residual GH1196"
+  ],
+  "food_residual_owner": "https://github.com/ligon/LSMS_Library/issues/1196",
+  "scanner": {
+    "records": 3,
+    "statuses": {
+      "warn": 3
+    },
+    "complete_parent_records_exact": true,
+    "phase2_grid_scenarios": 0,
+    "finding_accounting": [
+      {
+        "check": "has_household_index",
+        "country": "Mali",
+        "status": "warn",
+        "reason": "native cluster table has no household i"
+      },
+      {
+        "check": "has_household_index",
+        "country": "Niger",
+        "status": "warn",
+        "reason": "native cluster table has no household i"
+      },
+      {
+        "check": "runtime_warning",
+        "country": null,
+        "status": "warn",
+        "reason": "Mali obs sentinel1 retains all86261rows"
+      }
+    ]
+  },
+  "auxiliary_direct_Wave_limit": {
+    "original_attempt": "zero-write assertion failed before receipts were persisted; exact original delta unidentified",
+    "original_evidence": [
+      "attempt1-final-wave-controls.py",
+      "attempt1-final-wave-controls-private.log",
+      "attempt1-direct-wave-note-private.txt"
+    ],
+    "subsequent_per_call_changed_lists": {
+      "2011-12": [],
+      "2014-15": [],
+      "Mali": []
+    },
+    "subsequent_endpoints_exact": true,
+    "same_collector_repeat_endpoints_exact": true,
+    "subsequent_both_native_full_frames_exact": true,
+    "interpretation": "Later observations do not establish the original lost delta or its cause. Separate from normal Country/backend matrix."
+  },
+  "final_read_only_cache_metadata": {
+    "Niger/2011-12/_/community_prices.parquet": {
+      "stored_hash": null,
+      "coverage": null,
+      "classification": "normal hashless native script output"
+    },
+    "Niger/2014-15/_/community_prices.parquet": {
+      "stored_hash": null,
+      "coverage": null,
+      "classification": "normal hashless native script output"
+    },
+    "Niger/var/community_prices.parquet": {
+      "stored_hash": "95d452f7ef364c6acf01de998a1a8a8a2a46f759cdc0f4de1bf9013edc03ff47",
+      "coverage": [
+        "2011-12",
+        "2014-15",
+        "2018-19",
+        "2021-22"
+      ],
+      "expected_hash": "95d452f7ef364c6acf01de998a1a8a8a2a46f759cdc0f4de1bf9013edc03ff47",
+      "current_hash": true,
+      "full_coverage": true
+    },
+    "Mali/var/community_prices.parquet": {
+      "stored_hash": "905706eed2aa30f90dbeda71371977d4a8fe5f216744fc7309b7f8715bb400e4",
+      "coverage": [
+        "2014-15",
+        "2017-18",
+        "2018-19",
+        "2021-22"
+      ],
+      "expected_hash": "905706eed2aa30f90dbeda71371977d4a8fe5f216744fc7309b7f8715bb400e4",
+      "current_hash": true,
+      "full_coverage": true
+    }
+  },
+  "read_only_metadata_cache_changes": [],
+  "PR_stack_metadata": {
+    "url": "https://github.com/ligon/LSMS_Library/pull/1176",
+    "number": 1176,
+    "state": "open",
+    "merged": false,
+    "draft": false,
+    "base": "development",
+    "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "head": "fix/1088-niger-quantity-sentinel-20261021",
+    "head_sha": "d602f8d63520e521a730f85551b366c4d45d9a35"
+  },
+  "limits": [
+    "Independent review pending; no final PASS.",
+    "Original auxiliary cache delta was not persisted and remains unidentified; subsequent zero changes do not explain it.",
+    "No whole-corpus or broad full-suite rebuild.",
+    "23 Niger API names were hashed, not all built.",
+    "Tanzania residual and independently handled Mali are not composed.",
+    "Unwired EHCVM community sources and GH1196 are unchanged."
+  ],
+  "private_evidence_root": "/local/job40255479/control/isa-backlog-20261021/Niger/1091-fix",
+  "final_freeze_receipt": "/local/job40255479/control/isa-backlog-20261021/Niger/1091-fix/READY.json"
+}
