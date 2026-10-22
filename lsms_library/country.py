@@ -53,6 +53,7 @@ from .local_tools import (
     read_parquet_cache_waves,
     read_parquet_datetime_audit,
     read_parquet_build_drops,
+    _read_parquet_with_index_policy,
     source_tier,
     _collect_file_paths_from_block,
 )
@@ -1719,9 +1720,14 @@ class Wave:
             if (cache_freshness(cache_path, expected_wave_hash) != "stale"
                     and degraded_verdict != "rebuild"):
                 try:
-                    df_cached = pd.read_parquet(cache_path)
-                except (OSError, ArrowInvalid):
+                    cache_file = open(cache_path, 'rb')
+                except OSError:
                     df_cached = None
+                else:
+                    with cache_file:
+                        df_cached, _ = _read_parquet_with_index_policy(
+                            cache_file, read_errors=(OSError, ArrowInvalid),
+                        )
                 if df_cached is not None:
                     if (expected_wave_hash is not None
                             and read_parquet_cache_hash(cache_path) is None):
@@ -2175,7 +2181,8 @@ class Wave:
                 logger.warning(f"Parquet file for {request} still missing after running Makefile.")
                 return pd.DataFrame()
 
-            df = pd.read_parquet(parquet_fn)
+            with open(parquet_fn, 'rb') as parquet_file:
+                df, _ = _read_parquet_with_index_policy(parquet_file)
             # GH #868: the wave script ran out of process; whatever its
             # reducer reported lives only in the stamp it wrote.
             _replay_wave_stamp(parquet_fn, self.country.name, request, self.year)

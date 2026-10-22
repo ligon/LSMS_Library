@@ -170,4 +170,26 @@ No old completed prefix is replayed to overwrite evidence. Existing singleton,
 JSON, guard, original XML and caller-stop qualifications remain explicit.
 No science/schema/exclusion/acquisition change, author PASS or public write.
 
+The exact two-path expansion is now applied. Actual guarded prebuild censuses
+on candidate, clean bd80 and f8 each contain549/39/1362 entries. Candidate
+differs on every entry against BOTH controls, with exact keysets and zero
+data-endpoint changes. The new private wave-expansion root uses the original
+denial policy with only its new private root and three exact prepared metadata
+targets; no prior launcher/evidence root is edited.
+
+Expansion candidate v1 retained72 existing selected PASS nodes and one
+collection ERROR in the new file (incorrect sibling-module import). Its source
+and XML remain intact. Correcting that test-only import, v2 ran ONLY the47 new
+nodes:47PASS,0skip. Actual clean-bd80 counterfactual:47nodes,21PASS/26FAIL,
+0error/skip. Twelve failures are recorded-index-policy assertions; six are
+absent-private-helper API-contract negatives; the remaining eight concern
+missing footer/restoration boundaries or same-open-stream contracts. They are
+not all described as source-value or row-loss evidence. Existing disappearance,
+corrupt-payload and payload-error-disposition controls pass on both versions.
+
+New held staging terminally verified17 immutable declared sources and34 physical
+copies into two candidate backend roots, empty L2 and nlink1/distinct inodes,
+with all MD5/SHA/size/mode/mtime and sidecar gates before decode/API. Source-cold,
+fresh-warm/scanner/CLI evidence for the new runtime remains pending.
+
 Sue

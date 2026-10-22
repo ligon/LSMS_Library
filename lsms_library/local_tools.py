@@ -1746,6 +1746,23 @@ def _restore_parquet_index_string_policy(df, pandas_metadata):
     return df
 
 
+def _read_parquet_with_index_policy(f, *, read_errors=(), **kwargs):
+    """Read an already-open parquet stream and its same-file index policy.
+
+    Return (frame, None), or (None, error) for only the caller's existing
+    payload-read errors. Footer/metadata/restoration errors stay outside
+    that catch. Callers retain their own miss, format and fallback policy.
+    No source lookup, path reopening, audit or non-parquet parser runs here.
+    """
+    try:
+        df = pd.read_parquet(f, **kwargs)
+    except read_errors as error:
+        return None, error
+    import pyarrow.parquet as pq
+    metadata = pq.read_schema(f).pandas_metadata
+    return _restore_parquet_index_string_policy(df, metadata), None
+
+
 def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
@@ -1896,17 +1913,15 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                         NotImplementedError) as exc:
                     raise ValueError(f'{fn} claims SPSS but cannot be decoded') from exc
 
-        try:
-            df = pd.read_parquet(f, engine='pyarrow')
-        except (ArrowInvalid,) as exc:
+        df, parquet_error = _read_parquet_with_index_policy(
+            f, engine='pyarrow', read_errors=(ArrowInvalid,),
+        )
+        if parquet_error is not None:
             if Path(fn).suffix.lower() == '.parquet':
-                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from exc
-            failure = exc
+                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from parquet_error
+            failure = parquet_error
         else:
-            import pyarrow.parquet as pq
-            # The same open file binds metadata to the payload just decoded.
-            metadata = pq.read_schema(f).pandas_metadata
-            return _restore_parquet_index_string_policy(df, metadata)
+            return df
 
         # Stata -- only when the header says so (GH #712).  Handed a file
         # that is NOT Stata, ``StataReader`` reads a garbage header and dies
