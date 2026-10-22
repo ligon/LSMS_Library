@@ -1,0 +1,31 @@
+{
+  "rows": 180184,
+  "exact_original_index_order_values_and_dtypes": true,
+  "original_columns_order_values_dtypes_exact_except_organic_quantity": true,
+  "organic_rows": 11075,
+  "organic_quantity_zero_to_missing": 11075,
+  "organic_applied_true": 11075,
+  "other_applied_missing": 169109,
+  "nonorganic_quantity_and_other_measures_unchanged": true,
+  "nitrogen_output_exact": true,
+  "nitrogen_rows": 33466,
+  "nitrogen_total": 840235.7795800001,
+  "organic_rows_by_wave": {
+    "2010-11": 1991,
+    "2013-14": 822,
+    "2016-17": 3617,
+    "2019-20": 4645
+  },
+  "original_column_dtypes": {
+    "Quantity": "Float64",
+    "Quantity_purchased": "Float64",
+    "Purchased": "boolean",
+    "Improved": "boolean"
+  },
+  "added_column_dtype": "boolean",
+  "no_shared_cache_promotion": true,
+  "private_builds_offline": true,
+  "nonorganic_zero_only_payloads": 513,
+  "nonorganic_rows_deleted_by_rejected_global_min_count": 437,
+  "zero_only_nonorganic_rows_preserved_even_by_global_min_count": 76
+}

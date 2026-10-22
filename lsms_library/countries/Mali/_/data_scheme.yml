@@ -266,8 +266,8 @@ Data Scheme:
     #
     # plot   = "{field}_{parcel}" — the SAME plot id as crop_production /
     #          plot_inputs / plot_features (join on (t, i, plot_id)).
-    # source = harmonize_labor_source Preferred Label (Family / Hired /
-    #          Other), a FIXED questionnaire block, not a decoded column.
+    # source = harmonize_labor_source Preferred Label (family / hired /
+    #          other), a FIXED questionnaire block, not a decoded column.
     #
     # PersonDays = reported person-days of that source on the plot, summed
     #              over the two passages (post-planting + post-harvest) and
