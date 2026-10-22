@@ -1220,3 +1220,13 @@ Malawi218 independent review_nigeria_1034 has51PASS,actualparent1FAIL1PASS,own26
 Next source21 Uganda1198 composition must gate actual current Niger CROP hashes/full coverage; current20 community comparators do not establish current CP. Old leaf46376 caches may require normal private source rebuild, never restamp/bypass. Twenty-one frozen owner-only archives verified; new frozen20/849author not archived yet; active1196/Malawi/Uganda review roots must not be archived.
 
 Sue
+
+* Diagnosis accepted; source21 queued; archive22 durable -- 2026-10-22 05:40 UTC
+
+Root1196diagnosis receipt verifies281payloads/13safe exports/full directory/source14880/current checker/original/copy pins,8meaningfuldtypeFAIL7GH645PASS. Shared retained Arrow index-extraction cause accepted; no production fix. Both public indices MultiIndex. Country-cache-only route misses observedUgandaMake; actualNigerMakeunmeasured. All8guardevents/94legacyhash/membership/release stops retained. Safe evidence at1196-index-roundtrip-diagnosis.
+Released mali_lane now stage1 private patch proposal onf8 inisa-1196-index-fix; ledger-firstee533 durablypublished. No product/test/config edits/imports/tests/decodes/APIs authorized until root actualpatch review. Generic reader index-field policy only; no exclusion/schema/writer/science fix. Root initial base-worktree terminal-handle metadata timing addendum preserved, both HEAD/clean gates passed before dispatch.
+Source21 bd235a6d494434061dedacc8359351f5a4fb64aa filesystempublished afterexact31path/30nonCONTENTS leafblob/mode verification. Uganda documentation is complete actual20bytes plus exact085suffix,3722lines. Initial whole-f8-prefix assertion failed before source write; next gitadd staged original conflict markers, diffcheck blockedcommit; originalconflict/stop preserved, correct literal mergeverified beforecommit. No tests/imports/builds. Separateactual20control/de38 andmetadata targets/fullbrief queued UNASSIGNED, no GitHubsource21publication/verdict.
+Future21 healthy comparator must gate CROP hash/coverage, not use source20 community proof. OldleafNiger46376 may be stale; authorize only normal held-declared-source private build if needed, no acquisition/stamp/bypass.
+Archive22 exact2545members/sourceafter/fsync/owner/modes/durablelauncher,265780108bytes, SHAba9c76b9d1ea2c5628f58cef91b1b088d79a2493a14a296b9df54f82a1a0e927. Only frozen20and849author included; activeindie/fix roots excluded. Public private-evidence-durability-twentysecond.json. Ugandaindie own416PASS/10skip/source effect reproduced, tail/sealactive; Malawiindie51PASS/actualcoldcontrols measured, tailactive.22implementationPRs await human merge; goalactive.
+
+Sue

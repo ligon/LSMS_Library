@@ -1,0 +1,18 @@
+{
+  "status": "FROZEN_READONLY_DIAGNOSIS_COMPLETE_RELEASE_V4",
+  "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "production_patch": false,
+  "manifest": "final-private-manifest-v4.json",
+  "manifest_entries": 281,
+  "manifest_sha256": "368e4997fd99d0982c6db54992fa19e8f6bea82271b28a1e2ec91e2d1afcd24c",
+  "safe_exports": "safe-exports",
+  "allowlist": "safe-exports/ALLOWLIST-v4.json",
+  "allowlist_sha256": "bc252fa5503b2b4779e421885eef0df7d40929b5da09776dd6f946427fe98235",
+  "original273_entries_exact": true,
+  "prior_READY_and_manifest_preserved": true,
+  "late_original_verifier_membership_stop_explicit": true,
+  "writer_exits_after_READY": true,
+  "postexit_verifier": "postexit-v4-readonly.py",
+  "UTC": "2026-10-22T05:27:41.526984+00:00",
+  "signed": "Sue"
+}

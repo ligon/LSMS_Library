@@ -12,7 +12,7 @@ The 37 partial records carry exact residual titles and bodies in =triage.json=; 
 =summary.json= records the tier and dependency ordering; unresolved enhancement/acquisition choices are reported for the maintainer.
 Existing rulings in issues such as #851, #894 and #1134 are binding implementation context, not unanswered questions to ask again.
 
-* Current checkpoint -- 2026-10-22 05:22 UTC
+* Current checkpoint -- 2026-10-22 05:40 UTC
 
 At 05:21:50 UTC, all twenty-two independently reviewed implementation PRs were OPEN, unmerged and at their expected heads.
 =public-pr-checkpoint-twentytwo-followup.json= records that fresh check.
@@ -21,12 +21,12 @@ Human merge remains the next public landing step.
 Newest PRs1201/1202/1203 have exact-head unit/windows CI success; six other jobs including data-tests were skipped in each run.
 Held-source verification is separate evidence, not a credentialed CI data-suite pass.
 
-Three workers are active in separate checkouts: Uganda849 independent review, Malawi218 independent review and shared1196 read-only dtype diagnosis.
+Three workers are active in separate checkouts: Uganda849 independent review, Malawi218 independent review and shared1196 private repair proposal.
 Uganda849 author491 is frozen: root verified1858 payloads and19 safe exports; a different reviewer is assigned on actual085 parent.
 The twelve factor bindings preserve existing screens, but their author-measured12.931Mkg downstream effect requires independent source/pool review; no849 PR or independent verdict yet.
 Malawi218 author d29 is frozen/root verified815; its independent reviewer has51PASS and actual-parent1FAIL/1PASS, with source-cold builds running.
 The two pre-existing scanner FAILs, Make food-builder failure and invalid-wave effects remain explicit residuals.
-1196 diagnosis has source/read-route evidence, but final seal/root acceptance is pending; no product change is approved or made.
+1196 bounded read-only diagnosis is root accepted: both retained cases first lose recorded string NA policy in installed Arrow index extraction. A generic reader patch is being privately proposed; no product edit/fix is approved or made.
 Both complete public frames are MultiIndex; the earlier Index label described an extracted level, and historical overstatements remain corrected additively.
 
 Bounded combined source20 =de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2= is root accepted against actual19 =2566a3e490c0aefe03ab31d538d7d04e9b77c77e= and GitHub published.
@@ -34,10 +34,10 @@ It adds exactly Tanzania1201:85PASS, actual-parent20FAIL/7PASS,162main and152sou
 It uses current Mali155931/Niger46043 and Feature219673; the footprint is25Tanzania/524otherAPI/39framework exact.
 Earlier per-key populated child logs were overwritten by backend-only names; unique full frames/endpoints/statuses/main structured warnings survive, while missing original child bytes/occurrences remain unavailable.
 The bounded verdict does not claim complete populated-child log equality, a full20 suite or a corpus rebuild.
-Uganda1202 has not yet been composed into source20.
+Separate source21 bd235a6d494434061dedacc8359351f5a4fb64aa adds reviewedUganda1202 to actual20, preserving30exact leaf blobs/modes plus both documentation histories. It is source-only prepared/UNASSIGNED, with zero imports/tests/builds or runtime verdict; source20 stays frozen.
 
 Uganda residual owners are1204 (country fallback wave coverage),1205 (parcel-area linkage/coverage) and1196 (index-level dtype roundtrips).
-Twenty-one verified owner-only archives preserve completed private evidence; active roots remain separate.
+Twenty-two verified owner-only archives preserve completed private evidence; active roots remain separate. Archive22 preserves frozen combined20 and Uganda849author:2545files,265780108archivebytes, SHAba9c76b9d1ea2c5628f58cef91b1b088d79a2493a14a296b9df54f82a1a0e927.
 Historical global17 remains5148PASS/4459SKIP/13FAIL/0ERROR, with its doc-child guard/mtime and stale-eight limitations.
 No later bounded increment erases that result.
 Detailed current paths, pins, owners and qualifications are in =country-lanes.json=; dated sections below retain their original checkpoints.

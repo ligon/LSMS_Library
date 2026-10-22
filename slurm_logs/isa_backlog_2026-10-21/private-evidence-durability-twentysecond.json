@@ -1,0 +1,24 @@
+{
+  "verified_at_UTC": "2026-10-22T05:34:04.939462+00:00",
+  "archive_name": "quiescent-followup-twentysecond.tar.gz",
+  "archive_sha256": "ba9c76b9d1ea2c5628f58cef91b1b088d79a2493a14a296b9df54f82a1a0e927",
+  "archive_bytes": 265780108,
+  "included_files": 2545,
+  "included_source_bytes": 2308085125,
+  "roots": [
+    "integration/tanzania-twenty-review",
+    "Uganda/849-fix"
+  ],
+  "excluded_entries": 82,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "9b40b75705b0c70a1cdf60d363c57bae987e3f78b8c3d5a8b52239df7b02f5c7",
+  "private_full_manifest_sha256": "f5175a61f91c1586a0681122355b40813077a9fdfad8eb3a7bd6918160dc9bf4",
+  "private_evidence_not_exported_to_Git": true
+}

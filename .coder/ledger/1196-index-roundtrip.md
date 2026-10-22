@@ -1,15 +1,17 @@
 # Prior-Art Ledger - GH1196 cold/warm index dtype diagnosis
 
 **Search tier used:** ripgrep + git; installed-source inspection is available.
-This is initial grounding for a queued read-only diagnosis, not a cause or fix.
+The initial grounding is retained below; section7 records the root-accepted diagnosis.
+No production fix has been accepted or applied.
 
 ## §1 Task, restated
 
 Locate the precise serialization/read/finalization transition behind the two
-independently measured GH1196 manifestations: Niger food_acquired MultiIndex u
-and Uganda cluster_features Index v. Both change pyarrow StringDtype missing
-sentinel between ordinary cold and fresh-process warm returns. A shared cause
-has not been established. Preserve the full interface, values and typed attrs.
+independently measured GH1196 manifestations: Niger food_acquired u and
+Uganda cluster_features v levels, both within complete public MultiIndex frames.
+Both change pyarrow StringDtype missing sentinel between ordinary cold and
+fresh-process warm returns. A shared cause was unproved at initial grounding;
+section7 now binds both retained cases. Preserve the full interface, values and typed attrs.
 
 ## §2 Existing machinery
 
@@ -74,3 +76,47 @@ Report any genuine contract ambiguity before proposing a production change.
 ### Phase3 verification
 
 Pending. Source-only preparation and initial grounding have no runtime verdict.
+
+
+## Section7 Root-accepted read-only diagnosis, 2026-10-22
+
+Source f8, READY-v4 08a2aa8392cd21b4b6d4308523334303ed7b43d42cf767ab1e1bf56b1958832a;
+281-entry manifest368e4997fd99d0982c6db54992fa19e8f6bea82271b28a1e2ec91e2d1afcd24c.
+Root independently verified every receipt, complete directory membership,
+13 safe exports, actual checker pins,14880 tracked source endpoints, selected
+original/dependency/copy receipts and actual8FAIL/7PASS JUnit causes.
+
+Both retained cases first diverge in installed pyarrow25.0.1
+`pandas_compat._extract_index_level`: unlike data-column reconstruction, its
+`col.to_pandas(types_mapper=None)` ignores retained field numpy_type="string"
+extension policy and selects pandas3's NaN string policy. Actual write-time
+and read schema bytes match; neither map_index nor finalization first creates
+the difference. This binds239877Niger/u and4805Uganda/v cases only, not every
+string index or survey. Both complete public indices are MultiIndex.
+
+Two new ordinary Default warm processes exactly match saved warm full frames
+and typed attrs, preserving21 current/fullcoverage cache files per process.
+No original native-prewrite operand or new source-cold/Make/Feature/scanner
+proof was produced. Existing writer JSON attrs and pre-Arrow unused-level
+pruning remain separate contracts.
+
+Actual source routes show a Country L2-gate-only repair misses observed Uganda
+Make: both entries lack materialize:make, and Make uses the YAML wave route.
+Four immutable original Uganda1198 Make endpoints corroborate the4805row case;
+actual Niger Make food remains source-only/unmeasured in this diagnosis.
+
+Eight guard denials remain qualified:6relative cleanup removals and2pytest
+cache-directory attempts, without PID/dir_fd/stack attribution. The94legacy
+symlink-hash convention stop, original273-payload late-file membership stop
+and release Path/string stop remain preserved. No source/evidence mutation,
+API/test replay or zero-denial claim repaired that history.
+
+Next candidate is a PRIVATE PATCH PROPOSAL at the generic parquet reader,
+using each recorded physical index field's policy. Root must inspect the actual
+patch before production edits. No dependency/schema/fingerprint exclusion,
+writer coercion/JSON, country/source/scientific or missingness-policy change.
+The549/39/1362 source-marker fingerprint cost is a prediction to measure on
+the actual future source, not an approval to rebuild other-country outputs.
+
+See slurm_logs/isa_backlog_2026-10-21/1196-index-roundtrip-diagnosis/ and
+queued-1196-index-fix/STAGE1.json for exact limits and next-stage ownership.

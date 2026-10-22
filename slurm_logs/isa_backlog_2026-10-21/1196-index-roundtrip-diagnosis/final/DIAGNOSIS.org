@@ -1,0 +1,141 @@
+#+TITLE: GH1196 read-only index roundtrip diagnosis
+#+AUTHOR: Sue
+#+DATE: 2026-10-22
+
+* Result and scope
+
+The two observed cases independently reach the same first reproduced dtype-loss operation: installed pyarrow25.0.1 =pandas_compat._extract_index_level= calls =ChunkedArray.to_pandas(types_mapper=None)= without restoring the index field's retained pandas extension dtype metadata.
+The writer input, prepared return and persisted Arrow schema still identify the affected field as =numpy_type="string"=, whose pandas dtype has =na_value=pd.NA=.
+The unqualified column conversion used to reconstruct the index chooses pandas3's default Arrow string dtype with =na_value=NaN=.
+No source/product/test/config edit, Git/ref mutation, schema/hash lever, stamp, acquisition or policy change was made.
+This is a completed diagnosis and proposed boundary, not a production-fix acceptance.
+
+Both complete public frames are MultiIndex: Niger =(i,t,v,j,u,s)= and Uganda =(t,v)=.
+The plain pandas.Index identified in Uganda's original issue/brief is its extracted =v= level.
+Root acknowledged that wording error; the original brief, initial468d ledger and frozen evidence are preserved.
+
+* Actual country contracts
+
+Complete current Niger1557 and Uganda3604 CONTENTS lines, including TODO/WAITING/LOGBOOK, were read.
+Niger distinguishes ECVMA full =(GRAPPE,MENAGE,EXTENSION)= household identity from EHCVM grappe/menage, seasonal halves and its explicitly keyed =Original Label= unit dictionary.
+Its opening "each grappe is visited in exactly one vague" coexists with the later quoted design that "divided each enumeration area into two equal groups" interviewed separately.
+The dated corrections to "No u table is wired" and mapping.py hash visibility remain part of the history.
+
+Uganda uses origin-EA comm, synthetic GPS bins, parish codes and district/parish composites at different boundaries.
+Cluster features are an explicit agreed-value household-to-cluster projection; geographic disagreement is blanked, never averaged.
+The statement Region "is complete for every household" coexists with "three have missing Region" for2019-20.
+The unconditional refresh "each wave" claim coexists with the quoted "This same sample was used for the UNPS2015/16 (Wave5)".
+Native harvest records, A/B module-versus-calendar distinctions, separately recorded sale units,2013 swapped labels,2018A asked-not-distributed units and the settled2018B condition-slot ruling remain unchanged and outside this diagnosis.
+No geography, identifier, unit or source eligibility conclusion follows from the dtype symptom.
+
+* Separate causal verdicts and matching stages
+
+| Case | Saved original cold | Saved original warm and new actual warm | Strict verdict |
+|------+---------------------+----------------------------------------+----------------|
+| Niger food_acquired |239877 rows; extracted u Arrow StringDtype pd.NA |239877 rows; extracted u Arrow StringDtype NaN | full strict comparison fails solely on u dtype metadata |
+| Uganda cluster_features |4805 rows; extracted v Arrow StringDtype pd.NA |4805 rows; extracted v Arrow StringDtype NaN | full strict comparison fails solely on v dtype metadata |
+
+For each case every payload value/dtype, mask, key, multiplicity, row order, axis class/name/code and other level dtype, plus recursively typed full public attrs, is otherwise exact.
+Neither affected public level contains a missing value; Uganda has0 null v records.
+The failing strict assertions and separate explicitly qualified comparisons are retained without rewriting an operand or stripping attrs.
+
+Both ordinary sanctioned writer branches were observed on a physical copy of each saved real cold public operand.
+Each prepared writer return is a complete exact match to its input, including full typed attrs.
+All four actual write-time Arrow schemas are byte-exact to their persisted read schemas; each affected field retains numpy_type string.
+The observational extraction hook records the NaN policy at its return before any library map/index normalization/finalization.
+Raw current-country reads already contain that policy.
+map_index is a complete exact no-op on both actual raw frames; observed normalize/finalizer inputs and outputs retain the already-NaN policy.
+Therefore neither the country unit dictionary, cluster projection, finalizer, null-key reducer, current-cache grading nor stale/partial coverage is the first dtype divergence here.
+
+Eighteen saved-native/raw/schema comparisons are complete and exact at their matching serialized stages.
+Native saved operands were already decoded from parquets; this cohort contains no original raw-memory/native-prewrite operand.
+No raw decode, original-cold reconstruction or new whole-country source-cold claim is made.
+The original cold public frames are pinned prior evidence, not a new cold API run.
+
+The newly serialized public-frame controls also show the existing JSON conversion of Population/Recall/Sampling records and frozen nested containers into ordinary JSON containers.
+Their complete postread attrs exactly match the unchanged JSON serialization operation, but prepared API attrs and postread typed attrs are not identical.
+This is separate from the exact original public cold/warm attrs and exact new warm/warm attrs.
+No writer/CLI attrs repair is proposed.
+
+* New guarded warm evidence and integrity gates
+
+Only59 necessary saved operands/reports/derived caches were physically copied;21 are compatible parquet caches.
+Each copied file passed original manifest SHA256, measured MD5/size, mode, mtime, nonsymlink, nlink1 and distinct device/inode checks before payload reads.
+Raw-source DVC identities and sidecar sizes are explicitly not applicable: no raw sources were staged or decoded.
+The original Uganda READY and1908-entry manifest digests match the root-supplied pins; the original Niger manifest and selected files are independently receipt-checked.
+Original source/report/checker manifests and selected operands remain protected; no whole old farm is treated as current.
+
+All21 copied caches have actual-f8 current hashes; every country cache has full declared requested-wave coverage.
+An initial gate implementation misidentified the var parent path and stopped with KeyError before a payload/API read; the unique corrected gate reached terminal success first.
+No cache was stamped, bypassed or repaired.
+
+Two independent guarded fresh processes, each constructing new Country objects, made ordinary default Niger food_acquired and Uganda cluster_features calls with empty kwargs.
+All four complete returns exactly match the argument-matched saved warm frames and the two new processes exactly match each other, with full typed attrs.
+Each process preserves all21 cache-file bytes, sizes, modes, mtimes and inodes exactly.
+Each complete warning list and before/after endpoint was saved before equality assertions: Niger0 and Uganda11 warnings per process.
+No Feature call, Make replay, raw-source build, FDC or nutrition call was needed for this read-boundary diagnosis.
+
+Mounted Python3.11.6, pandas3.0.6, pyarrow25.0.1 and numpy2.4.6 were asserted under exact checkout/PYTHONPATH/package/countries/config/data identity.
+Socket/write guards and unshare-rn precede imports/unpickling/APIs; numeric/build/Make threads are1.
+The reused denial functions are AST-exact after task-label substitution, with only the new private-root binding and metadata-receipt adapter.
+Only the exact root-prepared ignored DVC tmp target is an exception.
+
+* Discriminating regressions and existing boundaries
+
+The private draft has8 meaningful f8 failures: both writer branches times plain/MultiIndex times complete/missing-bearing Arrow string indexes.
+All fail on the recorded string-versus-str index dtype, with0 setup/API/credential errors or skips.
+All7 selected existing GH645 write controls pass, including literal-null strings, genuine missingness and mixed-object stringification.
+An empty Arrow-string Index is an additional failing control; the already-NaN Index and mirror data-column policy control remain exact.
+
+Nine comparator negatives reject changed float-by-one-nextafter, mask, axis name, row order, column extension dtype, nested float, int-versus-float attr, index na policy and unused level structure.
+An actual immutable-record missing-field-presence negative is also rejected using declared _FIELDS and typed attribute values.
+Both intentionally failed partial-write branches leave original target bytes intact and remove temporary siblings.
+
+Unused original MultiIndex labels expose a separate existing writer preparation boundary: reset_index/set_index prunes an unused label before Arrow.
+That strict structural difference is recorded as existing behavior, not relabelled preservation or silently included in the proposed dtype fix.
+The prepared-to-read codes, actual missing masks and literal None/nan/<NA> strings are exact in that control.
+
+* Fingerprint prediction and proposed next scope
+
+The static experiment reused the existing test_build_transform_hash::_probe_edit pattern: an artificial no-op AST source marker visible only to inspect.getsource, never executed or written to source.
+The actual f8 inventory has549 country API hashes,39 per-table framework fingerprints and1362 declared-wave hashes.
+Marker edits to generic reader or writer each move549/549,39/39 and1362/1362; the excluded country-cache read gate moves0 throughout.
+These are predictions for edit boundaries, not an actual post-fix census or permission for exclusions/schema changes.
+The future writer must measure its own exact source pin before builds; no other-country rebuilt-output inference is made.
+
+PROPOSAL-DRAFT.md recommends only field-metadata-directed missing-policy restoration at generic parquet read, with alternatives and unresolved mapping edges explicit.
+The writer should not rewrite cached data, globally cast string axes, infer unit/ID meaning, alter missingness or change the generic writer's JSON/GH645 policies.
+Country note drafts and a private ledger addendum are provided; root owns authorization and tracked updates.
+
+* Preserved stops and release limits
+
+The first setup shell used an unavailable unqualified python and exited127 before writing a script; the mounted interpreter then performed stdlib-only guard setup.
+The original bad gate, both strict real cold/warm failures, four writer/read failures, eight draft test failures and empty-index failure remain present.
+No completed API/source prefix was replayed to erase a stop.
+Discovery's deterministic initial source snapshot was refreshed during the stdlib preparation-plan import; its first snapshot-file mtime is not claimed as preserved.
+The source-content/mode/mtime/HEAD/clean receipt itself remains the comparison baseline.
+Tracked ledger/STANDING/local guidance and actual IO/gate sources preceded experiments; the shared prior-art/code-reviewer skill text was loaded later during report preparation and orgmode before authoring this report.
+
+There is no production candidate, no broad string-index correctness assertion, no new source-cold/Make/Feature/scanner/full-suite acceptance, and no other-country rebuilt-output claim.
+Safe exports are separately allowlisted; full values/IDs/coordinates/warnings/traces remain private.
+Final protection/manifest/quiescence receipts seal this bounded read-only diagnosis before release.
+
+The first seal stopped on94 cross-convention SHA comparisons:47 tracked symlinks on each previous Malawi head.
+The original Malawi snapshot recorded a followed file-target SHA and None for directory links, while the new helper hashes literal link bytes.
+Enumeration found no regular-file, mode or mtime delta.
+The new sealing checker verifies the original convention and separately checks literal os.readlink strings against Git blobs; the failed checker/trace and full delta enumeration remain private.
+No timestamp, source file, prior evidence or API result was changed to resolve this checker interpretation.
+
+The second sealing assertion stopped on8 retained guard denials, not a zero-denial result.
+Six relative os.remove('t.parquet') events are consistent with the six GH645 TemporaryDirectory roundtrips and the installed shutil dir_fd-relative cleanup, whose tempfile PermissionError handler can retry the absolute private path.
+Two denied pytest-cache-files-* mkdir attempts under the checkout match pytest cacheprovider's cache-directory setup.
+The original guard did not retain PID, dir_fd or stack fields, so individual retrospective attribution of those six removals is not established.
+All15 test outcomes and every strict failure remain unchanged; no guard was weakened or test replayed.
+The exact original log, source-based explanation and this qualification remain separate from the independently guarded warm API/frame results.
+
+ROUTE-COVERAGE.md binds each actual Default/Make route from unchanged source and original saved caller evidence.
+Neither target declares materialize:make: Default enters the excluded country-cache read gate, whereas Make loads the YAML waves and bypasses that country gate.
+Uganda's four manifest-gated old Make endpoints corroborate its observed Make cold/warm difference on both1198 heads; Niger Make food is source-bound but unmeasured here.
+A country-gate-only repair would therefore miss an actually observed Uganda served route, not merely a hypothetical unrelated API.
+
+Sue

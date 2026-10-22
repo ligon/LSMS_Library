@@ -1,0 +1,16 @@
+{
+  "assigned": true,
+  "owner": "mali_lane",
+  "stage": "PRIVATE_PATCH_PROPOSAL_ONLY_NO_PRODUCT_EDITS_AUTHORIZED",
+  "candidate": "/local/job40255479/worktrees/isa-1196-index-fix",
+  "branch": "fix/1196-parquet-index-policy-20261022",
+  "release_parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "ledger_first": "ee533e09af4b29408985a0c7a1abf815c5c385d1",
+  "diagnosis_root_accepted": true,
+  "actual_patch_approval_pending": true,
+  "boundary": "Index-field metadata-directed generic parquet read repair; no global cast, writer/science/ID change, dependency/schema/hash exclusion or cache stamp.",
+  "predicted_scope_only": "549/549API,39/39framework,1362/1362declared-wave; actual candidate inventory required before builds",
+  "tests_builds": 0,
+  "source_data_API_calls": 0,
+  "signed": "Sue"
+}

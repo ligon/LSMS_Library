@@ -236,7 +236,7 @@
           "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Malawi-218",
           "brief": "queued-Malawi-218-review/NEXT-REVIEW-BRIEF.md",
           "assigned": true,
-          "tests_builds": "Own51PASS; actualparent1expectedFAIL1PASS; own26Malawi/523otherAPI/39framework/97wave census complete before builds; four normal source-cold roots running",
+          "tests_builds": "Own51PASS,parent1FAIL1PASS,actual prebuild26/523/39/97wave exact. Default source-cold full/single returns and both Make error controls measured; warm/Feature/CLI/scanner/final seal active.",
           "verdict": null,
           "reviewer": "review_nigeria_1034"
         },
@@ -808,8 +808,10 @@
           "assigned": true,
           "reviewer": "niger_lane",
           "brief": "queued-Uganda-849-review/NEXT-REVIEW-BRIEF.md",
-          "verdict": null
-        }
+          "verdict": null,
+          "interim": "Own416PASS/10genuineSKIP,parent20FAIL4PASS; own exact133761raw-slot/source-stage oracle,+12931281.585085638kg and parcel+498keys/7335shared values reproduced; warm/scanner/CLI/subset/seal active, no final acceptance"
+        },
+        "private_archive": "private-evidence-durability-twentysecond.json"
       },
       "documentation_qualification": {
         "accepted_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
@@ -1029,7 +1031,7 @@
     },
     "1196": {
       "issue": 1196,
-      "status": "Read-only diagnosis running; source/read-route and saved roundtrip evidence collected; final seal/root acceptance pending. No production edit or accepted cause verdict.",
+      "status": "Root accepted bounded read-only diagnosis; same retained Arrow index-reader loss demonstrated for both cases. Different source root is stage1 private patch proposal only; no production edit/fix accepted.",
       "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
       "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
@@ -1045,7 +1047,23 @@
       "source_of_correction": "Frozen review-Uganda-1198/dtype-details.py:6-7 reports extracted level class",
       "full_index_level_clarification": "Both complete public frames use MultiIndex; earlier Index label referred to extracted StringDtype level. Preserve old overstated tracking snapshots with additive correction.",
       "route_qualification": "Country L2 read gate covers current Default warm route but Make bypasses it for both entries; observed Uganda Make case prevents Country-gate-only scope. Actual Niger Make operand unmeasured.",
-      "sealing_qualification": "Eight guard denials and two sealing stops retained; cleanup/cache-provider attributions qualified, no zero-denial claim or test replay."
+      "sealing_qualification": "Eight guard denials and two sealing stops retained; cleanup/cache-provider attributions qualified, no zero-denial claim or test replay.",
+      "diagnosis_READY_sha256": "08a2aa8392cd21b4b6d4308523334303ed7b43d42cf767ab1e1bf56b1958832a",
+      "diagnosis_manifest_entries": 281,
+      "diagnosis_manifest_sha256": "368e4997fd99d0982c6db54992fa19e8f6bea82271b28a1e2ec91e2d1afcd24c",
+      "root_acceptance": "1196-index-roundtrip-diagnosis/ROOT-DIAGNOSIS-ACCEPTANCE.json",
+      "cause_scope": "Both retained cases first diverge in installed Arrow _extract_index_level; field numpy_type=string survives writing but index conversion ignores that extension metadata.",
+      "route_scope": "Country L2-only fix is incomplete for observed Uganda Make; Niger Make is source-only/unmeasured here.",
+      "proposed_fix": {
+        "path": "/local/job40255479/worktrees/isa-1196-index-fix",
+        "control": "/local/job40255479/worktrees/isa-1196-index-fix-base",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-fix",
+        "owner": "mali_lane",
+        "stage": "PRIVATE_PATCH_PROPOSAL_ONLY",
+        "ledger_first": "ee533e09af4b29408985a0c7a1abf815c5c385d1",
+        "product_edits_authorized": false,
+        "tests_builds": 0
+      }
     }
   },
   "integration": {
@@ -1423,7 +1441,8 @@
       "manifest_entries": 2629,
       "manifest_sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
       "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
-      "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022"
+      "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022",
+      "private_archive": "private-evidence-durability-twentysecond.json"
     },
     "twenty_increment": {
       "head": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
@@ -1450,7 +1469,28 @@
       "manifest_entries": 2629,
       "manifest_sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
       "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
-      "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022"
+      "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022",
+      "private_archive": "private-evidence-durability-twentysecond.json"
+    },
+    "pending_twentyone": {
+      "head": "bd235a6d494434061dedacc8359351f5a4fb64aa",
+      "actual20_control": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
+      "additional_PR": 1202,
+      "branch": "isa/integration-twentyone-20261022",
+      "path": "/local/job40255479/worktrees/isa-integration-twentyone",
+      "control_path": "/local/job40255479/worktrees/isa-integration-twentyone-base",
+      "private_root": "/local/job40255479/control/isa-backlog-20261021/integration/uganda-twentyone-review",
+      "status": "SOURCE_ONLY_PREPARED_UNASSIGNED",
+      "changed_paths": 31,
+      "non_CONTENTS_leaf_blobs_modes_exact": 30,
+      "CONTENTS": "Complete current20 bytes plus exact accepted085 suffix; root initial whole-f8-prefix assumption stop preserved.",
+      "source_filesystem_published": true,
+      "source_GitHub_published": false,
+      "reviewer": null,
+      "tests_builds": 0,
+      "verdict": null,
+      "brief": "queued-twentyone/NEXT-REVIEW-BRIEF.md",
+      "healthy_CROP_gate": "Current20 COMMUNITY caches are insufficient. Gate actual Niger crop hash/full coverage; stale leaf46376 requires normal held-source private build, never stamp/bypass."
     }
   }
 }
