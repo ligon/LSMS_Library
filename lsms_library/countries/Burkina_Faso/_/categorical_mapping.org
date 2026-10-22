@@ -611,9 +611,17 @@ script-path tables.  Not paid here; verified on the read path with
 | 21                                        | Seed                |
 
 # harmonize_seed_crop — EHCVM-only.  The s16b roster has NO crop column;
-# the crop is encoded in the seed-type label.  Resolves each seed label to
-# the crop's harmonize_food Preferred Label.  Catch-all seed slots ->
-# 'Autre crop'.  '21' is Burkina's trailing 'Autres semences' slot.
+# the crop is encoded in the seed-type label.  Keep distinct reported input
+# slots distinct on the (t, i, input, crop, u) index (GH #1123).  The named
+# cereal/tuber categories follow the existing Benin/Togo split.
+#
+# In the held 2018 source, code 20 is 'Autres semences'; code 21 has no
+# value label and occurs on 602 applied rows.  Its source-qualified unknown
+# below preserves that native identity without inventing a physical crop.
+# The existing harmonize_input 21 -> Seed classification is UNVERIFIED
+# legacy curation, not established by this identity repair.  Do not borrow
+# 2021's different code-21 meaning or reuse this 2018-qualified fallback
+# for a future wave.  Only the 2018-19 plot_inputs builder uses this table.
 
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
@@ -626,11 +634,11 @@ script-path tables.  Not paid here; verified on the read path with
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
-| Plants/boutures de tubercules | Autre crop          |
+| Semences d'autres céréales    | Autre céréale       |
+| Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
-| 21                            | Autre crop          |
+| 21                            | Unknown [Burkina_Faso 2018-19 s16bq01=21] |
 
 # harmonize_species_ehcvm — s17q02 livestock species CODE (1-11) ->
 # canonical species Preferred Label.  Code-keyed (load s17 with
