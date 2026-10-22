@@ -1,0 +1,12 @@
+{
+  "verify_1194_1195_numeric_root.py": {
+    "sha256": "ca63d35d1352cfcc33d969d5dc1d746556c86de10779a535cf3f2d9e082466f5",
+    "bytes": 8653,
+    "stdlib_only": true
+  },
+  "verify_1194_1195_numeric_root_v2.py": {
+    "sha256": "10a093ca1d9dc3863d379756cfcf06d7b00bd5521eae55214d7441e26dd37d5a",
+    "bytes": 374,
+    "stdlib_only": true
+  }
+}

@@ -65,6 +65,30 @@ The old frozen hold packets remain unchanged; new pair/stage/source mapping and 
 No payload was decoded or extracted and no original API/source/test stage replayed.
 See =1206-archive1-saved-content-authority-safe.json=.
 
+Root additionally accepted1194 and1195 bounded saved-evidence packets.
+Burkina1194 has87 strict groups,58 physical products and189 authenticated original entries; source-coordinate/ID-walk expected objects and fixture memory remain unsaved.
+Shared1195 has142 strict groups,97 products and2,154 original review/later-author entries; six warm fresh returns and235 fixture memories remain absent.
+The four authenticated historical unitprice refusal records contradict Ethiopia's empty-result prose; this is reported without replay or a new policy ruling.
+All274 packet/attestation entries and actual source/projection/refusal maps pass root checks, with no payload/API/source/test replay.
+Safe exports are =1206-pr1194-Burkina/= and =1206-pr1195-categorical/=.
+
+Archive26 is fully verified and durable:11 frozen roots,861 files,872,506,930 source bytes and210,269,730 compressed bytes.
+SHA256 =881c49c837ccef9413939c7da4cde19ed91734abe3fce16573ef9d6015a2ad60=.
+Every member and source-after receipt, owner/mode, durable launcher/verifier and fsync check passed.
+Later10 packets and the newly accepted1194/1195 root records remain for archive27.
+
+Malawi1209 author READY and all1,085 entries passed separate postexit protection; independent reviewer authenticated them before its data grid.
+Independent regressions give6PASS, actual-parent4FAIL/2PASS and13 supportingPASS; measured fingerprints are26/549 Malawi country and97/1362 Malawi wave changes,0/39 framework changes.
+Its own held-source Default/Make all/singleton cold/fresh-warm checks are active; no independent data verdict or new implementation PR exists yet.
+GH1210 is now assigned on an isolated f8-based branch: root approved a shared early validation helper plus public/aggregate entry guards before destructive cache/derived work.
+It must preserve exact invalid errors, None/empty/order/duplicates/iterable behavior and valid GH479 staleness; source/quantity/Make cleanup remains separate.
+
+The archive-backed critic is assigned only13 Uganda1173 and12 Mali1186 saved products, not all182 newly authenticated contents.
+Mali's12 original comparisons pass at the worker stage; Uganda has six strict NEW saved-stage comparisons and one preserved complete-domain finding being characterized.
+Neither new packet is root accepted or frozen yet, and original unsaved oracles remain missing.
+The later10 critic has sealed its75-entry registry and all subpackets, then stopped; those remaining root acceptances are next.
+All implementation PRs still require human merge; no full26-PR or corpus result is claimed.
+
 * Earlier checkpoint -- 2026-10-22T13:39:00+00:00
 
 There are 26 published implementation PRs, all freshly verified OPEN and unmerged in =publication-26-safe.json=.
