@@ -9,15 +9,15 @@ pytestmark = pytest.mark.requires_s3
 
 
 def _has_cached_table(country_name: str, table: str) -> bool:
-    """Check if a table is cached (either data_root or in-tree)."""
-    from lsms_library.paths import countries_root
-    for candidate in [
-        data_root(country_name) / "var" / f"{table}.parquet",
-        countries_root() / country_name / "var" / f"{table}.parquet",
-    ]:
-        if candidate.exists():
-            return True
-    return False
+    """Check actual source caches for runtime-derived tables (ledger section 2)."""
+    if table in ll.Country._FOOD_DERIVED:
+        sources = ("food_acquired", "sample")
+    elif table in ll.Country._ROSTER_DERIVED:
+        sources = ("household_roster", "sample")
+    else:
+        sources = (table,)
+    root = data_root(country_name) / "var"
+    return all((root / f"{source}.parquet").is_file() for source in sources)
 
 
 def _attrition_matrix(country_name: str, table: str) -> pd.DataFrame:
@@ -43,7 +43,7 @@ def _nonzero_adjacent(matrix: pd.DataFrame) -> bool:
 
 @pytest.mark.skipif(
     not _has_cached_table("Uganda", "household_characteristics"),
-    reason="Requires cached Uganda household_characteristics (data build needed)",
+    reason="Requires cached Uganda household_roster and sample source tables",
 )
 def test_panel_attrition_household_characteristics_is_upper_triangular():
     matrix = _attrition_matrix("Uganda", "household_characteristics")
@@ -54,7 +54,7 @@ def test_panel_attrition_household_characteristics_is_upper_triangular():
 @pytest.mark.skipif(
     not (_has_cached_table("Uganda", "household_characteristics")
          and _has_cached_table("Uganda", "income")),
-    reason="Requires cached Uganda household_characteristics and income (data build needed)",
+    reason="Requires cached Uganda household_roster, sample and income source tables",
 )
 def test_panel_attrition_consistency_between_tables():
     hc_matrix = _attrition_matrix("Uganda", "household_characteristics")
@@ -71,8 +71,7 @@ def test_panel_attrition_consistency_between_tables():
             if b == 0 and a > threshold:
                 raise AssertionError(f"income has 0 overlap for {row}/{col} while household_characteristics has {a}")
 
-    # diagonals should be monotonically non-decreasing for both tables
-    # diagonals shouldn't be zero and should be at least overlapping
+    # Each wave must have observations; refresh samples need not be monotone.
     for diag_value in hc_matrix.values.diagonal():
         assert diag_value > 0
     for diag_value in income_matrix.values.diagonal():

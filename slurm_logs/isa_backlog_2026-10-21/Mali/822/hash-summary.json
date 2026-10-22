@@ -1,0 +1,33 @@
+{
+  "country_hashes_total": 549,
+  "changed": [
+    "Mali/sample",
+    "Mali/cluster_features",
+    "Mali/household_roster",
+    "Mali/individual_education",
+    "Mali/subjective_well_being",
+    "Mali/food_security",
+    "Mali/food_acquired",
+    "Mali/interview_date",
+    "Mali/panel_ids",
+    "Mali/assets",
+    "Mali/housing",
+    "Mali/shocks",
+    "Mali/food_coping",
+    "Mali/plot_features",
+    "Mali/crop_production",
+    "Mali/plot_inputs",
+    "Mali/livestock",
+    "Mali/plot_labor",
+    "Mali/people_last7days",
+    "Mali/community_prices",
+    "Mali/food_expenditures",
+    "Mali/food_prices",
+    "Mali/food_quantities",
+    "Mali/household_characteristics"
+  ],
+  "unchanged_other_country_hashes": 525,
+  "framework_fingerprints_total": 39,
+  "changed_framework_fingerprints": [],
+  "runtime_codebook_matches_source_metadata": true
+}

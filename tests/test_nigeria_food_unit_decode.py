@@ -16,6 +16,9 @@ the rounds' ``.dta`` value labels, transcribed below) and a cache-gated
 guardrail on the BUILT table.
 """
 import importlib.util
+import shutil
+
+import pandas as pd
 
 import pytest
 
@@ -78,7 +81,9 @@ DTA_FACTS = {
                11: 'small derica', 14: 'tiya'},
     '2013Q1': {4: 'cl', 10: 'medium derica', 11: 'small derica', 14: 'tiya'},
     # W3/W4: 4 CENTILITRES, 10 BIN/BASKET, 11 PAINT RUBBER, 14 TIN
-    '2015Q3': {4: 'cl', 10: 'bin/basket', 11: 'paint rubber', 14: 'tin'},
+    '2015Q3': {4: 'cl', 10: 'bin/basket', 11: 'paint rubber', 14: 'tin',
+               131: 'Sack/Bag Medium', 151: 'Basin Medium',
+               152: 'Basin Large', 161: 'Bundle Medium'},
     '2018Q3': {4: 'cl', 10: 'bin/basket', 11: 'paint rubber', 14: 'tin'},
 }
 
@@ -96,6 +101,61 @@ def test_w2_code_4_is_centilitre_not_millilitre(nigeria):
     error on ~13.9k rows in the other direction."""
     assert nigeria.food_unit_labels('2012Q3')[4] == 'cl'
     assert nigeria.food_unit_labels('2010Q3')[4] == 'ml'
+
+
+def test_w3_planting_extra_labels_do_not_decode_other_waves(nigeria):
+    """GH #1034: the planting Stata labels add no cross-wave meanings.
+
+    Both W3 rounds read one wave column; the PH source has no rows using
+    these codes. Its existing valid-code meanings remain unchanged.
+    """
+    expected = {131: 'Sack/Bag Medium', 151: 'Basin Medium',
+                152: 'Basin Large', 161: 'Bundle Medium'}
+    for t in ('2015Q3', '2016Q1'):
+        decoded = nigeria.food_unit_labels(t)
+        assert {code: decoded[code] for code in expected} == expected
+        assert decoded[4] == 'cl'
+        assert decoded[11] == 'paint rubber'
+    for t in sorted(set(ROUNDS) - {'2015Q3', '2016Q1'}):
+        assert not set(expected).intersection(nigeria.food_unit_labels(t))
+
+
+def test_w3_extra_unit_labels_preserve_food_rows(nigeria, monkeypatch, tmp_path):
+    """Decode actual builder rows, retaining measurements and source grain."""
+    from lsms_library import local_tools
+
+    # The item resolver reads cwd-relative config. Keep the synthetic run
+    # private while using exactly the worktree's country table.
+    shutil.copyfile(countries_root() / COUNTRY / '_' / 'categorical_mapping.org',
+                    tmp_path / 'categorical_mapping.org')
+    monkeypatch.chdir(tmp_path)
+    raw = pd.DataFrame({
+        'hhid': [1, 2, 3, 4, 5],
+        'item_cd': [10] * 5,
+        'q_buy': [2., 3., 4., 5., 6.],
+        'u_buy': [131., 151., 152., 161., 1.],
+        'q_produced': [1., 2., 3., 4., 5.],
+        'u_produced': [131., 151., 152., 161., 1.],
+        'spend': [100., 200., 300., 400., 500.],
+    })
+    monkeypatch.setattr(local_tools, 'get_dataframe', lambda *a, **k: raw.copy())
+    out = nigeria.food_acquired_for_wave(
+        'synthetic.csv', '2015Q3',
+        {'purchased': {'quantity': 'q_buy', 'unit': 'u_buy'},
+         'produced': {'quantity': 'q_produced', 'unit': 'u_produced'}},
+        expenditure='spend').reset_index().set_index(['i', 's']).sort_index()
+    assert len(out) == 10
+    assert set(out['t']) == {'2015Q3'}
+    expected_units = ['Sack/Bag Medium', 'Basin Medium', 'Basin Large',
+                      'Bundle Medium', 'Kg']
+    for source, qcol in (('purchased', 'q_buy'), ('produced', 'q_produced')):
+        part = out.xs(source, level='s')
+        assert list(part['u']) == expected_units
+        assert list(part['Quantity']) == list(raw[qcol])
+        if source == 'purchased':
+            assert list(part['Expenditure']) == list(raw['spend'])
+        else:
+            assert part['Expenditure'].isna().all()
 
 
 # --- built-table guardrail -------------------------------------------------
