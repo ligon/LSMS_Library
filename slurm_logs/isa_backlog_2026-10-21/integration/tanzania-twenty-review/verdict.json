@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS",
+  "scope": "BOUNDED_GLOBAL20_FUNCTIONAL_WITH_EXPLICIT_POPULATED_CHILD_LOG_HISTORY_LIMIT",
+  "candidate": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
+  "actual19_control": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+  "product_blockers": [],
+  "limits": [
+    "Overwritten earlier populated child stdout/stderr bytes/occurrences unavailable; unique full frames, statuses, arguments, endpoints and structured main warnings retained; no replay or complete child-log equality claim.",
+    "No full suite/corpus/other24 Tanzania output rebuild/Make-pooled/source-cold comparator claim.",
+    "Leaf evidence gaps and historical17 failures/guard/stale8/1196 retained at original pins."
+  ],
+  "reviewer": "Sue (GPT-6)",
+  "release_requires_final_manifest_and_zero_consumers": true
+}

@@ -1,0 +1,99 @@
+{
+  "status": "PASS_CLEAN_SOURCE_RUNTIME_TEST_REFERENCE_BOUNDARY",
+  "candidate_head": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "actual_parent_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "candidate_tracked_paths": 14912,
+  "base_tracked_paths": 14893,
+  "actual_changed_paths": [
+    ".coder/ledger/849-uganda-reported-factors.md",
+    "lsms_library/countries/Uganda/2019-20/_/crop_production.py",
+    "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "lsms_library/countries/Uganda/_/uganda.py",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/Feature-CLI.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/REPORT.org",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/REPRODUCE.sh",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/RESIDUAL.org",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/artifact-checks.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/derived.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/hash-scope.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/protected-references.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/source-fields.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/source-oracle.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/stage-comparison.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/stops.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/tests.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/unit-condition-dispersion.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/validation.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/warning-and-scanner.json",
+    "slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/wave-measurements.json",
+    "tests/test_crop_kg_factor.py",
+    "tests/test_gh842_uganda_harvest_unit.py",
+    "tests/test_gh849_uganda_reported_factors.py"
+  ],
+  "all_other_tracked_bytes_Git_modes_actual_modes_exact": true,
+  "literal_os_readlink_bytes_verified_against_Git": true,
+  "runtime_pin": "7a8fd22492255cc2c4d020b7a16f99249f588977",
+  "runtime_file_SHAs_exact_to_actual_prebuild_census": true,
+  "tested_tests_pin": "66bfa1eb16442ceb6d455dfaa5726f181d713abd",
+  "entire_tests_tree_exact_to_tested_descendant": true,
+  "postruntime_library_only_change": [
+    "lsms_library/countries/Uganda/_/CONTENTS.org"
+  ],
+  "dated_CONTENTS_addition_preserves_all_old3671_lines": true,
+  "old_reference_receipt_proof": {
+    "status": "PASS_ALL_RECORDED_FROZEN_REFERENCES",
+    "checks": {
+      "author1198": {
+        "entries": 4122,
+        "manifest_sha256": "e1a7d64677dbc9b11f6159512e890d8372ba330acfa471dfdd9ed6cae5734472",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "review1198": {
+        "entries": 1908,
+        "manifest_sha256": "fa04d70934d3d7f32083ecabd45de9e0d2fc60fcac001dffc20c29dd93f2f72d",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "docs73ad": {
+        "entries": 52,
+        "manifest_sha256": "80f2f9500e7f23b330ce0fe20d09c5427b58b599bd614112f0fb5d8cde3e210d",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "docs085": {
+        "entries": 45,
+        "manifest_sha256": "48b3a7fc4017ebe855917db472f076f1ee1732ce48dde7df00b2dc70fed1736f",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "original_1198_849_addendum_Mali_references": {
+        "entries": 1960,
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "GLOBAL17": {
+        "entries": 6468,
+        "manifest_sha256": "f559b1677e5ccbf237caf0b4a96a050c4d69bd0fec91f27a9d62ce8fc05e30cd",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "BF1119": {
+        "entries": 594,
+        "manifest_sha256": "62cadf6a6080969f3aebe056fd4bfcfe54d0a6fde1604306019a62a93a1cbe57",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "Tanzania1091": {
+        "entries": 2894,
+        "manifest_sha256": "2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "gated_held_sources_and_copies": {
+        "exact_receipts": 606
+      }
+    }
+  },
+  "credential_operands_exact_private_receipts": 9,
+  "source_mtime_limit": "Full initial/final byte/mode/HEAD/clean checks; no invented initial new-checkout source-mtime baseline. Frozen reference receipts retain recorded mtimes.",
+  "network_attempts": 0,
+  "guard_events": {
+    "mkdir-existing": 20
+  },
+  "no_intree_parquets_or_new_Uganda_raw_payloads": true,
+  "safe_tracked_exports17_byte_exact": true,
+  "independent_acceptance": false
+}

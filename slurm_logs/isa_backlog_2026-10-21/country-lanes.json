@@ -210,7 +210,7 @@
         "base_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
         "control": "/local/job40255479/worktrees/isa-Malawi-218-base",
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/218",
-        "status": "Author frozen atd29; root verified815payloads/source boundary; independent review prepared/unassigned, no acceptance or PR",
+        "status": "Author frozen/root verified815; independent review ASSIGNED and running, no acceptance or PR",
         "boundary": "Remove only two raw null derived registrations; preserve automatic Country/Feature food-derived methods and all output semantics. Other218/nonISA/shared cleanup remains residual.",
         "independence": "Starts releasef8, independent of unmerged1109/1111 plot-input patches; normal future composition still required.",
         "root_static_prior_art": "CLAUDE698,Country.data_scheme/_materialization_entry/_FOOD_DERIVED,Feature source discovery and Malawi retirement note1653ff personally read; static raw-key search finds only Malawi2.",
@@ -235,9 +235,10 @@
           "control": "/local/job40255479/worktrees/isa-review-Malawi-218-base",
           "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Malawi-218",
           "brief": "queued-Malawi-218-review/NEXT-REVIEW-BRIEF.md",
-          "assigned": false,
-          "tests_builds": 0,
-          "verdict": null
+          "assigned": true,
+          "tests_builds": "Own51PASS; actualparent1expectedFAIL1PASS; own26Malawi/523otherAPI/39framework/97wave census complete before builds; four normal source-cold roots running",
+          "verdict": null,
+          "reviewer": "review_nigeria_1034"
         },
         "private_archive": "private-evidence-durability-twentyfirst.json"
       }
@@ -778,11 +779,11 @@
         "private_root": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-fix",
         "brief": "queued-Uganda-849/NEXT-WRITER-BRIEF.md",
         "writer_assigned": true,
-        "edits_tests_builds": "416focusedPASS/10genuineskips;actualparent20FAIL4PASS;normal bothbackendcold/source-oracle/Feature/CLI/scanner checks pass, final subset/warnings/freeze active; no independent verdict",
+        "edits_tests_builds": "Author416PASS/10genuine skips; actualparent20FAIL4PASS. Author completed bounded source/Default/Make/Feature/CLI/subset/scanner/protection checks; not independently accepted.",
         "gate": "Root1198 runtime+doc acceptance completed",
         "boundary": "Exactly12 reported-factor map entries at retained native grain, preserving existing numeric coercion/nonpositive normalization and all helper/screen/science logic; raw source values are separate private oracles.",
         "owner": "review_nigeria_1034",
-        "status": "Writer active at retained085 parent;12maps/tests published, source-backed default builds in progress",
+        "status": "Author491 frozen/root verified1858 receipts and19safe exports; independent niger_lane review ASSIGNED, no independent verdict or PR",
         "parent_preparation_receipt": "queued-Uganda-849/root-doc-parent-fastforward.json",
         "nonpositive_clarification": "queued-Uganda-849/ROOT-NONPOSITIVE-CLARIFICATION.json",
         "runtime_head_prefix": "7a8fd2249",
@@ -794,7 +795,21 @@
         "source_oracle_stop": "Original categorical lookup cwd stop retained; corrected expectation reads each actual wave directory, no production/helper change",
         "downstream_author_measurement": "Native-grain harvest42026694.99297963kg vsparent29095413.407893993;delta12931281.585085638. Real parcel-yield14022to14520,+498keys/7335shared values changed; area unchanged. Unreviewed author evidence, not historical42.035M projection.",
         "warm_qualification": "Default0writes;bothMakeheads17byte-identicalpaths0600to0644+mtime inTHISrun, opposite prior1198 observation, no provenance inference",
-        "subset_expected_operand_qualification": "First stopped parent supported call saved actual/endpoints; filtered expected existed only in memory. Artifact-only reconstructed expectation uniquely named, not original/replayed API"
+        "subset_expected_operand_qualification": "First stopped parent supported call saved actual/endpoints; filtered expected existed only in memory. Artifact-only reconstructed expectation uniquely named, not original/replayed API",
+        "source_head": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+        "author_READY_sha256": "262edfc60eec4cffdb6c6e9279c61459c349b5f2d908a7bb7c58a9ade39ea69e",
+        "author_manifest_entries": 1858,
+        "author_manifest_sha256": "eb0e0d07305d820b05f6d34a4ef313f4ef5c18130150a95d8d66bd54655beb84",
+        "author_safe_exports": "849-Uganda-author/",
+        "independent_review": {
+          "path": "/local/job40255479/worktrees/isa-review-Uganda-849",
+          "control": "/local/job40255479/worktrees/isa-review-Uganda-849-base",
+          "private_root": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-849",
+          "assigned": true,
+          "reviewer": "niger_lane",
+          "brief": "queued-Uganda-849-review/NEXT-REVIEW-BRIEF.md",
+          "verdict": null
+        }
       },
       "documentation_qualification": {
         "accepted_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
@@ -1014,7 +1029,7 @@
     },
     "1196": {
       "issue": 1196,
-      "status": "Assigned read-only diagnosis to released Malawi author; grounding/operand shortlist, no cause verdict",
+      "status": "Read-only diagnosis running; source/read-route and saved roundtrip evidence collected; final seal/root acceptance pending. No production edit or accepted cause verdict.",
       "path": "/local/job40255479/worktrees/isa-1196-index-diagnosis",
       "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "private_root": "/local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis",
@@ -1027,7 +1042,10 @@
       "product_changes": 0,
       "owner": "mali_lane",
       "clarification": "queued-1196-index-diagnosis/ROOT-AXIS-LEVEL-CLARIFICATION.json",
-      "source_of_correction": "Frozen review-Uganda-1198/dtype-details.py:6-7 reports extracted level class"
+      "source_of_correction": "Frozen review-Uganda-1198/dtype-details.py:6-7 reports extracted level class",
+      "full_index_level_clarification": "Both complete public frames use MultiIndex; earlier Index label referred to extracted StringDtype level. Preserve old overstated tracking snapshots with additive correction.",
+      "route_qualification": "Country L2 read gate covers current Default warm route but Make bypasses it for both entries; observed Uganda Make case prevents Country-gate-only scope. Actual Niger Make operand unmeasured.",
+      "sealing_qualification": "Eight guard denials and two sealing stops retained; cleanup/cache-provider attributions qualified, no zero-denial claim or test replay."
     }
   },
   "integration": {
@@ -1390,17 +1408,49 @@
       "additional_PR": 1201,
       "exact_leaf_nine_path_mode_blob_delta": true,
       "filesystem_origin_published": true,
-      "GitHub_published": false,
+      "GitHub_published": true,
       "review_assigned": true,
-      "tests_builds": "85candidatePASS;actual19controls20FAIL7PASS;candidate matrix/tail and152native/raw strictpairs pass, parenttail/finalaccounting ongoing",
-      "verdict": null,
+      "tests_builds": "85PASS; actual19 newcontrols20FAIL7PASS;162main and152source-bound cache pairs (not asserted disjoint),92literal warning pairs,5scannerWARN exact",
+      "verdict": "ROOT_ACCEPT_BOUNDED_GLOBAL20_WITH_EXPLICIT_POPULATED_CHILD_LOG_HISTORY_LIMIT",
       "brief": "queued-twenty/NEXT-REVIEW-BRIEF.md",
       "healthy_comparator_boundary": "Current19/fullcoverage Mali155931 and Niger46043; never leaf Mali40218 or an old pooled Feature",
-      "status": "Active bounded review; no terminal release/root acceptance/GitHub publication",
+      "status": "ROOT_ACCEPT_BOUNDED_GLOBAL20_WITH_EXPLICIT_POPULATED_CHILD_LOG_HISTORY_LIMIT",
       "reviewer": "niger_lane",
       "actual_prebuild": "25Tanzania/524otherAPI/39frameworkexact;14relevantwavecells,6Tanzania changes",
       "execution_qualification": "Dependent preparation gates launched before census completion stopped before copies/decode/API; originals retained; resumed only never-started preparation after terminal0 scope receipt",
-      "warning_evidence_qualification": "Populated child logs backend-only names overwrote earlier per-key logs. Unique frames/endpoints/aggregate/structured main warnings preserved; original child log bytes/history unavailable; no complete populated-child-warning equality or API replay."
+      "warning_evidence_qualification": "Populated child logs backend-only names overwrote earlier per-key logs. Unique frames/endpoints/aggregate/structured main warnings preserved; original child log bytes/history unavailable; no complete populated-child-warning equality or API replay.",
+      "root_acceptance": "integration/tanzania-twenty-review/ROOT-ACCEPTANCE.json",
+      "manifest_entries": 2629,
+      "manifest_sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
+      "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
+      "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022"
+    },
+    "twenty_increment": {
+      "head": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
+      "actual19_control": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+      "branch": "isa/integration-twenty-20261022",
+      "path": "/local/job40255479/worktrees/isa-integration-twenty",
+      "control_path": "/local/job40255479/worktrees/isa-integration-twenty-base",
+      "private_root": "/local/job40255479/control/isa-backlog-20261021/integration/tanzania-twenty-review",
+      "additional_PR": 1201,
+      "exact_leaf_nine_path_mode_blob_delta": true,
+      "filesystem_origin_published": true,
+      "GitHub_published": true,
+      "review_assigned": true,
+      "tests_builds": "85PASS; actual19 newcontrols20FAIL7PASS;162main and152source-bound cache pairs (not asserted disjoint),92literal warning pairs,5scannerWARN exact",
+      "verdict": "ROOT_ACCEPT_BOUNDED_GLOBAL20_WITH_EXPLICIT_POPULATED_CHILD_LOG_HISTORY_LIMIT",
+      "brief": "queued-twenty/NEXT-REVIEW-BRIEF.md",
+      "healthy_comparator_boundary": "Current19/fullcoverage Mali155931 and Niger46043; never leaf Mali40218 or an old pooled Feature",
+      "status": "ROOT_ACCEPT_BOUNDED_GLOBAL20_WITH_EXPLICIT_POPULATED_CHILD_LOG_HISTORY_LIMIT",
+      "reviewer": "niger_lane",
+      "actual_prebuild": "25Tanzania/524otherAPI/39frameworkexact;14relevantwavecells,6Tanzania changes",
+      "execution_qualification": "Dependent preparation gates launched before census completion stopped before copies/decode/API; originals retained; resumed only never-started preparation after terminal0 scope receipt",
+      "warning_evidence_qualification": "Populated child logs backend-only names overwrote earlier per-key logs. Unique frames/endpoints/aggregate/structured main warnings preserved; original child log bytes/history unavailable; no complete populated-child-warning equality or API replay.",
+      "root_acceptance": "integration/tanzania-twenty-review/ROOT-ACCEPTANCE.json",
+      "manifest_entries": 2629,
+      "manifest_sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
+      "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
+      "public_source_branch": "https://github.com/ligon/LSMS_Library/tree/isa/integration-twenty-20261022"
     }
   }
 }

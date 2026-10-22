@@ -1,0 +1,348 @@
+{
+  "original_safe_stops": [
+    {
+      "side": "base",
+      "file": "base/failure-1792642570812010116-safe.json",
+      "status": "ERROR",
+      "exception_type": "AssertionError",
+      "script": "hash-inventory.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 291,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 98,
+          "function": "_run_module_code"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 88,
+          "function": "_run_code"
+        },
+        {
+          "file": "hash-inventory.py",
+          "line": 15,
+          "function": "<module>"
+        }
+      ]
+    },
+    {
+      "side": "base",
+      "file": "base/failure-1792642656555086494-safe.json",
+      "status": "ERROR",
+      "exception_type": "SystemExit",
+      "script": "new-tests.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 291,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 98,
+          "function": "_run_module_code"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 88,
+          "function": "_run_code"
+        },
+        {
+          "file": "new-tests.py",
+          "line": 5,
+          "function": "<module>"
+        }
+      ]
+    },
+    {
+      "side": "base",
+      "file": "base/failure-1792643870451069625-safe.json",
+      "status": "ERROR",
+      "exception_type": "AssertionError",
+      "script": "subsets.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 291,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 98,
+          "function": "_run_module_code"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 88,
+          "function": "_run_code"
+        },
+        {
+          "file": "subsets.py",
+          "line": 15,
+          "function": "<module>"
+        },
+        {
+          "file": "common.py",
+          "line": 36,
+          "function": "exact"
+        }
+      ]
+    },
+    {
+      "side": "candidate",
+      "file": "candidate/failure-1792642571203795558-safe.json",
+      "status": "ERROR",
+      "exception_type": "AssertionError",
+      "script": "hash-inventory.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 291,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 98,
+          "function": "_run_module_code"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 88,
+          "function": "_run_code"
+        },
+        {
+          "file": "hash-inventory.py",
+          "line": 15,
+          "function": "<module>"
+        }
+      ]
+    },
+    {
+      "side": "candidate",
+      "file": "candidate/failure-1792643095918198441-safe.json",
+      "status": "ERROR",
+      "exception_type": "KeyError",
+      "script": "source-factor-oracle.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 291,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 98,
+          "function": "_run_module_code"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 88,
+          "function": "_run_code"
+        },
+        {
+          "file": "source-factor-oracle.py",
+          "line": 24,
+          "function": "<module>"
+        },
+        {
+          "file": "<unchanged actual parent with private physical trace>",
+          "line": 1374,
+          "function": "_parent_native_with_physical_trace"
+        },
+        {
+          "file": "uganda.py",
+          "line": 1175,
+          "function": "_crop_label_map"
+        },
+        {
+          "file": "uganda.py",
+          "line": 775,
+          "function": "_harmonized_codes"
+        },
+        {
+          "file": "local_tools.py",
+          "line": 2564,
+          "function": "get_categorical_mapping"
+        },
+        {
+          "file": "local_tools.py",
+          "line": 2538,
+          "function": "get_categorical_mapping"
+        }
+      ]
+    },
+    {
+      "side": "candidate",
+      "file": "candidate/failure-1792643457199172811-safe.json",
+      "status": "ERROR",
+      "exception_type": "FileNotFoundError",
+      "script": "source-factor-oracle-v2.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 290,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 254,
+          "function": "_get_code_from_file"
+        }
+      ]
+    },
+    {
+      "side": "candidate",
+      "file": "candidate/failure-1792643471833386496-safe.json",
+      "status": "ERROR",
+      "exception_type": "FileNotFoundError",
+      "script": "source-factor-oracle-v2.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 290,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 254,
+          "function": "_get_code_from_file"
+        }
+      ]
+    },
+    {
+      "side": "candidate",
+      "file": "candidate/failure-1792643604315560474-safe.json",
+      "status": "ERROR",
+      "exception_type": "ValueError",
+      "script": "derived.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 291,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 98,
+          "function": "_run_module_code"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 88,
+          "function": "_run_code"
+        },
+        {
+          "file": "derived.py",
+          "line": 46,
+          "function": "<module>"
+        },
+        {
+          "file": "base.py",
+          "line": 664,
+          "function": "to_numpy"
+        },
+        {
+          "file": "masked.py",
+          "line": 589,
+          "function": "to_numpy"
+        }
+      ]
+    },
+    {
+      "side": "candidate",
+      "file": "candidate/failure-1792644616260141098-safe.json",
+      "status": "ERROR",
+      "exception_type": "AssertionError",
+      "script": "package-safe.py",
+      "frames": [
+        {
+          "file": "entry.py",
+          "line": 13,
+          "function": "<module>"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 291,
+          "function": "run_path"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 98,
+          "function": "_run_module_code"
+        },
+        {
+          "file": "<frozen runpy>",
+          "line": 88,
+          "function": "_run_code"
+        },
+        {
+          "file": "package-safe.py",
+          "line": 4,
+          "function": "<module>"
+        }
+      ]
+    }
+  ],
+  "first_subset_expected_operand": {
+    "original_expected_serialized_at_stop": false,
+    "surviving_actual": "base/default-subsets/supported-private.pkl",
+    "surviving_full_reference": "base/default-warm/Uganda-crop-bare-private.pkl",
+    "reference_sha256": "aaca07e76f7221574ee52cd7fe37b887ecb250026d07f8caa2a1356f116f3c10",
+    "new_reconstruction_file": "artifact-final-checks/base-supported-expected-filter-RECONSTRUCTED-private.pkl",
+    "no_API_replay": true,
+    "differing_typed_attrs_keys": [
+      "sampling",
+      "population",
+      "recall"
+    ]
+  },
+  "auxiliary_launch_qualification": [
+    "First oracle retry shell used unavailable bare python, then passed a relative script path; next retry also passed relative path. Both FileNotFound stops precede decode. Final absolute-path run is separate.",
+    "Auxiliary aggregate inspection indexed integer new_bindings as a list and stopped with TypeError; no source decode/API/cache operation."
+  ],
+  "no_completed_API_prefix_replayed_to_erase_a_stop": true
+}

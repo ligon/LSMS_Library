@@ -1,0 +1,109 @@
+{
+  "status": "FINAL_RELEASE",
+  "verdict": "PASS_BOUNDED_WITH_EXPLICIT_POPULATED_CHILD_LOG_HISTORY_LIMIT",
+  "candidate": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
+  "actual19_control": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+  "manifest": "/local/job40255479/control/isa-backlog-20261021/integration/tanzania-twenty-review/private-final-manifest.json",
+  "manifest_receipt": {
+    "sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
+    "bytes": 665454,
+    "mode": 384,
+    "mtime_ns": 1792645069476042557,
+    "type": "file"
+  },
+  "manifest_entries": 2629,
+  "safe_export_allowlist": {
+    "safe-exports/REVIEW.org": {
+      "sha256": "7ac7e45b831c394bbb6bd11c9f36ca95b77151bc3c26e26d3011ffb35ab138e1",
+      "bytes": 17555,
+      "mode": 384,
+      "mtime_ns": 1792644962978445202,
+      "type": "file"
+    },
+    "safe-exports/verdict.json": {
+      "sha256": "db4c2b3d5cd8a2c40355d2d31b5b1db9f8a85580efe3eaebaa0ca39ee6fdc3d1",
+      "bytes": 799,
+      "mode": 384,
+      "mtime_ns": 1792644962978445202,
+      "type": "file"
+    },
+    "safe-exports/proof.json": {
+      "sha256": "669dcc50ec758d382d4c6f89e7692269862c8390e822e38eb38ad81471900dc8",
+      "bytes": 2388,
+      "mode": 384,
+      "mtime_ns": 1792644962978445202,
+      "type": "file"
+    },
+    "safe-exports/validation.json": {
+      "sha256": "8231bebba167d4a8c8f73c905f598bdcf75c0896a5c56b4392ade644f49daefd",
+      "bytes": 15212,
+      "mode": 384,
+      "mtime_ns": 1792644962978445202,
+      "type": "file"
+    },
+    "safe-exports/REPRODUCE.md": {
+      "sha256": "3ac5048bd8d0c30ee56f6a2ada0e5b6c69c540af7c72622bf94883ddfb0e6c32",
+      "bytes": 3139,
+      "mode": 384,
+      "mtime_ns": 1792644962979445208,
+      "type": "file"
+    },
+    "safe-exports/checker-sources.json": {
+      "sha256": "b96122297dd7b4d952216ad0210d2927875b56f4d60bf55ea2c85316e08db275",
+      "bytes": 5763,
+      "mode": 384,
+      "mtime_ns": 1792645067930034174,
+      "type": "file"
+    }
+  },
+  "excluded_controls": {
+    "finish-seal-private.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "mtime_ns": 1792645136560406314,
+      "type": "file"
+    },
+    "package-seal-private.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "mtime_ns": 1792645064062013047,
+      "type": "file"
+    },
+    "private-final-manifest.json": {
+      "sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
+      "bytes": 665454,
+      "mode": 384,
+      "mtime_ns": 1792645069476042557,
+      "type": "file"
+    },
+    "terminal-seal-private.json": {
+      "sha256": "950da6da9af47c8f5538dcae1144b364d00b9d830bd2ffe0349594d33bf4bcec",
+      "bytes": 254,
+      "mode": 384,
+      "mtime_ns": 1792645141892435226,
+      "type": "file"
+    }
+  },
+  "exact_relative_exclusions": [
+    "FINAL-READY.json",
+    "finish-seal-error-private.txt",
+    "finish-seal-private.log",
+    "package-seal-error-private.txt",
+    "package-seal-private.log",
+    "private-final-manifest.json",
+    "terminal-seal-private.json"
+  ],
+  "terminal_seal": {
+    "status": "TERMINAL_SUCCESS",
+    "payload_entries": 2629,
+    "all_payload_receipts_exact": true,
+    "exact_payload_path_set": true,
+    "tracked_source_endpoints_exact": 30085,
+    "zero_task_consumers": true,
+    "no_API_source_test_replay_for_seal": true
+  },
+  "zero_consumers_at_seal": true,
+  "reviewer": "Sue / GPT-6"
+}

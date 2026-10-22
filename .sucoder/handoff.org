@@ -1209,3 +1209,14 @@ Sue
 Twenty-first owner-only archive verifies561files/2160380400sourcebytes,246007940archivebytes,SHAf6cde2800f50c7ee28450f7a48cee7a463029827f0f789bf8dad13bd2538bc9a. Allmembers/source-after/owner/modes/fsync/durablelauncherverified; rawextensions and duplicateL1/L2/tempdata excluded. Only frozenMalawi/218 included; active roots separate. Receipt private-evidence-durability-twentyfirst.json. No independent Malawi verdict yet.
 
 Sue
+
+* Combined20 accepted and two independent reviews active -- 2026-10-22 05:22 UTC
+
+Source20 de38 against actual19 2566 is root accepted for bounded Tanzania increment and GitHub-published. All2629manifest payloads/sixsafe exports/checker pins/30085current source endpoints and exact nine-path leaf delta independently verified;85PASS,actualparent20FAIL7PASS,92literalwarningpairs,5scannerWARNexact. Populated earlier child logs overwritten/unavailable; no fullchildlog equality/full20suite/corpus claim. Safe review and ROOT-ACCEPTANCE atintegration/tanzania-twenty-review.
+At05:21:50UTC all22implementation PRs freshly OPEN/unmerged/exact expected heads; public-pr-checkpoint-twentytwo-followup.json. Human merges only.
+Ug849author491 frozen1858payloads/19safe exports, independently rehashed; root v1 link-versus-symlink vocabulary stop preserved and v2 passed unchanged receipts. Released niger_lane now independent Uganda849 reviewer in separate491/085 checkouts with full current CONTENTS/source/pool/actual Make/subset/1196 obligations. New849-Uganda-author reports are author evidence only; queued-Uganda-849-review records dispatch.
+Malawi218 independent review_nigeria_1034 has51PASS,actualparent1FAIL1PASS,own26/523/39/97wave census before builds; four source-cold roots running. No independent verdict/PR; oldMake/scanner/invalidwave caveats remain.
+1196mali_lane diagnosis is sealing with additive route note: fullindices bothMultiIndex; Country read-gate-only cannot cover observed Uganda Make route. Actual NigerMake operand unmeasured. Eight guard events and two sealing stops preserved, no zero-denial claim. No production edit/corpus rebuild authorized.
+Next source21 Uganda1198 composition must gate actual current Niger CROP hashes/full coverage; current20 community comparators do not establish current CP. Old leaf46376 caches may require normal private source rebuild, never restamp/bypass. Twenty-one frozen owner-only archives verified; new frozen20/849author not archived yet; active1196/Malawi/Uganda review roots must not be archived.
+
+Sue
