@@ -4857,20 +4857,28 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     return res
 
 
-def _parcel_from_crop_plot(plot, i):
+def _parcel_from_crop_plot(plot, i, *, country=None):
     """Extract the parcel token from a ``crop_production`` plot id.
 
     Uganda's ``crop_production.plot_id`` is ``{hhid}-{parcel}-{plot}`` (e.g.
     ``'1021000108-1-2'``).  Strip the leading ``{hhid}-`` and return the
-    first remaining ``-``-delimited token (the parcel).  Returns the plot id
-    unchanged when it doesn't carry the ``{hhid}-`` prefix (other countries'
-    vocabularies), so the parcel join degrades to a plot join rather than
-    erroring.
+    first remaining ``-``-delimited token (the parcel).
+    Uganda's household-only panel walk can change ``i`` while the composite
+    plot id retains its native household.  For an explicitly Uganda-marked
+    Country operand, invert that native constructor from the right when its
+    parcel and plot suffixes are nonempty ASCII-decimal tokens.  Otherwise
+    return an unrecognized plot id unchanged.
     """
     s = str(plot)
     prefix = f"{i}-"
     if s.startswith(prefix):
         return s[len(prefix):].split('-', 1)[0]
+    if country == 'Uganda':
+        parts = s.rsplit('-', 2)
+        if (len(parts) == 3 and parts[0]
+                and all(token.isascii() and token.isdecimal()
+                        for token in parts[1:])):
+            return parts[1]
     return s
 
 
@@ -4930,8 +4938,12 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
           ``{parcel}_{suffix}``, and both encode the same parcel.  Harvest
           is summed over the parcel's crops and plots, area over the
           parcel's land sub-units (the AGSEC2A/2B split), and divided.  This
-          is the WB-faithful grain (their ``plot_id_merge`` = ``hhid-parcel``)
-          and on Uganda the parcel key matches on 100% of crop rows.
+          is the WB-faithful grain (their ``plot_id_merge`` = ``hhid-parcel``).
+          Uganda's native household prefix can differ from the panel-walked
+          ``i``; the existing ``attrs['country']='Uganda'`` enables its native
+          constructor inverse for Country operands.  Coverage also requires
+          convertible harvest and a matching positive area; neither missing
+          nor nonpositive area is filled.
         - ``'plot'``: join on the literal ``plot`` value verbatim.  Use only
           where the two features already share a plot vocabulary; on Uganda
           the literal ids never match and the result is empty.
@@ -4975,8 +4987,21 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     base = [k for k in ['t', 'i'] if k in hk.columns and k in pf.columns]
 
     if on == 'parcel':
+        native_country = crop_production.attrs.get('country')
+        if not isinstance(native_country, str) or native_country != 'Uganda':
+            native_country = None
+        if native_country is not None:
+            area_country = plot_features.attrs.get('country')
+            if area_country is not None and (
+                    not isinstance(area_country, str) or area_country != 'Uganda'):
+                native_country = None
+        # Feature frames carry row-level country identity. A stale scalar
+        # attr must not authorize a country-specific decode of pooled rows.
+        if 'i' not in base or any('country' in frame.index.names or 'country' in frame.columns
+               for frame in (crop_production, plot_features)):
+            native_country = None
         hk['_land'] = [
-            _parcel_from_crop_plot(p, i)
+            _parcel_from_crop_plot(p, i, country=native_country)
             for p, i in zip(hk[hk_key],
                             hk['i'] if 'i' in hk.columns else [''] * len(hk))
         ]
