@@ -577,12 +577,16 @@ def test_uganda_harvest_kg_baseline():
     cp = ll.Country("Uganda").crop_production()
     assert "KgFactor" in cp.columns
     res = harvest_kg(cp)
-    assert len(cp) == 133_331
+    # GH1198, 2026-10-22: normal held-source cold build retains every native
+    # observation. Current factor wiring is unchanged; own-row pairing and
+    # the resulting median pools move the whole harvest by exactly 2,091 kg.
+    # The complete zero-tolerance source/transform oracle is in the task report.
+    assert len(cp) == 133_761
     assert len(res) == 78_571
-    assert res["Harvest_kg"].sum() == pytest.approx(29_093_322.407894, rel=1e-9)
+    assert res["Harvest_kg"].sum() == pytest.approx(29_095_413.407894, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
-        "reported": 14_972, "shipped": 0, "survey_median": 555,
-        "metric": 88_190, "inferred": 0, "none": 29_614,
+        "reported": 14_981, "shipped": 0, "survey_median": 560,
+        "metric": 88_443, "inferred": 0, "none": 29_777,
         "reported_implausible": 102, "shipped_implausible": 0,
         "shipped_matched": 0, "declared": 0}
     # GH #931 (2026-10-19): `declared` joins the dict and NO NUMBER MOVES.

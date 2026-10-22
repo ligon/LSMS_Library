@@ -1227,7 +1227,38 @@ def _to_int_code(series):
     return pd.to_numeric(series, errors='coerce').astype('Int64')
 
 
-def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
+def _production_observations(df, cm, cond, source_ref, slot, where):
+    """Name source observations, before any selection (ledger GH1198 §3/§4).
+
+    ``source_ref`` is supplied by the loader, not guessed from a wave name.
+    Physical positions are release-order coordinates, never survey IDs.
+    """
+    if not isinstance(source_ref, str) or not source_ref.strip():
+        raise ValueError('Uganda crop_production requires an explicit source reference')
+    row = pd.Series(np.arange(len(df)), dtype='string')
+    locator = 'row:' + source_ref + ':' + row
+    if cm.get('production_id') is not None:
+        native = _require(df, cm['production_id'], where, 'production id')
+        native = native.apply(format_id).reset_index(drop=True).astype('string')
+        native = native.mask(native.eq(''), pd.NA)
+        token = ('reported:' + native).fillna('missing-id:' + locator)
+        constructed = native.isna().any()
+    elif cond.get('production_slot') is not None:
+        token = pd.Series('slot:' + str(cond['production_slot']),
+                          index=range(len(df)), dtype='string')
+        constructed = False
+    else:
+        token = locator.copy()
+        constructed = True
+    if constructed and source_ref.startswith('missing:'):
+        raise ValueError('Uganda crop_production constructed identity has no verified source')
+    # The slot belongs to the physical locator even for long-form sources.
+    physical_slot = cond.get('production_slot', slot)
+    return token, locator, locator + '/slot:' + str(physical_slot)
+
+
+def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None,
+                             *, source_refs):
     """Build canonical ``crop_production`` for one Uganda UNPS wave.
 
     Parameters
@@ -1252,9 +1283,11 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
         Per-(season) column maps keyed by ``'A'`` / ``'B'``.  Each value
         is a dict with keys:
             hhid, parcel, plot, crop       — id columns
+            production_id                 -- reported record ID, or None
             conditions : list of dicts, one per parallel harvest-record
                          set, each with keys:
                 qty           — reported harvest quantity column
+                production_slot -- actual wide condition slot, where present
                 unit          — reported harvest unit code column (or None)
                 condition     — reported harvest CONDITION/state code column
                                 (UNPS q6c; None only if the wave has none)
@@ -1298,6 +1331,11 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
         ``df4b`` respectively.  A season whose block is absent (or whose
         frame is None) serves NA for that season -- never the other
         season's answer.
+    source_refs : dict
+        Explicit A/B source identities computed by the loader with
+        ``local_tools.source_fingerprint`` from the same paths it reads.
+        A dvc identity contains the source name and SHA256 of its sidecar,
+        not a raw-file MD5. Synthetic callers supply synthetic references.
 
     Raises
     ------
@@ -1312,7 +1350,8 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
 
     Returns
     -------
-    pd.DataFrame indexed by ``(t, i, plot, j, u, condition, season)`` with columns
+    pd.DataFrame indexed by
+    ``(t, i, plot_id, j, u, condition, season, production_obs)`` with columns
         ``Quantity`` (Float64), ``Quantity_sold`` (Float64),
         ``Value_sold`` (Float64), ``Unit_sold`` (string, the unit the SALE
         was reported in -- GH #824), ``Condition_sold`` (string),
@@ -1402,6 +1441,8 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
             qcol = cond.get('qty')
             if not qcol:
                 continue
+            observation, row_locator, slot_locator = _production_observations(
+                df5, cm, cond, source_refs.get(season), n + 1, w)
             qty = pd.to_numeric(_require(df5, qcol, ws, 'quantity'), errors='coerce')
             # SURVEY-REPORTED missing-value sentinel on the harvest quantity
             # (UNPS q6a).  2009-10's a5aq6a/a5bq6a use `99999` for "no
@@ -1501,6 +1542,9 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
                 'u':             u.values,
                 'condition':     condition.values,
                 'season':        season,
+                'production_obs': observation.array,
+                '_production_row': row_locator.array,
+                '_production_locator': slot_locator.array,
                 'Quantity':      qty.values,
                 'Quantity_sold': qsold.values,
                 'Value_sold':    vsold.values,
@@ -1569,45 +1613,35 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
     df['condition'] = df['condition'].astype('object').where(
         df['condition'].notna(), _CONDITION_UNKNOWN)
 
-    df = df.set_index(['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season'])
-    # Collapse exact-duplicate index tuples (same plot/crop/unit/condition/
-    # season reported twice) by summing the reported quantities — this is NOT
-    # an aggregation across distinct items, just de-duplication of repeated
-    # identical source rows so the index is unique.  Before `condition` was
-    # in the index this block also summed FRESH onto DRY weight (GH #323).
+    keys = ['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season']
+    df = df.set_index(keys)
+    # The old reducer ran only for a nonunique seven-level index. Preserve
+    # its null-key exclusion on that branch, including otherwise unique
+    # null keys in the same frame. A wholly unique old index keeps its null
+    # records. v is joined later and is outside this existing boundary.
     if not df.index.is_unique:
-        num = df[['Quantity', 'Quantity_sold', 'Value_sold']].groupby(level=df.index.names).sum(min_count=1)
-        # KgFactor is a RATE (kg per one unit of `u`), not an extensive
-        # measure: summing it across de-duplicated rows would multiply the
-        # implied weight by the number of duplicates.  first(), like the
-        # other per-row attributes.
-        firstcols = df[['harvest_month', 'intercropped', 'KgFactor']].groupby(level=df.index.names).first()
-        # Unit_sold / Condition_sold are REPORTED LABELS, and the numeric
-        # block above SUMS Quantity_sold across the collapsed rows.  A sum
-        # taken across two DIFFERENT sold units is in NO unit, so `first()`
-        # -- which is what every other per-row attribute here gets -- would
-        # put a label on a number that does not have it.  `reduce_to_agreed`
-        # (lsms_library.build_transforms, the same reducer Uganda's
-        # cluster_features hook uses) is the tested "lossless or loud"
-        # collapse: it keeps the agreed value where the group agrees, sets
-        # the cell NA and warns where it does not, and escalates to a raise
-        # under LSMS_GRAIN_STRICT=1.  Nothing is dropped -- the row and its
-        # summed quantities are served exactly as they were before GH #824;
-        # only the label is withheld where the sources contradict each
-        # other.  Such a group is a PRE-EXISTING defect in the summed
-        # Quantity_sold that this column makes visible for the first time.
-        # GH #868: this runs OUT OF PROCESS (make -> the wave script), so no
-        # framework context names the cell; pass it, so the report files
-        # under ('Uganda', 'crop_production') -- the key the wave script hands
-        # to to_parquet(grain_audit=grain_reports(...)) and the framework
-        # replays into the country stamp.  A warm read then still names the
-        # 11 blanked groups.
-        from lsms_library.build_transforms import reduce_to_agreed
-        labelcols = reduce_to_agreed(df[['Unit_sold', 'Condition_sold']],
-                                     on_conflict='na',
-                                     country='Uganda', table='crop_production',
-                                     wave=t)
-        df = num.join(firstcols).join(labelcols)
+        df = df.loc[~df.index.to_frame(index=False).isna().any(axis=1).to_numpy()]
+    if df['_production_locator'].duplicated().any():
+        raise ValueError(f'Uganda crop_production {t}: repeated physical source locator')
+    observation = df['production_obs'].copy()
+
+    def extended_index(values):
+        codes, level = pd.factorize(pd.Index(values, name='production_obs'), sort=False)
+        return pd.MultiIndex(levels=list(df.index.levels) + [level],
+                             codes=list(df.index.codes) + [codes],
+                             names=keys + ['production_obs'], verify_integrity=True)
+
+    index = extended_index(observation)
+    repeated = index.duplicated(keep=False)
+    if repeated.any():
+        rows = df['_production_row']
+        if rows.loc[repeated].str.startswith('row:missing:').any():
+            raise ValueError('Uganda crop_production repeated identity has no verified source')
+        observation.iloc[np.flatnonzero(repeated)] += '/' + rows.iloc[np.flatnonzero(repeated)].array
+        index = extended_index(observation)
+    if not index.is_unique:
+        raise ValueError(f'Uganda crop_production {t}: observation identity is not unique')
+    df.index = index
     return df[cols]
 
 
@@ -1814,12 +1848,12 @@ CROP_COLMAPS = {
         # harvest row" (measured: 1400 rows season A, 1697 season B, none
         # of them in Quantity_sold, Value_sold or KgFactor).  Exact-value
         # strip only; see crop_production_for_wave's qty_sentinel handling.
-        'A': {'hhid': 'HHID', 'parcel': 'a5aq1', 'plot': 'a5aq3', 'crop': 'a5aq5',
+        'A': {'production_id': None, 'hhid': 'HHID', 'parcel': 'a5aq1', 'plot': 'a5aq3', 'crop': 'a5aq5',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
                               'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
                               'condition_sold': 'a5aq7b', 'value_sold': 'a5aq8',
                               'month': None, 'qty_sentinel': 99999}]},
-        'B': {'hhid': 'HHID', 'parcel': 'a5bq1', 'plot': 'a5bq3', 'crop': 'a5bq5',
+        'B': {'production_id': None, 'hhid': 'HHID', 'parcel': 'a5bq1', 'plot': 'a5bq3', 'crop': 'a5bq5',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
@@ -1839,12 +1873,12 @@ CROP_COLMAPS = {
                         'flag': 'a4bq7', 'crop': 'a4bq6'},
     },
     '2010-11': {
-        'A': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
+        'A': {'production_id': None, 'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
                               'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
                               'condition_sold': 'a5aq7b', 'value_sold': 'a5aq8',
                               'month': None}]},
-        'B': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
+        'B': {'production_id': None, 'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
@@ -1863,7 +1897,7 @@ CROP_COLMAPS = {
                         'flag': 'a4bq7', 'crop': 'cropID'},
     },
     '2011-12': {
-        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+        'A': {'production_id': 'productionID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
                               'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
                               # 2011-12 ships NO 7b column in either file.  The
@@ -1875,7 +1909,7 @@ CROP_COLMAPS = {
                               'condition_sold': None,
                               'value_sold': 'a5aq8',
                               'month': 'a5aq6f'}]},
-        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+        'B': {'production_id': 'production2ID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               # 2011-12 ships NO 7b column in either file.  The
@@ -1893,13 +1927,13 @@ CROP_COLMAPS = {
                         'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2013-14': {
-        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+        'A': {'production_id': 'Production_ID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
                               'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
                               'condition_sold': 'a5aq7b',
                               'value_sold': 'a5aq8',
                               'month': 'a5aq6f'}]},
-        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+        'B': {'production_id': 'Production2_ID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b',
@@ -1911,13 +1945,13 @@ CROP_COLMAPS = {
                         'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2015-16': {
-        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+        'A': {'production_id': 'Production_ID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
                               'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
                               'condition_sold': 'a5aq7b',
                               'value_sold': 'a5aq8',
                               'month': 'a5aq6f'}]},
-        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+        'B': {'production_id': 'Production2_ID', 'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b',
@@ -1929,17 +1963,17 @@ CROP_COLMAPS = {
                         'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2018-19': {
-        'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
-              'conditions': [{'qty': 's5aq06a_1', 'unit': None, 'condition': 'a5aq6b',
+        'A': {'production_id': None, 'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+              'conditions': [{'production_slot': 1, 'qty': 's5aq06a_1', 'unit': None, 'condition': 'a5aq6b',
                               'qty_sold': 's5aq07a_1', 'unit_sold': 's5aq07c_1',
                               'condition_sold': 's5aq07b_1',
                               'value_sold': 's5aq08_1',
                               'month': 's5aq06f_1', 'kg_factor': 'a5aq6d'}]},
-        'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+        'B': {'production_id': None, 'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [
                   # Slot 1: LEGACY a5bq6{b,c,d} names for unit / condition /
                   # kg factor beside WB s5bq0?_1 names for everything else.
-                  {'qty': 's5bq06a_1', 'unit': 'a5bq6b', 'condition': 'a5bq6c',
+                  {'production_slot': 1, 'qty': 's5bq06a_1', 'unit': 'a5bq6b', 'condition': 'a5bq6c',
                    'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
                    'condition_sold': 's5bq07b_1',
                    'value_sold': 's5bq08_1',
@@ -1956,7 +1990,7 @@ CROP_COLMAPS = {
                   # decodes Kg / Sack (100 kgs) / Plastic Basin); s5bq06c_2
                   # is 100% inside `harvest_conditions` (91.1% cond-only,
                   # modal 45 "Dry - grain" vs slot 1's modal 20).
-                  {'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
+                  {'production_slot': 2, 'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
                    'qty_sold': 's5bq07a_2', 'unit_sold': 's5bq07c_2',
                    'condition_sold': 's5bq07b_2',
                    'value_sold': 's5bq08_2',
@@ -1968,20 +2002,20 @@ CROP_COLMAPS = {
                         'flag': 's4bq08', 'crop': 'cropID'},
     },
     '2019-20': {
-        'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+        'A': {'production_id': None, 'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [
-                  {'qty': 's5aq06a_1', 'unit': 's5aq06b_1', 'condition': 's5aq06c_1',
+                  {'production_slot': 1, 'qty': 's5aq06a_1', 'unit': 's5aq06b_1', 'condition': 's5aq06c_1',
                    'qty_sold': 's5aq07a_1', 'unit_sold': 's5aq07c_1',
                    'condition_sold': 's5aq07b_1', 'value_sold': 's5aq08_1',
                    'month': 's5aq06f_1'},
-                  {'qty': 's5aq06a_2', 'unit': 's5aq06b_2', 'condition': 's5aq06c_2',
+                  {'production_slot': 2, 'qty': 's5aq06a_2', 'unit': 's5aq06b_2', 'condition': 's5aq06c_2',
                    'qty_sold': 's5aq07a_2', 'unit_sold': 's5aq07c_2',
                    'condition_sold': 's5aq07b_2', 'value_sold': 's5aq08_2',
                    'month': 's5aq06f_2'},
               ]},
-        'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+        'B': {'production_id': None, 'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [
-                  {'qty': 's5bq06a_1', 'unit': 's5bq06b_1', 'condition': 's5bq06c_1',
+                  {'production_slot': 1, 'qty': 's5bq06a_1', 'unit': 's5bq06b_1', 'condition': 's5bq06c_1',
                    'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
                    'condition_sold': 's5bq07b_1', 'value_sold': 's5bq08_1',
                    'month': 's5bq06f_1'},
@@ -1990,7 +2024,7 @@ CROP_COLMAPS = {
                   # `kg_factor` on EITHER 2019-20 slot, deliberately -- this
                   # wave's q6d (s5bq06d_1 / s5bq06d_2, 7 366 / 921 non-null)
                   # is #849's scope and needs its own before/after.
-                  {'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
+                  {'production_slot': 2, 'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
                    'qty_sold': 's5bq07a_2', 'unit_sold': 's5bq07c_2',
                    'condition_sold': 's5bq07b_2', 'value_sold': 's5bq08_2',
                    'month': 's5bq06f_2'},
