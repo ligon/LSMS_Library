@@ -3790,3 +3790,18 @@ filtering an already-finalized all-wave frame is not a full-attrs oracle.
 The original strict subset comparison stop is retained in the task evidence.
 See =slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/= for the safe report,
 source-grounded aggregates, exact hash scope, tests and explicit evidence limits.
+
+* Parquet index policy: cluster keys (GH #1196, 2026-10-22)
+
+The held eight-wave cluster cohort serves 4,805 rows with no null =v= values.
+The reported =Index/v= diagnostic described the extracted level; the complete public frame has a MultiIndex.
+In the verified native wave parquets, 2009-10 records =v= as =numpy_type="string"= and the other seven waves record =str=.
+The all-wave country union records =string=.
+The generic parquet reader preserves each field's recorded missing policy instead of Arrow 25/pandas 3 replacing =string= with =str=.
+It does not impose one policy on all native waves.
+
+A 2019-20 singleton therefore retains its native =str= policy through Make, while a Default request filters the all-wave country union and retains =string=.
+The same existing route difference also leaves Default with two all-null optional GPS columns and unused all-wave index levels, whereas Make serves the three native columns and the requested wave's levels.
+Those complete frames are not identical and were not normalized to claim equality.
+The recorded native 2019-20 writer input, prepared frame, footer and returned Make subset agree; the country footer and returned Default subset also agree.
+The reader repair leaves the EA/GPS-bin/parish conventions, missing-Region caveat, source joins and cluster reducers unchanged.
