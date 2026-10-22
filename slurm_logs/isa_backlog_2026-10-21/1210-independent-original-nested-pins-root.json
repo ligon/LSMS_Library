@@ -1,0 +1,35 @@
+{
+  "status": "ROOT_VERIFIED_ALL_FIVE_ORIGINAL_NESTED_PINS_EXACT",
+  "at_UTC": "2026-10-22T17:10:06.091472+00:00",
+  "pins_sha256": "c93210d9ab4171dd45f8bdefaa4a6ff887ae9f70f579ca93c645627f025f3ac2",
+  "checks": [
+    {
+      "name": "comparator",
+      "exact": true,
+      "mode": "0o600"
+    },
+    {
+      "name": "source_before",
+      "exact": true,
+      "mode": "0o600"
+    },
+    {
+      "name": "scope",
+      "exact": true,
+      "mode": "0o600"
+    },
+    {
+      "name": "protection",
+      "exact": true,
+      "mode": "0o600"
+    },
+    {
+      "name": "native_operands",
+      "exact": true,
+      "mode": "0o600"
+    }
+  ],
+  "earlier_peer_anticipated_mode_mismatch_not_present": true,
+  "no_frozen_edit_or_product_decode_or_replay": true,
+  "signed": "Sue"
+}
