@@ -1281,3 +1281,9 @@ Root object-v3 verifier terminal0:1204newmanifestentries/12632old/1154physicalsa
 RootMali1199ruling afteractual1190SHA/bytes/mode+Niger9bf->READYb8c->manifest9f0gate0 permits NEWcurrentphysicalbaseline, explicitly nohistoricalmtimecontinuityclaim. Criticnew202positive+3attrs+7extra/10negatives/6footercontrols reported, sealingpending; Tz1201sealed322positive30negative16CLI rootacceptancepending; restfull22stillprimaryowned. Source21remainspreparedUNASSIGNED, no allcampaignverdict. Archive24six-rootdrypending; archive23lastfullyverified. Goalactive, no implementationmerges.
 
 Sue
+
+* GH1149 root accepts reviewed amendment -- 2026-10-22T12:53:54.373018+00:00
+
+Root independentdelta gate terminal0:1151entries/7safeexports/JUnit270PASS+4PathLikePASS/actualfb4expectedcleanupFAIL, actual549/39/1362 unchanged, exactcleanheads/ledgeronlydescendant. Root read full delta/adversarialsource; originalhuman6contract carries through unchangedproductionAST/fixture/skill and current270suite. Originalfbwarm12frames/5scannerremain separatelypinned; no newwarm or actualacquisition claim. Acceptedsource4f9344f42/runtime21f5cb7f9, PRpendingpublication; sourceplacementperfileatomicitydoesnotclaimwhole-release rollback.
+
+Sue

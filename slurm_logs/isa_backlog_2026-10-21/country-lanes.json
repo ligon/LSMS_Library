@@ -1274,7 +1274,7 @@
     },
     "1149": {
       "issue": 1149,
-      "status": "HUMAN_SIX_CONTRACT_FIRST_REVIEW_ESTABLISHED; AMENDED_AUTHOR_FROZEN; INDEPENDENT_DELTA_REVIEW_ACTIVE",
+      "status": "ROOT_ACCEPTED_COMPLETE_CODE_ONLY_REPAIR; PR_PUBLICATION_PENDING",
       "candidate": "/local/job40255479/worktrees/isa-1149-acquisition",
       "control": "/local/job40255479/worktrees/isa-1149-acquisition-base",
       "branch": "fix/1149-staged-reacquisition-20261022",
@@ -1322,8 +1322,13 @@
         "safe_evidence": "1149-amendment-author/",
         "review": "queued-1149-amendment-review/",
         "owner": "review_acquisition_1149",
-        "status": "INDEPENDENT_DELTA_REVIEW_ACTIVE",
-        "new_data_API_or_real_acquisition": false
+        "status": "INDEPENDENT_DELTA_PASS_ROOT_ACCEPTED",
+        "new_data_API_or_real_acquisition": false,
+        "root_acceptance": "1149-amendment-independent/ROOT-ACCEPTANCE.json",
+        "independent_tests": "270PASS+4independentPathLikePASS; actualfb4cleanupFAIL",
+        "independent_READY": "d6b06c9230efbcdc8beaa6b6246931dd6442b8fd2626813e8f1b04faa5dffc27",
+        "independent_manifest_entries": 1151,
+        "independent_manifest_sha256": "00b54088f4212f620c99af0dac9b8c9a2ed97521207712739ab13d090b7cb872"
       }
     }
   },
