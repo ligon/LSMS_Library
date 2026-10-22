@@ -1555,3 +1555,13 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* Parquet index policy: food units (GH #1196, 2026-10-22)
+
+The held 2018-19 and 2021-22 food sources produce 239,877 public rows in the f8-based verification cohort.
+The =u= diagnostic concerns one level of the complete MultiIndex, not a separate plain-Index table.
+Its written pandas metadata records =numpy_type="string"=, but Arrow 25 with pandas 3 reconstructed that index field as the NaN-policy =str= dtype.
+The generic parquet reader now restores each physical index field's recorded =string= versus =str= missing policy, preserving the storage already read.
+Both Default country-cache reads and Make wave-cache reads use that repair.
+Unit labels, values, missing masks, source eligibility, index grain and the questionnaire interpretation above are unchanged.
+This does not combine different container sizes or expose the last-purchase quantity as a new observation.

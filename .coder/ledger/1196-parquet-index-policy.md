@@ -192,4 +192,46 @@ copies into two candidate backend roots, empty L2 and nlink1/distinct inodes,
 with all MD5/SHA/size/mode/mtime and sidecar gates before decode/API. Source-cold,
 fresh-warm/scanner/CLI evidence for the new runtime remains pending.
 
+### Completed runtime evidence and author release boundary
+
+Tested runtime is7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1.
+Both new candidate source-cold backends and fresh-process/new-object warm
+backends completed normally for Nigerfood239877/Ugandacluster4805. Default
+has12current caches with full4/8-wave manifests; Make has10current native
+caches and no country cache. Both warm runs have0writer calls and0byte/mode/
+mtime changes. No old API/source/test prefix was replayed to replace evidence.
+
+The strengthened saved329-pair assessment records256full exact,72intended
+recorded-policy-only changes and1explicit existing singleton qualification,
+with0unexpected differences. All44within-route cold/warm pairs are full
+exact, including independent EA values and recursively typed object elements.
+All22cache footers reconstruct by expected-hash-only replacement, including
+nested ARROW:schema. Existing writers and map_index remain AST-exact.
+
+The Uganda singleton qualification includes native-str versus country-union-
+string v policy, as well as824x3versus824x5columns and unused levels.
+Actual2019writer input/prepared/footer/read/Make subset agree onstr; full
+country footer/raw/Default subset agree onstring. Seven native waves record
+str and2009-10 recordsstring. No cross-route dtype/column padding or pruning
+was used to claim full equality. The stronger failed singleton assertion is
+retained separately from this source-bound qualification.
+
+Scanner27raw occurrences are multiset-exact to bothf8/bd80:26WARN and1known
+FAIL, not a zero-finding or full-suite PASS claim. Two scanner baselines and
+six CLI stage frames are full exact tobd80. Scanner/CLI cache endpoints have
+zero changes. CLI JSON attrs and pre-Arrow unused-level preparation remain
+explicit serialization boundaries. All176matched warning category/message
+multisets agree;136full raw multisets agree and40retain location differences.
+
+The earlier comparator's object-EA element-type gaps are retained and bounded
+by8negative controls. NEW private exact_deep.py recurseskind-O objects,
+skipping onlyStringDtype, and reassesses SAVED operands only. Original checks
+are not retroactively called strict. Original87-case XML, new collection
+error, comparator key/path/receipt-schema stops and the initial attempted-v4
+stream-basename reuse are explicit in the safe report; its unique failure
+trace survives though those initial stream bytes lack a separate receipt.
+
+Final notes and safe reports are documentation descendants only. Independent
+review/root acceptance, not an author PASS or public closure, is required.
+
 Sue
