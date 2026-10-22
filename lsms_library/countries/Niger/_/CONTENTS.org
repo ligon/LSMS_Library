@@ -1557,3 +1557,70 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-10-21 -- community_prices uses the framework country builder (GH #1091)
+
+The framework is authoritative under the GH #788 ruling of 2026-10-17,
+reaffirmed 2026-10-18.
+The country =_/community_prices.py= concatenator and its explicit Make target
+are retired; the independent wave pattern and its =niger.py= /
+=categorical_mapping.org= prerequisites remain unchanged.
+Both ECVMA source scripts, their eligibility and duplicate-entry policy, and
+the GH #1088 exact quantity mask are unchanged.
+All 46,043 readings remain: 32,352 in 2011-12 and 13,691 in 2014-15,
+including the 30 nonrepeat second-entry slots after the 134 exact melted
+repeats were removed under GH #840.
+No variety, visit, observation, unit, price, quantity or ID is reinterpreted.
+
+This changes the old explicit Make subset behavior deliberately.
+The retired country target returned BOTH wired waves even for a supported
+singleton or an unsupported EHCVM request.
+Both backends now return 32,352 / 13,691 for the respective supported
+singletons and zero for 2018-19, 2021-22 or their combination.
+The API and CLI remain country materialization entry points; the retired
+country Make target is no longer an alternate country builder.
+The default route writes its verified normalized country cache.
+Explicit Make aggregates the waves and writes no new country parquet;
+normal hashless-wave eviction can rewrite the requested native wave files
+on a warm Make call, without changing their data.
+
+The native wave parquets carry the redundant =i == v= shim described in
+=_finish_community_prices=; the framework removes it before serving the
+declared seven-level index.
+Consequently the old schema comment saying the API renames =j= to =i=
+does not describe these measured outputs: they carry =j=, not =i=.
+The authoritative default layer carries =attrs['id_converted']=; the old
+hashless native country concatenation did not.
+Corrected supported Make results follow the authoritative layer, including
+that flag.
+Raw wave, normalized country, public API and serialized CLI artifacts are
+separate comparison stages, not interchangeable frames.
+
+Zero-row states also retain existing framework distinctions.
+A cold absent request uses the declared-empty helper, whose =visit= / =obs=
+levels are strings and =Description= is object; a covered country-cache
+slice inherits integer levels, string Description and =id_converted=.
+These differences are recorded rather than coerced away.
+CLI parquet serialization turns immutable population records into dicts;
+matched artifact-stage controls preserve that existing behavior.
+The food cold/warm =u= StringDtype difference is separately owned by
+GH #1196 and is not repaired here.
+
+Coverage contradictions in the older prose remain visible.
+The removed Make comment said "only the two ECVMA waves have an EA-level
+community price module", and the helper still says 2018 "ships no community
+price file at all".
+The section above, "2018-19 DOES ship a cluster-grain community price file",
+already explains why the latter claim is false: its grappe module exists
+but remains unwired.
+This retirement adds no EHCVM source and makes no new absence verdict.
+Likewise the older open-decision wording about the nonrepeat tail does not
+reopen the accepted GH #840 / PR #1086 variety/visit/obs representation.
+
+Cache cost, measured before rebuilding: all 549 API hashes were compared
+with the reviewed GH #1088 parent; 23 Niger hashes move, 526 other hashes
+and all 39 framework fingerprints stay exact.
+This is one Niger re-warm from shared country build inputs, not a claim
+that 23 physical outputs were rebuilt.
+Full-frame, source, cold/warm, CLI and Feature evidence is recorded in
+=slurm_logs/isa_backlog_2026-10-21/Niger/1091/=.
