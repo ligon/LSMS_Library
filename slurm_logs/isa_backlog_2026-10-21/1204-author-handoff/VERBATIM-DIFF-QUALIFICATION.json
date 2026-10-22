@@ -1,0 +1,8 @@
+{
+  "verbatim_diff_sha256": "9d29e954ad19cc237c79e37ffd149aa481ce6aa460f511327a157e82737c4fbe",
+  "reason": "The immutable unified diff embeds original Makefile tab-indented context and context-only blank lines. Cached whitespace check flags those eight artifact lines; changing them would alter the authenticated evidence.",
+  "cached_check_excluding_only_this_artifact_exit": 0,
+  "actual_candidate_source_git_diff_check_against_491_exit": 0,
+  "all_other_cached_files_checked": true,
+  "signed": "Sue"
+}

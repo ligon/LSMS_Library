@@ -3,7 +3,7 @@
 
 * Snapshot
 Captured 2026-10-22T17:28:43.364859+00:00.
-There are 112 ISA-related open issue records: 25 with campaign PRs, two active, and 85 other open records.
+There are 112 ISA-related open issue records: 25 with campaign PRs, three active, and 84 other open records.
 All 28 implementation PRs are OPEN and unmerged.
 Umbrellas, decisions and partial repairs overlap; these are not 112 distinct confirmed bugs.
 The original inventory had 97 in-scope records; 96 remain open, duplicate #1089 is now closed, and 16 campaign follow-ups were added.
@@ -12,9 +12,13 @@ Development0671019 adds only a certifi dependency-lock update after the tested r
 Initial triage tiers and approaches are routing guidance and must be rechecked against live issues and complete country notes before dispatch.
 
 * Active work
+** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
+Countries: Burkina_Faso.
+Static source/schema diagnosis active at actualPR1203parent after ledger-first7eb9cfe34. Preserve gift/purchase quantities with their own native units; runtime and production/schema edits held pending concrete boundary.
+
 ** [[https://github.com/ligon/LSMS_Library/issues/1204][#1204]] Uganda crop_production: country fallback violates requested wave coverage
 Countries: Uganda.
-Authora417fix frozen after59heldactors and finalprotection;8candidatePASS/actualparent7FAIL1PASS,existing170PASS. Four newlyexposedzero-row column-orderdifferences retained. Independent phase0assigned; runtimeheld pendingroot handoffauthentication.
+Authora417fix frozen after59heldactors and finalprotection;8candidatePASS/actualparent7FAIL1PASS,existing170PASS. Four newlyexposedzero-row column-orderdifferences retained. Root-authenticated frozenauthor; independent runtime released after ownguardcalibration.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1205][#1205]] Uganda yield_kg: diagnose incomplete parcel-area matches and correct the 100% coverage claim
 Countries: Uganda.
@@ -452,8 +456,6 @@ Countries: Ethiopia.
 ** [[https://github.com/ligon/LSMS_Library/issues/1187][#1187]] Burkina Faso 2018-19: establish the source meaning of unlabelled agricultural input code21
 Countries: Burkina_Faso.
 
-** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
-Countries: Burkina_Faso.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1190][#1190]] Malawi plot_inputs: preserve seed purchase-unit identity before aggregating or joining planted quantities
 Countries: Malawi.

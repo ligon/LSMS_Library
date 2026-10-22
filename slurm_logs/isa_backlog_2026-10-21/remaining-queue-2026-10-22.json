@@ -5,8 +5,8 @@
   "repository_open_issues": 171,
   "isa_related_open_issue_records": 112,
   "pr_linked_issue_records": 25,
-  "active_issue_records": 2,
-  "other_open_issue_records": 85,
+  "active_issue_records": 3,
+  "other_open_issue_records": 84,
   "open_unmerged_implementation_prs": 28,
   "initial_in_scope_still_open": 96,
   "new_campaign_issue_records": 16,
@@ -1842,13 +1842,13 @@
       "title": "Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields",
       "url": "https://github.com/ligon/LSMS_Library/issues/1188",
       "github_state": "open",
-      "queue_state": "OPEN_UNASSIGNED",
+      "queue_state": "ACTIVE",
       "countries": [
         "Burkina_Faso"
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": null,
+      "current_active_scope": "Static source/schema diagnosis after ledger-first7eb9cfe34 at actualPR1203parent; usage/purchase/gift quantities require independent native-unit fields. No production edit or payload runtime released.",
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": true
@@ -1917,7 +1917,7 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Authora417fix frozen after59heldactors and protection; independent reviewer phase0assigned, runtimeheld pendingroot handoffauthentication. Four newlyexposedzero-row column-orderchanges retained.",
+      "current_active_scope": "Root-authenticated frozenauthora417; independent runtime released after ownguardcalibration. Four newlyexposedempty-column-order strictfailures remain explicit.",
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": false
@@ -2252,5 +2252,5 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-22T17:55:35.719067+00:00"
+  "active_progress_updated_at_UTC": "2026-10-22T18:18:48.271234+00:00"
 }

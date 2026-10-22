@@ -121,6 +121,18 @@
           "ci_final": "Burkina1203-CI-final.json"
         },
         "issue_remains_open": true
+      },
+      "current_1188": {
+        "owner": "review_malawi_1209",
+        "path": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188",
+        "actual_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
+        "actual_parent_PR": 1203,
+        "ledger": "7eb9cfe34",
+        "status": "STATIC_SOURCE_SCHEMA_DIAGNOSIS_ONLY_RUNTIME_HELD",
+        "scope": "Correct gift/purchase field semantics while preserving each measured quantity with its own unit; no flag-only shortcut, pooling, grain/source eligibility/code21 classification changes. Concrete representation decision pending static transport/source census.",
+        "production_or_schema_edits_released": false,
+        "provider_payload_copy_decode_imports_released": false
       }
     },
     "Ethiopia": {
@@ -1046,9 +1058,9 @@
         "path": "/local/job40255479/worktrees/isa-Uganda-1204",
         "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
         "ledger": "a53f71bad6a26307eb83d051b57a6cdd9c9424cc",
-        "status": "FROZEN_AUTHOR_INDEPENDENT_PHASE0_RUNTIME_HELD",
+        "status": "ROOT_AUTHENTICATED_AUTHOR_INDEPENDENT_RUNTIME_RELEASED",
         "source_head": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
-        "source_status": "Author reports sealer99339 and separatepostexit88691 terminal0; READY/1839entrymanifest/allowlist frozen, root handoff authentication pending. Later source delta from tested69bcbd5ff is ledger only.",
+        "source_status": "Root89473terminal0 authenticates1839manifest files,29825tracked source receipts,37genuine binaryproviders/444copies and exact8exports. Root first optional-size assertion preserved;27legacy sidecars omit size. Production independent acceptance pending.",
         "targeted": "8candidatePASS/actual491parent7FAIL1PASS;existing170PASS/APIaudit0",
         "copies": "37providers/444distinctcopies/12roots/533307636bytes",
         "static_qualifications": "Guard setup/fixture/IPv6 probe history retained; root has not accepted runtime yet.",
@@ -1056,9 +1068,10 @@
         "source_audit": "12-root exact footprints/177 footers;21 native-footer pairs and22 literal ordered scanner records exact. Held grain ledgers empty; nonempty transport covered only by targeted synthetic tests.",
         "independent_reviewer": "malawi_1209",
         "independent_review_path": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1204",
-        "independent_phase1": "HELD until root handoff authentication and DVC/image preparation; no data/test imports yet",
+        "independent_phase1": "RELEASED after own guard calibration terminal0; root prepared exact mounted-image and private DVCtmp links",
         "private_author_READY": "5febb754720e182cc0834ca2f8b4f45fbb91dba1406b8b88e0dfe72497de9f08",
-        "private_author_manifest": "920a0d87c1473651e0704b2988648178853a6981949e51840520e2814b610d54"
+        "private_author_manifest": "920a0d87c1473651e0704b2988648178853a6981949e51840520e2814b610d54",
+        "root_author_handoff": "1204-author-handoff/ROOT-HANDOFF.json"
       },
       "current_1205": {
         "owner": "acquisition_1149",
@@ -1077,7 +1090,7 @@
         "author": "malawi_1209",
         "root_author_handoff": "1205-author-handoff/ROOT-HANDOFF.json",
         "independent_review_path": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1205",
-        "independent_progress": "Own full549/39/1362fingerprints unchanged; both census terminal1 at empty dvc-cache directory assertion after complete outputs, separately qualified without replay. Candidate65PASS, actual491 new33 sixFAIL27PASS.53genuine providers and106distinctcopies authenticated; both normal cold actors running. Decimal/provider setup stops retained."
+        "independent_progress": "Candidate65PASS/actual491new33sixFAIL27PASS; full549/39/1362fingerprints unchanged,53genuineproviders/106copies. Allsupporting5crossheadframes and12coldwarmframes strict, warmtrees physically unchanged. Rawcolumnoracle27755yields/31959convertedparcels;14520oldkeys/values exact,+13235/0lost. Unserved4204=3918bothareareportsmissing+276nonpositivechosenGPSarea+10missingparcel;0HHrosterabsence/0postdivisiondrop. Literal48orderedscannerwarnings match. Finalprotection/sealpending."
       }
     }
   },
@@ -1870,11 +1883,12 @@
     "implementation_prs": 28,
     "active": [
       1204,
-      1205
+      1205,
+      1188
     ],
     "interpretation": "Explicit current ownership; older per-lane active fields are historical task records.",
     "pr_linked_issue_records": 25,
-    "other_open_issue_records": 85
+    "other_open_issue_records": 84
   },
   "current_invalid_wave_1210": {
     "owner": "acquisition_1149",
