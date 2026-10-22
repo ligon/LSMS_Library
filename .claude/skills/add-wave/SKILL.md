@@ -39,7 +39,12 @@ Returns a list of dicts annotated with:
 | `held_idnos`   | the release idnos those dirs record holding (compare the row's `idno`, the catalog's latest). |
 
 **Acquisition candidates are `no` (a new wave) and `stale-release` (a newer
-release of a wave we hold). The existing flat/no-overwrite extraction does not implement a staged refresh or nested-layout replacement; those remain GH #1149 and need a separately reviewed acquisition procedure.**  A `no` has to be
+release of a wave we hold).** Acquisition stages the complete archive before
+placing data files (GH #1149). For an existing wave, each member's basename
+matches a unique existing `.dvc` sidecar recursively under `Data/`, ignoring
+case, and the file lands at that sidecar's path. Multiple matching sidecars or
+colliding destinations raise before placement. New files, and every file of a
+new wave without sidecars, retain their zip-relative paths. A `no` has to be
 *earned* — it is a confident claim that we neither hold this study nor
 anything containing it (GH #600):
 
@@ -78,10 +83,24 @@ lists an entry's files; compare against the `.dta` you actually downloaded.
 `add_wave` / `populate_and_push` move them, once the whole release has demonstrably landed, and they clear the
 `#+CATALOG_LATEST_*` keys. With `push=True`, every file must also be
 successfully pushed; `push=False` records a complete local download.
-Existing raw files are not overwritten. Nested paths, retirement of older
-files and rollback are separate GH #1149 work, not supplied by these metadata
-guards. Existing SOURCE facts stay intact until the requested acquisition
-succeeds, even when it requests a different primary entry.
+Revised members are reported against the held sidecars' checksums before any
+placement. The comparison uses each sidecar's DVC hash convention: explicit
+`hash: md5` means raw bytes; a legacy sidecar without `hash` uses DVC's
+text-aware `md5-dos2unix`. A matching sidecar permits replacement of its raw
+workspace copy, using atomic per-file replacement to preserve DVC hardlinks.
+An existing byte-identical member is verified without rewriting it. A differing
+raw file without a matching sidecar stays unverified/skipped and prevents the
+new held-release stamp. The acquisition's actual verified members, including
+nested and unchanged files, are the set sent to the batched push helper.
+
+Sidecars/files absent from the new release are reported recursively by their
+resolved paths and left in place; retirement remains a reviewed step. Staging
+prevents an early member from being placed before a later comparison fails.
+Placement is atomic per file, not a whole-release rollback: an IO failure can
+leave a partial refresh, which never receives a complete new held-release
+stamp. Existing SOURCE facts stay intact until the requested acquisition
+succeeds, even when it requests a different primary entry. A new directory's
+initial routing record names the catalog entry without claiming a held release.
 
 To (re)stamp provenance across the tree:
 
@@ -148,11 +167,14 @@ This will:
 1. Resolve the WB catalog IDNO
 2. Show a confirmation prompt (disable with `confirm=False`)
 3. Create `{Country}/{wave}/Data/`, `Documentation/`, and `_/` directories
-4. Write `Documentation/SOURCE.org` with the catalog URL
+4. Write an initial routing `Documentation/SOURCE.org` if none exists
 5. Download the full Stata zip from the WB NADA API
-6. Extract all `.dta` files
-7. Run batched `dvc add` + `dvc push` (if `push=True`, the default)
-8. Show a rich progress summary
+6. Stage all data members, resolve destinations, compare checksums and report
+   revised members/leftovers, then place the files
+7. Run batched `dvc add` + `dvc push` on the actual release membership
+   (if `push=True`, the default)
+8. Record the held release only after complete acquisition and requested push,
+   then show a rich progress summary
 
 Pass `verbose=True` (default) for spinners and a summary table. Use `verbose=False` for scripted/non-interactive use.
 

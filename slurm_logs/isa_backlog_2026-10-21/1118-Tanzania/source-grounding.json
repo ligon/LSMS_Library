@@ -1,0 +1,386 @@
+{
+  "agriculture_sources_and_questionnaires": [
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2019-20/Data/AG_SEC_3A.dta.dvc",
+      "md5": "620902ae358d10c662b28c17780d3b6f",
+      "size": 3284617,
+      "path": "AG_SEC_3A.dta",
+      "held": true,
+      "sha256": "82e1f4ef0f9d3a3947dedd945a82d65263494526c827d698ffe10e36eff3ba69",
+      "rows": 2305,
+      "columns": 173
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2019-20/Data/AG_SEC_4A.dta.dvc",
+      "md5": "4ce0c2a61e460899192b464d26cda13e",
+      "size": 473779,
+      "path": "AG_SEC_4A.dta",
+      "held": true,
+      "sha256": "53ac2085ce498e20426667073a0d9040e3be93963169d882ba5c12f7f7db1ed6",
+      "rows": 1379,
+      "columns": 36
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2020-21/Data/ag_sec_3a.dta.dvc",
+      "md5": "32fe4e855a9a4e4d9d55097ba7be93ab",
+      "size": 2837512,
+      "path": "ag_sec_3a.dta",
+      "held": true,
+      "sha256": "543bf7849911834bd05bc92203d6c420bf17fdf05e9ffed07f77d0e52aef4c50",
+      "rows": 6560,
+      "columns": 234
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2020-21/Data/ag_sec_4a.dta.dvc",
+      "md5": "4d913b74c69a9b4712e8edbe4ba56832",
+      "size": 656818,
+      "path": "ag_sec_4a.dta",
+      "held": true,
+      "sha256": "0f9c45c2e54128ccef131ff8a548f434714ccb4ba45bb37311dd09d7cc538c82",
+      "rows": 5606,
+      "columns": 36
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2019-20/Documentation/nps_sdd_agriculture_qx_final_english_.pdf.dvc",
+      "md5": "b317a47738ccd48c6aecabe4b92185e8",
+      "size": 1084540,
+      "hash": "md5",
+      "path": "nps_sdd_agriculture_qx_final_english_.pdf",
+      "held": true,
+      "sha256": "550cb93ac9efe42e8846a737453d3f34b8287112b8b8497b9bb7547f078610b7"
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2020-21/Documentation/nps_agriculture_qx_y5_final.pdf.dvc",
+      "md5": "635f875f7ffc02415411d808bb4a7a2b",
+      "size": 1115850,
+      "hash": "md5",
+      "path": "nps_agriculture_qx_y5_final.pdf",
+      "held": false
+    }
+  ],
+  "cold_prerequisite_sources": [
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2019-20/Data/AG_SEC_3A.dta.dvc",
+      "md5": "620902ae358d10c662b28c17780d3b6f",
+      "size": 3284617,
+      "path": "AG_SEC_3A.dta",
+      "held": true,
+      "sha256": "82e1f4ef0f9d3a3947dedd945a82d65263494526c827d698ffe10e36eff3ba69"
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2019-20/Data/AG_SEC_4A.dta.dvc",
+      "md5": "4ce0c2a61e460899192b464d26cda13e",
+      "size": 473779,
+      "path": "AG_SEC_4A.dta",
+      "held": true,
+      "sha256": "53ac2085ce498e20426667073a0d9040e3be93963169d882ba5c12f7f7db1ed6"
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2020-21/Data/ag_sec_3a.dta.dvc",
+      "md5": "32fe4e855a9a4e4d9d55097ba7be93ab",
+      "size": 2837512,
+      "path": "ag_sec_3a.dta",
+      "held": true,
+      "sha256": "543bf7849911834bd05bc92203d6c420bf17fdf05e9ffed07f77d0e52aef4c50"
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2020-21/Data/ag_sec_4a.dta.dvc",
+      "md5": "4d913b74c69a9b4712e8edbe4ba56832",
+      "size": 656818,
+      "path": "ag_sec_4a.dta",
+      "held": true,
+      "sha256": "0f9c45c2e54128ccef131ff8a548f434714ccb4ba45bb37311dd09d7cc538c82"
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2008-15/Data/upd4_hh_a.dta.dvc",
+      "md5": "dd8133164050755f4e2e33d37f08daa3",
+      "size": 17800269,
+      "path": "upd4_hh_a.dta",
+      "held": true,
+      "sha256": "9706c5cb5e1aa717c2bf074a450c93f8fc8a3f9bb6699ec3f2e0402f9dbd39bc"
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2019-20/Data/HH_SEC_A.dta.dvc",
+      "md5": "9179d7f5e7621d642b79034cf9cec238",
+      "size": 584392,
+      "path": "HH_SEC_A.dta",
+      "held": true,
+      "sha256": "c43351a6296e7a5277a1c9d19f1bbef3e2dfaffab1e46caa2205c515be3ba84d"
+    },
+    {
+      "sidecar": "lsms_library/countries/Tanzania/2020-21/Data/hh_sec_a.dta.dvc",
+      "md5": "61548b85a2bc9bf4ee85408a7b7cbfbc",
+      "size": 1307336,
+      "path": "hh_sec_a.dta",
+      "held": true,
+      "sha256": "116359959a09ffc26bfb9f5ddb31cf431c93be4939cb42aedd9e68a512f9ca9f"
+    }
+  ],
+  "diagnosis": {
+    "2019-20": {
+      "source": {
+        "Seed": {
+          "source_rows_selected": 1379,
+          "code_counts": {
+            "1.0": 1145,
+            "2.0": 85,
+            "5.0": 73,
+            "4.0": 32,
+            "3.0": 30,
+            "nan": 14
+          },
+          "by_code_quantity_missing": {
+            "nan": 14
+          },
+          "quantity_present_unit_na": 0,
+          "other_code_with_quantity": 73,
+          "unlisted_nonnull_code": 0
+        },
+        "Herbicide": {
+          "source_rows_selected": 33,
+          "code_counts": {
+            "2.0": 27,
+            "3.0": 5,
+            "1.0": 1
+          },
+          "by_code_quantity_missing": {},
+          "quantity_present_unit_na": 0,
+          "other_code_with_quantity": 0,
+          "unlisted_nonnull_code": 0
+        },
+        "Pesticide": {
+          "source_rows_selected": 119,
+          "code_counts": {
+            "3.0": 49,
+            "2.0": 42,
+            "1.0": 26,
+            "4.0": 2
+          },
+          "by_code_quantity_missing": {},
+          "quantity_present_unit_na": 0,
+          "other_code_with_quantity": 2,
+          "unlisted_nonnull_code": 0
+        }
+      },
+      "country": {
+        "rows": 1774,
+        "columns": [
+          "Quantity",
+          "u",
+          "Purchased",
+          "Quantity_purchased",
+          "Improved"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "plot_id",
+          "input",
+          "crop"
+        ],
+        "missing_or_blank": 86,
+        "quantity_present": 72,
+        "quantity_missing": 14,
+        "by_input": {
+          "Pesticide": 2,
+          "Seed": 84
+        },
+        "no_amount_by_input": {
+          "Seed": 14
+        },
+        "existing_unknown": 0
+      }
+    },
+    "2020-21": {
+      "source": {
+        "Seed": {
+          "source_rows_selected": 5606,
+          "code_counts": {
+            "1.0": 4718,
+            "2.0": 381,
+            "5.0": 302,
+            "3.0": 97,
+            "4.0": 93,
+            "nan": 15
+          },
+          "by_code_quantity_missing": {
+            "nan": 5
+          },
+          "quantity_present_unit_na": 10,
+          "other_code_with_quantity": 302,
+          "unlisted_nonnull_code": 0
+        },
+        "Herbicide": {
+          "source_rows_selected": 286,
+          "code_counts": {
+            "2.0": 234,
+            "3.0": 45,
+            "4.0": 4,
+            "1.0": 3
+          },
+          "by_code_quantity_missing": {},
+          "quantity_present_unit_na": 0,
+          "other_code_with_quantity": 4,
+          "unlisted_nonnull_code": 0
+        },
+        "Pesticide": {
+          "source_rows_selected": 605,
+          "code_counts": {
+            "3.0": 328,
+            "2.0": 253,
+            "1.0": 17,
+            "4.0": 7
+          },
+          "by_code_quantity_missing": {},
+          "quantity_present_unit_na": 0,
+          "other_code_with_quantity": 7,
+          "unlisted_nonnull_code": 0
+        }
+      },
+      "country": {
+        "rows": 7924,
+        "columns": [
+          "Quantity",
+          "u",
+          "Purchased",
+          "Quantity_purchased",
+          "Improved"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "plot_id",
+          "input",
+          "crop"
+        ],
+        "missing_or_blank": 322,
+        "quantity_present": 317,
+        "quantity_missing": 5,
+        "by_input": {
+          "Herbicide": 4,
+          "Pesticide": 7,
+          "Seed": 311
+        },
+        "no_amount_by_input": {
+          "Seed": 5
+        },
+        "existing_unknown": 0
+      }
+    }
+  },
+  "source_oracle": {
+    "2019-20": {
+      "source_long_rows": 1787,
+      "rows_after_existing_collapse": 1774,
+      "channel_rows": {
+        "seed": 1379,
+        "pesticide": 119,
+        "inorganic1": 113,
+        "organic": 96,
+        "inorganic2": 47,
+        "herbicide": 33
+      },
+      "source_use_rows_without_quantity": 14,
+      "output_without_quantity": 14,
+      "duplicate_groups": 13,
+      "duplicate_source_rows": 26,
+      "rows_collapsed": 13,
+      "unknown_output_units": 86,
+      "all_bound_fields_match_helper": true,
+      "conflicting_unit_groups": 0,
+      "conflict_patterns": []
+    },
+    "2020-21": {
+      "source_long_rows": 8035,
+      "rows_after_existing_collapse": 7924,
+      "channel_rows": {
+        "seed": 5606,
+        "organic": 631,
+        "inorganic1": 612,
+        "pesticide": 605,
+        "inorganic2": 295,
+        "herbicide": 286
+      },
+      "source_use_rows_without_quantity": 5,
+      "output_without_quantity": 5,
+      "duplicate_groups": 101,
+      "duplicate_source_rows": 212,
+      "rows_collapsed": 111,
+      "unknown_output_units": 322,
+      "all_bound_fields_match_helper": true,
+      "conflicting_unit_groups": 6,
+      "conflict_patterns": [
+        {
+          "input": "Seed",
+          "crop": "Pulses",
+          "units": [
+            "20 liter bucket",
+            "kg"
+          ],
+          "groups": 2
+        },
+        {
+          "input": "Seed",
+          "crop": "Pulses",
+          "units": [
+            "20 liter bucket",
+            "small cup"
+          ],
+          "groups": 1
+        },
+        {
+          "input": "Seed",
+          "crop": "Pulses",
+          "units": [
+            "kg",
+            "large cup"
+          ],
+          "groups": 2
+        },
+        {
+          "input": "Seed",
+          "crop": "Pulses",
+          "units": [
+            "kg",
+            "small cup"
+          ],
+          "groups": 1
+        }
+      ]
+    }
+  },
+  "purchase_unit_channel": {
+    "2019-20": {
+      "raw_total_unit_missing_or_other": 87,
+      "purchased_unit_known_among_total_unit_missing_other": 0,
+      "quantity_missing_and_total_unit_known": 0,
+      "source_text_columns": [
+        "interview__key",
+        "sdd_hhid",
+        "ag4a_06"
+      ]
+    },
+    "2020-21": {
+      "raw_total_unit_missing_or_other": 317,
+      "purchased_unit_known_among_total_unit_missing_other": 2,
+      "quantity_missing_and_total_unit_known": 0,
+      "source_text_columns": [
+        "interview__key",
+        "y5_hhid",
+        "ag4a_06"
+      ]
+    }
+  },
+  "duplicate_null_known_units": {
+    "2019-20": {
+      "duplicate_groups_missing_and_known_units": 1,
+      "first_missing_later_known": 0
+    },
+    "2020-21": {
+      "duplicate_groups_missing_and_known_units": 4,
+      "first_missing_later_known": 3
+    }
+  }
+}

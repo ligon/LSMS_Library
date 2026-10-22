@@ -38,7 +38,8 @@ WAVE = '2016-17'
 # Module D columns needed for the input blocks (avoid the latin-1 free-text
 # column by restricting the read).
 _D_USECOLS = ['case_id', 'y3_hhid', 'gardenid', 'plotid',
-              'ag_d36', 'ag_d38', 'ag_d39a', 'ag_d39d', 'ag_d39e',
+              'ag_d36', 'ag_d37a', 'ag_d37b', 'ag_d38',
+              'ag_d39a', 'ag_d39d', 'ag_d39e',
               'ag_d39g', 'ag_d39j', 'ag_d40',
               'ag_d41a', 'ag_d41b', 'ag_d41c',
               'ag_d41d', 'ag_d41e', 'ag_d41f']

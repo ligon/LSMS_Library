@@ -48,6 +48,9 @@ EXPECTED_ENTRY_POINTS = {
     # GH #871: SITE 2 (the household -> cluster projection) reached no
     # fingerprint before this tag; scoped to the one table it builds.
     "lsms_library.country.Wave.cluster_features",
+    # GH #1078: the producer-dependent food compatibility route changes
+    # cached content and must heal already-corrupt current-hash country food.
+    "lsms_library.country.Wave.food_acquired",
     "lsms_library.country.Country._aggregate_wave_data",
     "lsms_library.local_tools.df_data_grabber",
     # GH #1045: the build-time calendar parser, tagged for exactly the tables

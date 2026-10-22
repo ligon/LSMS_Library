@@ -1,0 +1,2679 @@
+{
+  "baseline_records": 217,
+  "candidate_records": 217,
+  "complete_normalized_multisets_equal": true,
+  "exact_record_occurrences": 217,
+  "removed": 0,
+  "added": 0,
+  "status_counts": {
+    "warn": 214,
+    "pass": 3
+  },
+  "phase_counts": {
+    "1a-sanity": 30,
+    "1b-assembly": 29,
+    "2-kwargs": 158
+  },
+  "normalization": [
+    "exact source checkout prefix",
+    "exact private data-root prefix",
+    "metrics.seconds only"
+  ],
+  "raw_multisets_also_equal": true,
+  "actual_records_with_seconds": 0,
+  "no_value_warning_count_fingerprint_normalization": true,
+  "skips": 0,
+  "all_records_individually_accounted": [
+    {
+      "phase": "1a-sanity",
+      "feature": "food_acquired",
+      "country": "Uganda",
+      "check": "index_levels_match_scheme",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "f0909fee3de8e8ed462febf77acf5481b907738e0949c48da47f119828894a8a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "696f010ff927949db8e61db1231a26b676755779dc9e159c8fcb740bb0a34dc3",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "ae01199e507a5b14fc57bc05e970d8e963742d361f55548ea96f8c8a85fb4b65",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "ffa36c53eeeba414578972a5611191417c205ba6254d34a36bb08fab095eab42",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "units": "unitprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "43ea4cb74af5ff88be40d0a33c5e67d97b145d79bc4db1de1006985f9c047cde",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "1f20aa79d245afbcff5ae54bc93a97d0858e804b5a8caaa53f78c36d663d45bc",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "f8a2c76f86e305a57baddd348f168b8f0f4e645eaf822a73f67a5e7dba3782a6",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "units": "unitvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "dbae10b2d65b39e8d0cded2917bca23b6ba23173000011f0265e57651978ab22",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "328029f9b99c5f88dfb8c1020fc29dfdea6b9a5ad9a86a7ae2972ccc9e15838e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a5a6d4ffb7de73488bc3c0935eb764414c86877b7383938602d9389e0cff6afd",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "units": "units"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "714feca3a6d1189be6d72bb7c96c18e6fe3092b26853cd47bf17a9704597e28e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "kwarg_changes_rowcount",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a13669c4285daed06bc9ae5920b0329052b6693f2635a17878dd224e6f270b0d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "market_adds_m",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "pass",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "ef0cd479f7df1d163e9145c96fef33b7e6588e6d30969716f0d5116a501f61df",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "market_adds_m",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "pass",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e60e3c83b35286f77cefb308f110a31c287ab27873961924144648c7f8773573",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "market_adds_m",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "pass",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "43d0639697a0ce1083c39e536544faa20eac770fbf435080703a4d7884f4bd58",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "reaggregate_conservation",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e76bbec4bb2ca105061ea701429f717a32fdc8743ce12322c366c8e85f647ef4",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "reaggregate_conservation",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "9e5c12006a192eb61dd0bbfe2e7e35a38f3492f1e39937cfd9f63649d51a7a40",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "reaggregate_conservation",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "088616e539c2748e6fb733474539a64bec3096e2c742a1e671ed5253467d78f0",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "reaggregate_conservation",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "5392f08b96aa9ad47065ffeea9987e862f33c0f11c594161728bdb83cc7cf0b2",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a8975c22246cd589bea18579045b71b88fcd8e14c10cbff3bd9e12443f7c091f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "4ca8163bdb8e1d70eea6d8b48c06a9d6097acc03871dd6e49e559f60ecff7520",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "b1c5f7e9577202a675bfd8a6a6da42395eced0b8c7bd4e7831a28d442d6542fc",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "43b3a8c42c07d9481572bb3e0f3bf16b9bef8d72c553cb40be8d9894624c14c3",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "436e02dd66adc16f6c99117e09b37afccbacbbad0b816df52ee76d4eed3a2cb6",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "de67c80011d8a74f8ff396fa533c79b1eea058bdda4584833446655ae09540da",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 2,
+      "full_normalized_record_sha256": "b40bb251a31b6120778aeadb2c2b8b0defa0972cfb98fc62a1e443bb85a72ddd",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "833f48d703f7d159ec278606d19a8bddd2afac9a9a63581b42f83726a4f4221b",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "0068f21fda924d89e33f2730d890a28928dbfcf04fe6ce5841561d6dfa7ff9e3",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "5c5cea68ff225b7f0bcbe11051dff355422e5e1c0c1e94ce4368f5fb249af5c3",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 2,
+      "full_normalized_record_sha256": "291ceb8a7b7b9e3bc519962e3b80d6c048adb29a3a9964ca1def65bac9053cbf",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a6f86dc68f5f54f9e7208c8756fc88384c46cd999017b646af4451b659c445e8",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "c296a94a752e55f5e4bb7624e3e116c1ef80a18cc51e179821410a7f3e3db5fc",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "97324b818a1c065321a16f26b6b932483006dfb809a1e9fe2620cb2013ad83e5",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "2b706adc4b0182a3e7434690f752bffd1a4043cc8ccaca01fd42afb52d428a53",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "cfc94457ffdf0151cd0dda74200ac3a9eac7f605a13f2507cb51df39b421fd2c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 2,
+      "full_normalized_record_sha256": "a9f37f3b7d4494e161d0d12373641ec66bdc9a9cdf79a6b333553834c15641e9",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "6a87293acb7001f87d43226ed23213e326817f55249ff16a4b05ee1c58c5d15f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "units"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "65cad36a9a348c61a4f231f71c076e7e79ad25e3e70339b7c80593351a5b639a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a2f2428d3039129d3d1498a4d40043f6f16197e03864dda28168c19c36d060d8",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "58f242194e3065240a0a25987d9e1ba09593ea57918e267e08983ab9944ab342",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "bbfd0b6671c4cd252bf40b77daa8782745a3263e4a787b175dbeebce5e31735d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "258a231cc98c034cde6a65d065397097f9279987b58e832bda3bbf7eb6704f3e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "fd346251b8201efd633109d989ddc656acb596578bbd9a51894e54a222c02cea",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "94312d5020c8958bfa17b35ac10745c679eee372e7d7814e88385fc745abd73c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "598bae55dd8aa9df16ab675252be570a519298aeab997270749a8ada4eebee0d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "02644316a78c061a5f96f6db6471bf932ff81a10bd9fbe673dd927865f63149c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "f2f54c8e4661f43518b8ff556164b663223d0baf25525f806466b1c06731a595",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "c6296918c2809567e6aa9197f95090f45ce44b381ed706518cb6da5b7b8aaa30",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "5577def9def389b47e4b719cf8a3fe3ac12db478f171dc13327d003dd01bc3c4",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "7a7e1926dcf67e5525cf57eb089b0200721426f911b95a9fe5698dbfb00e3c2c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "6ad2debf3669f0a1f3e74788ab9ffd104fd143119d9f04266cebb628c089e85c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "4ba98bec30c6caab9985a0c84fdea2153f3fc25ff452767c8c6011f0fbcbb76c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "6c118361b1c964bab48a196d01443113548e0982949f27d59cb195720dd8a267",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "0e6f3513e59ad582e18239074d338432e4d3d53b8c198e394e8cc721654ec552",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "54441d818b3012c01ffafa3d28bfd07b7f9cb4ea64b64ad8adcdf096c34707b9",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "83aa2c49a72b0601848eca3366cba65d004082acd428214d3583f8c7a6cfdd9f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 2,
+      "full_normalized_record_sha256": "a8684315c9da81fae0069ad94fdfd4d7abf66393a40fb05c2a5b65f0ff979e27",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "15b9acb6933d3d2f9a2f09f74f72cb36e8189c3d69da122d7a80efb0e06bd99c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "dcd2f54142c42ee4cc47207dd59c37a95b0c501e5f53146960c31579137f7362",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e8c0f54a93071e750ff68aec555154cc8032766968fcc6370fcc44b71a5a9b19",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "fac7b2f00bade7b2bc7b9738b9e843c666f1367576bcd186e38bc07ff236768f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "ff23aef390cb94c554342e0fb408337a0fd381ef769919a11f9e2f89975d6945",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "0405c33492ec8f76044665374b16ced6e5c78c305feb387291a140f68fda3e9f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "2ad6ef205512334afdfcb8b70736dd615e44d49a9abf9698641c3a5559bbb090",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "4d52b8834aee57638d9b3bf8889d093f76a3d67e2031ca8474baf47397098093",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "1e328263430b29fd4a2efb2fb5c9553f5fbd1a2d633d828541dd7eb916e14d03",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "c0a07f437647a370dc5efb6769d6c68c45e0b0d9b343cd86ff6fa74558f61a7f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "77879b4d770d3fe799297365bad418c2923a2dd472ccff17fe35e452835be32f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "4df46c8c8013604cafa5750b087f9acbe813442f9c9692e0c853f61b08a755dd",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "dd235d5d83570d77ae58da6d379d395a6b254f5fb0b0ca75e8b65d3bd514b022",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "4f059b80e5309c42345daa3a7780e67c126a49effbc08304abff545436beb923",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "573c7ad112e4e8956fc8d924a1cca969a37ff399a5a75f5f43dbdc21d56c9680",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "d0b78ac1bff5102cec7e65ce19d5e81c0c07083aaad2ae770207b703842dd1c9",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "8418e99de967a4d88866985cfe6f9bb3748c91d9bb0cb00cda0a4e80b7d66800",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "68f93b534e99e95ff2e72297c23607c35a00484b60bb36a22adef14518bef42e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a52f17f8d1c0b2c7f240deece211de28a7520f4cc8c0a63db7b8aaff2f418fa2",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "443cdded2ef40228275ece4205a21af45921282d9200e3e2232a1e42f25395f4",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "units"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "30df00e51bfe9149955ec324c6ba537c163c35136dc9f2858c839482c7a0e0b6",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "61d5c1fe2afcf4b27d3349e9106215ff4866367b311a55b5320a8a8ea0b95000",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "473feb4813926ceb9e9375e988f3a5b7eaf435911b75fa74eb1c63b0d9a29f21",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "c21ebc514a8686a13816a1f3e6d476bf8ca2ebffcba203fe1f72fe38b1a6b52e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "3e32dc4274f6b8821f9e5a97c5d4426ee479f51aa210821ce4dad56098cf97d2",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "d3ce5b35b887c778a11f6e9619a5ef0859f04dc23852361f0a75a829bcf5369b",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "19b21285c59124c8af1cdd449497a6482968d6011b3e4ca79b049251d8ad3b9f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "f8f101b8ba13f6b1cd82a8e1d8807ba76a8460729833bdbf373be4a8e42b099b",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e84e3163196bc5595ac054891bfd174412407ce6c60713f712717edca22ab75a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "1c9da48ed9d8330cc686a434a5b31ae04633f508b5a14a535fd0109cdf8e94b4",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "226d69dfe337879cfbba44b65e2303186262db4c1d5d284e00da11973eb2d50d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "35edaaf3b68a923adfaf52bf9228ffb513c10c7b06ac7eea8dc58b890b7c2e3a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e20d7f854eb18761f745d0b121f910e679e33da87c6be222321ead425a2de479",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "ec4cb9027a479fcde135e3b2add737a5d1dadf5d68377ce80433f96bb4c70202",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "9265bba72a9c3f3b951b07900fa22d7bbb7df1c7292139fe3f60646740ca6597",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "725ae06197144c07d17ed7023a11cf46f9ccb3463caabc2bd542eca1cf31df51",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "2e9b3231750dbf2869268fc9a2068d3ffd6e80d264534ab4494d0bc497ca6afe",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "47b59497f12a47e5d5785af2bb62e2af187e9e7da360e95488ea2375c231a0c7",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "27db9331668f2c5284b057528bdb2d4f8bcd9164d7a6f9f4d2aaea0f171c719f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "ddc724980a55da1cf1bf50dddce16ac0eb85e139b1b9978ca9524b2e2dd7f435",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "49e5afd37d9cd27b4b46f3bf3071d26079e0a7ccb10a1ffce6585405bdddfd57",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "units"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "9f418d4c46128dc1f5b16e36b486dc3e45afcfc35fb7c3af71710cafb4dd70d8",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a8b7c84c7ee270a514da188726c98548829b1a2ddf13d89ae4b6e9268c7cbce3",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "85b44c2dbd98b227e0f5bb503fabab57994d3a3862596658c28cd79db0bfbb47",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "8bd015d4ebcddd6f644539de428df7e4d90bad8195d5f9d06970c12547b9c153",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "d62f02dd9583d4c45d56f02b65330f5ee70985cc5d40739e2716d64399e9aba7",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "b9c57eb352061d83b3036fed0f60967e297354e6fde753277d922839ba496d4b",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "af6e85e8b1e68a44e0a612c6d8befa139a8f53cc92dc9e739e05da28206359e9",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "4e8d20861353d97f9c43aa448325f27e7dd9455ad6be3c7a7332004526c372c2",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "78fdc2bf587d77593f4de2dc16ca7293f4393ba3583eab6967f71a121ea56c1d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "89c97b2b6e544b2ae44130faf7735dbc06045ebb83bca666f6696e35c54b2005",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "7926b7f6e33e953a9cdc5c1509c2b3be0a2a4a804be57840c68f5c5ea7b047d2",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "16de7547ee9b7e3449db7890398057d9740ffa08c5cd43be937d9a3b07c13493",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "1cfbe980da46bb959d8991fcb51d508fac6297467b496bba6560daf42661ca15",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "5cafdb953c1aa1090e135de320baa8c1dfc54a82365eeba7c36f40fb23c58cae",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "7d20dc6dae17b9465aba650dba192f3a40e50327a94db2015a98c70373f98d75",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "9729ba691366c3c11f40e62b151bb0c28327a1587dd8475ebb2244afe513865a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "99526d5f7dbce831fa3b9bedc33c33c9f42edba48fa00311e13e7cecbce968ab",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "1f0fef80fd284ea1ae991b7c16af624ade11344e7cb6c0b427ba0449186631db",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "c5f347c0bd4453464f310eccfe532ee0489685fcc9f3d162eb0ee3d898be533c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "07f15e82e6f0e3bcfcc8ca5526047f75b37cfc9afc0624bbb39eaca77ec56040",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "5bded59b74fdf1aeed78fd0be84f3718aaec84a05c22bcf2b02a0b95be139002",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "units"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "df828d0cb2e2cfd7a31c1cdc2594f9a48b90b5b08026917e63d6dc918c205814",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "60e98f7a46cf4e37c9ffd33d5bf1a25a225c903de6bd69ec35cddce0ac302893",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "c4235e8b5be3a87f8516a103b77bc146e1827288db18e7a2bc1452a249757989",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "c2242c278c06bf04b874be4f7cc4e1841b4abab4e0f1793b48a6fe6fdd52c551",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "035280c8ea6ec36c0a83f78b66de5c5e75a7454653dd1c72fda82b52168bf816",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "b036874162adc479ee835aab671eba7a848b44f9bf8bfd6cc2ba059f04cbe77b",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e91d5fb2eb6c3ba959b3287482bac69147d68793b97a7bae9941fc689ec9207d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "2a57f9308cf8a1c07e83bfa7283c9100683bf7afff2078fb92c63cf757c000cc",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "b04679a53e8dc1fd3bb046406411573e6cea2fcdfe238483b32ba2b0b70cd214",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "721bc8ef9f544717392fd6dec53c67c74cd87d22e24d050f2f47d6a3ac53d4da",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "37008050f7ca6f960c9a2cb82241e3588250baf5640c623839aebd8536dc71dc",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "1c0ae8e740cec3c98516a9e9cc9ad8465709bf82649a312da24d28b81be08a12",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "b7335717a3ed5217cc440b0473efd29314c0cbf2fa9f0250310c89aa7632d34a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "05590b722a110fb8872d3c26f6fa4ed177389d08ca0ad79cdc13883395742ed3",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "03bf47bde89021f582bf4d8408493704a2ae7846ffe6410dd40c3fe4525916e0",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "7b9c03808f1177a56f04f7b8bd69b28487fb987c8ee8b47b3936592de2f4f082",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "734e97316826729e41b5bb2b15f6fa763224392f6d16d72f381924dac2ec642d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "201a2a4ee71dd4d9b079cc8f30cc4bff30dd05019ddf99752fe1689a9ef44e0e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "b8a2778d7c9bc854e3990fe6ac55a21287b6c753727eeb94117f668eaed0f1e4",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "d1ebab115eedca66597d89be9fc885c3303f76377f44367848971155056edad4",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "b3433e2e1cfdcb93e87d0c0ed800f2a20498866d18029a61d5420523e4d807e8",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "units"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "74e0bb2fb8307540ea49962432e3b6484879a5f646aa2899b9cfa6a0d3521388",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "0358bf074bd99a0f8836d60b7babc92170728acbcaaf1da0687269f42b74a41e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "221b5f5b3a63c8970f6203d28e3b0f3645d28f4372212d93b91833ea484cc150",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "ca4445feca625abee7c39cc72d14ad3c675f9c99c39c24a77d0c43ff1ec11457",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e3e3f6beb6b5721c1cc40165aaaa0c4ac7b3aab3c4b10fc1aed82f6b30c3af85",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "6e53cc6e9c12fdb21a3b0858cdcc16b4a32683abb088d74ab30a7aa05c770618",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "0cebd1b1ca6dbedb9831cddba515eaccd44558070080c2b56142908ce5d972be",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "94c217f7b9d43e3459fcbd617b4a958c6ee2975bd80659d6630f9beb6e9cf9e9",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "6b9ddb5ab2916794ffdd6bb639776e29eb49097e2bcbb00983fa62682c05de44",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "71b016f07c6f361ca447fa71490c01f99f5133d134e2166e2a00a788338b46ed",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "92d6e1596eccaf5ffb0d0c783c784c9b361a74bc3531acdb1d00abe546a4347b",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "3fb566eeb92464dc01ee0ecf3554f201bb69303a7db7bd9f6af7ae501687e942",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "88475a98cfe110f2c731fb424b99653293741014007158439aabd5236550b458",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "cc44272621daa53d9e10012a18194f15fac594e944cc9cf1b87b7479020b8118",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e1a59fb6f2cf838f6977e74aaf4ac5d75b1715d469aa9801c9f701f36406db50",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "42126d5d60932ec8575f3b3ff5cacdb3a0e515875882d544d10bb41a078d6800",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "fc165c95f83edc0c8282c841a4c480fbd7e4c62cbc1fbeb0c1ccfe87b0bd52c1",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "becd3ac5eb1dd67c20c27df7207bb6818c1ea8fc1a969396ead2fd5179ffcc6f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "2bd7f358f4ffb131104f83aa60336ec83d4ba07f52e4b7711c748ea9dd0c145c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "87a1d6509e0b0040841842f1dcc1e0e99f4b7458383b71d702c3f0999cc7af5b",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "042115f89f16e47112ea33ae8290bab6bbe72034f4274ac887f1423fb6080feb",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "units"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "6b324ee7d32e8e330727b7c81ecf681cd5d88c007fcee498e193cb512239db6b",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "7edcc67f6229d89890b384631ecccbc09f3a6791b73eceb159348a1a296e636c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "dca04588046653ee2dd69ee52df3f07886a4e77c88d30692e09ed1088593a87d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "69a1d93fd0fe1468b0adfe6f4bb47dcb31b07f83a2448db15278e7408579f8b0",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "9def476644b352957cf5c93e0bbd3eec3d67561e9b28f9e556073e16e7371456",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "36456b66c7662ab40ec5767adffa74df296ae1ba48461eb1e3cbfd13eef67a2c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "bd694be11ac6b17a198277c4b1e69ea3b14cb348f64cf656dd575c547c5b401e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "1af575af45e97fc9cfc784479a241863b2ac6672ad12fc96c7f1ea7dd90e482f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "0e8200fc8021cec4299d95fd07c304032bd72cb5cf8c0e9e9607ec2876d12bae",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "abf80af7be4510552578886af505031aada1b00456f417bb6b24ff698e244472",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "0a39f8ecfab6b4909ad298d2f04ec0fe122403f5e3023f59983277d807272494",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "002e0f1b05f931a8587b2bc384905ef22e11363ba8340cf16529bbfa1baae7dc",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "d781f96d20af5a0a85778eed25eaa81c0ff9c7c5637dc1aae5d958afcace974f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "83dca5f11011571e3277f6caef5463fa9a09b73d1933f94be1c7ecb58eb90736",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "units"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "4b75bc0452452eb2c7c6f8fca075948fd71f0361c3c416588936f331bbd4d60c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "305fbcd4e2da8245bee92f5f60f8e3304136ac35dfcb3040e656cb89834f6128",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "f23233ed33ae55988dfd0f9f3a1d9867fac8ba657a1eb3d544964b430f4f4543",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_acquired",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a489dca6f53f9b14d692e2bef908e003820974c4f1d0437ce7d64bd0303c8040",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "97fadb034dc2c7b1fd516c698ddb61d5c6975b96471fc2c81a378f761f8572ca",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e385d9353380a3e5f1e3503975625179896f2352dd271d210a2dbc85e40cbf40",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "6a606463ddf5aed91b61d7bc03c1bcd5663eb1e71839ccd95d91d459fd7941bb",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "62a82a668978e50f4ef3f98b97102e45faf350edb1e07f77d69af0c71c6d2293",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "725b87acb3b48d3ca2e89d85ea0ef4de331969e246a75e1fcc00b794da0362ee",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "f6c615fb13dce4dbc41b0c27add412183bb294dc358a4fa7dd8096a8ccaa203e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "9491d19342605e33d785ab53c132a09c0fe326517a4ac5d4e822f66014b1eb72",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "261beb8e732bbfbad3f30db826eb52d6d77abc3823b285b05f88fbfbb7cbddb7",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "205bc9af289bf5ae525ac8ca83e0e99bfcd59bb84c0632ba857c8eb79a5ee5fa",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "f3a679b4f4dd9853bb13bbd89966d63b4fa60ee85175c135dde644e691a90f93",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "87f798d79fe92b57ac04c512b1607c2c67bb7faf61b43e382ddcbccbdbd890f0",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "e6bd1b9da2f9a19ab61c3c63bd86a5ff93553c0dbd37e3990ef462a90c4fe23e",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "408cd41fefd6c74ee47b1731840c2d35fb29f12e8874e2a377ef206d480bc198",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a6bf757f1ec5b28f5be8321a9c87985087742542e95acc5a0addedfe4ffb4a8a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgvalue"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "07ec75ec0146e3d93a1d02f2e69407e5a776fe7742fc8ea599b0ab0daeffc2ea",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "cf6cfa40f1c70f50c3b6a64c333a93497732a7e3e0d3ee6068ea5fccd4a8e5e3",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "599f160e9786fde2c48964618b18b03bf59df6b8fbdab7847075f9b584ed421d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "01ac620f4fc88707fe87ad500b18976cac59820dc789061817003fd747825a2c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "962599786807ee4f22275708b89ad2f3e1fcfd9319c4f82adca9d51d4b86c0d6",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgs"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "144a70077c12f53f646ff5f188d130d9abff327360771cc8973f32ca86ab86df",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "c3ddb3785a08cda3f4c8863d92fc9bbe4cebf55e6f5f1e49ea4308c8fe157d6a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "1b-assembly",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {},
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "52e9b6ab60ed2af7d251379a85dd582383126af314d61242dc73bd2feee1af3a",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "9ba8f288b33c50454cf997650b2e519cfe00b70d3d6db7516f0b4b1ba1cadc52",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "kgprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "4f428864337b50197a3572a47d32b1b644afbe58ce32983e2515f01c0e18645f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_prices",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "units": "unitprice"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "65f2c2f93914c1ab74192632bc955f8a351a4cf9c5e5f326e123d4c09153f106",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_quantities",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "labels": "Aggregate"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "f7afa7cbe270b643ad89ca3deab896d720b4f8de042660833389f4e65d444c4c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "13f100a93e13115a166dfc0a012790fd4aa401022b4c51a99bde2ef79fcfa7b0",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "319883e4b25c1ebfae7c7061c8f9eec7b96eabc23e6b11020e6a7edb0d0fa98d",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "5a7f5ddcece644bde1610f118c27a8e91d0164082d92da40a91bac546f4f8613",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "96f8058a4d4a4d157d8eaddce2905b5eeb3b40c3509305074f9ff831abf0a37c",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "a8a35d18ec61b8ba74be9ce733afa31f71237fad1055f4271db4ea6ba28de4ab",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "3c7d74fb7499f94bd579ac833a1681a5210229fe52021e256291f4b52fd1c383",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "979fd667613ab4dc58442a7e483f0bebd206534df63c2fc3101b1586b0d4ad3f",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    },
+    {
+      "phase": "2-kwargs",
+      "feature": "food_expenditures",
+      "country": null,
+      "check": "runtime_warning",
+      "kwargs": {
+        "market": "Region"
+      },
+      "status": "warn",
+      "occurrences": 1,
+      "full_normalized_record_sha256": "2fe114c407f582f47c6f094e776091fb29eb1bc72cfbc7deff43409da4fb8299",
+      "classification": "EXACT_BASELINE_CANDIDATE"
+    }
+  ]
+}

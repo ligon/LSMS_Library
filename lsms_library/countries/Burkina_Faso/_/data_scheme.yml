@@ -113,9 +113,8 @@ Data Scheme:
     # module s16a (GH #167; copied from the Mali EHCVM reference, PR
     # #284).  EHCVM waves only: 2018-19 and 2021-22.  The pre-EHCVM 2014
     # EMC wave uses a different instrument and is out of scope.
-    # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
-    # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
-    # an area, not a coordinate); deferred as in Uganda.
+    # plot_id = "{field_no}_{parcel_no}". 2021-22 records parcel coordinates
+    # in s16aq46; 2018-19 has none. s16aq47 is area, not a coordinate.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str
@@ -123,6 +122,8 @@ Data Scheme:
     TenureSystem: str
     SoilType: str
     Irrigated: bool
+    Latitude: {type: float, optional: true}
+    Longitude: {type: float, optional: true}
     materialize: make
 
   food_security:
@@ -218,7 +219,8 @@ Data Scheme:
     # applied: input identity (Seed / Urea / DAP / NPK / Phosphate / Mixed
     # fertilizer / Organic manure / Organic compost / Pesticide / Herbicide
     # / Fungicide / Other phytosanitary), reported quantity used + native
-    # unit, purchased flag + reported purchased quantity, and (seed rows)
+    # unit, purchase/gift flags + quantities with their OWN unit columns,
+    # and (seed rows)
     # the seed's crop on the shared harmonize_food labels.  REPORTED values
     # only.  Source s16b (2018-19) records inputs at the HOUSEHOLD x input
     # grain, NOT plot x input (no parcel-level input data); the GAP-2 name
@@ -234,6 +236,21 @@ Data Scheme:
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    # q08/q09a/b describe purchases; q05/q07a/b describe gifts/donations.
+    # Missing acquisition fields stay missing.  u describes Quantity used;
+    # these optional unit columns do not imply a conversion to that unit.
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
     materialize: make
 
   livestock:
