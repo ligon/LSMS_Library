@@ -244,7 +244,8 @@
           "manifest_entries": 1458,
           "root_accepted": true,
           "public_safe_evidence": "218-Malawi-independent/",
-          "root_acceptance": "218-Malawi-independent/ROOT-ACCEPTANCE.json"
+          "root_acceptance": "218-Malawi-independent/ROOT-ACCEPTANCE.json",
+          "private_archive": "private-evidence-durability-twentythird.json"
         },
         "private_archive": "private-evidence-durability-twentyfirst.json",
         "open_pr": 1208,
@@ -254,6 +255,55 @@
           "1210": "Invalid-wave request evicts five native companions beforeKeyError",
           "218": "Remaining nonISA/shared retired-family cleanup",
           "1196": "Shared string-index read policy; JSON typedattrs remain deliberate"
+        },
+        "ci": {
+          "PR": 1208,
+          "query_commit": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+          "run_id": 39735616155,
+          "workflow_status": "completed",
+          "workflow_conclusion": "success",
+          "jobs": [
+            {
+              "name": "windows-smoke",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "unit-tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "windows-script-build",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "dvc-lock-check",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "docs",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "refresh-dvc-locks",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "data-tests",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "dvc-remote-reachability",
+              "status": "completed",
+              "conclusion": "skipped"
+            }
+          ]
         }
       }
     },
@@ -830,11 +880,61 @@
           "manifest_sha256": "dfef539aa8ffca3ff81acd1ffaba3da390b5f1c5903de47ca3410beb2997778f",
           "root_accepted": true,
           "public_safe_evidence": "849-Uganda-independent/",
-          "root_acceptance": "849-Uganda-independent/ROOT-ACCEPTANCE.json"
+          "root_acceptance": "849-Uganda-independent/ROOT-ACCEPTANCE.json",
+          "private_archive": "private-evidence-durability-twentythird.json"
         },
         "private_archive": "private-evidence-durability-twentysecond.json",
         "open_pr": 1207,
-        "pr_url": "https://github.com/ligon/LSMS_Library/pull/1207"
+        "pr_url": "https://github.com/ligon/LSMS_Library/pull/1207",
+        "ci": {
+          "PR": 1207,
+          "query_commit": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+          "run_id": 39735520713,
+          "workflow_status": "completed",
+          "workflow_conclusion": "success",
+          "jobs": [
+            {
+              "name": "unit-tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "windows-smoke",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "windows-script-build",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "docs",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "data-tests",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "dvc-remote-reachability",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "dvc-lock-check",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "refresh-dvc-locks",
+              "status": "completed",
+              "conclusion": "skipped"
+            }
+          ]
+        }
       },
       "documentation_qualification": {
         "accepted_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
@@ -1092,7 +1192,8 @@
         "targeted_tests": "Original87cases85PASS2fixtureFAIL preserved; narrow correction4PASS includes2correctedcontrols+2newnullable-comparator negatives, no85passednode replay. Actualparent24IO cases23meaningfuldtypeFAIL1PASS.",
         "sources": "All17declared held sources available; four-root physical gate running before decode/API, actual NigerMake now required aswell.",
         "stage1_chronology": "Manifest includes rootapproval FILE; sealing-before-approval claim is limited to receipt/read of explicit proceed MESSAGE, no product/import before proceed."
-      }
+      },
+      "make_saved_classification": "12indexNApolicy bypasses;2preexisting Uganda singleton differences include5vs3columns,824rows andunusedlevels; full classification/proposedparquet-only helper pending"
     },
     "1206": {
       "issue": 1206,
@@ -1116,11 +1217,12 @@
         17,
         18,
         19
-      ]
+      ],
+      "critical_private_archive": "private-evidence-durability-twentythird.json"
     },
     "1149": {
       "issue": 1149,
-      "status": "LEDGER_FIRST_IMPLEMENTATION_ACTIVE",
+      "status": "AUTHOR_FINAL_EVIDENCE_FREEZE_PENDING; NO_INDEPENDENT_REVIEW_OR_PR",
       "candidate": "/local/job40255479/worktrees/isa-1149-acquisition",
       "control": "/local/job40255479/worktrees/isa-1149-acquisition-base",
       "branch": "fix/1149-staged-reacquisition-20261022",
@@ -1133,7 +1235,11 @@
       "owner": "acquisition_1149",
       "assigned": true,
       "ledger_first_commit_prefix": "7b5bca233",
-      "actual_acquisition": false
+      "actual_acquisition": false,
+      "runtime_head_prefix": "f85a871fb",
+      "candidate_tests": "266PASS/0SKIP;1expectedmockedwarning",
+      "parent_controls": "43finalcases41expectedFAIL2PASS,plus4newcompletionreceiptcases4expectedFAIL in separate cohort",
+      "actual_hash_scope": "0of549API/39framework/1362wave moves"
     }
   },
   "integration": {

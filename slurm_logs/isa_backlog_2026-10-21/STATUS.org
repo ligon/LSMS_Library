@@ -17,6 +17,7 @@ Existing rulings in issues such as #851, #894 and #1134 are binding implementati
 All24 independently reviewed implementation PRs are freshly verified OPEN/unmerged at their expected heads in =public-pr-checkpoint-twentyfour.json=.
 New Uganda1207 carries the12reported-factor bindings at native grain and stacks1202; root accepted416PASS/10genuineSKIP plus stronger saved-value/source checks.
 New Malawi1208 removes only two obsolete registrations; root accepted51PASS/209strong comparisons and unchanged205scanner findings, including2existingFAIL.
+Both1207/1208exact-headCI runs areSUCCESS: unit/windowsPASS,6jobsincludingdata-testsSKIP; no credentialed data-suite claim.
 Safe independent reports/root gates are =849-Uganda-independent/= and =218-Malawi-independent/=.
 No human merge has occurred through this campaign.
 
@@ -36,7 +37,7 @@ Uganda1204(subset routing),1205(area/key coverage),1196(index policy) and remain
 Source21bd235 remains prepared/UNASSIGNED, adding reviewedUganda1202 to accepted source20de38; strong numeric supplement for critical20 is now accepted.
 Its healthy Niger CROP comparator still needs actual20 hash/fullcoverage verification; no older46376row cache substitution or stamp.
 
-Twenty-two owner-only private archives are fully verified; archive23 is currently writing six frozen roots after a successful8GiB-bound dry gate.
+Twenty-three owner-only private archives are fully verified. Archive23:6frozenroots/2952files/711263678compressedbytes,SHAef49e5476424ec575c51623a431e30ad6d1f1d9e31160ce5accd816c827adace; allmembers/sourceafter/owner/modes/fsync/durablelauncher passed.
 Historical global17 remains5148PASS/4459SKIP/13FAIL/0ERROR with recorded doc-child guard/mtime/stale8 limits.
 This is no all-green full24-suite/corpus claim.
 Earlier dated checkpoints below remain historical; detailed owners/pins are in =country-lanes.json=.
