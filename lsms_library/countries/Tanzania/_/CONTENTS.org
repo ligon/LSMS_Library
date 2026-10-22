@@ -2140,3 +2140,31 @@ recorded =KeyError('m')=; the column check now fails one step earlier).
 The script was written for the pre-GH #169 table in which =j= was the household and =i= the item; the canonical table swaps them back, so even its index assumptions were stale.  Removing the =!make= registrations does not change dispatch: =Country.data_scheme= auto-surfaces the three tables from =food_acquired=, and the derivation was already tried first.
 
 Served tables before and after the removal are frame-equal (196,293 / 196,280 / 251,717 rows; waves 2008-09 ... 2020-21, the four =2008-15/= rounds included).
+
+* 2026-10-22 -- Community prices use framework wave aggregation (GH #1091)
+
+The concatenate-only country =_/community_prices.py= and its five-line Make variable/country-rule block are retired.
+The independent wave rule, generic pattern and Make =all= source discovery remain unchanged.
+The existing framework selector now finds no country builder and assembles only requested supported waves on both backends.
+Previously explicit Make returned both modern waves even for an unsupported older-wave request.
+This is the Tanzania portion of GH #1091; independent acceptance and other country sites remain separate.
+
+Held-source author checks retain all 17,699 eligible readings: 3,076 in 2019-20 and 14,623 in 2020-21.
+Native =v= remains =interview__key=, with the helper's redundant =i==v= shim removed by existing framework normalization.
+It is not the household sample cluster identifier.
+Source-code =variety=, questionnaire =Description=, native units and each row's own =cm_f063/cm_f062= price basis remain unchanged; district-capital prices remain excluded.
+No household join, reducer, crosswalk, Quantity column or unit factor is added.
+
+The authoritative default country cache contains normalized frames with =id_converted=.
+Make now creates no country cache and preserves an existing verified one, while ordinary hashless native eviction/rebuild can delete an unrequested native sibling.
+Default warm reads change no cache bytes, modes or mtimes in the measured requests; Make's natural writes are recorded separately.
+For the measured fresh roots without a country cache, an unsupported strict subset uses the existing declared-empty/finalizer contract (=object= Description).
+Default reads served from the measured full-coverage country cache instead return a filtered zero-row slice retaining cached =string= Description and =id_converted=.
+Both routes return zero rows; representation depends on route/coverage, and these measurements do not generalize every partial-coverage miss or union rebuild.
+These route distinctions and API-to-parquet JSON attr record/container type changes are measured explicitly, without normalization to force equality.
+
+The older geography-only statement calls a link "infeasible without a lossy, unverifiable crosswalk", while the later implemented crosswalk records the 2020 cluster as "BAKED INTO the community admin codes".
+Both dated accounts remain; this retirement changes neither that crosswalk nor the community identifier.
+The Extended/Refresh split, split-off back-casting and live WAITING #114 caveats remain unchanged.
+The separate reviewed 408 plot-input unit replacements (86 plus 322) are preserved by exact source/test identity; no agriculture sources or plot-input outputs were rebuilt here.
+Changing the shared country Makefile moves all 25 enumerated Tanzania API cache hashes; other tables were not rebuilt for this check.
