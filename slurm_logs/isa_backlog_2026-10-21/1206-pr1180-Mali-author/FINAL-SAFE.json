@@ -1,0 +1,27 @@
+{
+  "PR": 1180,
+  "scope": "author822_saved_results_only",
+  "status": "PASS_NEW_NUMERIC_SUPPLEMENT_WITH_UNUSED_DOMAIN_QUALIFICATIONS",
+  "complete_strict_cold_warm_pairs": 2,
+  "obs3_numeric_typed_attrs_used_tuples_qualified_pairs": 2,
+  "full_complete_axis_failures_retained": 2,
+  "unexplained_domain_differences": 0,
+  "numeric_mismatches_observed": 0,
+  "independent_review822_objects_or_authority_not_recovered": true,
+  "signed": "Sue",
+  "authenticated_saved_public_operands": 4,
+  "source_records": 5,
+  "overlapping_static_locator_sites": 137,
+  "actual_original_positive_groups": 4,
+  "historical_payload_SHA_size_mode_mtime_full_match": true,
+  "1199_manifest_protected_snapshot_entry_historical_mtime_absent_NEW_baseline_only": true,
+  "source_record_module_blobs_exact_f8_23d_aba2": true,
+  "gaps": [
+    "Independent review822 expected/raw-mask/baseline/warm receipts remain outside this author-only authority; exact one candidate review parquet is covered separately only by the API9 content ruling.",
+    "Original all-readings decoded source expectation/finalizer and source-slot/native unknown/drop-mask objects were not decoded or reconstructed.",
+    "Original Feature objects are unsaved; no Feature/API/source/test prefix replay.",
+    "Original author api_check does not assert exact candidate HEAD and its mode JSON omits it; no new historical exact-HEAD claim is invented. Known f8/23d/aba2 record-class modules are independently byte-identical."
+  ],
+  "old_evidence_and_source_unchanged": true,
+  "full_frame_equality_not_claimed_for_qualified_obs3_views": true
+}

@@ -76,6 +76,19 @@ The first two all-wave data actors omitted =LSMS_MAKE_JOBS= and remain diagnosti
 New private L1-only roots use the explicit serial setting and actual helper assertion for conforming checks.
 Default all-wave/singleton cold/fresh-warm parent/candidate actors pass; Make and derived/API/audit checks continue before independent review.
 
+Root accepted three further retrospective packets on 2026-10-22, without decoding payloads or replaying source/API/test stages.
+Burkina1189 has16 same-stage strict pairs, one original field projection, one NEW source-pinned native reconstruction and two qualified pooled-domain views with both complete-axis failures retained.
+Its v1 reconstruction source gate was inert; v2 authenticates the original dictionary source before the new reconstruction, and only that corrected result supplies the source binding.
+Uganda1191 has nine actual original public pairs and two NEW saved attrition-result pairs passing full strict checks, plus six scalar predicates; original third-party AUTHOR expectation authority stays missing.
+Mali1180's separate author-only packet has two strict cold/warm pairs and two qualified obs3 views; all added unused domains belong exactly to the candidate obs1/2 rows.
+It does not recover independent review822 objects or establish the historical exact candidate HEAD.
+All234 frozen manifest entries,66 selected products and14,880 current source receipts pass root checks.
+Safe exports and additive acceptances are1206-pr1189-Burkina_Faso/,1206-pr1191-Uganda/ and1206-pr1180-Mali-author/.
+
+The1175 original packet and API9 exact-nine packet remain pending root acceptance.
+Root requested two separately sealed precision checks after reading the actual checkers: explicit u-code array dtype checks on the three qualified Malawi views, and typed field-key checks at all eight API9 record/plain-dict boundaries.
+Their old packets and full strict failures must remain unchanged.
+
 * Historical checkpoint -- 2026-10-22T06:53:02.010069+00:00
 
 All24 independently reviewed implementation PRs are freshly verified OPEN/unmerged at their expected heads in =public-pr-checkpoint-twentyfour.json=.

@@ -1,0 +1,21 @@
+{
+  "full_strict_pairs": 16,
+  "original_field_projection": 1,
+  "NEW_native_reconstruction": 1,
+  "qualified_pooled_domains": 2,
+  "strict_findings_preserved": 2,
+  "status": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_EXPLICIT_QUALIFICATIONS",
+  "READY_sha256": "906e54f3c20d84e57c9010c0bbf44391e84659a908c8b77a49aa8b0007e1395b",
+  "manifest_sha256": "b7d5d511cf8075d744bd7d123b25748e244ea02d95d3874eaac4e609dcf6edd7",
+  "manifest_entries": 103,
+  "physical_products": 40,
+  "source_records": 16,
+  "overlapping_locator_sites_not_pair_counts": 406,
+  "all_original_unsaved_and_authority_gaps_preserved": true,
+  "old_failures_and_initial_locator_corrections_preserved": true,
+  "root_read_preparation_checker_and_characterization_sources": true,
+  "root_metadata_only_no_payload_API_source_test_replay": true,
+  "no_unexplained_numeric_mismatch_established": true,
+  "no_all_campaign_verdict": true,
+  "signed": "Sue"
+}

@@ -1,0 +1,24 @@
+{
+  "PR": 1191,
+  "status": "PASS_NEW_SAVED_SUPPLEMENT",
+  "distinct_saved_positive_pairs": 11,
+  "full_strict_pairs_passed": 11,
+  "saved_operands": 22,
+  "exact_scalar_checks": 6,
+  "array_checks": {
+    "str": 47,
+    "object": 20,
+    "Float64": 5,
+    "numeric_nonmissing_arrays": 37,
+    "float64": 4,
+    "int64": 28,
+    "string": 4
+  },
+  "original_author_reference_pairs_not_substituted_with_baseline_selfpairs": true,
+  "gaps": [
+    "Original AUTHOR/private-mode-table and private-attrition reference operands are distinct third-party artifacts; their historical full authority is not supplied by twelve refs. Their original comparisons remain gaps. New candidate-vs-baseline pairs are the actual independently saved review pairs.",
+    "Original producer objects before serialization, source-readiness and dtype/market fault objects, threshold controls and root-restoration actual API return are unsaved; no API/test/control or attrition-transform replay.",
+    "Original tests are enumerated but not rerun. This is a saved warm-output supplement for a test-only patch, not a cold-data/science approval."
+  ],
+  "signed": "Sue"
+}
