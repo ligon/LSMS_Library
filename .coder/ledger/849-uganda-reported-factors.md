@@ -23,7 +23,7 @@ projection is rejected historical evidence, never the expected new total.
 |---|---|---|
 | CROP_COLMAPS / crop_production_for_wave | Uganda/_/uganda.py:1230,1848 | test_uganda_crop_condition.py, test_crop_kg_factor.py; extend only12 mapping cells, reuse builder unchanged |
 | _production_observations and source_fingerprint | Uganda/_/uganda.py:1230; local_tools.py:2954 | test_gh1198_uganda_production_observations.py; reuse native IDs/actual slots/release-row identity and source bindings unchanged |
-| Builder factor coercion | Uganda/_/uganda.py:1522-1536 | existing pd.to_numeric(errors='coerce') and where(kgf>0,NaN); preserve pending brief clarification (§6) |
+| Builder factor coercion | Uganda/_/uganda.py:1522-1536 | existing pd.to_numeric(errors='coerce') and where(kgf>0,NaN); preserve the approved raw/served clarification (§6) |
 | _screen_reported_factors / _valid_factor | transformations.py:3668 | test_crop_kg_factor.py, test_shipped_factors.py; reuse finite-positive, Kg1percent, cap250 and calendar-year rules |
 | _survey_median_factors | transformations.py:3861 | existing same-country/wave fine(u,condition) then coarse(u), minimum5, missing-unit excluded on both sides; reuse |
 | harvest_kg_factors / harvest_kg / yield_kg | transformations.py:4282,4698,4888 | existing factor/shipped/transform tests; reuse row conversion before explicit analyst reduction and real-area controls |
@@ -95,7 +95,7 @@ projection is rejected historical evidence, never the expected new total.
 | Source/Feature exact comparator and negative mutations | reuse reviewed strict pattern | explicit zero tolerances, unused MI levels/codes and complete typed attrs |
 | Cold/warm/cache/CLI/scanner proof | reuse actual normal routes | current hashes/coverage, private source gates; no shortcut/freshness stamp |
 
-## §6 Approved boundary and outstanding clarification
+## §6 Approved boundary and resolved clarification
 
 Root explicitly assigned this bounded writer after accepting1198 runtime and
 085 documentary qualification; no new survey or scientific decision is needed.
@@ -110,11 +110,39 @@ follow the existing helper and downstream screen. No helper/science repair.
 The original brief and ledger-first commit795501c69 remain historical evidence.
 Proceed after terminal held-source confirmation; no further approval is needed.
 
-### Phase3 verification
+### Phase3 verification in progress, 2026-10-22
 
-Pending fresh source gates, exactly12-key AST proof, actual inventory/same-source
-cold/warm/Feature/derived/source pairing, focused parent-negative controls,
-scanner full occurrence accounting and independent review of the frozen head.
-No author-side final PASS or GitHub publication/merge/closure is implied.
+Terminal held gates confirm all twelve new and three existing2018 source
+fields. The independent literal-row/slot oracle matches133761 helper/native/
+raw/walked/public observations on both actual cold backends; every non-factor
+payload, axis/unused level/code, dtype, mask and typed attrs is exact. The403
+conditional old-null exclusions and928 public null-v records remain exact.
+
+The prebuild actual census moved28/549 API hashes, all Uganda, with521 others
+and39/39 framework exact;171/1362 declared-wave and224/2139 API-wave hashes
+moved, Uganda only. Inventory ran on the ledger head with the eventual7a8fd2249
+runtime bytes; final evidence must prove those exact measured file SHAs.
+No assertion that all other moved Uganda outputs were rebuilt follows.
+
+The independent native-grain product and median-pool oracles measure
+29,095,413.407893993 ->42,026,694.99297963 kg, +12,931,281.585085638.
+The historical42.035M scalar projection remains rejected. All42841 area rows
+are exact; real parcel yields gain498 keys and7335 shared values change.
+Literal plot yield remains empty on both heads, the existing#1205 residue.
+The new24 regression cases pass; the same test file on the actual085 parent
+has20 meaningful mapping/contract failures and4 unchanged-normalization
+passes, no fixture errors. The focused426-case selection has416 passes,
+10 genuine skips and no failures/errors. Only two directly superseded existing
+test contracts are updated: whole-harvest totals/layers, and the2018-only
+exclusivity assumption; retain its positive2018 and explicit negative2009
+controls plus nonempty newly-wired-wave assertions.
+
+The initial toy cohorts accidentally overlapped two2-worker processes (four
+requested workers); both original terminal outputs remain, root acknowledged
+the bounded execution qualification, and later pytest ran alone at two workers.
+Preserve the source-oracle cwd stop, two failed launch paths, and the later
+nullable-Boolean summary stop with separate corrected checker outputs.
+No author-side final PASS or GitHub publication/merge/closure is implied;
+final freeze and different-agent acceptance remain required.
 
 Sue (GPT-6).
