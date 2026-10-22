@@ -276,9 +276,9 @@ def test_season_B_declares_a_unit_column(colmap_2018_19):
 def test_kg_factor_is_declared_optional_in_the_scheme(uganda_scheme):
     """`KgFactor` must be declared, and declared `optional`.
 
-    It is wired for 2018-19 only, so it is legitimately all-NaN in the other
-    six waves; without `optional: true` the all-null sanity check would fire
-    on them (CLAUDE.md, "The Silent All-Null Read", Site B).
+    It remains unwired in 2009-10 after GH849; without `optional: true` the
+    all-null sanity check would fire there (CLAUDE.md, "The Silent All-Null
+    Read", Site B).
     """
     col = uganda_scheme.get("KgFactor")
     assert isinstance(col, dict), (
@@ -287,9 +287,8 @@ def test_kg_factor_is_declared_optional_in_the_scheme(uganda_scheme):
     )
     assert col.get("type") == "float", f"KgFactor declared {col.get('type')!r}"
     assert col.get("optional") is True, (
-        "KgFactor is wired for 2018-19 only and is all-NaN in the other six "
-        "waves, so it MUST be `optional: true` or Site B of the null-read "
-        "audit fires on every one of them."
+        "KgFactor is unwired in 2009-10, so it MUST be `optional: true` "
+        "or Site B of the null-read audit fires there."
     )
 
 
@@ -453,7 +452,7 @@ def test_2018_19_B_unit_vocabulary_is_canonical(crop_production, harvest_units):
 @pytest.mark.requires_s3
 @pytest.mark.slow
 def test_kg_factor_is_carried_for_2018_19(crop_production):
-    """`KgFactor` reaches the table for 2018-19, and only for 2018-19.
+    """Preserve 2018-19 reported factors and the unwired 2009-10 control.
 
     It is the survey's own kg-per-unit rate (UNPS q6d).  A reported 0 means
     "not recorded", not "weighs nothing", so it must be NaN — a stored 0 would
@@ -474,15 +473,17 @@ def test_kg_factor_is_carried_for_2018_19(crop_production):
         f"KgFactor is non-null on only {here.notna().mean():.1%} of {WAVE} "
         f"rows; 99.7% were measured on 2026-09-09"
     )
-    # Wired for 2018-19 only, deliberately -- see _/CONTENTS.org. If another
-    # wave is wired later this assertion should be RELAXED with its own
-    # before/after, not deleted.
-    elsewhere = kgf[r["t"] != WAVE]
-    assert elsewhere.notna().sum() == 0, (
-        "KgFactor is populated outside 2018-19. That may be correct, but "
-        "wiring a wave whose kilograms already resolve through the unit label "
-        "MOVES numbers and needs its own before/after (_/CONTENTS.org)."
-    )
+    # GH849 wires five more waves at their retained native observation grain.
+    # Keep an explicit negative control rather than the superseded assertion
+    # that every other wave is unwired. Source-row/slot pairing and the exact
+    # before/after are covered by the GH849 tests and report.
+    unwired = kgf[r["t"] == "2009-10"]
+    assert len(unwired) > 0
+    assert unwired.notna().sum() == 0
+    for wave in ("2010-11", "2011-12", "2013-14", "2015-16", "2019-20"):
+        newly_wired = kgf[r["t"] == wave]
+        assert len(newly_wired) > 0
+        assert newly_wired.notna().sum() > 0, wave
 
 
 #: Per-unit floor for the kg-factor agreement check.  30 is

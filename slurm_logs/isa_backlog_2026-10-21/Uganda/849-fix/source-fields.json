@@ -1,0 +1,284 @@
+{
+  "status": "CONFIRMED_BEFORE_PRODUCTION_EDIT",
+  "sources": [
+    {
+      "wave": "2009-10",
+      "module": "A",
+      "source_reference": "dvc:AGSEC5A.dta:5bf8b1b79f428d25ce2d5a5353e3b7fb54b3bf54e4d3c51b0cfe76877cc1fcc9",
+      "raw_sha256": "a5e28b3e9161c3fe42de6d7b62dbca43c8a485e1917dab7f2f4853795554ceda",
+      "slots": []
+    },
+    {
+      "wave": "2009-10",
+      "module": "B",
+      "source_reference": "dvc:AGSEC5B.dta:4fd4c69666a352af5a66fb95f42210e60cce83dd8a7963a8f2006268d55cf868",
+      "raw_sha256": "dbb73ecb638e812cd9416ff91451340e7230e42098f9abdd897a0660bb148e85",
+      "slots": []
+    },
+    {
+      "wave": "2010-11",
+      "module": "A",
+      "source_reference": "dvc:AGSEC5A.dta:144bd08c25da0935c02de879eaa2fa5c9de694a8070f7c43d0d2d304fc93304b",
+      "raw_sha256": "e8b9be6b5616c9bd222ecb676212034a043e1c09bc5bf18e034112e1edfccef5",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5aq6d",
+          "label": "How much did you harvest during the first seaon of 2010 and in what state-conver",
+          "source_rows": 13873,
+          "nonmissing": 10934,
+          "finite_positive": 10928,
+          "zero": 6,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2010-11",
+      "module": "B",
+      "source_reference": "dvc:AGSEC5B.dta:26258ec66916c116caceb3c030aba3fa38992185e4d61a1ea1fbc50853123a83",
+      "raw_sha256": "d2c19a750138f9cf4ba3949d48c329e0728dfb8a9c34ad7190fd885b8a4e5c6e",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5bq6d",
+          "label": "How much did you harvest during the second seaon of 2010 and in what state-conve",
+          "source_rows": 9413,
+          "nonmissing": 9403,
+          "finite_positive": 9402,
+          "zero": 1,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2011-12",
+      "module": "A",
+      "source_reference": "dvc:AGSEC5A.dta:f8c43f5fc4db424ee84d29f5fdaec7a398d1c940aada6430a0a35dd74d956346",
+      "raw_sha256": "4d855c4aaf3a29d71086a7f4663be8aea8e9b69bc24c20c5f1f971b1c306a04b",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5aq6d",
+          "label": "How much did you harvest during the first season of 2011 and in conversion facto",
+          "source_rows": 12361,
+          "nonmissing": 7963,
+          "finite_positive": 7963,
+          "zero": 0,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2011-12",
+      "module": "B",
+      "source_reference": "dvc:AGSEC5B.dta:08e25b6cb6222ecfad49812155a8949d77464a71fde7ea971a6e10d266829a2d",
+      "raw_sha256": "891fdf8def6bac4b7cd9b3ccbcfbf992ef9023b1a879f74760249302edc66acd",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5bq6d",
+          "label": "How much did you harvest during the first season of 2011 and in conversion facto",
+          "source_rows": 10348,
+          "nonmissing": 7125,
+          "finite_positive": 7125,
+          "zero": 0,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2013-14",
+      "module": "A",
+      "source_reference": "dvc:AGSEC5A.dta:6336387d0cb6778b95a1c2062a9550ec45ad572ca90a0331b95b1504ee4e3c30",
+      "raw_sha256": "35244762e67a9be52e3650adaa81d2dc56657e9384694635f43144d32364ddda",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5aq6d",
+          "label": "A5AQ6D:Corvension factor into kgs per crop",
+          "source_rows": 10774,
+          "nonmissing": 6603,
+          "finite_positive": 6603,
+          "zero": 0,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2013-14",
+      "module": "B",
+      "source_reference": "dvc:AGSEC5B.dta:7b0bc8c09f320e395d57b1acba268240c2d4152f8ed8a24850b291faa370d54d",
+      "raw_sha256": "7085a5d92f1e7630b8d9cf1d1e9e9875c15801ca0f1327996fd034e9ce4c411a",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5bq6d",
+          "label": "A5BQ6D:Corvension factor into kgs per crop in 2013",
+          "source_rows": 10424,
+          "nonmissing": 6665,
+          "finite_positive": 6664,
+          "zero": 1,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2015-16",
+      "module": "A",
+      "source_reference": "dvc:AGSEC5A.dta:cbc1da32262790cfd365dff76fc95d1c84956611bb8bc311c6e81690ec3d304f",
+      "raw_sha256": "e902db5490dde7492e95928468f7aff55ef9396b2d428757846557b3e60c3aa9",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5aq6d",
+          "label": "A5aq6d:how much did you harvest during the second season of 2014 and in what sta",
+          "source_rows": 10678,
+          "nonmissing": 10675,
+          "finite_positive": 10675,
+          "zero": 0,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2015-16",
+      "module": "B",
+      "source_reference": "dvc:AGSEC5B.dta:754086db997216d8528534229ca4e154aad22b2955d9ac502d3ab72e2179f372",
+      "raw_sha256": "4323761f608c78fa674e7b6d7ad08b78561d68e1a584805a4cd89202f84fd652",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5bq6d",
+          "label": "A5bq6d:how much did you harvest during the first season of 2015 and in what stat",
+          "source_rows": 8971,
+          "nonmissing": 6610,
+          "finite_positive": 6610,
+          "zero": 0,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2018-19",
+      "module": "A",
+      "source_reference": "dvc:AGSEC5A.dta:0f9a83a63df2798d077ea93627dfd66e17d75d87ffd22165edfc882a117cdbb6",
+      "raw_sha256": "81de4ad9c683dd30e303452d592ac6f8b19b78f15719592f61b61282d91a030e",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5aq6d",
+          "label": "6d. Conversion factor into kg?",
+          "source_rows": 7153,
+          "nonmissing": 7134,
+          "finite_positive": 7123,
+          "zero": 11,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2018-19",
+      "module": "B",
+      "source_reference": "dvc:AGSEC5B.dta:7cf0b53195099d93528d9ee53883134c23b9ee7d357a335f6e51e26372e3708c",
+      "raw_sha256": "1393ee911f2dafa1446e1e381bc8764779fc544d8e96de8e57fabf5b9ab29da0",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "a5bq6d",
+          "label": "6d. Conversion factor into kg?",
+          "source_rows": 7041,
+          "nonmissing": 7037,
+          "finite_positive": 7026,
+          "zero": 11,
+          "negative": 0,
+          "positive_nonfinite": 0
+        },
+        {
+          "slot": 2,
+          "field": "s5bq06d_2",
+          "label": "6d. Conversion factor into kg?",
+          "source_rows": 7041,
+          "nonmissing": 935,
+          "finite_positive": 934,
+          "zero": 1,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2019-20",
+      "module": "A",
+      "source_reference": "dvc:agsec5a.dta:433211da10152b33222a3acce55030d52f6e6f8e8258701bd45105dc17bbe5d1",
+      "raw_sha256": "e8a887b6c831ce7f3a3442cf3e4e9722a4f06795b4c3e41eb005ac05abffc0a2",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "s5aq06d_1",
+          "label": "6d. Conversion faction into kg (2018, full harvest, condition1)",
+          "source_rows": 8429,
+          "nonmissing": 6977,
+          "finite_positive": 6970,
+          "zero": 7,
+          "negative": 0,
+          "positive_nonfinite": 0
+        },
+        {
+          "slot": 2,
+          "field": "s5aq06d_2",
+          "label": "6d. Conversion faction into kg (2018, full harvest, condition2)",
+          "source_rows": 8429,
+          "nonmissing": 936,
+          "finite_positive": 936,
+          "zero": 0,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    },
+    {
+      "wave": "2019-20",
+      "module": "B",
+      "source_reference": "dvc:agsec5b.dta:eb2969021ebd4e2410c607ae96611e7ce75f7031f40970969bbd7db73a8751fb",
+      "raw_sha256": "3863fb5ae93f26b5cb8f00b7db5c29987da8dc0f5a01c3d064cd318dd614c25b",
+      "slots": [
+        {
+          "slot": 1,
+          "field": "s5bq06d_1",
+          "label": "6d. Conversion faction into kg (2019, condition1)",
+          "source_rows": 9356,
+          "nonmissing": 7366,
+          "finite_positive": 7357,
+          "zero": 9,
+          "negative": 0,
+          "positive_nonfinite": 0
+        },
+        {
+          "slot": 2,
+          "field": "s5bq06d_2",
+          "label": "6d. Conversion faction into kg (2019, condition2)",
+          "source_rows": 9356,
+          "nonmissing": 921,
+          "finite_positive": 921,
+          "zero": 0,
+          "negative": 0,
+          "positive_nonfinite": 0
+        }
+      ]
+    }
+  ],
+  "new_bindings": 12,
+  "existing2018_bindings": 3,
+  "raw_files28": true,
+  "served_nonpositive_normalization_is_existing_helper_not_changed": true
+}

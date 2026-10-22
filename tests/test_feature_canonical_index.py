@@ -47,7 +47,8 @@ CANONICAL = ["t", "v", "i", "plot_id", "j", "u", "condition", "season"]
 
 class TestDeclarations:
     def test_crop_production_is_registered(self):
-        assert _canonical_index_levels("crop_production") == CANONICAL
+        # GH1198 adds the native observation coordinate after the core grain.
+        assert _canonical_index_levels("crop_production") == CANONICAL + ["production_obs"]
 
     def test_canonical_index_keeps_v(self):
         """Load-bearing: `country._compute_no_v_join` exempts any table whose
@@ -64,7 +65,8 @@ class TestDeclarations:
     def test_missing_level_sentinels_are_non_null_strings(self):
         sentinels = _missing_level_sentinels("crop_production")
         assert sentinels == {"u": "Unknown", "condition": "unknown_condition",
-                             "season": "unknown_season"}
+                             "season": "unknown_season",
+                             "production_obs": "unresolved_observation"}
         for lvl, value in sentinels.items():
             assert isinstance(value, str) and value, lvl
             assert pd.notna(value), (
@@ -528,7 +530,8 @@ class TestFeatureEndToEnd:
             warnings.simplefilter("ignore")
             out = f(list(shapes), currency=None)
 
-        assert list(out.index.names) == ["country"] + CANONICAL
+        assert list(out.index.names) == ["country"] + CANONICAL + ["production_obs"]
+        assert set(out.index.get_level_values("production_obs")) == {"unresolved_observation"}
         assert sorted(out.index.get_level_values("country").unique()) == sorted(shapes)
         assert len(out) == len(shapes)
         assert out.index.is_unique

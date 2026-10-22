@@ -1,0 +1,135 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "parent": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "measured_working_source_ledger_head": "337f8432193902c0d6f3d6251ff911606d0955b6",
+  "supported_rows": 155931,
+  "obs_counts": {
+    "1": 66699,
+    "2": 49014,
+    "3": 40218
+  },
+  "visit_counts": {
+    "1": 66159,
+    "2": 89772
+  },
+  "runtime": {
+    "runtime_stages": 40,
+    "cold": 20,
+    "supported_stages": 8,
+    "country_comparisons": 20,
+    "native_comparisons": 24,
+    "warm": 20,
+    "unsupported_stages": 32
+  },
+  "default_fresh_process_warm_no_cache_writes": 10,
+  "Make_supported_fresh_warm_native_identical_bytes_rewrites": 2,
+  "unsupported_frame_rows": 0,
+  "unsupported_community_builds": 0,
+  "candidate_focused_pytest": {
+    "passed": 111,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "explicit_deselected": 1,
+    "warnings": 7
+  },
+  "original_822_source_backed_public_function_direct_execution_passed": true,
+  "baseline_new_test_negative": {
+    "failed": 24,
+    "passed": 4,
+    "errors": 0,
+    "skipped": 0
+  },
+  "physical_MD5_source_copies": 42,
+  "distinct_held_sources": 2,
+  "healthy_Niger_rows": 46043,
+  "Feature_rows_each_argument_variant": 201974,
+  "paired_full_frame_full_typed_attrs_comparisons": 4,
+  "raw_scanner_records_per_head": 2,
+  "raw_scanner_records_byte_exact": true,
+  "scanner_warn": 2,
+  "scanner_error_failure": 0,
+  "native_cluster_no_household_index_warning_countries": [
+    "Mali",
+    "Niger"
+  ],
+  "actual_549_39": {
+    "baseline_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+    "candidate_ledger_head": "337f8432193902c0d6f3d6251ff911606d0955b6",
+    "candidate_dirty_production_scope": [
+      "Mali/_/Makefile",
+      "delete Mali/_/community_prices.py"
+    ],
+    "before_actual_country_rebuild": true,
+    "country_cells": 549,
+    "changed_country_cells": 24,
+    "changed_cells": [
+      "Mali/sample",
+      "Mali/cluster_features",
+      "Mali/household_roster",
+      "Mali/individual_education",
+      "Mali/subjective_well_being",
+      "Mali/food_security",
+      "Mali/food_acquired",
+      "Mali/interview_date",
+      "Mali/panel_ids",
+      "Mali/assets",
+      "Mali/housing",
+      "Mali/shocks",
+      "Mali/food_coping",
+      "Mali/plot_features",
+      "Mali/crop_production",
+      "Mali/plot_inputs",
+      "Mali/livestock",
+      "Mali/plot_labor",
+      "Mali/people_last7days",
+      "Mali/community_prices",
+      "Mali/food_expenditures",
+      "Mali/food_prices",
+      "Mali/food_quantities",
+      "Mali/household_characteristics"
+    ],
+    "unchanged_other_country_cells": 525,
+    "framework_cells": 39,
+    "changed_framework_cells": []
+  },
+  "CLI_three_layer": {
+    "parent_default_and_candidate_request": [
+      "2017-18",
+      "2018-19",
+      "2021-22"
+    ],
+    "rows_all_controls": 0,
+    "candidate_default_make_three_stages_full_frame_full_typed_attrs_exact": true,
+    "candidate_empty_API_exact_actual_empty_declared_factory_and_finalizer": true,
+    "candidate_default_make_full_arrow_schema_and_metadata_exact": true,
+    "all_three_artifacts_exact_independent_unchanged_writer_controls": true,
+    "parent_artifact_and_API_identical_to_candidate": false,
+    "parent_candidate_empty_full_typed_attrs_exact": true,
+    "parent_empty_visit_obs_dtype": "int64",
+    "candidate_declared_empty_visit_obs_dtype": "str",
+    "candidate_Description_API_dtype": "object",
+    "candidate_Description_postread_dtype": "string",
+    "writer_source_SHA256": "e697a53f93279add6268c011b87dd3784c6245a588563223176d1c32db9009a3",
+    "supported_CLI_two_backends_full_frame_full_typed_attrs_and_footer_exact_parent_artifact": true,
+    "supported_CLI_API_prewrite_full_frame_full_typed_attrs_exact_parent_API": true,
+    "supported_API_to_artifact_typed_attrs_identical": false,
+    "supported_artifact_exact_unchanged_writer_control": true,
+    "framework_or_writer_changes": false
+  },
+  "strict_api_audit_exit": 0,
+  "network_attempts": 0,
+  "denied_source_writes": 0,
+  "source_acquisition": false,
+  "other_23_Mali_outputs_rebuilt_or_claimed": false,
+  "full_suite_run": false,
+  "author_independent_PASS_claim": false,
+  "runtime_test_source_head": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+  "ledger_first_head": "337f8432193902c0d6f3d6251ff911606d0955b6",
+  "strict_api_audit_committed_runtime_head_exit": 0,
+  "synthetic_test_warning_accounting": {
+    "same_process_repeat_build": 4,
+    "missing_Fakeland_builder": 1,
+    "Fakeland_Make_failure": 2
+  }
+}

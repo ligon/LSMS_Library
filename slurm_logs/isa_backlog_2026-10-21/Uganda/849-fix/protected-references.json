@@ -1,0 +1,47 @@
+{
+  "status": "PASS_ALL_RECORDED_FROZEN_REFERENCES",
+  "checks": {
+    "author1198": {
+      "entries": 4122,
+      "manifest_sha256": "e1a7d64677dbc9b11f6159512e890d8372ba330acfa471dfdd9ed6cae5734472",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "review1198": {
+      "entries": 1908,
+      "manifest_sha256": "fa04d70934d3d7f32083ecabd45de9e0d2fc60fcac001dffc20c29dd93f2f72d",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "docs73ad": {
+      "entries": 52,
+      "manifest_sha256": "80f2f9500e7f23b330ce0fe20d09c5427b58b599bd614112f0fb5d8cde3e210d",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "docs085": {
+      "entries": 45,
+      "manifest_sha256": "48b3a7fc4017ebe855917db472f076f1ee1732ce48dde7df00b2dc70fed1736f",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "original_1198_849_addendum_Mali_references": {
+      "entries": 1960,
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "GLOBAL17": {
+      "entries": 6468,
+      "manifest_sha256": "f559b1677e5ccbf237caf0b4a96a050c4d69bd0fec91f27a9d62ce8fc05e30cd",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "BF1119": {
+      "entries": 594,
+      "manifest_sha256": "62cadf6a6080969f3aebe056fd4bfcfe54d0a6fde1604306019a62a93a1cbe57",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "Tanzania1091": {
+      "entries": 2894,
+      "manifest_sha256": "2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "gated_held_sources_and_copies": {
+      "exact_receipts": 606
+    }
+  }
+}
