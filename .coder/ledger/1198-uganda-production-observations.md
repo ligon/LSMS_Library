@@ -125,3 +125,59 @@ scope. Independent review precedes any PR; this lane has no GitHub writes.
   or public observation contract is made. Safe DESIGN/PROTOTYPE/commands are
   the engineering handoff; original strict stops and handling qualifications
   remain private and are described there. Sue (GPT-6).
+
+### Implementation verification, 2026-10-22
+
+- OK (§2/§4): runtime/test commit `929149222e43a8fe500cc08420cdc68357170af3`
+  follows ledger-first `9144f5085`. All seven real loaders fingerprint the same
+  literal sources they read. Reported IDs, physical release rows, reordered
+  declared slots, missing values/columns and duplicate locators have controls.
+  The conditional old nonunique-index null boundary is exact, including an
+  otherwise-unique null-key frame; 403 held-source exclusions remain separate.
+- OK (§2/§5): 59 held DTA prerequisites were physically copied to private L1,
+  both layouts MD5/SHA/size/mode/mtime/inode/nlink-gated before decode. Forty-one
+  sidecars omit a declared size; actual copy size is recorded, not invented.
+  Normal empty-L2 source builds retain133761 records on both backends. Fresh
+  default warm changes0/144 file receipts; Make changes17 mtimes only, exactly
+  the measured existing parent route. No cache stamp/bypass/acquisition occurs.
+- OK (§4): 85 complete raw/native/public/sample/area frame comparisons use
+  check_exact=True,rtol=atol=0 plus every index level/code/class/dtype/null mask
+  and recursively typed full attrs. They connect the corrected final builds to
+  the independently decoded source oracle and prior downstream operands. No
+  production_observation metadata is manufactured. All928 null-v records survive.
+- OK (§2/§5): actual healthy Niger46376 and pooled Feature180137, both currency
+  branches, with fresh-process API pairs and a separately labelled artifact
+  oracle. Country bare default is None; Feature default is index. The earlier
+  parent Country operand labelled default explicitly requested index and is
+  preserved as such. No original Niger bare-cold API was saved; its actual
+  explicit-None operand is available. Only canonical_alignment gains the
+  Niger unresolved_observation entry; other typed attrs are exact.
+- OK (§2/§3): current-wiring whole harvest78571 rows, +2091kg; factor-layer
+  counts and median pool effects measured using existing transformations.
+  Actual plot_features42841 and real parcel-yield14022 full frames are exact
+  parent/candidate. The documented100% parcel-match claim is contradicted by
+  14022/40409 converted keys and0 literal-plot matches. Separate residual only.
+- OK (§4): actual inventories before final source builds:28/549 Uganda country
+  hashes move,521 others exact;0/39 framework fingerprints;171/1362 declared
+  wave hashes and224/2139 API-wave pairs move, all Uganda. All old CROP_COLMAPS
+  entries including kg_factor are AST-exact f8 after removing identity fields.
+- OK (§2/§4):392 focused cases pass,10 genuine unstaged unrelated warm-corpus
+  skips,0 errors/failures. Final39 observation controls give36 failures/3 passes
+  on actual parent989; the three passes include the preserved unique-null,
+  duplicate-null and empty-input boundaries. Strict API audit passes.
+- OK (§4): scoped unmodified scanner51→41 WARN,0FAIL/ERROR, no phase2 grid.
+  Exact full-record multiset22 unchanged,29 removed,19 added: ten old lossy
+  label-reducer warnings vanish; remaining differences are quantity diagnostics,
+  row-count/index declaration text and the declared sentinel alignment. Every
+  occurrence/digest remains available without warning normalization.
+- Residual (§6): Make country crop builder ignores strict wave subsets on both
+  heads; default unsupported2005 public0 still comes from a whole raw country
+  fallback with requested-only coverage metadata. No builder retirement here.
+- Evidence limits: original34-pass v2 log survives, its XML was overwritten by
+  a new39-pass run; no recovery/replay claim. Original source snapshots, null/
+  slot/attrs stops, premature hash check, scanner-wrapper argument stop and
+  area-oracle axis-construction stop remain pinned separately. Corrected runs
+  use unique names/fresh roots; safe exports never replace private operands.
+
+Independent review is still required; these are author verification results.
+No public PR or GitHub write was made. Sue (GPT-6).
