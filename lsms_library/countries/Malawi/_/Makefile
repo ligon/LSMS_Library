@@ -12,17 +12,19 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # _ROSTER_DERIVED — no country-level parquet is built or consulted.
 # See GH #218.
 
-all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet $(VAR_DIR)/community_prices.parquet
+all: $(parquet) food_acquired $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet $(VAR_DIR)/community_prices.parquet
 
-food_acquired = $(shell find $(rounds) -name food_acquired.py)
 # Wave-level parquets live in data_root, not in-tree
 food_acquired_parquet := $(foreach r,$(rounds),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(notdir $(r))/_/food_acquired.parquet)
 
+# GH #1209: build the native waves here; Country assembles them through the
+# existing no-country-builder route (ledger 1209-malawi-food-builder, section 2).
+# This target does not write a country-level var/food_acquired.parquet.
+.PHONY: food_acquired
+food_acquired: $(food_acquired_parquet)
+
 $(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/food_acquired.parquet:
 	(cd ../$(*)/_/ && python food_acquired.py)
-
-$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
-	python food_acquired.py
 
 # --- non-FIES food security (GH #332) -------------------------------------
 # food_coping and months_food_inadequate are built only for the four IHS3+/
