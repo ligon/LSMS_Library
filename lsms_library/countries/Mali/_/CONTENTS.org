@@ -1282,8 +1282,9 @@ unsupported 2017-18, 2018-19 or 2021-22 request, including their combined subset
 Default returned zero, but a cold unsupported request still built the full
 2014-15 raw country frame and stamped only the requested unsupported coverage.
 That actual-row-wave/manifest mismatch is historical defect evidence, not a
-valid subset product.  Both backends now use the existing declared empty frame
-for unsupported subsets and the existing wave aggregation for supported data.
+valid subset product.
+Both backends now return zero rows for unsupported subsets and use the existing wave aggregation for supported data.
+The empty representation depends on the route and available cache coverage.
 
 Old Make public attrs lacked only =id_converted=True= relative to default.
 The authoritative full default attrs are now also the Make expectation; this
@@ -1293,12 +1294,11 @@ still reads/writes native wave caches normally; it is not a cache bypass.
 Country aggregation is available through Country/CLI materialize, while a
 direct request for the removed country var target has no rule.
 
-Empty unsupported outputs use the existing declared shape: visit/obs have
-string index dtypes, rather than the integer dtypes left by filtering the old
-full table.  Description is object at the API and becomes StringDtype through
-the unchanged generic parquet writer.  These are explicit empty-output
-consequences; supported API frames and matched CLI artifacts retain their
-separate full-frame and attrs comparisons.
+The declared-empty route has string visit/obs index dtypes and object Description at the API.
+The unchanged generic parquet writer converts Description to StringDtype.
+A filtered empty slice from a current covered default cache can instead retain integer visit/obs, StringDtype Description and =id_converted= attrs.
+Both representations contain zero rows; compare API frames and CLI artifacts at their matching stages.
+Supported API frames and matched CLI artifacts retain their separate full-frame and attrs comparisons.
 
 The retired Make comment said all EHCVM price files had "no grappe key".
 The current scheme and the earlier note in this file already distinguish the
