@@ -1484,3 +1484,22 @@ This does not adjudicate code 21's physical meaning or legacy Seed classificatio
 Senegal and Guinea-Bissau work remains outside this Burkina Faso partial fix.
 The Org file is a whole-country build input: all 24 Burkina API hashes change, with 525 other-country hashes and all 39 framework fingerprints exact.
 Only the four scoped Burkina tables were actually rebuilt; this is not evidence for all other outputs.
+
+* 2026-10-22 -- purchases and gifts retain their own reported units (GH #1188)
+
+The 2018-19 input roster records use, purchase and gift/donation measurements separately.
+=Quantity= and index =u= retain used quantity =s16bq03a= and its unit =s16bq03b= exactly.
+=Purchased= now reads =s16bq08=, and =Quantity_purchased= reads =s16bq09a= with nullable column =Unit_purchased= from =s16bq09b=.
+The old q05/q07a answers are retained under =Received_as_gift= and =Quantity_received_as_gift=, with their own nullable =Unit_received_as_gift= from =s16bq07b=.
+Each unit variable uses its own decoded labels and only exact curated formatter keys; equal numeric unit codes do not establish equal units.
+The acquisition unit columns do not inherit the name-matched post-read normalization of the =u= axis.
+Missing acquisition flags, quantities and units remain missing; they are not filled with false, zero or the used unit.
+=s16bq09c= is a monetary amount and is not introduced as a quantity or a new monetary field.
+
+Guarded source-first diagnosis reproduces all 22,877 applied rows, 802 gift yes versus 7,689 purchase yes, 8,297 flag disagreements and 8,371 quantity/mask disagreements.
+Known gift/used and purchase/used unit differences remain 23 and 193.
+The 183 previously recovered native lines include 18 reported purchases with positive purchase quantity.
+There is no new application gate, parcel allocation, reducer, inferred factor or unit conversion.
+All native household/input-slot identities, row order, used quantities/units, seed crop labels and 602 source-qualified code21 records remain in scope for exact preservation.
+Code21's unverified legacy Seed classification remains owned by GH #1187.
+Only four country-local optional columns are added; no shared axis, framework, global schema or mapping is changed.
