@@ -1,0 +1,80 @@
+{
+  "status": "PASS",
+  "strict_checks": 30,
+  "checks": [
+    "base-Uganda-bare-actual-fresh-warm",
+    "candidate-Uganda-bare-actual-fresh-warm",
+    "base-Niger-bare-actual-fresh-warm",
+    "candidate-Niger-bare-actual-fresh-warm",
+    "Niger-bare-matched-actual-heads",
+    "base-Feature-bare-actual-fresh-warm",
+    "candidate-Feature-bare-actual-fresh-warm",
+    "Uganda-bare-currency-stage-artifact-oracle",
+    "Niger-bare-currency-stage-artifact-oracle",
+    "Feature-bare-full-typed-source-assembly-oracle",
+    "base-Uganda-None-actual-fresh-warm",
+    "candidate-Uganda-None-actual-fresh-warm",
+    "base-Niger-None-actual-fresh-warm",
+    "candidate-Niger-None-actual-fresh-warm",
+    "Niger-None-matched-actual-heads",
+    "base-Feature-None-actual-fresh-warm",
+    "candidate-Feature-None-actual-fresh-warm",
+    "Uganda-None-currency-stage-artifact-oracle",
+    "Niger-None-currency-stage-artifact-oracle",
+    "Feature-None-full-typed-source-assembly-oracle",
+    "base-Uganda-index-actual-fresh-warm",
+    "candidate-Uganda-index-actual-fresh-warm",
+    "base-Niger-index-actual-fresh-warm",
+    "candidate-Niger-index-actual-fresh-warm",
+    "Niger-index-matched-actual-heads",
+    "base-Feature-index-actual-fresh-warm",
+    "candidate-Feature-index-actual-fresh-warm",
+    "Uganda-index-currency-stage-artifact-oracle",
+    "Niger-index-currency-stage-artifact-oracle",
+    "Feature-index-full-typed-source-assembly-oracle"
+  ],
+  "rows": 180137,
+  "healthy_Niger": 46376,
+  "alignment": {
+    "bare": {
+      "all_typed_attrs_exact": true,
+      "every_nonfactor_value_axis_dtype_mask_exact": true
+    },
+    "None": {
+      "all_typed_attrs_exact": true,
+      "every_nonfactor_value_axis_dtype_mask_exact": true
+    },
+    "index": {
+      "all_typed_attrs_exact": true,
+      "every_nonfactor_value_axis_dtype_mask_exact": true
+    }
+  },
+  "CLI": {
+    "base": {
+      "status": "PASS",
+      "rows": 133761,
+      "actual_prewrite_API_full_exact": true,
+      "postread_artifact_full_exact": true,
+      "full_Arrow_footer_schema_bytes_exact": true,
+      "zero_cache_writes": true,
+      "prewrite_to_postread_strict": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": false
+      }
+    },
+    "candidate": {
+      "status": "PASS",
+      "rows": 133761,
+      "actual_prewrite_API_full_exact": true,
+      "postread_artifact_full_exact": true,
+      "full_Arrow_footer_schema_bytes_exact": true,
+      "zero_cache_writes": true,
+      "prewrite_to_postread_strict": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": false
+      }
+    }
+  }
+}

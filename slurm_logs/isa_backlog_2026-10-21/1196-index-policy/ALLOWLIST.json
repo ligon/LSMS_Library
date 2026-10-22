@@ -1,0 +1,21 @@
+{
+  "safe_aggregate_only": true,
+  "files": {
+    "REPORT.org": {
+      "sha256": "ebaf3bb6b9a375e4ebcfc9a45512aec9160dbadb144715e73a401d2e3e71f266",
+      "size": 12743
+    },
+    "REPRODUCE.org": {
+      "sha256": "f00006d71b52a74c0bc240db78e30656b3f2384e1180bcbb67ecf7c780070afa",
+      "size": 5589
+    },
+    "validation.json": {
+      "sha256": "fea55a1deb5c9c799e0c3f6eb26a0f76f9f8380938be4f984134fae406b74ead",
+      "size": 5478
+    },
+    "proof.json": {
+      "sha256": "d1fb0cf17e9d2ffa6cae9a788727f2a7286be3d7bd98ec424653ce0b53385332",
+      "size": 5770
+    }
+  }
+}

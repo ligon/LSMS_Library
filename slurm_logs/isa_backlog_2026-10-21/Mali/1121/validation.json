@@ -1,0 +1,231 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "issue": 1121,
+  "base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "runtime_commit": "3990052090e2f56049f6d5116a82ff4cfef97aeb",
+  "root_cause": "Three country Preferred Labels capitalized source codes, splitting shared Feature groups and failing exact lowercase selectors",
+  "change": "Only Family/Hired/Other Preferred Labels become family/hired/other; schema comment, country notes and tests align",
+  "implementation_boundary": {
+    "three_Preferred_Label_cells": true,
+    "helper_driver_framework_unchanged": true,
+    "no_global_enum_or_Ghana_edits": true,
+    "no_822_dependency": true
+  },
+  "Country": {
+    "cold": {
+      "rows": 52057,
+      "by_source": {
+        "family": 33655,
+        "hired": 9565,
+        "other": 8837
+      },
+      "by_wave": {
+        "2014-15": 14843,
+        "2017-18": 37214
+      },
+      "index": [
+        "i",
+        "t",
+        "v",
+        "plot_id",
+        "source"
+      ],
+      "unique": true,
+      "PersonDays_sum": 11544571.100000001,
+      "Wage_sum": 214685819.0,
+      "attrs_exact": true,
+      "non_source_keys_values_dtypes_nullmasks_exact": true,
+      "warning_classes": {
+        "CacheRebuildWarning": 1,
+        "UnicodeWarning": 22,
+        "NullReadWarning": 1
+      }
+    },
+    "warm": {
+      "rows": 52057,
+      "by_source": {
+        "family": 33655,
+        "hired": 9565,
+        "other": 8837
+      },
+      "by_wave": {
+        "2014-15": 14843,
+        "2017-18": 37214
+      },
+      "index": [
+        "i",
+        "t",
+        "v",
+        "plot_id",
+        "source"
+      ],
+      "unique": true,
+      "PersonDays_sum": 11544571.100000001,
+      "Wage_sum": 214685819.0,
+      "attrs_exact": true,
+      "non_source_keys_values_dtypes_nullmasks_exact": true,
+      "warning_classes": {
+        "NullReadWarning": 1
+      }
+    },
+    "all_non_source_values_keys_dtypes_nullmasks_attrs_exact": true,
+    "actual_empty_L2_cold_and_fresh_process_warm": true,
+    "native_wave_frames": {
+      "2014-15": {
+        "rows": 14843,
+        "full_frame_case_only_exact": true
+      },
+      "2017-18": {
+        "rows": 37214,
+        "full_frame_case_only_exact": true
+      }
+    },
+    "warm_parquet_byte_size_mtime_unchanged": 28
+  },
+  "selectors": {
+    "family_persondays": 7867691.5,
+    "hired_persondays": 1197091.3,
+    "full_frames_exact_to_baseline_selection": true,
+    "total_labor_days_exact": true
+  },
+  "Feature": {
+    "rows": 105098,
+    "country_parts": {
+      "Mali": 52057,
+      "Niger": 53041
+    },
+    "by_source": {
+      "family": 57671,
+      "hired": 26719,
+      "other": 20708
+    },
+    "frame_exact_to_case_projection": true,
+    "all_attrs_exact": true,
+    "warning_classes": {
+      "NullReadWarning": 2,
+      "UserWarning": 1,
+      "PopulationHeterogeneityWarning": 1
+    }
+  },
+  "Niger_comparator": {
+    "rows": 53041,
+    "by_source": {
+      "family": 24016,
+      "hired": 17154,
+      "other": 11871
+    },
+    "by_wave": {
+      "2011-12": 19643,
+      "2014-15": 15935,
+      "2018-19": 9457,
+      "2021-22": 8006
+    },
+    "index": [
+      "i",
+      "t",
+      "v",
+      "plot_id",
+      "source"
+    ],
+    "unique": true,
+    "PersonDays_sum": 1798429.0,
+    "Wage_sum": 172889043.0,
+    "attrs_exact": true,
+    "non_source_keys_values_dtypes_nullmasks_exact": true,
+    "warning_classes": {
+      "NullReadWarning": 1
+    }
+  },
+  "tests": {
+    "focused_pass": 335,
+    "focused_skip": 0,
+    "new_tests_pass": 10,
+    "baseline_new_fail": 7,
+    "baseline_new_pass": 3,
+    "selection": [
+      "tests/test_mali_plot_labor_source.py",
+      "tests/test_categorical_mapping_resolution.py",
+      "tests/test_schema_consistency.py"
+    ],
+    "workers": 2,
+    "distribution": "loadfile",
+    "api_audit": "pass; no untracked hashed build inputs"
+  },
+  "scanner": {
+    "before_records": 8,
+    "after_records": 8,
+    "exact_unchanged_records": 8,
+    "removed": 0,
+    "added": 0,
+    "errors": 0,
+    "failures": 0,
+    "normalization": "Only checkout/private-data roots and elapsed/duration fields",
+    "full_records_sha256": "03368c8dd66d9de894946c58f81b2753e247d00e5b9a90f3df04306e2c7f3d81"
+  },
+  "hashes": {
+    "country_pairs": 549,
+    "Mali_changed": 24,
+    "other_pairs_unchanged": 525,
+    "tagged_fingerprints_unchanged": 39,
+    "changed_pairs": [
+      "Mali/sample",
+      "Mali/cluster_features",
+      "Mali/household_roster",
+      "Mali/individual_education",
+      "Mali/subjective_well_being",
+      "Mali/food_security",
+      "Mali/food_acquired",
+      "Mali/interview_date",
+      "Mali/panel_ids",
+      "Mali/assets",
+      "Mali/housing",
+      "Mali/shocks",
+      "Mali/food_coping",
+      "Mali/plot_features",
+      "Mali/crop_production",
+      "Mali/plot_inputs",
+      "Mali/livestock",
+      "Mali/plot_labor",
+      "Mali/people_last7days",
+      "Mali/community_prices",
+      "Mali/food_expenditures",
+      "Mali/food_prices",
+      "Mali/food_quantities",
+      "Mali/household_characteristics"
+    ],
+    "actual_file_hashes": true
+  },
+  "private_sources": {
+    "held_relevant_blobs": 17,
+    "physical_separate_copy": true,
+    "all_md5_verified": true,
+    "labor_sources": 4,
+    "new_acquisitions": 0
+  },
+  "old_trees_immutable": {
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_contents_and_modes_unchanged": 14880,
+      "clean": true
+    },
+    "current": {
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "tracked_contents_and_modes_unchanged": 14891,
+      "clean": true
+    }
+  },
+  "offline": {
+    "guard_active": true,
+    "blocked_socket_connections": 0,
+    "successful_acquisitions": 0,
+    "DVC_CLI": 0,
+    "shared_cache_changes": 0,
+    "GitHub_writes": 0
+  },
+  "remaining_scope": "Tier C cross-country harmonize_labor_source design stays under #1121; GhanaSPS/GhanaLSS categories unchanged",
+  "limits": [
+    "Only labor outputs were rebuilt/compared; other Mali changes are cache-hash claims, not output validation",
+    "No questionnaire PDF newly acquired or inspected; source meaning corroborated by held Stata metadata",
+    "Two initial private cold verifiers stopped on oracle assumptions (Series attrs; all-missing hired group); captures preserved and later fresh empty-L2 proof passed without code changes"
+  ]
+}

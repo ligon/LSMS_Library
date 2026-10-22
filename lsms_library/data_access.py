@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import base64
 import configparser
+import filecmp
 import functools
 import hashlib
 import json
@@ -53,6 +54,7 @@ import random
 import re
 import shutil
 import signal
+import stat
 import subprocess
 import tempfile
 import time
@@ -61,7 +63,7 @@ import warnings
 import zipfile
 from collections.abc import Sequence
 from contextlib import contextmanager
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import NamedTuple
 from urllib.parse import urlparse
 
@@ -1141,67 +1143,158 @@ def _download_and_extract(download_url: str, zip_filename: str,
 def _extract_all_from_zip(download_url: str, zip_filename: str,
                           dest_dir: Path, api_key: str,
                           report: dict | None = None) -> list[Path]:
-    """Download a zip and extract ALL data files.  Returns list of paths.
+    """Stage a whole release, compare it, then place its data files (GH #1149).
 
-    A file already at its destination is NOT overwritten, and is not in the
-    returned list.  Pass *report* (a dict) to learn what was left alone and
-    whether the download failed: ``report["skipped"]`` lists those files and
-    ``report["error"]`` is set on failure.  The acquisition path needs both
-    before it may record which release a directory holds (GH #1128): a
-    pre-existing file is the OLD release's.
+    An existing sidecar's unique, case-insensitive basename fixes the member's
+    destination, including nested layouts. New members keep their zip-relative
+    paths. Ambiguous or escaping destinations raise before any placement.
+
+    Return the files written. ``report['members']`` also includes existing
+    files verified byte-identical to the staged member; those need no write.
+    A differing raw file WITHOUT a matching sidecar stays ``skipped`` and
+    cannot certify a held release. ``revised`` compares staged content with
+    the declared sidecar checksum, using DVC's raw/legacy hashing convention.
+    ``leftovers`` names old sidecars absent from the resolved release; nothing
+    retires them. Recoverable download/IO errors retain partial results and
+    set ``error``, so the existing provenance gate refuses a complete release.
     """
-    if report is not None:
-        report.setdefault("skipped", [])
-        report.setdefault("error", None)
+    # The report is the existing acquisition receipt, not a second provenance
+    # pipeline (ledger 1149-staged-reacquisition sections2/4).
+    report = report if report is not None else {}
+    report.update(skipped=[], error=None, members=[], revised=[], leftovers=[])
     import urllib.request
-
-    with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as tmp:
-        tmp_path = tmp.name
+    import yaml
+    from dvc_data.hashfile.hash import fobj_md5
 
     extracted: list[Path] = []
     try:
-        logger.info("Downloading %s (full zip) ...", zip_filename)
-        req = urllib.request.Request(download_url)
-        req.add_header("X-API-KEY", api_key)
-        with urllib.request.urlopen(req, timeout=600) as resp:
-            with open(tmp_path, "wb") as f:
-                while True:
-                    chunk = resp.read(65536)
-                    if not chunk:
-                        break
-                    f.write(chunk)
+        with tempfile.TemporaryDirectory(prefix="lsms-acquire-") as tmp:
+            staging = Path(tmp)
+            archive = staging / "release.zip"
+            logger.info("Downloading %s (full zip) ...", zip_filename)
+            req = urllib.request.Request(download_url)
+            req.add_header("X-API-KEY", api_key)
+            with urllib.request.urlopen(req, timeout=600) as resp:
+                with open(archive, "wb") as dst:
+                    shutil.copyfileobj(resp, dst)
 
-        data_suffixes = {".dta", ".csv", ".sav", ".dta.gz"}
-        with zipfile.ZipFile(tmp_path) as zf:
-            for name in zf.namelist():
-                if any(name.lower().endswith(s) for s in data_suffixes):
-                    basename = Path(name).name
-                    dest = dest_dir / basename
-                    if dest.exists() and report is not None:
-                        report["skipped"].append(dest)
-                    if not dest.exists():
-                        dest.parent.mkdir(parents=True, exist_ok=True)
-                        with zf.open(name) as src, open(dest, "wb") as dst:
-                            while True:
-                                chunk = src.read(65536)
-                                if not chunk:
-                                    break
-                                dst.write(chunk)
-                        extracted.append(dest)
-                        logger.info("  Extracted %s", basename)
+            data_suffixes = (".dta", ".csv", ".sav", ".dta.gz")
+            sidecars: dict[str, list[Path]] = {}
+            for sidecar in sorted(dest_dir.rglob("*.dvc")):
+                basename = sidecar.name.removesuffix(".dvc")
+                if basename.lower().endswith(data_suffixes):
+                    sidecars.setdefault(basename.casefold(), []).append(sidecar)
+
+            root = dest_dir.resolve()
+            plan = []
+            destinations: dict[str, str] = {}
+            with zipfile.ZipFile(archive) as zf:
+                for member in zf.infolist():
+                    if member.is_dir() or not member.filename.lower().endswith(data_suffixes):
+                        continue
+                    relative = PurePosixPath(member.filename.replace("\\", "/"))
+                    if (relative.is_absolute() or ".." in relative.parts
+                            or re.match(r"^[A-Za-z]:", relative.parts[0])
+                            or stat.S_ISLNK(member.external_attr >> 16)):
+                        raise ValueError(f"Unsafe archive member: {member.filename}")
+                    matches = sidecars.get(relative.name.casefold(), [])
+                    if len(matches) > 1:
+                        raise ValueError(
+                            f"Ambiguous sidecars for {member.filename}: "
+                            + ", ".join(str(p.relative_to(dest_dir)) for p in matches))
+                    sidecar = matches[0] if matches else None
+                    dest = (sidecar.with_suffix("") if sidecar is not None
+                            else dest_dir.joinpath(*relative.parts))
+                    if (not dest.resolve().is_relative_to(root)
+                            or (sidecar is not None
+                                and not sidecar.resolve().is_relative_to(root))):
+                        raise ValueError(f"Destination escapes Data/: {dest}")
+                    key = str(dest.resolve()).casefold()
+                    if key in destinations:
+                        raise ValueError(
+                            f"Archive members {destinations[key]} and "
+                            f"{member.filename} resolve to the same destination: {dest}")
+                    if any(key.startswith(prior + os.sep)
+                           or prior.startswith(key + os.sep)
+                           for prior in destinations):
+                        raise ValueError(f"Overlapping archive destinations: {dest}")
+                    if dest.exists() and not dest.is_file():
+                        raise ValueError(f"Destination is not a file: {dest}")
+                    for parent in dest.parents:
+                        if parent == dest_dir:
+                            break
+                        if parent.exists() and not parent.is_dir():
+                            raise ValueError(f"Destination parent is not a directory: {parent}")
+                    destinations[key] = member.filename
+                    staged = staging / f"member-{len(plan)}"
+                    with zf.open(member) as src, open(staged, "wb") as dst:
+                        shutil.copyfileobj(src, dst)
+                    identical = (dest.exists()
+                                 and filecmp.cmp(staged, dest, shallow=False))
+                    if sidecar is not None:
+                        declared = yaml.safe_load(sidecar.read_text(encoding="utf-8"))
+                        outs = declared.get("outs") if isinstance(declared, dict) else None
+                        if (not isinstance(outs, list) or len(outs) != 1
+                                or not isinstance(outs[0], dict)
+                                or not re.fullmatch(r"[0-9a-fA-F]{32}",
+                                                    str(outs[0].get("md5", "")))
+                                or outs[0].get("hash", "md5-dos2unix")
+                                not in ("md5", "md5-dos2unix")):
+                            raise ValueError(f"Cannot compare sidecar checksum: {sidecar}")
+                        # DVC3 explicit md5 is raw bytes; absent hash means the
+                        # DVC2 text-aware algorithm. Reuse its implementation.
+                        algorithm = outs[0].get("hash", "md5-dos2unix")
+                        with staged.open("rb") as src:
+                            staged_md5 = fobj_md5(src, name=algorithm)
+                        if staged_md5 != outs[0]["md5"].lower():
+                            report["revised"].append({
+                                "path": dest, "sidecar": sidecar,
+                                "algorithm": algorithm,
+                                "declared_md5": outs[0]["md5"],
+                                "staged_md5": staged_md5})
+                    plan.append((staged, dest, sidecar, identical))
+
+            shipped = {str(dest.resolve()).casefold() for _, dest, _, _ in plan}
+            report["leftovers"] = sorted(
+                p for group in sidecars.values() for p in group
+                if str(p.with_suffix("").resolve()).casefold() not in shipped)
+            for revised in report["revised"]:
+                logger.warning("Revised release member: %s (%s %s -> %s)",
+                               revised["path"], revised["algorithm"],
+                               revised["declared_md5"], revised["staged_md5"])
+            for leftover in report["leftovers"]:
+                logger.warning("Release does not ship sidecar: %s", leftover)
+
+            # No Data/ write has happened before this point. Atomic per-file
+            # replacement avoids modifying a DVC hardlink/blob through a raw
+            # workspace copy. This is staging, not whole-release rollback.
+            for staged, dest, sidecar, identical in plan:
+                if identical:
+                    report["members"].append(dest)
+                    continue
+                if dest.exists() and sidecar is None:
+                    report["skipped"].append(dest)
+                    continue
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                with tempfile.NamedTemporaryFile(dir=dest.parent,
+                                                 prefix=".lsms-acquire-",
+                                                 delete=False) as dst:
+                    temporary = Path(dst.name)
+                try:
+                    shutil.copyfile(staged, temporary)
+                    os.replace(temporary, dest)
+                finally:
+                    temporary.unlink(missing_ok=True)
+                extracted.append(dest)
+                report["members"].append(dest)
+                logger.info("  Extracted %s", dest.relative_to(dest_dir))
         return extracted
     except (urllib.error.URLError, OSError, TimeoutError,
             zipfile.BadZipFile) as e:
         # network / HTTP / disk / corrupt-zip; programmer bugs propagate.
         logger.error("Full zip download/extract failed: %s", e)
-        if report is not None:
-            report["error"] = f"{type(e).__name__}: {e}"
+        report["error"] = f"{type(e).__name__}: {e}"
         return extracted
-    finally:
-        try:
-            os.unlink(tmp_path)
-        except OSError:
-            pass
 
 
 class _AcquiredRelease(NamedTuple):
@@ -1209,8 +1302,21 @@ class _AcquiredRelease(NamedTuple):
     catalog_id: str
     idno: str
     extracted: tuple[Path, ...]     # files written
-    skipped: tuple[Path, ...]       # already there, so NOT overwritten
+    skipped: tuple[Path, ...]       # differing untracked files, NOT verified
     error: str | None               # the download / extraction failed
+    members: tuple[Path, ...] = ()  # written OR verified byte-identical
+
+
+def _acquired_data_files(country: str, wave: str) -> list[Path]:
+    """Actual release membership, including verified identical nested files."""
+    acq = _ACQUIRED_RELEASES.get((country, wave))
+    if acq is not None:
+        return sorted(acq.members)
+    # Retain the local push-only behavior when no WB acquisition occurred.
+    data_dir = _COUNTRIES_DIR / country / wave / "Data"
+    return sorted(f for f in data_dir.rglob("*")
+                  if f.is_file() and f.name.lower().endswith(
+                      (".dta", ".csv", ".sav", ".dta.gz")))
 
 
 # ``(country, wave)`` -> the release the last acquisition download for that
@@ -1570,17 +1676,16 @@ def _record_acquired_release(country: str, wave: str,
     :func:`lsms_library.provenance.acquired_release`.
 
     Written only when the download demonstrably put the WHOLE release there:
-    nothing failed, and no file was left in place.  ``_extract_all_from_zip``
-    never overwrites a file, so a pre-existing one is the old release's, and
-    recording the new idno over it would be the false claim #1114 exists to
-    prevent.  Otherwise ``SOURCE.org`` is left as it is, with a warning.
+    nothing failed, and every member was written or verified byte-identical.
+    A differing untracked raw file stays unverified/skipped, and cannot be
+    used to certify the new held release. Otherwise SOURCE stays unchanged.
 
     *entry* is the catalog row for the entry, if the caller already has it;
     otherwise it is looked up (for the DOI, title and years).  Returns the
     record written, or ``None``.
     """
     acq = _ACQUIRED_RELEASES.pop((country, wave), None)
-    if acq is None or not acq.extracted:
+    if acq is None or not acq.members:
         logger.warning("%s/%s: no World Bank release was extracted; "
                        "SOURCE.org not updated.", country, wave)
         return None
@@ -1590,8 +1695,8 @@ def _record_acquired_release(country: str, wave: str,
                f"overwritten (e.g. {acq.skipped[0].name}) and may be another "
                "release's")
         logger.warning("%s/%s: %s, so it cannot be said that the directory "
-                       "holds %s.  SOURCE.org not updated; clear Data/ and "
-                       "re-run to record the release.", country, wave, why,
+                       "holds %s. SOURCE.org not updated; review the "
+                       "unverified files and re-run to record the release.", country, wave, why,
                        acq.idno)
         return None
     # Files the release did NOT ship stay where they are (nothing deletes
@@ -1601,27 +1706,23 @@ def _record_acquired_release(country: str, wave: str,
     # recursive: Nigeria/2023-24's Data/ holds 0 top-level entries and 106
     # sidecars under subdirectories (``Post Harvest Wave 5/...``), which a
     # top-level listing reported as nothing (red team r1, R5 iii).  The
-    # skip gate above is NOT: ``_extract_all_from_zip`` flattens to
-    # ``Data/<basename>`` and skips only a top-level file of that name, so a
-    # nested older release is neither skipped nor overwritten -- it is left
-    # beside the flat new one, and named here.  Nested layouts are GH #1149.
-    shipped = {p.name.lower() for p in acq.extracted}
+    # GH1149 compares resolved paths, not basenames: a nested leftover cannot
+    # disappear merely because a different directory ships the same name.
+    shipped = {p.resolve() for p in acq.members}
     data_dir = _COUNTRIES_DIR / country / wave / "Data"
     others = sorted(
         str(f.relative_to(data_dir)) for f in data_dir.rglob("*")
         if f.is_file()
-        and Path(f.name.removesuffix(".dvc")).suffix.lower()
-        in {".dta", ".csv", ".sav"}
-        and f.name.removesuffix(".dvc").lower() not in shipped)
+        and f.name.removesuffix(".dvc").lower().endswith(
+            (".dta", ".csv", ".sav", ".dta.gz"))
+        and (f.with_suffix("") if f.suffix == ".dvc" else f).resolve()
+        not in shipped)
     if others:
         logger.warning("%s/%s: Data/ also holds %d file(s) (searched "
-                       "recursively) that %s does not ship (e.g. %s).  They "
-                       "are another release's; check the wave's config does "
-                       "not read them.  The skip gate that keeps an earlier "
-                       "release from being recorded over is per-basename at "
-                       "the top level of Data/ only, so a release held in "
-                       "subdirectories is not seen by it (GH #1149).",
-                       country, wave, len(others), acq.idno, others[0])
+                       "recursively) that %s does not ship: %s. They "
+                       "remain outside the acquired release; check the wave's config does "
+                       "not read them (GH #1149).",
+                       country, wave, len(others), acq.idno, ", ".join(others))
     if entry is None or str(entry.get("id")) != acq.catalog_id:
         entry = None
         spec = _COUNTRY_CATALOG.get(country)
@@ -1695,15 +1796,13 @@ def populate_and_push(country: str, wave: str,
     # _fetch_destination).
     data_dir = _COUNTRIES_DIR / country / wave / "Data"
     if not data_dir.exists():
+        _ACQUIRED_RELEASES.pop((country, wave), None)
         logger.warning("No Data directory after download: %s", data_dir)
         return []
 
-    data_suffixes = {".dta", ".csv", ".sav"}
-    data_files = sorted(
-        f for f in data_dir.iterdir()
-        if f.suffix.lower() in data_suffixes
-    )
+    data_files = _acquired_data_files(country, wave)
     if not data_files:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
         logger.warning("No data files found in %s", data_dir)
         return []
 
@@ -1720,8 +1819,12 @@ def populate_and_push(country: str, wave: str,
     # The held release moves only here and in add_wave (GH #1128) -- and here
     # only once the remote holds every file, so the record never names a
     # release the shared store does not have.
-    expected = {f.resolve() for f in data_files}
-    confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in pushed}
+    try:
+        expected = {f.resolve() for f in data_files}
+        confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in pushed}
+    except BaseException:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
+        raise
     if confirmed == expected:
         _record_acquired_release(country, wave)
     else:
@@ -2320,13 +2423,10 @@ def add_wave(country: str, catalog_id: str,
             get_data_file(dummy, populate_cache=True)
 
     data_dir = wave_dir / "Data"
-    data_suffixes = {".dta", ".csv", ".sav"}
-    data_files = sorted(
-        f for f in data_dir.iterdir()
-        if f.suffix.lower() in data_suffixes
-    ) if data_dir.exists() else []
+    data_files = _acquired_data_files(country, wave) if data_dir.exists() else []
 
     if not data_files:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
         logger.warning("No data files found in %s", data_dir)
         return []
 
@@ -2363,8 +2463,12 @@ def add_wave(country: str, catalog_id: str,
     # Ledger section 4: a requested push is part of acquisition success, while
     # push=False deliberately records a complete local download.  Neither a
     # failed/partial push nor a same-length list of other files certifies it.
-    expected = {f.resolve() for f in data_files}
-    confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in result}
+    try:
+        expected = {f.resolve() for f in data_files}
+        confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in result}
+    except BaseException:
+        _ACQUIRED_RELEASES.pop((country, wave), None)
+        raise
     if not push or confirmed == expected:
         held = _record_acquired_release(country, wave, entry=entry)
         if held is not None:
@@ -2603,10 +2707,11 @@ def get_data_file(path: str | Path,
                                           data_dir, api_key, report=report)
         _ACQUIRED_RELEASES[(country, wave)] = _AcquiredRelease(
             catalog_id=catalog_id, idno=idno, extracted=tuple(extracted),
-            skipped=tuple(report["skipped"]), error=report["error"])
+            skipped=tuple(report["skipped"]), error=report["error"],
+            members=tuple(report["members"]))
         if abs_path.exists():
             return abs_path
-        for f in extracted:
+        for f in report["members"]:
             if f.name.lower() == target_filename.lower():
                 return f
         return None

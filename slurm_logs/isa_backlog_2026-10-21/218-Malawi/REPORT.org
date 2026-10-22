@@ -1,0 +1,111 @@
+#+TITLE: Malawi GH218 author evidence -- two derived registrations
+
+* Boundary and source pins
+
+Author READY for a different agent's independent review; no author acceptance or GH closure.
+Runtime/tests: =299fb8675e785fd392b1259ab1f4fb535eb69c34=.
+Actual parent: =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+Ledger-first: =61f2236e91ab51eb3e7f09aa2a029d380dac147e=; both commits FS-published.
+The only production edit deletes two null Data Scheme keys.
+The existing Country/Feature derivation machinery, helpers, Make rules and science remain unchanged.
+Public method discovery, order and empty materialization metadata are exact.
+The actual loader census found Malawi's two keys were the sole raw-derived registrations.
+
+* Country grounding
+
+The full original3063-line current CONTENTS was read, including TODO/WAITING/LOGBOOK.
+2013-14 is panel-only; 2016-17/2019-20 mix cross-sectional and tracking populations.
+Preserve cs-17 identifiers, sample joins and baseline/current EA distinctions.
+IHS2 has no survey conversion table, but its metric unit labels carry factors; IHS3+ tables are region-keyed.
+The old phrase "lacks any unit-to-kg conversion factors entirely" (CONTENTS:1598) and later label-magnitude exception are retained as distinct recorded claims.
+The retired-family entry says the three products "now derive from food_acquired" (CONTENTS:1656), while the raw null registrations remained.
+The dated note records this cleanup and the separately measured Make caveat.
+
+The full1557-line Niger CONTENTS was also read.
+Its EHCVM grappe/menage seasonal convention,2014 EXTENSION tracking keys, Original Label unit-table key and split/bundled commodity labels stay intact.
+The opening one-vague-per-grappe statement and later quoted split-EA seasonal design coexist; no survey-design adjudication is made here.
+The historical no-unit-table and no-mapping-hash claims have explicit dated corrections.
+The older reported-price EMPTY-return statement coexists with the later typed unavailable-unit contract; this cleanup changes neither instrument nor shared policy.
+
+* Measured preservation
+
+| Malawi API | All five waves | Supported2013-14 |
+|------------+----------------+------------------|
+| food_acquired | 971531 | 81680 |
+| food_expenditures | 681980 | 59264 |
+| food_prices | 680400 | 59180 |
+| food_quantities | 971028 | 81675 |
+
+All72 saved matched-stage frame pairs pass full exact values, axes/classes/unused levels/codes/dtypes/null masks/order and recursively typed attrs, including record field presence.
+Comparators use check_exact=True,rtol=atol=0; eight deliberate fault controls are rejected.
+The five native waves are exact; all ten Default-pre-invalid/Make-native byte bindings are exact.
+Eleven current cache frames/typed attrs are exact.
+The two naturally rebuilt COUNTRY footers have the independently measured hash delta, including its nested ARROW:schema copy.
+Replacing only that hash in the old serialized schema reconstructs the complete candidate schema bytes exactly; no metadata/attrs stripping.
+
+Source-backed Default all-wave/singleton builds, explicit None/default currency pairs, native unitvalue/units and total-expenditure-basis controls are preserved.
+Reported-price kgprice/unitprice requests raise the same UnitsUnavailableError.
+All five declared Malawi food waves are supported; the invalid1900-00 request is labelled invalid, never a fabricated declared-unsupported subset.
+
+Healthy Niger's thirteen current/coverage-gated parquets are physical private warm comparators.
+Joint default Features retain1211408/846994/845427/1210883 rows for acquired/expenditures/prices/quantities.
+Default Feature currency-index and explicit currency=None calls are separately matched across heads.
+No axis/attrs normalization converts them into the same argument.
+Three actual CLI artifact pairs preserve full post-read frames/typed attrs, Arrow schemas, all footer keys and parquet bytes.
+API-before-write and artifact-after-read are distinct stages; no cross-stage typed-attrs equality claim.
+
+* Source, hash, warm and audit limits
+
+Actual prebuild census:549 API cells,26 Malawi hash changes,523 other-country hashes exact,39 framework fingerprints exact,97 Malawi wave hashes exact.
+This is metadata scope, not rebuilt-output evidence for the other Malawi tables or countries.
+Four physically private roots passed19-held-source/two-layout MD5/SHA/size/mode/mtime/inode/nlink gates before dependent builds.
+All32 distinct held/cache copy origins and all private staged copies remain exact.
+The four staged geo companions were unused: market=Region reads sample.Region.
+Normal source-cold evidence covers food/sample and lazy panel-ID companions, not Malawi cluster or a whole-country cold rebuild.
+There was no acquisition, DVC CLI, shared cache mutation, bypass, hash stamp, fixture/golden change or in-tree payload.
+
+Fresh-process/new-object Default warm calls preserve all62 data files/head byte/mode/mtime exact.
+Feature, scanner and CLI stages write zero data-cache files.
+Make fresh warm preserves the existing errors with zero cache file changes.
+Detailed cold calls bracket full L1/L2; later phases bracket full L1/L2 with per-call L2 receipts.
+All numerical/build/Make threads are one; tests explicitly use two loadfile workers.
+Mounted interpreter, exact imports/cwd/PYTHONPATH/countries/config/data, private DVC/XDG/temp and socket/unshare guards are asserted before imports/unpickle/product calls.
+The two prepared source DVCtmp realpaths are the only metadata exceptions.
+Read-only GitHub issue metadata and ordinary FS publication are separate from offline source/product probes.
+
+Focused candidate51PASS/0FAIL/0ERROR/0SKIP; actual-parent new controls1FAIL/1PASS.
+The failing policy test names the actual two registrations; no fixture/signature/credential failure is counted.
+Strict API surface audit passed.
+The Uganda-only requires_s3 dtype file was read and explicitly excluded; Malawi numeric dtypes are covered by actual complete frames.
+No broad suite was run.
+
+The unmodified scanner's205 records/head match in full ordered sequence and full multiset:200WARN/3PASS/2FAIL/0ERROR.
+Both existing FAILs are food_prices/assembly_nonempty for kgprice/unitprice, since neither comparator records Price.
+All occurrence digests/multiplicities are in scanner-occurrences.json; full private records are retained unchanged.
+There are330 captured parent-process warning occurrences/head over77 endpoint pairs.
+Seventy Default category/message multisets are exact.
+Seven Make endpoint raw messages differ; literal checkout/data-path substitution reconstructs each counterpart exactly, with zero unexplained occurrences.
+Raw inequality remains visible.
+Scanner message strings and Make child stderr remain complete/private; complete category/stack or structured child-warning equality is not claimed.
+
+* Separate residuals and preserved stops
+
+The existing country Make concatenator still expects pre-canonical u_consumed/quantity_consumed fields and fails with KeyError:'units', surfaced as RuntimeError.
+Both heads fail all/singleton food_acquired requests and all three derived callers; these are errors, not empty payloads.
+The invalid-wave control raises KeyError and evicts five hashless companions on both heads, preserving the country parquet.
+Saved pre-call hashes and existing Make native files close native proof without any source replay.
+Both residuals are drafted separately in RESIDUALS.md, alongside precise remaining GH218 scope; no repair/owner/closure is invented.
+
+Original stops remain: a wrong-owner metadata read, a private audit wrapper's missing import, two old-manifest link-type assumptions, a literal-link source-checker mismatch, and the overstrict nested-Arrow footer assertion.
+The wrong-owner read's empty artifact survives, but its diagnostic stderr was not persisted as a file.
+All other stopped checker/launcher sources and private diagnostics are retained; corrected unique scripts rerun only the needed artifact/metadata step.
+No completed API/source prefix was replayed and no evidence basename was overwritten.
+
+* Review handoff
+
+Safe exports are aggregate-only; raw records/IDs/warnings/tracebacks remain private.
+REPRODUCE.sh records actual commands/dependency order and prohibits replay into frozen roots.
+Final READY pins the full private manifest, exact clean published source, docs-only descendant boundary, protected frozen sources/evidence and zero consumers.
+GH218 remains open; no GitHub write, PR, merge or author PASS.
+
+Sue.

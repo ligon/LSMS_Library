@@ -42,7 +42,7 @@ def native_food(tmp_path, monkeypatch):
     c._updated_ids_cache = {}
     state = {'quantity': 2.5, 'built': []}
 
-    def grab(wave, request):
+    def grab(wave, request, *, _with_origin=False):
         assert request == 'food_acquired'
         state['built'].append(wave.year)
         frame = pd.DataFrame({
@@ -55,7 +55,7 @@ def native_food(tmp_path, monkeypatch):
         path = root / 'Malawi' / wave.year / '_' / 'food_acquired.parquet'
         path.parent.mkdir(parents=True, exist_ok=True)
         to_parquet(frame, path, absolute_path=True)
-        return frame
+        return (frame, 'parquet') if _with_origin else frame
 
     monkeypatch.setattr(C.Wave, 'grab_data', grab)
     # The v-join is separately covered. Retain real finalization/id_walk but
