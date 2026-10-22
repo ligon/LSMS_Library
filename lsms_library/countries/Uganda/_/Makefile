@@ -23,7 +23,6 @@ var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DI
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
 	  $(VAR_DIR)/plot_features.parquet \
-	  $(VAR_DIR)/crop_production.parquet \
 	  $(VAR_DIR)/plot_inputs.parquet \
 	  $(VAR_DIR)/plot_labor.parquet \
 	  $(VAR_DIR)/livestock.parquet \
@@ -103,8 +102,10 @@ $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 crop_production = $(shell find $(rounds) -name crop_production.py)
 crop_production_parquet := $(crop_production:.py=.parquet)
 
-$(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
-	python crop_production.py
+# GH1204: Country owns requested-wave assembly, ID conversion and audit
+# transport. Direct Make builds native waves without a second country writer.
+.PHONY: crop_production
+crop_production: $(crop_production_parquet)
 
 plot_inputs = $(shell find $(rounds) -name plot_inputs.py)
 plot_inputs_parquet := $(plot_inputs:.py=.parquet)

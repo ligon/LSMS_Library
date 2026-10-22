@@ -3739,3 +3739,33 @@ filtering an already-finalized all-wave frame is not a full-attrs oracle.
 The original strict subset comparison stop is retained in the task evidence.
 See =slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/= for the safe report,
 source-grounded aggregates, exact hash scope, tests and explicit evidence limits.
+
+* Requested crop waves use framework assembly (GH #1204, 2026-10-22)
+
+The country =_/crop_production.py= compiler and its country-parquet Make rule
+are retired.
+That compiler concatenated every native wave without accepting a requested
+wave set, which explains the supported and barren subset caveat recorded above.
+The existing framework now assembles this table on both Default and Make,
+using the same seven native loaders, canonical household ID walk and
+wave-to-country grain-audit transport.
+The reviewed household map terminates in one step in every wave, so replacing
+the compiler's local walk with the existing framework walk changes no binding.
+
+2005-06 remains genuinely barren: it has crop-area allocation without
+crop-level harvest quantities.
+The existing typed-empty path answers that request before a country-cache
+rebuild or write; it preserves any other waves already cached.
+Default supported builds retain the existing coverage manifest and monotone
+union rule.
+Make uses requested native waves and writes no country crop parquet.
+The direct =make crop_production= target builds only the native wave parquets.
+
+This changes routing, not the source observation, identifier, factor or
+scientific contracts recorded under GH #1198 and GH #849.
+Native =production_obs=, reported factors, the conditional legacy null-key
+boundary, the sample join and the 2015-16 sale-value correction are unchanged.
+The older country-builder subset and warm-write measurements above remain
+historical evidence; they are not guarantees about this new route.
+The separate area/key limitation (GH #1205) and support-string null-policy
+observation (GH #1196) remain outside this change.
