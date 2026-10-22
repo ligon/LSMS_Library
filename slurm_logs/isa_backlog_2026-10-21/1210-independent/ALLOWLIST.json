@@ -1,0 +1,37 @@
+{
+  "files": {
+    "pins.json": {
+      "sha256": "c93210d9ab4171dd45f8bdefaa4a6ff887ae9f70f579ca93c645627f025f3ac2",
+      "bytes": 1390,
+      "mode": 384,
+      "mtime_ns": 1792688340431554479,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3811011,
+      "symlink": false,
+      "link": null
+    },
+    "reproduction.json": {
+      "sha256": "695a290827c36925d6b017b537012e6a2545df412357f92b27b42d61ea4e27b7",
+      "bytes": 2267,
+      "mode": 384,
+      "mtime_ns": 1792688340432554485,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3811012,
+      "symlink": false,
+      "link": null
+    },
+    "review.json": {
+      "sha256": "c52aa6d7bb64c9ea8440b81fb1d4b667215edaf8295c00d5a8a0558e7a915c5a",
+      "bytes": 7970,
+      "mode": 384,
+      "mtime_ns": 1792688340402554311,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3811010,
+      "symlink": false,
+      "link": null
+    }
+  }
+}

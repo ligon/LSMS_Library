@@ -1,0 +1,63 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_INDEPENDENT1210_WITH_METADATA_QUALIFICATIONS",
+  "at_UTC": "2026-10-22T17:19:06.682888+00:00",
+  "candidate": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+  "parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "runtime_READY_sha256": "b1878041c931bf71426f5f865ea2d9ebb01b6e279ede5fd2085a08eb17616765",
+  "runtime_manifest_sha256": "5f7364326678e13989091e887e6dd2a0d0044c9e28028f89ff2a9dcca5da99de",
+  "runtime_entries": 359,
+  "supplement_READY_sha256": "5c1550fa983140b4b183235c5001207a0b52a95b28a0b83adc01bc381faabb29",
+  "supplement_manifest_sha256": "bbd87d432c35d8c2ea1887dceb848d2691829469cd0521e1ff8ed704a96a0b51",
+  "supplement_entries": 27,
+  "tracked_source_receipts_rehashed": 29762,
+  "v1_full_physical_paths_checked": 2065,
+  "independent_tests": {
+    "candidate_pass": 28,
+    "parent_fail": 17,
+    "parent_pass": 11,
+    "existing_pass": 21
+  },
+  "strict_pairs": 50,
+  "public_pairs": 40,
+  "native_pairs": 10,
+  "comparator_faults_rejected": 14,
+  "cold_roots": 4,
+  "fresh_warm_roots": 4,
+  "warm_outputs_each": 8,
+  "warm_physical_unchanged": true,
+  "invalid_controls": {
+    "candidate_paths_preserved": 105,
+    "parent_native_files_deleted": 5,
+    "parent_directories_changed": 5
+  },
+  "literal_scanner_records": 163,
+  "scanner_statuses": {
+    "warn": 158,
+    "passed": 3,
+    "fail": 2
+  },
+  "full_warning_pairs_exact": 24,
+  "fingerprints_moved": {
+    "country": 549,
+    "framework": 39,
+    "wave": 1362
+  },
+  "original_nested_pins_all_exact": true,
+  "calibration_PID_strength": "Source/path/order/time association, separate original PID records absent",
+  "stopped_controller_PID_strength": "Direct original boot PID, precollection and exit3 stream binding",
+  "author_six_unattributed_relative_denials_retained": true,
+  "independent_two_precollection_fd12_denials_retained": true,
+  "no_whole_task_zero_network_or_outside_write_claim": true,
+  "iterator_and_earlier_derived_error_timing_changes_disclosed": true,
+  "raw_provider_copy_full_hashes_rely_on_observed_separate_independent_postexit_not_rehashed_by_root": true,
+  "no_corpus_or_full_suite_or_other_country_output_certification": true,
+  "root_no_project_import_payload_decode_API_test_or_protection_replay": true,
+  "root_checker_sha256": "f1541c32afaef075b000db445ed7d5f70e75119e9e6e0d63659801a3cc02340f",
+  "root_initial_metadata_count_stop_preserved": true,
+  "comparator_fault_count_split": {
+    "frame_faults": 12,
+    "metadata_faults": 2
+  },
+  "human_merge_required": true,
+  "signed": "Sue"
+}

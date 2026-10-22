@@ -1860,11 +1860,14 @@
   "current_invalid_wave_1210": {
     "owner": "acquisition_1149",
     "author_head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
-    "status": "Frozen author repair; independent held-source runtime review in progress; no PR yet.",
+    "status": "INDEPENDENT_AND_ROOT_ACCEPTED_PR_PUBLICATION_PENDING",
     "tests": "Independent candidate28PASS/actual release17FAIL11PASS; existing21PASS/APIaudit0. Held-source grid and strong comparisons still in progress.",
     "scope": "Framework fingerprints all549country/39framework/1362waves move; no corpus output certification.",
-    "review_interim": "All50strict/4cold/4warm/2scanners/directbad-mixed complete. Original359entry v1 seal/postexit reported0. Circular guard-PID classification requires additive source/path/order/time association; no root production acceptance yet.",
-    "nested_pins_root_check": "All five original full content/physical receipts exact, mode0600. Earlier peer anticipation of mismatch was independently disproven; no packaging defect. Preserved diagnostic stop/supplement pending."
+    "review_interim": "Root78135terminal0 verifies359runtime+27supplement entries and29762tracked source receipts; 50strict pairs, fourcold/warm roots, invalid105-path preservation, 24literalwarningpairs and163literalorderedscannerrecords. Retained12calibration+2startup denials and original calibrationPID record gap; original five nestedpins exact.",
+    "nested_pins_root_check": "All five original full content/physical receipts exact, mode0600. Earlier peer anticipation of mismatch was independently disproven; no packaging defect. Preserved diagnostic stop/supplement pending.",
+    "root_acceptance": "1210-independent/ROOT-ACCEPTANCE.json",
+    "independent_runtime_READY": "b1878041c931bf71426f5f865ea2d9ebb01b6e279ede5fd2085a08eb17616765",
+    "supplement_READY": "5c1550fa983140b4b183235c5001207a0b52a95b28a0b83adc01bc381faabb29"
   },
   "latest_archive_checkpoint": {
     "archive_count": 28,
