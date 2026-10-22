@@ -4688,7 +4688,8 @@
     "Preserved candidate preparation deleted-file snapshot stop and CLI wrapper-path stop; no production/read-gate changes or raw diagnostics exported.",
     "First candidate public/Feature observations were not replayed after CLI stop; only missing first CLI controls resumed in another process with separate endpoints.",
     "Original source snapshots contain normalized representations for four convenience links per head; they never recorded literal target bytes. Separate final literal-reader receipts compare to immutable Git and original physical modes; stopped freezer and both originals remain preserved.",
-    "Empty representation claims are limited to measured fresh-root/no-country-cache strict subsets and Default full-coverage cache slices. Both return zero rows; partial-coverage misses/union rebuilds were not separately replayed and are not assigned a universal representation."
+    "Empty representation claims are limited to measured fresh-root/no-country-cache strict subsets and Default full-coverage cache slices. Both return zero rows; partial-coverage misses/union rebuilds were not separately replayed and are not assigned a universal representation.",
+    "Evidence limitation: original first partial aggregate JSON was overwritten before archival; its original bytes/size/SHA were not recorded. Seven original per-call frames, endpoints, log and script survive. Preserved completed aggregate and distinctly named reconstruction are not the original; independent review must assess this gap."
   ],
   "runtime_pin": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
   "parent_pin": "99c824079da480ab2646e499c06ac70e457ff271",
@@ -4732,7 +4733,11 @@
       "failed_CLI_cache_changes": 0,
       "prior_successful_first_public_Feature_API_calls_preserved_not_replayed": true,
       "missing_CLI_tail_resumed_in_separate_guarded_process": true,
-      "separate_endpoints_and_original_partial_aggregate_archived": true
+      "original_percall_frames_endpoints_log_script_preserved": true,
+      "original_partial_aggregate_archived": false,
+      "original_partial_bytes_size_SHA_available": false,
+      "completed_aggregate_preserved_and_distinct_reconstruction_NOT_ORIGINAL": true,
+      "independent_review_must_assess_gap": true
     },
     {
       "stage": "first strict freeze",
@@ -4747,6 +4752,17 @@
         "South Africa",
         "_"
       ]
+    },
+    {
+      "stage": "second freezer evidence inventory",
+      "reason": "Archive glob missed the original partial aggregate before CLI-tail resumption; earlier archive claim corrected.",
+      "original_partial_bytes_size_SHA_available": false,
+      "surviving_original_frame_calls": 7,
+      "surviving_original_endpoints_log_script_preserved": true,
+      "completed_aggregate_preserved": true,
+      "distinct_reconstruction_not_original": true,
+      "both_freezer_failures_preserved": true,
+      "API_test_source_decode_replay": false
     }
   ],
   "historical_diagnosis_qualification": "Frozen diagnosis retains its original auxiliary unpickle/text-only launch qualifications and absent first-cold Feature snapshot; it is not rewritten by these author results.",

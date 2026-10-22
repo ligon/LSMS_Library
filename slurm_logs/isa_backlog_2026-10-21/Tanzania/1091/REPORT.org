@@ -85,7 +85,10 @@ These measured existing-contract consequences are not new framework repairs.
 
 Candidate preparation initially stopped while snapshotting the approved deleted country script, before staging/decoding/API; the explicit-deletion snapshot correction and original attempt are preserved.
 The first candidate extras stage completed valid public/Feature/API controls before its CLI subprocess failed to find the private wrapper at a per-head path.
-That failed CLI invocation never opened the wrapper, issued no CLI API call and changed no cache; its endpoints, log, script and original partial aggregate are archived.
+That failed CLI invocation never opened the wrapper, issued no CLI API call and changed no cache; its original per-call frames, endpoints, log and script survive.
+I missed the partial aggregate filename in the archive glob before resumption, so its original JSON bytes, size and SHA were not retained; the path now holds the completed aggregate.
+The completed aggregate and both freezer failures are preserved, with a distinctly named reconstruction from surviving summaries/endpoints that is explicitly NOT the original.
+Independent review must assess the surviving original observations and this evidence gap.
 Only the missing first CLI tail resumed through the corrected shared path in another guarded process; prior successful first public/Feature observations were not replayed.
 The first strict freezer stopped because initial source snapshots hashed four convenience symlink targets per head through Path.readlink().as_posix, which normalized literal target bytes.
 Those original snapshots did not record literal link bytes; both originals and the stopped freezer are preserved.

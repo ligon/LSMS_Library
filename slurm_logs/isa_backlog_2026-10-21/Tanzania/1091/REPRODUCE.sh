@@ -24,8 +24,10 @@ R=/local/job40255479/worktrees/isa-Tanzania-1091-fix
 # Candidate also runs existing58focused cases with2loadfileworkers/threads1.
 # bash "$P/run.sh" candidate analysis "$P/analyze-composition.py"
 # Preserve normalized-link source snapshots and stopped freeze-final.py.
-# Final freeze-final-v2.py uses separate literal os.readlink/Git receipts;
+# Final freeze-final-v3.py uses separate literal os.readlink/Git receipts;
 # never rewrite links or present the original snapshots as literal bytes.
+# Preserve the missed-partial-aggregate limitation and both freezer failures.
+# Reconstruction in partial-aggregate-gap/ is NOT ORIGINAL; no API/test replay.
 # Read-only checks below are safe on the frozen checkout:
 git -C "$R" rev-parse HEAD
 git -C "$R" status --short

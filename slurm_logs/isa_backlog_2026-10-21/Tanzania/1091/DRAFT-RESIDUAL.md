@@ -24,7 +24,11 @@ Preserve both author harness stops: preparation's approved-deletion snapshot
 and CLI's shared-wrapper path. The latter followed successful first public/
 Feature/API controls; only the failed CLI invocation had no CLI API/cache
 operation. Its missing tail resumed separately without replaying those first
-observations. Original diagnosis qualifications remain frozen. No first-cold
+observations. The archive glob missed the original partial summary aggregate,
+which was overwritten; original bytes/size/SHA were not recorded. All seven
+original per-call frames/endpoints/log/script survive. Completed aggregate, both
+freezer failures and a distinctly named NOT-ORIGINAL reconstruction are retained;
+independent review must assess this evidence gap. Original diagnosis qualifications remain frozen. No first-cold
 Feature, broad-suite or whole-corpus coverage is claimed.
 
 Also preserve the first strict-freeze stop: four convenience links per head
