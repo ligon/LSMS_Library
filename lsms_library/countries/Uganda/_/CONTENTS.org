@@ -3656,7 +3656,13 @@ Two measured caveats remain outside this fix.
 The country Make builder returns all seven supported waves for either
 =waves=['2018-19']= or the unsupported =waves=['2005-06']=, on both heads;
 default public output returns only the requested wave or zero rows respectively.
-Make also rewrites cache mtimes without changing bytes/modes on a warm call.
+Warm Make calls rewrite native cache files on both heads.
+The author's private run measured 17 byte-identical files with changed mtimes
+and unchanged modes; the independent review started from mode 0644 copies
+and measured the same 17 paths changing to 0600 as well as changing mtimes.
+These are separate measured starting states, not a general guarantee that
+warm Make preserves modes or performs zero writes; no payload change or
+permission repair is part of #1198.
 Separately, =transformations.py= says "on Uganda the parcel key matches on
 100% of crop rows." Actual held-area controls on BOTH heads match 14,022 of
 40,409 converted harvest parcel keys, with zero literal-plot matches.
