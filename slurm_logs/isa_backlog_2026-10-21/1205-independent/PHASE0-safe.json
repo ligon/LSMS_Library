@@ -1,0 +1,117 @@
+{
+  "status": "PHASE0_COMPLETE",
+  "signed": "Sue",
+  "source_entries": 29826,
+  "all_source_bytes_and_physical_receipts_unchanged": true,
+  "runtime_exceptions_exact": true,
+  "calibrations": [
+    {
+      "label": "phase0-candidate-guard",
+      "pid": 3898381,
+      "direct_boot": {
+        "sha256": "0af73ced8a6857e33f5612d89ff48b42efcaa179a0e98ade74ac99638070fd29",
+        "bytes": 675,
+        "mode": 384,
+        "mtime_ns": 1792691065779427480,
+        "nlink": 1,
+        "device": 64770,
+        "inode": 4860539,
+        "symlink": false,
+        "link": null
+      },
+      "start": {
+        "sha256": "58286667878a1404176fee63cf9793a5ac5ff7fb62daa91397d9f3b2fd475371",
+        "bytes": 874,
+        "mode": 384,
+        "mtime_ns": 1792691065685427016,
+        "nlink": 1,
+        "device": 64770,
+        "inode": 3944809,
+        "symlink": false,
+        "link": null
+      },
+      "terminal": {
+        "sha256": "1e035ad8768d1c6de8b6ae98d15ab2e2c1f295579f1e3fae122eca4582cc6daa",
+        "bytes": 1152,
+        "mode": 384,
+        "mtime_ns": 1792691065827427716,
+        "nlink": 1,
+        "device": 64770,
+        "inode": 3944812,
+        "symlink": false,
+        "link": null
+      },
+      "expected_seeded_denials": 6,
+      "independent_original_PID_record": true
+    },
+    {
+      "label": "phase0-base-guard",
+      "pid": 3898437,
+      "direct_boot": {
+        "sha256": "b72c79d90e15eceaff79a242516cd9f3a1adde15f5df2cf0844f4ffb3a5987eb",
+        "bytes": 675,
+        "mode": 384,
+        "mtime_ns": 1792691072684461524,
+        "nlink": 1,
+        "device": 64770,
+        "inode": 4860546,
+        "symlink": false,
+        "link": null
+      },
+      "start": {
+        "sha256": "6a9e4fbd4837f9fc5538ad5231dc08ac200b1e08d9d52c2d399391c1e22b2228",
+        "bytes": 864,
+        "mode": 384,
+        "mtime_ns": 1792691072636461288,
+        "nlink": 1,
+        "device": 64770,
+        "inode": 3944817,
+        "symlink": false,
+        "link": null
+      },
+      "terminal": {
+        "sha256": "2376a2cbed65354224419d0a2986478daa0a002c531b3d1c60c9d5e5b795eb6f",
+        "bytes": 1142,
+        "mode": 384,
+        "mtime_ns": 1792691072717461687,
+        "nlink": 1,
+        "device": 64770,
+        "inode": 3944819,
+        "symlink": false,
+        "link": null
+      },
+      "expected_seeded_denials": 6,
+      "independent_original_PID_record": true
+    }
+  ],
+  "expected_seeded_denials": 12,
+  "unmatched_denials": 0,
+  "calibration_attribution": "Independent original controller actor_pid and actor boot PID/source receipts, before classifying network rows.",
+  "raw_provider_copy_decode_API_test_dynamic_fingerprint_operations": 0,
+  "no_project_numerical_or_payload_import": true,
+  "root_phase1_release_received": true,
+  "phase0_inventory_stop_preserved": true,
+  "initial": {
+    "sha256": "9b4424997ec75a071c2fc4fcd773496d6cc730d2348a73da116e175497a6424e",
+    "bytes": 11814033,
+    "mode": 384,
+    "mtime_ns": 1792690943116747123,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 3944802,
+    "symlink": false,
+    "link": null
+  },
+  "root_release_handoff": {
+    "sha256": "4a0a7cc8d67dc5063b1b9751a6767ac739c9fb222f33b9ce0c0adfc1d4d20975",
+    "bytes": 1196,
+    "mode": 384,
+    "mtime_ns": 1792691009033118302,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 49549610,
+    "symlink": false,
+    "link": null
+  },
+  "source_only_locator_read_stop": "Initial old1210 identity.py/worker_identity.py/run-side.py names were absent; correct named identity1210.py/identity_plugin1210.py/launch.py were then read. No old file changed."
+}
