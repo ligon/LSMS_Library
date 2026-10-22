@@ -762,7 +762,7 @@ def people_last7days_finalize(df):
 
 
 # ---------------------------------------------------------------------------
-# community_prices (GAP C; parity loop) — item-level (t, v, j, u, variety, visit)
+# community_prices (GAP C; parity loop) - (t, v, j, u, variety, visit, obs)
 # ---------------------------------------------------------------------------
 #
 # One row per SURVEY-RECORDED price: the price the EACI community price
@@ -779,7 +779,7 @@ def people_last7days_finalize(df):
 # ships a grappe-grain s05_co_mli2018.dta that is unwired -- see CONTENTS.org
 # "The EHCVM waves DO ship a price file".)
 #
-# Grain: one row per (t, v, j, u, variety, visit), where
+# Grain: one row per (t, v, j, u, variety, visit, obs), where
 #   - t       = wave ('2014-15'),
 #   - v       = grappe (cluster) as a string — sample().v keyspace,
 #   - j       = harmonize_food Preferred Label, decoded from the broad item
@@ -793,11 +793,12 @@ def people_last7days_finalize(df):
 #               every row of both passages), so it is unique within j and
 #               identical across the two passages, whose value LABELS are not
 #               (p1 quotes "Aicha", p2 'Aicha'),
-#   - visit   = the field passage: 1 post-planting, 2 post-harvest.
+#   - visit   = the field passage: 1 post-planting, 2 post-harvest,
+#   - obs     = the form's reading slot: 1, 2 or 3 (GH #822).
 #
 # REPORTED columns only:
-#   Price       = s04q11, the surveyed price (FCFA) for a Quantity-sized lot.
-#   Quantity    = s04q10, the lot weight in kg ("Poids (KG)"); the 999 / 9999
+#   Price       = s04q05/q08/q11, surveyed FCFA for a Quantity-sized lot.
+#   Quantity    = s04q04/q07/q10, lot weight in kg ("Poids (KG)"); 999 / 9999
 #                 sentinel is coerced to NA.
 #   Description = the s04q02 value label of that passage's file ("Riz importé
 #                 vendu en sac", "Boîte de 220g de marque 'Aicha'", ...).
@@ -810,17 +811,15 @@ def people_last7days_finalize(df):
 # under u='Boîte' is 600 / 125 / 225 FCFA for three varieties (CONTENTS.org).
 # The (t, v, j, u) choice the old build made is recoverable from this table:
 # per (t, v, j, u), the highest visit, then the lowest variety code
-# (questionnaire order).  The survey's relevé 1 / relevé 2 readings are still
-# NOT read (only relevé 3, s04q09-s04q11) -- a coverage gap recorded in
-# CONTENTS.org, not touched here; when they are read they belong on an `obs`
-# level, which is why this table emits none today.
+# (questionnaire order), on obs=3. GH #822 restores readings 1/2 on their
+# own obs slots while preserving the original reading-3 keep/drop sets.
 
 # s04q09 unit labels that are numeric-coded data artifacts (a handful of
 # rows where the unit was entered as a number / the missing sentinel); they
 # do not map through the u table and are dropped.
 _PRICE_QTY_SENTINELS = {999, 9999}
 
-COMMUNITY_PRICES_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit']
+COMMUNITY_PRICES_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
 
 
 def community_prices_finalize(df):
@@ -828,12 +827,12 @@ def community_prices_finalize(df):
 
     Expects raw columns already assembled:
         t, v, j (decoded item label), u (decoded unit label), variety (the
-        s04q02 code as a string), visit (the passage), Description (the
+        s04q02 code as a string), visit (the passage), obs (reading 1/2/3), Description (the
         s04q02 label), Price, Quantity.
     Maps j/u labels via harmonize_food / u, drops unmapped item/unit rows and
     rows with no positive price, coerces the Price/Quantity dtypes and the
     999 Quantity sentinel, and indexes the result by
-    (t, v, j, u, variety, visit) -- one row per survey-recorded price.  No row
+    (t, v, j, u, variety, visit, obs) -- one row per reported reading. No row
     is selected; a duplicate key is an error (GH #840).
     """
     df = df.copy()
@@ -846,6 +845,9 @@ def community_prices_finalize(df):
     df['v'] = df['v'].astype('string')
     df['variety'] = df['variety'].astype('string')
     df['visit'] = pd.to_numeric(df['visit']).astype('int64')
+    obs = pd.to_numeric(df['obs'])
+    assert obs.isin([1, 2, 3]).all(), "community_prices: obs must be a reading slot 1/2/3"
+    df['obs'] = obs.astype('int64')
     df['Description'] = df['Description'].astype('string').str.strip()
     # Keep only resolvable, genuinely-priced item-unit rows.
     df = df[df['j'].notna() & df['u'].notna() & df['Price'].notna() & (df['Price'] > 0)]
@@ -855,7 +857,7 @@ def community_prices_finalize(df):
     assert not dup.any(), (
         f"community_prices: {int(dup.sum())} rows share a "
         f"{tuple(COMMUNITY_PRICES_INDEX)} key -- the instrument records one "
-        "price per (cluster, variety, passage), so this is a broken key, not "
+        "price per (cluster, variety, passage, reading), so this is a broken key, not "
         "a cell to select from (GH #840)")
 
     # community_prices is a CLUSTER table — there is no household i.  But the
@@ -869,7 +871,7 @@ def community_prices_finalize(df):
     # shim Tanzania/Malawi/Ethiopia community_prices use — see Tanzania
     # community_prices_for_wave.)
     df['i'] = df['v']
-    out = (df.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'visit'])
+    out = (df.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs'])
              [['Price', 'Quantity', 'Description']]
              .sort_index())
     return out

@@ -1,127 +1,102 @@
-import os
-import shutil
-from pathlib import Path
-from typing import Optional
+import pandas as pd
 import pytest
 
 import lsms_library as ll
-from lsms_library.paths import data_root, countries_root
+from lsms_library.paths import data_root
 
 pytestmark = pytest.mark.requires_s3
 
 
-def _has_cached_table(country_name: str, table: str) -> bool:
-    """Check if a table parquet exists at data_root or in-tree."""
-    for candidate in [
-        data_root(country_name) / "var" / f"{table}.parquet",
-        countries_root() / country_name / "var" / f"{table}.parquet",
-    ]:
-        if candidate.exists():
-            return True
-    return False
+def _has_cached_table(country_name: str, table: str, *, market=False) -> bool:
+    """Resolve runtime-derived prerequisites without creating outputs."""
+    # Reuse dispatch memberships, not a second table registry (ledger sections 2 and 5).
+    if table in ll.Country._FOOD_DERIVED:
+        sources = ("food_acquired", "sample")
+    elif table in ll.Country._ROSTER_DERIVED:
+        sources = ("household_roster", "sample")
+    else:
+        sources = (table,)
+    if market:
+        sources += ("cluster_features",)
+    root = data_root(country_name) / "var"
+    return all((root / f"{source}.parquet").is_file() for source in sources)
 
-
-_XFAIL_V_MIGRATION = pytest.mark.xfail(
-    reason=(
-        "v-migration (Phases 2/3/4): 'm' is now added at API time via "
-        "_add_market_index(market='Region'), not baked into the food_* "
-        "parquets.  Test assertion still encodes the pre-migration "
-        "'m-in-index' contract.  Fix post-merge by calling the method "
-        "with market='Region' or dropping 'm' from required_levels."
-    ),
-    strict=False,
-)
 
 UGANDA_TABLES = [
     "household_characteristics",
-    pytest.param("food_expenditures", marks=_XFAIL_V_MIGRATION),
-    pytest.param("food_quantities", marks=_XFAIL_V_MIGRATION),
+    "food_expenditures",
+    "food_quantities",
     "shocks",
     "income",
     "cluster_features",
-    pytest.param("food_prices", marks=_XFAIL_V_MIGRATION),
+    "food_prices",
 ]
 
+DERIVED_TABLES = [
+    "household_characteristics",
+    "food_expenditures",
+    "food_quantities",
+    "food_prices",
+]
+
+
+def _assert_default_derived(result: pd.DataFrame, table: str) -> None:
+    assert isinstance(result, pd.DataFrame)
+    assert not result.empty, f"{table} should not be empty"
+    required_levels = {"t", "v", "i"}
+    if table in ll.Country._FOOD_DERIVED:
+        required_levels.update({"j", "s"})
+        if table != "food_expenditures":
+            required_levels.add("u")
+    missing = required_levels.difference(result.index.names)
+    assert not missing, f"{table} missing index levels {sorted(missing)}"
+    assert "m" not in result.index.names, "Default API must keep cluster v"
+
+
+def _assert_region_preserves_observations(default, region):
+    # Region can exclude unresolved geography, but cannot change retained data
+    # or multiply rows. Uganda's changing v and missing Region are in ledger section 3.
+    assert not region.empty
+    assert "m" in region.index.names
+    assert "v" not in region.index.names
+    assert region.index.is_unique
+    assert region.index.get_level_values("m").notna().all()
+    default_keys = default.droplevel("v")
+    region_keys = region.droplevel("m")
+    assert default_keys.index.is_unique
+    assert region_keys.index.is_unique
+    assert len(region_keys) <= len(default_keys)
+    assert region_keys.index.isin(default_keys.index).all()
+    retained = default_keys.loc[region_keys.index]
+    assert list(region_keys.columns) == list(retained.columns)
+    # Compare each Series exactly. HC's existing columns.name metadata changes
+    # through the market merge; column payload dtypes and values must not.
+    for column in retained.columns:
+        pd.testing.assert_series_equal(
+            region_keys[column], retained[column], check_exact=True,
+        )
+
+
 @pytest.mark.parametrize("table", UGANDA_TABLES)
-def test_uganda_makefile_backfill(table):
-    # Exercise the default (cache + YAML) build path, not LSMS_BUILD_BACKEND=make.
-    # The Makefile backfill path is legacy; as of v0.7.0 all data loading goes
-    # through the cache + load_from_waves path, and the DVC stage layer is
-    # retired (see CLAUDE.md).  Invoking it here silently hangs Uganda's
-    # cluster_features rebuild, and also leaks LSMS_BUILD_BACKEND into later
-    # tests in the same xdist worker (breaking test_fallback_path_uses_wave_data_scheme).
+def test_uganda_cached_source_api(table):
     if not _has_cached_table("Uganda", table):
-        pytest.skip(f"Uganda/{table} not cached (requires data build)")
+        pytest.skip(f"Uganda/{table} source prerequisites not cached")
     country = ll.Country("Uganda", preload_panel_ids=False, verbose=False)
-    method = getattr(country, table)
-    result = method()
+    result = getattr(country, table)()
     assert result is not None
     if hasattr(result, "empty"):
         assert not result.empty, f"{table} should not be empty"
-    if hasattr(result, "index") and method.__name__ in {"household_characteristics", "food_expenditures", "food_quantities", "food_prices"}:
-        required_levels = {"m", "i"}
-        missing = required_levels.difference(result.index.names or [])
-        assert not missing, f"{table} missing index levels {sorted(missing)}"
+    if table in DERIVED_TABLES:
+        _assert_default_derived(result, table)
 
 
-def _backup_and_remove(path: Path, tmpdir: Path) -> Optional[Path]:
-    """Copy the existing file to tmpdir (if any) and remove the original."""
-    if not path.exists():
-        return None
-    token = "__".join(path.parts[-3:])
-    backup = tmpdir / token
-    backup.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(path, backup)
-    path.unlink()
-    return backup
-
-
-def _restore_or_cleanup(path: Path, backup: Optional[Path]) -> None:
-    """Restore from backup when provided; otherwise remove any generated file."""
-    if backup and backup.exists():
-        if path.exists():
-            path.unlink()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.move(str(backup), path)
-    else:
-        if path.exists():
-            path.unlink()
-
-
-def test_uganda_household_characteristics_has_m_index(tmp_path):
-    """Verify household_characteristics has 'm' (market/region) in its index.
-
-    Requires pre-built household_characteristics parquet (skips in CI).
-    """
-    from lsms_library.paths import data_root
+@pytest.mark.parametrize("table", DERIVED_TABLES)
+def test_uganda_derived_explicit_region_preserves_observations(table):
+    if not _has_cached_table("Uganda", table, market=True):
+        pytest.skip(f"Uganda/{table} source and Region prerequisites not cached")
     country = ll.Country("Uganda", preload_panel_ids=False, verbose=False)
-
-    # Only run if cached data exists (building from scratch may not produce 'm')
-    var_path = country.file_path / "var" / "household_characteristics.parquet"
-    ext_path = data_root("Uganda") / "var" / "household_characteristics.parquet"
-    if not var_path.exists() and not ext_path.exists():
-        pytest.skip("household_characteristics parquet not cached (requires data build)")
-
-    df = country.household_characteristics()
-
-    assert df is not None
-    assert hasattr(df, "index")
-    assert not df.empty, "household_characteristics returned an empty dataframe"
-    assert "m" in (df.index.names or []), "household_characteristics missing 'm' index"
-
-
-def test_fallback_path_uses_wave_data_scheme():
-    """Test that the fallback path at country.py:987 works.
-
-    The load_from_waves function accesses wave_obj.data_scheme, which
-    was broken by the aggressive recursion guard.
-    """
-    if not _has_cached_table("Uganda", "food_expenditures"):
-        pytest.skip("Uganda/food_expenditures not cached (requires data build)")
-
-    country = ll.Country('Uganda', preload_panel_ids=False, verbose=False)
-    result = country.food_expenditures()
-
-    assert len(result) > 0
-    assert 'i' in result.index.names
-    assert 'j' in result.index.names
+    method = getattr(country, table)
+    default = method()
+    _assert_default_derived(default, table)
+    region = method(market="Region")
+    _assert_region_preserves_observations(default, region)

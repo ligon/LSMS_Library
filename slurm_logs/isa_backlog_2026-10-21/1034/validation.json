@@ -1,0 +1,463 @@
+{
+  "base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "issue": 1034,
+  "tests": {
+    "final_passed": 53,
+    "final_skipped": 0,
+    "unrelated_built_checks_excluded": 2,
+    "baseline_new_test_failures_expected": 3,
+    "workers": 4,
+    "dist": "loadfile",
+    "numeric_threads": 1,
+    "build_workers": 1
+  },
+  "cold": {
+    "rows_before": 595725,
+    "rows_after": 595725,
+    "label_counts_before": {
+      "other specify (151)": 8,
+      "other specify (131)": 3,
+      "other specify (152)": 1
+    },
+    "changed_unit_rows": 12,
+    "other_7_rounds_exact_equal": true,
+    "exact_equal_after_unit_rename": true,
+    "Expenditure_sum": 196081393.6719517,
+    "downstream": {
+      "food_prices": {
+        "rows_before": 481191,
+        "rows_after": 481191,
+        "same_index": false,
+        "exact_equal": false,
+        "changed_cells": null
+      },
+      "food_quantities": {
+        "rows_before": 595053,
+        "rows_after": 595053,
+        "same_index": false,
+        "exact_equal": false,
+        "changed_cells": null
+      }
+    },
+    "Quantity_sum_native_units_diagnostic": 34463986.98308215
+  },
+  "kg_only": {
+    "before": {
+      "kg_rows": 594452,
+      "kg_sum": 1467177.4931960062,
+      "kg_per_wave": {
+        "2010Q3": 191605.37554104754,
+        "2011Q1": 245545.61677119357,
+        "2012Q3": 189240.58506433875,
+        "2013Q1": 147518.59108019585,
+        "2015Q3": 119964.90881539119,
+        "2016Q1": 108087.16421589373,
+        "2018Q3": 251203.08254536905,
+        "2019Q1": 214012.1691625765
+      },
+      "native_rows": 601
+    },
+    "after": {
+      "kg_rows": 594455,
+      "kg_sum": 1467196.4975769585,
+      "kg_per_wave": {
+        "2010Q3": 191605.37554104754,
+        "2011Q1": 245539.33734262217,
+        "2012Q3": 189240.58506433875,
+        "2013Q1": 147518.59108019585,
+        "2015Q3": 119990.192624915,
+        "2016Q1": 108087.16421589373,
+        "2018Q3": 251203.08254536905,
+        "2019Q1": 214012.1691625765
+      },
+      "native_rows": 598
+    }
+  },
+  "derived": {
+    "food_prices": {
+      "index_names": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "u",
+        "s"
+      ],
+      "before_only": 0,
+      "after_only": 0,
+      "before_only_t_u": {},
+      "after_only_t_u": {},
+      "common_changed_rows": 14,
+      "common_changed_t_u": {
+        "('2011Q1', 'Basin Medium')": 13,
+        "('2015Q3', 'Basin Medium')": 1
+      },
+      "before_attrs": {
+        "kg_factor_sources": {
+          "survey_kg": 168441,
+          "metric": 250905,
+          "item_unit": 121216,
+          "item_unit_tight": 0,
+          "unit": 54305,
+          "none": 858
+        },
+        "kg_factor_wave_spread": {
+          "threshold": 2.0,
+          "rows_served_by_item_rung": 121216,
+          "rows_over_threshold": 5123,
+          "rows_single_wave": 57535
+        },
+        "kg_factor_baseline_gate": {
+          "baseline_max_spread": 10.0,
+          "rows_refused": 42278,
+          "refused_to_unit": 42278,
+          "refused_to_none": 0
+        },
+        "kg_factor_declared_none": {
+          "rows_matched": 0,
+          "rows_refused": 0,
+          "cells": {}
+        }
+      },
+      "after_attrs": {
+        "kg_factor_sources": {
+          "survey_kg": 168441,
+          "metric": 250905,
+          "item_unit": 121216,
+          "item_unit_tight": 0,
+          "unit": 54308,
+          "none": 855
+        },
+        "kg_factor_wave_spread": {
+          "threshold": 2.0,
+          "rows_served_by_item_rung": 121216,
+          "rows_over_threshold": 5123,
+          "rows_single_wave": 57535
+        },
+        "kg_factor_baseline_gate": {
+          "baseline_max_spread": 10.0,
+          "rows_refused": 42278,
+          "refused_to_unit": 42278,
+          "refused_to_none": 0
+        },
+        "kg_factor_declared_none": {
+          "rows_matched": 0,
+          "rows_refused": 0,
+          "cells": {}
+        }
+      },
+      "per_wave": {
+        "2010Q3": {
+          "rows_before": 61596,
+          "rows_after": 61596,
+          "sum_before": 112908315.40814957,
+          "sum_after": 112908315.40814957
+        },
+        "2011Q1": {
+          "rows_before": 59682,
+          "rows_after": 59682,
+          "sum_before": 31960792.744011708,
+          "sum_after": 31960839.132520862
+        },
+        "2012Q3": {
+          "rows_before": 52671,
+          "rows_after": 52671,
+          "sum_before": 22312030.961351283,
+          "sum_after": 22312030.961351283
+        },
+        "2013Q1": {
+          "rows_before": 56536,
+          "rows_after": 56536,
+          "sum_before": 27657457.953786127,
+          "sum_after": 27657457.953786127
+        },
+        "2015Q3": {
+          "rows_before": 62468,
+          "rows_after": 62468,
+          "sum_before": 172876066.11863905,
+          "sum_after": 172863923.2614962
+        },
+        "2016Q1": {
+          "rows_before": 57130,
+          "rows_after": 57130,
+          "sum_before": 99643471.57632804,
+          "sum_after": 99643471.57632804
+        },
+        "2018Q3": {
+          "rows_before": 64376,
+          "rows_after": 64376,
+          "sum_before": 51523917.31565976,
+          "sum_after": 51523917.31565976
+        },
+        "2019Q1": {
+          "rows_before": 66732,
+          "rows_after": 66732,
+          "sum_before": 44721634.0611248,
+          "sum_after": 44721634.0611248
+        }
+      }
+    },
+    "food_quantities": {
+      "index_names": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "u",
+        "s"
+      ],
+      "before_only": 3,
+      "after_only": 3,
+      "before_only_t_u": {
+        "('2015Q3', 'Sack/Bag Medium')": 3
+      },
+      "after_only_t_u": {
+        "('2015Q3', 'kg')": 3
+      },
+      "common_changed_rows": 93,
+      "common_changed_t_u": {
+        "('2011Q1', 'kg')": 85,
+        "('2015Q3', 'kg')": 8
+      },
+      "before_attrs": {
+        "kg_factor_sources": {
+          "survey_kg": 168441,
+          "metric": 250905,
+          "item_unit": 121216,
+          "item_unit_tight": 0,
+          "unit": 54305,
+          "none": 858
+        },
+        "kg_factor_wave_spread": {
+          "threshold": 2.0,
+          "rows_served_by_item_rung": 121216,
+          "rows_over_threshold": 5123,
+          "rows_single_wave": 57535
+        },
+        "kg_factor_baseline_gate": {
+          "baseline_max_spread": 10.0,
+          "rows_refused": 42278,
+          "refused_to_unit": 42278,
+          "refused_to_none": 0
+        },
+        "kg_factor_declared_none": {
+          "rows_matched": 0,
+          "rows_refused": 0,
+          "cells": {}
+        }
+      },
+      "after_attrs": {
+        "kg_factor_sources": {
+          "survey_kg": 168441,
+          "metric": 250905,
+          "item_unit": 121216,
+          "item_unit_tight": 0,
+          "unit": 54308,
+          "none": 855
+        },
+        "kg_factor_wave_spread": {
+          "threshold": 2.0,
+          "rows_served_by_item_rung": 121216,
+          "rows_over_threshold": 5123,
+          "rows_single_wave": 57535
+        },
+        "kg_factor_baseline_gate": {
+          "baseline_max_spread": 10.0,
+          "rows_refused": 42278,
+          "refused_to_unit": 42278,
+          "refused_to_none": 0
+        },
+        "kg_factor_declared_none": {
+          "rows_matched": 0,
+          "rows_refused": 0,
+          "cells": {}
+        }
+      },
+      "per_wave": {
+        "2010Q3": {
+          "rows_before": 71733,
+          "rows_after": 71733
+        },
+        "2011Q1": {
+          "rows_before": 69641,
+          "rows_after": 69641
+        },
+        "2012Q3": {
+          "rows_before": 65377,
+          "rows_after": 65377
+        },
+        "2013Q1": {
+          "rows_before": 70627,
+          "rows_after": 70627
+        },
+        "2015Q3": {
+          "rows_before": 77700,
+          "rows_after": 77700
+        },
+        "2016Q1": {
+          "rows_before": 70469,
+          "rows_after": 70469
+        },
+        "2018Q3": {
+          "rows_before": 82865,
+          "rows_after": 82865
+        },
+        "2019Q1": {
+          "rows_before": 86641,
+          "rows_after": 86641
+        }
+      }
+    }
+  },
+  "feature_audit": {
+    "before_counts": {
+      "warn": 452,
+      "pass": 3
+    },
+    "after_counts": {
+      "warn": 452,
+      "pass": 3
+    },
+    "records_before": 455,
+    "records_after": 455,
+    "records_added": 0,
+    "records_removed": 0,
+    "new_fail_error": 0,
+    "identical_normalized_multiset": true,
+    "Uganda_food_acquired_exact_equal": true,
+    "Uganda_food_acquired_rows": 355571,
+    "Uganda_sample_exact_equal": true,
+    "Uganda_sample_rows": 24362
+  },
+  "hashes": {
+    "Nigeria": {
+      "total": 24,
+      "changed": [
+        "sample",
+        "cluster_features",
+        "shocks",
+        "food_acquired",
+        "household_roster",
+        "individual_education",
+        "panel_ids",
+        "assets",
+        "interview_date",
+        "housing",
+        "plot_features",
+        "crop_production",
+        "plot_inputs",
+        "food_coping",
+        "livestock",
+        "anthropometry",
+        "plot_labor",
+        "people_last7days",
+        "community_prices",
+        "nonfood_expenditures",
+        "food_expenditures",
+        "food_prices",
+        "food_quantities",
+        "household_characteristics"
+      ]
+    },
+    "Uganda": {
+      "total": 28,
+      "changed": []
+    }
+  },
+  "source_labels": {
+    "2015Q3": {
+      "s7bq2b": {
+        "131": "None",
+        "151": "None",
+        "152": "None",
+        "161": "None"
+      },
+      "s7bq3b": {
+        "131": "131. SACK/BAG MEDIUM",
+        "151": "151. BASIN MEDIUM",
+        "152": "152. BASIN LARGE",
+        "161": "161. BUNDLE MEDIUM"
+      },
+      "s7bq6b": {
+        "131": "None",
+        "151": "None",
+        "152": "None",
+        "161": "None"
+      },
+      "s7bq7b": {
+        "131": "None",
+        "151": "None",
+        "152": "None",
+        "161": "None"
+      }
+    },
+    "2016Q1": {
+      "s10bq2b": {
+        "131": "131. SACK/BAG MEDIUM",
+        "151": "151. BASIN MEDIUM",
+        "152": "152. BASIN LARGE",
+        "161": "161. BUNDLE MEDIUM"
+      },
+      "s10bq3b": {
+        "131": "None",
+        "151": "None",
+        "152": "None",
+        "161": "None"
+      },
+      "s10bq6b": {
+        "131": "None",
+        "151": "None",
+        "152": "None",
+        "161": "None"
+      },
+      "s10bq7b": {
+        "131": "None",
+        "151": "None",
+        "152": "None",
+        "161": "None"
+      }
+    }
+  },
+  "positive_source_rows": {
+    "2015Q3": {
+      "purchased": {
+        "131": 0,
+        "151": 1,
+        "152": 1,
+        "161": 0
+      },
+      "produced": {
+        "131": 3,
+        "151": 5,
+        "152": 0,
+        "161": 0
+      },
+      "inkind": {
+        "131": 0,
+        "151": 2,
+        "152": 0,
+        "161": 0
+      }
+    },
+    "2016Q1": {
+      "purchased": {
+        "131": 0,
+        "151": 0,
+        "152": 0,
+        "161": 0
+      },
+      "produced": {
+        "131": 0,
+        "151": 0,
+        "152": 0,
+        "161": 0
+      },
+      "inkind": {
+        "131": 0,
+        "151": 0,
+        "152": 0,
+        "161": 0
+      }
+    }
+  }
+}
