@@ -138,4 +138,36 @@ pending; no author PASS. Frozen diagnosis source-memory/JSON/guard/sealing
 qualifications remain at their original pins. The stage1 manifest includes
 the root's approval file; do not claim it predates that file's creation.
 
+### Approved wave-reader boundary correction
+
+At clean bd80d86c26786ca92680160abd790260bc924c3f, the actual Make cohort
+exposed a remaining read route: Wave._read_l2_wave_cache directly called
+pd.read_parquet, as did the script-path Wave.grab_data branch. The generic
+get_dataframe repair therefore did not cover either direct Wave read.
+Twelve saved strict failures concern that missing-policy boundary. Two more
+concern an existing Uganda singleton Default/Make column-universe and unused
+index-level difference; they remain separate, with no padding or pruning.
+All14 full typed attrs comparisons were exact. The original bd80 source,
+operands and stops are frozen by the795-file manifest SHA256
+06ffefbf446c763b4e61a3497160ac2654758be16f13cc3c338ee0a2c782c83d.
+
+Root explicitly approved the exact private expansion patch SHA256
+942527406d9abaa3a58e853b11255ef5740de4d59a982ca028dd72dce7b26c31 and design
+3661423d205757cd044538d9e792df322d8a5515d0a36262cc48cf8763799be5, with all
+conditions terminally satisfied in ROOT-EXPANSION-GATES-SATISFIED.json.
+This ledger update precedes applying that expansion. Add a shared parquet-only
+already-open-stream reader; preserve caller-specific payload errors and keep
+footer/restoration errors outside that catch. Wire get_dataframe and BOTH
+direct Wave paths without generic source lookup or new parser fallback.
+The field-directed restore helper and both writers remain unchanged.
+
+Measure actual549/39/1362 hash inventories against bd80 AND f8 before new
+data builds. Use meaningful actual Wave/parser/error/race controls and a
+separate clean bd80 counterfactual checkout. Then use new candidate private
+source-cold/fresh-warm roots for both backends and both targets, with strict
+EA/axes/full typed attrs, warning, scanner and matched CLI stage evidence.
+No old completed prefix is replayed to overwrite evidence. Existing singleton,
+JSON, guard, original XML and caller-stop qualifications remain explicit.
+No science/schema/exclusion/acquisition change, author PASS or public write.
+
 Sue
