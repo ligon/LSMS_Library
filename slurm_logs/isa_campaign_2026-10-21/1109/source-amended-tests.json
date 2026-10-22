@@ -1,0 +1,32 @@
+{
+  "c08_negative_control": {
+    "runtime_base": "c08abb3f1",
+    "then_regression_cases": 27,
+    "failed": 15,
+    "passed": 12
+  },
+  "literal_fallback_actual_Country_negative": {
+    "failed": 1,
+    "reason": "unrelated food unit aliases change bare organic 1/3"
+  },
+  "final_targeted": {
+    "passed": 72,
+    "skipped": 0,
+    "deselected": "Ethiopia warm test (not seeded)",
+    "xdist_workers": 2,
+    "dist": "loadfile"
+  },
+  "final_pure": {
+    "passed": 52
+  },
+  "private_cold_seconds": 69.97,
+  "historical_evidence": {
+    "baseline-cold.json": "f8 organic Quantity zeros",
+    "fixed-final-cold.json": "c08 runtime organic Quantity all missing",
+    "comparison.json": "f8/c08 comparison, superseded source interpretation",
+    "warm-feature.json": "f8/c08 pooled comparison",
+    "one-line-failure.json": "rejected global min_count patch; nonorganic loss finding remains valid"
+  },
+  "source_premise_correction_date": "2026-10-21",
+  "raw_logs_private": true
+}

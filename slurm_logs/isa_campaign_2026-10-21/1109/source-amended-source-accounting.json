@@ -1,0 +1,206 @@
+{
+  "source_headers_checked": 7,
+  "loaded_sources": 6,
+  "source_rows": 11075,
+  "all_source_rows_unique_at_plot_key": true,
+  "every_wave_organic_quantity_and_unit_exactly_matches_source": true,
+  "every_public_organic_quantity_unit_and_applied_matches_finalized_source": true,
+  "source_qualified_unit_codes_have_no_inferred_kg_factor": true,
+  "source_positive_amounts": 11068,
+  "source_missing_amounts": 7,
+  "source_zero_amounts": 0,
+  "source_unit_counts": {
+    "Kilogramme": 5518,
+    "Ox-Cart": 2155,
+    "Bucket": 1451,
+    "Other (Specify)": 1204,
+    "Wheelbarrow": 733,
+    "Unknown": 8,
+    "Organic unit code 1": 5,
+    "Organic unit code 3": 1
+  },
+  "served_organic_rows": 11075,
+  "served_positive_amounts": 11068,
+  "served_missing_amounts": 7,
+  "served_unit_counts": {
+    "Kilogramme": 5518,
+    "Ox-Cart": 2155,
+    "Bucket": 1451,
+    "Other (Specify)": 1204,
+    "Wheelbarrow": 733,
+    "Unknown": 8,
+    "Organic unit code 1": 5,
+    "Organic unit code 3": 1
+  },
+  "remaining_native_null_units": 17649,
+  "remaining_null_units_with_amount": 17649,
+  "sources": [
+    {
+      "source": "lsms_library/countries/Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_d.dta.dvc",
+      "used_by_current_builder": true,
+      "organic_unit_dictionary": {
+        "2": "Kilogram",
+        "10": "Bucket",
+        "11": "Wheelbarrow",
+        "12": "Ox cart",
+        "13": "Other (Specify)"
+      },
+      "quantity_label": "How much organic fertilizer did you apply to this[PLOT]?(QUANT)",
+      "unit_label": "How much organic fertilizer did you apply to this[PLOT]?(UNIT)",
+      "affirmative_rows": 1991,
+      "positive_amounts": 1986,
+      "zero_amounts": 0,
+      "missing_amounts": 5,
+      "missing_unit_codes": 5,
+      "unit_counts": {
+        "Kilogramme": 743,
+        "Ox-Cart": 680,
+        "Bucket": 294,
+        "Wheelbarrow": 227,
+        "Other (Specify)": 42,
+        "Unknown": 5
+      }
+    },
+    {
+      "source": "lsms_library/countries/Malawi/2010-11/Data/Panel/Agriculture/ag_mod_d.dta.dvc",
+      "used_by_current_builder": false,
+      "organic_unit_dictionary": {
+        "2": "Kilogram",
+        "10": "Bucket",
+        "11": "Wheelbarrow",
+        "12": "Ox cart",
+        "13": "Other (Specify)"
+      },
+      "quantity_label": "How much organic fertilizer did you apply to this[PLOT]?(QUANT)",
+      "unit_label": "How much organic fertilizer did you apply to this[PLOT]?(UNIT)"
+    },
+    {
+      "source": "lsms_library/countries/Malawi/2013-14/Data/AG_MOD_D_13.dta.dvc",
+      "used_by_current_builder": true,
+      "organic_unit_dictionary": {
+        "2": "KILOGRAM",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "quantity_label": "How much organic fertilizer did you apply to this [PLOT]? (QUANTITY)",
+      "unit_label": "How much organic fertilizer did you apply to this [PLOT]? (UNIT)",
+      "affirmative_rows": 822,
+      "positive_amounts": 820,
+      "zero_amounts": 0,
+      "missing_amounts": 2,
+      "missing_unit_codes": 3,
+      "unit_counts": {
+        "Kilogramme": 270,
+        "Ox-Cart": 204,
+        "Bucket": 191,
+        "Wheelbarrow": 112,
+        "Other (Specify)": 36,
+        "Organic unit code 1": 5,
+        "Unknown": 3,
+        "Organic unit code 3": 1
+      }
+    },
+    {
+      "source": "lsms_library/countries/Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta.dvc",
+      "used_by_current_builder": true,
+      "organic_unit_dictionary": {
+        "2": "kilogram",
+        "10": "bucket",
+        "11": "wheelbarrow",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "quantity_label": "How much organic fertilizer did you apply to this [PLOT](QUANTITY)?",
+      "unit_label": "unit",
+      "affirmative_rows": 2862,
+      "positive_amounts": 2862,
+      "zero_amounts": 0,
+      "missing_amounts": 0,
+      "missing_unit_codes": 0,
+      "unit_counts": {
+        "Kilogramme": 1499,
+        "Ox-Cart": 512,
+        "Other (Specify)": 423,
+        "Bucket": 306,
+        "Wheelbarrow": 122
+      }
+    },
+    {
+      "source": "lsms_library/countries/Malawi/2016-17/Data/Panel/ag_mod_d_16.dta.dvc",
+      "used_by_current_builder": true,
+      "organic_unit_dictionary": {
+        "2": "KILOGRAM",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "quantity_label": "How much organic fertilizer did you apply to this [PLOT](QUANTITY)?",
+      "unit_label": "UNIT",
+      "affirmative_rows": 755,
+      "positive_amounts": 755,
+      "zero_amounts": 0,
+      "missing_amounts": 0,
+      "missing_unit_codes": 0,
+      "unit_counts": {
+        "Kilogramme": 464,
+        "Ox-Cart": 138,
+        "Bucket": 84,
+        "Other (Specify)": 42,
+        "Wheelbarrow": 27
+      }
+    },
+    {
+      "source": "lsms_library/countries/Malawi/2019-20/Data/Cross_Sectional/ag_mod_d.dta.dvc",
+      "used_by_current_builder": true,
+      "organic_unit_dictionary": {
+        "2": "KILOGRAM",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "quantity_label": "How much organic fertilizer did you apply to this [PLOT](QUANTITY)?",
+      "unit_label": "UNIT",
+      "affirmative_rows": 3581,
+      "positive_amounts": 3581,
+      "zero_amounts": 0,
+      "missing_amounts": 0,
+      "missing_unit_codes": 0,
+      "unit_counts": {
+        "Kilogramme": 1932,
+        "Other (Specify)": 528,
+        "Bucket": 468,
+        "Ox-Cart": 463,
+        "Wheelbarrow": 190
+      }
+    },
+    {
+      "source": "lsms_library/countries/Malawi/2019-20/Data/Panel/ag_mod_d_19.dta.dvc",
+      "used_by_current_builder": true,
+      "organic_unit_dictionary": {
+        "2": "KILOGRAM",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "quantity_label": "How much organic fertilizer did you apply to this [PLOT](QUANTITY)?",
+      "unit_label": "UNIT",
+      "affirmative_rows": 1064,
+      "positive_amounts": 1064,
+      "zero_amounts": 0,
+      "missing_amounts": 0,
+      "missing_unit_codes": 0,
+      "unit_counts": {
+        "Kilogramme": 610,
+        "Ox-Cart": 158,
+        "Other (Specify)": 133,
+        "Bucket": 108,
+        "Wheelbarrow": 55
+      }
+    }
+  ]
+}

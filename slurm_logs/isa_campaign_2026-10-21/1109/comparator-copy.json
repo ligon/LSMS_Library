@@ -1,0 +1,16 @@
+[
+  {
+    "table": "plot_inputs",
+    "bytes": 833687,
+    "sha256": "54a97d55b2226e97603706514ad3418a14c2f39d13d2799a1c8429fd905435f2",
+    "source_unchanged": true,
+    "L2_copies_distinct": true
+  },
+  {
+    "table": "sample",
+    "bytes": 336663,
+    "sha256": "07e4e73d07f5627a59073540a53a33b3e16377e2d3cac397959f15ca5c9ea2ca",
+    "source_unchanged": true,
+    "L2_copies_distinct": true
+  }
+]
