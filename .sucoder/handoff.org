@@ -1545,3 +1545,11 @@ Independent1205acquisition_1149 rawcolumnoracleexact27755yieldkeys/31959converte
 BF1188authorreview_malawi_1209 fullCONTENTS1486linesandguidance/skillsread; ledger7eb9cfe34normalhookpublishedonexactPR1203parent3dc. Staticdiagnosisonly:currentAPIhasnoindependentpurchase/giftunitfields,usageconsumersreadQuantity+u, nativeunitlabel5differsCharrettee/Charrettebyvariable. Scope/sourcecensus/transportoptionspending; noprojectimports/providerpayloadopens/copies/decodes/tests/APIorproduction/schemaeditsreleased.
 Current112openrecords=25PRlinked+3active+84other;28implementationPRsremainunmerged. Nextrootpublishexactauthorhandoffexports/residual, chooseBFcoherentrepresentationafterconcretediagnosis, authenticate1205finalindependentpacketandpublishonlyifaccepted. GoalACTIVE,humanmergeonly.
 Sue
+
+* 2026-10-22T19:04:06.056446+00:00 Uganda parcel-area PR published
+Sue independently root-accepted source884775a461d769fd4bb5181005ca3238513b5b01 at actual491 parent and opened PR1216, stacked on PR1207.
+Independent65PASS, actualparent new6FAIL27PASS;27,755 yields retain all14,520 old records and add13,235, with4,204 source-bound area exclusions.
+Queue113records now26PR-linked/twoactive/85other;29implementation PRs await human merge.
+Active Uganda1204 independent saved-operand checks retain original strict-stage failures and private trace-output exception; Burkina1188 narrow implementation3d39096d5 published and under author testing.
+Archive30 exact plan8e0ab9e10d1513966b37f04d50472d3bd3fb60ded9b193f2ef6d3a638d193186 released by rootapproval7c1d3290e984b9af25e895e4e229ff4bc496bc1d7b968b6a0f9acb8b160d8b0e; writer/verifier acceptance pending.
+Next: finish private archive30 root verification, independent1204 review, Burkina1188 author tests then independent review, and refresh tracker1170.

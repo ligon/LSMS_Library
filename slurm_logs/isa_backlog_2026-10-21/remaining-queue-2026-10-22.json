@@ -1,13 +1,13 @@
 {
   "captured_at_UTC": "2026-10-22T18:55:36.298257+00:00",
   "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
-  "method": "Complete gh issue list state=open limit500; complete gh PR list state=open limit100. All113 queue issue numbers remain open and all28 known implementation PRs remain open at the exact saved head SHAs and base branch names. Prior connector exact PR readbacks retained.",
+  "method": "Complete172-open-issue gh refresh and complete open-PR refresh authenticated all113 queue records and28 existing PR heads/base branch names; subsequent exact connector readback adds PR1216 at884775a461d7 against actual491daf5654b9. No issue was closed by publication.",
   "repository_open_issues": 172,
   "isa_related_open_issue_records": 113,
-  "pr_linked_issue_records": 25,
-  "active_issue_records": 3,
+  "pr_linked_issue_records": 26,
+  "active_issue_records": 2,
   "other_open_issue_records": 85,
-  "open_unmerged_implementation_prs": 28,
+  "open_unmerged_implementation_prs": 29,
   "initial_in_scope_still_open": 96,
   "new_campaign_issue_records": 17,
   "original_duplicate_now_closed": 1089,
@@ -1924,16 +1924,18 @@
     },
     {
       "number": 1205,
-      "title": "Uganda yield_kg: diagnose incomplete parcel-area matches and correct the 100% coverage claim",
+      "title": "Uganda yield_kg: merge the reviewed parcel-area repair and coverage correction",
       "url": "https://github.com/ligon/LSMS_Library/issues/1205",
       "github_state": "open",
-      "queue_state": "ACTIVE",
+      "queue_state": "PR_OPEN",
       "countries": [
         "Uganda"
       ],
-      "implementation_prs": [],
-      "residual": null,
-      "current_active_scope": "Independent review and root acceptance complete at884775a461d7;65candidate testsPASS, actual parent new tests6FAIL27PASS. Restores13,235 yield keys, preserves all14,520 prior keys/values; PR publication pending.",
+      "implementation_prs": [
+        1216
+      ],
+      "residual": "Independently reviewed and root-accepted; stacked PR1216 awaits human review/merge after1207. Source eligibility exclusions and comparator/metadata limits explicit.",
+      "current_active_scope": null,
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": false
@@ -2261,6 +2263,15 @@
       "base": "development",
       "base_sha": "06710190305e0057d9e19d42059753d4cc0db012",
       "url": "https://github.com/ligon/LSMS_Library/pull/1214"
+    },
+    {
+      "number": 1216,
+      "state": "open",
+      "merged": false,
+      "head_sha": "884775a461d769fd4bb5181005ca3238513b5b01",
+      "base": "fix/849-uganda-reported-factors-20261022",
+      "base_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1216"
     }
   ],
   "signed": "Sue",
@@ -2269,5 +2280,5 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-22T18:55:36.298257+00:00"
+  "active_progress_updated_at_UTC": "2026-10-22T19:04:06.056446+00:00"
 }

@@ -2,12 +2,12 @@
 #+AUTHOR: Sue
 
 * Snapshot
-Captured 2026-10-22T18:55:36.298257+00:00.
-There are 113 ISA-related open issue records: 25 with campaign PRs, three active, and 85 other open records.
-All 28 implementation PRs are OPEN and unmerged.
+Open-issue refresh 2026-10-22T18:55:36.298257+00:00; publication updated 2026-10-22T19:04:06.056446+00:00.
+There are 113 ISA-related open issue records: 26 with campaign PRs, two active, and 85 other open records.
+All 29 implementation PRs are OPEN and unmerged.
 Umbrellas, decisions and partial repairs overlap; these are not 113 distinct confirmed bugs.
 The original inventory had 97 in-scope records; 96 remain open, duplicate #1089 is now closed, and 17 campaign follow-ups were added.
-The complete172-issue refresh confirms all113queue records OPEN, including new ordering residual1215; all28implementation PRheads/bases remain unchanged, OPEN/unmerged.
+The complete172-issue refresh confirms all113queue records OPEN; the original28PR heads/bases remain unchanged and newPR1216 was read back OPEN/unmerged at the accepted884 head and actual491 base.
 Development0671019 adds only a certifi dependency-lock update after the tested release; existing mounted runtime was not changed.
 Initial triage tiers and approaches are routing guidance and must be rechecked against live issues and complete country notes before dispatch.
 
@@ -19,10 +19,6 @@ Source-first diagnosis reproduced on all22,877 native rows; narrow implementatio
 ** [[https://github.com/ligon/LSMS_Library/issues/1204][#1204]] Uganda crop_production: country fallback violates requested wave coverage
 Countries: Uganda.
 Independent review running: requested-wave coverage repair reproduced, four new empty-column-order differences retained under1215. Author frozen/root-authenticated; final independent verdict pending.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1205][#1205]] Uganda yield_kg: diagnose incomplete parcel-area matches and correct the 100% coverage claim
-Countries: Uganda.
-Independent review and root acceptance complete at884775a461d7;65candidate testsPASS, actual parent new tests6FAIL27PASS. Restores13,235 yield keys, preserves all14,520 prior keys/values; PR publication pending.
 
 * Reviewed changes awaiting human merge
 ** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
@@ -133,6 +129,11 @@ PRs: [[https://github.com/ligon/LSMS_Library/pull/1213][#1213]].
 Countries: Malawi, Shared framework.
 PRs: [[https://github.com/ligon/LSMS_Library/pull/1214][#1214]].
 Remaining scope: Root accepted bounded repair; PR1214 awaits human merge. Iterator/error timing and broad fingerprint invalidation are explicit. Independent private proofs durable in archive29.
+
+** [[https://github.com/ligon/LSMS_Library/issues/1205][#1205]] Uganda yield_kg: merge the reviewed parcel-area repair and coverage correction
+Countries: Uganda.
+PRs: [[https://github.com/ligon/LSMS_Library/pull/1216][#1216]].
+Remaining scope: Independently reviewed and root-accepted; stacked PR1216 awaits human review/merge after1207. Source eligibility exclusions and comparator/metadata limits explicit.
 
 * Remaining unassigned issue records
 ** [[https://github.com/ligon/LSMS_Library/issues/226][#226]] feat: principled auto-aggregation script for harmonize_food's Aggregate Label column

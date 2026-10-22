@@ -1086,7 +1086,7 @@
         "path": "/local/job40255479/worktrees/isa-Uganda-1205",
         "parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
         "ledger": "309215e28bc12924ea22a7d15cf0b4c89591e696",
-        "status": "INDEPENDENT_AND_ROOT_ACCEPTED_PR_PUBLICATION_PENDING",
+        "status": "INDEPENDENT_ROOT_ACCEPTED_OPEN_PR_HUMAN_MERGE",
         "provider_metadata_root_gate": "Uganda1205-provider-census-root.json",
         "provider_count": 53,
         "provider_bytes": 49160847,
@@ -1099,7 +1099,10 @@
         "root_author_handoff": "1205-author-handoff/ROOT-HANDOFF.json",
         "independent_review_path": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1205",
         "independent_progress": "Independent65candidatePASS; actual-parent33new tests6FAIL27PASS. All549/39/1362fingerprints unchanged;48ordered scanner warnings unchanged. Main451files plus23supplement frozen; metadata limitations retained.",
-        "root_acceptance": "1205-independent/ROOT-ACCEPTANCE.json"
+        "root_acceptance": "1205-independent/ROOT-ACCEPTANCE.json",
+        "pr": 1216,
+        "source_branch": "fix/1205-uganda-parcel-area-20261022",
+        "publication": "1216-publication.json"
       }
     }
   },
@@ -1886,17 +1889,16 @@
     }
   },
   "current_queue_refresh": {
-    "recorded_at_UTC": "2026-10-22T18:55:36.298257+00:00",
+    "recorded_at_UTC": "2026-10-22T19:04:06.056446+00:00",
     "queue": "remaining-queue-2026-10-22.json",
     "open_issue_records": 113,
-    "implementation_prs": 28,
+    "implementation_prs": 29,
     "active": [
       1204,
-      1205,
       1188
     ],
     "interpretation": "Explicit current ownership; older per-lane active fields are historical task records.",
-    "pr_linked_issue_records": 25,
+    "pr_linked_issue_records": 26,
     "other_open_issue_records": 85
   },
   "current_invalid_wave_1210": {
