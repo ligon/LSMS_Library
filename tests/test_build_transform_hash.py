@@ -610,23 +610,48 @@ def test_nullable_dtype_serialiser_rejects_custom_subclasses(monkeypatch):
         R._closure_parts(uses_custom_dtype, set())
 
 
-def test_nullable_dtype_serialization_stable_across_hashseeds():
+def test_nullable_dtype_serialization_stable_across_hashseeds(tmp_path):
+    import json
     import subprocess
     import sys
+    import time
 
-    code = (
-        'import pandas as pd; from lsms_library import _build_registry as R;'
-        "values=[pd.BooleanDtype(),pd.Int64Dtype(),pd.Float64Dtype()]+"
-        "[pd.StringDtype(storage=s,na_value=n) for s in ('python','pyarrow') "
-        "for n in (pd.NA,float('nan'))];"
-        "print(R._ser({'nested':values},set(),[]))"
-    )
+    code = """
+import json, os, sys, time
+from pathlib import Path
+boot = dict(pid=os.getpid(), ppid=os.getppid(), time_ns=time.time_ns(),
+            cwd=os.getcwd(), executable=sys.executable, prefix=sys.prefix,
+            maps={kind: Path('/proc/self/'+kind+'_map').read_text()
+                  if Path('/proc/self/'+kind+'_map').exists() else None
+                  for kind in ('uid', 'gid')})
+Path(sys.argv[1]).write_text(json.dumps(boot))
+import pandas as pd
+from lsms_library import _build_registry as R
+values = [pd.BooleanDtype(), pd.Int64Dtype(), pd.Float64Dtype()] + [
+    pd.StringDtype(storage=s, na_value=n) for s in ('python', 'pyarrow')
+    for n in (pd.NA, float('nan'))]
+print(R._ser({'nested': values}, set(), []))
+"""
     outputs = []
+    records = []
     for seed in ('0', '1'):
-        result = subprocess.run([sys.executable, '-B', '-c', code], capture_output=True,
-                                text=True, env=dict(os.environ, PYTHONHASHSEED=seed))
-        assert result.returncode == 0, result.stderr
-        outputs.append(result.stdout.strip())
+        boot_path = tmp_path / ('hashseed-'+seed+'-boot.json')
+        command = [sys.executable, '-B', '-c', code, str(boot_path)]
+        before = time.time_ns()
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   text=True, env=dict(os.environ, PYTHONHASHSEED=seed))
+        stdout, stderr = process.communicate()
+        after = time.time_ns()
+        boot = json.loads(boot_path.read_text()) if boot_path.exists() else None
+        records.append(dict(seed=seed, parent_pid=os.getpid(), child_pid=process.pid,
+                            before_Popen_ns=before, after_wait_ns=after, command=command,
+                            returncode=process.returncode, stdout=stdout, stderr=stderr,
+                            original_child_boot=boot))
+        (tmp_path / 'dtype-hashseed-process-records.json').write_text(json.dumps(records))
+        assert process.returncode == 0, stderr
+        assert boot['pid'] == process.pid and boot['ppid'] == os.getpid()
+        assert before <= boot['time_ns'] <= after
+        outputs.append(stdout.strip())
     assert outputs[0] == outputs[1] and ' at 0x' not in outputs[0]
 
 
