@@ -1,0 +1,16 @@
+{
+  "scope": "precision-supplement",
+  "terminal_checker_exit_expected": 0,
+  "manifest_sha256": "ce11931191354bbf6554b07a37c3c176b0d8d820b97cd9e34338a68a278e6782",
+  "manifest_entries": 42,
+  "source_tracked_physical_receipts_exact": 14880,
+  "source_head_clean_exact": true,
+  "original_authority_selected_operands_and_review_sources_exact": true,
+  "distinct_inode_copies_exact": true,
+  "remaining_consumers": 0,
+  "original_axis_findings_retained": 3,
+  "original_API9_typed_attr_findings_retained": 4,
+  "prior_frozen_packet_files_verified": 188,
+  "numeric_axis_qualified_groups_not_full_frame_equality": true,
+  "signed": "Sue"
+}

@@ -1,0 +1,24 @@
+{
+  "status": "FINDINGS_REQUIRE_CLASSIFICATION",
+  "original_products": 9,
+  "distinct_independently_produced_API9_pairs": 18,
+  "full_strict_passes": 14,
+  "saved_operands": 27,
+  "array_checks": {
+    "str": 110,
+    "string": 26,
+    "Float64": 40,
+    "numeric_nonmissing_arrays": 70,
+    "boolean": 20,
+    "object": 2,
+    "int64": 8,
+    "float64": 2
+  },
+  "root_SHA_only_ruling_exact_nine_only": true,
+  "historical_original_size_mode_mtime_absent": true,
+  "historical_physical_continuity_not_established": true,
+  "earlier_root_wide_authority_and_unsaved_memory_gaps_retained": true,
+  "no_self_comparisons_or_reference_copy_as_actual": true,
+  "no_API_source_cli_pytest_or_cache_replay": true,
+  "signed": "Sue"
+}

@@ -1,0 +1,76 @@
+{
+  "status": "ROOT_VERIFIED_TWELVE_ACTUAL_ROLE_SOURCE_COPIES",
+  "at_UTC": "2026-10-22T14:44:04.408860+00:00",
+  "source_roles": {
+    "API9": {
+      "lsms_library/country.py": {
+        "head": "483b4aa117c2c05ac00bf023adab97e47782df46",
+        "git_blob": "2fad0fea74c88ca39fb4c51806a1f30d8bcf2bfa",
+        "sha256": "6a8bfb0d13fea2643832d3fa52681e74b6901cd24249a67c16c205817167d675"
+      },
+      "lsms_library/local_tools.py": {
+        "head": "483b4aa117c2c05ac00bf023adab97e47782df46",
+        "git_blob": "3cf58b7629fc84afc664769de01f41899e67d718",
+        "sha256": "de2a4075128967eba0d832c9b442e47c7d5da943e561d52cbfaac5543aaf5818"
+      },
+      "lsms_library/population.py": {
+        "head": "483b4aa117c2c05ac00bf023adab97e47782df46",
+        "git_blob": "45d0bd7f49fc699cdf38654ddd648d7cf1d37150",
+        "sha256": "a5a7c79627f274a1fef05098d655e8dc8857f860cdc047fd5c0e04b247eb80c1"
+      },
+      "lsms_library/recall.py": {
+        "head": "483b4aa117c2c05ac00bf023adab97e47782df46",
+        "git_blob": "087275e4263e087dc80473a557275077aa0cdb09",
+        "sha256": "fc82a9dbf2d863167da0d78fbadfaca942f5e1471a7784fb4820f9bd26cc092c"
+      }
+    },
+    "MaliWriter": {
+      "lsms_library/country.py": {
+        "head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+        "git_blob": "c233eb731b10954b2963ba6d3b193b39e6714ff0",
+        "sha256": "7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c"
+      },
+      "lsms_library/local_tools.py": {
+        "head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+        "git_blob": "3cf58b7629fc84afc664769de01f41899e67d718",
+        "sha256": "de2a4075128967eba0d832c9b442e47c7d5da943e561d52cbfaac5543aaf5818"
+      },
+      "lsms_library/population.py": {
+        "head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+        "git_blob": "45d0bd7f49fc699cdf38654ddd648d7cf1d37150",
+        "sha256": "a5a7c79627f274a1fef05098d655e8dc8857f860cdc047fd5c0e04b247eb80c1"
+      },
+      "lsms_library/recall.py": {
+        "head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+        "git_blob": "087275e4263e087dc80473a557275077aa0cdb09",
+        "sha256": "fc82a9dbf2d863167da0d78fbadfaca942f5e1471a7784fb4820f9bd26cc092c"
+      }
+    },
+    "NigerWriter": {
+      "lsms_library/country.py": {
+        "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+        "git_blob": "c233eb731b10954b2963ba6d3b193b39e6714ff0",
+        "sha256": "7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c"
+      },
+      "lsms_library/local_tools.py": {
+        "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+        "git_blob": "3cf58b7629fc84afc664769de01f41899e67d718",
+        "sha256": "de2a4075128967eba0d832c9b442e47c7d5da943e561d52cbfaac5543aaf5818"
+      },
+      "lsms_library/population.py": {
+        "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+        "git_blob": "45d0bd7f49fc699cdf38654ddd648d7cf1d37150",
+        "sha256": "a5a7c79627f274a1fef05098d655e8dc8857f860cdc047fd5c0e04b247eb80c1"
+      },
+      "lsms_library/recall.py": {
+        "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+        "git_blob": "087275e4263e087dc80473a557275077aa0cdb09",
+        "sha256": "fc82a9dbf2d863167da0d78fbadfaca942f5e1471a7784fb4820f9bd26cc092c"
+      }
+    }
+  },
+  "source_copy_bytes_equal_exact_git_head_and_blob": true,
+  "stdlib_only_no_source_execution_or_payload_decode": true,
+  "existing_four_typed_attrs_failures_unchanged": true,
+  "signed": "Sue"
+}

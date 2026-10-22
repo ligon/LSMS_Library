@@ -1,0 +1,8 @@
+{
+  "status": "PASS_ACTUAL_PRODUCER_INITIAL_WARM_SAVED_PAIRS",
+  "additional_actual_producer_initial_warm_pairs": 9,
+  "full_strict_passes": 9,
+  "original_four_typed_attrs_failures_and_fourteen_passes_unchanged": true,
+  "no_API_or_metadata_record_reconstruction": true,
+  "signed": "Sue"
+}

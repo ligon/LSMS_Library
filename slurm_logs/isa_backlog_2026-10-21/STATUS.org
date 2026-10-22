@@ -12,7 +12,38 @@ The 37 partial records carry exact residual titles and bodies in =triage.json=; 
 =summary.json= records the tier and dependency ordering; unresolved enhancement/acquisition choices are reported for the maintainer.
 Existing rulings in issues such as #851, #894 and #1134 are binding implementation context, not unanswered questions to ask again.
 
-* Current checkpoint -- 2026-10-22T13:39:00+00:00
+* Current checkpoint -- 2026-10-22T14:50 UTC
+
+All 26 implementation PRs remain OPEN and unmerged at their expected heads and prerequisite bases.
+The fresh inventory is =publication-26-with-second-supplements-safe.json=.
+Country worktrees continue to isolate changes; shared framework defects remain separate.
+Malawi1209 has 56 strict Country comparisons and 24 strict Feature comparisons, with parent Make failures/degrades reproduced.
+The author is finishing the planned audit, direct-Make and protection checks before source freeze and independent review.
+These are author results, not an independent acceptance or a new published implementation PR.
+
+Root has now accepted the bounded1175 and exact-nine API9 saved-evidence packets and the separately sealed precision supplement.
+Malawi1175 has one full strict group, two original intended field projections, and three qualified unused-u-domain views; all three complete-axis failures remain.
+Fourteen original scalar predicates pass.
+All three u-code arrays retain int8 storage and exact mapped values and missing masks.
+The added unused domains are bound to the candidate's actual organic-unit gains and the original filters' preserved parent domains.
+Missing raw-source, standalone warm, Feature expected and test-fixture objects remain unavailable.
+
+The exact-nine API9 comparisons have14 full strict reference pairs and four preserved typed-attrs failures.
+Their eight record/plain-dict boundaries preserve all stored field values, types and plain-string field keys; public record classes and _FIELDS presence differ.
+The boundary is the documented JSON attrs serialization followed by public-record reconstruction.
+Nine additional actual initial/warm producer pairs and the original1182 Code non-u projection pass.
+Historical original size/mode/mtime remain absent for the nine source products; only authenticated content and the new physical interval are established.
+Root additionally bound all twelve actual-role module copies to exact historical Git heads and blobs.
+No full equality replaces the four failures.
+
+All230 frozen entries,33 original/prior products and ten fresh precision copies pass the root receipt gate.
+Safe exports are =1206-pr1175-Malawi/=, =1206-api9-products/= and =1206-precision-supplement/=.
+The previously accepted1189/1191/1180-author packets remain separate; their missing authority, expected objects and strict axis findings remain explicit.
+The first12 critic has sealed its bounded registry and stopped; root has not yet accepted that final registry.
+The later10 critic continues, and1206 remains OPEN.
+No all-campaign suite, corpus verdict, human merge or goal completion is claimed.
+
+* Earlier checkpoint -- 2026-10-22T13:39:00+00:00
 
 There are 26 published implementation PRs, all freshly verified OPEN and unmerged in =publication-26-safe.json=.
 The independent GH1196 repair is root accepted and published as [[https://github.com/ligon/LSMS_Library/pull/1212][PR1212]].
