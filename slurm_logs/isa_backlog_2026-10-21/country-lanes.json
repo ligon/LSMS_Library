@@ -129,11 +129,13 @@
         "actual_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
         "actual_parent_PR": 1203,
         "ledger": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
-        "status": "SOURCE_DIAGNOSIS_REPRODUCED_NARROW_IMPLEMENTATION_RELEASED",
+        "status": "COMMITTED_NARROW_REPAIR_AUTHOR_VERIFICATION_ACTIVE",
         "scope": "Keep native used Quantity/u and all22,877 rows; purchase=q08/q09a, add own Unit_purchased and gift flag/quantity/unit as four optional country-local columns; retain native acquisition labels and nullable types. No code21/science/grain/framework/map change.",
         "production_or_schema_edits_released": true,
         "provider_payload_copy_decode_imports_released": true,
-        "source_first_result": "Reported source diagnosis reproduced all22,877 rows and native keys; guarded implementation proceeds; not independently reviewed."
+        "source_first_result": "Reported source diagnosis reproduced all22,877 rows and native keys; guarded implementation proceeds; not independently reviewed.",
+        "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+        "postedit_scope": "Author reports actual549/39/1362 maps:24BFcountry changes,18BF2018waves;all525other-country/39framework/1344other-wave hashes exact. Root read source of existing all-wave-input invalidation rule."
       }
     },
     "Ethiopia": {
@@ -1102,7 +1104,19 @@
         "root_acceptance": "1205-independent/ROOT-ACCEPTANCE.json",
         "pr": 1216,
         "source_branch": "fix/1205-uganda-parcel-area-20261022",
-        "publication": "1216-publication.json"
+        "publication": "1216-publication.json",
+        "ci_run": 39836472369,
+        "ci": "Unit-tests/windows-smoke success; six jobs including data-tests skipped; independent local held-source proof separate."
+      },
+      "current_1215": {
+        "owner": "acquisition_1149",
+        "path": "/local/job40255479/worktrees/isa-Uganda-1215",
+        "private_root": "/local/job40255479/control/isa-backlog-20261021/uganda1215-order-static",
+        "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+        "ledger_first_commit": "467b3b59c",
+        "status": "STATIC_CONTRACT_DIAGNOSIS_ONLY",
+        "production_or_runtime_released": false,
+        "scope": "Ledger-first static column-order contract diagnosis at actuala417 parent; no production/schema edit or runtime released. Concrete order alternatives and affected callers required before design decision."
       }
     }
   },
@@ -1889,17 +1903,18 @@
     }
   },
   "current_queue_refresh": {
-    "recorded_at_UTC": "2026-10-22T19:04:06.056446+00:00",
+    "recorded_at_UTC": "2026-10-22T19:12:15.403653+00:00",
     "queue": "remaining-queue-2026-10-22.json",
     "open_issue_records": 113,
     "implementation_prs": 29,
     "active": [
       1204,
-      1188
+      1188,
+      1215
     ],
     "interpretation": "Explicit current ownership; older per-lane active fields are historical task records.",
     "pr_linked_issue_records": 26,
-    "other_open_issue_records": 85
+    "other_open_issue_records": 84
   },
   "current_invalid_wave_1210": {
     "owner": "acquisition_1149",
@@ -1921,12 +1936,17 @@
     "ci_qualification": "1214-ci-metadata-qualification.json"
   },
   "latest_archive_checkpoint": {
-    "archive_count": 29,
-    "receipt": "private-evidence-durability-twentyninth.json",
-    "covers": "Frozen independent1210 runtime/additive guard-attribution supplement/root receipts",
-    "excludes": "All live Uganda author/review prefixes and runtime caches",
-    "native_parquet_operands_retained": 20,
-    "public_serialized_operands_retained": 48,
-    "raw_cache_runtime_exclusions": 549
+    "archive_count": 30,
+    "receipt": "private-evidence-durability-thirtieth.json",
+    "covers": [
+      "frozen Uganda1204 author",
+      "frozen Uganda1205 author",
+      "independent Uganda1205 runtime and terminal precision supplement",
+      "51 root/static source receipts and their frozen55-file root copy packet"
+    ],
+    "native_parquet_operands_retained": 290,
+    "serialized_operands_retained": 166,
+    "exclusions": 866,
+    "scope": "Archival preserves existing evidence and original failures; it supplies no additional product validation. Live Uganda1204 review, Burkina1188 and Uganda1215 static roots excluded."
   }
 }

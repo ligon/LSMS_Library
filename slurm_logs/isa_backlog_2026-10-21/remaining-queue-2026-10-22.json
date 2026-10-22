@@ -5,8 +5,8 @@
   "repository_open_issues": 172,
   "isa_related_open_issue_records": 113,
   "pr_linked_issue_records": 26,
-  "active_issue_records": 2,
-  "other_open_issue_records": 85,
+  "active_issue_records": 3,
+  "other_open_issue_records": 84,
   "open_unmerged_implementation_prs": 29,
   "initial_in_scope_still_open": 96,
   "new_campaign_issue_records": 17,
@@ -1998,14 +1998,14 @@
       "title": "Uganda crop_production: empty result column order depends on cache coverage and backend",
       "url": "https://github.com/ligon/LSMS_Library/issues/1215",
       "github_state": "open",
-      "queue_state": "OPEN_UNASSIGNED",
+      "queue_state": "ACTIVE",
       "countries": [
         "Uganda",
         "Shared framework"
       ],
       "implementation_prs": [],
       "residual": "Four new zero-row column-order failures exposed by1204routing repair; preserve all strictfindings and choose a stable public empty-column contract across cold/covered-cache/Make.",
-      "current_active_scope": null,
+      "current_active_scope": "Ledger-first static column-order contract diagnosis at actuala417 parent; no production/schema edit or runtime released. Concrete order alternatives and affected callers required before design decision.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Reuse existing schema/empty/native ordering machinery; measure affected scope before framework edit. Closed1099row/errorbehavior and1204rawcoverage are different owners; no normalizedcomparison or native-data changes.",
       "scope_recheck_required_before_dispatch": true
@@ -2280,5 +2280,5 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-22T19:04:06.056446+00:00"
+  "active_progress_updated_at_UTC": "2026-10-22T19:12:15.403653+00:00"
 }

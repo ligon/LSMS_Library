@@ -3,7 +3,7 @@
 
 * Snapshot
 Open-issue refresh 2026-10-22T18:55:36.298257+00:00; publication updated 2026-10-22T19:04:06.056446+00:00.
-There are 113 ISA-related open issue records: 26 with campaign PRs, two active, and 85 other open records.
+There are 113 ISA-related open issue records: 26 with campaign PRs, three active, and 84 other open records.
 All 29 implementation PRs are OPEN and unmerged.
 Umbrellas, decisions and partial repairs overlap; these are not 113 distinct confirmed bugs.
 The original inventory had 97 in-scope records; 96 remain open, duplicate #1089 is now closed, and 17 campaign follow-ups were added.
@@ -19,6 +19,10 @@ Source-first diagnosis reproduced on all22,877 native rows; narrow implementatio
 ** [[https://github.com/ligon/LSMS_Library/issues/1204][#1204]] Uganda crop_production: country fallback violates requested wave coverage
 Countries: Uganda.
 Independent review running: requested-wave coverage repair reproduced, four new empty-column-order differences retained under1215. Author frozen/root-authenticated; final independent verdict pending.
+
+** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Uganda crop_production: empty result column order depends on cache coverage and backend
+Countries: Uganda.
+Ledger-first static column-order contract diagnosis at actuala417 parent; no production/schema edit or runtime released. Concrete order alternatives and affected callers required before design decision.
 
 * Reviewed changes awaiting human merge
 ** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
@@ -463,8 +467,3 @@ Countries: Malawi.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1206][#1206]] Campaign validation: finish exact numeric and object-type saved-result reassessment
 Countries: Cross-country validation.
-
-
-** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Uganda crop_production: empty result column order depends on cache coverage and backend
-Countries: Uganda, Shared framework.
-Four newlyexposedzero-row column-order strictfailures from1204repair are preserved. Closed1099 fixes emptyrow/errorbehavior; this separate owner needs a stable public column-order contract across cold/covered-cache/Make. Author runtime/rootauth and independent staticreview support filing; independent runtime review remains in progress.

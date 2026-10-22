@@ -1553,3 +1553,11 @@ Queue113records now26PR-linked/twoactive/85other;29implementation PRs await huma
 Active Uganda1204 independent saved-operand checks retain original strict-stage failures and private trace-output exception; Burkina1188 narrow implementation3d39096d5 published and under author testing.
 Archive30 exact plan8e0ab9e10d1513966b37f04d50472d3bd3fb60ded9b193f2ef6d3a638d193186 released by rootapproval7c1d3290e984b9af25e895e4e229ff4bc496bc1d7b968b6a0f9acb8b160d8b0e; writer/verifier acceptance pending.
 Next: finish private archive30 root verification, independent1204 review, Burkina1188 author tests then independent review, and refresh tracker1170.
+
+* 2026-10-22T19:20:39.886027+00:00 Private archive30 accepted; next reviews
+Root verifier94711/chunk505e5f actual0 independently checked all1,830opaque archive members, complete source-after receipts and exact plan/approval/controller/terminal chains.
+Archive SHA2562f72327102e1fdc7cf956dbd9f905c4c368ce6ff2af00c0994f6d526f5075a7a retains290parquet and166serialized operands; raw sources and live prefixes remain excluded.
+PR1216 exact-head CI39836472369 passed unit-tests/windows-smoke; six jobs including data-tests skipped.
+Uganda1204 independent READY90150bdb/finalmanifestd1c74be6 sealed; root authentication pending. Four empty-column-order failures remain1215; original oracle-stage and private trace-output qualifications retained.
+Uganda1215 ledger-first static proposal467b3b59c on actuala417 is active; code/runtime unreleased pending concrete schema-order decision.
+Burkina1188 author3d39096d5 has14syntheticPASS/actualparent7FAIL7PASS reported; normal four-root builds active after preserved source-copy preflight stop and root-authorized quarantine. Independent BF static reviewer now owns immutable3d/3dc snapshots; runtime remains held pending author freeze/authentication.

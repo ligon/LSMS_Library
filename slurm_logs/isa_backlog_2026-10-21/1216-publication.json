@@ -26,7 +26,8 @@
     "nonpositive_chosen_GPS": 276,
     "parcel_absent": 10
   },
-  "ci_status": "Not yet certified; local independent held-source review remains separate evidence.",
+  "ci_status": "Exact-head run39836472369 completed success; unit-tests/windows-smoke completed success; six jobs including data-tests skipped. Independent local held-source verification is separate.",
   "source_publish_qualification": "First GitHub branch push returned remote rejected (failed); exact remote branch absence checked; one ordinary nonforce retry completed0. Original author branch and frozen source unchanged; additive fix branch names the exact accepted head.",
-  "signed": "Sue"
+  "signed": "Sue",
+  "ci_receipt": "1216-ci.json"
 }
