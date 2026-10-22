@@ -319,3 +319,10 @@ no author PASS, GitHub write, public merge or issue closure.
   READY/proof freezes source/reference receipts and zero consumers. No broad
   suite/corpus, AG/FCT/food build, acquisition, bypass, shared cache mutation,
   GitHub write, public merge, issue closure or author PASS is claimed.
+- LIMIT (section 4): the first strict freezer stopped on four convenience
+  symlinks per head. Initial snapshots used Path.readlink().as_posix and did
+  not record literal target bytes. Preserve both originals and the stopped
+  freezer; separate corrective receipts compare literal os.readlink bytes and
+  modes against immutable Git plus the original physical modes. No source
+  link rewrite, API/source decode or test replay is needed. Independent review
+  must use the literal-reader helper, not treat normalized receipts as literal.
