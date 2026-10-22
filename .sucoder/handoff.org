@@ -1,6 +1,77 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T22:53:15.201933+00:00
+* Current task -- 2026-10-22T23:08:50.144364+00:00
+
+The user expressly authorized consistency checks and merges into development.
+The goal remains active; do not ask again for merge permission.
+Three agents are active: malawi_1209 owns merging, acquisition_1149 owns #1218, and review_malawi_1209 owns Mali #1118 preparation.
+
+The complete root remote checkpoint (6dd8ee, exit 0) confirms nine of 32 implementation PRs merged and 23 open.
+Merged PRs: #1182, #1172, #1173, #1175, #1176, #1178, #1180, #1181 and #1185.
+Their accepted heads are unchanged and all target development.
+The captured development tip is 48856358513baa89a44aefb108b8f447497788a6; later merges may advance it.
+Exact heads, merge SHAs and timestamps are in slurm_logs/isa_backlog_2026-10-21/merge-progress-nine-PRs.json.
+The merger records exact-head unit/Windows CI, expected-head protection and parent/tree checks for every merge.
+Root separately verified #1172's parents/tree (41c9b4).
+Next, #1186 needs a mechanical EOF country-note conflict resolution using only its accepted head and current development, preserving both complete additions and obtaining fresh CI.
+Never push the combined 32-PR integration history or the old erroneous local 30c4 history into a PR branch.
+
+The internal remote merge hold is lifted.
+Root independently verified all three JUnit/Popen/terminal chains and failure-only continuations (a35a39, exit 0).
+Original outcomes remain 1,655 PASS / 36 FAIL / 102 SKIP; the isolation continuation has six PASS / 28 FAIL; the fixture adapter has 30 PASS.
+The latest distinct outcomes are 1,691 PASS and 102 SKIP, with no replay of passing cases and no single-run green claim.
+Acceptance: C/ISA-PR-INTEGRATION-V2-ROOT-TEST-ACCEPTANCE.json, SHA256 5cc062186f55c25e433f418f21375a2df10f711842e035a4607673491b5bd1d2.
+Root reviewed the exact two-file test adapter at 26a301e2: keyword-only _with_origin support and the actual parquet-producer tag, with all assertions preserved.
+Apply each file only to its respective #1213/#1214 head, or a narrow followup, with fresh CI.
+The corrected guard uses literal namespace owner maps, committed sidecar metadata, and a private DVC site cache.
+The original startup failure, all 12,436 guard rows, held read attempts, skipped genuine tests and pinned-runtime limits remain documented.
+No full-data or corpus verdict follows.
+
+Root docs continue on docs/isa-backlog-20261022-merge-progress, last pushed at 0c588889f before this checkpoint.
+The original PR #1170 branch is frozen at 59cc6b693e431b812c2676f3c9233b54dd2f7d7b and may merge last.
+Push new docs only to the continuation branch.
+PR #1170's body still describes the first merge and original integration failures; refresh it after the next merge checkpoint.
+The queue JSON/Org retain the dated first-merge snapshot: 113 open scope records and 31 open PRs.
+The new nine-merge record supersedes that PR-state count.
+Only #1077's closure has root readback; the merger must reconcile other linked issues against live bodies, closing complete fixes and retaining partial residuals.
+
+#1218 source remains clean 2f83bb2, published to the durable mirror.
+The dtype metadata tests give 13 meaningful failures / three passes on the actual f7 parent and 25 passes on the candidate.
+The fresh amended candidate census completed once (PID 393339, session 41294, chunk 41027a, exit 0).
+All 549 country, 39 framework and 1,362 declared-wave hashes move against the already-saved f7 maps; ordered API and source materialization policy remain exact.
+The suffix records 1,458 denied missing-reference hash attempts and one probe, with 561 endpoint/sidecar absences measured in a new interval.
+There is no historical-absence claim.
+Root release C/FRAMEWORK1218-V4-EMPTY-REGRESSION-RELEASE.json (SHA256 a995aed5da0d4dc67c233c77e2fa77d8feb9984df77ed393b584960748a42abf) permits the original empty-table regressions only.
+The parent run (12236/cfe183, exit 1) has 39 direct dtype failures, seven Make-child instrumentation failures and 11 passes, with zero errors/skips.
+Those seven children exited 121 before boot records; their exact failed assertion, PID and environment are unknown.
+A new stdlib-only actual-Make toy (67179/64d31d, exit 0) measured MAKEFLAGS changing from '-j1' to 's -j1' with MAKELEVEL=1; this does not recover the old missing history.
+The agent is preparing an additive guard accepting only those measured serial forms, detailed startup records and exact identity/runner/launcher pins.
+Review those pins before product actors.
+Then continue only the seven failed parent cases and the never-run 57 candidate cases; do not replay the 39 dtype failures or 11 passes.
+Supporting tests must deselect the completed 57 rather than rerun the whole GH1039 file.
+All six genuine providers, 24 copies and four normal roots remain held.
+The original 7eb BooleanDtype census failure, unsaved maps and namespace-receipt gate stop remain preserved.
+
+Mali #1118 phase0 is accepted (root receipt SHA256 53aeaca1...).
+The exact f8 base, mounted venv links and separate private DVC tmp directories are prepared.
+The agent is preparing controllers only: no imports, actors, data roots or production fill have run.
+Provider bytes, tests, census and genuine runtime need exact new pins/release.
+Require source-first classification of meaningful unmapped units versus source-declared absence before any fill.
+The namespace, FD, source-identity and serial-Make lessons were explicitly sent to the agent.
+
+A future Uganda #1133 phase0 brief is prepared but not dispatched: C/NEXT-UGANDA-1133-PHASE0-BRIEF.md, SHA256 f176e37afa8e069d211b6baac3c94bf574c0d6157ce18b95ed76b5def25bd535.
+The live issue requires a source-grounded 322-pair rendering table, inspection of two non-bijective cases and community join keys; no digit rule.
+Read complete Uganda CONTENTS and prior art before proposing provider work.
+Keep current agent slots on merging, #1218 and Mali.
+
+Archive32 remains root-accepted; independent #1215, live #1218 and newer root receipts are not yet covered.
+Do not replay product actors for packaging.
+Main remains clean at f8; never edit the shared mirror working tree.
+The last allocation inventory showed about 24 hours remaining and no deadline warning.
+
+Sue
+
+* Earlier task -- 2026-10-22T22:53:15.201933+00:00
 
 User authorized consistency checking and merging outstanding PRs into development. Continue without asking again for merge permission.
 Root docs branch is docs/isa-backlog-20261022-merge-progress; PR1170 original branch remains frozen at59cc6b693e431b812c2676f3c9233b54dd2f7d7b and may merge LAST. Never commit/push continuation to the original branch.

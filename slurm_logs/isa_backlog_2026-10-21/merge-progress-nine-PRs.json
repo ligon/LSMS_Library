@@ -1,0 +1,129 @@
+{
+  "status": "NINE_IMPLEMENTATION_MERGES_ROOT_REMOTE_READBACK",
+  "at_UTC": "2026-10-22T23:07:57.049749+00:00",
+  "method": "Complete gh allPR limit1000 collection;663records, rootexact32scopehead/state/base/merge checks. Capture is a dated checkpoint; later merges may advance it.",
+  "merged_implementation_PRs": 9,
+  "open_implementation_PRs": 23,
+  "merged": [
+    {
+      "PR": 1172,
+      "accepted_head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "merge": "5f2d198db1a69b25318b851516eea11e9b8f61f6",
+      "merged_at_UTC": "2026-10-22T23:01:04Z",
+      "base": "development"
+    },
+    {
+      "PR": 1173,
+      "accepted_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "merge": "801e47978ccfc2433727b7bff240fbc4d234b30b",
+      "merged_at_UTC": "2026-10-22T23:03:36Z",
+      "base": "development"
+    },
+    {
+      "PR": 1175,
+      "accepted_head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "merge": "ec067f8008a24bb0708d3b63915d2529120e9849",
+      "merged_at_UTC": "2026-10-22T23:03:44Z",
+      "base": "development"
+    },
+    {
+      "PR": 1176,
+      "accepted_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "merge": "c598082ee622802ef20f4ca32f7b061d26a7865d",
+      "merged_at_UTC": "2026-10-22T23:03:51Z",
+      "base": "development"
+    },
+    {
+      "PR": 1178,
+      "accepted_head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "merge": "989c7abb023740632a7ca0d83f14d21d1cf7b30b",
+      "merged_at_UTC": "2026-10-22T23:04:42Z",
+      "base": "development"
+    },
+    {
+      "PR": 1180,
+      "accepted_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "merge": "94098ff4503cc2c0cd501e6ddb8ea64558bf1b8e",
+      "merged_at_UTC": "2026-10-22T23:04:49Z",
+      "base": "development"
+    },
+    {
+      "PR": 1181,
+      "accepted_head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "merge": "d8825d25f8380a17fb781868b34b2f2f9cb8bf7b",
+      "merged_at_UTC": "2026-10-22T23:04:57Z",
+      "base": "development"
+    },
+    {
+      "PR": 1182,
+      "accepted_head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "merge": "b42b3bf68d4ada33a57a128a61d276c18103a423",
+      "merged_at_UTC": "2026-10-22T22:39:40Z",
+      "base": "development"
+    },
+    {
+      "PR": 1185,
+      "accepted_head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "merge": "48856358513baa89a44aefb108b8f447497788a6",
+      "merged_at_UTC": "2026-10-22T23:05:04Z",
+      "base": "development"
+    }
+  ],
+  "open_numbers": [
+    1186,
+    1189,
+    1191,
+    1192,
+    1193,
+    1194,
+    1195,
+    1197,
+    1199,
+    1200,
+    1201,
+    1202,
+    1203,
+    1207,
+    1208,
+    1211,
+    1212,
+    1213,
+    1214,
+    1216,
+    1217,
+    1219,
+    1220
+  ],
+  "live_collection_SHA256": "9b4fa1a1e421bcef541132fe5d1a2ee54c36a02429f2260cac090f12f853fe5e",
+  "verification": "Dedicated merger independently gates exact-head unit/windows CI, expectedhead merge and exactparents/tree against local composition for every merge. Root independently read back complete remote PRcollection; separately read back1182/1172 parents/tree.",
+  "root_source_acceptance_SHA256": "3bf9a5677d0125590664033064cfd2c1b84ee509575638cb4739fe29f4e3d3e4",
+  "root_scoped_test_acceptance_SHA256": "5cc062186f55c25e433f418f21375a2df10f711842e035a4607673491b5bd1d2",
+  "source_head": "718b8af4a39b23587b7f712b92e7b4c664982c36",
+  "two_test_adapter_head": "26a301e2f8783e7b6adb58804c09fdd74ba517ec",
+  "distinct_test_outcomes": {
+    "PASS": 1691,
+    "SKIP": 102
+  },
+  "original_test_runs": [
+    {
+      "PASS": 1655,
+      "FAIL": 36,
+      "SKIP": 102
+    },
+    {
+      "PASS": 6,
+      "FAIL": 28
+    },
+    {
+      "PASS": 30
+    }
+  ],
+  "limits": [
+    "Distinct latest outcomes are not a single all-green run; originalfailures/streams retained.",
+    "102genuine/unready normal skips remain skips. No genuine/full-data/corpus verdict.",
+    "Metadata guard/privateDVC isolation corrections and exacttwofile mockadaptation preserve assertions/productsource.",
+    "Oldlocal30c4conflictmarkerhistory preserved and neverpushed; clean reconstruction used instead.",
+    "Currentmountedruntime doesnotcertify newcertifilock installation."
+  ],
+  "signed": "Sue"
+}
