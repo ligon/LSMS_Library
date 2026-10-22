@@ -485,5 +485,3 @@ Data Scheme:
     NumberOfUnits: float
     Available: bool
     materialize: make
-  food_expenditures:
-  food_prices:

@@ -3061,3 +3061,21 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
     2019-20, whose unit column is not read (=unit2=None=).  Under the
     #1041 ruling a missing unit is =Unknown=, not NULL.  Drafted as a
     residual.
+
+* 2026-10-22 -- derived food registrations (GH #218, Malawi-only)
+
+The remaining null =food_expenditures= and =food_prices= entries in
+=_/data_scheme.yml= are removed.
+The retired-family note above already says these products "now derive from
+food_acquired"; the raw registrations were still present despite that decision.
+The public products remain available: =Country.data_scheme= appends
+=food_expenditures=, =food_prices= and =food_quantities= from the existing
+=food_acquired= declaration, and =Feature= discovers them through that source.
+The public method order and empty materialization metadata are unchanged.
+
+This registration cleanup preserves the distinctions recorded above:
+2013-14 is panel-only, the later waves combine cross-sectional and tracking
+populations, IHS2 derives metric factors from its unit labels, and IHS3+
+conversion tables are region-keyed.
+It changes no source, identifier, factor, unit, valuation or reduction rule.
+GH #218 remains open for the other countries and shared cleanup.
