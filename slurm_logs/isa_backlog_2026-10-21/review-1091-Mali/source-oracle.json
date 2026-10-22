@@ -1,0 +1,67 @@
+{
+  "status": "PASS",
+  "source_files": 2,
+  "eligible_rows": 155931,
+  "obs_counts": {
+    "1": 66699,
+    "2": 49014,
+    "3": 40218
+  },
+  "visit_counts": {
+    "1": 66159,
+    "2": 89772
+  },
+  "positive_unresolved_unit_entries_excluded": 129,
+  "raw_positive_slots": 156060,
+  "slots": [
+    {
+      "visit": 1,
+      "obs": 1,
+      "raw_rows": 66555,
+      "positive_price": 28697,
+      "eligible": 28672
+    },
+    {
+      "visit": 1,
+      "obs": 2,
+      "raw_rows": 66555,
+      "positive_price": 20692,
+      "eligible": 20636
+    },
+    {
+      "visit": 1,
+      "obs": 3,
+      "raw_rows": 66555,
+      "positive_price": 16860,
+      "eligible": 16851
+    },
+    {
+      "visit": 2,
+      "obs": 1,
+      "raw_rows": 78752,
+      "positive_price": 38045,
+      "eligible": 38027
+    },
+    {
+      "visit": 2,
+      "obs": 2,
+      "raw_rows": 78752,
+      "positive_price": 28389,
+      "eligible": 28378
+    },
+    {
+      "visit": 2,
+      "obs": 3,
+      "raw_rows": 78752,
+      "positive_price": 23377,
+      "eligible": 23367
+    }
+  ],
+  "all_native_values_keys_masks_dtypes_order_axes_full_typed_attrs_exact": true,
+  "candidate_wave_helper_or_finalizer_called_for_expected_rows": false,
+  "source_oracle_and_native_serialization_layers_separate": true,
+  "postread_oracle_uses_actual_unchanged_writer_control": true,
+  "initial_strict_prewrite_vs_postread_dtype_stop_preserved": true,
+  "missing_passage2_unit_dictionaries_confirmed": true,
+  "exact_known_community_dictionary_correspondence": true
+}

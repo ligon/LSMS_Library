@@ -909,3 +909,17 @@ Unarchived completed roots now Uganda/849, Uganda/849-exact-addendum and Niger/1
 No running root exec handles at this checkpoint; docs push11449 completed to1d9dc902d, merge86001 completed FS-published7ec. Main development remains f8; no public PR merged. Goal active.
 
 Sue
+
+* Root checkpoint -- 2026-10-22 00:24 UTC
+
+Live newcarrier owner1198 exists;849 is retitled/reconciled, stale967/972 merge dependency removed from current scope while history retained.
+Agent niger_lane now owns design/privateprototype1198 on separate isa-Uganda-1198 f8; no production/config/schema edits, ledgerFIRST then concrete lossless observation proposal.
+Mali independent1091 PASS read in full by root, actual source/comparator/CLI and freeze proof also read. Safe13reports+3checkers exported byte-exact in review-1091-Mali/.
+Stacked PR next on verified actual1180 branch fix/822-mali-community-readings-20261021 ataba; author9e8ebeabb source already pushed GitHub. No1198production or global18composition claim.
+Niger writer candidate runtime6be657660 published;114tests pass and parent17newcontrols12fail5pass after explicitfixture correction. Source23Niger/526others/39framework actualcensus beforebuild; final evidence/freeze pending.
+Global17 source7ec reviewactive:438focused pass; newfull FAIL5148pass4459skip13fail,9knownutime +4warning-nodeidprefixglobs. Only narrow matching actual16 counterpart allowed; no secondfullsuite or normalized PASS. Actual63heldsources/316physicalcopies gate succeeded before44framecoldcohorts.
+Archive9 session6075 finished SUCCESS and closed: quiescent-followup-00h15.tar.gz SHA17d99ac26f72c81f1b7985e26363ec982abc93916dd3c16e4c2c672784d132bb,734files/67143657bytes,3roots849original+strictaddendum+Niger1091diagnosis. Durable launcher/private manifest/owner-only modes independently verified.
+Unarchived newly completed root: review-Mali-1091 (1190manifest entries); archive after source-safe publication, never include active1198/Nigerwriter/global17 as quiescent.
+Main development remains clean f8;17publicPRs all green at last17head checkpoint, latestcompletedcombinedproof remains16d527. No PR merged automatically; goal active.
+
+Sue

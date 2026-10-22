@@ -1,0 +1,28 @@
+{
+  "status": "SUCCESS_BEFORE_PACKAGE_IMPORT_OR_BUILD",
+  "runtime": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+  "final": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+  "baseline": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "ledger_first": "337f8432193902c0d6f3d6251ff911606d0955b6",
+  "evidence_only_descendant": [
+    "slurm_logs/isa_backlog_2026-10-21/Mali/1091/REPORT.org",
+    "slurm_logs/isa_backlog_2026-10-21/Mali/1091/REPRODUCE.sh",
+    "slurm_logs/isa_backlog_2026-10-21/Mali/1091/RESIDUAL.md",
+    "slurm_logs/isa_backlog_2026-10-21/Mali/1091/proof.json",
+    "slurm_logs/isa_backlog_2026-10-21/Mali/1091/validation.json"
+  ],
+  "author_manifest_files": 1309,
+  "guidance_same_as_previously_fully_read": {
+    "AGENTS.md": "c1205513db01fb743ec3c8b8c0ec69615a2bfcd9521fb7ed2d3195bd1a7e20dd",
+    "CLAUDE.md": "c1205513db01fb743ec3c8b8c0ec69615a2bfcd9521fb7ed2d3195bd1a7e20dd"
+  },
+  "Mali_baseline_is_exact_fully_read_historical_prefix": true,
+  "Niger_notes_exact_to_prior_full_read": true,
+  "source_trees": 6,
+  "evidence_file_counts": {
+    "/local/job40255479/control/isa-backlog-20261021/Mali/1091-fix": 1311,
+    "/local/job40255479/control/isa-backlog-20261021/Mali/1091": 398,
+    "/local/job40255479/control/isa-backlog-20261021/Mali/822": 81,
+    "/local/job40255479/control/isa-backlog-20261021/review-1078-unit-attribution": 1758
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "verdict": "PASS",
+  "production_blockers": [],
+  "final_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+  "runtime_tests": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+  "baseline": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "ledger_first": "337f8432193902c0d6f3d6251ff911606d0955b6",
+  "focused_tests_PASS": 111,
+  "baseline_new_cases_FAIL_PASS": [
+    24,
+    4
+  ],
+  "source_eligible_rows": 155931,
+  "candidate_stages_supported_unsupported": [
+    8,
+    32
+  ],
+  "all_full_value_axis_dtype_mask_order_and_typed_attrs_checks_explicit_exact": true,
+  "healthy_Niger_L2_rows": 46043,
+  "Feature_rows_default_and_currency_None": 201974,
+  "scanner_WARN_FAIL_ERROR": [
+    2,
+    0,
+    0
+  ],
+  "hash_scope_Mali_changed_others_exact_framework_exact": [
+    24,
+    525,
+    39
+  ],
+  "fresh_Default_warm_zero_changes": 10,
+  "supported_Make_warm_normal_native_rewrites_bytes_identical": 2,
+  "explicit_deltas": [
+    "Old Make unsupported wrong-wave output replaced by declared empty",
+    "Old Make gains authoritative DEFAULT id_converted=True attrs",
+    "No Make framework country cache",
+    "Declared empty visit/obs string vs parent filtered int64",
+    "Existing API-to-artifact writer dtype/container differences retained"
+  ],
+  "preserved_qualifications": [
+    "Initial mapper cwd/path and oracle serialization-layer stops",
+    "Baseline unsupported raw eight-level vs supported country seven-level stop; fresh poststop exact control",
+    "Optional get_data_file metadata unavailable; no fresh variable-label/PDF claim",
+    "Bounded private-log tail emitted native index examples internally; no raw examples in safe exports"
+  ],
+  "limits": [
+    "Mali portion only; Niger/Tanzania remain",
+    "No source-cold Niger claim",
+    "No other23 Mali output/corpus rebuild or fullsuite claim",
+    "No stacked/integration or production-resolution claim"
+  ],
+  "original_evidence_source_receipts_exact": true,
+  "clean_immutable_sources": true,
+  "active_consumers": [],
+  "reviewer": "Sue (GPT-6)"
+}

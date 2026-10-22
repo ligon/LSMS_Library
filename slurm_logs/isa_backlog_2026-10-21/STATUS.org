@@ -283,3 +283,25 @@ Four MD5/SHA-gated public Nigeria instrument PDFs are an explicit private-archiv
 The safe receipt is =private-evidence-durability-eighth.json=.
 
 Sue
+
+* Remaining-work ownership -- 2026-10-22 00:24 UTC
+
+The Uganda native production-record defect is [[https://github.com/ligon/LSMS_Library/issues/1198][#1198]].
+The live #849 title/body now records merged967/972 prerequisites, completed five-wave measurement and that actual carrier blocker; no factor-only promotion or issue closure occurred.
+A separate design/private-prototype lane at =isa-Uganda-1198= is active on f8 with a ledger-first requirement; production/schema/API edits remain unapproved for that phase.
+
+Mali1091 independently PASSES at9e8ebeabb:111focused tests,24meaningful parent failures/fourpasses,40candidate stages and complete source/native/public/typed-attrs/CLI/Feature/scanner checks.
+Root read the full review, actual comparator/oracle/runtime/CLI source and freeze receipts.
+The safe independent review is in =review-1091-Mali/=; parent PR1180 is verified open ataba on its actual branch.
+A stacked PR is being prepared; no other-campaign composition or production resolution is claimed.
+Niger's writer measured23 changed country hashes,526other hashes and39framework fingerprints unchanged before its actual source rebuild.
+
+The active global17 review has438focused passes and a preserved full-selection FAIL:5148passed,4459skipped,13failed.
+Nine are the known protected tracked-timestamp cases; four warning-text glob failures are being checked against the actual16 parent under matching private paths/launch arguments.
+No full-suite repeat, assertion weakening or17integration PASS is authorized by these intermediate results.
+
+Archive9 completed with734included files and67143657compressed bytes, SHA256 =17d99ac26f72c81f1b7985e26363ec982abc93916dd3c16e4c2c672784d132bb=.
+All included members/source-after receipts, durable private manifest/launcher and owner-only modes verified.
+The safe receipt is =private-evidence-durability-ninth.json=.
+
+Sue
