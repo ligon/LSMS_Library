@@ -3720,3 +3720,73 @@ Separately, =transformations.py= says "on Uganda the parcel key matches on
 The full real parcel-yield frames are unchanged by #1198. This contradicts
 that blanket coverage claim; its remaining ID/area routing requires separate
 diagnosis, not an inferred repair here.
+
+* Reported harvest rates at native observation grain (GH #849, 2026-10-22)
+
+The five previously unwired rounds now carry their own reported kg-per-unit
+fields through the existing builder: =a5aq6d=/=a5bq6d= in 2010-11, 2011-12,
+2013-14 and 2015-16, and =s5aq06d_1=/=s5aq06d_2=/=s5bq06d_1=/=s5bq06d_2=
+in 2019-20.
+These are twelve mapping additions, not a new factor estimator.
+The three 2018-19 bindings and the unwired 2009-10 map remain unchanged;
+this does not adjudicate an additional 2009-10 source carrier.
+The retained 133,761 native observations, source fingerprints, actual slots,
+production IDs or explicit release-row observations, 403 conditional old-null
+exclusions and 928 public null-=v= records remain exact.
+All non-=KgFactor= values, units, conditions, quantities, sales, dates and
+metadata remain exact at their corresponding serialization stages.
+
+Raw and served factors are different layers.
+The helper already applies =pd.to_numeric(errors='coerce')= and
+=kgf.where(kgf > 0, np.nan)=; this work preserves both operations.
+Raw literals remain in the private source oracle, while nonnumeric and
+nonpositive reports remain missing in the served frame.
+Positive over-cap, year-like and Kg-not-one reports are retained in the
+reported column and rejected only by the unchanged downstream screen.
+The new mappings add 82,103 nonmissing reported values at the retained grain.
+
+The earlier note says the move "would be small and in the right direction"
+and immediately cautions that "small" must be measured.
+The normal held-source parent/candidate comparison measures harvest_kg
+29,095,413.407893993 -> 42,026,694.99297963 kg (+12,931,281.585085638), with
+78,571 -> 88,980 plot-crop output rows.
+The rejected historical scalar-carrier projection of about 42.035M kg is
+not this result: each retained observation is converted before aggregation.
+The layer counts are now reported 96,747, survey_median 4,840, metric 23,406,
+none 8,768, with 439 implausible reports rejected; shipped/inferred remain zero.
+The new reports also change fine/coarse median support for other records in
+the same round, rather than only the cells whose own factor was added.
+
+Agreement is measured against nominal label-derived factors, with
+=volume_as_mass=True= and no price inference or declared factor table.
+Among rows with finite positive factors on both sides, the screened-report
+10% / 20% agreement counts are 9,667 / 11,252 of 15,085 (2010-11),
+5,625 / 7,390 of 10,758 (2011-12), 5,214 / 6,081 of 9,526 (2013-14),
+8,508 / 9,671 of 13,542 (2015-16), and 8,052 / 9,465 of 12,602 (2019-20).
+These denominators do not require a reported Quantity.
+Unit/condition dispersion and screen counts are retained in the task report;
+no disagreement is rescaled, averaged, relabelled or hidden by an exception.
+The #829 2015 sales-release WAITING entry and the settled 2018-19 slot-label
+adjudication above retain their existing meanings.
+
+The real area frame remains 42,841 rows, exact to the parent.
+Parcel yield has 14,022 -> 14,520 matched output keys, including 498 newly
+convertible keys and 7,335 changed shared values; literal plot yield remains
+empty on both heads.
+This does not repair the existing #1205 area/key coverage limitation.
+The #1204 country-Make subset-routing defect also remains.
+Cold/warm support =cluster_features.v= still changes from pyarrow StringDtype
+=na_value=pd.NA= to =na_value=np.nan= with zero null values on both heads,
+the distinct Uganda manifestation recorded in #1196; no common cause is proved.
+
+Normal DEFAULT warm reads, new Country objects, matched Feature and CLI calls
+leave private cache bytes, modes and mtimes exact.
+In this separate GH849 run, warm Make changed the same 17 byte-identical paths
+from 0600 to 0644 and changed mtimes on both parent and candidate.
+This is a separate observation from the prior GH1198 opposite-direction
+measurement; it implies no initial-copy provenance or universal mode guarantee.
+Populated DEFAULT subsets recompute sampling/population/recall metadata, so
+filtering an already-finalized all-wave frame is not a full-attrs oracle.
+The original strict subset comparison stop is retained in the task evidence.
+See =slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/= for the safe report,
+source-grounded aggregates, exact hash scope, tests and explicit evidence limits.

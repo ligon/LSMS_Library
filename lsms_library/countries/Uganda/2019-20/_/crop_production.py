@@ -13,8 +13,9 @@ the 2009-16 long-form waves.  That condition is now an index level
 Season B's agsec5b.dta carries the same slot _2 (s5bq06a_2 / s5bq06b_2 /
 s5bq06c_2, labelled "(2019, condition2)", 1 307 harvest records) and it is
 read too, since GH #848: +1 303 season-B rows (4 slot-2 records share
-(plot, crop, unit, condition) with slot 1; production_obs keeps both).  No kg_factor is wired on either 2019-20 slot; this
-wave's q6d is #849's scope.  See Uganda/_/CONTENTS.org.
+(plot, crop, unit, condition) with slot 1; production_obs keeps both). Each
+slot carries its own survey-reported q6d factor (GH #849), retaining the
+existing builder normalization and downstream screen. See Uganda/_/CONTENTS.org.
 
 Crop module lives under Data/Agric/.  See uganda.CROP_COLMAPS['2019-20'].
 
