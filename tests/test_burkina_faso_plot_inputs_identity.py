@@ -178,8 +178,8 @@ def test_every_real_native_line_and_full_payload_survives(actual_country):
           + raw['menage'].map(lambda x: local_tools.format_id(x, zeropadding=2)))
     expected = pd.DataFrame({
         'i': hh.to_numpy(), '_native_code': raw['s16bq01'].to_numpy(),
-        'u': labelled['s16bq03b'].astype('string').replace(
-            {'Kilogramme': 'Kg'}).to_numpy(),
+        'u': pd.array(labelled['s16bq03b'].astype('string').replace(
+            {'Kilogramme': 'Kg'}), dtype='string'),
         'Quantity': pd.array(raw['s16bq03a'], dtype='Float64'),
         'Purchased': pd.array(raw['s16bq08'].map({1: True, 2: False}), dtype='boolean'),
         'Quantity_purchased': pd.array(raw['s16bq09a'], dtype='Float64'),
@@ -191,8 +191,10 @@ def test_every_real_native_line_and_full_payload_survives(actual_country):
     got = actual.set_index(['i', '_native_code'])[expected.columns].sort_index()
     assert got.index.is_unique
     assert set(got.index) == set(expected.index)
-    # Align index encoding; core canonically uses pandas str, the raw source
-    # uses nullable strings. Measurement dtypes/NA patterns remain exact.
+    # Every string column is the nullable `string` policy the wave script
+    # writes: since #1196 (PR #1212) a parquet read restores the recorded
+    # string policy instead of drifting it to pandas `str`/NaN, so the served
+    # `u` is `string` like the other unit columns.  Dtypes/NA patterns exact.
     pd.testing.assert_frame_equal(got.reindex(expected.index), expected,
                                   check_exact=True, check_dtype=True)
 
