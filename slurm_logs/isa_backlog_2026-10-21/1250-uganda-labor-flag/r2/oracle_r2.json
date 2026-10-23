@@ -1,0 +1,174 @@
+{
+ "served_rows": {
+  "old": 164692,
+  "new": 164777
+ },
+ "added_keys": 85,
+ "wage_only_source_rows": 85,
+ "wage_only_source_rows_on_existing_key": 0,
+ "existing_keys_changed": 0,
+ "wage_only_wage_sum": 6062000.0,
+ "added_wage_sum": 6062000.0,
+ "added_plot_nan": 0,
+ "added_source_counts": {
+  "hired": 85
+ },
+ "wage_only_by_wave_season_class": [
+  {
+   "t": "2009-10",
+   "season": "A",
+   "flag": "missing",
+   "wage": "positive",
+   "plot_nan": false,
+   "rows": 2,
+   "wage_sum": 146000.0,
+   "wage_min": 6000.0,
+   "wage_max": 140000.0
+  },
+  {
+   "t": "2009-10",
+   "season": "A",
+   "flag": "yes",
+   "wage": "positive",
+   "plot_nan": false,
+   "rows": 36,
+   "wage_sum": 2235000.0,
+   "wage_min": 2000.0,
+   "wage_max": 270000.0
+  },
+  {
+   "t": "2009-10",
+   "season": "B",
+   "flag": "missing",
+   "wage": "positive",
+   "plot_nan": false,
+   "rows": 3,
+   "wage_sum": 210000.0,
+   "wage_min": 50000.0,
+   "wage_max": 80000.0
+  },
+  {
+   "t": "2009-10",
+   "season": "B",
+   "flag": "yes",
+   "wage": "positive",
+   "plot_nan": false,
+   "rows": 26,
+   "wage_sum": 1993000.0,
+   "wage_min": 4000.0,
+   "wage_max": 300000.0
+  },
+  {
+   "t": "2010-11",
+   "season": "A",
+   "flag": "yes",
+   "wage": "positive",
+   "plot_nan": false,
+   "rows": 6,
+   "wage_sum": 400000.0,
+   "wage_min": 5000.0,
+   "wage_max": 325000.0
+  },
+  {
+   "t": "2010-11",
+   "season": "A",
+   "flag": "yes",
+   "wage": "zero",
+   "plot_nan": false,
+   "rows": 1,
+   "wage_sum": 0.0,
+   "wage_min": 0.0,
+   "wage_max": 0.0
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "flag": "missing",
+   "wage": "positive",
+   "plot_nan": false,
+   "rows": 2,
+   "wage_sum": 58000.0,
+   "wage_min": 28000.0,
+   "wage_max": 30000.0
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "flag": "yes",
+   "wage": "positive",
+   "plot_nan": false,
+   "rows": 8,
+   "wage_sum": 1020000.0,
+   "wage_min": 3000.0,
+   "wage_max": 500000.0
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "flag": "yes",
+   "wage": "zero",
+   "plot_nan": false,
+   "rows": 1,
+   "wage_sum": 0.0,
+   "wage_min": 0.0,
+   "wage_max": 0.0
+  }
+ ],
+ "wage_only_served_on_development": {
+  "served_as_zero": 7,
+  "never_served": 78,
+  "served_as_zero_by_flag": {
+   "missing": 7
+  },
+  "never_served_by_flag": {
+   "yes": 78
+  }
+ },
+ "wage_only_by_flag": {
+  "yes": 78,
+  "missing": 7
+ },
+ "wage_only_by_wage": {
+  "positive": 83,
+  "zero": 2
+ },
+ "wage_only_by_wave_season": {
+  "2009-10/A": 38,
+  "2009-10/B": 29,
+  "2010-11/A": 7,
+  "2010-11/B": 11
+ },
+ "no_flag_with_wage": {
+  "source_rows": 17,
+  "days_present": 12,
+  "wage_zero": 2,
+  "wage_positive": 15,
+  "wage_sum": 456700.0,
+  "served_old": 17,
+  "served_new": 17,
+  "by_wave_season": {
+   "2009-10/A": 7,
+   "2009-10/B": 6,
+   "2010-11/A": 1,
+   "2010-11/B": 3
+  }
+ },
+ "hired_rows_by_flag_days_wage": {
+  "missing/empty/nan": 3779,
+  "missing/empty/positive": 7,
+  "missing/present/nan": 24,
+  "missing/present/positive": 25,
+  "no/empty/nan": 70003,
+  "no/empty/positive": 5,
+  "no/present/nan": 5,
+  "no/present/positive": 10,
+  "no/present/zero": 2,
+  "other/empty/nan": 5,
+  "yes/empty/nan": 56,
+  "yes/empty/positive": 76,
+  "yes/empty/zero": 2,
+  "yes/present/nan": 97,
+  "yes/present/positive": 21531,
+  "yes/present/zero": 327
+ }
+}

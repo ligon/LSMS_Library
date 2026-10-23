@@ -1,0 +1,82 @@
+#+title: GH #1250 -- Uganda plot_labor: a missing use-flag served as "No"
+
+Aggregates only; no row-level data is committed (the repo is public).  The
+two cold-built frames (row-level) stayed in a session scratchpad.
+
+* Setup
+- base :: detached worktree at development =9a0ed5f3c=
+- branch :: =fix/1250-uganda-labor-flag-20261023=
+- Each side used its own fresh =LSMS_DATA_DIR= (only =dvc-cache= symlinked), its own
+  =PYTHONPATH=, and an import-identity assert.  =OPENBLAS_NUM_THREADS=1
+  OMP_NUM_THREADS=1 LSMS_BUILD_WORKERS=1=, =nice -n 19=.  Afterwards
+  =find lsms_library/countries -name '*.parquet'= returns 0 in both worktrees.
+
+* Files
+- =build_plot_labor.py= :: cold =Country('Uganda').plot_labor()=; writes the frame
+  (scratch only) and =build_{base,branch}.json= (shape, Site I report, warnings).
+- =oracle.py= / =oracle.json= :: raw-source oracle.  Reads AGSEC3A/3B through
+  =get_dataframe= and classifies every row by its RAW float flag (No / missing /
+  other) x day cells (empty / present) x NaN =plot_id=.  It emulates the old and
+  new gate, then the builder's NaN drop and =groupby(dropna=False).max()=.  Key
+  construction mirrors =plot_labor_for_wave=; the flag logic is independent of
+  =_to_int_code= / =_labor_persondays=.  Its "old" served count is 169,877, equal
+  to development's API frame; "new" is 164,692, equal to the branch's.  All 13
+  (wave, season) cells agree with the branch build on rows, zeros, positives,
+  total and NaN-=plot_id= rows.
+- =compare.py= / =compare.json= :: base vs branch on =(t, i, plot_id, source,
+  season)= (=v= compared separately: 0 differences on common keys).  Covers
+  per-wave/season cells, the removed-row split, value changes, Site I, and the
+  three =total_*_labor_days= transforms.
+- =hash-impact.json= :: =hash_census.py= (from
+  =1218-current-validation/=) run on both checkouts.  28/28 Uganda
+  L2-country hashes and 224/224 Uganda L2-wave hashes moved; no other country's
+  hash moved; 0/40 =build_transforms_fingerprint=.
+- =sibling_probe.py= / =sibling_probe.json= :: the dtype each sibling
+  =.where(gate != code, 0)= instance actually sees.
+
+* Headline (all measured)
+| quantity                                  | development | fix       |
+|-------------------------------------------+-------------+-----------|
+| rows                                      | 169,877     | 164,692   |
+| removed: NaN =plot_id= / valid plot       |             | 3,561 / 1,624 |
+| removed rows that were =PersonDays = 0=   |             | 5,185 of 5,185 |
+| rows added                                |             | 0         |
+| positive values changed                   |             | 0         |
+| 0 -> reported positive                    |             | 97 (+2,745 days; 1 plot-less) |
+| =PersonDays= total                        | 3,052,057   | 3,054,802 |
+| served zeros                              | 78,823      | 73,541    |
+| removed rows that carried a =Wage=        |             | 7 (6,000-140,000 UGX; 414,000) |
+| Site I NaN =plot_id=                      | 3,656       | 95 (2009-10 85, 2011-12 5, 2013-14 5) |
+| Site I NaN =v=                            | 1,235       | 1,218     |
+| plot-less positive keys                   |             | 50 (2009-10 45, 2011-12 1, 2013-14 4) |
+| 2009-10 plot-less positive rows -> keys   | 69 -> 44    | 70 -> 45  |
+
+See =Uganda/_/CONTENTS.org= "=plot_labor=: a missing use-flag is not 'No'"
+and =.coder/ledger/1250-uganda-labor-flag.md=.
+
+* Tests
+- =tests/test_uganda_plot_labor_flag.py= (new, 6 tests): *6 failed* on
+  development (with the file copied in temporarily), *6 passed* on the branch.
+  The two data-gated tests re-derive every served zero from the raw files.
+  Development serves 4,504 unjustified zeros in 2009-10 (4,459 removed + 45 that
+  become positive) and 569 in 2010-11 (526 + 43), which reconciles exactly with
+  the oracle.
+- Uganda + plot_labor selection (=tests/test_uganda_*.py=,
+  =tests/test_gh*_uganda_*.py=, =test_id_format_id_canonical.py=,
+  =test_feature_canonical_index.py=, =test_feature_audit_participation.py=;
+  =-n 3 --dist=loadfile=, fresh data dir per side):
+  - development: 403 passed, 81 skipped
+  - branch: 407 passed, 83 skipped (+6 new tests).  The two extra skips are
+    =test_uganda_tables.py= =household_characteristics= "prerequisites not
+    cached", a cache-order artefact.  Re-run alone on the branch, they pass
+    (8 passed with the new tests).  No failures on either side.
+
+* Sibling =.where(gate != code, 0)= instances (=sibling_probe.json=; not changed)
+Niger =2011-12/_/plot_labor.py:51= and =2014-15/_/plot_labor.py:46=, Tanzania
+=tanzania.py:1199= / =:1727-1728=, Ethiopia =ethiopia.py:2680-2681=: each gate
+is a bare =pd.to_numeric= of a numpy =float64= column, so =gate != code= is a
+plain =bool= (0 NA in every probe) and a missing gate keeps its value.  These
+are LATENT, not live: they fabricate only if someone routes the gate through a
+nullable cast, as Uganda's =_to_int_code= does.  Ethiopia =ethiopia.py:2608=
+compares a nullable =Float64= =n=, but the zeroed =d= is multiplied by that same
+=n=, so the result is NA, not 0.

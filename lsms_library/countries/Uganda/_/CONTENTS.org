@@ -4040,3 +4040,135 @@ Populated output is not reordered.
 This empty-construction rule does not promise that every country's native
 writer uses declaration order or emits every optional column.
 The separate country-local optional-dict dtype gap is not repaired here.
+
+* =plot_labor=: a missing use-flag is not "No" (GH #1250, 2026-10-23)
+
+=uganda._labor_persondays= zeroes a source's person-days where the survey's
+use-flag says "No", mirroring the World Bank's =replace hired_man_days = 0 if
+A3aq41==2= (=UGA_UNPS1.do:484=; the same rule in every =UGA_UNPS*.do= that
+reads a hired block).  In
+Stata a missing flag is not === 2=, so the row keeps its reported days, and a
+row with no reported days stays missing.  The library cast the flag through
+=_to_int_code= (nullable =Int64=), so =flag != code= was =<NA>= for a missing
+flag.  =Series.where= reads =<NA>= as False, so *every missing-flag row was
+served =PersonDays = 0=*.  That included empty stub rows and rows whose day
+cells WERE reported.  The zero is now applied only where the flag positively
+equals the code: =out.mask((flag == code).fillna(False), 0.0)=.
+
+Survey facts this leans on, measured on the raw AGSEC3A/3B:
+
+- *The 2009-10 / 2010-11 family gate =a3aq38= / =a3bq38= is a WORKER COUNT*
+  (0 to 94), not a yes/no, which is why its "No" code is 0.  The hired gates
+  (=q41= in 2009-10 / 2010-11, =q34= after) are 1 Yes / 2 No.  2009-10 hired
+  also carries two off-scheme 0s per season and one 3 (=a3bq41=).  They are
+  not "No", so their reported days are served as before.
+- *Missing flags are concentrated in 2009-10*: 1,365 / 1,452 (A family / hired)
+  and 1,836 / 1,879 (B) rows, against 0 to 170 per cell in later waves.  Most
+  are stub rows whose =a3aq1= / =a3aq3= (parcel / plot) are also blank, so the
+  =hhid-parcel-plot= key is NaN: 1,098 of 9,898 rows (A) and 1,759 of 9,789
+  (B).  No later wave has more than 5.
+- 2018-19 has no family cells and no season-B labour block, and 2019-20's family
+  roster (=AGSEC3A_1=) is not in-repo.  So only =hired= carries a gate there,
+  and the fix touches only =hired= rows in those waves.
+
+*Measured, cold, private =LSMS_DATA_DIR= per side, development =9a0ed5f3c= vs
+the fix* (=Country('Uganda').plot_labor()=):
+
+| quantity                                     | before    | after     |
+|----------------------------------------------+-----------+-----------|
+| rows                                         | 169,877   | 164,692   |
+| rows removed, NaN =plot_id= / valid plot     | --        | 3,561 / 1,624 |
+| served zeros                                 | 78,823    | 73,541    |
+| rows 0 -> reported positive days             | --        | 97 (+2,745 days) |
+| positive values changed                      | --        | 0         |
+| =PersonDays= total                           | 3,052,057 | 3,054,802 |
+| Site I NaN =plot_id= (2009-10 / 11-12 / 13-14) | 3,646 / 5 / 5 | 85 / 5 / 5 |
+| Site I NaN =v=                               | 1,235     | 1,218     |
+
+Valid-plot removals by wave: 2009-10 898, 2010-11 526, 2011-12 18, 2013-14 14,
+2015-16 2, 2018-19 22, 2019-20 144.  Every removed row was a zero.  The total
+RISES because 97 rows have a missing flag and reported days that development
+served as 0.  By wave: 2009-10 45 (one on a plot-less row, 28 days), 2010-11
+43, 2019-20 B 9.  Those rows are served as reported, which is what the Stata
+rule does.  Every surviving zero has a "No" flag or reported zero days behind
+it: =tests/test_uganda_plot_labor_flag.py= re-derives this from the raw files
+for 2009-10 and 2010-11.  An independent raw-source oracle reproduces both
+frames' row, zero, positive, total and NaN-key counts in every (wave, season)
+cell.
+
+*Wage-only hired rows are served (ruling @ligon, 2026-10-23).*  A hired row
+with a reported =Wage= and no day cells is served on its wage, with
+=PersonDays= NaN (not 0).  This follows Malawi's =_plot_labor_block=
+(=Malawi/_/malawi.py:3766-3767=: =... | (source == 'hired') & Wage.notna()=).
+The fix commit above had dropped 7 such rows (missing flag; development served
+them with a fabricated =PersonDays = 0=).  The raw oracle shows the class is
+larger: *85 rows*, all of them in 2009-10 and 2010-11, and 78 of them carry a
+"Yes" flag.  Neither development nor the first #1250 commit ever served those
+78, because their day sum is NaN and a "Yes" is not "No".  Measured, cold,
+=90fc1e18d= vs the follow-up:
+
+| wave, season | flag "Yes" | flag missing | of which wage 0 | rows added |
+|--------------+------------+--------------+-----------------+------------|
+| 2009-10 A    |         36 |            2 |               0 |         38 |
+| 2009-10 B    |         26 |            3 |               0 |         29 |
+| 2010-11 A    |          7 |            0 |               1 |          7 |
+| 2010-11 B    |          9 |            2 |               1 |         11 |
+| total        |         78 |            7 |               2 |         85 |
+
+- 164,692 -> 164,777 rows: 85 added, 0 removed, and 0 changes to =PersonDays=,
+  =Wage= or =v= on the 164,692 common keys.  Wages total 6,062,000 UGX; the 7
+  missing-flag rows are the 414,000 above.  No added row lacks a plot (so GH
+  #1120 D3 is not touched), none folds into an existing key, and every one
+  gets a =v=.  Site I is unchanged (NaN =plot_id= 95, NaN =v= 1,218), and
+  Sites B and Q report nothing on either side.
+- No other flag class has a wage-only row: the off-scheme 2009-10 codes (0, 3)
+  never carry a wage without days.  Later waves have none.
+- *Two zero wages are served* (2010-11 A 1, B 1, both "Yes").  Malawi's test is
+  =Wage.notna()=, so a reported 0 counts as a reported wage.
+- *A "No" flag with a wage was already served, and still is.*  The gate zeroes
+  the days, and the row is served with =PersonDays = 0= and its wage.  That is
+  17 raw rows (2009-10 13, 2010-11 4; 456,700 UGX), 12 of them with day cells
+  that the "No" zeroes.  Malawi has no flag and keeps any hired row with a
+  wage, so this agrees with its rule.
+- *Malawi's other half is NOT adopted.*  Malawi also drops =PersonDays == 0=
+  rows of every source.  Uganda keeps them, because a "No" flag's zero is a
+  reported value (73,541 served zeros).  Family and other rows therefore keep
+  the days-only rule, and they have no wage to be served on.
+
+Downstream: =total_*_labor_days= drop NaN days before summing, so all three are
+byte-identical (16,442 / 11,700 / 16,438 household rows; 3,054,802 days).  A
+median-wage valuation of hired days (=median_price_valuation=,
+=value_col='Wage'=, =kg_qty=PersonDays=, ladder =v= -> national by wave) keeps
+the same 21,513 rows in the price pool and the same price and value on every
+common row.  The 85 new rows receive a ladder price but a NaN value, because
+NaN days times a price is NaN.  A consumer that wants each wage itself now has
+it.
+
+*Residual NaN =plot_id= (GH #1120 D3, unchanged).*  95 rows are still served
+with a NaN =plot_id=, 50 of them with positive days: 2009-10 85 (45 positive),
+2011-12 5 (1), 2013-14 5 (4).  The final =groupby(..., dropna=False).max()=
+puts every plot-less row of a household-season-source on one NaN key.  So it
+folds DISTINCT source rows, not just duplicates: 2009-10 70 positive plot-less
+source rows -> 45 keys (69 -> 44 before the fix), 2011-12 2 -> 1, 2013-14
+4 -> 4.  Two valid-plot keys (4 positive rows) also go through that max.
+Keeping the rows apart needs a =plot_id= sentinel or a row ordinal, which is
+D3's decision, so it is reported and left alone.  This is also why Site I's
+NaN-=plot_id= count is much larger here than on the other Uganda plot tables.
+=crop_production= and =plot_inputs= collapse with =dropna=True=, and only when
+their index is non-unique, so they DELETE most NaN-key rows rather than serve
+them.
+
+*Downstream* (=transformations.total_*_labor_days=, which drop NaN and sum): the
+day totals rise by the same 2,745 (family +1,787, hired +958).  Household rows
+fall 16,481 -> 16,442 (all sources), 11,714 -> 11,700 (family) and 16,480 ->
+16,438 (hired), because households whose only rows were fabricated zeros leave
+the table.
+
+*Cost*: =uganda.py= is in every Uganda table's hash.  The census moved 28/28
+Uganda L2-country and 224/224 Uganda L2-wave hashes, no other country's, and
+0/40 =build_transforms_fingerprint=, so this is a Uganda-only re-warm.  The
+wage-only follow-up moves the same set again: =uganda.py= and
+=data_scheme.yml= give 28/28 and 224/224, against both development and
+=90fc1e18d=, and 0/40.  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/1250-uganda-labor-flag/= (follow-up:
+=r2/=); ledger =.coder/ledger/1250-uganda-labor-flag.md=.

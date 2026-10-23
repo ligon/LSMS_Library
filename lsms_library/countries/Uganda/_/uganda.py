@@ -3052,6 +3052,7 @@ ANTHRO_FILES = {
 # total_labor_days / total_family_labor_days / total_hired_labor_days and the
 # median-wage hired_labor_value.  We keep the PRE-collapse REPORTED rows:
 #   PersonDays  -- reported person-days of that source on the plot-season
+#                  (NaN on a wage-only HIRED row: wage reported, no days)
 #   Wage        -- reported cash paid to HIRED labor (NaN for family/other)
 # The WB sums and median-wage valuation are TRANSFORMATIONS, never stored here
 # (total_labor_days = groupby(['t','i']).PersonDays.sum(); hired_labor_value =
@@ -3184,6 +3185,15 @@ def _labor_persondays(df, cols, flag_col=None, flag_zero_code=None):
     ``flag_zero_code`` (the survey "did you use this source? No" branch), again
     mirroring the WB ``replace ... = 0 if flag==code`` logic.
 
+    A MISSING flag is not "No" (GH #1250).  Stata's ``flag==code`` is false
+    for a missing flag, so ``replace`` leaves that row alone: its reported cells
+    are served as reported, and a row whose cells are all missing stays NaN
+    (and is not served).  ``_to_int_code`` returns nullable ``Int64``, so
+    ``flag != code`` is ``<NA>`` there, and ``Series.where`` reads ``<NA>`` as
+    False -- which used to zero every missing-flag row, empty stubs and
+    reported days alike.  The zero is therefore applied only where the flag
+    POSITIVELY equals the code.
+
     The sum is over the survey's own disaggregated cells of a SINGLE labor
     question (man/woman/child day cells, or per-family-worker day cells); it is
     the reported person-day quantity that question measures, NOT a cross-row /
@@ -3196,7 +3206,8 @@ def _labor_persondays(df, cols, flag_col=None, flag_zero_code=None):
     out = block.sum(axis=1, min_count=1)
     if flag_col is not None and flag_col in df.columns and flag_zero_code is not None:
         flag = _to_int_code(df[flag_col])
-        out = out.where(flag != flag_zero_code, 0.0)
+        said_no = (flag == flag_zero_code).fillna(False).astype(bool)
+        out = out.mask(said_no.to_numpy(), 0.0)
     return out
 
 
@@ -3219,7 +3230,13 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
     pd.DataFrame indexed by ``(t, i, plot, source, season)`` with REPORTED
     columns ``PersonDays`` (Float64) and ``Wage`` (Float64, hired rows only;
     NaN for family/other).  One row per (plot, source, season) with a non-NaN
-    reported PersonDays value.
+    reported PersonDays value, and also one per HIRED (plot, season) whose
+    PersonDays is NaN but whose ``Wage`` was reported (zero included).  Such a
+    wage-only row is served with ``PersonDays`` NaN, not 0 (@ligon, 2026-10-23,
+    GH #1250 follow-up), following Malawi's ``_plot_labor_block``
+    (``Malawi/_/malawi.py:3766-3767``), which keeps a hired row on its wage
+    alone.  Malawi's rule also drops ``PersonDays == 0`` rows; that half is
+    NOT adopted here, because a "No" flag's zero is a reported value.
     """
     pieces = []
     for season, df3 in (('A', df3a), ('B', df3b)):
@@ -3263,10 +3280,17 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
                 'Wage': (wage.values if source == 'hired'
                          else np.full(len(df3), np.nan)),
             })
-            # Keep only rows with a reported person-day value (drop the
+            # Keep rows with a reported person-day value (drop the
             # question-not-asked NaNs); a plot with 0 reported days for a
             # source that WAS asked is a genuine reported zero and stays.
-            piece = piece[piece['PersonDays'].notna()]
+            # A HIRED row is also kept on a reported Wage alone, with
+            # PersonDays left NaN (@ligon 2026-10-23; Malawi's rule,
+            # malawi.py:3766-3767).  A "No" flag's row already carries
+            # PersonDays 0, so it is served with its wage either way.
+            keep = piece['PersonDays'].notna()
+            if source == 'hired':
+                keep = keep | piece['Wage'].notna()
+            piece = piece[keep]
             if len(piece):
                 pieces.append(piece)
 
@@ -3282,6 +3306,11 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
     # Collapse exact-duplicate (plot, source, season) keys that can arise when
     # a wave repeats a plot row; keep the max reported days / wage so the index
     # is unique without summing distinct reported observations.
+    # NOT only exact duplicates (GH #1250, measured): with dropna=False every
+    # plot-less row of a household-season-source shares one NaN key, so the max
+    # also folds DISTINCT plot-less source rows (2009-10: 70 positive rows ->
+    # 45 keys).  Keeping them apart needs a plot_id sentinel or a row ordinal,
+    # which is GH #1120 decision D3; left as is until that is decided.
     out = (out.groupby(['t', 'i', 'plot_id', 'source', 'season'], dropna=False)
               .agg({'PersonDays': 'max', 'Wage': 'max'}))
     return out
