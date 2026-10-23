@@ -119,3 +119,75 @@ definition.  No canonical rendering decision is requested before the evidence.
 - No production symbol, test, source mapping, or sampling declaration changed.
 - Ledger/source map: OK (anchored on §2-§4).  Dynamic claims, canonical mapping,
   actual cache cost, and source-key evidence remain unmeasured and held.
+
+---
+### Phase 1 - measurement (2026-10-22, base `9a0ed5f3c`, private data root)
+
+Raw keys via `get_dataframe` (+ `StataReader` labels via `get_data_file`):
+
+| wave | GSEC1 `comm` | community file key(s) |
+|---|---|---|
+| 2005-06 | int32 8-digit, 322 EAs, "EA Code in 2005/06" | `csec1.comm` 7-char, 320, "2005/06 District Definitions (7 Digits)"; 0 literal overlap with GSEC1 |
+| 2009-10 | 7-char, 317 EAs + 565 blank, "Current EA Code as in 2005/06 Data (7 Digits)" | `CSECTION1.comm` (05/06 defs) 315/317 overlap; `comcod` (2009/10 defs) 266 |
+| 2010-11 | 7-char, 324 EAs, "Current EA Code as in 2005/06 Data" | `CSECTION1.comm` (05/06 defs) 273/324; `comcod` (2010/2011 defs) **321/324** |
+| 2011-12 | int32 8-digit, 321 EAs | `CSEC1.comm` 8-digit 308/321; `comcod` 7-char "current" 0 |
+
+No Uganda table reads any community file (`rg` over Uganda yml/py/Makefile).
+
+- Three code families: 8-digit frame EA; 7-char 2005/06-definitions form =
+  8-digit with its 4th digit dropped (all 317 2005-06 -> 2009-10 household
+  pairs; every community `comm`; 0 collisions over 323 known 8-digit codes);
+  7-char current-definitions form (2010-11 GSEC1, `comcod`).
+- Household linkage = HHID identity in 2005-06 .. 2011-12 (`Waves` entries
+  are `()`, `updated_ids.json` has no early-wave keys).
+- 2010-11 -> 2011-12: 322 pairs, 272 insert-at-index-3, 50 district recode,
+  region digit and serial preserved in all 322 -- the issue's numbers
+  reproduce exactly.  The 2 "non-bijective" pairs are 8-digit EAs receiving
+  two 7-codes: 10730027 <- 1070027 (1 hh) + 1150027 (8 hh); 30630002 <-
+  3060002 (1 hh) + 3180002 (7 hh).  CSECTION1 (2009-10 and 2010-11) pairs
+  comm 1070027 / comcod 1150027 and comm 3060002 / comcod 3180002 on one
+  row; CSEC1 2011-12 pairs comcod 1150027 / comm 10730027 and comcod 3180002
+  / comm 30630002.  One EA under two district definitions; 7 -> 8 remains a
+  function.  Region: Central (10730027), Northern/KAABONG (30630002).
+- 2009-10 real codes: 269 of 317 in the 2010-11 7-domain; the 48 missing are
+  derived from 2005-06 -> 2009-10 (and 2009-10 -> 2011-12) linkage.  Union
+  over four boundaries: 370 pairs, no 7-code with two 8-codes, every row
+  corroborated by >= 1 community file.  Uncovered: 2010-11 `1530040` (1 hh).
+- Canonical form: 8-digit confirmed (GSEC1 2005-06/2011-12, CSEC1 2011-12;
+  changes 2 waves not 3).  Evidence against, reported: 3 of 4 community
+  files key on the 7-char 2005/06 form; drop-4th-digit recovers that key.
+- `mappings:` probe: the flat `[tbl, key, value]` form on Uganda `v` becomes
+  `(uganda.v, dict)`, and `grabber`'s tuple branch applies only the first
+  element, row-wise, so the build raises `ValueError`; an all-digit org key
+  column parses to int64, so even a nested form would silently miss str
+  `comm`.  Framework not edited; the string form `mappings: <function>`
+  (Burkina_Faso/2014/_/data_info.yml:239, mapping.py:41) is used instead.
+
+### Phase 2 - implementation (commit `113d53392`)
+
+- `Uganda/_/categorical_mapping.org`: `#+key: comm7` / `#+name:
+  comm_frame_ea` (370 rows; Form, four per-boundary household counts,
+  community-file corroboration, Notes), evidence in the header comment.
+  `#+key:` precedent: `Niger/_/categorical_mapping.org:90`.
+- `Uganda/_/uganda.py`: `comm_frame_ea(value)` (format_id, lookup, else
+  as-is) + `_comm_frame_ea_map()` read via `get_categorical_mapping` from
+  `Path(__file__)` (precedent `harmonized_unit_labels`).
+- 2009-10 `sample`/`cluster_features` myvar and 2010-11 `sample` myvar /
+  `cluster_features` idxvar: `v: [comm, {mappings: comm_frame_ea}]`.
+- `sampling.yml` 2011-12 `wave-scoped` -> `stable`; 2009-10 and 2010-11 notes
+  re-measured (`mixed` kept).  CONTENTS.org item 1 rewritten; hybrid-`v`
+  claim corrected ("exactly" was 315/317).
+
+### Phase 3 - verification
+
+- Continuity (linked households keeping `v`): 2005-06->2009-10 0/2607 ->
+  2410/2607; 2009-10->2010-11 1819/2647 -> 2207/2647; 2010-11->2011-12
+  0/2510 -> 2510/2510.  Every remaining non-keeper is a 2009-10 bin or NA.
+- Distinct served `v`: 2009-10 656 -> 656 (541 bin rows / 339 bins / 24 NA
+  unchanged), 2010-11 324 -> 322; cluster_features 4805 -> 4803 (2010-11
+  320 -> 318); every other cluster row identical after relabel.
+- `sample(waves=['2010-11','2011-12'])` ClusterIdentityWarning 1 -> 0.
+- household_roster `v` == sample `v` for all early-wave households.
+- Hash census: Uganda only -- 28/28 L2-country, 224/224 L2-wave, 0/40 btf.
+- `tests/fixtures/uganda_baseline.json` `var/sample` and
+  `var/cluster_features` entries move (out of scope here; values reported).
