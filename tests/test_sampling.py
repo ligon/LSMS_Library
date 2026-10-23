@@ -724,6 +724,8 @@ class TestShippedDeclarations:
         ("Uganda", "2011-12", "wave-scoped"),        # two renderings of `comm`
         ("Uganda", "2013-14", "redefined"),          # EA -> parish
         ("Nigeria", "2012Q3", "stable"),             # movers are singletons
+        ("Burkina_Faso", "2018-19", "redefined"),    # EMC zd / EHCVM grappe serials
+        ("Burkina_Faso", "2021-22", "stable"),       # grappe == grappe_EHCVM1
     ])
     def test_the_measured_boundaries(self, country, wave, value):
         assert sampling_records(country)[wave].cluster_id_continuity == value
@@ -748,6 +750,20 @@ class TestShippedDeclarations:
         note = " ".join(r["panel"]["cluster_id_note"].split())
         assert "two renderings" in note and "not a redraw" in note
         assert "rendering issue" in note and "becomes `stable`" in note
+
+    def test_overlapping_serials_without_linkage_are_not_unobservable(self):
+        """Burkina Faso 2014 -> 2018-19 (GH #1243): two independent draws, no
+        household linkage, but BOTH number their clusters from 1, so the same
+        `v` names an unrelated cluster (Region differs for 517 of 585 shared).
+        `unobservable` is silent because grouping across DISJOINT keyspaces is
+        correct (GhanaLSS 1991-92); here the keyspaces overlap, so it must
+        warn.  The note also records that the 583 shared `i` are an id
+        collision, so nobody re-measures this boundary as `stable`."""
+        r = sampling_records("Burkina_Faso")["2018-19"]
+        assert r.household_continuity == "independent"
+        assert r.cluster_id_continuity in S.INCOMPARABLE_CLUSTER_IDS
+        note = " ".join(r["panel"]["cluster_id_note"].split())
+        assert "keyspaces OVERLAP" in note and "id collision" in note
 
 
 @pytest.mark.requires_s3
@@ -803,6 +819,20 @@ class TestTheReproduction:
         wide = idx.pivot_table(index="i", columns="t", values="v",
                                aggfunc="first").dropna()
         assert (wide["2010-11"] == wide["2011-12"]).sum() == 0   # still served
+
+    def test_burkina_warns_across_the_emc_ehcvm_boundary_only(self):
+        """GH #1243: 2014 (EMC `zd`) and 2018-19 (EHCVM `grappe`) reuse the
+        integers 1-585 for unrelated clusters; the EHCVM panel keeps its
+        `grappe`.  One warning for the first pair, none for the second."""
+        S._clear_sampling_reports()
+        _, caught = warns(lambda: self._fresh("Burkina_Faso").sample(
+            waves=["2014", "2018-19"]))
+        assert len(caught) == 1, [str(w.message)[:200] for w in caught]
+        assert ("2014 -> 2018-19: cluster_id_continuity=redefined"
+                in str(caught[0].message))
+        _, caught = warns(lambda: self._fresh("Burkina_Faso").sample(
+            waves=["2018-19", "2021-22"]))
+        assert caught == [], [str(w.message)[:200] for w in caught]
 
     def test_strict_mode_refuses_the_reproduction(self, monkeypatch):
         monkeypatch.setenv("LSMS_CLUSTER_STRICT", "1")

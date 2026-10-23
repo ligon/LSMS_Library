@@ -1,0 +1,82 @@
+# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+#
+# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
+# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
+# wave of `Country('Burkina_Faso').waves`?  The design fields are #793's
+# curation and are not written yet; their absence here is "not curated", not
+# "not found".
+#
+# Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
+# {wave-scoped, redefined, mixed} makes a `Country('Burkina_Faso')` frame that
+# carries `v` across that boundary warn (`ClusterIdentityWarning`); nothing is
+# ever dropped or rewritten.  The first wave (2014) has no preceding wave and
+# so no entry.  Vocabulary and field names: see sampling.py.
+#
+# The idiosyncrasy (GH #1243): `v` is a SAMPLE SERIAL in every wave, not a
+# frame code.  2014 (EMC) numbers its 900 ZD 1-900 (`zd`, called `grappe` in
+# emc2014_welfare.dta); EHCVM-1 numbers its own 585 ZD 1-585 (`grappe`).  Two
+# independent draws whose id spaces OVERLAP -- unlike GhanaLSS 1991-92, whose
+# disjoint 3xxx keyspace is what makes grouping across an unlinked boundary
+# correct there.  EHCVM-2 (2021-22) is a sub-sample of EHCVM-1's households,
+# tracked within their EA, and keeps EHCVM-1's `grappe`.
+#
+# Do NOT measure the 2014 boundary by shared `i`: both waves build `i` from
+# the cluster serial, so 583 ids coincide and all 583 "keep" `v` -- an id
+# collision, not 583 households (see the 2018-19 note and CONTENTS.org).
+
+Sampling:
+
+  '2018-19':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: redefined
+      cluster_id_note: |-
+        `v` is a sample serial in both waves (EMC 2014 `zd` 1-900, EHCVM-1
+        `grappe` 1-585), so on the 585 shared integers the same id names an
+        unrelated cluster: Region differs for 517, District for 540, Rural for
+        282.  Two separate surveys, two separate PPS draws of ZD: EMC 900 ZD
+        (Report.pdf p. 20), EHCVM-1 585 ZD (rapport general p. 17).  No
+        household links across this boundary: the 2018-19 cover
+        (s00_me_bfa2018.dta, 18 columns) carries no pointer to 2014, and
+        panel_ids.py records no EMC -> EHCVM linkage.  The 583 `i` the two
+        waves share all "keep" `v` only because both build `i` from the
+        cluster serial (2014 zd + menage.zfill(3); 2018-19 grappe + '0' +
+        menage.zfill(2)): an id collision, not a household -- the clusters'
+        Region agrees for 80 of those 583.  `redefined`, not `unobservable`:
+        the keyspaces OVERLAP, so a cross-wave groupby('v') merges 585 pairs
+        of unrelated clusters, which is the hazard the warning exists for.
+        The unit KIND is the same (a ZD); what changes is the sample list the
+        serial indexes.  `redefined` is the closest warning-bearing value in
+        the frozen vocabulary (its gloss, "a different KIND of unit", fits
+        loosely); `wave-scoped` would claim a crosswalk is meaningful, and
+        none is (GH #1243).  District is compared case- and accent-folded,
+        Koulpelgo = Koulpelogo (GH #1059 not landed); unfolded it differs for
+        all 585.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'measured 2026-10-23 through Country("Burkina_Faso").sample() and .cluster_features() on a cold build at development 9a0ed5f3c; draws quoted in CONTENTS.org, "2014 -- ... Sample design" and "2018-19 -- ... Sample-size figures"; no linkage: Burkina_Faso/_/panel_ids.py docstring'
+
+  '2021-22':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        `grappe` both waves, and EHCVM-2 tracked households within their EA
+        of origin (bid_bfa_ehcvm2.pdf, page 4).  Measured on the raw cover:
+        grappe == grappe_EHCVM1 for 3,227 of 3,227 panel households, in 550
+        grappes, all among 2018-19's 585.  Region agrees 550/550.  District
+        names a different province on 3 grappes (Seno/Yagha, Poni/Noumbiel,
+        Kompienga/Gourma; GH #1059) and Rural differs on 7: attribute
+        recodes on a grappe the households were tracked within, not a
+        renumbering.  Through the API only 2,053 `i` are shared, and 2,050 of
+        them keep `v`: panel_ids.py builds the 2018-19 id as grappe +
+        menage.zfill(3) while sample() builds grappe + '0' +
+        menage.zfill(2), which agree only for a 2-digit menage, so 1,105 of
+        3,227 links are lost and 3 point at a different 2018-19 household
+        (those are the 3 "changes").  A linkage defect, not a cluster fact
+        (see CONTENTS.org); the raw count is the measurement.
+      source_type: derived-from-data
+      confidence: high
+      source_file: 'lsms_library/countries/Burkina_Faso/2021-22/Data/s00_me_bfa2021.dta'
+      locator: 'grappe vs grappe_EHCVM1 in that file, read via get_dataframe 2026-10-23; design: bid_bfa_ehcvm2.pdf p. 4 (quoted in CONTENTS.org, "THE THING TO KNOW"); re-measured through Country("Burkina_Faso").sample() and .cluster_features() at development 9a0ed5f3c'
