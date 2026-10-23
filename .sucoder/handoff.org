@@ -47,6 +47,13 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
 4e. Integration now =7912ea596=: + the #1251 pin, + #1279 (#1260 Malawi panel GPS, red-teamed, 3 rounds), + the docs-tidy branch =docs/batch-tidy-20261023= (=4a5448d89=, Malawi-only hash).  Round 2: Malawi shard =40410294= + full suite =40410295=.
 4f. Round 2 GREEN: 10,460 passed, 1 failed (the pre-existing =test_shipped_quintal...=).
 4g. MERGING (authorized): merged #1236 #1246 #1248 #1262 #1266 #1271 #1233 #1251 #1273 #1227.  #1241 conflicted on Niger CONTENTS.org; resolved theirs-first (identical to integration), pushed =11f21fb9a=, waiting on CI (the repository ruleset requires checks).
+4h. BATCH COMPLETE 2026-10-23 ~15:00 PDT: all 30 PRs plus docs-tidy #1280 merged into development (=57d255585=).  The tree is IDENTICAL to the validated integration tree =7912ea596=.  Mirror development fast-forwarded.  The staging cache was PROMOTED into the shared cache (=/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library=, 1,563 files; log =/local/job40390255/data-private/promotion_20261023.log=); warm spot checks serve with no rebuilds.  21 fixed issues closed by hand; partial-progress comments on #637, #824, #1084, #1123, #1247.
+4i. NEXT BATCH (a corpus re-warm again, because #1245 moves every hash):
+    - #1245 single-pass =id_walk= (reviewed, round 2 done);
+    - Malawi 2013-14 stayer GPS (=fix/malawi-2013-14-panel-stayer-geo-20261023=, needs red-team);
+    - Mali tree sales as recorded with a window key (ruled, in progress);
+    - Burkina #1276 investigation running (no acquisition yet).
+    Filed #1281 (a single-file YAML KeyError silently drops a wave, cached as current).
 5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
 
 ** Merge plan: ONE corpus re-warm
