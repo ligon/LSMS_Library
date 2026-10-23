@@ -502,8 +502,13 @@ derivation is registered.
 (=NullIndexKeyWarning= gone from =plot_labor=, =plot_inputs=,
 =plot_features=, =crop_production= and =interview_date= -- the last one is the
 W5 post-harvest household noted under "interview_date", which IS in the
-agriculture cover).  *Site I (=LSMS_READ_STRICT=) now reports nothing for
-any Ethiopia table.*  Every other cell of every table is unchanged, except
+agriculture cover).  *Site I now reports nothing for any Ethiopia table: the
+plot tables are clean on =v=.*  That is not the same as =LSMS_READ_STRICT=1=
+passing: the lever also drives Site B, which still reports two documented,
+pre-existing cells, identical on development -- =plot_features.SoilType= in
+2011-12 (W1 asks no soil question; "W1 missing soil") and =shocks.Occurrence=
+in 2018-19 / 2021-22 (the question was dropped; GH #875).  Every other cell
+of every table is unchanged, except
 the within-wave mean-1 weight normalisation, which moves every W2-W5 weight
 by at most 0.12% / 0.07% / 0.74% / 0.12% (W1 unchanged).
 
@@ -607,6 +612,11 @@ Measured cold on =development=:
 | 2015-16 | 4954 |  1682 |       34.0% |  3272 |
 | 2018-19 | 6770 |  3655 |       54.0% |  3115 |
 | 2021-22 | 4959 |  2674 |       53.9% |  2285 |
+
+(Household-cover counts.  Since GH #1120 D1 =sample()= also carries the
+agriculture-only households -- 25 / 27 / 124 / 40 more in W2-W5, of them
+Rural 19 / 22 / 124 / 40 and Urban 6 / 5 / 0 / 0 -- so =sample().Rural= on
+the current build is the table above plus those.)
 
 *This is not urbanisation, and it is not a reweighting.*  Note the *Rural*
 column: 3466 -> 3115 across a decade, essentially flat, while Urban grows
@@ -1871,6 +1881,19 @@ below).*  The two bottom rows are now:
 |------------------+--------------------------+--------------------------+--------------------------|
 | attached, then dropped | 0                  | 90 / 0 / 0               | 0                        |
 | attached and served | 563 / 160 / 61,284    | 4,683 / 1,412 / 967,615  | 4,559 / 1,290 / 1,070,306 |
+
+*UPDATED again 2026-10-23 (W1 tree-crop ruling, PR #1257)*: W1's lines with
+no §9 row that sit on a unique §4 field now become rows of their own (see "W1
+tree / fruit / root crops served as rows" below) and are then attached like
+any one-plot line, so for W1:
+
+| class            | 2011-12                  |
+|------------------+--------------------------|
+| no §9 row        | 2,697 / 851 / 1,340,992  |
+| attached and served | 4,000 / 988 / 545,669 |
+
+(3,437 lines / 828 positive / 484,385 Birr moved from "no §9 row" to
+"attached and served"; W2/W3 and the other classes unchanged.)
 
 No line that brings a sale value can be in class 7 any more (asserted in
 =_report_sect12_sales=).  W2's 90 are lines that fill NOTHING -- Q6 not No,

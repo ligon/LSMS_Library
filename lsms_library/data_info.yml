@@ -249,9 +249,10 @@ Index Info:
   # The "not crop-specific" marker on plot_inputs `j` (an input applied to the
   # plot or the farm as a whole, not to one crop) has ONE canonical spelling:
   # `(not crop-specific)` (GH #1119, @ligon 2026-10-23).  It is in force for
-  # the EHCVM countries and Mali; the other spellings -- `Whole Plot`
-  # (Ethiopia), `Farm-level` (GhanaLSS), `n/a` (Nigeria, Uganda) and NaN
-  # (Malawi, Tanzania) -- are migrated per country.  It is a `j` value, distinct
+  # the EHCVM countries, Mali and Ethiopia (its `Whole Plot` migrated
+  # 2026-10-23); the other spellings -- `Farm-level` (GhanaLSS), `n/a`
+  # (Nigeria, Uganda) and NaN (Malawi, Tanzania) -- are migrated per
+  # country.  It is a `j` value, distinct
   # from the STRUCTURAL `plot_id` sentinel `Farm-level` (see `plot_id:` at the
   # top of this file); do not reuse `Farm-level` for it.
   # plot_labor needs no alias: every country already spells `plot_id` and
