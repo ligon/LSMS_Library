@@ -1243,10 +1243,13 @@ counts above (42,247 rows, 504 grappes, 55 product codes, 74 unit codes,
   =Louche (Djoni/Djini)=/=Louche=), and =1252= is labelled =grand= and
   =1253= =moyen=, the reverse of the size digit (79 rows; which is wrong is
   unknown).
-- *Item labels differ by file.*  s05 stores =produitID= in clean UTF-8
+- *Item labels differ by file.*  s05 stores =produitID= mostly in clean UTF-8
   (=Thé vert=), s07b in the double-encoded form =mapping.py= repairs
-  (=ThÃ©=); code 23 is =Viande de boe__uf= in s05 (not the =bÅ__uf= that
-  =_LOST_PREFIX_REPLACEMENTS= targets).  So =harmonize_food= on the s05 label
+  (=ThÃ©=).  Not all of s05 is clean: 2 of 55 product labels are mojibake
+  (code 23 =Viande de boe__uf=, not the =bÅ__uf= that
+  =_LOST_PREFIX_REPLACEMENTS= targets, and =MÃ¢choiron frais (guiguiri)=), as
+  are 3 of 74 unit labels (=CueillÃ¨re=); the code join below makes this moot
+  for =j= and =u=, and =Description= keeps the label as recorded.  So =harmonize_food= on the s05 label
   lands 41 of 55 codes on a household =j=; joining by CODE lands 55 of 55.
   Three codes name a NARROWER product in the community module: 67 =Pastèque=
   (household =Pastèque, Melon=), 77 =Courge/courgette= (=Aubergine,

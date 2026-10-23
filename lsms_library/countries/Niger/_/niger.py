@@ -1631,8 +1631,9 @@ def _s05_code_maps(item_codes, unit_codes, hh_categories, item_map, unit_map,
 
     Joined to the household food module BY CODE (GH #823 decision D3): the
     s05 file and s07b_me_ner2018 share the ``produitID`` code list, but not its
-    strings -- s05 stores clean UTF-8 (``Thé vert``), s07b the double-encoded
-    form 2018-19's ``mapping.py`` repairs (``ThÃ©``), and three s05 codes name
+    strings -- s05 stores mostly clean UTF-8 (``Thé vert``; 2 of 55 product
+    and 3 of 74 unit labels are mojibake, e.g. ``MÃ¢choiron``), s07b the
+    double-encoded form 2018-19's ``mapping.py`` repairs (``ThÃ©``), and three s05 codes name
     a NARROWER product than the household's label for the same code (67
     ``Pastèque`` vs ``Pastèque, Melon``; 77 ``Courge/courgette`` vs
     ``Aubergine, Courge/Courgette``; 130 ``Thé vert`` vs ``Thé``).  So ``j`` is
