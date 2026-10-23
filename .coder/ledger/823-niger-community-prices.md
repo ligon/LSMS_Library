@@ -339,6 +339,25 @@ Ethiopia reads a recorded quantity, and GhanaLSS and Malawi carry `NumberOfUnits
   (Niger only), 0 of 40 `build_transforms_fingerprint`, 92 of 2,109 wave hashes (Niger only,
   23 per wave).  One Niger re-warm.
 
+**Precedents followed (standing guidance, @ligon 2026-10-22).**  For each sub-decision the
+decisions did not settle, the precedent found in other countries (paths under
+`lsms_library/`; lines at `9a0ed5f3c`).
+
+| sub-decision | built | precedent |
+|---|---|---|
+| wave-script layout | `sys.path` + `niger` helpers, labels and codes read twice, `_finish_community_prices`, assert, `to_parquet` | `countries/Niger/2014-15/_/community_prices.py` (whole file); `countries/Mali/2014-15/_/community_prices.py:44-91` |
+| `Description` where the source has no variety label | s05 product label as recorded, stripped | Tanzania `countries/Tanzania/_/tanzania.py:1988-1993` (source item label); GhanaLSS `countries/GhanaLSS/2012-13/_/community_prices.py:55` (item label) |
+| `obs` = reading number | s05q03 → 1, s05q04 → 2 | Mali `countries/Mali/2014-15/_/community_prices.py:65,78` (`enumerate(_READINGS, 1)`) |
+| second source record | `obs = slot + nslots·rank` (3/4), repeats dropped | Niger CS07 `countries/Niger/_/niger.py:1460,1487,1504`; GhanaLSS slot + 3 (`data_info.yml:166-167`) |
+| rows with no usable price | dropped (none present) | `countries/Niger/_/niger.py:1494` |
+| `visit` for EHCVM | `vague` (D6) | `visit: vague` in 14 EHCVM wave configs, e.g. `countries/Niger/2018-19/_/data_info.yml:42`, `countries/Mali/2018-19/_/data_info.yml:190`, `countries/Senegal/2018-19/_/data_info.yml:174` |
+| sized-unit labels | `<unit> (<Size>)`, size word title-cased in the survey's language (D4) | Uganda `countries/Uganda/_/categorical_mapping.org:359-361` (`Heap (Big/Medium/Small)`); Malawi `countries/Malawi/_/categorical_mapping.org:291-293, 333-335` (`Pail (Small)`, `Heap (Large)`).  Anti-precedent: Nigeria folds ordinal sizes into the base unit and records that as a loss (`countries/Nigeria/_/nigeria.py:2380-2384`) |
+| derivation function/inputs placement | wave `mapping.py` wrappers over country-module logic | Nigeria `countries/Nigeria/2018-19/_/mapping.py:34,50`; Niger `countries/Niger/2018-19/_/mapping.py:22` |
+| `Derivation` dtype and stamping | nullable `string`, stamped after the last drop | Nigeria `countries/Nigeria/_/nigeria.py:2448`; CLAUDE.md "Derived Values" (stamp after collapse) |
+| assumption basis for an instrument statement | `questionnaire` | Nigeria `countries/Nigeria/_/derivations.yml:45` |
+| `variety` where the form names none | `unknown_variety` | **No native-frame precedent.**  Followed the canonical sentinel's definition (`data_info.yml:269`, value at `:299`).  The structural alternative, Tanzania's source item code as `variety` (`countries/Tanzania/_/tanzania.py:2000-2004`), applies only where several codes are lumped into one `j`; s05 codes are one-to-one with `j`.  **Flagged for review.** |
+| `Quantity` on a per-one-unit price | `1` as a registered derivation (D2) | **No precedent serves a constant `Quantity`**, and none registers a constant as a derivation.  The per-one-unit precedent is to serve `Price` only: Nigeria `countries/Nigeria/_/data_scheme.yml:571-572`, Tanzania `:396-397`, EthiopiaRHS `:254-255`.  Niger's scheme requires `Quantity` for all its waves, and D2 decided 1 explicitly.  **The tension is flagged, not resolved here.** |
+
 **Publication.**  Row-level outputs (built frames, `derivation_inputs`, duplicate-key detail, full
 warning text) were written only under `/local/job40390255/data-private/lane-823/`.  The committed
 JSON holds counts, labels and hashes summaries, and warning *classes* only.
