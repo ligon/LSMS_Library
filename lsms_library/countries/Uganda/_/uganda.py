@@ -403,14 +403,25 @@ def _adopt_alternate_cover(flat):
         only_alt = flat[_COVER_MARKER].isna()
         for c in alt:
             target = c[len(_ALT_COVER_PREFIX):]
-            src = flat[c]
+            src = flat[c].loc[only_alt]
             if target == 'v':
                 # A myvar has no `v` formatter, and the outer merge floats it.
                 src = src.map(format_id)
             if target not in flat.columns:
                 flat[target] = pd.NA
-            flat[target] = flat[target].astype('object')
-            flat.loc[only_alt, target] = src.loc[only_alt].astype('object')
+            col = flat[target]
+            # Keep the column's own type: a weight stays numeric (an object
+            # cast here is written to the parquet as STRING), and a label
+            # column leaves Categorical so it can take a new value.
+            if isinstance(col.dtype, pd.CategoricalDtype):
+                col = col.astype('object')
+            if pd.api.types.is_numeric_dtype(col.dtype):
+                src = pd.to_numeric(src, errors='coerce')
+            elif isinstance(src.dtype, pd.CategoricalDtype):
+                src = src.astype('object')
+            col = col.copy()
+            col.loc[only_alt] = src
+            flat[target] = col
     temps = [c for c in flat.columns
              if c in (_COVER_MARKER, _FRAME_MARKER)
              or str(c).startswith(_ALT_COVER_PREFIX)]
@@ -2641,6 +2652,14 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # 2011-12) -- and 138 are merged away by collapsing 135 duplicate groups.
     # This residual is PRE-EXISTING and much smaller than before (pre-fix the
     # same 84,489 rows returned 83,019, losing 1,470).
+    #
+    # GH #1120 D3 (2026-10-23) ends the deletion: a blank parcel/plot id is now
+    # plot_id = UNKNOWN_PLOT (`_plot_key`), never NaN, so the 135 rows reach
+    # the collapse with a key.  2009-10's 130 become 119 rows: 11 Seed keys
+    # each fold two plot-less AGSEC4A lines of one household and crop, and no
+    # folded pair reports conflicting values (they differ only where one line
+    # left Purchased / Improved blank).  2011-12's 5 stay 5.  Measured on the
+    # raw files; the builder now returns 84,340 rows.
     #
     # And the residual is NOT self-evidently "genuine duplication".  All 135
     # groups are `input='Seed'`: two AGSEC4A plot-crop rows for the same

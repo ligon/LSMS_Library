@@ -285,8 +285,9 @@ Data Scheme:
     #            are the finest identities the UNPS questionnaire records
     #            (it asks nutrient class, not urea/DAP/NPK product names).
     #   j      — the seed's crop, on harmonize_crop labels, for seed rows;
-    #            the sentinel 'n/a' for fertilizer/pesticide rows (no crop
-    #            linkage).  In the index so per-crop seed rows on a
+    #            the canonical marker '(not crop-specific)' for fertilizer /
+    #            pesticide rows (no crop linkage; spelled 'n/a' until GH #1119,
+    #            @ligon 2026-10-23).  In the index so per-crop seed rows on a
     #            multi-crop plot stay distinct (plot-crop seed grain) — ~38%
     #            of seeded plots carry >1 crop.
     #   season — 'A' (first season) / 'B' (second season).  Carried in the
@@ -317,7 +318,11 @@ Data Scheme:
     # constructs; the other 273 are still discarded by its de-dup step — 135
     # DELETED outright by `groupby(dropna=True)` because `plot_id` is NaN (130 in
     # 2009-10, 5 in 2011-12), and 138 merged away by collapsing 135 duplicate
-    # groups.  Every one of those 135 groups is `input='Seed'`: two AGSEC4A
+    # groups.  [GH #1120 D3, 2026-10-23: those 135 rows now carry
+    # plot_id = 'unknown_plot' and are SERVED -- 2009-10's 130 as 119 rows
+    # (11 Seed keys fold two plot-less AGSEC4A lines each; no reported value
+    # conflicts), 2011-12's 5 as 5 -- so the builder returns 84,340.  See
+    # CONTENTS.org, the #1120 section.]  Every one of those 135 groups is `input='Seed'`: two AGSEC4A
     # plot-crop rows for the same (plot, crop), i.e. a missing "which AGSEC4A
     # row" identifier — the same defect one level down.  8 of them (all
     # 2011-12) sum two or three reported quantities.  Measured cold

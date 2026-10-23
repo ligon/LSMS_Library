@@ -137,9 +137,15 @@ def test_alternate_cover_fills_only_households_the_cover_lacks(uganda_module):
         "_ag_panel_weight": [99.0, 77.0, 55.0],
         "_ag_Region": ["Central", "Eastern", "Western"],
     }).set_index(["t", "i"])
+    # As the merge delivers them: a converted Stata label is Categorical.
+    df["Region"] = df["Region"].astype("category")
     out = u.sample(df)
     temps = [c for c in out.columns if c.startswith("_")]
     assert temps == [], f"{len(temps)} temporary column(s) left"
+    # A weight must stay numeric: an object column is written to the cached
+    # parquet as STRING (measured on the first branch build).
+    for col in ("weight", "panel_weight"):
+        assert pd.api.types.is_numeric_dtype(out[col].dtype), out[col].dtype
     ag = out.loc[("2015-16", "AG")]
     assert ag["v"] == "23456789"          # formatted, not '23456789.0'
     assert ag["weight"] == 55.0 and ag["panel_weight"] == 55.0
