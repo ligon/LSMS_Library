@@ -1,0 +1,4785 @@
+{
+  "status": "AUTHOR_VALIDATION_COMPLETE_AWAITS_INDEPENDENT_REVIEW",
+  "matrix": {
+    "base/default-all": {
+      "rows": 17699,
+      "requested": null,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-2019": {
+      "rows": 3076,
+      "requested": [
+        "2019-20"
+      ],
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-2020": {
+      "rows": 14623,
+      "requested": [
+        "2020-21"
+      ],
+      "wave_rows": {
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-modern": {
+      "rows": 17699,
+      "requested": [
+        "2019-20",
+        "2020-21"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-2008": {
+      "rows": 0,
+      "requested": [
+        "2008-09"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-2010": {
+      "rows": 0,
+      "requested": [
+        "2010-11"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-2012": {
+      "rows": 0,
+      "requested": [
+        "2012-13"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-2014": {
+      "rows": 0,
+      "requested": [
+        "2014-15"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-older": {
+      "rows": 0,
+      "requested": [
+        "2008-09",
+        "2010-11",
+        "2012-13",
+        "2014-15"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/default-mixed": {
+      "rows": 3076,
+      "requested": [
+        "2008-09",
+        "2019-20"
+      ],
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-all": {
+      "rows": 17699,
+      "requested": null,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-2019": {
+      "rows": 17699,
+      "requested": [
+        "2019-20"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-2020": {
+      "rows": 17699,
+      "requested": [
+        "2020-21"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-modern": {
+      "rows": 17699,
+      "requested": [
+        "2019-20",
+        "2020-21"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-2008": {
+      "rows": 17699,
+      "requested": [
+        "2008-09"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-2010": {
+      "rows": 17699,
+      "requested": [
+        "2010-11"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-2012": {
+      "rows": 17699,
+      "requested": [
+        "2012-13"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-2014": {
+      "rows": 17699,
+      "requested": [
+        "2014-15"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-older": {
+      "rows": 17699,
+      "requested": [
+        "2008-09",
+        "2010-11",
+        "2012-13",
+        "2014-15"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "base/make-mixed": {
+      "rows": 17699,
+      "requested": [
+        "2008-09",
+        "2019-20"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "candidate/default-all": {
+      "rows": 17699,
+      "requested": null,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "candidate/default-2019": {
+      "rows": 3076,
+      "requested": [
+        "2019-20"
+      ],
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "candidate/default-2020": {
+      "rows": 14623,
+      "requested": [
+        "2020-21"
+      ],
+      "wave_rows": {
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "candidate/default-modern": {
+      "rows": 17699,
+      "requested": [
+        "2019-20",
+        "2020-21"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "candidate/default-2008": {
+      "rows": 0,
+      "requested": [
+        "2008-09"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/default-2010": {
+      "rows": 0,
+      "requested": [
+        "2010-11"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/default-2012": {
+      "rows": 0,
+      "requested": [
+        "2012-13"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/default-2014": {
+      "rows": 0,
+      "requested": [
+        "2014-15"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/default-older": {
+      "rows": 0,
+      "requested": [
+        "2008-09",
+        "2010-11",
+        "2012-13",
+        "2014-15"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/default-mixed": {
+      "rows": 3076,
+      "requested": [
+        "2008-09",
+        "2019-20"
+      ],
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": [
+        "Tanzania/var/community_prices.parquet"
+      ]
+    },
+    "candidate/make-all": {
+      "rows": 17699,
+      "requested": null,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-2019": {
+      "rows": 3076,
+      "requested": [
+        "2019-20"
+      ],
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-2020": {
+      "rows": 14623,
+      "requested": [
+        "2020-21"
+      ],
+      "wave_rows": {
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-modern": {
+      "rows": 17699,
+      "requested": [
+        "2019-20",
+        "2020-21"
+      ],
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-2008": {
+      "rows": 0,
+      "requested": [
+        "2008-09"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-2010": {
+      "rows": 0,
+      "requested": [
+        "2010-11"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-2012": {
+      "rows": 0,
+      "requested": [
+        "2012-13"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-2014": {
+      "rows": 0,
+      "requested": [
+        "2014-15"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-older": {
+      "rows": 0,
+      "requested": [
+        "2008-09",
+        "2010-11",
+        "2012-13",
+        "2014-15"
+      ],
+      "wave_rows": {},
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_files_cold": []
+    },
+    "candidate/make-mixed": {
+      "rows": 3076,
+      "requested": [
+        "2008-09",
+        "2019-20"
+      ],
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "strict_cold_warm_exact": true,
+      "warm_changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_files_cold": []
+    },
+    "candidate-default-vs-parent-default/all": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "candidate-Make-vs-authoritative-parent-default/all": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "candidate-default-vs-parent-default/2019": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "candidate-Make-vs-authoritative-parent-default/2019": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "candidate-default-vs-parent-default/2020": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "candidate-Make-vs-authoritative-parent-default/2020": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "candidate-default-vs-parent-default/modern": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "candidate-Make-vs-authoritative-parent-default/modern": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "candidate-default-vs-parent-default/2008": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-Make-vs-authoritative-parent-default/2008": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-default-vs-parent-default/2010": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-Make-vs-authoritative-parent-default/2010": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-default-vs-parent-default/2012": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-Make-vs-authoritative-parent-default/2012": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-default-vs-parent-default/2014": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-Make-vs-authoritative-parent-default/2014": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-default-vs-parent-default/older": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-Make-vs-authoritative-parent-default/older": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {
+        "Description": {
+          "left": {
+            "type": "StringDtype",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "storage": "pyarrow",
+            "na_type": "NAType",
+            "na_repr": "<NA>"
+          },
+          "right": {
+            "type": "ObjectDType",
+            "repr": "dtype('O')",
+            "storage": null,
+            "na_type": "NoneType",
+            "na_repr": "None"
+          }
+        }
+      },
+      "rows_left": 0,
+      "rows_right": 0,
+      "qualification": "Retained strict full-frame failure: old fallback string Description versus existing no-builder empty object Description; all other components exact."
+    },
+    "candidate-default-vs-parent-default/mixed": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "candidate-Make-vs-authoritative-parent-default/mixed": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    }
+  },
+  "populated": {
+    "base/default-all": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-2019": {
+      "rows": 3076,
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 3076,
+        "rows_right": 3076
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-2020": {
+      "rows": 14623,
+      "wave_rows": {
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 14623,
+        "rows_right": 14623
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-modern": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-2008": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-2010": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-2012": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-2014": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-older": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/default-mixed": {
+      "rows": 3076,
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 3076,
+        "rows_right": 3076
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "base/make-all": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-2019": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-2020": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-modern": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-2008": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-2010": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-2012": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-2014": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-older": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "base/make-mixed": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/var/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": null,
+        "coverage": null
+      },
+      "country_footer_after": {
+        "hash": null,
+        "coverage": null
+      }
+    },
+    "candidate/default-all": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-2019": {
+      "rows": 3076,
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 3076,
+        "rows_right": 3076
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-2020": {
+      "rows": 14623,
+      "wave_rows": {
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 14623,
+        "rows_right": 14623
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-modern": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-2008": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": false,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {
+          "Description": {
+            "left": {
+              "type": "ObjectDType",
+              "repr": "dtype('O')",
+              "storage": null,
+              "na_type": "NoneType",
+              "na_repr": "None"
+            },
+            "right": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "na_type": "NAType",
+              "na_repr": "<NA>"
+            }
+          }
+        },
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-2010": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": false,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {
+          "Description": {
+            "left": {
+              "type": "ObjectDType",
+              "repr": "dtype('O')",
+              "storage": null,
+              "na_type": "NoneType",
+              "na_repr": "None"
+            },
+            "right": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "na_type": "NAType",
+              "na_repr": "<NA>"
+            }
+          }
+        },
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-2012": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": false,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {
+          "Description": {
+            "left": {
+              "type": "ObjectDType",
+              "repr": "dtype('O')",
+              "storage": null,
+              "na_type": "NoneType",
+              "na_repr": "None"
+            },
+            "right": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "na_type": "NAType",
+              "na_repr": "<NA>"
+            }
+          }
+        },
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-2014": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": false,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {
+          "Description": {
+            "left": {
+              "type": "ObjectDType",
+              "repr": "dtype('O')",
+              "storage": null,
+              "na_type": "NoneType",
+              "na_repr": "None"
+            },
+            "right": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "na_type": "NAType",
+              "na_repr": "<NA>"
+            }
+          }
+        },
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-older": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": false,
+        "pandas_payload_exact": false,
+        "typed_full_attrs_FIELDS_exact": false,
+        "attrs_only_left": [],
+        "attrs_only_right": [
+          "id_converted"
+        ],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {
+          "Description": {
+            "left": {
+              "type": "ObjectDType",
+              "repr": "dtype('O')",
+              "storage": null,
+              "na_type": "NoneType",
+              "na_repr": "None"
+            },
+            "right": {
+              "type": "StringDtype",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "storage": "pyarrow",
+              "na_type": "NAType",
+              "na_repr": "<NA>"
+            }
+          }
+        },
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/default-mixed": {
+      "rows": 3076,
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 3076,
+        "rows_right": 3076
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-all": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet",
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-2019": {
+      "rows": 3076,
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 3076,
+        "rows_right": 3076
+      },
+      "changes": {
+        "added": [],
+        "deleted": [
+          "Tanzania/2020-21/_/community_prices.parquet"
+        ],
+        "modified": [
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-2020": {
+      "rows": 14623,
+      "wave_rows": {
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 14623,
+        "rows_right": 14623
+      },
+      "changes": {
+        "added": [
+          "Tanzania/2020-21/_/community_prices.parquet"
+        ],
+        "deleted": [
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-modern": {
+      "rows": 17699,
+      "wave_rows": {
+        "2019-20": 3076,
+        "2020-21": 14623
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 17699,
+        "rows_right": 17699
+      },
+      "changes": {
+        "added": [
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ],
+        "deleted": [],
+        "modified": [
+          "Tanzania/2020-21/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-2008": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-2010": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-2012": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-2014": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-older": {
+      "rows": 0,
+      "wave_rows": {},
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 0,
+        "rows_right": 0
+      },
+      "changes": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate/make-mixed": {
+      "rows": 3076,
+      "wave_rows": {
+        "2019-20": 3076
+      },
+      "cold_vs_populated": {
+        "full_strict_exact": true,
+        "pandas_payload_exact": true,
+        "typed_full_attrs_FIELDS_exact": true,
+        "attrs_only_left": [],
+        "attrs_only_right": [],
+        "attrs_changed_keys": [],
+        "row_axis_full_unused_levels_codes_exact": true,
+        "column_axis_full_exact": true,
+        "column_dtype_changes": {},
+        "rows_left": 3076,
+        "rows_right": 3076
+      },
+      "changes": {
+        "added": [],
+        "deleted": [
+          "Tanzania/2020-21/_/community_prices.parquet"
+        ],
+        "modified": [
+          "Tanzania/2019-20/_/community_prices.parquet"
+        ]
+      },
+      "country_footer_before": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      },
+      "country_footer_after": {
+        "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+        "coverage": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15",
+          "2019-20",
+          "2020-21"
+        ]
+      }
+    },
+    "candidate-default-vs-parent-default/all": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "candidate-default-vs-parent-default/2019": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "candidate-default-vs-parent-default/2020": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "candidate-default-vs-parent-default/modern": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "candidate-default-vs-parent-default/2008": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "candidate-default-vs-parent-default/2010": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "candidate-default-vs-parent-default/2012": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "candidate-default-vs-parent-default/2014": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "candidate-default-vs-parent-default/older": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "candidate-default-vs-parent-default/mixed": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    }
+  },
+  "layers": {
+    "2019-20/source-oracle-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "2019-20/helper-memory-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "2019-20/native-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "2019-20/walked-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "2019-20/normalized-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "2019-20/memory-vs-native": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": false,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "2019-20/native-vs-walked": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": false,
+      "attrs_only_left": [],
+      "attrs_only_right": [
+        "id_converted"
+      ],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "2020-21/source-oracle-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "2020-21/helper-memory-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "2020-21/native-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "2020-21/walked-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "2020-21/normalized-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "2020-21/memory-vs-native": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": false,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": false,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "2020-21/native-vs-walked": {
+      "full_strict_exact": false,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": false,
+      "attrs_only_left": [],
+      "attrs_only_right": [
+        "id_converted"
+      ],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 14623,
+      "rows_right": 14623
+    },
+    "raw-default-country-cross-head": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "candidate-Make-has-no-country-cache": true,
+    "default_country_Arrow_metadata_changed_keys": [
+      "lsms_cache_hash"
+    ],
+    "default_country_Arrow_schema_without_metadata_exact": true
+  },
+  "Feature": {
+    "first/healthy-Mali": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 40218,
+      "rows_right": 40218
+    },
+    "first/default/Tanzania-Mali": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 57917,
+      "rows_right": 57917
+    },
+    "first/default/candidate-Make-Tanzania-vs-parent-default": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "first/currency-None/Tanzania-Mali": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 57917,
+      "rows_right": 57917
+    },
+    "first/currency-None/candidate-Make-Tanzania-vs-parent-default": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "fresh/healthy-Mali": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 40218,
+      "rows_right": 40218
+    },
+    "fresh/default/Tanzania-Mali": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 57917,
+      "rows_right": 57917
+    },
+    "fresh/default/candidate-Make-Tanzania-vs-parent-default": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    },
+    "fresh/currency-None/Tanzania-Mali": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 57917,
+      "rows_right": 57917
+    },
+    "fresh/currency-None/candidate-Make-Tanzania-vs-parent-default": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 17699,
+      "rows_right": 17699
+    }
+  },
+  "CLI": {
+    "base/default/first": {
+      "CLI": {
+        "2019": {
+          "rows": 3076,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        },
+        "2008": {
+          "rows": 0,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        }
+      },
+      "API_to_artifact": {
+        "2019": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 3076,
+          "rows_right": 3076
+        },
+        "2008": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 0,
+          "rows_right": 0
+        }
+      }
+    },
+    "base/make/first": {
+      "CLI": {
+        "2019": {
+          "rows": 17699,
+          "wrong_wave_rows": 14623,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": [
+              "Tanzania/2020-21/_/community_prices.parquet",
+              "Tanzania/var/community_prices.parquet",
+              "Tanzania/2019-20/_/community_prices.parquet"
+            ]
+          }
+        },
+        "2008": {
+          "rows": 17699,
+          "wrong_wave_rows": 17699,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": [
+              "Tanzania/2020-21/_/community_prices.parquet",
+              "Tanzania/var/community_prices.parquet",
+              "Tanzania/2019-20/_/community_prices.parquet"
+            ]
+          }
+        }
+      },
+      "API_to_artifact": {
+        "2019": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 17699,
+          "rows_right": 17699
+        },
+        "2008": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 17699,
+          "rows_right": 17699
+        }
+      }
+    },
+    "candidate/default/first": {
+      "CLI": {
+        "2019": {
+          "rows": 3076,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        },
+        "2008": {
+          "rows": 0,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        }
+      },
+      "API_to_artifact": {
+        "2019": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 3076,
+          "rows_right": 3076
+        },
+        "2008": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 0,
+          "rows_right": 0
+        }
+      }
+    },
+    "candidate/make/first": {
+      "CLI": {
+        "2019": {
+          "rows": 3076,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": [
+              "Tanzania/2019-20/_/community_prices.parquet"
+            ]
+          }
+        },
+        "2008": {
+          "rows": 0,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        }
+      },
+      "API_to_artifact": {
+        "2019": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 3076,
+          "rows_right": 3076
+        },
+        "2008": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": false,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {
+            "Description": {
+              "left": {
+                "type": "ObjectDType",
+                "repr": "dtype('O')",
+                "storage": null,
+                "na_type": "NoneType",
+                "na_repr": "None"
+              },
+              "right": {
+                "type": "StringDtype",
+                "repr": "<StringDtype(na_value=<NA>)>",
+                "storage": "pyarrow",
+                "na_type": "NAType",
+                "na_repr": "<NA>"
+              }
+            }
+          },
+          "rows_left": 0,
+          "rows_right": 0
+        }
+      }
+    },
+    "first/candidate-default-API-vs-parent-default/2019": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "first/candidate-default-artifact-vs-parent-default/2019": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "first/candidate-default-API-vs-parent-default/2008": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "first/candidate-default-artifact-vs-parent-default/2008": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "first/candidate-Make-2019-vs-parent-default": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "first/candidate-Make-empty-vs-existing-finalizer": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "base/default/fresh": {
+      "CLI": {
+        "2019": {
+          "rows": 3076,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        },
+        "2008": {
+          "rows": 0,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        }
+      },
+      "API_to_artifact": {
+        "2019": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 3076,
+          "rows_right": 3076
+        },
+        "2008": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 0,
+          "rows_right": 0
+        }
+      }
+    },
+    "base/make/fresh": {
+      "CLI": {
+        "2019": {
+          "rows": 17699,
+          "wrong_wave_rows": 14623,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": [
+              "Tanzania/2020-21/_/community_prices.parquet",
+              "Tanzania/var/community_prices.parquet",
+              "Tanzania/2019-20/_/community_prices.parquet"
+            ]
+          }
+        },
+        "2008": {
+          "rows": 17699,
+          "wrong_wave_rows": 17699,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": [
+              "Tanzania/2020-21/_/community_prices.parquet",
+              "Tanzania/var/community_prices.parquet",
+              "Tanzania/2019-20/_/community_prices.parquet"
+            ]
+          }
+        }
+      },
+      "API_to_artifact": {
+        "2019": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 17699,
+          "rows_right": 17699
+        },
+        "2008": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 17699,
+          "rows_right": 17699
+        }
+      }
+    },
+    "candidate/default/fresh": {
+      "CLI": {
+        "2019": {
+          "rows": 3076,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        },
+        "2008": {
+          "rows": 0,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        }
+      },
+      "API_to_artifact": {
+        "2019": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 3076,
+          "rows_right": 3076
+        },
+        "2008": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 0,
+          "rows_right": 0
+        }
+      }
+    },
+    "candidate/make/fresh": {
+      "CLI": {
+        "2019": {
+          "rows": 3076,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": [
+              "Tanzania/2019-20/_/community_prices.parquet"
+            ]
+          }
+        },
+        "2008": {
+          "rows": 0,
+          "wrong_wave_rows": 0,
+          "full_footer_exact": true,
+          "full_schema_metadata_exact": true,
+          "file_bytes_exact": true,
+          "changes_by_kind": {
+            "added": [],
+            "deleted": [],
+            "modified": []
+          }
+        }
+      },
+      "API_to_artifact": {
+        "2019": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": true,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "recall",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {},
+          "rows_left": 3076,
+          "rows_right": 3076
+        },
+        "2008": {
+          "full_strict_exact": false,
+          "pandas_payload_exact": false,
+          "typed_full_attrs_FIELDS_exact": false,
+          "attrs_only_left": [],
+          "attrs_only_right": [],
+          "attrs_changed_keys": [
+            "population",
+            "sampling"
+          ],
+          "row_axis_full_unused_levels_codes_exact": true,
+          "column_axis_full_exact": true,
+          "column_dtype_changes": {
+            "Description": {
+              "left": {
+                "type": "ObjectDType",
+                "repr": "dtype('O')",
+                "storage": null,
+                "na_type": "NoneType",
+                "na_repr": "None"
+              },
+              "right": {
+                "type": "StringDtype",
+                "repr": "<StringDtype(na_value=<NA>)>",
+                "storage": "pyarrow",
+                "na_type": "NAType",
+                "na_repr": "<NA>"
+              }
+            }
+          },
+          "rows_left": 0,
+          "rows_right": 0
+        }
+      }
+    },
+    "fresh/candidate-default-API-vs-parent-default/2019": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "fresh/candidate-default-artifact-vs-parent-default/2019": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "fresh/candidate-default-API-vs-parent-default/2008": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "fresh/candidate-default-artifact-vs-parent-default/2008": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    },
+    "fresh/candidate-Make-2019-vs-parent-default": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 3076,
+      "rows_right": 3076
+    },
+    "fresh/candidate-Make-empty-vs-existing-finalizer": {
+      "full_strict_exact": true,
+      "pandas_payload_exact": true,
+      "typed_full_attrs_FIELDS_exact": true,
+      "attrs_only_left": [],
+      "attrs_only_right": [],
+      "attrs_changed_keys": [],
+      "row_axis_full_unused_levels_codes_exact": true,
+      "column_axis_full_exact": true,
+      "column_dtype_changes": {},
+      "rows_left": 0,
+      "rows_right": 0
+    }
+  },
+  "source": {
+    "base": {
+      "status": "COMPLETE",
+      "source": {
+        "2019-20": {
+          "raw_rows": 5148,
+          "retained_rows": 3076,
+          "excluded_rows": 2072,
+          "positive_price": 3079,
+          "positive_basis": 3077,
+          "positive_price_and_basis": 3077,
+          "missing_community_key": 0,
+          "blank_community_key": 0,
+          "unresolved_item": 0,
+          "unresolved_unit": 1895,
+          "community_keys": 94,
+          "source_varieties": 52,
+          "source_code_to_label_pairs": 52,
+          "unit_code_label_pairs": 6,
+          "coarse_cells": 2769,
+          "coarse_multivariety_groups": 261,
+          "coarse_price_disagreement_groups": 243,
+          "full_source_key_unique": true,
+          "positive_source_price_divided_by_own_basis_exact": true,
+          "source_helper_full_frame_exact": true,
+          "all_retained_native_values_masks_axes_attrs_exact_at_writer_stage": true
+        },
+        "2020-21": {
+          "raw_rows": 25376,
+          "retained_rows": 14623,
+          "excluded_rows": 10753,
+          "positive_price": 14639,
+          "positive_basis": 14673,
+          "positive_price_and_basis": 14625,
+          "missing_community_key": 0,
+          "blank_community_key": 0,
+          "unresolved_item": 0,
+          "unresolved_unit": 10457,
+          "community_keys": 484,
+          "source_varieties": 52,
+          "source_code_to_label_pairs": 52,
+          "unit_code_label_pairs": 6,
+          "coarse_cells": 13062,
+          "coarse_multivariety_groups": 1281,
+          "coarse_price_disagreement_groups": 1149,
+          "full_source_key_unique": true,
+          "positive_source_price_divided_by_own_basis_exact": true,
+          "source_helper_full_frame_exact": true,
+          "all_retained_native_values_masks_axes_attrs_exact_at_writer_stage": true
+        }
+      },
+      "strict_source_oracles_and_writer_stage_native_controls": true,
+      "normalized_concat_raw_exact": true,
+      "memory_native_exact": {
+        "2019-20": false,
+        "2020-21": false
+      },
+      "data_root_changes": 0
+    },
+    "candidate": {
+      "status": "COMPLETE",
+      "source": {
+        "2019-20": {
+          "raw_rows": 5148,
+          "retained_rows": 3076,
+          "excluded_rows": 2072,
+          "positive_price": 3079,
+          "positive_basis": 3077,
+          "positive_price_and_basis": 3077,
+          "missing_community_key": 0,
+          "blank_community_key": 0,
+          "unresolved_item": 0,
+          "unresolved_unit": 1895,
+          "community_keys": 94,
+          "source_varieties": 52,
+          "source_code_to_label_pairs": 52,
+          "unit_code_label_pairs": 6,
+          "coarse_cells": 2769,
+          "coarse_multivariety_groups": 261,
+          "coarse_price_disagreement_groups": 243,
+          "full_source_key_unique": true,
+          "positive_source_price_divided_by_own_basis_exact": true,
+          "source_helper_full_frame_exact": true,
+          "all_retained_native_values_masks_axes_attrs_exact_at_writer_stage": true
+        },
+        "2020-21": {
+          "raw_rows": 25376,
+          "retained_rows": 14623,
+          "excluded_rows": 10753,
+          "positive_price": 14639,
+          "positive_basis": 14673,
+          "positive_price_and_basis": 14625,
+          "missing_community_key": 0,
+          "blank_community_key": 0,
+          "unresolved_item": 0,
+          "unresolved_unit": 10457,
+          "community_keys": 484,
+          "source_varieties": 52,
+          "source_code_to_label_pairs": 52,
+          "unit_code_label_pairs": 6,
+          "coarse_cells": 13062,
+          "coarse_multivariety_groups": 1281,
+          "coarse_price_disagreement_groups": 1149,
+          "full_source_key_unique": true,
+          "positive_source_price_divided_by_own_basis_exact": true,
+          "source_helper_full_frame_exact": true,
+          "all_retained_native_values_masks_axes_attrs_exact_at_writer_stage": true
+        }
+      },
+      "strict_source_oracles_and_writer_stage_native_controls": true,
+      "normalized_concat_raw_exact": true,
+      "memory_native_exact": {
+        "2019-20": false,
+        "2020-21": false
+      },
+      "data_root_changes": 0
+    }
+  },
+  "scanner": {
+    "base": {
+      "records": 4,
+      "counts": {
+        "warn": 4
+      },
+      "individual_accounting": [
+        {
+          "check": "has_household_index",
+          "country": "Mali",
+          "status": "warn",
+          "reason": "Native community/interview table has no household i",
+          "full_record_sha256": "9bcc97ac72c13c11e8ed366f6c12e53249491d14713acd32dfc190ade81b4067"
+        },
+        {
+          "check": "has_household_index",
+          "country": "Tanzania",
+          "status": "warn",
+          "reason": "Native community/interview table has no household i",
+          "full_record_sha256": "353699c0c348d7a6e15ff90b7aa2f9dcf07c2bfda23123c19d7107499c5c22bd"
+        },
+        {
+          "check": "runtime_warning",
+          "country": null,
+          "status": "warn",
+          "reason": "Declared Feature sentinel alignment: Tanzania visit/obs, Mali obs; no row loss",
+          "full_record_sha256": "6719da59ea32d5e812d3adc99a0f45c38573192e9b77e9a7a6128a2ed0e6db02"
+        },
+        {
+          "check": "runtime_warning",
+          "country": null,
+          "status": "warn",
+          "reason": "Tanzania2020-21 held population statement absent",
+          "full_record_sha256": "da3effc9629a3cf9032b656c66167fa358c0e0ad6ec18c8ac4ef98b0a339d06e"
+        }
+      ],
+      "phase2_kwargs_grid": 0
+    },
+    "candidate": {
+      "records": 4,
+      "counts": {
+        "warn": 4
+      },
+      "individual_accounting": [
+        {
+          "check": "has_household_index",
+          "country": "Mali",
+          "status": "warn",
+          "reason": "Native community/interview table has no household i",
+          "full_record_sha256": "9bcc97ac72c13c11e8ed366f6c12e53249491d14713acd32dfc190ade81b4067"
+        },
+        {
+          "check": "has_household_index",
+          "country": "Tanzania",
+          "status": "warn",
+          "reason": "Native community/interview table has no household i",
+          "full_record_sha256": "353699c0c348d7a6e15ff90b7aa2f9dcf07c2bfda23123c19d7107499c5c22bd"
+        },
+        {
+          "check": "runtime_warning",
+          "country": null,
+          "status": "warn",
+          "reason": "Declared Feature sentinel alignment: Tanzania visit/obs, Mali obs; no row loss",
+          "full_record_sha256": "6719da59ea32d5e812d3adc99a0f45c38573192e9b77e9a7a6128a2ed0e6db02"
+        },
+        {
+          "check": "runtime_warning",
+          "country": null,
+          "status": "warn",
+          "reason": "Tanzania2020-21 held population statement absent",
+          "full_record_sha256": "da3effc9629a3cf9032b656c66167fa358c0e0ad6ec18c8ac4ef98b0a339d06e"
+        }
+      ],
+      "phase2_kwargs_grid": 0
+    },
+    "complete_record_multisets_exact": true
+  },
+  "tests": {
+    "parent": {
+      "pytest_exit": 1,
+      "cases": 27,
+      "passed": 7,
+      "failures": 20,
+      "errors": 0,
+      "skipped": 0,
+      "same_new_test_sha256": "cc64075e6edfc5be063c23ab0b63ddcb0f42e6b24a87c0b40b9f01f0fd619c77",
+      "testfile_unchanged": true,
+      "actual_source": "/local/job40255479/worktrees/isa-Tanzania-1091-fix-base",
+      "arguments": [
+        "-q",
+        "-n",
+        "2",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix/base/pytest-new-tests",
+        "--junitxml",
+        "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix/base/new-tests-junit-private.xml",
+        "-c",
+        "/local/job40255479/worktrees/isa-Tanzania-1091-fix-base/pyproject.toml",
+        "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix/new-tests/test_gh1091_tanzania_community_builder.py"
+      ]
+    },
+    "candidate": {
+      "pytest_exit": 0,
+      "cases": 27,
+      "passed": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "same_new_test_sha256": "cc64075e6edfc5be063c23ab0b63ddcb0f42e6b24a87c0b40b9f01f0fd619c77",
+      "testfile_unchanged": true,
+      "actual_source": "/local/job40255479/worktrees/isa-Tanzania-1091-fix",
+      "arguments": [
+        "-q",
+        "-n",
+        "2",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix/candidate/pytest-new-tests",
+        "--junitxml",
+        "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix/candidate/new-tests-junit-private.xml",
+        "-c",
+        "/local/job40255479/worktrees/isa-Tanzania-1091-fix/pyproject.toml",
+        "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix/new-tests/test_gh1091_tanzania_community_builder.py"
+      ]
+    },
+    "existing": {
+      "pytest_exit": 0,
+      "cases": 58,
+      "passed": 58,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "built_marker_cases_deselected_not_counted": true,
+      "arguments": [
+        "-q",
+        "-n",
+        "2",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix/candidate/pytest-existing-tests",
+        "--junitxml",
+        "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix/candidate/existing-tests-junit-private.xml",
+        "tests/test_community_prices_variety.py",
+        "tests/test_gh1039_make_backend_no_country_rule.py",
+        "-k",
+        "not TestBuilt"
+      ]
+    }
+  },
+  "built_assertions": {
+    "parent": {
+      "assertion_bodies_completed": 11,
+      "completed": [
+        {
+          "country": "Tanzania",
+          "assertion_body": "test_index_is_the_declared_one_and_unique"
+        },
+        {
+          "country": "Tanzania",
+          "assertion_body": "test_no_null_on_an_added_level"
+        },
+        {
+          "country": "Tanzania",
+          "assertion_body": "test_variety_is_a_code_not_a_float_string"
+        },
+        {
+          "country": "Tanzania",
+          "assertion_body": "test_rows_and_cells_are_the_measured_ones"
+        },
+        {
+          "country": "Mali",
+          "assertion_body": "test_index_is_the_declared_one_and_unique"
+        },
+        {
+          "country": "Mali",
+          "assertion_body": "test_no_null_on_an_added_level"
+        },
+        {
+          "country": "Mali",
+          "assertion_body": "test_variety_is_a_code_not_a_float_string"
+        },
+        {
+          "country": "Mali",
+          "assertion_body": "test_rows_and_cells_are_the_measured_ones"
+        },
+        {
+          "assertion_body": "test_mali_tomato_paste_varieties_survive"
+        },
+        {
+          "assertion_body": "test_mali_carries_both_passages"
+        },
+        {
+          "assertion_body": "test_tanzania_lumped_codes_keep_their_own_prices"
+        }
+      ],
+      "ordinary_held_cache_API_reads": true,
+      "not_counted_as_collected_pytest_cases": true,
+      "credential_marker_not_modified_or_fabricated": true,
+      "cache_changes_by_kind": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      }
+    },
+    "candidate": {
+      "assertion_bodies_completed": 11,
+      "completed": [
+        {
+          "country": "Tanzania",
+          "assertion_body": "test_index_is_the_declared_one_and_unique"
+        },
+        {
+          "country": "Tanzania",
+          "assertion_body": "test_no_null_on_an_added_level"
+        },
+        {
+          "country": "Tanzania",
+          "assertion_body": "test_variety_is_a_code_not_a_float_string"
+        },
+        {
+          "country": "Tanzania",
+          "assertion_body": "test_rows_and_cells_are_the_measured_ones"
+        },
+        {
+          "country": "Mali",
+          "assertion_body": "test_index_is_the_declared_one_and_unique"
+        },
+        {
+          "country": "Mali",
+          "assertion_body": "test_no_null_on_an_added_level"
+        },
+        {
+          "country": "Mali",
+          "assertion_body": "test_variety_is_a_code_not_a_float_string"
+        },
+        {
+          "country": "Mali",
+          "assertion_body": "test_rows_and_cells_are_the_measured_ones"
+        },
+        {
+          "assertion_body": "test_mali_tomato_paste_varieties_survive"
+        },
+        {
+          "assertion_body": "test_mali_carries_both_passages"
+        },
+        {
+          "assertion_body": "test_tanzania_lumped_codes_keep_their_own_prices"
+        }
+      ],
+      "ordinary_held_cache_API_reads": true,
+      "not_counted_as_collected_pytest_cases": true,
+      "credential_marker_not_modified_or_fabricated": true,
+      "cache_changes_by_kind": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      }
+    }
+  },
+  "hash_scope": {
+    "status": "PASS_MEASURED_BEFORE_REBUILD",
+    "API_total": 549,
+    "Tanzania_changed": 25,
+    "others_exact": 524,
+    "framework_total": 39,
+    "framework_changed": 0,
+    "changed_cells": [
+      "Tanzania/sample",
+      "Tanzania/cluster_features",
+      "Tanzania/shocks",
+      "Tanzania/household_roster",
+      "Tanzania/individual_education",
+      "Tanzania/anthropometry",
+      "Tanzania/life_satisfaction",
+      "Tanzania/food_coping",
+      "Tanzania/interview_date",
+      "Tanzania/food_acquired",
+      "Tanzania/panel_ids",
+      "Tanzania/assets",
+      "Tanzania/housing",
+      "Tanzania/plot_features",
+      "Tanzania/crop_production",
+      "Tanzania/plot_inputs",
+      "Tanzania/plot_labor",
+      "Tanzania/people_last7days",
+      "Tanzania/livestock",
+      "Tanzania/community_prices",
+      "Tanzania/community_cluster_xwalk",
+      "Tanzania/food_expenditures",
+      "Tanzania/food_prices",
+      "Tanzania/food_quantities",
+      "Tanzania/household_characteristics"
+    ],
+    "parent_head": "99c824079da480ab2646e499c06ac70e457ff271",
+    "candidate_ledger_head_at_working_runtime": "aa97459633809893c5235d7285e627cdb142369d",
+    "candidate_runtime_working_patch": {
+      "delete_country_script": true,
+      "Make_lines_removed": 5
+    },
+    "raw_source_or_parquet_build_started": false,
+    "enumerated_other_outputs_built": false
+  },
+  "boundary": {
+    "status": "EXACT_ALLOWED_TWO_PATH_RETIREMENT",
+    "head": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
+    "baseline": "99c824079da480ab2646e499c06ac70e457ff271",
+    "production_paths": [
+      "lsms_library/countries/Tanzania/_/Makefile",
+      "lsms_library/countries/Tanzania/_/community_prices.py"
+    ],
+    "old_country_script_lines": 45,
+    "Make_lines_removed": 5,
+    "all_other_Make_bytes_exact": true,
+    "wave_generic_shared_rules_exact": true,
+    "unchanged_blobs_modes": {
+      "lsms_library/countries/Tanzania/_/tanzania.py": "100644 blob dafd5cd7865912d31d57059bb405ce0c99f56239\tlsms_library/countries/Tanzania/_/tanzania.py",
+      "lsms_library/countries/Tanzania/_/data_scheme.yml": "100644 blob ab59e901f2d1b9df4e0a8360a2eaa295c8ac5ef2\tlsms_library/countries/Tanzania/_/data_scheme.yml",
+      "lsms_library/countries/Tanzania/2019-20/_/community_prices.py": "100644 blob 8520071d8040bd66a6d5441c7d8cafab5c76caad\tlsms_library/countries/Tanzania/2019-20/_/community_prices.py",
+      "lsms_library/countries/Tanzania/2020-21/_/community_prices.py": "100644 blob 5d5e18ef82dae74d3d8308234585325994b8ec94\tlsms_library/countries/Tanzania/2020-21/_/community_prices.py",
+      "lsms_library/countries/Tanzania/2019-20/_/plot_inputs.py": "100644 blob cbf92fb6244cfbd11c3a45cafb44005a5e425134\tlsms_library/countries/Tanzania/2019-20/_/plot_inputs.py",
+      "lsms_library/countries/Tanzania/2020-21/_/plot_inputs.py": "100644 blob 1035c3c916797d02290db73411e0efe957d7fe32\tlsms_library/countries/Tanzania/2020-21/_/plot_inputs.py",
+      "lsms_library/countries/Tanzania/_/plot_inputs.py": "100644 blob 41dd284768ca955ae2d6661710f76491cbcf8ae1\tlsms_library/countries/Tanzania/_/plot_inputs.py",
+      "tests/test_1118_tanzania_plot_input_units.py": "100644 blob 2a30e2e9537d4a5afdaf79ea964cbe63bcea9316\ttests/test_1118_tanzania_plot_input_units.py"
+    },
+    "framework_and_registry_exact": true,
+    "new_test_sha256": "cc64075e6edfc5be063c23ab0b63ddcb0f42e6b24a87c0b40b9f01f0fd619c77"
+  },
+  "limits": [
+    "Independent review required; no author PASS.",
+    "No first-cold Feature snapshot claimed; separate argument-matched warm controls.",
+    "408 plot-input changes retained by exact code/prior-proof identity; no AG staging/build.",
+    "Only two community modules and current/full-coverage warm Mali cache staged; no other table corpus rebuild.",
+    "Retain strict source/native serialization and empty Description/id_converted differences; JSON record type changes are compared at matched stages.",
+    "Preserved candidate preparation deleted-file snapshot stop and CLI wrapper-path stop; no production/read-gate changes or raw diagnostics exported.",
+    "First candidate public/Feature observations were not replayed after CLI stop; only missing first CLI controls resumed in another process with separate endpoints.",
+    "Original source snapshots contain normalized representations for four convenience links per head; they never recorded literal target bytes. Separate final literal-reader receipts compare to immutable Git and original physical modes; stopped freezer and both originals remain preserved.",
+    "Empty representation claims are limited to measured fresh-root/no-country-cache strict subsets and Default full-coverage cache slices. Both return zero rows; partial-coverage misses/union rebuilds were not separately replayed and are not assigned a universal representation.",
+    "Evidence limitation: original first partial aggregate JSON was overwritten before archival; its original bytes/size/SHA were not recorded. Seven original per-call frames, endpoints, log and script survive. Preserved completed aggregate and distinctly named reconstruction are not the original; independent review must assess this gap."
+  ],
+  "runtime_pin": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
+  "parent_pin": "99c824079da480ab2646e499c06ac70e457ff271",
+  "parent_runtime_PR1185": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+  "source_gates": {
+    "held_modules": 2,
+    "sidecars": 2,
+    "initial_physical_source_copies": 80,
+    "populated_additional_source_copies": 8,
+    "both_held_DVC_layouts_checked": true,
+    "MD5_SHA_size_mode_mtime_nlink_inode_gates_before_decode": true,
+    "Mali_rows": 40218,
+    "Mali_current_full_coverage_physical_copies": 2,
+    "Mali_source_rebuild_claimed": false,
+    "new_AG_modules": 0,
+    "plot_inputs_rebuilt": false
+  },
+  "reviewed1185_invariant": {
+    "unit_replacements_prior_proof": {
+      "2019-20": 86,
+      "2020-21": 322,
+      "total": 408
+    },
+    "exact_runtime_test_blobs_retained": true,
+    "new_measurement_claimed": false,
+    "live_PR_open_unmerged_actual_branch": "fix/1118-tanzania-unknown-units-20261021"
+  },
+  "stops": [
+    {
+      "stage": "candidate preparation snapshot",
+      "exception": "FileNotFoundError",
+      "reason": "Inventory included the approved deleted country script.",
+      "before_staging_decode_API": true,
+      "preserved": true,
+      "correction": "Snapshot explicit approved deletion; no gate/runtime change."
+    },
+    {
+      "stage": "candidate first extras CLI invocation",
+      "reason": "Private wrapper resolved shared cli-launch.py under per-head directory.",
+      "CLI_script_started": false,
+      "failed_CLI_cache_changes": 0,
+      "prior_successful_first_public_Feature_API_calls_preserved_not_replayed": true,
+      "missing_CLI_tail_resumed_in_separate_guarded_process": true,
+      "original_percall_frames_endpoints_log_script_preserved": true,
+      "original_partial_aggregate_archived": false,
+      "original_partial_bytes_size_SHA_available": false,
+      "completed_aggregate_preserved_and_distinct_reconstruction_NOT_ORIGINAL": true,
+      "independent_review_must_assess_gap": true
+    },
+    {
+      "stage": "first strict freeze",
+      "reason": "Initial source snapshot used Path.readlink().as_posix for four tracked convenience links per head, normalizing literal target bytes.",
+      "original_snapshots_and_stopped_freezer_preserved": true,
+      "original_snapshot_literal_bytes_claimed": false,
+      "correction": "Separate literal os.readlink receipts checked against immutable Git blob/mode, plus exact original physical modes.",
+      "source_link_rewrite_or_API_decode_test_replay": false,
+      "paths": [
+        "Kyrgyz Republic",
+        "Serbia and Montenegro",
+        "South Africa",
+        "_"
+      ]
+    },
+    {
+      "stage": "second freezer evidence inventory",
+      "reason": "Archive glob missed the original partial aggregate before CLI-tail resumption; earlier archive claim corrected.",
+      "original_partial_bytes_size_SHA_available": false,
+      "surviving_original_frame_calls": 7,
+      "surviving_original_endpoints_log_script_preserved": true,
+      "completed_aggregate_preserved": true,
+      "distinct_reconstruction_not_original": true,
+      "both_freezer_failures_preserved": true,
+      "API_test_source_decode_replay": false
+    }
+  ],
+  "historical_diagnosis_qualification": "Frozen diagnosis retains its original auxiliary unpickle/text-only launch qualifications and absent first-cold Feature snapshot; it is not rewritten by these author results.",
+  "phase_counts": {
+    "per_head": {
+      "target_cold": 20,
+      "fresh_process_new_object_warm": 20,
+      "populated": 20
+    },
+    "heads": 2,
+    "core_requests_total": 120,
+    "CLI_artifacts": 16,
+    "pytest_candidate_passed": 85,
+    "pytest_parent_new_test_failed": 20,
+    "pytest_parent_new_test_passed": 7,
+    "direct_existing_built_assertion_bodies_per_head": 11,
+    "direct_assertion_bodies_not_added_to_pytest_case_count": true
+  },
+  "signed": "Sue (GPT-6)"
+}

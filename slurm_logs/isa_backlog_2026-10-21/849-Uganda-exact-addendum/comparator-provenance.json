@@ -1,0 +1,18 @@
+{
+  "source": "/local/job40255479/control/isa-backlog-20261021/review-1078-unit-attribution/exact_artifacts.py",
+  "source_sha256": "27885c7fa967e37ce6a5adc6deb03f5d44b284865a4b2a1556908579a45eeb46",
+  "functions": [
+    "typed",
+    "dtype",
+    "index",
+    "frame",
+    "receipt"
+  ],
+  "function_AST_sha256": "482913e1c535c4fd7b80ee68952434625b3071d83edde823eefb1805d0ba8f1d",
+  "function_AST_reused_without_change": true,
+  "old_top_level_checks_executed": false,
+  "seven_self_controls_rejected": 7,
+  "local_source_copy": "EXACT-COMPARATOR.py",
+  "local_function_AST_exact": true,
+  "local_source_sha256": "658b3417858790fe0810706e8b7ac195a91fc5ee39a70a3ea3bbb6d2bd2e1b1b"
+}

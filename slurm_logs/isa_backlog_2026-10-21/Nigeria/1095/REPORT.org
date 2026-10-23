@@ -1,0 +1,115 @@
+#+TITLE: Nigeria GH #1095 partial fix: recorded C8 community units
+#+AUTHOR: Sue
+#+DATE: 2026-10-21
+
+* Result and scope
+
+The community-price builder now places the ten recorded C8 labels using the Preferred Labels already in Nigeria's =u= dictionary.
+No shared =_canon_unit= expansion, codebook edit, size rule, eligibility rule, reducer, index, source acquisition or framework change is included.
+The existing =_canon_units= reporter gains a default-preserving disposition argument; community reporting runs AFTER metric rescue and accurately says that a remaining unplaced label is dropped.
+This is PARTIAL work on #1095: its literal "instead of dropping" requirement remains the explicit Tier C retention/fallback residual in =DRAFT-RESIDUAL.md=.
+No positive recorded label remains unplaced in the held W3-W5 sources after the ten aliases.
+
+The ledger was committed FIRST as =f4d17e5d5= before code.
+Runtime changes are confined to =Nigeria/_/nigeria.py=, with focused tests, country notes and safe evidence.
+
+* Country facts read before editing
+
+Nigeria C8 is PH-only despite the survey's PP/PH wave structure.
+Its =v= is composite state/LGA/EA; bare EA identifiers collide.
+The native helper retains the existing redundant =i==v= shim, which the Country API removes.
+W1/W2 have fixed per-item units; W3 splits C8a/C8b and uses free-text size; W4/W5 carry coded SIZE, with existing #834 metric rescue and derivation.
+The community data describe sampled households' shared EA price environment, not sociological communities.
+The live WAITING nonfood-recall caveat, sampling/security exclusions and size-collapsing first-row caveat remain separate.
+
+CONTENTS overview says "124,539 priced rows"; fresh f8 cold builds produce 131,338.
+Both are recorded, without assuming the historical claim describes this source/build state.
+Fresh W5 metadata also limits the existing claim that quantity/factor fields "agree with it and are a cross-check": only 54 of 5,339 metric-size rows record quantity, and 5,167 record the factor.
+Only 258 of all 56,388 W5 source rows record that quantity field.
+The coded-size rule and previously recorded questionnaire evidence are reused; no new PDF was acquired or verified.
+The two restored Bottle/Can rows have ordinal =0. SMALL= sizes and retain native prices without a volume factor.
+
+* Actual source and API accounting
+
+| PH round | baseline | candidate | gained | intentional metric-size drop |
+|----------+----------+-----------+--------+------------------------------|
+| 2011Q1   |   27,104 |    27,104 |      0 | n/a                          |
+| 2013Q1   |   27,079 |    27,079 |      0 | n/a                          |
+| 2016Q1   |   20,562 |    20,562 |      0 | 14,603                       |
+| 2019Q1   |   29,275 |    31,757 |  2,482 | 0                            |
+| 2024Q1   |   27,318 |    30,064 |  2,746 | 133                          |
+| total    |  131,338 |   136,566 |  5,228 |                              |
+
+W4 gains by native label: Whole Animal 793, Loaf 513, Wrap 503, Metric Cup 240, Slice 175, Crate 133, Cube 112, Table Spoon 12, Tea Spoon 1, Bottle/Can 0.
+W5: Wrap 894, Whole Animal 636, Loaf 500, Metric Cup 316, Slice 203, Cube 139, Crate 56, Bottle/Can 2; neither spoon is observed in the held W5 rows.
+Every new cell has its unique source-derived key and exact reported Price, with Derivation NA; none collides with an old cell or fans out.
+All 131,338 old rows retain exact values, keys, null masks, dtypes and attrs at native/helper, actual wave, raw-country and public Country layers.
+W1-W3 full frames are exact.
+Existing derived-row counts remain W3 1 / W4 5,393 / W5 5,339.
+The old source/drop boundaries are preserved, including W1/W2 unresolved-item exclusions and the old first-row collapse.
+
+| PH round | source rows | positive Price | candidate eligible before first | existing first extras |
+|----------+-------------+----------------+---------------------------------+-----------------------|
+| 2011Q1   |      46,471 |         31,095 |                          30,628 |                 3,524 |
+| 2013Q1   |      45,456 |         32,997 |                          31,239 |                 4,160 |
+| 2016Q1   |      37,756 |         37,756 |                          23,153 |                 2,591 |
+| 2019Q1   |      57,387 |         31,757 |                          31,757 |                     0 |
+| 2024Q1   |      56,388 |         30,197 |                          30,064 |                     0 |
+
+W1/W2 retain their existing 467 / 1,758 positive-price unresolved-item exclusions.
+The exact old metric-drop source masks are compared, not just their counts.
+These existing first-row collapses are not claimed as source-row retention; only the newly restored W4/W5 cells have one-to-one source conservation.
+
+Before rescue, the shared decoder cannot place 5,850 W4 and 6,013 W5 positive recorded labels.
+Existing metric sizes already rescue 3,368 / 3,267 of them.
+An upfront reporter would falsely flag those 6,635 rescued rows.
+The new reporter sees only labels still unplaced after both size paths, and only otherwise eligible positive-price/resolved-cluster/item rows.
+Synthetic unknown labels are reported with exact counts and still dropped; blank/bare codes stay silent under the existing policy.
+
+* Cold, warm, comparator and Feature
+
+Baseline and candidate each began with fully absent Nigeria/Niger L2 after complete verification of 13 physically private held blobs (28,426,011 bytes per root).
+These comprise six wired C8 sources, two held Stata twins for CSV metadata, two required lazy panel-ID cover dependencies and three Niger sources.
+Every blob retains original bytes, raw SHA256 and the declared DVC key, with distinct inode/single link/no symlink.
+For the two CSVs, raw MD5 differs from the declared text key: the existing DVC md5-dos2unix reader verifies the key without rewriting bytes.
+All source reads use get_dataframe/get_data_file; Stata metadata reads follow the sanctioned resolved held path.
+The guard and =unshare -rn= permit no network acquisition; successful preparation gates all dependent probes.
+
+Normal Country cold builds produce the counts above, with fresh hashes and complete wave manifests.
+Fresh processes serve exact warm Country and Feature frames/attrs while every private country-file byte and nanosecond mtime remains unchanged, including all L2 caches and any companion JSON.
+Healthy Niger remains 46,043 rows, with all native wave/raw-country/Country/Feature payloads, dtypes and attrs exact; its three independently built cache files are byte-identical across roots.
+Feature(Nigeria,Niger) grows 177,381 -> 182,609; every old row and full Feature attrs are exact.
+The candidate Feature equals normal Country parts after existing canonical neutral levels and column union.
+
+Actual audit phases 1/2 yield the same complete six-warning multiset after normalizing only checkout/data-root paths, with zero errors/failures/skips.
+Two has_household_index findings reflect deliberate cluster-level tables; two ClusterIdentityWarning records reflect known Nigeria wave-boundary LGA identity; one UserWarning records neutral variety/visit/obs alignment; one PopulationHeterogeneityWarning records the existing pooled universe classes.
+There is no community_prices phase-2 kwargs grid.
+Full warnings and frames remain private.
+
+* Tests and cache cost
+
+The complete focused selection passes 60 tests, 0 skips, with three unrelated unstaged food/crop/input built-data tests deselected explicitly.
+All ten actual-builder recovery tests fail on unchanged f8 (10 failures, 35 deselected).
+Controls cover the ten native labels, malformed/unknown and missing/bare-code units, exact reporter defaults, eligibility gates, ordinal/invalid/zero sizes, metric rescue of a genuinely unknown label before reporting, missing-metric-size exclusion and ONE SIZE ONLY.
+Existing #1047 and PH/metric C8 tests remain green.
+=make api-audit= passes using a private mounted-image adapter, with no untracked build inputs.
+
+All 549 actual country/table hashes and all 39 tagged framework fingerprints were computed on both trees.
+Exactly 24 Nigeria hashes move because the country module is hashed country-wide; 525 other hashes and all 39 framework fingerprints are exact.
+This is a rewarm cost, not an output claim for Nigeria's other 23 tables.
+Only community_prices and its required identity dependencies were built; healthy Niger was the measured comparator.
+
+* Reproduction, failures and boundaries
+
+The exact private runner and executed commands are in =REPRODUCE.sh=; source receipts, complete hash inventories and full raw evidence stay in the private implementation root.
+Each runtime uses the mounted Python, exact cwd/PYTHONPATH/countries-root assertions, active offline guard, single numerical/build/Make threads and serial test workers.
+No shared data-root writes, clears, promotions, assume-fresh bypass, fixture/golden edit or GitHub write occurred.
+
+The diagnosis preserves two failed preparation attempts (text-key handling, then a missing held panel-ID prerequisite); neither is product evidence and neither acquired a source.
+The implementation preserves an interrupted initial overbroad test selection (46 passed, 22 deselected before interruption), then the corrected explicit 60-test selection.
+That initial selector briefly overlapped the first cold build; the final source-backed cold/warm/Feature claim therefore uses a second physically private verified root with no overlapping data consumer.
+The first root and logs remain intact; no code changed and the passing focused tests and actual complete hash census were not repeated for this isolation check.
+No failure log was overwritten or presented as successful validation.
+The immutable f8 baseline, earlier Nigeria writer and frozen #1034/#1144 trees are protected by full tracked-content/mode/head/status snapshots; final freeze proof is private.
+
+Sue

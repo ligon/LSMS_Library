@@ -1,0 +1,18 @@
+{
+  "verdict": "PASS",
+  "candidate_HEAD": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+  "baseline_HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "frozen_all4_heads_clean": true,
+  "source_and_cache_freeze_proof": "proof.json",
+  "review_artifacts_SHA256": {
+    "REVIEW.org": "95674af71f6b8a709be873754b60f64da5b5f9d03de19a76802888ca919dd19e",
+    "REPRODUCE.md": "25e6d171628b7b10b86f36446fc2ebf4a25574adcde37d981c95f19f3efae372",
+    "verdict.json": "a7ff45a169688c5ff43235c1ece7c38ff4ebff5746104d1177ccf9fe6659e08f",
+    "proof.json": "a1e3ff7229b58cc2745b4c12e7872a955951531963843e0486cc6be239728a6d",
+    "static-proof.json": "50232a5368b754b5e6405989a1ff8b6f9736e61ac7fa54145cbaafce7078f82e",
+    "whole-tree-scope.json": "5b08d3f6daac470ff6b2bffd0ed8cdea2a90d6f276e667e7a855d64712478718"
+  },
+  "no_remaining_review_consumers": true,
+  "ready_for_dispatcher_PR_readiness_review": true,
+  "completion_time_UTC": "2026-10-21T22:14:37Z"
+}

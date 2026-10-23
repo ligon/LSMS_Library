@@ -1,0 +1,118 @@
+#+TITLE: GH849 Uganda -- exact saved-artifact addendum
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Result and scope
+
+The saved nonfactor-preservation claim is confirmed by this NEW exact artifact verification.
+There is no observed data mismatch in the checked saved objects.
+There are 85 successful checks: 35 frame comparisons (nine explicitly exclude only the intended KgFactor projection), 41 series comparisons, two full factor-attrs checks and seven exact carrier aggregate checks.
+Seven deliberate comparator self-controls also reject their injected differences; no pytest/product test or source/API stage was run.
+The unsaved comparisons below remain outside artifact proof.
+This addendum neither rewrites the original frozen diagnosis nor retroactively labels its comparator settings exact.
+
+Original baseline.py:23, oracle.py:74/83, measure.py:26/28/33/34 and default-warm.py:13 use pandas comparison defaults for floating values.
+The original DIAGNOSIS says the scenario preserves "every other helper/raw/public value, key, order, dtype, null mask, axis and full attr".
+This addendum supplies a separate stricter saved-object check of the comparisons its artifacts support.
+Original Uganda/849 (344 manifest entries plus three final control files) remains untouched.
+No inference of a mismatch was drawn from those earlier comparator settings alone.
+
+* Country grounding and historical qualifications
+
+The complete 3,604-line Uganda CONTENTS, including TODO/WAITING/LOGBOOK, was freshly read first.
+SHA256 is 774d5bc13c35ca5a6d9543766648f88dbc1efe508d73aa388d5ac6e81146256c at f8d236694c26fe9e709c5548f02c70f74ea72c33.
+The actual native-record caveat is that the existing retained-key reducer sums quantities but takes the first nonmissing reported factor, losing distinct production/slot observations.
+The later _1/_2 fields are condition records within a season, not additional seasons.
+A/B are module/visit labels: 2015-16 A describes the second season of 2014 and B the first season of 2015.
+Unit/condition identity follows code vocabulary, including the swapped 2013-14 A variable labels; 2018-19 A has no distributed harvest-unit column, and mixes two condition columns with a real reported factor.
+Native production IDs are recorded for 2011/2013/2015; actual slots distinguish wide-vintage observations, while 2010 source position is only a held-file locator, not a survey-supplied ID.
+Quantity and its own factor must remain paired before analyst reduction.
+The WAITING 2015-16 sales-value x100 correction is separate from quantity/factor interpretation.
+
+Historical statements are not silently treated as current invariants.
+CONTENTS:2435 calls the future factor move "small and in the right direction", whereas the frozen projection measures about +12.94 million kg.
+CONTENTS:1469 says harvest_kg "does not yet consume KgFactor" in an older before/after section; the frozen current ladder already consumes screened reports.
+Older slot and null-key counts coexist with dated corrections; this artifact task remeasures neither source eligibility nor questionnaire evidence.
+The source-grain blocker remains; exact preservation by a projection does not make the scalar-carrier promotion safe.
+
+* Exact comparator and guarded environment
+
+Exact reviewable comparator source is EXACT-COMPARATOR.py.
+Its typed/dtype/index/frame/receipt function AST is unchanged from the root-reviewed frozen review-1078-unit-attribution/exact_artifacts.py pattern.
+The original file SHA256 is 27885c7fa967e37ce6a5adc6deb03f5d44b284865a4b2a1556908579a45eeb46.
+Function AST SHA256 is 482913e1c535c4fd7b80ee68952434625b3071d83edde823eefb1805d0ba8f1d.
+Only those function definitions and the seven isolated comparator self-controls are executed; the old top-level artifact checks are not executed.
+
+Every pandas frame/series numerical comparison explicitly sets check_exact=True, rtol=0 and atol=0.
+The comparator additionally checks axis classes/names, all MultiIndex levels/codes/sortorder, row/column order, column and extension dtypes, StringDtype storage/na_value, flags and complete null masks.
+Full attrs are recursively type-checked, including PopulationRecord, SamplingRecord, RecallRecord, _FrozenDict and _FrozenList.
+Immutable record _FIELDS presence and attribute values are checked in addition to stored mapping fields; dataclass fields, sets and nested arrays are covered by the same comparator.
+No actual frame/attr normalization, sorting, coercion or attrs stripping is used.
+The only dropped comparison column is the expressly projected KgFactor on nine nonfactor-preservation pairs.
+Expected factor series use the frozen canonical Float64/key-alignment construction on the untouched helper axis, as oracle.py explicitly specifies.
+
+The new owner-only private root has a separate launcher, config/data/tmp/DVC-site/XDG/matplotlib roots and an empty data payload.
+Before record imports/unpickling, bootstrap asserts the mounted image interpreter, exact cwd/PYTHONPATH/package discovery/countries/config/data paths, threads/build/Make=1, active socket/write guard and unshare-rn.
+Resolved package/config/data paths are checked again before any pickle load.
+The denial-policy AST differs from the original only by the new private-root literal.
+Its metadata-link exception is entirely inside the new private root; the original source DVC tmp and all old evidence/Mali writes are denied.
+Country/Feature constructors and sanctioned source/cache IO are blocked as additional artifact-only guards; none is invoked.
+No DTA decode, helper/finalizer/ladder stage, source measurement, acquisition, DVC CLI, cache payload write, Git/ref or GitHub mutation occurred.
+
+* Checked artifact pairs and arithmetic
+
+- Eleven cold/warm complete baseline pairs: public, raw COUNTRY, factor provenance, harvest kg and seven native wave frames.
+- Two scenario raw/public nonfactor full-frame pairs and seven before/proposed helper nonfactor full-frame pairs, including their full typed attrs.
+- Baseline factor frame versus separately saved factors-before control.
+- Seven source-key first-nonmissing reported-factor expected series, with exact values/dtypes/masks and unchanged actual helper axes.
+- Complete unchanged 2009-10 and already-wired 2018-19 helper/public positive controls.
+- Thirty saved-source-position operand series: Quantity and reported factor for all 15 recorded factor slots, read from already-saved decoded source pickles only.
+- Four saved screen/rejection series plus independently reconstructed full factor attrs on baseline/projected sides.
+- Two complete saved harvest frames checked from saved Quantity times saved kg_per_unit, existing zero exclusion and existing plot-crop algebra; no factor ladder is rerun.
+- The complete saved source-identity carrier columns versus concatenated saved native oracles.
+- Seven full saved collision diagnostic frames and seven exact carrier-count/net/absolute aggregates, using saved factors and the existing explicit household lookup solely to align expected source keys.
+
+The baseline and projected crop frames each contain 133,331 rows.
+Their saved analyst harvest reductions contain 78,571 and 88,980 rows respectively.
+Projected factor/harvest differences are intended scenario measurements and are kept separate from preservation checks.
+The exact source-product diagnostics retain the original unsafe-carrier conclusion, including all 112 complete comparable requested-wave conflict groups and the six pre-existing 2018 control groups.
+No repaired total, weighted factor, grain change or public API claim is introduced.
+The whole saved factor attrs, including changed provenance counts and disagreements, are checked against their own reconstructed expected metadata rather than stripped to force baseline equality.
+
+* Preserved stops and bounded correction
+
+An initial launcher assertion required a literally empty data directory.
+Package import creates an empty private dvc-cache directory (local_tools.py:130), so that assertion stopped before any unpickle.
+The original stop is preserved; the correct terminal assertion requires only that directory and ZERO payload files.
+An inventory-script syntax stop is also preserved and is not product evidence.
+
+The initial strict checker passed 81 checks and recorded four additional source-operand dtype failures: its expected vectors incorrectly forced float64 for 2011-12 A/B Quantity/KgFactor, whose saved native source/oracle arrays are float32.
+Those four exact failures and the initial checker are preserved, not hidden.
+Only those four checks were then repeated by verify_four_operands.py.
+It reproduces oracle.py:54/59/63: pd.to_numeric on the saved source, positive-factor where(..., NaN), then native to_numpy(), with no dtype taken from the observed result.
+All four source/numeric/NumPy/observed dtypes are float32 and strict comparisons pass.
+No actual artifact was cast; no unrelated comparison or source stage was repeated.
+The final 85-check record combines the original 81 successes and these four corrected expected constructions.
+
+* Honest artifact gaps
+
+1. default-warm.py saved only ordinary-default-warm.json, not the returned default-constructor public/harvest objects. Its constructor comparison cannot be made newly exact from saved artifacts.
+2. No separately captured explicit currency=None/Feature pair exists. No new default-versus-None equality claim is made.
+3. measure.py's recreated base_final return was not saved separately. Its own original default-tolerance assertion cannot be replaced by an artifact-only comparison; raw/public operands and the projected return are saved and checked as described above.
+4. Four preliminary scenario/*.pkl source frames belong to the preserved failed initial oracle launch, not final acceptance targets. Inventory enumerates all 88 saved pickles: 22 baseline, 62 final scenario-v3 and four preliminary artifacts. Unpaired source fields outside the stated operand checks are not newly adjudicated.
+
+These gaps are not filled by rerunning source or API work.
+The original report/checker remains frozen with its original claims and comparator settings; this dated addendum is the separate publication evidence and qualification.
+
+* Original receipts and final release
+
+Before and after checks confirm all 344 original manifest receipts and 22 safe exports, and protect all 347 original files byte/size/mode/mtime exact.
+All 14,880 tracked Uganda source contents/modes, f8 HEAD, branch, clean status and raw Git index SHA256 remain exact.
+Index SHA256 is 777bf6282634d2f18c98b0844ea64de752470fa738640ac08a8f92cd3bfcf84c.
+All 1,309 Mali manifest receipts remain exact; all 1,311 files including its final receipt controls are protected unchanged.
+Loaded-input and comparator-source receipts are checked again at release.
+Detailed frames, source keys, logs and strict failure messages stay private; this addendum exports only bounded aggregates and comparator source.
+Final quiescence and this new root's immutable manifest are recorded in READY.json/freeze-proof.json.
+No old report or source tree was edited, and no commit/ref/GitHub operation was performed.
+
+Sue

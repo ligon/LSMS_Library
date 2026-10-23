@@ -1,0 +1,41 @@
+{
+  "heads": [
+    "candidate",
+    "actual_parent"
+  ],
+  "feature": "plot_inputs",
+  "country": "Burkina_Faso",
+  "phases_requested": [
+    1,
+    2
+  ],
+  "jobs": 1,
+  "records_per_head": 4,
+  "warnings_per_head": 4,
+  "phase2_plot_inputs_grid_entries": 0,
+  "ordered_full_records_equal": true,
+  "whole_JSONL_bytes_equal": true,
+  "comparison_receipt_sha256": "2effd253ec2573b96702e6b79ad37efd9b4c167701483dbaf58c93eea97a51e7",
+  "checks": [
+    {
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "phase": "1a-sanity",
+      "check": "index_levels_match_scheme",
+      "status": "warn"
+    },
+    {
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "status": "POSTEXIT_PR1203_ALL_SAVED_RECEIPTS_EXACT",
+  "READY_sha256": "f212cfa2e0ba34bb358de123d81ba6bcf21173c2386409576c2b8e1819785996",
+  "manifest_sha256": "61ace40be6c441731dd813c3d979610e8468cdf09fb1c39e426a5fa9de4dc0bd",
+  "manifest_entries": 284,
+  "historical_entries": 1173,
+  "selected_physical_operands": 204,
+  "all_original_copy_receipts_exact": true,
+  "source_clean": true,
+  "zero_active_payload_consumers": true,
+  "write_denials": 0,
+  "network_denials": 0,
+  "signed": "Sue"
+}

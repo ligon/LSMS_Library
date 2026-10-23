@@ -1,0 +1,91 @@
+{
+  "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "normal_default_backend_cold_tables": [
+    "plot_features",
+    "sample"
+  ],
+  "verified_cold_data_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058/data-cold-verified",
+  "initial_Burkina_L2": 0,
+  "initial_Senegal_verified_fresh_L2": 6,
+  "public_rows": 19784,
+  "raw_country_rows": 19791,
+  "country_attrs_id_converted": true,
+  "columns": [
+    "Area",
+    "AreaUnit",
+    "Tenure",
+    "TenureSystem",
+    "SoilType",
+    "Irrigated"
+  ],
+  "dtypes": {
+    "Area": "Float64",
+    "AreaUnit": "string",
+    "Tenure": "string",
+    "TenureSystem": "string",
+    "SoilType": "string",
+    "Irrigated": "boolean"
+  },
+  "baseline_has_coordinate_columns": false,
+  "wave_accounting": [
+    {
+      "wave": "2018-19",
+      "retained_source_rows": 12441,
+      "helper_and_wave_rows": 12441,
+      "country_raw_rows": 12441,
+      "public_rows": 12434,
+      "country_all_payload_missing_rows_removed": 7,
+      "native_duplicate_keys": 0,
+      "post_id_walk_duplicate_keys": 0,
+      "public_duplicate_keys": 0,
+      "public_null_key_cells": 0,
+      "public_household_orphans_vs_sample": 0,
+      "native_household_count": 4563,
+      "post_walk_household_count": 4563,
+      "changed_household_tokens_after_id_walk": 0,
+      "native_to_wave_exact": true,
+      "tested_id_walk_to_country_raw_exact": true,
+      "full_old_public_values_nulls_keys_axes_dtypes_attrs_preserved_in_projection": true
+    },
+    {
+      "wave": "2021-22",
+      "retained_source_rows": 7350,
+      "helper_and_wave_rows": 7350,
+      "country_raw_rows": 7350,
+      "public_rows": 7350,
+      "country_all_payload_missing_rows_removed": 0,
+      "native_duplicate_keys": 0,
+      "post_id_walk_duplicate_keys": 0,
+      "public_duplicate_keys": 0,
+      "public_null_key_cells": 0,
+      "public_household_orphans_vs_sample": 0,
+      "native_household_count": 2110,
+      "post_walk_household_count": 2110,
+      "changed_household_tokens_after_id_walk": 1756,
+      "native_to_wave_exact": true,
+      "tested_id_walk_to_country_raw_exact": true,
+      "full_old_public_values_nulls_keys_axes_dtypes_attrs_preserved_in_projection": true
+    }
+  ],
+  "proposed_public_rows": 19784,
+  "proposed_full_old_public_frame_and_logical_attrs_exact": true,
+  "proposed_coordinates_per_wave": {
+    "2018-19": {
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "2021-22": {
+      "Latitude": 4180,
+      "Longitude": 4180
+    }
+  },
+  "normal_cold_warning_classes": {
+    "NullReadWarning": 2,
+    "QuantityImplausibleWarning": 2
+  },
+  "projection_warning_classes": {
+    "NullReadWarning": 1,
+    "QuantityImplausibleWarning": 2
+  },
+  "candidate_implementation_or_new_curation": false
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "scenario": "market-then-currency",
+    "passed_test_executions": 2,
+    "complete_frame_attrs_exact": true
+  },
+  {
+    "scenario": "currency-then-market",
+    "passed_test_executions": 2,
+    "complete_frame_attrs_exact": true
+  }
+]

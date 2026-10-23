@@ -1,0 +1,21 @@
+* DRAFT: reported harvest factors need native production-record grain (GH849)
+
+Measured read-only at f8d236694c26fe9e709c5548f02c70f74ea72c33 on2026-10-21.
+The five missing-wave q6d carriers exist, but adding their12 colmap entries alone would keep a source-grain defect: the retained plot/crop/unit/condition/season key sums quantities while taking first nonmissing KgFactor.
+Different source production observations can share that key, even with the same factor.
+In2011-12, productionID/production2ID distinguishes every eligible nonnull-key observation;2013-14 and2015-16 use Production_ID/Production2_ID.
+Those actual identifiers are not carried by the current builder.
+The2018/2019 wide vintage has actual condition-slot identity, which also distinguishes every such observation even when the two slots report the same condition label.
+2010-11 has no corresponding production-ID column; a held-file row-position locator would be constructed provenance, not an instrument ID.
+
+The requested waves have115raw factor-disagreement groups,113with multiple screened usable factors,112with complete usable quantities/factors and a common known unit/condition.
+For those112groups, first-factor times summed quantity differs from the sum of the source observations' own products by net+10,710.9000002kg, absolute26,602.0999998kg.
+Two2013groups contain rejected operands and one2019group has Unknown unit; neither receives an invented supported total.
+The six already-wired2018groups have a pre-existing carrier discrepancy and are not a precedent for accepting this loss elsewhere.
+
+A follow-up must retain all distinct native observations, including equal-factor and partial-report groups, through Country and Feature before analyst conversion/reduction.
+No averaging, weighted scalar, silent factor NA, reported_total, new unit/factor or automatic repair was approved in this diagnosis.
+The original all-nonfactor payload is unchanged under the measured private12-key scenario, but that is not sufficient to approve the scalar carrier or claim an implemented fix.
+Existing2015Value_sold x100 and null-key-loss caveats remain separate.
+
+Sue

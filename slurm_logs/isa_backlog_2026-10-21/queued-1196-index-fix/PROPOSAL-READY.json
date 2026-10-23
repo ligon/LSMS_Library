@@ -1,0 +1,16 @@
+{
+  "status": "STAGE1_PROPOSAL_READY_STOP_NO_APPLY_AUTHORIZATION",
+  "ledger_head": "ee533e09af4b29408985a0c7a1abf815c5c385d1",
+  "patch": "proposed.patch",
+  "patch_sha256": "6fa0329189b79af399be0bcd89e2367b71041ebe39b648a1c88145906d879482",
+  "design": "DESIGN.md",
+  "design_sha256": "bb8c47fa06cfc77d0aee6db59d1eeae5c94364157bc5d84cf9ddeee4c647aed2",
+  "manifest": "stage1-manifest.json",
+  "entries": 9,
+  "manifest_sha256": "1d3c9e486c88ec527b2b009fdf3ca830b768d8ed8ae5f971d964a38c339ca6c0",
+  "product_applied": false,
+  "tests_apis_imports_source_staging": 0,
+  "clean_source_and_base": true,
+  "active_task_consumers": 0,
+  "signed": "Sue"
+}

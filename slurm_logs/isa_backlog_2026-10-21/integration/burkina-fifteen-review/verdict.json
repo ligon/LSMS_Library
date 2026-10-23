@@ -1,0 +1,406 @@
+{
+  "verdict": "PASS",
+  "candidate_head": "4227e3a802c7349b11f41ec70a924d712159e587",
+  "control_head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+  "findings_requiring_fix": [],
+  "checks": {
+    "candidate_head": "4227e3a802c7349b11f41ec70a924d712159e587",
+    "control_head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "complete_frames_per_cold_warm_process": 35,
+    "processes": 4,
+    "all_old_values_keys_order_dtypes_nullmasks_logical_attrs_exact": true,
+    "source_and_native_GPS_oracle": "PASS",
+    "native_2018_columns": 6,
+    "country_union_columns": 8,
+    "public_GPS_rows": 19784,
+    "GPS_Feature_default_rows": 33608,
+    "positions_pairs": 4180,
+    "both_missing": 3170,
+    "partial_pairs": 0,
+    "input_rows": 22877,
+    "historically_recovered_lines_preserved": 183,
+    "historically_recovered_Quantity_kg": 2409.58,
+    "input_Feature_default_rows": 47212,
+    "input_Feature_currency_None_rows": 47212,
+    "sample_rows": 20648,
+    "cluster_rows": 2035,
+    "healthy_rows": {
+      "Senegal_plot_features": 13824,
+      "Benin_plot_inputs": 10605,
+      "Togo_plot_inputs": 13730
+    },
+    "18_healthy_cache_bytes_modes_mtimes_exact": true,
+    "31_total_parquets_per_root": true,
+    "actual_normal_cold_empty_BF_L2_roots": 2,
+    "fresh_process_warm_data_bytes_modes_mtimes_changes": 0,
+    "cache_tier_counts": {
+      "baseline": {
+        "YAML_wave_current": 12,
+        "script_wave_hashless_unchanged": 7,
+        "country_current_full_coverage": 12
+      },
+      "candidate": {
+        "YAML_wave_current": 12,
+        "script_wave_hashless_unchanged": 7,
+        "country_current_full_coverage": 12
+      }
+    },
+    "full_warning_multisets_stage_class_message_exact": true,
+    "scanner_complete_unmodified_multisets_exact": true,
+    "scanner_individual_records": {
+      "GPS": [
+        {
+          "ordinal": 1,
+          "phase": "1a-sanity",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "NullReadWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 2,
+          "phase": "1a-sanity",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "QuantityImplausibleWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 3,
+          "phase": "1a-sanity",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "QuantityImplausibleWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 4,
+          "phase": "1a-sanity",
+          "country": "Burkina_Faso",
+          "check": "index_levels_match_scheme",
+          "classification": "index_levels_match_scheme",
+          "fingerprint": "plot_features|Burkina_Faso||index_levels_match_scheme",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 5,
+          "phase": "1a-sanity",
+          "country": "Burkina_Faso",
+          "check": "no_constant_columns",
+          "classification": "no_constant_columns",
+          "fingerprint": "plot_features|Burkina_Faso||no_constant_columns",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 6,
+          "phase": "1a-sanity",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "QuantityImplausibleWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 7,
+          "phase": "1a-sanity",
+          "country": "Senegal",
+          "check": "index_levels_match_scheme",
+          "classification": "index_levels_match_scheme",
+          "fingerprint": "plot_features|Senegal||index_levels_match_scheme",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 8,
+          "phase": "1a-sanity",
+          "country": "Senegal",
+          "check": "no_constant_columns",
+          "classification": "no_constant_columns",
+          "fingerprint": "plot_features|Senegal||no_constant_columns",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 9,
+          "phase": "1b-assembly",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "NullReadWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 10,
+          "phase": "1b-assembly",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "QuantityImplausibleWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 11,
+          "phase": "1b-assembly",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "QuantityImplausibleWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 12,
+          "phase": "1b-assembly",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "QuantityImplausibleWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 13,
+          "phase": "1b-assembly",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "PopulationHeterogeneityWarning",
+          "fingerprint": "plot_features|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        }
+      ],
+      "input": [
+        {
+          "ordinal": 1,
+          "phase": "1a-sanity",
+          "country": "Benin",
+          "check": "index_levels_match_scheme",
+          "classification": "index_levels_match_scheme",
+          "fingerprint": "plot_inputs|Benin||index_levels_match_scheme",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 2,
+          "phase": "1a-sanity",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "NullReadWarning",
+          "fingerprint": "plot_inputs|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 3,
+          "phase": "1a-sanity",
+          "country": "Burkina_Faso",
+          "check": "index_levels_match_scheme",
+          "classification": "index_levels_match_scheme",
+          "fingerprint": "plot_inputs|Burkina_Faso||index_levels_match_scheme",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 4,
+          "phase": "1a-sanity",
+          "country": "Togo",
+          "check": "index_levels_match_scheme",
+          "classification": "index_levels_match_scheme",
+          "fingerprint": "plot_inputs|Togo||index_levels_match_scheme",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 5,
+          "phase": "1b-assembly",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "NullReadWarning",
+          "fingerprint": "plot_inputs|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        },
+        {
+          "ordinal": 6,
+          "phase": "1b-assembly",
+          "country": null,
+          "check": "runtime_warning",
+          "classification": "runtime_warning",
+          "fingerprint": "plot_inputs|ALL||runtime_warning",
+          "status": "warn",
+          "full_record_exact_to_actual_global14": true
+        }
+      ]
+    },
+    "scanner_receipts": {
+      "GPS": {
+        "baseline": {
+          "sha256": "d5d760249312a6f4ed911fe542092a9094e86e3108bbc06f1985e64e5ee64c20",
+          "mode": 420,
+          "mtime_ns": 1792620704719562136,
+          "bytes": 13792
+        },
+        "candidate": {
+          "sha256": "d5d760249312a6f4ed911fe542092a9094e86e3108bbc06f1985e64e5ee64c20",
+          "mode": 420,
+          "mtime_ns": 1792620828526337879,
+          "bytes": 13792
+        }
+      },
+      "input": {
+        "baseline": {
+          "sha256": "1ad3b12faef18830277d8f6597cab28701d7b9a790d619de818b69c35e143b4a",
+          "mode": 420,
+          "mtime_ns": 1792620755146874792,
+          "bytes": 3947
+        },
+        "candidate": {
+          "sha256": "1ad3b12faef18830277d8f6597cab28701d7b9a790d619de818b69c35e143b4a",
+          "mode": 420,
+          "mtime_ns": 1792620834968375613,
+          "bytes": 3947
+        }
+      }
+    },
+    "scanner_warns": {
+      "GPS": 13,
+      "input": 6
+    },
+    "scanner_fail_error_skip": 0,
+    "phase2_kwargs_cases": 0,
+    "tests": {
+      "GPS": {
+        "tests": 44,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "input": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "baselineGPS": {
+        "tests": 15,
+        "failures": 12,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "explicit_unstaged_comparator_parameter_cases_deselected": 4,
+    "API_audit": "PASS",
+    "full549_39_not_repeated": true,
+    "whole_file_hash_rebuilds_measured_for_BF_tables": [
+      "plot_features",
+      "plot_inputs",
+      "sample",
+      "cluster_features"
+    ],
+    "source_receipts_per_root": 20,
+    "sanctioned_get_data_file_extra_private_source_materializations": 3,
+    "extra_source_materializations_MD5_SHA_exact": true,
+    "no_acquisition_shared_writes_stamps_or_read_gate_bypass": true,
+    "actual_network_attempts": 0,
+    "guard_probes": {
+      "frozen_write_denials": 2,
+      "existing_metadata_FileExists": 2,
+      "socket_denials": 2
+    },
+    "residuals_unchanged": [
+      "1187 unlabelled code21 legacy Seed curation",
+      "1188 gift/donation fields under purchase-named API columns"
+    ],
+    "new_country_note_proposal": "Clarify historical sample counts versus fresh served counts; preserve the recorded design universe distinction."
+  },
+  "source_boundary": {
+    "control_head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "candidate_head": "4227e3a802c7349b11f41ec70a924d712159e587",
+    "incremental_paths": [
+      ".coder/ledger/1058-burkina-parcel-gps.md",
+      "lsms_library/countries/Burkina_Faso/2021-22/_/plot_features.py",
+      "lsms_library/countries/Burkina_Faso/_/CONTENTS.org",
+      "lsms_library/countries/Burkina_Faso/_/burkina_faso.py",
+      "lsms_library/countries/Burkina_Faso/_/data_scheme.yml",
+      "slurm_logs/isa_backlog_2026-10-21/1058-Burkina_Faso/REPORT.md",
+      "slurm_logs/isa_backlog_2026-10-21/1058-Burkina_Faso/REPRODUCE.md",
+      "slurm_logs/isa_backlog_2026-10-21/1058-Burkina_Faso/validation.json",
+      "tests/test_burkina_faso_plot_gps.py"
+    ],
+    "only_coordinate_loop_and_docstring_in_helper": true,
+    "all_other_helper_function_AST_exact": true,
+    "only_two_2021_q46_bindings": true,
+    "only_two_optional_canonical_float_declarations": true,
+    "prior1123_non_doc_files_byte_exact": [
+      "lsms_library/countries/Burkina_Faso/2018-19/_/plot_inputs.py",
+      "lsms_library/countries/Burkina_Faso/_/categorical_mapping.org"
+    ],
+    "prior1123_tests_exact": true,
+    "combined1123_identity_gift_residual_notes_exact": true,
+    "standalone1058_runtime_files_exact": true,
+    "standalone_full_549_39_receipts_carried_source_pinned": true
+  },
+  "immutable_protection": {
+    "heads": {
+      "/local/job40255479/worktrees/isa-integration": "4227e3a802c7349b11f41ec70a924d712159e587",
+      "/local/job40255479/worktrees/isa-baseline-fourteen-Burkina": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+      "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso-base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1058-fix": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1058": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "/local/job40255479/worktrees/isa-baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1123": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "/local/job40255479/worktrees/isa-Burkina_Faso": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb"
+    },
+    "tracked_counts": {
+      "/local/job40255479/worktrees/isa-integration": 15011,
+      "/local/job40255479/worktrees/isa-baseline-fourteen-Burkina": 15006,
+      "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso": 14885,
+      "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso-base": 14880,
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1058-fix": 14885,
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1058": 14880,
+      "/local/job40255479/worktrees/isa-baseline": 14880,
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1123": 14886,
+      "/local/job40255479/worktrees/isa-Burkina_Faso": 14889
+    },
+    "evidence_counts": {
+      "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058": 186,
+      "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058-fix": 200,
+      "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1123": 258,
+      "/local/job40255479/control/isa-backlog-20261021/review-1058-Burkina_Faso": 189,
+      "/local/job40255479/control/isa-backlog-20261021/review-1123-Burkina_Faso": 192,
+      "/local/job40255479/control/isa-backlog-20261021/integration/api-eleven-review": 2875
+    },
+    "all_clean": true,
+    "files_modes_symlinks_mtimes_heads_exact": true,
+    "candidate_existing_dvc_tmp_exact": true,
+    "incorrect_bootstrap_path_absent": true
+  },
+  "release": {
+    "task_consumers_remaining": 0,
+    "freeze_released": true
+  },
+  "limits": [
+    "Healthy Senegal/Benin/Togo are current-hash held warm comparators, not source-cold claims.",
+    "Four legacy per-household comparator parameter cases explicitly deselected; zero skipped.",
+    "No other hashed Burkina output or other-country primary-source claim.",
+    "No full549/39 rerun; exact standalone receipts are source-pinned and carried.",
+    "Three sanctioned get_data_file source materializations are MD5/SHA exact; all original cache files remain unchanged."
+  ],
+  "residuals": [
+    "1187 unlabelled2018 code21 legacy Seed classification unchanged",
+    "1188 gift/donation fields retain current purchase-named API bindings and units unchanged"
+  ],
+  "signed": "Sue"
+}

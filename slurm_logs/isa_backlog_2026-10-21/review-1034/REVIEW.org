@@ -1,0 +1,88 @@
+#+title: Independent review - Nigeria GH #1034
+#+date: 2026-10-21
+
+* Verdict
+
+PASS for the four-label scope at frozen commit =6fda46bc5437758bd650cf4016f0782a124281cf= against =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+No actionable correctness defect was reproduced.
+The frozen tracked tree remains unchanged and clean.
+
+* Anchored review
+
+The task ledger sections 2-5 correctly reuse =food_unit_labels=, =food_acquired_for_wave= and the existing food derivations.
+The units skill distinguishes native labels from kilogram factors and warns that even residual labels can receive pooled factors.
+Nigeria's CONTENTS records colliding wave code spaces, the shared PP/PH column, the #223 historical correction, W4 size defects, and the separate nonfood recall-window WAITING item.
+The implementation does not contradict these boundaries or introduce another decoder.
+
+- Mapping :: =lsms_library/countries/Nigeria/_/categorical_mapping.org:416= changes exactly three existing cells, all in =2015-16=, and adds code 161 at line 419.
+  Every existing Preferred Label and every existing non-W3 cell is exactly preserved against the baseline table.
+  Code 161 has no other-wave cell.
+- Source truth :: Sanctioned =get_dataframe(..., categories_only=True)= reads independently confirm all four source spellings in W3 planting =s7bq3b=.
+  Both Stata blobs match their sidecar MD5 byte-for-byte.
+  Both CSV blobs match their sidecar MD5 under the installed DVC legacy =md5-dos2unix= algorithm.
+  That algorithm normalizes 1 MiB chunks; whole-file CRLF normalization alone does not reproduce the PH digest.
+  This resolved the initial integrity-check alarm without altering or acquiring data.
+- Round boundary :: Every wired PH unit column has zero occurrences of the four codes, including records with no positive quantity.
+  The unwired PH total-consumption =s10bq2b= does carry their labels, confirming the qualification at =Nigeria/_/CONTENTS.org:223=.
+- Test meaning :: The independently transcribed label facts at =tests/test_nigeria_food_unit_decode.py:84= and source-grain test at line 123 assert expected meanings and measurements.
+  With only the unit-table reader redirected in memory to a private copy of the baseline table, all three strengthened cases fail as expected.
+  No repository fixture, baseline, dependency or source file was changed for that counterfactual.
+
+* Independent execution
+
+A physically empty private Nigeria L2 and physically copied private L1 were used with the frozen package/config roots asserted by real path.
+The image Python, BLAS/OMP/MKL thread limits of 1 and =LSMS_BUILD_WORKERS=1 were used throughout.
+The cold Country food/derived replay took 55.44 seconds.
+
+- Native data :: 595,725 rows exactly match the writer's after frame and the baseline frame after only the three intended unit renames.
+  All native Quantity/Expenditure values and missingness are therefore preserved exactly.
+  Exactly 12 W3-PP rows relabel: 131 three, 151 eight, 152 one; seven other quarters remain exactly equal without renaming.
+- Kilograms :: The kg-only sum moves from 1,467,177.4931960062 to 1,467,196.4975769585.
+  The +19.004380952334 kg is fully accounted for by +15.480571428571 on common kg rows and +3.523809523810 on three newly convertible rows.
+  Those three rows formerly carried 4.0 native units, which are not added to the kilogram total.
+  Common changes are 85 W1-PH rows and eight W3-PP rows; quarter deltas are -6.279428571404 and +25.283809523811 kg respectively.
+- Prices :: 481,191 rows remain, with 14 changed default kgvalue prices: 13 W1-PH and one W3-PP Basin Medium.
+  Every remaining derived value agrees after the native-unit rename.
+- Targeted tests :: 53 passed, zero skipped, zero failed/errors, 46 retained warnings, in 22.89 seconds under two loadfile workers.
+  The selection excludes only the two unrelated built crop/plot-input checks; the modules' synthetic tests run.
+  These built checks used the reviewer's newly cold-built private data, subsequently warm during pytest.
+- Counterfactual :: Three selected strengthened cases produce three expected assertion failures against the old unit table, zero setup errors or skips.
+- Cache hashes :: All 24 Nigeria table hashes change against the recorded baseline hashes; none of 28 Uganda hashes changes.
+  This verifies the reported country-wide Nigeria invalidation cost.
+- Feature/comparator evidence :: Independently recomputed full record multisets from both writer scans agree after checkout/data-path normalization only: 455 records each, 452 warnings and three passes, zero added/removed records or fail/error/skip records.
+  Uganda before/after held food and sample parquets are exactly equal: 355,571 and 24,362 rows respectively.
+
+* Reproduction and artifacts
+
+Scripts =check.py= and =tests.py= in this review directory assert the frozen package/config identity before running.
+Their commands, run from the frozen checkout with the environment below, were:
+
+#+begin_src sh :eval no :tangle no
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONPATH=/local/job40255479/worktrees/isa-review-1034
+export LSMS_COUNTRIES_ROOT="$PYTHONPATH/lsms_library/countries"
+export LSMS_DATA_DIR=/local/job40255479/control/isa-backlog-20261021/review-1034/data
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+export PATH="/local/job40255479/venv_img/bin:$PATH"
+cd "$PYTHONPATH"
+python /local/job40255479/control/isa-backlog-20261021/review-1034/check.py static
+python /local/job40255479/control/isa-backlog-20261021/review-1034/check.py audit
+python /local/job40255479/control/isa-backlog-20261021/review-1034/check.py cold
+python /local/job40255479/control/isa-backlog-20261021/review-1034/tests.py counterfactual
+python /local/job40255479/control/isa-backlog-20261021/review-1034/tests.py positive
+#+end_src
+
+The cold phase requires an empty private Nigeria L2; use a new private data directory under this review directory and seed its =dvc-cache= from this directory's copied =l1= to repeat it.
+The counterfactual intentionally records three test failures and exits successfully only after checking those exact failure counts.
+Machine-readable evidence is in =static-source.json=, =cold-derived.json=, =audit-hashes.json=, =positive-tests.json=, =counterfactual-tests.json= and =validation.json=.
+The positive and negative JUnit records are =positive.xml= and =counterfactual.xml=.
+
+* Limits
+
+The baseline cold build and complete Feature scans were not independently repeated; their held artifacts were independently compared, and the frozen candidate's food/derived output was independently rebuilt cold and matched exactly.
+Uganda is a warm held comparator, not a newly cold-built source validation.
+The 452 retained Feature warnings and 46 pytest warnings are not an all-green corpus claim.
+No blanket full suite, other-country cold corpus, unrelated Nigeria table rebuild, raw acquisition, DVC CLI or GitHub write was performed.
+No shared cache was modified or promoted, and no other-wave or W4 policy issue is claimed resolved.
+
+Sue

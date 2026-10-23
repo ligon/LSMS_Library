@@ -1,0 +1,674 @@
+{
+  "status": "AUTHOR_READY_PENDING_FINAL_FREEZE_AND_INDEPENDENT_REVIEW",
+  "author_independent_PASS": false,
+  "runtime": "929149222e43a8fe500cc08420cdc68357170af3",
+  "parent": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+  "tests": {
+    "release-focused.xml": {
+      "cases": 402,
+      "failures": 0,
+      "errors": 0,
+      "skips": 10
+    },
+    "negative-release.xml": {
+      "cases": 39,
+      "failures": 36,
+      "errors": 0,
+      "skips": 0
+    },
+    "null-precheck.xml": {
+      "cases": 3,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0
+    },
+    "observation-release-39-tests.xml": {
+      "cases": 39,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    }
+  },
+  "skipped_cases": [
+    {
+      "node": "tests.test_863_transforms::test_malawi_warm_livestock_sales_value",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_863_transforms::test_malawi_warm_food_acquired_hdds_partition_guard_bites",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_863_transforms::test_malawi_warm_food_acquired_hdds_scores_in_range",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_863_transforms::test_malawi_warm_fertilizer_rate",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_863_transforms::test_malawi_warm_nitrogen_kg_resolves_the_fertilizer_labels",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_863_transforms::test_malawi_warm_crop_revenue_by_crop_sums_back_to_the_household",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_863_transforms::test_malawi_warm_crop_diversity",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_feature_canonical_index::test_warm_corpus_assembly_loses_no_rows",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_feature_canonical_index::test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_labor]",
+      "exception_classes": [],
+      "credential_gate": false
+    },
+    {
+      "node": "tests.test_feature_canonical_index::test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_inputs]",
+      "exception_classes": [],
+      "credential_gate": false
+    }
+  ],
+  "hash_scope": {
+    "country_hashes": {
+      "total": 549,
+      "changed": 28
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "changed": 0
+    },
+    "wave_hashes": {
+      "total": 1362,
+      "changed": 171
+    },
+    "api_wave_hashes": {
+      "total": 2139,
+      "changed": 224
+    },
+    "all_old_colmaps_including_kg_factor_exact_f8": true
+  },
+  "source_oracle": {
+    "status": "PASS",
+    "waves": [
+      {
+        "wave": "2009-10",
+        "eligible_before_existing_nullkey_exclusion": 22909,
+        "existing_nullkey_excluded": 360,
+        "retained": 22549,
+        "reported_or_slot_colliding_members": 0,
+        "fullframe_prewrite_and_artifact_exact": true
+      },
+      {
+        "wave": "2010-11",
+        "eligible_before_existing_nullkey_exclusion": 21051,
+        "existing_nullkey_excluded": 0,
+        "retained": 21051,
+        "reported_or_slot_colliding_members": 0,
+        "fullframe_prewrite_and_artifact_exact": true
+      },
+      {
+        "wave": "2011-12",
+        "eligible_before_existing_nullkey_exclusion": 20243,
+        "existing_nullkey_excluded": 43,
+        "retained": 20200,
+        "reported_or_slot_colliding_members": 0,
+        "fullframe_prewrite_and_artifact_exact": true
+      },
+      {
+        "wave": "2013-14",
+        "eligible_before_existing_nullkey_exclusion": 17646,
+        "existing_nullkey_excluded": 0,
+        "retained": 17646,
+        "reported_or_slot_colliding_members": 0,
+        "fullframe_prewrite_and_artifact_exact": true
+      },
+      {
+        "wave": "2015-16",
+        "eligible_before_existing_nullkey_exclusion": 19639,
+        "existing_nullkey_excluded": 0,
+        "retained": 19639,
+        "reported_or_slot_colliding_members": 0,
+        "fullframe_prewrite_and_artifact_exact": true
+      },
+      {
+        "wave": "2018-19",
+        "eligible_before_existing_nullkey_exclusion": 15630,
+        "existing_nullkey_excluded": 0,
+        "retained": 15630,
+        "reported_or_slot_colliding_members": 0,
+        "fullframe_prewrite_and_artifact_exact": true
+      },
+      {
+        "wave": "2019-20",
+        "eligible_before_existing_nullkey_exclusion": 17046,
+        "existing_nullkey_excluded": 0,
+        "retained": 17046,
+        "reported_or_slot_colliding_members": 0,
+        "fullframe_prewrite_and_artifact_exact": true
+      }
+    ],
+    "fresh_raw_frames_exact": 28,
+    "source_nullkey_exclusions": 403,
+    "native_rows": 133761,
+    "public_rows": 133761,
+    "null_v_retained": 928,
+    "new_metadata_carrier": false,
+    "factor_wiring_exact_f8": true
+  },
+  "final_frame_comparisons": 85,
+  "Feature": {
+    "rows": 180137,
+    "Uganda": 133761,
+    "Niger": 46376,
+    "fullframe_comparisons": 20,
+    "alignment": {
+      "default": {
+        "parent_alignment": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season"
+            }
+          }
+        },
+        "candidate_alignment": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season",
+              "production_obs": "unresolved_observation"
+            }
+          }
+        },
+        "all_other_typed_attrs_exact": true
+      },
+      "None": {
+        "parent_alignment": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season"
+            }
+          }
+        },
+        "candidate_alignment": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season",
+              "production_obs": "unresolved_observation"
+            }
+          }
+        },
+        "all_other_typed_attrs_exact": true
+      }
+    }
+  },
+  "source_cold_and_warm": {
+    "default": {
+      "cold": {
+        "status": "PASS",
+        "phase": "cold",
+        "backend": "default",
+        "frames": {
+          "public-default": 133761,
+          "public-None": 133761,
+          "sample": 24362,
+          "plot-features": 42841,
+          "native-2009-10": 22549,
+          "native-2010-11": 21051,
+          "native-2011-12": 20200,
+          "native-2013-14": 17646,
+          "native-2015-16": 19639,
+          "native-2018-19": 15630,
+          "native-2019-20": 17046,
+          "raw-country": 133761
+        },
+        "cache_files": 144,
+        "changes": 26,
+        "warning_count": 32,
+        "make_mtime_only_route_consequence": false
+      },
+      "warm": {
+        "status": "PASS",
+        "phase": "warm",
+        "backend": "default",
+        "frames": {
+          "public-default": 133761,
+          "public-None": 133761,
+          "sample": 24362,
+          "plot-features": 42841,
+          "native-2009-10": 22549,
+          "native-2010-11": 21051,
+          "native-2011-12": 20200,
+          "native-2013-14": 17646,
+          "native-2015-16": 19639,
+          "native-2018-19": 15630,
+          "native-2019-20": 17046,
+          "raw-country": 133761
+        },
+        "cache_files": 144,
+        "changes": 0,
+        "warning_count": 30,
+        "make_mtime_only_route_consequence": false
+      }
+    },
+    "make": {
+      "cold": {
+        "status": "PASS",
+        "phase": "cold",
+        "backend": "make",
+        "frames": {
+          "public-default": 133761,
+          "public-None": 133761,
+          "sample": 24362,
+          "plot-features": 42841,
+          "native-2009-10": 22549,
+          "native-2010-11": 21051,
+          "native-2011-12": 20200,
+          "native-2013-14": 17646,
+          "native-2015-16": 19639,
+          "native-2018-19": 15630,
+          "native-2019-20": 17046,
+          "raw-country": 133761
+        },
+        "cache_files": 143,
+        "changes": 25,
+        "warning_count": 32,
+        "make_mtime_only_route_consequence": false
+      },
+      "warm": {
+        "status": "PASS",
+        "phase": "warm",
+        "backend": "make",
+        "frames": {
+          "public-default": 133761,
+          "public-None": 133761,
+          "sample": 24362,
+          "plot-features": 42841,
+          "native-2009-10": 22549,
+          "native-2010-11": 21051,
+          "native-2011-12": 20200,
+          "native-2013-14": 17646,
+          "native-2015-16": 19639,
+          "native-2018-19": 15630,
+          "native-2019-20": 17046,
+          "raw-country": 133761
+        },
+        "cache_files": 143,
+        "changes": 17,
+        "warning_count": 30,
+        "make_mtime_only_route_consequence": true
+      }
+    }
+  },
+  "subsets": [
+    {
+      "side": "parent",
+      "backend": "default",
+      "request": [
+        "2005-06"
+      ],
+      "cold_public_rows": 0,
+      "populated_public_rows": 0,
+      "actual_t_counts": {},
+      "raw_rows": 133331,
+      "manifest": [
+        "2005-06"
+      ],
+      "country_hash_present": true,
+      "cold_cache_changes": 17,
+      "populated_cache_changes": 0,
+      "fullframe_and_attrs_cold_populated_exact": true
+    },
+    {
+      "side": "parent",
+      "backend": "default",
+      "request": [
+        "2018-19"
+      ],
+      "cold_public_rows": 15616,
+      "populated_public_rows": 15616,
+      "actual_t_counts": {
+        "2018-19": 15616
+      },
+      "raw_rows": 15616,
+      "manifest": [
+        "2018-19"
+      ],
+      "country_hash_present": true,
+      "cold_cache_changes": 11,
+      "populated_cache_changes": 0,
+      "fullframe_and_attrs_cold_populated_exact": true
+    },
+    {
+      "side": "parent",
+      "backend": "make",
+      "request": [
+        "2005-06"
+      ],
+      "cold_public_rows": 133331,
+      "populated_public_rows": 133331,
+      "actual_t_counts": {
+        "2009-10": 22408,
+        "2010-11": 20970,
+        "2011-12": 20152,
+        "2015-16": 19576,
+        "2013-14": 17585,
+        "2019-20": 17024,
+        "2018-19": 15616
+      },
+      "raw_rows": 133331,
+      "manifest": null,
+      "country_hash_present": false,
+      "cold_cache_changes": 16,
+      "populated_cache_changes": 8,
+      "fullframe_and_attrs_cold_populated_exact": true
+    },
+    {
+      "side": "parent",
+      "backend": "make",
+      "request": [
+        "2018-19"
+      ],
+      "cold_public_rows": 133331,
+      "populated_public_rows": 133331,
+      "actual_t_counts": {
+        "2009-10": 22408,
+        "2010-11": 20970,
+        "2011-12": 20152,
+        "2015-16": 19576,
+        "2013-14": 17585,
+        "2019-20": 17024,
+        "2018-19": 15616
+      },
+      "raw_rows": 133331,
+      "manifest": null,
+      "country_hash_present": false,
+      "cold_cache_changes": 16,
+      "populated_cache_changes": 8,
+      "fullframe_and_attrs_cold_populated_exact": true
+    },
+    {
+      "side": "candidate",
+      "backend": "default",
+      "request": [
+        "2005-06"
+      ],
+      "cold_public_rows": 0,
+      "populated_public_rows": 0,
+      "actual_t_counts": {},
+      "raw_rows": 133761,
+      "manifest": [
+        "2005-06"
+      ],
+      "country_hash_present": true,
+      "cold_cache_changes": 17,
+      "populated_cache_changes": 0,
+      "fullframe_and_attrs_cold_populated_exact": true
+    },
+    {
+      "side": "candidate",
+      "backend": "default",
+      "request": [
+        "2018-19"
+      ],
+      "cold_public_rows": 15630,
+      "populated_public_rows": 15630,
+      "actual_t_counts": {
+        "2018-19": 15630
+      },
+      "raw_rows": 15630,
+      "manifest": [
+        "2018-19"
+      ],
+      "country_hash_present": true,
+      "cold_cache_changes": 11,
+      "populated_cache_changes": 0,
+      "fullframe_and_attrs_cold_populated_exact": true
+    },
+    {
+      "side": "candidate",
+      "backend": "make",
+      "request": [
+        "2005-06"
+      ],
+      "cold_public_rows": 133761,
+      "populated_public_rows": 133761,
+      "actual_t_counts": {
+        "2009-10": 22549,
+        "2010-11": 21051,
+        "2011-12": 20200,
+        "2015-16": 19639,
+        "2013-14": 17646,
+        "2019-20": 17046,
+        "2018-19": 15630
+      },
+      "raw_rows": 133761,
+      "manifest": null,
+      "country_hash_present": false,
+      "cold_cache_changes": 16,
+      "populated_cache_changes": 8,
+      "fullframe_and_attrs_cold_populated_exact": true
+    },
+    {
+      "side": "candidate",
+      "backend": "make",
+      "request": [
+        "2018-19"
+      ],
+      "cold_public_rows": 133761,
+      "populated_public_rows": 133761,
+      "actual_t_counts": {
+        "2009-10": 22549,
+        "2010-11": 21051,
+        "2011-12": 20200,
+        "2015-16": 19639,
+        "2013-14": 17646,
+        "2019-20": 17046,
+        "2018-19": 15630
+      },
+      "raw_rows": 133761,
+      "manifest": null,
+      "country_hash_present": false,
+      "cold_cache_changes": 16,
+      "populated_cache_changes": 8,
+      "fullframe_and_attrs_cold_populated_exact": true
+    }
+  ],
+  "currency_scope": {
+    "candidate_actual_API": "Country bare default and explicit None, Feature default index and explicit None; each initial/fresh warm pair saved.",
+    "parent_actual_API": "Uganda bare Country cold source API saved and compared to bare warm; Country explicit None pairs saved for Uganda/Niger; Feature default index/None pairs saved.",
+    "parent_Niger_bare_cold_gap": "Original Niger bare-default cold API was not separately saved; explicit currency=None cold was. No bare-cold API claim.",
+    "artifact_oracle": "Feature expected frame reconstructed from independent source oracle + actual healthy Niger, using unchanged attach_currency/alignment/registered attrs machinery; separate from actual API comparisons.",
+    "strict_stop_preserved": true
+  },
+  "derived_effects": {
+    "status": "PASS",
+    "actual_frames": {
+      "baseline": {
+        "input_rows": 133331,
+        "harvest_rows": 78571,
+        "harvest_kg": 29093322.407893993,
+        "factor_counts": {
+          "reported": 14972,
+          "shipped": 0,
+          "survey_median": 555,
+          "metric": 88190,
+          "inferred": 0,
+          "none": 29614,
+          "reported_implausible": 102,
+          "shipped_implausible": 0,
+          "shipped_matched": 0,
+          "declared": 0
+        },
+        "actual_area_rows": 42841,
+        "positive_area_rows": 37636,
+        "real_yields": [
+          {
+            "on": "parcel",
+            "harvest_land_keys": 40409,
+            "positive_area_keys": 37634,
+            "yield_rows": 14022,
+            "sum_kg_per_ha": 32001079.51703798,
+            "matched_harvest_land_keys": 14022
+          },
+          {
+            "on": "plot",
+            "harvest_land_keys": 51358,
+            "positive_area_keys": 37636,
+            "yield_rows": 0,
+            "sum_kg_per_ha": 0.0,
+            "matched_harvest_land_keys": 0
+          }
+        ],
+        "sale_controls": {
+          "knows_both_units": 41162,
+          "agreement_share": 0.9614450221077693,
+          "largest_priced_disagreement_cell": 165,
+          "2009A_sold_unit_coverage": 0.9675675675675676
+        }
+      },
+      "native_current_wiring": {
+        "input_rows": 133761,
+        "harvest_rows": 78571,
+        "harvest_kg": 29095413.407893993,
+        "factor_counts": {
+          "reported": 14981,
+          "shipped": 0,
+          "survey_median": 560,
+          "metric": 88443,
+          "inferred": 0,
+          "none": 29777,
+          "reported_implausible": 102,
+          "shipped_implausible": 0,
+          "shipped_matched": 0,
+          "declared": 0
+        },
+        "actual_area_rows": 42841,
+        "positive_area_rows": 37636,
+        "real_yields": [
+          {
+            "on": "parcel",
+            "harvest_land_keys": 40409,
+            "positive_area_keys": 37634,
+            "yield_rows": 14022,
+            "sum_kg_per_ha": 32001079.51703798,
+            "matched_harvest_land_keys": 14022
+          },
+          {
+            "on": "plot",
+            "harvest_land_keys": 51358,
+            "positive_area_keys": 37636,
+            "yield_rows": 0,
+            "sum_kg_per_ha": 0.0,
+            "matched_harvest_land_keys": 0
+          }
+        ],
+        "sale_controls": {
+          "knows_both_units": 41241,
+          "agreement_share": 0.961349142843287,
+          "largest_priced_disagreement_cell": 165,
+          "2009A_sold_unit_coverage": 0.967915956842703
+        }
+      }
+    },
+    "median_changes": [
+      {
+        "grain": "fine",
+        "count_changed_groups": 7,
+        "median_changed_groups": 1,
+        "support_crossings": 0
+      },
+      {
+        "grain": "coarse",
+        "count_changed_groups": 2,
+        "median_changed_groups": 0,
+        "support_crossings": 0
+      }
+    ],
+    "factor_wiring_unchanged": true,
+    "real_source_area_oracles": true,
+    "zero_tolerance_fullframes": true
+  },
+  "scanner": {
+    "status": "EVERY_DIFFERENT_OCCURRENCE_CLASSIFIED",
+    "unchanged_exact_occurrences": 22,
+    "removed": 29,
+    "added": 19,
+    "parent": 51,
+    "candidate": 41,
+    "counts": [
+      {
+        "kind": "added",
+        "category": "alignment_adds_Niger_unresolved_observation_sentinel",
+        "occurrences": 1
+      },
+      {
+        "kind": "added",
+        "category": "existing_empty_harvest_month_scope_row_count",
+        "occurrences": 1
+      },
+      {
+        "kind": "added",
+        "category": "existing_null_index_warning_counts_retained_records",
+        "occurrences": 2
+      },
+      {
+        "kind": "added",
+        "category": "existing_scheme_vs_public_index_warning_text_gains_declared_axis",
+        "occurrences": 1
+      },
+      {
+        "kind": "added",
+        "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+        "occurrences": 14
+      },
+      {
+        "kind": "removed",
+        "category": "alignment_adds_Niger_unresolved_observation_sentinel",
+        "occurrences": 1
+      },
+      {
+        "kind": "removed",
+        "category": "existing_empty_harvest_month_scope_row_count",
+        "occurrences": 1
+      },
+      {
+        "kind": "removed",
+        "category": "existing_null_index_warning_counts_retained_records",
+        "occurrences": 2
+      },
+      {
+        "kind": "removed",
+        "category": "existing_scheme_vs_public_index_warning_text_gains_declared_axis",
+        "occurrences": 1
+      },
+      {
+        "kind": "removed",
+        "category": "old_lossy_sold_label_reducer_warning_removed",
+        "occurrences": 10
+      },
+      {
+        "kind": "removed",
+        "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+        "occurrences": 14
+      }
+    ],
+    "quantity_guard_source_unchanged": "lsms_library/quantity_audit.py:_format_quantity_report; own source frame retains individual records rather than old sums; diagnostics are recomputed, not normalized."
+  },
+  "qualification": "Original34-pass log survives, original34-pass XML bytes do not. New39-pass XML is new evidence, not recovery; all stops retained. No all-country output claim."
+}

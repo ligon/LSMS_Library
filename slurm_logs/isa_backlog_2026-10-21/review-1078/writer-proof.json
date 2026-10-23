@@ -1,0 +1,25 @@
+{
+  "candidate": {
+    "real_read_then_normal_eviction_then_real_false_but_actual_parquet_origin_preserved": true,
+    "A_writer_input_and_actual_output_exact_entire_correct_cold": true,
+    "B_writer_input_and_output_exact_own_correct_cold": true,
+    "A_final_actual_bytes_equal_served_cache": true,
+    "A_B_normal_current_hash_and_full_coverage": true,
+    "actual_function_data_Path_exists_and_write_arguments_unchanged": true,
+    "real_read_wave_full_frame_attrs_exact": true,
+    "legacy_reducer_not_reached": true,
+    "writer_A_pid": 1363056,
+    "writer_B_pid": 1369855,
+    "A_null_counts": {
+      "Quantity": 27,
+      "Expenditure": 34,
+      "Price": 29755
+    },
+    "B_null_counts": {
+      "Quantity": 27,
+      "Expenditure": 34,
+      "Price": 29755
+    },
+    "current_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c"
+  }
+}

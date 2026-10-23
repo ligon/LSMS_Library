@@ -1,0 +1,23 @@
+{
+  "status": "ROOT_AUTHENTICATED_SEALED_AUTHOR_HANDOFF_FOR_INDEPENDENT_REVIEW",
+  "at_UTC": "2026-10-22T16:20:21.006773+00:00",
+  "source_head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+  "parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "READY_sha256": "e0d3ff8fb9767a073822554a5eff758dc71a0e9fe3741366850cb66db7f731f3",
+  "manifest_sha256": "bf77ea989db4da51aeb2d21385f40716a1a9757b8bea2ad3f4562ed097ff86f6",
+  "manifest_entries_physical_metadata_checked": 1159,
+  "non_L1_entries_content_rehashed_by_root": 931,
+  "raw_L1_entries_full_hash_checked_by_observed_separate_postexit_not_rehashed_again_by_root": 228,
+  "observed_author_sealer_and_postexit_handles": [
+    50484,
+    7930
+  ],
+  "observed_postexit_terminal": 0,
+  "six_denials_full_log_pinned_unresolved_dir_fd_timestamps_and_endpoint_history_retained": true,
+  "protection_v1_terminal1_and_metadata_only_qualification_retained": true,
+  "initial_parent_and_scope_metadata_diagnostics_retained": true,
+  "author_handoff_not_production_acceptance": true,
+  "no_project_import_API_data_or_test_replay_by_root": true,
+  "root_checker_sha256": "13108976ddac0f8823206c2b970a260a4500216de13704fa5caf3f172210c8c4",
+  "signed": "Sue"
+}

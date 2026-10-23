@@ -1,0 +1,68 @@
+{
+  "verdict": "PASS",
+  "head": "483b4aa117c2c05ac00bf023adab97e47782df46",
+  "clean_status": true,
+  "tracked_files_checked": 14977,
+  "tracked_bytes_and_paths_unchanged": true,
+  "tracked_manifest_sha256": "4c701479ab816779ec511755bb45ad012c30c7cdae8d153a309fcb51ecefec4d",
+  "Country_calls_per_process": 9,
+  "Feature_calls_per_process": 4,
+  "all_frozen_reference_frames_attrs_exact": true,
+  "initial_reviewer_expected_attrs_error_corrected": true,
+  "initial_original_log_preserved": true,
+  "fresh_process_warm_no_parquet_writes": true,
+  "held_private_L1_copies_and_source_hashes_unchanged": 1113,
+  "quiescent_release_1519_manifest_unchanged": 1519,
+  "frozen_reference_source_hashes_unchanged": 9,
+  "no_in_tree_raw_or_parquet": true,
+  "mutable_integration_cache_payloads_read_copied_or_written": false,
+  "path_normalizations": 0,
+  "limits": [
+    "No new source-oracle study, full test suite, scanner sweep or all-country hash census",
+    "No acquisition or unheld questionnaire/source fetch",
+    "Existing country residuals preserved; no new bug fixes"
+  ],
+  "Malawi_organic": {
+    "rows": 11075,
+    "positive_reported_quantity": 11068,
+    "missing_quantity": 7,
+    "Applied_true": 11075,
+    "unit_counts": {
+      "Kilogramme": 5518,
+      "Ox-Cart": 2155,
+      "Bucket": 1451,
+      "Other (Specify)": 1204,
+      "Wheelbarrow": 733,
+      "Unknown": 8,
+      "Organic unit code 1": 5,
+      "Organic unit code 3": 1
+    }
+  },
+  "Nigeria_recorded_native_item_counts": {
+    "Groundnuts": 2839,
+    "Pepper": 10446,
+    "Maize (shelled)": 1425
+  },
+  "supporting_sample_hashes_and_coverage": {
+    "Ethiopia": {
+      "hash_grade": "fresh",
+      "all_waves_exact": true
+    },
+    "Tanzania": {
+      "hash_grade": "fresh",
+      "all_waves_exact": true
+    },
+    "Malawi": {
+      "hash_grade": "fresh",
+      "all_waves_exact": true
+    },
+    "Uganda": {
+      "hash_grade": "fresh",
+      "all_waves_exact": true
+    },
+    "Nigeria": {
+      "hash_grade": "fresh",
+      "all_waves_exact": true
+    }
+  }
+}

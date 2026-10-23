@@ -1,0 +1,646 @@
+[
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p1_conso3mois_16032015.dta",
+    "hh": 10800,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 10699,
+      "(2.0,)": 84,
+      "(3.0,)": 1,
+      "(4.0,)": 4,
+      "(6.0,)": 2,
+      "(9.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 190918,
+      "2.0": 1550,
+      "3.0": 17,
+      "4.0": 70,
+      "6.0": 21,
+      "9.0": 12,
+      "nan": 140
+    },
+    "rows": 192728,
+    "same_status_duplicate_rows": 181928,
+    "status": "res_entr1"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p1_conso7jours_16032015.dta",
+    "hh": 10800,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 10699,
+      "(2.0,)": 84,
+      "(3.0,)": 1,
+      "(4.0,)": 4,
+      "(6.0,)": 2,
+      "(9.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 169627,
+      "2.0": 1345,
+      "3.0": 24,
+      "4.0": 62,
+      "6.0": 26,
+      "9.0": 11,
+      "nan": 141
+    },
+    "rows": 171236,
+    "same_status_duplicate_rows": 160436,
+    "status": "res_entr1"
+  },
+  {
+    "all_missing_hh": 6,
+    "conflict_hh": 0,
+    "file": "emc2014_p2_conso3mois_16032015.dta",
+    "hh": 10605,
+    "hh_status_sets": {
+      "()": 6,
+      "(1.0,)": 10428,
+      "(2.0,)": 157,
+      "(3.0,)": 1,
+      "(4.0,)": 13
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 142277,
+      "2.0": 2312,
+      "3.0": 7,
+      "4.0": 181,
+      "nan": 96
+    },
+    "rows": 144873,
+    "same_status_duplicate_rows": 134267,
+    "status": "res_entr2"
+  },
+  {
+    "all_missing_hh": 6,
+    "conflict_hh": 0,
+    "file": "emc2014_p2_conso7jours_16032015.dta",
+    "hh": 10544,
+    "hh_status_sets": {
+      "()": 6,
+      "(1.0,)": 10369,
+      "(2.0,)": 156,
+      "(4.0,)": 13
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 163853,
+      "2.0": 2717,
+      "4.0": 228,
+      "nan": 115
+    },
+    "rows": 166913,
+    "same_status_duplicate_rows": 156369,
+    "status": "res_entr2"
+  },
+  {
+    "all_missing_hh": 6,
+    "conflict_hh": 0,
+    "file": "emc2014_p2_conso7nonalimjours_17032015.dta",
+    "hh": 10577,
+    "hh_status_sets": {
+      "()": 6,
+      "(1.0,)": 10401,
+      "(2.0,)": 157,
+      "(4.0,)": 13
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 47071,
+      "2.0": 707,
+      "4.0": 69,
+      "nan": 33
+    },
+    "rows": 47880,
+    "same_status_duplicate_rows": 37302,
+    "status": "res_entr2"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p2_entreprise_indiv1_27022105.dta",
+    "hh": 10621,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 10432,
+      "(2.0,)": 158,
+      "(3.0,)": 3,
+      "(4.0,)": 15,
+      "(5.0,)": 3,
+      "(6.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 15886,
+      "2.0": 242,
+      "3.0": 3,
+      "4.0": 27,
+      "5.0": 3,
+      "6.0": 1,
+      "nan": 24
+    },
+    "rows": 16186,
+    "same_status_duplicate_rows": 5565,
+    "status": "A13"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p2_individu_27022015.dta",
+    "hh": 10619,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 10432,
+      "(2.0,)": 158,
+      "(3.0,)": 3,
+      "(4.0,)": 13,
+      "(5.0,)": 3,
+      "(6.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 76361,
+      "2.0": 1118,
+      "3.0": 32,
+      "4.0": 130,
+      "5.0": 11,
+      "6.0": 4,
+      "nan": 65
+    },
+    "rows": 77721,
+    "same_status_duplicate_rows": 67102,
+    "status": "res_entr2"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p2_revenus_27022014.dta",
+    "hh": 10621,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 10432,
+      "(2.0,)": 158,
+      "(3.0,)": 3,
+      "(4.0,)": 15,
+      "(5.0,)": 3,
+      "(6.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 93881,
+      "2.0": 1422,
+      "3.0": 13,
+      "4.0": 121,
+      "5.0": 27,
+      "6.0": 9,
+      "nan": 77
+    },
+    "rows": 95550,
+    "same_status_duplicate_rows": 84929,
+    "status": "A13"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p2_transfert_recu_27022015.dta",
+    "hh": 10621,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 10432,
+      "(2.0,)": 158,
+      "(3.0,)": 3,
+      "(4.0,)": 15,
+      "(5.0,)": 3,
+      "(6.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 11635,
+      "2.0": 166,
+      "3.0": 3,
+      "4.0": 15,
+      "5.0": 3,
+      "6.0": 1,
+      "nan": 9
+    },
+    "rows": 11832,
+    "same_status_duplicate_rows": 1211,
+    "status": "A13"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p2_transfert_verse_27022015.dta",
+    "hh": 10621,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 10432,
+      "(2.0,)": 158,
+      "(3.0,)": 3,
+      "(4.0,)": 15,
+      "(5.0,)": 3,
+      "(6.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 11704,
+      "2.0": 180,
+      "3.0": 3,
+      "4.0": 18,
+      "5.0": 3,
+      "6.0": 1,
+      "nan": 9
+    },
+    "rows": 11918,
+    "same_status_duplicate_rows": 1297,
+    "status": "A13"
+  },
+  {
+    "all_missing_hh": 3,
+    "conflict_hh": 0,
+    "file": "emc2014_p3_conso3mois_16032015.dta",
+    "hh": 10217,
+    "hh_status_sets": {
+      "()": 3,
+      "(1.0,)": 10121,
+      "(2.0,)": 85,
+      "(3.0,)": 4,
+      "(4.0,)": 3,
+      "(7.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 136672,
+      "2.0": 1308,
+      "3.0": 53,
+      "4.0": 44,
+      "7.0": 7,
+      "nan": 79
+    },
+    "rows": 138163,
+    "same_status_duplicate_rows": 127946,
+    "status": "res_entr3"
+  },
+  {
+    "all_missing_hh": 3,
+    "conflict_hh": 0,
+    "file": "emc2014_p3_conso7jours_16032015.dta",
+    "hh": 10179,
+    "hh_status_sets": {
+      "()": 3,
+      "(1.0,)": 10083,
+      "(2.0,)": 84,
+      "(3.0,)": 5,
+      "(4.0,)": 3,
+      "(7.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 162743,
+      "2.0": 1459,
+      "3.0": 58,
+      "4.0": 39,
+      "7.0": 2,
+      "nan": 65
+    },
+    "rows": 164366,
+    "same_status_duplicate_rows": 154187,
+    "status": "res_entr3"
+  },
+  {
+    "all_missing_hh": 3,
+    "conflict_hh": 0,
+    "file": "emc2014_p3_conso7nonalimjours_16032015.dta",
+    "hh": 10160,
+    "hh_status_sets": {
+      "()": 3,
+      "(1.0,)": 10065,
+      "(2.0,)": 85,
+      "(3.0,)": 3,
+      "(4.0,)": 3,
+      "(7.0,)": 1
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 47076,
+      "2.0": 414,
+      "3.0": 13,
+      "4.0": 17,
+      "7.0": 3,
+      "nan": 17
+    },
+    "rows": 47540,
+    "same_status_duplicate_rows": 37380,
+    "status": "res_entr3"
+  },
+  {
+    "all_missing_hh": 0,
+    "conflict_hh": 0,
+    "file": "emc2014_p3_emploi_27022015.dta",
+    "hh": 10228,
+    "hh_status_sets": {
+      "(1,)": 10142,
+      "(2,)": 86
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1": 49494,
+      "2": 475
+    },
+    "rows": 49969,
+    "same_status_duplicate_rows": 39741,
+    "status": "res_entr3"
+  },
+  {
+    "all_missing_hh": 0,
+    "conflict_hh": 0,
+    "file": "emc2014_p3_sante_27022015.dta",
+    "hh": 10230,
+    "hh_status_sets": {
+      "(1,)": 10144,
+      "(2,)": 86
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1": 76463,
+      "2": 702
+    },
+    "rows": 77165,
+    "same_status_duplicate_rows": 66935,
+    "status": "res_entr3"
+  },
+  {
+    "all_missing_hh": 0,
+    "conflict_hh": 0,
+    "file": "emc2014_p3_securitealimentaire_27022015.dta",
+    "hh": 10230,
+    "hh_status_sets": {
+      "(1,)": 10144,
+      "(2,)": 86
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1": 10144,
+      "2": 86
+    },
+    "rows": 10230,
+    "same_status_duplicate_rows": 0,
+    "status": "res_entr3"
+  },
+  {
+    "all_missing_hh": 8,
+    "conflict_hh": 0,
+    "file": "emc2014_p4_conso3mois_10032015.dta",
+    "hh": 10137,
+    "hh_status_sets": {
+      "()": 8,
+      "(1.0,)": 10030,
+      "(2.0,)": 87,
+      "(3.0,)": 2,
+      "(4.0,)": 7,
+      "(7.0,)": 3
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 134099,
+      "2.0": 1335,
+      "3.0": 25,
+      "4.0": 100,
+      "7.0": 40,
+      "nan": 102
+    },
+    "rows": 135701,
+    "same_status_duplicate_rows": 125564,
+    "status": "res_entr4"
+  },
+  {
+    "all_missing_hh": 8,
+    "conflict_hh": 0,
+    "file": "emc2014_p4_conso3mois_16032015.dta",
+    "hh": 10164,
+    "hh_status_sets": {
+      "()": 8,
+      "(1.0,)": 10057,
+      "(2.0,)": 87,
+      "(3.0,)": 2,
+      "(4.0,)": 7,
+      "(7.0,)": 3
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 134431,
+      "2.0": 1335,
+      "3.0": 25,
+      "4.0": 100,
+      "7.0": 40,
+      "nan": 102
+    },
+    "rows": 136033,
+    "same_status_duplicate_rows": 125869,
+    "status": "res_entr4"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p4_conso7jours_10032015.dta",
+    "hh": 10101,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 9993,
+      "(2.0,)": 87,
+      "(3.0,)": 2,
+      "(4.0,)": 7,
+      "(7.0,)": 3
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 165463,
+      "2.0": 1529,
+      "3.0": 29,
+      "4.0": 127,
+      "7.0": 43,
+      "nan": 133
+    },
+    "rows": 167324,
+    "same_status_duplicate_rows": 157223,
+    "status": "res_entr4"
+  },
+  {
+    "all_missing_hh": 85,
+    "conflict_hh": 0,
+    "file": "emc2014_p4_conso7jours_16032015.dta",
+    "hh": 10800,
+    "hh_status_sets": {
+      "()": 85,
+      "(1.0,)": 10085,
+      "(2.0,)": 87,
+      "(3.0,)": 3,
+      "(4.0,)": 179,
+      "(5.0,)": 107,
+      "(6.0,)": 181,
+      "(7.0,)": 73
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 165995,
+      "2.0": 1529,
+      "3.0": 30,
+      "4.0": 299,
+      "5.0": 107,
+      "6.0": 181,
+      "7.0": 113,
+      "nan": 209
+    },
+    "rows": 168463,
+    "same_status_duplicate_rows": 157663,
+    "status": "res_entr4"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p4_conso7nonalimjours_10032015.dta",
+    "hh": 10067,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 9960,
+      "(2.0,)": 86,
+      "(3.0,)": 2,
+      "(4.0,)": 7,
+      "(7.0,)": 3
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 45310,
+      "2.0": 367,
+      "3.0": 7,
+      "4.0": 34,
+      "7.0": 13,
+      "nan": 37
+    },
+    "rows": 45768,
+    "same_status_duplicate_rows": 35701,
+    "status": "res_entr4"
+  },
+  {
+    "all_missing_hh": 9,
+    "conflict_hh": 0,
+    "file": "emc2014_p4_conso7nonalimjours_16032015.dta",
+    "hh": 10093,
+    "hh_status_sets": {
+      "()": 9,
+      "(1.0,)": 9986,
+      "(2.0,)": 86,
+      "(3.0,)": 2,
+      "(4.0,)": 7,
+      "(7.0,)": 3
+    },
+    "key_null_rows": 0,
+    "keys": [
+      "zd",
+      "menage"
+    ],
+    "row_statuses": {
+      "1.0": 45412,
+      "2.0": 367,
+      "3.0": 7,
+      "4.0": 34,
+      "7.0": 13,
+      "nan": 37
+    },
+    "rows": 45870,
+    "same_status_duplicate_rows": 35777,
+    "status": "res_entr4"
+  }
+]

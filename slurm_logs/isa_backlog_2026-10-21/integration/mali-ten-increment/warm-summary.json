@@ -1,0 +1,37 @@
+{
+  "head": "bbdcf34578085fb90e981184a0cadadc9701a366",
+  "phase": "warm",
+  "calls": {
+    "Mali-plot_labor": {
+      "rows": 52057,
+      "full_reference_frame_dtypes_attrs_exact": true,
+      "hash_grade_before": "fresh",
+      "hash_grade_after": "fresh",
+      "all_wave_coverage": true
+    },
+    "Niger-plot_labor": {
+      "rows": 53041,
+      "full_reference_frame_dtypes_attrs_exact": true,
+      "hash_grade_before": "fresh",
+      "hash_grade_after": "fresh",
+      "all_wave_coverage": true
+    },
+    "Mali-community_prices": {
+      "rows": 155931,
+      "full_reference_frame_dtypes_attrs_exact": true,
+      "hash_grade_before": "fresh",
+      "hash_grade_after": "fresh",
+      "all_wave_coverage": true
+    }
+  },
+  "normal_no_bypass": true,
+  "Feature": {
+    "rows": 105098,
+    "full_reference_frame_dtypes_attrs_exact": true
+  },
+  "parquets": 1519,
+  "changed_parquets": 0,
+  "created_parquets": 0,
+  "deleted_parquets": 0,
+  "warm_zero_byte_mtime_writes": true
+}

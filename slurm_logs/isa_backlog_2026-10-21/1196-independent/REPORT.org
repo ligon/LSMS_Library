@@ -1,0 +1,75 @@
+#+TITLE: Independent GH1196 parquet index reader review
+#+AUTHOR: Sue
+
+* Verdict and scope
+
+PASS with the qualifications below.
+Candidate ee520afeb11ea028a76a371e0c89dc2aba6ad0a4 preserves tested runtime 7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1 through eight documentation descendants.
+The actual release control is f8d236694c26fe9e709c5548f02c70f74ea72c33.
+Root owns acceptance, publication and human merge.
+No product, tracked test, source, Git or GitHub mutation was made by this review.
+
+* Independent results
+
+The candidate passed 149 tests: 109 new reader cases, 31 existing regressions and nine independently written holdouts.
+A physically copied actual-f8 subset produced 23 meaningful index-dtype failures, one positive pass and zero collection errors.
+Thirteen fresh corrected-comparator faults were rejected before real data; they include tiny/nextafter Float64, object EA/null/type/axis/nested Series/DataFrame/attrs and _FIELDS presence faults.
+Four separate L1-only roots, containing 68 physically distinct copies of 17 declared binary Stata sources, completed eight independent cold and fresh-process warm actors.
+Niger returned 239,877 rows and 108,333 for the supported singleton; Uganda returned 4,805 and 824.
+Default wrote twelve current-hash caches with full country coverage; Make wrote ten native caches and no country cache.
+Every warm actor made zero writes and preserved byte/mode/mtime receipts.
+All 44 candidate cold/warm frame pairs are fully exact; f8 has four index-policy-only cold/warm discrepancies.
+
+The stronger artifact check covered 570 pairs: 438 full exact, 130 explicitly qualified policy-only comparisons, two existing singleton qualifications and zero unexplained differences.
+This includes an independent reassessment of the original 329 author pairs: 256 full exact, 72 recorded-policy-only and one singleton qualification.
+Complete axes, levels, codes, unused levels, storage, null masks, exact numeric arrays and recursively typed attrs were checked without casting, pruning or padding operands.
+All 22 new actual-f8 footer pairs and all 22 frozen author footer pairs are exact after substitution of the declared content hash, including nested ARROW:schema metadata.
+
+The unmodified scanner's actual two-feature scope gives the same 27 raw occurrence multiset as actual f8: 26 warnings and one existing phase-2 food assembly_nonempty failure.
+There is no invented cluster phase-2 grid.
+Four actual CLI calls have fully exact matched callable inputs and post-serialization artifacts; all six cross-head stage differences are explicitly confined to the repaired index policy.
+Existing JSON attrs serialization and writer unused-level preparation are separate stages.
+Across 88 matched API warning pairs and 210 occurrences per head, 68 raw warning multisets are exact; all 88 category/message multisets are exact, with twenty location-qualified pairs.
+No normalized-raw-warning equality is claimed.
+
+Before any data call, the independent actual census established that all 549 country, 39 framework and 1,362 declared-wave fingerprints move, with exact key sets and zero data-endpoint changes.
+This broad invalidation cost is measured; it does not establish corpus-wide output coverage.
+
+* Code and country context
+
+The shared helper reads payload and footer from the same already-open stream in generic and both Wave routes.
+Only recognized physical index-field string null policy is restored, preserving the storage already read.
+Original generic format causes, YAML miss handling and script loud payload errors remain; new footer/restoration errors are outside the payload catch.
+Writer, map_index, df_data_grabber, non-parquet parser, dependency, schema and fingerprint-exclusion behavior is unchanged.
+Independent holdouts challenge both storage implementations, identical exception classes at different stages and ambiguous physical mappings.
+
+Both current country CONTENTS files were read completely, including tasks, WAITING and LOGBOOK entries, before runtime.
+Niger uses grappe/EXTENSION identifiers and label-keyed unit dictionaries.
+Its overview says "each grappe is visited in exactly one vague"; the documented seasonal account says "half of every EA".
+That contradiction is retained, not silently resolved.
+Uganda has EA, synthetic GPS-bin and parish-composite identifier eras.
+Its "complete for every household" Region claim is explicitly qualified by "three have missing Region" in 2019.
+The settled 2018 second harvest slot is a condition slot.
+No science, identifier, unit, factor, area or nutrition decision was changed.
+
+* Qualifications and protection
+
+Uganda 2019 Default remains 824 x 5 with two all-null Float64 GPS columns and all-wave unused index levels; Make remains 824 x 3 with requested-wave levels.
+The native 2019 writer/footer/read and Make v policy is str/NaN; the pooled country writer/footer and Default subset is string/pd.NA.
+That pre-existing difference is separately proven, with no full cross-backend singleton equality claim.
+
+All 1,935 frozen diagnosis/bd80/expansion manifest entries, seventeen original providers and 89,298 tracked receipts across six source trees remain exact.
+All 68 new L1 copies and all four final data roots retain their receipts.
+The two new source trees contain only their nine pre-existing tracked CSV codebooks, with no new in-tree payload.
+Own runtime used the mounted image, network namespace, active write/socket guards, private configuration/XDG/temp/DVC metadata, thread/build pins of one and at most two total loadfile pytest workers.
+There were zero own protected-write denials and zero network attempts.
+No acquisition, shared-cache fallback, source download, cache bypass, manual stamp or corpus build was used.
+
+Historical author qualifications remain: six denied relative cleanups and existing-directory/report-copy guard stops; the missing-v4 reused raw-stream receipt gap; and absent full initial mtime history for the old bd80 control.
+They are not relabelled by this review's successful protection checks.
+Own failed checker versions and unique traces are retained for a dangling-symlink path-set check, a shadowed derivations module import and a mistaken uppercase status expectation.
+The first host Python 3.6 metadata-only source-inspection stop was before source processing; its tool-result trace is transcribed, not an original raw-stream receipt.
+The final manifest pins all own scripts, comparisons, failed versions, operands and private warnings.
+READY releases immutable evidence only after zero consumers, followed by a separate terminal-zero post-exit receipt.
+
+Sue

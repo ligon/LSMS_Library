@@ -1,0 +1,45 @@
+#+title: Eight-PR offline credential-free integration check
+#+author: Sue
+#+date: 2026-10-21
+
+The immutable validation-only head =dd0dddcb052f8ce9b0c7401b281ac60df47933ad= contains reviewed PRs #1172, #1173, #1175, #1176, #1178, #1180, #1181 and #1182.
+The full pytest selection passed 4,961 cases and skipped 4,455 in 140.842 seconds, with zero failures or errors.
+The run used 16 loadfile workers, an empty private data root, a private credential-free configuration and both the inherited socket guard and =unshare -rn=.
+All tracked contents/modes, HEAD and clean status stayed unchanged.
+This verifies credential-free code behavior, not the skipped source-dependent cases.
+The earlier 266-test source-backed cohort result belongs to the separate six-PR head =5906e87155e03e27cb493daaa2b8ec989516f3e2=.
+
+The original private launcher is =control/isa-backlog-20261021/integration/run_unit.py=; its terminal exec session is =28550=.
+Its complete log and JUnit XML stay private under =integration/unit-eight-prs/= in the campaign control root.
+=launch.json= records the exact pytest argv; =summary.json= records the result and immutable checks.
+
+For a fresh reproduction, set =ISA_CHECKOUT= to a clean checkout at the exact head, =ISA_UNIT= to a new private evidence directory, =ISA_PYTHON= to the image interpreter, and =ISA_OFFLINE= to the documented inherited guard directory in the parent =REPRODUCE.org=.
+Create the private evidence/data/config directories first and verify exact package/config realpaths, missing reader credentials and active socket refusal before pytest, as in the original launcher.
+Do not reuse a shared writable cache or mutate the source checkout during the run.
+
+#+begin_src sh :eval no :tangle no :results output
+cd "$ISA_CHECKOUT"
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
+unset AWS_PROFILE AWS_DEFAULT_PROFILE LSMS_NO_CACHE LSMS_BUILD_BACKEND
+export PYTHONPATH="$ISA_CHECKOUT:$ISA_OFFLINE"
+export PYTHONDONTWRITEBYTECODE=1 LSMS_SKIP_AUTH=1
+export LSMS_COUNTRIES_ROOT="$ISA_CHECKOUT/lsms_library/countries"
+export LSMS_DATA_DIR="$ISA_UNIT/data" LSMS_CONFIG_DIR="$ISA_UNIT/config"
+export LSMS_S3_CREDS="$ISA_UNIT/absent-reader-creds"
+export AWS_SHARED_CREDENTIALS_FILE="$ISA_UNIT/absent-aws-creds"
+export AWS_CONFIG_FILE="$ISA_UNIT/absent-aws-config"
+export AWS_EC2_METADATA_DISABLED=true
+export LSMS_ISSUES_LOG="$ISA_UNIT/issues-private.log"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1 LSMS_MAKE_JOBS=1
+export PATH="$(dirname "$ISA_PYTHON"):$PATH"
+unshare -rn "$ISA_PYTHON" -m pytest -n 16 --dist=loadfile \
+  --timeout=600 --timeout-method=thread --durations=25 \
+  --maxfail=3 --tb=short -ra \
+  -o cache_dir="$ISA_UNIT/pytest-cache" \
+  --basetemp="$ISA_UNIT/pytest-temp" \
+  --junitxml="$ISA_UNIT/unit-private.xml" \
+  > "$ISA_UNIT/unit-private.log" 2>&1
+#+end_src
+
+Sue

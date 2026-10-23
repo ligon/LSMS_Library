@@ -1,0 +1,17 @@
+{
+  "verify_coverage12_registry_root.py": {
+    "sha256": "7d53a60969c87d092c7ce471d242acf4a62030ab97b0a919f4df5c6d77bad779",
+    "bytes": 9218,
+    "stdlib_only": true
+  },
+  "verify_coverage12_registry_root_v2.py": {
+    "sha256": "5f89e219ae9bdf64f648508feab7e13c3d16f986ef90bf18873c3d1c11a2e765",
+    "bytes": 667,
+    "stdlib_only": true
+  },
+  "authenticate_archive1_saved_products_root.py": {
+    "sha256": "373ed66f6a88007cd1c5b6caaf5c61065168b727658617c003e128531e114eec",
+    "bytes": 4658,
+    "stdlib_only": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "status": "PASS_FULL_PROTECTION_WITH_DECLARED_HISTORY_AND_SCOPE_EXCEPTION",
+  "tracked_source_receipts_exact": 29825,
+  "genuine_providers_MD5_SHA_magic_physical_exact": 37,
+  "copies_MD5_SHA_physical_exact": 444,
+  "copied_binary_bytes": 533307636,
+  "sidecar_copies": 0,
+  "author_SAFE_exports_exact": 8,
+  "guard_events": 369,
+  "guard_network_events": 283,
+  "nonseed_unattributed_IPv6_loopback_binds": 273,
+  "guard_write_events": 86,
+  "unexpected_guard_write_events": 0,
+  "prebuild_DVC_site_write_denials_retained": 4,
+  "Make_existing_country_directory_noop_denials_retained": 56,
+  "whole_task_zero_outside_prefix_write_or_network_attempt_claim": false,
+  "no_intree_Uganda_binary_source_or_parquet": true,
+  "source_DVC_tmp_links_exact": 2,
+  "live_consumers_before": [],
+  "live_consumers_after": []
+}

@@ -1,0 +1,25 @@
+{
+  "candidate": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+  "parent": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "python_sha256": "99b9e30b1e34701e7136448414fe5e4d2b788bc768cba4ddeca9e5e18bc18b91",
+  "mounted_generation_sha256": "97e6ed8a488dad718f71cc4a43c17e1ea34bba0b014465b52fe780c8af5d0852",
+  "mounted_generation": "20261019T221223Z",
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "dvc": "3.67.1",
+    "pytest": "8.4.2",
+    "pytest-xdist": "3.8.0"
+  },
+  "serial": {
+    "LSMS_MAKE_JOBS": "1",
+    "LSMS_BUILD_WORKERS": "1",
+    "MAKEFLAGS": "-j1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "make_jobs_helper": null,
+  "comparator_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94"
+}

@@ -1,0 +1,27 @@
+{
+  "PR": 1189,
+  "status": "FINDINGS_REQUIRE_CLASSIFICATION",
+  "saved_operands": 40,
+  "declared_pairs": 20,
+  "pass_pairs": 18,
+  "typed_attrs_only_checks": 6,
+  "array_checks": {
+    "str": 88,
+    "string": 29,
+    "int16": 1,
+    "numeric_nonmissing_arrays": 37,
+    "float64": 8,
+    "float32": 4,
+    "Float64": 20,
+    "boolean": 4
+  },
+  "NEW_artifact_reconstructions": 1,
+  "raw_source_API_or_test_prefix_replays": 0,
+  "gaps": [
+    "Original independent raw expected/native/public oracle objects were not serialized. Saved native reconstruction is explicitly NEW.",
+    "Original actual-script controlled writes and adversarial fixture objects are unsaved. No script/pytest replay.",
+    "Original warm Country/comparator objects were not serialized separately; saved cold objects do not recover original warm objects.",
+    "Country-to-Feature expected assembly objects and original retained-public selected_keys derived from raw source are unsaved; no API or raw prefix replay."
+  ],
+  "signed": "Sue"
+}

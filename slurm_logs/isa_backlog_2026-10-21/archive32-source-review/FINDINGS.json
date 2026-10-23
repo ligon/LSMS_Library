@@ -1,0 +1,32 @@
+{
+  "acceptance_still_requires": [
+    "Exact plan SHA approval before first durable writer and unchanged75 static inputs.",
+    "Observed original writer exit0 and its actual original child verifier exit0 with saved Popen/gate/terminal identities.",
+    "Separate original read-only postexit exit0, complete new interval physical sets, full durable receipts, and exact old102entry/31archive preservation.",
+    "Root independent archival acceptance; this review confers no product/science acceptance."
+  ],
+  "blocking_findings": [],
+  "safe_privacy": "607 serialized proof operands remain private; source-derived raw-table oracles are explicitly classified. Writer/verifier stdout exposes aggregate counts/hashes/process identities only. Full private warning/operand content is not reproduced in this report.",
+  "scope": "Source/JSON text reads, AST parse only, saved approved-plan metadata projections. No authored controller execution/import, product/numerical imports, raw/provider/root proof payload reads, decoding, tests, APIs, process inspection or durable writes.",
+  "signed": "Sue",
+  "source_limitations": [
+    {
+      "disposition": "Explicitly accepted by root under frozen-source exact before/after receipt contract. No atomic fd snapshot or zero-race claim.",
+      "fact": "Streaming payload Path.open itself has no O_NOFOLLOW or streaming-fd fstat. receipt() at line352 uses O_NOFOLLOW/fstat/nlink1, and full source-after and member-hash gates remain mandatory.",
+      "id": "N1",
+      "line": 355,
+      "path": "/local/job40255479/control/isa-backlog-20261021/archive32-control/archive32-launcher.py"
+    },
+    {
+      "disposition": "Explicit root scoped consistency policy; zero observed readable hits is not universal absence.",
+      "fact": "Seven process scopes have unreadable axes in all three saved preparation snapshots; those axes remain UNKNOWN.",
+      "id": "N2"
+    },
+    {
+      "disposition": "Retain original overstrict root assertion stop; no permission change. Four fresh durable artifacts must remain0600, destination02700.",
+      "fact": "343 included regular files are0644 under recorded private ancestors;1634 are0600.",
+      "id": "N3"
+    }
+  ],
+  "status": "NO_SOURCE_BLOCKERS_WITH_EXPLICIT_ROOT_SCOPED_CONTRACT"
+}

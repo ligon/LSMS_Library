@@ -1,0 +1,31 @@
+{
+  "cases": 5,
+  "all_passed": true,
+  "records": [
+    {
+      "kind": "empty",
+      "explicit_valuation_preserves_intended_behavior": true,
+      "no_legacy_call": true
+    },
+    {
+      "kind": "conflict",
+      "explicit_valuation_preserves_intended_behavior": true,
+      "no_legacy_call": true
+    },
+    {
+      "kind": "key",
+      "explicit_valuation_preserves_intended_behavior": true,
+      "no_legacy_call": true
+    },
+    {
+      "kind": "units",
+      "explicit_valuation_preserves_intended_behavior": true,
+      "no_legacy_call": true
+    },
+    {
+      "kind": "generic",
+      "explicit_valuation_preserves_intended_behavior": true,
+      "no_legacy_call": true
+    }
+  ]
+}

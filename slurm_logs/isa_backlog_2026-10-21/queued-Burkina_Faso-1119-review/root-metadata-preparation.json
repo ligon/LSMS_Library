@@ -1,0 +1,23 @@
+{
+  "recorded_at_UTC": "2026-10-22T02:59:57.780878+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-review-Burkina_Faso-1119",
+      "head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-Burkina_Faso-1119/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-Burkina_Faso-1119/candidate-dvc-tmp",
+      "clean": true
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-review-Burkina_Faso-1119-base",
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-Burkina_Faso-1119-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-Burkina_Faso-1119/base-dvc-tmp",
+      "clean": true
+    }
+  ],
+  "review_assigned": false,
+  "tests_builds": 0
+}

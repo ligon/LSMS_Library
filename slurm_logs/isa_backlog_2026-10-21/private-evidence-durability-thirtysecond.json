@@ -1,0 +1,32 @@
+{
+  "status": "ROOT_ARCHIVE32_ACCEPTED_WITH_EXPLICIT_QUALIFICATIONS",
+  "artifact_source_process_acceptance_sha256": "b8875be82f7371bd4aaf95531141a2ba52b6044fb3e1bf94a1feb4a398f948eb",
+  "literal_original_harness_receipt_sha256": "c43e89de7209696ecb6e443ff68a9fadf91f10755a87578b1813787e091447c3",
+  "literal_original_call_return_lines": 8,
+  "actual_exit_codes": {
+    "writer": 0,
+    "direct_original_child_verifier": 0,
+    "separate_postexit": 0
+  },
+  "archive_sha256": "2e70528380275032d8d80e7afca0e46d66e11e0a0ca8e98081b3ad21bd0983a8",
+  "archive_bytes": 93568213,
+  "manifest_sha256": "23e89334502bc2b6c8ae30af3f3a1afc1774029bbbda21d4d4355b207984970b",
+  "included_files": 1977,
+  "included_bytes": 462361511,
+  "private_proof_parquets": 156,
+  "private_pickle_operands": 451,
+  "raw_L1_copies_excluded_metadata_only": 172,
+  "old31_archives_preserved": true,
+  "all_scoped_source_streaming_process_and_original_failure_qualifications_retained": true,
+  "archival_not_product_or_science_acceptance": true,
+  "at_ns": 1792707784579226327,
+  "signed": "Sue (GPT-6)",
+  "private_prefixes_excluded_from32": [
+    "frozen independent1215",
+    "live1218 runtime"
+  ],
+  "new_four_artifacts_mode": "0600",
+  "unchanged_directory_mode": "02700",
+  "process_scope": "7 unreadable process scopes UNKNOWN; no universal absence claim",
+  "streaming_scope": "Selection receipts O_NOFOLLOW/fstat; streaming Path.open not fd-bound. Frozen before/after/member proof contract; no atomic/zero-race claim."
+}

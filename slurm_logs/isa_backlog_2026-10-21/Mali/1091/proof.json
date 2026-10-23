@@ -1,0 +1,62 @@
+{
+  "status": "READY_PENDING_PRIVATE_TERMINAL_FREEZE",
+  "base": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "ledger_first": "337f8432193902c0d6f3d6251ff911606d0955b6",
+  "runtime_tests": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+  "ordinary_commits_FS_published": true,
+  "runtime_allowlist": [
+    ".coder/ledger/1091-mali-community-builder.md",
+    "lsms_library/countries/Mali/_/CONTENTS.org",
+    "lsms_library/countries/Mali/_/Makefile",
+    "lsms_library/countries/Mali/_/community_prices.py",
+    "tests/test_mali_community_prices_builder.py"
+  ],
+  "runtime_blobs": {
+    ".coder/ledger/1091-mali-community-builder.md": {
+      "git_blob": "8d5cad899990586cbc4236c192ce0bab474b3682",
+      "sha256": "bf5ce2ab944309cbe8e51615cd53e38259a0701bc1619c97c3a76bf85e1a1d42",
+      "filesystem_mode": 384
+    },
+    "lsms_library/countries/Mali/_/CONTENTS.org": {
+      "git_blob": "a36c1173c59ab858851d9c57f7d22f8a6b41f12c",
+      "sha256": "c1552bcb7df6f77abdfa3d6c0198742ef96821387f4cd1e2a696ca0be40aedb4",
+      "filesystem_mode": 384
+    },
+    "lsms_library/countries/Mali/_/Makefile": {
+      "git_blob": "9afa87e88abde5aa5dd58262d2b002ea258f6f78",
+      "sha256": "b985732e97b44253295a608a2d208bce8794dd84e0a1cc3b3a00f75910711559",
+      "filesystem_mode": 384
+    },
+    "lsms_library/countries/Mali/_/community_prices.py": {
+      "deleted": true
+    },
+    "tests/test_mali_community_prices_builder.py": {
+      "git_blob": "69a6f57a18fb7123ea3897e00184d7dcbe59154f",
+      "sha256": "88c34eee9929bc3d602c7ce405f72cf36f7bc45fca38a36b9b310f768b8c78b1",
+      "filesystem_mode": 384
+    }
+  },
+  "all_other_tracked_blobs_and_git_modes_exact_to_parent": true,
+  "old_roots_protection": {
+    "heads": {
+      "/local/job40255479/worktrees/isa-Mali-1091": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "/local/job40255479/worktrees/isa-Mali": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "/local/job40255479/worktrees/isa-baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    "tracked_trees": 3,
+    "immutable_evidence_files": {
+      "/local/job40255479/control/isa-backlog-20261021/Mali/1091": 398,
+      "/local/job40255479/control/isa-backlog-20261021/Mali/822": 81
+    },
+    "all_clean": true,
+    "exact": true
+  },
+  "strict_api_audit_on_committed_runtime_head_exit": 0,
+  "strict_api_audit_log_sha256": "b758eb7c1b7ff6452b01f849f1bf914876b29eb436967a6172deeb48551fd7b2",
+  "validation_sha256": "9a34cead97fc50f4e30e6458ba75e8327a16c762f2f09da3b8676f9fa6090b07",
+  "postchange_549_39_measured_before_rebuild": true,
+  "empty_output_and_CLI_serialization_deltas_explicit": true,
+  "framework_or_schema_changes": false,
+  "private_terminal_freeze_proof": "/local/job40255479/control/isa-backlog-20261021/Mali/1091-fix/freeze-proof.json",
+  "note": "Final evidence-only HEAD and zero-consumer proof are private to avoid a self-referential committed hash."
+}

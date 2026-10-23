@@ -1,0 +1,69 @@
+{
+  "frames_per_head": 26,
+  "heads": 2,
+  "all_dtype_differences": [
+    {
+      "side": "baseline",
+      "frame": "Niger-public-food_acquired",
+      "rows": 239877,
+      "differences": [
+        {
+          "axis": "index",
+          "level": "u",
+          "cold": {
+            "str": "string",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "type": "StringDtype",
+            "storage": "pyarrow",
+            "na_value_repr": "<NA>",
+            "na_value_type": "NAType"
+          },
+          "warm": {
+            "str": "str",
+            "repr": "<StringDtype(na_value=nan)>",
+            "type": "StringDtype",
+            "storage": "pyarrow",
+            "na_value_repr": "nan",
+            "na_value_type": "float"
+          }
+        }
+      ],
+      "strict_frame_comparison_failed": true,
+      "all_other_values_masks_dtypes_keys_order_axes_full_attrs_exact": true
+    },
+    {
+      "side": "candidate",
+      "frame": "Niger-public-food_acquired",
+      "rows": 239877,
+      "differences": [
+        {
+          "axis": "index",
+          "level": "u",
+          "cold": {
+            "str": "string",
+            "repr": "<StringDtype(na_value=<NA>)>",
+            "type": "StringDtype",
+            "storage": "pyarrow",
+            "na_value_repr": "<NA>",
+            "na_value_type": "NAType"
+          },
+          "warm": {
+            "str": "str",
+            "repr": "<StringDtype(na_value=nan)>",
+            "type": "StringDtype",
+            "storage": "pyarrow",
+            "na_value_repr": "nan",
+            "na_value_type": "float"
+          }
+        }
+      ],
+      "strict_frame_comparison_failed": true,
+      "all_other_values_masks_dtypes_keys_order_axes_full_attrs_exact": true
+    }
+  ],
+  "only_dtype_difference": "Niger public food_acquired u index StringDtype[pyarrow] with pd.NA to StringDtype[pyarrow] with NaN",
+  "complete_data_files_per_head": 73,
+  "warm_bytes_modes_mtimes_unchanged": true,
+  "strict_matched_stage_baseline_candidate_equal": true,
+  "no_payload_or_attrs_normalization": true
+}

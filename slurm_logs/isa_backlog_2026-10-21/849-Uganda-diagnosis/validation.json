@@ -1,0 +1,332 @@
+{
+  "status": "DIAGNOSIS_COMPLETE_COLMAP_ONLY_PROMOTION_UNSAFE",
+  "source_HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "author": "Sue",
+  "read_only": true,
+  "preparation": {
+    "status": "COMPLETE_BEFORE_SOURCE_DECODE_OR_API",
+    "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "tracked_files": 14880,
+    "contents_exact_prior_full_f8_blob": true,
+    "declared_held_MD5_SHA_size_mode_mtime_verified_sources": 43,
+    "physical_copies": 129,
+    "layouts_searched": [
+      "legacy",
+      "files/md5"
+    ],
+    "selected_layout_counts": {
+      "legacy": 43
+    },
+    "source_gaps": 0,
+    "normal_baseline_L2_absent": true,
+    "scenario_L2_absent": true,
+    "counterfactual_private_only": true,
+    "all_copies_distinct_inode_nlink1_no_symlinks": true
+  },
+  "ordinary_cold": {
+    "mode": "cold",
+    "public_rows": 133331,
+    "raw_rows": 133331,
+    "wave_rows": {
+      "2009-10": 22408,
+      "2010-11": 20970,
+      "2011-12": 20152,
+      "2013-14": 17585,
+      "2015-16": 19576,
+      "2018-19": 15616,
+      "2019-20": 17024
+    },
+    "reported_nonmissing_by_wave": {
+      "2009-10": 0,
+      "2010-11": 0,
+      "2011-12": 0,
+      "2013-14": 0,
+      "2015-16": 0,
+      "2018-19": 15074,
+      "2019-20": 0
+    },
+    "harvest_kg_rows": 78571,
+    "harvest_kg_sum": 29093322.407893993,
+    "factor_sources": {
+      "reported": 14972,
+      "shipped": 0,
+      "survey_median": 555,
+      "metric": 88190,
+      "inferred": 0,
+      "none": 29614,
+      "reported_implausible": 102,
+      "shipped_implausible": 0,
+      "shipped_matched": 0,
+      "declared": 0
+    },
+    "hash_current": true,
+    "full_coverage": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ],
+    "private_data_files_before": 43,
+    "private_data_files_after": 60,
+    "strict_warm_frames_attrs_exact": null,
+    "warm_bytes_modes_mtimes_unchanged": null,
+    "country_args": {
+      "name": "Uganda",
+      "preload_panel_ids": false
+    },
+    "crop_kwargs": {},
+    "harvest_kwargs": {}
+  },
+  "fresh_process_warm": {
+    "mode": "warm",
+    "public_rows": 133331,
+    "raw_rows": 133331,
+    "wave_rows": {
+      "2009-10": 22408,
+      "2010-11": 20970,
+      "2011-12": 20152,
+      "2013-14": 17585,
+      "2015-16": 19576,
+      "2018-19": 15616,
+      "2019-20": 17024
+    },
+    "reported_nonmissing_by_wave": {
+      "2009-10": 0,
+      "2010-11": 0,
+      "2011-12": 0,
+      "2013-14": 0,
+      "2015-16": 0,
+      "2018-19": 15074,
+      "2019-20": 0
+    },
+    "harvest_kg_rows": 78571,
+    "harvest_kg_sum": 29093322.407893993,
+    "factor_sources": {
+      "reported": 14972,
+      "shipped": 0,
+      "survey_median": 555,
+      "metric": 88190,
+      "inferred": 0,
+      "none": 29614,
+      "reported_implausible": 102,
+      "shipped_implausible": 0,
+      "shipped_matched": 0,
+      "declared": 0
+    },
+    "hash_current": true,
+    "full_coverage": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ],
+    "private_data_files_before": 60,
+    "private_data_files_after": 60,
+    "strict_warm_frames_attrs_exact": true,
+    "warm_bytes_modes_mtimes_unchanged": true,
+    "country_args": {
+      "name": "Uganda",
+      "preload_panel_ids": false
+    },
+    "crop_kwargs": {},
+    "harvest_kwargs": {}
+  },
+  "ordinary_default_constructor_control": {
+    "default_Country_constructor_and_crop_kwargs": {},
+    "complete_public_and_harvest_frames_attrs_strictly_equal_to_cold_preloadFalse_control": true,
+    "cache_files": 60,
+    "bytes_modes_mtimes_unchanged": true,
+    "rows": 133331,
+    "harvest_sum": 29093322.407893993
+  },
+  "private_factor_only_scenario": {
+    "status": "PRIVATE_FACTOR_ONLY_PROJECTION_NOT_IMPLEMENTED_API",
+    "ordinary_baseline_recreated_by_current_finalizer_strictly_exact": true,
+    "all_other_raw_and_public_values_keys_order_dtypes_masks_axes_full_attrs_exact": true,
+    "total_rows_before_and_scenario": 133331,
+    "actual_baseline_harvest_sum": 29093322.407893993,
+    "projected_harvest_sum": 42035114.892979845,
+    "kg_delta": 12941792.485085852,
+    "baseline_cache_bytes_modes_mtimes_unchanged": true,
+    "scenario_private_no_parquet_promotion": true,
+    "proposed_source_code_and_API_hash_change_measured": false,
+    "original_f8_country_API_hashes_remain_current": true,
+    "screen_unchanged": {
+      "KG_FACTOR_MAX": 250.0,
+      "Kg_tolerance": 0.01,
+      "calendar_year_band": [
+        1990,
+        2030
+      ]
+    },
+    "agreement_reference_denominator": "finite positive factors on both sides, screened reported reference; abs(label-reported)/reported <= .1/.2",
+    "all_payloads_and_source_keys_private": true
+  },
+  "direct_source_oracle": {
+    "status": "PURE_HELPER_PRIVATE_SCENARIO_MEASURED_NOT_IMPLEMENTED",
+    "helper_rows": {
+      "2009-10": {
+        "before": 22408,
+        "proposed": 22408,
+        "factor_nonmissing_before": 0,
+        "factor_nonmissing_proposed": 0
+      },
+      "2010-11": {
+        "before": 20970,
+        "proposed": 20970,
+        "factor_nonmissing_before": 0,
+        "factor_nonmissing_proposed": 20249
+      },
+      "2011-12": {
+        "before": 20152,
+        "proposed": 20152,
+        "factor_nonmissing_before": 0,
+        "factor_nonmissing_proposed": 15025
+      },
+      "2013-14": {
+        "before": 17585,
+        "proposed": 17585,
+        "factor_nonmissing_before": 0,
+        "factor_nonmissing_proposed": 13210
+      },
+      "2015-16": {
+        "before": 19576,
+        "proposed": 19576,
+        "factor_nonmissing_before": 0,
+        "factor_nonmissing_proposed": 17226
+      },
+      "2018-19": {
+        "before": 15616,
+        "proposed": 15616,
+        "factor_nonmissing_before": 15074,
+        "factor_nonmissing_proposed": 15074
+      },
+      "2019-20": {
+        "before": 17024,
+        "proposed": 17024,
+        "factor_nonmissing_before": 0,
+        "factor_nonmissing_proposed": 16167
+      }
+    },
+    "proposed_factor_keys": 12,
+    "module_global_colmaps_unchanged": true,
+    "all_other_helper_payload_attrs_dtypes_keys_order_exact": true,
+    "direct_source_factor_oracle_exact_after_existing_first_nonmissing_reducer": true,
+    "metadata_only_variable_labels": "StataReader.variable_labels; data via sanctioned get_dataframe",
+    "existing_2015_Value_sold_x100_and_defect_guard_applied_identically": true,
+    "no_parquet_promotion": true
+  },
+  "requested_carrier_conflict_counts": {
+    "raw_positive_factor_conflict_groups": 115,
+    "surviving_screened_positive_disagreement_groups": 113,
+    "complete_usable_comparable_groups": 112,
+    "net_kg_difference": 10710.900000214577,
+    "absolute_kg_difference": 26602.099999785423,
+    "positive_excess_kg": 18656.5,
+    "negative_shortfall_kg": -7945.599999785423,
+    "excluded_rejected_operand_groups": 2,
+    "excluded_Unknown_unit_group": 1,
+    "2018_control_raw_screened_complete_groups": 6,
+    "control_difference_is_preexisting_not_permission": true
+  },
+  "source_grain_followup": "New/split Uganda carrier site; preserve ALL distinct native production observations including equal-factor/partial groups before wiring",
+  "source_identity_reference": "source-identity.json",
+  "all_record_key_audit_reference": "all-production-key-audit.json",
+  "tests": {
+    "focused_factor_and_shipped_files": {
+      "passed": 81,
+      "failed": 0,
+      "skipped": 0,
+      "deselected_real_baseline": 1,
+      "workers": 2,
+      "distribution": "loadfile"
+    },
+    "separate_actual_baseline_pytest_attempt": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 1,
+      "reason": "Existing requires_s3 credential collection gate; unchanged, not bypassed"
+    },
+    "actual_held_source_baseline_API_and_derived_probes_executed": true
+  },
+  "expected_rewarm_not_after_patch_proof": {
+    "current_country_API_hashes": 28,
+    "current_nonnull_country_hashes": 28,
+    "API_wave_pairs": 224,
+    "current_nonnull_API_wave_hashes": 224,
+    "source_hashes_unchanged_f8": true,
+    "proposed_rewarm_expected_not_measured_after_patch": true,
+    "basis": "Wave._input_hash includes own country module for every table; Country._table_cache_hash folds full wave set",
+    "expected_country_scope": "All28 Uganda cached API tables; crop descendants such as harvest_kg/yield are runtime transformations",
+    "other_country_framework_changes_proposed": false,
+    "no_actual_candidate_after_hash_claim": true
+  },
+  "source_copy_and_freeze": {
+    "source_HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "branch": "diagnose/849-uganda-reported-kgfactor-20261021",
+    "source_clean": true,
+    "all_tracked_bytes_modes_exact": 14880,
+    "protected_1078_receipts_unchanged": 4,
+    "held_sources_MD5_SHA_size_mode_mtime_exact": 43,
+    "physical_distinct_inode_nlink1_nonsymlink_copies_exact": 129,
+    "baseline_cache_bytes_modes_mtimes_exact": 60,
+    "baseline_crop_hash_current_full8wave_coverage": true,
+    "scenario_no_parquets_promoted": true,
+    "no_intree_parquets": true,
+    "guard_events": {},
+    "network_attempts": 0,
+    "no_denied_writes": true,
+    "PR967_PR972_merge_ancestors_verified": true,
+    "no_source_Git_ref_or_GH_mutation": true
+  },
+  "safe_allowlist": [
+    "DIAGNOSIS.org",
+    "PROPOSAL.md",
+    "ledger-DRAFT.md",
+    "DRAFT-CONTENTS-addition.org",
+    "REPRODUCE.sh",
+    "validation.json",
+    "source-slots.json",
+    "proposed-colmap-keys.json",
+    "wave-measurements.json",
+    "raw-factor-counts.json",
+    "unit-condition-dispersion-safe.json",
+    "systematic-unit-condition-disagreement.json",
+    "carrier-ambiguity-safe.json",
+    "all-coalescence-classification.json",
+    "coalescences.json",
+    "source-identity.json",
+    "all-production-key-audit.json",
+    "kg-delta-decomposition.json",
+    "expected-rewarm-scope.json",
+    "ordinary-default-warm.json",
+    "freeze-proof.json",
+    "preparation.json"
+  ],
+  "private_frames_source_IDs_keys_warnings_traces_not_exported": true,
+  "excluded_historical_or_preliminary_attempts": [
+    "oracle-private.log (wrong helper dictionary cwd)",
+    "oracle-private-v2.log (independent oracle groupby index representation; production pair never normalized)",
+    "measurement-private.log (existing country ID walk not yet applied to oracle keys)",
+    "measurement-private-v2.log (list-valued data_scheme accessor)",
+    "coalescence-factor-consequence.json (preliminary incomplete comparability definition; final112-comparable carrier audit supersedes it)",
+    "real-baseline-test-private.log (genuine credential-gate skip, not a data-validation pass)"
+  ],
+  "limits": [
+    "No implementation/API axis/unit/factor/core-layer change",
+    "No actual patched-source hash/API proof; current source hashes remain f8",
+    "All-record key counts using physical row position are private bounds, not instrument identity or a promoted API contract",
+    "No native-grain whole-derived prototype promoted; survey-median pool changes require the follow-up whole-frame measurement",
+    "2015 agriculture questionnaire not independently revalidated here; legacy variable-label truncation and prior instrument evidence disclosed",
+    "Existing null-key drops are separate and unchanged",
+    "No claim that GH849 is fixed or that current2018 carrier residue is acceptable"
+  ]
+}

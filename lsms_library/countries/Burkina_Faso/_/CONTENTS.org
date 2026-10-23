@@ -740,8 +740,9 @@ Parcel-level lasting characteristics from the EHCVM agriculture module
 uses a different instrument and is out of scope.
 
 - Index =(t, i, plot_id)= with =plot_id = "{field_no}_{parcel_no}"=
-  (=s16aq02= _ =s16aq03=); =i= is the EHCVM composite =(grappe, menage)=
-  built with Burkina's =i()= formatter so it matches =sample().i=.
+  (=s16aq02= _ =s16aq03=); the native household key is =(grappe, menage)=.
+  The 2018-19 script passes =ehcvm_i=, while 2021-22 passes =_old_i=
+  wrapping country =i()=, matching each wave's sample namespace.
 - Columns: =Area= (hectares; GPS =s16aq47= where measured, else farmer
   estimate =s16aq09a= converted via =s16aq09b= 1=ha/2=m²), =AreaUnit=
   ('hectares'), =Tenure= (=s16aq10=), =TenureSystem= (=s16aq13=),
@@ -750,8 +751,9 @@ uses a different instrument and is out of scope.
   =harmonize_water=, =harmonize_tenure_system= live in
   =categorical_mapping.org=, keyed on the integer s16a codes.
 - Placeholder rows (no field/parcel number) for non-farming households
-  are dropped.  Latitude / Longitude deferred (no decimal-degree parcel
-  GPS in EHCVM s16a).
+  are dropped.
+- =Latitude= / =Longitude= carry the recorded 2021-22 parcel position;
+  2018-19 has no coordinate source and is missing in the country table.
 
 CORRECTION (2026-10-18, GH #1050).  "no decimal-degree parcel GPS in EHCVM
 s16a" holds for 2018-19 only.  =s16a_me_bfa2021.dta= carries
@@ -759,7 +761,35 @@ s16a" holds for 2018-19 only.  =s16a_me_bfa2021.dta= carries
 =s16aq46__latitude= / =s16aq46__longitude= « Coordonnées GPS de la parcelle »,
 populated for 4,180 of 8,467 parcels (lat 9.85-13.99, lon -5.35-0.35).
 =s16a_me_bfa2018.dta= has =s16aq45= and the area =s16aq47= but no =s16aq46=.
-The 2021-22 parcel coordinates are not wired into =plot_features=.
+At that date the 2021-22 parcel coordinates were not wired into =plot_features=.
+
+** Parcel coordinates and key layers (GH #1058, 2026-10-21)
+
+The 2021-22 loader now binds =s16aq46__latitude= and =s16aq46__longitude= through the existing retained-source helper as independent nullable floats.
+The earlier helper/scheme claim "EHCVM s16a has no decimal-degree parcel GPS" contradicted the dated correction above and the held variable labels; those comments are corrected with this mapping.
+The 8,467 source rows contain 7,350 native parcels and 1,117 placeholders with both field and parcel number missing.
+All 4,180 paired positions occur on retained parcels; 3,170 retained parcels lack both coordinates and none has only one axis.
+Of 4,190 retained parcels answering Yes to GPS measurement, ten record area but no position; their positions remain missing.
+Neither the measurement flag nor the GPS area =s16aq47= supplies a missing coordinate.
+No coordinate-based row filter, plausibility screen or interpolation is applied.
+The 2018-19 wave retains its six-column output; country concatenation supplies missing coordinate columns for that wave.
+The different 2014 EMC instrument remains unsupported by this plot recipe.
+
+Native script identity and country/API identity are distinct layers.
+The country concatenator says "Cached parquets store pre-transformation data" and does not itself call =id_walk=.
+The default framework =load_from_waves= route nevertheless applies the existing tested =id_walk= before writing its country parquet, which carries =id_converted=True=.
+This mapping preserves that route, both wave-specific native formatters and the attrs flag.
+Measured before/after: 19,784 public rows (12,434 in 2018-19 and 7,350 in 2021-22), with all old keys and six payload columns unchanged.
+Seven 2018-19 raw-country rows whose six old payload columns are all missing remain excluded by the existing public finalizer.
+There are no native or walked parcel-key collisions and no public plot-household orphans against =sample()= in either wave.
+
+The issue also requested a held-source check of Mali, Niger and Senegal 2021-22 =s16a=.
+Their files contain 9,924, 5,729 and 6,112 rows respectively; header and variable-label searches find the measurement flag =s16aq45= and area =s16aq47=, but no latitude, longitude, coordinate or =s16aq46= field.
+This is a finding about those held distributions, not an inference from Burkina's instrument or a claim about unpublished sources.
+No other country's code is changed.
+
+The helper and country declaration are whole-file build inputs, so all 24 Burkina country hashes move; supporting sample caches rebuild normally.
+This does not change sample, panel, universe, area, tenure, soil or irrigation policy.
 
 * =2018-19= / =2021-22= =food_acquired.py= are DEAD CODE, and their =encoding== is a trap
 
@@ -1374,3 +1404,194 @@ recorded =KeyError('m')=; the column check now fails one step earlier).
 The script also grouped on an =m= (market) level, which no cached parquet carries any more (CLAUDE.md: =m= is added on demand), so it would have died there next.  Removing the =!make= registrations does not change dispatch: =Country.data_scheme= auto-surfaces the three tables from =food_acquired=, and the derivation was already tried first.
 
 Served tables before and after the removal are frame-equal (377,563 / 234,282 / 316,441 rows; waves 2014, 2018-19, 2021-22).
+
+* 2026-10-21 -- =plot_inputs= retains native input-slot identities (GH #1123)
+
+The held 2018-19 =s16b_me_bfa2018.dta= has 22,877 applied rows, unique on
+=(grappe, menage, s16bq01)=, with no missing native or declared keys.
+This is HOUSEHOLD x input grain, with no parcel column; =vague= is a sample
+split, not a repeat measurement.  Use =burkina_faso.ehcvm_i=, not the older
+=i= formatter: among the 4,509 input households, 1,329 ids differ between
+those formatters, and =ehcvm_i= is injective with zero sample orphans.
+
+The crop map pooled four native slots on =Seed / Autre crop / Kilogramme=.
+Country kept 22,694 rows, losing 183 native lines in 170 groups: 163 extras
+in 150 conflicting-payload groups and 20 equal-payload pairs.  The latter
+are distinct native input slots too, not duplicate source records.
+The lost quantities total 2,409.58 reported kg; every lost existing API
+=Purchased= is False and every lost existing API =Quantity_purchased= is
+missing.  These are column names, not verified purchase semantics: the
+bindings read gift/donation fields (see the separate caveat below).
+No quantity was curated.
+
+The named categories now follow the Benin/Togo fix: =Semences d'autres
+céréales= -> =Autre céréale= and =Plants/boutures de tubercules= ->
+=Autre tubercule=.  Those two splits alone leave 98 duplicate extra rows.
+The held dictionary binds code 20 to =Autres semences=; code 21 has NO
+value label and appears as literal =21= on 602 applied rows.  The old
+comment calling 21 another Autres-semences slot was not supported by that
+dictionary.  It now retains the source-qualified identity
+=Unknown [Burkina_Faso 2018-19 s16bq01=21]=, explicitly approved as an
+identity fallback, not a physical crop classification.
+
+*The existing =input = Seed= for code 21 is UNVERIFIED legacy curation.*
+It remains unchanged and needs separate source authority in
+[[https://github.com/ligon/LSMS_Library/issues/1187][GH #1187]].  The two 2018
+household questionnaire XLS files and two nomenclature PDFs have sidecars
+but no held blobs; none was acquired.  Do not borrow 2021's meaning:
+its dictionary calls code 21 =Plants d'hévéa, de teck= and code 22
+=Autres semences=.
+
+Only the 2018-19 builder currently reads =harmonize_seed_crop=; the
+2018-qualified token reaches no other current wave key.  There is no
+2014/2021-22 =plot_inputs= builder, and their public subset requests remain
+empty.  Held counterparts exist: 2014 =emc2014_agri_couts_intrants.dta=
+has 138,242 rows and 36 rows on repeated =(zd, menage, W1)= keys;
+2021 =s16b_me_bfa2021.dta= has 70,994 rows, including 12,223 applied rows,
+with a unique native household/input key and a changed 22-slot dictionary.
+Adding either wave needs its own source/grain work.
+
+All 22,877 reported 2018-19 lines now survive with their full payloads.
+Conservation here means preserving the existing API bindings and NA masks;
+it does not certify the purchase interpretation of those column names.
+The existing native grain, household namespace, input classification and
+units stay in force.  A Benin/Togo-style uniqueness assertion immediately
+before =to_parquet= refuses future collisions, including equal-payload ones,
+without printing source keys.  The Org edit invalidates all 24 Burkina
+table hashes; other countries and shared framework fingerprints are unchanged.
+The separate #1119 named-crop vocabulary mismatch is not changed here.
+
+* 2026-10-21 -- =plot_inputs= gift/donation fields served under purchase names (GH #1188)
+
+Independent review of the identity repair at =3848778d0e8676c798883c11ea3e33fc88e8a591=
+found a separate source-binding contradiction in =2018-19/_/plot_inputs.py=.
+Its comments say =s16bq05 purchased?= and =s16bq07a quantity purchased=,
+but the held q05 label asks:
+
+#+begin_quote
+16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de don?
+#+end_quote
+
+=s16bq07a= records gift/donation quantity, with its own unit =s16bq07b=.
+The purchase flag is =s16bq08=, and purchased quantity is =s16bq09a= with
+its own unit =s16bq09b=.  The builder currently binds =Purchased= to q05
+and =Quantity_purchased= to q07a, while the row unit =u= comes from used
+quantity's =s16bq03b=.  Thus these API names do not establish purchase
+semantics, and preserving their values does not correct the binding.
+
+On all 22,877 applied source rows, gift yes is 802 and purchase yes 7,689;
+the flags differ on 8,297 rows.  Gift quantity is positive/nonmissing on
+801 rows, purchase quantity on 7,689; values or missingness differ on
+8,371 rows.  Among records with both relevant units known, gift and used
+units differ on 23 rows, purchase and used units on 193 rows.
+Of the 183 recovered native lines, 18 report purchases and positive purchase
+quantity despite their existing API =Purchased=False= and missing
+=Quantity_purchased=.  No source yes/no eligibility change follows from
+these comparisons.
+
+[[https://github.com/ligon/LSMS_Library/issues/1188][GH #1188]] owns the separate purchase/gift routing and unit diagnosis;
+[[https://github.com/ligon/LSMS_Library/issues/1187][GH #1187]] owns unlabelled code 21's source meaning and legacy Seed classification.
+The reviewed identity implementation remains unmerged at this writing.
+It preserves all current bindings, units and grain; this documentation
+amendment neither rebinds fields nor chooses a physical-unit representation.
+
+* 2026-10-22 -- seed crop names match the native harvest vocabulary (GH #1119)
+
+Only two =harmonize_seed_crop= Preferred Label cells change: =Semences de maïs= now maps to =Maïs= and =Semences de haricots/niébé= to =Niébé=.
+The accents in this paragraph reproduce the exact source labels.
+The held 2018-19 input source has 2,274 applied maize-seed records and 2,156 cowpea-seed records.
+Its crop-production source uses =Maïs= on 2,671 records and =Niébé= on 2,898; neither old seed target occurs there.
+All original mapping keys and all other cells remain unchanged, including the source-qualified code-21 identity from GH #1123.
+
+The 22,877 input records retain their full existing payloads, units and native identities.
+The 15,587 public crop-production records are unchanged.
+At the actual =(t,i,crop)= projection, maize seed records with a corresponding crop record rise from zero to 2,251 of 2,274, and cowpea from zero to 2,097 of 2,156.
+This is a household/crop existence check: the input roster has no parcel axis, so these totals must not be allocated to crop parcels.
+The existing =seed_kg= result remains exact at its household =(t,i)= grain (4,229 rows).
+The 2014 and 2021-22 input/crop subset requests remain empty; no new wave is wired.
+
+This does not adjudicate code 21's physical meaning or legacy Seed classification (GH #1187), gift/purchase routing (GH #1188), or shared farm-level/not-crop-specific/missing marker policy.
+Senegal and Guinea-Bissau work remains outside this Burkina Faso partial fix.
+The Org file is a whole-country build input: all 24 Burkina API hashes change, with 525 other-country hashes and all 39 framework fingerprints exact.
+Only the four scoped Burkina tables were actually rebuilt; this is not evidence for all other outputs.
+
+* 2026-10-22 -- purchases and gifts retain their own reported units (GH #1188)
+
+The 2018-19 input roster records use, purchase and gift/donation measurements separately.
+=Quantity= and index =u= retain used quantity =s16bq03a= and its unit =s16bq03b= exactly.
+=Purchased= now reads =s16bq08=, and =Quantity_purchased= reads =s16bq09a= with nullable column =Unit_purchased= from =s16bq09b=.
+The old q05/q07a answers are retained under =Received_as_gift= and =Quantity_received_as_gift=, with their own nullable =Unit_received_as_gift= from =s16bq07b=.
+Each unit variable uses its own decoded labels and only exact curated formatter keys; equal numeric unit codes do not establish equal units.
+The acquisition unit columns do not inherit the name-matched post-read normalization of the =u= axis.
+Missing acquisition flags, quantities and units remain missing; they are not filled with false, zero or the used unit.
+=s16bq09c= is a monetary amount and is not introduced as a quantity or a new monetary field.
+
+Guarded source-first diagnosis reproduces all 22,877 applied rows, 802 gift yes versus 7,689 purchase yes, 8,297 flag disagreements and 8,371 quantity/mask disagreements.
+Known gift/used and purchase/used unit differences remain 23 and 193.
+The 183 previously recovered native lines include 18 reported purchases with positive purchase quantity.
+There is no new application gate, parcel allocation, reducer, inferred factor or unit conversion.
+All native household/input-slot identities, row order, used quantities/units, seed crop labels and 602 source-qualified code21 records are unchanged in the source/native/public proof.
+Code21's unverified legacy Seed classification remains owned by GH #1187.
+Only four country-local optional columns are added; no shared axis, framework, global schema or mapping is changed.
+
+Bounded Default/Make cold and separate fresh warm requests preserve all nonempty source payloads, complete public axes/typed attrs and existing =seed_kg= / =nitrogen_kg= results against the actual parent.
+The 2014 and 2021-22 input requests remain empty; no new wave is wired.
+Those empty Country results expose a separate type discrepancy: Default retains the four new nullable string/boolean/Float64/string types, while Make's existing empty constructor leaves the optional dict-declared fields as object.
+The seven-column order agrees, and the parent's three older fields retain matching types on both backends; the parent does not have the four new fields.
+This newly exposed framework behavior is retained for separate follow-up, without changing this country's declarations or normalizing the failed comparisons.
+
+Persisted native expectations use the existing writer/readback policy.
+The original strict pre-write-versus-persisted comparisons remain failed because index string dtypes distinguish =<NA>= from =nan=; 56 additional strict comparisons against independently source-built, serialized expectations pass, including full storage-schema metadata.
+There is no actual-frame cast or attrs replacement to make the comparison pass.
+The unmodified one-country Feature audit has the same four warnings as the parent, with no failure/error; its sample-strata warning is not silenced here.
+The local data-scheme edit moves all 24 Burkina country hashes, and the wave-script edit moves all 18 declared 2018-19 wave hashes through the existing whole-wave module fingerprint.
+The other 525 country hashes, 1,344 declared-wave hashes and all 39 framework fingerprints remain exact.
+Only input and sample outputs were rebuilt in this task; the wider hash scope does not establish other outputs.
+
+* 2026-10-21 -- WAITING per-household food exposure: retained interview results disagree (GH #1148)
+
+Read-only diagnosis at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+All 50 declared 2014 sidecars (48 Stata files, two PDFs) have matching held L1 blobs; none was acquired.
+There is no standalone household cover dataset named among the held sidecars: cover-page result fields survive in module extracts as =res_entr1= through =res_entr4= and, in broad p2 nonfood files, =A13=.
+The key is =(zd, menage)=; the food passage is still stamped from its filename, never invented as a raw food column.
+
+The held passage-1 questionnaire, p. 1, A13, distinguishes interview accepted, accepted reluctantly, abandonment, temporary absence, refusal and other.
+The first two are positive interview results, but the literal question does not certify completion of every food question.
+P3's dictionary makes code 6 "household lost" and code 7 "other", whereas p1/p2 use code 6 for other.
+P4's retained =res_entr4= has no direct value dictionary; its code binding must not be assumed from p3 silently.
+
+The p1 panel has 10,800 keys, while the union of retained passage result carriers has 10,802, including one extra key each at p2 and p3.
+Within a carrier, no household has two distinct non-null result codes.
+Across carriers, eight p3 households disagree: accepted in health/food-security extracts versus abandonment (four), temporary absence (three) or other (one) in consumption extracts.
+Those eight remain conflicts; no carrier was chosen as a winner.
+
+| Passage | Accepted codes 1/2 | Abandon 3 | Absence/refusal 4/5 | Other/undecoded 6/7/9 | Missing/absent/conflict |
+|---------+--------------------+-----------+--------------------+-----------------------+-------------------------|
+|       1 |             10,783 |         1 |                  4 |                     3 |                       9 |
+|       2 |             10,590 |         3 |                 18 |                     1 |                     188 |
+|       3 |             10,224 |         1 |                  0 |                     0 |                     575 |
+|       4 |             10,172 |         3 |                286 |                   254 |                      85 |
+
+Each row partitions the 10,800 p1 keys; raw-code labels at p4 have the dictionary qualification above.
+The p2 unknowns include 179 absent carrier keys plus nine missing results; p3 includes 567 absent keys plus eight conflicts.
+Absence from a module extract is unknown, not a nonresponse code.
+
+*The official report disagrees with the retained fields.*
+=Report.pdf=, p. 22, table 1-2, reports accepted-plus-reluctant totals 10,800 / 10,619 / 10,221 / 10,168 and says all p1 households participated, with abandonment beginning at p2.
+The conflict-free retained-status union gives 10,783 / 10,591 / 10,225 / 10,172; even p1 has missing and nonaccepted results.
+Both are recorded, without declaring either stale or using the aggregate report to fill individual statuses.
+
+*A food-row count cannot count interviews.*
+Accepted results exist with no served food rows for 57 / 78 / 60 / 74 p1-panel households across the four passages.
+Conversely, positive served food spending coexists with temporary-absence codes for four p1 and thirteen p2 households.
+Neither observation is a licence to overwrite the other source.
+The historical GH #851 option-A estimate (9.3% of food-carrying households; -3.94% aggregate understatement) is a food-value-carrier estimate, not this status census, and is not replaced here.
+
+The release baseline still has Phase I recall metadata only; =period=, =RecallRecord.exposure_days(column)= and =recall.to_period= are absent.
+The separate existing =fix/851-recall-period= branch contains option A, including the one-ask Quantity / four-ask Expenditure distinction; integration is a prerequisite to #1148.
+No production exposure denominator was chosen.
+Unknown, partial, contradictory and undecoded household results need an explicit shared policy before a correction can be served.
+
+Aggregate evidence, source hashes, reproduction commands and the proposed country/shared boundary are in =slurm_logs/isa_backlog_2026-10-21/burkina-1148/REPORT.md=; the prior-art ledger is =.coder/ledger/1148-burkina-interview-status.md=.
+Raw records, household keys and full logs remain private.
+Existing record and passage-config checks: 35 passed, two deselected.

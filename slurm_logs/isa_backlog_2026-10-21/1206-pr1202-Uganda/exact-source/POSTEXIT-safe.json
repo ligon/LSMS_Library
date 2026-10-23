@@ -1,0 +1,10 @@
+{
+  "status": "POSTEXIT_PR1202_EXACT_SOURCE_NEW_RECIPES",
+  "READY_sha256": "b2c1ab80d258daebd1b885d0d03b1fe4462536b6e3baf94f7c8f75f35bb74ca8",
+  "manifest_sha256": "9ada12caa1bf81c5f3d896de3941a75a9dc3068e473d8ff6631fbe15f9ae0abd",
+  "manifest_entries": 93,
+  "all42_source_and9original_copy_receipts_exact": true,
+  "source_clean_zero_consumers_zero_denials": true,
+  "prior_f8_hold_packet_unchanged": true,
+  "signed": "Sue"
+}

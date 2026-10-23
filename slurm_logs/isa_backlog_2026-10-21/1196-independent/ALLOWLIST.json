@@ -1,0 +1,14 @@
+{
+  "files": [
+    "REPORT.org",
+    "REPRODUCE.org",
+    "validation.json",
+    "proof.json",
+    "source-review.json",
+    "contract.json",
+    "ALLOWLIST.json"
+  ],
+  "safe_aggregates_only": true,
+  "no_rows_IDs_coordinates_full_warnings_or_traces": true,
+  "root_publication_authority": true
+}

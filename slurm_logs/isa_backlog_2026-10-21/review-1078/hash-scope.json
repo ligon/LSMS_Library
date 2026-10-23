@@ -1,0 +1,28 @@
+{
+  "status": "SUCCESS",
+  "country_hashes": {
+    "total": 549,
+    "changed": 549,
+    "unchanged": 0
+  },
+  "framework_fingerprints": {
+    "total": 39,
+    "changed": 39,
+    "unchanged": 0
+  },
+  "wave_hashes": {
+    "total": 1362,
+    "changed": 1362,
+    "unchanged": 0
+  },
+  "registry_added": [
+    "lsms_library.country.Wave.food_acquired"
+  ],
+  "registry_removed": [],
+  "API_wave_hashes": {
+    "total": 2139,
+    "changed_nonnull": 2109,
+    "none_both": 30,
+    "unchanged_nonnull": 0
+  }
+}

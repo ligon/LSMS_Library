@@ -1,0 +1,75 @@
+{
+  "checks": [
+    {
+      "wave": "2011-12",
+      "season": "A",
+      "slot": 1,
+      "column": "Quantity",
+      "source_field": "a5aq6a",
+      "source_dtype": "float32",
+      "numeric_source_dtype": "float32",
+      "native_numpy_dtype": "float32",
+      "observed_dtype": "float32",
+      "rows": 10858,
+      "exact_zero_tolerance_with_full_axis_dtype_mask_attrs": true,
+      "observed_dtype_not_used_to_construct_expected": true
+    },
+    {
+      "wave": "2011-12",
+      "season": "A",
+      "slot": 1,
+      "column": "KgFactor",
+      "source_field": "a5aq6d",
+      "source_dtype": "float32",
+      "numeric_source_dtype": "float32",
+      "native_numpy_dtype": "float32",
+      "observed_dtype": "float32",
+      "rows": 10858,
+      "exact_zero_tolerance_with_full_axis_dtype_mask_attrs": true,
+      "observed_dtype_not_used_to_construct_expected": true
+    },
+    {
+      "wave": "2011-12",
+      "season": "B",
+      "slot": 1,
+      "column": "Quantity",
+      "source_field": "a5bq6a",
+      "source_dtype": "float32",
+      "numeric_source_dtype": "float32",
+      "native_numpy_dtype": "float32",
+      "observed_dtype": "float32",
+      "rows": 9385,
+      "exact_zero_tolerance_with_full_axis_dtype_mask_attrs": true,
+      "observed_dtype_not_used_to_construct_expected": true
+    },
+    {
+      "wave": "2011-12",
+      "season": "B",
+      "slot": 1,
+      "column": "KgFactor",
+      "source_field": "a5bq6d",
+      "source_dtype": "float32",
+      "numeric_source_dtype": "float32",
+      "native_numpy_dtype": "float32",
+      "observed_dtype": "float32",
+      "rows": 9385,
+      "exact_zero_tolerance_with_full_axis_dtype_mask_attrs": true,
+      "observed_dtype_not_used_to_construct_expected": true
+    }
+  ],
+  "original_oracle_source_sha256": "a96949005551bb79c2ea84c91ef735bfc36ddb881d36fc53cbaff4df453fdb38",
+  "source_operation_quotes": [
+    {
+      "line": 54,
+      "text": "   qty=pd.to_numeric(src[slot['qty']],errors='coerce');qty=qty.where(qty!=slot.get('qty_sentinel'),np.nan) if slot.get('qty_sentinel') is not None else qty"
+    },
+    {
+      "line": 59,
+      "text": "   rep=pd.to_numeric(src[field],errors='coerce') if field else pd.Series(np.nan,index=src.index)"
+    },
+    {
+      "line": 63,
+      "text": "      'Quantity':qty.to_numpy(),'KgFactor':rep.where(rep>0,np.nan).to_numpy(),'source_slot':n+1,'source_position':np.arange(len(src))})"
+    }
+  ]
+}

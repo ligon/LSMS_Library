@@ -1,0 +1,41 @@
+{
+  "at_UTC": "2026-10-22T15:32:42.780152+00:00",
+  "root_read_actual_new_checkers_and_authority_preparers": true,
+  "signed": "Sue",
+  "cohorts": {
+    "pr1197-provenance": {
+      "status": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_EXPLICIT_GAPS",
+      "positive_groups": 152,
+      "strict_full_frames": 150,
+      "original_u_NA_policy_qualifications": 2,
+      "NEW_nine_zero_recipe": 1,
+      "historical_addendum_entries": 1758,
+      "original_suite_FAIL9_and_guard_attribution_history_retained": true,
+      "physical_selected_products": 195,
+      "source_census_scripts": 7,
+      "READY_sha256": "c3617b331974d9568e0e976427b57f7f4a2b31e69e6660b4ec3537beda65aac6",
+      "manifest_sha256": "62bdcf92a54c5fb797fee8b56c793be7f86db628d6dfe84730a970af908fd207",
+      "packet_and_attestation_entries": 263,
+      "all_original_unsaved_source_expected_warm_test_and_runtime_gaps_retained": true,
+      "no_payload_decode_API_source_test_or_cache_replay_by_root": true,
+      "no_all_campaign_or_scientific_verdict": true
+    },
+    "pr1197-source-details": {
+      "status": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_EXPLICIT_GAPS",
+      "original_source_row_predicate_sets": 9,
+      "Quantity_NA": 6,
+      "Expenditure_NA": 3,
+      "historical_entries": 3618,
+      "not_full_frame_comparisons_or_full_counterpart_numeric_equality": true,
+      "physical_selected_products": 4,
+      "source_census_scripts": 21,
+      "READY_sha256": "da565b90ec39d08e117bd987da07a200b909c9a832120b7ab04d16d34e34794c",
+      "manifest_sha256": "a80bfed657e2c9796ca21450fea0b0c29aae3e62a10bc1bb2b50040671ae3b64",
+      "packet_and_attestation_entries": 69,
+      "all_original_unsaved_source_expected_warm_test_and_runtime_gaps_retained": true,
+      "no_payload_decode_API_source_test_or_cache_replay_by_root": true,
+      "no_all_campaign_or_scientific_verdict": true
+    }
+  },
+  "complete_root_decision_sha256": "8621b05ebb0a9439594ffdf53e8c5c842e5b4b8d3c1d0e64821e223d7b774b67"
+}

@@ -1,0 +1,249 @@
+{
+  "sources": {
+    "api-audit.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/api-audit.py",
+      "mode": 384,
+      "mtime_ns": 1792654329733999887,
+      "bytes": 566,
+      "inode": 54272483,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "3cf181fdfc8d7e0db1ed4f1a71bc11522c0df04a38783d1cc123d92cde8af6af"
+    },
+    "capture-source.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/capture-source.py",
+      "mode": 384,
+      "mtime_ns": 1792653828247304663,
+      "bytes": 948,
+      "inode": 54272420,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "e1d22a43d3d4e4f884d34d9ecc1e1bd1f6c984c88bd0e3de7f9608a05f442b52"
+    },
+    "compare-warm-v1.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/compare-warm-v1.py",
+      "mode": 384,
+      "mtime_ns": 1792654163141105423,
+      "bytes": 5121,
+      "inode": 54272461,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "11d2e14011e8a6abaae1cd8122a4d543ccaf7046673e54762959e97edc9a4dd0"
+    },
+    "compare-warm-v2.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/compare-warm-v2.py",
+      "mode": 384,
+      "mtime_ns": 1792654202201314955,
+      "bytes": 5922,
+      "inode": 54272467,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "dc224082fe37cad5da444fe0338460814251d2aefb63ae04c5304e7e020b5cfb"
+    },
+    "compare-warm-v3.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/compare-warm-v3.py",
+      "mode": 384,
+      "mtime_ns": 1792654273671698797,
+      "bytes": 6705,
+      "inode": 54272470,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "9196605773564f0723975e8c6ef1ee82c2b5c58f7b4302724cbe1efef27cfc88"
+    },
+    "entry.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/entry.py",
+      "mode": 384,
+      "mtime_ns": 1792653828247304663,
+      "bytes": 1419,
+      "inode": 54272415,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "3fed895cb1551232f93b183fdb3dbf17b846dea7358dad9ad2385208a8ca618a"
+    },
+    "exact_strict-v2.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/exact_strict-v2.py",
+      "mode": 384,
+      "mtime_ns": 1792654163141105423,
+      "bytes": 5220,
+      "inode": 54272462,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "f7dfa6b97bc66658058ab0b7bbe74990fd03ee4a2cf0f215ab5a5ef2526d95c0"
+    },
+    "exact_strict.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/exact_strict.py",
+      "mode": 384,
+      "mtime_ns": 1792654009903284799,
+      "bytes": 4906,
+      "inode": 54272440,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "aae4d838b46dde6025c96f76b6177be9a9a95a0f96089e0f695943c479a840f9"
+    },
+    "final-protection.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/final-protection.py",
+      "mode": 384,
+      "mtime_ns": 1792654508506962692,
+      "bytes": 2115,
+      "inode": 54272487,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "8287c0af5fc5f0d0782c759b32d384feba0e69bed3118e8a3d17a3795898ca7a"
+    },
+    "hash-census.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/hash-census.py",
+      "mode": 384,
+      "mtime_ns": 1792653828247304663,
+      "bytes": 1136,
+      "inode": 54272421,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "fb216fbe2bc14a8bcc98f85b9cea5104cc29ef08b4c2c1a882291ec6ad76cc2e"
+    },
+    "identity.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/identity.py",
+      "mode": 384,
+      "mtime_ns": 1792653828247304663,
+      "bytes": 472,
+      "inode": 54272416,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "311e4d4cbeee1e383351282e60a0f97340314fbfb0d47a6095b7c9c17bc66c57"
+    },
+    "package.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/package.py",
+      "mode": 384,
+      "mtime_ns": 1792654670918880018,
+      "bytes": 6321,
+      "inode": 54272492,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "6d5e8cd93c4f28304763bfdd5d8ef25aa4688987fff425eeb19b397b04656f5f"
+    },
+    "postexit-readonly.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/postexit-readonly.py",
+      "mode": 384,
+      "mtime_ns": 1792654719542180254,
+      "bytes": 913,
+      "inode": 54272494,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "884d0e0ad76b2c960ceaccd608d9cc1e8f99b8e9db9d198e378b2f444cc1e7d2"
+    },
+    "receipts.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/receipts.py",
+      "mode": 384,
+      "mtime_ns": 1792653828247304663,
+      "bytes": 830,
+      "inode": 54272417,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "150a6664211502321f68e0464e78956953d9fcdeada257abf08a52571399039d"
+    },
+    "run-pytest.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/run-pytest.py",
+      "mode": 384,
+      "mtime_ns": 1792653828247304663,
+      "bytes": 85,
+      "inode": 54272419,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "7631327bffed04933109fa99b0c7462d081d36d6986db520bb8b8aceec1fc3c7"
+    },
+    "run.sh": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/run.sh",
+      "mode": 384,
+      "mtime_ns": 1792653828247304663,
+      "bytes": 1232,
+      "inode": 54272418,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "66e59bfbe86157b50e198eba4b6c3b591586f40ad1e478ad667d954d8c8c7f59"
+    },
+    "seal.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/seal.py",
+      "mode": 384,
+      "mtime_ns": 1792654719541180247,
+      "bytes": 2612,
+      "inode": 54272493,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "3edc1e192b69cb74cdf0c94ecd7a94bc5d4c7c5a50198072f49e51fd16d6f48d"
+    },
+    "sitecustomize.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/sitecustomize.py",
+      "mode": 384,
+      "mtime_ns": 1792653828247304663,
+      "bytes": 2720,
+      "inode": 54272414,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "03fbc669f11a7fb98fff968e17865b102b2b90f2c8e314a1fa2314c62f3f04b9"
+    },
+    "test_review_adversarial.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/test_review_adversarial.py",
+      "mode": 384,
+      "mtime_ns": 1792654097151751876,
+      "bytes": 5048,
+      "inode": 54272450,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "e8e269ea2b3e051b5d9a12de33a9211e1c48864a5a0f3a54d5ea80986c2bf686"
+    },
+    "verify-fixtures.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/verify-fixtures.py",
+      "mode": 384,
+      "mtime_ns": 1792654299601838058,
+      "bytes": 1689,
+      "inode": 54272478,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "16432d235da2209b47600c28e779599cd2c6d64b58deb70e9926bd02df0cd160"
+    },
+    "warm-prepare.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/warm-prepare.py",
+      "mode": 384,
+      "mtime_ns": 1792654009903284799,
+      "bytes": 2477,
+      "inode": 54272438,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "46c12a618c88f3f82ed101452431540081d4a3878a6a027134f421850c021459"
+    },
+    "warm-probe.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/warm-probe.py",
+      "mode": 384,
+      "mtime_ns": 1792654009903284799,
+      "bytes": 2691,
+      "inode": 54272439,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "4c637db0dcf652ee2db9571f619b691f3d183ef5212a7bb9782645df0a046730"
+    }
+  },
+  "reuse": "Author guard/runner and strict comparator patterns were personally read, copied privately and rebound; independent axis/value checks,14calibrations, adversarial tests and fixture census added. No original author file was run as a writer.",
+  "author_source_protection": "all4014originalmanifest entries reverified unchanged",
+  "checker_executed": "compare-warm-v3.py + exact_strict-v2.py; earlier copied/prepared v1/v2 scripts retained, not claimed executed"
+}

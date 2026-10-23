@@ -1,0 +1,111 @@
+{
+  "verdict": "PASS",
+  "reviewer": "Sue (GPT-6)",
+  "HEAD": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+  "base": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+  "other_reviewed_parent": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+  "blocking_findings": [],
+  "production_union_exact_reviewed_parents": true,
+  "driver_tests": 12,
+  "organic_tests": 28,
+  "supporting_tests": 89,
+  "all_tests": {
+    "passed": 129,
+    "skipped": 0,
+    "failed": 0,
+    "errors": 0
+  },
+  "Country_rows": [
+    180184,
+    179949
+  ],
+  "default_Feature_rows": [
+    264400,
+    264165
+  ],
+  "Uganda_rows": 84216,
+  "sample_rows": 57118,
+  "organic_rows_full_frame_order_axis_dtypes_null_masks_attrs_and_Applied_exact": 11075,
+  "organic_positive": 11068,
+  "organic_missing": 7,
+  "organic_source_qualified_unit_fallbacks_preserved": true,
+  "independent_slot_count": 33193,
+  "independent_covered_source_kg_sum": 1765763.95,
+  "same_source_positive_affirmative_pair_count": 235,
+  "all_pair_and_source_group_sums_exact": true,
+  "inorganic_numeric_sum_conserved": 2899339.95,
+  "no_excluded_wave_physical_total_claim": true,
+  "nitrogen_full_frame_attrs_exact_standalone": true,
+  "nitrogen_total": 1028195.63206,
+  "both_full_frame_expectations_pass": true,
+  "all_unaffected_de9_payload_and_2013_2016_frames_exact": true,
+  "all_five_native_raw_country_frames_exact": true,
+  "original_target_cold_build_complete": true,
+  "original_cold_full_Country_validation_passed": true,
+  "original_cold_public_Feature_snapshot_serialized": false,
+  "full_Feature_capture": "ordinary post-cold API from unchanged persisted cold caches, argument-matched to fresh default de9 control",
+  "explicit_currency_None_full_frame_exact_immutable_de9_artifact": true,
+  "default_Feature_full_attrs_exact_fresh_default_control_projection": true,
+  "fresh_process_warm_all_frames_exact_zero_parquet_writes": true,
+  "healthy_Uganda_full_frames_and_cache_bytes_exact": true,
+  "scanner": {
+    "records_before": 15,
+    "records_after": 15,
+    "full_records_exact": 11,
+    "count_only_expected_changes": 4,
+    "failures_or_errors": 0,
+    "null_native_unit": [
+      17649,
+      6067
+    ],
+    "normalization": false
+  },
+  "fresh_current_country_hashes_and_complete_wave_coverage_verified": true,
+  "full549_39census_repeated": false,
+  "immutable_clean_checkouts": 6,
+  "quiescent_reference_files_unchanged": {
+    "organic": 133,
+    "standalone": 413
+  },
+  "physical_copies": 140,
+  "all_copy_sources_and_held_L1_reference_copies_unchanged": true,
+  "network_attempts": 0,
+  "denied_source_writes": 0,
+  "subprocesses_remaining": 0,
+  "freeze_released": true,
+  "limits": [
+    "First normal cold Feature return was not serialized before the private expectation hit the old explicit-currency=None reference; all cold raw cache frames, already-validated Country and subsequent complete default Feature capture are preserved, with zero cache changes and an independent fresh-process warm repeat.",
+    "2013/2016 literal C4 gates remain; no new older-wave physical-unit authority or acquisition.",
+    "Bounded composition only; no full suite, repeated549/39 census or new residual diagnosis.",
+    "Missing units, purchase-unit separation, nutrient composition, retention and container/free-text interpretations remain separate."
+  ],
+  "artifact_sha256": {
+    "REVIEW.org": "67a78790f8a0194935d14c24c6e839fef677f7bf2ece7aa874c4cfe589a26fcf",
+    "REPRODUCE.org": "8e095c5dc27b034d086f9924cd6333039747157a61a2d5c2cd67c62fbe924a79",
+    "proof.json": "c9582f279a4d8db41f3196afc1500cd1403056468616021d900d3f31dfd9214f",
+    "preparation.json": "9d9278267d160e187db926a1b9281419b48fd9b2a3faca13a6dd23057ae303d6",
+    "composition-summary.json": "7c218a3c26c55c750b847ab0d569c364f9c1d6ff43c98cdd810d27d9058fe4f5",
+    "source-oracle.json": "ea2681a2d7b329161283e08127c063c028528f030ee619fa5bce6e8f3aef8ee6",
+    "tests.json": "2d33f14672670cfbe65cce9ab158630c4223e3b49b7c6c20af0053879d2c305b",
+    "scanner-comparison.json": "31cf55bcb4efd5c594cad4ea572c4c7d6d003e51dbe24a215e27256c22944718",
+    "candidate-cache-gates.json": "d398ac34ddeb4c20e6be8838640a4ceaea314267abaa5566b36173603237960d"
+  },
+  "runner_sha256": {
+    "cache_gates.py": "606f3c0cca0081491089f2f3ad4a6dce6ad4e9a7548c7632363234310054cd8f",
+    "compare_scan.py": "479dd696b93c6a907790f7c2b4933546ac8db8f62e759f3d088b38d50b61884a",
+    "expectations.py": "339bf5d16ff06ca6cb4aeceb6a4d3de920d04d59f75c96624cfd9834d9c066cb",
+    "final_proof.py": "c9b0e8125b9a8c751b41b1e9eb997a4d2f50455309292ac816585adbabb29281",
+    "identity.py": "640127ae2ef00a777dbdd9e9a9995aac7a447b4c87ad27e8baa28d2da8f5addb",
+    "prepare.py": "ed449558f12ac0f6dafdfcbed6fa4166ffc2aa5d67083bb4289124df85b459c1",
+    "pytest_identity.py": "1c1d29689ca6423db07ad953777e41796f86a33eeef9b09dc87646fefa1742c1",
+    "run.sh": "43812d46eb960eaca3d2038c2b2ae4100805c026214cad076ba0beec07eec548",
+    "run_scan.py": "e8bf99f113429d015384e4a28188e10a2a4f5301625cb5f0b2aa2b0973983d99",
+    "runtime.py": "2adc5613d3e733b7544698d9652af6348ea1251d066e4097ba5900ee5a2259e2",
+    "runtime_v2.py": "09d49e5f8ca9b836271c007206581690ea14778500d71269c7d4a4b12d1bd6ad",
+    "runtime_v3.py": "6a2fe71a28fa47fcca4e22352a4aefd4c97cdebad821ecb6ce0720306c2edfca",
+    "sitecustomize.py": "e037aafdf95ebf176625932e4247ecd62099ab0624851bc149e9708177221ab0",
+    "source_oracle.py": "862198b88bc0a76b9b277c9e3cd543eb00aa8538f9989dec4ee2c026ffc4733e",
+    "summarize.py": "e47c5ee2c7ccd4c9535a3e63b18040ac849bf4ef841bd0f660af1d1e4ac95ede",
+    "test_runner.py": "f05e45b97678a380a3fe7e9f022eb93bdda61d808aa059ce79d2fb929bce1715"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "safe_payload_files": 8,
+  "construction": "Only explicitly selected aggregate counts, source-code/release pins, scope statements and historical command templates. No raw rows, household identifiers, source dictionaries, frame pickle/parquet bytes, complete warnings, traces or strict failure details are included.",
+  "raw_and_complete_operands": "Retained only in the private manifest payload.",
+  "all_full_frames_axes_storage_and_typed_attrs_preserved_privately": true,
+  "export_scope": "Only these eight literal files named in ALLOWLIST.json; private manifest/READY/control records are for root authentication.",
+  "universal_identifier_scan_claim": false,
+  "signed": "Sue (GPT-6)"
+}

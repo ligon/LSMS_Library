@@ -1,0 +1,56 @@
+{
+  "status": "EXACT_AGGREGATE_AND_SOURCE_EXPORT_ALLOWLIST",
+  "files": {
+    "author-report-safe.md": {
+      "sha256": "ed107433c2da68d11d493542d3b06eb5b88b1866e0e2f5084bd38e21bd9b5d0e",
+      "bytes": 5513,
+      "mode": 384,
+      "mtime_ns": 1792701692283012863,
+      "inode": 4337581,
+      "device": 64770,
+      "nlink": 1,
+      "uid": 43292,
+      "gid": 501,
+      "symlink": false
+    },
+    "safe-proof.json": {
+      "sha256": "02677e69069394bbad1696859555cb1bcdf18478677a455e4eefdfebe6d5faa2",
+      "bytes": 4412,
+      "mode": 384,
+      "mtime_ns": 1792701693168017300,
+      "inode": 4337587,
+      "device": 64770,
+      "nlink": 1,
+      "uid": 43292,
+      "gid": 501,
+      "symlink": false
+    },
+    "source.diff": {
+      "sha256": "1b69f1947dd284e45b6f3a0f6e0b312a56c97827f635698a05c4a0988b953db2",
+      "bytes": 17920,
+      "mode": 384,
+      "mtime_ns": 1792700931989202195,
+      "inode": 4337518,
+      "device": 64770,
+      "nlink": 1,
+      "uid": 43292,
+      "gid": 501,
+      "symlink": false
+    },
+    "privacy-scan-safe.json": {
+      "sha256": "28628659a54ee26841ecc32861113e472547bd0bd96e7be7a466322c1b4f8bff",
+      "bytes": 441,
+      "mode": 384,
+      "mtime_ns": 1792701693203017476,
+      "inode": 4337588,
+      "device": 64770,
+      "nlink": 1,
+      "uid": 43292,
+      "gid": 501,
+      "symlink": false
+    }
+  },
+  "privacy_private_proof_sha256": "74a38656242d74764c28ce9cabcff767cf8be4a448831496f9181e9f1e9631bd",
+  "root_acceptance": false,
+  "signed": "Sue"
+}

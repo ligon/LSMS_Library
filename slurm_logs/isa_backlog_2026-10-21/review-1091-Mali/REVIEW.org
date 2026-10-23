@@ -1,0 +1,146 @@
+#+TITLE: Mali GH #1091 independent review
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Verdict and exact source scope
+
+PASS for the bounded Mali retirement; no production blocker found.
+Candidate final is =9e8ebeabb0e996684d325d05987763a8c3581cc8=, runtime/tests =fdadc0698efcd300f5f09c21b60c30f570f96621=, against reviewed #822 parent =aba2badfe2f701a8b3793f1243fd8ed4fce18a53=.
+The ledger-first commit is =337f8432193902c0d6f3d6251ff911606d0955b6=; its sole change is the task ledger and its parent is aba.
+The final descendant changes only the five allowlisted evidence reports; library, tests and ledger Git trees/modes are exact to runtime.
+Independent source/receipt snapshots and the final clean/zero-consumer proof accompany this review.
+No tracked, Git/ref, GitHub, source, fixture, schema, dependency, CPU fingerprint or tolerance change was made by the reviewer.
+
+Production scope is exactly deletion of the 39-line country concatenate-only script, removal of its explicit var target/recipe and correction of the adjacent Make comment.
+The wave pattern/recipe/script, materialize:make declaration, helper/finalizer, driver/framework, units, eligibility, measurements, IDs and accepted variety/visit/obs grain are unchanged.
+Existing #788 authority and #840/merged #1086 grain decisions remain settled.
+The task ledger, #822 ledger, STANDING, code-reviewer, backlog, categorical/Feature contracts and unmodified scanner ground the review; search tier is git/ripgrep with AST-aware comparison.
+
+* Country grounding and documentary tensions
+
+The complete candidate Mali CONTENTS was read, including tasks/history; the full baseline text is its byte-identical historical prefix, separately verified.
+Repository guidance is byte-identical to the previously fully read immutable guidance, and the complete prior Niger reading was carried only after exact SHA256 =b1bf5794b242c794437995eb76742db763951397d8dfdb691d064af569ef67ee= verification.
+
+Mali mixes EAC-I 2014-15/2017-18 and EHCVM 2018-19/2021-22; rural 2014 observation units are agricultural holdings, unlike urban households, and 2017 rural Lourd/Leger coverage differs.
+The opening "Mali EHCVM [...] Four waves are configured" coexists with "Only 2018-19 and 2021-22 are EHCVM" in its explicit correction.
+The EAC-I community grid has two passages and three native Unit/Poids/Prix slots.
+Variety CODE stays the key because Description quoting differs across passages; native i==v is a deliberate compatibility shim, while the framework's public declared grain drops i.
+Quantity remains the recorded Poids(KG) lot weight and Price its lot quote, under the existing instrument record; no fresh PDF interpretation is claimed.
+All 129 positive-price unresolved-unit entries remain excluded; positive price does not establish their validity.
+
+The retired Make comment says EHCVM has "no grappe key", while CONTENTS identifies the unwired 2018-19 grappe-grain s05 module separately from 2021 region/milieu prices.
+The historical phrase "community_prices reads ONE of the survey's THREE price readings" is explicitly marked historical before #822 and coexists with the dated three-reading restoration.
+The scheme comment that "wave/var parquets carry a redundant i==v level" is broader than the measured layers: supported framework country caches already have seven levels, while native and old country-fallback files have eight.
+The new dated CONTENTS note correctly names the native/framework distinction; this residual comment precision does not authorize a schema or identity edit.
+These tensions are reported, not grounds for discarding documentation.
+The unwired 2018-19 module remains #821, outside this patch.
+
+Niger's pre-EHCVM GRAPPE/MENAGE/EXTENSION key distinguishes movers and split-offs; it must not be replaced by the EHCVM grappe/menage convention.
+Its price notes distinguish 134 exact duplicate-entry repeats removed from 30 nonrepeat second records awaiting representation policy.
+The existing nominal9999.9 quantity-sentinel caveat is not repaired or reinterpreted here, and no Price/Quantity policy is changed in the comparator.
+The opening "each grappe is visited in exactly one vague" coexists with the later description of each enumeration area divided into two groups.
+This is a documentary tension, not permission to change Niger keys, duplicates or retention.
+
+* Preparation, actual source oracle and bounds
+
+The actual 549-country-cell/39-framework inventory was measured in two isolated source-pinned processes BEFORE any review source decoding or build.
+Exactly 24 Mali hashes move; 525 other-country hashes and all 39 framework fingerprints are exact.
+Whole-file Make hashing explains the bounded cost; this is not a rebuilt-output claim for Mali's other 23 tables or a corpus rebuild.
+
+Both declared EACIS04 sidecars match the held source bindings and MD5s =d8ef05e89059993a76b082481feb3942= and =ca8ed4d483fa9714c3cf3a4fb1519b96=.
+Seventy-two physical L1 copies across 18 needed roots cover both flat and files/md5 layouts, each gated by sidecar MD5 plus SHA256, size, mode, mtime, distinct inode, nlink1 and nonsymlink checks before dependent reads.
+Five physical reviewed822 layer references and the current/full-four-wave Niger L2 comparator were independently gated; no unmanifested seed raw file was used.
+Sixteen later populated-root copies come only from this review's normally built, current-hash/full-coverage candidate outputs, with physical receipts and no stamps.
+Each cache root has one consumer at a time.
+
+A separate source oracle reads both labelled and numeric held sources through get_dataframe, reuses curation mappings and independently assembles each native passage/slot's expected rows without calling the candidate wave helper/finalizer.
+It confirms the identical four available community unit dictionaries and absent passage2 q03/q06 dictionaries, retaining exact known numeric codes and all unresolved exclusions.
+The complete eligible oracle is 155931 rows: obs1/2/3 = 66699/49014/40218 and passage1/2 = 66159/89772.
+Its eight-level native keys are unique/non-null and all payloads, masks, order and dtypes reconcile exactly at the matched post-read native layer.
+The initial pre-write-oracle versus post-Parquet reference dtype comparison stopped strictly and is preserved.
+The corrected layer comparison passes through the actual unchanged writer and sanctioned read, preserving both pre-write and post-read artifacts without in-memory normalization.
+
+An optional fresh variable-label probe stopped at the first get_data_file returning None under the credential-free permission branch, before metadata decoding or raw materialization.
+That stop is retained; no permission or reader bypass was introduced.
+Current value-label metadata and actual numeric/labelled source counts were freshly verified via get_dataframe; the older variable-label/instrument authority remains the reviewed record bound to the same raw MD5s.
+No fresh variable-label/PDF acquisition claim is made.
+
+All actual probes use the mounted interpreter, exact cwd/package/countries/config/data identity before artifact/data calls, private config/XDG/temp/DVC, PYTHONDONTWRITEBYTECODE, socket guards plus unshare-rn and numerical/build/Make threads of one.
+Only the two root-prepared ignored metadata links are writable inside the checkouts.
+No acquisition, DVC CLI, shared-cache mutation/clear/promotion, NO_CACHE, assumed freshness, manual stamp, read-gate bypass or in-tree payload is used.
+
+* Normal backend, subset and cache results
+
+All 40 candidate stages pass: 20 initial calls and 20 fresh-process/new-object warm calls.
+Eight supported stages (all versus 2014-15, both backends) preserve the complete authoritative parent DEFAULT public frame and recursively typed full attrs exactly.
+Every native layer also matches the independent full source oracle, and each framework raw country layer matches its separate seven-level parent DEFAULT oracle.
+Thirty-two unsupported stages cover each 2017-18/2018-19/2021-22 request and their combined strict subset, both empty and naturally populated roots, both backends and both process stages.
+They return declared zero-row frames, build no community source, serve no unrelated 2014 rows and change/remove no cache files.
+
+The parent was independently exercised for all 12 backend/request cases, with supported fresh-process warm controls.
+Old Make serves all 155931 unrelated 2014 rows for each unsupported request, including the combination.
+Old DEFAULT returns zero but its cold fallback stores the full eight-level 2014 native country frame under a current hash with requested-only unsupported coverage.
+That actual-row-wave/manifest mismatch is defect evidence, not an equality target.
+The first 2017 baseline cold API completed before an incorrect review-layer expectation stopped; the complete strict failure and saved frames remain private.
+A separate fresh-process poststop call verifies those exact eight-level native/fallback frames and the zero public result with zero cache changes; the cold call was not rerun or relabelled a clean first-pass validation.
+
+The parent Make public payload/axes/dtypes/masks and all common attrs equal DEFAULT, with only id_converted=True absent.
+The strict full-attrs comparison is preserved as an expected failure.
+Candidate Make now matches the authoritative DEFAULT FULLattrs, including that explicit addition.
+No attr stripping or normalization is used to assert full-frame equivalence with old Make.
+
+Native caches remain eight-level/hashless.
+DEFAULT country caches are seven-level, genuinely current and correctly manifest-covered.
+Make's new framework wave route creates no country cache.
+Ten DEFAULT fresh-warm controls change zero bytes/modes/mtimes.
+The two supported Make fresh-warm controls normally rewrite only the hashless native file: bytes, size and mode stay exact while mtime changes.
+This is normal wave-cache behavior, not a bypass or a zero-write Make claim.
+Actual Make probes retain the wave target and all route, reject the fresh removed var target, and preserve loud required Price/Quantity gates and script-path classification.
+
+* Tests, Feature, scanner, CLI and exact comparators
+
+The discriminating focused selection passes 111 tests, zero errors/skips, with one explicitly deselected requires_s3-marked original public822 function.
+That original function is separately called unmodified on held sources and passes; its normal pytest credential marker was not weakened.
+The byte-identical new28-case file physically copied to untouched aba yields 24 meaningful failures and four passes, zero errors/skips.
+The failures independently reconcile as 18 retired-country-builder reaches, four unwanted unsupported builds, one still-present script and one still-present var rule.
+The seven focused warnings are four synthetic repeat-build, one missing Fakeland builder and two Fakeland Make-target warnings; full logs remain private.
+The strict API audit passes.
+There is no full-suite claim and no fixture/golden refresh.
+
+The physically copied healthy Niger comparator is current for both reviewed checkouts, has full four-wave coverage and serves 46043 rows.
+Its source and copies remain byte/mode/mtime exact; this is a normal current-L2 comparator, not source-cold Niger evidence.
+Paired Mali/Niger Country frames and Feature default-currency versus explicit currency=None frames are separately compared: each Feature has 201974 rows and all four complete pairs match exactly, including full typed attrs.
+The unmodified scanner phases1/2 produce the same two complete WARN records byte-for-byte: native Mali/Niger cluster-price tables have no household i level.
+No FAIL/ERROR or hidden finding is removed, and this feature has no invented phase2 kwargs grid.
+Terminal runtime/Feature/CLI probes have zero Python warnings; full parent/child logs are retained separately from focused synthetic warnings and failed harness logs.
+
+Actual CLI callable and Typer repeated-wave forwarding controls preserve the argument boundary.
+Supported pre-write APIs match actual parent DEFAULT APIs; post-read artifacts independently match actual parent artifacts, recursively typed attrs and full Arrow schema/footer metadata.
+The unchanged writer's JSON attrs conversion changes Python container types across API/artifact stages; those strict failures remain explicit.
+Unsupported candidate backends exactly match the actual existing empty-declared factory plus finalizer, and match one another at callable/pre-write/post-read stages and full Arrow footer metadata.
+Parent filtered empty visit/obs levels are int64, while the candidate's existing declared-empty contract yields string levels.
+Candidate Description is object at API time and StringDtype after the unchanged writer.
+Each artifact matches a separate actual-writer control; no dtype/attrs normalization is used to claim parent/candidate empty-frame equality.
+
+Every full-frame comparator explicitly uses check_exact=True, rtol=atol=0 and checks axes, order, dtypes, level codes, flags and null masks.
+Full attrs use exact types and recursively checked declared record fields, frozen containers, pandas/numpy arrays and scalar values; pandas' tolerant generic attrs comparator is not used.
+The comparator code is physically reused from the already reviewed exact-control machinery, whose source receipt is retained, and invoked under this review's identity/guard.
+
+* Handling qualifications, residual and release
+
+Initial review stops remain private: categorical mapper path/cwd, pre-write versus post-Parquet oracle dtype, and parent unsupported raw-layer mismatch.
+They were corrected as harness/layer expectations only; no product/source change or assertion weakening was made.
+A tail command on the stopped baseline log inadvertently emitted native index examples into the internal tool transcript.
+This bounded handling error was reported promptly; no raw example is included in these safe exports and none was posted to GitHub.
+Full frames, IDs, source fields, logs, stack diagnostics and original strict failures remain private.
+
+The country notes already record the native/framework distinction; a future scheme-comment cleanup should say that the native shim is dropped from framework country caches, without changing grain.
+Niger/Tanzania retirement and Mali #821/unresolved-unit/source-authority work remain outside this PASS.
+Root should narrow #1091 in the PR-readiness phase with the new PR link and explicit reviewed-but-unmerged status; this review does not claim production resolution or authorize closing the umbrella.
+Stack only on the actual reviewed PR1180 head and validate the resulting composition; no union/integration proof is claimed here.
+
+Final source/evidence receipts, physical source/current comparator receipts and cache inventories are in freeze-proof.json.
+The safe allowlist and zero-consumer release are pinned in FINAL-READY.json.
+All author/diagnosis/original822 and prior1078-addendum evidence remains unchanged.
+
+Sue

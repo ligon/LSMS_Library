@@ -1,0 +1,27 @@
+{
+  "status": "EXACT_INDEPENDENT_92_GROUP_PROGRESS_BODY_READBACK",
+  "at_UTC": "2026-10-22T21:46:12.041929+00:00",
+  "evidence_commit": "94c49b11a0863cac54a7ce7b8c6631fead038df4",
+  "items": [
+    {
+      "number": 1215,
+      "state": "open",
+      "head_sha": null,
+      "merged": null,
+      "body_exact": true,
+      "body_sha256": "a48566c93a494855665dc5cfd2701347f677a331c02ecd0a5c0bf35f8fccfaea",
+      "body_bytes": 6152
+    },
+    {
+      "number": 1170,
+      "state": "open",
+      "head_sha": "94c49b11a0863cac54a7ce7b8c6631fead038df4",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "9247ef37aa7b6aa506b565e8876c82b37189a2e3cb0b6e42612f9efbbf009a3e",
+      "body_bytes": 31659
+    }
+  ],
+  "final_protection_seal_root_acceptance_pending": true,
+  "signed": "Sue"
+}

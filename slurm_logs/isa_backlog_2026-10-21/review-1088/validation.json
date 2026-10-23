@@ -1,0 +1,79 @@
+{
+  "verdict": "PASS",
+  "frozen_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "findings": [],
+  "checks": {
+    "actual_cold_and_fresh_warm_API_runs": 4,
+    "source_rows": [
+      23409,
+      34380,
+      21960
+    ],
+    "source_md5_verified": 3,
+    "held_2014_quantity_storage": "Stata double, no assigned value-label set",
+    "served_rows_unchanged": 46043,
+    "exact_source_to_served_changed_quantities": 76,
+    "changed_by_slot": [
+      43,
+      32,
+      1
+    ],
+    "changed_clusters": 21,
+    "changed_varieties": 5,
+    "other_quantities_exact": 45967,
+    "keys_Price_other_columns_exact": true,
+    "duplicate_drops_before_and_after": [
+      0,
+      17,
+      117
+    ],
+    "wide_duplicates_before_and_after": [
+      0,
+      13478,
+      0
+    ],
+    "nonrepeat_tail_rows_exact": 30,
+    "unit_assembly_passed": 55,
+    "real_Niger_Mali_passed": 12,
+    "skips": 0,
+    "expected_negative_baseline_failures": 8,
+    "Feature_rows": 86261,
+    "Feature_unique": true,
+    "Feature_rows_by_country": {
+      "Niger": 46043,
+      "Mali": 40218
+    },
+    "Feature_warnings_identical": 3,
+    "changed_Niger_hashes": 23,
+    "unchanged_Mali_hashes": 24,
+    "unchanged_Tanzania_hashes": 25,
+    "framework_and_other_country_sources_structurally_identical": true,
+    "production_AST_only_exact_quantity_mask_extended": true
+  },
+  "public_evidence_hygiene": {
+    "lines": 3,
+    "empty_metrics": true,
+    "only_static_index_and_schema_alignment_warnings": true,
+    "raw_household_individual_records": 0,
+    "sensitive_source_examples": 0
+  },
+  "frozen_proof": {
+    "head_before": "d602f8d63520e521a730f85551b366c4d45d9a35",
+    "head_after": "d602f8d63520e521a730f85551b366c4d45d9a35",
+    "tracked_file_contents_sha256_checked": 14839,
+    "tracked_symlink_targets_git_verified": 47,
+    "tracked_entries": 14885,
+    "tracked_content_changes": [],
+    "git_status_porcelain": "",
+    "no_intree_niger_parquets": true
+  },
+  "limits": [
+    "Missing-code meaning follows existing issue/CONTENTS ruling; no independent instrument confirmation",
+    "No PDF acquisition, external API calls completed, raw acquisition, shared-cache mutation or DVC CLI",
+    "Held wired ECVMA sources only; 2018-19 unwired EHCVM price file and existing 30-row tail policy unchanged",
+    "No full suite/corpus rebuild",
+    "Metadata-only audit uses held-L1 permission answer to avoid credential validation; all comparator/hash checks run without that instrumentation"
+  ],
+  "author": "Sue"
+}

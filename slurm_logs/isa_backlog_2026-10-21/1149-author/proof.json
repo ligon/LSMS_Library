@@ -1,0 +1,304 @@
+{
+  "status": "AUTHOR_PASS_PENDING_INDEPENDENT_REVIEW",
+  "source": {
+    "source_head": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+    "runtime_tests_head": "f85a871fb8772b0bf1c296927e739ea0f7211214",
+    "parent_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "branch": "fix/1149-staged-reacquisition-20261022",
+    "FS_published_ref_exact": true,
+    "source_clean": true,
+    "exact_changed_paths": [
+      ".claude/skills/add-wave/SKILL.md",
+      ".coder/ledger/1149-staged-reacquisition.md",
+      "lsms_library/data_access.py",
+      "tests/fixtures/reacquisition_members.json",
+      "tests/test_staged_reacquisition.py",
+      "tests/test_wave_provenance.py"
+    ],
+    "all_other_tracked_receipts_exact": true,
+    "source_receipt_counts": {
+      "/local/job40255479/worktrees/isa-1149-acquisition": 14883,
+      "/local/job40255479/worktrees/isa-1149-acquisition-base": 14880
+    },
+    "dependency_sources_exact": true,
+    "three_original_held_parquets_exact": true,
+    "zero_untracked_country_source_payloads_or_parquets": true,
+    "zero_socket_attempts_or_write_denials": true,
+    "metadata_exceptions_exact": true,
+    "runtime_library_and_tests_trees_identical_to_final": true,
+    "only_ledger_descendant_of_runtime": true,
+    "warm_mode_note": "Private root is0700. The six copied warm parquet endpoints retain measured0644 modes; no post-read mode normalization is claimed."
+  },
+  "fingerprint_measurement": {
+    "measurement": "ACTUAL_WORKING_PRODUCT_SOURCE",
+    "moves": {
+      "country": {
+        "total": 549,
+        "moved": 0,
+        "keys_exact": true
+      },
+      "framework": {
+        "total": 39,
+        "moved": 0,
+        "keys_exact": true
+      },
+      "declared_wave": {
+        "total": 1362,
+        "moved": 0,
+        "keys_exact": true
+      }
+    },
+    "country_data_builds": 0,
+    "zero_data_endpoint_changes": true
+  },
+  "bounded_warm_audit": {
+    "status": "PASS_BOUNDED_WARM_ONLY",
+    "strict_frame_assertions": 12,
+    "groups_overlap_not_unique_pair_count": true,
+    "comparisons": [
+      {
+        "family": "cross-head",
+        "name": "Nigeria",
+        "phase": "first",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Nigeria",
+        "phase": "warm",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Nigeria",
+        "head": "parent",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Nigeria",
+        "head": "candidate",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Ethiopia",
+        "phase": "first",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Ethiopia",
+        "phase": "warm",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Ethiopia",
+        "head": "parent",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Ethiopia",
+        "head": "candidate",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Feature",
+        "phase": "first",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Feature",
+        "phase": "warm",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Feature",
+        "head": "parent",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Feature",
+        "head": "candidate",
+        "exact": true
+      }
+    ],
+    "negative_controls": [
+      {
+        "label": "tiny",
+        "scope": "column",
+        "rejected": true,
+        "pandas_frame_accepted_column": true
+      },
+      {
+        "label": "tiny",
+        "scope": "nested-Series-attrs",
+        "rejected": true,
+        "pandas_frame_accepted_column": true
+      },
+      {
+        "label": "nextafter",
+        "scope": "column",
+        "rejected": true,
+        "pandas_frame_accepted_column": true
+      },
+      {
+        "label": "nextafter",
+        "scope": "nested-Series-attrs",
+        "rejected": true,
+        "pandas_frame_accepted_column": true
+      },
+      {
+        "label": "missing-mask",
+        "rejected": true
+      },
+      {
+        "label": "column-dtype",
+        "rejected": true
+      },
+      {
+        "label": "unused-index-level",
+        "rejected": true
+      },
+      {
+        "label": "attrs",
+        "rejected": true
+      },
+      {
+        "label": "row-order",
+        "rejected": true
+      }
+    ],
+    "warning_pairs": [
+      {
+        "phase": "first",
+        "call": {
+          "kind": "Country",
+          "country": "Nigeria",
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 1,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "first",
+        "call": {
+          "kind": "Country",
+          "country": "Ethiopia",
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 1,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "first",
+        "call": {
+          "kind": "Feature",
+          "countries": [
+            "Nigeria",
+            "Ethiopia"
+          ],
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 3,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "warm",
+        "call": {
+          "kind": "Country",
+          "country": "Nigeria",
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 1,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "warm",
+        "call": {
+          "kind": "Country",
+          "country": "Ethiopia",
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 1,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "warm",
+        "call": {
+          "kind": "Feature",
+          "countries": [
+            "Nigeria",
+            "Ethiopia"
+          ],
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 3,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      }
+    ],
+    "scanner_records": 5,
+    "scanner_statuses": {
+      "warn": 5
+    },
+    "scanner_full_ordered_bytes_equal": true,
+    "country_rows": {
+      "Nigeria": 49770,
+      "Ethiopia": 25914
+    },
+    "Feature_rows": 75684,
+    "cache_endpoint_changes": 0,
+    "raw_L1_copies": 0,
+    "source_cold_builds": 0,
+    "phase2_kwargs_grid": "sample has no grid; phase1 only"
+  },
+  "original_country_raw_sources_copied_or_decoded": 0,
+  "actual_WB_S3_DVC_acquisition_calls": 0,
+  "synthetic_payloads_only": true,
+  "member_fixture_cases": {
+    "Nigeria": {
+      "held_source_sidecars": 106,
+      "unchanged": 104,
+      "revised": 2,
+      "new": 2
+    },
+    "Ethiopia": {
+      "held_source_sidecars": 68,
+      "unchanged": 67,
+      "removed": 1,
+      "new": 1
+    }
+  },
+  "member_fixture_scope": "Exact174held-sidecar basenames/SHA pins plus issue-cited additions/removal; synthetic bytes and chosen archive-relative directory names. No original downloaded archive-path or data comparison claim.",
+  "source_cohort_qualification": {
+    "earlier_hash_and262_suite_source_sha256": "a20e00fe14e602bd196645b311e83ce4a9fae13d3ea8caf7c5345d11fd2afb75",
+    "earlier_source_bytes_reconstructed_after_last_two_line_change": true,
+    "reconstructed_sha_matches_independent_saved_receipt": true,
+    "latest_source_sha256": "1cb8a9253c6ab375719a442b413f6b27671840120e95998ab7980dd205745569",
+    "delta": "qualified leftover provenance wording; clear empty failed populate receipt when Data absent",
+    "first_warm_cohort_preceded_latest_two_line_change": "retained as older-source cohort; current final-source warm follow-up separately pinned",
+    "earlier_source_metadata_not_reconstructed": true
+  },
+  "independent_review_required": true,
+  "human_merge_required": true,
+  "public_GitHub_writes_by_author": 0,
+  "full_suite_or_all_country_outputs_not_claimed": true
+}

@@ -1,0 +1,42 @@
+{
+  "verdict": "PASS",
+  "scope": "Narrow doc-only descendant confirmation; full source/runtime review remains pinned to 3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+  "tree_check": {
+    "old": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+    "new": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+    "changed": [
+      "lsms_library/countries/Uganda/_/CONTENTS.org"
+    ],
+    "insertions": 3,
+    "deletions": 1,
+    "all_other_tree_entries_identical": 14883,
+    "exact_reviewed_replacement": true,
+    "diff_check_clean": true,
+    "old_is_ancestor": true,
+    "old_blob": "100644 blob 6bad560bef33eb6b2b9decaf6f96c901f67bf67b",
+    "new_blob": "100644 blob c9acd94bc5b6b8e7d0c865ee02f485c94b803589"
+  },
+  "runtime_tests_config_all_other_blobs_identical": true,
+  "country_hashes_exact": 549,
+  "additional_country_hash_changes": 0,
+  "framework_fingerprints_exact": 39,
+  "additional_framework_changes": 0,
+  "data_cohort_or_tests_rerun": false,
+  "no_parquets_written": true,
+  "immutable_proof": {
+    "descendant": {
+      "HEAD": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "clean": true,
+      "all_tracked_sha256_unchanged": true,
+      "tracked_files": 14884
+    },
+    "frozen": {
+      "HEAD": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+      "clean": true,
+      "all_tracked_sha256_unchanged": true,
+      "tracked_files": 14884
+    }
+  },
+  "no_other_task_processes": true,
+  "author": "Sue"
+}

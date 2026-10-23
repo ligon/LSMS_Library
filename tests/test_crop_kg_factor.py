@@ -577,13 +577,16 @@ def test_uganda_harvest_kg_baseline():
     cp = ll.Country("Uganda").crop_production()
     assert "KgFactor" in cp.columns
     res = harvest_kg(cp)
-    assert len(cp) == 133_331
-    assert len(res) == 78_571
-    assert res["Harvest_kg"].sum() == pytest.approx(29_093_322.407894, rel=1e-9)
+    # GH849, 2026-10-22: twelve reported-factor mappings at GH1198's native
+    # observation grain. The held-source row/slot and direct product/median
+    # oracles preserve every other payload and the existing screens.
+    assert len(cp) == 133_761
+    assert len(res) == 88_980
+    assert res["Harvest_kg"].sum() == pytest.approx(42_026_694.99297963, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
-        "reported": 14_972, "shipped": 0, "survey_median": 555,
-        "metric": 88_190, "inferred": 0, "none": 29_614,
-        "reported_implausible": 102, "shipped_implausible": 0,
+        "reported": 96_747, "shipped": 0, "survey_median": 4_840,
+        "metric": 23_406, "inferred": 0, "none": 8_768,
+        "reported_implausible": 439, "shipped_implausible": 0,
         "shipped_matched": 0, "declared": 0}
     # GH #931 (2026-10-19): `declared` joins the dict and NO NUMBER MOVES.
     # Uganda's own `u` table maps nothing to a unit the merged `u_kg` declares

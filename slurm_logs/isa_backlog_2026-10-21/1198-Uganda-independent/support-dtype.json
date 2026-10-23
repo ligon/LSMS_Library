@@ -1,0 +1,58 @@
+{
+  "base": {
+    "cold": {
+      "index_class": "pandas.Index",
+      "dtype_class": "pandas.StringDtype",
+      "dtype_str": "string",
+      "dtype_repr": "<StringDtype(na_value=<NA>)>",
+      "storage": "pyarrow",
+      "na_value_repr": "<NA>",
+      "na_value_type": "NAType",
+      "index_nulls": 0,
+      "level_nulls": 0,
+      "rows": 4805,
+      "typed_attrs_sha": "e73557b7850d1f42430c067067b3c98f102e56eb293958e88295170c56be4b6f"
+    },
+    "warm": {
+      "index_class": "pandas.Index",
+      "dtype_class": "pandas.StringDtype",
+      "dtype_str": "str",
+      "dtype_repr": "<StringDtype(na_value=nan)>",
+      "storage": "pyarrow",
+      "na_value_repr": "nan",
+      "na_value_type": "float",
+      "index_nulls": 0,
+      "level_nulls": 0,
+      "rows": 4805,
+      "typed_attrs_sha": "e73557b7850d1f42430c067067b3c98f102e56eb293958e88295170c56be4b6f"
+    }
+  },
+  "candidate": {
+    "cold": {
+      "index_class": "pandas.Index",
+      "dtype_class": "pandas.StringDtype",
+      "dtype_str": "string",
+      "dtype_repr": "<StringDtype(na_value=<NA>)>",
+      "storage": "pyarrow",
+      "na_value_repr": "<NA>",
+      "na_value_type": "NAType",
+      "index_nulls": 0,
+      "level_nulls": 0,
+      "rows": 4805,
+      "typed_attrs_sha": "e73557b7850d1f42430c067067b3c98f102e56eb293958e88295170c56be4b6f"
+    },
+    "warm": {
+      "index_class": "pandas.Index",
+      "dtype_class": "pandas.StringDtype",
+      "dtype_str": "str",
+      "dtype_repr": "<StringDtype(na_value=nan)>",
+      "storage": "pyarrow",
+      "na_value_repr": "nan",
+      "na_value_type": "float",
+      "index_nulls": 0,
+      "level_nulls": 0,
+      "rows": 4805,
+      "typed_attrs_sha": "e73557b7850d1f42430c067067b3c98f102e56eb293958e88295170c56be4b6f"
+    }
+  }
+}

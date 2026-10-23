@@ -1,0 +1,4032 @@
+{
+  "verdict": "PASS",
+  "qualification": "Bounded production acceptance; pre-existing serialization/routing/area behavior and evidence gaps are explicit. No blanket cold-warm full-frame equality.",
+  "candidate_head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "parent_head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+  "runtime_tests_pin": "929149222e43a8fe500cc08420cdc68357170af3",
+  "hash_scope": {
+    "status": "PASS_MEASURED_BEFORE_REBUILD",
+    "country_hashes": {
+      "total": 549,
+      "changed": 28,
+      "unchanged": 521,
+      "changed_keys": [
+        "Uganda/people_last7days",
+        "Uganda/sample",
+        "Uganda/cluster_features",
+        "Uganda/household_roster",
+        "Uganda/individual_education",
+        "Uganda/shocks",
+        "Uganda/earnings",
+        "Uganda/food_acquired",
+        "Uganda/fct",
+        "Uganda/nutrition",
+        "Uganda/interview_date",
+        "Uganda/panel_ids",
+        "Uganda/income",
+        "Uganda/enterprise_income",
+        "Uganda/assets",
+        "Uganda/months_food_inadequate",
+        "Uganda/housing",
+        "Uganda/plot_features",
+        "Uganda/crop_production",
+        "Uganda/plot_inputs",
+        "Uganda/livestock",
+        "Uganda/anthropometry",
+        "Uganda/plot_labor",
+        "Uganda/nonfood_expenditures",
+        "Uganda/food_expenditures",
+        "Uganda/food_prices",
+        "Uganda/food_quantities",
+        "Uganda/household_characteristics"
+      ]
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "changed": 0,
+      "unchanged": 39,
+      "changed_keys": []
+    },
+    "wave_hashes": {
+      "total": 1362,
+      "changed": 171,
+      "unchanged": 1191,
+      "changed_keys": [
+        "Uganda/2005-06/education_expenses",
+        "Uganda/2005-06/cluster_features",
+        "Uganda/2005-06/sample",
+        "Uganda/2005-06/individual_education",
+        "Uganda/2005-06/assets",
+        "Uganda/2005-06/housing",
+        "Uganda/2005-06/plot_features",
+        "Uganda/2005-06/plots",
+        "Uganda/2005-06/shocks",
+        "Uganda/2005-06/household_roster",
+        "Uganda/2005-06/earnings",
+        "Uganda/2005-06/nonfood_expenditures",
+        "Uganda/2005-06/food_acquired",
+        "Uganda/2005-06/interview_date",
+        "Uganda/2005-06/people_last7days",
+        "Uganda/2005-06/enterprise_income",
+        "Uganda/2009-10/mapping",
+        "Uganda/2009-10/anthropometry",
+        "Uganda/2009-10/nonfood_expenditures",
+        "Uganda/2009-10/livestock",
+        "Uganda/2009-10/plots",
+        "Uganda/2009-10/crop_production",
+        "Uganda/2009-10/plot_inputs",
+        "Uganda/2009-10/cluster_features",
+        "Uganda/2009-10/people_last7days",
+        "Uganda/2009-10/education_expenses",
+        "Uganda/2009-10/sample",
+        "Uganda/2009-10/plot_features",
+        "Uganda/2009-10/household_roster",
+        "Uganda/2009-10/plot_labor",
+        "Uganda/2009-10/earnings",
+        "Uganda/2009-10/months_food_inadequate",
+        "Uganda/2009-10/food_acquired",
+        "Uganda/2009-10/interview_date",
+        "Uganda/2009-10/assets",
+        "Uganda/2009-10/housing",
+        "Uganda/2009-10/shocks",
+        "Uganda/2009-10/individual_education",
+        "Uganda/2009-10/enterprise_income",
+        "Uganda/2010-11/mapping",
+        "Uganda/2010-11/anthropometry",
+        "Uganda/2010-11/nonfood_expenditures",
+        "Uganda/2010-11/livestock",
+        "Uganda/2010-11/plots",
+        "Uganda/2010-11/crop_production",
+        "Uganda/2010-11/plot_inputs",
+        "Uganda/2010-11/cluster_features",
+        "Uganda/2010-11/education_expenses",
+        "Uganda/2010-11/sample",
+        "Uganda/2010-11/plot_features",
+        "Uganda/2010-11/household_roster",
+        "Uganda/2010-11/plot_labor",
+        "Uganda/2010-11/earnings",
+        "Uganda/2010-11/months_food_inadequate",
+        "Uganda/2010-11/food_acquired",
+        "Uganda/2010-11/interview_date",
+        "Uganda/2010-11/assets",
+        "Uganda/2010-11/housing",
+        "Uganda/2010-11/shocks",
+        "Uganda/2010-11/individual_education",
+        "Uganda/2010-11/enterprise_income",
+        "Uganda/2011-12/mapping",
+        "Uganda/2011-12/anthropometry",
+        "Uganda/2011-12/nonfood_expenditures",
+        "Uganda/2011-12/livestock",
+        "Uganda/2011-12/plots",
+        "Uganda/2011-12/crop_production",
+        "Uganda/2011-12/plot_inputs",
+        "Uganda/2011-12/cluster_features",
+        "Uganda/2011-12/sample",
+        "Uganda/2011-12/plot_features",
+        "Uganda/2011-12/household_roster",
+        "Uganda/2011-12/plot_labor",
+        "Uganda/2011-12/earnings",
+        "Uganda/2011-12/months_food_inadequate",
+        "Uganda/2011-12/food_acquired",
+        "Uganda/2011-12/interview_date",
+        "Uganda/2011-12/assets",
+        "Uganda/2011-12/housing",
+        "Uganda/2011-12/shocks",
+        "Uganda/2011-12/individual_education",
+        "Uganda/2011-12/enterprise_income",
+        "Uganda/2013-14/mapping",
+        "Uganda/2013-14/anthropometry",
+        "Uganda/2013-14/nonfood_expenditures",
+        "Uganda/2013-14/livestock",
+        "Uganda/2013-14/plots",
+        "Uganda/2013-14/crop_production",
+        "Uganda/2013-14/plot_inputs",
+        "Uganda/2013-14/cluster_features",
+        "Uganda/2013-14/people_last7days",
+        "Uganda/2013-14/education_expenses",
+        "Uganda/2013-14/sample",
+        "Uganda/2013-14/plot_features",
+        "Uganda/2013-14/household_roster",
+        "Uganda/2013-14/plot_labor",
+        "Uganda/2013-14/earnings",
+        "Uganda/2013-14/months_food_inadequate",
+        "Uganda/2013-14/food_acquired",
+        "Uganda/2013-14/interview_date",
+        "Uganda/2013-14/assets",
+        "Uganda/2013-14/housing",
+        "Uganda/2013-14/shocks",
+        "Uganda/2013-14/individual_education",
+        "Uganda/2013-14/enterprise_income",
+        "Uganda/2015-16/mapping",
+        "Uganda/2015-16/anthropometry",
+        "Uganda/2015-16/nonfood_expenditures",
+        "Uganda/2015-16/livestock",
+        "Uganda/2015-16/plots",
+        "Uganda/2015-16/crop_production",
+        "Uganda/2015-16/plot_inputs",
+        "Uganda/2015-16/cluster_features",
+        "Uganda/2015-16/education_expenses",
+        "Uganda/2015-16/sample",
+        "Uganda/2015-16/plot_features",
+        "Uganda/2015-16/household_roster",
+        "Uganda/2015-16/plot_labor",
+        "Uganda/2015-16/earnings",
+        "Uganda/2015-16/months_food_inadequate",
+        "Uganda/2015-16/food_acquired",
+        "Uganda/2015-16/interview_date",
+        "Uganda/2015-16/assets",
+        "Uganda/2015-16/housing",
+        "Uganda/2015-16/shocks",
+        "Uganda/2015-16/individual_education",
+        "Uganda/2015-16/enterprise_income",
+        "Uganda/2018-19/mapping",
+        "Uganda/2018-19/anthropometry",
+        "Uganda/2018-19/nonfood_expenditures",
+        "Uganda/2018-19/livestock",
+        "Uganda/2018-19/plots",
+        "Uganda/2018-19/crop_production",
+        "Uganda/2018-19/plot_inputs",
+        "Uganda/2018-19/cluster_features",
+        "Uganda/2018-19/people_last7days",
+        "Uganda/2018-19/education_expenses",
+        "Uganda/2018-19/sample",
+        "Uganda/2018-19/plot_features",
+        "Uganda/2018-19/household_roster",
+        "Uganda/2018-19/plot_labor",
+        "Uganda/2018-19/earnings",
+        "Uganda/2018-19/food_acquired",
+        "Uganda/2018-19/interview_date",
+        "Uganda/2018-19/assets",
+        "Uganda/2018-19/housing",
+        "Uganda/2018-19/shocks",
+        "Uganda/2018-19/individual_education",
+        "Uganda/2018-19/enterprise_income",
+        "Uganda/2019-20/mapping",
+        "Uganda/2019-20/anthropometry",
+        "Uganda/2019-20/nonfood_expenditures",
+        "Uganda/2019-20/livestock",
+        "Uganda/2019-20/plots",
+        "Uganda/2019-20/crop_production",
+        "Uganda/2019-20/plot_inputs",
+        "Uganda/2019-20/cluster_features",
+        "Uganda/2019-20/people_last7days",
+        "Uganda/2019-20/education_expenses",
+        "Uganda/2019-20/sample",
+        "Uganda/2019-20/plot_features",
+        "Uganda/2019-20/household_roster",
+        "Uganda/2019-20/plot_labor",
+        "Uganda/2019-20/earnings",
+        "Uganda/2019-20/food_acquired",
+        "Uganda/2019-20/interview_date",
+        "Uganda/2019-20/assets",
+        "Uganda/2019-20/housing",
+        "Uganda/2019-20/shocks",
+        "Uganda/2019-20/individual_education",
+        "Uganda/2019-20/enterprise_income"
+      ]
+    },
+    "api_wave_hashes": {
+      "total": 2139,
+      "changed": 224,
+      "unchanged": 1915,
+      "changed_keys": [
+        "Uganda/2005-06/people_last7days",
+        "Uganda/2005-06/sample",
+        "Uganda/2005-06/cluster_features",
+        "Uganda/2005-06/household_roster",
+        "Uganda/2005-06/individual_education",
+        "Uganda/2005-06/shocks",
+        "Uganda/2005-06/earnings",
+        "Uganda/2005-06/food_acquired",
+        "Uganda/2005-06/fct",
+        "Uganda/2005-06/nutrition",
+        "Uganda/2005-06/interview_date",
+        "Uganda/2005-06/panel_ids",
+        "Uganda/2005-06/income",
+        "Uganda/2005-06/enterprise_income",
+        "Uganda/2005-06/assets",
+        "Uganda/2005-06/months_food_inadequate",
+        "Uganda/2005-06/housing",
+        "Uganda/2005-06/plot_features",
+        "Uganda/2005-06/crop_production",
+        "Uganda/2005-06/plot_inputs",
+        "Uganda/2005-06/livestock",
+        "Uganda/2005-06/anthropometry",
+        "Uganda/2005-06/plot_labor",
+        "Uganda/2005-06/nonfood_expenditures",
+        "Uganda/2005-06/food_expenditures",
+        "Uganda/2005-06/food_prices",
+        "Uganda/2005-06/food_quantities",
+        "Uganda/2005-06/household_characteristics",
+        "Uganda/2009-10/people_last7days",
+        "Uganda/2009-10/sample",
+        "Uganda/2009-10/cluster_features",
+        "Uganda/2009-10/household_roster",
+        "Uganda/2009-10/individual_education",
+        "Uganda/2009-10/shocks",
+        "Uganda/2009-10/earnings",
+        "Uganda/2009-10/food_acquired",
+        "Uganda/2009-10/fct",
+        "Uganda/2009-10/nutrition",
+        "Uganda/2009-10/interview_date",
+        "Uganda/2009-10/panel_ids",
+        "Uganda/2009-10/income",
+        "Uganda/2009-10/enterprise_income",
+        "Uganda/2009-10/assets",
+        "Uganda/2009-10/months_food_inadequate",
+        "Uganda/2009-10/housing",
+        "Uganda/2009-10/plot_features",
+        "Uganda/2009-10/crop_production",
+        "Uganda/2009-10/plot_inputs",
+        "Uganda/2009-10/livestock",
+        "Uganda/2009-10/anthropometry",
+        "Uganda/2009-10/plot_labor",
+        "Uganda/2009-10/nonfood_expenditures",
+        "Uganda/2009-10/food_expenditures",
+        "Uganda/2009-10/food_prices",
+        "Uganda/2009-10/food_quantities",
+        "Uganda/2009-10/household_characteristics",
+        "Uganda/2010-11/people_last7days",
+        "Uganda/2010-11/sample",
+        "Uganda/2010-11/cluster_features",
+        "Uganda/2010-11/household_roster",
+        "Uganda/2010-11/individual_education",
+        "Uganda/2010-11/shocks",
+        "Uganda/2010-11/earnings",
+        "Uganda/2010-11/food_acquired",
+        "Uganda/2010-11/fct",
+        "Uganda/2010-11/nutrition",
+        "Uganda/2010-11/interview_date",
+        "Uganda/2010-11/panel_ids",
+        "Uganda/2010-11/income",
+        "Uganda/2010-11/enterprise_income",
+        "Uganda/2010-11/assets",
+        "Uganda/2010-11/months_food_inadequate",
+        "Uganda/2010-11/housing",
+        "Uganda/2010-11/plot_features",
+        "Uganda/2010-11/crop_production",
+        "Uganda/2010-11/plot_inputs",
+        "Uganda/2010-11/livestock",
+        "Uganda/2010-11/anthropometry",
+        "Uganda/2010-11/plot_labor",
+        "Uganda/2010-11/nonfood_expenditures",
+        "Uganda/2010-11/food_expenditures",
+        "Uganda/2010-11/food_prices",
+        "Uganda/2010-11/food_quantities",
+        "Uganda/2010-11/household_characteristics",
+        "Uganda/2011-12/people_last7days",
+        "Uganda/2011-12/sample",
+        "Uganda/2011-12/cluster_features",
+        "Uganda/2011-12/household_roster",
+        "Uganda/2011-12/individual_education",
+        "Uganda/2011-12/shocks",
+        "Uganda/2011-12/earnings",
+        "Uganda/2011-12/food_acquired",
+        "Uganda/2011-12/fct",
+        "Uganda/2011-12/nutrition",
+        "Uganda/2011-12/interview_date",
+        "Uganda/2011-12/panel_ids",
+        "Uganda/2011-12/income",
+        "Uganda/2011-12/enterprise_income",
+        "Uganda/2011-12/assets",
+        "Uganda/2011-12/months_food_inadequate",
+        "Uganda/2011-12/housing",
+        "Uganda/2011-12/plot_features",
+        "Uganda/2011-12/crop_production",
+        "Uganda/2011-12/plot_inputs",
+        "Uganda/2011-12/livestock",
+        "Uganda/2011-12/anthropometry",
+        "Uganda/2011-12/plot_labor",
+        "Uganda/2011-12/nonfood_expenditures",
+        "Uganda/2011-12/food_expenditures",
+        "Uganda/2011-12/food_prices",
+        "Uganda/2011-12/food_quantities",
+        "Uganda/2011-12/household_characteristics",
+        "Uganda/2013-14/people_last7days",
+        "Uganda/2013-14/sample",
+        "Uganda/2013-14/cluster_features",
+        "Uganda/2013-14/household_roster",
+        "Uganda/2013-14/individual_education",
+        "Uganda/2013-14/shocks",
+        "Uganda/2013-14/earnings",
+        "Uganda/2013-14/food_acquired",
+        "Uganda/2013-14/fct",
+        "Uganda/2013-14/nutrition",
+        "Uganda/2013-14/interview_date",
+        "Uganda/2013-14/panel_ids",
+        "Uganda/2013-14/income",
+        "Uganda/2013-14/enterprise_income",
+        "Uganda/2013-14/assets",
+        "Uganda/2013-14/months_food_inadequate",
+        "Uganda/2013-14/housing",
+        "Uganda/2013-14/plot_features",
+        "Uganda/2013-14/crop_production",
+        "Uganda/2013-14/plot_inputs",
+        "Uganda/2013-14/livestock",
+        "Uganda/2013-14/anthropometry",
+        "Uganda/2013-14/plot_labor",
+        "Uganda/2013-14/nonfood_expenditures",
+        "Uganda/2013-14/food_expenditures",
+        "Uganda/2013-14/food_prices",
+        "Uganda/2013-14/food_quantities",
+        "Uganda/2013-14/household_characteristics",
+        "Uganda/2015-16/people_last7days",
+        "Uganda/2015-16/sample",
+        "Uganda/2015-16/cluster_features",
+        "Uganda/2015-16/household_roster",
+        "Uganda/2015-16/individual_education",
+        "Uganda/2015-16/shocks",
+        "Uganda/2015-16/earnings",
+        "Uganda/2015-16/food_acquired",
+        "Uganda/2015-16/fct",
+        "Uganda/2015-16/nutrition",
+        "Uganda/2015-16/interview_date",
+        "Uganda/2015-16/panel_ids",
+        "Uganda/2015-16/income",
+        "Uganda/2015-16/enterprise_income",
+        "Uganda/2015-16/assets",
+        "Uganda/2015-16/months_food_inadequate",
+        "Uganda/2015-16/housing",
+        "Uganda/2015-16/plot_features",
+        "Uganda/2015-16/crop_production",
+        "Uganda/2015-16/plot_inputs",
+        "Uganda/2015-16/livestock",
+        "Uganda/2015-16/anthropometry",
+        "Uganda/2015-16/plot_labor",
+        "Uganda/2015-16/nonfood_expenditures",
+        "Uganda/2015-16/food_expenditures",
+        "Uganda/2015-16/food_prices",
+        "Uganda/2015-16/food_quantities",
+        "Uganda/2015-16/household_characteristics",
+        "Uganda/2018-19/people_last7days",
+        "Uganda/2018-19/sample",
+        "Uganda/2018-19/cluster_features",
+        "Uganda/2018-19/household_roster",
+        "Uganda/2018-19/individual_education",
+        "Uganda/2018-19/shocks",
+        "Uganda/2018-19/earnings",
+        "Uganda/2018-19/food_acquired",
+        "Uganda/2018-19/fct",
+        "Uganda/2018-19/nutrition",
+        "Uganda/2018-19/interview_date",
+        "Uganda/2018-19/panel_ids",
+        "Uganda/2018-19/income",
+        "Uganda/2018-19/enterprise_income",
+        "Uganda/2018-19/assets",
+        "Uganda/2018-19/months_food_inadequate",
+        "Uganda/2018-19/housing",
+        "Uganda/2018-19/plot_features",
+        "Uganda/2018-19/crop_production",
+        "Uganda/2018-19/plot_inputs",
+        "Uganda/2018-19/livestock",
+        "Uganda/2018-19/anthropometry",
+        "Uganda/2018-19/plot_labor",
+        "Uganda/2018-19/nonfood_expenditures",
+        "Uganda/2018-19/food_expenditures",
+        "Uganda/2018-19/food_prices",
+        "Uganda/2018-19/food_quantities",
+        "Uganda/2018-19/household_characteristics",
+        "Uganda/2019-20/people_last7days",
+        "Uganda/2019-20/sample",
+        "Uganda/2019-20/cluster_features",
+        "Uganda/2019-20/household_roster",
+        "Uganda/2019-20/individual_education",
+        "Uganda/2019-20/shocks",
+        "Uganda/2019-20/earnings",
+        "Uganda/2019-20/food_acquired",
+        "Uganda/2019-20/fct",
+        "Uganda/2019-20/nutrition",
+        "Uganda/2019-20/interview_date",
+        "Uganda/2019-20/panel_ids",
+        "Uganda/2019-20/income",
+        "Uganda/2019-20/enterprise_income",
+        "Uganda/2019-20/assets",
+        "Uganda/2019-20/months_food_inadequate",
+        "Uganda/2019-20/housing",
+        "Uganda/2019-20/plot_features",
+        "Uganda/2019-20/crop_production",
+        "Uganda/2019-20/plot_inputs",
+        "Uganda/2019-20/livestock",
+        "Uganda/2019-20/anthropometry",
+        "Uganda/2019-20/plot_labor",
+        "Uganda/2019-20/nonfood_expenditures",
+        "Uganda/2019-20/food_expenditures",
+        "Uganda/2019-20/food_prices",
+        "Uganda/2019-20/food_quantities",
+        "Uganda/2019-20/household_characteristics"
+      ]
+    },
+    "all_old_colmaps_including_kg_factors_AST_exact": true,
+    "no_parquet_builds_yet": true
+  },
+  "source_oracle": {
+    "status": "PASS",
+    "waves": [
+      {
+        "wave": "2009-10",
+        "eligible_before_old_null_boundary": 22909,
+        "old_index_nonunique": true,
+        "excluded_old_null_rows": 360,
+        "retained": 22549,
+        "duplicate_observation_members_suffixed": 0,
+        "every_own_payload_and_coordinate_exact": true
+      },
+      {
+        "wave": "2010-11",
+        "eligible_before_old_null_boundary": 21051,
+        "old_index_nonunique": true,
+        "excluded_old_null_rows": 0,
+        "retained": 21051,
+        "duplicate_observation_members_suffixed": 0,
+        "every_own_payload_and_coordinate_exact": true
+      },
+      {
+        "wave": "2011-12",
+        "eligible_before_old_null_boundary": 20243,
+        "old_index_nonunique": true,
+        "excluded_old_null_rows": 43,
+        "retained": 20200,
+        "duplicate_observation_members_suffixed": 0,
+        "every_own_payload_and_coordinate_exact": true
+      },
+      {
+        "wave": "2013-14",
+        "eligible_before_old_null_boundary": 17646,
+        "old_index_nonunique": true,
+        "excluded_old_null_rows": 0,
+        "retained": 17646,
+        "duplicate_observation_members_suffixed": 0,
+        "every_own_payload_and_coordinate_exact": true
+      },
+      {
+        "wave": "2015-16",
+        "eligible_before_old_null_boundary": 19639,
+        "old_index_nonunique": true,
+        "excluded_old_null_rows": 0,
+        "retained": 19639,
+        "duplicate_observation_members_suffixed": 0,
+        "every_own_payload_and_coordinate_exact": true
+      },
+      {
+        "wave": "2018-19",
+        "eligible_before_old_null_boundary": 15630,
+        "old_index_nonunique": true,
+        "excluded_old_null_rows": 0,
+        "retained": 15630,
+        "duplicate_observation_members_suffixed": 0,
+        "every_own_payload_and_coordinate_exact": true
+      },
+      {
+        "wave": "2019-20",
+        "eligible_before_old_null_boundary": 17046,
+        "old_index_nonunique": true,
+        "excluded_old_null_rows": 0,
+        "retained": 17046,
+        "duplicate_observation_members_suffixed": 0,
+        "every_own_payload_and_coordinate_exact": true
+      }
+    ],
+    "raw_source_frames": 28,
+    "independent_locator_definition": true,
+    "candidate_helper_not_used_as_expected": true,
+    "source_fingerprint_sidecar_SHA_hand_checked": true
+  },
+  "public_source_oracle": {
+    "status": "PASS",
+    "strict_fullframe_checks": 18,
+    "checks": [
+      "independent-default-country-artifact",
+      "independent-default-public",
+      "independent-Make-country-artifact",
+      "independent-Make-public",
+      "default-2009-10-native",
+      "default-2010-11-native",
+      "default-2011-12-native",
+      "default-2013-14-native",
+      "default-2015-16-native",
+      "default-2018-19-native",
+      "default-2019-20-native",
+      "make-2009-10-native",
+      "make-2010-11-native",
+      "make-2011-12-native",
+      "make-2013-14-native",
+      "make-2015-16-native",
+      "make-2018-19-native",
+      "make-2019-20-native"
+    ],
+    "records": 133761,
+    "null_v": 928,
+    "comparator_mutations_caught": {
+      "unused_level": true,
+      "attrs_presence": true,
+      "value": true
+    }
+  },
+  "derived": {
+    "status": "PASS",
+    "frames": {
+      "base": {
+        "input_rows": 133331,
+        "harvest_rows": 78571,
+        "kg": 29093322.407893993,
+        "factors": {
+          "reported": 14972,
+          "shipped": 0,
+          "survey_median": 555,
+          "metric": 88190,
+          "inferred": 0,
+          "none": 29614,
+          "reported_implausible": 102,
+          "shipped_implausible": 0,
+          "shipped_matched": 0,
+          "declared": 0
+        },
+        "land_rows": 42841,
+        "positive_area_rows": 37636,
+        "yield": [
+          {
+            "on": "parcel",
+            "harvest_keys": 40409,
+            "positive_area_keys": 37634,
+            "matched": 14022,
+            "rows": 14022
+          },
+          {
+            "on": "plot",
+            "harvest_keys": 51358,
+            "positive_area_keys": 37636,
+            "matched": 0,
+            "rows": 0
+          }
+        ]
+      },
+      "candidate": {
+        "input_rows": 133761,
+        "harvest_rows": 78571,
+        "kg": 29095413.407893993,
+        "factors": {
+          "reported": 14981,
+          "shipped": 0,
+          "survey_median": 560,
+          "metric": 88443,
+          "inferred": 0,
+          "none": 29777,
+          "reported_implausible": 102,
+          "shipped_implausible": 0,
+          "shipped_matched": 0,
+          "declared": 0
+        },
+        "land_rows": 42841,
+        "positive_area_rows": 37636,
+        "yield": [
+          {
+            "on": "parcel",
+            "harvest_keys": 40409,
+            "positive_area_keys": 37634,
+            "matched": 14022,
+            "rows": 14022
+          },
+          {
+            "on": "plot",
+            "harvest_keys": 51358,
+            "positive_area_keys": 37636,
+            "matched": 0,
+            "rows": 0
+          }
+        ]
+      }
+    },
+    "pools": [
+      {
+        "grain": "fine",
+        "count_changes": 7,
+        "median_changes": 1,
+        "threshold_crossings": 0
+      },
+      {
+        "grain": "coarse",
+        "count_changes": 2,
+        "median_changes": 0,
+        "threshold_crossings": 0
+      }
+    ],
+    "strict_checks": [
+      "base-harvest-own-row-products",
+      "base-independent-fine-coarse-median-pool",
+      "base-parcel-real-area-oracle",
+      "base-plot-real-area-oracle",
+      "candidate-harvest-own-row-products",
+      "candidate-independent-fine-coarse-median-pool",
+      "candidate-parcel-real-area-oracle",
+      "candidate-plot-real-area-oracle",
+      "crosshead-parcel-yield",
+      "crosshead-plot-yield",
+      "crosshead-full-area-frame"
+    ],
+    "kg_delta": 2091.0
+  },
+  "Feature": {
+    "status": "PASS",
+    "strict_checks": 30,
+    "checks": [
+      "base-Uganda-bare-actual-fresh-warm",
+      "candidate-Uganda-bare-actual-fresh-warm",
+      "base-Niger-bare-actual-fresh-warm",
+      "candidate-Niger-bare-actual-fresh-warm",
+      "Niger-bare-matched-actual-heads",
+      "base-Feature-bare-actual-fresh-warm",
+      "candidate-Feature-bare-actual-fresh-warm",
+      "Uganda-bare-currency-stage-artifact-oracle",
+      "Niger-bare-currency-stage-artifact-oracle",
+      "Feature-bare-full-typed-source-assembly-oracle",
+      "base-Uganda-None-actual-fresh-warm",
+      "candidate-Uganda-None-actual-fresh-warm",
+      "base-Niger-None-actual-fresh-warm",
+      "candidate-Niger-None-actual-fresh-warm",
+      "Niger-None-matched-actual-heads",
+      "base-Feature-None-actual-fresh-warm",
+      "candidate-Feature-None-actual-fresh-warm",
+      "Uganda-None-currency-stage-artifact-oracle",
+      "Niger-None-currency-stage-artifact-oracle",
+      "Feature-None-full-typed-source-assembly-oracle",
+      "base-Uganda-index-actual-fresh-warm",
+      "candidate-Uganda-index-actual-fresh-warm",
+      "base-Niger-index-actual-fresh-warm",
+      "candidate-Niger-index-actual-fresh-warm",
+      "Niger-index-matched-actual-heads",
+      "base-Feature-index-actual-fresh-warm",
+      "candidate-Feature-index-actual-fresh-warm",
+      "Uganda-index-currency-stage-artifact-oracle",
+      "Niger-index-currency-stage-artifact-oracle",
+      "Feature-index-full-typed-source-assembly-oracle"
+    ],
+    "rows": 180137,
+    "healthy_Niger": 46376,
+    "alignment": {
+      "bare": {
+        "parent": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season"
+            }
+          }
+        },
+        "candidate": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season",
+              "production_obs": "unresolved_observation"
+            }
+          }
+        },
+        "all_other_typed_attrs_exact": true
+      },
+      "None": {
+        "parent": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season"
+            }
+          }
+        },
+        "candidate": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season",
+              "production_obs": "unresolved_observation"
+            }
+          }
+        },
+        "all_other_typed_attrs_exact": true
+      },
+      "index": {
+        "parent": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season"
+            }
+          }
+        },
+        "candidate": {
+          "fabricated": {
+            "Niger": {
+              "condition": "unknown_condition",
+              "season": "unknown_season",
+              "production_obs": "unresolved_observation"
+            }
+          }
+        },
+        "all_other_typed_attrs_exact": true
+      }
+    }
+  },
+  "strict_saved_frame_account": {
+    "comparisons": 184,
+    "exact": 180,
+    "differences": [
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Uganda-cluster_features-private.pkl",
+        "cold_index_dtypes": [
+          "str",
+          "string"
+        ],
+        "warm_index_dtypes": [
+          "str",
+          "str"
+        ],
+        "typed_attrs_exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "Uganda-cluster_features-private.pkl",
+        "cold_index_dtypes": [
+          "str",
+          "string"
+        ],
+        "warm_index_dtypes": [
+          "str",
+          "str"
+        ],
+        "typed_attrs_exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Uganda-cluster_features-private.pkl",
+        "cold_index_dtypes": [
+          "str",
+          "string"
+        ],
+        "warm_index_dtypes": [
+          "str",
+          "str"
+        ],
+        "typed_attrs_exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "Uganda-cluster_features-private.pkl",
+        "cold_index_dtypes": [
+          "str",
+          "string"
+        ],
+        "warm_index_dtypes": [
+          "str",
+          "str"
+        ],
+        "typed_attrs_exact": true
+      }
+    ],
+    "checks": [
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2005-06-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2005-06-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2005-06-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2009-10-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2009-10-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2009-10-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2009-10-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2010-11-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2010-11-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2010-11-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2010-11-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2011-12-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2011-12-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2011-12-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2011-12-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2013-14-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2013-14-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2013-14-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2013-14-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2015-16-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2015-16-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2015-16-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2015-16-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2018-19-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2018-19-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2018-19-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2018-19-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2019-20-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2019-20-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2019-20-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "2019-20-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Niger-cluster_features-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Niger-crop-None-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Niger-crop-bare-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Niger-crop-index-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Niger-sample-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Uganda-cluster_features-private.pkl",
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Uganda-crop-None-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Uganda-crop-bare-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Uganda-plot_features-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "Uganda-sample-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "cluster_features-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "crop_production-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "plot_features-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "sample-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "new-Country-bare",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "frame": "new-Country-None",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2005-06-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2005-06-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2005-06-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2009-10-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2009-10-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2009-10-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2009-10-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2010-11-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2010-11-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2010-11-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2010-11-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2011-12-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2011-12-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2011-12-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2011-12-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2013-14-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2013-14-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2013-14-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2013-14-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2015-16-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2015-16-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2015-16-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2015-16-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2018-19-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2018-19-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2018-19-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2018-19-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2019-20-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2019-20-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2019-20-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "2019-20-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "Uganda-cluster_features-private.pkl",
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "Uganda-crop-None-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "Uganda-crop-bare-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "Uganda-plot_features-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "Uganda-sample-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "crop_production-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "plot_features-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "new-Country-bare",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "frame": "new-Country-None",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "frame": "Uganda-crop-bare",
+        "backend": "DEFAULT-vs-Make-cold",
+        "exact": true
+      },
+      {
+        "side": "base",
+        "frame": "Uganda-crop-None",
+        "backend": "DEFAULT-vs-Make-cold",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2005-06-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2005-06-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2005-06-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2009-10-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2009-10-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2009-10-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2009-10-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2010-11-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2010-11-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2010-11-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2010-11-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2011-12-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2011-12-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2011-12-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2011-12-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2013-14-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2013-14-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2013-14-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2013-14-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2015-16-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2015-16-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2015-16-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2015-16-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2018-19-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2018-19-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2018-19-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2018-19-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2019-20-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2019-20-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2019-20-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "2019-20-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Niger-cluster_features-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Niger-crop-None-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Niger-crop-bare-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Niger-crop-index-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Niger-sample-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Uganda-cluster_features-private.pkl",
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Uganda-crop-None-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Uganda-crop-bare-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Uganda-plot_features-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "Uganda-sample-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "cluster_features-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "crop_production-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "plot_features-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "sample-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "new-Country-bare",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "frame": "new-Country-None",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2005-06-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2005-06-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2005-06-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2009-10-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2009-10-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2009-10-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2009-10-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2010-11-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2010-11-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2010-11-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2010-11-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2011-12-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2011-12-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2011-12-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2011-12-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2013-14-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2013-14-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2013-14-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2013-14-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2015-16-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2015-16-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2015-16-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2015-16-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2018-19-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2018-19-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2018-19-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2018-19-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2019-20-cluster_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2019-20-crop_production-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2019-20-plot_features-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "2019-20-sample-native-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "Uganda-cluster_features-private.pkl",
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "Uganda-crop-None-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "Uganda-crop-bare-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "Uganda-plot_features-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "Uganda-sample-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "crop_production-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "plot_features-raw-country-private.pkl",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "new-Country-bare",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "frame": "new-Country-None",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "frame": "Uganda-crop-bare",
+        "backend": "DEFAULT-vs-Make-cold",
+        "exact": true
+      },
+      {
+        "side": "candidate",
+        "frame": "Uganda-crop-None",
+        "backend": "DEFAULT-vs-Make-cold",
+        "exact": true
+      },
+      {
+        "frame": "sample",
+        "backend": "matched-stage-parent-candidate",
+        "stage": "cold",
+        "exact": true
+      },
+      {
+        "frame": "plot_features",
+        "backend": "matched-stage-parent-candidate",
+        "stage": "cold",
+        "exact": true
+      },
+      {
+        "frame": "cluster_features",
+        "backend": "matched-stage-parent-candidate",
+        "stage": "cold",
+        "exact": true
+      },
+      {
+        "frame": "sample",
+        "backend": "matched-stage-parent-candidate",
+        "stage": "warm",
+        "exact": true
+      },
+      {
+        "frame": "plot_features",
+        "backend": "matched-stage-parent-candidate",
+        "stage": "warm",
+        "exact": true
+      },
+      {
+        "frame": "cluster_features",
+        "backend": "matched-stage-parent-candidate",
+        "stage": "warm",
+        "exact": true
+      }
+    ],
+    "cache_changes": {
+      "base-default": {
+        "added": 0,
+        "deleted": 0,
+        "modified": 0,
+        "changed_fields": {},
+        "mode_transition": null,
+        "bytes_sizes_exact": true
+      },
+      "base-make": {
+        "added": 0,
+        "deleted": 0,
+        "modified": 17,
+        "changed_fields": {
+          "mode+mtime_ns": 17
+        },
+        "mode_transition": "0644\u21920600",
+        "bytes_sizes_exact": true
+      },
+      "candidate-default": {
+        "added": 0,
+        "deleted": 0,
+        "modified": 0,
+        "changed_fields": {},
+        "mode_transition": null,
+        "bytes_sizes_exact": true
+      },
+      "candidate-make": {
+        "added": 0,
+        "deleted": 0,
+        "modified": 17,
+        "changed_fields": {
+          "mode+mtime_ns": 17
+        },
+        "mode_transition": "0644\u21920600",
+        "bytes_sizes_exact": true
+      }
+    }
+  },
+  "tests": {
+    "status": "PASS_MEANINGFUL_DISCRIMINATION",
+    "candidate": {
+      "pass": 392,
+      "skip": 10,
+      "fail": 0,
+      "error": 0
+    },
+    "parent": {
+      "pass": 3,
+      "fail": 36,
+      "error": 0,
+      "skip": 0
+    },
+    "categories": [
+      {
+        "status": "fail",
+        "category": "actual_loader_literal_source_binding_contract",
+        "count": 7
+      },
+      {
+        "status": "fail",
+        "category": "actual_parent_old_signature_native_row_loss",
+        "count": 4
+      },
+      {
+        "status": "fail",
+        "category": "canonical_observation_axis_contract",
+        "count": 1
+      },
+      {
+        "status": "fail",
+        "category": "new_private_helper_call_contract_TypeError_negative",
+        "count": 1
+      },
+      {
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "count": 23
+      },
+      {
+        "status": "pass",
+        "category": "existing_null_or_empty_contract_pass",
+        "count": 3
+      }
+    ],
+    "cases": [
+      {
+        "test": "test_every_eligible_record_retains_its_own_complete_payload[distinct]",
+        "status": "fail",
+        "category": "actual_parent_old_signature_native_row_loss",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_every_eligible_record_retains_its_own_complete_payload[equal]",
+        "status": "fail",
+        "category": "actual_parent_old_signature_native_row_loss",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_every_eligible_record_retains_its_own_complete_payload[partial]",
+        "status": "fail",
+        "category": "actual_parent_old_signature_native_row_loss",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_every_eligible_record_retains_its_own_complete_payload[sale-only]",
+        "status": "fail",
+        "category": "actual_parent_old_signature_native_row_loss",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_reported_id_is_stable_under_reordering",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_missing_id_values_use_explicit_physical_fallback[None]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_missing_id_values_use_explicit_physical_fallback[nan]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_missing_id_values_use_explicit_physical_fallback[missing2]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_missing_id_values_use_explicit_physical_fallback[]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_missing_id_values_use_explicit_physical_fallback[  ]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_missing_id_values_use_explicit_physical_fallback[.]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_named_missing_id_column_is_loud",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_repeated_id_suffixes_every_occurrence[True]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_repeated_id_suffixes_every_occurrence[False]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_physical_positions_precede_filtering_and_ignore_dataframe_labels",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_constructed_release_and_order_semantics",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_actual_condition_slots_remain_distinct_even_with_equal_payload",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_repeated_slot_suffixes_all_source_rows",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_reordered_condition_declarations_keep_actual_slot_bindings",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_duplicate_declared_slot_is_loud_even_with_distinct_condition_keys",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_duplicate_physical_source_row_slot_is_an_error",
+        "status": "fail",
+        "category": "new_private_helper_call_contract_TypeError_negative",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_constructed_identity_requires_verifiable_explicit_source[None]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_constructed_identity_requires_verifiable_explicit_source[]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_constructed_identity_requires_verifiable_explicit_source[  ]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_constructed_identity_requires_verifiable_explicit_source[missing:AGSEC5A.dta]",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_missing_source_reference_does_not_guess_from_wave",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_unique_old_key_with_null_is_retained",
+        "status": "pass",
+        "category": "existing_null_or_empty_contract_pass",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_duplicate_null_old_keys_keep_the_old_exclusion",
+        "status": "pass",
+        "category": "existing_null_or_empty_contract_pass",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_nonunique_old_index_keeps_its_existing_null_key_boundary",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_empty_input_needs_no_constructed_identity",
+        "status": "pass",
+        "category": "existing_null_or_empty_contract_pass",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_conversion_uses_each_observations_own_factor_before_harvest_sum",
+        "status": "fail",
+        "category": "other_observation_identity_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2009-10]",
+        "status": "fail",
+        "category": "actual_loader_literal_source_binding_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2010-11]",
+        "status": "fail",
+        "category": "actual_loader_literal_source_binding_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2011-12]",
+        "status": "fail",
+        "category": "actual_loader_literal_source_binding_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2013-14]",
+        "status": "fail",
+        "category": "actual_loader_literal_source_binding_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2015-16]",
+        "status": "fail",
+        "category": "actual_loader_literal_source_binding_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2018-19]",
+        "status": "fail",
+        "category": "actual_loader_literal_source_binding_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2019-20]",
+        "status": "fail",
+        "category": "actual_loader_literal_source_binding_contract",
+        "error": false,
+        "skip": false
+      },
+      {
+        "test": "test_canonical_axis_has_honest_unresolved_sentinel",
+        "status": "fail",
+        "category": "canonical_observation_axis_contract",
+        "error": false,
+        "skip": false
+      }
+    ],
+    "candidate_skips": [
+      {
+        "class": "tests.test_863_transforms",
+        "test": "test_malawi_warm_livestock_sales_value"
+      },
+      {
+        "class": "tests.test_863_transforms",
+        "test": "test_malawi_warm_food_acquired_hdds_partition_guard_bites"
+      },
+      {
+        "class": "tests.test_863_transforms",
+        "test": "test_malawi_warm_food_acquired_hdds_scores_in_range"
+      },
+      {
+        "class": "tests.test_863_transforms",
+        "test": "test_malawi_warm_fertilizer_rate"
+      },
+      {
+        "class": "tests.test_863_transforms",
+        "test": "test_malawi_warm_nitrogen_kg_resolves_the_fertilizer_labels"
+      },
+      {
+        "class": "tests.test_863_transforms",
+        "test": "test_malawi_warm_crop_revenue_by_crop_sums_back_to_the_household"
+      },
+      {
+        "class": "tests.test_863_transforms",
+        "test": "test_malawi_warm_crop_diversity"
+      },
+      {
+        "class": "tests.test_feature_canonical_index",
+        "test": "test_warm_corpus_assembly_loses_no_rows"
+      },
+      {
+        "class": "tests.test_feature_canonical_index",
+        "test": "test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_labor]"
+      },
+      {
+        "class": "tests.test_feature_canonical_index",
+        "test": "test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_inputs]"
+      }
+    ]
+  },
+  "scanner": {
+    "status": "PASS_ALL_OCCURRENCES_CLASSIFIED",
+    "parent": 51,
+    "candidate": 41,
+    "exact": 22,
+    "removed": 29,
+    "added": 19,
+    "records": [
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "eeefb14287313f3aab8c7715bb006cd49617a55123944d80a211f11f71b5371a",
+        "phase": "1a-sanity",
+        "country": "Niger",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "88c2918fe82fc45fae941e0645ba7d719eb735cf1f602f1505ca21faa24b9716",
+        "phase": "1a-sanity",
+        "country": "Niger",
+        "check": "null_content",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "519c61567c65bf8220a96a0a581fec9268da240b2ecf17f23cc1b2e7fb7cb084",
+        "phase": "1a-sanity",
+        "country": "Niger",
+        "check": "null_content",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "b599337c1bea9e3172083801d3920b42af8f8b858cf0ce1a4bf52beb4c89f133",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "2fdca1b4f480a5e02b440e55ed271f4ce087091e7d22077722b95733373c5354",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "32d8cc54e1145f984d92d0d59225034dab7f56c5ff9f478d7dc5c392d3463704",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "2749e6177abcee230036003ffce26a52ec7d9dfd62368ecc58f03f20ad3b382d",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "03cda8ffbd4a3beda82e849fbe2a7dc54df7ebb975b043ec615411c1cbf1e0ec",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "de05ae4da1bd70478e4a6af44d30cd756f3a38ae9aa30d72e643d3af16473de3",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "870840228549cb465be0204774fbca268076f7b28182632d4508148456eba585",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "d3edd328820875271ca4b7c99971fc7e51bb201540f06032e0aaeaf2a8c731b3",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "876c70308497d96f278639e6c37538092e225a4c57f9920fe03bcfb3ccb8f89f",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "565c6b84ced9e07980b47cff698524876118fc9f25dda43b54d2f0bb559f71da",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "952aca235c1f79db102392df63c1e38882a6306fb356fb542247c2f51c6b5a24",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "30872af81351dab4fe3559588eef846500d7905b16d34522969fec7fd2f094ca",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "35aa9b16ea8eaea072c9b1de86daeec8f8d333839f6ef1a117f885aea94728a4",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "280fa8c8a0c5b9ae0d1c8f759f834936463f780859f50468809dcd00a5e4ac46",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "289fb74fd00e4ff21a6443bfbb2d58575b51aa8ba31179b795585daea0a87099",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "f82fa00891c69e48f15941fb6128fcc5796b8c87f1e4c022a77b5705659edb5c",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "bf3f32e224ad8f898c848a738c72197e34c09b7b15a86edb77377fe7e82d027d",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "16f5390d99df8f156bf8d00bed763a49f642d0bfac55f65de7cdd11b23fba21a",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "unchanged",
+        "multiplicity": 1,
+        "sha256_full_record": "0a24d61ac94f621866b5deec5d9ada3af730a9968d6084b481fc8bbe716a99b3",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "exact_full_record"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "be5494263a2205d32c28547e3373a979b03f80df8a7ec2d949dd1fee016be83a",
+        "phase": "1a-sanity",
+        "country": "Uganda",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "category": "existing_scheme_public_order_text_gains_axis"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "c53c3a7b4b5a6fcdbf4fd66dd23a450e15f143d01e8a90bc7829c818c4f901d2",
+        "phase": "1a-sanity",
+        "country": "Uganda",
+        "check": "null_content",
+        "status": "warn",
+        "category": "existing_empty_harvest_month_count",
+        "metrics": {
+          "column": "harvest_month",
+          "rows": 133331,
+          "scope": "waves",
+          "waves": [
+            "2009-10",
+            "2010-11"
+          ]
+        }
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "28b56818fda439373ee295684333ea27cb3996191f8d59c6aee59fb8bb75fd97",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2009-10",
+        "numerator": 2,
+        "denominator": 22408
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "234fef80569c2e794f6eba65844221fa1052bacdbf8105675f53223119e1abb6",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2009-10",
+        "numerator": 2,
+        "denominator": 22408
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "811883be488e04009cabb84e91dd9a94a09a1ad0229c31e73fd057eb107eeb6c",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2010-11",
+        "numerator": 4,
+        "denominator": 20970
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "6c7927c50ff76aab93979e8aee6057ae6a3bdda0579a459af741c1a6e4ff2dfb",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2010-11",
+        "numerator": 4,
+        "denominator": 20970
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "0125d86c2c7300f87f1c9cc9ae3a0abb30d6f2d7d520f11977afcc82171dee50",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2011-12",
+        "numerator": 3,
+        "denominator": 20152
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "10abf2c00c08fc896d3b3189534cc7f48028552df5db58af71e2439181fd46cd",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2011-12",
+        "numerator": 3,
+        "denominator": 20152
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "60b324829515c13cbc5298c91fc969b776ddef617b03098faf4cb248f6277b69",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2013-14",
+        "numerator": 5,
+        "denominator": 17585
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "1b50b07ee45d13c159c2523a20b2e5eb17e5c7a781f9c7800f21b09ea2fc097e",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2013-14",
+        "numerator": 5,
+        "denominator": 17585
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "4689456cd2dc3c32a3577338097f755ed2ec8779a4410a6df185fd99ff864c08",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2015-16",
+        "numerator": 3,
+        "denominator": 19576
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "9b6d8818f110195c22f7634fcc4e0405681498fc308c8e490f735c44ac362d2d",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2015-16",
+        "numerator": 3,
+        "denominator": 19576
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "457fd8711729f218d70d293fe7de2d2cce3b49d31586b74a817482258a9e37d6",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2018-19",
+        "numerator": 4,
+        "denominator": 15616
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "35a1ddb233c09b8506efd9a3c793169ce390843d6f03f20913cbf53da8f3ebcd",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2018-19",
+        "numerator": 4,
+        "denominator": 15616
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "8e11f21dd0576b6a661ee4e5916b935fc2258ac4a30e10222c5a5762d25a3642",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2019-20",
+        "numerator": 5,
+        "denominator": 17024
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "865c6f8730e34845e49917988b5ffa388754c6a5b3afd0f34fc96cea8ebd4b51",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2019-20",
+        "numerator": 5,
+        "denominator": 17024
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "bbbbc195767de1a404cdfe984877bed524a0d61582623dd9137759090cb92282",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "b186cf4c65d14217441ce1b9ed56aaa66cd97e775c5fe1f4b998e60bfff60ab4",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "1b742d5dbb1f0525b6eb29b17332e27c4b877ff0040af7621dfd47d3462b5df3",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "6ff3addc2f6db3139f57957b714c4eef6be2d68b9cdccc06ff86354765818bec",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "d1a759ef263e77991c35b8c0c447b0681c600d006ea16f91e326a8aff973ac93",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "ef055f1f889d2fda7fccbb2f1206d8e48b02d78448b0049409ccb6f75904362e",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "fff43951f4d4bdf42e29ec9bd1268eabcdfa5fca75e43539167a61fc8b57c0bf",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "c870a00922f01a2d6f074c23b3ec7abd881b9169720a1488d55d8df2497a0bae",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "9a67ac7bc7c2e7ddf7d8c10214a14fa5dd229fa79d5c5679bbba49b144f560a9",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "31a1d7db2e5f36b3f76a822c057c98e47a8a7fdd413cc7087a1cf68fb5bf298c",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "old_lossy_sold_label_reducer_warning_removed"
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "e44d6f514c1a35489f852d1be8e5ba6cb6de339500576922824394bf2a1e75ca",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "retained_null_key_records",
+        "counts": [
+          926
+        ]
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "142df9b6680632795acba84f9373f52dc9cbaae6a976199650ece4f14eb23043",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "retained_null_key_records",
+        "counts": [
+          926
+        ]
+      },
+      {
+        "kind": "removed",
+        "multiplicity": 1,
+        "sha256_full_record": "d09437d4be1184402eb06289fe5f6e04c3b12f4987b4a3d6309c57d35214f113",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "Niger_unresolved_observation_alignment"
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "75828032b413d0ea1b3aeae84472413af7ef1026508ba54ce40088f315728f90",
+        "phase": "1a-sanity",
+        "country": "Uganda",
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "category": "existing_scheme_public_order_text_gains_axis"
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "c1b27228e98452745c5358f7ad3584ae1ca6e0e1164393401189cfa9cc526796",
+        "phase": "1a-sanity",
+        "country": "Uganda",
+        "check": "null_content",
+        "status": "warn",
+        "category": "existing_empty_harvest_month_count",
+        "metrics": {
+          "column": "harvest_month",
+          "rows": 133761,
+          "scope": "waves",
+          "waves": [
+            "2009-10",
+            "2010-11"
+          ]
+        }
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "17ed234eebd207f447f24bb35a2ea4392b50d5cc53cee6c20c7631049778d25d",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2009-10",
+        "numerator": 2,
+        "denominator": 22549
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "1487d684c132b9733031398e2d75d454c7ac434446d62f08aeb7fde5d3f947e7",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2009-10",
+        "numerator": 2,
+        "denominator": 22549
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "ec04cba7c9d7c9f630bff890dba1c41fe7f4f1bbfcdc65b5da6c2c8de058c928",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2010-11",
+        "numerator": 4,
+        "denominator": 21051
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "b27ea45719d07b8fa4b72b84e3e8ae323103ad90dff92388d2402cd34500075c",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2010-11",
+        "numerator": 4,
+        "denominator": 21051
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "df99183b2af4ef871456fefa469b1ed008fe486fa4462cf06ec0d5f7543dad99",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2011-12",
+        "numerator": 3,
+        "denominator": 20200
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "0ef46d7cde81015f7887e5712f781ee7225913d7425591692f715b067abb2cf8",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2011-12",
+        "numerator": 3,
+        "denominator": 20200
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "88547549d11ab81c9759419194dc1a0eff37ab4baa8013691161a00a04cd168d",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2013-14",
+        "numerator": 5,
+        "denominator": 17646
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "2cb47708b5f3d93905194f211a8381c5088bf92da76f0a63c7e0bf3aada049ea",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2013-14",
+        "numerator": 5,
+        "denominator": 17646
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "1a308c2e26b4b3cda59b13bd6433becfaf334cd45394de9fecad23d9d8fb722b",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2015-16",
+        "numerator": 3,
+        "denominator": 19639
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "9739a0a6184b94757b3720b96dc015465a39b70a27e53ebd29d8654468406e86",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2015-16",
+        "numerator": 3,
+        "denominator": 19639
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "202d0f9ef920d9f4803015d43edd109a1fb413128d47a3ebbe8a1fc8b925dd95",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2018-19",
+        "numerator": 4,
+        "denominator": 15630
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "a23c32f0b411ec4f242a4c62ca59d4632fc9ff7260b10526470e3733056353b0",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2018-19",
+        "numerator": 4,
+        "denominator": 15630
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "f7032bf77f4dff61dd1f1e5350a6b84c267bf4433601b6cd84483342d1a34441",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2019-20",
+        "numerator": 5,
+        "denominator": 17046
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "7461f74862a6626e1ae9425d228731ebe0624deef58b1e4e8c68db4007eaf2d4",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "same_quantity_audit_recomputed",
+        "wave": "2019-20",
+        "numerator": 5,
+        "denominator": 17046
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "0be9ec5189d8e3b193978ca47851ee9d628ddfea0ddb48c9e1986ddfbf05b66d",
+        "phase": "1a-sanity",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "retained_null_key_records",
+        "counts": [
+          928
+        ]
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "dc51d3d88277299665aea848ccd439149cdaf093eae77f3929fe89697c84cb9a",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "retained_null_key_records",
+        "counts": [
+          928
+        ]
+      },
+      {
+        "kind": "added",
+        "multiplicity": 1,
+        "sha256_full_record": "b81bc74c8a75b11443b2c2482396a8d1f612f8c308346c9a545b688dcff0406d",
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "category": "Niger_unresolved_observation_alignment"
+      }
+    ],
+    "counts": [
+      {
+        "kind": "added",
+        "category": "Niger_unresolved_observation_alignment",
+        "occurrences": 1
+      },
+      {
+        "kind": "added",
+        "category": "existing_empty_harvest_month_count",
+        "occurrences": 1
+      },
+      {
+        "kind": "added",
+        "category": "existing_scheme_public_order_text_gains_axis",
+        "occurrences": 1
+      },
+      {
+        "kind": "added",
+        "category": "retained_null_key_records",
+        "occurrences": 2
+      },
+      {
+        "kind": "added",
+        "category": "same_quantity_audit_recomputed",
+        "occurrences": 14
+      },
+      {
+        "kind": "removed",
+        "category": "Niger_unresolved_observation_alignment",
+        "occurrences": 1
+      },
+      {
+        "kind": "removed",
+        "category": "existing_empty_harvest_month_count",
+        "occurrences": 1
+      },
+      {
+        "kind": "removed",
+        "category": "existing_scheme_public_order_text_gains_axis",
+        "occurrences": 1
+      },
+      {
+        "kind": "removed",
+        "category": "old_lossy_sold_label_reducer_warning_removed",
+        "occurrences": 10
+      },
+      {
+        "kind": "removed",
+        "category": "retained_null_key_records",
+        "occurrences": 2
+      },
+      {
+        "kind": "removed",
+        "category": "same_quantity_audit_recomputed",
+        "occurrences": 14
+      },
+      {
+        "kind": "unchanged",
+        "category": "exact_full_record",
+        "occurrences": 22
+      }
+    ]
+  },
+  "source_lineage_counts": [
+    {
+      "wave": "2009-10",
+      "retained_records": 22549,
+      "repeated_old_key_records": 277,
+      "repeated_old_key_groups": 136,
+      "additional_records_over_old_grouped_grain": 141,
+      "equal_complete_served_payload_groups": 17,
+      "raw_fullrow_repeat_members": {
+        "a": 0,
+        "b": 0
+      }
+    },
+    {
+      "wave": "2010-11",
+      "retained_records": 21051,
+      "repeated_old_key_records": 162,
+      "repeated_old_key_groups": 81,
+      "additional_records_over_old_grouped_grain": 81,
+      "equal_complete_served_payload_groups": 2,
+      "raw_fullrow_repeat_members": {
+        "a": 0,
+        "b": 0
+      }
+    },
+    {
+      "wave": "2011-12",
+      "retained_records": 20200,
+      "repeated_old_key_records": 95,
+      "repeated_old_key_groups": 47,
+      "additional_records_over_old_grouped_grain": 48,
+      "equal_complete_served_payload_groups": 7,
+      "raw_fullrow_repeat_members": {
+        "a": 0,
+        "b": 0
+      }
+    },
+    {
+      "wave": "2013-14",
+      "retained_records": 17646,
+      "repeated_old_key_records": 122,
+      "repeated_old_key_groups": 61,
+      "additional_records_over_old_grouped_grain": 61,
+      "equal_complete_served_payload_groups": 8,
+      "raw_fullrow_repeat_members": {
+        "a": 0,
+        "b": 0
+      }
+    },
+    {
+      "wave": "2015-16",
+      "retained_records": 19639,
+      "repeated_old_key_records": 126,
+      "repeated_old_key_groups": 63,
+      "additional_records_over_old_grouped_grain": 63,
+      "equal_complete_served_payload_groups": 4,
+      "raw_fullrow_repeat_members": {
+        "a": 0,
+        "b": 0
+      }
+    },
+    {
+      "wave": "2018-19",
+      "retained_records": 15630,
+      "repeated_old_key_records": 28,
+      "repeated_old_key_groups": 14,
+      "additional_records_over_old_grouped_grain": 14,
+      "equal_complete_served_payload_groups": 0,
+      "raw_fullrow_repeat_members": {
+        "a": 0,
+        "b": 0
+      }
+    },
+    {
+      "wave": "2019-20",
+      "retained_records": 17046,
+      "repeated_old_key_records": 44,
+      "repeated_old_key_groups": 22,
+      "additional_records_over_old_grouped_grain": 22,
+      "equal_complete_served_payload_groups": 0,
+      "raw_fullrow_repeat_members": {
+        "a": 0,
+        "b": 0
+      }
+    }
+  ],
+  "CLI_serialization": {
+    "base": {
+      "index_level_representation_differences": [
+        {
+          "name": "v",
+          "before_dtype": "<StringDtype(na_value=<NA>)>",
+          "after_dtype": "<StringDtype(na_value=nan)>",
+          "before_storage": "pyarrow",
+          "after_storage": "pyarrow",
+          "before_na": "<NA>",
+          "after_na": "nan",
+          "values_equal": true
+        }
+      ],
+      "attrs_differences": [
+        {
+          "path": "attrs.sampling.Uganda.2013-14",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2015-16",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2010-11",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2019-20",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2011-12",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2018-19",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2009-10",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2013-14",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2015-16",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2010-11",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2019-20",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2011-12",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2018-19",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2009-10",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2013-14",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2015-16",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2010-11",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2019-20",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2011-12",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2018-19",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2009-10",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        }
+      ],
+      "column_dtypes_before": [
+        "Float64",
+        "Float64",
+        "Float64",
+        "string",
+        "string",
+        "Int64",
+        "boolean",
+        "Float64"
+      ],
+      "column_dtypes_after": [
+        "Float64",
+        "Float64",
+        "Float64",
+        "string",
+        "string",
+        "Int64",
+        "boolean",
+        "Float64"
+      ]
+    },
+    "candidate": {
+      "index_level_representation_differences": [
+        {
+          "name": "v",
+          "before_dtype": "<StringDtype(na_value=<NA>)>",
+          "after_dtype": "<StringDtype(na_value=nan)>",
+          "before_storage": "pyarrow",
+          "after_storage": "pyarrow",
+          "before_na": "<NA>",
+          "after_na": "nan",
+          "values_equal": true
+        }
+      ],
+      "attrs_differences": [
+        {
+          "path": "attrs.sampling.Uganda.2013-14",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2015-16",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2010-11",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2019-20",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2011-12",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2018-19",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.sampling.Uganda.2009-10",
+          "before_type": "lsms_library.sampling.SamplingRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2013-14",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2015-16",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2010-11",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2019-20",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2011-12",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2018-19",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.population.Uganda.2009-10",
+          "before_type": "lsms_library.population.PopulationRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2013-14",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2015-16",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2010-11",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2019-20",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2011-12",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2018-19",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        },
+        {
+          "path": "attrs.recall.Uganda.2009-10",
+          "before_type": "lsms_library.recall.RecallRecord",
+          "after_type": "builtins.dict"
+        }
+      ],
+      "column_dtypes_before": [
+        "Float64",
+        "Float64",
+        "Float64",
+        "string",
+        "string",
+        "Int64",
+        "boolean",
+        "Float64"
+      ],
+      "column_dtypes_after": [
+        "Float64",
+        "Float64",
+        "Float64",
+        "string",
+        "string",
+        "Int64",
+        "boolean",
+        "Float64"
+      ]
+    }
+  },
+  "protection": {
+    "status": "PASS_ALL_FROZEN_SOURCE_REFERENCE_RECEIPTS",
+    "sources": [
+      {
+        "root": "/local/job40255479/worktrees/isa-review-Uganda-1198",
+        "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+        "tracked_paths": 14893,
+        "exact_initial_bytes_modes_HEAD_status": true,
+        "literal_symlinks": true
+      },
+      {
+        "root": "/local/job40255479/worktrees/isa-review-Uganda-1198-base",
+        "head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+        "tracked_paths": 14885,
+        "exact_initial_bytes_modes_HEAD_status": true,
+        "literal_symlinks": true
+      },
+      {
+        "root": "/local/job40255479/worktrees/isa-Uganda-1198-fix",
+        "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+        "tracked_paths": 14893,
+        "Git_blob_bytes_modes_clean": true
+      },
+      {
+        "root": "/local/job40255479/worktrees/isa-Uganda-849",
+        "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "tracked_paths": 14880,
+        "Git_blob_bytes_modes_clean": true
+      },
+      {
+        "root": "/local/job40255479/worktrees/isa-Mali-1091-fix",
+        "head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+        "tracked_paths": 14897,
+        "Git_blob_bytes_modes_clean": true
+      },
+      {
+        "root": "/local/job40255479/worktrees/isa-integration-seventeen",
+        "head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+        "tracked_paths": 15026,
+        "Git_blob_bytes_modes_clean": true
+      },
+      {
+        "root": "/local/job40255479/worktrees/isa-Burkina_Faso-1119",
+        "head": "3dc9d28510dd783c648413987011832669f8bcf7",
+        "tracked_paths": 14893,
+        "Git_blob_bytes_modes_clean": true
+      }
+    ],
+    "references": {
+      "author": {
+        "entries": 4122,
+        "manifest_sha256": "e1a7d64677dbc9b11f6159512e890d8372ba330acfa471dfdd9ed6cae5734472",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "original_1198_849_addendum_Mali_references": {
+        "entries": 1960,
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "GLOBAL17": {
+        "entries": 6468,
+        "manifest_sha256": "f559b1677e5ccbf237caf0b4a96a050c4d69bd0fec91f27a9d62ce8fc05e30cd",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "BF1119": {
+        "entries": 594,
+        "manifest_sha256": "62cadf6a6080969f3aebe056fd4bfcfe54d0a6fde1604306019a62a93a1cbe57",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "Tanzania1091": {
+        "entries": 2894,
+        "manifest_sha256": "2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f",
+        "all_recorded_content_modes_mtimes_exact": true
+      },
+      "author_actual_parent_tracked": {
+        "paths": 14839,
+        "all_recorded_content_modes_mtimes_exact": true,
+        "legacy_receipt_follows_file_symlink_targets": true
+      },
+      "source_and_healthy_copies": {
+        "exact_receipts": 606,
+        "source_modules": 59,
+        "source_copies": 472,
+        "Niger_files_per_root": 15
+      }
+    },
+    "runtime_tests_pin": "929149222e43a8fe500cc08420cdc68357170af3",
+    "after_runtime_only_changed_library_path": [
+      "lsms_library/countries/Uganda/_/CONTENTS.org"
+    ],
+    "review_parent_release_f8_library_tests_exact": true,
+    "source_mtime_limit": "New review checkouts have initial/final full content/mode/HEAD/status checks, not an invented initial mtime baseline. Protected original parent and private references retain their recorded timestamp checks.",
+    "network_attempts": 0,
+    "guard_events": {
+      "mkdir-existing": 16
+    },
+    "no_intree_parquets": true
+  },
+  "current_module_ids_source_metadata": {
+    "status": "PASS_SOURCE_METADATA_GROUNDED",
+    "modules": [
+      {
+        "wave": "2009-10",
+        "module": "A",
+        "source_rows": 15403,
+        "reported_id_field": null,
+        "reported_id_nonmissing": null,
+        "reported_id_distinct_nonmissing": null,
+        "source_labels": {
+          "a5aq6a": "Quantity Harvested"
+        },
+        "declared_sidecar_sha256": "5bf8b1b79f428d25ce2d5a5353e3b7fb54b3bf54e4d3c51b0cfe76877cc1fcc9",
+        "raw_sha256": "a5e28b3e9161c3fe42de6d7b62dbca43c8a485e1917dab7f2f4853795554ceda"
+      },
+      {
+        "wave": "2009-10",
+        "module": "B",
+        "source_rows": 15273,
+        "reported_id_field": null,
+        "reported_id_nonmissing": null,
+        "reported_id_distinct_nonmissing": null,
+        "source_labels": {
+          "a5bq6a": "Quantity Harvested"
+        },
+        "declared_sidecar_sha256": "4fd4c69666a352af5a66fb95f42210e60cce83dd8a7963a8f2006268d55cf868",
+        "raw_sha256": "dbb73ecb638e812cd9416ff91451340e7230e42098f9abdd897a0660bb148e85"
+      },
+      {
+        "wave": "2010-11",
+        "module": "A",
+        "source_rows": 13873,
+        "reported_id_field": null,
+        "reported_id_nonmissing": null,
+        "reported_id_distinct_nonmissing": null,
+        "source_labels": {
+          "a5aq6a": "How much did you harvest during the first seaon of 2010 and in what state-Qty"
+        },
+        "declared_sidecar_sha256": "144bd08c25da0935c02de879eaa2fa5c9de694a8070f7c43d0d2d304fc93304b",
+        "raw_sha256": "e8b9be6b5616c9bd222ecb676212034a043e1c09bc5bf18e034112e1edfccef5"
+      },
+      {
+        "wave": "2010-11",
+        "module": "B",
+        "source_rows": 9413,
+        "reported_id_field": null,
+        "reported_id_nonmissing": null,
+        "reported_id_distinct_nonmissing": null,
+        "source_labels": {
+          "a5bq6a": "How much did you harvest during the second seaon of 2010 and in what state-Qty"
+        },
+        "declared_sidecar_sha256": "26258ec66916c116caceb3c030aba3fa38992185e4d61a1ea1fbc50853123a83",
+        "raw_sha256": "d2c19a750138f9cf4ba3949d48c329e0728dfb8a9c34ad7190fd885b8a4e5c6e"
+      },
+      {
+        "wave": "2011-12",
+        "module": "A",
+        "source_rows": 12361,
+        "reported_id_field": "productionID",
+        "reported_id_nonmissing": 12361,
+        "reported_id_distinct_nonmissing": 27,
+        "source_labels": {
+          "productionID": "Crop Production & Disposition"
+        },
+        "declared_sidecar_sha256": "f8c43f5fc4db424ee84d29f5fdaec7a398d1c940aada6430a0a35dd74d956346",
+        "raw_sha256": "4d855c4aaf3a29d71086a7f4663be8aea8e9b69bc24c20c5f1f971b1c306a04b"
+      },
+      {
+        "wave": "2011-12",
+        "module": "B",
+        "source_rows": 10348,
+        "reported_id_field": "production2ID",
+        "reported_id_nonmissing": 10348,
+        "reported_id_distinct_nonmissing": 28,
+        "source_labels": {
+          "production2ID": "ACrop2_Production"
+        },
+        "declared_sidecar_sha256": "08e25b6cb6222ecfad49812155a8949d77464a71fde7ea971a6e10d266829a2d",
+        "raw_sha256": "891fdf8def6bac4b7cd9b3ccbcfbf992ef9023b1a879f74760249302edc66acd"
+      },
+      {
+        "wave": "2013-14",
+        "module": "A",
+        "source_rows": 10774,
+        "reported_id_field": "Production_ID",
+        "reported_id_nonmissing": 10774,
+        "reported_id_distinct_nonmissing": 20,
+        "source_labels": {
+          "Production_ID": "Crop Production & Disposition"
+        },
+        "declared_sidecar_sha256": "6336387d0cb6778b95a1c2062a9550ec45ad572ca90a0331b95b1504ee4e3c30",
+        "raw_sha256": "35244762e67a9be52e3650adaa81d2dc56657e9384694635f43144d32364ddda"
+      },
+      {
+        "wave": "2013-14",
+        "module": "B",
+        "source_rows": 10424,
+        "reported_id_field": "Production2_ID",
+        "reported_id_nonmissing": 10424,
+        "reported_id_distinct_nonmissing": 22,
+        "source_labels": {
+          "Production2_ID": "ACrop2_Production"
+        },
+        "declared_sidecar_sha256": "7b0bc8c09f320e395d57b1acba268240c2d4152f8ed8a24850b291faa370d54d",
+        "raw_sha256": "7085a5d92f1e7630b8d9cf1d1e9e9875c15801ca0f1327996fd034e9ce4c411a"
+      },
+      {
+        "wave": "2015-16",
+        "module": "A",
+        "source_rows": 10678,
+        "reported_id_field": "Production_ID",
+        "reported_id_nonmissing": 10678,
+        "reported_id_distinct_nonmissing": 22,
+        "source_labels": {
+          "Production_ID": "Crop production & disposition"
+        },
+        "declared_sidecar_sha256": "cbc1da32262790cfd365dff76fc95d1c84956611bb8bc311c6e81690ec3d304f",
+        "raw_sha256": "e902db5490dde7492e95928468f7aff55ef9396b2d428757846557b3e60c3aa9"
+      },
+      {
+        "wave": "2015-16",
+        "module": "B",
+        "source_rows": 8971,
+        "reported_id_field": "Production2_ID",
+        "reported_id_nonmissing": 8971,
+        "reported_id_distinct_nonmissing": 20,
+        "source_labels": {
+          "Production2_ID": "Acrop2_production"
+        },
+        "declared_sidecar_sha256": "754086db997216d8528534229ca4e154aad22b2955d9ac502d3ab72e2179f372",
+        "raw_sha256": "4323761f608c78fa674e7b6d7ad08b78561d68e1a584805a4cd89202f84fd652"
+      },
+      {
+        "wave": "2018-19",
+        "module": "A",
+        "source_rows": 7153,
+        "reported_id_field": null,
+        "reported_id_nonmissing": null,
+        "reported_id_distinct_nonmissing": null,
+        "source_labels": {
+          "s5aq06a_1": "6a. How much %rostertitle% did you harvest during the second season of 2017 (fir",
+          "s5aq06a_1_1": "6a1. Were the decisions concerning the use of the crop output made by a single H",
+          "s5aq06a_2_1": "6a2. Who is the primary decision maker concerning the use of crop output?"
+        },
+        "declared_sidecar_sha256": "0f9a83a63df2798d077ea93627dfd66e17d75d87ffd22165edfc882a117cdbb6",
+        "raw_sha256": "81de4ad9c683dd30e303452d592ac6f8b19b78f15719592f61b61282d91a030e"
+      },
+      {
+        "wave": "2018-19",
+        "module": "B",
+        "source_rows": 7041,
+        "reported_id_field": null,
+        "reported_id_nonmissing": null,
+        "reported_id_distinct_nonmissing": null,
+        "source_labels": {
+          "s5bq06a_1": "6a. How much %rostertitle% did you harvest during the first season of 2018, and ",
+          "s5bq06a_1_1": "6a1. Were the decisions concerning the use of the crop output made by a single H",
+          "s5bq06a_2_1": "6a2. Who is the primary decision maker concerning the use of crop output?",
+          "s5bq06a_2": "6a. How much %rostertitle% did you harvest during the second season of 2017, and",
+          "s5bq06a_1_2": "6a1. Were the decisions concerning the use of the crop output made by a single H",
+          "s5bq06a_2_2": "6a2. Who is the primary decision maker concerning the use of crop output?"
+        },
+        "declared_sidecar_sha256": "7cf0b53195099d93528d9ee53883134c23b9ee7d357a335f6e51e26372e3708c",
+        "raw_sha256": "1393ee911f2dafa1446e1e381bc8764779fc544d8e96de8e57fabf5b9ab29da0"
+      },
+      {
+        "wave": "2019-20",
+        "module": "A",
+        "source_rows": 8429,
+        "reported_id_field": null,
+        "reported_id_nonmissing": null,
+        "reported_id_distinct_nonmissing": null,
+        "source_labels": {
+          "s5aq06a_1": "6a. Qty of harvest (2018, full harvest, condition1)",
+          "s5aq06a_1_1": "6a1. Type of decision maker for use of crop output(2018,full harvest,condition1)",
+          "s5aq06a_2_1": "6a2. Primary decision maker for use of crop output(2018,full harvest,condition1)",
+          "s5aq06a_2": "6a. Qty of harvest (2018, full harvest, condition2)",
+          "s5aq06a_1_2": "6a1. Type of decision maker for use of crop output(2018,full harvest,condition2)",
+          "s5aq06a_2_2": "6a2. Primary decision maker for use of crop output(2018,full harvest,condition2)",
+          "s5aq06a_11": "6a. Qty of harvest (2018, part harvest, condition1)",
+          "s5aq06a_1_11": "6a1. Type of decision maker for use of crop output(2018,part harvest,condition1)",
+          "s5aq06a_2_11": "6a2. Primary decision maker for use of crop output(2018,part harvest,condition1)",
+          "s5aq06a_21": "6a. Qty of harvest (2018, part harvest, condition2)",
+          "s5aq06a_1_21": "6a1. Type of decision maker for use of crop output(2018,part harvest,condition2)",
+          "s5aq06a_2_21": "6a2. Primary decision maker for use of crop output(2018,part harvest,condition2)"
+        },
+        "declared_sidecar_sha256": "433211da10152b33222a3acce55030d52f6e6f8e8258701bd45105dc17bbe5d1",
+        "raw_sha256": "e8a887b6c831ce7f3a3442cf3e4e9722a4f06795b4c3e41eb005ac05abffc0a2"
+      },
+      {
+        "wave": "2019-20",
+        "module": "B",
+        "source_rows": 9356,
+        "reported_id_field": null,
+        "reported_id_nonmissing": null,
+        "reported_id_distinct_nonmissing": null,
+        "source_labels": {
+          "s5bq06a_1": "6a. Qty of harvest (2019, condition1)",
+          "s5bq06a_1_1": "6a1. Type of decision maker for use of crop output(2019,condition1)",
+          "s5bq06a_2_1": "6a2. Primary decision maker for use of crop output(2019,condition1)",
+          "s5bq06a_2": "6a. Qty of harvest (2019, condition2)",
+          "s5bq06a_1_2": "6a1. Type of decision maker for use of crop output(2019,condition2)",
+          "s5bq06a_2_2": "6a2. Primary decision maker for use of crop output(2019,condition2)"
+        },
+        "declared_sidecar_sha256": "eb2969021ebd4e2410c607ae96611e7ce75f7031f40970969bbd7db73a8751fb",
+        "raw_sha256": "3863fb5ae93f26b5cb8f00b7db5c29987da8dc0f5a01c3d064cd318dd614c25b"
+      }
+    ]
+  },
+  "saved_date_tally": {
+    "status": "ARTIFACT_ONLY_NO_DECODE_OR_API_REPLAY",
+    "modules": {
+      "a": {
+        "s5aq06f_1": {
+          "nonmissing": 7138,
+          "counts": {
+            "12.0": 3466,
+            "11.0": 1276,
+            "1.0": 580,
+            "10.0": 577,
+            "2.0": 300,
+            "3.0": 236,
+            "9.0": 188,
+            "5.0": 131,
+            "8.0": 108,
+            "4.0": 107,
+            "6.0": 90,
+            "7.0": 79,
+            "nan": 15
+          }
+        },
+        "s5aq06f_1_1": {
+          "nonmissing": 7138,
+          "counts": {
+            "2017.0": 5583,
+            "2018.0": 1555,
+            "nan": 15
+          }
+        }
+      },
+      "b": {
+        "s5bq06f_1": {
+          "nonmissing": 7038,
+          "counts": {
+            "6.0": 2924,
+            "7.0": 1359,
+            "8.0": 773,
+            "5.0": 721,
+            "9.0": 362,
+            "11.0": 254,
+            "10.0": 253,
+            "12.0": 186,
+            "4.0": 113,
+            "1.0": 64,
+            "3.0": 17,
+            "2.0": 12,
+            "nan": 3
+          }
+        },
+        "s5bq06f_1_1": {
+          "nonmissing": 7037,
+          "counts": {
+            "2018.0": 6948,
+            "2019.0": 58,
+            "2017.0": 24,
+            "nan": 4,
+            "2010.0": 2,
+            "2818.0": 2,
+            "2015.0": 1,
+            "201.0": 1,
+            "1500.0": 1
+          }
+        },
+        "s5bq06f_2": {
+          "nonmissing": 1435,
+          "counts": {
+            "nan": 5606,
+            "6.0": 660,
+            "7.0": 504,
+            "5.0": 107,
+            "8.0": 104,
+            "12.0": 15,
+            "9.0": 14,
+            "10.0": 12,
+            "4.0": 8,
+            "1.0": 6,
+            "11.0": 5
+          }
+        },
+        "s5bq06f_1_2": {
+          "nonmissing": 1435,
+          "counts": {
+            "nan": 5606,
+            "2018.0": 1423,
+            "2017.0": 6,
+            "2019.0": 6
+          }
+        }
+      }
+    },
+    "source_slot_identity_unchanged": true
+  },
+  "no_new_API_source_test_replay_after_terminal": true,
+  "signed": "Sue",
+  "actual_CLI": {
+    "base": {
+      "status": "PASS",
+      "rows": 133331,
+      "actual_prewrite_API_full_exact": true,
+      "postread_artifact_full_exact": true,
+      "full_Arrow_footer_schema_bytes_exact": true,
+      "zero_cache_writes": true,
+      "prewrite_to_postread_strict": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": false
+      }
+    },
+    "candidate": {
+      "status": "PASS",
+      "rows": 133761,
+      "actual_prewrite_API_full_exact": true,
+      "postread_artifact_full_exact": true,
+      "full_Arrow_footer_schema_bytes_exact": true,
+      "zero_cache_writes": true,
+      "prewrite_to_postread_strict": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": false
+      }
+    }
+  }
+}

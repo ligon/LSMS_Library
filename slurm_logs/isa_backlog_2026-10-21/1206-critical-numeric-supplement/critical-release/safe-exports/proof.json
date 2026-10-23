@@ -1,0 +1,35 @@
+{
+  "status": "PASS_BOUNDED_CRITICAL_NUMERIC_SUPPLEMENT",
+  "critical_main_and_qualified_pairs": {
+    "twenty": 329,
+    "1196": 12
+  },
+  "additional_direct_cache_pairs": 76,
+  "additional_1196_retained_artifact_and_synthetic_pairs": 16,
+  "total_executed_pair_groups": 433,
+  "full_strict_groups": 407,
+  "qualified_stage_groups": 26,
+  "independent_unique_pair_count_not_claimed": true,
+  "original162main_and152source_bound_cache_families_reassessed": true,
+  "original76direct_cache_cold_warm_family_reassessed": true,
+  "saved_CLI_byte_control_pairs": 16,
+  "negative_controls_rejected": 12,
+  "main341_production_only_array_checks": {
+    "numeric_nonmissing_arrays": 451,
+    "str": 2177,
+    "Float64": 383,
+    "string": 362,
+    "object": 23,
+    "int64": 68
+  },
+  "mismatches": 0,
+  "source_API_build_test_replays": 0,
+  "all_campaign_result": false,
+  "remaining_implementation_review_cohorts": 22,
+  "remaining_integration_cohorts": 3,
+  "old_evidence_unchanged": true,
+  "prior_raw_mapped_memory_operand_unavailable": true,
+  "original_native_prewrite_memory_unavailable": true,
+  "original_populated_child_log_history_gap_unchanged": true,
+  "signed": "Sue"
+}

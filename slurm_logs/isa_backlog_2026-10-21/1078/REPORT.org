@@ -1,0 +1,116 @@
+#+TITLE: GH #1078 food producer provenance -- author validation
+#+AUTHOR: Sue
+#+DATE: 2026-10-21
+
+* Result and review boundary
+
+The approved framework repair is implemented at =a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b= on =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+Author validation is complete; independent review, including its one credential-free full suite, remains required before PASS.
+Subsequent report/ledger commits preserve the exact runtime and test blobs and modes.
+The ledger was committed first at =695b57970=.
+
+The original immutable diagnosis reproduced the historical six Quantity and three Expenditure NaN-to-zero cells on f8 and reviewed #1062, using real cache reads, normal hashless-wave eviction and actual Arrow writers.
+Its source oracle independently read the held 2011-12 =GSEC15B.dta= (MD5 =f4b5885a98654c12d5c9960d1a3586ff=, 38,743 rows), establishing nine genuine missing operand sets and their positive counterparts without using the food transformation as its oracle.
+Those frozen observations remain historical pins.
+The original historical full-suite writer and interleaving remain unidentified.
+The present candidate is f8-based; it does not establish composition with #1062 or the campaign integration head.
+
+* Production change and compatibility
+
+=Wave.grab_data= retains its default public DataFrame return and attrs.
+An optional keyword-only private return carries the origin of the actual result: successful parquet read, successful YAML materialization, legitimate in-memory output, or missing route.
+Only =Wave.food_acquired= consumes that metadata.
+A later path-existence observation cannot change the route of an already-read frame.
+There is no mutable global/instance origin state or public attrs sentinel.
+
+The legitimate non-parquet reducer is unchanged: the original index keys, selected Quantity/Expenditure/Produced sums, Price first, numeric coercion and default missing-value aggregation remain in force.
+No source, ID, canonical reshape, category, unit, currency, nutrition arithmetic, eviction, lock, global min_count policy, cache-read exclusion or global schema change is included.
+An explicit distinction remains: YAML write failure or disabled-cache output is in-memory even when an unrelated stale file exists.
+The former existence heuristic could have skipped its reducer merely because that file existed.
+Synthetic route tests cover this distinction; real-source validation uses ordinary caching exclusively.
+
+The content-producing food method now carries =@build_transform(tables=['food_acquired'])=, following existing registry machinery.
+This versions the producer so existing corrupt current-hash country caches can heal naturally.
+The private plumbing also changes the already all-table-tagged =grab_data= body.
+This is a material operational cost: all 549 enumerated country API hashes, all 39 framework per-table fingerprints, all 1,362 own-declared wave hashes and all 2,109 non-null API-wave caller hashes change.
+The remaining 30 API-wave pairs are None on both sources; the full caller enumeration is 2,139 pairs.
+Only =Wave.food_acquired= is added to the registry; no callable is removed and read-gate exclusions/schema are unchanged.
+The repair invalidates all currently enumerated verifiable caches and requires a coordinated rebuild window for human PR review.
+No whole-corpus rebuild was performed or authorized.
+
+* Country grounding and live caveats
+
+The initial full Uganda CONTENTS blob was verified identical to the previously fully read f8 document (=6bad560bef33eb6b2b9decaf6f96c901f67bf67b=, 3,604 lines), including TODO, WAITING and LOGBOOK entries.
+Uganda's 2009 hybrid GPS-bin/EA =v= and later EA/parish/district-parish identities are survey-specific; household Region fallback remains necessary.
+At =Uganda/_/CONTENTS.org:253=, Region is described as "complete for every household"; =:270= records three missing 2019-20 Regions.
+At =:279= the sample refresh occurs "each wave", while =:689= records the same sample in 2013-14 and 2015-16.
+These qualifications are retained as findings rather than silently declaring the notes stale.
+Live 2019 panel/GPS/null-key tasks and WAITING #829 sales-scale scope remain outside this repair.
+The older hashless trust-once prose at =:1949= is explicitly qualified by the #809 country-versus-wave correction at =:1952=.
+An additive country note records the producer race and limits of historical attribution.
+
+The healthy comparator is Niger, with four declared waves but food in EHCVM 2018-19 and 2021-22 only.
+Its seasonal halves are not a household panel; EHCVM =v= uses grappe, while 2014 household identity includes GRAPPE/MENAGE/EXTENSION and splitoffs do not imply links.
+The unit dictionary uses Original Label rather than Code; source-driven missing units, size qualifiers and expenditure NaNs are preserved.
+The "national coverage" description at =Niger/_/CONTENTS.org:59= is qualified by Arlit/collective exclusions at =:61= and the documented 2021 universe gap at =:42=.
+The missing-coordinate conclusion is explicitly called "wrong" at =:360=; actual held coordinates are described there rather than assuming the original note stale.
+The unit dictionary's actual Original Label key is documented at =:638=.
+No Niger implementation or documentation is changed.
+
+* Isolation and source preparation
+
+All source builds ran with exact checkout cwd, imported-package realpath, countries-root and private data-root assertions.
+The mounted image uses Python 3.11.6, pandas 3.0.6, numpy 2.4.6 and pyarrow 25.0.1.
+Numeric/build/Make thread counts are one; the focused cohort uses two loadfile workers and actual source tests run serially per root, except the explicitly coordinated two-process scenario.
+Active Python write/socket guards and =unshare -rn= prevent source acquisition and external writes.
+Only the exact root-prepared ignored candidate DVC tmp target is writable; attempts to create an already existing frozen baseline btime receive FileExistsError.
+
+Preparation completed before dependent decoding/builds: 47 declared held sources passed sidecar MD5, SHA256, size, mode and mtime gates.
+All 291 private copies are physical, distinct-inode, nlink-one copies, with no payload symlinks.
+Cold controls began with empty L2.
+The healing setup physically copied the genuinely corrupted current-hash f8 root, preserving its exact receipts, rather than replacing, clearing or stamping its cache.
+Original diagnosis/source/historical files remain unchanged.
+No acquisition, DVC CLI, shared-cache writes, in-tree parquet, manual hash stamp, assume-fresh or read-gate bypass was used.
+Full frames, IDs, exact cell keys, warning examples, writer arguments and traces remain private.
+
+* Checks and exact accounting
+
+- Focused cohort :: 64 passed, zero failed/skipped, including 14 new real-route cases, registry/hash tests and existing Wave attribute tests.
+- Initial negative fixture :: Its hashless input was legitimately served as legacy, producing a retained test failure; the fixture was corrected to an actual stale hashed input, with no gate change.
+- Actual source scenarios :: Two original named sample/currency tests ran in both serial orders and as the scheduled pair: six passing executions of two tests, zero skips.
+- Scheduled writer proof :: The actual read occurs before normal eviction, and real exists subsequently returns False; preserved parquet origin skips the legacy reducer. Both real writer inputs/outputs equal the complete correct cold frame and attrs, with current country hash/full eight-wave coverage; A writes last and the served bytes equal A's actual output.
+- Natural healing :: An ordinary candidate read grades the copied corrupt f8 hash stale and rebuilds all 355,571 Uganda rows, restoring all nine NaNs and every full value/key/order/dtype/null/axis/attr to the correct independent cold reference. Quantity/Expenditure/Price null counts are 27/34/29,755.
+- Healing warm :: Fresh-process/new Country and Feature reads are strictly exact and leave all 57 data-root files' bytes/modes/mtimes unchanged.
+- Matched cold :: All 26 complete baseline/candidate frames compare strictly equal with full attrs: sample, raw/public/native food, default quantities/prices/expenditures and four default Features.
+- Matched warm :: The same 26 baseline/candidate frames compare strictly equal in fresh processes; every new Country/Feature uses identical arguments. Each 73-file data-root inventory has zero byte/mode/mtime changes.
+- Arguments :: Country calls use ordinary defaults, kwargs ={}=; =Feature(table)(['Uganda','Niger'])= also uses kwargs ={}=, including default Feature currency behavior. No currency=None snapshot substitutes for a default Feature control.
+- Frame counts :: Uganda sample 24,362, food 355,571, quantities 355,487, prices 348,181, expenditures 247,049. Niger sample 20,231, food 239,877, quantities 239,855, prices 165,027, expenditures 165,014. Default Feature counts are 595,448 / 595,342 / 513,208 / 412,063 for food / quantities / prices / expenditures.
+- Hash/coverage :: Ordinary country caches carry each source's genuine expected hash and complete declared-wave coverage, including Niger's zero-food waves. Changed hash footer bytes across sources are expected; payload equality and zero writes within each warm source are measured separately.
+- Scanner :: The existing harness's actual phase 1/2 run yields 217 records on each head: 214 warnings, three passes, zero fail/error/skip. All 217 full raw record occurrences match; normalized multisets also match with zero removed/added. Phase counts are 30 sanity, 29 assembly and 158 kwarg records. No warning text/count/number is discarded. Safe per-record digests/classifications are in =scanner-proof.json=.
+
+* Strict cold-to-warm residual
+
+Strict cold-to-warm frame equality fails identically on both source pins for Niger's 239,877-row public =food_acquired= only.
+The =u= index level changes from Arrow-backed StringDtype with =na_value=pd.NA= (display =string=) to Arrow-backed StringDtype with =na_value=NaN= (display =str=).
+No other frame-column or index/column-level dtype differs in the complete 26-frame enumeration on either head.
+Values, masks, keys/order, other dtypes, axes and full attrs otherwise match, and all 73 files remain unchanged during warm reads.
+The diagnostic comparison with =check_index_type=False= does not replace the strict failure or normalize either frame.
+Initial strict failure logs and frames are retained.
+This pre-existing residual is drafted separately for deduplication/filing and independent verification; no repair is included.
+Do not infer complete cold-to-warm dtype equality from the strict matched-stage or Uganda-healing proofs.
+
+* Limits, freeze and reproduction
+
+The author did not repeat a broad full suite, whole-corpus build or the long original FCT/nutrition controls.
+Their immutable diagnosis pins remain separate from this candidate's measured proof.
+The independent reviewer owns one credential-free full suite because the shared-loader hash footprint is broad.
+Later composition with #1062 or other campaign changes requires a separate exact-source proof.
+The original historical writer/interleaving remains unidentified even though the controlled causal mechanism is repaired.
+
+Private evidence is under =/local/job40255479/control/isa-backlog-20261021/framework1078-fix=.
+Safe validation and exact commands are adjacent to this report.
+Frozen-source verification covers both original source heads and all tracked bytes/modes, 1,799 original diagnosis files, eight historical original/copy receipts and 815 prior global13/global14 evidence files.
+All source/copy receipts and the exact runtime/test boundary are checked again at final release.
+Final head, clean state and zero live consumers are recorded in the separate final READY receipt so no report claims its own future commit hash.
+
+Sue

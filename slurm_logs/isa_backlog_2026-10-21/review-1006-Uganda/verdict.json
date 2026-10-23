@@ -1,0 +1,342 @@
+{
+  "verdict": "PASS",
+  "blockers": [],
+  "reviewed_head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+  "test_implementation": "1eb9bb377157c78f74962c7a9de59807d446b239",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "independent_reviewer": "Sue (GPT-6)",
+  "scope": "test-only #1006; no production/runtime/config/fixture change",
+  "static": {
+    "changed_paths": [
+      ".coder/ledger/1006-uganda-derived-api-tests.md",
+      "slurm_logs/isa_backlog_2026-10-21/1006-Uganda/REPORT.md",
+      "slurm_logs/isa_backlog_2026-10-21/1006-Uganda/REPRODUCE.md",
+      "slurm_logs/isa_backlog_2026-10-21/1006-Uganda/validation.json",
+      "tests/test_food_prices_dtype.py",
+      "tests/test_panel_attrition.py",
+      "tests/test_uganda_tables.py"
+    ],
+    "unchanged_original_blobs_modes": 14877,
+    "library_config_fixtures_all_exact_f8": true,
+    "final_test_blobs_exact_to_test_implementation": true,
+    "ledger_first": "cdb6274efe7081f07940cfb6d17f727faf154bd1",
+    "attrition_AST_bodies_exact": [
+      "_attrition_matrix",
+      "_is_upper_triangular",
+      "_nonzero_adjacent",
+      "test_panel_attrition_household_characteristics_is_upper_triangular",
+      "test_panel_attrition_consistency_between_tables"
+    ],
+    "no_migration_xfail_or_destructive_IO_in_changed_tests": true,
+    "diff_check_passed": true,
+    "full549_hash_inventory_not_needed": "all production/library/config blobs and modes exact to immutable f8"
+  },
+  "scoped_tests": {
+    "passed": 25,
+    "skipped": 0
+  },
+  "supporting_tests": {
+    "passed": 41,
+    "skipped": 0
+  },
+  "baseline_counterfactual": {
+    "passed": 5,
+    "skipped": 10,
+    "old_bad_payload_false_passes": 12,
+    "old_actual_output_dtype_predicate_hits": 0
+  },
+  "independent_controls": {
+    "dtype_faults_rejected": 8,
+    "float64_Float64_positive_controls": 4,
+    "all_four_tables_index_dtype_value_faults_rejected": 32,
+    "unchanged_attrition_faults_rejected": 6,
+    "threshold50_boundary_controls": [
+      {
+        "amount": 50,
+        "reverse": false,
+        "rejected": false
+      },
+      {
+        "amount": 51,
+        "reverse": false,
+        "rejected": true
+      },
+      {
+        "amount": 51,
+        "reverse": true,
+        "rejected": true
+      }
+    ],
+    "source_ready_API_errors_propagated": [
+      "dtype",
+      "default",
+      "attrition",
+      "explicit_Region"
+    ],
+    "root_restoration_cases": 4
+  },
+  "absence": {
+    "empty": {
+      "counts": {
+        "skipped": 15,
+        "passed": 10
+      },
+      "skip_reasons": {
+        "Skipped: Requires cached Uganda food_acquired and sample source tables": 2,
+        "Skipped: Requires cached Uganda household_roster and sample source tables": 1,
+        "Skipped: Requires cached Uganda household_roster, sample and income source tables": 1,
+        "Skipped: Uganda/household_characteristics source prerequisites not cached": 1,
+        "Skipped: Uganda/food_expenditures source prerequisites not cached": 1,
+        "Skipped: Uganda/food_quantities source prerequisites not cached": 1,
+        "Skipped: Uganda/shocks source prerequisites not cached": 1,
+        "Skipped: Uganda/income source prerequisites not cached": 1,
+        "Skipped: Uganda/cluster_features source prerequisites not cached": 1,
+        "Skipped: Uganda/food_prices source prerequisites not cached": 1,
+        "Skipped: Uganda/household_characteristics source and Region prerequisites not cached": 1,
+        "Skipped: Uganda/food_expenditures source and Region prerequisites not cached": 1,
+        "Skipped: Uganda/food_quantities source and Region prerequisites not cached": 1,
+        "Skipped: Uganda/food_prices source and Region prerequisites not cached": 1
+      }
+    },
+    "credentialless": {
+      "counts": {
+        "skipped": 15,
+        "passed": 10
+      },
+      "skip_reasons": {
+        "Skipped: needs S3 credentials to build country data; the unit-tests job is deliberately data-free (see the data-tests job for the credentialed run)": 15
+      }
+    }
+  },
+  "API": {
+    "baseline": {
+      "comparisons": [
+        {
+          "mode": "default",
+          "table": "food_prices",
+          "rows": 348181,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "default",
+          "table": "food_quantities",
+          "rows": 355487,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "default",
+          "table": "food_expenditures",
+          "rows": 247049,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "default",
+          "table": "household_characteristics",
+          "rows": 24364,
+          "columns_axis_name": "sex_age",
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "default",
+          "table": "income",
+          "rows": 14740,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "Region",
+          "table": "food_prices",
+          "rows": 348145,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "Region",
+          "table": "food_quantities",
+          "rows": 355450,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "Region",
+          "table": "food_expenditures",
+          "rows": 247018,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "Region",
+          "table": "household_characteristics",
+          "rows": 24297,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        }
+      ],
+      "full_frame_attrs_exact": 9,
+      "attrition_matrices_exact": 2,
+      "Region_exclusions": {
+        "food_prices": 36,
+        "food_quantities": 37,
+        "food_expenditures": 31,
+        "household_characteristics": 67
+      },
+      "HC_columns_axis_name_modes": [
+        "sex_age",
+        null
+      ],
+      "parquet_bytes_mtimes_exact": true,
+      "derived_parquets_created": 0,
+      "warning_classes": {
+        "QuantityImplausibleWarning": 18,
+        "NullIndexKeyWarning": 12,
+        "ClusterIdentityWarning": 8,
+        "StatedVsInferredKgWarning": 4,
+        "UserWarning": 2,
+        "GrainCollapseWarning": 8
+      },
+      "scope": "warm normal API on own physically copied pinned prerequisites; not cold source rebuild"
+    },
+    "candidate": {
+      "comparisons": [
+        {
+          "mode": "default",
+          "table": "food_prices",
+          "rows": 348181,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "default",
+          "table": "food_quantities",
+          "rows": 355487,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "default",
+          "table": "food_expenditures",
+          "rows": 247049,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "default",
+          "table": "household_characteristics",
+          "rows": 24364,
+          "columns_axis_name": "sex_age",
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "default",
+          "table": "income",
+          "rows": 14740,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "Region",
+          "table": "food_prices",
+          "rows": 348145,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "Region",
+          "table": "food_quantities",
+          "rows": 355450,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "Region",
+          "table": "food_expenditures",
+          "rows": 247018,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        },
+        {
+          "mode": "Region",
+          "table": "household_characteristics",
+          "rows": 24297,
+          "columns_axis_name": null,
+          "full_values_index_dtypes_axis_metadata_attrs_exact": true
+        }
+      ],
+      "full_frame_attrs_exact": 9,
+      "attrition_matrices_exact": 2,
+      "Region_exclusions": {
+        "food_prices": 36,
+        "food_quantities": 37,
+        "food_expenditures": 31,
+        "household_characteristics": 67
+      },
+      "HC_columns_axis_name_modes": [
+        "sex_age",
+        null
+      ],
+      "parquet_bytes_mtimes_exact": true,
+      "derived_parquets_created": 0,
+      "warning_classes": {
+        "QuantityImplausibleWarning": 18,
+        "NullIndexKeyWarning": 12,
+        "ClusterIdentityWarning": 8,
+        "StatedVsInferredKgWarning": 4,
+        "UserWarning": 2,
+        "GrainCollapseWarning": 8
+      },
+      "scope": "warm normal API on own physically copied pinned prerequisites; not cold source rebuild"
+    }
+  },
+  "attrition_diagonal_facts": {
+    "household_characteristics": {
+      "all_positive": true,
+      "monotonically_non_decreasing": false
+    },
+    "income": {
+      "all_positive": true,
+      "monotonically_non_decreasing": false
+    }
+  },
+  "registered_nonempty_assertions_AST_exact": true,
+  "immutable_proof": {
+    "candidate": {
+      "head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "all_tracked_SHA256_modes_exact": 14884,
+      "clean": true,
+      "introduced_raw_or_parquet_files": 0
+    },
+    "writer": {
+      "head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "all_tracked_SHA256_modes_exact": 14884,
+      "clean": true,
+      "introduced_raw_or_parquet_files": 0
+    },
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "all_tracked_SHA256_modes_exact": 14880,
+      "clean": true,
+      "introduced_raw_or_parquet_files": 0
+    }
+  },
+  "physical_private_roots": {
+    "per_root_L2_files": 170,
+    "per_root_MD5_verified_L1_blobs": 581,
+    "source_inodes_distinct": true,
+    "own_and_quiescent_writer_bytes_mtimes_exact": true,
+    "no_extra_payloads_or_derived_parquets": true,
+    "empty_root_payload_files": 0
+  },
+  "remaining_task_processes": 0,
+  "GitHub_writes": 0,
+  "git_mutations": 0,
+  "limits": [
+    "held-prerequisite normal API/warm verification, not a cold source rebuild or full-country output census",
+    "all production blobs exact f8; no full549 hash census or Feature scanner needed for this test-only patch",
+    "HC column-axis sex_age to None remains pre-existing and reported; every mode exactly matches its own f8 reference",
+    "schema/Region/refresh/unit documentation contradictions remain outside this patch",
+    "nutrition/FCT/fixtures/goldens/CPU variants unchanged and not called"
+  ]
+}

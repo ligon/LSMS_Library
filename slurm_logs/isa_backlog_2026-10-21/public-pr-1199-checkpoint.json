@@ -1,0 +1,22 @@
+{
+  "observed_at_UTC": "2026-10-22T00:34:00Z",
+  "number": 1199,
+  "url": "https://github.com/ligon/LSMS_Library/pull/1199",
+  "head": "fix/1091-mali-community-builder-20261021",
+  "head_sha": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+  "base": "fix/822-mali-community-readings-20261021",
+  "base_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "state": "open",
+  "merged": false,
+  "independent_review": "PASS at exact final head; source-pinned bounded review; no broader campaign composition claimed",
+  "ci": [
+    {
+      "id": 39699773895,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "umbrella_issue": 1091,
+  "dependency_pr": 1180
+}

@@ -1,4 +1,229 @@
-#+title: Handoff -- v0.16.0 release, 2026-10-21
+#+title: Handoff -- LSMS-ISA backlog campaign
+
+* Current task -- 2026-10-22T22:03:17.321841+00:00
+
+LATEST USER AUTHORIZATION OVERRIDES OLDER HUMAN-ONLY MERGE RULES: user said "Let's delegate to an agent the job of checking for consistency of the outstanding PRs and merging those", then clarified "merging to development, that is". Do not ask again for merge permission. Dedicated malawi_1209 assigned actual live32 implementation PR consistency/integration/merge job, own NEW W/isa-pr-integration-20261022 and C/isa-pr-merge-20261022. Read all exact liveheads/bases/dependencies/CI, acceptance qualifications and applicable country CONTENTS, isolate integration from actual GitHub development. Test meaningful offline unit/portability/affectedregressions in privateguarded mountedruntime,≤8loadfileworkers/BLASOMP_MKL_BUILD1/exactidentities, no genuine acquisition/sharedcacheflags/builds without bounded plan. Direct dependency-ordered GitHub merge commits with expected_head_sha authorized; preserve ancestry, retarget child todevelopment onlyafterprerequisitecontent/freshdiff. No squash/rebase/forcepush/branchdelete/unattendedautomerge. Routine additive mechanical conflict resolution+meaningfultests/freshCI authorized; semanticconflicts/failingchecks stayopenwithreasons. Tracker1170 docsbranch remains ROOT-OWNED/LIVE: leaveopen untilrootfreezescheckpoint. Rootcampaignbranch untouchedbymerger. Agent will record exact mergeSHA/readback/currentdevelopmenttip and report progress. Tracker1170 latest authorization prepend exactreadback. Do not apply historical "never merge" restrictions to these newly authorized merges.
+
+1218 latest ACTUAL production blocker: failed candidatecensus62105/50be60 originalPID289915 exit1 has TypeError _build_registry._ser cannot serialize BooleanDtype. New emptyhelper callingexisting _enforce_declared_dtypes reaches _SCHEME_DTYPE_MAP through closure fingerprint. No candidate complete maps saved; intermediate locals UNSAVED/UNAVAILABLE, no maps/API gate/tests/genuine. Failedactor metadata accounting493f580 binds1459suffix(1458deniedmissingpathopens+1IPv6),561currentabsencepoints, full2982guardprefix; classification88d2e65f4ff4290705a36a79565e19d12805d389df39a453d5f27cd176894910. Root authorized acquisition_1149 LEDGER-FIRST scope amendment and minimal explicit deterministic supported nullable dtype serializer in _build_registry plus existing test_build_transform_hash controls, Stringstorage/missing semantics distinguished; retain unknownconstant rejection/fullclosurehash/noarbitraryrepr/noexclusion/no populatedcoercerrewrite. Source/testtext only untilnewexactpins/runtimeplan. Prior3-pathscope must be expanded honestly. Preserve7ebsnapshot separately; no reset/frozenmutation or completedbasecensus/control replay. Genuine remainsheld.
+
+Archive32 is NOW ROOT-ACCEPTED: C/ARCHIVE32-ROOT-ACCEPTANCE.json ca5ccae6617993c620004cdaefc5e65119a6a35c0c3bec1c6984d4b11c2ecf78. Rootfullartifact/source/process checker29865/5b9154 actual0, receipt b8875be82f7371bd4aaf95531141a2ba52b6044fb3e1bf94a1feb4a398f948eb; all1977memberhash/PAXns/source1977+excluded671/1455dirs/old31archives102endpoints+4new600artifacts/unmodified2700dir exact. Archive2e70528380275032d8d80e7afca0e46d66e11e0a0ca8e98081b3ad21bd0983a8=93568213bytes, manifest23e89334502bc2b6c8ae30af3f3a1afc1774029bbbda21d4d4355b207984970b. Originalwriter2888670/child2888710/separatepostexit2919980; rootrecovered8literaloriginalharnesscallreturns andmatched4SDKvalues, alsoexactagentcapture261cbf21d11b07536993b4f94725397ebdff6545ed3e373c33882c5f9d32bef4. Rootparserc99090metadataAttributeError(str-vs-listoldtooloutput) retained; correctedshape-filter recovery81fa220, no archive/productreplay. Qualifs343private644inputs/7UNKNOWNprocessscopes/non-atomicstream/oldfixtureunknownPopen andsetupstops allretained. Frozen independent1215 andlive1218 runtime are NOT in32; futureprivatearchive must coverthem plusnewroot32terminal/SDKchain, withoutclaimallcurrentprivateevidencedurable.
+
+Mali1118 owned review_malawi_1209, own W/isa-Mali-1118 and C/mali1118-fix. Ledger-FIRST24278b6c9 normalcommitpublishedFS correctSue/GPT-6. CompleteCONTENTSreadfirst/idiosyncrasies+contradictions recorded. Metadata-onlysourcebudget14providers33322098bytes(6core30155819+8sample/weight3166279),4proposedroots/56copies133288392bytes. All14 have metadataregular/nlink1/declared-size heldL1candidates across2roots; byte/MD5/SHA/magic authority NOT authenticated. SOURCE-METADATA SHA97366f95cba704cd07e0f6e187c739de3c1162893e17b173561952380fa788fe. No productionfill/providerbytes/copies/import/tests/census/genuine yet. Preparing exactunit/source diagnostic andactorplan before rootgates. No duplicateMaliwork bymerger.
+
+
+The LSMS-ISA goal remains ACTIVE. Never auto-merge. Main development is clean at f8d236694; GitHub development067 remains a poetry.lock-only dependency change. Mounted runtime generation20261019T221223Z is unchanged.
+
+PR1220 is OPEN and unmerged for the user-approved declaration-order rule, exact f7c33dd64d4b2d6e9a62838c33cc30d07863d706 on PR1217 branch fix/1204-uganda-crop-wave-coverage-20261022 at a417b69d71c460ab33f6a494b4df5d67cd792de5. Its body/head/base/state readback is exact. Independent root acceptance bd17bd1873e69155d0af1cfe20bea86fc7fbb94021261d2ea84f4ff259e0e454 authenticates2848 entries,545526967 bytes,29827 source paths,37 providers/148 copies/185 inodes. It preserves82 strict PASS/10 order FAIL,22 WARN/head in identical complete JSONL,48 completed genuine calls and all historical qualifications. Historical six source PKLs were SHA-read only by the initial independent source snapshot; root did not reopen them. Both original sealer262707 and separate postexit263300 exited0. Root separately recovered8 literal original harness call/return lines, matching all4 SDK values; private receipt a5b682a35edcf4a895105553006f351232c4781449e8cddaa9eda1bbfddf4ba4. Addendum resolves the earlier pending literal-harness field without rewriting frozen acceptance. Independent report/auth published681e6add34153f6ad60e0ff34e0cdbf715a97c37. Exact-head CI39861535004 completed SUCCESS:unit-tests120113199144/windows-smoke120113198772 SUCCESS,six jobs including data-tests SKIPPED; API binds f7/headbranch/PR event/attempt1. No full-data/combined32-PR verdict. Issue1215 body updated and exact read back. Root metadata inspection requested nonexistent FINAL-PROTECTION.json; actual protection-private.json used in acceptance; no product replay.
+
+Complete live collections after1220:33 repository open PRs including tracker1170,32 implementation PRs;173 repository open issues, all114 scope records OPEN. Queue categories29 PR-linked,1 active,84 other. All previous31 heads/base names are exact. A first root queue helper wrongly counted only PR_OPEN and missed PR_OPEN_AWAIT_HUMAN_MERGE; it stopped before writes. Corrected helper2b1b5e sums both states, preserving the stop in queue-live-check-after-1220.json. These are overlapping issue records, not114 distinct bugs. No combined32-PR suite/corpus verdict.
+
+1218: source7eb on f7, three changed paths, unchanged. Root full controller/physical pin gate8f7216 actual0, receipt d289320aa693d12aaa9034eea7ba149abe55dd1406c121b4f1ea2284747bd1cd. Independent V2 source critic frozen C/review1218-v2-static: REVIEW7b627a9a..., FINDINGS07199b2b..., FINALPINS4f14a706... found no remaining blocker within RG1-RG3. Root conditional synthetic runtime release C/FRAMEWORK1218-V2-SYNTHETIC-RELEASE.json c6934fc2d69d2ad3be10a355dd9cab99d6a27d41dbacc61abf3d600f00bcfc2d binds plan67ec,15new+2shared+14old pins and exact three HEADs. acquisition_1149 now executing ordered sourceepoch,4old/v2 read/startup controls and gate,2core23seed calibrations and gate,2native549/39/1362 censuses and gate,57 planned same-source regression cells both heads plus bounded support. Counts14/48/62/57 remain predictions until actual evidence. Old control exit1 and parentpytest1 require semantic/PID/source/JUnit proof, not generic1. Synthetic-only original GH1039 flag/manual-cache fixtures explicitly allowed; genuine flags prohibited. Genuine six providers/24 copies25343300 bytes/four roots remain SEPARATELY HELD; no source replays or historical direct byte opens.
+
+malawi_1209 owns archive32 PREPARATION at C/archive32-control, exact five frozen roots in brief C/ARCHIVE32-PREPARATION-BRIEF.md. Original fixture1 has unknown original Popen/exit, retained. New fixturef3ef2b original265908/ready/finally-reap exit0 proves all argv/cwd/fd/maps axes. Seven unrelated same-UID processes have unreadable axes, explicitly UNK2026-10-22T22:03:17.321841+00:00N. Root authorizes scoped frozen-root/content-and-physical before/after consistency, with no universal zero-consumer claim, rather than blocking on those unrelated unknowns. Original plan-preparer270390 actual1 misinterpreted root42 COPY-MANIFEST copy paths; v2 safe-relative-path correction is preparing exact plan, no durable writer approved. Preserve original source/streams and never invent missing process records.172 raw L1 copies excluded; actual harmonized proof parquets/serialized operands PRIVATE included. Live independent1215/1218runtime excluded. Archives1–31 preserved. Root must approve exact plan/controller SHA before writer, then independently verify member/PAX/source-after/endpoint/terminal chain.
+
+review_malawi_1209 now has bounded SOURCE-ONLY Mali1118 reconnaissance, own C/mali1118-recon. Must read complete Mali CONTENTS/TODO/WAITING/LOGBOOK and name idiosyncrasy, live1118/1041 and prior-art baseline; reconcile pending1180/1186/1199 file scopes/base. No product imports/tests/census/provider bytes/cache roots or implementation yet. Historical null-unit counts not fresh. Malawi follow-up must later reconcile1175/1193; Nigeria eligibility remains separate.
+
+Latest runtime checkpoint:1218 sourceepoch63645 actual0; base-old59603 actual1 expected, five failed old read controls/six healthy/children121each. Base-v2 59571 actual1 unexpected: five read denials/six healthy PASS, positive identity child276413 exits1 on private-config auth prompt/EOFError, negatives121. Eight guard rows retain base-old1 +five v2 read denials +source-associated urllib3 IPv6 bind +dev/tty refusal. No later actors/census/tests/genuine. Root and author agree on minimal documented LSMS_SKIP_AUTH=1 offline-only import continuation, no fake credentials or pytest skips; exact new launcher/positive-child/gate source pins required before execution. Do not replay completed controls/sourceepoch. Tracker1170 current32/114 update and exact body readback complete. PR1220 CI39861535004 initially in_progress; later exact API confirms f7/completedSUCCESS. Normalized connector omits headSHA, so exact API was separately retained at C/1220-exact-CI-run-api.json. PR1220 and1170 CI-qualified bodies exact read back.
+
+New checkpoint: 1218 V3 offline continuation ROOT RELEASE a5b1fd390530250fed0912ca19e25ca894b8f249437631c1a723fe4a86d3eda7, exact plan9ff1453f9a46ed26567562f8826ae9da160e09e6e3a85f3ea5fea7e8e199c0e4,7new sources/diff328722.../READYf646. Root read complete326line diff/positive launcher and verified all old15+14+2/full sourceepoch/prod/3HEAD pins. Documented LSMS_SKIP_AUTH=1 exception only for offline native metadata/synthetic; no fakecredentials/pytest skips/genuine. Actual proc maps translate only namespace owner metadata, all other fields/SHA exact. Original root locator stopdeaefe searched sourceepoch top-level; corrected to reviewed source-pins/source-before-private.json, no runtime replay.
+Positive-only continuation92457/ec9469 actual0, candidate-old82397 actual1 expected, candidate-v276163 actual0; gatec291eb actual0 validates12readrows+3IPv6+originaltty=16, retaining originalbaseactor1/child1. Core33883/90880 actual0; gate79c2d2 actual0 validates46seeds+2IPv6=48suffix, measured64atthatgate. Native base2863/a50c01 actual0, full549/39/1362 maps, datafiles0/oneemptydir. Extra host suffix assumption765056 actual1 wrongly expected only one probe. Metadata-only full attributiond1ff800, classification859a39a92785a6a4b69d2fbed50f7bef32e3e1b89b546b39b75908c5d4918ed1:1458denied source_fingerprint->cached_file_hash attempts(1244parquet70dta144csv),561currentlyabsent endpoints+sidecars/fourclasses704/736/9/9,plusoneurllib3probe, all originalPID287131/boot/Popen/time/source bound. Full1523guardprefix retained. Guard denies beforeactualread; cached_file_hash OSError->None/missing sentinel. Currentabsence NEW interval, not historical/unguarded or zero-attempt proof. Initial verbose diagnostic truncated; savedfullJSONLauthoritative. Root independently matchedfullrow/context/classes/currentabsence/receiptsprefix in79dd980; C/FRAMEWORK1218-BASE-CENSUS-SUFFIX-ACCEPTANCE.json1115f787d10d4148702a5995a3caf406266523ab5694665e5b921aac2b36ca25 releases ONLY never-run candidatecensus underunchangedguard/launcher, analogousfullattribution+allmap/API/policygate BEFORE tests. No completedreplay/genuine yet.
+
+Archive32 exact finite plan f157b0a08cdfcc340f55791b10fa6543ec031f6b71d2dc84d726d8c23dab93e7 root PREAUTH c09993e68d04a166027681bcc27a1ee20c154b2134f3e6e2fd1073456539372d:1977included462361511bytes,671excluded,172rawL1copies203112512bytes metadataonly,1455dirs,156parquets451PRIVATEpickles(twofullrawderivedoracles),75staticinputs,31oldarchives102oldendpoints,4newnamesabsent. Root8ce85b overstrict all600 assertion retained;343original644inputs underC700 preserved(nochmod), exactprivateexceptionsdd57e8949323a287081fb102eae1f759bf81beff25ea19d3238b2194f389a248; correctedrootv2gate0. Sourcecritic frozen C/review-archive32-static FINALPINS64b958b49b0aa2514f83296e1e918f7bd9ed4eac110018a09b35f30723f934a3, REVIEWf6daad..., FINDINGSb922e... no scopedblocker;16common/7selectionembeddingsall75pins exact. Root read full writer+verifier/originallaunch keychains. Explicit qualification: payload stream writer355 usesPath.open, not fd-level O_NOFOLLOW/fstat; selection receipts are O_NOFOLLOW and exact frozen before/after/source+member hashes required; no atomic/zero-race/universalclaim. SevenunreadableaxesUNKNOWN retained.
+Root A/ROOT-WRITE-APPROVAL.json and C/ARCHIVE32-ROOT-WRITE-APPROVAL.json exact67b5d9a51fdf2fc08e3183903bc7070cbf0ee8cc2419aab3e6137144589e9742(8718B), issued57de650. malawi_1209 now executing originalgatedwriter, actualchildverifier then separateoriginalgatedpostexit; rootfullartifact/member/PAX/source-after/terminalauthentication STILLPENDING. Never overwrite/remove partialoutputs or infer unknownPID. Preserve old1–31 endpoints/02700directory/allnew4artifacts0600. Originalv1fixtureunknownPopen, correctedv2four-axis0, twooriginalpreparer1+v3preparer0 allretained.
+
+Mali1118 reconnaissance frozen20bf1fd587edb5074c43ecc7d5e06aceb81ce025b1239cd720da2b3ca567a5b7/RECON18d651...; rootread fullRECON. SourceAST provesfinalize/unit/helper and3producerblobs identical acrossf8/1180/1186/1199, standalonef8recommended. Actualcountry idiosyncrasy EAC-I2014/2017 vsEHCVM2018/2021;2017(grappe,exploitation), plot-level fertilizer missingcrop, householdpurchasesnotplotallocations; contradictions retained. _unit_labels.map also loses substantiveunmatchedlabels, so rawabsencevsdecode-loss sourcegate needed BEFOREfinalfill. review_malawi_1209 now assigned Mali1118PHASE0 NEWworktreeW/isa-Mali-1118 branchfix/1118-mali-missing-input-units-20261022 exactf8, ownC/mali1118-fix0700. ReadcompleteownCONTENTSfirst, ledgerFIRSTcommit, static source/dependency/sidecar/SOURCE authority and finite14possibleproviderbudget plus meaningfulcontrols/runtimeplan. NO productionfill/import/runtime/tests/census/providerbytes/staging/acquisition/cache rootsuntilsourceauthority/rootgates. Proposedfinalfillafterexistinggroupby.first preservesfirstvalid/reducers/eligibility/science. No pendingPRcherry-picks/otherfrozenmutations.
+
+Next root: publish updated32-PR tracker/queue and this checkpoint; observe1220 exact-head CI without triggering rerun; authenticate1218 staged runtime outcomes before genuine release; review archive32 finite plan before writer; use Mali reconnaissance for isolated country implementation. Allocation40255479 has about25h remaining,32 cores exclusive; no new job submitted. No goal pause/completion or resource release while work remains.
+
+Sue
+
+* Earlier task -- 2026-10-22T21:41:22.156800+00:00
+
+LSMS-ISA goal ACTIVE; NEVERauto-merge.31implementationPRs OPEN/unmerged,114scopeOPENrecords=28PRlinked+2active+84other. Currentcomplete31head/base collections173repoissues retained. Maincleanf8; mounted20261019runtimeunchanged, development067lock-onlycertifi.
+PR1219BF1188 exact657on1203exact3dc OPEN/unmerged/bodyreadbackEXACT. Independentrootaccepted0f4124979cbdcb6f0f6496f1d0d4dbf909abfd45f988601b65da3cbebb4a9aba, evidence928de01919ea1960ea95473ce0192a3a6d4c137d;151strict111PASS40prewriterFAIL,4NEWempty2PASS2MakeFAIL1218 preserved. ExactCI39856584211unit/windowsSUCCESS,6SKIPPEDincludingdata. CIbody1219and1170readbackEXACT, receiptpublication-1219-CI-and-tracker-readback.json; publicevidence238dabe78211f659b8159aa8788a73f64fe9e45c.
+
+Active review_malawi_1209 independent1215 sourcef7/a417 atC/review-Uganda-1215: all8normalactors48methodcalls0, group75559/856869. Oldfirstloader1oneattribute-resolutionattempt/0methodinvocations remains. Twonewmetadataresourcecontrols0; startup1535/closed031/originalguard993 and releasec194be1/addenda663413+eb0e7 remainexact.37providers/148copies177769212bytes/185inodes,4roots, noextra/stagingreplay. RawpartialcountryoperandsretainedBEFOREunion.
+Originalstrictreader62625/b224fe0:92groups=82PASS(54public+28native)+10FAIL(7crossheadapprovedorder+3actualparentDefault-vs-Makebarrenorder). CandidatebackendcomparisonsPASS; allfailedgroups completeindex/typedattrs/membership/eightnamedarraysPASSasnarrowerchecksONLY. Nosort/cast/normalization/no populated mismatch. Twooriginalscanners+fullprotection/seal/rootacceptancepending.
+IMPORTANT independenthistoricalsource-snapshotexception: itsoriginalhostsource-before helper63931/7433dc0 at2026-10-22T20:28:41.531425+00:00 directlySHA-read3historicalMalawipicklesPERHEAD,2210706bytesEACH=6632118perhead/13264236total6files; nodecode/copy/valueoutput. These areNOT37Ugproviderendpoints. Author3UNOPENEDclaim appliesONLYauthor. OriginalhelperPopenPID/pre-PopenreceiptUNKNOWN, notinvented. v3qualification31c7198f1fce6135748bb79aeeaba9ca339ddd80a9d83a0e282d2bedb1dfaf52. Finalprotection/rootcheckermustNOTdirectreopenhistorical6files; useoriginalsavedSHA+fullphysical/GitblobidentityNEWinterval, untracedGitinternalsqualified. Initialnarrowsuffixinventorywasexit0empty/incomplete, NOTanactorstop.
+
+Active acquisition_1149 owns1218minimalproduction7eb596c223055d45c4f45cffdba4f7eb6aee76e4 onf7, exactlyhelper/GH1039tests/ledger. Allruntime/import/tests/census/genuineHELD. Independentv1sourcegatecriticfrozenC/review1218-runtime-gates:REVIEWda3a223...,FINDINGSd6a691...,FINALPINSd04ce29...; all14controllers/3HEADs/3productionpinsmatch. ConcreteRG1readfd/dir_fd/extensionlessownL1holes,RG2syntheticfixtureMakechilddataredirectfailsstartup,RG3metadataGitoptionalindexwrites; exact3HEAD+3opaque-namegatealsorequired. AuthorpreparingADDITIVEversionedv2guard/calibration/gates/launcher/runtime_common/identities/plan, preservingold14/8b72/7eb; noactorsexecuted. Exactopaquenames slurm_logs/2026-06-16_ehcvm_interview_date/{malawi_baseline,malawi_retrofit,malawi_retrofit2}.pkl mustremainUNOPENEDin1218. Nativefull549/39/1362metadatahashesbeforetests/build,57staticnewcasesNOTcollected/passed. Genuine6providers/24copies25343300bytes4roots separatelyheld, fixedBF657configcompositionexplicit.
+
+Active malawi_1209 nowarchive32PREPARATIONONLY underC/archive32-control, briefC/ARCHIVE32-PREPARATION-BRIEF.md. Fivefrozenarchiveprefixes:author1215;independentBF1188;1218phase0-staticONLY;root42snapshot;critic4staticfiles. No normalcacheroot added. root42COPYmanifestc73181b60c73d5569532e3834f4c94b348031dd65255891a75a5f040d6ba97be. Live1215independent/1218runtimeEXCLUDED. Exactfiniteplan/launcher/verifier/rootapprovalSHA requiredBEFOREwriter. No durablewriter approvedyet. Archives1–31preserved, source-derivedfullrawtablepicklesPRIVATEproofoperands retained,172rawL1copies/excludedruntimeboundmetadata. No oldcontroller/API/test/census/rawproviderbyte replay.
+
+Nextroot: review1218v2pins+discriminatorsbeforeconditionalcalibrationrelease; finishindependent1215scanners/protection/freeze/rootauth thenopenstackedPRon1217; approvearchive32exactplanandindependentlyverifyartifact/member/source-afterchain. Further1118Mali/Malawiunitsnextmechanical;1135sourcegated;821/823size/weightbasisreconciliation.31PRcombined/fullcorpusverdictNOTestablished. Allocation40255479about25h20left/no warning. Keepallfailuresandprivacyqualifications.
+
+Latestpublicationcheckpoint:94c49b11a0863cac54a7ce7b8c6631fead038df4pushed; independent92aggregateprogresspublishedand1215/1170bodyEXACTreadback. Bothscanners0(34966/a68fed,38420/a18033),22WARNeachfullJSONLbyteexact8a67501840d3fd1b379f03f129b9a35abafef068737293ef937c98acc1299a2c; allcachebefore/afterexact. Finalguard161rowsreported40seeds101IPv6binds20existingmkdirrefusals, pendingfullsourceattribution. Finalmetadatahelper1wronglyexpected9sampleparquetseverycoldbackend; savedactualDefault9vsMake8bothheads,0CROPboth, additiveaccountingcorrectiononly/noAPIreplay. NEWsiblingC/review-Uganda-1215-terminal-records/0700AUTHORIZEDfororiginalSDK/harness/pre/Popen/stream/terminalsealer/postexitcapture, nofrozenPaftersealwrites.
+
+Sue
+
+* Earlier task -- 2026-10-22T21:23:27.634333+00:00
+
+LSMS-ISA goal ACTIVE; NEVER auto-merge. Main cleanf8, dependency-onlydevelopment067 does not change pinned runtime.
+Current COMPLETE live refresh:31implementationPRs OPEN/unmerged with exact current heads/base names,173repoOPENissues,114scopeOPENrecords=28PRlinked+2active+84other. All114stillOPEN; old30PRheads/basenames unchanged.
+NEWPR1219 BF1188 country purchase/gift wiring OPEN/unmerged exact657fed11a63354886772d0f978cec8adb2ad647e, basePR1203branchfix/1119-burkina-seed-crop-labels-20261022 exact3dc9d28510dd783c648413987011832669f8bcf7. Body/head/base/state readback EXACT. Evidence928de01919ea1960ea95473ce0192a3a6d4c137d. CI notyetobserved.
+Independentrootacceptance0f4124979cbdcb6f0f6496f1d0d4dbf909abfd45f988601b65da3cbebb4a9aba:14targeted397supportPASS, trueparent7FAIL7PASS;22877appliedrows/602code21;151strict111PASS40prewriterFAIL (40writerreadbackPASSalreadyinside111),4NEWempty2DefaultPASS2MakeFAIL1218. FourWARN/head raw3028byteJSONLexactSHA3e395b68...;2effd253...iscomparisonDOCUMENThash. Allguard/capability/lifecycle/metadata/rootstops+missingpostexitselfrecord retained; originaltool/harnesscapture03a369f1 exact. NoallstrictPASS/fullcorpus/scienceverdict.
+
+Active review_malawi_1209 owns independent1215f7/a417 at C/review-Uganda-1215. Exactgenuinereleasec194be1/startupaddendum663413b; guard993+startup3c2+closedentryba034unchanged. Fresh37provider0(97614/4363ec),148copy0(14130/686e51),4actualresolutionpreflights0(98406/24f602),185distinctinodes177769212copybytes/4L1-onlyroots. Firstpreflightsetup1usedmetadataroot, correctedbefore resolver/API; no provider/stagingreplay. Next8normalactors48calls+2scanners,64public28nativeplanned. Rootauthbbc76authorpacket alreadyacceptedwith6approvedorderFAIL.
+Active acquisition_1149 owns1218source7eb596c223055d45c4f45cffdba4f7eb6aee76e4 basef7, exactlyhelper/GH1039tests/ledger. Rootphase0fd577; ownC/framework1218-empty-types. Runtime/imports/tests/census/genuine HELDpendingfinalguard/calibration/testpins. TrueframeworkbaseW/isa-framework-1218-base=f7; NEWfixedBFconfigW/isa-config-Burkina_Faso-1218=657, bothownprivateDVCtmp; nofrozenlinksmodified. Source/configcompositionexplicit, notexactoldBFcombinedparent. Historicalstaticpostexit9aaPRE-EDITonly.
+Idle malawi_1209 finished frozenBFreview. Nextarchive32PREPARATIONonlyafterrootgivesexact3frozenroots+finiteimmutable root snapshot plan; no durablewriter untilrootexactplanSHA approval. Currentliveindependent1215/1218runtimeexcluded. Archives1–31preserved; newfrozen1215author/BF1188indep/1218phase0notyetdurableprivatearchive.
+
+Root next: commit/push31PRqueue/readbackreceipt, update1170+1188+1218bodies exactly; observe1219CI without rerun. Prepare32snapshot/brief for idleagent. Review1218guard/cal/testrelease; watchindependent1215firstcold actors. Further1118Mali/Malawi units are strongest mechanicalnext;1135sourcegated;821/823needweight/sizeunitbasis reconciliation. No goal completion/pause/block; data/science residuals remain.
+Allocation40255479about25h45left, no warning. Keepalloriginal failures and exact privacy qualifications; neveremitrawIDs/fullwarnings orreplay actors torepair packaging.
+
+
+Latercheckpoint: PR1219exacthead657 CI39856584211SUCCESS; unit120096251088/window120096251533SUCCESS,6SKIPPEDincludingdata. ConnectoromittedrunheadSHA; directreadonlyAPI97ad33bindsexact657/eventpull_request. C/1219-CI-FINAL-OBSERVATION.json andS/1219-ci-final-observed.json preservefullmetadata.
+Rootimmutable snapshot32 C/root-evidence-followup32 has40exactoriginalcopies+COPY-MANIFEST+SCOPE=42files. COPY-MANIFEST SHAc73181b60c73d5569532e3834f4c94b348031dd65255891a75a5f040d6ba97be. Do notaddtoit. Candidatearchive32roots shouldbe frozen1215author,independentBF1188,1218phase0-staticONLY,root42snapshot; live1215independent/1218runtimeexcluded. Archiveprepnotyetassigned/nowriterapproved.
+1215firstnormal72812/2323d6PID231288actual1 failedattribute/resource-loader BEFOREcropmethod/build/decode,0steps/results. Originalidentitywrapper3c lackedresourceprotocoldelegation. Rootaddendumeb0e7...approvesONLYnewstartup1535/closed031 (__getattr__delegation+receiptpath), originalguard993and3c/ba preservedbyteexact. Rootfourfullfilesetsstill148L1-only. TwoNEWmetadataresourcesmokes38794/2d3a9factual0; correctedfirstcold17560/03d2c0actual0 rows0/15630/0/133761/0 withpartialrawcountryoperandBEFOREunion. Sevennormalremainingin75559, scanner/comparisonpending; nostaging/provider/census/test/preflightreplay.
+1218runtimeplan8b72sources14remainunexecuted. Independentguardcriticmalawi_1209nowinC/review1218-runtime-gates identifiedreadguarddir_fd/intfd/extensionlessownL1holes, syntheticMakechildDATAoverridefailsstartup, source-epochgitstatusoptionalindexwrites/exact3HEAD+opaque-namegate omissions. Authoracquisition_1149preparingADDITIVEv2guard/calibration/controller/identitywiring; old14sources/plan8b72/production7ebpreserved. No runtime/import/test/census/genuine release untilreviewednewpins. LoaderreturnsoriginalPathFinder spec, avoiding1215wrapperbug.
+
+Sue
+
+* Earlier task -- 2026-10-22T21:19:39.620705+00:00
+
+LSMS-ISA goal ACTIVE; NEVER auto-merge. Main clean developmentf8; GitHub development067 is lock-only certifi, mounted runtime unchanged.
+Queue114open records=27PRlinked+3active+84other;30implementation PRs OPEN/unmerged at last full inventory.
+Three active scopes: BF1188 independent freeze, shared1215 independent genuine review, shared1218 ledger-first planning.
+
+1215author frozenf7c vs actuala417 ROOT-authenticated by verify_1215_author_root_v3.py: original session52159/finalac561d actual0; C/1215-AUTHOR-ROOT-AUTHENTICATION.json SHAbbc76ab1a0f0478255cd8871cdee95be1458b5309460e8c878d90b292fa8468e.
+All1498files/30links/1228dirs;29827tracked source receipts (3historical binary files/head unopened metadata-only);37providers+148copies177769212bytes freshly MD5/SHA/magic/physical exact.
+Author13new+88supportPASS; parent6FAIL7PASS. All549/39/1362fingerprints move. Ten normal actors0;44strict38PASS6approved empty-orderFAIL;22WARN/head ordered fullJSONLbyteexact. Never rename strictFAIL as PASS.
+Sealer15242/80d51d and separatefullpostexit65267/89b801actual0, exact original tool records retained. Four safe exports+allowlist/rootauth/two rootchecker stops published in1215-author/.
+Root checker v1 static locator assumed class instead of module helper; v2 compared whole stat including atime on first shared provider; both retained. v3 compares exact protected fields. No product/API/decoding replay.
+Root inspection268055 printed nested private warning examples. Exact original truncated returned container recovered privately under root-1215-output-scope-268055 (returnSHAc4af4c436cf4b732d596bb747e79cee42ae49a50f2a67b12e66a9e0e00495639); no unreturned-tail recovery claimed. Do not repeat identifiers. All9published material files screened against54private literals,0matches.
+Independent review_malawi_1209: candidate63PASS, parent57PASS6FAIL from complete2-file13new+50existing catalog; author88support separate. Original30faults+2positives retained with twoconfounded-axis seeds; two NEW isolated domain/order controls actual0 session93027/d88a00 preserve represented tuples/dtypes and reject full domains. Exact genuine plan next, held untilrootrelease.
+
+BF1188author657/runtime3d/rootauthdfca2 already publisheda58db20cd and archived31. Independent malawi_1209:14targeted+397supportPASS; actualparent7FAIL7PASS. Own raw oracle,8normal actors0/40calls,151original comparisons111PASS+40prewriter-storageFAIL (40writer/readbackPASS already inside151);4NEW parent-based empty controls2DefaultPASS2Make dtypeFAIL remain1218. Two scannerJSONLs4records/head BYTEEXACT.
+Final6providers+24copies25343300bytes/29788source/cache/footer protections passed; finalpolicy/sealer/postexit now pending, no furtherdata/test actors. Preserve156predataabsentrawdenials plus52phantomparquetdenials(source-backed effect INFERENCE, no historical per-open stacks/individualabsencelstat),16existingmkdirnoops; original capability-v1assertstop and extra16probev2replay retained.
+
+1218acquisition_1149 owns W/isa-framework-1218 branchfix/1218-typed-empty-optional-fields-20261022 and C/framework1218-empty-types. FIRSTledger d60275ada published; production/runtime HELD. Full current issue saved ownP/GH1218-CURRENT-ISSUE.json SHA6828890f5826a491901780cb0dd40a3ddba1c94472c4569aa4db1a2ed97ed9e2.
+Plan existing dtype machinery on empty-only explicitdict.type projection; preserve populated/global canonical/index/membership. Basef7 with separately bound fixedBF657 config for old/new genuine composition, no BFchain merge. Proposed6providers/4roots24copies25343300bytes/eightactors requires rootreview before runtime.
+
+PR1214CI39822550698 resolved: unit119977316030 andWindows119977316502SUCCESS, sixSKIPPEDincldata. Old inconsistent snapshot retained; fresh1214-ci-final-observed.json committedbfcb0b12f. PR1214 and1170 bodies exactreadback; final publication receipt pending.
+Fresh frontier next-ISA-frontier-recheck-20261022.json:1135stillmovement-sourcegated, no newpolicyquestion;1118Mali/Malawi mechanicalunits strongestnext after currentprereqs;821Mali2018S05has no2014Poidsfields,823Nigerrecordedsizeunitcrosswalkhold must be reconciled. Two rawblobs onlylstatmetadata, not authenticated/decoded.
+Archive31 accepted (C/ARCHIVE31-ROOT-ACCEPTANCE.json),1-31preserved. Author1215/independentBF/independent1215/new1218NOTarchived31. Prepare32onlyfrozen prefixes after exactplan approval; do notarchive live data trees.
+Allocation40255479 about26hoursleft; no warning. Stay sourcebound, private guarded runtime, no acquisition/sharedcache writes/NO_CACHE/assume flags on genuine data, no hidden budget expansions. No full30PR/corpus verdict.
+
+
+Root later checkpoint: BF1188 ROOT acceptance C/1188-INDEPENDENT-ROOT-ACCEPTANCE.json SHA0f4124979cbdcb6f0f6496f1d0d4dbf909abfd45f988601b65da3cbebb4a9aba; packet452fbe... originalchecker23412/1b6b9c0 and finaltoolchainfa8c540.
+AgentSDKvaluecaptureb10db3e8 explicitly uses NEW kind/tool envelopes, not originalharness lines. Root separately recovered all3literaloriginalcall/returnpairs03a369f1e53f47859214431a15c780c860a119c0a388a1c9d150d03a2e411c15; eachSDKvalueexact. Originalsealer6e8397/PID2106290; postexit52803/146c69/PID2111800. Postexit childselfrecordabsent, notinvented.
+Scanner object qualification: raw3028byteJSONL SHA3e395b68... onbothheads;2effd253... is comparisonDOCUMENT hash. Root stopped wrongdigestobject andsavedexactcorrection. Original151=111PASS40FAIL and fourNEWempty2PASS2MakeFAIL unchanged. Other root metadata scalar/textrepresentation stops retained; noAPI/datareplay.
+1215independent exactgenuine plan e5b26fa... sourceauthoritycfd547... released C/REVIEW-UGANDA1215-GENUINE-RELEASE.json SHAc194be1c414f83c77779a28631520a7b9ed03cec0dd6ad85c8fcb05d50137b70; addendum663413b505416faf0c62e716c299c384f4061612c922e99a28472373940adfbd approves untouchedguard993+startup3c2+fatalclosedentryba0345.
+Independent37provider freshgates actual0(97614/4363ec/PID223582),44442303bytes; no copies/API atthatcheckpoint. Next148distinct0600copies177769212bytes,4L1roots;8normalactors48calls+2scanners,64public28nativeplanned, preserveactualrawpartialbeforeunion. No oldactorreplay.
+1218phase0eightfiles/rootauthfd577; approvedminimalproduction7eb596c223055d45c4f45cffdba4f7eb6aee76e4 exactly3paths. Runtime heldpendingguard/cal/testpins. BaseW/isa-framework-1218-base=f7,newfixedBFconfigW/isa-config-Burkina_Faso-1218=657 bothownDVCtmp. Historicalphase0postexitbelongs9aaPRE-EDITonly.
+
+Sue
+
+* Earlier task -- 2026-10-22T20:22:00+00:00
+
+LSMS-ISA backlog goal remains ACTIVE; never auto-merge.
+Main is clean developmentf8; publication development067 is only a poetry.lock certifi update, not a newly certified dependency runtime.
+There are30 implementation PRs OPEN/unmerged; queue114open scope records =27PR-linked+2active+85other, including overlapping umbrellas/decisions/acquisition work.
+PR1170 has exact current30PR/114queue body readback;1216/1217 CI bodies also read back exactly.
+
+Uganda1205 is reviewed/root-accepted in PR1216, head884775a46, stacked on1207; independent65PASS, parent6FAIL27PASS;14520old yields exact plus13235recovered=27755, converted denominator31959 and explicit exclusions.
+Uganda1204 is reviewed/root-accepted in PR1217, heada417b69d7, stacked on1207;8regressions+170supporting+2synthetictransportPASS,59normalactors0;109/113strictPASS with4newempty-orderFAIL owned1215.
+Both exact-head CI unit/windows jobs pass; six other jobs includingdata-tests skipped. No full30PR/corpus verdict.
+
+User explicitly chose declaration order for1215; no permission question remains.
+Author acquisition_1149 owns W/isa-Uganda-1215, sourcef7c33dd64 vs actuala417, private C/uganda1215-order-fix.
+New13PASS+88supportingPASS; actuala4176FAIL7PASS. Guarded calibration/predata full549/39/1362allmove; source/type/science/optional-required membership unchanged.
+Root exact genuine release is C/UGANDA1215-GENUINE-RELEASE.json;37providers freshly authenticated/148distinct0600nlink1copies177769212bytes in4freshL1roots.
+Default sequence actors19976base/7929candidate terminal0; supported15630/all133761rows, candidate cold/partial/all-cache barren order exact,9coldsamplecache writes/no crop, later barren crop bytes/physical unchanged.
+All10approved normal-grid actors are now terminal0, including Make/freshwarm/Feature and both unmodified scanners26056/68469;22WARN each, not an all-pass audit.
+Full strict/ordered22record comparison actor57758/d92063 terminal0:44fullcomparisons retain38PASS and6intentional approved empty-orderFAIL; separate complete-index/name-matched-array/dtype/mask/typedattrs diagnosticsPASS, not full equality.14native/8harvest groups and10producer source sets included; ordered22WARN records typed-exact. Do not restart completed actors.
+Author diagnostic6a791a printed raw warning-example IDs; exact original call/return JSONL recovered from own harness under private output-scope-exception-6a791a, four exposed lexemes retained privately. Final aggregate export+source.diff identifier privacy scan required; never repeat those IDs.
+review_malawi_1209 now owns independent1215PHASE0 STATIC/METADATA ONLY, own detached W/isa-review-Uganda-1215=f7c and -base=a417, own C/review-Uganda-1215.
+Root prepared mounted venv/private source tmp links/prior guard3ada; imports/runtime/provider payloads held until concrete plan and gated release, finalauthor authentication required before independent genuine data.
+
+Burkina1188 author frozen657fed11a, runtime3d39096d5, actualparent3dc9d2851; finaldelta ONLY ledger+CONTENTS.
+Root authenticated967opaque entries/29788tracked sources/6providers25privatecopies26332243bytes including quarantined budget exception.
+Original398PASS60FAIL remain;56additional persisted-native storage checksPASS,4trueoptional-emptydtypeFAIL remain1218. Author16testsPASS/8normalactors0; independent data verdict still required before PR.
+Exact9safeexports/root authentication and3rootchecker stops publisheda58db20cd under1188-author/.
+Independent malawi_1209 owns W/isa-review-Burkina_Faso-1188 tested3d and -base3dc, C/review-Burkina_Faso-1188.
+Independent calibration/full549/39/1362maps,14synthetics vs trueparent7FAIL7PASS and397supportingPASS; retain156absent-source read denials,12laterIPv6binds and stopped precollection/control metadata checks.
+Root approved minimal readpolicy guard377e85... plan8c8469...; P/ROOT-DATA-READ-RELEASE.json SHA757ffa868fa6827d3a6f9f784cecf83af9b79bd041eb39046a35f51eeb6348b9.
+Fresh capability-v1(PID102895,14962/da8b9a) completed16syntheticprobes but terminal1 on an overstrict empty-directory assertion; ordinary import had created one empty dvc-cache directory.
+Before root steering to avoid probe replay arrived, capability-v2(PID113900,30470/72ab6e) repeated16probes and terminal0; preserve this extra replay explicitly, both17row logs and v1source/streams remain.
+DATA-CAPABILITY-GATE.json SHA16e9b869468f65c6d82c1d1479043f77eee55bedc463b78f37a4b5737a69c2ac binds exact newguard/release/plan/runtime/DVC/source identity. Incidental wrong0644mode expectation stop also retained; no chmod.
+Existing release now permits other3bound identity boots then fresh6providerMD5SHAphysicalmagic and24exclusivecopies25343300bytes/4normalroots; no further capability replay, get_data_file materialization or fifthroot. No original calibration/census/test/supporting replay.
+Root adapter-checker AST-list TypeError retained; v2actual0 chunk79b083. No prior payload access.
+
+Archive31 independently ROOT-ACCEPTED, C/ARCHIVE31-ROOT-ACCEPTANCE.json; rootchecker56862/chunk226e13actual0.
+Archive326181834bytes SHA1cc296cdc30b662eebe914d8e2362018d7bdeb11ca2f96bded131d996df2f115, manifest385744cfc8598ba5fc6d8e02e25fc3ac7d306bdb9b9a17def78e1e6a80c5a6d7.
+It preserves independentUg1204, static1215, BF1188author and29file root snapshot:2386included/692excluded,241parquets/585serialized operands, two raw-source-derived table pickles PRIVATE only.
+Original writer65825/a484a6/PID82005actual0, childverifier0(PIDunknown), separate postexit54540/f250ac/PID90848actual0; root full member/source-after hashes/PAX ns/mode/uid/gid/dirs/file sets/terminal chain independently checked.
+Exact tool record SHA68ef885cc6ae93b4575687114531e57a9ada3bb0df2b687b8d47694e17400dd4; archives1-31 remain preserved.
+Current1215runtime/independentBF/independent1215 prefixes are not in archive31. Do not execute old controllers/overwrite originals.
+
+Next: finish1215author grid/comparisons/freeze/rootauth, release independent1215calibration/census/synthetics after PHASE0; watch BF freshcapability then independent raw oracle/grid; implement1218empty-only dtype wiring after ledger/prior-art plan on BF source without changing populated policy; later actionable country lanes remain821/823 subject to fresh issue/docs check.
+Keep settled851/894/1134 decisions; do not re-ask. Nigeria1033 is gated by W4 unit vocabulary; science/acquisition residuals stay explicit.
+Allocation40255479 still has about27hours; no deadline warning. Preserve every original failure/qualification; no all-country/full-suite certification.
+
+Sue
+
+* Earlier task -- 2026-10-22T15:21:31.806794+00:00
+
+ISA backlog goal ACTIVE; main clean development f8. Campaign docs/isa-backlog-20261021 evidence published407a4e160c4a0a161f006e18f4a2e436b3d508ea with first12 registry, recovered archive1 authority,1194/1195 acceptances and archive26 durability.
+26 implementation PRs are open/unmerged at last exact inventory; never auto-merge.
+Accepted1194(87 strict)/1195(142 strict) safe packets and verified archive26 receipt are published. Tracker1170,1194,1195 and issue1206 bodies read back exactly; fresh26 inventory remains OPEN/unmerged. Publication metadata is publication-archive26-and-two-scopes-readback-safe.json.
+Archive26: SHA881c49c837ccef9413939c7da4cde19ed91734abe3fce16573ef9d6015a2ad60,861files,210269730bytes; writer55285 and verifier terminal0, do not restart.
+Private manifest SHAa22cf9b0cfa4373fd02c9b3cea485a2cf0c4f328e52d2fdb89bcfb2b526e0ae4; launcher eb0527913d37b35240e18f9861129b70820cb95a7641967698d14ce479a4e432; verifier e71d4e4414aca4238214f54fbdba4569c23900e1f57808875466f441882a0e80.
+It includes first12 seven packets/seals,Nigeria1192 packet/attestation and19 frozen root records. Archive27 unused; later10 plus new1194/1195 root files await it.
+
+Three workers active:
+- review_malawi_1209 owns independent review of47b3c5d76371acc457c5553ebf8adfb1859e115b vsd29a56783d08a8a647e2622150a4ee5fbdd7246a, own detached sources/private review-1209-Malawi. Author READY1c929873cd37233eb6f6872cee0fe6a9132a4c44350590e9cacd91a479b385d2/manifest1085 a6aba364589604b63a042088fac700c58389c1075ae17cb07b07b5f12f66700f; sealer88285/postexit6914 terminal0. Independent source/provider/calibration/fingerprints/tests pass; own data grid active. Source was tested dirty on d29 and receipts bind final47; preserve this distinction and all diagnostic/status-tool/hook exceptions. External providers rehashed after guarded no-data bootstrap but before copying/decoding, explicitly root accepted ordering; no replay needed.
+- acquisition_1149 NEW task: only archive1-backed Uganda1173(13products)/Mali1186(12). Private comparator-values-archive1, detached isa-review-archive1-products f8; full brief ARCHIVE1-UGANDA-MALI-REASSESSMENT-BRIEF.md. Exact182 ruling ROOT-ARCHIVE1-SAVED-CONTENT-AUTHORITY-RULING-private.json, archive SHA from old Git-pinned receipt. Worker Mali12 original groups pass; Uganda6 strict NEW stage groups plus1 complete-unused-i-domain finding and a typed-attrs difference, source-bound characterization pending; v1 metadata diagnostic stopped1 and is retained. Old holds immutable; no raw/API/test/cache replay.
+- malawi_1209 NEW task GH1210, writable isa-invalid-wave-1210 branch fix/1210-invalid-food-wave-20261022 vs detached -base f8, private framework1210-fix. Root approved early iterable validation helper reused at aggregate/public derived entry, before maintenance/valuation geo, exact __getitem__ error for first invalid, no valid Wave construction. Preserve argument precedence and None/empty/order/duplicates/generators/validGH479 behavior, no hash exclusions. Four planned paths: ledger,country.py,focusedtests,Malawi note. Full brief GH1210-INVALID-WAVE-FIX-BRIEF.md; ledger/tests/actual hashes before source data. Actual549/39/1362 hashes all move, no exclusions changed; preserve this full invalidation cost separately from valid-output equality. No1209/1204/1196/science fold-in.
+
+validation_reassess is stopped after sealing later10 registry v2: READY8851c5ef630a3770344f2cde48c91a31c65b20cde2ec20166445248b7b033950,75-entry manifest65ef324a8962cab7d998cc9441d7195080f527d19299f1bcc85b2cc1da565341. See PRIMARY-RESUME-20261022-after1202-final.md; v1 absent-manifest-count metadata stop retained. PR1202 split persisted/exact6e packets sealed and pending root. Root still owes1193 standalone/composed+integration14,1197 main/source-details,1202 and final registry acceptance. New1194/1195 root verifier v2 terminal0; v1 release-path-field stop preserved.
+Root accepted first12 registry223entries/177sources/6950static locators/55helpers, not runtime counts. Archive1 supplies182 exact content/size/mode matches with NEW physical interval only, no historical nanos/inode continuity. 1172 still has no saved pair in archive; no unsaved expectation recovery.
+Source21 remains prepared/unassigned; remainingA/B and acquisition/design residuals keep goal incomplete. Poll deadline warning at checkpoints; allocation still about32h.
+
+Next concrete actions: root-check remaining later10 sealed packets and registry, archive27 frozen later10/root1194-1195 records; review new archive-backed results and independent Malawi1209, then open its PR after acceptance. Continue1210 author/review pipeline and archive27 after frozen metadata dry run.
+
+Sue
+
+* Earlier task -- 2026-10-22T14:52:19.587362+00:00
+
+The eight-country ISA backlog goal remains ACTIVE; no implementation PR is merged.
+Main development remains clean f8d236694c26fe9e709c5548f02c70f74ea72c33.
+Campaign docs/isa-backlog-20261021 published6810683dd16f1a2e04ed34e9ba220fb51a719f4f with newly root-accepted1175/API9/precision reports; prior5e65bdf8e contains1189/1191/1180-author acceptances.
+All26 implementation PRs freshly match expected heads/bases, OPEN/unmerged.
+Four affected PR descriptions,1170 and1206 read back exactly after qualifications.
+Never auto-merge; no full26-PR suite or corpus verdict.
+
+Current workers: validation_reassess finishes later10 packets (1202 persisted278 groups plus nine exact-source NEW pure recipes terminal0, release seal pending); malawi_1209 seals author evidence; review_malawi_1209 independently reviews frozen source47b3c5d76371acc457c5553ebf8adfb1859e115b against d29a56783d08a8a647e2622150a4ee5fbdd7246a.
+Reviewer initially metadata/source/guard only until root supplies final author READY/manifest.
+Root prepared detached isa-review-Malawi-1209 and -base with private exact .dvc/tmp links; full brief is control/isa-backlog-20261021/REVIEW-MALAWI1209-BRIEF.md.
+Author56 strict Country/24 strict Feature/10 native comparisons pass, scanner163 records unchanged with2 known failures, direct Make retains1/builds4 native waves and no aggregate.
+Preserve diagnostic omitted-Make-worker runs, status-tool temporary-write history gap, ledger hook exception, guard/test stops and warning-path substitution qualifiers.
+Independent verdict still required before root acceptance/new PR.
+
+First12 critic acquisition_1149 completed and stopped.
+Its coverage12 frozen READY3b3f55718abb05e814c7eb2f9e7200d89c7ecdd6fd999b394b40c6ea4d9f4943, manifest a58e9587be0a5673e21e9600c6e9b5b39d75dc69148e4d3146a7db2eb772d075 (223 entries) await ROOT acceptance.
+PR1172/1173/1186 no-decode authority holds and all original memory gaps remain.
+Later1193 standalone/integration14,1194,1195 and1197 main/source-detail packets are sealed pending root review; pins live in critic messages/control.
+The new1175/API9 root verifier and exact twelve-role source binder both terminal0.
+Do not rerun original APIs/tests/data merely to repair artifact checkers.
+
+Archive25 is complete/durable, SHA bef3c42324c24fabbac19843d6a14d4980e5e23151b69abb5652b9fa90a39071; no archive26 exists yet.
+Next archive must cover new critic packets/root1192 and current acceptances after frozen metadata dry run, excluding runtime/raw trees while retaining selected operands-*.
+Job40255479 holds32 cores and about32h20m at checkpoint, no warning.
+Source21 remains prepared/unassigned; GH1210 and other actionable A/B issues remain, with acquisition/design residuals separate.
+
+Next concrete action: receive/verify Malawi1209 author freeze; release reviewer data/tests after authenticated READY; independently root-check sealed first12/later10 packets; archive26 and publish remaining bounded acceptances.
+Keep goal active; do not repeat terminal-zero work or reuse unverified warm caches.
+
+Sue
+
+* Earlier task -- 2026-10-22T13:16:17.876519+00:00
+
+The ISA backlog goal is ACTIVE. Main is clean development at f8d236694c26fe9e709c5548f02c70f74ea72c33; campaign branch docs/isa-backlog-20261021 records evidence for draft PR1170. There are25 open implementation PRs, all unmerged; newest PR1211 is the independently accepted code-only GH1149 repair at4f9344f42. Never auto-merge.
+Three assigned workers: review_acquisition_1149 independently reviews GH1196 ee520afeb/runtime7f4b222 (149tests pass, own cold actors running); validation_reassess owns the later10 PR cohorts plus17/18/19; acquisition_1149 owns first12 saved-evidence cohorts. Corrected object comparator only;42calibrations and root-accepted1160supplement, no all-campaign verdict. Preserve every frozen old source/artifact and missing-memory/mtime/stream qualification.
+Archive24 is fully verified and durable; public receipt private-evidence-durability-twentyfourth.json. Root archive handles80748/80220 are terminal0; do not restart them. Next archive25 is unused. PR1170 and issue1196 live bodies now exactly match the published8683af50d evidence snapshot; publication-25-final-safe.json pins their readbacks. Check live GitHub and gitlog before resuming. Source21 remains prepared/unassigned with actualNigerCROP hash/coverage trap. RemainingA/B bugs and design/acquisition issues keep goal incomplete. The older release-complete/idle notes below are historical, not the current lifecycle state.
+
+Sue
+
 
 * v0.16.0 published and verified -- 2026-10-21
 
@@ -653,3 +878,857 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 - Default branch is master: "Closes #N" never fires on a development merge -- close issues by hand with the PR cited.
 
 -- Sue
+
+* 2026-10-21 -- Active LSMS-ISA country backlog campaign
+
+Sue, GPT-6. The goal remains ACTIVE; actionable country backlog work continues.
+Main development is clean at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+Report branch =docs/isa-backlog-20261021=, previous checkpoint =075e067129ae103ea1ad2991aa1cf422172cf3a8=; commit this current note with the next checkpoint.
+Campaign draft PR #1170: inventory, exact residuals, reconciliation, independent reviews and source-safe evidence.
+The detailed current records are =slurm_logs/isa_backlog_2026-10-21/{STATUS.org,country-lanes.json,reconciliation.json}=.
+
+** Public PRs and source validation
+
+Sixteen independently reviewed implementation PRs remain open, unmerged and individually mergeable at the latest live checkpoint recorded in =public-pr-checkpoint-sixteen.json=.
+All sixteen latest CI runs passed, including Burkina1194/run39683305731 and shared1195/run39685546468. Sixteen implementation PRs are independently reviewed/open/mergeable; none merged.
+PRs: #1172, #1173, #1175, #1176, #1178, #1180, #1181, #1182, #1185, #1186, #1189, #1191, #1192, #1193 and #1194, plus #1195.
+Exact heads and bases are in =public-pr-checkpoint-sixteen.json=; earlier snapshots remain historical.
+#1178 is stacked on #1172 and #1193 on #1175; retarget each only after a human merges its parent.
+No public PR is automatically merged.
+
+Validation-only branch =isa/integration-20261021= is now clean and FROZEN at =d527249ba9d3eaebf190a075e39043e36d2dbb85= for bounded global16 shared-handler coexistence review. Global15 independently PASSED at4227 and freeze released before this merge.
+Its previous653f77b1437886138f6b29078dcfb6108bf1e9c6 global14 review PASSED and released before the new merge.
+The public validation branch now names validated4227; all earlier ancestor pins are public. Do not moved527 until the current reviewer releases it.
+Global13 PASS:60tests,5228source gains, all old native/raw/Country/both Feature full payloads and attrs exact, current Niger1088 exact, all6scanner records matched; zero writes across27files/root.
+Root read final global14 report/proof, pushed653f and updated PR1193 body, then clean-merged PR1194 into4227 after release. All prior1123 non-doc changes remain exact; no public implementation PR was merged. Do not attribute earlier PASS to4227.
+Its twelve-change Uganda increment passed 25 scoped plus 41 supporting cases, zero skips, and two API processes each matching nine complete frames and two attrition matrices to independent f8/#1191 references.
+Six stale required prerequisites rebuilt normally from 55 held source blobs; all eight required tables then had current hashes and eight-wave manifests.
+Warm API/test serving changed none of the 64 scoped parquets; all 14,992 tracked paths, modes, HEAD and clean status remained exact.
+Global14 PASS:129tests, full both-parent frames/attrs, all235pair sums/11075organic/Nfullframe/Uganda exact,15scanner records11exact+4expectedcounts. New dedicated default Feature cold returns were serialized at this new source pin; earlier fd235 limitation is preserved. Warm reads write zero of90files in each of4private roots; all392physical-copy/five frozen trees/970prior evidence receipts exact. Do not relabel this bounded proof as a full corpus rebuild.
+Safe exports: =integration/uganda-twelve-review/=; private evidence: =control/isa-backlog-20261021/integration/uganda-twelve-review/=.
+
+Earlier completed proofs retain their exact pins:
+- Six-change =5906e8715=: 266 tests, zero skips; exec23070.
+- Eight-change =dd0dddcb0=: credential-free full selection 4,961 passed / 4,455 skipped, zero failures/errors; exec28550.
+- Nine-change =483b4aa11=: 656 tests across 18 files, zero skips; exec62910; exactly two all-country canonical corpus cases explicitly deselected.
+- The same nine-change head: nine Country calls and four Features match complete independent frames/attrs; fresh process writes zero of 1,519 parquets.
+- Ten-change =bbdcf3457=: 31 tests, three Country calls and one Feature match full references; warm writes zero of 1,519 parquets; exec59069.
+- Eleven-change =7886f7ece=: twenty complete reference frames per process, thirteen focused tests, four explicit deselections; warm writes zero of 1,519 parquets.
+The eleven-change normal build changed exactly ten Burkina parquets, leaving 1,509 others and all comparator outputs exact.
+All failed private harness/staging attempts and scope corrections remain preserved in the corresponding evidence; they are not product failures or passing tests.
+The initial ten-change Org marker mistake was corrected by =bbdcf3457= without changing runtime PRs; both commits are preserved.
+
+** Three active workers and next actions
+
+The concurrency limit is root plus three workers; do not dispatch a fourth worker.
+
+- =review_nigeria_1034= now WRITES only =isa-framework-1078-fix=, branch =fix/1078-food-producer-provenance-20261021= atf8; private =framework1078-fix/=.
+  Root prepared exact private ignored DVCtmp -> dvc-tmp, receipt root-metadata-preparation.json. FIRST full Uganda notes/tasks (priorfull reading only after byteidentity), name actual idiosyncrasies/quote contradictions. Ledger FIRST695b57970 published before code; rootread complete anchored ledger. Sue/GPT6 attribution and FSpublished ordinary commits.
+  Root read full frozen DIAGNOSIS/PROPOSAL/ledger/proof/manifest and source/registry code. Approved default grab_data(request)->DataFrame unchanged with private opt-in actual per-result origin consumed by Wave.food_acquired; no public attrs/global mutable last-origin. Cover actual YAML-cache/script-read/postMake/YAMLmaterialized/memory/empty/failure returns, never a later/earlier exists/config guess. Legitimate non-parquet numeric coercion/columns/groupkeys/sum/first unchanged; no global min_count/locks/eviction suppression/scientific change.
+  Approved food-scoped build_transform tag on currently unversioned Wave.food_acquired, plus normal-gate healing of NEW physical copies of naturally corrupted f8 roots (originals immutable). grab_data is already ALL-table-tagged: origin plumbing can invalidate broadly. Measure actual549/39/relevantwave hashes from distinct immutable source processes and report promptly; do not hide cost with registry exclusions/schema lever. No wholecorpus rebuild authorized.
+  Repeat actual real-eviction two-process regression with actual tests/writevalues plus source/fullframe/fullattrs/defaultderived/Feature/serial-order/freshwarm controls. Later1062composition needs own exactsource proof; f8writer does not prove it. Do not repeat650second FCT baseline unnecessarily; no FDC/nutrition keyprinting/acquisition.
+  Completed diagnosis ORIGINAL =Uganda/1078/= and both source snapshots are frozen/quiescent.12tests0skip,31heldsources/341physicalcopies/directDTA9missing operand oracle, allotherfullframes exact. Bothf8/1062 actual currenthash/fullcoverage corruption persists ordinarywarm0writes/57files. FCT fourcalls/head correctfoodwrites6vs1,hashless3vs0; no FDC/network. Original historical fullsuite writer/interleaving unidentified. Safe exports =1078-Uganda-diagnosis/= and liveissue updated. Full traces/IDs/frames remain private.
+- =mali_lane= performs bounded global16 shared-handler coexistence at frozen d527 against actualglobal15 in =isa-baseline-fifteen-framework=.
+  Root prepared new private =integration/framework-sixteen-review/= and ignored control DVCtmp -> exactprivate baseline-dvc-tmp; receipt root-metadata-preparation.json. Candidate existingreal tmp unchanged, allother source writes denied, normal FileExistsError for exclusive existing btime creates.
+  Exact7-path union verified: all6new blobs equal reviewedbfbb; removing exactly9added production lines reconstructs ENTIREactual15country.py. Commit d527 FSpublished, PUBLICvalidation branch still4227 until ownPASS.
+  FIRST fullEt/Ugnotes/tasks with actualidiosyncrasies/quotedcontradictions; priorfull readings only afterexactblobverification. Read1081author/indie/ledger/skills. Candidate235selection+1077jointtests, actual15counterfactual73cases, composed handler/Feature faultcontrols and68completehealthyframes/fullattrs with currency args separately matched.
+  Initial full60-file gate stopped BEFORE all APIs/tests:42current inputs available,18Etfiles unavailable/stale. Original PREREQUISITE-BLOCK.json retained; sample-wave tier initialYAMLdescription corrected after source inspection toscript-path. No dependent consumers used the failed gate. Root explicitly authorized narrow held-L1 source-backed staging/builds for Etfood_acquired/roster/sample/cluster only in NEW =isa-framework16-Ethiopia-prereq= detached4227 and private =integration/framework-sixteen-Ethiopia-prereq/=, with own ignored privateDVCtmp. Every needed held raw blob must pass sidecarMD5+copySHA/mode/mtime terminally; no acquisition or otherfeature/country build. Preserve all earlier roots. Freeze new checkout-current requiredL2 files then physicalcopy into two reviewroots, rerun complete60-file terminal gate before dependent probes. Report this source-backed staging extension explicitly, not purelywarm proof. Freshprocess warm0writes/scopedscanner/currentmetadata; no broad549/fullsuite/bypass/stamps.
+  Completed global15 is PASS57tests/35fullframes perprocess/4cold+warmprocesses, all4180GPS+183inputgains preserved,31parquetmetadata/root(12country+12YAML+7legithashless),19scannerwarnsexact,0warmwrites,nine sourcetrees/sixprior evidence rootsunchanged/zero consumers. RootreadfinalFULLproof, published4227public andupdated1194body. Safe =integration/burkina-fifteen-review/=.
+- =niger_lane= now performs READ-ONLY Nigeria2-boundary #1135 counts in =isa-Nigeria-1135=, branch =diagnose/1135-nigeria-boundary-counts-20261021= atf8; private =framework1135-Nigeria-counts/=.
+  Root prepared ignored exactprivate DVCtmp and root-metadata-preparation.json. Full Nigeria notes/tasks first (prior complete reading only after blobidentity). No tracked/ref/GitHub writes or sourcebuild/acquisition; held current sample/panel cache plus actualdeclared W3/W4/W5covers only after terminalMD5/SHA/mode/mtime/coverage gate.
+  Measure currentserved uniqueunambiguous household N, genuinely movement-separated changed numeratorR and distinct earlier real clusterK. Prove ea0/moved sentinel completeness from actualcode/source/instrument evidence; no copying historical1493/10 or5067/112, first-wins ambiguity, pair-count-as-cluster or inventedunknownzero. Ifunidentifiable, report exactbounds/evidence carrier/heldstatus. Fullpairtables/IDs PRIVATE, warm0writes andfreeze before safeaggregate release.
+  Prior =framework1135-diagnosis/= is COMPLETE/frozen/quiescent:97synthetic tests/7data deselections,4negative+1preservation,119policy comparisons exact;all14880tracked bytes/modes/HEADclean exact. Rootread fullDIAGNOSIS/PROPOSAL/validation and exported allowlisted safe reports. No implementation yet; do not create all-unavailable formatter-only PR.
+  Root found original1137 H2/H3 scripts/results at durable backlog_fix_local_40139031_1019/793-942-sampling-r1fix/scratch;5physicalverified copies andreceipt in originaldiagnosis/root-historical-1137, contextroot-1137-context.json. Exact12historicalN/prefixP counts held, noK; prefix predicate excludes only moved- sentinel, not all Tanzanian/Ugandan movers. Underlying source absence NOTcensused/claimed. SettledH2SPAN/H3no-threshold not reopened;other10 measurement residuals explicit.
+  Completed1081 independent review remains PASS/quiescent in =review-1081/=, public1195/allCIgreen; do not mutate those roots.
+
+Malawi #1111 independent standalone a935 PASSED101 tests after deleting five test lines that pinned the excluded organic defect; production remains exact9b.
+Root-owned composition =fd2356ee94ecfc7448527dc0085b9e4d60368049= in =isa-Malawi-1111-composed= independently PASSED129 tests, all235source pair sums, both parent-based full frames/attrs, all11075organic answers,15scanner records and zero warm writes across17parquets/root.
+It is public stacked partial PR1193, branch =fix/1111-malawi-kg-on-organic-20261021= on actual organic base =fix/1109-malawi-organic-quantity-v2-20261021= (PR1175).
+Original standalone author/review artifacts remain unchanged; no permanent tests pin the excluded organic bug.
+Explicit provenance limit: first cold public Feature was not serialized after a private currency=None reference/default argument mismatch; all cold raw frames and passed Country proof persist, subsequent full default Feature uses fresh matched de9 control from unchanged cold caches, followed by independent fresh-process warm proof.
+Safe exports =review-1111-Malawi-v2/= and =review-1111-Malawi-composition/=; matching private roots are quiescent, not active.
+
+Idle writers =burkina_lane= and =review_malawi_1109= must leave frozen source/evidence unchanged. niger_lane and mali_lane are active independent reviewers as above.
+The original frozen P2 shared diagnosis for #1081 remains in f8 worktree =isa-framework-1081=, branch =fix/1081-derived-categorical-errors-20261021=.
+Live issue/zero comments and 100 recent PRs were checked; no matching implementation.
+Private =framework1081-queued-context.json= records the derived food/roster handlers and related CategoricalKeyDeclarationError question.
+The read-only diagnosis is complete and root approved the explicit minimal three-type correction; preserve UnitsUnavailable default fall-through and unrelated legacy handling, and never use the original issue's suggested stash-probe.
+
+Shared #1135 is actively dispatched read-only as above; historical queued context is retained. No code is approved yet. #1078 remains active with original historical evidence preserved read-only.
+
+** Source boundaries and residuals
+
+Malawi #1111 is ONLY the questionnaire-covered 2010/2019 correction: label already selected enumerator TOTAL KG quantities before the existing additive aggregation.
+No numeric rescale, new application axis, reducer/eligibility/ID/factor/share change, or 2013/2016 physical-unit claim.
+Literal C4 remains: 2013 questionnaire/DDI unheld; 2016 has no agriculture-questionnaire sidecar.
+Independent source oracle confirms 33,193 selected slots / 1,765,763.95 kg and exactly 235 newly coalesced positive, affirmative same-source pairs (51 + 184), with every contribution preserved.
+Full f8 Country rows are 180,184 to 179,949; 169,109 is the nonorganic subset, not the total.
+Standalone f8 organic rows remain unchanged; composition must preserve de9's 11,068 positive reported quantities plus seven missing quantities and its Applied semantics.
+All 26 Malawi API hashes change (22 nonderived + four derived), while 523 other-country entries and 39 framework fingerprints remain exact.
+The earlier narrower-footprint diagnosis hypothesis is retained with an additive correction, not silently rewritten.
+Sample-only cold builds both return 57,118 exact rows and eighteen identical full warning records; main six warning events and ten source bindings are distinct counts.
+Malawi #1118 truly missing units, three unlisted seed codes, #1174 retention, #1106 nutrient composition and #1190 seed-purchase units remain separate.
+
+Nigeria #1095 restores ten exact community-only aliases; global harvest, food/input paths, size rescue/deletion and first aggregation remain unchanged.
+Reporting follows metric rescue to avoid falsely naming 6,635 already rescued records.
+Unknown future labels are accurately warned then dropped under existing eligibility; this is partial work, not fulfillment of literal retention.
+Preserve its explicit Tier C fallback/retention residual when reconciling the live issue.
+Legacy W1/W2 CSVs keep CRLF bytes; verify DVC md5-dos2unix keys using existing machinery and retain raw SHA/MD5 receipts.
+Held panel-ID cover prerequisites are required even with preload_panel_ids=False; finish preparation before dependent probes.
+
+Burkina #1187 owns unlabelled code21 authority, #1188 gift/purchase routing, #1148 source-status contradictions and pending approved #851 integration; no food-row interview denominator is justified.
+Ethiopia #1183 purchase answers and #1184 all-missing sums remain separate; Tanzania's existing mixed-unit groups remain #637.
+Mali #839's false food-shape comment is queued for the next substantive Mali configuration task; the Tanzania quantity note is already corrected.
+Initial triage remains immutable: 156 open issues / 97 ISA references including umbrellas; only duplicate #1089 closed, no implementation PR merged.
+Existing human rulings such as #851/#894/#1134 are binding; do not ask again.
+
+** Runtime, durability and turnover
+
+Node n0071.savio3, job40255479: 32 allocated cores, 93 GiB, about fifty hours remained at the last check.
+Use mounted image generation20261019T221223Z at =/local/job40255479/venv_img/bin/python=; no writable master/new venv.
+Assert exact cwd/PYTHONPATH/countries paths; numeric, build and Make threads one, bounded loadfile workers.
+Root explicitly prepared only ignored countries/.dvc/tmp symlinks to exact owner-only private targets for the BF diagnosis/writer, Malawi composition, global12 CP control and global13 Malawi control; guards permit only those resolved metadata paths and preserve normal FileExistsError on existing btime. DVC_SITE_CACHE_DIR is private; this is not a read-gate or cache/source bypass.
+Only physical private L1/L2 copies; no source acquisition, DVC CLI, shared-cache write/clear/promotion, assumed-fresh/manual stamps/read-gate bypass or in-tree payload.
+Private task root =/local/job40255479/control/isa-backlog-20261021/=; relative private evidence paths above are under that root.
+Full frames, IDs, warnings and logs stay private; safe aggregate exports only enter Git.
+The 1,519 manifest-pinned release seed files remain unchanged; sixteen unmanifested raw files are excluded.
+Leave the earlier gpg-agent with shared homedir unmodified; its private-termination guard correctly refused it.
+
+Eighteen completed review roots are durably archived, with 957 verified files in 153,526,829 compressed bytes.
+Archive =/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-reviews-20h45.tar.gz=.
+SHA256 =e828a78dca5b82e9863d35700ef408f475e5693c2742286c1a8ce1acb3007858=; private manifest and launcher are beside it, with owner-only permissions and inherited setgid retained.
+All archived contents and unchanged source receipts were checked; duplicate caches/raw sources are excluded.
+A SECOND verified owner-only archive now includes Uganda twelve-change, standalone Malawi1111 and Nigeria1095 author diagnostics:1,236files/10roots,185,096,692bytes.
+Path =quiescent-followup-21h00.tar.gz= in the same durable directory; SHA256 =4a9bc56d4d307d2da0434f36b06d026bee8990fc4e97eb1ab218e7252d74776a=.
+All archive contents/source receipts were checked. Root sets overlap; counts are not unique combined totals.
+Independent Nigeria1095, Malawi composition, BF1058 diagnosis/newwriter and A FOURTH verified archive is complete: quiescent-followup-21h55.tar.gz, SHA256 db34d7cb1537f35ca2e2ef8e02540cf2c2bfec2bcf30066677c2fb508380d83e,74743101compressed bytes,650files/4roots (global13/global14 reviews,framework1081diagnosis,BF1058author). Source receipts/archivecontents exact; launcher durably copied0600, SHA42d2be1683430188ca77520f1290010ab09a4f112204b631e4d65a8b92672708. Root session25095 completed successfully and is closed. See private-evidence-durability-fourth.json. New BF independent/global15, framework1081 finalauthor/independent and Uganda1078 roots still need a later quiescent snapshot; do not claim they are in this archive.
+A THIRD verified archive =quiescent-followup-21h30.tar.gz= adds312files/3roots (independent Nigeria1095, Malawi composition, BF1058 diagnosis),56,655,122bytes, SHA256 =efacc5ffc55263a0e69010c8113905e932650b23036b6c698a93a5c4fd689bca=.
+All source receipts and archive contents exact; launcher is durably copied0600. See =private-evidence-durability-third.json=.
+See =private-evidence-durability*.json= for safe aggregate receipts.
+
+Ordinary commits hook-publish to the shared filesystem origin; verify SUCODER: published.
+For merges use --no-commit then an ordinary attributed commit, which does publish; never manually edit the shared mirror or force-push.
+Poll the actual per-job deadline path at natural checkpoints and commit a handoff before turnover; no warning was present at the last check.
+
+Sue
+
+** Fifth private archive -- 2026-10-21
+
+quiescent-followup-22h30.tar.gz preserves1,518files/4released roots (independentBF1058/global15/framework1081author+review),174,537,777bytes, SHA256 =d1e70973e78908579d8cbe9bf687ec3ac123e65f4ba5976e9cb4ec6737187c29=. Source-after and every archive member verified. Durable launcher0600/SHA=3f9d87019e72c4552e355dcac0872289f3e08f3cfe37a9ec1117ac1ca1909ff7. Root session68120 completed successfully/closed. Safe receipt =private-evidence-durability-fifth.json=. No active1078/global16/1135 evidence is included. Root sets overlap prior archives; never sum as unique files.
+
+** Ethiopia prerequisite extension completed -- 2026-10-21
+
+Mali reviewer completed four normal held-source Et table builds atactual15:20physicalL1source receipts,24companions (4country current/fullcoverage,10YAMLcurrent,10legithashless sample/food). New source checkoutbytes/modes/HEADclean unchanged, zero consumers; freshwarm0cachewrites. Food326456/roster126376 fullframes/attrs matchhealthyrefs; sample25914/clusters2168. A privatepostbuild harness stop used HC25528 for sample; corrected expectation only, no source/data edits. Review now reruns complete60file terminal gate before GLOBAL16 probes; no passing result inherited.
+
+** Current gate and hash-cost facts -- 2026-10-21
+
+Global16 complete60-file physical/current gate PASSED beforeprobes. Candidate354tests0skip(235categoricalselection+119nonfinitekey cases) passed. Actual15healthy17frames andcandidate166handler/context controls active; NOFINALPASSyet.
+Ug1078 working candidate pre-rebuild scope ACTUALLY549/549countryAPI,39/39framework,1362/1362declared wave-table hashes changed; registrygains onlyWave.food_acquired. No exclusions/schema changes or corpusrebuild. Rootacknowledged cost and constrained continuingwork to approved scopedUg validation; finalimmutable source/runtimecommit/receipts and independentassessment remain required. Initial14route tests13pass/1fixture setupstop usedlegitimatehashlesscache; correctedsetup uses actuallystale taggedcache, rerunpending.
+A SIXTH verified private archive, quiescent-followup-22h40.tar.gz, preserves1,292files/3released roots (Ug1078diagnosis,original1135diagnosis,Etprereqstaging),307472195bytes,SHA256=b31e587207904057b80731f8d9717a7dc3b2d2fb31520e7985d43cb7de1010c3. Sourceafter/everymember verified; launcher0600SHA=eb9268b8916494fab584314785db4456de55e5eb3c812c67d3d514524fbf3a27. Root session99564SUCCESS/CLOSED. Active1078writer/global16review/Nigeria1135counts are NOTincluded. Safe receiptprivate-evidence-durability-sixth.json.
+
+
+** Latest checkpoint -- 2026-10-21 23:05 UTC
+
+This section supersedes older active-state checkpoints above; earlier proof pins and failed logs remain historical.
+Campaign source before this checkpoint=e5565b6;16public implementation PRs/allCIgreen/none merged. Global16 d527 is independently PASS354tests0skip and now PUBLIC; complete68fullframes/fullattrs,166handlers/head+72causecontrols,398rawscannerrecords byteexact (SHAde1d1f6f0862a73173a9fee75ff87ec0d6ac8551aa4ac0caec8ea3d151d47dc2),zero warmwrites,14source/12priorroots unchanged,zero consumers/freeze released. Root verified complete rawfiles and updatedPR1195body. Safeexports integration/framework-sixteen-review/. Earlier15control remains4227.
+
+Active workers are review_nigeria_1034(author1078),niger_lane(independent1078),mali_lane(readonlyMali1091). Slots full; no other active review roots may be mutated.
+1078 runtimea4c92cc is cleanFSpublished/FROZEN; docs/ledger descendants may change only after runtime/testblob+modes equality. Author64targetedPASS, ordinarynewhash naturally heals genuinebaselinecorruptcache/fullframe/fullattrs/all9missingcells/current8wavecoverage;26baseline-candidate fullframes at matchedcold/warm stages,6actualtestexecs/racebothwriters correct,217rawscannerrecordsexact. Finaldocs/ledger/quiescence/pin pending. Broadactual549API/39framework/1362declaredwave-table changed;2109nonnull among2139API-wavepairs+30Noneboth. No excludedfingerprint/schema lever or corpusrebuild. NigerfoodcoldwarmuIndexStringDtype na_value pd.NA->floatNaN presentBOTHf8/a4; strict stops retained, residual draft/live dedup pending; do notclaim coldwarm dtypeexact.
+Independent1078 prephase at exactimmutablea4: ONEfullcredentialfree suite terminal4689pass4453skip9fail0error138.82s,all9existing panel persistence tests deliberatelyutime trackedpanel_ids.py deniedby strictsourceguard. No product/newtestfailure,0dataparquets/sourcebytes/modes/index/head/clean exact. Preserve entirefailedfullrun; separate nine-case exact physicalprivateconfig rerun being prepared withoutguardweakening or changingtestassertions. No fullsuitePASSclaim. Sourcephase only after finalauthorpin/evidencequiescence. No1078PRyet.
+
+Nigeria1135followup is COMPLETE/frozen/quiescent atf8, notactive. Safeexports framework1135-Nigeria-counts/ preserve7reports/sourceexact withROOT-QUALIFICATIONS.org: initialvalidationfalseboolean marks initialcaptureuncompared, warmstrictfullframes/fullattrspass; companionoracle sort_index comparesvalues/keys/dtypes, not originalorder/fullattrs. FourheldcoverMD5gates/6manifestparquets/current sample10wavecoverage/6normalAPIcalls/freshwarm14filesexact/14880trackedexact/zero consumers. Prefix10/1493and112/5067reproduce, W5P112=86reported-original+6closemovers+20unknown; ea0 sentinel incomplete. Kphysical/intervalR unverified; conditional86..106notliteralall-moverR. FiveinstrumentPDFs absentbothheldlayouts notupstreamabsence. Other10boundaries residual. RootupdatedLIVE1135title/body at23:02UTC tosettledimplementation+measurement; historicalrequest/rulingpreserved,no policyreopened/no partialformatterapproved.
+
+Mali1091 read-only at reviewed822aba in isa-Mali-1091; FIRSTfullnotes/tasks,788retirementruling/1086acceptedgrain reviewed. TwoheldpassagesMD5/copygatesSUCCESS beforeAPIs. Bothbaselinebackends155931payloadexact; strictattrs stop preserved: Make lacks only id_converted=True, native/raw legacy8leveli==v countryshim/hashless/no manifest versus authoritative7level/current/fullcoverage. No strippingattrs; validsinglewave andunsupported2017/18/21subsetprobes running. Minimalproposal removes countrycommunity_prices.py andonlyexplicitvarrule/comment; retainwavebuilders/materialize:make/acceptedgrain/science. No codeapprovedyet. Niger/Tanzaniaremain1091residual. Existing stale Makecomment no-grappe contradictsscheme/docs, recordratherthansilentlyassume.
+
+Durablearchives1..6 remain exact. Completedglobal16 and Nigeriacountroots needarchive7later; active1078/Mali1091mustnotbesnapshottedasquiescent. Poll actual per-jobdeadlinewarning; about48h remained,no warning. Main development remainsf8clean. No root yieldedexecsessions outstanding atthischeckpoint. Commit/publish thisreport thenupdatePR1170body. Next: review concreteMali proposal, waitauthor1078finalfreeze+indie sourceproof, dedup/file exactNigerdtype residual once independentlyverified. Goalactive,manyA/Bitemsremain; no completion/block merelyforcheckpoint.
+
+Sue
+
+1078 independent prephase addendum23:05UTC: SAME9unchanged persistence tests PASS9/9zero skip on36physical privateconfig operands via supported LSMS_COUNTRIES_ROOT override/cache_clear beforecollection,packagea4exact. No testmonkeypatch/sourceguardweakening;source/privatebytes+modes exact. Intentional testfloat-timestamp restoration rounds private-scriptmtimes1..109ns,recorded.0dataParquets/network attempts. Originalfull4689/4453/9 failedisolation selection preserved;no fullsuitePASSclaim. Finalauthorpin/freeze stillpending.
+
+Latest state23:08UTC: Author1078 FINALclean/FSpublished/quiescent d46795c303e2409ddb8ed5e4c62efca4e87ca347; root Git-tree independently verified librarycc18a441cca4c69a24c2f24d513f4f23c3937d86/tests9b685fc972bbbcec464bf6176963e4f0773ba674 exacta4 includingmodes. READY1288privatefilesmanifestSHAdeaffb7411f164ece2316aa393bf4f51cdab617e9fdf607f2360b9ba76421b43,zero consumers. RootreadFULLreport/draft/residual/READY; niger_lane approvedindependentNEWphysical source/healing/race/scanner/warmphase, immutablea4 runtime carryplusfinaldocs equivalence, no fullsuite repeat. NoPASS/PRyet.
+Newthirdworker review_nigeria_1034 now READONLYUg849 atf8isa-Uganda-849/privateUganda/849 withrootignoredDVCtmp. Rootverified967/972merged/readissuecomments/currentcolmap; fivewaves2010/11/13/15/19source fields/currentcore screens/precedence/no reported_total/perwave10/20%agreement/kgmovement/coverage/unitdispersion/Qty==factor>250 diagnostics,2018healthycontrol. Onlyprivate deepcopied colmap passedtoexistingpurehelper counterfactual, notmoduleglobalmonkeypatch/configpromotion;actualordinarybaseline required. No tracked/Git/ref/GHwrites or sourceacq/bypass;all1078roots frozen. Fullnotes/tasks FIRSTwithexactblobcarry/nameidiosyncrasies/quotecontradictions. No implementationapprovedyet.
+Archive7quiescent-followup-23h10.tar.gz SUCCESSrootexec34338CLOSED;741files/2roots(global16,Nigeriacounts),99705731bytes,SHA67ec653ac78f5bcfbf90f92835e3289d71190fcfbed45cf3e224812e6d97308b. Input729055082bytes/11exclusions,sourceafter/everymemberverified. Durablelauncher0600/SHA63fb5db675a2afdbc6d5c37821b890820d8545b33a0b3869819f59e5bf8f4ead; safe receiptprivate-evidence-durability-seventh.json. Active1078author/indie/Mali1091/Ug849NOTincluded; allarchives1..7counts overlap. No rootrunningexecsessions.
+
+Latest23:13UTC: reportcheckpoint2598fe126ca085f8e862724a108966df91e62ab6FSpublished/GHpushed;PR1170bodyupdated23:09Z. Bothrootcommitsession67489 andGithubpush55705SUCCESS/CLOSED. Mainf8/campaigndocsstatuscleanatcheckpoint; no publicimplementationmerge.
+Mali1091READONLYCOMPLETEaba,proofreleased23:11:33/zero consumers;12cold6warm,all155931native/oldobs3exact;wrongMakeunsupported155931andsoleid_converted attr omission measured/strictstopretained. RootFULLreadDIAGNOSIS/PROPOSAL/TESTPLAN/LEDGERDRAFT/REPRODUCE/validation/proof andactualscriptMake/scheme; APPROVEDnewwriter isa-Mali-1091-fix branchfix/1091-mali-community-builder-20261021 onaba/privateMali/1091-fix exactignoredDVCtmp prepared23:12:24. mali_lane writesLEDGERFIRST thenonlydeletecountryconcat+explicitvarrule/recipe+boundedcomments;retainwave102-103/script,scheme/materialize:make,finalizer/core/science. Newtests,oldnegativecontrols/fullsource155931/rawlayers/fullattrs/defaultMake/subset coldpopulatedwarm/CLIactualMake/FeatureNiger/scanner/actual549/39scope BEFOREsourcebuild. Prediction24Mali/525other/39same mustmeasure;unexpectedstop. Correctunsupportedempties/publicMakefullDEFAULTattrs inclid_converted andnoCOUNTRYwrite are explicitintendedchanges. NoGHwrites/PRuntilrootindiePASS;futureSTACKbasePR1180actualfix/822-mali-community-readings-20261021. OtherNiger/Tz1091remain;issue notclosed/narrowedyet. Olddiag7safeexports+manifest now1091-Mali-diagnosis/sourceexact,rawprivate.
+Ug849prep43declaredheldsources verifiedMD5/SHA/size/mode/mtime,129physicalcopies/3roots,0gaps. Ordinarybaselinecropcoldactive;12proposedfactor-onlycolmapkeys passedpurehelperprivately, no modulemutation/promotion. Preserve2015Value_soldguard/x100/sourcecoalescenceconflictcounts. All1078rootsimmutable. Independent1078 own47sources/1288authorfiles verified,actual549/39/1362scope independentlyconfirmed, ordinarynineNaNhealing completefullframe/attrs,26coldframecontrolsfinishing; no protectedwrite/IPattempts. No finalPASSyet; no re-fullsuite. Rootqueued218Malawi2deadregistrationscontext forlaterworker (notdispatched), remainingnonISA/frameworkscopeexplicit.
+
+
+** Source findings checkpoint -- 2026-10-21 23:25 UTC
+
+Mali writer ledger337f8432193902c0d6f3d6251ff911606d0955b6 published first.
+Its working production allowlist remains exact; actual census before source rebuild moves24Mali hashes, leaves525other hashes/39framework fingerprints exact.
+Niger full notes1557lines read; held comparator gate/private preparation precedes API/tests.
+No candidate PASS yet.
+
+Ug849 readonly scenario preserves133331rows/allnonfactor payload and exposes115raw positive-factor-conflict groups;113have multiple screened factors,112fully comparable known-unit/condition/allvalid operands.
+Their first-factor-times-summedQuantity versus per-source contribution sums differ net+10710.9000002kg/absolute26602.0999998kg.
+The2018already-wired6groups separately have-2090kg pre-existing net discrepancy.
+Whole12-key private projection29.0933M->42.0351Mkg is not approved API output or a completed fix.
+Root requires full perwave source/slot/key/coverage/dispersion/screen counts, frozen final report, concrete native-grain follow-up; no averaging/unknown-factor masking/reported_total/newaxis implementation approved.
+Live prior-art/dedup context queued-849-carrier-prior-art.json includes637/current859ruling; no exact carrier owner found, don't silently extend original637tail.
+
+Independent1078 adds its own actual f8 race counterfactual: both tests pass, bad A reproduces exact historical9zeros; candidate bothwriters fullframe/attrs correct and two serial orders pass.
+All26cold/warm matched pairs and73-file warm0writes hold, BOTHsource Niger strictdtype residual reproduced;217rawscannerrecords match.
+Stronger scanner-zero-write assertion stopped because grid normally adds12previouslyabsent wave cluster_features caches/head (8Ug+4Niger) from terminally gated held sources, all73priorfiles unchanged.
+Root approved finishing exact new12payload/fullattrs/currenthash receipts under same scoped prerequisite authority; preserve original harness stop, do NOTclaim scannerzero-write or repeat fullsuite.
+Final independent verdict/quiescence still pending.
+
+Root public-instrument research is separate from every frozen1135/other evidence root: root-public-instruments-1135/.
+Four official public PDFs fetched without microdata/authentication;3match declared DVC MD5 exactly (W4questionnaire da641e8..., W5questionnaire c096dce..., W5manual4c0f81...).
+Extra W4manual cae7dc8... is official but undeclared here.
+Web PDF reader refused octet-stream; local pdftotext unavailable (preserved tool stop), so root fetched pure-Python pypdf6.21.2 wheel into PRIVATE pdf-reader only, verified PyPI wheel SHA1d44d1a3a200f25062adff0085b02040e4646431ac2ccac22e42679e91466084, no venv/dependency edit.
+PDF extraction session82643 completed SUCCESS/CLOSED. Full texts remain private; rotated-table extraction warnings qualify unrelated questionnaire pages, the relevant manual cover text is explicit.
+Read W4manualpp24/25,W5pp5/19/20/21/22/23 and question covers. Prior-wave/listing dwelling language supports nonmovement interpretation but does not establish exact prefilled round/full movement history or resolve20unknown statuses/allphysicalK. W5 has old date examples and apparently inconsistent routing wording, retained as caution against treating manual as a complete numeric oracle.
+Safe exports1135-public-instruments/PUBLIC-INSTRUMENTS.org,public-proof.json,pdf-reader-receipt.json. No PDFs/text/thirdparty code in Git, no old diagnosis/cache/source changes.
+LIVE1135 follow-up appended23:23:23UTC with direct primary links, original ruling/historicalbody preserved; no numeric records/formatter implementation approved.
+No root running exec sessions at this checkpoint.
+
+Sue
+
+* Checkpoint -- 2026-10-21 23:50 UTC
+
+#1078 standalone independent review and bounded addendum PASS; source branch d46795c303e2409ddb8ed5e4c62efca4e87ca347 pushed to GitHub.
+Author7, independent14 and new addendum safe exports are committed with this checkpoint; root publication gates record explicit exact-value checks and full failed-suite qualifications.
+Next: open the reviewed PR with all549/39/1362 invalidation cost, nine guarded timestamp failures/separate private-operand pass, pre-existing Niger dtype residual and no1062/global16 composition claim.
+Deduplicate/file the precise Niger cold/warm u StringDtype owner using the public evidence; keep it separate from1078.
+
+Mali1091 writer final9e8ebeabb0e996684d325d05987763a8c3581cc8 is frozen; runtime fdadc0698efcd300f5f09c21b60c30f570f96621 on822aba.
+111 targeted tests pass; new baseline controls24fail4pass. Independent reviewer niger_lane now owns review-Mali-1091 in separate candidate/base checkouts; root prepared exact DVC tmp targets.
+Agent review_nigeria_1034 owns read-only Niger1091 at reviewed1088 d602, with all/singleton/unsupported default/Make source probes in progress.
+Agent mali_lane owns new Uganda849 artifact-only exact addendum; original344files and all source roots remain frozen.
+849 source-grain carrier repair must preserve actual observation identity and survive Feature assembly before12factor mappings are promoted.
+Tanzania1091 checkout e75be9c56fa6c318ce32cea5a8be6d448578bed1 and private root are prepared, but no diagnosis has begun.
+No public implementation PR has been merged. Goal remains active.
+
+Sue
+
+* Publication -- 2026-10-21 23:52 UTC
+
+PR1197 is open at d46795c303e2409ddb8ed5e4c62efca4e87ca347; metadata confirms open/unmerged/mergeable, CI39696155414 in progress.
+Niger strict cold/warm dtype residual is now1196; do not duplicate it.
+Seventeen implementation PRs exist, but verified integration remains global16 d527; no1078/1062 composition proof yet.
+New archive8 is running under exec session55915 using archive_quiescent_followup_23h55_bounded.py.
+Initial plan stopped before any archive creation at4GiB; measured4393492017bytes/2592files now bounded explicitly at5GiB, same six immutable roots and exclusions.
+Four exact public Nigeria instrument PDFs are an explicit private-archive exception; microdata/L1/L2/raw sources and parser tree remain excluded.
+Wait for terminal success, verify every member/source receipt and owner-only durable modes, then record safe receipt. Never claim archive durability from its launch.
+
+Sue
+
+At23:58UTC all17 exact public heads are freshly verified open/unmerged/mergeable/CI-success; see public-pr-checkpoint-global17.json.
+PR1197 CI39696155414 is SUCCESS. PR1170 body now reflects17publicPRs and source-backed current country work.
+Do not confuse the17head metadata checkpoint with global17 integration; global16 d527 remains latest combined PASS.
+
+* Active work -- 2026-10-22 00:10 UTC
+
+Previously public campaign head1d9dc902d contains17head metadata and corrected whitespace.
+Current pending exports add frozen Niger1091 diagnosis/approval, Uganda849 source diagnosis+85-check strict addendum, archive8 durable receipt and this checkpoint.
+Mali independent reviewer niger_lane has111tests,24baseline negative causes,40candidate stages,fullpairedFeature/scanner/CLI passing; actual parent source cases are finishing. Retain its raw-log handling and optional variable-label metadata qualifications.
+Niger writer review_nigeria_1034 is approved ONLY countryconcat+Makeblock/solevar removal, newledger FIRST, on fix/1091-niger-community-builder-20261021 at d602. Protect frozen690-entry diagnosis.
+Global17 independent reviewer mali_lane now owns candidate7ecf8e95fef567554fe93870ba95abddd1955a86 versus actual16d527, new private integration/framework-seventeen-review and exact percheckout DVCtmp targets. Actualsource/race/healing/1062orders gates required; no17PASS/publicbranch yet.
+Uganda849 addendum is frozen52entries SHA939b450191680dee00f92fb8bc7a1ae9d1f99a5f6fc575b0ff4bc0d221565e56; root read full report/checker and independently verified reused comparator AST. Next file/dedup native-production carrier owner, reconcile849 merged prerequisites, then assign full-record lossless Country/Feature engineering after source-key/design prototype. No factor-only promotion.
+Tanzania1091 prepared but not yet dispatched; retain its separate priority after immediate shared composition check.
+Archive8 exec55915 FINISHEDSUCCESS: durable quiescent-followup-23h55.tar.gz SHA b74bba64ffd1a10d01b5db1897495b469a8c704bdd81617bc380f46333e300c4,499305331bytes,2592files,6roots. Launchers/private manifest fsynced and owner-only, all included members/source-after verified. Four exact public PDFs included privately; derived frames remain confidential.
+Unarchived completed roots now Uganda/849, Uganda/849-exact-addendum and Niger/1091; preserve them in the next bounded owner-only archive. Never archive active Niger writer/Mali review/global17 as quiescent.
+No running root exec handles at this checkpoint; docs push11449 completed to1d9dc902d, merge86001 completed FS-published7ec. Main development remains f8; no public PR merged. Goal active.
+
+Sue
+
+* Root checkpoint -- 2026-10-22 00:24 UTC
+
+Live newcarrier owner1198 exists;849 is retitled/reconciled, stale967/972 merge dependency removed from current scope while history retained.
+Agent niger_lane now owns design/privateprototype1198 on separate isa-Uganda-1198 f8; no production/config/schema edits, ledgerFIRST then concrete lossless observation proposal.
+Mali independent1091 PASS read in full by root, actual source/comparator/CLI and freeze proof also read. Safe13reports+3checkers exported byte-exact in review-1091-Mali/.
+Stacked PR next on verified actual1180 branch fix/822-mali-community-readings-20261021 ataba; author9e8ebeabb source already pushed GitHub. No1198production or global18composition claim.
+Niger writer candidate runtime6be657660 published;114tests pass and parent17newcontrols12fail5pass after explicitfixture correction. Source23Niger/526others/39framework actualcensus beforebuild; final evidence/freeze pending.
+Global17 source7ec reviewactive:438focused pass; newfull FAIL5148pass4459skip13fail,9knownutime +4warning-nodeidprefixglobs. Only narrow matching actual16 counterpart allowed; no secondfullsuite or normalized PASS. Actual63heldsources/316physicalcopies gate succeeded before44framecoldcohorts.
+Archive9 session6075 finished SUCCESS and closed: quiescent-followup-00h15.tar.gz SHA17d99ac26f72c81f1b7985e26363ec982abc93916dd3c16e4c2c672784d132bb,734files/67143657bytes,3roots849original+strictaddendum+Niger1091diagnosis. Durable launcher/private manifest/owner-only modes independently verified.
+Unarchived newly completed root: review-Mali-1091 (1190manifest entries); archive after source-safe publication, never include active1198/Nigerwriter/global17 as quiescent.
+Main development remains clean f8;17publicPRs all green at last17head checkpoint, latestcompletedcombinedproof remains16d527. No PR merged automatically; goal active.
+
+Sue
+
+* Active checkpoint -- 2026-10-22 00:34 UTC
+
+This section supersedes earlier active-state notes; their proof pins and failures remain historical.
+Campaign has18open implementation PRs, none merged. New Mali1091 PR1199 is stacked on exact1180/aba, final9e8ebeabb, CI39699773895SUCCESS.
+Root read and accepted full independent source/comparator/runtime/CLI/freeze proof; safe review exports were already published at4426267d1.
+Umbrella1091 live title/body now records settled788/840/1086 authority and remaining Niger/Tanzania/human merges, preserving historical draft.
+
+Active workers: mali_lane reviews global17 at7ec versus actual16d527; review_nigeria_1034 finishes Niger1091 author docs/freeze at runtime6be6576607f1862b603d123acfb74ace4026fd3f; niger_lane performs1198 design/private prototype on f8 with first ledger4332afede.
+Global17:438focused passes, full5148pass4459skip13fail0error retained. Nine protected timestamp cases; four warning glob failures reproduced in narrow actual16 counterpart, correct warning category/message, private prefix mismatch; later returncode assertion not reached. No full suite repeat.44cold/freshwarm frames/head and174warm files/head complete; final race/healing/1062-order/strict freeze review pending. Global16d527 remains latest public combinedPASS;7ec remains validation-only, not GitHub published.
+Niger author114passes, baseline12meaningful fails/fivepasses;72frame/typedattrs and72axis controls,3exact artifact/Arrowfooter controls. Original auxiliary unrecorded delta unidentified; later zero-write controls cannot explain it. Await final source/docs equivalence and freeze then assign a DIFFERENT independent reviewer in fresh roots. Eventual stack1176 actual fix/1088-niger-quantity-sentinel-20261021 atd602. No extra API repeats.
+Ug1198 private projection133761eligible observations versus133331baseline plus403existing null-key exclusions; strict original levels/codes and99paired-field controls pass. Current undeclared-extra Feature drops coordinate; interpret with existing collapse before proposing contract. Whole conversion/median/yield effects pending. No production/schema edits authorized yet. Source IDs/full logs stay private; wrappers may emit only class/source-line/aggregate counts/dtype names, never raw exception text or failure-log tails.
+
+Archive10 review-Mali-1091 is durable:898files,89770166bytes,SHA cbe66610d13e12d840e27563f4f236e6cf73994b3ff33de177e10fe8f6b5cec8; full member/source-after verification, root compressedSHA/modes/fsync/launcher verified. Safe private-evidence-durability-tenth.json. Archives1..9 remain unchanged; active roots are not archived as quiescent.
+Allocation has roughly46h37m left, main development stillf8clean. No root background exec at checkpoint. GoalACTIVE; many queued country issues remain. Next root: publish campaign checkpoint/body, review final global17 and Niger evidence when ready, review1198 concrete design before choosing implementation, dispatch Tanzania1091 when a slot frees. Never merge public PRs automatically or treat global17 unit failures as PASS.
+
+Sue
+
+* Active handoff -- 2026-10-22 00:57 UTC
+
+This section supersedes earlier active-state notes.18implementation PRs remain open, none merged. Last public campaign commit before this change463e24d52719215efe1c14e588c38c9a14476aea; public integration16remainsd527.
+Workers: niger_lane independently reviews Niger1091final670 in isa-review-Niger-1091 versusd602; review_nigeria_1034 diagnoses Tanzania1091ate75 with ledgeraa627; mali_lane finishes global17freeze7ec versusactual16d527.
+Niger author safe10exports/source-pins now1091-Niger-author/. Root verified tests treea2c9ba05f0faf6625885bc6a0bd5f3bd71bece43 and final librarytree00cb01e7c1ca727dcefd5ed04d3de49d951a5276, onlyCONTENTSdiff versus6be; manifest1701/SHA237003a67682a1a354406df29d6fe31fbcfffdfe90569a1a7749999ff65e635b. Keep lost auxiliary delta and premanifest overwritten aggregate (no original final SHA/size) explicit. No extra author API replay. Independent reviewer has actual23/526/39prebuild census and source gates; its normal matrix/oracle ongoing.
+Tanzania community measured17699readings3076/14623, not9698plot-input rows. Root corrected the408brief conflation before any AG stage; current new source scope onlycommunity and healthy gated comparator. No retirement implementation authorized until concrete proposal.
+Ug1198 original design989frozen,241files/SHA c336abbaad17d4b9dadab19f6c5abd00319aa55f118162ad773525faa49cc223; root read complete reports and actual checker/prototype sources. Safe1198-Uganda-design/ plus root1198-root-engineering-decision.md. Root approved revised production_obs contract; new isa-Uganda-1198-fix branchfix/1198-uganda-production-observations-20261022 at989 prepared, privateUganda/1198-fix has exactignoredDVCtarget/rootdecisioncopy. Source fingerprint reuse replaces rawMD5-only proposedtoken; explicit loader refs/physicalpositions, no new provenance attrs promise. Allow7wavecallers and existing country-script comments plushelper/colmaps/schema/canonicalmetadata/docs/tests/ledger; allscreens/units/ID/sample/nullkeypolicy unchanged;849mapping separate. After global17READY, dispatchmali_lane FULLUgCONTENTSfirst, updateledgerFIRST thenimplement underdecision; new held-source/currentcache gates, prebuild549/39+wavecensus, realcomparator andactualarea/yield controls, independentreview required.
+Global17 safeREVIEW/verdict prepared but FINALREADY pending. Root fully read comparator/compare/orders/race/healing/scanner/exercise/trace/coordination actualcode and doc generator/test. Independently verified raw236scannerrecords and safeSHA/multiplicities; JUnit full9620cases=5148pass4459skip13fail SHAeb4fdbb42ad4df92ae5d058dad77d705990b7c4c9653197ce513d006cb81d5e4;438focused;14actual16negativefailures;4actual16warningcounterpartfailures. Exactly9restoredNaNs (6Q/3E), totals21->27/31->34 separate.8unrequested unserved old16clustercompanions stale, explicitly excluded. One docsmtime-onlydelta sourceguardPYTHONPATHchildgap: no retrospective fullguard/eventattributionclaim, original13FAIL preserved. Root acceptable bounded functional verdict pendingfinalpin/manifest/quiescence; no extra data/tests needed. Publish safeevidence and NEWisa/integration-seventeen branch only afterfinalreceipt androotgates; oldpublic16branchuntouched. No global18/Mali1199composition yet.
+Archive11complete/rootverifiedsafe receipt; activeglobal17notyetarchived. No root exec session currentlyrunning. Main developmentf8clean at lastcheck. GoalACTIVE; many actionable country items remain; no automaticpublicmerges. Next root: finishglobal17release/publication, dispatch1198writer, reviewNigerindie/Tanzaniaproposal, queueBF1119/MW218/Mali839as slotsfree.
+
+Sue
+
+* Released17 / active1198 -- 2026-10-22 01:03 UTC
+
+Global17FINALREADY sha3c65328e946952349f34fdb6c987d277a7215bf1d5579142c49490c64ae8fe0c;6468manifestSHAf559b1677e5ccbf237caf0b4a96a050c4d69bd0fec91f27a9d62ce8fc05e30cd; REVIEWsha2a07dfec2fef15c60d7ed851efcaee0dc86d22e8b4e852b282b018562250aaa5. Root accepted bounded functionalUganda/Niger proof after full actualcode/source/metadata/JUnit/scanner review, copied15allowedfilesbyteexact plus ROOT-ACCEPTANCE. NEWsourcebranchisa/integration-seventeen-20261021 pushedterminalSUCCESSat7ec; oldpublic16d527untouched. Full13FAIL and source-docmtime/childguard,8staleunservedcompanions,1196,originalwriterunknown,549/39/1362globalhashcost all remain explicit. No unrestricted17/18/fullsuite/corpusPASS.
+Mali_lane now AUTHOR1198 in isa-Uganda-1198-fix, revisedledger9144f5085publishedbeforeproduction. Full task and rootdecision require actualloader source_fingerprint/physicalrow refs, no newattrs carrier, preserveallobservations/403oldnullkeyexclusions/existingscreens/2015sales/idwalk; canonicalproduction_obs/unresolved sentinel;849factor mappings separate (use prototype current-wiring reference, NOT12-field factor scenario). Actual549/39+wavecensus beforebuild; heldsource/currentcache gates; realcomparator andrealarea/yield proof; no broad suite/sourceacquisition.
+Nigerreviewniger_lane ongoing, exact23/526/39census/tests/sourcegates; Tanzaniareview_nigeria_1034read-only source/MakeDAGdiagnosis,17699communityrows and58focusedpasses. Its make api-audit invoked Poetryvenvcreation andguarddenied; exact existing audit script runwithmountedinterpreter instead, no dependencychange.
+Rootarchive12runningexecsession68080: privateintegration/framework-seventeen-review, dryplan3331files/3291759001inputbytes/1316exclusionsunder4GiB. Pollterminalbeforeanyreceipt; archive/quiescent-followup-twelfth.tar.gz. Archive11alreadyverifiedreceipt. Rootsourcepushsession99924anddryplansession97425closedSUCCESS.
+Next root: finisharchive12, finalizecommit/pushcampaignsafeexports+handoff andupdate1170/1197bodies withbounded17proof, thenreviewTanzaniaproposal/Nigerindie while1198writerprogresses. GoalACTIVE; no publicmerge.
+
+Sue
+
+* Latest root checkpoint -- 2026-10-22 01:10 UTC
+
+Archive12terminalSUCCESS/rootreceiptcomplete:3331files/524515130bytes/SHA d5388b73a05e34b63799146d29774f9561dc8ca6688dfe0964f2e39a96c1e1d7; safeprivate-evidence-durability-twelfth.json. All rootexecsessions closed(archive68080, mergecommit15134included).
+New validation-only18snapshot f9feb3c807aff5206134c37768992302ceb431fa onisa/integration-eighteen-20261022, worktreeisa-integration-eighteen; detachedcontrolisa-integration-eighteen-base at7ec. Bothmetadata links use privateintegration/mali-eighteen-review/candidate-dvc-tmp andbase-dvc-tmp; rootpreparationreceipt +NEXT-REVIEW-BRIEF.md. Source delta10paths equals1199,9nonCONTENTSblobs/modesexact; CONTENTSfullprior17prefix+exact1091append. Initialresolverleadingnewlineassertfailedbeforewrite; ungatedaddstagedmarkers, cachedcheckcaughtbeforecommit, corrected/provenbothnotesbeforeordinarycommitpublished. No18test/build/PASS/GHpublication/reviewer yet. Assign a free DIFFERENTreviewer aftercurrentNigerreview orTanzaniadiagnosis, usingbrief; healthyNiger must beactual1088corrected/current7echash, oldMaliauthorcomparatornotblindreference.
+Ug1198actualprebuild28Uganda/521othercountryexact/39frameworkexact;171declaredUgandawavehashesmove,224APIwavepairs; allkg_factorcolmaps exactf8 after removingonlynewidentityfields. Workerpreparesheldcrop/sample/plotprereqs, thenfocusedtests/sourcebuilds. No extra849mappings. Nigerindieongoing: populatedMakecombinedendpoint2011modified/2014deleted fromlater2011singletoneviction, notprovedcountryfallback; reviewerwithdrewhypothesis, preservesmissingindividualallendpointlimit, finishesONLY4unexecutedrequests. Tanzania58focusedpasses/current17699communityoracle; fullproposalpending.
+Next root: finishstaging/check/commit/pushcampaignsafeexports+metadataandupdate1170/1197bodies topublicbounded17/active1198/Nigerindie/Tzdiag/queued18. Mainf8clean;45h+left/no warning. GoalACTIVE/no publicmerge.
+
+Sue
+
+* Publication complete -- 2026-10-22 01:14 UTC
+
+Campaign e7b7e09401749b649427b8629d3ddf0e2643dbb9 is FS-published/GitHub-pushed and clean before this status-only checkpoint. PR1170 and1197 bodies now describe the separate bounded17PASS/full13FAIL and exact limits; both public bodies fetched/verified byteexact. Eighteen exact PR heads freshlyverifiedopen/unmerged/individuallymergeable; their previous successfulCIreceipts remain recorded, CI notrefreshedinthisread. No root backgroundexec remains. Publicproof links pin e7b7.
+Active1198writer reports59heldStata crop/sample/cluster/area prereqs/531physicalcopies terminalgated,41sidecarswithoutdeclaredsizequalified; fourbackend/controlrootsinitiallyL2empty. Post-whitespace-ID boundary-fixcensus remains28Uganda/521otherexact/39frameworkexact,171declaredwave/224APIwavechanged; normaldefaultcoldrunningunder guard. Nigerindiefinisheswarnings/scanner/finalreceipts plus onlypreviouslyunexecuted actual-parent unsupportedcoldwarmpair. Tanzaniareadonlyproposalpending;58focusedpasses,17699communityrows,wrongMake subset proof.
+Queued18review sourcef9feb3c807aff5206134c37768992302ceb431fa is cleanFSonly, privateintegration/mali-eighteen-review/NEXT-REVIEW-BRIEF.md; assign after a slot frees. No18PASS orGHpublication. GoalACTIVE; many actionable tasks remain. No publicmerges.
+
+Sue
+
+* Niger1091 reviewed PR -- 2026-10-22T01:26:27.975827+00:00
+
+Independent review of670de9cc passes114tests; actual parent controls12FAIL/5PASS.
+Root read the code/checker/source-oracle/proofs, independently checked JUnit and28exact warning multisets, and accepted the frozen1437-entry manifest9bf86ab634b8913e2e5bfcbadec051de05206b2475cef0b6db58e7f274402808.
+PR1200 is open on actual1176base d602; CI39705606211 is in progress.
+Five safe reports, FINAL-READY and root acceptance are exported in1091-Niger-independent.
+All author auxiliary/aggregate and reviewer receipt/seal limitations remain explicit.
+No public merge/closure/composition claim; nineteen implementation PRs are now open.
+Reviewer niger_lane moved to separately prepared bounded18/Mali1199 composition.
+Uganda1198 source/native/public cold133761 and defaultwarm0/144 are interim passes; Make17mtime-only changes and parent counterpart remain active.
+Tanzania1091 concrete retirement proposal remains read-only until final freeze/root review.
+
+Sue
+
+* Tanzania retirement authorized -- 2026-10-22T01:32:30.004463+00:00
+
+Root accepted frozen read-only diagnosis99c824079da480ab2646e499c06ac70e457ff271, runtime/tests exacte75be9c56.
+1216-entry private manifest0d0519b90e77e918b695815d7174d942b4fe1a12ce777510c0521b0d92315784; seven safe reports plusREADY/rootdecision copied byte-exact.
+Source17699=3076+14623,60requests,58existing tests and4scannerWARN are diagnosis results, not candidate proof.
+Approved only45-line country concatenator+originalMake145-149 retirement; current candidate/parent checkouts start99c and own exactprivate DVC metadata targets.
+Writer review_nigeria_1034 dispatched to isa-Tanzania-1091-fix; ledger revision must commit before code, actualhashcensus before sourcebuild, different-agent review beforePR.
+Other schema/science/units/IDs/source predicates and generic/wave rules remain scope boundaries.
+Niger1200 CI39705606211 completed success: unit-tests/windows-smoke passed; six other jobs skipped.
+Thirteenth archive of frozenNigerreview:743includedfiles,37671534B,SHA8e705305be5bf267e19ebc49b93aae9e6ca850abfb1f496cc0ec668692858fd0.
+Fourteenth archive of frozenTanzaniadiagnosis:1004files,19133955B,SHA52b4f89817fd07f0ab52920845ad1f02830f1d32a53c6315137914b02adbb68e.
+Both owner-only,allincludedmembers/sourceafter verified; rawextensions/duplicatecachetrees excluded, confidentialderivedframes remainprivate.
+No public merge or issue closure; goal active.
+
+Sue
+
+* Source-only nineteen-change preparation -- 2026-10-22T01:38:21.305396+00:00
+
+Prepared60d2281abfff72bc9dccb6256cffac623f42e28f onisa/integration-nineteen-20261022, FS-published only; actual18f9 control atisa-integration-nineteen-base.
+Clean merge ofPR1200; all12changed blobs/modes exactly match670de9cvsd602; no conflict, no test/API build/verdict/GitHub publication.
+Exactprivate candidate/base DVC metadata targets and NEXT-REVIEW-BRIEF.md prepared inintegration/niger-nineteen-review.
+Await released18rootacceptance before dispatch; healthyMali must now be current/full4coverage155931, not old40218 comparator.
+Actual18review has111PASS/24negativeFAIL4PASS, actual24Mali/525others/39frameworkscope and source oracle/currentNiger gates; matrices still active.
+Tanzania writer ledgeraa9745963 preceded production; prebuild25/524/39actual, no source rebuild at that update.
+Uganda current-wiring harvest+2091kg/zero supportcrossings and exactreal42841area/yield controls passed on the pre-edge-correction snapshot.
+Existing parcelkey100percentdocclaim is contradicted equally on bothheads:14022/40409 parcel matches and0literalplot; residual draft only.
+Writer corrects declared-slot locator collision guard and three required canonical test expectations, retaining stopped325-case322PASS/3FAIL outcomes; affected proof must be reverified after helper change.
+Campaignb775dfe11 is GitHub-pushed; PR1170/issue1091 public bodies fetched and verified exact,19PRs recorded,14private archives verified.
+Goal remainsactive; no public merge or issue closure.
+
+Sue
+
+* Next country task prepared -- 2026-10-22T01:44:47.243270+00:00
+
+Prepared1119BFcandidate/base at reviewed1123cfd0782766068da6dc7e7605334e957f988a4ab1, exactignored metadata targets underBurkina_Faso/1119.
+Live1189stillopen/unmerged onfix/1123-burkina-input-identity-20261021, exactcfd; live1119unchanged/open with0comments.
+Queuedbrief restricts mechanicaltwoPreferredLabelcells after baseline/CONTENTS/prior-art checks; shared marker decision/Senegal/Guinea-Bissau remainresidual.
+No writer assigned, no productedit/test/APIbuild/verdict yet.
+Three activeagents remainUganda1198,Tanzania1091and bounded18Mali composition;19review waits18release/rootacceptance.
+Previous goal turn was progress: Niger1200PR/CI/indie acceptance, Tanzania concrete approval, source19preparation and14durablearchives published.
+This turn revalidated liveagenthandles/currentcleanrepos and preparesnextcountrytask while those specificworkers continue.
+
+Sue
+
+* Mali empty-result wording qualification and current lanes -- 2026-10-22T02:23:36.259365+00:00
+
+Original1199/9e and bounded18/f9 runtime proofs remain at their exact heads.
+Reviewer found two overbroad Mali CONTENTS paragraphs: unsupported results are zero rows, but dtypes/attrs depend on route and available cache coverage.
+Root prepared documentation-only b4ad74d5da39f939a7c2ecec030891cb82c02ade and18descendant471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3, FS-published only.
+Each separate metadata-only census measured549API/39framework hashes unchanged, tests/other paths/modes exact,0network/denials/parquets; no API/test/decode replay.
+Independent wording review pending; public1199 remains9e and its priorCI pertains onlyto9e.
+New source19descendant2566a3e490c0aefe03ab31d538d7d04e9b77c77e versus471 has exact12Niger670-vsd602 path/blobs/modes.
+New detached control/private metadata targets and queued-nineteen-docs brief prepared; old60/f9 checkouts/brief remain unchanged.
+No19reviewer/build/verdict/publication; gate on released18rootacceptance and bounded wording review.
+Uganda1198 corrected source/backends/fullframes and scanner complete; author finaldocs/ledger/freeze pending,392PASS10unrelatedSKIP.
+Tanzania1091 runtimeccc/source/CLI/scanner complete,85PASS; finalfreeze exposed literal-link baseline and overwritten partial-aggregate evidence limitations, both retained explicitly.
+No independent Uganda/Tanzania implementation review or newPR yet; three agents still assigned.
+All19existingPRs remainopen/unmerged/exactheads/bases at01:49:18UTC snapshot; no newerCI claim.
+No public merge/issueclosure; goal active.
+
+Sue
+
+* Bounded eighteen runtime accepted; review rotation -- 2026-10-22T02:33:24.058141+00:00
+
+Released18 runtimePASS remains pinnedf9 vsactual17/7ec; two Mali wording paragraphs still require bounded docreview.
+Root read full report/actual checker sources and independently rehashed all1885manifest payloads plus excluded controls/checker pins, parsed111PASS vs24FAIL4PASS, verified24/525/39hashscope and two byte-exact scannerWARN/all40warningfields true.
+READY SHA3e1b1311ee2477ea09f337606b96805684c634e2c92a8dbdba948875a66d0a59; manifest2406d10a2c013a08df6da2336a2fdc2643213e88981c3f1b2167c6f87284ea02.
+Final seal retained first privatefont-metadata stop; no test/API/data replay. Sourcepublication and19dispatch remain gated on separatewordingreview.
+Tanzaniaauthor frozenfa457f90edbedfd7282eaf988c8231e4e87ba082/runtimeccc,2894manifest2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f, zero consumers.
+Root verified READY/manifestSHA/sixsafe-export hashes; authorresult still requires independent review and both evidence limitations remain explicit.
+SeparateTanzania candidate/control and exactmetadata targets/brief prepared; queuedfor differentagent afterUgandaauthor release, notyetassigned.
+Tanzaniaauthor review_nigeria_1034 rotated to preparedBF1119 writer; noTanzania source/proof mutation authorized.
+Fifteenth private archive covers only frozenTanzaniaauthor and18review:3456files,161863486compressedbytes,SHA5579b6346bfb26139ca09a8807911238cdd3eb98e43a7e830f2e020b608e77b2.
+Allmembers/sourceafter/owner-onlymodes/fsync/durablelauncher verified; rawextensions/duplicatecachetrees excluded, derivedframes remainprivate.
+No public merge/issueclosure; goal active.
+
+Sue
+
+* Mali wording accepted and source published -- 2026-10-22T02:36:21.503833+00:00
+
+Root accepted the separate documentation review after reading all reports and both actual checker sources, then independently verifying its READY and all 12 manifest entries.
+The two replacements are exact in b4ad74d5da39f939a7c2ecec030891cb82c02ade and 471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3; all other blobs/modes/tests and 549 API / 39 framework hashes remain unchanged.
+Original runtime evidence remains pinned to 9e and f9. No data, API, decode or test replay occurred for the wording correction.
+PR1199 was freshly verified open, unmerged and based on aba; its source branch was fast-forwarded to b4 on FS origin and GitHub, leaving the frozen local 9e checkout untouched.
+Public metadata confirms exact b4 / aba and mergeability. New CI39712187800 is in progress; the old green run remains evidence only for 9e.
+The new integration18 documentation branch was pushed at exact 471. This publishes bounded runtime plus separately verified documentation evidence, without claiming a full18 suite or corpus pass.
+Reviewer niger_lane has started the prepared nineteen-change increment at 2566 versus 471 in its new private root. The historical 60 / f9 preparation stays untouched.
+Uganda author freeze is still active; Tanzania independent review is queued for that different agent afterward. Burkina Faso1119 grounding is complete and ledger-first publication is underway; exactly two matching old-label test expectations are authorized alongside the two map cells.
+Fifteenth private evidence archive is verified; no public merge or issue closure. Goal active.
+
+Sue
+
+* New-head CI and independent review rotation -- 2026-10-22T02:49:33.586886+00:00
+
+Mali1199 CI39712187800 passed at exact b4ad74d5da39f939a7c2ecec030891cb82c02ade: unit tests and Windows smoke succeeded; six jobs, including data tests, skipped.
+PR1199 and campaign1170 bodies were updated and separately fetched byte-exact; issue1091 remains open with its historical text preserved and current Mali/Tanzania status reconciled.
+Parent1180 was freshly confirmed open, unmerged and exact aba. No public PR merge occurred.
+Uganda1198 author released clean 6e735eca93e3f68e63d79ce65ac71607ee9493bf, runtime929149222e43a8fe500cc08420cdc68357170af3.
+Root read the full report/residuals, verified READY/4122-entry manifest digest and all ten export receipt hashes; independent implementation acceptance is still pending.
+Separate Uganda review candidate/actual989 control, exact private metadata targets and full queued brief are prepared, unassigned. Its residual drafts remain unfiled pending independent verification and deduplication.
+The released author mali_lane now independently reviews Tanzania1091; its complete current country reading and NPS caveats are reported before source work.
+Niger reviewer reports the19 prebuild scope and source/copy/current155931-Mali gates passed; focused tests and actual18 matrices are active. No19 verdict or public source publication.
+Burkina Faso1119 author reports131passes, actual-parent5fail/4pass,52complete-frame checks,4430 label-only changes,22877 preserved lines and six exact scanner warnings. Final docs/freeze remain active.
+The missing prebuild relevant-wave enumeration is explicitly recorded; later exact-source metadata measurement is post-build. Original wrong accessor and Feature-currency expected-construction stops survive without API replay.
+Fresh parent1189/issue1119 scope receipt confirms the open exact cfd parent, unchanged issue and zero comments. Two label cells and matching test expectations remain the boundary.
+Three workers remain active; goal active, no public merge or issue closure.
+
+Sue
+
+* Sixteenth archive and next independent task -- 2026-10-22T02:51:20.018609+00:00
+
+The sixteenth owner-only archive covers frozen Uganda1198 author evidence, root Mali documentation hash proof and its separate independent documentation review.
+It contains 895 files / 219261255 compressed bytes, SHA25646c526d7b965a44916c0f1ea44f530354bad53c5de2a1a4e703d6d17d1447e22.
+All included members, source-after receipts, access modes, launcher and directory fsync were verified. Raw sources and duplicate cache trees are excluded; derived frames remain private.
+Current workers are Burkina Faso1119 author, Tanzania1091 independent review and nineteen-change composition review.
+After the Burkina author releases a clean READY, assign that different agent to the prepared Uganda1198 review; it has not started.
+Uganda residual query metadata is in queued-Uganda-1198-review/RESIDUAL-DEDUP-QUERIES.json; direct879/1146 reconciliation and independent verification remain before any filing.
+No root command remains running. Goal active; no public merge or issue closure.
+
+Sue
+
+* BF author release, Uganda review and next Malawi task -- 2026-10-22T03:07:30.841474+00:00
+
+The previous goal turn made concrete progress: accepted/published the bounded18 source and Mali documentation qualification, verified new-head CI and public bodies, froze Uganda, prepared its independent review, and verified sixteen private archives.
+BF1119 author is now frozen at 3dc9d28510dd783c648413987011832669f8bcf7, runtime c5134f57f76bc53e84df6c3398ffc9a3781e9e1c.
+Root read the full report and actual two-cell/test diffs, verified READY digest,594-entry manifest digest and six safe-export hashes; independent acceptance is still required.
+Actual author prebuild scope is24BF/525others/39framework. Supplemental12wave hashes were measured after builds; the timing omission and wrong-accessor stop remain explicit.
+Its six scanner occurrences were compared after explicit path-prefix normalization, without a raw-byte-equality claim. Existing household seed_kg remains unchanged; join evidence is crop-label existence at(t,i,crop), with no parcel allocation.
+Separate BF candidate/actualcfd review control, private metadata targets and full brief are prepared, unassigned; plan for niger_lane after19 release.
+The BF author review_nigeria_1034 now independently reviews Uganda1198. It has read full current country history and all source/test/contract documents; no verdict or PR.
+Tanzania reviewer reports27passes/20parentfails7passes and normal source/cold/warm proof; remaining populated/CLI/Feature/scanner stages are active.
+Nineteen-change reviewer reports114passes/12parentfails5passes and independent46043-source oracle with all76 masks/30late observations; matrices active, no verdict.
+Live218 remains open, unchanged sinceOct18 with zero comments. Root confirmed the two raw Malawi registrations still exist and personally traced the existing automatic Country/Feature derivation and retired-family docs.
+Prepared releasef8 Malawi218 candidate/control/metadata targets and narrow writer brief; no edits/tests/builds. It is independent of1109/1111 and preserves their source/proofs.
+After Tanzania review release, mali_lane can take that next writer task; other218/nonISA/framework cleanup remains residual.
+Seventeenth owner-only archive preserves frozen BF1119:528files,14564732compressedbytes,SHA4cbfdc571fff6a912d8ac752ae3d715350448dfa742a5cef415af541e089a3af.
+All members/source-after/access modes/durable launcher/fsync verified; raw sources/duplicate cache trees excluded, derived frames private.
+No root process remains running; all three worker slots active. Goal active, no public merge or issue closure.
+
+Sue
+
+* Tanzania leaf and bounded19 accepted -- 2026-10-22 03:43 UTC
+
+Root read actual review/checker sources and independently verified all2426 Tanzania and2842 combined19 manifest entries, safe exports/JUnits/hash/scanner controls. Sourcefa and2566 are GitHub-published and independently refetched exact; no public PR was merged. Tanzania PR preparation remains pending.
+Proofs: =1091-Tanzania-independent/= and =integration/niger-nineteen-review/= under the ISA report directory. Tanzania warning text/category limitation, original author aggregate/link gaps, empty/serialization distinctions and old17/1196 limits stay explicit. No unrestricted19 full-suite result follows.
+mali_lane now writes prepared Malawi218; niger_lane independently reviews BF1119. Uganda1198 final review/seal remains pending; new849 writer is prepared but unassigned until root acceptance. Preserve matched-parent support dtype and Make mode+mtime qualifications; the2018 slot-label concern is already adjudicated in current country notes and was independently reproduced.
+All19 existing implementation PRs refetched OPEN/unmerged/exact heads at03:32UTC. Ethiopia820 static triage remains tierC/W1-W3, no implementation.
+
+Sue
+
+* Uganda runtime and documentary qualification accepted -- 2026-10-22 04:07 UTC
+
+Root accepted1198 runtime6e/929 after independent1908-entry verification,392PASS10SKIP/36FAIL3PASS controls, source133761/Feature180137/+2091kg and all scanner occurrences. Final documentary085 independently preserves all549API/39framework hashes and every other tracked blob/mode. Original73ad NEEDS_FIX wording proof52entries and finalPASS45entries remain distinct; final wording states observed0644to0600+mtime directly, with no copied-L2 inference.
+Final085 is published to the original public1198 source ref; local frozen author6e remains unchanged. Parent PR preparation remains pending. Only unused clean849 candidate/control were fast-forwarded to085; reviewer is now assigned849 writer. Exactly12maps, existing nonpositive normalization unchanged; original mistaken brief and explicit clarification remain preserved.
+Tanzania PR1201 atfa passed CI39718698178 unit/Windows smoke; six other jobs including data were skipped. Issue1091 remains OPEN and describes all3 reviewed country PRs awaiting human merge. Combined20de38 versus19control2566 is prepared/FS-durable with exact9path leaf delta, UNASSIGNED/no builds/verdict. Its healthy Mali/Niger references must be current155931/46043.
+mali_lane writes Malawi218; existing Make failure is a separate matched-parent exception, all5foodwaves supported. niger_lane finishes BF1119 independent proof; source/native unit dictionary expectation stop is retained and corrected artifact-only. Both active roots remain unarchived.
+
+Sue
+
+* Private evidence durability checkpoint -- 2026-10-22 04:08 UTC
+
+All19 owner-only private archives are verified. Archive18 retains frozen Tanzania independent plus bounded19 proof (3184files, SHA028eeb4160a9361568f9b7b33e87f5de7df8e6d778c7702216f574811a759d8c); archive19 retains frozen Uganda runtime and both documentary reviews (1088files, SHAddc4f303b680f92c2be5ed2c2a796c1b0c3bf71ff72ea61d79233afbf83898c8). Source-after/member/digest/owner/mode/fsync receipts passed. Active Malawi/BF/849 roots are not archived.
+
+Sue
+
+* ISA backlog checkpoint -- 2026-10-22 04:27:19 UTC
+
+Uganda production observation carrier PR1202 is OPEN at0854303bc5f60daa698b2927fc3b193822a4c090, with exact-head CI39720922853 unit/windows SUCCESS; six jobs including data-tests skipped.
+All21 implementation PRs were independently OPEN/unmerged/exact at04:12:37UTC; receipt public-pr-checkpoint-twentyone.json. No human merge has occurred.
+BF1119 independent bounded review/root verification PASS:1173 payloads,131tests,actualparent5FAIL4PASS,184exactpairs/195inputs; exactly4430labels change and22877lines survive. Six scannerWARN and76warningpairs exact; broader1119/1187/1188 remain open.
+Safe review at1119-Burkina_Faso-independent; root acceptance is not yet a PR or merge. Parent1189 remains OPEN/exactcfd at fresh publication reconciliation.
+Released reviewer niger_lane is assigned actual20 de38/control2566 using integration/tanzania-twenty-review/NEXT-REVIEW-BRIEF.md; no20runtime verdict yet. Use current19 Mali155931/Niger46043 held warm, never leafMali40218.
+Malawi218 writer completes CLI/footer/freeze after51tests; scanner retains both-head2FAIL/200WARN/3PASS. Existing Make error and invalid-wave evictions are residuals, not scope expansions.
+Uganda849 writer7a8fd2249 has24newpasses/parent20FAIL4PASS and actualprebuild28/521/39; source-backed builds active. Brief nonpositive-helper normalization correction and bounded four-worker data-free overlap remain explicit.
+Goal remains active; user merges only.
+
+Sue
+
+* ISA22 PRs and residual ownership -- 2026-10-22 04:34:04 UTC
+
+All22 implementation PRs freshly OPEN/unmerged/exact expected heads; public-pr-checkpoint-twentytwo.json. NewBF1203 is partial1119, stacked1189cfd; CI39722612561 in progress at this checkpoint.
+BF independent root archived owner-only as twentieth archive b0d6d944d37658764128a5283e48012c50ecef3c3847550b30c843785b5e5040,27066878bytes/985files; receipt private-evidence-durability-twentieth.json.
+Deduplicated/filed Uganda1204 country-fallback wave coverage and1205 parcel-area coverage diagnosis. Existing1196 now explicitly owns distinct NigerMultiIndex/u and UgandaIndex/v observations, with no assumed shared cause. All three OPEN/body readbacks exact. PR1202 and1198 link residual owners; no new implementation or closure.
+Actual20 prebuild25/524/39exact,14wavecells/6Tanzaniachanges; early dependent gates stopped before staging/decode/API and are retained. Preparation resumes only after terminal census/scope receipt.
+Ug849 runtime7a8fd22492255cc2c4d020b7a16f99249f588977 published; bothbackendcold133761rows per head. Sourceoracle cwd stop retained; expected mappings read from actual wave directories. Writer validation remains active.
+
+Sue
+
+* BF1203 CI completion -- 2026-10-22 04:38:02 UTC
+
+Exact-head39722612561 SUCCESS:unit-tests/windows-smoke pass; six other jobs including data-tests skipped. PR1203 and campaign1170 latest body independently readback exact; no credentialed CI data claim. All22 implementation heads remain unmerged at the04:34 fresh check.
+
+Sue
+
+* Queued dtype diagnosis -- 2026-10-22
+
+Read-only1196 diagnosis checkout prepared atreleasef8; exact private metadata target and initial git-tracked ledger/brief recorded. UNASSIGNED:zero imports/tests/decodes/APIs/product changes. Wait for a released worker. Both observed axis classes need separate causal proof; no shared cause or production normalization assumed. Root owns any later implementation boundary.
+
+Sue
+
+* Malawi218 freeze and review preparation -- 2026-10-22
+
+Author d29a56783d08a8a647e2622150a4ee5fbdd7246a/runtime299fb8675e785fd392b1259ab1f4fb535eb69c34 vsactualf8 frozen; root independently rehashed815payloads and seven-export allowlist. This is author freeze verification, NOT independent acceptance.
+Different-reviewer candidate/base worktrees and exact private DVCtmp targets ready atreview-Malawi-218; AUTHOR-FROZEN-PINS.json and full NEXT brief prepared, UNASSIGNED.
+Released mali_lane is assigned1196 read-only diagnosis. Root corrected an overstated full-frame Index distinction: frozen dtype-details.py:6-7 extracts thevLEVEL. Live issue body corrected/readback; original468dledger and original private brief preserved, addendum tracked. No old evidence/source mutation or cause inference.
+Ug849 writer416PASS/10skip, source/Feature/CLI/scanner/90warmchecks pass; new native-grain total42026694.99297963kg is unreviewed author evidence, not the old unsafe projection. Retain opposite Make mode direction and missing original in-memory subset expected operand.
+Bounded20 candidate85PASS/actual19newcontrols20FAIL7PASS; final parenttail/accounting pending. Populated backend-only child logs overwrote earlier per-key logs; originals unavailable, unique fullframes/endpoints/structured main warnings preserved, no replay/fullchild-warning claim.
+
+Sue
+
+* Malawi author evidence durable -- 2026-10-22
+
+Twenty-first owner-only archive verifies561files/2160380400sourcebytes,246007940archivebytes,SHAf6cde2800f50c7ee28450f7a48cee7a463029827f0f789bf8dad13bd2538bc9a. Allmembers/source-after/owner/modes/fsync/durablelauncherverified; rawextensions and duplicateL1/L2/tempdata excluded. Only frozenMalawi/218 included; active roots separate. Receipt private-evidence-durability-twentyfirst.json. No independent Malawi verdict yet.
+
+Sue
+
+* Combined20 accepted and two independent reviews active -- 2026-10-22 05:22 UTC
+
+Source20 de38 against actual19 2566 is root accepted for bounded Tanzania increment and GitHub-published. All2629manifest payloads/sixsafe exports/checker pins/30085current source endpoints and exact nine-path leaf delta independently verified;85PASS,actualparent20FAIL7PASS,92literalwarningpairs,5scannerWARNexact. Populated earlier child logs overwritten/unavailable; no fullchildlog equality/full20suite/corpus claim. Safe review and ROOT-ACCEPTANCE atintegration/tanzania-twenty-review.
+At05:21:50UTC all22implementation PRs freshly OPEN/unmerged/exact expected heads; public-pr-checkpoint-twentytwo-followup.json. Human merges only.
+Ug849author491 frozen1858payloads/19safe exports, independently rehashed; root v1 link-versus-symlink vocabulary stop preserved and v2 passed unchanged receipts. Released niger_lane now independent Uganda849 reviewer in separate491/085 checkouts with full current CONTENTS/source/pool/actual Make/subset/1196 obligations. New849-Uganda-author reports are author evidence only; queued-Uganda-849-review records dispatch.
+Malawi218 independent review_nigeria_1034 has51PASS,actualparent1FAIL1PASS,own26/523/39/97wave census before builds; four source-cold roots running. No independent verdict/PR; oldMake/scanner/invalidwave caveats remain.
+1196mali_lane diagnosis is sealing with additive route note: fullindices bothMultiIndex; Country read-gate-only cannot cover observed Uganda Make route. Actual NigerMake operand unmeasured. Eight guard events and two sealing stops preserved, no zero-denial claim. No production edit/corpus rebuild authorized.
+Next source21 Uganda1198 composition must gate actual current Niger CROP hashes/full coverage; current20 community comparators do not establish current CP. Old leaf46376 caches may require normal private source rebuild, never restamp/bypass. Twenty-one frozen owner-only archives verified; new frozen20/849author not archived yet; active1196/Malawi/Uganda review roots must not be archived.
+
+Sue
+
+* Diagnosis accepted; source21 queued; archive22 durable -- 2026-10-22 05:40 UTC
+
+Root1196diagnosis receipt verifies281payloads/13safe exports/full directory/source14880/current checker/original/copy pins,8meaningfuldtypeFAIL7GH645PASS. Shared retained Arrow index-extraction cause accepted; no production fix. Both public indices MultiIndex. Country-cache-only route misses observedUgandaMake; actualNigerMakeunmeasured. All8guardevents/94legacyhash/membership/release stops retained. Safe evidence at1196-index-roundtrip-diagnosis.
+Released mali_lane now stage1 private patch proposal onf8 inisa-1196-index-fix; ledger-firstee533 durablypublished. No product/test/config edits/imports/tests/decodes/APIs authorized until root actualpatch review. Generic reader index-field policy only; no exclusion/schema/writer/science fix. Root initial base-worktree terminal-handle metadata timing addendum preserved, both HEAD/clean gates passed before dispatch.
+Source21 bd235a6d494434061dedacc8359351f5a4fb64aa filesystempublished afterexact31path/30nonCONTENTS leafblob/mode verification. Uganda documentation is complete actual20bytes plus exact085suffix,3722lines. Initial whole-f8-prefix assertion failed before source write; next gitadd staged original conflict markers, diffcheck blockedcommit; originalconflict/stop preserved, correct literal mergeverified beforecommit. No tests/imports/builds. Separateactual20control/de38 andmetadata targets/fullbrief queued UNASSIGNED, no GitHubsource21publication/verdict.
+Future21 healthy comparator must gate CROP hash/coverage, not use source20 community proof. OldleafNiger46376 may be stale; authorize only normal held-declared-source private build if needed, no acquisition/stamp/bypass.
+Archive22 exact2545members/sourceafter/fsync/owner/modes/durablelauncher,265780108bytes, SHAba9c76b9d1ea2c5628f58cef91b1b088d79a2493a14a296b9df54f82a1a0e927. Only frozen20and849author included; activeindie/fix roots excluded. Public private-evidence-durability-twentysecond.json. Ugandaindie own416PASS/10skip/source effect reproduced, tail/sealactive; Malawiindie51PASS/actualcoldcontrols measured, tailactive.22implementationPRs await human merge; goalactive.
+
+Sue
+
+* Reader patch active; nullable comparator follow-up1206; acquisition queue -- 2026-10-22 06:05 UTC
+
+1196stage2 root approved exactpatch6fa032/designbb8c afterfullsource review. Actual549/39/1362allmove before source builds. Initial87cases85PASS2wrongfixtureFAIL retained; only2correctedfixtures+2newEAnegativecases rerun4PASS, no85passedprefixreplay. Actualparent24publicIO23dtypeFAIL1PASS. All17sourcesheld; physical4rootgate beforedecode, NigerMake is now required, not conditional. Sourcecurrentlydirtylocal_tools/newtest atledger-firstee533, no finalfixverdict/PR. Stage1nineentrymanifest1d3c includesROOTapprovalfile; wordingbeforeapproval meansproceedmessage, notfilecreation.
+NEW1206 OPEN/bodyreadbackexact: pandas3.0.6framecheckexact/rtol0/atol0 ACCEPTS nullableFloat64 tiny1.000088900582341e-12 andnextafter2.220446049250313e-16; EAexact andNumPystrict reject. IndependentROOTsynthetic guardedoffline proof/frozen6entrymanifestb7b0c74292e4f27e0a04143a1ce34543f4902540b6d7b004bcdab0fd7c5e1dae atnullable-float-comparator-root, safe1206-comparator-validation. No actualcountryproductmismatchfound. Active849/218hardenedcomparators recheck SAVED operands; oldfrozenexact-valueclaims require separateaddenda, especiallyGLOBAL20, notrewrittenreports or API/source/pytestprefixreplays. Root ownsreassessment.
+Ug849newstrict reports99matchedhead/subsetCLI+264source/stage/derived+30Featurechecks (notdisjointfamilies),4knownvNAexceptionsseparate; finalwarning/sealactive. Skipreason literal gaps10sourcepathsqualified, originalfailures retained. MW218newstrict209comparisons/177uniquepairs/15negatives exact;205scanner200WARN3PASS2oldFAIL;67warningpairs353occurrences,7Make literalpathdifferences; percall childFDfieldsabsent/outerlogsretained. Assemblyfirstexpectedwrongcurrencyguard/absentoriginalmemoryexpected retained, correctedartifact-only16exact, no productbug. Finalsourceprotection/sealactive.
+1149OptionC stillunimplementedflatpath despite0.16recursiveleftoverscan; code-only releasef8worktrees/rootmeta/fullbrief/initialledger prepared UNASSIGNED. Nextfreeworkeraftervalidationpriority can implementsynthetic-onlyrepair, noWB/S3/DVC/acquisition. 1150rulingAsettledbut1127OPEN andcurrentEtv02sidecarsold; Pubnewsidecarabsentcaseinsensitive andclaimed55dbrawblobabsentbothcheckedL1layouts, remotepresenceunverified. Nigeria978OPENtierDthenB. 827unknownpricebasis/sourcefielddiagnosisfirst;856harvestother-countfirst;798finalraw-versus-servedcoveragepromotionremaining. Source21 remainsqueuedUNASSIGNED; beforedispatchreconcile1206addendum andactualNigerCROPhash/fullcoverage.22PRsunmergedlastfresh05:21;22privatearchivesverified.
+
+Sue
+
+* User status checkpoint -- 2026-10-22 06:24:38 UTC
+
+Fresh GitHub metadata verifies22implementationPRs stillOPEN/unmerged at expectedheads. IndependentUg849PASS416/10skip andMalawi218PASS51 nowFROZEN, awaiting rootacceptance/publication. Ugfinal375strongassertions=99+246+30overlappinggroups, old264included18selfchecks; no originalcount rewritten. Malawi1458manifest/READY36439ba6.1196authorruntimebd80FSpublished/sourcecoldprefix retained after invalid nonmonetary currency caller, continuation onlyunexecutedcalls. Newvalidation_reassess assigned full1206saved-evidencefollowup, prioritizes20/1196then affected22reviewcohorts+17/18/19; held ledger untilthisrootcheckpointcommit. Goalactive, no merge,22archives.
+
+Sue
+
+* Root accepts849andMalawi218 -- 2026-10-22T06:38:09.673635+00:00
+
+Root stdlib-only verifier verify_849_218_root.py terminal0: all2125Uganda/1458Malawi reviewmanifest entries and completepathsets,6/8safeexports, original2author manifests1858/815, allchecker pins/sourceGit/ownOSreceipts/copyMD5+SHA/inodes, actualJUnit416PASS10SKIP/51PASS andparent20FAIL4PASS/1FAIL1PASS, actualhashcensus/AST/two-keydiff, savedstrongproof375groups/209checks andliteral scanner/warning evidence checked. No API/decode/testreplay. Exactpublicreports now849-Uganda-independent and218-Malawi-independent. Runtimeauthorheads491/d29 stillclean; PRpublication pending. Uganda dated doc causewording is originalauthor scope; later1196Arrowdiagnosis will be qualified inPRbody.1149workeracquisition_1149 ledgerFIRST7b5bca233published, fullNigeria/Ethiopiagrounding/currentrulings, no actualacq. Critic1206reports329+12criticalgroups PASS, finalcriticalseal pending. Metadata-only earlier list-vs-dict diagnostic stopped while printing safe scanner allowlist, no frozen artifact changed.
+
+Sue
+
+* Twenty-four implementationPRs; critical1206numeric supplement accepted -- 2026-10-22T06:53:02.010069+00:00
+
+NewPR1207Ug849@491 stacks1202@085;1208Malawi218@d29basef8; exactbody/head/base readbacks. Live849/218updated/readbackexact, remainOPEN. FreshALL24headsOPEN/unmerged. Root1206critical verifier terminal0: new452manifestentries/8safeexports/checkers/classblobs, old2910payloads current;433groups407full/26qualified,0mismatch,12negativecontrols,16CLIcontrols; source/public20numericclaims independentlysupplemented without replay. Full22earlierreview+17/18/19remaining work staysactive. Source21newrootvaluesaddendum preservesactualNigerhashtrap. Newresidual1209MalawiMake canonicalcolumns/1210invalidwave5evictionsOPEN/readbackexact afterdedup. 1196actualDefault23/23candidate passes; Make14strict failures retained/classificationactive, nofixacceptance.1149synthetic262pass/parentcontrolsactive. Archive23dry6roots2952files6364388822B77exclusions terminal0; --writerunninghandle21062, notverified/durableclaimed. CriticalreaderrootverificationdoesnoAPI/decode/testreplay.
+
+Sue
+
+* Durability/CI/public readbacks -- 2026-10-22T07:02:31.852104+00:00
+
+Archive23 write+verification terminal0;6roots2952files6364388822inputbytes77exclusions711263678archivebytes SHAef49e5476424ec575c51623a431e30ad6d1f1d9e31160ce5accd816c827adace. Manifest9fbd34121a89608294cbb9e36ff8d27eff7c73e2979a1928d19baee21b5b6deb; launcher21fbbdec83076b488ea1cfb70fe8229b28f06150154f2c3266c18fc18aca66bf. Archive/member/sourceafter/owner0600/dir0700/fsync/durablelauncher verified; receipt validJSON. Includes849indie,218indie,1196diagnosis,ROOTnullabletoy,critical1206release+attestation. NewCI1207run39735520713/1208run39735616155SUCCESS2jobs6skipincldata. Publication24PRs/issue8492181196120612091210 exactbody readbacks savedSHAmetadata.1170bodyrewritten current24table andcritical evidence; updatedarchive23countreadbackexact.1196liveissue nowexplicitdirectWavebypass/incomplete repair; two otherMake stops include824x5versus824x3, notmerelyunusedlevels. Root read1722/2178 andget_dataframefallback/errors; requestedconcretesharedparquet-onlysame-stream helper proposal beforeexpansion, no simplegenericfallback replacement.1149committedFSpublishedf85a871fb266PASS,0fingerprintmoves; finalauthorfreeze pending. Critic17additional252stronggroups PASS reported,18/19gatesnext, no finalsubreleaseyet. Rootsource21remainsunassigned; critical20numericgate nowaccepted. No runningroot exec handles afterthischeckpoint unless commit/push reports one. Goalactive; noimplementation merges.
+
+Sue
+
+* Reader expansion approved;1149independent review assigned -- 2026-10-22T07:26:01.933587+00:00
+
+PreviousgoalturnPROGRESS:2implementationPRs+2residualissues+criticalnumericacceptance+archive23. Root new795receiptgate64376terminal0, SHA+MD5/allOS/inode/linkfields exact, bd80clean/sourcepins exact. Root fullread+gitapplycheck0 approvedpatch94252740/design3661423d, approval+conditions artifacts private/public1196-wave-reader-expansion. Separatebd80controlworktreeisa-1196-index-fix-bd80 prepared/rootDVCtmp targetmetadata terminal0. mali_lane resumedviafollowup;ledgerFIRST29cb3cf8dFSpublished, exact2paths applied, actualcandidate/bd80/f8censusesall549/39/1362move/keysexact/0datawrites,47newtargetedplusaffectedcontrols running; newcandidate sourcebuild notyet. Old14stops remain12policy+2Ug824x5vs3+unusedlevels/attrsqualified.
+1149authorREADY8b6dab49/4014manifest1473e075/rootall4014+7exports gate terminal0. Headfb1571035eac6f0f67e4496fd58d4b101b164ce9 runtimef85a871fb8772b0bf1c296927e739ea0f7211214;onlyledgerdescendant/teststreeexact. Preparedfresh reviewsource/basef8 andexactDVCtmp targetsbeforeimports. review_acquisition_1149dispatched full6contract/strongnumeric/real-namefixtures/provenance, noGit/source/GH/acq. FullcurrentNigeria2166/Ethiopia2350notes read/namecontradictions. Authorfirstwarmunembeddedsource/twoline timing and6private644copies kept; finalwarmcurrentpinned.
+Critic17prefix448groups+8bytes PASS reported;18/19posthoc570plusproducer123/204and20CLIbytes PASS reported, fullsealedreleasepending. All22earlier PRcohorts remainownedbyprimarycritic. Secondcriticf8source/private/rootmeta preparedUNASSIGNED, proposed12cohorts/brief/helperpins queued; noimports/payloads. Current3workers1196writer/1149review/primarycritic. No rootrunningexecsessions. Goalactive/noimplementationmerges.
+
+Sue
+
+* Root accepts object-v3 supplement; acquisition delta under independent review -- 2026-10-22T12:49:17.392431+00:00
+
+Previous goal turn PROGRESS: root reproduced fast-v2 object-EA escape, directed narrow corrected helper, acquisition amendment4f9344f42/runtime21f5cb7f9 completed270PASS/4actualfbcleanupFAIL with0fingerprintmoves. After two model-capacity terminal errors root verifiedno survivingtaskprocesses; both1196andcritic resumed completion/unexecutedstagesonly. All24publicimplementationPRsfreshOPEN/unmerged/exactheads.
+Root object-v3 verifier terminal0:1204newmanifestentries/12632old/1154physicalsavedcopies,1160positivegroups(17extra196/18=265/19=603/PR1200=96),8originalstagequalifications,42negativecalibrations;39objectEAblocks/32actualcellpairsallstr;0mismatch.38emptyoriginalmemorygaps+2extra18Featurememorygapsremain. Rootonlymetadata/staticreads,noAPI/decode/replay. Six-case ROOTobjecttoy frozen58bd5dba: fast-v2 accepts5typedfaults, slowrejectsall; originalhelper/releasesremainunchanged.
+1149firstindie allhuman6contractestablished266PASS/actualf8newcoherent47=45FAIL2PASS; invalidNonecleanupgap pre-existing/preservesSOURCE, additionaldispatchrequirement. Rootall1918+7exportschecked. Newauthoramend1135+7/rootgate0; twoexpected/confirmedtry-currentpop-reraise wrappers, onlyledgerdescendant. Newisolatedreview1149amend candidate4f9344f42/basefbpreparedterminal0/exactDVCtmp; assignedreview_acquisition_1149, own270PASS/4fbFAILreported, finaldeltafreeze pending; no newdata API/warmclaims.
+1196runtime7f4 unchanged; authornewcold/freshwarm bothbackendsNig239877/Ug4805 complete, deep329=256exact72intendedpolicy1explicit2019nativeversuscountry qualification;22hashfooters/27scanner26WARN1knownFAIL/2CLI6stageframes done, authorfinaldocs/freezepending. No completedAPI/testprefixreplayed.
+RootMali1199ruling afteractual1190SHA/bytes/mode+Niger9bf->READYb8c->manifest9f0gate0 permits NEWcurrentphysicalbaseline, explicitly nohistoricalmtimecontinuityclaim. Criticnew202positive+3attrs+7extra/10negatives/6footercontrols reported, sealingpending; Tz1201sealed322positive30negative16CLI rootacceptancepending; restfull22stillprimaryowned. Source21remainspreparedUNASSIGNED, no allcampaignverdict. Archive24six-rootdrypending; archive23lastfullyverified. Goalactive, no implementationmerges.
+
+Sue
+
+* GH1149 root accepts reviewed amendment -- 2026-10-22T12:53:54.373018+00:00
+
+Root independentdelta gate terminal0:1151entries/7safeexports/JUnit270PASS+4PathLikePASS/actualfb4expectedcleanupFAIL, actual549/39/1362 unchanged, exactcleanheads/ledgeronlydescendant. Root read full delta/adversarialsource; originalhuman6contract carries through unchangedproductionAST/fixture/skill and current270suite. Originalfbwarm12frames/5scannerremain separatelypinned; no newwarm or actualacquisition claim. Acceptedsource4f9344f42/runtime21f5cb7f9, PRpendingpublication; sourceplacementperfileatomicitydoesnotclaimwhole-release rollback.
+
+Sue
+
+* PR1211 published; reader independent review and split critics active -- 2026-10-22T13:10:29.079598+00:00
+
+PR1211 is OPEN at4f9344f42 with development basef8; exact body/head/base readback and mergeabletrue. It closes1149 only after human merge/release; live1149 now links the reviewed complete OptionC code repair and preserves the human ruling/acquisition separation. Source branch and campaign evidence abadb9fe9 both GitHub-pushed terminal0. There are25 open implementationPRs; no implementation merge. Updated1206 title/body correctly states root-accepted433critical and1160object-v3 groups, active22-cohort registry and explicit gaps; final issue bodies read back exact. An intermediate body separator dropped one opening character; immediately corrected, no code/evidence effect.
+1196 author ee520afeb/runtime7f4b222: root gate859/5safeexports/exactpathset/approved2productionSHAs/8dateddocdescendants terminal0. New detached ee/f8 review sources and exactDVCtmp prepared terminal0; review_acquisition_1149 assigned full independent reader review, complete Niger1567/Uganda3619 notes and code read, no tests/data actors yet at latest report. Capacity error resumed only after actual /proc confirmed no surviving actors.
+Root explicitly transferred first12 implementation cohorts to acquisition_1149 on separately prepared f8/private-second. Primary acknowledged retaining later10 plus17/18/19. Correctedv3 only; second own42negative+6positive calibration done, recordmoduleblobs matchall12, currentcountry readings/authority census active. General ROOT-HISTORICAL-MTIME-CONTENT-POLICY permits NEW physical baselines only with authenticated originalSHA/bytes/mode and missing historicalmtime explicitly unproved. No inferred oldmtime or API/test/source replay.
+Primary has frozen Tz1201(322positive/30negative/16CLI), Mali1199content-v2(209frame+3attrs/10negative/6footer), BF1203(192frame+1payloaddiagnostic/5negative/4footer), all pending root acceptance; Nigeria1192 authority149originals/44copies terminal, unexecuted checker next. No all-campaign verdict.
+Archive24 six-root dry terminal0:1537files/5458220397inputbytes/65exclusions. Existing writer handle80748 is confirmed live; final member/source/checksum verdict and durable receipt NOT YET available. Do not restart it or claim24archives verified. Last fully verified archive remains23. Source21 is prepared/unassigned; goal active.
+
+Sue
+* Archive24 verified; campaign continues -- 2026-10-22T13:16:17.876519+00:00
+
+Archive24 write and receipt verification both returned0. Six frozen roots /1,537files /5,458,220,397inputbytes /65exclusions produce562,309,240archivebytes, SHA256 c49ade4f4444bf60b92f9e68f61f073b9164a1a356e46e43478883106641ba45. Manifest7066ffe85271c5e8931a02ad01f03b9fbcb54cb39f75f18d4c8691bc4e768346; launcher635689c8dcc7a7a6ab44a39674a81da6d1aaa0ee421ce8fbe6a77bc3eebf229d. All archive members, source-after receipts, ownership/0600files/0700directory, durablelauncher and fsync checks passed. There are now24fullyverifiedarchives; next25unused. No rootarchive/test process remains.
+Fresh GitHub metadata verifies all25 implementation PRs OPEN/unmerged at expected heads.1196 independent current tests149PASS, actualf8IO23dtypeFAIL/1PASS, own13comparator faults reject, own549/39/1362 allmove; four NEW cold roots(twoheads x twobackends) running after17binarysource receipt gates. Primary1192 saved strictchecker retained12axisdomain findings versus25full-axisPASS; numericcolumns/masks/usedlabels agree but source-bound fullaxis characterization remains active. Do not call full index equality or automatically normalize/qualify unexplained domains. Missing old-payload authority in first12 remains a hold; source-only snapshots are not saved-data receipts.
+Goal stays active. No implementation merge, real acquisition, cache promotion or all-country/full-suite verdict. Next: finish independent1196review, root-accept finished1206subcohorts, continue actionablecountryissues, archive newly frozen outputs in25. Source21 still prepared/unassigned; actual20 NigerCROP hash/fullcoverage gate remains required.
+
+Sue
+
+* PR1212 and four validation classifications published -- 2026-10-22 14:13 UTC
+
+Previous goal turn was PROGRESS: root accepted the complete1196 independent review, published PR1212 and assigned Malawi1209.
+This turn also makes authoritative progress: root accepted three frozen country supplements, classified the Nigeria1192 index findings, authenticated nine earlier content digests and verified archive25.
+The goal remains active; no implementation PR was merged.
+The fresh14:13 GitHub inventory verifies all26 implementation PRs OPEN and unmerged at their exact expected heads/bases.
+The campaign source before this final receipt/handoff commit is32a2ec2bb59fa413286acc16ef2af8b4f409cf0e, published to both origins.
+
+PR1212 is OPEN at ee520afeb11ea028a76a371e0c89dc2aba6ad0a4, tested runtime7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1, development basef8d236694c26fe9e709c5548f02c70f74ea72c33.
+Root verified1,113 independent manifest entries,89,298 tracked receipts,1,935 old entries,17 providers and68 copies;149 tests pass and actualf8 controls give23 failures/1 pass.
+Eight data actors pass,44 candidate cold/warm pairs are exact, and570 overlapping groups give438 strict/130 policy-qualified/2 pre-existing singleton qualifications.
+All549/39/1362 fingerprints move; no corpus-wide output claim.
+CI39789045996 succeeded: unit-tests and windows-smoke passed; six jobs including data-tests skipped.
+Independent safe reports and acceptance are in slurm_logs/isa_backlog_2026-10-21/1196-independent/.
+
+The root three-country checker exited0: Tanzania1201 has322 positives(307 strict/15 qualified),30 negatives and16 byte controls; Mali1199 has209 positives(208/1),3 separate attrs-only groups,10 negatives and6 footer/byte controls; Burkina1203 has192 full frames,1 narrower payload diagnostic,5 negatives and4 footer/byte controls.
+All4,789 historical entries,1,072 new entries and813 selected products were gated.
+Mali's historicalmtime gap and every missing memory/stopped-stage limit remain explicit.
+These use the existing shared corrected-v3 calibration, not new42-control runs for each country.
+Reports/root receipts are1206-pr1201-Tanzania/,1206-pr1199-Mali/ and1206-pr1203-Burkina_Faso/; related PR bodies,1206 and1170 read back exactly.
+
+Root1192 classification checker exited0 and is published in1206-pr1192-Nigeria/.
+The original checker remains25 strict passes/12 strict findings.
+Eight findings are full unused domains inherited from actual gained unit keys; four producer expectations have local versus pooled domains/code widths and never asserted attrs.
+Two NEW pure Feature reconstructions bind the complete axes and payloads; no operands were normalized.
+The earlier unqualified axis metadata preservation claim is withdrawn in PR1192,issue1095 and1206/tracker1170.
+Original source-gain/helper/warm/adversarial/fixture memory remains unavailable.
+
+ROOT-API9-SHA256-CONTENT-BASELINE-RULING.json permits NEW comparisons of exactly nine named historical harmonized products after root verified the tracked framework16 proof -> snapshot -> API9 manifest/producer and each original's current authenticated content SHA.
+Historical original size/mode/mtime are absent; new physical receipts describe only the new interval and no other outputs in those roots gain authority.
+The second critic's API9 packet reports14 strict passes/four typed-record failures, nine separate warm-vs-initial strict pairs and one Code projection pass.
+The four failures are PopulationRecord/RecallRecord versus plain parquet dictionaries; all stored field values/types match, but _FIELDS presence differs.
+This packet is frozen pending root classification, with original failures retained and no record coercion.
+
+Three workers remain active.
+malawi_1209 owns the local food-builder retirement on actual PR1208 head d29a56783d08a8a647e2622150a4ee5fbdd7246a.
+Its five-path patch removes the obsolete country script/var rule, preserves native wave rules and adds a phony wave-only target; no framework or scientific edits.
+Six focused tests pass; parent4fail/2pass discriminates the repair.
+Actual26of549country and97of1362wave hashes change, all Malawi; other1265wave keys and39framework hashes stay exact.
+Nineteen binary providers x two L1 layouts x ten private roots give380 binary copies, no sidecar copies; eight roots are conforming and two diagnostic.
+The first two all-wave actors omitted LSMS_MAKE_JOBS and stay diagnostic; corrected roots assert LSMS_MAKE_JOBS=1, actual helper None and MAKEFLAGS=-j1.
+Default source-cold/fresh-warm all/singleton checks complete with16 strict endpoint pairs; Make/derived/audit work continues.
+Earlier relative-output denials and synthetic test stops must remain in the author history.
+
+acquisition_1149 is finishing the bounded12-PR assertion/authority registry and will stop after frozen API9/1180-author packets and the handoff.
+Its1175,1189,1191,1180-author and API9 packets remain pending root acceptance; do not label all earlier12 covered.
+Use that worker slot for independent Malawi1209 review once the author supplies a frozen source/runtime pin.
+validation_reassess retains the later10 plus integrations:1193 standalone/composed284+4 and integration14 165+5 entries,1197 259+4,1194 110+4 are frozen pending root acceptance.
+1195/1202 and a NEW1197 source-detail supplement continue; source-detail authority was traced through17 to authenticated old receipts.
+Keep all original holds, pre-decode metadata-schema stops, source-product actor143 stop and missing memory explicit.
+
+Archive25 writer94223 and verifier16137 both exited0; no root archive process remains.
+Ten frozen roots/2,544 files/4,045,639,544 input bytes produce578,226,314 archive bytes, SHA bef3c42324c24fabbac19843d6a14d4980e5e23151b69abb5652b9fa90a39071.
+Manifest733ff7c8d74189cce09f5a3d142f2ec2b546683d8888b67c07005e563bd2ac3b; launchercbbf6b51cdb948c05b468285b3f15218333b051c47db6648be44d351c423b2f1; verifiere0a72e59858bece8981caf16e6566c3200d8e109b39d0e0cb7547a81408ee7c3.
+All members/source-after/owner/mode/fsync checks pass; launcher and executed verifier are durable owner-only files.
+Runtime data/raw trees are excluded; selected operands-* trees retain country-named subdirectories.
+Later critic packets and root1192 classification require archive26; do not rewrite25.
+
+Next: independently review Malawi1209 when frozen, continue the remaining root cohort acceptances and exact public residuals, then address separate1210 and other actionable country issues.
+Source21 remains prepared/unassigned; actual20 Niger CROP current-hash/full-coverage gate remains mandatory before its integration work.
+The node still has more than32hours left and no deadline warning at14:13UTC.
+No real acquisition, shared-cache mutation, schema/exclusion shortcut, automatic merge or all-PR/full-suite/corpus verdict is authorized or claimed.
+
+Sue
+
+* Current campaign checkpoint -- 2026-10-22 16:06 UTC
+
+Goal ACTIVE; no implementation PR merged. There are26OPENimplementation PRs at the last live inventory.
+Previous source709bd75e96d3df4ef91b3fa4b935a12726a73ac4was FS/GitHub-published with six later10safe packets and the75-entry/34metadata-pair registry.
+Root accepted1193standalone/composed251strict+2NEWrecipes+4key predicates; separate14has135strict+1NEWrecipe+2key predicates+4inline sets.
+Root accepted1197provenance150strict+2originalNAqualifications and separate nine original source-row predicate sets, not nine full-frame pairs.
+Root accepted1202persisted274strict+4originalvNAqualifications plus separately scoped attrs/CLI controls; nine exact6eNEWpure recipes include duplicate targets, not recovered memories.
+All original source/fixture/expected/fresh-return gaps, suite failures, Make/area/warning/XML limitations and old holds remain.
+Tracker1170, issue1206and PR1193/1197/1202new bodies read back exactly; proof is primary10-followup-publication-readbacks.json.
+
+Root archive1173/1186gate48160completed0: six strict NEWUganda consistency pairs/one retained unused-domain+21attrs-presence failure, zero original reference pairs recovered; Mali12originalpublicstrict pairs.
+See1206-pr1173-Uganda-archive1/,1206-pr1186-Mali-archive1/and root-checkers/1206-archive1-1173-1186-root.py.
+No product defect is inferred from differing saved subset/all-wave stages; no full equality replaces the failures.
+
+Archive27is complete and root-receipt-verified:1968members/19roots/733844565compressed bytes, SHA1a7a7369fcefb0d25dbad9d1a631d65a891783142e7312eba2d362bdd0478ccf.
+Full safe receipt private-evidence-durability-twentyseventh.json;31runtime/raw/cache exclusions are explicit, four text source-snapshot exceptions retained, destinationSGIDunchanged.
+Archive27includes frozen later10/registry/P3/root records; it predates root1173/1186decision, whose checker and safe decision are committed here.
+No root verifier/archive process remains live after48160and66819returned0.
+
+Active agents:
+- review_malawi_1209: independent1209allfunctionalactorsdone;56Country/24Feature/10native strict,98footers,163literal scanner records,16warning sequences after checkout-path-only substitution. Full protection remains streaming, then seal/postexit. Await immutableREADY before rootacceptance/newPR.
+- malawi_1209: NEWGH1210source128cc095a62cbd210e30d2256359acfe53d4a2c5, normal commits FS-published; author28tests/actualf8 16invalidfailures+1iteratorbehaviorchange/11pass;56strictvalid/nativepairs; candidate105cachepathsexact versus five deleted parent wavefiles. Protection4319is still streaming frozen1209/218and ownprovider/copy receipts; no newAPI/testprefix. Await finalREADY/manifest.
+- acquisition_1149: NEWindependent1210PHASE0staticreviewonly. Read C/REVIEW-INVALID-WAVE1210-BRIEF.md. Explicit required HOLD before project/numpy/pandasimports/tests/providerCOPY/decode until authorREADY/manifest and rootphase1release. Sources W/isa-review-invalid-wave-1210and-base are detached128cc095/f8, task C/review-invalid-wave-1210, exact new per-sourceDVCtmp links already prepared with stdlib. No reviewdataactorsyet.
+
+Next concrete actions: finish current GitHub readbacks; receive and root-gate1209independentseal, publish stackedPRon exact1208 d29; receive1210authorseal, verify and release independentphase1. Do not restart protection handles or completeddata/tests. Continue Uganda1204/1205and other actionablebacklog after these fixes; source21stillprepared/unassigned and actual20NigerCROPcurrent-hash/fullcoverage prerequisite remains.
+Three agents and allocation40255479remain active, with about31hours left. No idle/release recommendation while this work continues.
+All merges remain human-owned; no actualacquisition/shared-cachepromotion/newvenv/fingerprint-exclusion/all-country-full-suite verdict.
+
+Sue
+
+* Final live publication/readback checkpoint -- 2026-10-22 16:12 UTC
+
+Fresh GitHub metadata verifies all26implementation PRs OPEN/unmerged at unchanged exact heads/bases.
+Tracker1170,issue1206and PR1173/1186bodies match the final qualified text exactly; public proof is archive27-publication-readbacks.json.
+Source d9560685ce3143b8b6c0b17e7ea3b90d1a0ca621 is FS/GitHub-published; this receipt commit adds no implementation.
+The goal remains ACTIVE and no root verifier/archive process remains.
+
+Independent1209final protection12966returned0:29779tracked source receipts,1085author entries,19providers/304copies and endpoints/cache receipts exact, zero observed guard/network attempts in this independent task.
+Sealer34361is active; separate full postexit follows only after observed sealer0.
+Author1210protection4319ended1 at its LAST assumed-zero guard-log assertion after its earlier source/frozen/provider/copy checks passed.
+Six retained relative remove/rmdir denials are associated with existing-test cleanup by source/time context only; original dir_fd/resolved endpoints/per-event timestamps are unavailable.
+Root requires exact log SHA/bytes/rows and unresolved attribution, preserved terminal1/source/trace, no zero-denial or zero-outside-write claim.
+Author will not rerun the completed full protection prefix: only stdlib metadata qualification, necessary seal and separate postexit remain.
+No project/data/test/API prefix or source edits are authorized to manufacture the missing event history.
+
+Independent1210phase0has completed static entry-order review and full Malawi notes; no project imports/tests/provider copies/decodes yet.
+The public guard follows existing argument checks and precedes valuation/derived fallback; internal validation precedes panel-ID/cache/Make work.
+The iterator behavior change is separately disclosed.
+Inherited IHS2-factor and2013GPS/cluster prose tensions are reported without silently rewriting country decisions.
+Root must receive/authenticate immutable authorREADY/manifest before releasing phase1under REVIEW-INVALID-WAVE1210-BRIEF.md.
+
+Next: root-accept1209after immutable independentREADY; publish a PR stacked on exact1208d29, then release independent1210runtime review after the author's final packet.
+Other backlog remains, including Uganda1204/1205 and prepared/unassigned integration21.
+Do not mark the overall campaign complete, merge automatically or restart existing protection/seal/data actors.
+
+Sue
+
+* Queue refresh and Malawi publication 2026-10-22T16:47:51.474415+00:00
+Sue. Turn classification: PROGRESS.
+Campaign head before this note: dcf19925f4f319d170fe5cfa99cef7ba3176efd4.
+PR1213 is OPEN/unmerged at47b3c5d76371acc457c5553ebf8adfb1859e115b, stacked on1208d29; independent/root acceptance complete. CI39815466875 unit/windows success, six skipped including data.
+Live queue112 records =24PR-linked+3active+85other; all27 implementation PRs individually read back OPEN/unmerged. No merge or full-campaign claim.
+Active owners: acquisition_1149 independently reviews1210; review_malawi_1209 authors1204; malawi_1209 diagnoses1205. Root released1204 narrow builder retirement after pinned source/map checks;1205 bounded diagnosis requires exact provider census/gates before copying/decoding.
+Next: finish workers, independent reviews, preserve/seal/archive new1209/1210 packets (archive27 does not cover them), then choose next per-country issues from remaining-queue-2026-10-22.org. Tracker1170 and issue1209 publication updates are prepared this turn.
+Goal stays ACTIVE; no paused/blocked/completed state.
+
+* Archive28 and active-lane gates 2026-10-22T17:05:08.417428+00:00
+Sue. Turn classification: PROGRESS.
+Archive28 writer33652 observed terminal0, durable verifier0:1304files/2106672195sourcebytes/540822174compressedbytes,50exact native operands retained,1868runtime/raw-cache exclusions. SHA9b8d035b3786b48ea61e409f81962267d1667233c83328383e82cf6f3de9b7cd.
+Durable manifest embeds exact config/approvedplan/rootapproval/preparationcontroller and the initial UID-namespace dryrun stop. Old unwritten plan is superseded only to add that audit embedding; all selected files unchanged. Archives1-27 were not targeted.
+Uganda1205root independently checked53current sidecar declarations and distinct held provider physical identities/49160847bytes, receiptUganda1205-provider-census-root.json. Worker actual binary auth84030 and53distinct-copy gate observed0; bounded cold/warm/source ancestry diagnosis follows. Guard/capability/helper/import bootstrap stops remain private history.
+Uganda1204 source69bcbd5ff includes only approved builder retirement/Make/doc/test/ledger. Original guard/test-fixture setup failures preserved; actual491parent and candidate v3 tests running. No held staging reported yet.
+Independent1210 reports50strict pairs,4cold/4warm and bothbad/mixed controls complete. V1seal48820/postexit30150 reported0,359manifest entries; root has read actual comparison/protection/seal/postexit source. Circular calibration PID classification and nested old safe-pin mode mismatch are retained. Additive sibling review-invalid-wave-1210-supplement-v2 must bind non-network source/path/order/time association (missing independent original calibrationPID records explicit), direct stopped-controller PID records, corrected current pins and exact terminaltool records. Never rewrite v1 or replay data/protection.
+Next: authenticate both independent1210packets and archive jointly, review scope/known iterator+error timing+549/39/1362invalidation, publishPRhumanmerge only if accepted. Continue Uganda workers and select next country lane when a slot frees. Goal remains ACTIVE.
+
+* Correction to anticipated packaging mismatch 2026-10-22T17:10:46.592790+00:00
+Root independently compared all five original nested safe pin receipts in independent1210 v1: every byte/hash/mode/mtime/device/inode/nlink/symlink field is exact, mode0600. No packaging mismatch exists. Earlier tracker/handoff anticipation was unsupported and has been explicitly corrected publicly. Root receipt1210-independent-original-nested-pins-root.json. Preserve the peer supplement failed assumption as history; only the circular guard attribution still needs the additive qualification.
+
+* Independent1210 joint root acceptance 2026-10-22T17:23:09.382666+00:00
+Sue. Root verifier78135 actual0 verifies359runtime+27additive metadata entries,29762source receipts,2065physical paths; all50strict pairs and49targeted tests validated, actualparent17FAIL11PASS. Fourcold/fourwarm roots,105candidatepaths preserved vsfiveparentnativefiles deleted;163literalorderedscanner records incltwo knownFAIL and24fullwarningpairs exact. Root first metadata-count stop preserved:12frame+2separate metadatafault controls comprise14total, not14inonefile. Original nestedpins all exact. CalPID source/path/order/timeassociation keeps missing originalPID records; twoexecnetprecollectionfd12stops havebootPIDdirectevidence. Author sixunattributeddenials retained. No globalzero-network/outsidewrite/fullsuite/corpusclaim.
+Allowlisted exports/root acceptance under1210-independent; authorpacket durablearchive28, independent runtime/supplement awaitarchive29. Next publish1210PRfrom128againstactualf8 with broad549/39/1362invalidation, iterator/error timing change and review qualifications. Human merge only.
+Uganda1205author restores13235yieldkeys in saved raw-column oracle, preserving14520oldkeys/values; not yet independently accepted. Rootapproved narrowcountrygated constructor inverse; staticcriticacquisition_1149 flagged explicitconflictingareacountry and prospectivecanonicali/rawparcelalias census, both senttoauthor beforefreeze.
+
+* PR1214 published 2026-10-22T17:28:43.364859+00:00
+Sue. PR1214OPEN/unmerged exact128cc095a62cbd210e30d2256359acfe53d4a2c5, base development06710190305e0057d9e19d42059753d4cc0db012. Base advanced by ONE poetry.lock-only certifi commit; library/config/tests unchanged fromtestedf8. No mountedvenv/dependencychange. CI39822550698inprogress.
+Full28implementationPRreadbacks allOPEN/unmerged. Complete171issueheadline refresh confirmsall112ISArecords stillOPEN/no newnumbers;25PRlinked+2active+85other. Independent1210publicevidencea3ff2b05c4fdb75756bdea20458963c0bb5c496e; privatearchive29stillpending.
+ActiveUganda1204authorheldgrid12roots;1205authorfixplusacquisition_1149staticcritic. Concrete newyieldrepair remainsunaccepted untilsourceoracle/fingerprint/finalfreeze andindependentreview. No merges or goalcompletion.
+
+* Queue and Uganda handoff checkpoint 2026-10-22T17:55:35.719067+00:00
+Sue. Goal remains ACTIVE.112openISAissue records=25PRlinked+2active+85other;28implementation PRs OPEN/unmerged. PR1214 at128 accepted scoped independent/root proofs; actual creation base067 is lock-only dependency advance from testedf8, mountedruntime unchanged.
+Direct gh API reproduces contradictoryCI39822550698: run completed/success, unit job119977316030 stillin_progress, Windows success, six skipped. Qualification1214-ci-metadata-qualification.json; no completed unit/full-data/overallCI claim or restart.
+Uganda1205author884hand-off root87223terminal0:302fullmanifestfiles/53current genuine binaryproviders/53copies; source unchanged549/39/1362fingerprints and13235additionalyieldkeys are author claims pending independentruntime. Revieweracquisition_1149 completedphase0, ownPopenPID/boot guardcalibration andfull29826trackedentrysnapshot; phase1released in own freshprefix. Three historical trackedMalawi.pkl artifacts are opaque Git source bytes only.
+Uganda1204author a417b69d7 ledger-onlyfinalcommit published. All59acceptedactors andartifact63519terminal0;61/65strictpairs pass, fournewlyexposedempty-column-order differences retained.177footers/21native-footerpairs/22literal scannerrecords verified. Heldgrainledgers empty; nonemptytransport onlysynthetic. Finalprotection74572schema assumption stop preserved; additive explicitphysical-field/MD5/magic continuation only, no API/data-grid replay. Awaitfreeze, rootauthentication andindependentreview.
+Archive29exactplane0c8799 rootapproved416files/905657034bytes including20native and48serializedpublicoperands;549runtime exclusions. Agentmalawi_1209 maywrite fresh twentyninth only under8GiB, exactmember/source-after verifier andSGID/accesspreservation. Rootapprovalf2bcd15...; no runtime/data/test replay or old-controller execution.
+Next: finisharchive29, independent1205 andauthor1204; retain issue1206 campaignvalidation andother85queuedrecords. No automaticmerge or campaigncompletion.
+Sue
+
+* Archive29 and independent Uganda ownership 2026-10-22T18:00:52.901856+00:00
+Sue. Archive29writer38595actual0/innerexactmemberverifier0;root75559actual0 checkscompressedSHA06f48a8e4f0ca5365c55aa4a60dec68e581730a6dfca8e6532c39d1c1e8f3f12,163291151bytes,416members/905657034sourcebytes,20native+48publicoperands,549excludedruntimefiles. Exactplan/approval/controllers/rootterminalrecords/SGID02700/artifacts0600 checked; no package/data replay. Receiptprivate-evidence-durability-twentyninth.json.
+Uganda1204authorfreezea417b69d71c460ab33f6a494b4df5d67cd792de5 READY5febb754.../1839entrymanifest920a0d87... reportedsealer99339/postexit886910. Rootauthentication pending. Rootprepared detachedreviewworktrees andC/review-Uganda-1204; malawi_1209assignedPHASE0ONLY viaC/REVIEW-UGANDA1204-BRIEF.md, no project/data/testimports/copiesuntilrootrelease. Nextrootmustauthenticatefrozenauthor/toolreturns, prepareDVCtmp/mountedimage links, thenreleaseboundedindependentruntime. FourstrictorderFAILandheldemptygrainledgerqualificationretained.
+Uganda1205independentacquisition_1149 nowcandidate65PASS/actual491new33sixFAIL27PASS;fullfingerprintsunchanged,53genuineproviders/106distinctcopiesauthenticated. Bothnormalcoldactorsrunning. Censusactorsproducedcompletehashes thenterminal1atemptydvc-cachedirectoryassertion; additivequalificationwithoutreplay. ProviderprefixandDecimalcalibrationstopsretained. Do notrestartcompletedactors.
+Queuequestionansweruses112openrecords/25PRlinked/2active/85other,28OPENunmergedPRs;fulllive171headlinecheckall112stillopen. Other59titlesnotfreshlyretriagedinthisrootreadback. GoalACTIVE; nextcountryworkremains.
+Sue
+
+* Independent Uganda release and Burkina source diagnosis 2026-10-22T18:18:48.273150+00:00
+Sue. PreviousgoalturnPROGRESS:ee2e4846aFS/GitHubpublished queue/archive29/root1205handoff; no rootactorlive fromthatturn. Thisturn root1204gate89473terminal0 authenticates1839fullentries/29825source/37binaryproviders/444copies/8safeexports andsealer99339/postexit88691 exacttoolrecords. Root70523metadataassertionstop preserved:27legacy sidecars omitoptionaldeclaredsize; v2checksrealphysicalsizeanddeclaredsizewhenpresent,stillMD5/SHA/binary. Missingmanifest/allowlist pathreads correctedwithoutproduct execution.
+Independent1204malawi_1209 phase1releasedunderownactualguardcalibrationgate; rootprepared exactreviewDVCtmp/venvlinksandfrozenauthorv2guardcopySHA6d1557.... Ownfirstcalibrationstoppedbeforeprobes/importson/proc/1/ns/netpermissions; additivev2usesownlauncherrecordednamespace, no guard weakening. FourNEWempty-column-order strictFAILandsynthetic-onlynonemptygraintransportremain. Rootdedupfinds noexistingowner;closed1099isrow/errorbehavioronly. Separatepreciseresidualmaybefiledafterpublicexportpin, noframeworkscopeexpansioninside1204.
+Independent1205acquisition_1149 rawcolumnoracleexact27755yieldkeys/31959convertedparcelkeys,+13235/0lost/all14520oldkeysvaluesexact. Missing4204partition3918bothareareportsmissing+276nonpositivechosenGPSarea+10missingparcel;zeroHHrosterabsence/zeroeligiblepostdivisiondrop. Preharvestquantity-vs-factor exclusions notpartitioned. Full5supportingcrossheadframes/12coldwarmpairs/48literalorderedscannerwarnings exact. Final21actorprotection/sealfollows, no dataactorreplay.
+BF1188authorreview_malawi_1209 fullCONTENTS1486linesandguidance/skillsread; ledger7eb9cfe34normalhookpublishedonexactPR1203parent3dc. Staticdiagnosisonly:currentAPIhasnoindependentpurchase/giftunitfields,usageconsumersreadQuantity+u, nativeunitlabel5differsCharrettee/Charrettebyvariable. Scope/sourcecensus/transportoptionspending; noprojectimports/providerpayloadopens/copies/decodes/tests/APIorproduction/schemaeditsreleased.
+Current112openrecords=25PRlinked+3active+84other;28implementationPRsremainunmerged. Nextrootpublishexactauthorhandoffexports/residual, chooseBFcoherentrepresentationafterconcretediagnosis, authenticate1205finalindependentpacketandpublishonlyifaccepted. GoalACTIVE,humanmergeonly.
+Sue
+
+* 2026-10-22T19:04:06.056446+00:00 Uganda parcel-area PR published
+Sue independently root-accepted source884775a461d769fd4bb5181005ca3238513b5b01 at actual491 parent and opened PR1216, stacked on PR1207.
+Independent65PASS, actualparent new6FAIL27PASS;27,755 yields retain all14,520 old records and add13,235, with4,204 source-bound area exclusions.
+Queue113records now26PR-linked/twoactive/85other;29implementation PRs await human merge.
+Active Uganda1204 independent saved-operand checks retain original strict-stage failures and private trace-output exception; Burkina1188 narrow implementation3d39096d5 published and under author testing.
+Archive30 exact plan8e0ab9e10d1513966b37f04d50472d3bd3fb60ded9b193f2ef6d3a638d193186 released by rootapproval7c1d3290e984b9af25e895e4e229ff4bc496bc1d7b968b6a0f9acb8b160d8b0e; writer/verifier acceptance pending.
+Next: finish private archive30 root verification, independent1204 review, Burkina1188 author tests then independent review, and refresh tracker1170.
+
+* 2026-10-22T19:20:39.886027+00:00 Private archive30 accepted; next reviews
+Root verifier94711/chunk505e5f actual0 independently checked all1,830opaque archive members, complete source-after receipts and exact plan/approval/controller/terminal chains.
+Archive SHA2562f72327102e1fdc7cf956dbd9f905c4c368ce6ff2af00c0994f6d526f5075a7a retains290parquet and166serialized operands; raw sources and live prefixes remain excluded.
+PR1216 exact-head CI39836472369 passed unit-tests/windows-smoke; six jobs including data-tests skipped.
+Uganda1204 independent READY90150bdb/finalmanifestd1c74be6 sealed; root authentication pending. Four empty-column-order failures remain1215; original oracle-stage and private trace-output qualifications retained.
+Uganda1215 ledger-first static proposal467b3b59c on actuala417 is active; code/runtime unreleased pending concrete schema-order decision.
+Burkina1188 author3d39096d5 has14syntheticPASS/actualparent7FAIL7PASS reported; normal four-root builds active after preserved source-copy preflight stop and root-authorized quarantine. Independent BF static reviewer now owns immutable3d/3dc snapshots; runtime remains held pending author freeze/authentication.
+
+* 2026-10-22T19:53:36.982786+00:00 Uganda1217 published; ordering policy approved
+PR1217 is OPEN at exacta417 head against491 parent after root86543/chunk328892terminal0;109of113strictPASS andfournewempty-column-orderFAIL retained1215.
+Its CI39840558700 and1216CI39836472369 each completed unit-tests/windows-smoke success;sixjobs includingdata-tests skipped.
+User explicitly selected declaration order for constructed-empty frames; source/runtime release C/UGANDA1215-IMPLEMENTATION-RELEASE.md uses newC/uganda1215-order-fix and detachedactuala417base.
+Frozenstatic1215packetaf425bb7/2de89c7a has24entries; source epoch666 is allowed to advance after approval. No claim its old external sourcephysicalbaseline stays forevercurrent.
+Newissue1218ownsfourBFoptional-emptydtypefailures; unchanged populated outputs are part of the proposed fix boundary. Queue114=27PRlinked+twoactive+85other;30implementation PRs awaithumanmerge.
+IndependentBFcalibrations original4187529/4187530passed;predata549/39/1362metadataandsynthetic checks released;realproviders/dataheldpendingfinalauthorfreeze/rootauthentication.
+AuthorBFall8normalactorsand16candidatecasesreportedcomplete;original458matrix398PASS60FAIL preserved plus56stage-correctnativeproofPASS;fourrealemptydtypeFAIL1218. Finalprotection/sealawaited.
+Nextrootactions: finish tracker1170refresh;authenticate frozenBFauthor then releaseindependentfourrootgenuineplan;review1215guard/census/synthetic/provide37provider148copybudget;preparearchive31forfrozenUG1204independent/static1215/newrootreceipts;implement1218afterBFauthorhandoff.

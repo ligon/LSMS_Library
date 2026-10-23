@@ -1,0 +1,7 @@
+{
+  "exact_lost_key_set_equals_all_six_old_payload_columns_missing": true,
+  "lost_rows": 7,
+  "wave": "2018-19",
+  "2021_lost_rows": 0,
+  "no_identifier_null_or_coordinate_filter_used": true
+}

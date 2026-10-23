@@ -1,0 +1,104 @@
+{
+  "status": "FROZEN_INDEPENDENT_PASS",
+  "verdict": "PASS",
+  "candidate_head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "actual_parent_head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+  "runtime_tests_pin": "929149222e43a8fe500cc08420cdc68357170af3",
+  "candidate_and_parent_all_initial_tracked_bytes_modes_HEAD_clean_exact": true,
+  "literal_os_readlink_Git_bytes_checked": true,
+  "tested_cohort": {
+    "pass": 392,
+    "skip": 10,
+    "fail": 0,
+    "error": 0
+  },
+  "actual_parent_new_tests": {
+    "pass": 3,
+    "fail": 36,
+    "skip": 0,
+    "error": 0
+  },
+  "source_observations": 133761,
+  "public_null_v_retained": 928,
+  "Feature_rows": 180137,
+  "healthy_Niger_rows": 46376,
+  "harvest_kg_delta": 2091.0,
+  "preexisting_qualifications": [
+    "Uganda cluster_features v StringDtype pd.NA-to-nan on both heads/backends; strict failures retained",
+    "Make17 byte-identical paths mode0644-to0600 and mtime, matched parent, strict failures retained",
+    "CLI exact matched-stage API/artifact with explicit existing dtype/JSON-record serialization differences",
+    "Subset routing and real-area coverage residuals unchanged",
+    "Original author overwritten XML and failed-Make warning-list gaps unrecovered",
+    "Initial metadata-label review interpretation corrected against existing settled ruling; saved dates independently match",
+    "Deterministic final snapshot retry refreshed identical JSON; no first-attempt snapshot-file mtime baseline claimed"
+  ],
+  "network_attempts": 0,
+  "other_consumers": [],
+  "writer_exits_after_READY": true,
+  "no_API_test_source_replay_after_terminal": true,
+  "source_reference_proof": "safe-exports/source-and-cache-proof.json",
+  "checker_pins": "safe-exports/checkers.json",
+  "manifest": "final-private-manifest.json",
+  "manifest_entries": 1908,
+  "manifest_sha256": "fa04d70934d3d7f32083ecabd45de9e0d2fc60fcac001dffc20c29dd93f2f72d",
+  "safe_exports_allowlist": {
+    "REPRODUCE.sh": {
+      "sha256": "2c7303b1b051de9a07c056edda4e62511714485ddf0cbee0764f65fa2e739b44",
+      "bytes": 1723
+    },
+    "RESIDUALS.md": {
+      "sha256": "2fbfae128fe3ccd882291d088dc2431de2e7054097881119c37d3cf1a84e8475",
+      "bytes": 1948
+    },
+    "REVIEW.org": {
+      "sha256": "41aeb9e327685e7deb8fd5f2b46e69ef8fe4b65ce52a56216727e89518489d07",
+      "bytes": 15284
+    },
+    "STOP-INDEX.json": {
+      "sha256": "d52c69c75fd11777888eaaf79a5dbd0e5c437cbe474b8d187f472d75370014c2",
+      "bytes": 3019
+    },
+    "checkers.json": {
+      "sha256": "3767ba4cca228ec5ea3402a9df0b273978d567ddfe570a83bf69d0bc02fef0f5",
+      "bytes": 3719
+    },
+    "ledger.md": {
+      "sha256": "2d8bf0f637f5e9b487e096a6fdb7ccb9f90e7aee66867cef3876ecac537ce6f1",
+      "bytes": 5820
+    },
+    "scanner-account.json": {
+      "sha256": "ae954424d16fe6914dfe2389c5829c504b157e2980ede1f44f99cf55a8f9b58f",
+      "bytes": 26517
+    },
+    "source-and-cache-proof.json": {
+      "sha256": "ef4790fca1d1e39fcaf4e8fdd9034d6b2cfe47f79746bd395f23b0e306971260",
+      "bytes": 3475
+    },
+    "source-metadata.json": {
+      "sha256": "dc769187356d9d04d01344716c65de5d0c45a2afed0e666c4b6024bc127aceee",
+      "bytes": 9279
+    },
+    "support-dtype.json": {
+      "sha256": "cf36fa92b9346c6842f7f40df6ab569685df8d8aad4e7d1be6ab9bd96fc0c6b5",
+      "bytes": 1764
+    },
+    "test-account.json": {
+      "sha256": "a03c7b752b9a4759a9796e1c6fb2a1c681bcf92971f96031e8c97e93a6dd46ca",
+      "bytes": 10770
+    },
+    "validation.json": {
+      "sha256": "4256bee28303e0c0721906478ad60e08fbbe5fbf0a2e806d871a79fc9f50a339",
+      "bytes": 124626
+    },
+    "verdict.json": {
+      "sha256": "0c0f6c94e8c58b9ee3fa80ef3d8be78b9562ce11b72d355133cc7cef6a880c4d",
+      "bytes": 887
+    },
+    "warning-account.json": {
+      "sha256": "c63c70fe5f5bfae5ddba6290c480ae9a7ce785a74f098fff39e58134cef28dd0",
+      "bytes": 274919
+    }
+  },
+  "created_UTC": "2026-10-22T03:44:37.728621+00:00",
+  "signed": "Sue"
+}

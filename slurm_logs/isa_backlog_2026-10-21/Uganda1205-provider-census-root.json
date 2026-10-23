@@ -1,0 +1,12 @@
+{
+  "status": "ROOT_METADATA_CENSUS_ACCEPTED_BEFORE_ACTUAL_HASH_COPY_DECODE",
+  "at_UTC": "2026-10-22T16:54:12.958306+00:00",
+  "census_sha256": "f8604562167e802a8f84bb335dd632b121aaedff44a16d12fadb0f9cf2f38278",
+  "declarations": 53,
+  "distinct_provider_inodes": 53,
+  "bytes": 49160847,
+  "raw_hashes_or_decode_by_root": 0,
+  "own_actual_MD5_SHA256_and_full_physical_gates_still_required": true,
+  "no_acquisition": true,
+  "signed": "Sue"
+}

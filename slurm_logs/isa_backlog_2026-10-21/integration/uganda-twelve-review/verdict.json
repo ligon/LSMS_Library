@@ -1,0 +1,130 @@
+{
+  "verdict": "PASS",
+  "head": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
+  "integration_freeze_may_be_released_for_this_bounded_Uganda_check": true,
+  "blockers": [],
+  "scoped_passed": 25,
+  "support_passed": 41,
+  "failed": 0,
+  "skipped": 0,
+  "xfail": 0,
+  "complete_API_frames_exact_to_f8_and1191_per_process": 9,
+  "complete_attrition_matrices_exact_per_process": 2,
+  "separate_API_processes": 2,
+  "new_Country_objects_per_API_process": 9,
+  "production_logical_output_differences": 0,
+  "normal_rebuild_needed_prerequisites": [
+    "household_roster",
+    "income",
+    "shocks",
+    "cluster_features",
+    "earnings",
+    "enterprise_income"
+  ],
+  "Region_exclusions": {
+    "food_prices": 36,
+    "food_quantities": 37,
+    "food_expenditures": 31,
+    "household_characteristics": 67
+  },
+  "HC_columns_axis_name_modes": [
+    "sex_age",
+    null
+  ],
+  "warning_accounting": {
+    "initial_warm_full_warning_sequence_exact": true,
+    "old_reference_Country_objects": 1,
+    "new_Country_objects_per_API_phase": 9,
+    "Region_Country_objects": 4,
+    "each_Region_call_exact_same_8_grain_messages": true,
+    "all_other_warning_class_counts_exact_reference": true,
+    "old_reference_GrainCollapseWarning": 8,
+    "new_GrainCollapseWarning": 32,
+    "delta_24_accounted_for_by_per_object_market_lookup_cache": true,
+    "market_lookup_market_join_and_warning_replay_AST_exact_f8": [
+      "_market_lookup",
+      "_add_market_index",
+      "_replay_grain_audit",
+      "_emit_grain_report"
+    ],
+    "production_warning_change": false
+  },
+  "warning_class_counts": {
+    "initial_API": {
+      "QuantityImplausibleWarning": 18,
+      "NullIndexKeyWarning": 12,
+      "ClusterIdentityWarning": 8,
+      "StatedVsInferredKgWarning": 4,
+      "UserWarning": 2,
+      "GrainCollapseWarning": 32
+    },
+    "fresh_process_warm_API": {
+      "QuantityImplausibleWarning": 18,
+      "NullIndexKeyWarning": 12,
+      "ClusterIdentityWarning": 8,
+      "StatedVsInferredKgWarning": 4,
+      "UserWarning": 2,
+      "GrainCollapseWarning": 32
+    },
+    "scoped_tests": {
+      "NullIndexKeyWarning": 25,
+      "ClusterIdentityWarning": 17,
+      "UserWarning": 5,
+      "QuantityImplausibleWarning": 33,
+      "StatedVsInferredKgWarning": 8,
+      "GrainCollapseWarning": 40,
+      "NullReadWarning": 2
+    },
+    "support_tests": {
+      "NullIndexKeyWarning": 4,
+      "GrainCollapseWarning": 24,
+      "QuantityImplausibleWarning": 3,
+      "ClusterIdentityWarning": 2,
+      "UserWarning": 1
+    },
+    "normal_stale_builds": {
+      "CacheRebuildWarning": 6,
+      "NullIndexKeyWarning": 2,
+      "ClusterIdentityWarning": 4,
+      "UserWarning": 4,
+      "GrainConflictWarning": 8,
+      "RuntimeWarning": 2,
+      "NullReadWarning": 2
+    }
+  },
+  "freeze_proof": {
+    "head": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
+    "branch": "isa/integration-20261021",
+    "tracked_files_checked": 14992,
+    "tracked_SHA256_mode_symlink_changes": 0,
+    "status": "clean",
+    "production_config_modes_exact_previous_eleven_review": true,
+    "three_test_blobs_exact_independently_reviewed1191": true,
+    "original_selected_source_L2_files_unchanged": 64,
+    "original_selected_source_L1_blobs_unchanged": 55,
+    "original_and_private_reference_files_exact": 22,
+    "private_L1_MD5_SHA_mode_mtime_exact": 55,
+    "committed_panel_JSON_sources_SHA_mode_mtime_exact": 2,
+    "source_files_physically_copied_not_linked": 119,
+    "authorized_normal_private_stale_builds": 6,
+    "private_L2_build_changes": 46,
+    "private_L2_initial_unchanged": 18,
+    "current_fresh_required_country_tables": 8,
+    "each_country_table_manifest_waves": 8,
+    "private_ready_parquets_bytes_modes_mtimes_exact_after_API_tests_warm": 64,
+    "derived_nutrition_FCT_parquets": 0,
+    "in_tree_parquets": 0,
+    "in_tree_untracked_raw_sources": 0,
+    "actual_outbound_network_attempts": 0,
+    "acquisition_DVC_CLI_shared_cache_mutations_bypasses_manual_stamps": false,
+    "remaining_task_processes": 0,
+    "captured_utc": "2026-10-21T20:49:15.813755+00:00"
+  },
+  "prior_full_eleven_review_retained_pin": "7886f7ece49767b2357a2f559c474e0eb710561f",
+  "limits": [
+    "Bounded Uganda coexistence verification; not a cold rebuild of all Uganda tables or all eight-country data.",
+    "Only six actually stale required tables were rebuilt; fresh sample and food_acquired were verified and normally served.",
+    "No repeat full cohort/scanner/fault catalog; prior eleven-change review and independent1191 fault review remain separately pinned.",
+    "Known Region exclusions, grain/source warnings, survey-design caveats and mode-specific HC columns.name remain unchanged."
+  ]
+}

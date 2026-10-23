@@ -1,0 +1,689 @@
+[
+  {
+    "source": "lsms_library/countries/Malawi/2010-11/Data/Panel/Agriculture/ag_mod_f.dta.dvc",
+    "fields": {
+      "ag_f16b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "5 kg bag",
+        "6": "10 kg bag",
+        "7": "50 kg bag",
+        "8": "Liter",
+        "9": "Milliliter",
+        "10": "Bucket",
+        "11": "Wheelbarrow",
+        "12": "Ox cart",
+        "13": "Other (Specify)"
+      },
+      "ag_f26b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "5 kg bag",
+        "6": "10 kg bag",
+        "7": "50 kg bag",
+        "8": "Liter",
+        "9": "Milliliter",
+        "10": "Bucket",
+        "11": "Wheelbarrow",
+        "12": "Ox cart",
+        "13": "Other (Specify)"
+      },
+      "ag_f38b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "5 kg bag",
+        "6": "10 kg bag",
+        "7": "50 kg bag",
+        "8": "Liter",
+        "9": "Milliliter",
+        "10": "Bucket",
+        "11": "Wheelbarrow",
+        "12": "Ox cart",
+        "13": "Other (Specify)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2010-11/Data/Panel/Agriculture/ag_mod_g.dta.dvc",
+    "fields": {
+      "ag_g04b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "3.7 kg bag",
+        "6": "5 kg bag",
+        "7": "10 kg bag",
+        "8": "50 kg bag",
+        "9": "Other (specify)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2010-11/Data/Panel/Agriculture/ag_mod_h.dta.dvc",
+    "fields": {
+      "ag_h16b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "3.7 kg bag",
+        "6": "5 kg bag",
+        "7": "10 kg bag",
+        "8": "50 kg bag",
+        "9": "Other (specify)"
+      },
+      "ag_h26b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "3.7 kg bag",
+        "6": "5 kg bag",
+        "7": "10 kg bag",
+        "8": "50 kg bag",
+        "9": "Other (specify)"
+      },
+      "ag_h38b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "3.7 kg bag",
+        "6": "5 kg bag",
+        "7": "10 kg bag",
+        "8": "50 kg bag",
+        "9": "Other (specify)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_f.dta.dvc",
+    "fields": {
+      "ag_f16b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "5 kg bag",
+        "6": "10 kg bag",
+        "7": "50 kg bag",
+        "8": "Liter",
+        "9": "Milliliter",
+        "10": "Bucket",
+        "11": "Wheelbarrow",
+        "12": "Ox cart",
+        "13": "Other (Specify)"
+      },
+      "ag_f26b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "5 kg bag",
+        "6": "10 kg bag",
+        "7": "50 kg bag",
+        "8": "Liter",
+        "9": "Milliliter",
+        "10": "Bucket",
+        "11": "Wheelbarrow",
+        "12": "Ox cart",
+        "13": "Other (Specify)"
+      },
+      "ag_f38b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "5 kg bag",
+        "6": "10 kg bag",
+        "7": "50 kg bag",
+        "8": "Liter",
+        "9": "Milliliter",
+        "10": "Bucket",
+        "11": "Wheelbarrow",
+        "12": "Ox cart",
+        "13": "Other (Specify)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_g.dta.dvc",
+    "fields": {
+      "ag_g04b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "3.7 kg bag",
+        "6": "5 kg bag",
+        "7": "10 kg bag",
+        "8": "50 kg bag",
+        "9": "Other (specify)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_h.dta.dvc",
+    "fields": {
+      "ag_h07b": {
+        "1": "gram",
+        "2": "kilogram",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      },
+      "ag_h16b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "3.7 kg bag",
+        "6": "5 kg bag",
+        "7": "10 kg bag",
+        "8": "50 kg bag",
+        "9": "Other (specify)"
+      },
+      "ag_h26b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "3.7 kg bag",
+        "6": "5 kg bag",
+        "7": "10 kg bag",
+        "8": "50 kg bag",
+        "9": "Other (specify)"
+      },
+      "ag_h38b": {
+        "1": "Gram",
+        "2": "Kilogram",
+        "3": "2 kg bag",
+        "4": "3 kg bag",
+        "5": "3.7 kg bag",
+        "6": "5 kg bag",
+        "7": "10 kg bag",
+        "8": "50 kg bag",
+        "9": "Other (specify)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2013-14/Data/AG_MOD_F_13.dta.dvc",
+    "fields": {
+      "ag_f16b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "ag_f26b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "ag_f38b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2013-14/Data/AG_MOD_G_13.dta.dvc",
+    "fields": {
+      "ag_g04b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2013-14/Data/AG_MOD_H_13.dta.dvc",
+    "fields": {
+      "ag_h16b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      },
+      "ag_h26b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      },
+      "ag_h38b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2016-17/Data/Panel/ag_mod_h_16.dta.dvc",
+    "fields": {
+      "ag_h16b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER(SPECIFY)"
+      },
+      "ag_h26b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER(SPECIFY)"
+      },
+      "ag_h38b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2016-17/Data/Panel/ag_mod_f_16.dta.dvc",
+    "fields": {
+      "ag_f16b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER(SPECIFY)"
+      },
+      "ag_f26b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER(SPECIFY)"
+      },
+      "ag_f38b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2016-17/Data/Panel/ag_mod_g_16.dta.dvc",
+    "fields": {
+      "ag_g04b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2016-17/Data/Cross_Sectional/ag_mod_f.dta.dvc",
+    "fields": {
+      "ag_f07b": {
+        "1": "gram",
+        "2": "kilogram",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "liter",
+        "9": "milliliter",
+        "10": "bucket",
+        "11": "wheelbarrow",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "ag_f38b": {
+        "1": "gram",
+        "2": "kilogram",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "liter",
+        "9": "milliliter",
+        "10": "bucket",
+        "11": "wheelbarrow",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2016-17/Data/Cross_Sectional/ag_mod_g.dta.dvc",
+    "fields": {
+      "ag_g04b": {
+        "1": "gram",
+        "2": "kilogram",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2016-17/Data/Cross_Sectional/ag_mod_h.dta.dvc",
+    "fields": {
+      "ag_h07b": {
+        "1": "gram",
+        "2": "kilogram",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      },
+      "ag_h38b": {
+        "1": "gram",
+        "2": "kilogram",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2019-20/Data/Panel/ag_mod_g_19.dta.dvc",
+    "fields": {
+      "ag_g04b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2019-20/Data/Panel/ag_mod_h_19.dta.dvc",
+    "fields": {
+      "ag_h16b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER(SPECIFY)"
+      },
+      "ag_h26b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER(SPECIFY)"
+      },
+      "ag_h38b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2019-20/Data/Panel/ag_mod_f_19.dta.dvc",
+    "fields": {
+      "ag_f16b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER(SPECIFY)"
+      },
+      "ag_f26b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER(SPECIFY)"
+      },
+      "ag_f38b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2019-20/Data/Cross_Sectional/ag_mod_f.dta.dvc",
+    "fields": {
+      "ag_f07b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      },
+      "ag_f38b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "5 KG BAG",
+        "6": "10 KG BAG",
+        "7": "50 KG BAG",
+        "8": "LITER",
+        "9": "MILLILITER",
+        "10": "BUCKET",
+        "11": "WHEELBARROW",
+        "12": "OX CART",
+        "13": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2019-20/Data/Cross_Sectional/ag_mod_g.dta.dvc",
+    "fields": {
+      "ag_g04b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  },
+  {
+    "source": "lsms_library/countries/Malawi/2019-20/Data/Cross_Sectional/ag_mod_h.dta.dvc",
+    "fields": {
+      "ag_h07b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      },
+      "ag_h38b": {
+        "1": "GRAM",
+        "2": "KILOGRAM",
+        "3": "2 KG BAG",
+        "4": "3 KG BAG",
+        "5": "3.7 KG BAG",
+        "6": "5 KG BAG",
+        "7": "10 KG BAG",
+        "8": "50 KG BAG",
+        "9": "OTHER (SPECIFY)"
+      }
+    }
+  }
+]

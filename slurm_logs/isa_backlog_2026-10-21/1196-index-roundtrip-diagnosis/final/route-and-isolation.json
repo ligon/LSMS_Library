@@ -1,0 +1,166 @@
+{
+  "saved_make_calls": [
+    {
+      "side": "base",
+      "stage": "make-cold",
+      "rows": 4805,
+      "index_names": [
+        "t",
+        "v"
+      ],
+      "index_dtypes": [
+        "str",
+        "string"
+      ],
+      "saved_before_assertion": true
+    },
+    {
+      "side": "base",
+      "stage": "make-warm-continuation",
+      "rows": 4805,
+      "index_names": [
+        "t",
+        "v"
+      ],
+      "index_dtypes": [
+        "str",
+        "str"
+      ],
+      "saved_before_assertion": true
+    },
+    {
+      "side": "candidate",
+      "stage": "make-cold",
+      "rows": 4805,
+      "index_names": [
+        "t",
+        "v"
+      ],
+      "index_dtypes": [
+        "str",
+        "string"
+      ],
+      "saved_before_assertion": true
+    },
+    {
+      "side": "candidate",
+      "stage": "make-warm-continuation",
+      "rows": 4805,
+      "index_names": [
+        "t",
+        "v"
+      ],
+      "index_dtypes": [
+        "str",
+        "str"
+      ],
+      "saved_before_assertion": true
+    }
+  ],
+  "source_pins": {
+    "/local/job40255479/worktrees/isa-1196-index-diagnosis/lsms_library/country.py": {
+      "sha256": "7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c",
+      "md5": "ba92f26831d3d9495d943ffa98a5a3b7",
+      "size": 457055,
+      "mode": 384,
+      "mtime_ns": 1792643918956414015,
+      "nlink": 1,
+      "inode": 18102773,
+      "device": 64770,
+      "symlink": false
+    },
+    "/local/job40255479/worktrees/isa-1196-index-diagnosis/lsms_library/countries/Niger/_/data_scheme.yml": {
+      "sha256": "2f40940d87fb29360bbf8fb641c2b90fe6f53a62c35320a891bef4f8eb34a364",
+      "md5": "25a045501059af2ee7f222e3fce565b3",
+      "size": 26250,
+      "mode": 384,
+      "mtime_ns": 1792643918824413252,
+      "nlink": 1,
+      "inode": 18219801,
+      "device": 64770,
+      "symlink": false
+    },
+    "/local/job40255479/worktrees/isa-1196-index-diagnosis/lsms_library/countries/Uganda/_/data_scheme.yml": {
+      "sha256": "2a7ca4dd995b13073abfffe77d3cc38e2f249f1d509a765ac017e329836ca827",
+      "md5": "ffc5ca11abcb25751c3f71aa50a12837",
+      "size": 27231,
+      "mode": 384,
+      "mtime_ns": 1792643918937413905,
+      "nlink": 1,
+      "inode": 18224531,
+      "device": 64770,
+      "symlink": false
+    },
+    "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1198/build-v2.py": {
+      "sha256": "570af23372c19ae6d697097f3b37f453b9957ac181fba666623cb8cfdbd61c25",
+      "md5": "065d880279bb9a563c515038b628b4bc",
+      "size": 4796,
+      "mode": 420,
+      "mtime_ns": 1792638540470241727,
+      "nlink": 1,
+      "inode": 50600558,
+      "device": 64770,
+      "symlink": false
+    },
+    "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/shutil.py": {
+      "sha256": "0c2338e4b6211e4d0cf672fb47f121b125e33a6015040fe1e6414179a610613a",
+      "md5": "e61469bafe446666207aed883a18ea81",
+      "size": 148,
+      "mode": 511,
+      "mtime_ns": 1738885409025841828,
+      "nlink": 1,
+      "inode": 824007581488119335,
+      "device": 36,
+      "symlink": true
+    },
+    "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/tempfile.py": {
+      "sha256": "8ca9494dd31952cf6ce6416fd051b981396f535a4195c2106e6c9a6cbda0daba",
+      "md5": "b903da825a427c5bcab35a593f24cff1",
+      "size": 150,
+      "mode": 511,
+      "mtime_ns": 1738885409026841834,
+      "nlink": 1,
+      "inode": 13070744449445816322,
+      "device": 36,
+      "symlink": true
+    },
+    "/local/job40255479/venv_img/lib/python3.11/site-packages/_pytest/cacheprovider.py": {
+      "sha256": "ae00499f39afb1f266423f8ab431b58269b30ae3f353da996dff9c62fbab6030",
+      "md5": "7f5ca55cb78701747ffb3a9274673a54",
+      "size": 22375,
+      "mode": 420,
+      "mtime_ns": 1775835757000000000,
+      "nlink": 1,
+      "inode": 46929272,
+      "device": 64770,
+      "symlink": false
+    }
+  },
+  "additional_manifest_gated_physical_JSON_copies": 4,
+  "route_binding": {
+    "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "Niger_food_acquired": {
+      "materialize_make": false,
+      "Default": "source-bound country.py5811->load_with_dvc_cache->load_dataframe_with_dvc5498->_read_l2_country_cache; actual copied-current/fullcoverage warm state observed",
+      "Make": "source-only5800\u20135823 use_dvcFalse and prefer_make_backendFalse -> load_from_waves5249 -> YAML Wave.grab_data/wave read gate; country read gate bypassed",
+      "Make_runtime_evidence": "not in this new cohort or staged original1078 Niger food calls; no Make API replay performed"
+    },
+    "Uganda_cluster_features": {
+      "materialize_make": false,
+      "Default": "same Default branch and actual copied-current/fullcoverage warm calls",
+      "Make": "same country-gate bypass -> load_from_waves -> YAML Wave gates; four original saved4805row caller endpoints corroborate actual cold/warm Make observations on both1198 heads",
+      "Make_runtime_evidence": "immutable1198 report/build-v2.py/manifest-gated saved per-call endpoints; not newly executed or newly instrumented"
+    }
+  },
+  "isolation": {
+    "denied_remove_relative_t_parquet": 6,
+    "denied_pytest_cache_mkdir": 2,
+    "existing_mkdir_FIE": 2,
+    "exact_retrospective_call_stacks_or_dir_fd_not_recorded": true,
+    "six_remove_pattern": "consistent with six GH645 TemporaryDirectory roundtrips and shutil dir_fd-relative unlink; tempfile PermissionError fallback can unlink absolute private path; not individually attributed",
+    "two_mkdir_pattern": "matches pytest cacheprovider._ensure_cache_dir_and_supporting_files TemporaryDirectory prefix under cachedir.parent; no successful source write",
+    "test_replay_or_guard_weakening": false,
+    "full_original_guard_log_retained": true,
+    "source_bytes_modes_mtimes_HEAD_clean_exact": true
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "status": "AUTHOR_READY_FOR_INDEPENDENT_REVIEW",
+  "source_head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+  "actual_parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "branch": "fix/1210-invalid-food-wave-20261022",
+  "manifest_path": "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/final-private-manifest.json",
+  "manifest_entries": 1159,
+  "manifest_sha256": "bf77ea989db4da51aeb2d21385f40716a1a9757b8bea2ad3f4562ed097ff86f6",
+  "safe_export_allowlist_sha256": "1d06b3beaffcde3296596c48ba42962d1c69e6a33c1e536429e0a47b51cdb4f2",
+  "freeze_proof_sha256": "a3d6da0dbd88fc6bcf9538b6abcf5c6268d2aadaf6272e065b3c0a86f3fbc4e7",
+  "safe_exports": [
+    "ALLOWLIST.json",
+    "REPORT.org",
+    "RESIDUALS.md",
+    "commands.json",
+    "pins.json",
+    "protection.json",
+    "source.diff",
+    "validation.json"
+  ],
+  "zero_remaining_task_consumers_excluding_this_sealer": true,
+  "diagnostic_exceptions_retained": [
+    "initial-parent-worker-identity-history-not-captured",
+    "initial-registration-set-order-artifact-checker-stop",
+    "protection-v1-last-assert-stop-six-relative-delete-denials-unresolved-dir-fd"
+  ],
+  "postexit_requirement": "Separate read-only verifier must follow observed sealer terminal0, hash READY and completed sealer stream, and verify all manifest entries after exit; no author acceptance.",
+  "signed": "Sue"
+}

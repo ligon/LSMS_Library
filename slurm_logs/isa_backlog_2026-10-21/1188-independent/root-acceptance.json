@@ -1,0 +1,68 @@
+{
+  "status": "ROOT_ACCEPTED_BF1188_COUNTRY_WIRING_WITH_1218_RESIDUAL_AND_EXECUTION_QUALIFICATIONS",
+  "issue": 1188,
+  "final_source": "657fed11a63354886772d0f978cec8adb2ad647e",
+  "tested_runtime": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+  "actual_parent_source": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "packet_authentication_sha256": "452fbe627adc53d7b5061b023532c86b58a75b893b127c0504f7fe44e15ec33e",
+  "original_SDK_value_capture_sha256": "b10db3e83969ec1765a750b342a31cb1112fa75a04e38eb20548438447f40cf4",
+  "verbatim_original_harness_capture_sha256": "03a369f1e53f47859214431a15c780c860a119c0a388a1c9d150d03a2e411c15",
+  "manifest_sha256": "dc36563c3d321b3e6397e2d27f523d029db911ab89203e3b603b65e67b0deff0",
+  "manifest_entries": 1045,
+  "private_payload_bytes": 162253383,
+  "tracked_sources": 29788,
+  "providers": 6,
+  "private_copies": 24,
+  "copy_bytes": 25343300,
+  "original_and_copy_distinct_inodes": 30,
+  "all_applied_rows": 22877,
+  "unlabelled_source21_rows_preserved": 602,
+  "independent_tests": {
+    "targeted_PASS": 14,
+    "actual_parent_FAIL": 7,
+    "actual_parent_PASS": 7,
+    "supporting_PASS": 397,
+    "full_suite": false
+  },
+  "strict_matrix": {
+    "total": 151,
+    "PASS": 111,
+    "FAIL": 40,
+    "writer_readback_PASS_already_inside111": 40,
+    "other_PASS": 71
+  },
+  "new_empty_references": {
+    "Default_PASS": 2,
+    "Make_FAIL": 2,
+    "residual_issue": 1218,
+    "complete_axes_typed_attrs_PASS": 4
+  },
+  "scanners_each_WARN": 4,
+  "scanner_JSONL_bytes_each": 3028,
+  "scanner_JSONL_sha256": "3e395b68d67db3da11b295c81cecba7a5aa61024d83c91236dab74ac1f087f29",
+  "scanner_comparison_DOCUMENT_sha256": "2effd253ec2573b96702e6b79ad37efd9b4c167701483dbaf58c93eea97a51e7",
+  "sealer": {
+    "Popen_pid": 210629,
+    "SDK_chunk": "6e8397",
+    "exit_code": 0
+  },
+  "separate_postexit": {
+    "Popen_pid": 211180,
+    "SDK_session": 52803,
+    "SDK_terminal_chunk": "146c69",
+    "exit_code": 0,
+    "child_self_record_absent_not_reconstructed": true
+  },
+  "safe_export_allowlist_sha256": "624e1a8705208e58f2fb5fdc250d559e64a010e850e5de1684cc319d8cecd9d3",
+  "safe_exports": 8,
+  "directory_precision": "Three original full physical directory exceptions and other original mode/owner checks; root whole-directory physical snapshot is explicitly NEW. No chmod.",
+  "guard_scope": "Observed guarded execution retains156earlier absent raw-read denials,52phantom parquet read denials(source-chain inference; historical individual stacks/absence not captured),16existing-directory mkdir refusals, network probes and all original calibration/precollection/capability/lifecycle/capture stops plus extra16probe capability replay. No universal unguarded-loader equivalence.",
+  "root_metadata_stops": [
+    "v1 expected boolean but saved original151 summary is exact count mapping",
+    "v2 peer summary supplied comparison-document digest for raw JSONL; manifest-bound raw hash now distinct",
+    "Two root shape-only diagnostic inspections failed on scalar fields; no product/API/data decode replay"
+  ],
+  "full_campaign_or_science_certification": false,
+  "human_merge_required": true,
+  "signed": "Sue"
+}

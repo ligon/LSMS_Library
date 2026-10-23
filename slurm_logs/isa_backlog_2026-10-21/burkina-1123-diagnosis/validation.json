@@ -1,0 +1,615 @@
+{
+  "status": "DIAGNOSIS_COMPLETE_PENDING_ROOT_APPROVAL",
+  "implemented": false,
+  "HEAD": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb",
+  "runtime_baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "tracked_files": 14889,
+  "all_tracked_sha256_unchanged": true,
+  "clean": true,
+  "no_in_tree_source_or_parquet_created": true,
+  "source_refs": [
+    {
+      "sidecar": "Benin/2018-19/Data/s16b_me_ben2018.dta.dvc",
+      "md5": "c2125f89fd882d2368ef3a06f61ca2aa",
+      "held": true,
+      "bytes": 418935
+    },
+    {
+      "sidecar": "Burkina_Faso/2014/Data/emc2014_agri_couts_intrants.dta.dvc",
+      "md5": "be199cb415435688f2f2478e63fb8e3c",
+      "held": true,
+      "bytes": 21302637
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/s16b_me_bfa2018.dta.dvc",
+      "md5": "32eb603ade5ae97b1844c00a2923fd31",
+      "held": true,
+      "bytes": 988943
+    },
+    {
+      "sidecar": "Burkina_Faso/2021-22/Data/s16b_me_bfa2021.dta.dvc",
+      "md5": "ed8625abcf1d679669d7d231cf77f58c",
+      "held": true,
+      "bytes": 20891535
+    },
+    {
+      "sidecar": "Togo/2018/Data1/s16b_me_tgo2018.dta.dvc",
+      "md5": "f386441870fb7c4c6e2fd23f09771c78",
+      "held": true,
+      "bytes": 623325
+    }
+  ],
+  "private_held_L1_MD5_unchanged": true,
+  "private_held_blob_count": 5,
+  "companion_seed_and_private_bytes_unchanged": 16,
+  "instrument_gaps": [
+    {
+      "sidecar": "Burkina_Faso/2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague1.xls.dvc",
+      "md5": "b4b6edb0eaead5615c218be15c20f175",
+      "held": false
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague2.xls.dvc",
+      "md5": "5120acd2332832b4033f2d1c9aad0ed3",
+      "held": false
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Documentation/bfa_ehcvm1_nomenclature_vague1.pdf.dvc",
+      "md5": "33ff5d72b5e14ce60d9eadd7168d6e30",
+      "held": false
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Documentation/bfa_ehcvm1_nomenclature_vague2.pdf.dvc",
+      "md5": "bb180644aa5d61af8099c1ebeb8fcda7",
+      "held": false
+    }
+  ],
+  "tests": {
+    "private_positive": {
+      "passed": 11,
+      "skipped": 0,
+      "deselected": 2
+    },
+    "private_deliberate_negative": {
+      "failed": 2,
+      "deselected": 11
+    },
+    "scoped_existing_comparator_tests": {
+      "passed": 4,
+      "skipped": 0,
+      "deselected": 4
+    }
+  },
+  "evidence": {
+    "diagnosis": {
+      "Burkina_Faso": {
+        "wave": "2018-19",
+        "source_applied_rows": 22877,
+        "wave_rows": 22877,
+        "hollow_rows": 0,
+        "raw_household_input_key_duplicate_rows": 0,
+        "raw_household_input_unit_key_duplicate_rows": 0,
+        "null_raw_key_rows": 0,
+        "null_declared_key_rows": 0,
+        "duplicate_groups": 170,
+        "all_extra_rows": 183,
+        "cases": {
+          "conflicting_nonnull": 150,
+          "conflicting_nonnull_extra_rows": 163,
+          "exact_payload": 20,
+          "exact_payload_extra_rows": 20
+        },
+        "native_code_sets_in_collisions": {
+          "20,21": 87,
+          "19,21": 7,
+          "15,20": 46,
+          "19,20": 9,
+          "19,20,21": 1,
+          "15,20,21": 10,
+          "15,21": 7,
+          "15,19,20": 2,
+          "15,19": 1
+        },
+        "all_collision_groups_distinct_native_codes": true,
+        "colliding_input_crop_pairs": [
+          [
+            "Seed",
+            "Autre crop"
+          ]
+        ],
+        "selection_discarded_rows_by_unit": {
+          "Kilogramme": 183
+        },
+        "selection_discarded_Quantity_by_native_unit": {
+          "Kilogramme": 2409.58
+        },
+        "selection_discarded_Quantity_purchased_by_native_unit": {},
+        "selection_discarded_Purchased_counts": {
+          "False": 183
+        },
+        "raw_code_counts": {
+          "1": 2339,
+          "2": 1570,
+          "3": 2011,
+          "4": 59,
+          "5": 2125,
+          "6": 76,
+          "7": 615,
+          "8": 1644,
+          "9": 262,
+          "10": 95,
+          "11": 1592,
+          "12": 2659,
+          "13": 2274,
+          "14": 532,
+          "15": 195,
+          "16": 540,
+          "17": 568,
+          "18": 2156,
+          "19": 80,
+          "20": 883,
+          "21": 602
+        },
+        "raw_label_counts": {
+          "Semences de sorgho": 2659,
+          "Engrais organiques - d\u00e9chets d'animaux": 2339,
+          "Semences de ma\u00efs": 2274,
+          "Semences de haricots/ni\u00e9b\u00e9": 2156,
+          "Engrais inorganiques - NPK/Formule unique": 2125,
+          "Engrais inorganiques - Ur\u00e9e": 2011,
+          "Produits phytosanitaires - Herbicides": 1644,
+          "Semences de petit mil": 1592,
+          "Engrais organiques - Ordures m\u00e9nag\u00e8res": 1570,
+          "Autres semences": 883,
+          "Produits phytosanitaires - Pesticides": 615,
+          "21": 602,
+          "Semences de c\u00e9same": 568,
+          "Semences de coton": 540,
+          "Semences de riz": 532,
+          "Produits phytosanitaires -Fongicides": 262,
+          "Semences d'autres c\u00e9r\u00e9ales": 195,
+          "Autres produits phytosanitaires": 95,
+          "Plants/boutures de tubercules": 80,
+          "DAP et autres engrais inorganiques": 76,
+          "Engrais inorganiques - Phosphates": 59
+        },
+        "wave_warning_classes": {},
+        "existing_Benin_Togo_split_counterfactual": {
+          "rows": 22877,
+          "duplicate_extra_rows": 98,
+          "index_unique": false,
+          "null_key_rows": 0,
+          "changed_crop_label_rows": 275
+        },
+        "household_namespace": {
+          "raw_households": 4509,
+          "canonical_ids": 4509,
+          "legacy_formatter_diff_households": 1329,
+          "canonical_orphans_vs_sample": 0,
+          "source_grappe_vague_max_distinct": 1
+        },
+        "Country_rows": 22694,
+        "Country_wave_counts": {
+          "2018-19": 22694
+        },
+        "Country_warning_classes": {
+          "GrainCollapseWarning": 1,
+          "NullReadWarning": 1
+        },
+        "Country_grain_reports": [
+          {
+            "levels": [
+              "t",
+              "i",
+              "input",
+              "crop",
+              "u"
+            ],
+            "rows": 22877,
+            "dropped": 183,
+            "destroyed": 163,
+            "conflicting_groups": 150,
+            "nan_key_rows": 0,
+            "country": "Burkina_Faso",
+            "table": "plot_inputs",
+            "wave": "2018-19",
+            "missing_levels": null,
+            "additive": false,
+            "from_cache": true
+          }
+        ],
+        "Country_raw_exact_independent_observed_row_selection": true,
+        "script_to_Country_row_gap": 183,
+        "script_to_public_Country_row_gap": 183
+      },
+      "Benin": {
+        "wave": "2018-19",
+        "source_applied_rows": 10605,
+        "wave_rows": 10605,
+        "hollow_rows": 0,
+        "raw_household_input_key_duplicate_rows": 0,
+        "raw_household_input_unit_key_duplicate_rows": 0,
+        "null_raw_key_rows": 0,
+        "null_declared_key_rows": 0,
+        "duplicate_groups": 0,
+        "all_extra_rows": 0,
+        "cases": {},
+        "native_code_sets_in_collisions": {},
+        "all_collision_groups_distinct_native_codes": true,
+        "colliding_input_crop_pairs": [],
+        "selection_discarded_rows_by_unit": {},
+        "selection_discarded_Quantity_by_native_unit": {},
+        "selection_discarded_Quantity_purchased_by_native_unit": {},
+        "selection_discarded_Purchased_counts": {},
+        "raw_code_counts": {
+          "1": 271,
+          "2": 158,
+          "3": 1699,
+          "4": 20,
+          "5": 1720,
+          "6": 324,
+          "7": 711,
+          "8": 1466,
+          "9": 99,
+          "10": 36,
+          "11": 61,
+          "12": 365,
+          "13": 1751,
+          "14": 132,
+          "15": 79,
+          "16": 415,
+          "17": 13,
+          "18": 300,
+          "19": 655,
+          "20": 330
+        },
+        "raw_label_counts": {
+          "Semences de ma\u00efs": 1751,
+          "Engrais inorganiques - NPK/Formule unique": 1720,
+          "Engrais inorganiques - Ur\u00e9e": 1699,
+          "Produits phytosanitaires - Herbicides": 1466,
+          "Produits phytosanitaires - Pesticides": 711,
+          "Plants/boutures de tubercules": 655,
+          "Semences de coton": 415,
+          "Semences de sorgho": 365,
+          "Autres semences": 330,
+          "DAP et autres engrais inorganiques": 324,
+          "Semences de haricots/ni\u00e9b\u00e9": 300,
+          "Engrais organiques - d\u00e9chets d'animaux": 271,
+          "Engrais organiques - Ordures m\u00e9nag\u00e8res": 158,
+          "Semences de riz": 132,
+          "Produits phytosanitaires -Fongicides": 99,
+          "Semences d'autres c\u00e9r\u00e9ales": 79,
+          "Semences de petit mil": 61,
+          "Autres produits phytosanitaires": 36,
+          "Engrais inorganiques - Phosphates": 20,
+          "Semences de c\u00e9same": 13
+        },
+        "wave_warning_classes": {},
+        "Country_rows": 10605,
+        "Country_wave_counts": {
+          "2018-19": 10605
+        },
+        "Country_warning_classes": {},
+        "Country_grain_reports": [],
+        "Country_raw_exact_independent_observed_row_selection": true,
+        "script_to_Country_row_gap": 0,
+        "script_to_public_Country_row_gap": 0
+      },
+      "Togo": {
+        "wave": "2018",
+        "source_applied_rows": 13733,
+        "wave_rows": 13733,
+        "hollow_rows": 3,
+        "raw_household_input_key_duplicate_rows": 0,
+        "raw_household_input_unit_key_duplicate_rows": 0,
+        "null_raw_key_rows": 0,
+        "null_declared_key_rows": 0,
+        "duplicate_groups": 0,
+        "all_extra_rows": 0,
+        "cases": {},
+        "native_code_sets_in_collisions": {},
+        "all_collision_groups_distinct_native_codes": true,
+        "colliding_input_crop_pairs": [],
+        "selection_discarded_rows_by_unit": {},
+        "selection_discarded_Quantity_by_native_unit": {},
+        "selection_discarded_Quantity_purchased_by_native_unit": {},
+        "selection_discarded_Purchased_counts": {},
+        "raw_code_counts": {
+          "1": 405,
+          "2": 149,
+          "3": 2004,
+          "4": 14,
+          "5": 2041,
+          "6": 77,
+          "7": 727,
+          "8": 1294,
+          "9": 61,
+          "10": 154,
+          "11": 284,
+          "12": 885,
+          "13": 2248,
+          "14": 347,
+          "15": 370,
+          "16": 522,
+          "17": 103,
+          "18": 677,
+          "19": 780,
+          "20": 591
+        },
+        "raw_label_counts": {
+          "Semences de ma\u00efs": 2248,
+          "Engrais inorganiques - NPK/Formule unique": 2041,
+          "Engrais inorganiques - Ur\u00e9e": 2004,
+          "Produits phytosanitaires - Herbicides": 1294,
+          "Semences de sorgho": 885,
+          "Plants/boutures de tubercules": 780,
+          "Produits phytosanitaires - Pesticides": 727,
+          "Semences de haricots/ni\u00e9b\u00e9": 677,
+          "Autres semences": 591,
+          "Semences de coton": 522,
+          "Engrais organiques - d\u00e9chets d'animaux": 405,
+          "Semences d'autres c\u00e9r\u00e9ales": 370,
+          "Semences de riz": 347,
+          "Semences de petit mil": 284,
+          "Autres produits phytosanitaires": 154,
+          "Engrais organiques - Ordures m\u00e9nag\u00e8res": 149,
+          "Semences de c\u00e9same": 103,
+          "DAP et autres engrais inorganiques": 77,
+          "Produits phytosanitaires -Fongicides": 61,
+          "Engrais inorganiques - Phosphates": 14
+        },
+        "wave_warning_classes": {},
+        "Country_rows": 13730,
+        "Country_wave_counts": {
+          "2018": 13730
+        },
+        "Country_warning_classes": {},
+        "Country_grain_reports": [],
+        "Country_raw_exact_independent_observed_row_selection": true,
+        "script_to_Country_row_gap": 0,
+        "script_to_public_Country_row_gap": 3
+      }
+    },
+    "proposal": {
+      "token_proposed_pending_root_approval": "Unknown [Burkina_Faso 2018-19 s16bq01=21]",
+      "source21_rows": 602,
+      "two_named_splits_remaining_duplicate_extra_rows": 98,
+      "three_mapping_proposal_rows": 22877,
+      "three_mapping_proposal_duplicate_extra_rows": 0,
+      "changed_crop_rows": 877,
+      "all_other_keys_payload_dtypes_exact": true,
+      "existing_guard_rejects_baseline": true,
+      "existing_guard_rejects_two_split_partial_fix": true,
+      "existing_guard_accepts_three_map_proposal": true,
+      "existing_guard_rejects_future_even_exact_payload_duplicate": true,
+      "equal_payload_distinct_native_identities_survive": true,
+      "private_proposal_current_finalizer_rows": 22877,
+      "private_proposal_full_payload_exact_after_finalizer": true,
+      "existing_unit_canonicalization_in_public_comparison": "Kilogramme -> Kg, global categorical_mapping/u.org:40; unchanged",
+      "current_other_wave_public_rows": {
+        "2014": 0,
+        "2021-22": 0
+      },
+      "qualified_token_current_consumer_waves": [
+        "2018-19"
+      ],
+      "private_proposal_warning_classes": {
+        "NullReadWarning": 1
+      },
+      "production_candidate_build_claimed": false,
+      "input_Seed_code21_semantic_evidence": "legacy harmonize_input binding only; absent held 2018 Stata label and no held instrument"
+    },
+    "counterparts": {
+      "Burkina_Faso/2021-22/Data/s16b_me_bfa2021.dta": {
+        "rows": 70994,
+        "raw_key": [
+          "grappe",
+          "menage",
+          "s16bq01"
+        ],
+        "null_key_rows": 0,
+        "duplicate_key_rows": 0,
+        "input_slot_counts": {
+          "1": 3227,
+          "2": 3227,
+          "3": 3227,
+          "4": 3227,
+          "5": 3227,
+          "6": 3227,
+          "7": 3227,
+          "8": 3227,
+          "9": 3227,
+          "10": 3227,
+          "11": 3227,
+          "12": 3227,
+          "13": 3227,
+          "14": 3227,
+          "15": 3227,
+          "16": 3227,
+          "17": 3227,
+          "18": 3227,
+          "19": 3227,
+          "20": 3227,
+          "21": 3227,
+          "22": 3227
+        },
+        "candidate_gate_counts": {
+          "2.0": 31743,
+          "nan": 27028,
+          "1.0": 12223
+        },
+        "gate_dictionary": {
+          "1": "Oui",
+          "2": "Non"
+        },
+        "configured_plot_inputs_builder": false,
+        "applied_rows": 12223,
+        "applied_duplicate_key_rows": 0
+      },
+      "Burkina_Faso/2014/Data/emc2014_agri_couts_intrants.dta": {
+        "rows": 138242,
+        "raw_key": [
+          "zd",
+          "menage",
+          "W1"
+        ],
+        "null_key_rows": 3111,
+        "duplicate_key_rows": 36,
+        "input_slot_counts": {
+          "1.0": 7528,
+          "2.0": 7507,
+          "3.0": 7506,
+          "4.0": 7506,
+          "5.0": 7506,
+          "6.0": 7506,
+          "7.0": 7506,
+          "8.0": 7506,
+          "9.0": 7506,
+          "10.0": 7506,
+          "11.0": 7506,
+          "12.0": 7506,
+          "13.0": 7506,
+          "14.0": 7506,
+          "15.0": 7506,
+          "16.0": 7506,
+          "17.0": 7506,
+          "18.0": 7506,
+          "nan": 3111
+        },
+        "candidate_gate_counts": {
+          "2.0": 97789,
+          "1.0": 35595,
+          "nan": 4858
+        },
+        "gate_dictionary": {
+          "1": "Oui",
+          "2": "Non"
+        },
+        "configured_plot_inputs_builder": false
+      }
+    },
+    "lost_payloads_by_native_code": {
+      "15": {
+        "discarded_rows": 32,
+        "reported_Quantity_sum": 590.5,
+        "native_unit_labels": [
+          "Kilogramme"
+        ],
+        "Purchased_true": 0,
+        "Quantity_purchased_nonmissing": 0
+      },
+      "19": {
+        "discarded_rows": 7,
+        "reported_Quantity_sum": 147.0,
+        "native_unit_labels": [
+          "Kilogramme"
+        ],
+        "Purchased_true": 0,
+        "Quantity_purchased_nonmissing": 0
+      },
+      "20": {
+        "discarded_rows": 89,
+        "reported_Quantity_sum": 740.48,
+        "native_unit_labels": [
+          "Kilogramme"
+        ],
+        "Purchased_true": 0,
+        "Quantity_purchased_nonmissing": 0
+      },
+      "21": {
+        "discarded_rows": 55,
+        "reported_Quantity_sum": 931.6,
+        "native_unit_labels": [
+          "Kilogramme"
+        ],
+        "Purchased_true": 0,
+        "Quantity_purchased_nonmissing": 0
+      }
+    },
+    "Feature": {
+      "rows": 47029,
+      "country_rows": {
+        "Benin": 10605,
+        "Burkina_Faso": 22694,
+        "Togo": 13730
+      },
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "i",
+        "plot_id",
+        "input",
+        "j",
+        "u",
+        "season"
+      ],
+      "Country_values_preserved_after_canonical_alignment": true,
+      "additional_Feature_row_loss": 0,
+      "no_warm_parquet_writes": true,
+      "warning_classes": {
+        "GrainCollapseWarning": 1,
+        "NullReadWarning": 1,
+        "UserWarning": 1
+      }
+    },
+    "Feature_audit": {
+      "records": 8,
+      "status_counts": {
+        "warn": 8
+      },
+      "check_counts": {
+        "index_levels_match_scheme": 3,
+        "runtime_warning": 5
+      },
+      "scoped_countries": [
+        "Burkina_Faso",
+        "Benin",
+        "Togo"
+      ],
+      "phase_requests": [
+        "1",
+        "2"
+      ],
+      "phase2_grid_available": false
+    },
+    "hash_scope": {
+      "current_a63_vs_f8_all_549_country_hashes_exact": true,
+      "current_a63_vs_f8_all_39_framework_tags_exact": true,
+      "virtual_categorical_mapping_edit_hash_changes": [
+        "Burkina_Faso/sample",
+        "Burkina_Faso/cluster_features",
+        "Burkina_Faso/household_roster",
+        "Burkina_Faso/individual_education",
+        "Burkina_Faso/subjective_well_being",
+        "Burkina_Faso/panel_ids",
+        "Burkina_Faso/food_acquired",
+        "Burkina_Faso/assets",
+        "Burkina_Faso/housing",
+        "Burkina_Faso/shocks",
+        "Burkina_Faso/plot_features",
+        "Burkina_Faso/food_security",
+        "Burkina_Faso/food_coping",
+        "Burkina_Faso/months_food_inadequate",
+        "Burkina_Faso/interview_date",
+        "Burkina_Faso/crop_production",
+        "Burkina_Faso/plot_inputs",
+        "Burkina_Faso/livestock",
+        "Burkina_Faso/plot_labor",
+        "Burkina_Faso/people_last7days",
+        "Burkina_Faso/food_expenditures",
+        "Burkina_Faso/food_prices",
+        "Burkina_Faso/food_quantities",
+        "Burkina_Faso/household_characteristics"
+      ],
+      "changed_country_cells": 24,
+      "unaffected_other_country_cells": 525,
+      "framework_tags_unchanged": 39,
+      "method": "in-memory override of existing cached_file_hash for target org only; no file edit; scope probe, not candidate-content hash receipt"
+    }
+  },
+  "no_other_task_processes": true,
+  "next_boundary": "Root approval of exact three mapping cells/source-qualified unknown token and pre-write guard before tracked ledger/runtime edits",
+  "author": "Sue"
+}

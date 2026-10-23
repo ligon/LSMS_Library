@@ -1,0 +1,173 @@
+{
+  "status": "AUTHOR_VALIDATION_COMPLETE_PENDING_INDEPENDENT_REVIEW",
+  "parent": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "runtime_pin": "7a8fd22492255cc2c4d020b7a16f99249f588977",
+  "tested_tests_pin": "66bfa1eb16442ceb6d455dfaa5726f181d713abd",
+  "native_records": 133761,
+  "new_nonmissing_factor_payloads": 82103,
+  "old_null_excluded": 403,
+  "public_null_v": 928,
+  "new_factor_bindings": 12,
+  "healthy_Niger_rows": 46376,
+  "Feature_rows": 180137,
+  "tests": {
+    "pass": 416,
+    "skip": 10,
+    "fail": 0,
+    "errors": 0
+  },
+  "new_cases": {
+    "candidate_pass": 24,
+    "parent_pass": 4,
+    "parent_fail": 20
+  },
+  "hash_scope": {
+    "API_changed": 28,
+    "API_other_exact": 521,
+    "framework_exact": 39,
+    "declared_wave_changed": 171,
+    "declared_wave_total": 1362,
+    "API_wave_changed": 224,
+    "API_wave_total": 2139
+  },
+  "harvest": {
+    "status": "PASS",
+    "frames": {
+      "base": {
+        "input_rows": 133761,
+        "harvest_rows": 78571,
+        "kg": 29095413.407893993,
+        "factors": {
+          "reported": 14981,
+          "shipped": 0,
+          "survey_median": 560,
+          "metric": 88443,
+          "inferred": 0,
+          "none": 29777,
+          "reported_implausible": 102,
+          "shipped_implausible": 0,
+          "shipped_matched": 0,
+          "declared": 0
+        },
+        "land_rows": 42841,
+        "positive_area_rows": 37636,
+        "yield": [
+          {
+            "on": "parcel",
+            "harvest_keys": 40409,
+            "positive_area_keys": 37634,
+            "matched": 14022,
+            "rows": 14022
+          },
+          {
+            "on": "plot",
+            "harvest_keys": 51358,
+            "positive_area_keys": 37636,
+            "matched": 0,
+            "rows": 0
+          }
+        ]
+      },
+      "candidate": {
+        "input_rows": 133761,
+        "harvest_rows": 88980,
+        "kg": 42026694.99297963,
+        "factors": {
+          "reported": 96747,
+          "shipped": 0,
+          "survey_median": 4840,
+          "metric": 23406,
+          "inferred": 0,
+          "none": 8768,
+          "reported_implausible": 439,
+          "shipped_implausible": 0,
+          "shipped_matched": 0,
+          "declared": 0
+        },
+        "land_rows": 42841,
+        "positive_area_rows": 37636,
+        "yield": [
+          {
+            "on": "parcel",
+            "harvest_keys": 42481,
+            "positive_area_keys": 37634,
+            "matched": 14520,
+            "rows": 14520
+          },
+          {
+            "on": "plot",
+            "harvest_keys": 54538,
+            "positive_area_keys": 37636,
+            "matched": 0,
+            "rows": 0
+          }
+        ]
+      }
+    },
+    "pools": [
+      {
+        "grain": "fine",
+        "count_changes": 1287,
+        "median_changes": 1287,
+        "threshold_crossings": 692
+      },
+      {
+        "grain": "coarse",
+        "count_changes": 166,
+        "median_changes": 166,
+        "threshold_crossings": 133
+      }
+    ],
+    "strict_checks": [
+      "base-harvest-own-row-products",
+      "base-independent-fine-coarse-median-pool",
+      "base-parcel-real-area-oracle",
+      "base-plot-real-area-oracle",
+      "candidate-harvest-own-row-products",
+      "candidate-independent-fine-coarse-median-pool",
+      "candidate-parcel-real-area-oracle",
+      "candidate-plot-real-area-oracle",
+      "crosshead-full-area-frame"
+    ],
+    "kg_delta": 12931281.585085638,
+    "yield_changes": [
+      {
+        "on": "parcel",
+        "before_rows": 14022,
+        "after_rows": 14520,
+        "new_keys": 498,
+        "lost_keys": 0,
+        "changed_shared_values": 7335
+      },
+      {
+        "on": "plot",
+        "before_rows": 0,
+        "after_rows": 0,
+        "new_keys": 0,
+        "lost_keys": 0,
+        "changed_shared_values": 0
+      }
+    ]
+  },
+  "scanner": {
+    "parent_records": 41,
+    "candidate_records": 41,
+    "all41_full_literal_records_exact": true,
+    "warn": 41,
+    "fail": 0,
+    "error": 0,
+    "phase2_grid": []
+  },
+  "independent_acceptance": false,
+  "no_GitHub_write_merge_closure": true,
+  "limits": [
+    "#1204 Make subset routing remains",
+    "#1205 real-area key coverage remains",
+    "#1196 distinct Uganda v cold/warm StringDtype manifestation; shared cause unproved",
+    "This run Make17 byte-identical0600-to0644+mtime; no provenance/universal mode inference",
+    "CLI v dtype plus typed sampling/population/recall JSON serialization differences remain, exact matched artifacts",
+    "First subset expected filter was in memory only; distinctly named artifact-only reconstruction",
+    "Original hash/cwd/launch/summary stops and toy4-worker overlap retained",
+    "No2009factor adjudication, no other Uganda output corpus/whole-suite or nutrition/FDC validation"
+  ]
+}

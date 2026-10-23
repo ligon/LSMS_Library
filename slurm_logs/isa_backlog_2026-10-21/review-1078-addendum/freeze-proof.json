@@ -1,0 +1,75 @@
+{
+  "status": "FROZEN_QUIESCENT_ADDENDUM_PASS",
+  "time_utc": "2026-10-21T23:46:33.721532+00:00",
+  "runtime_pin": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+  "author_final_pin": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+  "sources": {
+    "/local/job40255479/worktrees/isa-review-1078-unit-attribution": {
+      "head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+      "tracked_paths": 14882,
+      "bytes_filesystem_modes_symlinks_index_clean_exact": true
+    },
+    "/local/job40255479/worktrees/isa-review-1078": {
+      "head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+      "tracked_paths": 14882,
+      "bytes_filesystem_modes_symlinks_index_clean_exact": true
+    },
+    "/local/job40255479/worktrees/isa-review-1078-base": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_paths": 14880,
+      "bytes_filesystem_modes_symlinks_index_clean_exact": true
+    },
+    "/local/job40255479/worktrees/isa-framework-1078-fix": {
+      "head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "tracked_paths": 14889,
+      "bytes_filesystem_modes_symlinks_clean_exact": true
+    }
+  },
+  "original_diagnosis_sources": {
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_paths": 14880,
+      "exact": true
+    },
+    "with1062": {
+      "head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "tracked_paths": 14905,
+      "exact": true
+    }
+  },
+  "runtime_test_git_trees_modes_and_filesystem_modes_exact_to_final": true,
+  "author_frozen_private_manifest_files_exact": 1288,
+  "original_diagnosis_private_files_exact": 1799,
+  "historical_original_copy_receipts_exact": 8,
+  "prior_integration_reference_files_exact": {
+    "global13-evidence": 169,
+    "global14-evidence": 646
+  },
+  "original_safe_exports_exact": 14,
+  "original_final_cache_inventories_exact": {
+    "data-baseline-api-wave-hashes": 0,
+    "data-baseline-cold": 85,
+    "data-baseline-hashes": 0,
+    "data-baseline-timed-pair": 57,
+    "data-candidate-api-wave-hashes": 0,
+    "data-candidate-cold": 85,
+    "data-candidate-currency-then-market": 57,
+    "data-candidate-hashes": 0,
+    "data-candidate-healing": 57,
+    "data-candidate-market-then-currency": 57,
+    "data-candidate-timed-pair": 57
+  },
+  "artifact_input_receipts_exact": 195,
+  "old_held_source_receipts_exact": 47,
+  "guarded_unit_and_artifact_IP_attempts": 0,
+  "guarded_artifact_protected_write_attempts": 0,
+  "new_LSMS_data_root_or_in_tree_parquets": 0,
+  "intentional_synthetic_pytest_temp_parquets": 251,
+  "initial_freeze_broad_zero_parquet_assertion_qualified": "First freeze stopped because 251 legitimate synthetic test parquet outputs live only under private pytest-temp; LSMS data roots and checkouts remain empty.",
+  "expected_attributed_unit_denials": 24,
+  "ignored_private_metadata_target_exact": true,
+  "active_new_private_consumers": [],
+  "preliminary_unguarded_introspection_qualification_required": true,
+  "no_git_ref_checkout_or_GH_mutation": true,
+  "no_additional_held_microdata_or_source_backed_API_probe": true
+}

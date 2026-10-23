@@ -1,0 +1,422 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent bounded f8-based GH1078 producer-provenance review; original guarded full suite is qualified, not reported PASS",
+  "author": "Sue (GPT-6)",
+  "source_pins": {
+    "ledger_first": "695b57970c17fdaec5a3e63a8c0f283b29b86282",
+    "runtime": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+    "final_docs": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+    "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+  },
+  "blockers": [],
+  "full_suite_original": {
+    "head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+    "exit_code": 1,
+    "seconds": 143.277,
+    "xml_counts": {
+      "tests": 9151,
+      "failures": 9,
+      "errors": 0,
+      "skipped": 4453
+    },
+    "tracked_content_modes_index_head_status_exact": true,
+    "tracked_counts": {
+      "/local/job40255479/worktrees/isa-review-1078": 14882,
+      "/local/job40255479/worktrees/isa-review-1078-base": 14880
+    },
+    "private_parquet_count": 0
+  },
+  "bounded_unchanged_persistence_tests": {
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "physical_config_operands": 36,
+    "source_and_copy_bytes_modes_exact": true,
+    "private_timestamp_float_roundtrip_only_ns": [
+      -97,
+      109
+    ]
+  },
+  "focused_selection_within_full_suite": {
+    "selection": [
+      "test_gh1078_food_producer_provenance",
+      "test_build_transform_hash",
+      "test_wave_getattr"
+    ],
+    "outcomes": {
+      "passed": 64
+    },
+    "source": "same full-selection XML; no repeated suite"
+  },
+  "source_oracle": {
+    "status": "SUCCESS",
+    "sanctioned_get_dataframe": true,
+    "source_md5": "f4b5885a98654c12d5c9960d1a3586ff",
+    "source_rows": 38743,
+    "genuine_missing_cells": 9,
+    "Quantity_cells": 6,
+    "Expenditure_cells": 3,
+    "one_unique_raw_row_per_cell": true,
+    "positive_counterparts_preserved": true,
+    "all_output_NaNs_match_source_operands": true,
+    "no_food_transform_used_as_source_oracle": true
+  },
+  "candidate_actual_writers": {
+    "candidate": {
+      "real_read_then_normal_eviction_then_real_false_but_actual_parquet_origin_preserved": true,
+      "A_writer_input_and_actual_output_exact_entire_correct_cold": true,
+      "B_writer_input_and_output_exact_own_correct_cold": true,
+      "A_final_actual_bytes_equal_served_cache": true,
+      "A_B_normal_current_hash_and_full_coverage": true,
+      "actual_function_data_Path_exists_and_write_arguments_unchanged": true,
+      "real_read_wave_full_frame_attrs_exact": true,
+      "legacy_reducer_not_reached": true,
+      "writer_A_pid": 1363056,
+      "writer_B_pid": 1369855,
+      "A_null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "B_null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "current_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c"
+    }
+  },
+  "baseline_actual_counterfactual": {
+    "status": "SUCCESS",
+    "actual_f8_counterfactual_Arrow_inputs_outputs_and_final_cache_exact_historical_nine_zero_frame": true,
+    "A_changed_cells": 9,
+    "Quantity_NaN_to_zero": 6,
+    "Expenditure_NaN_to_zero": 3,
+    "B_correct_complete_frame": true,
+    "both_actual_original_tests_passed_despite_corruption": true,
+    "real_eviction_and_false_exists_observed": true,
+    "legacy_reducer_reached_once": true,
+    "all_other_values_keys_dtypes_order_axes_fullattrs_exact": true,
+    "normal_f8_hash_full_coverage": true
+  },
+  "serial_orders": [
+    {
+      "scenario": "market-then-currency",
+      "passed_test_executions": 2,
+      "complete_frame_attrs_exact": true
+    },
+    {
+      "scenario": "currency-then-market",
+      "passed_test_executions": 2,
+      "complete_frame_attrs_exact": true
+    }
+  ],
+  "actual_source_test_executions": 8,
+  "distinct_actual_source_test_nodes": 2,
+  "healing": {
+    "cold": {
+      "mode": "cold",
+      "initial_real_grade": "stale",
+      "initial_stored_hash": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba",
+      "normal_candidate_current_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c",
+      "rows": 355571,
+      "null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "every_value_key_order_dtype_null_axis_full_attrs_exact_to_correct_f8": true,
+      "original_nine_NaNs_restored_without_clear_stamp_or_bypass": true,
+      "full_eight_wave_coverage": true,
+      "initial_files": 57,
+      "final_files": 57,
+      "cache_bytes_modes_mtimes_zero_warm_writes": null,
+      "original_corrupt_root_only_read": true
+    },
+    "warm": {
+      "mode": "warm",
+      "initial_real_grade": "fresh",
+      "initial_stored_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c",
+      "normal_candidate_current_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c",
+      "rows": 355571,
+      "null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "every_value_key_order_dtype_null_axis_full_attrs_exact_to_correct_f8": true,
+      "original_nine_NaNs_restored_without_clear_stamp_or_bypass": true,
+      "full_eight_wave_coverage": true,
+      "initial_files": 57,
+      "final_files": 57,
+      "cache_bytes_modes_mtimes_zero_warm_writes": true,
+      "original_corrupt_root_only_read": true
+    }
+  },
+  "matched_frames": {
+    "cold": {
+      "strict_complete_frame_pairs": 26,
+      "values_nulls_keys_order_dtypes_axes_fullattrs_exact": true,
+      "full_warning_category_message_multisets_exact": true,
+      "warning_occurrences": 60
+    },
+    "warm": {
+      "strict_complete_frame_pairs": 26,
+      "values_nulls_keys_order_dtypes_axes_fullattrs_exact": true,
+      "full_warning_category_message_multisets_exact": true,
+      "warning_occurrences": 58
+    },
+    "baseline_whole_cold_warm_inventory_exact": 73,
+    "candidate_whole_cold_warm_inventory_exact": 73
+  },
+  "cross_stage_residuals": {
+    "baseline": [
+      {
+        "frame": "Niger-public-food_acquired",
+        "strict_equal": false,
+        "only_index_dtype_difference": [
+          {
+            "axis": "index",
+            "level": "u",
+            "cold": "<StringDtype(na_value=<NA>)>",
+            "warm": "<StringDtype(na_value=nan)>"
+          }
+        ],
+        "all_payloads_keys_nulls_axes_order_fullattrs_exact": true
+      }
+    ],
+    "candidate": [
+      {
+        "frame": "Niger-public-food_acquired",
+        "strict_equal": false,
+        "only_index_dtype_difference": [
+          {
+            "axis": "index",
+            "level": "u",
+            "cold": "<StringDtype(na_value=<NA>)>",
+            "warm": "<StringDtype(na_value=nan)>"
+          }
+        ],
+        "all_payloads_keys_nulls_axes_order_fullattrs_exact": true
+      }
+    ]
+  },
+  "warnings": {
+    "baseline": {
+      "normalized_full_child_log_sha256": "82ed9543ee7c41acf980eb133177eea146e18f046ebb12dc374a06980be5a13f",
+      "formatted_warning_headers": 2
+    },
+    "candidate": {
+      "normalized_full_child_log_sha256": "82ed9543ee7c41acf980eb133177eea146e18f046ebb12dc374a06980be5a13f",
+      "formatted_warning_headers": 2
+    },
+    "complete_child_logs_exact_after_only_source_data_path_substitution": true,
+    "cold_category_counts": {
+      "builtins.RuntimeWarning": 2,
+      "lsms_library.sampling.ClusterIdentityWarning": 9,
+      "lsms_library.quantity_audit.QuantityImplausibleWarning": 24,
+      "lsms_library.null_index_audit.NullIndexKeyWarning": 12,
+      "lsms_library.transformations.StatedVsInferredKgWarning": 8,
+      "lsms_library.null_read_audit.NullReadWarning": 5
+    },
+    "warm_category_counts": {
+      "lsms_library.sampling.ClusterIdentityWarning": 9,
+      "lsms_library.quantity_audit.QuantityImplausibleWarning": 24,
+      "lsms_library.null_index_audit.NullIndexKeyWarning": 12,
+      "lsms_library.transformations.StatedVsInferredKgWarning": 8,
+      "lsms_library.null_read_audit.NullReadWarning": 5
+    },
+    "cold_only_warning_occurrences": [
+      {
+        "category": "builtins.RuntimeWarning",
+        "message_sha256": "df5ba0eb38a69c5b14af2fedf2654aebd77e5678c381d91c1a40c620d04217a6",
+        "count": 1
+      },
+      {
+        "category": "builtins.RuntimeWarning",
+        "message_sha256": "113afcdb7a721b23bdf41dcf1b1e51a151a74c264fe6210923fee8c99536f243",
+        "count": 1
+      }
+    ],
+    "warm_only_warning_occurrences": []
+  },
+  "scanner": {
+    "status": "SUCCESS",
+    "full_raw_record_occurrences_equal": 217,
+    "removed": 0,
+    "added": 0,
+    "statuses": {
+      "warn": 214,
+      "pass": 3
+    },
+    "phases": {
+      "1a-sanity": 30,
+      "1b-assembly": 29,
+      "2-kwargs": 158
+    },
+    "normalization": "none; raw complete record multisets exact",
+    "all_record_occurrences_also_exact_to_author": true,
+    "baseline": {
+      "pre_scanner_existing_files": 73,
+      "all_existing_bytes_modes_mtimes_exact": true,
+      "new_wave_cluster_files": 12,
+      "all_new_yaml_hashes_actual_checkout_current": true,
+      "final_files": 85
+    },
+    "candidate": {
+      "pre_scanner_existing_files": 73,
+      "all_existing_bytes_modes_mtimes_exact": true,
+      "new_wave_cluster_files": 12,
+      "all_new_yaml_hashes_actual_checkout_current": true,
+      "final_files": 85
+    },
+    "all_12_new_full_frames_attrs_strictly_equal_between_heads": true,
+    "new_cache_paths": [
+      "Niger/2011-12/_/cluster_features.parquet",
+      "Niger/2014-15/_/cluster_features.parquet",
+      "Niger/2018-19/_/cluster_features.parquet",
+      "Niger/2021-22/_/cluster_features.parquet",
+      "Uganda/2005-06/_/cluster_features.parquet",
+      "Uganda/2009-10/_/cluster_features.parquet",
+      "Uganda/2010-11/_/cluster_features.parquet",
+      "Uganda/2011-12/_/cluster_features.parquet",
+      "Uganda/2013-14/_/cluster_features.parquet",
+      "Uganda/2015-16/_/cluster_features.parquet",
+      "Uganda/2018-19/_/cluster_features.parquet",
+      "Uganda/2019-20/_/cluster_features.parquet"
+    ],
+    "first_stronger_zero_write_assertion_stop": "Preserved final-checks-private.log; normal first grid adds 12 absent prerequisites per head. This does not change the separate earlier 73-file freshwarm zero-write proof."
+  },
+  "actual_hash_scope": {
+    "status": "SUCCESS",
+    "country_hashes": {
+      "total": 549,
+      "changed": 549,
+      "unchanged": 0
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "changed": 39,
+      "unchanged": 0
+    },
+    "wave_hashes": {
+      "total": 1362,
+      "changed": 1362,
+      "unchanged": 0
+    },
+    "registry_added": [
+      "lsms_library.country.Wave.food_acquired"
+    ],
+    "registry_removed": [],
+    "API_wave_hashes": {
+      "total": 2139,
+      "changed_nonnull": 2109,
+      "none_both": 30,
+      "unchanged_nonnull": 0
+    }
+  },
+  "runtime_final_tree_equivalence": {
+    "status": "SUCCESS",
+    "runtime_final_library_tests_git_trees_modes_identical": {
+      "runtime": {
+        "lsms_library": "cc18a441cca4c69a24c2f24d513f4f23c3937d86",
+        "tests": "9b685fc972bbbcec464bf6176963e4f0773ba674"
+      },
+      "final": {
+        "lsms_library": "cc18a441cca4c69a24c2f24d513f4f23c3937d86",
+        "tests": "9b685fc972bbbcec464bf6176963e4f0773ba674"
+      }
+    },
+    "runtime_test_filesystem_paths": 12002,
+    "filesystem_mode_differences": [],
+    "runtime_test_content_differences": [],
+    "docs_descendant_paths": [
+      ".coder/ledger/1078-food-producer-provenance.md",
+      "slurm_logs/isa_backlog_2026-10-21/1078/DRAFT-RESIDUAL-warm-index-dtype.md",
+      "slurm_logs/isa_backlog_2026-10-21/1078/PR-DRAFT.md",
+      "slurm_logs/isa_backlog_2026-10-21/1078/REPORT.org",
+      "slurm_logs/isa_backlog_2026-10-21/1078/REPRODUCE.sh",
+      "slurm_logs/isa_backlog_2026-10-21/1078/cold-warm-dtype-residual.json",
+      "slurm_logs/isa_backlog_2026-10-21/1078/scanner-proof.json",
+      "slurm_logs/isa_backlog_2026-10-21/1078/validation.json"
+    ],
+    "initial_prephase_writer_HEAD_assertion_stop": "Writer advanced from a4 to expected docs descendant during review; no runtime difference. Original assertion failure retained in tool log; superseded by exact tree/FS comparison, not a source test retry."
+  },
+  "freeze": {
+    "status": "FROZEN_QUIESCENT",
+    "time_utc": "2026-10-21T23:25:39.219683+00:00",
+    "final_author_head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+    "runtime_pin": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+    "baseline_pin": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "review_and_writer_sources": {
+      "/local/job40255479/worktrees/isa-review-1078": {
+        "HEAD": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+        "tracked_files": 14882,
+        "bytes_modes_symlinks_index_clean_exact": true
+      },
+      "/local/job40255479/worktrees/isa-review-1078-base": {
+        "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "tracked_files": 14880,
+        "bytes_modes_symlinks_index_clean_exact": true
+      },
+      "/local/job40255479/worktrees/isa-framework-1078-fix": {
+        "HEAD": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+        "tracked_files": 14889,
+        "bytes_modes_symlinks_clean_exact_to_final_release": true
+      }
+    },
+    "original_diagnosis_source_trees": {
+      "baseline": {
+        "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "tracked_files": 14880,
+        "all_exact": true
+      },
+      "with1062": {
+        "HEAD": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+        "tracked_files": 14905,
+        "all_exact": true
+      }
+    },
+    "author_release_manifest_files_exact": 1288,
+    "original_diagnosis_files_exact": 1799,
+    "historical_original_copy_receipts_exact": 8,
+    "prior_global13_global14_receipts_exact": {
+      "global13-evidence": 169,
+      "global14-evidence": 646
+    },
+    "initial_copy_files_unchanged": 176,
+    "ordinary_healing_rebuilt_parquets": 26,
+    "scenario_L1_copies_MD5_SHA_modes_mtimes_exact": 124,
+    "all_copies_distinct_inodes_single_links": true,
+    "private_reader_config_mode_qualified": "Existing 0644 credential file physically copied, private copy intentionally tightened to0600; source mode/bytes unchanged, no credential material exported. First strict-copy-mode freeze assertion retained in freeze-private.log.",
+    "source_network_or_protected_write_attempts": 0,
+    "ignored_private_metadata_links_verified": 2,
+    "final_cache_file_counts": {
+      "data-baseline-api-wave-hashes": 0,
+      "data-baseline-cold": 85,
+      "data-baseline-hashes": 0,
+      "data-baseline-timed-pair": 57,
+      "data-candidate-api-wave-hashes": 0,
+      "data-candidate-cold": 85,
+      "data-candidate-currency-then-market": 57,
+      "data-candidate-hashes": 0,
+      "data-candidate-healing": 57,
+      "data-candidate-market-then-currency": 57,
+      "data-candidate-timed-pair": 57
+    },
+    "active_private_consumers": [],
+    "no_git_ref_checkout_or_GH_mutation": true
+  },
+  "residuals_and_limits": [
+    "Pre-existing strict Niger public food u Arrow StringDtype pd.NA-to-NaN cold/warm change independently reproduced under both heads; no normalization/fix",
+    "Broad 549API/39framework/1362declared-wave invalidation requires human coordinated rebuild window; no whole-corpus build/equality claim",
+    "Original historical full-suite writer/interleaving unidentified despite independently reproduced exact causal signature",
+    "No proven #1062/global16/campaign composition; original FCT/nutrition controls remain historical pins",
+    "Original full selection has 9 correctly blocked tracked-utime isolation failures; separate physical-config rerun passed9; six extra generic unit denied attempts not individually attributed"
+  ],
+  "quiescent_release": true,
+  "release_time_utc": "2026-10-21T23:28:26.317520+00:00",
+  "safe_review": "REVIEW.org",
+  "commands": "REPRODUCE.md",
+  "no_GH_or_git_mutation": true
+}

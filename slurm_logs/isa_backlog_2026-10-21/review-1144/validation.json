@@ -1,0 +1,923 @@
+{
+  "verdict": "PASS",
+  "frozen_head": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
+  "baseline": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+  "blocking_findings": [],
+  "nonblocking_observation": {
+    "path": "slurm_logs/isa_backlog_2026-10-21/1144/REPORT.org",
+    "line": 118,
+    "issue": "GH1035 shared-spelling W3 subset is eleven rows; twelve is the overall1034 unit-relabel count"
+  },
+  "frozen_HEAD_and_all_14890_tracked_file_bytes_unchanged": true,
+  "source-proof": {
+    "table_changes": 19,
+    "Code_Preferred_Aggregate_exact": true,
+    "unit_table_exact": true,
+    "complete_258_noarg_maps_exact": true,
+    "sources": {
+      "2010Q3": {
+        "dictionary_sidecar_md5_verified": "47cefb38178aee67f7d93821327ed36d",
+        "CSV_legacy_DVC_digest_verified": "3f3d2e5ec180e1297ebdda26ee873c50",
+        "dictionary_labels": 90,
+        "retained_source_rows": 72236,
+        "affected_source_labels": {
+          "20": "Other grains and flour",
+          "43": "Groundnuts",
+          "44": "Other nuts/seeds/pulses",
+          "76": "Pepper",
+          "77": "Leaves (cocoyam, spinach, etc.)",
+          "78": "Other vegetables (fresh or canned)",
+          "114": "Other milk products"
+        },
+        "affected_targets": {
+          "20": "Other grains and flour",
+          "43": "Groundnuts",
+          "44": "Other nuts/seeds/pulses",
+          "76": "Pepper",
+          "77": "Leaves (Cocoyam, Spinach, etc.)",
+          "78": "Other vegetables (fresh or canned)",
+          "114": "Other milk products"
+        }
+      },
+      "2011Q1": {
+        "dictionary_sidecar_md5_verified": "9612e28be279c8c5d7542230c71eadc9",
+        "CSV_legacy_DVC_digest_verified": "b7e9d852daf165b942b55fa414c7ed1a",
+        "dictionary_labels": 90,
+        "retained_source_rows": 69734,
+        "affected_source_labels": {
+          "20": "Grain and Flours: Other grains and flour",
+          "43": "Pulses, Nuts and Seeds:Groundnuts",
+          "44": "Pulses, Nuts and Seeds:Other nuts/seeds/pulses",
+          "76": "Vegetables : Pepper",
+          "77": "Vegetables Leaves: (Cocoyam, Spinach, etc)",
+          "78": "Vegetables : Other vegetables (fresh or canned)",
+          "114": "Milk and Milk Products: Other milk products"
+        },
+        "affected_targets": {
+          "20": "Other grains and flour",
+          "43": "Groundnuts",
+          "44": "Other nuts/seeds/pulses",
+          "76": "Pepper",
+          "77": "Leaves (Cocoyam, Spinach, etc.)",
+          "78": "Other vegetables (fresh or canned)",
+          "114": "Other milk products"
+        }
+      },
+      "2012Q3": {
+        "dictionary_sidecar_md5_verified": "0ce334959d3875199558e2de60b92d20",
+        "CSV_legacy_DVC_digest_verified": "25b213ff9ca2ddde59ab162786b9a039",
+        "dictionary_labels": 96,
+        "retained_source_rows": 65429,
+        "affected_source_labels": {
+          "21": "maize shelled",
+          "22": "grain and flours: other grains and flour",
+          "43": "pulses, nuts and seeds:groundnuts",
+          "44": "pulses, nuts and seeds:other nuts/seeds/pulses",
+          "76": "vegetables : pepper",
+          "77": "vegetables leaves: (cocoyam, spinach, etc)",
+          "78": "vegetables : other vegetables (fresh or canned)"
+        },
+        "affected_targets": {
+          "21": "Maize (shelled)",
+          "22": "Other grains and flour",
+          "43": "Groundnuts",
+          "44": "Other nuts/seeds/pulses",
+          "76": "Pepper",
+          "77": "Leaves (Cocoyam, Spinach, etc.)",
+          "78": "Other vegetables (fresh or canned)"
+        }
+      },
+      "2013Q1": {
+        "dictionary_sidecar_md5_verified": "b9932dec7da2a2c99a4b6039161332f5",
+        "CSV_legacy_DVC_digest_verified": "3d10081acb86cf2129c261b6bc33f77e",
+        "dictionary_labels": 104,
+        "retained_source_rows": 70649,
+        "affected_source_labels": {
+          "21": "maize shelled",
+          "22": "grain and flours: other grains and flour",
+          "45": "pulses, nuts and seeds:other nuts/seeds/pulses",
+          "79": "vegetables : other vegetables (fresh or canned)",
+          "141": "salt",
+          "142": "ogbonno ungrinded",
+          "143": "ogbonno grinded",
+          "144": "grinded pepper",
+          "145": "melon (shelled)",
+          "146": "melon (unshelled)"
+        },
+        "affected_targets": {
+          "21": "Maize (shelled)",
+          "22": "Other grains and flour",
+          "45": "Other nuts/seeds/pulses",
+          "79": "Other vegetables (fresh or canned)",
+          "141": "Salt",
+          "142": "Unground Ogbono",
+          "143": "Ground Ogbono",
+          "144": "Ground Pepper",
+          "145": "Melon (shelled)",
+          "146": "Melon (unshelled)"
+        }
+      },
+      "2015Q3": {
+        "dictionary_sidecar_md5_verified": "1e2e4166560aeef8c725e4c9e53ce74b",
+        "CSV_legacy_DVC_digest_verified": "10859e683857cc9611e5eacf9e630691",
+        "dictionary_labels": 116,
+        "retained_source_rows": 77702,
+        "affected_source_labels": {},
+        "affected_targets": {}
+      },
+      "2016Q1": {
+        "dictionary_sidecar_md5_verified": "b4f414efd1adf000a09e9f39eb6cdaae",
+        "CSV_legacy_DVC_digest_verified": "752950c54ae2c499ec7b69633a16d987",
+        "dictionary_labels": 116,
+        "retained_source_rows": 70469,
+        "affected_source_labels": {},
+        "affected_targets": {}
+      },
+      "2018Q3": {
+        "dictionary_sidecar_md5_verified": "577247be1c8e0eeb9efda67f70c36ecb",
+        "CSV_legacy_DVC_digest_verified": "391d27701be5efb4dcaf0f19fc7da611",
+        "dictionary_labels": 157,
+        "retained_source_rows": 82865,
+        "affected_source_labels": {
+          "148": "148. Other Spices"
+        },
+        "affected_targets": {
+          "148": "Other Spices"
+        }
+      },
+      "2019Q1": {
+        "dictionary_sidecar_md5_verified": "a29b85af326bba4696d58e2f8a6cedd4",
+        "CSV_legacy_DVC_digest_verified": "a647a02d0b70b1529223c284cfafae5e",
+        "dictionary_labels": 154,
+        "retained_source_rows": 86641,
+        "affected_source_labels": {
+          "20": "20. Maize (On the cob)",
+          "113": "113. Milk tinned"
+        },
+        "affected_targets": {
+          "20": "Maize (unshelled, on the cob)",
+          "113": "Milk tinned (unsweetened)"
+        }
+      }
+    },
+    "quarter_rename_map": {
+      "2010Q3": {
+        "Fresh Pepper": "Pepper",
+        "Groundnuts (unshelled)": "Groundnuts",
+        "Leaves (Cocoyam, Spinach, etc.)": "Other vegetables (fresh or canned)",
+        "Dry Pepper": "Leaves (Cocoyam, Spinach, etc.)",
+        "Groundnuts (shelled)": "Other nuts/seeds/pulses",
+        "Cheese (wara)": "Other milk products",
+        "Maize (unshelled, on the cob)": "Other grains and flour"
+      },
+      "2011Q1": {
+        "Fresh Pepper": "Pepper",
+        "Leaves (Cocoyam, Spinach, etc.)": "Other vegetables (fresh or canned)",
+        "Groundnuts (unshelled)": "Groundnuts",
+        "Dry Pepper": "Leaves (Cocoyam, Spinach, etc.)",
+        "Groundnuts (shelled)": "Other nuts/seeds/pulses",
+        "Maize (unshelled, on the cob)": "Other grains and flour",
+        "Cheese (wara)": "Other milk products"
+      },
+      "2012Q3": {
+        "Fresh Pepper": "Pepper",
+        "Groundnuts (unshelled)": "Groundnuts",
+        "Leaves (Cocoyam, Spinach, etc.)": "Other vegetables (fresh or canned)",
+        "Maize (shelled, on the cob)": "Maize (shelled)",
+        "Dry Pepper": "Leaves (Cocoyam, Spinach, etc.)",
+        "Groundnuts (shelled)": "Other nuts/seeds/pulses",
+        "Maize (shelled, off the cob)": "Other grains and flour"
+      },
+      "2013Q1": {
+        "Maize (shelled, on the cob)": "Maize (shelled)",
+        "Maize (shelled, off the cob)": "Other grains and flour"
+      },
+      "2015Q3": {},
+      "2016Q1": {},
+      "2018Q3": {},
+      "2019Q1": {}
+    },
+    "expected_renames": {
+      "2010Q3": 6492,
+      "2011Q1": 6286,
+      "2012Q3": 6982,
+      "2013Q1": 739,
+      "2015Q3": 0,
+      "2016Q1": 0,
+      "2018Q3": 0,
+      "2019Q1": 0
+    },
+    "native_counts": {
+      "Pepper": 10446,
+      "Groundnuts": 2839,
+      "Maize (shelled)": 1425
+    },
+    "source_grounding_entries_verified": 34,
+    "new_multicode_merges": {
+      "2010Q3": {},
+      "2011Q1": {},
+      "2012Q3": {},
+      "2013Q1": {},
+      "2015Q3": {},
+      "2016Q1": {},
+      "2018Q3": {},
+      "2019Q1": {}
+    },
+    "naive_old_quarter_errors": 2135,
+    "eight_missing_PH_positive_rows": 6288,
+    "source_backed_canonical_renames": 5789
+  },
+  "comparison": {
+    "complete_raw_frame_exact_after_item_rename": true,
+    "raw_rows": 595725,
+    "quarter_changes": {
+      "2010Q3": 6492,
+      "2011Q1": 6286,
+      "2012Q3": 6982,
+      "2013Q1": 739,
+      "2015Q3": 0,
+      "2016Q1": 0,
+      "2018Q3": 0,
+      "2019Q1": 0
+    },
+    "native_counts": {
+      "Pepper": 10446,
+      "Groundnuts": 2839,
+      "Maize (shelled)": 1425
+    },
+    "derived": {
+      "food_quantities": {
+        "rows": 595053,
+        "index_sets_exact": true,
+        "missingness_exact": true,
+        "changed_exact": 1724,
+        "changed_1e_12": 1724,
+        "by_quarter": {
+          "2010Q3": 0,
+          "2011Q1": 0,
+          "2012Q3": 611,
+          "2013Q1": 277,
+          "2015Q3": 500,
+          "2016Q1": 323,
+          "2018Q3": 13,
+          "2019Q1": 0
+        }
+      },
+      "food_prices": {
+        "rows": 481191,
+        "index_sets_exact": true,
+        "missingness_exact": true,
+        "changed_exact": 1239,
+        "changed_1e_12": 1239,
+        "by_quarter": {
+          "2010Q3": 0,
+          "2011Q1": 0,
+          "2012Q3": 391,
+          "2013Q1": 164,
+          "2015Q3": 403,
+          "2016Q1": 280,
+          "2018Q3": 1,
+          "2019Q1": 0
+        }
+      },
+      "food_prices_native": {
+        "rows": 481613,
+        "index_sets_exact": true,
+        "missingness_exact": true,
+        "changed_exact": 0,
+        "changed_1e_12": 0,
+        "by_quarter": {
+          "2010Q3": 0,
+          "2011Q1": 0,
+          "2012Q3": 0,
+          "2013Q1": 0,
+          "2015Q3": 0,
+          "2016Q1": 0,
+          "2018Q3": 0,
+          "2019Q1": 0
+        }
+      },
+      "food_expenditures": {
+        "rows": 482285,
+        "index_sets_exact": true,
+        "missingness_exact": true,
+        "changed_exact": 0,
+        "changed_1e_12": 0,
+        "by_quarter": {
+          "2010Q3": 0,
+          "2011Q1": 0,
+          "2012Q3": 0,
+          "2013Q1": 0,
+          "2015Q3": 0,
+          "2016Q1": 0,
+          "2018Q3": 0,
+          "2019Q1": 0
+        }
+      }
+    },
+    "rungs": {
+      "before": {
+        "counts": {
+          "metric": 250905,
+          "survey_kg": 168441,
+          "item_unit": 121216,
+          "unit": 54308,
+          "none": 855
+        },
+        "kg_by_rung": {
+          "item_unit": 341103.64683597675,
+          "metric": 621179.8078306111,
+          "none": 0.0,
+          "survey_kg": 457808.09061491955,
+          "unit": 47104.95229545118
+        },
+        "kg_only_rows": 594455,
+        "kg_only_total": 1467196.4975769585,
+        "kg_by_quarter": {
+          "2010Q3": 191605.3755410475,
+          "2011Q1": 245539.33734262217,
+          "2012Q3": 189240.58506433875,
+          "2013Q1": 147518.59108019585,
+          "2015Q3": 119990.192624915,
+          "2016Q1": 108087.16421589373,
+          "2018Q3": 251203.08254536905,
+          "2019Q1": 214012.16916257652
+        }
+      },
+      "after": {
+        "counts": {
+          "metric": 250905,
+          "survey_kg": 168441,
+          "item_unit": 121264,
+          "unit": 54260,
+          "none": 855
+        },
+        "kg_by_rung": {
+          "item_unit": 340991.4935538368,
+          "metric": 621179.8078306111,
+          "none": 0.0,
+          "survey_kg": 457808.09061491955,
+          "unit": 47114.61899982491
+        },
+        "kg_only_rows": 594455,
+        "kg_only_total": 1467094.0109991923,
+        "kg_by_quarter": {
+          "2010Q3": 191605.3755410475,
+          "2011Q1": 245539.33734262217,
+          "2012Q3": 189159.47969290407,
+          "2013Q1": 147521.75924436536,
+          "2015Q3": 119978.52985464575,
+          "2016Q1": 108084.77761554718,
+          "2018Q3": 251192.5825454838,
+          "2019Q1": 214012.16916257652
+        }
+      }
+    },
+    "join_coverage": {
+      "before": {
+        "crop": 16495,
+        "community": 43268
+      },
+      "after": {
+        "crop": 16218,
+        "community": 41291
+      }
+    },
+    "public": {
+      "normal": {
+        "full_frame_exact": true,
+        "native_counts": {
+          "Pepper": 10446,
+          "Groundnuts": 2839,
+          "Maize (shelled)": 1425
+        }
+      },
+      "Preferred": {
+        "full_frame_exact": true,
+        "native_counts": {
+          "Pepper": 10446,
+          "Groundnuts": 2839,
+          "Maize (shelled)": 1425
+        }
+      },
+      "Preferred Label": {
+        "full_frame_exact": true,
+        "native_counts": {
+          "Pepper": 10446,
+          "Groundnuts": 2839,
+          "Maize (shelled)": 1425
+        }
+      },
+      "fresh_Country": {
+        "full_frame_exact": true,
+        "native_counts": {
+          "Pepper": 10446,
+          "Groundnuts": 2839,
+          "Maize (shelled)": 1425
+        }
+      },
+      "Aggregate": {
+        "rows": 595725,
+        "labels_unmatched": {
+          "labels": "Aggregate",
+          "column": "Aggregate Label",
+          "n_unmatched": 3,
+          "n_values": 121,
+          "rows": 14710,
+          "row_share": 0.024692601452012256,
+          "examples": [
+            "Groundnuts",
+            "Maize (shelled)",
+            "Pepper"
+          ]
+        },
+        "warning_classes": {
+          "QuantityImplausibleWarning": 8,
+          "NullIndexKeyWarning": 1,
+          "ClusterIdentityWarning": 1,
+          "LabelPassThroughWarning": 1
+        },
+        "native_rows_preserved": true
+      },
+      "both_call_orders_exact": true,
+      "warm_no_parquet_writes": true
+    },
+    "comparator": {
+      "food_acquired": {
+        "rows": 355571,
+        "exact": true
+      },
+      "sample": {
+        "rows": 24362,
+        "exact": true
+      }
+    },
+    "crop_production_exact": true,
+    "community_prices_exact": true,
+    "derivation": {
+      "rows": 1856,
+      "all_raw_columns_exact": true,
+      "all_served_keys_join": true,
+      "Quantity_kg_sum": 4740.73
+    },
+    "metric_survey_none_per_row_exact": true,
+    "rung_transitions": {
+      "('item_unit', 'item_unit')": 121160,
+      "('item_unit', 'unit')": 56,
+      "('metric', 'metric')": 250905,
+      "('none', 'none')": 855,
+      "('survey_kg', 'survey_kg')": 168441,
+      "('unit', 'item_unit')": 104,
+      "('unit', 'unit')": 54204
+    },
+    "kg_delta": -102.48657776624896,
+    "hashes": {
+      "Nigeria": {
+        "tables": 24,
+        "changed": 24
+      },
+      "Uganda": {
+        "tables": 28,
+        "changed": 0
+      }
+    },
+    "stored_cache_fresh": {
+      "food_acquired": true,
+      "crop_production": true,
+      "community_prices": true
+    }
+  },
+  "audit-proof": {
+    "before_records": 441,
+    "after_records": 445,
+    "statuses": {
+      "before": {
+        "warn": 438,
+        "pass": 3
+      },
+      "after": {
+        "warn": 442,
+        "pass": 3
+      }
+    },
+    "removed": 54,
+    "added": 58,
+    "removed_groups": {
+      "quantity": 42,
+      "metric": 10,
+      "cardinality": 2
+    },
+    "added_groups": {
+      "quantity": 42,
+      "native_coverage": 4,
+      "metric": 10,
+      "cardinality": 2
+    },
+    "full_normalized_multiset_exact_after_enumerated_accounting": true,
+    "quantity_warning_differences_only_verified_quarter_j_names": 42,
+    "metric_warning_differences_only_cell_count_77_to_75": 10,
+    "Aggregate_cardinality": {
+      "food_quantities": {
+        "before": 930511,
+        "after": 930790,
+        "baseline": 950540
+      },
+      "food_expenditures": {
+        "before": 714907,
+        "after": 715137,
+        "baseline": 729334
+      }
+    },
+    "new_expected_native_coverage_warnings": 4,
+    "Uganda_country_records_exact": true
+  },
+  "positive-tests": {
+    "total": 116,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exitcode": 0
+  },
+  "counterfactual-tests": {
+    "total": 36,
+    "failed": 31,
+    "errors": 0,
+    "skipped": 0,
+    "exitcode": 1
+  },
+  "before-build": {
+    "head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+    "repo": "/local/job40255479/worktrees/isa-review-1034-v2",
+    "package": "/local/job40255479/worktrees/isa-review-1034-v2/lsms_library/__init__.py",
+    "offline": true,
+    "tables": {
+      "food_acquired": {
+        "rows": 595725,
+        "columns": [
+          "Quantity",
+          "Expenditure",
+          "Quantity_kg",
+          "Derivation"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ]
+      },
+      "food_quantities": {
+        "rows": 595053,
+        "columns": [
+          "Quantity"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ]
+      },
+      "food_prices": {
+        "rows": 481191,
+        "columns": [
+          "Price"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ]
+      },
+      "food_prices_native": {
+        "rows": 481613,
+        "columns": [
+          "Price"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ]
+      },
+      "food_expenditures": {
+        "rows": 482285,
+        "columns": [
+          "Expenditure"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "s"
+        ]
+      },
+      "crop_production": {
+        "rows": 62844,
+        "columns": [
+          "Quantity",
+          "u",
+          "Quantity_sold",
+          "Value_sold",
+          "Unit_sold",
+          "planting_month",
+          "harvest_month",
+          "intercropped",
+          "perennial",
+          "KgFactor"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "plot_id",
+          "crop"
+        ]
+      },
+      "community_prices": {
+        "rows": 131338,
+        "columns": [
+          "Price",
+          "Derivation"
+        ],
+        "index": [
+          "t",
+          "v",
+          "j",
+          "u"
+        ]
+      }
+    },
+    "hashes": {
+      "Nigeria": {
+        "sample": "d0e8b0b4c2c3c906da14f2a03d593d4bc9674734ea3365d0278736b04e52a9e5",
+        "cluster_features": "253343cd93e90c9ffd89a3feb6b40830c3cbdfefe3b7e03b52a81a1adb1a46e5",
+        "shocks": "c38f3c5889fccc50faa9e2351e14d1691ce3822db0e29789e19bffca07ced080",
+        "food_acquired": "13f1a1f4d0ac66c40406d0f8c921d5dcb4ab2d6e0ae43ac93275306b319659db",
+        "household_roster": "053bf39ec94136767865836b6cdd1703c0f15f7f12f57a64b68beba2692551f1",
+        "individual_education": "5e9ef88c52d514db3f1671f0b156e51c1a50b62285fb3a2834d779b4b1269260",
+        "panel_ids": "cb90d7a99c24b52bae92d444b24d71dcc718806013f7cb78f85a68483508a96d",
+        "assets": "72e31f374ca226018125d13c5129d1c5515451a185ab15276ced37f291cf7119",
+        "interview_date": "485350f323ea96a793cd8f843f84eb505a778ee1a244f8e34f6bd13eee49ddd2",
+        "housing": "59ff892f612c9ab3647b58c8a08d1085f7e060b6b3ca23ee8ab822a6e2a3b15c",
+        "plot_features": "1690290256c2f2c9a7900c5ee9ed23486f68c13bd6cd55bf373fb8e24b2595c7",
+        "crop_production": "87838da24b9e71a15b4c3a226319790a5875582d480e7af5ec79ecb440423079",
+        "plot_inputs": "22fe0876b4a0f48445632347055e7d663799335b4d7621063c3821ced3d8fc94",
+        "food_coping": "e2922b0fab91872ae13ab571d17549e9f41e24e46e3ac991425c9f3098541ff8",
+        "livestock": "f645018f6369217cf02f2c1d160ac2dd8860d2a5b72e7f5c12890aa9b2a66456",
+        "anthropometry": "23dda16ab8c2cc32e35c1fd9942a324bcf291fed99e1cd9f962a15e277ce5e79",
+        "plot_labor": "418d5967f799ae480b0cbd36615dfdbc46526043636df8dcc13039dd921efe57",
+        "people_last7days": "9cc4cc8bc3884d196b2c69f041da3fd8982835f46f0424c3ef05a985743b896b",
+        "community_prices": "a250d10f78dd63a09b4310889f95460fc839dab35863a457af728bf94ffd0c4d",
+        "nonfood_expenditures": "f8ddc5686e992cf815d3bd0cce5238a44f4b8b3e2e24489d0cc180be2c7d7068",
+        "food_expenditures": "008f0d87c06bc54bb8db072a054f24e8f1f559b3b3b30b13019c0b749f8d7473",
+        "food_prices": "6078c94ae190f4710976fe1fb9e69cd9b6833ce542d11c4547fa232a497ff825",
+        "food_quantities": "498bd3956e36118041b80adf1ea18e394343875c3739c3a054e3b93b675c229b",
+        "household_characteristics": "e8147c405119cc478814c4ca6684bc51d2b061a28eb6ff32bd1713bf2c74c52d"
+      },
+      "Uganda": {
+        "people_last7days": "40ac083a465c155ebe158c9f68d9f0ed14c0d80e48ca0bad888235a653b6ea61",
+        "sample": "5ff5d830c3c50553c9fa610667419f2e610f587b6ec9b2d163c332694284ce76",
+        "cluster_features": "c5facf580f52ade373eff9d81720f436ccecd7d035f3850f41008bf291133478",
+        "household_roster": "e0654e3a5370fdfe1a3d62cfa3e0ce883813291b6f668d61c9b03e61a26a5080",
+        "individual_education": "b2181bbfc72c2fcddc08845fc669d39bc8bf6b5599679f2208b5941b29ee91b7",
+        "shocks": "cf916c8bccf2c58cf8c4c9ac689114e3e05838f20f2df51d75451ae572956798",
+        "earnings": "72ba5e7ec2a7df0cd079fa126db464005dcf0c35ca8498afc763a3bac06690d7",
+        "food_acquired": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba",
+        "fct": "02fa27a96359021ccc8d3b5729b9a15f38304a525b21ff0df3b745b898488edd",
+        "nutrition": "8934b068a814e99092b5421e8ad6cfff54dc216115c77fd46ce5973350e5d9fe",
+        "interview_date": "6b6fc90a2e29e6b2765320f200b10198fcf1ee31ac705e00df39af10a94ab451",
+        "panel_ids": "28cb9e908eea832dc8a22397786da1e56e706cfae9432ec9bdd3fd60344bf1d9",
+        "income": "8a64b2406155f58ffebc05705c939acecb788c7cc767fbf299b45783c42f65c5",
+        "enterprise_income": "539000844cafa0fb827c069b0c4503493c8ea0ae5194ec1a3fbe9568a1885ae3",
+        "assets": "7a6c43376b1bd6cadee3fbc9e116a4236e1ac13a53ab1e95a7addefeaeafcfc7",
+        "months_food_inadequate": "06e6b5cb745e379e7eedf77b7661aa9b98ffd9ddf6cc9bdc5d1b7daa91e83c29",
+        "housing": "670fee3613af5cff127e5b7f0bea1edd8e5d55bbe1d6acbfe4db90558e63b7c8",
+        "plot_features": "2d4f4d98771bfd067a4ed139aac4a2a7eefe0ea7d94a4760e4a0663650b6672d",
+        "crop_production": "266bff9fae8d105154cac9dd3d7291000cd3e4b422d2c64ea674e717117aaa10",
+        "plot_inputs": "a2eee72db5c816087527e343233debcfe76e61a37ed0026653effe604be16bfe",
+        "livestock": "1390500e2f0900154f41bbfdcc9be361fdeb5cee61ac6c3316cc3e355ffe7811",
+        "anthropometry": "5303b7bf64ecb1900843fc1a6074da92016c75964cd4d30592df5737ad3b0892",
+        "plot_labor": "7aaddf05d2973b524a24da44b84de50a69dfe1a738a1f55fc7c3d80fa5266d8c",
+        "nonfood_expenditures": "aafcf68bee0b2b47732d00ae2bbec4b8cbdde87dd19c9867ccc6d17acc610945",
+        "food_expenditures": "0f7a283863b839d99da612a4c2d65f5addb4d37c255d011ec15ecd8d5e8f50a8",
+        "food_prices": "969828e9c8dd1b641bbe856b454a44f86523e89561c63e082272c1e3c60f2916",
+        "food_quantities": "7ba7c074b511c73dea48a6dea0318c2fee9587992d6c0e42ba59ca6569018fe2",
+        "household_characteristics": "9d746a3f0c7a61bd15a7324de8018b41e681757cfaba6608dcb0578267235dba"
+      }
+    },
+    "rungs": {
+      "metric": 250905,
+      "survey_kg": 168441,
+      "item_unit": 121216,
+      "unit": 54308,
+      "none": 855
+    },
+    "seconds": 110.30780050624162
+  },
+  "after-build": {
+    "head": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
+    "repo": "/local/job40255479/worktrees/isa-review-1144",
+    "package": "/local/job40255479/worktrees/isa-review-1144/lsms_library/__init__.py",
+    "offline": true,
+    "tables": {
+      "food_acquired": {
+        "rows": 595725,
+        "columns": [
+          "Quantity",
+          "Expenditure",
+          "Quantity_kg",
+          "Derivation"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ]
+      },
+      "food_quantities": {
+        "rows": 595053,
+        "columns": [
+          "Quantity"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ]
+      },
+      "food_prices": {
+        "rows": 481191,
+        "columns": [
+          "Price"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ]
+      },
+      "food_prices_native": {
+        "rows": 481613,
+        "columns": [
+          "Price"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ]
+      },
+      "food_expenditures": {
+        "rows": 482285,
+        "columns": [
+          "Expenditure"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "s"
+        ]
+      },
+      "crop_production": {
+        "rows": 62844,
+        "columns": [
+          "Quantity",
+          "u",
+          "Quantity_sold",
+          "Value_sold",
+          "Unit_sold",
+          "planting_month",
+          "harvest_month",
+          "intercropped",
+          "perennial",
+          "KgFactor"
+        ],
+        "index": [
+          "i",
+          "t",
+          "v",
+          "plot_id",
+          "crop"
+        ]
+      },
+      "community_prices": {
+        "rows": 131338,
+        "columns": [
+          "Price",
+          "Derivation"
+        ],
+        "index": [
+          "t",
+          "v",
+          "j",
+          "u"
+        ]
+      }
+    },
+    "hashes": {
+      "Nigeria": {
+        "sample": "147eb1eb59a831cc94556b4c60bdc88c063e43a95d29029d14185e7d2b391e09",
+        "cluster_features": "d938127ffaba2809c5aef6312c4b1e12274dc2b52d2e5808b2cd9c3fe9137f26",
+        "shocks": "a4f08d8cccde7d8fd033bcd180a1b7c638df8380ac5f9d6c227883969f24f656",
+        "food_acquired": "0fc6b0fd17b4d5fe8c867d34321d323f47f5ad034c52e31b6455c53b391ae0fb",
+        "household_roster": "c613cc39130d26a329a83c146a3005ec5ecd5aa42a54bbcfd9eb5fa6aa4a7c48",
+        "individual_education": "dda96a94bb9db0e0b2f462942bda00f23793774ed6de82689e70e7c6bff10046",
+        "panel_ids": "f7335308dbba82561f749c833d0ce2aa814c420024cfdfc87e911911109a450c",
+        "assets": "9b6b882643f3cdd467f8e3435567a4c389382e9f315bc7354f998f0e5e8086f7",
+        "interview_date": "ff58a4dc7de8bde1031b79378b18658b958040a54b4872d61eccb15dff2e0487",
+        "housing": "ac01f18c4c7a84b9ed4e9ca0904053340c19e35cd19b81642160dc3743aedd5e",
+        "plot_features": "326b5227356c5c42ed7345519730fcc01606e13c7c4cdff99907a6625838b315",
+        "crop_production": "cc426da0c8908bc8a2597aa2837cd8202fb9bcc13413aba0b9b3127b16b1519d",
+        "plot_inputs": "ab625e7927952ec80bbcea2115e9e5bd38ce2ac72e9e5fb9fee8e9f30fdf7e30",
+        "food_coping": "5040c542160cdc2dafb116d8710bf5d037aeb8a10451d9b15e68a124e50d974a",
+        "livestock": "251ea7fc668a3eb7f4769abb90b0f6a4bb6b8d6efeb04c1e77b8a84433e7baec",
+        "anthropometry": "865dd4463a90e2f86ddf05a47cf6bc9ddacd03842e307ba4ee6ece6e65e71a52",
+        "plot_labor": "f5ccdf597d048a5ae4b31ac140e2185f3011765793b121e97e6fe6d2f27be529",
+        "people_last7days": "cb2d358338a012d628fc6d5d6568bbca8fc42cf7cf77913c859647cc1a73dfe6",
+        "community_prices": "ea35b584ea28a031592bd39b617d5d1fde502b28f8bf559fdbd85de6420625d8",
+        "nonfood_expenditures": "60ee323c007da48b6e4e67c83ea6917f91668ea00febbea16789ba27a77a6eb7",
+        "food_expenditures": "45675463569e5883685d9c6c44d9ff8e8f69abe31b00de3e10f2586089c8b3a2",
+        "food_prices": "7d02d5ca17413571f4f5fe835ae3b837ef445156dc0f239e2cc858c5658e60c5",
+        "food_quantities": "7a5bd50d1d4858a8143a2dd82a4acf371c0701d4d7c98147365523ef72add4d7",
+        "household_characteristics": "acc481625d036c98fb0f7ff5031cc46934b032ba4ffc34f0bbb61d04daba00b0"
+      },
+      "Uganda": {
+        "people_last7days": "40ac083a465c155ebe158c9f68d9f0ed14c0d80e48ca0bad888235a653b6ea61",
+        "sample": "5ff5d830c3c50553c9fa610667419f2e610f587b6ec9b2d163c332694284ce76",
+        "cluster_features": "c5facf580f52ade373eff9d81720f436ccecd7d035f3850f41008bf291133478",
+        "household_roster": "e0654e3a5370fdfe1a3d62cfa3e0ce883813291b6f668d61c9b03e61a26a5080",
+        "individual_education": "b2181bbfc72c2fcddc08845fc669d39bc8bf6b5599679f2208b5941b29ee91b7",
+        "shocks": "cf916c8bccf2c58cf8c4c9ac689114e3e05838f20f2df51d75451ae572956798",
+        "earnings": "72ba5e7ec2a7df0cd079fa126db464005dcf0c35ca8498afc763a3bac06690d7",
+        "food_acquired": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba",
+        "fct": "02fa27a96359021ccc8d3b5729b9a15f38304a525b21ff0df3b745b898488edd",
+        "nutrition": "8934b068a814e99092b5421e8ad6cfff54dc216115c77fd46ce5973350e5d9fe",
+        "interview_date": "6b6fc90a2e29e6b2765320f200b10198fcf1ee31ac705e00df39af10a94ab451",
+        "panel_ids": "28cb9e908eea832dc8a22397786da1e56e706cfae9432ec9bdd3fd60344bf1d9",
+        "income": "8a64b2406155f58ffebc05705c939acecb788c7cc767fbf299b45783c42f65c5",
+        "enterprise_income": "539000844cafa0fb827c069b0c4503493c8ea0ae5194ec1a3fbe9568a1885ae3",
+        "assets": "7a6c43376b1bd6cadee3fbc9e116a4236e1ac13a53ab1e95a7addefeaeafcfc7",
+        "months_food_inadequate": "06e6b5cb745e379e7eedf77b7661aa9b98ffd9ddf6cc9bdc5d1b7daa91e83c29",
+        "housing": "670fee3613af5cff127e5b7f0bea1edd8e5d55bbe1d6acbfe4db90558e63b7c8",
+        "plot_features": "2d4f4d98771bfd067a4ed139aac4a2a7eefe0ea7d94a4760e4a0663650b6672d",
+        "crop_production": "266bff9fae8d105154cac9dd3d7291000cd3e4b422d2c64ea674e717117aaa10",
+        "plot_inputs": "a2eee72db5c816087527e343233debcfe76e61a37ed0026653effe604be16bfe",
+        "livestock": "1390500e2f0900154f41bbfdcc9be361fdeb5cee61ac6c3316cc3e355ffe7811",
+        "anthropometry": "5303b7bf64ecb1900843fc1a6074da92016c75964cd4d30592df5737ad3b0892",
+        "plot_labor": "7aaddf05d2973b524a24da44b84de50a69dfe1a738a1f55fc7c3d80fa5266d8c",
+        "nonfood_expenditures": "aafcf68bee0b2b47732d00ae2bbec4b8cbdde87dd19c9867ccc6d17acc610945",
+        "food_expenditures": "0f7a283863b839d99da612a4c2d65f5addb4d37c255d011ec15ecd8d5e8f50a8",
+        "food_prices": "969828e9c8dd1b641bbe856b454a44f86523e89561c63e082272c1e3c60f2916",
+        "food_quantities": "7ba7c074b511c73dea48a6dea0318c2fee9587992d6c0e42ba59ca6569018fe2",
+        "household_characteristics": "9d746a3f0c7a61bd15a7324de8018b41e681757cfaba6608dcb0578267235dba"
+      }
+    },
+    "rungs": {
+      "metric": 250905,
+      "survey_kg": 168441,
+      "item_unit": 121264,
+      "unit": 54260,
+      "none": 855
+    },
+    "seconds": 114.45937791280448
+  },
+  "immutable-proof": {
+    "head": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
+    "tracked_files_SHA256_unchanged": 14890,
+    "git_status_clean": true,
+    "all_library_changes_scoped_to_Nigeria": true,
+    "no_in_tree_parquets": true,
+    "library_changed_paths": [
+      "lsms_library/countries/Nigeria/2010-11/_/mapping.py",
+      "lsms_library/countries/Nigeria/_/CONTENTS.org",
+      "lsms_library/countries/Nigeria/_/categorical_mapping.org",
+      "lsms_library/countries/Nigeria/_/nigeria.py"
+    ]
+  }
+}

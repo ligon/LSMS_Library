@@ -1,0 +1,12 @@
+{
+  "status": "ROOT_PHYSICAL_FULL_STAT_EQUALITY_STOP",
+  "original_session_id": 64962,
+  "initial_chunk": "0f274a",
+  "terminal_chunk": "b40dd7",
+  "exit_code": 1,
+  "cause": "Root checker compared complete stat tuples across read, including atime. It stopped on first shared provider before any provider receipt comparison completed. Exact protected physical fields including ctime are now compared; atime is outside protected historical receipts. Original pre-read stat is not retained, so a historical isolated-atime diagnosis is not claimed.",
+  "v1_metadata_status_correction": "Earlier v1 stop title incorrectly included PROVIDER_HASH_GATES: v1 actually stopped at static AST locator after packet/source hashes and before providers. v2 passed static locator and stopped on first provider.",
+  "original_checker_sha256": "82d5ae3e918a6fb544c06e75d8bfe34e7c79652b448e6257a30d873c93c0c89d",
+  "product_API_raw_decoding_actors": 0,
+  "signed": "Sue"
+}

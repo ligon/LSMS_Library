@@ -1,0 +1,8 @@
+{
+  "verdict": "PASS",
+  "scope": "Only Malawi two raw null derived-food registrations removed; broader GH218 remains open.",
+  "candidate": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "new_product_findings": [],
+  "reviewer": "Sue",
+  "freeze_requires_READY_and_manifest": "READY.json"
+}

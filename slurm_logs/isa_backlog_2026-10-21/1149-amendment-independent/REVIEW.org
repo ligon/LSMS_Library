@@ -1,0 +1,78 @@
+#+title: GH1149 narrow cleanup amendment - independent delta review
+#+author: Sue
+
+* Decision
+
+PASS for the narrow amendment at4f9344f42a322c80a42bbbe013fc16116b8f3451, with runtime/tests21f5cb7f91152c5a86eba8cfd264dd24124b523a.
+The additional dispatcher cleanup requirement identified in the original review is now satisfied for the reviewed invalid receipts and focused exception controls.
+Root owns final acceptance, PR publication and human merge.
+The normal push helper still promises list[Path].
+The original gap was pre-existing on release f8 and actual fb; this review claims no ordinary-helper regression, false held-release stamp or country-data corruption.
+
+* Exact delta and exception semantics
+
+The entire production AST equals actualfb1571035eac6f0f67e4496fd58d4b101b164ce9 after removing exactly two new try/except wrappers around the existing expected/confirmed path-set assignments.
+Each wrapper catches BaseException, removes only the current (country,wave) key and uses a bare re-raise.
+No extraction, recursive mapping, checksum, revision/leftover, provenance, confirmation, successful push or return rule changed.
+Removing exactly one new parametrized regression makes the complete affected test AST equal fb.
+Only data_access.py, test_staged_reacquisition.py and the task ledger differ from fb.
+The add-wave skill,174-member real-name fixture and Country/Feature source bytes are unchanged.
+The final commit is a ledger-only descendant of the tested runtime; complete library/test/skill blobs and modes match that runtime.
+
+The four new author controls were independently executed on the candidate as part of the complete affected five-file selection:270 PASS, zero failures/errors/skips, one expected mocked bad-GPG warning.
+Identical physically copied controls on the actualfb source produce4 FAIL, zero errors/skips.
+All four fail only at the final current-receipt-removal assertion, after original TypeError args, unchanged SOURCE bytes and unrelated receipt identity have passed.
+Receipts None and [None] are distinguished; Path(None) is the failing validation operation for the second receipt, not a returned Path object.
+
+Four additional independent controls use a PathLike that raises either ValueError or a custom BaseException while its returned receipt is validated, at each public entrypoint.
+All four pass on the candidate, preserving the exact exception object and args, SOURCE bytes and unrelated receipt object while clearing the current key.
+These controls exercise propagation and isolation beyond repeating the two author None predicates.
+No test was loosened, failure normalized away or product edited by this reviewer.
+
+* Original human contract and country context
+
+The six human Option C requirements remain distinct from the additional invalid-receipt cleanup requirement.
+The original independent staged-acquisition review remains frozen atfb, with its country-context qualifications, synthetic fixtures,47-case parent discrimination and bounded warm evidence unchanged.
+The270-case current suite contains all 266 original affected cases, and AST/blob checks establish unchanged extractor, membership, confirmation, provenance and fixture semantics.
+This is the basis for carrying the six original contract findings through this amendment.
+It is not a new actual-acquisition or country-data measurement.
+
+Current Nigeria and Ethiopia CONTENTS bytes and Git blobs independently match my prior complete 2166/2350-line personal readings, including TODO/WAITING/LOGBOOK material.
+Nigeria retains nested W5v01, its v02 geography acquisition gap, amended quantity-aware W1 rule and WAITING nonfood recall caveat.
+Ethiopia retains heldv02 and the old plot filename; its "coordinates are **CONFIDENTIAL** anyway" rationale conflicts with #1127's "The redaction is in a different file" correction.
+That contradiction remains recorded and unadjudicated.
+No country source, scientific, raster or acquisition decision was made here.
+The fresh live #1149 body still specifies the settled six-part Option C contract.
+The standing/task ledgers, original independent findings, actual helper contracts and full new source/test diff were read.
+
+* Actual footprints and data boundary
+
+Own actual measurements on both candidate and actualfb give 549 country, 39 framework and 1362 declared-wave fingerprints with identical keysets and zero movements.
+Both data-endpoint inventories remain unchanged.
+The two census stderr streams contain the same three non-ISA Peru missing-underscore-directory diagnostics, equal after only the known checkout-prefix substitution.
+There is no schema, dependency, fingerprint-exclusion, cache bypass or stamp change.
+
+No Country/Feature/CLI data call, warm actor, real payload copy, raw/L1 copy, source-cold build, World Bank/S3/DVC acquisition or credential operation was requested or performed for this amendment.
+The original 12 strict warm comparisons and five ordered scanner WARN controls remain pinned tofb and their original physical operands.
+They are not relabelled as measurements on the new runtime.
+The only production delta is in explicit acquisition entrypoint receipt validation; unchanged ordinary Country/Feature code and the full-module AST comparison establish that code-path separation.
+The real Nigeria/Ethiopia release refresh and its dispatcher content review remain separate work.
+
+* Protection, execution and retained history
+
+Before imports and after all actors finish, all 7067 frozen entries from the original author, original independent review and amendment author are physically reverified with exact pathsets.
+All 119058 tracked source endpoints across eight checkouts, two installed hashing sources and the exact two prepared ignored DVCtmp links remain unchanged.
+Original verdicts, XMLs, warnings, checkers, source pins and physical fields are preserved.
+The two new review checkouts remain clean at their exact prepared heads.
+Offline namespaces and active socket/write guards precede package imports; cwd/package/countries/config/data identity and private config/XDG/tmp roots are asserted.
+At most two total pytest workers use loadfile distribution; numerical/build/Make thread limits remain 1.
+There are zero network attempts and write-guard denials.
+
+One read-only attempt to inspect an optional author snapshot.py path found no such file; the actual protect.py was then read.
+That metadata-only setup stop is retained before imports/tests, with no product or evidence mutation.
+All executed cohorts and protection tools have explicit terminal outcomes.
+The seven aggregate-only safe exports, full manifest and zero-consumer seal are followed by a separate read-only post-exit verification.
+Full failures, warning strings and synthetic payloads remain private.
+The original review root is not rewritten or repackaged.
+
+Sue.

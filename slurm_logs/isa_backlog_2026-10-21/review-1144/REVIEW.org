@@ -1,0 +1,125 @@
+#+title: Independent full review - Nigeria GH #1144
+#+date: 2026-10-21
+
+* Verdict
+
+PASS within the approved recorded-native and quarter-selection boundary at immutable =1e6111e2b0580e045084d3c077c258469f8d7dc0=.
+The comparison baseline is immutable =3e658298753db4f2934ea1b703415a1bdfa9f6af=, whose runtime is identical to the separately reviewed 6f #1034 runtime.
+No blocking source, runtime, conservation, public-boundary or regression defect was reproduced.
+All 14,890 tracked file contents remain SHA256-identical to the review's initial manifest; HEAD and the clean status remain unchanged.
+
+* Findings and boundary
+
+One nonblocking evidence correction: =slurm_logs/isa_backlog_2026-10-21/1144/REPORT.org:118= says twelve W3 rows share W1 container names.
+The exact shared-spelling subset exercised by the GH1035 guard is eleven: three Sack/Bag Medium and eight Basin Medium.
+The twelfth #1034 relabel is Basin Large, while W1 uses Basin Big/Large.
+The twelve-row #1034 conservation result remains correct; the sentence should distinguish that total from the eleven-row shared-spelling subset.
+
+The two inherited W4-PH specificity questions remain outside the approved correction.
+Direct held metadata confirms code 20 =20. Maize (On the cob)= on 20 retained rows and code 113 =113. Milk tinned= on 340 retained rows.
+The preserved outputs add unshelled and unsweetened respectively; this review does not establish those attributes.
+No questionnaire PDF is held in the permitted private L1, and no instrument was acquired.
+The source-grounded residual at =Nigeria/_/CONTENTS.org:32= and the exact residual issue text in the implementation report correctly keep that adjudication separate.
+
+* Grounding against the ledger and approved design
+
+The root-approved =1144-design.md= was read independently and copied into this private review directory.
+The task ledger sections 2-5 correctly reuse the country decoder, canonical food builder, W1 derivation registry, existing food inference and Feature harness.
+=harmonized_food_labels(t)= extends the food path while preserving the no-argument consumer contract; the two food-only quarter consumers are the acquisition builder and W1 raw-input reconstruction.
+No competing estimator or reducer was introduced.
+
+The old quarter table contradicts the held dictionaries.
+For W2-PP, its code 44 Groundnuts (shelled), code 77 Dry Pepper and code 78 Leaves entries conflict with the dictionary's other nuts/seeds/pulses, leaves and other vegetables meanings.
+For W2-PH, those same numeric codes carry shelled groundnuts, dry pepper and leaves, contradicting the old PH cells in the opposite direction.
+These are direct source contradictions, not permission to trust every existing table cell.
+Nigeria's existing W4 purchase/consumption-window caveat and the nonfood WAITING entry "Recall windows are POOLED, and no column records it" remain unchanged and unresolved.
+The historical #223 negative about W3 unit labels is already qualified by #1034 and is not used as a reason to reject the held metadata.
+
+* Independent source and static checks
+
+All eight held Stata dictionary blobs match their sidecar MD5 byte-for-byte.
+All eight CSVs match their sidecars under the appropriate byte or legacy DVC text digest.
+Metadata and positive acquisition-source counts independently reproduce every one of the 34 explicit source-grounding entries, all eight quarter totals, the W4 residual counts and the full rename accounting.
+The rejected old-quarter-table control produces exactly 2,135 PH errors; the eight previously missing positive PH cells represent 6,288 retained rows.
+
+Exactly nineteen quarter cells change.
+All Code, Preferred Label and Aggregate Label cells, the complete unit table, and all 258 no-argument food/crop mappings are exactly equal to the baseline.
+Every library change is under Nigeria; no framework or other-country file changes.
+There are zero new observed multicode merges within a quarter.
+The new tests exercise actual builder rows and independent label expectations, including both W2 meanings, exact-name priority, unreviewed/ambiguous aliases, numeric forms, unknown/NaN raw items, missing curation, unsupported quarters and W1 raw-input keys.
+
+* Independent cold, derived and public verification
+
+Both seven-table cohorts were rebuilt from physically empty Nigeria L2 roots, using a physically copied private L1, image Python, exact package/config/cwd assertions, active offline socket guard and numeric/build thread counts of one.
+The baseline cohort took 110.31 seconds and the candidate 114.46 seconds.
+No acquisition, DVC CLI, shared-cache write or promotion occurred.
+
+- Raw food :: All 595,725 rows and four value columns, including missingness and multiplicity, are exactly equal after 20,499 quarter-specific j replacements.
+  The source-backed existing-Preferred part is 5,789 rows and recorded-native preservation 14,710 rows.
+  Changed-quarter counts are 6,492 / 6,286 / 6,982 / 739 for W1-PP / W1-PH / W2-PP / W2-PH; all four later native frames remain exactly equal without replacement.
+  Every household/quarter expenditure sum is exactly preserved.
+- Derivation :: All 1,856 W1 raw-input rows and all raw columns remain exact after the same key replacements and join the served stamped rows exactly.
+  Their stated-kilogram sum remains 4,740.73.
+- Other consumers :: The complete 62,844-row crop and 131,338-row community frames remain exactly equal.
+  Exact food-row join coverage changes from 16,495 to 16,218 for crop and 43,268 to 41,291 for community, reproducing the disclosed losses of 277 and 1,977.
+- Derived effects :: Quantities retain 595,053 rows and default prices 481,191, with exact remapped index sets and missingness.
+  Exactly 1,724 quantity values and 1,239 default price values change, both bit-exactly and at the recorded 1e-12 comparison tolerance.
+  The kg-only total changes from 1,467,196.4975769585 to 1,467,094.0109991923, a decrease of 102.486577766249 kg; kg-row count remains 594,455.
+  Metric/survey_kg/none masks and per-row factors remain exact; 48 rows move net from unit to item_unit inference.
+  Native-unit prices and expenditures remain exactly equal.
+  The measured changes in unchanged later quarters reproduce the existing cross-quarter pooling effect.
+- Public boundary :: Normal, Preferred, Preferred Label and fresh-Country warm calls all return the exact expected complete frame.
+  Native counts remain Groundnuts 2,839, Pepper 10,446 and Maize (shelled) 1,425.
+  Both food-first and crop-first public consumer orders return exact expected frames.
+  The Aggregate request preserves every incoming native-name row and reports three unmatched labels / 14,710 rows / 2.4692601452 percent; no bucket was added.
+  These warm/order checks write no parquet.
+- Comparator and caches :: The complete held Uganda food/sample frames remain exactly equal at 355,571 and 24,362 rows.
+  Uganda's documented EA/parish/name transitions remain comparator caveats, not new failures.
+  All 24 Nigeria hashes move, none of 28 Uganda hashes moves, and final stored food/crop/community hashes match current candidate inputs.
+
+Nigeria declares no nutrition feature; none is claimed verified.
+
+* Tests and full Feature accounting
+
+The complete six-file selection passes *116 tests, zero skips/failures/errors*, with 67 retained warnings, under two loadfile workers in 91.87 seconds.
+No crop/plot-input case was deselected in this review.
+The new 36 cases run against the immutable baseline produce exactly 31 expected failures and five passes, zero setup errors or skips.
+
+The existing Feature scanner was independently rerun on both private roots for all four food features, Nigeria plus Uganda, phases 1 and 2, jobs 2.
+It reproduces 441 baseline records (438 warnings, three passes) and 445 candidate records (442 warnings, three passes), with zero failures/errors/skips.
+The complete normalized record multisets are accounted for, retaining every detail and metric except the explicit transformations below:
+
+- 42 removed/added quantity warnings match exactly after simultaneous, verified quarter-specific item-name replacement.
+- Ten removed/added metric diagnostics match exactly after changing only 77 to 75 item/unit contradiction cells.
+- Two existing Aggregate cardinality findings change: quantities 930,511 to 930,790 and expenditures 714,907 to 715,137, with their other fields and baseline sizes preserved.
+- Four new expected Aggregate native-label coverage warnings appear, exactly one per food feature.
+
+That accounts for all 54 removals and 58 additions, with no unexplained difference.
+The scans are not unchanged and are not an all-green corpus claim.
+
+* Runnable commands and safe artifacts
+
+All scripts live in this private review directory and assert the selected immutable checkout identity.
+Set =PYTHONPATH=<checkout>:/local/job40255479/control/isa-backlog-20261021/east/1144/offline=, =LSMS_COUNTRIES_ROOT=<checkout>/lsms_library/countries=, =LSMS_DATA_DIR=<this-directory>/<before-or-after>-data=, =PYTHONDONTWRITEBYTECODE=1= and =OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1=.
+Prepend =/local/job40255479/venv_img/bin= to PATH and run from the selected checkout.
+The image interpreter is =/local/job40255479/venv_img/bin/python=.
+
+- =build.py --repo <checkout> --side before|after= builds the seven-table cohort; it requires the initial physically empty Nigeria L2 used for this run.
+- =source_check.py= independently verifies held dictionaries, source counts and table/map conservation.
+- =compare.py= verifies full paired frames, derived/rung totals, public modes/order, warm writes, joins, hashes and comparator.
+- =run_tests.py --repo <candidate> --phase positive= runs the complete six-file 116-test selection with =-n 2 --dist=loadfile=.
+- =run_tests.py --repo <baseline> --phase counterfactual= runs the copied candidate's 36 cases at the immutable baseline and checks the expected failure counts.
+- =run_audit.py --repo <checkout> --side before|after= executes the existing four-feature scanner with the stated country/phase/job arguments.
+- =audit_proof.py= checks the entire normalized scanner multiset after the explicit accounting above.
+
+Safe aggregate artifacts are =validation.json=, =source-proof.json=, =comparison.json=, =audit-proof.json=, =positive-tests.json=, =counterfactual-tests.json=, the two build JSON summaries and =immutable-proof.json=.
+Raw frames, warning logs, full audit JSONL and JUnit records remain private and must not be committed or published because diagnostics may contain household records.
+
+* Limits
+
+The Nigeria cohorts and scanner runs are independently reproduced, while Uganda uses a physically copied held warm comparator rather than a new source rebuild.
+Source dictionaries and raw positive-row counts were read independently; questionnaire PDFs were unavailable in the permitted held cache, so the two inherited W4-PH qualifier questions remain open.
+No claim is made that this bounded correction adjudicates every inherited Nigeria food label.
+No tracked file, fixture, golden, dependency or source was edited, and no Git/GitHub mutation occurred.
+
+Sue

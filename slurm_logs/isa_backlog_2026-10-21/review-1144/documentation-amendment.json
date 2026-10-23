@@ -1,0 +1,36 @@
+{
+  "verdict": "NEEDS_FIX",
+  "scope": "Documentation wording only; original full source/runtime PASS preserved",
+  "base": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
+  "candidate": "47f9a8006fb35b89c2794e1d3135e209ec642961",
+  "only_changed_path": "slurm_logs/isa_backlog_2026-10-21/1144/REPORT.org",
+  "identical_trees": {
+    "lsms_library": {
+      "base": "951754b37e8d3adca4f41d5ffdb8036d04fc0931",
+      "candidate": "951754b37e8d3adca4f41d5ffdb8036d04fc0931"
+    },
+    "tests": {
+      "base": "dcdd1fb810d0a4d902e16eeb347278a7f4686efe",
+      "candidate": "dcdd1fb810d0a4d902e16eeb347278a7f4686efe"
+    }
+  },
+  "historic_115_plus_1_and_integrated_116_counts_accurate": true,
+  "eleven_shared_vs_twelve_total_count_accurate": true,
+  "finding": {
+    "severity": "low",
+    "path": "slurm_logs/isa_backlog_2026-10-21/1144/REPORT.org",
+    "line": 119,
+    "actual_text_labels": [
+      "Basin (Large)",
+      "Basin (Big/Large)"
+    ],
+    "required_source_exact_labels": [
+      "Basin Large",
+      "Basin Big/Large"
+    ],
+    "evidence": "Unchanged u table codes152 and33; private independent source/runtime reviews already verified these literal labels"
+  },
+  "no_cohort_or_test_rerun": true,
+  "frozen_1e611_worktree_HEAD_clean_unchanged": true,
+  "no_git_or_tracked_mutations": true
+}

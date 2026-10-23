@@ -1,0 +1,7 @@
+{
+  "reviewer_additional_control_groups_passed": 23,
+  "default_mixed_series_and_warning_exact": true,
+  "same_cluster_distinct_unknown_labels_counted_then_dropped": true,
+  "metric_rescue_and_eligibility_gates_exact": true,
+  "zero_invalid_ordinal_one_size_controls_preserve_old_rule": true
+}

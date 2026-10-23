@@ -1,0 +1,15 @@
+{
+  "status": "ROOT_APPROVED_ADDITIVE_IDENTITY_STARTUP_AND_FAIL_CLOSED_ENTRYPOINT",
+  "original_genuine_release_sha256": "c194be1c414f83c77779a28631520a7b9ed03cec0dd6ad85c8fcb05d50137b70",
+  "pins": {
+    "offline/sitecustomize.py": "993fc4077a95e5b7da11eae757b68b07093b0b25a43d948c15f93c7b5762b3b4",
+    "genuine_startup.py": "3c2fb90bd56859ef0cc75eaa824de3961048352ac85d51b0a2244d585f24d825",
+    "offline-genuine-closed/sitecustomize.py": "ba0345ef18e4fa43e81892ddc2a62c0d0749ca9d74c92d25ccf9252f39a43e3a"
+  },
+  "review": "Root read all three source files. Startup executes original byte-identical guard and SourceIdentity loader; only additive literal postimport package/config/data/privateDVC/runtime/script/UID receipts are added. Closed entrypoint SHA-verifies startup and exits78 on any assertion/exception, with minimal private metadata diagnostic.",
+  "write_network_DNS_boundary_changes": 0,
+  "product_cache_data_transforms": 0,
+  "original_calibration_replay_required": false,
+  "approved_execution": "Only already-released37provider/fourroot/148copy/8normal+2scanner grid and metadata/provider/copy gates. No additional normal data root.",
+  "signed": "Sue"
+}

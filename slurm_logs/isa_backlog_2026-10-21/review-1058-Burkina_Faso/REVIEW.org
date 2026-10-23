@@ -1,0 +1,119 @@
+#+TITLE: Independent review: Burkina Faso GH #1058
+#+AUTHOR: Sue
+#+DATE: 2026-10-21
+
+* Verdict
+
+PASS for frozen =20a5541867ef0b991b01031cd4c766681b537fc0=.
+The runtime is =7eee549b15cacbe1e86b60a925b0899dc85d49e6=; ledger-first is =b5ced85c571bc4d5b430371d1f92ace336c24a3f=.
+I did not author this patch and reviewed it in separate detached candidate and f8 baseline checkouts with physically separate private data roots.
+No production, test, configuration, ref, source or GitHub mutation was made.
+
+* Survey and source authority
+
+I read all 1,406 current Burkina CONTENTS lines, including TODO/DONE entries, and all 749 Senegal CONTENTS lines before comparator work.
+Burkina 2021 is a half-panel restricted to households in their original EA, without automatic top-up where fewer than six remain.
+The 2018 native formatter is =ehcvm_i=; 2021 uses =_old_i= wrapping country =i=.
+Those source namespaces differ from the framework's walked country/API namespace.
+The raw-country cache carries =id_converted=True=; source, native, walked and public key layers were checked separately.
+No identifier normalization was used to force agreement.
+
+The earlier helper/scheme assertion "EHCVM s16a has no decimal-degree parcel GPS" contradicts the dated CONTENTS correction (2026-10-18), which says the claim "holds for 2018-19 only" and identifies the 2021 q46 positions.
+The country concatenator's "Cached parquets store pre-transformation data" also describes a different route/layer from the actual default framework country write, where the existing ID walk has already run.
+These are recorded contradictions, not reasons to discard the historical notes.
+The candidate corrects the first claim and records the key-layer distinction.
+The 2014 EMC remains unsupported by this plot recipe; the live survey-design and other-feature caveats remain outside scope.
+
+Fresh sanctioned held-source reads and resolved-path Stata metadata identify =s16aq46__latitude= / =s16aq46__longitude= as the two parcel GPS axes.
+=s16aq45= is the measurement flag and =s16aq47= is area in hectares, not a coordinate.
+The 2018 source lacks q46 coordinates and its native wave remains six-column.
+No new source acquisition or PDF verification occurred.
+Mali/Niger negative findings remain limited to the frozen original diagnosis and unchanged source receipts; I did not perform a fresh broader-country metadata census.
+No additional country survey fact requiring a new CONTENTS note was discovered beyond the candidate's recorded facts.
+
+* Independent source and frame accounting
+
+| Quantity | Result |
+|----------+--------|
+| 2021 raw source rows | 8,467 |
+| Null field/parcel placeholders | 1,117 |
+| Retained native parcels | 7,350 |
+| Reported coordinate pairs | 4,180 |
+| Partial coordinate pairs | 0 |
+| Retained both-missing pairs | 3,170 |
+| GPS Yes / No / missing | 4,190 / 3,151 / 9 |
+| GPS Yes with area but no position | 10 |
+| 2018 native / public rows | 12,441 / 12,434 |
+| Raw-country / public total rows | 19,791 / 19,784 |
+| Healthy Senegal public rows | 13,824 |
+| Feature rows | 33,608 |
+
+My raw-source key projection exactly reproduces native, walked raw-country and public coordinates; native floating-point bits also match.
+All 4,180 recorded pairs survive the existing parcel mask.
+The ten measured-area parcels without positions remain missing; no flag, area proxy, screen, fill or interpolation enters the coordinate path.
+Native/walked keys are unique; public keys are non-null and all plot households join the normal supporting sample.
+
+Each normal cold and separate fresh-process warm probe compares 13 complete frames: two countries' plot/sample frames, Feature, three Burkina wave subsets, raw-country, and both native/helper pairs.
+All old six payloads, keys, index/column order, axes, null masks, dtypes and full logical attrs are exact between candidate and baseline.
+The seven all-old-payload-missing 2018 removals remain unchanged; no permanent test was added to pin that separate policy.
+The country union supplies two all-missing coordinate columns for 2018 and the unsupported 2014 subset.
+Senegal's complete frames remain exact.
+
+* Independent controls and audit
+
+The requested 15 new plus 21 existing cases pass: 36/36, no errors or skips.
+Eight additional independent adversarial controls pass, for 44 total candidate cases.
+They exercise noncontiguous/interspersed source indices and source order, a demonstrably wrong aligned-Series alternative, independent axis mappings and partial nulls, signed zero, missing/non-Yes flags, an out-of-range synthetic value retained without screening, no area substitution, absent declared sources, unchanged old payload/attrs and detection of the wrong household formatter.
+On the immutable f8 baseline, the unchanged new test file produces exactly 12 failures and three passes, with zero errors/skips.
+The API audit passes.
+
+All 13 scanner records were individually classified and their full unmodified multiset equals baseline: nine runtime warnings (two NullRead, six QuantityImplausible, one population heterogeneity), two scheme/index diagnostics and two constant-AreaUnit diagnostics.
+The scheme/index diagnostics concern the existing API-added v level.
+There are zero failures/errors/skips and no plot_features phase-2 kwargs grid.
+Complete API stage/class/message warning multisets are exact across baseline/candidate cold and warm runs (six NullRead, eight QuantityImplausible and one population warning per probe sequence).
+Detailed warnings, coordinates, IDs and frames remain private.
+
+All 549 country hashes and 39 tagged framework fingerprints were independently computed in the exact detached checkouts.
+Exactly 24 Burkina hashes move; 525 others and all 39 fingerprints are exact.
+The final inventory equals both the frozen runtime and final author inventories.
+Static AST/YAML checks show only the optional positional coordinate loop, two 2021 q46 bindings and two existing canonical optional float declarations.
+After those exact additions and docstrings are removed, helper/wave ASTs and parsed scheme match f8.
+The final descendant changes only ledger and safe evidence: its full library/config and test tree blobs are exact to the runtime commit, with no additional hash footprint.
+Other Burkina table outputs were not rebuilt or claimed verified.
+
+* Cache tiers and isolation
+
+Preparation verified all 15 held L1 MD5/SHA/mode/mtime receipts before any API build and physically copied them into each new private root, with distinct inodes, single links and no symlinks.
+Burkina target and supporting caches were absent; normal plot_features builds rebuilt supporting sample through the normal framework.
+Cold probes were followed by separate fresh-process warm replays, with one consumer per root.
+Warm replays and all later checks change zero parquet bytes, modes or mtimes.
+All six Senegal comparator files remain byte/mode/mtime exact in both private roots.
+
+The six-file statement must be read by tier: Senegal's TWO country caches have exact current hashes and full wave coverage; TWO YAML sample-wave caches have exact current hashes; TWO script-path plot_features wave companions are legitimately hashless, with no wave manifest.
+They remain hashless and unchanged.
+They are not six embedded-current-hash caches.
+This qualifies the author's broader wording; no stamping, trust flag or read-gate bypass was used.
+
+Every process uses the mounted image, exact cwd/package/config/data identities, active socket guards plus =unshare -rn=, numerical/build/Make threads one and at most one loadfile test worker.
+The only checkout metadata exception is the exact root-prepared owner-only DVC tmp realpath for that checkout; DVC site state is private.
+Audit callbacks reject checkout writes and the existing metadata mkdir; both socket methods reject synthetic probes.
+Actual outbound attempts and in-tree parquets are zero.
+
+* Preserved failures and immutable proof
+
+The initial protection launcher named a nonexistent =isa-review-1123-Burkina_Faso= checkout, an incorrect bootstrap path rather than evidence of a disappeared source tree.
+It stopped before preparation/API work; its log remains private.
+The corrected snapshot protects the seven extant tracked trees and absence-checks that misnamed path.
+The actual cfd078 1123 writer and immutable private 1123 review evidence are protected.
+A second over-strict preparation gate required hashes on both script companions; it stopped before any copy/API probe.
+Its failed log and complete footer probe are preserved, and root approved the documented tier distinction before corrected preparation.
+Neither failure is product evidence.
+
+Final full content/mode/HEAD/clean-state receipts cover candidate, review baseline, author writer, original diagnosis tree, shared immutable f8 baseline, prior 1123 writer and prior Burkina tree.
+All regular-file payloads in four immutable private evidence roots, including all author data/logs and the original diagnosis, are SHA/mode/mtime exact.
+The regular-file snapshot excludes symlinks: one author pytest-current administrative link was separately recorded at final release, so its target is not claimed to have an initial link receipt.
+It points into the same protected pytest evidence; there are no source/payload symlinks, and the read-only guard denied mutation of that author root throughout review.
+The final proof also requires zero live review data/test consumers.
+See =verdict.json=, =proof.json= and =REPRODUCE.sh=; full evidence is private under this review root.
+
+Sue

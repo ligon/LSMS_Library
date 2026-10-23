@@ -1,0 +1,119 @@
+{
+  "status": "AUTHOR_READY_PENDING_INDEPENDENT_REVIEW",
+  "issue": 1215,
+  "signed": "Sue",
+  "source_head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "policy": "User-approved declaration order for constructed empties; existing membership, populated order and dtype policy unchanged",
+  "targeted_candidate_pass": 13,
+  "supporting_candidate_pass": 88,
+  "targeted_actual_parent_fail": 6,
+  "targeted_actual_parent_pass": 7,
+  "synthetic_skips": 0,
+  "comparator_calibration": {
+    "total": 30,
+    "positives": 3,
+    "faults": 27
+  },
+  "test_scope": "Bounded --noconftest runs, omitted root rebuild/purge and credential/skip hooks; two loadfile workers and threads/build1; no standard full-suite claim",
+  "actual_pred_data_fingerprint_moves": {
+    "country": 549,
+    "framework": 39,
+    "declared_wave": 1362
+  },
+  "broad_cache_invalidation": true,
+  "ordered_public_declarations_equal": true,
+  "genuine_budget": {
+    "providers": 37,
+    "normal_roots": 4,
+    "distinct_L1_binary_copies": 148,
+    "L1_copy_bytes": 177769212,
+    "normal_actors": 10
+  },
+  "genuine_rows": {
+    "supported": 15630,
+    "all_wave": 133761
+  },
+  "candidate_barren_column_order_controls": 8,
+  "full_strict": {
+    "total": 44,
+    "pass_count": 38,
+    "fail_count": 6,
+    "intentional_empty_order_deltas": 6,
+    "narrower_diagnostics_are_not_full_equality": true,
+    "native_pass": 14,
+    "harvest_pass": 8,
+    "native_paired_byte_equality": 14,
+    "unchanged_producer_sources": 10
+  },
+  "scoped_unmodified_scanners": {
+    "heads": 2,
+    "records_each": 22,
+    "warnings_each": 22,
+    "skips": 0,
+    "ordered_records_typed_exact": true,
+    "runtime_warning_records": 20,
+    "null_content_records": 1,
+    "index_scheme_records": 1,
+    "all_pass_audit": false
+  },
+  "physical_and_footer_scope": {
+    "cold_barren_sample_writes_observed": true,
+    "barren_crop_products_unchanged": true,
+    "default_warm_data_files_unchanged": true,
+    "make_crop_country_cache_absent": true,
+    "make_each_nonempty_warm_call_changed_one_crop_wave_receipt": true,
+    "final_default_country_footer_hash_matches_own_actual_census": true,
+    "final_coverage_waves": 8,
+    "final_raw_country_parquets_preserved_opaque": 2,
+    "raw_partial_country_equality_not_claimed": true
+  },
+  "protection": {
+    "source_paths_candidate": 14914,
+    "source_paths_parent": 14913,
+    "tracked_binary_unopened_metadata_only_each": 3,
+    "source_providers_preserved": 37,
+    "private_L1_copies_preserved": 148,
+    "static_packet_entries_unchanged": 24,
+    "zero_other_live_consumers": true,
+    "guard_events": 172,
+    "seed_denials": 38,
+    "denied_local_IPv6_import_probes": 90,
+    "existing_source_directory_mkdir_refusals": 44,
+    "unmatched_guard_events": 0,
+    "filesystem_call_stacks_not_recorded": true,
+    "zero_attempt_claim": false,
+    "original_protection_v1_stop_retained": true,
+    "completed_source_provider_checks_not_replayed": true
+  },
+  "output_scope_qualification": {
+    "current_warning_exposed_lexemes": 4,
+    "historical_source_comment_literals": 4,
+    "full_warning_unique_identifiers": 49,
+    "screened_union": 54,
+    "lossless_original_own_session_tool_records_private": true,
+    "original_reported_6a791a_token_count": 475,
+    "original_commands_not_replayed": true
+  },
+  "preserved_stops": [
+    "precollection namespace-owner receipt mismatch",
+    "two source path plan mapping stops",
+    "protection v1 narrow guard classification",
+    "tool-capture content-container TypeError",
+    "failed locator reads",
+    "original six actual-parent ordering failures",
+    "frozen static history and earlier GH1204 findings"
+  ],
+  "limits": [
+    "No universal cold-versus-warm full-axis/schema equality",
+    "Optional dict dtype coercion is separate",
+    "Legacy sidecar size remains absent where absent; current provider sizes are measured",
+    "Filesystem no-op endpoint/PID/time binding is exact; no original method/target stack claim",
+    "Historical tracked binary data source protection is metadata/Git only",
+    "Earlier original commit terminal handles lost by output-only wrappers are not invented",
+    "All-wave raw country operands are opaque retained; no raw-partial full-frame equality claim"
+  ],
+  "independent_review_required": true,
+  "root_acceptance": false,
+  "GitHub_mutations": 0
+}

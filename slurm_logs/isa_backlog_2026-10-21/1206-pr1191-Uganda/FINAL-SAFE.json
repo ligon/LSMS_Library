@@ -1,0 +1,36 @@
+{
+  "PR": 1191,
+  "status": "PASS_NEW_SAVED_SUPPLEMENT",
+  "distinct_saved_positive_pairs": 11,
+  "full_strict_pairs_passed": 11,
+  "saved_operands": 22,
+  "exact_scalar_checks": 6,
+  "array_checks": {
+    "str": 47,
+    "object": 20,
+    "Float64": 5,
+    "numeric_nonmissing_arrays": 37,
+    "float64": 4,
+    "int64": 28,
+    "string": 4
+  },
+  "original_author_reference_pairs_not_substituted_with_baseline_selfpairs": true,
+  "gaps": [
+    "Original AUTHOR/private-mode-table and private-attrition reference operands are distinct third-party artifacts; their historical full authority is not supplied by twelve refs. Their original comparisons remain gaps. New candidate-vs-baseline pairs are the actual independently saved review pairs.",
+    "Original producer objects before serialization, source-readiness and dtype/market fault objects, threshold controls and root-restoration actual API return are unsaved; no API/test/control or attrition-transform replay.",
+    "Original tests are enumerated but not rerun. This is a saved warm-output supplement for a test-only patch, not a cold-data/science approval."
+  ],
+  "signed": "Sue",
+  "source_records": 15,
+  "overlapping_static_locator_sites": 473,
+  "locator_counts_not_independent_proof_counts": true,
+  "toy_faults_rejected": 42,
+  "positive_calibrations": 6,
+  "original_unsaved_and_authority_gaps_explicit": true,
+  "claim_all_original_assertions_replayed": false,
+  "source_API_CLI_Feature_pytest_raw_or_cache_replays": 0,
+  "actual_original_candidate_vs_baseline_public_pairs": 9,
+  "explicitly_NEW_saved_attrition_baseline_candidate_pairs": 2,
+  "original_AUTHOR_attrition_reference_comparisons_remain_authority_gaps": true,
+  "correction_to_v1_mapping": "v1 labelled original_line36 for saved attrition pair, but actual original expectation was AUTHOR private attrition, not independently saved baseline. The two new full strict saved-result pairs do not recover or replace original AUTHOR assertions."
+}

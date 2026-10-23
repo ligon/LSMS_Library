@@ -1,0 +1,179 @@
+{
+  "trigger": "Uganda crop_production waves=[2005-06], ordinary Country endpoint; empty native-cache read versus absent-declaration construction",
+  "native_or_covered_cache_order": [
+    "Quantity",
+    "Quantity_sold",
+    "Value_sold",
+    "Unit_sold",
+    "Condition_sold",
+    "harvest_month",
+    "intercropped",
+    "KgFactor"
+  ],
+  "declared_empty_order": [
+    "Quantity",
+    "Quantity_sold",
+    "Value_sold",
+    "harvest_month",
+    "intercropped",
+    "Unit_sold",
+    "Condition_sold",
+    "KgFactor"
+  ],
+  "existing_491_constructor_rule": "required columns followed by optional columns",
+  "same_Uganda_observable_behavior_inherited_at_491": false,
+  "new_exposure": "No-country-builder routing newly reaches the unchanged typed-empty constructor on cold and coverage-short barren requests. Covered Default cache reads retain native order; candidate Make absent requests use declared order.",
+  "actual_parent_Default_cases": [
+    {
+      "suffix": "s-populated-barren",
+      "actual_parent_Default_order": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "candidate_Default_order": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "harvest_month",
+        "intercropped",
+        "Unit_sold",
+        "Condition_sold",
+        "KgFactor"
+      ],
+      "actual_parent_Default_vs_candidate_Default_full_strict": "FAIL",
+      "actual_parent_Default_raw_coverage": [
+        "2005-06",
+        "2018-19"
+      ],
+      "candidate_Default_raw_coverage": [
+        "2018-19"
+      ]
+    },
+    {
+      "suffix": "b-cold-barren",
+      "actual_parent_Default_order": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "candidate_Default_order": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "harvest_month",
+        "intercropped",
+        "Unit_sold",
+        "Condition_sold",
+        "KgFactor"
+      ],
+      "actual_parent_Default_vs_candidate_Default_full_strict": "FAIL",
+      "actual_parent_Default_raw_coverage": [
+        "2005-06"
+      ],
+      "candidate_Default_raw_coverage": null
+    },
+    {
+      "suffix": "b-after-all-barren",
+      "actual_parent_Default_order": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "candidate_Default_order": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "actual_parent_Default_vs_candidate_Default_full_strict": "PASS",
+      "actual_parent_Default_raw_coverage": [
+        "2005-06",
+        "2009-10",
+        "2010-11",
+        "2011-12",
+        "2013-14",
+        "2015-16",
+        "2018-19",
+        "2019-20"
+      ],
+      "candidate_Default_raw_coverage": [
+        "2005-06",
+        "2009-10",
+        "2010-11",
+        "2011-12",
+        "2013-14",
+        "2015-16",
+        "2018-19",
+        "2019-20"
+      ]
+    },
+    {
+      "suffix": "a-fresh-barren",
+      "actual_parent_Default_order": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "candidate_Default_order": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "actual_parent_Default_vs_candidate_Default_full_strict": "PASS",
+      "actual_parent_Default_raw_coverage": [
+        "2005-06",
+        "2009-10",
+        "2010-11",
+        "2011-12",
+        "2013-14",
+        "2015-16",
+        "2018-19",
+        "2019-20"
+      ],
+      "candidate_Default_raw_coverage": [
+        "2005-06",
+        "2009-10",
+        "2010-11",
+        "2011-12",
+        "2013-14",
+        "2015-16",
+        "2018-19",
+        "2019-20"
+      ]
+    }
+  ],
+  "four_full_strict_failures_retained": true,
+  "named_field_checks_are_narrower_diagnostics": true,
+  "framework_or_scheme_edits": 0,
+  "new_API_prefixes_for_residual": 0
+}

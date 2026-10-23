@@ -1,0 +1,21 @@
+{
+  "rows": [
+    {
+      "side": "candidate",
+      "source": "/local/job40255479/worktrees/isa-review-1149-acquisition",
+      "head": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-1149-acquisition/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/candidate/dvc-tmp"
+    },
+    {
+      "side": "base",
+      "source": "/local/job40255479/worktrees/isa-review-1149-acquisition-base",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-1149-acquisition-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/base/dvc-tmp"
+    }
+  ],
+  "both_checkout_commands_terminal0_before_any_metadata": "true",
+  "imports_tests_API_or_payload_read_started": false,
+  "source": "root"
+}

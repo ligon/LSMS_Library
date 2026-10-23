@@ -1,0 +1,198 @@
+{
+  "observed_at_UTC": "2026-10-22 02:50:10 UTC",
+  "scope": "Preliminary title/number-only deduplication for two Uganda1198 residual drafts; no issue filed or implementation authorized by these searches.",
+  "queries": [
+    {
+      "query": "Uganda \"yield_kg\"",
+      "results": [
+        {
+          "number": 852,
+          "title": "Ethiopia: wire Crop_CF_Wave{2..5} (WB crop x unit x region conversion factors) into harvest_kg",
+          "url": "https://github.com/ligon/LSMS_Library/issues/852",
+          "state_from_search": null
+        },
+        {
+          "number": 879,
+          "title": "plot_features: `data_info.yml` declares `Area` to be hectares, but 6 of the 23 countries that serve it stamp a native unit instead, and `Feature()` pools them silently",
+          "url": "https://github.com/ligon/LSMS_Library/issues/879",
+          "state_from_search": null
+        }
+      ]
+    },
+    {
+      "query": "Uganda \"crop_production\" \"waves\"",
+      "results": [
+        {
+          "number": 1146,
+          "title": "Test-side follow-ups to #1113: baseline generator pins partial parquets; Nigeria sold-unit test latent; cold-session invariance coverage",
+          "url": "https://github.com/ligon/LSMS_Library/issues/1146",
+          "state_from_search": null
+        },
+        {
+          "number": 849,
+          "title": "Uganda: wire reported kg factors in the remaining five waves after preserving native production records",
+          "url": "https://github.com/ligon/LSMS_Library/issues/849",
+          "state_from_search": null
+        },
+        {
+          "number": 862,
+          "title": "Schema proposal: plot_cultivation, a per-season plot decision-maker table (#167's reserved name, #439's convention)",
+          "url": "https://github.com/ligon/LSMS_Library/issues/862",
+          "state_from_search": null
+        },
+        {
+          "number": 647,
+          "title": "question: Uganda 2019-20 crop_production silently drops the PART-harvest columns (s5aq06*_11/_21)",
+          "url": "https://github.com/ligon/LSMS_Library/issues/647",
+          "state_from_search": null
+        },
+        {
+          "number": 824,
+          "title": "Complete sold-unit audits and use Unit_sold in farmgate consumers",
+          "url": "https://github.com/ligon/LSMS_Library/issues/824",
+          "state_from_search": null
+        },
+        {
+          "number": 439,
+          "title": "Exploit LSMS+ individual/intra-household (male vs female) disaggregation — new feature direction",
+          "url": "https://github.com/ligon/LSMS_Library/issues/439",
+          "state_from_search": null
+        },
+        {
+          "number": 778,
+          "title": "Tests that rebuild in the SHARED root under LSMS_NO_CACHE still open the #866 delete-then-rebuild window; assume_cache_fresh has an exists()-then-read race",
+          "url": "https://github.com/ligon/LSMS_Library/issues/778",
+          "state_from_search": null
+        },
+        {
+          "number": 637,
+          "title": "Complete the remaining first/last aggregation key-soundness audit after the merged reviews",
+          "url": "https://github.com/ligon/LSMS_Library/issues/637",
+          "state_from_search": null
+        },
+        {
+          "number": 829,
+          "title": "Uganda crop_production 2015-16: Value_sold is ~100x too small for every crop, both seasons (a scale defect in a5aq8/a5bq8, cause unestablished); grades sane",
+          "url": "https://github.com/ligon/LSMS_Library/issues/829",
+          "state_from_search": null
+        },
+        {
+          "number": 842,
+          "title": "A NULL `u` is served on a declared index level (Niger 453 rows), dropped by any downstream groupby; Uganda ships u='Unknown'",
+          "url": "https://github.com/ligon/LSMS_Library/issues/842",
+          "state_from_search": null
+        },
+        {
+          "number": 861,
+          "title": "Uganda: strip the 2009-10 99999 harvest-quantity sentinel",
+          "url": "https://github.com/ligon/LSMS_Library/issues/861",
+          "state_from_search": null
+        },
+        {
+          "number": 865,
+          "title": "Niger 2011-12: eleven Mil rows carry Quantity 999999 with u=Unknown -- an unstripped missing-value sentinel (sibling of #861)",
+          "url": "https://github.com/ligon/LSMS_Library/issues/865",
+          "state_from_search": null
+        },
+        {
+          "number": 872,
+          "title": "Uganda crop_production.intercropped is wired to the seed-use question (a4aq3/a4aq16/s4aq16), so served True means 'did not use seed', not a mixed stand",
+          "url": "https://github.com/ligon/LSMS_Library/issues/872",
+          "state_from_search": null
+        },
+        {
+          "number": 832,
+          "title": "The `u` axis is split by spelling in 7 countries: one unit under two labels (GhanaLSS 473,660 rows; Niger 26,000+)",
+          "url": "https://github.com/ligon/LSMS_Library/issues/832",
+          "state_from_search": null
+        },
+        {
+          "number": 854,
+          "title": "Malawi: wire the two IHS5 crop-side conversion files; decide what _harvest_block's condition parameter is for",
+          "url": "https://github.com/ligon/LSMS_Library/issues/854",
+          "state_from_search": null
+        },
+        {
+          "number": 850,
+          "title": "Generalise _get_kg_factors beyond Expenditure/Quantity so harvest_kg can infer crop factors from sale prices (needs j in the baseline group and the SOLD unit, #824)",
+          "url": "https://github.com/ligon/LSMS_Library/issues/850",
+          "state_from_search": null
+        },
+        {
+          "number": 852,
+          "title": "Ethiopia: wire Crop_CF_Wave{2..5} (WB crop x unit x region conversion factors) into harvest_kg",
+          "url": "https://github.com/ligon/LSMS_Library/issues/852",
+          "state_from_search": null
+        },
+        {
+          "number": 819,
+          "title": "_finalize_result cluster join: _v_to_str strips leading zeros and the v-join runs before id_walk -- 2/3 of Ethiopia ESS 2013-14 & 2015-16 rows have v=NaN, survivors are the urban refreshment cohort",
+          "url": "https://github.com/ligon/LSMS_Library/issues/819",
+          "state_from_search": null
+        }
+      ]
+    },
+    {
+      "query": "Uganda \"parcel\" \"100%\"",
+      "results": []
+    },
+    {
+      "query": "Uganda \"subset\" \"crop_production\"",
+      "results": [
+        {
+          "number": 1146,
+          "title": "Test-side follow-ups to #1113: baseline generator pins partial parquets; Nigeria sold-unit test latent; cold-session invariance coverage",
+          "url": "https://github.com/ligon/LSMS_Library/issues/1146",
+          "state_from_search": null
+        },
+        {
+          "number": 1198,
+          "title": "Uganda crop_production: preserve distinct production records before pairing quantities with kg factors",
+          "url": "https://github.com/ligon/LSMS_Library/issues/1198",
+          "state_from_search": null
+        },
+        {
+          "number": 861,
+          "title": "Uganda: strip the 2009-10 99999 harvest-quantity sentinel",
+          "url": "https://github.com/ligon/LSMS_Library/issues/861",
+          "state_from_search": null
+        }
+      ]
+    },
+    {
+      "query": "\"crop_production\" \"unsupported\"",
+      "results": [
+        {
+          "number": 637,
+          "title": "Complete the remaining first/last aggregation key-soundness audit after the merged reviews",
+          "url": "https://github.com/ligon/LSMS_Library/issues/637",
+          "state_from_search": null
+        }
+      ]
+    },
+    {
+      "query": "\"2005-06\" \"crop_production\" \"Make\"",
+      "results": [
+        {
+          "number": 778,
+          "title": "Tests that rebuild in the SHARED root under LSMS_NO_CACHE still open the #866 delete-then-rebuild window; assume_cache_fresh has an exists()-then-read race",
+          "url": "https://github.com/ligon/LSMS_Library/issues/778",
+          "state_from_search": null
+        },
+        {
+          "number": 832,
+          "title": "The `u` axis is split by spelling in 7 countries: one unit under two labels (GhanaLSS 473,660 rows; Niger 26,000+)",
+          "url": "https://github.com/ligon/LSMS_Library/issues/832",
+          "state_from_search": null
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Search state fields are null and were not interpreted as open/closed.",
+    "Relevant issue879 area-unit scope and issue1146 partial-cache/test scope need direct reconciliation before filing.",
+    "No exact duplicate was established from these results; search absence is not proof of absence.",
+    "Independent Uganda1198 review remains unassigned; original residual observations need that separate review."
+  ],
+  "signed": "Sue"
+}

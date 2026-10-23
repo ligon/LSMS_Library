@@ -1,0 +1,29 @@
+{
+  "verdict": "PASS",
+  "scope": "Documentation-only follow-up",
+  "reviewed_runtime_base": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
+  "previous_documentation_head": "47f9a8006fb35b89c2794e1d3135e209ec642961",
+  "candidate": "a1ba246f59d341c331c69471f914d3ca798e6894",
+  "only_changed_path_from_reviewed_base": "slurm_logs/isa_backlog_2026-10-21/1144/REPORT.org",
+  "exact_one_line_spelling_correction_verified": true,
+  "source_exact_labels": [
+    "Basin Large",
+    "Basin Big/Large"
+  ],
+  "eleven_shared_twelve_total_counts_accurate": true,
+  "historic_115_plus_1_and_integrated_116_counts_accurate": true,
+  "identical_trees": {
+    "lsms_library": {
+      "reviewed": "951754b37e8d3adca4f41d5ffdb8036d04fc0931",
+      "candidate": "951754b37e8d3adca4f41d5ffdb8036d04fc0931"
+    },
+    "tests": {
+      "reviewed": "dcdd1fb810d0a4d902e16eeb347278a7f4686efe",
+      "candidate": "dcdd1fb810d0a4d902e16eeb347278a7f4686efe"
+    }
+  },
+  "original_full_source_runtime_PASS_preserved": true,
+  "no_cohort_or_test_reruns": true,
+  "frozen_review_worktree_clean_HEAD_unchanged": true,
+  "no_tracked_or_Git_mutations": true
+}

@@ -1,0 +1,32 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:36:13.739938+00:00",
+  "verdict": "ROOT_ACCEPT_BOUNDED_READONLY_DIAGNOSIS_NOT_A_PRODUCTION_FIX",
+  "source": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "READY_sha256": "08a2aa8392cd21b4b6d4308523334303ed7b43d42cf767ab1e1bf56b1958832a",
+  "manifest_sha256": "368e4997fd99d0982c6db54992fa19e8f6bea82271b28a1e2ec91e2d1afcd24c",
+  "all_payload_receipts_verified": 281,
+  "exact_directory_membership": true,
+  "safe_allowlisted_exports_verified": 13,
+  "checker_pins_verified": 24,
+  "current_source_endpoints_verified": 14880,
+  "own_XML": {
+    "pass": 7,
+    "fail": 8
+  },
+  "both_complete_public_indices": "MultiIndex",
+  "cause_scope": "Both retained cases first diverge in installed Arrow _extract_index_level; field numpy_type=string survives writing but index conversion ignores that extension metadata.",
+  "route_scope": "Country L2-only fix is incomplete for observed Uganda Make; Niger Make is source-only/unmeasured here.",
+  "root_read_actual_IO_dependency_probe_exact_control_route_guard_seal_sources": true,
+  "original_selected_receipts_and_physical_copies_verified": true,
+  "root_data_API_pickle_decode_test_replay": 0,
+  "preserved_limits": [
+    "Eight guard denials retained; cleanup attribution lacks PID/dir_fd/stacks and remains qualified.",
+    "Initial94 legacy symlink-SHA convention stop, original273-payload extra-file membership stop and release Path/string stop remain preserved.",
+    "No original native-prewrite operand, new source-cold/Make/Feature/scanner/full-suite proof or production repair.",
+    "Generic writer JSON attrs and pre-Arrow unused-level pruning remain separate existing boundaries.",
+    "549/39/1362 fingerprint cost is a source-marker prediction, not an actual candidate measurement."
+  ],
+  "production_patch_authorized_by_this_receipt": false,
+  "GitHub_publication_or_issue_closure": false,
+  "signed": "Sue"
+}

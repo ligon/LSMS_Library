@@ -1,0 +1,68 @@
+#+title: GH1149 staged reacquisition - author evidence
+#+author: Sue
+
+* Result and scope
+
+All six decided Option C requirements are implemented against release f8.
+The current committed source passes266 targeted checks and the strict API surface audit.
+Actual549 country,39 framework and1362 wave fingerprints remain unchanged.
+No real World Bank/S3/DVC acquisition or source-sidecar/provenance rewrite was performed.
+Independent review and human merge remain.
+
+* Placement and completion contract
+
+The complete incoming archive is staged and compared before any held destination is written.
+Unique recursive case-insensitive sidecar basenames fix existing destinations; new files preserve archive-relative paths.
+Ambiguous sidecars, colliding or overlapping destinations, invalid checksums and escaping paths refuse before placement.
+Every revised member and recursive leftover sidecar is reported before placement; leftovers remain in place.
+Declared DVC raw/legacy checksum policy is reused; byte verification is literal.
+Atomic per-file replacement protects a held DVC hardlink; a partial placement is not a whole-release rollback.
+Only actual written or verified-identical members reach push/completion gates.
+Differing untracked raw files stay unverified; download, staging, placement and partial/invalid/raised push failures preserve held/unknown/source-primary facts.
+Empty/failed completion receipts are cleared.
+Confirmation and push=False semantics remain covered.
+
+* Country evidence and limits
+
+Complete current Nigeria2166-line and Ethiopia2350-line CONTENTS were read, including TODO/WAITING material.
+Nigeria's nested PP/PH W5 v01 remains held; no geography wiring changed.
+The Ethiopia note's "coordinates are **CONFIDENTIAL** anyway" rationale conflicts with live1127's correction, "The redaction is in a different file".
+That existing1127 note/acquisition correction is recorded as a contradiction, not silently adjudicated in1149.
+
+The member-list fixture pins174 held sidecar names and SHA receipts plus the additions/removal documented in1149/978/1127.
+With synthetic bytes, the product classifies Nigeria104unchanged/2revised/2new and Ethiopia67unchanged/1removed/1new.
+The archive-relative directory choices are synthetic; original2026-10-19 archive paths and actual downloaded-data equality are not established.
+No retirement or raster/unit/scientific decision is made here.
+
+* Validation and retained stops
+
+The final current-source five-file selection is266PASS,0FAIL/ERROR/SKIP, with one expected mocked bad-GPG warning.
+The actual-parent controls are separate: a minimal nested1FAIL;43 identical new/changed cases41FAIL2PASS; four later empty/failed completion cases4FAIL.
+The earlier259-case candidate cohort retains256PASS3FAIL: one fault fired during fixture construction and two controls assumed flattened paths/direct-open placement.
+Those three corrected controls passed narrowly, followed by262PASS and current266PASS after the final acquisition-only cleanup/wording change.
+All XMLs, logs, fixture versions and fault operands survive privately.
+Earlier tested source bytes were reconstructed after the last two-line change and match an independently saved SHA; original source metadata is not reconstructed.
+An initial isolated-interpreter metadata helper import failure and two incorrect installed-library path lookups are recorded as setup stops; the original tool transcript is their stderr source.
+
+* Bounded warm audit
+
+Two physically distinct current/full-coverage sample caches per country and a SHA-bound Nigeria panel companion were prepared before calls.
+The companion has no claimed country-hash validation.
+Nigeria49770 and Ethiopia25914 rows assemble to75684 Feature rows on both heads.
+All12 saved cross-head/separate-process strict comparisons pass, including EA values, numeric nonmissing values, masks, axes, codes, unused levels and typed attrs/nested Series.
+Nine negative controls reject tiny/nextafter and representation/metadata faults.
+Both phase1 scans retain the same5 ordered WARN records byte-for-byte:4 ClusterIdentityWarning and1 PopulationHeterogeneityWarning occurrences.
+Six main warning pairs hold10 occurrences per head; category/message are literal, line numbers equal, filenames qualified only by known checkout prefixes.
+Sample has no phase2 kwarg grid; no phase2 result is claimed.
+The first process cohort began under earlier source and lacks an embedded source receipt; the separate follow-up pins the current source.
+No cache byte/mode/mtime/inode changed during these calls, and no raw/L1 sources were copied or country source-cold builds run.
+Private root permissions0700 protect the retained measured0644 cache copies; no post-read mode normalization is presented as unchanged data.
+
+* Protection and handoff
+
+All other tracked source receipts, installed hashing sources, three original held parquets and exact prepared DVCtmp links remain unchanged.
+The final source is clean and FS-published; only the task ledger follows the runtime/tests commit.
+Safe exports contain aggregate results, checker pins and reproduction instructions; full frames, warnings and private failures stay under the owner-only evidence root.
+The release READY and manifest are produced only after the final protection and zero-consumer gates.
+
+Sue.

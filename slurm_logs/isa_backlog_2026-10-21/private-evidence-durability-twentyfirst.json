@@ -1,0 +1,23 @@
+{
+  "verified_at_UTC": "2026-10-22T04:57:54.938905+00:00",
+  "archive_name": "quiescent-followup-twentyfirst.tar.gz",
+  "archive_sha256": "f6cde2800f50c7ee28450f7a48cee7a463029827f0f789bf8dad13bd2538bc9a",
+  "archive_bytes": 246007940,
+  "included_files": 561,
+  "included_source_bytes": 2160380400,
+  "roots": [
+    "Malawi/218"
+  ],
+  "excluded_entries": 10,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "70a9777b4dc1e7382631ae165a84e3b52e4e63293b1bc9cbf5baf1b4c7a4eb6d",
+  "private_full_manifest_sha256": "a5ed891976f93be09f05468ed8e9dded2f5345ad4d0571febdbdc42d45ebd3fc",
+  "private_evidence_not_exported_to_Git": true
+}

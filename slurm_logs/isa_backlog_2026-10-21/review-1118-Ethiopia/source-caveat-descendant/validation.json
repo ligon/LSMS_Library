@@ -1,0 +1,18 @@
+{
+  "verdict": "PASS",
+  "from": "9e698a3677da8097da42fec90c90525cdaaf3e68",
+  "to": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+  "only_changed_file": "lsms_library/countries/Ethiopia/_/CONTENTS.org",
+  "insertions": 21,
+  "deletions": 0,
+  "all_other_tree_entries_mode_type_blob_unchanged": 14884,
+  "library_runtime_and_tests_unchanged": true,
+  "facts_match_independent_1183_1184_drafts_and_census": true,
+  "CONTENTS_explicitly_excluded_from_build_hashes": true,
+  "country_hashes_unchanged": 549,
+  "tagged_fingerprints_unchanged": 39,
+  "virtual_CONTENTS_hash_was_never_consulted": true,
+  "source_or_unit_reruns": 0,
+  "tracked_review_head_unchanged": true,
+  "clean": true
+}

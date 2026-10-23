@@ -1,0 +1,22 @@
+[
+  {
+    "sidecar": "Burkina_Faso/2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague1.xls.dvc",
+    "md5": "b4b6edb0eaead5615c218be15c20f175",
+    "held": false
+  },
+  {
+    "sidecar": "Burkina_Faso/2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague2.xls.dvc",
+    "md5": "5120acd2332832b4033f2d1c9aad0ed3",
+    "held": false
+  },
+  {
+    "sidecar": "Burkina_Faso/2018-19/Documentation/bfa_ehcvm1_nomenclature_vague1.pdf.dvc",
+    "md5": "33ff5d72b5e14ce60d9eadd7168d6e30",
+    "held": false
+  },
+  {
+    "sidecar": "Burkina_Faso/2018-19/Documentation/bfa_ehcvm1_nomenclature_vague2.pdf.dvc",
+    "md5": "bb180644aa5d61af8099c1ebeb8fcda7",
+    "held": false
+  }
+]

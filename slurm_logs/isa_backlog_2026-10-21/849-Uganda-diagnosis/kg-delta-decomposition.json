@@ -1,0 +1,79 @@
+[
+  {
+    "wave": "2009-10",
+    "newly_contributing_input_rows": 0,
+    "newly_contributing_kg": 0.0,
+    "lost_contributing_input_rows": 0,
+    "old_contributing_rows_value_changed": 0,
+    "old_contributing_kg_delta": 0.0,
+    "zero_quantity_rows": 2421,
+    "negative_quantity_rows": 0,
+    "missing_quantity_rows": 9
+  },
+  {
+    "wave": "2010-11",
+    "newly_contributing_input_rows": 5136,
+    "newly_contributing_kg": 3217607.06,
+    "lost_contributing_input_rows": 0,
+    "old_contributing_rows_value_changed": 5975,
+    "old_contributing_kg_delta": 20020.605000000003,
+    "zero_quantity_rows": 699,
+    "negative_quantity_rows": 0,
+    "missing_quantity_rows": 51
+  },
+  {
+    "wave": "2011-12",
+    "newly_contributing_input_rows": 4226,
+    "newly_contributing_kg": 3714614.3501076773,
+    "lost_contributing_input_rows": 0,
+    "old_contributing_rows_value_changed": 5940,
+    "old_contributing_kg_delta": -35364.030010803355,
+    "zero_quantity_rows": 710,
+    "negative_quantity_rows": 0,
+    "missing_quantity_rows": 0
+  },
+  {
+    "wave": "2013-14",
+    "newly_contributing_input_rows": 3634,
+    "newly_contributing_kg": 1963108.0499907546,
+    "lost_contributing_input_rows": 0,
+    "old_contributing_rows_value_changed": 4671,
+    "old_contributing_kg_delta": -64673.55000071526,
+    "zero_quantity_rows": 359,
+    "negative_quantity_rows": 0,
+    "missing_quantity_rows": 0
+  },
+  {
+    "wave": "2015-16",
+    "newly_contributing_input_rows": 3703,
+    "newly_contributing_kg": 1763882.199995555,
+    "lost_contributing_input_rows": 0,
+    "old_contributing_rows_value_changed": 5437,
+    "old_contributing_kg_delta": -99506.14999661595,
+    "zero_quantity_rows": 0,
+    "negative_quantity_rows": 0,
+    "missing_quantity_rows": 0
+  },
+  {
+    "wave": "2018-19",
+    "newly_contributing_input_rows": 0,
+    "newly_contributing_kg": 0.0,
+    "lost_contributing_input_rows": 0,
+    "old_contributing_rows_value_changed": 0,
+    "old_contributing_kg_delta": 0.0,
+    "zero_quantity_rows": 1,
+    "negative_quantity_rows": 0,
+    "missing_quantity_rows": 0
+  },
+  {
+    "wave": "2019-20",
+    "newly_contributing_input_rows": 3502,
+    "newly_contributing_kg": 2880322.35,
+    "lost_contributing_input_rows": 0,
+    "old_contributing_rows_value_changed": 5074,
+    "old_contributing_kg_delta": -418218.4,
+    "zero_quantity_rows": 10,
+    "negative_quantity_rows": 0,
+    "missing_quantity_rows": 0
+  }
+]

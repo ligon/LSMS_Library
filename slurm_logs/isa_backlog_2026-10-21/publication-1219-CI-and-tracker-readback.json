@@ -1,0 +1,36 @@
+{
+  "status": "EXACT_CI_QUALIFIED_PR_AND_TRACKER_BODY_READBACK",
+  "at_UTC": "2026-10-22T21:41:21.260642+00:00",
+  "evidence_commit": "238dabe78211f659b8159aa8788a73f64fe9e45c",
+  "items": [
+    {
+      "number": 1219,
+      "head_sha": "657fed11a63354886772d0f978cec8adb2ad647e",
+      "base_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "state": "open",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "cbe3756455e1a04dbeae1eb39ce4a44c3f58bed4dd83a3b004094523d7a52ca2",
+      "body_bytes": 3168
+    },
+    {
+      "number": 1170,
+      "head_sha": "238dabe78211f659b8159aa8788a73f64fe9e45c",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "state": "open",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "3733ac0d9a95169c4b08cb9ead8bc4c3b2e5a835e10d9bea503b02033f457725",
+      "body_bytes": 30956
+    }
+  ],
+  "CI": {
+    "run_id": 39856584211,
+    "head_sha": "657fed11a63354886772d0f978cec8adb2ad647e",
+    "unit_tests": "success",
+    "windows_smoke": "success",
+    "other_jobs_skipped": 6,
+    "data_tests": "skipped"
+  },
+  "signed": "Sue"
+}

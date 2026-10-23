@@ -1,0 +1,201 @@
+{
+  "verdict": "PASS",
+  "frozen_source_head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+  "runtime_head": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
+  "ledger_first": "b5ced85c571bc4d5b430371d1f92ace336c24a3f",
+  "independent_reviewer": "Sue (GPT-6), not patch author",
+  "scope": "normal target-cold plot_features and supporting sample; fresh healthy Senegal; no all-table BF cohort",
+  "source_oracle_aggregate": {
+    "2018-19": {
+      "raw": 12441,
+      "retained": 12441,
+      "coordinate_columns_absent": true
+    },
+    "2021-22": {
+      "raw": 8467,
+      "retained": 7350,
+      "placeholders_excluded": 1117,
+      "raw_placeholders_both_key_components_missing": 1117,
+      "pairs": 4180,
+      "partial_axes": 0,
+      "both_axes_missing": 3170,
+      "GPS_yes": 4190,
+      "GPS_no": 3151,
+      "GPS_missing": 9,
+      "GPS_yes_area_no_position": 10,
+      "independent_source_native_rawcountry_walked_public_full_projection_exact": true,
+      "floating_bits_exact_native": true
+    }
+  },
+  "validation": {
+    "review_head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+    "runtime_head": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
+    "public_Burkina_rows": 19784,
+    "raw_country_rows": 19791,
+    "Senegal_rows": 13824,
+    "Feature_rows": 33608,
+    "full_frames_each_process": 13,
+    "cold_warm_processes": 4,
+    "all_old_payload_keys_order_axes_nulls_dtypes_attrs_exact": true,
+    "fresh_warm_all_cache_bytes_modes_mtimes_exact": true,
+    "source_L1_receipts_per_root": 15,
+    "healthy_comparator_files_exact_each_root": 6,
+    "Senegal_cache_tiers": {
+      "fresh_full_coverage_country": 2,
+      "fresh_YAML_sample_wave": 2,
+      "unchanged_hashless_script_plot_wave": 2
+    },
+    "complete_API_warning_stage_class_message_multisets_exact": true,
+    "API_warning_classes": {
+      "NullReadWarning": 6,
+      "QuantityImplausibleWarning": 8,
+      "PopulationHeterogeneityWarning": 1
+    },
+    "scanner_full_unmodified_multiset_exact": true,
+    "scanner_records": [
+      {
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "NullReadWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "QuantityImplausibleWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "QuantityImplausibleWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "index_levels_match_scheme",
+        "country": "Burkina_Faso",
+        "classification": "index_levels_match_scheme",
+        "status": "warn",
+        "fingerprint": "plot_features|Burkina_Faso||index_levels_match_scheme"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "no_constant_columns",
+        "country": "Burkina_Faso",
+        "classification": "no_constant_columns",
+        "status": "warn",
+        "fingerprint": "plot_features|Burkina_Faso||no_constant_columns"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "QuantityImplausibleWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "index_levels_match_scheme",
+        "country": "Senegal",
+        "classification": "index_levels_match_scheme",
+        "status": "warn",
+        "fingerprint": "plot_features|Senegal||index_levels_match_scheme"
+      },
+      {
+        "phase": "1a-sanity",
+        "check": "no_constant_columns",
+        "country": "Senegal",
+        "classification": "no_constant_columns",
+        "status": "warn",
+        "fingerprint": "plot_features|Senegal||no_constant_columns"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "NullReadWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "QuantityImplausibleWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "QuantityImplausibleWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "QuantityImplausibleWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      },
+      {
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "country": null,
+        "classification": "PopulationHeterogeneityWarning",
+        "status": "warn",
+        "fingerprint": "plot_features|ALL||runtime_warning"
+      }
+    ],
+    "scanner_status": {
+      "warn": 13,
+      "fail": 0,
+      "error": 0,
+      "skip": 0
+    },
+    "phase2_kwargs_cases": 0,
+    "baseline_tests": {
+      "tests": 15,
+      "failures": 12,
+      "errors": 0,
+      "skipped": 0
+    },
+    "candidate_tests": {
+      "tests": 44,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "original_new_existing_cases": 36,
+    "independent_adversarial_cases": 8,
+    "API_audit": "PASS",
+    "country_hashes_checked": 549,
+    "BF_hashes_changed": 24,
+    "other_hashes_exact": 525,
+    "framework_fingerprints_exact": 39,
+    "final_hash_inventory_exact_to_frozen_runtime_and_author_final": true,
+    "guard_callbacks_denied_checkout_write_and_metadata_mkdir": 2,
+    "socket_guards_denied_synthetic_probes": 2,
+    "actual_outbound_attempts": 0,
+    "in_tree_parquets": 0
+  },
+  "cache_tier_qualification": "Two Senegal country caches fresh/full coverage; two YAML sample-wave caches fresh; two unchanged hashless script plot companions. All six byte/mode/mtime exact.",
+  "broader_country_limit": "Mali/Niger negative checks rely on immutable original diagnosis/receipts; no fresh broader metadata census claimed.",
+  "protected_roots_exact": 7,
+  "protected_private_evidence_roots_exact": 4,
+  "owned_live_review_consumers": 0,
+  "GitHub_writes": 0,
+  "tracked_edits_or_git_mutations": 0,
+  "receipt_limit": "Initial immutable private-evidence snapshot covers all regular-file payloads; one non-source pytest-current administrative symlink has a separate final-only receipt."
+}

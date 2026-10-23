@@ -1,0 +1,304 @@
+{
+  "sources": {
+    "sitecustomize.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/sitecustomize.py",
+      "mode": 384,
+      "mtime_ns": 1792650877007158383,
+      "bytes": 2715,
+      "inode": 53618089,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "4a73789452a07dd67c4b4ebe81b6cf6d027c780c57da223f58f0c9c0eb535f50"
+    },
+    "entry.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/entry.py",
+      "mode": 384,
+      "mtime_ns": 1792650877008158389,
+      "bytes": 1419,
+      "inode": 53618090,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "3fed895cb1551232f93b183fdb3dbf17b846dea7358dad9ad2385208a8ca618a"
+    },
+    "run.sh": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/run.sh",
+      "mode": 384,
+      "mtime_ns": 1792651504922754992,
+      "bytes": 1155,
+      "inode": 53618148,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "0233523f6476261b389adaf3304fd2198775aaff544f4411974bef8b1220195b"
+    },
+    "run-v1.sh": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/run-v1.sh",
+      "mode": 384,
+      "mtime_ns": 1792651504920754980,
+      "bytes": 1145,
+      "inode": 53618147,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "ff68dff192ef6d4272f310d41bb70a4bf59b421c44f820a0b3f994a337deb13e"
+    },
+    "identity.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/identity.py",
+      "mode": 384,
+      "mtime_ns": 1792650877011158405,
+      "bytes": 472,
+      "inode": 53618092,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "311e4d4cbeee1e383351282e60a0f97340314fbfb0d47a6095b7c9c17bc66c57"
+    },
+    "receipts.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/receipts.py",
+      "mode": 384,
+      "mtime_ns": 1792650930670473010,
+      "bytes": 830,
+      "inode": 53618103,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "150a6664211502321f68e0464e78956953d9fcdeada257abf08a52571399039d"
+    },
+    "test_parent_minimal.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/test_parent_minimal.py",
+      "mode": 384,
+      "mtime_ns": 1792650877013158417,
+      "bytes": 862,
+      "inode": 53618093,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "727d5fc4ed2f3a3d7347c399bf5b2555e54d1eff2b6452be9e2589242f8efe4e"
+    },
+    "run-pytest.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/run-pytest.py",
+      "mode": 384,
+      "mtime_ns": 1792650877014158422,
+      "bytes": 85,
+      "inode": 53618094,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "7631327bffed04933109fa99b0c7462d081d36d6986db520bb8b8aceec1fc3c7"
+    },
+    "source-snapshot.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/source-snapshot.py",
+      "mode": 384,
+      "mtime_ns": 1792650948083573585,
+      "bytes": 714,
+      "inode": 53618107,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "54afa78c788a8afb878f40984b585fb677dd016d03d290946e2f51976da35b12"
+    },
+    "source-snapshot-v1.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/source-snapshot-v1.py",
+      "mode": 384,
+      "mtime_ns": 1792650948081573571,
+      "bytes": 627,
+      "inode": 53618106,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "c0cb5d8464e84f769d21d0f329db6dbc25a6232d6096ebf6cae265b30e24b58d"
+    },
+    "hash-actual.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/hash-actual.py",
+      "mode": 384,
+      "mtime_ns": 1792652144738227713,
+      "bytes": 1814,
+      "inode": 53618152,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "ba2db21eeaa08c3aca13b69c2567d5d83a9d3f75ada5085c88f72fc089e017ff"
+    },
+    "hash-actual-v1.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/hash-actual-v1.py",
+      "mode": 384,
+      "mtime_ns": 1792651586180203038,
+      "bytes": 1790,
+      "inode": 53618151,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "59cf124d33ab5e788d6aee7fb4de65e234c88c5d67565f0c66010cf7f3bce713"
+    },
+    "hash-actual-v2.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/hash-actual-v2.py",
+      "mode": 384,
+      "mtime_ns": 1792652144738227713,
+      "bytes": 1808,
+      "inode": 53618192,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "c2cbca139480f6cba595510a2fd4f5de41e1fd983365d72c824fd362a4765ba7"
+    },
+    "make-member-fixtures.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/make-member-fixtures.py",
+      "mode": 384,
+      "mtime_ns": 1792651384692096662,
+      "bytes": 1434,
+      "inode": 53618137,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "f0b300ee092c5ead4bba4f134cc2df161dcb926fc9a6e78f8e1ecb15a9585f58"
+    },
+    "warm-prepare.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/warm-prepare.py",
+      "mode": 384,
+      "mtime_ns": 1792651936151075227,
+      "bytes": 2295,
+      "inode": 53618175,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "c7acc738abae3eedcee0ebe004ff15fd985b4c33a7a084b0443da140a1a405cd"
+    },
+    "warm-probe.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/warm-probe.py",
+      "mode": 384,
+      "mtime_ns": 1792652302651120847,
+      "bytes": 2706,
+      "inode": 53618176,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "c084910ef8f372ffa5843ecd9a5799e9eb4aba0a35985b861c33f2c65973278c"
+    },
+    "compare-warm.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/compare-warm.py",
+      "mode": 384,
+      "mtime_ns": 1792652255250847165,
+      "bytes": 5107,
+      "inode": 53618207,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "4084b13c2af516ab1e1fd3b61f60d92896acafcc0c952c00de6c39dfd47693ac"
+    },
+    "exact_strict.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/exact_strict.py",
+      "mode": 384,
+      "mtime_ns": 1792651936150075222,
+      "bytes": 4906,
+      "inode": 53618174,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "aae4d838b46dde6025c96f76b6177be9a9a95a0f96089e0f695943c479a840f9"
+    },
+    "api-audit.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/api-audit.py",
+      "mode": 384,
+      "mtime_ns": 1792652498514161283,
+      "bytes": 566,
+      "inode": 53618226,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "3cf181fdfc8d7e0db1ed4f1a71bc11522c0df04a38783d1cc123d92cde8af6af"
+    },
+    "final-source-version.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/final-source-version.py",
+      "mode": 384,
+      "mtime_ns": 1792652144637227149,
+      "bytes": 1901,
+      "inode": 53618187,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "e33daf79d38b002be493fcb6b8207cd3ea449831b0cae87bb814e7a36ce3861b"
+    },
+    "final-source-protection.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/final-source-protection.py",
+      "mode": 384,
+      "mtime_ns": 1792652761673617663,
+      "bytes": 3882,
+      "inode": 53618237,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "1e30b84ede6f5ca03948cf3416342594c95e6b183f6a906cd26bb9782bf4916d"
+    },
+    "package-safe.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/package-safe.py",
+      "mode": 384,
+      "mtime_ns": 1792653007747937554,
+      "bytes": 12722,
+      "inode": 53618246,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "382573626b93453c8db99cfd27f8c0a1d992d442e9f6c5c0a970ce3c87577008"
+    },
+    "seal.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/seal.py",
+      "mode": 384,
+      "mtime_ns": 1792653007748937560,
+      "bytes": 3964,
+      "inode": 53618247,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "158793ba5ccfaad5eaa9ca6da64efed338a89b95d7b0cd15ac3cefb946467ecf"
+    },
+    "postexit-readonly.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/postexit-readonly.py",
+      "mode": 384,
+      "mtime_ns": 1792653007750937571,
+      "bytes": 1197,
+      "inode": 53618248,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "f150491fb0e51e2b1b8d3d971f4b07b61a8e2f541a833d6a27c6521f2540bda0"
+    }
+  },
+  "strict_comparator_reuse": "Receipt-bound private copy of shared1196-fix/exact_strict.py; source read personally. Nine own calibration controls executed.",
+  "test_sources": {
+    "tests/test_staged_reacquisition.py": {
+      "path": "/local/job40255479/worktrees/isa-1149-acquisition/tests/test_staged_reacquisition.py",
+      "mode": 384,
+      "mtime_ns": 1792652055954733730,
+      "bytes": 19458,
+      "inode": 19545430,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "a5cc500ae95f9c0b576561b5fe52c4f2e4ace434113dd9b2558e826fa6abe494"
+    },
+    "tests/test_wave_provenance.py": {
+      "path": "/local/job40255479/worktrees/isa-1149-acquisition/tests/test_wave_provenance.py",
+      "mode": 384,
+      "mtime_ns": 1792651504932755049,
+      "bytes": 134260,
+      "inode": 19530445,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "a697d160899651ace94523592a808e53826586fba1b2e0d4696ec07c8bbf7e39"
+    },
+    "tests/fixtures/reacquisition_members.json": {
+      "path": "/local/job40255479/worktrees/isa-1149-acquisition/tests/fixtures/reacquisition_members.json",
+      "mode": 384,
+      "mtime_ns": 1792651384752097005,
+      "bytes": 32653,
+      "inode": 19545429,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "f92246ecfecc498c51abbe8073417ffe5c1cff484128d782dcd96bb9ede734eb"
+    }
+  }
+}

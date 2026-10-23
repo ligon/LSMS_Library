@@ -1,0 +1,74 @@
+{
+  "recorded_at_UTC": "2026-10-22T03:49:18.754253+00:00",
+  "verdict": "ROOT_ACCEPT_BOUNDED_UGANDA1198_RUNTIME_WITH_REQUIRED_DOCUMENTATION_QUALIFICATION",
+  "candidate": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "actual_parent": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+  "runtime_tests": "929149222e43a8fe500cc08420cdc68357170af3",
+  "READY_sha256": "48cdf1247ce321bce6f4af0dea5a92503f09e1c9dfa08762ed45e58a65b71450",
+  "manifest_sha256": "fa04d70934d3d7f32083ecabd45de9e0d2fc60fcac001dffc20c29dd93f2f72d",
+  "all_manifest_entries_verified": 1908,
+  "safe_exports_verified": 14,
+  "root_read_full_review_actual_oracle_derived_build_warm_Feature_CLI_scanner_warning_protection_and_seal_sources": true,
+  "root_independent_JUnit": {
+    "candidate/review-focused-actual.xml": {
+      "pass": 392,
+      "skip": 10
+    },
+    "base/review-parent-negative-actual.xml": {
+      "fail": 36,
+      "pass": 3
+    }
+  },
+  "root_independent_input_scope": {
+    "country_hashes": {
+      "total": 549,
+      "changed": 28,
+      "other_exact": 521
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "changed": 0,
+      "other_exact": 39
+    },
+    "wave_hashes": {
+      "total": 1362,
+      "changed": 171,
+      "other_exact": 1191
+    },
+    "api_wave_hashes": {
+      "total": 2139,
+      "changed": 224,
+      "other_exact": 1915
+    }
+  },
+  "saved_stage_comparisons": {
+    "total": 184,
+    "strict_exact": 180,
+    "qualified_support_dtype": 4
+  },
+  "root_independent_scanner": {
+    "parent_WARN": 51,
+    "candidate_WARN": 41,
+    "same": 22,
+    "removed": 29,
+    "added": 19
+  },
+  "source_observations": 133761,
+  "retained_null_v": 928,
+  "Feature_rows": 180137,
+  "harvest_kg_delta": 2091,
+  "required_documentation": "Qualify CONTENTS3660 warm Make statement: author mtime-only and independent0644-to0600+mtime are separate measured starts, not a universal mode-preserving guarantee.",
+  "documentation_descendant": null,
+  "documentation_review": "pending",
+  "source_GitHub_publication": false,
+  "limits": [
+    "Preexisting cluster_features/v Arrow StringDtype NA-to-NaN on both heads/backends; no full cross-stage support identity.",
+    "Make17 byte-identical paths change modes/mtimes in independent roots; original strict stops preserved.",
+    "Actual API/CLI artifact serialization stages differ in v dtype and21 nested typed records; matching stages exact.",
+    "Author subset routing and parcel-area coverage remain residuals; no new independent subset run or1198 repair.",
+    "Author XML/failed-Make warning-list gaps and reviewer stops/snapshot refresh lineage remain explicit.",
+    "2018 slot-label concern corrected against settled country date/vocabulary ruling; no reopened calendar design.",
+    "No full suite/corpus, other-country source-cold or849 factor promotion claim."
+  ],
+  "signed": "Sue"
+}

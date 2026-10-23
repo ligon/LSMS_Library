@@ -1,0 +1,276 @@
+{
+  "at_UTC": "2026-10-22T19:50:20.193068+00:00",
+  "repository_open_issues": 173,
+  "queued_open_records": 114,
+  "implementation_prs_exact_heads_and_base_branch_names": 30,
+  "known_PRs": [
+    {
+      "number": 1172,
+      "head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "base_branch": "development"
+    },
+    {
+      "number": 1173,
+      "head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "base_branch": "development"
+    },
+    {
+      "number": 1175,
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "base_branch": "development"
+    },
+    {
+      "number": 1176,
+      "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "base_branch": "development"
+    },
+    {
+      "number": 1178,
+      "head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "base_branch": "fix/1034-nigeria-w3-unit-labels-20261021"
+    },
+    {
+      "number": 1180,
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "base_branch": "development"
+    },
+    {
+      "number": 1181,
+      "head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "base_branch": "development"
+    },
+    {
+      "number": 1182,
+      "head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "base_branch": "development"
+    },
+    {
+      "number": 1185,
+      "head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "base_branch": "development"
+    },
+    {
+      "number": 1186,
+      "head": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "base_branch": "development"
+    },
+    {
+      "number": 1189,
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "base_branch": "development"
+    },
+    {
+      "number": 1191,
+      "head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "base_branch": "development"
+    },
+    {
+      "number": 1192,
+      "head": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "base_branch": "development"
+    },
+    {
+      "number": 1193,
+      "head": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "base_branch": "fix/1109-malawi-organic-quantity-v2-20261021"
+    },
+    {
+      "number": 1194,
+      "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "base_branch": "development"
+    },
+    {
+      "number": 1195,
+      "head": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "base_branch": "development"
+    },
+    {
+      "number": 1197,
+      "head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "base_branch": "development"
+    },
+    {
+      "number": 1199,
+      "head": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "base_branch": "fix/822-mali-community-readings-20261021"
+    },
+    {
+      "number": 1200,
+      "head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "base_branch": "fix/1088-niger-quantity-sentinel-20261021"
+    },
+    {
+      "number": 1201,
+      "head": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "base_branch": "fix/1118-tanzania-unknown-units-20261021"
+    },
+    {
+      "number": 1202,
+      "head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "base_branch": "development"
+    },
+    {
+      "number": 1203,
+      "head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "base_branch": "fix/1123-burkina-input-identity-20261021"
+    },
+    {
+      "number": 1207,
+      "head": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "base_branch": "fix/1198-uganda-production-observations-20261022"
+    },
+    {
+      "number": 1208,
+      "head": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+      "base_branch": "development"
+    },
+    {
+      "number": 1211,
+      "head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+      "base_branch": "development"
+    },
+    {
+      "number": 1212,
+      "head": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+      "base_branch": "development"
+    },
+    {
+      "number": 1213,
+      "head": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+      "base_branch": "fix/218-malawi-derived-registrations-20261022"
+    },
+    {
+      "number": 1214,
+      "head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+      "base_branch": "development"
+    },
+    {
+      "number": 1216,
+      "head": "884775a461d769fd4bb5181005ca3238513b5b01",
+      "base_branch": "fix/849-uganda-reported-factors-20261022"
+    },
+    {
+      "number": 1217,
+      "head": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+      "base_branch": "fix/849-uganda-reported-factors-20261022"
+    }
+  ],
+  "issue_numbers": [
+    218,
+    226,
+    438,
+    439,
+    449,
+    450,
+    587,
+    592,
+    637,
+    647,
+    650,
+    660,
+    689,
+    771,
+    778,
+    787,
+    791,
+    794,
+    798,
+    812,
+    816,
+    820,
+    821,
+    822,
+    823,
+    824,
+    827,
+    828,
+    833,
+    837,
+    839,
+    843,
+    844,
+    845,
+    846,
+    849,
+    851,
+    855,
+    856,
+    860,
+    862,
+    864,
+    881,
+    882,
+    894,
+    905,
+    926,
+    978,
+    1000,
+    1006,
+    1033,
+    1034,
+    1043,
+    1045,
+    1055,
+    1056,
+    1057,
+    1058,
+    1059,
+    1060,
+    1062,
+    1063,
+    1068,
+    1071,
+    1074,
+    1075,
+    1077,
+    1078,
+    1081,
+    1084,
+    1087,
+    1088,
+    1090,
+    1091,
+    1095,
+    1096,
+    1106,
+    1109,
+    1110,
+    1111,
+    1116,
+    1118,
+    1119,
+    1120,
+    1121,
+    1123,
+    1127,
+    1133,
+    1134,
+    1135,
+    1136,
+    1144,
+    1146,
+    1148,
+    1149,
+    1150,
+    1171,
+    1174,
+    1177,
+    1179,
+    1183,
+    1184,
+    1187,
+    1188,
+    1190,
+    1196,
+    1198,
+    1204,
+    1205,
+    1206,
+    1209,
+    1210,
+    1215,
+    1218
+  ],
+  "no_merges_or_product_runs_by_this_refresh": true,
+  "signed": "Sue"
+}

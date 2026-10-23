@@ -1,0 +1,33 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:59:35.496894+00:00",
+  "status": "INDEPENDENT_SYNTHETIC_COMPARATOR_ESCAPE_REPRODUCED",
+  "packages": {
+    "pandas": "3.0.6",
+    "numpy": "2.4.6",
+    "pyarrow": "25.0.1"
+  },
+  "cases": [
+    {
+      "case": "tiny",
+      "rows": 2,
+      "dtype": "Float64",
+      "actual_max_abs_difference": 1.000088900582341e-12,
+      "frame_accepts_difference": true,
+      "extension_accepts_difference": false,
+      "numpy_accepts_difference": false
+    },
+    {
+      "case": "nextafter",
+      "rows": 2,
+      "dtype": "Float64",
+      "actual_max_abs_difference": 2.220446049250313e-16,
+      "frame_accepts_difference": true,
+      "extension_accepts_difference": false,
+      "numpy_accepts_difference": false
+    }
+  ],
+  "actual_country_product_mismatch_measured": false,
+  "source_decode_Country_Feature_API_or_existing_test_replay": 0,
+  "existing_frozen_evidence_modified": false,
+  "signed": "Sue"
+}

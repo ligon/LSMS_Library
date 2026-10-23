@@ -1,0 +1,129 @@
+{
+  "status": "DIAGNOSIS_COMPLETE",
+  "source_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "implementation_authorized": false,
+  "baseline_supported_rows": 155931,
+  "obs_counts": {
+    "1": 66699,
+    "2": 49014,
+    "3": 40218
+  },
+  "passage_counts": {
+    "1": 66159,
+    "2": 89772
+  },
+  "cold_cases": 12,
+  "fresh_process_warm_cases": 6,
+  "native_full_frames_attrs_exact_to822": 18,
+  "raw_country_layer_full_frames_exact_to_their_recorded_baseline_oracles": 18,
+  "supported_or_Make_wrong_subset_public_payloads_exact_to822": 13,
+  "public_comparisons_sorted_rekeyed_or_normalized": false,
+  "default_all_supported_full_attrs_exact_to822": true,
+  "Make_attrs_delta": {
+    "default_only": {
+      "id_converted": true
+    },
+    "common_values_recursive_types_exact": true,
+    "preservation_equivalence_claimed": false
+  },
+  "unsupported_requests": [
+    "2017-18",
+    "2018-19",
+    "2021-22",
+    "all_three_combined"
+  ],
+  "unsupported_default_rows": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "unsupported_Make_wrong_2014_15_rows": [
+    155931,
+    155931,
+    155931,
+    155931
+  ],
+  "default_unsupported_cold_COUNTRY_actual_rows": 155931,
+  "default_unsupported_COUNTRY_actual_row_waves": [
+    "2014-15"
+  ],
+  "default_unsupported_COUNTRY_coverage": "only the requested unsupported wave(s), despite containing2014-15 rows",
+  "unsupported_products_accepted": false,
+  "warm_supported_and_combined_public_full_frames_attrs_exact_to_own_cold": true,
+  "default_warm_cache_byte_size_mode_mtime_changes": 0,
+  "Make_warm_rewritten_cache_files_per_call": 2,
+  "default_raw_supported_index_levels": 7,
+  "Make_and_default_unsupported_raw_country_index_levels": 8,
+  "native_index_levels": 8,
+  "default_raw_supported_attrs": {
+    "id_converted": true
+  },
+  "other_raw_native_attrs": {},
+  "Make_country_and_wave_metadata": "hashless, no coverage, script-written",
+  "default_country_metadata": "actual current hash; coverage manifest recorded separately, including unsupported-request mismatch",
+  "Feature_controls": [
+    {
+      "argument": "default",
+      "rows": 155931,
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs",
+        "currency"
+      ],
+      "all_payload_values_axes_dtypes_masks_order_exact": true,
+      "default_only_attrs_keys": [
+        "id_converted"
+      ],
+      "all_common_attrs_keys_values_recursive_types_exact": true
+    },
+    {
+      "argument": "currency-None",
+      "rows": 155931,
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "all_payload_values_axes_dtypes_masks_order_exact": true,
+      "default_only_attrs_keys": [
+        "id_converted"
+      ],
+      "all_common_attrs_keys_values_recursive_types_exact": true
+    }
+  ],
+  "CLI_actual_load_table_controls": {
+    "default_supported_rows": 155931,
+    "Make_unsupported_wrong_rows": 155931,
+    "full_frame_attrs_exact_to_same_request": true
+  },
+  "held_MD5_sources": 2,
+  "source_copy_receipts": 26,
+  "private_source_materializations": 0,
+  "source_integrity_receipts_exact": true,
+  "baseline_current_Mali_hashes": 24,
+  "actual_postchange_hash_measurement": false,
+  "global549_39_rerun": false,
+  "strict_API_audit": "PASS",
+  "network_or_forbidden_write_attempts": 0,
+  "in_tree_parquets": 0,
+  "source_acquisition": false,
+  "minimal_production_allowlist": [
+    "delete lsms_library/countries/Mali/_/community_prices.py",
+    "lsms_library/countries/Mali/_/Makefile country rule and adjacent comments only"
+  ],
+  "keep_materialize_make_scheme_wave_finalizer_framework": true,
+  "planned_future_gate": "Actual candidate default/Make public full attrs equals authoritative DEFAULT, supported payload155931 exact; unsupported declared empty; Make wave route no COUNTRY cache; independent review and composition after approval",
+  "signed": "Sue"
+}

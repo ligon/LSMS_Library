@@ -1,0 +1,39 @@
+{
+  "baseline": {
+    "normalized_full_child_log_sha256": "82ed9543ee7c41acf980eb133177eea146e18f046ebb12dc374a06980be5a13f",
+    "formatted_warning_headers": 2
+  },
+  "candidate": {
+    "normalized_full_child_log_sha256": "82ed9543ee7c41acf980eb133177eea146e18f046ebb12dc374a06980be5a13f",
+    "formatted_warning_headers": 2
+  },
+  "complete_child_logs_exact_after_only_source_data_path_substitution": true,
+  "cold_category_counts": {
+    "builtins.RuntimeWarning": 2,
+    "lsms_library.sampling.ClusterIdentityWarning": 9,
+    "lsms_library.quantity_audit.QuantityImplausibleWarning": 24,
+    "lsms_library.null_index_audit.NullIndexKeyWarning": 12,
+    "lsms_library.transformations.StatedVsInferredKgWarning": 8,
+    "lsms_library.null_read_audit.NullReadWarning": 5
+  },
+  "warm_category_counts": {
+    "lsms_library.sampling.ClusterIdentityWarning": 9,
+    "lsms_library.quantity_audit.QuantityImplausibleWarning": 24,
+    "lsms_library.null_index_audit.NullIndexKeyWarning": 12,
+    "lsms_library.transformations.StatedVsInferredKgWarning": 8,
+    "lsms_library.null_read_audit.NullReadWarning": 5
+  },
+  "cold_only_warning_occurrences": [
+    {
+      "category": "builtins.RuntimeWarning",
+      "message_sha256": "df5ba0eb38a69c5b14af2fedf2654aebd77e5678c381d91c1a40c620d04217a6",
+      "count": 1
+    },
+    {
+      "category": "builtins.RuntimeWarning",
+      "message_sha256": "113afcdb7a721b23bdf41dcf1b1e51a151a74c264fe6210923fee8c99536f243",
+      "count": 1
+    }
+  ],
+  "warm_only_warning_occurrences": []
+}

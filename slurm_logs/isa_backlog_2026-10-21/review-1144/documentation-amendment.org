@@ -1,0 +1,24 @@
+#+title: GH #1144 documentation-only amendment review
+#+date: 2026-10-21
+
+* Verdict
+
+NEEDS_FIX for exact label spelling only at =47f9a8006fb35b89c2794e1d3135e209ec642961=.
+The original full source/runtime PASS at =1e6111e2b0580e045084d3c077c258469f8d7dc0= remains preserved.
+
+* Finding
+
+=slurm_logs/isa_backlog_2026-10-21/1144/REPORT.org:119= introduces =Basin (Large)= and =Basin (Big/Large)=.
+The unchanged source-backed u table spells code 152 =Basin Large= and code 33 =Basin Big/Large=, without parentheses.
+Use those exact labels in the explanation of the spelling distinction.
+The eleven shared-spelling rows versus twelve total relabels are otherwise correctly distinguished.
+
+* Proof and limits
+
+The only changed tracked path is REPORT.org.
+The entire lsms_library tree and the entire tests tree are identical to the reviewed snapshot; their object IDs are recorded in =documentation-amendment.json=.
+The historical owner result of 115 pass plus one inherited failure and the separately reviewed integrated result of 116 pass are accurately distinguished.
+No cohort or test rerun was performed or needed.
+The frozen review checkout remains clean at 1e611; no worktree, ref or tracked file was modified.
+
+Sue

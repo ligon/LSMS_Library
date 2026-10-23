@@ -1,0 +1,147 @@
+{
+  "historical_receipts_exact": true,
+  "frames": {
+    "suite_written": {
+      "rows": 355571,
+      "columns": [
+        "Quantity",
+        "Expenditure",
+        "Price"
+      ],
+      "index_names": [
+        "t",
+        "i",
+        "j",
+        "u",
+        "s"
+      ],
+      "dtypes": {
+        "Quantity": "float64",
+        "Expenditure": "float64",
+        "Price": "float64"
+      },
+      "fingerprint": "b35bef562f3700d9f78e39ea46058c1d6bb00b4f686150b5c45b240fe149403e",
+      "null_counts": {
+        "Quantity": 21,
+        "Expenditure": 31,
+        "Price": 29755
+      },
+      "cache_metadata": {
+        "lsms_cache_hash": "ed5c69e880ad78684f803b5c807f4a1fa0e0fed664f2c6cdd9549a46c5fdb2a4",
+        "lsms_cache_waves": "[\"2005-06\", \"2009-10\", \"2010-11\", \"2011-12\", \"2013-14\", \"2015-16\", \"2018-19\", \"2019-20\"]"
+      },
+      "duplicate_index_rows": 0
+    },
+    "cold_tip": {
+      "rows": 355571,
+      "columns": [
+        "Quantity",
+        "Expenditure",
+        "Price"
+      ],
+      "index_names": [
+        "t",
+        "i",
+        "j",
+        "u",
+        "s"
+      ],
+      "dtypes": {
+        "Quantity": "float64",
+        "Expenditure": "float64",
+        "Price": "float64"
+      },
+      "fingerprint": "0773d920072e366218cc7b2e193ec0aea03e0830529ee4f2618a90df6260f5f3",
+      "null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "cache_metadata": {
+        "lsms_cache_hash": "ed5c69e880ad78684f803b5c807f4a1fa0e0fed664f2c6cdd9549a46c5fdb2a4",
+        "lsms_cache_waves": "[\"2005-06\", \"2009-10\", \"2010-11\", \"2011-12\", \"2013-14\", \"2015-16\", \"2018-19\", \"2019-20\"]"
+      },
+      "duplicate_index_rows": 0
+    },
+    "cold_base": {
+      "rows": 355571,
+      "columns": [
+        "Quantity",
+        "Expenditure",
+        "Price"
+      ],
+      "index_names": [
+        "t",
+        "i",
+        "j",
+        "u",
+        "s"
+      ],
+      "dtypes": {
+        "Quantity": "float64",
+        "Expenditure": "float64",
+        "Price": "float64"
+      },
+      "fingerprint": "0773d920072e366218cc7b2e193ec0aea03e0830529ee4f2618a90df6260f5f3",
+      "null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "cache_metadata": {
+        "lsms_cache_hash": "4672577bf6631db6cd787e062894d7de043007d9b784f3f6860a4a433a816217",
+        "lsms_cache_waves": "[\"2005-06\", \"2009-10\", \"2010-11\", \"2011-12\", \"2013-14\", \"2015-16\", \"2018-19\", \"2019-20\"]"
+      },
+      "duplicate_index_rows": 0
+    }
+  },
+  "schemas_equal_excluding_metadata": {
+    "suite_written": true,
+    "cold_tip": true,
+    "cold_base": true
+  },
+  "all_index_columns_dtypes_full_attrs_exact": true,
+  "correct_cold_tip_base_full_frames_exact": true,
+  "wrong_cells": 9,
+  "wrong_cell_columns": {
+    "Quantity": 6,
+    "Expenditure": 3
+  },
+  "wrong_cell_waves": {
+    "2011-12": 9
+  },
+  "all_wrong_cells_are_NaN_to_zero": true,
+  "all_other_values_exact": true,
+  "same_stored_country_hash": true,
+  "full_historical_records_and_log_private": true,
+  "historical_log_selected_lines": 35,
+  "log_Uganda_candidate_nodes": [
+    "tests/test_currency.py",
+    "tests/test_currency.py::test_country_currency_index_roundtrip",
+    "tests/test_currency.py::test_country_default_is_backward_compatible",
+    "tests/test_currency.py::test_feature_ghana_per_wave",
+    "tests/test_currency.py::test_feature_non_monetary_unaffected",
+    "tests/test_currency.py::test_feature_xof_consistency",
+    "tests/test_sample.py",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Albania]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Burkina_Faso]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[China]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[EthiopiaRHS]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[GhanaSPS]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Guatemala]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Liberia]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Mali]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Panama]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Peru]",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Serbia",
+    "tests/test_sample.py::TestSample::test_index_is_i_t[Tajikistan]",
+    "tests/test_sample.py::TestSample::test_v_mostly_populated[Albania]",
+    "tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH",
+    "tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH",
+    "tests/test_uganda_invariance.py",
+    "tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/food_acquired.parquet]",
+    "tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]",
+    "tests/test_uganda_tables.py::test_uganda_makefile_backfill[income]",
+    "tests/test_uganda_tables.py::test_uganda_makefile_backfill[shocks]"
+  ]
+}

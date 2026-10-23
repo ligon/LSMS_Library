@@ -1,0 +1,14 @@
+{
+  "scope": "API9-exact-nine-products",
+  "terminal_checker_exit_expected": 0,
+  "manifest_sha256": "bd49382ab666da604c7eb0b781afe23fb7044094043eab35ab8a1264a7a3d9cd",
+  "manifest_entries": 104,
+  "source_tracked_physical_receipts_exact": 14880,
+  "source_head_clean_exact": true,
+  "original_authority_selected_operands_and_review_sources_exact": true,
+  "distinct_inode_copies_exact": true,
+  "remaining_consumers": 0,
+  "typed_attribute_failures_retained": 4,
+  "record_type_qualified_groups_not_full_frame_equality": true,
+  "signed": "Sue"
+}

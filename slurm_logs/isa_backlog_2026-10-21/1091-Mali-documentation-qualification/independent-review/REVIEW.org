@@ -1,0 +1,27 @@
+#+TITLE: Mali1199 coverage documentation descendants
+#+AUTHOR: Sue
+
+PASS for standalone b4ad74d5da39f939a7c2ecec030891cb82c02ade versus9e8ebeabb0e996684d325d05987763a8c3581cc8 and GLOBAL18 471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3 versusf9feb3c807aff5206134c37768992302ceb431fa.
+Each changes only the same two Mali CONTENTS paragraphs,8 insertions/8 deletions, retaining Git mode100644 and every other tracked blob/mode including the exact tests tree.
+The corrected appended note is byte-identical across the two descendants; integration18 retains the entire actual17 country prefix and1121 note.
+
+The former “Both backends now use the existing declared empty frame” and blanket string visit/obs claims are replaced with the zero-row guarantee and explicit route/coverage-dependent representations.
+“The empty representation depends on the route and available cache coverage” avoids a universal claim about coverage misses or union rebuilds.
+“A filtered empty slice from a current covered default cache can instead retain integer visit/obs, StringDtype Description and =id_converted= attrs” matches the observed existing fully covered Default route.
+The declared-empty route retains its string visit/obs and object Description distinction; API frames and CLI artifacts are compared at matching stages.
+This matches the sealed source-backed observations: physically empty roots and the tested2014-only partial-coverage unsupported requests use the factory; full-four-wave Default caches return filtered empty slices; mixed coverage expands normally.
+No source, grain, eligibility, payload, dtype, attribute or runtime policy changed.
+
+The root's separately executed metadata inventories were verified by their supplied SHA/size receipts, exact source pins,549/549 API hash equality and39/39 framework fingerprint equality on each pair.
+Integration18 old inventories also exactly match this reviewer's independently measured frozenf9 inventory.
+These are verified existing measurements; this narrow review did not rerun Country metadata inventories or data APIs.
+Root inventory/launcher/guard source was read and uses exact checkout/config/data identity, separate processes and offline/write guards.
+Every actual tracked file in both new doc checkouts was independently verified against its Git blob, and all source/control filesystem receipts stayed exact.
+All1885 entries of the original bounded18 final manifest were reverified, with its READY and manifest bytes/modes/mtimes unchanged.
+
+No LSMS module was imported in the guarded checker, and no Country/Feature/build/decode/test call, source acquisition, Git/ref mutation or GitHub action occurred.
+Preliminary source diffs and aggregate JSON metadata were read with ordinary read-only tools before the isolated checker; no claim is made that those preliminary reads used its network namespace.
+The final checker used the mounted Python under unshare-rn plus active socket/write guards, private paths and threads1, with zero IP attempts, write denials and private parquets.
+The f9 runtime verdict and earlier1199 standalone proofs retain their original pins; these documentation verdicts add no broader runtime or full-suite claim.
+
+Sue

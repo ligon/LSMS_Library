@@ -1,0 +1,37 @@
+{
+  "status": "documentation_only_descendant_frozen_pending_narrow_independent_review",
+  "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "published_head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "full_review_pinned_head": "3848778d0e8676c798883c11ea3e33fc88e8a591",
+  "runtime_head": "69ed4d2028a6f989a8ac45d117a5cffc60a831fd",
+  "changed_paths": [
+    ".coder/ledger/1123-burkina-input-identity.md",
+    "lsms_library/countries/Burkina_Faso/_/CONTENTS.org",
+    "slurm_logs/isa_backlog_2026-10-21/Burkina_Faso/1123/DRAFT-ISSUES.md",
+    "slurm_logs/isa_backlog_2026-10-21/Burkina_Faso/1123/REPORT.md"
+  ],
+  "diffstat": ".coder/ledger/1123-burkina-input-identity.md       | 31 ++++++++++++---\n lsms_library/countries/Burkina_Faso/_/CONTENTS.org | 46 ++++++++++++++++++++--\n .../Burkina_Faso/1123/DRAFT-ISSUES.md              | 33 +++++++++++++---\n .../Burkina_Faso/1123/REPORT.md                    | 42 ++++++++++++++++----\n 4 files changed, 131 insertions(+), 21 deletions(-)",
+  "all_other_tracked_git_blobs_and_modes_exact": 14882,
+  "country_build_input_tree_excluding_CONTENTS_exact": 11656,
+  "tests_tree_exact": 249,
+  "validation_json_and_previous_full_report_proofs_unchanged": true,
+  "current_tracked_SHA256_receipts": 14886,
+  "reviewed_hash_receipt": "/local/job40255479/control/isa-backlog-20261021/review-1123-Burkina_Faso/candidate-hashes.json",
+  "reviewed_hash_receipt_sha256": "a6a81870d6c9c370a67a764ef61a2a399876796e42594b8d8aeeb3f08a40f2c2",
+  "country_hashes_compared": 549,
+  "additional_country_hash_changes": 0,
+  "framework_fingerprints_compared": 39,
+  "additional_framework_fingerprint_changes": 0,
+  "source_or_network_attempts": 0,
+  "absent_local_source_path_metadata_checks": 646,
+  "source_API_or_test_rerun": false,
+  "residuals": {
+    "source_authority": "https://github.com/ligon/LSMS_Library/issues/1187",
+    "gift_purchase_routing": "https://github.com/ligon/LSMS_Library/issues/1188"
+  },
+  "implementation_status": "reviewed but unmerged; no production resolution claimed",
+  "clean": true,
+  "remaining_task_processes": 0,
+  "diff_check_passed": true,
+  "author": "Sue"
+}

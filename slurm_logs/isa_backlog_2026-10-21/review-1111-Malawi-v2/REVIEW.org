@@ -1,0 +1,157 @@
+#+TITLE: Independent review: Malawi #1111 partial kg correction, test descendant
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Verdict
+PASS for the standalone f8-based candidate =a9356f2c5b2bb1709fedf9a288d12ef255ae44f3= in =/local/job40255479/worktrees/isa-review-1111-Malawi-v2=.
+No blocking finding remains within the two instrument-covered drivers.
+This verdict does not close #1111 or prove composition with organic PR1175.
+Root owns that separate composition check.
+
+The initial =9b883974a81d6ee664bbca425b7d484f0f14eb7a= NEEDS_FIX review remains intact in the sibling =review-1111-Malawi= directory.
+Its excluded-organic assertions would reject the correct organic recovery.
+The descendant deletes exactly those five test lines, changes three ledger/report/receipt files, and leaves both production-driver blobs exact.
+All other test assertions and fixture bytes are unchanged.
+The current namespace/nonfertilizer test at =tests/test_1111_malawi_applied_kg.py:137= still checks native household namespaces, seed measurements/purchases and pesticide measurements.
+No remaining organic-schema or measured-zero pin was found in this test or the bounded supporting selection.
+
+* Grounding and contradictions
+I read the full 3,088-line Malawi =_/CONTENTS.org=, including TODO/WAITING/LOGBOOK entries, before reviewing the candidate.
+Its SHA256 is =93211a86da8712ecafc7e164120b4695769a8093e7b98d6d2612f8a48521b7c3= and its bytes match the previously read old frozen candidate.
+I also read the standing/task ledgers, author REPORT/VALIDATION/REPRODUCE/RESIDUALS, the test-descendant receipt, and the relevant prior-art-ledger, code-reviewer and cross-country guidance.
+
+Relevant idiosyncrasies are substantive: 2010 reads Full_Sample only, not the redundant Panel tree (=CONTENTS.org:2089=); modern waves combine national cross-sections with tracking-defined panel universes; 2016 cross-sectional IDs require the =cs-17-= namespace; 2019 bare IDs rely on the unchanged framework ID walk; and IHS4's bad-byte unused string requires the existing restricted reader (=CONTENTS.org:1240=).
+Baseline-EA/current-geography mismatches can be tracked movers, rather than grounds for re-keying.
+Likoma enters and leaves the frame, and the IHPS2019 catalog and local report disagree about its inclusion (=CONTENTS.org:2431=).
+The live food conversion/FCT TODOs for #116 at lines1574 and1677 remain outside this fertilizer change.
+
+The old organic statement at =CONTENTS.org:3027= says "Module D records no organic quantity".
+The later qualification at line3080 and the reviewed de9 sources contradict that premise: organic has its own reported amount/unit fields.
+This standalone branch preserves f8 organic behavior only as a boundary; its tests now permit the independent correction.
+The old unit entry calls =ag_d39c= "acquired-amount" and =e/j= applied units (=CONTENTS.org:3044=).
+The shared helper comment at =Malawi/_/malawi.py:2904= says the applied-unit coding is the "SAME bag-size coding" and treats 11/12 as free-text residuals.
+Those interpretations are contradicted for the two covered waves by separate native quantity/unit, enumerator-total and timing fields; IHS3 11/12 are November/December.
+The candidate documents these contradictions and preserves the shared helper for excluded waves.
+Its actual all-26 Malawi hash footprint also disproves the earlier tentative narrower-footprint hypothesis.
+These are reported findings, not assumptions that prior documentation can be ignored.
+
+* Instrument and production boundary
+I independently MD5-verified and layout-extracted the held IHS3 printed/PDF p.13 (=d6e0d71486fd6ae4d7dda5b8e1854278=) and IHS5/IHPS printed/PDF p.10 (=86cc1f419c1320eb969d11a6d24a63e0=).
+Both distinguish two enumerator TOTAL KGs fields from native QUANTITY/UNIT pairs and timing.
+This is layout-preserving text evidence, with no page-image inspection claim.
+2010 selects =d/i= totals, distinct from native =b/c,g/h= and =e/j= MONTH.
+2019 selects =d/j= totals, distinct from native =b/c,h/i= and first-application timing =e=.
+Only these two instruments satisfy the literal C4 gate here; 2013/2016 remain excluded.
+
+At =Malawi/2010-11/_/plot_inputs.py:43= and =Malawi/2019-20/_/plot_inputs.py:45=, the actual drivers retain those selected numeric fields, pass =unit1=None, unit2=None=, and assign nullable-string =Kilogramme= before the unchanged additive assembler.
+A late finalizer relabel would preserve the old split rows; the independent in-memory AST mutant demonstrates that all 12 actual-driver cases reject this order error.
+No quantity rescaling, native-pair substitution, new eligibility gate, application axis, ID rule, schema, helper, reducer, factor or nutrient share was introduced.
+2013/2016 driver bytes and behavior remain exact.
+
+* Independent source oracle and complete data comparisons
+The independent oracle reads numeric native sources through sanctioned readers, uses an explicit source layout and old-unit equivalence classes, and does not call the production fertilizer decoder or assembler.
+Only the established identifier closure is reused.
+Every selected source-group amount matches both public baseline and public candidate groups exactly.
+
+| Evidence | Independent result |
+|----------+--------------------|
+| Selected source slots, covered waves | 33,193 |
+| Selected enumerator-total kg sum | 1,765,763.95 |
+| New 2010 same-source pairs | 51; 102 positive members; 4,670 kg |
+| New 2019 same-source pairs | 184; 368 positive members; 17,322 kg |
+| All 235 new pairs | Same source, slots1/2, affirmative use, positive observed amounts |
+| Covered target groups | 33,152 -> 32,917 |
+| Whole Malawi Country rows | 180,184 -> 179,949 |
+| Nonorganic subset | 169,109 -> 168,874 |
+| Pooled Malawi/Uganda Feature rows | 264,400 -> 264,165 |
+| All-inorganic numeric Quantity sum | 2,899,339.95 conserved |
+| Nitrogen diagnostic, unchanged factors | 840,235.7795800001 -> 1,028,195.63206 |
+| Nitrogen diagnostic delta | 187,959.85248 to floating precision |
+
+The all-inorganic numeric sum includes excluded-wave measurements; it is not a newly validated physical-unit total.
+No 1,000x rule was applied.
+Existing source-No/missing-use and missing/zero quantity retention is unchanged; the source oracle preserves their current contributions instead of weakening that boundary.
+No library or test tolerance was changed.
+
+I constructed fresh physical private L1/L2 roots, excluding every Malawi plot_inputs parquet.
+The candidate's old sample hash was genuinely stale and normal APIs rebuilt its supporting sample; no assumed-fresh route, NO_CACHE override, manual stamp or acquisition was used.
+Normal Country, native-wave/raw-country cache frames, Feature and nitrogen results match full physical copies of the frozen producer references exactly, including index/order, dtypes, null masks and attrs.
+An independent expected unit-key projection followed by the existing additive grouping also matches the entire candidate; the unaffected payload is exact in original order.
+All 2013-14/2016-17 frames are exact (16,188/52,494 rows).
+All 11,075 f8 organic rows remain exact as private standalone evidence, without adding permanent bug-pinning tests.
+The healthy Uganda comparator is 84,216 rows with complete exact frames/attrs, current hashes/coverage and unchanged cache bytes/modes/mtimes.
+
+Fresh-process warm repetitions, including new Country and Feature instances, return exact full frames and write zero parquet bytes or mtimes.
+Each main root contains17 parquets; each separately source-cold sample root contains10.
+The separate L1-only sample builds each return57,118 rows across all five waves; all six sample cache frames and attrs are exact.
+Their complete18 warning records match in original order, including category, message, image-library filename and line.
+Those18 build events differ from the main candidate's6 warning events and10 distinct native missing-value-label metadata bindings.
+All warned fields are unused by the declared sample blocks; each referenced value-label set is absent in native metadata.
+Sample warm reads emit zero warnings.
+
+* Tests and negative controls
+The candidate passes101 cases, zero skips, selected from:
+=tests/test_1111_malawi_applied_kg.py=,
+=tests/test_867_nitrogen_content.py=,
+=tests/test_863_transforms.py= and
+=tests/test_plot_id_canonical.py=, with =-k 'not warm'=.
+The new actual-driver file separately passes12 cases.
+The same current12 tests on immutable f8 produce10 failures and2 compatibility passes.
+The independent AST late-label mutant produces12 failures.
+Thus the assertions discriminate actual driver wiring and pre-aggregation unit identity, rather than merely mirroring a decoder implementation.
+
+Two initial xdist baseline-negative attempts were rejected before test execution by my exact checkout/import identity guard, including an attempt with an explicit baseline rootdir.
+I preserved those logs and used a serial =-n0= baseline-negative run with the baseline package already identity-asserted and immutable baseline countries configuration.
+That run completes with the required10fail/2pass.
+The candidate and mutant runs use two loadfile workers.
+An initial private instrument-check script also had a syntax error before reads/builds; its failed copy/log remain preserved and the corrected script verifies both instruments.
+These are harness failures, not passing product evidence.
+
+* Full scanner and hash accounting
+I ran the actual scanner with =--features plot_inputs --countries Malawi Uganda --phases 1,2 --jobs1= on each frozen tree.
+Every one of the15 ordered full records is accounted for; all are warnings, zero errors/failures.
+No warning/example or full source identity is printed here.
+No value, attr, detail or serialized-path normalization was applied.
+
+| Record | Finding | Baseline -> candidate |
+|--------+---------+-----------------------|
+| 1 | Malawi Improved all-null waves | Full record exact |
+| 2 | Malawi null keys | crop67,888->67,653; unit28,724->17,142; remainder exact |
+| 3 | Improved scope | rows180,184->179,949 only |
+| 4 | Malawi automatic v index | Full record exact |
+| 5 | Malawi null crop rate | 37.7%->37.6% only |
+| 6 | Malawi constant Purchased | Full record exact |
+| 7 | Uganda null keys | Full record exact |
+| 8 | Uganda cluster boundaries | Full record exact |
+| 9 | Uganda automatic v index | Full record exact |
+| 10 | Assembly Improved warning | Full record exact |
+| 11 | Assembly Malawi null keys | Same two counts as record2; remainder exact |
+| 12 | Assembly Uganda null keys | Full record exact |
+| 13 | Assembly Uganda clusters | Full record exact |
+| 14 | Canonical Feature alignment | Full record and attrs exact |
+| 15 | Population-universe warning | Full record exact |
+
+There is no plot_inputs phase2 keyword grid; this is not a claim to have exercised nonexistent phase2 variants or the full corpus.
+I independently computed all549 Country API hashes and39 framework fingerprints.
+The f8 values match the earlier independent f8 census exactly.
+Exactly26 Malawi hashes change (22 nonderived plus4 derived); all523 other-country hashes and all39 framework fingerprints are exact.
+The existing Wave hash includes every wave =_/= Python build input, so unchanged supporting sample rebuilds are authorized and expected.
+
+* Reproduction and immutable proof
+=REPRODUCE.org= lists the exact private entry points and test arguments.
+=source-oracle.json=, =runtime-comparison.json=, =warning-checks.json=, =scanner-comparison.json= and =hash-scope.json= contain source-safe aggregate receipts.
+=proof.json= records unchanged HEAD, clean status and all tracked file bytes/modes/symlink tokens for candidate, writer, original baseline, de9 organic reference and old rejected candidate.
+Their tracked file counts are14,888 /14,888 /14,880 /14,910 /14,887 respectively.
+All424 quiescent author evidence files and all200 files in the prior NEEDS_FIX review remain byte/size/mode/mtime exact.
+All212 physical copy sources and every held/L1/reference copy remain exact; only three copied candidate sample parquets change through normal authorized rebuilding.
+The four roots' warm zero-write assertions pass, both main roots remain exact against their warm receipts after subsequent tests/scans, no network attempts were recorded, and no review subprocess remains.
+No tracked source/ref, shared cache, fixture, dependency, in-tree parquet or untracked raw source was changed.
+
+* Limits and residual draft
+This is a standalone f8-based partial review, not an organic composition, full suite, new-country census, fieldwork-universe adjudication or resolution of older-wave physical units.
+C4 still requires the unheld2013 questionnaire and a held2016 agriculture questionnaire; neither was fetched.
+#1118 true missing-unit handling, source-qualified unlisted seed codes, #1190 purchase/planted unit separation, #1106 nominal nutrient composition and #1174 retention remain independent.
+The author residual's602 absent noninorganic units, three unlisted seed codes,13 mixed purchase groups and1,066 purchase/planted unit-set mismatches are prior held-source diagnosis, not a new census in this review.
+=RESIDUAL-DRAFT.org= keeps these boundaries explicit for root's issue update.
+
+Sue.

@@ -1,0 +1,24 @@
+{
+  "recorded_at_UTC": "2026-10-22T02:36:21.503833+00:00",
+  "PR1199": {
+    "state": "open",
+    "merged": false,
+    "mergeable": true,
+    "previous_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+    "head": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+    "base": "fix/822-mali-community-readings-20261021",
+    "base_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+    "source_pushes": "ordinary fastforwards to FS origin and GitHub; frozen local9e branch unchanged",
+    "CI_run": 39712187800,
+    "CI_status": "in_progress",
+    "old9e_success_not_transferred": true
+  },
+  "integration18": {
+    "branch": "isa/integration-eighteen-docs-20261022",
+    "head": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+    "GitHub_push_terminal_exit0": true,
+    "runtime_pin": "f9feb3c807aff5206134c37768992302ceb431fa"
+  },
+  "no_public_PR_merged": true,
+  "signed": "Sue"
+}

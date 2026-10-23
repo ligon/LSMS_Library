@@ -187,7 +187,7 @@ PH_QUARTER = {
 # Preferred Label registered in the `u` table.
 
 
-def harmonized_food_labels():
+def harmonized_food_labels(t=None, *, observed_codes=None):
     """{int itemcode: Preferred Label} from the Code-keyed harmonize_food
     table.  This is the SAME resolver crop_production uses (see
     ``_crop_labels``), exposed for food_acquired so its ``j`` resolves to
@@ -197,7 +197,13 @@ def harmonized_food_labels():
     (``item_cd`` is int64 in the source CSVs), while harmonize_food's Code
     column is string-keyed; this returns an INT-keyed dict so a numeric
     ``j`` matches.  Codes with a blank / '---' Preferred Label are dropped
-    (they legitimately stay raw)."""
+    (they legitimately stay raw).
+
+    With ``t``, decode the food module's own quarter instead (GH #1144).
+    The no-argument branch remains the crop/community Code contract.
+    """
+    if t is not None:
+        return _food_item_labels(t, observed_codes=observed_codes)
     from lsms_library.local_tools import get_categorical_mapping
     raw = get_categorical_mapping(tablename='harmonize_food', idxvars='Code',
                                   **{'Preferred Label': 'Preferred Label'})
@@ -210,6 +216,93 @@ def harmonized_food_labels():
         if pd.isna(v) or str(v).strip() in ('', '---'):
             continue
         out[ik] = str(v).strip()
+    return out
+
+
+class FoodItemDecodeWarning(UserWarning):
+    """Known food codes whose quarter curation cannot place them safely."""
+
+
+def _food_item_labels(t, *, observed_codes=None):
+    """Food-only quarter codebook, preserving the detail actually recorded.
+
+    Exact Preferred names beat historical aliases: colliding codes polluted
+    several aliases (Leaves -> Dry Pepper, for example). Only the reviewed
+    example-only Other Spices alias is used; the recorded unqualified foods
+    stay unqualified. See ledger #1144 sections 3-5 and CONTENTS.org.
+    """
+    from collections import Counter, defaultdict
+    from lsms_library.local_tools import df_from_orgfile
+    import warnings
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    tab = df_from_orgfile(os.path.join(here, 'categorical_mapping.org'),
+                          name='harmonize_food')
+    quarter_columns = [c for c in tab.columns if re.fullmatch(r'\d{4}Q[1-4]', str(c))]
+    if t not in quarter_columns:
+        raise KeyError(f"Nigeria food items have no quarter codebook for {t!r}")
+
+    def present(value):
+        return pd.notna(value) and str(value).strip() not in ('', '---')
+
+    def normalized(value):
+        return ' '.join(str(value).split()).casefold()
+
+    def code_key(value):
+        try:
+            return int(format_id(value))
+        except (TypeError, ValueError, OverflowError):
+            return None
+
+    exact = defaultdict(set)
+    aliases = defaultdict(set)
+    for _, row in tab.iterrows():
+        preferred = row['Preferred Label']
+        if not present(preferred):
+            continue
+        preferred = str(preferred).strip()
+        exact[normalized(preferred)].add(preferred)
+        for quarter in quarter_columns:
+            if present(row[quarter]):
+                aliases[normalized(row[quarter])].add(preferred)
+
+    native_names = {normalized(v): v for v in
+                    ('Groundnuts', 'Pepper', 'Maize (shelled)')}
+    reviewed_aliases = {normalized('Other Spices (e.g. Maggi)'): 'Other Spices'}
+    out, unresolved = {}, {}
+    for code, native in zip(tab['Code'], tab[t]):
+        code = code_key(code)
+        if code is None:
+            continue
+        if not present(native):
+            unresolved[code] = 'missing quarter label; raw code kept'
+            continue
+        native = str(native).strip()
+        key = normalized(native)
+        if len(exact[key]) == 1:
+            label = next(iter(exact[key]))
+        elif key in native_names:
+            label = native_names[key]
+        elif (key in reviewed_aliases
+              and aliases[key] == {reviewed_aliases[key]}):
+            label = reviewed_aliases[key]
+        else:
+            label = native
+            unresolved[code] = (
+                f"native label {native!r} kept; Preferred alias is "
+                f"ambiguous or unreviewed ({sorted(aliases[key])})")
+        out.update({code: label, str(code): label, f'{code}.0': label})
+
+    observed = Counter(code_key(v) for v in
+                       (() if observed_codes is None else observed_codes))
+    reports = {code: {'raw_rows': observed[code], 'reason': reason}
+               for code, reason in unresolved.items() if observed[code]}
+    if reports:
+        warnings.warn(
+            f"Nigeria food_acquired {t}: known item codes need quarter "
+            f"curation: {reports}. Native labels/raw codes are preserved; "
+            "no other round's global meaning was substituted.",
+            FoodItemDecodeWarning, stacklevel=2)
     return out
 
 
@@ -378,16 +471,18 @@ def _canon_input_unit(s):
 class UnplacedUnitLabelWarning(UserWarning):
     """A recorded unit LABEL the canonicaliser cannot place (GH #1047).
 
-    Such a row is served ``U_UNKNOWN`` like a blank one, which would be a
-    silent loss of a unit the survey recorded -- so it is named here."""
+    Name the label and the caller's disposition rather than silently losing
+    a unit the survey recorded."""
 
 
-def _canon_units(labels, canon=_canon_unit, where=''):
+def _canon_units(labels, canon=_canon_unit, where='',
+                 disposition='served as Unknown'):
     """Map a decoded unit-label Series through `canon`, REPORTING what it
     cannot place.  A blank, or a bare numeric code with no value label, is
-    NA silently (a missing unit; the caller serves it ``U_UNKNOWN``).  A
+    NA silently (a missing unit).  A
     non-numeric label that `canon` returns NA for is NA too, but raises an
-    `UnplacedUnitLabelWarning` naming each label and its row count."""
+    `UnplacedUnitLabelWarning` naming each label, its row count and the
+    caller's disposition.  The crop/input default remains ``U_UNKNOWN``."""
     import warnings
     out = labels.map(canon).astype('string')
     text = labels.astype('string').str.strip()
@@ -398,10 +493,36 @@ def _canon_units(labels, canon=_canon_unit, where=''):
         counts = text[unplaced].value_counts().to_dict()
         warnings.warn(
             f"Nigeria {where}: {int(unplaced.sum())} row(s) carry a unit label "
-            f"that cannot be placed and are served as Unknown: {counts}. "
+            f"that cannot be placed and are {disposition}: {counts}. "
             "Teach the canonicaliser in nigeria.py (GH #1047).",
             UnplacedUnitLabelWarning, stacklevel=2)
     return out
+
+
+# C8 labels already registered in categorical_mapping.org's `u` table.
+# Keep this extension local to community prices (ledger #1095, sections 2-5):
+# `_canon_unit` also serves harvest and sold units, with a different codebook.
+_COMMUNITY_UNIT_LABELS = {
+    'loaf': 'Loaf',
+    'bottle/can': 'Bottle/Can',
+    'cube': 'Cube',
+    'metric cup': 'Metric Cup',
+    'wrap': 'Wrap',
+    'tea spoon': 'Tea Spoon',
+    'table spoon': 'Table Spoon',
+    'crate': 'Crate',
+    'slice': 'Slice',
+    'whole animal': 'Whole Animal',
+}
+
+
+def _canon_community_unit(s):
+    """Place exact C8 label bodies, then use the existing base-unit decoder."""
+    if not pd.isna(s):
+        label = _COMMUNITY_UNIT_LABELS.get(_strip_code_prefix(s).lower())
+        if label is not None:
+            return label
+    return _canon_unit(s)
 
 
 def _month_str(month_series, year_series):
@@ -2293,11 +2414,14 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             axis=1)
         code = pd.to_numeric(df[fr['item']], errors='coerce')
         price = pd.to_numeric(df[fr['price']], errors='coerce')
+        unit_labels = None
 
         if mode == 'codes':
             j = code.astype('Int64').map(crop_labels).astype('string')
             if fr.get('unit') and fr['unit'] in dec.columns:
-                u = dec[fr['unit']].map(_canon_unit).astype('string')
+                unit_labels = dec[fr['unit']]
+                u = unit_labels.map(_canon_community_unit).astype('string')
+                initially_unplaced = u.isna()
             else:
                 u = pd.Series(pd.NA, index=df.index, dtype='string')
         else:  # names (W1/W2)
@@ -2376,6 +2500,18 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             unrecorded = (piece['u'].isin(['g', 'cl', 'Kg', 'l'])
                           & qty.isna())
             piece.loc[unrecorded, 'u'] = pd.NA
+
+        if unit_labels is not None:
+            # Report only labels still unplaced AFTER the existing metric
+            # rescue.  Reporting up-front falsely counts rescued g/cl rows;
+            # known metric units dropped for unrecorded sizes are separate.
+            # Retention/fallback remains the explicit #1095 design residual.
+            report = (initially_unplaced & piece['u'].isna()
+                      & piece['v'].notna() & piece['j'].notna()
+                      & piece['Price'].notna() & (piece['Price'] > 0))
+            _canon_units(unit_labels[report], canon=_canon_community_unit,
+                         where=f'community_prices {t}',
+                         disposition='dropped after metric-size rescue')
 
         pieces.append(piece)
 
@@ -2542,12 +2678,15 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
 
     df = get_dataframe(fn)
 
-    food_labels = harmonized_food_labels()
+    E = pd.to_numeric(df[expenditure], errors='coerce')
+    active = E.gt(0)
+    for spec in sources.values():
+        active |= pd.to_numeric(df[spec['quantity']], errors='coerce').gt(0)
+    food_labels = harmonized_food_labels(t, observed_codes=df.loc[active, item])
     unit_codes = food_unit_labels(t)
 
     i = df[hhid].astype(int).astype(str)
     j = df[item].replace(food_labels)
-    E = pd.to_numeric(df[expenditure], errors='coerce')
 
     pieces = []
     for s, spec in sources.items():

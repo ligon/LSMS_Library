@@ -1,0 +1,32 @@
+{
+  "verdict": "PASS",
+  "frozen_head": "7886f7ece49767b2357a2f559c474e0eb710561f",
+  "tracked_files": 14988,
+  "tracked_content_modes_paths_HEAD_and_clean_exact": true,
+  "tracked_manifest_SHA256": "ce0aef65bef3af9f9d6ccbf56479eb8eccb6d6844251702dafe019018808e834",
+  "quiescent_source_file_receipts_exact": 2807,
+  "reference_source_and_copies_exact": 20,
+  "supplement_MD5_mode_mtime_exact": 10,
+  "private_L1_exact": 1298,
+  "physical_private_data_no_symlinks": true,
+  "no_network_attempts": true,
+  "no_intree_parquets_or_introduced_raw_sources": true,
+  "unchanged_existing_tracked_curation_source_extensions": 9,
+  "warm_parquets_unchanged_bytes_modes_mtimes": 1519,
+  "focused_tests": {
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "deselected": 4
+  },
+  "initial_authorized_BF_stale_parquet_rebuilds": 10,
+  "other_initial_parquets_unchanged": 1509,
+  "fullframe_nullmask_dtype_axis_and_attrs_comparisons_per_process": 20,
+  "exact_frame_processes": 2,
+  "new_Country_repeats_per_process": 3,
+  "Feature_rows": 47212,
+  "normal_freshness_and_coverage": true,
+  "git_or_GH_mutations": 0,
+  "acquisition_DVC_CLI_sharedcache_write_clear_promotion": false,
+  "all_source_references_kept_private": true
+}

@@ -1,0 +1,59 @@
+{
+  "status": "FROZEN_INDEPENDENT_REVIEW_PASS_BOUNDED",
+  "reviewer": "Sue",
+  "candidate": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "runtime_tests": "299fb8675e785fd392b1259ab1f4fb535eb69c34",
+  "parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "manifest_entries": 1458,
+  "manifest_sha256": "94d5e89a4fe8f3706cda0181222a2c235e5eb137184015ef2f318254437a4a83",
+  "safe_exports": {
+    "ALLOWLIST.json": {
+      "sha256": "0d7ae0fd14db5948d8c8bfb1e788bdb814adf3ff17285c2e8e690d39572dc498",
+      "size": 322
+    },
+    "REVIEW.org": {
+      "sha256": "bea5dc67f847f2fe8b32c2bd9a21a8e7309ff4e203c00bf69339f4ab9cf5f8aa",
+      "size": 9146
+    },
+    "REPRODUCE.org": {
+      "sha256": "92413534220556823b6d4171c1fcd6cd1fe983f700523f1b36b95c39f1ff8f90",
+      "size": 2723
+    },
+    "RESIDUALS.md": {
+      "sha256": "339abb95aacbde8ea0f381e6f0f09d5f982a623f3f9ca34994ff0afdb99d5792",
+      "size": 2713
+    },
+    "verdict.json": {
+      "sha256": "b807b247064fc1a4cda960bc3b5e9fd8f4eed4049e0468738a4801ed6cc29d51",
+      "size": 291
+    },
+    "validation.json": {
+      "sha256": "78297257b06f5b3de9d1fdfcce32014a43ebdee0ed0533c5a3eb5fa7dce22ad4",
+      "size": 10226
+    },
+    "proof.json": {
+      "sha256": "0667608e6df4d9be775b021ac21bc73aa3ad97ca7464db8fccf9676485d9c69e",
+      "size": 5576
+    },
+    "scanner-occurrences.json": {
+      "sha256": "fc5422ad10e30a05fa28959c1b32ee2410aa9bc38fb7eaf1ab07fe9412578c48",
+      "size": 54603
+    }
+  },
+  "checker_pins_sha256": "2bc89e1b914688ed0b7fc1ffc076780bd3b615a0002191effca6a12643a489fa",
+  "zero_other_tagged_consumers": true,
+  "all_source_API_test_scanner_consumers_terminal": true,
+  "strict_reassessment_checks": 209,
+  "strict_unique_ordered_pairs": 177,
+  "qualifications": [
+    "Two preexisting scanner FAIL findings remain FAIL; Make country food builder errors remain.",
+    "Original first assembly expected operand was in memory only and is absent; later reconstructed expectations are separately named.",
+    "Inherited Make child FDs survive in full outer logs; per-call stdout/stderr strings were not captured.",
+    "Original pandas comparator exact-zero calls had a nullable Float64 precision gap; separate explicit EA/NumPy/typed-object reassessment passed.",
+    "CLI generic postread differs from API v NA representation and recursive population/recall attrs on BOTH heads; matched stages/oracles pass.",
+    "All failed metadata/artifact-only checkers and their qualifications remain; no source/API/pytest replay."
+  ],
+  "source_and_reference_protection": "final-protection-v2-private.json",
+  "no_Git_product_GitHub_mutation": true,
+  "broader_GH218_and_residual_ownership": "Root dispatcher; no closure or merge by reviewer"
+}

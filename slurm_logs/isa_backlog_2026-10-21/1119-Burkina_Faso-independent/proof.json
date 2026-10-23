@@ -1,0 +1,544 @@
+{
+  "pins": {
+    "candidate": "3dc9d28510dd783c648413987011832669f8bcf7",
+    "parent": "cfd0782766068da6dc7e7605334e957f988a4ab1"
+  },
+  "prebuild_hashes": {
+    "status": "PASS_BEFORE_ANY_BUILD",
+    "API": 549,
+    "changed_BF": 24,
+    "unchanged_others": 525,
+    "framework_unchanged": 39,
+    "relevant_wave_before_build": 12,
+    "relevant_wave_changed": 12,
+    "new_independent_proof_not_author_timing_repair": true,
+    "changed": [
+      "Burkina_Faso/sample",
+      "Burkina_Faso/cluster_features",
+      "Burkina_Faso/household_roster",
+      "Burkina_Faso/individual_education",
+      "Burkina_Faso/subjective_well_being",
+      "Burkina_Faso/panel_ids",
+      "Burkina_Faso/food_acquired",
+      "Burkina_Faso/assets",
+      "Burkina_Faso/housing",
+      "Burkina_Faso/shocks",
+      "Burkina_Faso/plot_features",
+      "Burkina_Faso/food_security",
+      "Burkina_Faso/food_coping",
+      "Burkina_Faso/months_food_inadequate",
+      "Burkina_Faso/interview_date",
+      "Burkina_Faso/crop_production",
+      "Burkina_Faso/plot_inputs",
+      "Burkina_Faso/livestock",
+      "Burkina_Faso/plot_labor",
+      "Burkina_Faso/people_last7days",
+      "Burkina_Faso/food_expenditures",
+      "Burkina_Faso/food_prices",
+      "Burkina_Faso/food_quantities",
+      "Burkina_Faso/household_characteristics"
+    ]
+  },
+  "physical_preparation": {
+    "status": "TERMINAL_SUCCESS",
+    "source_files": 9,
+    "sidecars": 9,
+    "physical_copies": 143,
+    "both_L1_layouts": true,
+    "BF_L2_unseeded_in_four_roots": true,
+    "healthy_comparator_files_per_root": 12,
+    "before_decode_or_API": true
+  },
+  "strict_frames": {
+    "status": "PASS",
+    "pair_counts": {
+      "cross_head_unchanged": 63,
+      "cross_head_two_labels_only": 25,
+      "fresh_warm_and_new_objects": 72,
+      "independent_source_oracle": 8,
+      "Feature_argument_matched_complete": 8,
+      "Feature_fresh_warm": 8
+    },
+    "checked_input_pickles": 195,
+    "negative_comparator_controls_rejected": 7,
+    "explicit_check_exact_rtol_atol": [
+      true,
+      0,
+      0
+    ],
+    "full_recursive_TYPED_attrs_FIELDS_presence_values": true,
+    "full_axes_levels_codes_classes_dtypes_masks_order": true,
+    "join_household_crop_only": {
+      "base": {
+        "Ma\u00efs": {
+          "seed_rows": 2274,
+          "matching_household_crop_rows": 0
+        },
+        "Ni\u00e9b\u00e9": {
+          "seed_rows": 2156,
+          "matching_household_crop_rows": 0
+        }
+      },
+      "candidate": {
+        "Ma\u00efs": {
+          "seed_rows": 2274,
+          "matching_household_crop_rows": 2251
+        },
+        "Ni\u00e9b\u00e9": {
+          "seed_rows": 2156,
+          "matching_household_crop_rows": 2097
+        }
+      }
+    },
+    "API_artifact_stage_distinctions": [
+      {
+        "scenario": "base-default",
+        "API_artifact_distinct": true,
+        "API": {
+          "rows": 22877,
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "input",
+            "crop",
+            "u"
+          ],
+          "index_dtypes": [
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=<NA>)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>"
+          ],
+          "columns": [
+            "Quantity",
+            "Purchased",
+            "Quantity_purchased"
+          ],
+          "dtypes": [
+            "Float64Dtype()",
+            "BooleanDtype",
+            "Float64Dtype()"
+          ],
+          "attrs_types": {
+            "id_converted": "bool",
+            "country": "str",
+            "unit_kg": "dict",
+            "population": "dict",
+            "population_resolution": "dict",
+            "recall": "dict"
+          },
+          "unique": true
+        },
+        "artifact": {
+          "rows": 22877,
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "input",
+            "crop",
+            "u"
+          ],
+          "index_dtypes": [
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>"
+          ],
+          "columns": [
+            "Quantity",
+            "Purchased",
+            "Quantity_purchased"
+          ],
+          "dtypes": [
+            "Float64Dtype()",
+            "BooleanDtype",
+            "Float64Dtype()"
+          ],
+          "attrs_types": {
+            "id_converted": "bool",
+            "country": "str",
+            "unit_kg": "dict",
+            "population": "dict",
+            "population_resolution": "dict",
+            "recall": "dict"
+          },
+          "unique": true
+        }
+      },
+      {
+        "scenario": "candidate-default",
+        "API_artifact_distinct": true,
+        "API": {
+          "rows": 22877,
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "input",
+            "crop",
+            "u"
+          ],
+          "index_dtypes": [
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=<NA>)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>"
+          ],
+          "columns": [
+            "Quantity",
+            "Purchased",
+            "Quantity_purchased"
+          ],
+          "dtypes": [
+            "Float64Dtype()",
+            "BooleanDtype",
+            "Float64Dtype()"
+          ],
+          "attrs_types": {
+            "id_converted": "bool",
+            "country": "str",
+            "unit_kg": "dict",
+            "population": "dict",
+            "population_resolution": "dict",
+            "recall": "dict"
+          },
+          "unique": true
+        },
+        "artifact": {
+          "rows": 22877,
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "input",
+            "crop",
+            "u"
+          ],
+          "index_dtypes": [
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>"
+          ],
+          "columns": [
+            "Quantity",
+            "Purchased",
+            "Quantity_purchased"
+          ],
+          "dtypes": [
+            "Float64Dtype()",
+            "BooleanDtype",
+            "Float64Dtype()"
+          ],
+          "attrs_types": {
+            "id_converted": "bool",
+            "country": "str",
+            "unit_kg": "dict",
+            "population": "dict",
+            "population_resolution": "dict",
+            "recall": "dict"
+          },
+          "unique": true
+        }
+      },
+      {
+        "scenario": "base-make",
+        "API_artifact_distinct": true,
+        "API": {
+          "rows": 22877,
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "input",
+            "crop",
+            "u"
+          ],
+          "index_dtypes": [
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=<NA>)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>"
+          ],
+          "columns": [
+            "Quantity",
+            "Purchased",
+            "Quantity_purchased"
+          ],
+          "dtypes": [
+            "Float64Dtype()",
+            "BooleanDtype",
+            "Float64Dtype()"
+          ],
+          "attrs_types": {
+            "id_converted": "bool",
+            "country": "str",
+            "unit_kg": "dict",
+            "population": "dict",
+            "population_resolution": "dict",
+            "recall": "dict"
+          },
+          "unique": true
+        },
+        "artifact": {
+          "rows": 22877,
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "input",
+            "crop",
+            "u"
+          ],
+          "index_dtypes": [
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>"
+          ],
+          "columns": [
+            "Quantity",
+            "Purchased",
+            "Quantity_purchased"
+          ],
+          "dtypes": [
+            "Float64Dtype()",
+            "BooleanDtype",
+            "Float64Dtype()"
+          ],
+          "attrs_types": {
+            "id_converted": "bool",
+            "country": "str",
+            "unit_kg": "dict",
+            "population": "dict",
+            "population_resolution": "dict",
+            "recall": "dict"
+          },
+          "unique": true
+        }
+      },
+      {
+        "scenario": "candidate-make",
+        "API_artifact_distinct": true,
+        "API": {
+          "rows": 22877,
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "input",
+            "crop",
+            "u"
+          ],
+          "index_dtypes": [
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=<NA>)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>"
+          ],
+          "columns": [
+            "Quantity",
+            "Purchased",
+            "Quantity_purchased"
+          ],
+          "dtypes": [
+            "Float64Dtype()",
+            "BooleanDtype",
+            "Float64Dtype()"
+          ],
+          "attrs_types": {
+            "id_converted": "bool",
+            "country": "str",
+            "unit_kg": "dict",
+            "population": "dict",
+            "population_resolution": "dict",
+            "recall": "dict"
+          },
+          "unique": true
+        },
+        "artifact": {
+          "rows": 22877,
+          "index_names": [
+            "i",
+            "t",
+            "v",
+            "input",
+            "crop",
+            "u"
+          ],
+          "index_dtypes": [
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>",
+            "<StringDtype(na_value=nan)>"
+          ],
+          "columns": [
+            "Quantity",
+            "Purchased",
+            "Quantity_purchased"
+          ],
+          "dtypes": [
+            "Float64Dtype()",
+            "BooleanDtype",
+            "Float64Dtype()"
+          ],
+          "attrs_types": {
+            "id_converted": "bool",
+            "country": "str",
+            "unit_kg": "dict",
+            "population": "dict",
+            "population_resolution": "dict",
+            "recall": "dict"
+          },
+          "unique": true
+        }
+      }
+    ],
+    "Make_healthy_pooled_not_attempted_L2_only_scope": true,
+    "saved_input_receipts_unchanged": true
+  },
+  "warning_scanner": {
+    "status": "PASS",
+    "all_paired_full_warning_multisets_literal_true": true,
+    "captured_warning_files": 152,
+    "captured_warning_category_counts": {
+      "NullReadWarning": 48,
+      "UserWarning": 16,
+      "GrainCollapseWarning": 12,
+      "QuantityImplausibleWarning": 20,
+      "NullIndexKeyWarning": 20
+    },
+    "scanner": {
+      "base": {
+        "records": 6,
+        "statuses": {
+          "warn": 6
+        },
+        "checks": {
+          "index_levels_match_scheme": 3,
+          "runtime_warning": 3
+        }
+      },
+      "candidate": {
+        "records": 6,
+        "statuses": {
+          "warn": 6
+        },
+        "checks": {
+          "index_levels_match_scheme": 3,
+          "runtime_warning": 3
+        }
+      }
+    },
+    "scanner_complete_path_substituted_occurrence_multisets_exact": true,
+    "scanner_original_JSONL_bytes_equal": true,
+    "normalization_only": {
+      "data_root_exact_prefix": "DATA_ROOT",
+      "checkout_exact_prefix": "SOURCE_ROOT"
+    },
+    "originals_unmodified_and_private": true,
+    "scanner_both_default_data_roots_zero_changes": true,
+    "no_phase2_plot_inputs_kwargs_grid": true,
+    "tests": {
+      "base": {
+        "outcomes": {
+          "fail": 5,
+          "pass": 4
+        },
+        "failed_functions": {
+          "test_actual_org_targets_use_crop_production_vocabulary": 2,
+          "test_real_resolvers_agree_on_seed_and_native_crop": 2,
+          "test_all_other_seed_cells_and_original_keys_are_preserved": 1
+        }
+      },
+      "candidate": {
+        "outcomes": {
+          "pass": 131
+        },
+        "failed_functions": {}
+      }
+    },
+    "standard_log_warning_header_groups": {
+      "NutrientCoverageWarning": 2
+    },
+    "header_groups_not_unique_event_counts": true
+  },
+  "warning_pair_count": 76,
+  "all76warning_pairs_literal_true": true,
+  "complete_native_source_oracle": "oracle_projection_v2.py from saved raw frames plus actual local Org BUILD dictionaries; original read-time-layer expectation retained separately",
+  "preservation": {
+    "status": "PASS",
+    "source_heads_clean": {
+      "/local/job40255479/worktrees/isa-review-Burkina_Faso-1119": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "/local/job40255479/worktrees/isa-review-Burkina_Faso-1119-base": "cfd0782766068da6dc7e7605334e957f988a4ab1"
+    },
+    "tracked_file_endpoints_bytes_modes_mtimes_inodes_Git_blobs_exact": 29779,
+    "in_tree_parquets": 0,
+    "initial_physical_copies_exact": 143,
+    "held_files_sidecars_exact": 9,
+    "author_manifest594_payloads_exact": 594,
+    "protected_control_receipts_exact": 9,
+    "older_roots_exact_only_for_the_explicit_controls_actually_used": true,
+    "warm_deltas": {
+      "base-default": {
+        "changes": 0,
+        "classifications": {}
+      },
+      "base-make": {
+        "changes": 2,
+        "classifications": {
+          "modified": 2
+        },
+        "byte_mode_preserving_native_rewrites_only": true
+      },
+      "candidate-default": {
+        "changes": 0,
+        "classifications": {}
+      },
+      "candidate-make": {
+        "changes": 2,
+        "classifications": {
+          "modified": 2
+        },
+        "byte_mode_preserving_native_rewrites_only": true
+      }
+    },
+    "final_data_parquets": 88,
+    "final_data_kinds": {
+      "current-YAML-wave": 40,
+      "hashless-script-native": 16,
+      "current-country": 32
+    },
+    "all_private_parquets": 102,
+    "private_parquet_root_groups": {
+      "writer": 6,
+      "data": 88,
+      "frames": 8
+    },
+    "guard_events": {
+      "mkdir-existing": 48
+    },
+    "unexpected_denials": 0,
+    "guarded_outbound_IP_attempts": 0,
+    "safe_export_basename_separation": true
+  },
+  "final_zero_consumer_release": "See FINAL-READY.json; this report precedes terminal seal."
+}

@@ -1,0 +1,124 @@
+#+title: Independent global15 Burkina coexistence review
+#+date: 2026-10-21
+#+author: Sue
+
+* Verdict and source pins
+PASS for frozen validation-only global15 =4227e3a802c7349b11f41ec70a924d712159e587= against actual global14 =653f77b1437886138f6b29078dcfb6108bf1e9c6=.
+This reviews coexistence of parcel GPS #1058 with the already integrated input-identity repair #1123.
+It does not publish, merge, modify or re-review other countries' implementations.
+The final immutable/quiescence release receipt is =proof.json=; =verdict.json= contains aggregate checks and individual scanner-record accounting.
+The standalone #1058 and #1123 reviews and API-eleven evidence remain immutable.
+
+* Country grounding and contradictions
+I first read all 1,496 lines of current Burkina =CONTENTS.org=, including TODO, WAITING and LOGBOOK entries.
+The 2021 survey is a half-panel restricted to households in their original EA; migrants are not followed and clusters are not automatically topped up to six households.
+The native 2018 formatter is =ehcvm_i=; 2021 retains =_old_i= wrapping the country formatter.
+Native wave keys, the framework's pre-country =id_walk= and public keys after the sample join are different proof layers.
+The raw country frame already carries =id_converted=True=; it is not interchangeable with a native wave frame.
+
+The historical blanket claim "EHCVM s16a has no decimal-degree parcel GPS" conflicts with the dated 2026-10-18 country correction and held 2021 q46 latitude/longitude labels.
+The absence of positions holds for 2018, while 2021 q46 records positions, q47 records AREA, and q45 records the GPS measurement flag.
+No area, flag or geographic-range proxy is used for positions.
+The concatenator's claim "Cached parquets store pre-transformation data" also differs from the default framework route, which walks IDs before its country write.
+Both histories are retained as recorded; the review does not assume either description can be silently discarded.
+
+The sample notes explicitly say "10,224 households", "6,961 households" and "3,218 households".
+Both actual cold revisions instead return 10,411 / 7,010 / 3,227 sample rows, totaling 20,648, and 900 / 585 / 550 public clusters, totaling 2,035.
+This is a contradiction between recorded counts and current served output, not authority to change the sample universe.
+A proposed country-note clarification should give those measured served counts and keep the historical survey/design counts distinguished; it is not a new discovery beyond the earlier #1123 review.
+No additional country idiosyncrasy requiring a production change was found.
+
+Before healthy checks, current Senegal, Benin and Togo CONTENTS hashes were verified byte-identical to the earlier complete reads.
+Those complete reads are carried explicitly in =reference-provenance.json=.
+Senegal has no sample strata column; its presence questions are binary household-membership filters, not continuous months, and its plot native/walked keys remain separate.
+Benin's =vague= is a fielding split with each cluster visited once, not an added household identity axis; its removed duplicate staging directory had md5-identical sidecars and was not another wave.
+Togo's seasonal half-samples pool under =2018=; its parcel source is in =Data1=, and distinct seed slots must remain separate rather than adding Purchased to identity.
+These comparator facts were carried from identical source-pinned notes, not inferred from warm frames.
+Repository guidance and the backlog/cross-country/ledger/audit instructions are byte-exact to their previously read f8 versions, including the tracked CLAUDE symlink target.
+
+* Exact incremental boundary
+The actual global14-to-global15 diff has exactly nine paths: the #1058 ledger, its three safe report/evidence files, one test file, CONTENTS, and three production/configuration files.
+Only =plot_features_for_wave= changes executable helper AST: the independent positional nullable-Float64 projection loop, before the existing index construction.
+Only the two 2021 q46 colmap bindings and existing canonical optional float fields are added.
+The runtime helper, wave, scheme and GPS tests are byte-exact to reviewed standalone =20a5541867ef0b991b01031cd4c766681b537fc0=.
+All helper AST outside the approved loop/docstring is exact to actual global14.
+No coordinate screening, fill, interpolation, GPS-flag gate, area substitution, filter, merge, identifier, reducer or universe changes occur.
+
+The prior #1123 2018 plot_inputs script and categorical_mapping Org file are nonempty and byte-exact to actual global14; their guard and source-qualified code-21 token are positively checked.
+The prior input tests and both identity/gift residual country-note sections are exact.
+This is a non-vacuous whole-file/AST check, not a guessed assignment-name comparison.
+
+* Held-source, normal cold and fresh-process warm proof
+Before API probes, 20 held sidecar-MD5-verified L1 blobs and 18 healthy comparator parquets were physically copied into EACH new root, with distinct inodes, single links and exact SHA/bytes/modes/mtimes.
+Each root had zero Burkina L2 inputs.
+No acquisition, DVC CLI, shared-cache mutation, manual stamp, assume-fresh, NO_CACHE or read-gate bypass was used.
+The comparators are held warm controls, not source-cold country claims.
+
+Actual normal global14 and global15 cold builds produce 35 complete frames apiece, followed by separate fresh-process warm replays using new Country and Feature objects.
+Every old value, key, row/column order, dtype, null mask and full logical attrs is exact across revisions and cold/warm; no values, attrs or ordering were normalized for those full-frame comparisons.
+Each warm replay changes zero file bytes, modes or nanosecond mtimes throughout its private data root.
+All 31 original parquets per root remain byte/mode/mtime exact after subsequent probes and tests.
+Three additional candidate raw-source copies were materialized by sanctioned =get_data_file= for the independent metadata oracles; their MD5/SHA/bytes match held blobs, and they are private single-link files.
+They are recorded as source materializations, not warm-cache writes or acquisitions.
+
+Each checkout independently verifies all 31 cache metadata records with its own current code/config:
+12 COUNTRY parquets have exact current hashes and full wave coverage; 12 YAML-wave parquets have exact current hashes; seven script-wave companions legitimately remain hashless and unchanged.
+This includes all six Senegal and all twelve Benin/Togo comparator files.
+No claim that all wave companions embed hashes is made.
+The four actually rebuilt Burkina table hashes change as expected from whole-helper/scheme inputs; all needed sample and cluster prerequisites rebuild normally from held data.
+
+* GPS and input coexistence
+The 2021 source has 8,467 rows, minus 1,117 null-key placeholders, leaving all 7,350 native parcels.
+Independent raw-source/native/helper/walked-country/public projections preserve 4,180 complete coordinate pairs, zero partial pairs and 3,170 missing pairs, including ten GPS-Yes/area-present parcels without positions.
+Native coordinate floating bits are exact.
+The old six payloads and full attrs remain exact.
+Native 2018 remains six columns; the country union has eight columns with missing optional positions for 2018.
+The existing seven all-old-payload-missing 2018 exclusions and unsupported 2014 subset remain unchanged.
+Public Burkina GPS has 19,784 rows, raw country 19,791; default Feature with Senegal 13,824 has 33,608 rows.
+
+Inputs remain 22,877 native/public lines, preserving all 183 recovered lines: 163 conflicting-payload extras and 20 equal-payload extras, totaling 2,409.58 reported kg.
+The independent primary-source oracle checks every native line's full current payload, native key, unit and public retention; the original f8 keep/drop set is a historical loss control, not a substitute for the actual global14 control.
+Sample remains 20,648 and clusters 2,035, with full raw-country and native cache-layer frames exact.
+The current 2014/2021 input subsets remain empty.
+Benin 10,605 and Togo 13,730 full frames are exact; input Feature has 47,212 rows.
+Default and =currency=None= Feature calls are saved and compared separately against actual global14, with full attrs; only the =currency=None= call is compared to the identically called API-eleven reference.
+API-eleven's head, frame SHA receipts, country tree blobs and cache hashes are checked against actual global14; it is not accepted as a stale proxy comparator.
+
+Code 21 still denotes =Unknown [Burkina_Faso 2018-19 s16bq01=21]=, with 602 existing Seed rows and no borrowed 2021 meaning.
+Its legacy Seed classification remains unverified under #1187.
+=Purchased= and =Quantity_purchased= are current API column names, not verified purchase semantics: the full source oracle still matches q05/q07a gift/donation bindings and standing NA masks.
+#1188 owns separate gift/purchase/unit routing; this review makes no rebinding or other-country primary-source claim.
+
+* Tests, scanner and bounded hash evidence
+The candidate passes 44 GPS cases (15 new, 21 existing, eight independent adversarial) plus 13 prior #1123 cases, with zero failures/errors/skips.
+Actual global14's GPS counterfactual gives 12 failures and three passes.
+The prior input selection explicitly deselects four unrelated legacy per-household comparator parameter cases; collection confirms 13 selected, four deselected, and no hidden skips.
+Complete healthy frames are independently compared regardless of that test selection.
+API audit passes.
+
+Actual scanner phases 1/2 yield the full exact unmodified finding multisets: 13 GPS WARN records and six input WARN records, each individually reconciled in =verdict.json=.
+There are zero failures, errors or skips, and neither feature has a phase-2 kwargs grid.
+All complete API warning stage/class/message multisets also match actual global14.
+Raw warnings, IDs, coordinates and full frames remain private.
+
+The standalone independently measured 549-country-cell/39-framework-tag evidence is carried with exact immutable receipts and source head: 24 Burkina changes, 525 other cells and all 39 tags exact at that standalone boundary.
+No full 549/39 sweep or full suite was repeated for this nine-path increment, as scoped by root.
+No output claim is made for other hashed Burkina features or countries beyond these four table/comparator scopes.
+
+* Reproduction, failed harness probes and immutable release
+=REPRODUCE.sh= records runnable executed command forms and the one-shot preparation boundary.
+The image interpreter, exact cwd/PYTHONPATH/countries/data realpaths and frozen HEAD are asserted per process.
+Socket guards plus =unshare -rn= prevent outbound access; numeric/build/Make workers are one, pytest uses one loadfile worker, and there is one data consumer per root.
+The root-prepared control tmp symlink permits writes only to its exact private target.
+The candidate's preexisting real DVC tmp directory and btime remain unchanged; existing exclusive creates receive FileExistsError, while all new checkout writes are denied.
+
+Initial private harness failures remain preserved: refusal of an auto-created empty data directory (both roots quarantined before corrected verified preparation), a relative private-script invocation, dereferenced-versus-tracked CLAUDE symlink comparison, an overbroad final data-tree assertion that omitted sanctioned source materializations, and xdist's omitted deselection summary (resolved by collection).
+No failed preparation was used to launch dependent API probes.
+No product failure, candidate test failure or hidden data exception was dismissed.
+
+Before/after protection covers nine actual source trees and six immutable earlier evidence roots, including symlink targets/modes/mtimes and source heads/content/modes/clean status.
+The incorrectly named isa-review-1123-Burkina_Faso path is absent in both snapshots; no disappeared tree is implied.
+The final receipt confirms zero remaining review consumers and releases only this bounded validation freeze.
+There were no Git/ref/checkout/branch/GitHub mutations, tracked edits or in-tree payloads.
+
+Sue

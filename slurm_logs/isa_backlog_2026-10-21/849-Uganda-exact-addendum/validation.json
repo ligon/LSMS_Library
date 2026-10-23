@@ -1,0 +1,209 @@
+{
+  "status": "EXACT_SAVED_ARTIFACTS_CONFIRMED_WITH_SCOPE_GAPS",
+  "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "check_exact": true,
+  "rtol": 0,
+  "atol": 0,
+  "all_axes_levels_codes_order_dtypes_masks_and_recursive_full_typed_attrs": true,
+  "StringDtype_storage_and_na_value_checked": true,
+  "immutable_record_FIELDS_presence_and_attributes_checked": true,
+  "comparisons": {
+    "baseline_cold_warm_full_frames": 11,
+    "scenario_nonfactor_full_frames": 2,
+    "baseline_factor_positive_control": 1,
+    "helper_nonfactor_full_frames": 7,
+    "reported_factor_source_oracle_series": 7,
+    "unchanged_wave_full_helper_controls": 2,
+    "unchanged_wave_full_public_controls": 2,
+    "saved_source_position_operand_series": 30,
+    "saved_factor_screen_series": 4,
+    "saved_factor_full_typed_attrs": 2,
+    "saved_product_harvest_full_frames": 2,
+    "saved_identity_carrier_full_frame": 1,
+    "source_product_carrier_full_frames": 7,
+    "carrier_exact_safe_aggregates": 7
+  },
+  "failures_count": 0,
+  "failure_labels": [],
+  "comparator_provenance": {
+    "source": "/local/job40255479/control/isa-backlog-20261021/review-1078-unit-attribution/exact_artifacts.py",
+    "source_sha256": "27885c7fa967e37ce6a5adc6deb03f5d44b284865a4b2a1556908579a45eeb46",
+    "functions": [
+      "typed",
+      "dtype",
+      "index",
+      "frame",
+      "receipt"
+    ],
+    "function_AST_sha256": "482913e1c535c4fd7b80ee68952434625b3071d83edde823eefb1805d0ba8f1d",
+    "function_AST_reused_without_change": true,
+    "old_top_level_checks_executed": false,
+    "seven_self_controls_rejected": 7,
+    "local_source_copy": "EXACT-COMPARATOR.py",
+    "local_function_AST_exact": true,
+    "local_source_sha256": "658b3417858790fe0810706e8b7ac195a91fc5ee39a70a3ea3bbb6d2bd2e1b1b"
+  },
+  "loaded_inputs": 72,
+  "loaded_old_receipts_before_after_exact": true,
+  "attrs_types": {
+    "builtins.list": 427,
+    "builtins.str": 32340,
+    "builtins.float": 381,
+    "builtins.NoneType": 600,
+    "builtins.dict": 179,
+    "pandas.api.typing.NAType": 54,
+    "builtins.int": 310,
+    "builtins.bool": 62,
+    "lsms_library.population.PopulationRecord": 28,
+    "builtins.tuple": 84,
+    "lsms_library.sampling.SamplingRecord": 28,
+    "lsms_library.sampling._FrozenList": 224,
+    "lsms_library.sampling._FrozenDict": 232,
+    "lsms_library.recall.RecallRecord": 28,
+    "pandas.Series": 41
+  },
+  "saved_source_product_carrier_aggregates": [
+    {
+      "wave": "2009-10",
+      "complete": 0,
+      "different": 0,
+      "net": 0.0,
+      "absolute": 0.0
+    },
+    {
+      "wave": "2010-11",
+      "complete": 41,
+      "different": 41,
+      "net": 3484.5,
+      "absolute": 12066.5
+    },
+    {
+      "wave": "2011-12",
+      "complete": 19,
+      "different": 19,
+      "net": 5077.400000214577,
+      "absolute": 5802.599999785423
+    },
+    {
+      "wave": "2013-14",
+      "complete": 18,
+      "different": 18,
+      "net": 2327.0,
+      "absolute": 4911.0
+    },
+    {
+      "wave": "2015-16",
+      "complete": 23,
+      "different": 23,
+      "net": 587.0,
+      "absolute": 1907.0
+    },
+    {
+      "wave": "2018-19",
+      "complete": 6,
+      "different": 6,
+      "net": -2090.0,
+      "absolute": 2130.0
+    },
+    {
+      "wave": "2019-20",
+      "complete": 11,
+      "different": 11,
+      "net": -765.0,
+      "absolute": 1915.0
+    }
+  ],
+  "baseline_crop_rows": 133331,
+  "projected_crop_rows": 133331,
+  "baseline_harvest_rows": 78571,
+  "projected_harvest_rows": 88980,
+  "projected_factor_changes_are_not_preservation_comparisons": true,
+  "scope_gaps": [
+    "Ordinary default-Country-constructor warm probe saved only ordinary-default-warm.json, not its returned public/harvest frames; no exact artifact pair exists for that constructor comparison.",
+    "No separately captured explicit currency=None/Feature frame pair is saved; no new default-versus-None equality claim is made.",
+    "The recreated baseline _finalize_result return base_final was not separately saved; only its raw/public operands and projected frame exist. No finalizer/API rerun is performed.",
+    "Four preliminary scenario/*.pkl source artifacts belong to the preserved failed initial oracle launch; only final scenario-v3 artifacts are acceptance targets."
+  ],
+  "source_decode": false,
+  "Country_Feature_calls": false,
+  "helper_finalizer_ladder_or_measurement_stage_reruns": false,
+  "pytest_or_product_tests": false,
+  "data_cache_payload_files": 0,
+  "original_tolerant_assertions_relabelled_exact_retroactively": false,
+  "initial_failures_preserved": "initial-four-source-dtype-stops-private.json",
+  "initial_failure_kind": "Expected-construction float64 assumption; original source/oracle is float32. Actual artifact frames were never cast.",
+  "bounded_four_native_dtype_checks": [
+    {
+      "wave": "2011-12",
+      "season": "A",
+      "slot": 1,
+      "column": "Quantity",
+      "source_field": "a5aq6a",
+      "source_dtype": "float32",
+      "numeric_source_dtype": "float32",
+      "native_numpy_dtype": "float32",
+      "observed_dtype": "float32",
+      "rows": 10858,
+      "exact_zero_tolerance_with_full_axis_dtype_mask_attrs": true,
+      "observed_dtype_not_used_to_construct_expected": true
+    },
+    {
+      "wave": "2011-12",
+      "season": "A",
+      "slot": 1,
+      "column": "KgFactor",
+      "source_field": "a5aq6d",
+      "source_dtype": "float32",
+      "numeric_source_dtype": "float32",
+      "native_numpy_dtype": "float32",
+      "observed_dtype": "float32",
+      "rows": 10858,
+      "exact_zero_tolerance_with_full_axis_dtype_mask_attrs": true,
+      "observed_dtype_not_used_to_construct_expected": true
+    },
+    {
+      "wave": "2011-12",
+      "season": "B",
+      "slot": 1,
+      "column": "Quantity",
+      "source_field": "a5bq6a",
+      "source_dtype": "float32",
+      "numeric_source_dtype": "float32",
+      "native_numpy_dtype": "float32",
+      "observed_dtype": "float32",
+      "rows": 9385,
+      "exact_zero_tolerance_with_full_axis_dtype_mask_attrs": true,
+      "observed_dtype_not_used_to_construct_expected": true
+    },
+    {
+      "wave": "2011-12",
+      "season": "B",
+      "slot": 1,
+      "column": "KgFactor",
+      "source_field": "a5bq6d",
+      "source_dtype": "float32",
+      "numeric_source_dtype": "float32",
+      "native_numpy_dtype": "float32",
+      "observed_dtype": "float32",
+      "rows": 9385,
+      "exact_zero_tolerance_with_full_axis_dtype_mask_attrs": true,
+      "observed_dtype_not_used_to_construct_expected": true
+    }
+  ],
+  "all_saved_factor_slots_source_quantity_and_factor_series": 30,
+  "unchanged_comparator_function_AST": true,
+  "protection_before_after": {
+    "stage": "after",
+    "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "source_clean": true,
+    "tracked_content_modes_exact": 14880,
+    "source_index_sha256": "777bf6282634d2f18c98b0844ea64de752470fa738640ac08a8f92cd3bfcf84c",
+    "original_Uganda_manifest_receipts_exact": 344,
+    "original_Uganda_safe_export_receipts_exact": 22,
+    "all_original_Uganda_files_protected": 347,
+    "original_Mali_manifest_receipts_exact": 1309,
+    "all_original_Mali_files_protected": 1311,
+    "before_after_exact": true
+  },
+  "original_report_and_checks_unchanged": true
+}

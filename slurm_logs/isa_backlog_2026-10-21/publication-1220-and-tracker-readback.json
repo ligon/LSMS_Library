@@ -1,0 +1,32 @@
+{
+  "at_UTC": "2026-10-22T22:05:28.218134+00:00",
+  "PR1220_body_exact": true,
+  "issue1215_body_exact": true,
+  "tracker1170_body_exact": true,
+  "implementation_PRs_open": 32,
+  "scope_issue_records_open": 114,
+  "queue_categories": {
+    "PRlinked": 29,
+    "active": 1,
+    "other": 84
+  },
+  "PR1220_initial_CI": {
+    "run": 39861535004,
+    "status": "in_progress",
+    "conclusion": null,
+    "headSHA_in_normalized_connector_record": "omitted; exact GitHub actions API verification required before final exact-head CI claim"
+  },
+  "retained_source_scope_exception": true,
+  "new_1218_runtime_stop": {
+    "sourceepoch_actual_exit": 0,
+    "base_old_actor_actual_exit": 1,
+    "base_v2_actor_actual_exit": 1,
+    "five_read_controls_PASS": true,
+    "six_healthy_controls_PASS": true,
+    "positive_child_actual_exit": 1,
+    "cause": "Private config has no credentials; import reached getpass and EOFError. Documented offline-auth suppression continuation proposed; no credential fabrication/test skip.",
+    "retained_guard_rows": 8,
+    "no_census_tests_or_genuine_yet": true
+  },
+  "signed": "Sue"
+}

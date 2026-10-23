@@ -1,0 +1,63 @@
+{
+  "fetched_at_UTC": "2026-10-21T23:19:13.837918+00:00",
+  "scope": "New root-owned public documentation copies only, separate from frozen held-source evidence. No microdata/authentication/DVC/shared-cache/config/venv mutation.",
+  "files": [
+    {
+      "name": "w4-household-questionnaire",
+      "url": "https://microdata.worldbank.org/catalog/3557/download/47668",
+      "final_url": "https://microdata.worldbank.org/catalog/3557/download/47668",
+      "status": 200,
+      "bytes": 485720,
+      "md5": "da641e8c226502f32b80183b1de59a7b",
+      "sha256": "a9e3451f81ea702cc922855d6da446cfa1fd6ffda3c29d542b3e723b65270a2c",
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename=\"pp_w4_household_quest.pdf\"",
+      "path": "/local/job40255479/control/isa-backlog-20261021/root-public-instruments-1135/w4-household-questionnaire.pdf",
+      "declared_sidecar": "lsms_library/countries/Nigeria/2018-19/Documentation/pp_w4_household_quest.pdf.dvc",
+      "declared_DVC_md5_exact": true
+    },
+    {
+      "name": "w4-interviewer-manual",
+      "url": "https://microdata.worldbank.org/catalog/3557/download/47675",
+      "final_url": "https://microdata.worldbank.org/catalog/3557/download/47675",
+      "status": 200,
+      "bytes": 2578910,
+      "md5": "cae7dc84938e00ff461f9f32db3b1a8f",
+      "sha256": "627e319327ec2ac9b8d9e65c5878547a98197bb014d3184f1b151fd08d187b83",
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename=\"interviewer_manual_w4_pp.pdf\"",
+      "path": "/local/job40255479/control/isa-backlog-20261021/root-public-instruments-1135/w4-interviewer-manual.pdf",
+      "declared_DVC_md5_exact": null,
+      "scope": "Additional public W4 manual, not declared by these three sidecars"
+    },
+    {
+      "name": "w5-household-questionnaire",
+      "url": "https://microdata.worldbank.org/catalog/6410/download/180528",
+      "final_url": "https://microdata.worldbank.org/catalog/6410/download/180528",
+      "status": 200,
+      "bytes": 1544737,
+      "md5": "c096dce419806f6d0eecf91606c28a63",
+      "sha256": "99e18b8ae4cd12083446a684e773904f8189925f8a587bffb77f7efe16e9c86e",
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename=\"ghs_panel_w5_pp_household_questionnaire.pdf\"",
+      "path": "/local/job40255479/control/isa-backlog-20261021/root-public-instruments-1135/w5-household-questionnaire.pdf",
+      "declared_sidecar": "lsms_library/countries/Nigeria/2023-24/Documentation/ghs_panel_w5_pp_household_questionnaire.pdf.dvc",
+      "declared_DVC_md5_exact": true
+    },
+    {
+      "name": "w5-interviewer-manual",
+      "url": "https://microdata.worldbank.org/catalog/6410/download/180535",
+      "final_url": "https://microdata.worldbank.org/catalog/6410/download/180535",
+      "status": 200,
+      "bytes": 2007388,
+      "md5": "4c0f81f1f720f4d84f3bc1328f57b542",
+      "sha256": "35a2cd433b1f429b2b472fe61f417fabe240bba8d7ec5afa3f3db3c935b46cc1",
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename=\"ghs_panel_w5_pp_interviewer_manual.pdf\"",
+      "path": "/local/job40255479/control/isa-backlog-20261021/root-public-instruments-1135/w5-interviewer-manual.pdf",
+      "declared_sidecar": "lsms_library/countries/Nigeria/2023-24/Documentation/ghs_panel_w5_pp_interviewer_manual.pdf.dvc",
+      "declared_DVC_md5_exact": true
+    }
+  ],
+  "after_read_receipts_exact": true
+}

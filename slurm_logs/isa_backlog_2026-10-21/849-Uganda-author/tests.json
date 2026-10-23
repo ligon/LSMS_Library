@@ -1,0 +1,95 @@
+{
+  "focused": {
+    "passed": 416,
+    "skipped": 10,
+    "failed": 0,
+    "errors": 0,
+    "tests": 426,
+    "skips": [
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_livestock_sales_value",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "84dc2060b459112c3bef2aa29a9f1648aca62f1f2e0be67309d5a00e5769f65a"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_food_acquired_hdds_partition_guard_bites",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "b0f2821e7843183edc08fe8a549d1dc2394849245c6b11267d91b250190840b9"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_food_acquired_hdds_scores_in_range",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "b0f2821e7843183edc08fe8a549d1dc2394849245c6b11267d91b250190840b9"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_fertilizer_rate",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "69c1cbaf37ee175893d8e7e889c36fa774aaca250fdea3c22ab4190cc2ef0b02"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_nitrogen_kg_resolves_the_fertilizer_labels",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "69c1cbaf37ee175893d8e7e889c36fa774aaca250fdea3c22ab4190cc2ef0b02"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_crop_revenue_by_crop_sums_back_to_the_household",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "130eb3dc8ddca1ea54cdb92474446e8c4f28f09cc0938ffc93f49306c79fc5ca"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_crop_diversity",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "130eb3dc8ddca1ea54cdb92474446e8c4f28f09cc0938ffc93f49306c79fc5ca"
+      },
+      {
+        "test": "tests.test_feature_canonical_index.test_warm_corpus_assembly_loses_no_rows",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "96a4f4d2158b9b1acfa9d03855284331c0574104339d433401b44c1b8460c6b3"
+      },
+      {
+        "test": "tests.test_feature_canonical_index.test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_labor]",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "e739fdfa881bac77df5826a7272ba1d33c457e47d333fc02b9db762b0d81781a"
+      },
+      {
+        "test": "tests.test_feature_canonical_index.test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_inputs]",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "8d74deb09d40c6fa602b69748d91df8792d1cb976a10733069b6517e235c675f"
+      }
+    ]
+  },
+  "new_cases_candidate": {
+    "pass": 24,
+    "fail": 0,
+    "skip": 0,
+    "errors": 0
+  },
+  "new_cases_actual_parent": {
+    "pass": 4,
+    "fail": 20,
+    "skip": 0,
+    "errors": 0
+  },
+  "parent_failure_causes": {
+    "absent_source_field_pairing": 12,
+    "wide_equal_or_partial_slot_carriers": 2,
+    "positive_suspect_reports_must_reach_existing_screen": 3,
+    "Kg_not_one_must_reach_existing_screen": 1,
+    "declared_factor_missing_must_raise": 2
+  },
+  "unchanged_normalization_controls_pass_on_both": 4,
+  "execution_worker_budget_qualification": {
+    "incident": "Candidate and parent24-case synthetic pytest cohorts were launched concurrently with2loadfile workers each, exceeding the lane2worker total request during overlap.",
+    "requested_peak_workers": 4,
+    "both_terminal": true,
+    "candidate_pass": 24,
+    "parent_fail": 20,
+    "parent_pass": 4,
+    "source_or_Country_cache_builds_in_those_cohorts": false,
+    "correction": "All later pytest invocations sequential, at most2workers total. Preserve original commands/logs/XML; no rerun to erase this qualification.",
+    "signed": "Sue"
+  },
+  "later_focused_workers": 2,
+  "later_focused_dist": "loadfile",
+  "later_focused_no_other_pytest_consumers": true
+}

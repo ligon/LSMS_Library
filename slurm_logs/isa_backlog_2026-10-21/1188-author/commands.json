@@ -1,0 +1,814 @@
+{
+  "actors": {
+    "api-audit": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/api_audit_runner.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4161316,
+      "controller_pid": 4160285,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:26:19.145663+00:00",
+      "ended_UTC": "2026-10-22T19:26:24.235370+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 2755,
+        "sha256": "b758eb7c1b7ff6452b01f849f1bf914876b29eb436967a6172deeb48551fd7b2"
+      }
+    },
+    "audit-candidate": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/audit_runner.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4177237,
+      "controller_pid": 4175708,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:39:41.592464+00:00",
+      "ended_UTC": "2026-10-22T19:39:48.255120+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 447,
+        "sha256": "8c70f68a32f48e01247f447e11a2a759d5fb167ca09d4a6e9a2800052dfa4661"
+      }
+    },
+    "audit-parent": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/audit_runner.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-default",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4177241,
+      "controller_pid": 4175709,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:39:41.591444+00:00",
+      "ended_UTC": "2026-10-22T19:39:48.260134+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 442,
+        "sha256": "ecf43679f2a8e686cddfd265b22c0719c085d4453255c8bf07e272fd1e0ce981"
+      }
+    },
+    "authenticate-stage": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/authenticate_stage.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+      "source_status": "",
+      "original_Popen_pid": 4073766,
+      "controller_pid": 4073249,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:46:22.728936+00:00",
+      "ended_UTC": "2026-10-22T18:46:25.632263+00:00",
+      "actual_returncode": 1,
+      "completed_log": {
+        "bytes": 205,
+        "sha256": "bcc6b7d09b5d30683de6f390d78c8104d9c1b8deb9f9d368a66938686c37cd96"
+      }
+    },
+    "base-default-cold": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid_v2.py",
+        "cold"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-default",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4144069,
+      "controller_pid": 4143036,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:18:48.981481+00:00",
+      "ended_UTC": "2026-10-22T19:19:04.979677+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 672,
+        "sha256": "075e093cfce3c38fbb2ae84abf7d32b8c737c490c561375295f5d53f004295ac"
+      }
+    },
+    "base-default-fresh-warm": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid_v2.py",
+        "fresh-warm"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-default",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4156727,
+      "controller_pid": 4155694,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:23:33.564083+00:00",
+      "ended_UTC": "2026-10-22T19:23:44.012837+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 1482,
+        "sha256": "14b993236a28587dc8a0a4ec37aea453a23f8d263764e20b541a89e976546ba4"
+      }
+    },
+    "base-make-cold": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid_v2.py",
+        "cold"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-make",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4152998,
+      "controller_pid": 4151964,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:22:32.371525+00:00",
+      "ended_UTC": "2026-10-22T19:22:47.735499+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 672,
+        "sha256": "00229d9788bb2fc41a314c8b076aeec95e34064722e47c4f9036c730f97a9b32"
+      }
+    },
+    "base-make-fresh-warm": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid_v2.py",
+        "fresh-warm"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-make",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4161318,
+      "controller_pid": 4160284,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:26:19.146613+00:00",
+      "ended_UTC": "2026-10-22T19:26:46.244692+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 1482,
+        "sha256": "d90f17cd82906ee6e187d7ca465df603111b40b41120631d105271853c09cc15"
+      }
+    },
+    "calibration": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/calibrate.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+      "source_status": "",
+      "original_Popen_pid": 4064321,
+      "controller_pid": 4063805,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:43:10.035596+00:00",
+      "ended_UTC": "2026-10-22T18:43:10.217666+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 439,
+        "sha256": "05284217ae9769b1580b932718f4fb9bcf80482944e5fd6587662bda16422888"
+      }
+    },
+    "candidate-default-cold": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid.py",
+        "cold"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4126977,
+      "controller_pid": 4125965,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:11:34.805914+00:00",
+      "ended_UTC": "2026-10-22T19:11:38.278383+00:00",
+      "actual_returncode": 1,
+      "completed_log": {
+        "bytes": 339,
+        "sha256": "abe19ab6dc5cf72da907a6fffad1789b79243af9d15aabe424a6a1518eee3202"
+      }
+    },
+    "candidate-default-cold-v2": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid_v2.py",
+        "cold"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4136921,
+      "controller_pid": 4136404,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:16:26.073150+00:00",
+      "ended_UTC": "2026-10-22T19:16:41.750708+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 1040,
+        "sha256": "afc427b7d1dea7aebce02c5cd91df994ab41c7668a7eccf5e5031bb9bc66d929"
+      }
+    },
+    "candidate-default-fresh-warm": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid_v2.py",
+        "fresh-warm"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4152996,
+      "controller_pid": 4151965,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:22:32.371502+00:00",
+      "ended_UTC": "2026-10-22T19:22:41.343386+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 2034,
+        "sha256": "844f81198d047b6c6d283db22cd6bae59dc7bbd188799901de11673a25bb94f6"
+      }
+    },
+    "candidate-make-cold": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid_v2.py",
+        "cold"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-make",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4144067,
+      "controller_pid": 4143035,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:18:48.983897+00:00",
+      "ended_UTC": "2026-10-22T19:19:04.828000+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 1040,
+        "sha256": "f1c5a9769c9bebe623db97874da0e1514514c2dff6153adaf7a0b17a01c7eeb2"
+      }
+    },
+    "candidate-make-fresh-warm": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/grid_v2.py",
+        "fresh-warm"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-make",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4156725,
+      "controller_pid": 4155693,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:23:33.564283+00:00",
+      "ended_UTC": "2026-10-22T19:24:02.019788+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 2034,
+        "sha256": "0f42b5eeca61035b3b82467f0e8acae9f8b2e0bfd6f5aeda70b1a7d17a1fcedb"
+      }
+    },
+    "declared-waves-before-base": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/inventory_declared_waves.py",
+        "inventory-before-base.json",
+        "declared-waves-before-base.json"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-default",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4078040,
+      "controller_pid": 4076519,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:48:12.199934+00:00",
+      "ended_UTC": "2026-10-22T18:48:24.559571+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 1572,
+        "sha256": "06bb7960d9485fb6fd18f38ce4fe6fca1c887691a85f332f8385e9432685540e"
+      }
+    },
+    "declared-waves-before-candidate": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/inventory_declared_waves.py",
+        "inventory-before-candidate.json",
+        "declared-waves-before-candidate.json"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+      "source_status": "",
+      "original_Popen_pid": 4076507,
+      "controller_pid": 4075497,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:48:03.180425+00:00",
+      "ended_UTC": "2026-10-22T18:48:15.059220+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 1542,
+        "sha256": "864d202b91158e04518ad1662550d0bb1a856a444bc1ae00d7f1d1b9721e3d9e"
+      }
+    },
+    "inventory-after-candidate": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/inventory_after.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4109541,
+      "controller_pid": 4109025,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:02:18.188556+00:00",
+      "ended_UTC": "2026-10-22T19:03:03.788188+00:00",
+      "actual_returncode": 1,
+      "completed_log": {
+        "bytes": 1697,
+        "sha256": "0d48b388bd7b2bc93b531e031cac709d355a14548b25c608ef51f220e95fd724"
+      }
+    },
+    "inventory-after-candidate-v2": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/inventory_after_v2.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4113188,
+      "controller_pid": 4112671,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:04:54.358175+00:00",
+      "ended_UTC": "2026-10-22T19:05:40.539990+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 1540,
+        "sha256": "94e018960fb9cfa92f4f22fe32e4aca2ebf3e45f1b4c1326d0d3c83a80930ea7"
+      }
+    },
+    "inventory-before-base": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/inventory.py",
+        "inventory-before-base.json"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-default",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4069102,
+      "controller_pid": 4068069,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:45:05.314399+00:00",
+      "ended_UTC": "2026-10-22T18:46:15.760105+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 48,
+        "sha256": "8d410e018e97c2f03ae814ada8fbb29fd1e579cfefd7e86d6c2be5af3744ea5a"
+      }
+    },
+    "inventory-before-candidate": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/inventory.py",
+        "inventory-before-candidate.json"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+      "source_status": "",
+      "original_Popen_pid": 4069100,
+      "controller_pid": 4068068,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:45:05.314392+00:00",
+      "ended_UTC": "2026-10-22T18:46:15.716952+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 48,
+        "sha256": "8d410e018e97c2f03ae814ada8fbb29fd1e579cfefd7e86d6c2be5af3744ea5a"
+      }
+    },
+    "proof-native-storage": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/proof_native_storage.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4172878,
+      "controller_pid": 4172362,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:34:37.803363+00:00",
+      "ended_UTC": "2026-10-22T19:34:42.294695+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 155,
+        "sha256": "c05bbd98ebddf7c09be4365564fcd868a6faa41da0086719591c2d4755ee97ae"
+      }
+    },
+    "proof": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/proof.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4165250,
+      "controller_pid": 4164220,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:28:08.965587+00:00",
+      "ended_UTC": "2026-10-22T19:28:16.647478+00:00",
+      "actual_returncode": 1,
+      "completed_log": {
+        "bytes": 102,
+        "sha256": "7229b93cbd16f614e1cdc3d1855a009c0fd7b10c23e8de1e13ba92800b1c993c"
+      }
+    },
+    "quarantine-preflight": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/quarantine_preflight.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4136389,
+      "controller_pid": 4135873,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:16:06.933862+00:00",
+      "ended_UTC": "2026-10-22T19:16:07.208610+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 201,
+        "sha256": "54ebb46af2b3305ec38a0d154e08bab297a82e237c7f39e88faf21dea9aa942a"
+      }
+    },
+    "source-diagnosis": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/source_diagnosis.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+      "source_status": "",
+      "original_Popen_pid": 4080246,
+      "controller_pid": 4079729,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:49:31.416121+00:00",
+      "ended_UTC": "2026-10-22T18:49:35.070390+00:00",
+      "actual_returncode": 1,
+      "completed_log": {
+        "bytes": 307,
+        "sha256": "758e2006444a9183e3abccd7ff7f518292db0c9385dda03dd1f37cec86fdb000"
+      }
+    },
+    "source-diagnosis-v2": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/source_diagnosis_v2.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+      "source_status": "",
+      "original_Popen_pid": 4084522,
+      "controller_pid": 4084005,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:51:24.510287+00:00",
+      "ended_UTC": "2026-10-22T18:51:27.897896+00:00",
+      "actual_returncode": 1,
+      "completed_log": {
+        "bytes": 1960,
+        "sha256": "fd3098e7f133d104bdeac6e5faf8b29b78b13f595e62509a58882a60404cf90c"
+      }
+    },
+    "source-diagnosis-v3-continuation": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/source_diagnosis_v3_continuation.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+      "source_status": "",
+      "original_Popen_pid": 4086189,
+      "controller_pid": 4085668,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:52:48.849925+00:00",
+      "ended_UTC": "2026-10-22T18:52:53.167367+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 214,
+        "sha256": "ad842d6c896b644a2537fd4a892b43e7c79310443dceb441e7d959a2a386f5a4"
+      }
+    },
+    "stage-continuation": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/stage_continuation.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "5888bf72ecf613bca1fce397a3571b1e2b9aa7a7",
+      "source_status": "",
+      "original_Popen_pid": 4079721,
+      "controller_pid": 4079205,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T18:49:21.038082+00:00",
+      "ended_UTC": "2026-10-22T18:49:21.332839+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 133,
+        "sha256": "4facbfe7ed3b9e0e5ac0651496871bbfb604d42d8901445bb825ec8bebcc8369"
+      }
+    },
+    "tests-candidate-held": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-p",
+        "xdist.plugin",
+        "-n",
+        "2",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/runtime/candidate-default/pytest/tests-candidate-held",
+        "-p",
+        "pytest_identity",
+        "--noconftest",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+        "-q",
+        "-m",
+        "requires_s3",
+        "tests/test_burkina_faso_plot_inputs_identity.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4173446,
+      "controller_pid": 4172930,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:35:27.491877+00:00",
+      "ended_UTC": "2026-10-22T19:35:37.415149+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 1333,
+        "sha256": "99d116f4dbc61f84415f127a6032dd7516d0927c61a7ebc934b9b49f4d2dd221"
+      }
+    },
+    "tests-candidate-synthetic": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-p",
+        "xdist.plugin",
+        "-n",
+        "2",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/runtime/candidate-default/pytest/tests-candidate-synthetic",
+        "-p",
+        "pytest_identity",
+        "--noconftest",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+        "-q",
+        "-m",
+        "not requires_s3",
+        "tests/test_burkina_faso_plot_inputs_identity.py",
+        "tests/test_gh1188_burkina_input_acquisition_fields.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188",
+      "role": "candidate-default",
+      "source_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+      "source_status": "",
+      "original_Popen_pid": 4120060,
+      "controller_pid": 4119544,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:08:30.980620+00:00",
+      "ended_UTC": "2026-10-22T19:08:40.244736+00:00",
+      "actual_returncode": 0,
+      "completed_log": {
+        "bytes": 142,
+        "sha256": "0f3cb2c5710d04ae0f65e152f6560bbd52d162a6b9f7b185e68e80b296daba20"
+      }
+    },
+    "tests-parent-held": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-p",
+        "xdist.plugin",
+        "-n",
+        "2",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/runtime/base-default/pytest/tests-parent-held",
+        "-p",
+        "pytest_identity",
+        "--noconftest",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+        "-q",
+        "-m",
+        "requires_s3",
+        "/local/job40255479/worktrees/isa-Burkina_Faso-1188/tests/test_burkina_faso_plot_inputs_identity.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-default",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4175060,
+      "controller_pid": 4174544,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:37:02.501125+00:00",
+      "ended_UTC": "2026-10-22T19:37:13.403119+00:00",
+      "actual_returncode": 1,
+      "completed_log": {
+        "bytes": 6419,
+        "sha256": "7ca351ea06f7c0479a7a7bdc50431fbb5e1e90ecd17d98861bddf702739154fa"
+      }
+    },
+    "tests-parent-synthetic": {
+      "command": [
+        "/usr/bin/unshare",
+        "-rn",
+        "/local/job40255479/venv_img/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-p",
+        "xdist.plugin",
+        "-n",
+        "2",
+        "--dist=loadfile",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1188/runtime/base-default/pytest/tests-parent-synthetic",
+        "-p",
+        "pytest_identity",
+        "--noconftest",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+        "-q",
+        "-m",
+        "not requires_s3",
+        "/local/job40255479/worktrees/isa-Burkina_Faso-1188/tests/test_burkina_faso_plot_inputs_identity.py",
+        "/local/job40255479/worktrees/isa-Burkina_Faso-1188/tests/test_gh1188_burkina_input_acquisition_fields.py"
+      ],
+      "cwd": "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base",
+      "role": "base-default",
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_status": "",
+      "original_Popen_pid": 4122560,
+      "controller_pid": 4121795,
+      "controller_ppid": 3753746,
+      "started_UTC": "2026-10-22T19:10:31.151686+00:00",
+      "ended_UTC": "2026-10-22T19:10:41.826158+00:00",
+      "actual_returncode": 1,
+      "completed_log": {
+        "bytes": 15769,
+        "sha256": "ba024ee16ea916a2d0a68ee43d0a577bd00aa42563e911ba5bb48630c0cc4405"
+      }
+    }
+  },
+  "environment_pins": [
+    "guard preimport + unshare -rn",
+    "own config/XDG/tmp/data/DVC and verified dvc.dirs",
+    "BLAS/build/Make1",
+    "max2loadfile pytestworkers",
+    "no LSMS_NO_CACHE/assume-fresh/cache-clear/acquisition"
+  ],
+  "signed": "Sue"
+}

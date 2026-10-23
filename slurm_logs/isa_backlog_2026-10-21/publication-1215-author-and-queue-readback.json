@@ -1,0 +1,44 @@
+{
+  "status": "EXACT_BODY_READBACK_CONFIRMED",
+  "at_UTC": "2026-10-22T21:07:20.267022+00:00",
+  "evidence_commit": "11ea69ede990ac5f42e12942fa52c381006f47d1",
+  "items": [
+    {
+      "number": 1215,
+      "state": "open",
+      "head_sha": null,
+      "merged": null,
+      "body_exact": true,
+      "body_sha256": "25d7c1b74e3bf29008a00097b0f59c060623dd0aff79716910aacef5fae2a65e",
+      "body_bytes": 4997
+    },
+    {
+      "number": 1170,
+      "state": "open",
+      "head_sha": "11ea69ede990ac5f42e12942fa52c381006f47d1",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "3aa2278ba28cbe55d0356d9deb2aa0cf367d2161cffac1379f6cf4d2f68752bb",
+      "body_bytes": 29649
+    },
+    {
+      "number": 1214,
+      "state": "open",
+      "head_sha": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "9fe6d157a7fcbe5a542aef7851491c00f4e3a44951fbf999683d8029adadbcc3",
+      "body_bytes": 3511
+    }
+  ],
+  "queue_progress": {
+    "ISA_open_records": 114,
+    "PR_linked": 27,
+    "active": 3,
+    "other": 84,
+    "implementation_PRs_open_unmerged": 30
+  },
+  "earlier1214_readback_scope": "Saved exact finalCI body readback from its original update; not a new PR1214 poll in this publication step.",
+  "limits": "GitHub metadata publication only; no new data or combined-campaign verdict.",
+  "signed": "Sue"
+}

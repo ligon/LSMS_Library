@@ -1,0 +1,84 @@
+{
+  "head_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "runs": [
+    {
+      "id": 39840558700,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 2941,
+      "jobs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39840558700/jobs",
+      "logs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39840558700/logs",
+      "workflow_id": 209110098
+    }
+  ],
+  "jobs": [
+    {
+      "id": 120040135879,
+      "name": "windows-smoke",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 39840558700
+    },
+    {
+      "id": 120040136309,
+      "name": "unit-tests",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 39840558700
+    },
+    {
+      "id": 120040138209,
+      "name": "dvc-lock-check",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39840558700
+    },
+    {
+      "id": 120040138274,
+      "name": "windows-script-build",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39840558700
+    },
+    {
+      "id": 120040138411,
+      "name": "data-tests",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39840558700
+    },
+    {
+      "id": 120040138437,
+      "name": "docs",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39840558700
+    },
+    {
+      "id": 120040140382,
+      "name": "refresh-dvc-locks",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39840558700
+    },
+    {
+      "id": 120040188225,
+      "name": "dvc-remote-reachability",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39840558700
+    }
+  ],
+  "unit_and_windows_success": true,
+  "skipped_jobs": [
+    "dvc-lock-check",
+    "windows-script-build",
+    "data-tests",
+    "docs",
+    "refresh-dvc-locks",
+    "dvc-remote-reachability"
+  ],
+  "data_suite_executed": false,
+  "signed": "Sue"
+}

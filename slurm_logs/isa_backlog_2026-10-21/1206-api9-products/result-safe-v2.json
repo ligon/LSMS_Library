@@ -1,0 +1,18 @@
+{
+  "status": "FOUR_TYPED_ATTRIBUTE_BOUNDARY_FAILURES_CHARACTERIZED_NUMERIC_SUPPLEMENT_PASSES",
+  "full_strict_original_pairs_retained": 14,
+  "complete_typed_attrs_failures_retained": 4,
+  "four_diagnostic_numeric_masks_dtype_complete_axes_checks": 4,
+  "record_class_mismatches_observed": 8,
+  "observed_record_class_names": [
+    "lsms_library.population.PopulationRecord",
+    "lsms_library.recall.RecallRecord"
+  ],
+  "additional_data_or_metadata_differences_observed": 0,
+  "all_stored_record_fields_values_types_and_other_attrs_exact": true,
+  "FIELDS_attribute_present_public_record_absent_plain_dict": true,
+  "no_normalization_cast_or_record_reconstruction": true,
+  "not_full_frame_equality_for_four_failed_pairs": true,
+  "root_classification_required": true,
+  "signed": "Sue"
+}

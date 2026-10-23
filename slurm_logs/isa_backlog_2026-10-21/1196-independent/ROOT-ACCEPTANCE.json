@@ -1,0 +1,31 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_REPAIR_WITH_EXPLICIT_QUALIFICATIONS",
+  "at_UTC": "2026-10-22T13:39:00.223366+00:00",
+  "candidate": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+  "runtime": "7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1",
+  "base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "independent_READY_sha256": "6428ae41d321a22f335f275e867a1b379d78b2102faabb313ea1109233b7e8fe",
+  "manifest_sha256": "eeed6f7593c7deba204e40045eb6341612164e960c1260ea6a3722b5ca0ffbb0",
+  "manifest_entries": 1113,
+  "tracked_source_receipts": 89298,
+  "old_frozen_entries": 1935,
+  "providers": 17,
+  "copies": 68,
+  "candidate_tests_passed": 149,
+  "actual_f8_fail_pass": [
+    23,
+    1
+  ],
+  "frame_pair_classification": {
+    "full_exact": 438,
+    "recorded_policy_only": 130,
+    "preexisting_singleton": 2
+  },
+  "comparison_groups_overlap_not_unique_pairs": true,
+  "broad_hash_invalidation_549_39_1362_explicit": true,
+  "all_history_scanner_warning_singleton_limits_preserved": true,
+  "no_runtime_tests_or_data_decode_replayed_by_root": true,
+  "root_read_checker_production_diff_and_all_seven_safe_exports": true,
+  "human_merge_required": true,
+  "signed": "Sue"
+}

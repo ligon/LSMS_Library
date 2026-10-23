@@ -1,0 +1,24 @@
+{
+  "verified_at_UTC": "2026-10-22T00:56:10.622916+00:00",
+  "archive_name": "quiescent-followup-eleventh.tar.gz",
+  "archive_sha256": "23d59e5214e63795298b49a5bcb82e4690b2deebd894a0ef7406a3dfca3e8381",
+  "archive_bytes": 103289390,
+  "included_files": 893,
+  "included_source_bytes": 1049716888,
+  "roots": [
+    "Niger/1091-fix",
+    "Uganda/1198"
+  ],
+  "excluded_entries": 74,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "c378f7471816d6ab95b76551732c6232746842213d7f6cda1f8f3d6fa2042d69",
+  "private_full_manifest_sha256": "dc26f163f8193450ba2ed7ed3b6881ba6223514f3ef6fd9b044d4a0d126b1bc8",
+  "private_evidence_not_exported_to_Git": true
+}

@@ -1,0 +1,60 @@
+{
+  "status": "INDEPENDENT_GENUINE_COMPARISONS_AND_SCANNERS_COMPLETE_FINAL_PROTECTION_SEAL_ROOT_ACCEPTANCE_PENDING",
+  "at_UTC": "2026-10-22T21:43:13.672153+00:00",
+  "issue": 1215,
+  "candidate": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "normal_actors": 8,
+  "completed_method_calls": 48,
+  "original_instrumentation_failure": {
+    "dispatch_expression_attempts": 1,
+    "completed_crop_method_invocations": 0,
+    "results": 0,
+    "preserved": true
+  },
+  "strict": {
+    "total": 92,
+    "public_PASS": 54,
+    "public_FAIL": 10,
+    "native_PASS": 28,
+    "FAIL_classification": {
+      "approved_cross_head_empty_order": 7,
+      "actual_parent_backend_empty_order": 3
+    },
+    "candidate_backend_comparisons": "PASS",
+    "all_failed_full_comparisons_remain_FAIL": true,
+    "narrower_diagnostics": "Complete index, typed attrs, membership and eight named arrays pass for failed groups; not full equality."
+  },
+  "strict_summary_sha256": "43b684bac5b85eaffbdc88e6217eac56bf72eb8305725c1d7324a12c9d9f08bf",
+  "strict_reader": {
+    "session": 62625,
+    "terminal_chunk": "b224fe",
+    "exit_code": 0
+  },
+  "scanners": {
+    "each_WARN": 22,
+    "full_ordered_JSONL_bytes_exact": true,
+    "JSONL_sha256": "8a67501840d3fd1b379f03f129b9a35abafef068737293ef937c98acc1299a2c",
+    "candidate_terminal_chunk": "a68fed",
+    "parent_terminal_chunk": "a18033",
+    "both_exit_code": 0,
+    "cache_receipts_unchanged": true
+  },
+  "historical_source_snapshot_read_scope_exception": {
+    "applies_to": "INDEPENDENT REVIEW ONLY; author retained its separate unopened metadata-only scope",
+    "historical_pickle_files_per_head": 3,
+    "bytes_each": 2210706,
+    "bytes_per_head": 6632118,
+    "total_files": 6,
+    "total_bytes": 13264236,
+    "operation": "Original direct opaque SHA reads only; no decode/copy/value output. These are not the37Uganda providers.",
+    "original_source_snapshot_session": 63931,
+    "original_terminal_chunk": "7433dc",
+    "original_exit_code": 0,
+    "original_Popen_pid": "UNKNOWN_NOT_RECONSTRUCTED",
+    "qualification_sha256": "31c7198f1fce6135748bb79aeeaba9ca339ddd80a9d83a0e282d2bedb1dfaf52",
+    "final_protection": "No further direct historical payload reads; saved SHA plus physical/Git identity NEW interval, untraced Git internals qualified."
+  },
+  "scope": "Reviewer completed bounded source-driven results; frozen packet/guard/source/provider/cache/fullSDK seal/postexit/root authentication remain pending. No full-corpus verdict.",
+  "signed": "Sue"
+}

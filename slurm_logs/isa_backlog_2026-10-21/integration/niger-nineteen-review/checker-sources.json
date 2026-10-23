@@ -1,0 +1,127 @@
+{
+  "sources": {
+    "api_audit_entry.py": {
+      "sha256": "2cac94949c215578ce930eebacf5b5d82629efd65f85aec1aab5ffff688ca9fa",
+      "bytes": 142
+    },
+    "base_matrix.sh": {
+      "sha256": "05b00b94ba869f38094277a1eaec3db56c0741317b5e760def7c57a1b04cfd11",
+      "bytes": 379
+    },
+    "bootstrap.py": {
+      "sha256": "60a42d16e639f2bbe697f74499853567b6380e32fca33a686d4c4b0cb9e80d6e",
+      "bytes": 1459
+    },
+    "candidate_matrix.sh": {
+      "sha256": "091be741a9ea4cac932431144b96f55b011a8562795cfc4fdc83f6329a9c7fdd",
+      "bytes": 399
+    },
+    "check_artifacts.py": {
+      "sha256": "403ff5b5207477ac2505a80d58123fe145b0979459f05b67160bde18aa626d69",
+      "bytes": 9237
+    },
+    "cli_check.py": {
+      "sha256": "2b89761b9ec1df7c63919cf66ef58740f4894e8ca8880d6c2570e4d3c17ebe9e",
+      "bytes": 2300
+    },
+    "cli_matrix.sh": {
+      "sha256": "5e192508614ae7e3410f87bbff92d5d2192e11436c1de598ce99f4bccd4dbe84",
+      "bytes": 388
+    },
+    "common.py": {
+      "sha256": "1fbad8ba6257fd9337dd0118be291ebd55d45b9d53c490056ee8f30b74857587",
+      "bytes": 2059
+    },
+    "diagnostic.py": {
+      "sha256": "e642ed0b6063a1df26b9d2d23f2b0939af62fb50d3acaf9da8cbb0ba4dea1e71",
+      "bytes": 912
+    },
+    "discovery.py": {
+      "sha256": "d6e38cf099942b07bc8a22e41c93e3972dcc83dd54f9642cd418ca3fbc7f4f62",
+      "bytes": 1217
+    },
+    "exact.py": {
+      "sha256": "c8c503db2d65b58cb806e7e57d9440935c6454d78caa161577bed4d1f0cc83fa",
+      "bytes": 4419
+    },
+    "extra.py": {
+      "sha256": "ba432c719fa7ee809b21ca71e4e83c49217a3dbcc8c4b0365b2eb83619c9e32f",
+      "bytes": 2782
+    },
+    "extra_pair.sh": {
+      "sha256": "54d66e62dcb79fb544db734a00310ced75accab58f41d67695565bb6719d5635",
+      "bytes": 291
+    },
+    "finish_seal.py": {
+      "sha256": "b571d0792f7cc8adcaf4dcc50c7d96aabfd63cf7f6b1ed5f8182beba26a2a3f0",
+      "bytes": 1684
+    },
+    "freeze_verify.py": {
+      "sha256": "0d97cdef8ca2da675a57edf91e0812e51aa5c88ded45e4ef810bd83792b7176f",
+      "bytes": 6112
+    },
+    "hash_inventory.py": {
+      "sha256": "434052617c48a7ecfcb2494f732e1f429250c354ccae300b53e39cbbf3a6106c",
+      "bytes": 1493
+    },
+    "make_features.py": {
+      "sha256": "773eb45dab4f732cbe2d229021ba3856367385465e8d1b9433b2934106a44e75",
+      "bytes": 669
+    },
+    "package_reports.py": {
+      "sha256": "e9ac9d844bf82ef14267239fe50b12e0651fa4e63016926490ace9aae819d0a1",
+      "bytes": 27072
+    },
+    "package_seal.py": {
+      "sha256": "0155338350eacff986c332505940d257a9d577451ff95bae6ea948c89ab7a535",
+      "bytes": 1659
+    },
+    "populate.py": {
+      "sha256": "8b4680b4293acb8e950a4ffc93532462d15bcb644bea06fac8b0cbaf1fb7f944",
+      "bytes": 1461
+    },
+    "populated_matrix.sh": {
+      "sha256": "0db4e0e74e3e0929f742c87a57e39593a8223451cc0b65717911b7f20b0c56fb",
+      "bytes": 521
+    },
+    "prepare.py": {
+      "sha256": "88f0d5f10dd333a3de7afaf87a3c96b8224a94eb20db883a1451159af78aa51d",
+      "bytes": 8624
+    },
+    "probe.py": {
+      "sha256": "a06dadd9215c60ad3c49f1807bb3d8335cc8f2b772721f73c7254354b16d6938",
+      "bytes": 3918
+    },
+    "run.sh": {
+      "sha256": "05dd6d02a0461d86d4be8ca22a7229029d998b8062bb9e6ff6af55c033101315",
+      "bytes": 1551
+    },
+    "scanner.py": {
+      "sha256": "71fb7876cb7e2584352ee6cfc2a11109434931206924e5ce13b739954c3c37d0",
+      "bytes": 630
+    },
+    "seal_utils.py": {
+      "sha256": "e0c0dbfddffc0e8c9171b7667d67cc930ceb724fdd167d692be9b2bb250828a5",
+      "bytes": 3724
+    },
+    "sitecustomize.py": {
+      "sha256": "89a9ec2362ca63bb102ca64999af159b507d723f59d43c20b2354da7bcecd3ba",
+      "bytes": 2513
+    },
+    "source_oracle.py": {
+      "sha256": "7e797d587c2606ef923456565bc781644cc460810758a6d302145518bf9b4f43",
+      "bytes": 4366
+    },
+    "test_launch.py": {
+      "sha256": "52407af686c93b3430c98dba055f35d136715e7ee721097b2f43d99c36625ae9",
+      "bytes": 626
+    },
+    "warnings_scanner_check.py": {
+      "sha256": "ade143426e957def47b30a42050687be00c2cc31a8136775a74d82308679a182",
+      "bytes": 4888
+    }
+  },
+  "exact_semantics": "check_exact=True, rtol=atol=0; full axes levels/codes/classes/dtypes/null masks/order and recursively typed attrs/immutable _FIELDS presence and values.",
+  "all_raw_source_frames_logs_warnings_private": true,
+  "reviewer": "Sue / GPT-6"
+}

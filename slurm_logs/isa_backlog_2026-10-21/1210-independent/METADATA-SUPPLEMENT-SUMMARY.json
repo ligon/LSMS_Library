@@ -1,0 +1,22 @@
+{
+  "status": "ADDITIVE_METADATA_SUPPLEMENT",
+  "signed": "Sue",
+  "v1_runtime_preserved": true,
+  "calibration_pid_association": "Two groups, selected by exact filesystem seeds; six ordered source/path/time-associated events each. Separate original calibration PID records were not captured.",
+  "startup_pid_attribution": "Two original fd12 stopped controllers directly bound to boot PID/precollection/exit3 streams; historical kernel pipe IDs remain unavailable.",
+  "logged_network": "Exactly two recorded seeded network denials associated by the independently selected groups; no unmatched denial. No whole-task zero-network claim.",
+  "packaging": "An anticipated nested scope mode mismatch is not present. All five immutable nested receipts match canonical current full receipts exactly, including scope0600; v1 files remain unchanged.",
+  "v1_postexit": {
+    "session": 30150,
+    "chunk": "59a218",
+    "exit_code": 0,
+    "entries": 359
+  },
+  "v1_sealer": {
+    "session": 48820,
+    "chunk": "e76681",
+    "exit_code": 0
+  },
+  "no_project_import_payload_decode_source_or_test_replay": true,
+  "root_joint_acceptance_pending": true
+}

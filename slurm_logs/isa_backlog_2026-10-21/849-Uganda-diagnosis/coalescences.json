@@ -1,0 +1,79 @@
+[
+  {
+    "wave": "2009-10",
+    "pre_coalescence_retained_source_records": 22909,
+    "helper_rows": 22408,
+    "coalesced_groups": 136,
+    "rows_coalesced": 141,
+    "coalesced_groups_with_multiple_positive_factors": 0,
+    "existing_null_key_rows_not_grouped": 360,
+    "factor_first_nonmissing_matches_direct_source_oracle": true,
+    "all_other_helper_payload_attrs_dtypes_keys_order_exact": true
+  },
+  {
+    "wave": "2010-11",
+    "pre_coalescence_retained_source_records": 21051,
+    "helper_rows": 20970,
+    "coalesced_groups": 81,
+    "rows_coalesced": 81,
+    "coalesced_groups_with_multiple_positive_factors": 41,
+    "existing_null_key_rows_not_grouped": 0,
+    "factor_first_nonmissing_matches_direct_source_oracle": true,
+    "all_other_helper_payload_attrs_dtypes_keys_order_exact": true
+  },
+  {
+    "wave": "2011-12",
+    "pre_coalescence_retained_source_records": 20243,
+    "helper_rows": 20152,
+    "coalesced_groups": 47,
+    "rows_coalesced": 48,
+    "coalesced_groups_with_multiple_positive_factors": 19,
+    "existing_null_key_rows_not_grouped": 43,
+    "factor_first_nonmissing_matches_direct_source_oracle": true,
+    "all_other_helper_payload_attrs_dtypes_keys_order_exact": true
+  },
+  {
+    "wave": "2013-14",
+    "pre_coalescence_retained_source_records": 17646,
+    "helper_rows": 17585,
+    "coalesced_groups": 61,
+    "rows_coalesced": 61,
+    "coalesced_groups_with_multiple_positive_factors": 20,
+    "existing_null_key_rows_not_grouped": 0,
+    "factor_first_nonmissing_matches_direct_source_oracle": true,
+    "all_other_helper_payload_attrs_dtypes_keys_order_exact": true
+  },
+  {
+    "wave": "2015-16",
+    "pre_coalescence_retained_source_records": 19639,
+    "helper_rows": 19576,
+    "coalesced_groups": 63,
+    "rows_coalesced": 63,
+    "coalesced_groups_with_multiple_positive_factors": 23,
+    "existing_null_key_rows_not_grouped": 0,
+    "factor_first_nonmissing_matches_direct_source_oracle": true,
+    "all_other_helper_payload_attrs_dtypes_keys_order_exact": true
+  },
+  {
+    "wave": "2018-19",
+    "pre_coalescence_retained_source_records": 15630,
+    "helper_rows": 15616,
+    "coalesced_groups": 14,
+    "rows_coalesced": 14,
+    "coalesced_groups_with_multiple_positive_factors": 6,
+    "existing_null_key_rows_not_grouped": 0,
+    "factor_first_nonmissing_matches_direct_source_oracle": true,
+    "all_other_helper_payload_attrs_dtypes_keys_order_exact": true
+  },
+  {
+    "wave": "2019-20",
+    "pre_coalescence_retained_source_records": 17046,
+    "helper_rows": 17024,
+    "coalesced_groups": 22,
+    "rows_coalesced": 22,
+    "coalesced_groups_with_multiple_positive_factors": 12,
+    "existing_null_key_rows_not_grouped": 0,
+    "factor_first_nonmissing_matches_direct_source_oracle": true,
+    "all_other_helper_payload_attrs_dtypes_keys_order_exact": true
+  }
+]

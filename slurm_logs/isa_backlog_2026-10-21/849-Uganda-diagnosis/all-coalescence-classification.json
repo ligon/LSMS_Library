@@ -1,0 +1,86 @@
+[
+  {
+    "wave": "2009-10",
+    "all_coalesced_groups": 136,
+    "all_coalesced_source_rows": 277,
+    "coalesced_groups_with_no_screened_factor": 136,
+    "coalesced_groups_with_some_but_not_all_screened_factors": 0,
+    "coalesced_groups_all_factors_screened_usable": 0,
+    "coalesced_groups_multiple_distinct_screened_factors": 0,
+    "coalesced_source_missing_quantity_rows": 2,
+    "coalesced_source_zero_quantity_rows": 0,
+    "coalesced_source_rejected_factor_rows": 0
+  },
+  {
+    "wave": "2010-11",
+    "all_coalesced_groups": 81,
+    "all_coalesced_source_rows": 162,
+    "coalesced_groups_with_no_screened_factor": 0,
+    "coalesced_groups_with_some_but_not_all_screened_factors": 0,
+    "coalesced_groups_all_factors_screened_usable": 81,
+    "coalesced_groups_multiple_distinct_screened_factors": 41,
+    "coalesced_source_missing_quantity_rows": 0,
+    "coalesced_source_zero_quantity_rows": 0,
+    "coalesced_source_rejected_factor_rows": 0
+  },
+  {
+    "wave": "2011-12",
+    "all_coalesced_groups": 47,
+    "all_coalesced_source_rows": 95,
+    "coalesced_groups_with_no_screened_factor": 14,
+    "coalesced_groups_with_some_but_not_all_screened_factors": 0,
+    "coalesced_groups_all_factors_screened_usable": 33,
+    "coalesced_groups_multiple_distinct_screened_factors": 19,
+    "coalesced_source_missing_quantity_rows": 0,
+    "coalesced_source_zero_quantity_rows": 6,
+    "coalesced_source_rejected_factor_rows": 0
+  },
+  {
+    "wave": "2013-14",
+    "all_coalesced_groups": 61,
+    "all_coalesced_source_rows": 122,
+    "coalesced_groups_with_no_screened_factor": 18,
+    "coalesced_groups_with_some_but_not_all_screened_factors": 2,
+    "coalesced_groups_all_factors_screened_usable": 41,
+    "coalesced_groups_multiple_distinct_screened_factors": 18,
+    "coalesced_source_missing_quantity_rows": 0,
+    "coalesced_source_zero_quantity_rows": 10,
+    "coalesced_source_rejected_factor_rows": 2
+  },
+  {
+    "wave": "2015-16",
+    "all_coalesced_groups": 63,
+    "all_coalesced_source_rows": 126,
+    "coalesced_groups_with_no_screened_factor": 11,
+    "coalesced_groups_with_some_but_not_all_screened_factors": 0,
+    "coalesced_groups_all_factors_screened_usable": 52,
+    "coalesced_groups_multiple_distinct_screened_factors": 23,
+    "coalesced_source_missing_quantity_rows": 0,
+    "coalesced_source_zero_quantity_rows": 0,
+    "coalesced_source_rejected_factor_rows": 0
+  },
+  {
+    "wave": "2018-19",
+    "all_coalesced_groups": 14,
+    "all_coalesced_source_rows": 28,
+    "coalesced_groups_with_no_screened_factor": 0,
+    "coalesced_groups_with_some_but_not_all_screened_factors": 5,
+    "coalesced_groups_all_factors_screened_usable": 9,
+    "coalesced_groups_multiple_distinct_screened_factors": 6,
+    "coalesced_source_missing_quantity_rows": 0,
+    "coalesced_source_zero_quantity_rows": 0,
+    "coalesced_source_rejected_factor_rows": 0
+  },
+  {
+    "wave": "2019-20",
+    "all_coalesced_groups": 22,
+    "all_coalesced_source_rows": 44,
+    "coalesced_groups_with_no_screened_factor": 0,
+    "coalesced_groups_with_some_but_not_all_screened_factors": 5,
+    "coalesced_groups_all_factors_screened_usable": 17,
+    "coalesced_groups_multiple_distinct_screened_factors": 12,
+    "coalesced_source_missing_quantity_rows": 0,
+    "coalesced_source_zero_quantity_rows": 0,
+    "coalesced_source_rejected_factor_rows": 0
+  }
+]

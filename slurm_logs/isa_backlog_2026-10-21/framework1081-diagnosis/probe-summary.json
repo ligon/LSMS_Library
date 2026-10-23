@@ -1,0 +1,32 @@
+{
+  "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "public_generated_handler_probes": 166,
+  "all_predicted_current_behaviors_verified": true,
+  "categorical_by_site": {
+    "source": {
+      "masked": 51,
+      "preserved": 15
+    },
+    "finalize": {
+      "masked": 18,
+      "preserved": 15
+    },
+    "pretry_unit_helper": {
+      "preserved": 24
+    }
+  },
+  "key_declaration_error_masked": true,
+  "default_and_scalar_Aggregate_food_failures_masked": true,
+  "explicit_food_mapping_or_units_preserves_identity_cause_notes_context": true,
+  "roster_mapping_dict_does_not_make_derive_handler_strict": true,
+  "LSMS_LABELS_STRICT_environment_does_not_make_derive_handler_strict": true,
+  "generic_fallback_controls": 32,
+  "UnitsUnavailable_controls": 11,
+  "healthy_Ethiopia_Aggregate_absence_stays_LabelUnavailableError": [
+    "food_expenditures",
+    "food_prices",
+    "food_quantities"
+  ],
+  "simulated_legacy_success_can_return_after_categorical_error": 12,
+  "real_legacy_cache_exists_claim": false
+}

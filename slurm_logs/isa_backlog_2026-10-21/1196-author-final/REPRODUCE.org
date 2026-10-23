@@ -1,0 +1,75 @@
+#+TITLE: GH1196 commands and immutable evidence
+#+AUTHOR: Sue
+
+* Exact source and environment
+
+Runtime =7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1= is the tested code/config/test pin.
+Candidate is =/local/job40255479/worktrees/isa-1196-index-fix=; actual bd80 and f8 controls are the sibling =isa-1196-index-fix-bd80= and =isa-1196-index-fix-base=.
+Private expansion evidence is =/local/job40255479/control/isa-backlog-20261021/shared1196-fix/wave-expansion=.
+Every command below already ran; do not execute it over frozen output paths.
+An independent reviewer needs new private paths and physical held-source copies.
+
+The launcher uses =/local/job40255479/venv_img/bin/python= under =unshare -rn=.
+It asserts exact cwd/PYTHONPATH/package/countries/config/data realpaths before package imports or unpickling, with active socket/write guards.
+All numeric/build/Make threads are one; pytest uses two explicit loadfile workers.
+Private config/XDG/DVC site cache/temp/metadata paths are recorded in =run.sh=, =sitecustomize.py= and =launcher-provenance.json=.
+The sole source metadata write exceptions are three exact root-prepared ignored tmp targets.
+No credentials, acquisition, cache bypass, stamp or DVC CLI is used.
+
+* Executed order
+
+#+begin_src sh
+# From the private expansion directory; historical outputs are immutable.
+TASK_HASH_LABEL=candidate TASK_DATA=data-hash-candidate ./run.sh hash-census.py
+TASK_CHECKOUT=/local/job40255479/worktrees/isa-1196-index-fix-bd80 TASK_HASH_LABEL=bd80 TASK_DATA=data-hash-bd80 ./run.sh hash-census.py
+TASK_CHECKOUT=/local/job40255479/worktrees/isa-1196-index-fix-base TASK_HASH_LABEL=f8 TASK_DATA=data-hash-f8 ./run.sh hash-census.py
+
+# Exact test node lists and original per-run options are in command JSONs.
+TASK_TEST_LABEL=candidate-v1 TASK_DATA=data-tests-candidate ./run.sh run-tests.py
+TASK_TEST_LABEL=candidate-v2-new-only TASK_DATA=data-tests-candidate-v2 ./run.sh run-tests.py
+TASK_CHECKOUT=/local/job40255479/worktrees/isa-1196-index-fix-bd80 TASK_TEST_LABEL=bd80-v1 TASK_DATA=data-tests-bd80 ./run.sh run-tests.py
+
+TASK_DATA=data-preparation ./run.sh prepare-held.py
+TASK_COHORT=candidate-default TASK_PHASE=cold TASK_DATA=data-candidate-default ./run.sh collect.py
+TASK_BACKEND=make TASK_COHORT=candidate-make TASK_PHASE=cold TASK_DATA=data-candidate-make ./run.sh collect.py
+# Each warm process was launched only after its cold actor exited0.
+TASK_COHORT=candidate-default TASK_PHASE=warm TASK_DATA=data-candidate-default ./run.sh collect.py
+TASK_BACKEND=make TASK_COHORT=candidate-make TASK_PHASE=warm TASK_DATA=data-candidate-make ./run.sh collect.py
+
+TASK_DATA=data-audit ./run.sh api-audit.py
+TASK_DATA=data-artifacts ./run.sh compare-v2.py
+TASK_DATA=data-warning-artifacts ./run.sh compare-warnings.py
+TASK_DATA=data-singleton-artifacts ./run.sh singleton-details-artifact-only.py
+TASK_DATA=data-singleton-oracle ./run.sh singleton-policy-oracle-artifact-only.py
+TASK_SCAN_HEAD=candidate TASK_DATA=data-candidate-default ./run.sh scoped-scanner.py
+TASK_DATA=data-deep-controls ./run.sh deep-fault-controls.py
+TASK_CLI_HEAD=candidate TASK_DATA=data-candidate-default ./run.sh cli-artifacts.py
+TASK_DATA=data-deep-saved ./run.sh compare-deep-v4.py
+TASK_DATA=data-finish-artifacts ./run.sh finish-artifacts.py
+TASK_DATA=data-protection ./run.sh protect-v2.py
+TASK_DATA=data-protection ./run.sh protect-v3.py
+#+end_src
+
+Actual commands redirected stdout/stderr to unique private files except the explicitly documented attempted-v4 stream-basename reuse.
+The original command JSONs preserve every pytest selector, =-n 2 --dist=loadfile=, cache/temp/JUnit path, source receipt and control root.
+The original failed collection, comparator preparation and protection-schema stages are retained; successful commands do not retroactively replace them.
+The successful source actors are new-runtime builds, not replays over old bd80/f8 evidence.
+
+* Review operands and stage pins
+
+- =hash-census-terminal-safe.json= :: actual 549/39/1362 inventories versus both controls, before builds.
+- =source-preparation-terminal.json= and held-source receipts :: 17 sources/34 physical copies; original sidecar size omissions explicit.
+- =results/candidate-{default,make}/{cold,warm}/= :: original calls, full warnings, writer input/prepared operands, native/raw/public/Feature frames, endpoint and current-hash/coverage records.
+- =comparison-private.json= :: original 329 strict checks and 22 exact hash-only footer reconstructions; original singleton stop retained.
+- =comparison-deep-private.json= :: stronger object/EA/axis/typed-attrs reassessment of the saved 329 pairs only.
+- =singleton-policy-oracle-artifact-only-safe.json= :: actual native writer/footer/read versus country/footer/subset distinction, with no new API.
+- =warning-comparison-private.json= :: complete raw warnings and separately measured category/message equality; locations preserved.
+- =finish-artifacts-safe.json= :: all 27 raw scanner occurrence digests and multiplicities, six matched CLI stage frames and two scanner baselines.
+- =exact_strict.py= / =exact_deep.py= :: old checker unchanged; new object recursion, provenance and eight negative controls separately pinned.
+- =protection-safe.json= :: old diagnosis281/bd80-stop795/provider/source checks and explicit initial-mtime limit for the new bd80 control.
+
+All saved operands, warnings and raw rows remain private.
+Only the dedicated safe-exports allowlist may be published.
+The final private manifest pins checker source as well as operands; READY pins the documentation descendant and zero-consumer release.
+
+Sue
