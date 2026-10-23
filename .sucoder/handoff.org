@@ -20,7 +20,12 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - *Malawi #856 and Niger #823:* dispatched to two subagents in worktrees =/local/job40390255/worktrees/{856,823}= (read-only diagnoses; ledger + CONTENTS.org only).
   On relaunch, check their branches for a published Phase 2 ledger section before redoing them.
 
-Next: review the #856/#823 results, then Uganda #1133 (12-source rendering diagnosis).
+- *Merged by Ethan's instruction (2026-10-22):* #1221 -> =326b6e3de= (#1218 closed by hand: =master= is the default branch, so merges into =development= never auto-close); #1222 -> =6ffeb3caf= (#1118 stays open for Malawi/Nigeria).  Mirror =development= synced to =6ffeb3caf=.
+- *PR #1223 open* (=fix/mali-input-use-flags-20261022=, =f31402ebc=): Mali group use answers as =plot_inputs= rows with =Applied= -- Ethan chose =plot_inputs= over =plot_features=.
+- *Niger #823 diagnosis done* (branch head =1f5f290d0=): wiring proposal plus seven decisions D1-D7 for Ethan in the ledger's Phase 2.  Not wired.
+- *Malawi #856:* Ethan approved the unit-text recovery (886 rows) and a separate cowpea issue.  The diagnosis agent is implementing on =fix/856-malawi-harvest-unit-text-20261022= and drafting (not filing) the cowpea issue.
+
+Next: review the Malawi implementation and file the cowpea issue; take Ethan's answers on Niger D1-D7; then Uganda #1133.
 
 Sue
 
