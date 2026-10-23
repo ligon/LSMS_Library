@@ -2382,6 +2382,10 @@ Corroborating: 588 of 4,000 households report a district different from the one
 encoded in their own =ea_id=, and those 588 sit a *median 68 km* from their
 IHS3 location against *0.03 km* for the 3,412 that match.
 
+Since GH #1260 round 4 the cluster serves that one stayer coordinate, the
+EA's fix, and takes Region / District / Rural from a stayer -- the 2016-17
+/ 2019-20 rule; see /GH #1260/ below.
+
 **** 2016-17 (IHS4 + IHPS4)
 The 75 remaining cells are all =Rural=, all in the panel half.  IHPS-2016
 records =district= / =region= at *baseline* (0 of 2,508 households sit outside
@@ -2594,10 +2598,62 @@ themselves disagree on =District= in 37 EAs, mostly city vs. district
 =Rural= flip in one 2016-17 panel EA (Urban -> Rural, 17 of 19 households
 Rural) stands: all its stayers are Rural.
 
-*Not extended to 2013-14* (follow-up; no hook, unchanged): it still serves a
-non-stayer coordinate in 11 of the 102 panel EAs that continue into 2016-17
-(24 of its 204 EAs in all).  Malawi's three IHPS waves therefore treat
-movers differently until it is.
+*Extended to 2013-14* (@ligon, 2026-10-23: "Yes, extend it").  IHPS 2013
+(catalog 2248) is the short-term panel: one cover and one geo file, 4,000
+households, every one a panel household (=y2_hhid=, =NNNN-NNN=), in 204 IHS3
+EAs -- 102 that continue into both later panels and 102 short-term only.
+Verified before applying the rule (counts in the evidence below):
+- =dist_to_IHS3location= is on the cover and populated for *all* 4,000
+  households.  So the =fillna(0) <= 1= in
+  =tests/test_gh323_malawi_cluster_key.py= and the hook's strict =<= 1= (an
+  unrecorded distance is not a stayer) select the same 2,660 stayers; that
+  test now asserts the 0 NaN, so the agreement is checked, not assumed.
+- It measures what it says: the geo file's =distY1Y2= is populated for
+  exactly the 724 households whose coordinate is off their EA's fix and
+  equals =dist_to_IHS3location= on every one; every household within 1 km
+  sits on the fix.
+- The stayers cover all 204 EAs (min 4, median 13), 0 EAs split (also at
+  0.5, 2 and 5 km), and their fix equals the 2010-11 coordinate in all 204
+  (max 1.89e-6 degrees), continuing and short-term-only EAs alike.
+- *616 movers sit on their EA's fix* (418 in 2016-17, 29 in 2019-20), 70 of
+  them more than 20 km from baseline: the geo file relocates only the 724
+  above.  Blanking by coordinate, not by distance, keeps them.
+- One cover file, so the status is a plain =df_main= myvar, not a per-file
+  override, and nothing was added to =df_geo=.
+
+The hook in =2013-14/_/mapping.py= is code-identical to the other two
+(=tests/test_gh1260_malawi_panel_geo.py= pins that).  Development
+(=8a8278a2a=) -> this change, cold:
+
+| 2013-14                                 | development    | this change |
+|-----------------------------------------+----------------+-------------|
+| clusters without GPS                    | 0 of 204       | 0 of 204    |
+| EAs serving the EA fix                  | 180 of 204     | 204 of 204  |
+| ... of the 102 continuing EAs           | 91             | 102         |
+| EAs with >1 coordinate                  | 188            | 0           |
+| households keeping a coordinate         | 4,000          | 3,276       |
+| Site 2 destroyed / conflicting groups   | 3,540 / 188    | 3,540 / 188 |
+
+- Development served a mover's location in 24 EAs, up to 608 km from the
+  EA.  Now the served coordinate is the same in every round: 2013-14 equals
+  2016-17 and 2019-20 in the 102 continuing EAs and 2010-11 in all 204
+  (max 1.89e-6 degrees).
+- Region / District / Rural moved in 3 / 18 / 7 EAs (55 / 353 / 136
+  households), every one *into* the stayers' modal value; served = mode in
+  204 of 204 for each (was 201 / 186 / 197).  Independent key: the cover's
+  =baseline_rural= (constant within every EA) now matches the served
+  =Rural= in 204 of 204 (was 197).  Stayer-first is not what moves them on
+  this wave's data -- the blanking is -- but it is kept: one rule.
+- Site 2 does not move: every blanked household's EA already disagreed.
+- Unchanged: the other four waves, =sample()=, =housing()=; same on the
+  warm, =LSMS_NO_CACHE= and =LSMS_BUILD_BACKEND=make= paths.
+- *Fails closed differently.*  One cover file means no =missing_ok=, so a
+  misspelled =dist_to_IHS3location= raises =KeyError= at extraction, before
+  the hook.  The country build then catches it (=build_wave=), warns, drops
+  2013-14 and caches the four-wave table under the current hash: the next
+  read serves it with no 2013-14 rows and no warning.  Never a mover's
+  location, but a lost wave.  Framework behaviour (any single-file YAML
+  table, any country), recorded, not changed.
 
 *Three things found on the way, not fixed here:*
 - *The held 2016-17 =Data/Panel/= is not all the current 2939 upload.*  93 of

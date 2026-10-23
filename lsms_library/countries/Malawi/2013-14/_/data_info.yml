@@ -68,10 +68,24 @@ cluster_features:
             # case, 2016-17 and 2019-20 mapped rural households to BOTH codes,
             # sign-flipping the indicator between waves.  GH #602.
             Rural: reside
+            # GH #1260: is the household still at its baseline (IHS3)
+            # location?  'stayer' / 'moved' / 'unrecorded' from
+            # dist_to_IHS3location, read by the `cluster_features` hook in
+            # this wave's mapping.py and dropped there.  2013-14 has one cover
+            # file (every household is a panel household), so this is a plain
+            # myvar, not the per-file override 2016-17 / 2019-20 need; a
+            # misspelled variable therefore raises KeyError at extraction.
+            _ihps_baseline_status:
+                - dist_to_IHS3location
+                - mapping: ihps_baseline_status
     df_geo:
-        # 2013-14 IHPS publishes lat/lon per HOUSEHOLD (jittered per HH),
-        # not per cluster — the file is keyed on y2_hhid, not ea_id.
-        # Merge df_geo onto df_main on i rather than v.
+        # 2013-14 IHPS publishes lat/lon per HOUSEHOLD, keyed on y2_hhid, not
+        # ea_id, so df_geo merges onto df_main on i rather than v.  It is each
+        # household's CURRENT location, displaced: a tracked mover's is not
+        # its EA's.  The households still at their baseline location share
+        # one coordinate per EA, the EA's fix, and the `cluster_features`
+        # hook in this wave's mapping.py keeps the coordinates equal to it
+        # and blanks the rest -- GH #1260, the rule 2016-17 and 2019-20 use.
         file: HouseholdGeovariables_IHPS_13.dta
         idxvars:
             i: y2_hhid

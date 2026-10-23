@@ -145,3 +145,88 @@ render is identical.
 * Hash census (=outputs/hash_census.txt=)
 =Country._table_cache_hash= 26/549 moved, all Malawi; =build_transforms_fingerprint=
 0/40; =Wave._input_hash= 52/2,109, all Malawi 2016-17 and 2019-20.
+
+* Round 4: 2013-14, the same rule (=outputs/round4_2013-14.txt=)
+@ligon, 2026-10-23: "Yes, extend it."  Development =8a8278a2a= (#1279
+merged) vs branch =fix/malawi-2013-14-panel-stayer-geo-20261023=, each cold
+in its own fresh =LSMS_DATA_DIR=.
+
+** Structure, verified before applying the rule
+- IHPS 2013 (catalog 2248) is one cover (=HH_MOD_A_FILT_13.dta=) and one geo
+  file, 4,000 households, all panel (=y2_hhid=, every one =NNNN-NNN= after
+  =format_id=), 1:1 on =y2_hhid=; 204 EAs (12-28 households each).
+- 204-EA design: 102 EAs continue into the 2016-17 *and* 2019-20 panels, 102
+  are in neither (short-term only); no later panel EA is outside 2013-14's 204.
+- =dist_to_IHS3location= is on the cover and populated for *all* 4,000
+  (0 NaN), so the existing test's =fillna(0) <= 1= and the hook's strict
+  =<= 1= select the same 2,660 stayers.  No status column needed adding to
+  =df_geo=: the cover carries it, so it is a plain =df_main= myvar.
+- Is it what it says?  The geo file's =distY1Y2= is populated for exactly
+  the 724 households whose coordinate is off their EA's fix, and equals
+  =dist_to_IHS3location= on every one; every household within 1 km sits on
+  the fix (max 0.0 km); distance vs km-to-fix Spearman 0.66 (displacement
+  noise).  Stayers' district equals the EA stayers' modal district for
+  2,655 of 2,660, off-fix movers' for 224 of 724.
+- Stayers (<= 1 km): 2,660, covering all 204 EAs (min 4, median 13 per EA),
+  0 EAs split -- also 0 at 0.5, 2 and 5 km.  Their fix equals the 2010-11
+  coordinate in all 204 EAs (max 1.89e-6 deg; continuing 1.86e-6,
+  short-term-only 1.89e-6).
+- 3,276 households sit on their EA's fix: the 2,660 stayers and 616 movers
+  (distance 1.01-390 km, median 2.4; 70 beyond 20 km).  Blanking by
+  coordinate, not by distance, keeps those 616, as in 2016-17 (418) and
+  2019-20 (29).
+
+** Wiring
+- =2013-14/_/mapping.py=: the =cluster_features= hook, code-identical to
+  2016-17's and 2019-20's (pinned by a drift test); only the comment differs.
+- =2013-14/_/data_info.yml=: =_ihps_baseline_status= as a =df_main= myvar.
+
+** Result
+| quantity (2013-14)                         | development     | branch          |
+|--------------------------------------------+-----------------+-----------------|
+| clusters without GPS                       | 0 of 204        | 0 of 204        |
+| EAs serving the EA fix (all)               | 180 of 204      | 204 of 204      |
+| ... continuing / short-term-only           | 91 / 89 of 102  | 102 / 102       |
+| EAs with >1 coordinate (wave frame)        | 188             | 0               |
+| households keeping a coordinate            | 4,000           | 3,276           |
+| served off the fix: max km                 | 608             | 0               |
+| Site 2 destroyed / conflicting groups      | 3,540 / 188     | 3,540 / 188     |
+
+- Blanked: 724, exactly the households whose geovariables carry =distY1Y2=.
+- Region / District / Rural moved in 3 (55 households) / 18 (353) / 7 (136)
+  EAs, every one INTO the stayers' modal value, none out of it; served =
+  stayers' mode 201 / 186 / 197 -> 204 / 204 / 204 of 204 (no ties).
+  Independent answer key, the cover's =baseline_rural= (constant within all
+  204 EAs): served =Rural= agrees in 197 -> 204.
+- Site 2 does not move: a blanked household's coordinate already differed
+  from its EA's stayers', so its EA was already a conflicting group.
+- Unchanged: 2004-05, 2010-11, 2016-17, 2019-20 =cluster_features= (and the
+  2016-17 / 2019-20 wave frames), =sample()= and =housing()=
+  (=DataFrame.equals=).
+- Same on every path: warm, =LSMS_NO_CACHE=, =LSMS_BUILD_BACKEND=make=
+  (cold root) all equal the cold build.
+- Cross-round, SERVED country-table coordinate: 2013-14 vs 2016-17 max
+  0.00e+00, vs 2019-20 1.86e-06, 2016-17 vs 2019-20 1.86e-06 (102
+  continuing EAs, 0 above 2e-6); 2013-14 vs 2010-11 1.89e-06 (all 204).  On
+  development 11 continuing EAs (24 of 204) differed, by up to 5.3 deg.
+- Stayer-first ordering is not load-bearing for 2013-14's served
+  attributes on current data (with it removed the data tests still pass;
+  the synthetic hook test and the drift test fail).  It is kept: same rule.
+
+** Fail closed (section 5 of the output)
+- A misspelled =dist_to_IHS3location= raises =KeyError= at extraction
+  (one cover, no =missing_ok=), at =Wave.grab_data=.
+- *Framework behaviour, not changed here:* =build_wave= catches that
+  =KeyError=, warns and drops the wave; the cold country table has 4 waves,
+  and the 4-wave L2-country parquet is stamped with the current hash, so the
+  next (warm) read serves it with no 2013-14 rows and no warning about
+  them.  Nothing wrong is served, a wave is lost.  2016-17 / 2019-20 reach
+  the hook (two cover files, =missing_ok=) and raise =RuntimeError=.  Not
+  engineered around in config (a second read of the cover would turn the
+  =KeyError= into the hook's =RuntimeError=); any single-file YAML table in
+  any country behaves the same.
+
+** Hash census (=hash_census.py=, 1218-current-validation)
+=Country._table_cache_hash= 26/549 moved, all Malawi;
+=build_transforms_fingerprint= 0/40; =Wave._input_hash= 26/2,109, all
+=Malawi/2013-14=.

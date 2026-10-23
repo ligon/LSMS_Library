@@ -274,6 +274,14 @@ def test_2013_14_within_cluster_spread_is_tracked_movers_not_a_broken_key():
 
     If this ever fails, the diagnosis behind leaving 2013-14 / 2019-20 unre-keyed
     has changed and the decision must be revisited.
+
+    It is also what licenses the GH #1260 hook in ``2013-14/_/mapping.py``,
+    which serves each EA this single stayer coordinate (pinned in
+    tests/test_gh1260_malawi_panel_geo.py).  The hook calls a household with
+    no distance 'unrecorded', not a stayer; this test's ``fillna(0)`` calls it
+    a stayer.  The two select the same households only because every 2013-14
+    household has a distance -- asserted below, so the agreement is checked,
+    not assumed.
     """
     from lsms_library.local_tools import get_dataframe
 
@@ -288,6 +296,10 @@ def test_2013_14_within_cluster_spread_is_tracked_movers_not_a_broken_key():
         geo[["y2_hhid", "LAT_DD_MOD", "LON_DD_MOD"]], on="y2_hhid", how="inner"
     ).dropna(subset=["LAT_DD_MOD"])
 
+    assert int(m["dist_to_IHS3location"].isna().sum()) == 0, (
+        "a 2013-14 household has no dist_to_IHS3location: `fillna(0)` here and "
+        "the GH #1260 hook ('unrecorded' is not a stayer) now disagree on it"
+    )
     stayers = m[m["dist_to_IHS3location"].fillna(0) <= 1]
     per_ea = stayers.groupby("ea_id")[["LAT_DD_MOD", "LON_DD_MOD"]].apply(
         lambda g: len(g.drop_duplicates())

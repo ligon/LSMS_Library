@@ -34,11 +34,20 @@ pass ``missing_ok=True``, so a mis-spelled column in either file becomes an
 all-NaN column instead of a ``KeyError``.  The config tests below cannot see
 that; the data-gated tests can, and they are the guard.
 
+2013-14 (IHPS 2013, the short-term panel, catalog 2248) gets the same hook
+(section 3).  Every one of its 4,000 households is a panel household and its
+one cover file carries ``dist_to_IHS3location`` directly, so the status is a
+plain ``df_main`` myvar there, and a misspelled distance raises ``KeyError``
+at extraction rather than reaching the hook as an all-NaN column.  Its stayers'
+fix is the coordinate 2010-11 serves in all 204 EAs and 2016-17 / 2019-20 serve
+in the 102 that continue, so each EA keeps one coordinate in every round.
+
 Two tiers: config-only tests (no data, always run) and ``requires_s3`` tests
 that build the wave frame and the country table.
 """
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 import yaml
@@ -64,6 +73,23 @@ ON_FIX = {"2016-17": 1861, "2019-20": 2165}
 STATUS_COL = "_ihps_baseline_status"
 STAYER_KM = 1.0
 SHARED_EA = "30305580"   # 2016-17: sampled by both the IHS4 and IHPS halves
+
+# 2013-14 (IHPS 2013): one cover, one geo file, every household a panel one.
+W13 = "2013-14"
+W13_GEO, W13_KEY, W13_LAT, W13_LON = (
+    "HouseholdGeovariables_IHPS_13.dta", "y2_hhid", "LAT_DD_MOD", "LON_DD_MOD")
+COVER[W13] = "HH_MOD_A_FILT_13.dta"
+# households, EAs, EAs continuing into 2016-17 / 2019-20, households whose
+# coordinate IS their EA's fix (2,660 stayers + 616 movers who sit on it; the
+# other 724 are exactly the households the geo file gives a `distY1Y2`).  A
+# property of the released files, like ON_FIX.
+W13_HH, W13_EAS, W13_CONTINUING, ON_FIX_13 = 4000, 204, 102, 3276
+# Every wave the hook runs in; the synthetic hook tests cover all three.
+HOOK_WAVES = sorted(PANEL_GEO) + [W13]
+PANEL_KEY = {w: PANEL_GEO[w][1] for w in PANEL_GEO} | {W13: W13_KEY}
+# Same EA coordinate in every round: the source's float32 values agree to
+# 1.9e-6 degrees (0.2 m) across 2010-11 / 2013-14 / 2016-17 / 2019-20.
+ROUND_TOL = 2e-6
 
 
 def _mapping_module(wave):
@@ -168,7 +194,7 @@ def test_panel_cover_supplies_the_baseline_status(wave):
     assert STATUS_COL not in cfg["df_main"].get("myvars", {})
 
 
-@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+@pytest.mark.parametrize("wave", HOOK_WAVES)
 def test_baseline_status_labels(wave):
     """A string, not a numeric sentinel: grab_data rewrites any value above
     1e99 to NaN, so a +inf "unrecorded" read as a cross-sectional row."""
@@ -191,7 +217,7 @@ def _frame(wave, rows):
     }, index=idx)
 
 
-@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+@pytest.mark.parametrize("wave", HOOK_WAVES)
 def test_hook_keeps_coordinates_on_the_eas_fix(wave):
     """EA A is shared with the cross-section; EA B is panel-only."""
     hook = _mapping_module(wave).cluster_features
@@ -216,7 +242,7 @@ def test_hook_keeps_coordinates_on_the_eas_fix(wave):
     assert first["A"] == "0001-001" and first["B"] == "0002-005"
 
 
-@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+@pytest.mark.parametrize("wave", HOOK_WAVES)
 def test_hook_fails_closed_without_a_status(wave):
     """missing_ok turns a renamed / misspelled distance variable into an
     all-NaN status.  Every panel row would then look cross-sectional and
@@ -231,7 +257,7 @@ def test_hook_fails_closed_without_a_status(wave):
         hook(df.drop(columns=STATUS_COL))
 
 
-@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+@pytest.mark.parametrize("wave", HOOK_WAVES)
 def test_hook_refuses_a_status_off_the_panel_id_shape(wave):
     hook = _mapping_module(wave).cluster_features
     df = _frame(wave, [("B", "0002-001", -14.0, 33.0, "stayer"),
@@ -240,7 +266,7 @@ def test_hook_refuses_a_status_off_the_panel_id_shape(wave):
         hook(df.copy())
 
 
-@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+@pytest.mark.parametrize("wave", HOOK_WAVES)
 def test_hook_refuses_stayers_that_disagree(wave):
     hook = _mapping_module(wave).cluster_features
     df = _frame(wave, [("B", "0002-001", -14.0, 33.0, "stayer"),
@@ -418,14 +444,16 @@ def test_shared_ea_serves_the_ihps_stayer_fix(malawi):
 
 
 @pytest.mark.requires_s3
-@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+@pytest.mark.parametrize("wave", HOOK_WAVES)
 def test_misspelled_distance_variable_raises(wave):
     """End to end on the real panel cover: extract the status with the
     distance variable misspelled (as missing_ok would), then run the hook.
-    It must raise rather than serve every mover's location."""
+    It must raise rather than serve every mover's location.  (2013-14 reads
+    its cover without missing_ok, so there the misspelling already raises
+    KeyError at extraction -- section 3; this is the hook's own guard.)"""
     from lsms_library.local_tools import df_data_grabber, format_id
     hook = _mapping_module(wave).cluster_features
-    key = PANEL_GEO[wave][1]
+    key = PANEL_KEY[wave]
     path = countries_root() / "Malawi" / wave / "Data" / COVER[wave]
     try:
         df = df_data_grabber(
@@ -440,3 +468,206 @@ def test_misspelled_distance_variable_raises(wave):
             .set_index(["t", "v", "i"]))
     with pytest.raises(RuntimeError, match="NO baseline status"):
         hook(df)
+
+
+# ---------------------------------------------------------------------------
+# 3.  2013-14 (IHPS 2013): the same rule, extended (@ligon, 2026-10-23).
+# ---------------------------------------------------------------------------
+
+def test_hook_is_the_same_code_in_every_ihps_wave():
+    """One rule, three copies (each wave's mapping.py is its own module):
+    they must not drift apart."""
+    import inspect
+    mods = {w: _mapping_module(w) for w in HOOK_WAVES}
+    for name in ("cluster_features", "ihps_baseline_status"):
+        src = {w: inspect.getsource(getattr(m, name)) for w, m in mods.items()}
+        assert len(set(src.values())) == 1, f"{name} differs across {sorted(src)}"
+    for name in ("IHPS_STAYER_KM", "_STATUS", "_PANEL_ID"):
+        vals = {w: getattr(m, name) for w, m in mods.items()}
+        assert len(set(vals.values())) == 1, f"{name}: {vals}"
+
+
+def test_2013_14_cover_supplies_the_baseline_status():
+    """2013-14 reads ONE cover file, so the status is a plain df_main myvar
+    (no per-file override to hang it on), from the same variable and through
+    the same mapping as the later waves."""
+    cfg = _cluster_cfg(W13)
+    assert cfg["df_main"]["file"] == COVER[W13]
+    assert cfg["df_main"]["idxvars"]["i"] == W13_KEY
+    assert cfg["df_main"]["myvars"].get(STATUS_COL) == [
+        "dist_to_IHS3location", {"mapping": "ihps_baseline_status"}]
+    assert cfg["df_geo"]["file"] == W13_GEO
+    assert cfg["df_geo"]["idxvars"] == {"i": W13_KEY}
+    assert STATUS_COL not in cfg["df_geo"].get("myvars", {})
+    assert cfg["merge_on"] == ["i"]
+
+
+def _w13_source():
+    """2013-14 cover x geo at household grain, with the structure the rule
+    relies on asserted (counts only on failure)."""
+    from lsms_library.local_tools import format_id
+    cover = _source(W13, COVER[W13])
+    geo = _source(W13, W13_GEO)
+    assert len(cover) == cover[W13_KEY].nunique() == W13_HH
+    assert len(geo) == geo[W13_KEY].nunique() == W13_HH
+    m = cover[[W13_KEY, "ea_id", "dist_to_IHS3location", "baseline_rural"]].merge(
+        geo[[W13_KEY, W13_LAT, W13_LON]], on=W13_KEY)
+    assert len(m) == W13_HH, "geo and cover must be 1:1 on y2_hhid"
+    m["i"] = m[W13_KEY].map(format_id).astype(str)
+    assert int(m["i"].str.fullmatch(r"\d{4}-\d{3}").sum()) == W13_HH, (
+        "every 2013-14 household must carry the panel id shape the hook keys on")
+    # Every household has a distance, so the hook's strict `<= 1 km` and
+    # test_gh323_malawi_cluster_key.py's `fillna(0) <= 1` select the same
+    # 2,660 stayers.
+    assert int(m["dist_to_IHS3location"].isna().sum()) == 0
+    m["v"] = m["ea_id"].astype(str).str.replace(r"\.0$", "", regex=True)
+    m["d"] = m["dist_to_IHS3location"].astype(float)
+    return m
+
+
+def _w13_fixes(m):
+    st = m[(m["d"] <= STAYER_KM) & m[W13_LAT].notna()]
+    per = st.groupby("v")[[W13_LAT, W13_LON]].agg(["nunique", "first"])
+    split = int(((per[(W13_LAT, "nunique")] > 1) | (per[(W13_LON, "nunique")] > 1)).sum())
+    assert split == 0, f"2013-14: stayers of {split} EAs disagree"
+    assert len(per) == m["v"].nunique() == W13_EAS, (
+        f"2013-14: stayers cover {len(per)} of {m['v'].nunique()} EAs")
+    return pd.DataFrame({"lat": per[(W13_LAT, "first")].astype(float),
+                         "lon": per[(W13_LON, "first")].astype(float)})
+
+
+def _country_cf(malawi):
+    try:
+        cf = malawi.cluster_features()
+    except Exception as exc:  # noqa: BLE001  # pragma: no cover
+        pytest.skip(f"Malawi cluster_features: {type(exc).__name__}: {exc}")
+    out = {}
+    for w in ("2010-11", W13, "2016-17", "2019-20"):
+        x = cf.xs(w, level="t")
+        x.index = x.index.astype(str)
+        out[w] = x
+    return out
+
+
+@pytest.mark.requires_s3
+def test_2013_14_wave_frame_keeps_only_coordinates_on_the_eas_fix(malawi):
+    """Before the hook every one of the 4,000 households kept its (current)
+    coordinate and 188 of 204 EAs carried several.  Now exactly the 3,276 on
+    their EA's fix keep it, and every EA has one coordinate."""
+    wf = _wave_frame(malawi, W13)
+    assert len(wf) == W13_HH
+    assert not [c for c in wf.columns if str(c).endswith(("_x", "_y"))]
+    assert STATUS_COL not in wf.columns, "the hook must drop its helper"
+    have = int(wf["Latitude"].notna().sum())
+    assert have == ON_FIX_13, (
+        f"2013-14: {have} households carry a Latitude, expected the {ON_FIX_13} "
+        f"on their EA's fix.  4,000: the hook did not run (movers leak).")
+    assert int(wf["Longitude"].notna().sum()) == have
+    per_ea = wf.dropna(subset=["Latitude"]).groupby("v")[
+        ["Latitude", "Longitude"]].nunique()
+    assert len(per_ea) == W13_EAS
+    assert int(((per_ea["Latitude"] > 1) | (per_ea["Longitude"] > 1)).sum()) == 0
+
+
+@pytest.mark.requires_s3
+def test_2013_14_every_ea_serves_its_stayers_fix(malawi):
+    """All 204 EAs, the 102 that continue into 2016-17 and the 102 short-term
+    ones alike.  Before the hook 24 served a mover's location (11 of them
+    continuing EAs), up to 608 km from the EA."""
+    fix = _w13_fixes(_w13_source())
+    w = _country_cf(malawi)[W13]
+    assert len(w) == W13_EAS and int(w["Latitude"].isna().sum()) == 0
+    served = w.reindex(fix.index)
+    off = int((~(((served["Latitude"].astype(float) - fix["lat"]).abs() < 1e-9)
+                 & ((served["Longitude"].astype(float) - fix["lon"]).abs() < 1e-9))).sum())
+    assert off == 0, f"2013-14: {off} of {W13_EAS} EAs do not serve their stayers' fix"
+
+
+@pytest.mark.requires_s3
+def test_2013_14_ea_coordinate_is_the_same_in_every_round(malawi):
+    """The SERVED cluster coordinate, country table: an EA's 2013-14
+    coordinate is its 2010-11 one (all 204) and its 2016-17 and 2019-20 one
+    (the 102 continuing EAs) -- one place per EA across rounds."""
+    cf = _country_cf(malawi)
+    v13 = list(cf[W13].index)
+    cont = sorted(set(v13) & set(cf["2016-17"].index) & set(cf["2019-20"].index))
+    assert len(cont) == W13_CONTINUING
+
+    def apart(a, b, vs):
+        d = np.maximum(
+            (cf[a].loc[vs, "Latitude"].astype(float) - cf[b].loc[vs, "Latitude"].astype(float)).abs(),
+            (cf[a].loc[vs, "Longitude"].astype(float) - cf[b].loc[vs, "Longitude"].astype(float)).abs())
+        return int((~(d <= ROUND_TOL)).sum())
+
+    assert set(v13) <= set(cf["2010-11"].index)
+    assert apart(W13, "2010-11", v13) == 0, "2013-14 vs 2010-11 coordinate"
+    assert apart(W13, "2016-17", cont) == 0, "2013-14 vs 2016-17 coordinate"
+    assert apart(W13, "2019-20", cont) == 0, "2013-14 vs 2019-20 coordinate"
+
+
+@pytest.mark.requires_s3
+def test_2013_14_cluster_attributes_come_from_a_stayer(malawi):
+    """Stayers first, so the collapse takes a stayer's Region / District /
+    Rural.  Two answer keys: the stayers' modal value, and the cover's own
+    `baseline_rural` (the IHS3 EA's urban/rural, constant within every EA) --
+    independent of which household the collapse picks.  Before the hook the
+    served value missed the stayers' mode in 3 / 18 / 7 EAs and
+    `baseline_rural` in 7."""
+    m = _w13_source()
+    wf = _wave_frame(malawi, W13)
+    wf["i"] = wf["i"].astype(str)
+    st = wf[wf["i"].isin(set(m.loc[m["d"] <= STAYER_KM, "i"]))]
+    assert len(st) == int((m["d"] <= STAYER_KM).sum())
+    w = _country_cf(malawi)[W13]
+    # Region: the API spells the wave frame's 'South' as 'Southern', so
+    # compare the first five letters (north / centr / south).
+    norm = {"Region": lambda s: s.astype(str).str.lower().str[:5],
+            "District": lambda s: s.astype(str).str.lower(),
+            "Rural": lambda s: s.astype(str).str.lower()}
+    for col, f in norm.items():
+        mode = st.assign(x=f(st[col])).groupby(st["v"].astype(str))["x"].agg(
+            lambda s: s.mode().iloc[0])
+        off = int((f(w.loc[mode.index, col]) != mode).sum())
+        assert off == 0, f"2013-14 {col}: {off} of {len(mode)} EAs off the stayers' mode"
+    base = m.groupby("v")["baseline_rural"].agg(lambda s: s.astype(str).str.lower().mode().iloc[0])
+    assert int((m.groupby("v")["baseline_rural"].nunique() > 1).sum()) == 0
+    off = int((w.loc[base.index, "Rural"].astype(str).str.lower() != base).sum())
+    assert off == 0, f"2013-14: {off} of {len(base)} EAs serve a Rural that is not baseline_rural"
+
+
+@pytest.mark.requires_s3
+def test_2013_14_misspelled_distance_variable_raises_at_extraction(monkeypatch):
+    """The real config, one variable misspelled, built through
+    ``Wave.grab_data`` with the cache bypassed: the single cover is read
+    without missing_ok, so extraction raises KeyError instead of serving
+    every household's current location.
+
+    What the COUNTRY table then does is framework behaviour, measured and not
+    pinned here: ``build_wave`` catches the KeyError, warns and drops the
+    wave, and the four-wave L2-country parquet is stamped with the current
+    hash, so every later read serves it with no 2013-14 rows and no warning.
+    Nothing wrong is served -- never a mover's location -- but a wave is
+    lost.  2016-17 / 2019-20 read two cover files (missing_ok), so the same
+    mistake reaches the hook and raises RuntimeError there instead."""
+    import copy
+    import lsms_library as ll
+    from lsms_library.country import Wave
+    orig = Wave.resources.fget
+
+    def mutated(self):
+        info = orig(self)
+        if str(self.year) != W13:
+            return info
+        info = copy.deepcopy(info)
+        mv = info["cluster_features"]["df_main"]["myvars"]
+        assert mv[STATUS_COL][0] == "dist_to_IHS3location", mv.get(STATUS_COL)
+        mv[STATUS_COL][0] = "dist_to_IHS3locationX"
+        return info
+
+    assert STATUS_COL in _cluster_cfg(W13)["df_main"]["myvars"], (
+        "2013-14 df_main does not read the baseline status at all")
+    monkeypatch.setattr(Wave, "resources", property(mutated))
+    monkeypatch.setenv("LSMS_NO_CACHE", "1")
+    _source(W13, COVER[W13])            # skips cleanly if the data is absent
+    with pytest.raises(KeyError, match="dist_to_IHS3locationX"):
+        ll.Country("Malawi")[W13].grab_data("cluster_features")

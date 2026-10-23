@@ -63,6 +63,7 @@ the panel household id. Config + data only; no framework change.
 |----------|----------|--------|
 | panel coordinates | reuse `file:` list + per-file override in `df_geo` | a third `dfs:` member would collide on `Latitude`/`Longitude` (`_x`/`_y`); no coalesce transformer exists and adding one is framework work |
 | merge type | keep `outer` | both sides 1:1 on `i` (14,955 / 14,612), so `outer` = `left`; `outer` keeps the orphan signal |
+| 2013-14 (round 4) | reuse the round-3 hook verbatim in `2013-14/_/mapping.py`; status as a plain `df_main` myvar | one cover file, all 4,000 households panel; distance populated for all, stayers cover 204/204 EAs, 0 split, fix = 2010-11's in 204/204; a `df_status` sub-df (to turn a misspelling's `KeyError` into the hook's `RuntimeError`) rejected as patching a framework gap in one country's config |
 | cluster coordinate for a panel EA | NEW wave hook (rounds 2-3): the stayers' single coordinate is the EA fix; keep panel coordinates equal to it, blank the rest; stayers first; fail closed | stayers (`dist_to_IHS3location` <= 1 km, the 2013-14 test's rule) share exactly one coordinate per EA, identical across 2013-14 / 2016-17 / 2019-20 and equal to 2010-11's; no precedent filter exists (2013-14 reports, does not filter) |
 | shared EA 30305580 | serve the IHPS stayer fix (round 3; round 2 kept IHS4's) | one coordinate per EA across rounds: IHS4's fix (4.1 km away) would make it the only panel EA that jumps in 2016-17 |
 | who supplies Region/District/Rural | stayer-first row order before the collapse | `most_complete_row` breaks ties by original order; a mover sitting on the fix is as complete as a stayer |
@@ -71,9 +72,18 @@ the panel household id. Config + data only; no framework change.
 - 2016-17 held `Data/Panel/`: 5 of 98 files differ from the current 2939 v03
   zip (`hh_mod_a_filt_16` differs only in `case_id`, all rows). Re-acquire as a
   separate issue?
-- Rounds 2-3 serve the stayers' fix in 2016-17 / 2019-20.  Extend the same
+- ~~Rounds 2-3 serve the stayers' fix in 2016-17 / 2019-20.  Extend the same
   hook to 2013-14 (11 of the 102 continuing panel EAs, 24 of 204 in all,
-  serve a non-stayer coordinate there)?
+  serve a non-stayer coordinate there)?~~  RESOLVED (@ligon 2026-10-23:
+  "Yes, extend it") -- round 4 below.
+- (round 4) A wave whose YAML build raises `KeyError` is dropped by
+  `build_wave` with a `UserWarning`, and the (N-1)-wave L2-country parquet is
+  stamped with the current hash, so every later read serves it with no
+  signal that a wave is missing.  2013-14's single cover file makes a
+  misspelled `dist_to_IHS3location` take that route (no `missing_ok`, so the
+  hook's null-status guard is never reached).  Framework: GH #675's
+  `lsms_build_drops` records a dropped sub-df, not a dropped wave; the
+  wave-level `run_make_target` fallback is #866's open route.  File?
 - Downstream: `with_region` and `market='Region'` / `'District'` see the
   moved attributes -- 2019-20 Region 4 EAs (108 households), District 10
   (329), Rural 4 (117); 2016-17 Rural 5 (107); all toward the stayers' mode.
@@ -114,3 +124,16 @@ the panel household id. Config + data only; no framework change.
   both waves, shared EA included; Site 2 groups equal round 1's; served
   attributes equal round 2's.  15 of the file's 31 tests fail on round 2
   (`bd51baf95`).  SOURCE.org `prov.note` is the #600 note again.
+- Round 4 (2013-14, `fix/malawi-2013-14-panel-stayer-geo-20261023`):
+  `Malawi/2013-14/_/mapping.py` `cluster_features` (code-identical to
+  2016-17 / 2019-20, drift-tested) and `data_info.yml` `df_main` myvar
+  `_ihps_baseline_status` -- OK (§5): 204/204 EAs serve the stayer fix
+  (was 180), 0 EAs with >1 coordinate (was 188), 3,276 of 4,000 households
+  keep a coordinate; served coordinate equals 2016-17 / 2019-20 (102
+  continuing) and 2010-11 (204) within 1.9e-6 degrees; Region / District /
+  Rural moved in 3 / 18 / 7 EAs, all into the stayers' mode; Site 2
+  3,540/188 unchanged; other waves, `sample()`, `housing()` unchanged.
+  13 new tests, all failing on `8a8278a2a`.  Hash: Malawi 26/549 country,
+  `Malawi/2013-14` 26/2,109 wave, 0/40 btf.  The existing
+  `fillna(0) <= 1` test now asserts 0 NaN distances (the two rules agree
+  only because of it).  Evidence: `outputs/round4_2013-14.txt`.
