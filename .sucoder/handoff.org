@@ -36,7 +36,17 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - *PRIVACY (repo is PUBLIC):* the Malawi agent committed three ROW-LEVEL JSONs (household/plot ids, sale values, free text) on =fix/856-malawi-harvest-unit-text-20261022= -- on the private filesystem mirror only, never on GitHub.  Clean branch for the PR: =fix/856-malawi-unit-text-20261022= (=955bfd5dd=, squashed, those files dropped, warning strings reduced to counts).  Deleting the old branch on the mirror is Ethan's call.  Every agent brief must now forbid committing row-level data.
 - *Malawi decision pending for Ethan:* map =BASKET (BAMBOO)= to dengu too? (re-attaches 9 sales, ~150k MWK; left out as a material qualifier.)
 
-Next: when the reviews and scan land, report; open the Malawi PR only after its red-team; file the cowpea issue (draft in the Malawi branch); then Uganda #1133.
+** Overnight mandate (Ethan, 2026-10-22 ~20:30 PDT, going to sleep)
+"Carry on, using the backlog and scrum-master skills, deferring questions for me until later (or: get some review, and come up with answers to questions on your own; review can happen at the PR stage)."
+- Open PRs for human merge; MERGE NOTHING.  Decide routine questions myself, with an independent review, and record each decision and its evidence in the PR body.
+- Every worker brief: stop-list, "SCOPE DEVIATIONS" first in the report, no row-level data committed (repo is PUBLIC).
+- Watchers armed: Slurm scan 40393183 terminal state; this job's deadline-warning file.
+
+** Queue (in order, at most ~3 agents at once on this 12-core slice)
+1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
+2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
+3. Scan diff: =results-base.jsonl= vs =results-cand.jsonl=, cluster deltas, triage any new finding.
+4. Next fixes (Tier B, priority 1, from =triage.json= reconciled against open issues; 82 in-scope open): #821 Mali 2018-19 s05 community prices (twin of #823, reuse its pattern after review); #1111 Malawi fertilizer unit misread (13,302 rows); #1133 Uganda =v= rendering (ledger-only lane); #827 Malawi community_prices blank u (46%); #1123 EHCVM plot_inputs collapses; #1119 plot_inputs.j sentinel spellings.
 
 Sue
 
