@@ -79,22 +79,35 @@ SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 ROWS = {
     '2010-11': {W: 947, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
     '2013-14': {W: 341, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
-    '2016-17': {W: 449, P: 8, OV: 2, N: 42, NR: 37, CS: 47, CH: 23},
-    '2019-20': {W: 1041, P: 29, OV: 2, N: 67, NR: 131, CS: 85, CH: 51},
+    '2016-17': {W: 467, P: 8, OV: 2, N: 42, NR: 37, CS: 46, CH: 23},
+    '2019-20': {W: 1137, P: 29, OV: 2, N: 67, NR: 131, CS: 84, CH: 51},
 }
+#: GH #856 (2026-10-22) moved the two IHS4/IHS5 waves: recovering 90 KG BAG /
+#: BASKET (DENGU) from the unit specify text on BOTH sides attached 18 / 97
+#: wildcard sales (perennial harvest rows coded 3 / 11 meeting a Module Q
+#: sale written 13 + text) and lost one wildcard sale in 2019-20 (OX-CART
+#: harvest vs 'BUSKET' sale -- different units); one contradiction-price-sale
+#: per wave became unresolved because its (crop, 'Other (Specify)') price cell
+#: lost the recovered rows.  Was W 449 / 1041, CS 47 / 85.
 #: Total Value_sold per wave, before (the GH #833 bundle) -> after.  The
 #: overrule rung of 2026-09-25 moved 2016-17 by +37,000 (409,053,925 ->
 #: 409,090,925) and 2019-20 by +120,000 (527,653,548 -> 527,773,548).
 VALUE_SOLD_BEFORE = {'2010-11': 126_816_048.0, '2013-14': 94_338_845.0,
                      '2016-17': 394_826_755.0, '2019-20': 496_063_698.0}
 VALUE_SOLD_AFTER = {'2010-11': 130_650_105.0, '2013-14': 94_992_745.0,
-                    '2016-17': 409_090_925.0, '2019-20': 527_773_548.0}
+                    '2016-17': 409_859_525.0, '2019-20': 529_425_948.0}
+#: GH #856 moved 2016-17 by +768,600 (409,090,925 -> 409,859,525) and 2019-20
+#: by +1,652,400 (527,773,548 -> 529,425,948): 2,768,000 MWK newly attached,
+#: 347,000 detached (see the ROWS comment above and CONTENTS.org, GH #856).
 #: Sales the ladder still suppresses (attrs['sale_basis_mismatch']), per
 #: wave: before 303 / 59 / 247 / 503 (64,110,157 MWK); after the ladder of
 #: 2026-09-24, 94 / 21 / 90 / 140 (13,805,180 MWK); the overrule rung took 2
 #: / 2 sales (37,000 / 120,000 MWK) out of 2016-17 / 2019-20.
 UNRESOLVED = {'2010-11': (94, 1_088_250.0), '2013-14': (21, 315_300.0),
-              '2016-17': (88, 5_972_600.0), '2019-20': (138, 6_272_030.0)}
+              '2016-17': (89, 6_009_600.0), '2019-20': (138, 6_324_030.0)}
+#: (GH #856: was 88 / 5,972,600 and 138 / 6,272,030 -- one groundnut sale per
+#: wave moved from contradiction-price-sale to unresolved, and in 2019-20 one
+#: unresolved sale was replaced by another.)
 #: attrs['sale_basis_ladder'][DEL]['grounds'], summed over the four waves.
 UNRESOLVED_GROUNDS = {'contradiction_no_separation': 271,
                       'contradiction_price_undecided': 57,
@@ -246,6 +259,10 @@ class TestScripts:
             assert half['hhid'] in src, (wave, half['hhid'])
             for k in ('gplot', 'gcrop', 'pplot', 'icrop', 'qcrop'):
                 assert half[k] in src, (wave, k, half[k])
+            # GH #856: the unit specify-text columns, where a wave passes them.
+            for k in ('gtext', 'ptext', 'itext', 'qtext'):
+                if half.get(k):
+                    assert f"'{half[k]}'" in src, (wave, k, half[k])
 
 
 # ---------------------------------------------------------------------------

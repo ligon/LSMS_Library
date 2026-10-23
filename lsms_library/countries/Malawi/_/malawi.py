@@ -1207,9 +1207,117 @@ def _crop_conditions(series):
     return out.astype('object').where(out.notna(), _CONDITION_UNKNOWN)
 
 
+# --- harvest/sale UNIT other-specify text that restates a coded unit -------
+#
+# GH #856 (step 2, approved by @ligon 2026-10-22).  The crop-harvest unit code
+# list printed in 2010-11 for Module G (ag_g13b), P (ag_p09b), I (ag_i02b) and
+# Q (ag_q02b) offers 3 = 90 KG BAG and 11 = BASKET (DENGU).  In IHS4/IHS5
+# (2016-17, 2019-20) the value labels of G, I and Q DROP both codes (G's
+# drops 3 already in 2013-14), and those files carry ZERO rows on either
+# code -- against 599 and 1,484 Module G rows in 2010-11.  Respondents wrote
+# them under 13 = OTHER (SPECIFY) instead, with the unit in the specify text
+# (ag_g13b_oth / ag_p09b_oth / ag_i02b_oth / ag_q02b_oth).  P kept both codes;
+# its few restatements are slips, recovered the same way so that a P harvest
+# and its Q sale stay comparable.
+#
+# The recovery recodes such a row's INTEGER code back to 3 or 11 before
+# `harmonize_crop_unit` is consulted, so it is served exactly the `u` label a
+# 2010-11 code-3 / code-11 row is served and `u` is continuous across waves.
+# It is a label harmonisation of the survey's own answer (the same class as
+# `harmonize_crop_unit` and `_PERENNIAL_RECODE`), not a constructed value, so
+# it carries no `Derivation` key; the rows recovered are COUNTED in
+# `attrs['unit_text_recovered']`.  `Quantity` is the respondent's count of
+# those units and is never touched.
+#
+# EXACT matches only, after `_normalise_unit_text` (strip, collapse
+# whitespace, upper-case), against strings measured in OUR files
+# (slurm_logs/isa_backlog_2026-10-21/856-harvest-unit-text/) -- no regex, no
+# outside list.  Deliberately NOT recovered, so they stay 'Other (Specify)':
+#   * a count prefix or a typo: '1 90 KG', '90 KG BAD', '90KG BAY';
+#   * any basket or dengu QUALIFIED by size, material or content, because
+#     code 11 names no size and a qualified one may not be that unit:
+#     'BASKET (UNSPECIFIED SIZE)', 'BASKET (LARGE)', 'BASKET (SMALL)',
+#     'LARGE BASKET(S)', 'SMALL BASKET', 'MEDIAM BASKET', 'LARGE DENGU',
+#     'DENGU(LARGE)', 'DENGU(GOGODA)', 'BASKET (BAMBOO)', 'WEAVING BASKET',
+#     'MEDIUM WEAVING BASKET', 'BASKET OF ...';
+#   * every other bag size ('70 KG BAG', '100 KG BAG', ...): no code exists.
+# Two judgement calls: a plain 'BASKET' / 'BASKETS' / 'BUSKET' is read as the
+# dengu, the only basket the code list offers; and a bare weight with no
+# container word ('90KG', '90 KG', '90KGS', '90 KGS': 21 lines) is read as the
+# 90 kg bag -- the kilograms are the same either way, the label says 'Bag'.
+_UNIT_OTHER_SPECIFY = 13
+_UNIT_TEXT_RECODE = {
+    3: frozenset({
+        '90 KG BAG', '90KG BAG', '90 KG BAGS', '90KG BAGS', '90KGBAG',
+        '90 KGBAG', '90KG', '90 KG', '90KGS', '90 KGS', 'BAGS OF 90 KGS',
+    }),
+    11: frozenset({
+        'DENGU', 'BASKET', 'BASKETS', 'BUSKET',
+        'BASKET (DENGU)', 'BASKET(DENGU)', 'BASKET ( DENGU)',
+        'BASKET ( DENGU )', 'BASKET (DENGUE)', 'BASKET DENGU',
+        'BASKET-DENGU', 'BASKET/ DENGU', 'DENGU/BASKET', 'DENGU ( BASKET )',
+        'DENGU( BASKET )', 'DENGU/BUSKET', 'BUSKET/DENGU',
+    }),
+}
+
+
+def _normalise_unit_text(series):
+    """Strip, collapse internal whitespace and upper-case a specify-text
+    Series; blank -> NA.  The form `_UNIT_TEXT_RECODE` is written in."""
+    s = pd.Series(series).astype('string').str.strip()
+    s = s.str.replace(r'\s+', ' ', regex=True).str.upper()
+    return s.where(s.notna() & (s != ''), pd.NA)
+
+
+def _recover_unit_code(code, text):
+    """Recode OTHER (SPECIFY) unit rows whose text restates code 3 or 11.
+
+    *code* is the integer unit code (nullable ``Int64``); *text* is the
+    module's own unit specify-text column, aligned to it (or None for a file
+    that ships none).  Returns ``(code, recovered_to)``: the code with those
+    rows set to 3 / 11, and an ``Int64`` Series holding the code each row
+    was recovered TO (NA where nothing moved) for the caller to count.  A
+    row is touched only when its code IS 13: text on any other code never
+    relabels it."""
+    code = pd.Series(code).astype('Int64')
+    recovered_to = pd.Series(pd.NA, index=code.index, dtype='Int64')
+    if text is None:
+        return code, recovered_to
+    norm = _normalise_unit_text(pd.Series(text, index=code.index))
+    other = (code == _UNIT_OTHER_SPECIFY).fillna(False).astype(bool)
+    for target, spellings in _UNIT_TEXT_RECODE.items():
+        hit = other & norm.isin(spellings).fillna(False).astype(bool)
+        recovered_to = recovered_to.mask(hit, target)
+    return code.mask(recovered_to.notna(), recovered_to).astype('Int64'), recovered_to
+
+
+def _unit_codes(df, unit, unit_text):
+    """The module's integer unit codes, with the GH #856 recovery applied.
+
+    ``unit_text`` names the module's own unit specify-text column; a name
+    that is not in the file raises (a mis-typed column must not silently
+    turn the recovery off)."""
+    if unit is None or unit not in df.columns:
+        na = pd.Series(pd.NA, index=df.index, dtype='Int64')
+        return na, na
+    code = pd.to_numeric(df[unit], errors='coerce').astype('Int64')
+    if unit_text is None:
+        return _recover_unit_code(code, None)
+    if unit_text not in df.columns:
+        raise KeyError(f'unit specify-text column {unit_text!r} not in the '
+                       f'module (columns: {sorted(df.columns)[:12]} ...)')
+    return _recover_unit_code(code, df[unit_text])
+
+
+def _recovered_counts(recovered_to):
+    """``{3: n, 11: n}`` from a ``recovered_to`` Series."""
+    vc = recovered_to.dropna().astype(int).value_counts()
+    return {k: int(vc.get(k, 0)) for k in _UNIT_TEXT_RECODE}
+
+
 def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
                    plant_m=None, plant_y=None, harv_m=None, intercrop=None,
-                   perennial=False, t=None):
+                   perennial=False, t=None, unit_text=None):
     """Reshape one harvest module (G or P) to canonical long rows.
 
     All keyword args are RAW column names in ``df`` (or None when the
@@ -1224,8 +1332,16 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     since GAP 1, so the column was always asserted to exist and never read.
     It is now an INDEX LEVEL of ``crop_production`` -- see
     ``_/data_scheme.yml`` and ``lsms_library/data_info.yml``.  Module P
-    (perennial) asks no such question and passes None, which sentinels its
-    rows to ``unknown_condition``.
+    (perennial) asks no S/U question and passes None, which sentinels its
+    rows to ``unknown_condition``.  (IHS4/IHS5 Module P does ask a FRESH /
+    DRY question, ``ag_p09_1``; it is not read -- see CONTENTS.org, GH #856.)
+
+    ``unit_text`` is the module's own unit specify-text column (2016-17 /
+    2019-20: ``ag_g13b_oth`` for G, ``ag_p09b_oth`` for P).  Where given, a
+    13 OTHER (SPECIFY) row whose text restates code 3 (90 KG BAG) or 11
+    (BASKET (DENGU)) -- the two codes the IHS4/IHS5 lists dropped -- is
+    served that code's label (GH #856, ``_UNIT_TEXT_RECODE``); the count
+    rides on ``attrs['unit_text_recovered']``.  ``Quantity`` never moves.
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
@@ -1240,9 +1356,10 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     # the grain would split no key and only widen the index.
     crop_variety = _map_codes(crop_code_int, _malawi_code_map(_VARIETY_TABLE))
 
-    u = (pd.to_numeric(df[unit], errors='coerce').astype('Int64').map(unit_map)
-         if unit is not None and unit in df.columns
-         else pd.Series(pd.NA, index=df.index, dtype='string'))
+    # GH #856: 13 OTHER (SPECIFY) rows whose own specify text restates a
+    # coded unit are recoded to that code first (see `_UNIT_TEXT_RECODE`).
+    ucode, recovered_to = _unit_codes(df, unit, unit_text)
+    u = ucode.map(unit_map)
     u = u.astype('string').where(u.notna(), pd.NA)
 
     quantity = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
@@ -1293,12 +1410,16 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     # Drop rows with no crop identity (crop code missing) — not a planted
     # item.  Keep rows with a crop even if Quantity is NaN (reported "no
     # harvest yet"/refused are legitimately item rows).
-    out = out[out['crop'].notna() | out['_crop_code'].notna()]
+    keep = (out['crop'].notna() | out['_crop_code'].notna()).to_numpy()
+    out = out[keep]
+    out.attrs['unit_text_recovered'] = _recovered_counts(
+        recovered_to[keep])
     return out
 
 
 def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
-                unit_sold=None, condition=None, perennial=False):
+                unit_sold=None, condition=None, perennial=False,
+                unit_sold_text=None):
     """Reshape one sale module (I or Q) to (i, _crop_code, u, condition_sold).
 
     Returns a DataFrame with columns [i, _crop_code, u, condition_sold,
@@ -1310,10 +1431,19 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
 
     ``unit_sold`` is the sale module's OWN unit column (Module I ag_i02b,
     Module Q ag_q02b).  The sale quantity is asked in its own unit, on the
-    same code list as the harvest unit (verified from the Stata value
+    same code list as the harvest unit (verified from the 2010-11 Stata value
     labels: ag_i02b / ag_q02b / ag_g13b all carry
-    {1 kilogram, 2 50 KG BAG, 3 90 KG BAG, 4 PAIL (SMALL), ... 13 OTHER}),
+    {1 kilogram, 2 50 KG BAG, 3 90 KG BAG, 4 PAIL (SMALL), ... 13 OTHER}; in
+    2016-17 / 2019-20 all three DROP 3 and 11, see ``unit_sold_text``),
     and it DIFFERS from the harvest unit for 22.2% of 2010-11 sale rows.
+
+    ``unit_sold_text`` is the sale module's own unit specify-text column
+    (2016-17 / 2019-20: ``ag_i02b_oth`` / ``ag_q02b_oth``).  The SAME
+    recovery as the harvest side (GH #856, ``_UNIT_TEXT_RECODE``) applies:
+    a 13 OTHER (SPECIFY) sale whose text restates 90 KG BAG or BASKET
+    (DENGU) gets that code's label.  It has to be both sides or neither: the
+    attach keys on ``u``, so recovering only the harvest row would detach a
+    sale both sides reported as 13 + "90 KG BAG" (158 such, measured).
     Carrying it is what lets ``assemble_crop_production`` attach a sale only
     to the harvest row measured in the SAME unit, so that
     ``Value_sold / Quantity_sold`` is a price per the row's declared ``u``.
@@ -1344,11 +1474,9 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     unit_map = _malawi_code_map('harmonize_crop_unit')
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
 
-    if unit_sold is not None and unit_sold in df.columns:
-        u = pd.to_numeric(df[unit_sold], errors='coerce').astype('Int64').map(unit_map)
-        u = u.astype('string').where(u.notna(), pd.NA)
-    else:
-        u = pd.Series(pd.NA, index=df.index, dtype='string')
+    ucode, recovered_to = _unit_codes(df, unit_sold, unit_sold_text)
+    u = ucode.map(unit_map)
+    u = u.astype('string').where(u.notna(), pd.NA)
 
     if condition is not None and condition in df.columns:
         cond_sold = _crop_conditions(df[condition])
@@ -1371,10 +1499,13 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
         'Quantity_sold':  qs.values,
         'Value_sold':     vs.values,
     })
-    out = out[out['_crop_code'].notna()]
+    keep = out['_crop_code'].notna().to_numpy()
+    out = out[keep]
     grp = out.groupby(['i', '_crop_code', 'u', 'condition_sold'],
                       as_index=False, dropna=False).agg(
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+    # Counted on the module's LINES, before the groupby sums them.
+    grp.attrs['unit_text_recovered'] = _recovered_counts(recovered_to[keep])
     return grp
 
 
@@ -1904,6 +2035,15 @@ def _consolidate_harvest(harvest_pieces):
     })
 
 
+def _sum_recovered(pieces):
+    """Sum the ``attrs['unit_text_recovered']`` counts of block outputs."""
+    total = {k: 0 for k in _UNIT_TEXT_RECODE}
+    for piece in pieces:
+        for k, n in piece.attrs.get('unit_text_recovered', {}).items():
+            total[int(k)] = total.get(int(k), 0) + int(n)
+    return total
+
+
 def assemble_crop_production(t, harvest_pieces, sale_pieces):
     """Combine reshaped harvest (_harvest_block) and sale (_sale_block)
     pieces into the canonical crop_production DataFrame for wave ``t``.
@@ -1948,6 +2088,11 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     -- registered as the deletion ``sale-basis-unresolved``), and
     ``attrs['sale_basis_ladder']`` (sales and MWK per rung).
     """
+    # GH #856: how many OTHER (SPECIFY) unit rows each block recovered to a
+    # coded unit from its own specify text, summed over the wave's pieces.
+    recovered = {'harvest': _sum_recovered(harvest_pieces),
+                 'sale': _sum_recovered(sale_pieces or [])}
+
     harv = _consolidate_harvest(harvest_pieces)
 
     if sale_pieces:
@@ -2067,6 +2212,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     out.attrs['sale_suppressed'] = tally
     out.attrs['sale_basis_mismatch'] = mismatch
     out.attrs['sale_basis_ladder'] = tallies['sale_basis_ladder']
+    out.attrs['unit_text_recovered'] = recovered
     return out
 
 
@@ -2078,6 +2224,13 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
 # source table below transcribes the four wave scripts
 # (`Malawi/<wave>/_/crop_production.py`), which stay the build's source of
 # truth; a test checks every file named here is named in its script.
+
+#: GH #856: the unit specify-text columns the 2016-17 / 2019-20 scripts hand
+#: `_harvest_block` (``unit_text``) and `_sale_block` (``unit_sold_text``).
+#: 2010-11 has none of the recovered strings and 2013-14 ships no text, so
+#: their halves name none (`dict.get` -> None).
+_UNIT_TEXT_COLS = dict(gtext='ag_g13b_oth', ptext='ag_p09b_oth',
+                       itext='ag_i02b_oth', qtext='ag_q02b_oth')
 
 _CROP_SALE_SOURCES = {
     '2010-11': [dict(half='full', dir='Data/Full_Sample/Agriculture',
@@ -2094,22 +2247,22 @@ _CROP_SALE_SOURCES = {
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
                      hhid='case_id', prefix='cs-17-', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
-                     icrop='crop_code', qcrop='crop_code'),
+                     icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS),
                 dict(half='panel', dir='Data/Panel',
                      g='ag_mod_g_16.dta', p='ag_mod_p_16.dta', i='ag_mod_i_16.dta', q='ag_mod_q_16.dta',
                      hhid='y3_hhid', prefix='', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
-                     icrop='crop_code', qcrop='crop_code')],
+                     icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS)],
     '2019-20': [dict(half='xs', dir='Data/Cross_Sectional',
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
                      hhid='case_id', prefix='', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
-                     icrop='crop_code', qcrop='crop_code'),
+                     icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS),
                 dict(half='panel', dir='Data/Panel',
                      g='ag_mod_g_19.dta', p='ag_mod_p_19.dta', i='ag_mod_i_19.dta', q='ag_mod_q_19.dta',
                      hhid='y4_hhid', prefix='', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
-                     icrop='crop_code', qcrop='crop_code')],
+                     icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS)],
 }
 
 #: The sale modules' variables, in questionnaire order, per module.
@@ -2148,20 +2301,26 @@ def _crop_pieces(wave):
             _harvest_block(g, hhid='hhid', plotkey=h['gplot'], cropcode=h['gcrop'],
                            qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
                            plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
-                           intercrop='ag_g01', perennial=False, t=wave),
+                           intercrop='ag_g01', perennial=False, t=wave,
+                           unit_text=h.get('gtext')),
             _harvest_block(p, hhid='hhid', plotkey=h['pplot'], cropcode=pcrop,
                            qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
-                           harv_m='ag_p06c', perennial=True, t=wave),
+                           harv_m='ag_p06c', perennial=True, t=wave,
+                           unit_text=h.get('ptext')),
         ]
-        for mod, df, cropcol, perennial in (('I', i_mod, h['icrop'], False),
-                                            ('Q', q, h['qcrop'], True)):
-            names = _SALE_RAW_VARS[mod]
-            flag, qty, unit, cond, value = names
+        for mod, df, cropcol, perennial, utext in (
+                ('I', i_mod, h['icrop'], False, h.get('itext')),
+                ('Q', q, h['qcrop'], True, h.get('qtext'))):
+            names = _SALE_RAW_VARS[mod] + ([utext] if utext else [])
+            flag, qty, unit, cond, value = _SALE_RAW_VARS[mod]
             sale.append(_sale_block(df, hhid='hhid', cropcode=cropcol, sold_flag=flag,
                                     qty_sold=qty, value_sold=value, unit_sold=unit,
-                                    condition=cond, perennial=perennial))
+                                    condition=cond, perennial=perennial,
+                                    unit_sold_text=utext))
             crop_label, code = _crop_codes(df[cropcol], perennial=perennial)
-            u = pd.to_numeric(df[unit], errors='coerce').astype('Int64').map(unit_map)
+            # The served `u`, decoded exactly as `_sale_block` decodes it
+            # (GH #856 recovery included), so the lines join the served rows.
+            u = _unit_codes(df, unit, utext)[0].map(unit_map)
             cond_sold = (_crop_conditions(df[cond]) if cond in df.columns
                          else pd.Series(_CONDITION_UNKNOWN, index=df.index, dtype='object'))
             line = pd.DataFrame({

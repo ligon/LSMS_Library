@@ -10,6 +10,11 @@ modules (P, Q) carry the perennial crop code -- P uses ag_p0c, Q uses
 crop_code -- offset +1000 in harmonize_crop.  Sale (I, Q) is at the
 household-crop grain (no plot id); attached to single-plot (i, crop)
 rows only.  See lsms_library/countries/Malawi/_/malawi.py.
+
+Unit specify text (GH #856): this wave's G/I/Q unit code lists have no
+3 (90 KG BAG) or 11 (BASKET (DENGU)), so those units arrive as 13 OTHER
+(SPECIFY) + text; ``unit_text=`` hands the blocks the module's own specify
+column so a plain restatement is served the coded unit's label.
 """
 import sys
 
@@ -40,20 +45,22 @@ def _half(g, p, i_mod, q, hh_of):
         _harvest_block(g, hhid='hhid', plotkey='plotkey', cropcode='crop_code',
                        qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
                        plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
-                       intercrop='ag_g01', perennial=False, t=WAVE),
+                       intercrop='ag_g01', perennial=False, t=WAVE,
+                       unit_text='ag_g13b_oth'),
         _harvest_block(p, hhid='hhid', plotkey='plotkey', cropcode=p_crop,
                        qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
-                       harv_m='ag_p06c', perennial=True, t=WAVE),
+                       harv_m='ag_p06c', perennial=True, t=WAVE,
+                       unit_text='ag_p09b_oth'),
     ]
     sale = [
         _sale_block(i_mod, hhid='hhid', cropcode='crop_code', sold_flag='ag_i01',
                     qty_sold='ag_i02a', value_sold='ag_i03', unit_sold='ag_i02b',
                     condition='ag_i02c',
-                    perennial=False),
+                    perennial=False, unit_sold_text='ag_i02b_oth'),
         _sale_block(q, hhid='hhid', cropcode='crop_code', sold_flag='ag_q01',
                     qty_sold='ag_q02a', value_sold='ag_q03', unit_sold='ag_q02b',
                     condition='ag_q02c',
-                    perennial=True),
+                    perennial=True, unit_sold_text='ag_q02b_oth'),
     ]
     return harvest, sale
 
