@@ -276,7 +276,8 @@ HOUSEHOLD_CONTINUITY: frozenset[str] = frozenset({
 CLUSTER_ID_CONTINUITY: frozenset[str] = frozenset({
     "stable",        # the same EA keeps its id
     "wave-scoped",   # renumbered; a crosswalk is meaningful
-    "redefined",     # a different unit list: another KIND of unit, or an independent draw with overlapping serials (above)
+    "redefined",     # a different unit list: another KIND of unit, or an
+                     # independent draw with overlapping serials (above)
     "mixed",         # some of the boundary's `v` are synthetic, not clusters
     "unobservable",  # no verified linkage; cannot be determined
 })
@@ -1137,12 +1138,12 @@ def _size_fragment(b: Mapping[str, Any]) -> str:
     r = m.get("households_changed_net_of_movers")
     if n == 0:
         parts.append("no household is linked across it, so no household share")
-    elif r is not None:
+    elif r is not None and n:
         parts.append(f"{r:,} of {n:,} linked households ({_share(r, n)}) "
                      "change `v` net of movers")
     else:
         text = "net-of-movers share: not measured"
-        if d is not None:
+        if d is not None and n:
             text += (f" ({d:,} of {n:,} linked households, {_share(d, n)}, "
                      "change `v` counting movers)")
         parts.append(text)
