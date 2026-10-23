@@ -3656,3 +3656,31 @@ Whether the doubling is an enumerator convention or an entry error is not establ
 *Make-backend exposure (filed separately).*  Every Malawi per-wave Makefile pattern rule names only =malawi.py= as a prerequisite (=Makefile:73= for =plot_inputs=; =food_acquired= names none), not the wave's own =_/<table>.py=.
 Under =LSMS_BUILD_BACKEND=make= a wave parquet warmed before a wave-script edit is therefore not rebuilt by =make=, so a cache warmed on development would keep the old 2013-14/2016-17 units there (the review's finding; the rule text is confirmed, the make backend was not re-run for this entry).
 The default backend is unaffected: the wave script is in =Wave._input_hash=, so the cache hashes move (measured: 26 of 26 Malawi tables) and the waves rebuild.
+
+* 2026-10-23 -- per-wave Make rules depend on the wave script (GH #1237)
+
+Malawi's per-wave rules use the data-root target form
+=$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/<table>.parquet=, so the target is the real
+cached wave parquet and can already exist.
+The nine table rules named only =malawi.py=, and =food_acquired='s rule named nothing.
+Under =LSMS_BUILD_BACKEND=make= an edit to =<wave>/_/<table>.py= therefore left the existing wave parquet "current".
+The country concatenator's =var/<table>.parquet= depends on those wave parquets, so it stayed current too.
+This was the GH #866 class at wave grain.
+The Default backend was unaffected, because the content hash covers the wave script.
+
+Each rule now names =../%/_/<table>.py=, which is GhanaAHIES's spelling for the same target form.
+It keeps =malawi.py=.
+Where a =malawi.py= helper reads =categorical_mapping.org= by path (=_malawi_code_map=, =_food_text_vocab=), the rule names that file too.
+Those tables are crop_production, plot_inputs, livestock, plot_labor, community_prices and food_acquired.
+food_coping, months_food_inadequate, anthropometry and people_last7days read no Malawi =.org= file.
+No wave script imports its wave =mapping.py=.
+
+A pattern rule whose prerequisite does not exist is inapplicable for that stem.
+A wave without the script (2004-05 for every table but food_acquired, and 2016-17 for community_prices) now answers "No rule to make target".
+It used to run the recipe, and =python= then failed on the missing file.
+Both are exit 2, so =run_make_target= treats them identically, and =build_wave= never asks for such a wave because the wave =data_scheme= gate excludes it.
+Every wave named in a =*_waves= list must carry its script.
+=tests/test_gh1237_malawi_make_prereqs.py= pins this with =make -n -W= rather than a text match.
+
+The Makefile is hashed into every Malawi table, so this is one Malawi re-warm.
+Measurements are in =slurm_logs/isa_backlog_2026-10-21/1237-malawi-make-prereqs/=.
