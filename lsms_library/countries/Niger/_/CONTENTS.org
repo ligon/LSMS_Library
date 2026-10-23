@@ -1634,3 +1634,67 @@ The generic parquet reader now restores each physical index field's recorded =st
 Both Default country-cache reads and Make wave-cache reads use that repair.
 Unit labels, values, missing masks, source eligibility, index grain and the questionnaire interpretation above are unchanged.
 This does not combine different container sizes or expose the last-purchase quantity as a new observation.
+
+* 2026-10-23 -- =v= across wave boundaries: =_/sampling.yml= declared (GH #1247)
+
+=_/sampling.yml= now records, per wave boundary, whether =v= names the same
+cluster as in the preceding wave (GH #942 Site C; panel-only format, modelled
+on Burkina Faso's record in PR #1246).  The idiosyncrasy: *Niger is two survey
+programmes, each a two-wave panel, and =v= is a cluster serial in both* --
+ECVMA numbers its 270 grappes 1-270, EHCVM-1 its 504 within 1-710 -- so the
+same integer names unrelated EAs on either side of the programme switch.
+
+| Boundary           | =household_continuity= | =cluster_id_continuity= | Warns? |
+|--------------------+------------------------+-------------------------+--------|
+| 2011-12 -> 2014-15 | panel                  | stable                  | no     |
+| 2014-15 -> 2018-19 | independent            | redefined               | yes    |
+| 2018-19 -> 2021-22 | rotating-panel         | stable                  | no     |
+
+Measured 2026-10-23 on a cold build at development =9a0ed5f3c=, through
+=sample()= / =cluster_features()= (Region compared on the served labels):
+
+- *2011-12 -> 2014-15.*  3,529 of 3,529 crosswalk-linked households keep =v=
+  (270 one-to-one pairs); Region and Rural agree 270/270.  =District= agrees
+  on only 78 of 270, and that is a *column-definition change, not a cluster
+  fact*: 2011-12 =cluster_features.District= is =strate= (the sampling
+  stratum, 25 labels such as "Agadez pastorale"), 2014-15's is =MS00Q11= (a
+  department).  Do not compare District across this boundary.  The one shared
+  =i= that "changes" =v= is the ='20012'= namespace collision recorded under
+  GH #679 above.  Movers and split-offs keep their 2011 grappe as =v=.
+- *2014-15 -> 2018-19.*  267 ids occur in both; on them Region agrees for 27
+  (26.5 expected if the two were unrelated draws), District for 6, Rural for
+  137, and the 2011-12 coordinates of a grappe lie a median 423 km from the
+  2018-19 coordinates of the same id (2 of 266 within 5 km).  No crosswalk
+  exists: the 2018-19 cover and weights file carry no ECVMA pointer, and
+  =panel_ids.py= links nothing across programmes.  Zero shared =i= is by
+  construction (='E_'= prefix in =niger.i=), not evidence.  Declared
+  =redefined= by elimination, as for Burkina Faso 2018-19: =unobservable= is
+  silent because grouping across *disjoint* keyspaces is correct, and these
+  overlap.
+- *2018-19 -> 2021-22.*  =s00q07f1= / =s00q07f2= equal =grappe= / =menage=
+  for 4,589 of 4,589 households that carry them (as =panel_ids.py= says);
+  Region and District agree 476/476 on the shared ids, Rural 473/476, and all
+  465 with coordinates on both sides lie within 5 km.
+
+*Two things the measurement surfaced that this file did not record:*
+
+1. *2021-22 adds 79 grappes and drops 28.*  The new grappes are numbered
+   900-996 (2018-19's maximum is 710), hold no panel household, and so cannot
+   collide with an old id -- which is why the boundary is =stable=, not
+   =mixed=.  28 of 2018-19's 504 grappes do not recur, 23 of them in
+   Tillaberi; no cause is recorded.  This qualifies the BID sentence quoted
+   above ("il a été procédé à un dénombrement dans les mêmes grappes"): 476
+   of 2021-22's 555 grappes are the same.  =household_continuity= is
+   therefore =rotating-panel= (1,567 of 6,622 households are "Ménage
+   non-panel"), a judgement call that does not change whether the boundary
+   warns.
+2. *=sample()= shares 5,055 =i= across the EHCVM boundary, not the
+   crosswalk's 4,589.*  466 households flagged =PanelHH= = "Ménage panel"
+   have no =s00q07f1/f2=, so =panel_ids.py= does not link them; but EHCVM =i=
+   is the same =(grappe, menage)= string in both waves and all 466 match a
+   2018-19 household, so they join on =i= anyway (all keep =v=).  A
+   linkage-coverage fact, not an id collision: no "Ménage non-panel"
+   household's =(grappe, menage)= occurs in 2018-19.
+
+*Cache*: none.  =sampling.yml= is not a build input (=.yml= is outside
+=_BUILD_INPUT_SUFFIXES=) and =CONTENTS.org= is excluded as documentation.
