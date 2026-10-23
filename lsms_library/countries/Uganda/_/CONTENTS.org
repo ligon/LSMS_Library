@@ -268,7 +268,9 @@ hybrid rule:
   outcome of a join.
 - =v = <NA>= when neither =comm= nor coordinates are available —
   24 households, the refreshment / geo-missing tail that is also
-  reported in the =UNPS_Geovars_0910= docs as /Invalid: 24/.
+  reported in the =UNPS_Geovars_0910= docs as /Invalid: 24/.  /Since
+  GH #1120 D2 (2026-10-23)/ each of these gets a singleton
+  =v = moved-{hhid}= instead; see below.
 
 Implementation: in =data_info.yml= the =sample:= block uses the
 =dfs:=/=derived:=/=drop:= pattern to merge GSEC1 and the geovars
@@ -292,9 +294,25 @@ construction rather than by coincidence, which is the point: the two
 =v='s MUST agree or =_join_v_from_sample= hands the rest of the library a
 key that matches nothing.  Orphan count is now 0 for 2009-10.
 
-The 24 households with neither a =comm= nor a GPS fix keep =v = <NA>= and
-are dropped — with a warning naming the count.  Nothing can locate them,
-and a fabricated cluster would be worse than a missing one.
+/Superseded 2026-10-23 (GH #1120 D2)./  This paragraph used to read: "The
+24 households with neither a =comm= nor a GPS fix keep =v = <NA>= and are
+dropped — with a warning naming the count.  Nothing can locate them, and a
+fabricated cluster would be worse than a missing one."  *That was only half
+true.*  They were dropped from =cluster_features= alone (its hook deletes a
+NaN =v= with a count); =sample()= SERVED all 24 with =v = <NA>=, so the
+v-join handed a NaN =v= to every table they appear in -- 9 of them reach
+=plot_labor= / =plot_inputs= / =crop_production=, and the roster carried 110
+person rows with no =v= (diagnosis on GH #1120, 2026-10-23).  A NaN =v= is a
+deferred deletion: the first =groupby= drops it.
+
+Each of the 24 now gets a *singleton* =v= of its own, =moved-{hhid}=, from
+the country hook =uganda.sample=, and the SAME singleton is a one-household
+=cluster_features= row carrying the household's own =Region= / =Rural= /
+=District= (no GPS: that is why it has no bin).  This is Nigeria's rule for its
+=ea == 0= movers (=Nigeria/_/nigeria.py= =cluster_id=), chosen on precedent:
+a singleton is not a fabricated cluster -- it can never pool two households --
+and NaN is the outcome Nigeria rejected because downstream =groupby=s delete
+it.  See [[*GH #1120 / #1119 (2026-10-23): the =sample= frame, singleton =v=, =unknown_plot=, the crop marker]].
 
 Why only 2009-10 gets the hybrid treatment: 2010-11 and 2011-12
 also use =comm= from GSEC1, but their raw surveys populated it for
@@ -3496,6 +3514,24 @@ Fixing any of this is out of scope for a config PR; it wants its own
 change with its own before/after.  Do not "fix" it by re-adding a
 build step to the invariance module without measuring what that costs.
 
+** TODO Two whole-wave =i= mismatches leave =v= NaN on every row (found 2026-10-23, GH #1120)
+Measured on a cold build of =fix/plot-sentinel-vocab-20261023= while sizing
+GH #1120's NaN-=v= census.  Neither is an unlocated household -- the table's
+=i= is simply not the =sample= key -- so the #1120 singleton rule does not and
+must not touch them.  They are the two largest Site I cells in Uganda, so
+=LSMS_READ_STRICT=1= cannot pass on these two tables until they are fixed.
+
+- *=housing= 2015-16: 3,312 of 3,312 rows.*  =2015-16/_/data_info.yml= keys
+  =housing= on =gsec9.dta='s =hhid=, a 12-character code that matches
+  =gsec1='s *=hh=* ("Household number") for 3,303 households and its =HHID=
+  (the =sample= key) for none.  Re-key on the =HHID= that =gsec1= pairs with
+  =hh= (or read =HHID= from =gsec9= if it carries one).
+- *=nonfood_expenditures= 2009-10 / 2010-11: 29,235 / 24,792 rows (2,752 /
+  2,639 households).*  The wave scripts emit a float-stringified =i=
+  (='...0'=: every one of those households ends in =.0=), so it matches no
+  =sample= =i=; 2011-12 onward is clean.  The CLAUDE.md "=format_id= is
+  auto-applied to =idxvars= but NOT to =myvars=" trap, in a script.
+
 ** TODO Missing panel weight for 2019-20
 :LOGBOOK:
 - Note taken on [2026-04-09 Wed] \\
@@ -4144,6 +4180,9 @@ common row.  The 85 new rows receive a ladder price but a NaN value, because
 NaN days times a price is NaN.  A consumer that wants each wage itself now has
 it.
 
+/Superseded 2026-10-23 by GH #1120 D3: these rows now carry =plot_id =
+unknown_plot=, the registered epistemic sentinel; the fold described below is
+unchanged by it -- see the #1120 section at the end of this file./
 *Residual NaN =plot_id= (GH #1120 D3, unchanged).*  95 rows are still served
 with a NaN =plot_id=, 50 of them with positive days: 2009-10 85 (45 positive),
 2011-12 5 (1), 2013-14 5 (4).  The final =groupby(..., dropna=False).max()=
@@ -4172,3 +4211,167 @@ wage-only follow-up moves the same set again: =uganda.py= and
 =90fc1e18d=, and 0/40.  Evidence:
 =slurm_logs/isa_backlog_2026-10-21/1250-uganda-labor-flag/= (follow-up:
 =r2/=); ledger =.coder/ledger/1250-uganda-labor-flag.md=.
+
+----
+* GH #1120 / #1119 (2026-10-23): the =sample= frame, singleton =v=, =unknown_plot=, the crop marker
+
+Rulings (@ligon, 2026-10-23), from the GH #1120 diagnosis of the NaN keys Site
+I names on Uganda's plot tables.  Every Uganda table's =v= comes from
+=sample()= through =_join_v_from_sample=, so a household missing from
+=sample=, or present with a NaN =v=, was served with a NaN =v= on EVERY table
+it appears in -- a NULL on a declared index level, which the first =groupby=
+deletes.  The idiosyncrasy behind all of it is the one this file opens with:
+=v= is not one thing in Uganda (EA code -> parish code -> =DISTRICT/PARISH=
+name), every wave builds it from its own cover (GSEC1), and the cover is not
+the whole survey -- the agriculture cover (AGSEC1), the roster (GSEC2) and
+the plot modules record households GSEC1 does not.
+
+** D1 -- 2015-16 takes the AGSEC1 households from AGSEC1
+=sample= takes a household the survey recorded in another cover from that
+cover, with that cover's weight.  2015-16 =AGSEC1= holds *72* households
+=gsec1= does not (the diagnosis counted the 63 that reach the plot tables;
+the frame takes every household the cover records).  Every one has
+=interview = nonresp = 3= ("Not done"): the household questionnaire was not
+completed, the agriculture one was.  AGSEC1 carries:
+- =parish_code= -- this wave's =v=, the same 8-digit codes (it agrees with
+  =gsec1= on all 2,622 households both files hold).  64 of the 72 sit in
+  parishes =gsec1= also has; *8 are in parishes no =gsec1= household is in*,
+  so =cluster_features= 2015-16 reads the same AGSEC1 rows and those 8
+  clusters get AGSEC1's =Region= / =Rural= / =District= (no =GPS=) -- the two
+  tables keep one keyspace;
+- =sregion= / =urban= / =region= (labels identical to =gsec1='s on the common
+  households);
+- *one* weight, =hwgt_W5= ("Panel hh weight for wave5"; identical to its
+  =mult=, "Household weight").  Following Uganda's single-weight precedent
+  (2005-06 .. 2011-12 and 2019-20 put one source weight in both columns) it
+  fills =weight= AND =panel_weight=.  It is *not* =gsec1='s =hwgt_W5=: on the
+  1,458 households both files weight positively they agree on none (median
+  ratio 0.93), so 2015-16 =panel_weight= now mixes two vintages for 72 rows,
+  and 33 of the 72 are 0 (the refresh households, as in =gsec1=, whose
+  =hwgt_W5= has 1,547 zeros).  =weight= gains 33 zeros where =gsec1='s
+  =h_xwgt_W5= has none.
+
+The adoption is row-level, never cell-level: a household =gsec1= has keeps
+every =gsec1= value, including a missing one (=gsec1= has 49 NaN
+=h_xwgt_W5=; AGSEC1 must not fill them -- a different vintage).  Mechanism:
+the =df_ag= sub-df's columns are prefixed =_ag_=, the =gsec1= sub-df carries
+a =_cover= marker, and =uganda._adopt_alternate_cover= applies =_ag_*= only
+where =_cover= is missing.
+
+Within-wave weight normalisation (=_normalise_sample_weights=) moves for
+2015-16 by the change in the column mean: =weight= x1.00125, =panel_weight=
+x1.00201 (raw means 2282.88 -> 2285.73 and 2206.71 -> 2211.15).  Weighted
+ratios within the wave are unchanged by construction; every 2015-16 weight
+value served changes in its 4th significant digit.
+
+** D2 -- a household no file locates gets a singleton =v=
+=v = moved-{hhid}=, spelled exactly as Nigeria spells it
+(=Nigeria/_/nigeria.py= =cluster_id=), built by =uganda.singleton_v= and
+applied by the country =df_edit= hook =uganda.sample= to every =sample= row
+whose =v= is still missing.  Never NaN (deleted downstream) and never a
+shared sentinel (it welds unrelated households into one "cluster" -- the
+roster's =household_characteristics= uses exactly such a shared ='Mover'=
+bucket for NaN =v=, GH #268, and Uganda no longer puts anyone in it).
+
+| wave    | singletons | who                                                         |
+|---------+------------+-------------------------------------------------------------|
+| 2009-10 |         28 | the 24 "no =comm=, no GPS" + 3 split-off ids found only in   |
+|         |            | season-B AGSEC3B/4B/5B + 1 found only in GSEC12 (enterprise) |
+| 2011-12 |         57 | AGSEC1-only (that AGSEC1 has no geographic column at all)   |
+| 2013-14 |          1 | a GSEC1 household with a blank parish code (=h1aq4a=)        |
+| 2018-19 |         66 | GSEC2 + AGSEC1, not GSEC1 (which ships only                  |
+|         |            | =response_status == 1=); AGSEC1's region / weights are null  |
+| 2019-20 |          1 | the GSEC1 household with a blank =district=                 |
+
+Weight / strata / =Rural= / =Region= are NaN where no file states them (the
+AGSEC1-only and season-B-only households); the cover households keep theirs.
+The households enter the frame through =_frame=-marked sub-dfs naming the
+file that records them (=i= only; 2009-10 concatenates AGSEC3B and GSEC12 in
+ONE sub-df because two plot-grain sub-dfs merged in turn would be a cartesian
+that =_merge_subframes= refuses).  =uganda.sample= proves their repeats
+identical before collapsing them.
+
+*2009-10's 24 get singletons too, on precedent.*  They are the textbook
+"no file locates": =comm= blank, no geovar fix.  Nigeria's movers have a
+state and an LGA and no EA, and get singletons; these have a =Region= and
+=District= and no EA or bin.  A singleton cannot pool two households, so it
+is not the "fabricated cluster" the old paragraph above feared.  Each is also
+a one-household =cluster_features= row with its own =Region= / =Rural= /
+=District= (so are 2013-14's and 2019-20's blank-field households):
+=uganda.cluster_features= gives a singleton to a NaN-=v= row that carries a
+cover attribute, and still DROPS one that carries none -- 2005-06's 368
+geovar rows of 2009-10 split-offs (the TODO below), which are not 2005-06
+households at all.
+
+*Open question for @ligon: the prefix.*  =moved-= is Nigeria's word for an
+=ea == 0= mover.  Uganda's are AGSEC1-only, GSEC2-only and split-off-id
+households and cover households with a blank cluster field; some 2009-10
+ones are movers or split-offs, most are not known to have moved.  Kept
+literally as ruled; a Uganda-specific prefix is a one-constant change
+(=uganda.SINGLETON_V_PREFIX=).
+
+** D3 -- =unknown_plot=
+A plot-grain row whose parcel or plot id is blank in the source gets
+=plot_id = 'unknown_plot'= (=uganda._plot_key=, used by =crop_production=,
+=plot_inputs= and =plot_labor=; registered in =lsms_library/data_info.yml=).
+The key used to be NaN -- pandas 3's =astype(str)= keeps a missing component
+missing -- and a known parcel with a blank plot gets the sentinel too (the
+sentinel is the bare string, so =plot_id == 'unknown_plot'= finds every
+one).  Only the served string changes: the intercrop lookup still joins on
+the separate =(hh, parcel, plot)= components, so an =unknown_plot= row can
+never borrow another household's answer through the shared sentinel.
+
+Measured residual BEFORE (base build): served NaN =plot_id= 95 rows in
+=plot_labor= (2009-10 85, 2011-12 5, 2013-14 5) and 1 in =plot_inputs=
+(2013-14); 0 in =crop_production=, which -- like =plot_inputs= in its other
+waves -- DELETED its NaN-key rows in the de-dup step.  So the sentinel
+resurrects rows:
+- =crop_production=: *+403 rows* (2009-10 360, 2011-12 43; 177
+  households), all =unknown_plot=, 0 removed, 0 changed on the 133,761 common
+  rows.  =production_obs= keeps them distinct; neither identity guard fires.
+- =plot_inputs=: *+124 rows* (2009-10 119, 2011-12 5).  2009-10's 130 source
+  rows become 119: 11 Seed keys each fold two plot-less AGSEC4A lines of one
+  household and crop through the builder's existing sum/max/first collapse.
+  No folded pair reports conflicting values -- they differ only where one
+  line left =Purchased= / =Improved= blank -- and no quantity is summed (2009-10
+  seed rows record none).  Disclosed, not split: the consumer rule says two
+  =unknown_plot= rows are not one plot, and the index cannot say so without
+  inventing a level.
+- =plot_labor=: row count unchanged; the 95 NaN keys are now =unknown_plot=.
+  The =dropna=False= max-fold described in the #1250 section is unchanged
+  (2009-10: 70 positive plot-less rows -> 45 keys).
+
+** #1119 -- =(not crop-specific)=
+=plot_inputs= =j= on a fertilizer / pesticide row is now the canonical marker
+=(not crop-specific)= (=uganda.CROP_NA=, Niger's / Mali's spelling), not
+=n/a=: 10,294 rows (10,292 before plus 2 of D3's resurrected rows).
+=plot_labor= has no =j=, and =crop_production= drops a row with no crop label
+before indexing, so the marker exists only on =plot_inputs=.
+
+*Six SEED rows carry it too, and that is a mislabel, pre-existing*: the fill
+applies to every row with no resolved crop, and 6 seed rows have a crop code
+=harmonize_crop= does not map -- 5 x code 790, which the 2013-14 and 2015-16
+AGSEC4A value labels call /Watermelon/ (4 in 2013-14, 1 in 2015-16), and 1 x
+code 0 in 2011-12 (no label).  Mali's rule is that a seed row is never marked
+(its crop is crop-specific even when unknown).  Adding =790 Watermelon= to
+=harmonize_crop= would fix five of them but also adds Watermelon rows to
+=crop_production= (code 790 harvest records are dropped today for want of a
+label) -- its own before/after, not done here.
+
+** What this does NOT fix
+The two whole-wave =i= mismatches (TODO under "Known Issues": =housing=
+2015-16, =nonfood_expenditures= 2009-10 / 2010-11) keep a NaN =v= on every
+row -- they are not unlocated households.  So Site I and
+=LSMS_READ_STRICT=1= are clean on =v= and =plot_id= for every Uganda plot
+table (and on =v= for every other v-joined table), but NOT for those two
+tables.
+
+** Cost
+=uganda.py=, =data_scheme.yml= and four wave =data_info.yml= files are in
+every Uganda table's hash.  The hash census (base
+=fix/plot-sentinel-vocab-20261023= vs this branch) moved *28/28* Uganda
+L2-country and *224/224* Uganda L2-wave hashes, no other country's, and
+*0/40* =build_transforms_fingerprint=: a Uganda-only cold re-warm.
+=tests/fixtures/uganda_baseline.json= moves for =var/sample.parquet= and
+=var/cluster_features.parquet= only (every other pinned parquet is pre-v-join).
+Ledger: =.coder/ledger/1120-uganda-frame-singletons-unknown-plot.md=.
