@@ -124,3 +124,66 @@ identified.
   raw priced, 647 / 647 2017-18); mixed per-unit / total for trees.
 - =condition= (2017-18 =s7gq21c= shelled state); the EHCVM harvest blocks.
 - The 2017-18 NA-sale -> 0 fill (1,653 / 1,662 served rows), kept identical.
+
+* Round 2 -- the maintainer rulings on PR #1272 (2026-10-23)
+
+Ruling 1: tree =Quantity= / =Quantity_sold= served as 12-month totals
+(per-month answer x =months_harvested=), a registered derivation.  Ruling 2:
+2017-18 unrecorded sales NA, not 0.  Three cold builds, each in its own fresh
+=LSMS_DATA_DIR= under =/local/job40390255/data-private/824-ml-r2/= (only a
+=dvc-cache= symlink): development =9a0ed5f3c= (=dev=), =e2836e5d2= (=e28=), and
+this branch (=new=).  Scripts in =scripts/r2/=, aggregate outputs in =out/r2/=;
+row-level frames and logs stay private.
+
+| script                   | output                     | what                                                     |
+|--------------------------+----------------------------+----------------------------------------------------------|
+| =build_r2.py= (=run.sh=) | (private)                  | cold build + warnings + downstream, one checkout          |
+| =compare_r2.py=, =downstream_r2.py= | =compare_r2.txt= | dev -> new and e28 -> new, column by column, wave x row kind; downstream |
+| =oracle_r2.py=           | =oracle_r2.txt=            | raw oracle for both rulings, the product rule written from scratch |
+| =probe_value_window.py=  | =probe_value_window.txt=   | is the tree sale value a total? (slope test; WAITING in CONTENTS) |
+| =probe_s7g_lourd.py=     | =probe_s7g_lourd.txt=      | the 1,607 'Oui'-without-quantity rows are the Leger questionnaire |
+| =probe_edges.py=         | =probe_edges.txt=          | per-month x months edge cases (missing codes, 0 / NA months) |
+| =partial_revenue_r2.py=  | =partial_revenue_r2.txt=   | households still served a =gross_crop_revenue= beside an unrecorded sale |
+| =hash_diff.py= (+ =../hash_census.py=) | =hash_diff_r2.txt= | dev vs new                                     |
+| (build logs)             | =warnings_r2.txt=          | warning categories and counts, offender detail omitted   |
+| =siteq_r2.py=            | (private)                  | Site Q offenders without household ids                    |
+
+** Results
+
+- 35,060 rows on all three; index identical.  e28 -> new: =Quantity= 271 rows
+  (2014-15 tree 154, 2017-18 tree 117), =Quantity_sold= 1,890 (2014-15 tree
+  137, 2017-18 tree 100, 2017-18 field 1,653 0 -> NA), =Value_sold= 1,662
+  (2017-18 field, all 0 -> NA), =Derivation= 627 (key renamed); every other
+  column identical.  =Value_sold= unchanged on every tree row.
+- =Derivation=: =tree-twelve-month-total= on 627 rows (357 + 270), NA on the
+  34,433 field rows; the two #1267 identity keys are gone.
+- Raw oracle: tree =Quantity= / =Quantity_sold= / =Value_sold= /
+  =months_harvested= 358 / 358 (2014-15) and 270 / 270 (2017-18); 2017-18 field
+  =Quantity_sold= / =Value_sold= 24,449 / 24,449.  At e28 the same oracle
+  matches 204 / 221 / 358 / 358 and 153 / 170 / 270 / 270, and 22,796 / 22,787.
+- Downstream: =harvest_kg= and =yield_kg= frame-equal; =gross_crop_revenue=
+  drops 447 2017-18 households (1,662 household-crop rows by crop), every one
+  a filled 0, and changes no other value.
+- Warnings: identical except Site Q 2014-15, 2 -> 3 offenders (a tree row,
+  2,005 =Panier= a month x 3).  Grain 0, Site I and Site B unchanged.
+- Hash census vs development: country 24 / 549 (Mali 24 / 24), wave 96 / 2,109
+  (Mali 96 / 96), =build_transforms_fingerprint= 0 / 40.
+
+** Tests (round 2)
+
+All with =-n 2= or =-n 3 --dist=loadfile=, =LSMS_BUILD_WORKERS=1=, BLAS pinned.
+
+| run                                                              | result                                       |
+|------------------------------------------------------------------+----------------------------------------------|
+| the two PR files (41 tests), this branch                         | 41 passed                                    |
+| the same files copied onto e2836e5d2                             | 19 failed, 3 errors, 19 passed (=out/r2/tests_new_files_on_e28.txt=) |
+| the two PR files at the ruling-2 commit alone (=c07a63ec8=), cold | 35 passed                                   |
+| =rg -l Mali tests/= (36 files) + =test_derivations.py=, development =9a0ed5f3c= | 1,353 passed, 3 skipped       |
+| the same + the two PR files, this branch                         | 1,394 passed, 3 skipped                      |
+
+The 3 errors on e2836e5d2 are the =raw= fixture's =derivation_inputs= call
+(the new key does not exist there).  Of the 19 that pass there, 17 are
+unchanged #824 tests; the two new ones that pass are a regression pin (2017-18
+tree =Quantity_sold= NA = 85, unchanged by the ruling) and the Leger raw-data
+finding, which does not depend on the code.  The 3 skips are identical on both
+sides (=Mali interview_date not cached here= x2, one L1 blob not cached).

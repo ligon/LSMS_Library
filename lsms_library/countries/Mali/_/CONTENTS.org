@@ -218,7 +218,12 @@ o  Households # 1, 2, 4, 5, 7, 8 are administered the version Léger
 
 So in rural areas *one third of sampled households got the long ("Lourd")
 questionnaire and two thirds the short ("Léger") one.*  Any table sourced from a
-Lourd-only module is a one-third rural subsample, not the wave.  Planned n =
+Lourd-only module is a one-third rural subsample, not the wave.  The data carry
+the split: =typequest= in =eaci17_s00p1.dta= / =eaci17_s00p2.dta= (1
+Questionnaire Leger, 2 Questionnaire Lourd).  It also reaches INSIDE a module
+-- the 7G crop-sale block asks Leger households whether they sold (7G.20) but
+not how much (7G.21 / 7G.22); see "2017-18 unrecorded sales are NA" in the
+crop_production section (GH #824, 2026-10-23).  Planned n =
 9,630; achieved 8,390.  (The 2014-15 instruments shipped in that wave's
 =Documentation/= are named =EACI2014_..._LOURD_...=, consistent with the 2014
 design's 3-per-rural-EA figure, but no statement was found declaring a 2014
@@ -1417,13 +1422,16 @@ and "knows both" means =Unit_sold= and =u= are both non-null:
 | wave    | rows  | priced | Unit_sold set | knows both | agree | differ | sold in Kg |
 |---------+-------+--------+---------------+------------+-------+--------+------------|
 | 2014-15 | field |    569 |           568 |        567 |   472 |     95 |         83 |
-| 2014-15 | trees |    198 |           196 |        190 |   148 |     42 |         38 |
+| 2014-15 | trees |    192 |           190 |        186 |   144 |     42 |         37 |
 | 2017-18 | field |    451 |           451 |        449 |   362 |     87 |         67 |
 | 2017-18 | trees |    127 |           127 |        127 |   109 |     18 |         45 |
 
 The four disagreement counts reproduce the raw-file audit (#824 comment,
 2026-10-23); its "knows both" ran on raw rows, before the build's crop-label
-drop and duplicate collapse (572 / 191).  A disagreement is a FLAG, not an
+drop and duplicate collapse (572 / 191).  The 2014-15 tree row was 198 / 196 /
+190 / 148 / 42 / 38 before the ruling of 2026-10-23 made the tree sold
+quantity a 12-month total (NA on the 6 priced rows whose month count is 0 or
+missing; section below).  A disagreement is a FLAG, not an
 identification (canonical =data_info.yml=, =Unit_sold= note).
 =median_price_valuation= does not read =Unit_sold= yet (a decision, for every
 country carrying the column).
@@ -1435,83 +1443,161 @@ tree factors are not: on rows sold in Kg, =s3bq13c= is 1 on 18 of 39 and equals
 the quantity on 10, and =s11fq14c= is 1 on 11 of 45 and equals the quantity on
 20.  So 3B / 11F "Equivalent en Kg" is sometimes a total.  Serving it is a decision.
 
-** Tree rows: the harvest is recorded PER HARVEST MONTH (GH #1267)
+** Tree rows: 12-month totals from per-month answers (GH #1267; ruling 2026-10-23)
 
 The 2014-15 tree rows (module 3B) served =Quantity = s3bq09=, which is the
 NUMBER OF MONTHS harvested: 357 rows, every value an integer up to 12.  The
 misreading came from the WB harmonised =MLI_EACI1.do:259=, whose
 =harvest_kg_per = s3bq09 * s3bq10b= multiplies months by the unit CODE; the wave
-script's docstring copied "qty=s3bq09".  The questionnaire
-(=EACI2014_AGR_LOURD_P2_11082014.pdf=, Section 3B) does record the harvest:
+script's docstring copied "qty=s3bq09".  Both tree rosters ask the same shape
+(2014-15 =EACI2014_AGR_LOURD_P2_11082014.pdf= pp. 26-27; 2017-18
+=eaci17_p1_french.pdf= pp. 44-45 / =eaci17_p1_eng.pdf= pp. 42-43):
 
-- 3B.09 "Pendant combien de mois au cours des 12 derniers mois avez-vous
-  recolte [Nom du produit]?" (=s3bq09=);
-- 3B.10 "Durant ces mois, quelle quantite a ete recoltee en moyenne chaque
-  mois?", with Quantite / UML / Equivalent en Kg (=s3bq10a/b/c=);
-- 3B.13 "Durant ces mois, quelle quantite avez-vous vendue en moyenne chaque
-  mois?" (=s3bq13a/b/c=);
-- 3B.14 "Quel a ete le montant total de cette vente? (En FCFA)" (=s3bq14=).
+| question                                   | 2014-15 3B         | 2017-18 11F         |
+|--------------------------------------------+--------------------+---------------------|
+| months harvested in the last 12            | 3B.09 =s3bq09=     | 11F.10 =s11fq10=    |
+| harvest "en moyenne chaque mois"           | 3B.10 =s3bq10a/b=  | 11F.11 =s11fq11a/b= |
+| quantity sold "en moyenne chaque mois"     | 3B.13 =s3bq13a/b=  | 11F.14 =s11fq14a/b= |
+| "le montant total de cette vente" (FCFA)   | 3B.14 =s3bq14=     | 11F.15 =s11fq15=    |
 
-2017-18's 11F asks the same per-month shape, with one difference: the sale
-VALUE is per month too (=s11fq15= "Montant de la vente mensuelle moyenne").
-2017-18 already served the monthly harvest =s11fq11a=, not the month count.
+*The 2017-18 Stata label contradicts its own questionnaire.*  =s11fq15= is
+labelled "Montant de la vente mensuelle moyenne des produits issus de ces
+arbres", but the printed 11F.15 is word for word 3B.14: "Quel a ete le montant
+total de cette vente ? (En FCFA)" / "What is the total amount of this sale? (in
+FCFA)".  (=s3bq14='s label is the neutral "Montant de la vente".)  An earlier
+version of this section, and of =derivations.yml=, read the label and said the
+2017-18 value was monthly; the WB =MLI_EACI2.do:353= also follows the label
+(=harvest_sold_value_per = s11fq10 * s11fq15=).
 
-*Decision taken*: the recorded values are served AS RECORDED, with nothing
-multiplied out:
-- 2014-15 =Quantity= = =s3bq10a=;
-- the month count goes in a new optional column, =months_harvested= (3B.09 /
-  11F.10, 0..12, with 0 meaning no harvest).  It is named away from
-  =harvest_month=, which is a month of the year;
-- every tree row carries a registered identity derivation that states the
-  window: =Mali::crop_production::3b-per-harvest-month= (2014-15) or
-  =Mali::crop_production::11f-per-harvest-month= (2017-18), in
-  =_/derivations.yml=.  The functions are =mali.derive_3b_per_harvest_month= /
-  =derive_11f_per_harvest_month=, which the wave scripts call to build those
-  rows.  The raw rows come back by their original names from
-  =Country('Mali').derivation_inputs(key)=.
+*Served (ruling @ligon 2026-10-23, PR #1272)*:
+- =Quantity= = harvest per month x =months_harvested= and =Quantity_sold= =
+  quantity sold per month x =months_harvested=, in both waves: the 12-month
+  totals a field-crop row serves.  One registered derivation,
+  =Mali::crop_production::tree-twelve-month-total= (=_/derivations.yml=,
+  =mali.derive_tree_twelve_month_total=), stamped on all 627 tree rows; it
+  replaces the two #1267 identity keys (=3b-per-harvest-month=,
+  =11f-per-harvest-month=).  The per-month answers come back by their original
+  names from =Country('Mali').derivation_inputs(key)=;
+- =Value_sold= as recorded in both waves -- the printed "montant total" (the
+  2014-15 reading is the ruling; for 2017-18 the ruling asked for the choice to
+  be justified from the instrument, and the instrument says total).  So
+  =Value_sold / Quantity_sold= is a price per =Unit_sold= on every tree row;
+- =months_harvested= (0..12) stays.
 
-Read a tree row this way:
-- 2014-15: =Quantity= and =Quantity_sold= are per harvest month, while
-  =Value_sold= is the TOTAL.  So =Value_sold / Quantity_sold= is NOT a price;
-  it overstates the price by =months_harvested=.  On the 198 served priced
-  rows that factor has median 2 and is above 1 on 65.1% (the audit's raw
-  count was 63.5%); 3 of those rows report 0 months harvested beside a
-  sale, and 3 have no month count;
-- 2017-18: all three are per harvest month, so the ratio IS a price per
-  =Unit_sold=;
-- a 12-month quantity is =Quantity * months_harvested=.  That is a construction,
-  and it is not served.  @ligon's call: GhanaLSS =9b-sale-amount-per-unit= is a
-  precedent for constructing it, and =MLI_EACI2.do:242/313/353= does it for
-  2017-18.
+*The edge rule*, decided from the data (counts are on the producing roster):
+- the missing codes 99 / 9999 / 9999.9 are masked on the PER-MONTH answer
+  before the product; =crop_production_finalize= no longer masks a tree total
+  (a genuine total can be 99; none is today);
+- a per-month answer of 0 gives 0 whatever the month count;
+- a missing month count (2014-15 =s3bq09= = 99) gives NA: 3 harvest and 3 sale
+  rows;
+- *a month count of 0 beside a POSITIVE per-month answer gives NA.*  2014-15
+  has 3 such harvest rows and 3 such sale rows, each sale with a recorded value
+  (35,000 to 100,000 FCFA); 2017-18 has 1 harvest row (11F.10 code 0 is
+  "Aucune recolte (Arbre fruitier n'a pas commence a produire)") and no sale
+  row.  The two answers contradict each other, so no total is formed and the
+  recorded =Value_sold= stays.  The WB do-file serves 0 there
+  (=replace harvest_sold_kg_per = 0 if s11fq10==0=); a 0 quantity beside a
+  recorded sale is the manufactured zero ruling 2 removes elsewhere;
+- a missing per-month answer stays NA (2017-18: 85 "Aucune recolte" rows).
 
-=gross_crop_revenue= is right on 2014-15 trees (a total) and is the per-month
-sale on 2017-18 trees.  =harvest_kg= / =yield_kg= drop the tree rows anyway,
-because their =plot_id= is NA.
+What moved (cold builds; development =9a0ed5f3c=, e2836e5d2 and this commit):
 
-What moved (cold builds, development =9a0ed5f3c= vs this branch):
-- 2014-15 tree =Quantity= is re-sourced on 357 rows; 241 values change.  The
-  other 116 coincide: 88 are 0 = 0, 27 are equal positives (16 of them one
-  month and one unit), and one row is NA on both sides;
-- 3B's float columns use =9999.9= as their missing code: once in =s3bq10a= and
-  once in =s3bq13a=, each beside a =Manquant= unit.  It joined the existing
-  99 / 9999 sentinel rule in =crop_production_finalize=, so one tree
-  =Quantity_sold= that used to serve 9999.9 is now NA;
-- the 2017-18 tree values are unchanged.  Those rows gain =months_harvested=,
-  the key and, on 2 rows, a =u=.
+| wave    | column          | changed vs e2836e5d2 | sum before -> after | NA before -> after |
+|---------+-----------------+----------------------+---------------------+--------------------|
+| 2014-15 | =Quantity=      |                  154 | 12,758 -> 34,163    | 2 -> 7             |
+| 2014-15 | =Quantity_sold= |                  137 | 15,875 -> 41,026    | 2 -> 8             |
+| 2017-18 | =Quantity=      |                  117 | 33,595 -> 163,434   | 85 -> 86           |
+| 2017-18 | =Quantity_sold= |                  100 | 706,855 -> 2,604,230 | 85 -> 85          |
 
-Every other column and row is identical.  Site Q's 2014-15 offenders are the
-same 2 field rows.  Before the 9999.9 rule, a tree row served =9999.9= and
-was flagged; it is now NA.
+(Sums are across mixed units; they show the scale, not a quantity.)
+=Value_sold= is unchanged on every tree row.  Priced 2014-15 tree rows
+(=Quantity_sold > 0= and =Value_sold > 0=) fall 198 -> 192: the six whose month
+count is 0 or missing.  On the 192 the price falls by exactly =months_harvested=
+(the e2836e5d2 ratio overstated it, as this section used to say); on 2017-18's
+127 priced tree rows the price falls by =months_harvested= on the 99 with more
+than one month -- the e2836e5d2 claim that the 2017-18 ratio already was a price
+rested on the label.  Site Q gains one 2014-15 offender: a mango row of 2,005
+=Panier= per month over 3 months, served 6,015.  =harvest_kg= / =yield_kg=
+still drop the tree rows (their =plot_id= is NA), and =gross_crop_revenue= is
+unchanged on them, because =Value_sold= did not move.
+
+*** WAITING The value's window: the instrument and the data disagree
+
+The ruling pairs a MONTHLY quantity sold (3B.13 / 11F.14, "en moyenne chaque
+mois") with a TOTAL value (3B.14 / 11F.15, "montant total").  If that is what
+respondents answered, =value / per-month quantity sold= rises one-for-one with
+the month count.  It does not, in either wave.  Within crop x sold-unit cells,
+the slope of =log(value / per-month quantity sold)= on =log(months harvested)=
+is:
+- 2014-15: -0.05 (se 0.30), n = 156 rows in 20 cells;
+- 2017-18: -0.52 (se 0.47), n = 104 rows in 15 cells.
+
+A total predicts a slope of 1, so both waves reject it at about 3 se.  Two
+caveats bound what this shows.
+- The test cannot tell "both monthly" (the 2017-18 label; WB 2017-18) from
+  "both total" (respondents ignored "en moyenne chaque mois").  It rejects only
+  the mixed pairing that is served.
+- A price that falls with harvest length (larger growers, a glut) would bias
+  the slope down.
+
+The WB harmonised do-files never adopt the mixed pairing either.  2014-15 uses
+the sold quantity and the value both unscaled (=MLI_EACI1.do:348/397=);
+2017-18 scales both (=MLI_EACI2.do:313/353=).  So the served price may be
+understated by =months_harvested= on multi-month rows.  If the value is in fact
+monthly, the remedy is to scale =Value_sold= too, keeping the ratio and making
+it a 12-month revenue.  That would be one line in =mali.tree_crop_rows= and one
+column in the registry entry.  Re-runnable:
+=slurm_logs/isa_backlog_2026-10-21/824-mali-unit-sold/scripts/probe_value_window.py=.
+
+** 2017-18 unrecorded sales are NA; the 1,607 are the Leger questionnaire (ruling 2026-10-23)
+
+The 2017-18 =s7g= sale was summed with a plain =sum= (=min_count=0=), so an
+unrecorded sale was served as 0: 1,653 =Quantity_sold= and 1,662 =Value_sold=
+rows on served single-plot field rows (624 with =s7gq20= unanswered, the rest
+=Oui= with nothing recorded).  It is now =sum(min_count=1)=, vectorised, and 0
+is filled only where =s7gq20 == 'Non'=.  This is the same class as #1250
+(Uganda), #1253 (Ethiopia) and #1263.  The WB do-file does the same thing in
+two steps (=collapse (sum) ... (count)=, then =replace ... = . if n == 0=).
+Served zeros fall 10,460 -> 8,807 (=Quantity_sold=: 8,806 =Non= plus one =Oui=
+line that records a quantity of 0) and 10,468 -> 8,806 (=Value_sold=, all
+=Non=).
+
+*Why 1,607 of the 2,269 =Oui= rows record no quantity or unit: the Leger
+questionnaire.*  =eaci17_s00p2.dta= carries =typequest= (1 Questionnaire Leger,
+2 Questionnaire Lourd), and joined to =s7g=:
+
+| s7g rows     | Leger  | Lourd |
+|--------------+--------+-------|
+| =s7gq20= Oui | 1,607  | 662   |
+| =s7gq20= Non | 8,346  | 4,666 |
+| unanswered   | 516    | 257   |
+
+Every one of the 1,607 =Oui= rows without a quantity is Leger, and they belong
+to 1,190 rural households.  No Leger row records =s7gq21a/b/c/d= or =s7gq22=
+(share non-null 0.000), and only =s7gq01/02=, =s7gq20=, =s7gq24-26= and
+=s7gq35-36= are filled for Leger at all.  Every Lourd =Oui= row has a quantity
+and a unit (662 / 662) and 647 have a value.  So a Leger household was asked
+WHETHER it sold, never how much or for how much; its sale is unrecorded by
+design and is now NA, not 0.  The printed questionnaire says nothing about
+Lourd / Leger in words (searched, both passages, both languages), but it
+hatches exactly the columns Leger leaves empty: in 7G, 7G.03-7G.19, 7G.21,
+7G.22, 7G.23 and 7G.27-7G.34 are hatched, while 7G.01, 7G.02, 7G.20,
+7G.24-7G.26, 7G.35 and 7G.36 -- the columns Leger fills -- are not
+(=eaci17_p2_french.pdf= / =eaci17_p2_eng.pdf= p. 35; the hatching was located
+from the PDF's drawing instructions).  There is no legend; the enumerator
+manual would settle it.  The household split (10,469 / 5,585 rows) matches the 2:1 rural design in
+the sampling section above.
+
+*Downstream residual, not fixed (=transformations.py=, framework).*
+=gross_crop_revenue= no longer serves the 447 2017-18 households whose only
+sale rows were filled zeros (by crop, 1,662 rows).  It still sums over a
+household's crops skipping NA, so 837 households with at least one unrecorded
+sale are served a revenue anyway: 809 of them as 0, from their other crops'
+explicit =Non=.
 
 ** Found on the way, not changed
 
-- 2017-18 =s7g= sales are summed with a plain =sum= (=min_count=0=), so an
-  unanswered sale becomes 0.  On served single-plot rows, 1,653 carry
-  =Quantity_sold = 0= although the raw quantity is NA (624 unanswered =s7gq20=,
-  1,029 =Oui= with no quantity), and 1,662 carry =Value_sold = 0= likewise.  Kept
-  byte-identical here, because changing it is a decision.  1,607 of the 2,269
-  =Oui= rows record no quantity or unit.  Whether that is the Lourd / Leger split
-  (sampling section above) is unmeasured.
 - One 2014-15 =s3a= duplicate (=i=, =plot_id=, =crop=) group sums =Quantity=
   across two different HARVEST units and serves the first =u=.  This is
   pre-existing and unchanged.
@@ -1520,6 +1606,8 @@ was flagged; it is now NA.
   location is unwired.
 - One 2014-15 tree row reports =Value_sold = 999999= with a sentinel quantity.
   This is pre-existing; the existing sentinel rule covers quantities only.
+- One 2014-15 mango row records 2,005 =Panier= harvested per month (a
+  year-like number); it is now Site Q's third 2014-15 offender at 6,015.
 
 Evidence (aggregates and scripts): =slurm_logs/isa_backlog_2026-10-21/824-mali-unit-sold/=.
 Ledger: =.coder/ledger/824-mali-unit-sold.md=.

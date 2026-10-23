@@ -1,0 +1,6 @@
+2014-15 3B (s3bq14 / s3bq13a): slope of log(value/monthly qty sold) on log(months) = -0.05 (se 0.30); n=156 rows in 20 crop x unit cells with varying months
+   pooled (no FE) slope 0.01; median value/monthly-qty by months (groups of n >= 5): 1m:3077(n=49), 2m:5000(n=49), 3m:3493(n=44)
+2017-18 11F (s11fq15 / s11fq14a): slope of log(value/monthly qty sold) on log(months) = -0.52 (se 0.47); n=104 rows in 15 crop x unit cells with varying months
+   pooled (no FE) slope -0.24; median value/monthly-qty by months (groups of n >= 5): 1m:2222(n=25), 2m:1500(n=27), 3m:7000(n=32), 4m:1389(n=7), 12m:150(n=5)
+2017-18 11F (s11fq15 / s11fq11a, harvest denominator): slope of log(value/monthly qty sold) on log(months) = 0.29 (se 0.33); n=107 rows in 17 crop x unit cells with varying months
+   pooled (no FE) slope -0.22; median value/monthly-qty by months (groups of n >= 5): 1m:3200(n=23), 2m:10000(n=27), 3m:12000(n=37), 4m:1250(n=7), 12m:140(n=5)

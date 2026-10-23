@@ -138,3 +138,37 @@ reducer (the Niger key + gate is copied, not generalised); a price rule
   99/9999 rule; 1 `Quantity` (NA before and after) and 1 `Quantity_sold`.
 - No REINVENTION found: no new unit table, no new reducer, no price rule.
 - Cache: hash census Mali-only (24/24 country, 96/96 wave, 0/40 btf).
+
+---
+## Round 2 — maintainer rulings on PR #1272 (@ligon, 2026-10-23)
+
+Supersedes §5 rows 2-3 and §5's "window disclosure", and closes §6 bullet 1.
+
+### §5' Reuse decision (round 2)
+
+| quantity | decision | reason |
+|---|---|---|
+| tree `Quantity`, `Quantity_sold` | per-month answer x `months_harvested`, both waves, one key `Mali::crop_production::tree-twelve-month-total` | ruling 1; precedent GhanaLSS `9b-sale-amount-per-unit` (a registered construction under the table's own name, two waves one key) and `MLI_EACI2.do:242/313`; CLAUDE.md "Derived Values" (a derived value is first-class; same rule, same name) |
+| tree `Value_sold` | as recorded, both waves | ruling 1: `s3bq14` is the total; for 2017-18 the instrument decides, and 11F.15 is printed word for word 3B.14 ("montant total de cette vente") -- the Stata label "mensuelle moyenne" disagrees (recorded in the registry and CONTENTS) |
+| edge rows | missing codes masked before the product; 0 a month is 0; months NA -> NA; months 0 beside a positive answer -> NA | ruling 1 "decide from the data": a 0 quantity beside a recorded sale value is a manufactured zero |
+| 2017-18 `s7g` sale | `sum(min_count=1)` (cython), 0 only on `s7gq20 == 'Non'` | ruling 2; #1250 / #1253 / #1263; CLAUDE.md #871 (no per-group callable) |
+
+### Phase 3' — verification (round 2)
+
+- `derive_tree_twelve_month_total` / `tree_crop_rows` -- OK (§5'): raw oracle
+  358/358 (2014-15) and 270/270 (2017-18) on Quantity, Quantity_sold,
+  Value_sold and months_harvested, written independently of `mali.py`.
+- `crop_production_finalize` sentinel rule now field-rows only -- OK: tree
+  per-month answers are masked before the product; 0 tree totals equal 99 /
+  9999 today, and a test pins that a tree 99 survives.
+- 2017-18 `s7g` `sum(min_count=1)` -- OK: raw oracle 24,449/24,449 on both
+  sale columns; served zeros 10,460 -> 8,807 / 10,468 -> 8,806.
+- The 1,607 'Oui'-without-quantity rows: all Leger (`typequest`); Leger's s7g
+  carries no 7G.21 / 7G.22 at all.  Recorded in CONTENTS (both the
+  crop_production and the sampling sections).
+- NOT corroborated, recorded as WAITING: within crop x unit cells,
+  value / per-month quantity sold does not rise with the month count (slope
+  -0.05 se 0.30 in 2014-15; -0.52 se 0.47 in 2017-18), which rejects the
+  mixed-window pairing the ruling serves; it cannot separate both-monthly from
+  both-total.
+- Cache: hash census vs development Mali-only (see the evidence README).

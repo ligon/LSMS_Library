@@ -1,0 +1,1 @@
+households with >=1 sale row moved 0 -> NA: 1284; still served a gross_crop_revenue: 837 (zero 809, positive 28)
