@@ -334,6 +334,121 @@ def test_the_ladder_falls_back_but_never_pools_across_waves():
 
 
 # ---------------------------------------------------------------------------
+# Zeros never define the scale (GH #1259)
+# ---------------------------------------------------------------------------
+
+#: Tanzania's ``(2020-21, kg, Timber)`` positive values, as pinned by
+#: ``test_p90_survives_the_second_outlier_where_p99_does_not``: 37 rows, p90
+#: 23,088, with the 200,000 kg row and the 4,000,000 kg row GH #857 names.
+_TIMBER_POSITIVE = ([600.0] * 27
+                    + [3500., 3600., 10200., 15000., 16200., 18480., 30000.,
+                       38500.]
+                    + [200_000., 4_000_000.])
+
+
+def _rows(values, crop="Timber", unit="kg", wave="2020-21", prefix="hh"):
+    return [{"t": wave, "i": f"{prefix}{k:04d}", "plot": "1", "j": crop,
+             "u": unit, "Quantity": v} for k, v in enumerate(values)]
+
+
+def _frame(rows):
+    return pd.DataFrame(rows).set_index(["t", "i", "plot", "j"])
+
+
+def _offenders(df):
+    return {(o["i"], o["j"], o["value"], o["reference"], o["rung"])
+            for r in _audit(df) for o in r["offenders"]}
+
+
+def test_recorded_zeros_do_not_collapse_the_reference():
+    """GH #1259's own cell.  PR #1263 serves Tanzania's recorded "not harvested
+    in the last 12 months" answers as explicit ``Quantity = 0, u = kg``, which
+    put 309 zeros beside Timber's 37 harvests.  Counted in the quantile, the
+    zeros dragged the reference from 23,088 kg to 17 and ordinary harvests
+    fired.  A zero says the household did not harvest; it says nothing about
+    how large a harvest in this cell is, so it may not define the scale.
+
+    Here the same 37 positive values sit under 309 zeros: the reference must
+    be the positive rows' own p90 (23,088, exactly as with no zeros at all),
+    the 4,000,000 kg row must still fire, and the 200,000 kg row -- 8.7x that
+    reference -- must not.  Counting the zeros, the reference is 600 and the
+    200,000 kg row is named at 333x."""
+    df = _frame(_rows([0.0] * 309 + _TIMBER_POSITIVE))
+    reports = _audit(df)
+    assert len(reports) == 1
+    offenders = reports[0]["offenders"]
+    assert [o["value"] for o in offenders] == [4_000_000.0], offenders
+    assert offenders[0]["reference"] == pytest.approx(23_088.0)
+    assert offenders[0]["rung"] == "t,u,j"
+
+    # ... and the audit still changes nothing, zeros included.
+    before = df["Quantity"].to_numpy(dtype="float64").copy()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        assert check_quantities(df, country="T", table="crop_production") is df
+    assert np.array_equal(before, df["Quantity"].to_numpy(dtype="float64"))
+    assert int((df["Quantity"] == 0).sum()) == 309
+
+
+def test_zeros_cannot_pad_a_thin_cell_over_the_floor():
+    """``QUANTITY_MIN_CELL`` exists because a thin cell cannot manufacture a
+    reference.  Zeros must not be able to supply the bulk: a cell of 300 zeros
+    and 5 harvests holds 5 measurements of scale, not 305.
+
+    The discriminating shape is a cell the zeros carry OVER the floor without
+    swamping its quantile: 20 zeros + 25 harvests + one extreme.  Counting the
+    zeros it has 46 rows and a p90 of 850, and the extreme fires; counting
+    measurements it has 26, below the floor at every rung, so it is not
+    judged -- silence, not a guess."""
+    harvests = [100.0 * (1 + k % 10) for k in range(25)]
+    df = _frame(_rows([0.0] * 20 + harvests + [1_000_000.0]))
+    assert len(df) >= QUANTITY_MIN_CELL
+    assert int((df["Quantity"] > 0).sum()) < QUANTITY_MIN_CELL
+    assert _audit(df) == []
+
+
+def test_a_zero_padded_crop_falls_to_its_wave_unit_cell():
+    """The ladder consequence of counting only measurements.  A crop with 20
+    zeros, 9 harvests and one extreme has 30 rows but 10 measurements, so its
+    own ``(t, u, j)`` cell no longer qualifies and the row is judged on the
+    wave's ``(t, u)`` cell -- the same fall-through a crop with 10 rows and no
+    zeros gets.  Counting the zeros, it was judged against itself."""
+    common = _rows([100.0 * (1 + k % 10) for k in range(60)], crop="Common",
+                   prefix="c")
+    rare = _rows([0.0] * 20 + [100.0 * (1 + k) for k in range(9)]
+                 + [9_000_000.0], crop="Rare", prefix="r")
+    df = _frame(common + rare)
+    reports = _audit(df)
+    assert len(reports) == 1
+    (offender,) = reports[0]["offenders"]
+    assert offender["j"] == "Rare" and offender["value"] == 9_000_000.0
+    assert offender["rung"] == "t,u"
+
+
+def test_the_audit_ignores_zero_rows_entirely():
+    """The rule stated as an invariant: auditing a frame names exactly the
+    rows, references and rungs that auditing its strictly positive rows
+    names.  A zero is never judged (it cannot exceed a positive reference)
+    and, since GH #1259, never judges either.  PR #1263's re-formed Tanzania
+    pin is built on exactly this comparison."""
+    rng = np.random.default_rng(1259)
+    rows = _rows([0.0] * 309 + _TIMBER_POSITIVE)
+    rows += _rows([0.0] * 20 + [100.0 * (1 + k % 10) for k in range(25)]
+                  + [1_000_000.0], crop="Thin", prefix="t")
+    for crop, zeros in (("Maize", 0.05), ("Beans", 0.5), ("Cassava", 0.85)):
+        n = 200
+        values = rng.lognormal(5, 1.5, n)
+        values[rng.random(n) < zeros] = 0.0
+        values[:2] = [values.max() * 500, 0.0]
+        rows += _rows(list(values), crop=crop, prefix=crop[:2])
+    df = _frame(rows)
+    q = df["Quantity"]
+    with_zeros, without = _offenders(df), _offenders(df[q > 0])
+    assert without, "the probe frame must name something"
+    assert with_zeros == without
+
+
+# ---------------------------------------------------------------------------
 # Strict mode -- its own lever, same spelling as the other two
 # ---------------------------------------------------------------------------
 
