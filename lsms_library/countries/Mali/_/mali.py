@@ -481,12 +481,21 @@ def _inputs_trees(wave):
     from pathlib import Path
     from lsms_library.paths import countries_root
     fn, crop, _, hh = _TREE_ROSTERS[wave]
-    src = tools.get_dataframe(str(Path(countries_root()) / 'Mali' / wave / 'Data' / fn))
+    root = Path(countries_root()) / 'Mali'
+    src = tools.get_dataframe(str(root / wave / 'Data' / fn))
     src = producing_trees(src, wave)
     out = src[_TREE_RAW[wave]].copy()
     out['t'] = wave
     out['i'] = src.apply(lambda r: i(pd.Series([r['grappe'], r[hh]])), axis=1)
-    out['crop'] = _crop_labels(src[crop]).values
+    # _crop_labels resolves its table relative to the cwd of a wave script;
+    # this callable runs from anywhere, so name the same two rungs (wave _/,
+    # then country _/) explicitly.
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Code',
+        dirs=[f'{root / wave / "_"}/', f'{root / "_"}/'],
+        **{'Preferred Label': 'Preferred Label'})
+    out['crop'] = (src[crop].astype('string').str.strip().map(crop_map)
+                   .astype('string').values)
     return out.set_index(['t', 'i', 'crop'])
 
 
