@@ -3701,13 +3701,20 @@ def _walk_partition(mapping: dict[str, str]) -> tuple[frozenset, frozenset, froz
             frozenset(keys & targets))
 
 
-def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: str = 'i') -> pd.DataFrame:
+def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: str = 'i',
+            state: str = 'unknown') -> pd.DataFrame:
     '''Re-key household ids into the panel's canonical ids, EXACTLY ONCE.
 
     Parameters:
         df (DataFrame): Panel data with a MultiIndex, including 't' for wave and 'i' (default) for household ID.
         updated_ids (dict): ``{wave: {current_id: canonical_id, ...}, ...}``.
         hh_index (str): Index name for the household ID level (default is 'i').
+        state (str): ``'unknown'`` (default) or ``'raw'``.  Pass ``'raw'`` only
+            when the caller knows ``df`` has not been walked -- stage 2 of
+            ``load_from_waves`` (a wave's own build) and ``derivation_inputs``
+            (raw survey rows).  It changes one thing: a wave whose ids cannot
+            say whether it was walked (see below) is renamed instead of
+            refused.
 
     Single-pass rename (GH #1245)
     ------------------------------
@@ -3730,25 +3737,47 @@ def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: 
     Uganda ``nutrition`` three times).  So each wave decides from its own ids,
     using the classes of :func:`_walk_partition`:
 
-    ============================  =========================================
-    the wave holds                action
-    ============================  =========================================
-    a ``raw_only`` id only        rename (unwalked)
-    a ``walked_only`` id only     leave as is (already walked)
-    both                          raise :class:`IdWalkError` (mixed)
-    neither, but a ``chained`` id raise :class:`IdWalkError` (undecidable)
-    neither, and no ``chained``   rename (a no-op on these ids)
-    ============================  =========================================
+    ==================================  =======================================
+    the wave holds                      action
+    ==================================  =======================================
+    a ``raw_only`` id, no walked_only   rename (unwalked)
+    a ``walked_only`` id, no raw_only   leave as is (already walked)
+    both                                raise :class:`IdWalkError` (mixed)
+    neither, but a ``chained`` id       raise :class:`IdWalkError`
+                                        (undecidable); ``state='raw'``: rename
+    neither, and no ``chained`` id      rename (a no-op on these ids)
+    ==================================  =======================================
 
-    So ``id_walk(id_walk(df)) == id_walk(df)`` again, now by detection rather
-    than by closure, and losing ``attrs`` is not a correctness hazard.  The
-    flag is still set: callers use it to skip the work.  A wave with no map, or
-    an empty one, is returned untouched.  See ``tests/test_id_walk.py``.
+    So ``id_walk(id_walk(df)) == id_walk(df)`` for a frame whose first walk
+    left at least one ``walked_only`` id in each walked wave, and losing
+    ``attrs`` is not a correctness hazard there.  The flag is still set:
+    callers use it to skip the work.  A wave with no map, or an empty one, is
+    returned untouched.
+
+    Limits, stated (pinned by ``tests/test_id_walk.py``):
+
+    - A *mixed* wave -- walked and unwalked rows of one wave in one frame -- is
+      refused only when each side shows its own class.  If one side holds
+      nothing but ``chained`` or inert ids it escapes: a walked ``{Q}`` beside a
+      raw ``{T}`` is left alone (``T`` stays raw); a walked ``{T}`` beside a
+      raw ``{P}`` is renamed (``T`` walked twice).  No code path builds such a
+      frame today (measured: 0 mixed waves in 1,250 reads).
+    - ``walked_only`` ids in a raw frame mean a target held by a household that
+      keeps its id -- a crosswalk collision, which a rename would turn into a
+      merge.  Such a wave alone is left as is; beside ``raw_only`` ids it is
+      refused as mixed.  Base renamed both (0 occurrences in the corpus).
+    - Rows whose ``t`` is NaN are dropped (``unique()`` keeps NaN, the ``==``
+      mask matches none of it); unchanged from the closure version.
     '''
-    # Guard: a frame with no rows (e.g. a wave whose source yielded nothing)
+    if state not in ('unknown', 'raw'):
+        raise ValueError(f"id_walk: state must be 'unknown' or 'raw', not {state!r}")
+    # Guard: a frame with no ROWS (e.g. a wave whose source yielded nothing)
     # or one lacking a 't' level has no waves to split on; the final
     # ``pd.concat([])`` would otherwise raise "No objects to concatenate".
-    if df.empty or 't' not in (df.index.names or []):
+    # ``len``, not ``df.empty``: an index-only frame (no columns) is "empty" to
+    # pandas but has rows to walk -- the panel diagnostics' spine is one, and
+    # ``df.empty`` returned it unwalked (GH #1245 review).
+    if len(df.index) == 0 or 't' not in (df.index.names or []):
         df.attrs['id_converted'] = True
         return df
 
@@ -3767,12 +3796,13 @@ def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: 
                     f"unwalked and walked rows mixed in one frame, or a crosswalk "
                     f"target held by a household that keeps its id; e.g. "
                     f"{sorted(ids & raw_only)[:3]} / {sorted(ids & walked_only)[:3]}")
-            if not n_raw and not n_walked and ids & chained:
+            if not n_raw and not n_walked and ids & chained and state != 'raw':
                 raise IdWalkError(
                     f"id_walk: wave {wave!r} holds only ids that are both a moving "
                     f"key and another key's target "
                     f"(e.g. {sorted(ids & chained)[:3]}), so whether it is already "
-                    f"walked cannot be told from its ids (GH #1245)")
+                    f"walked cannot be told from its ids (GH #1245); a caller that "
+                    f"knows the frame is unwalked passes state='raw'")
             if not n_walked:
                 df_wave = df_wave.rename(index=mapping, level=hh_index)
         dfs[wave] = df_wave

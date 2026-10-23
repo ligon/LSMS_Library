@@ -1678,9 +1678,17 @@ def _check_id_walk_idempotent(country) -> Check:
     This check clears the flag, reruns ``id_walk`` on the served spine and
     confirms the row count and index set are unchanged.  A served spine
     that ``id_walk`` refuses (``IdWalkError``: raw and walked ids mixed in
-    one wave) fails the check.  The pre-closure form of this check would
-    have caught the Burkina Faso 2021-22 attrs bug from commit 4db41a27
-    (392 duplicate tuples out of ~78,000).
+    one wave, or only ids it cannot classify) fails the check.
+
+    The spine is an index-only frame (zero columns).  Until the GH #1245
+    review, ``id_walk`` returned any ``df.empty`` frame untouched -- and pandas
+    calls a zero-column frame empty -- so this check never reached the walk
+    and passed vacuously.  ``id_walk`` now tests for zero ROWS.  With its
+    detection removed (a bare single-pass rename), the check fails on
+    Burkina Faso's served spine, so it does exercise the walk.  The
+    pre-closure form of this check would have caught the Burkina Faso
+    2021-22 attrs bug from commit 4db41a27 (392 duplicate tuples out of
+    ~78,000).
     """
     try:
         from .local_tools import id_walk

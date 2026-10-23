@@ -27,8 +27,11 @@ derived from a served one (``food_quantities``, Uganda ``nutrition``) reaches
 
 These tests pin, in order: the single-pass semantics; exactly-once (including
 the counterfactual that a bare single-pass rename is NOT idempotent, so the
-detection is load-bearing); the two refusals; and the flag surviving a parquet
-round trip, which is what keeps warm reads off the walk entirely.
+detection is load-bearing); the two refusals and the stated limit of the mixed
+check; ``state='raw'`` for callers that know a frame is unwalked; an
+index-only frame being walked (the panel diagnostic depends on it); and the
+flag surviving a parquet round trip, which is what keeps warm reads of a table
+whose own build walked it off the walk entirely.
 """
 
 from __future__ import annotations
@@ -180,9 +183,12 @@ def test_walked_detection_is_per_wave():
     assert _ids(out, "w2") == ["B"]
 
 
-def test_raises_on_a_wave_mixing_walked_and_unwalked_ids():
-    """A concat of a walked and an unwalked frame of the SAME wave: renaming
-    would walk the walked rows twice, not renaming would serve raw ids."""
+def test_raises_on_a_mixed_wave_when_both_sides_show_their_class():
+    """A concat of a walked and an unwalked frame of the SAME wave, where the
+    walked side holds a walked-only id (U) and the raw side a raw-only id (P):
+    renaming would walk the walked rows twice, not renaming would serve raw
+    ids.  When one side shows no id of its own class the mix is NOT caught --
+    see the next test."""
     walked = id_walk(_frame(["X", "T"]), RENUMBERED)
     walked.attrs = {}
     mixed = pd.concat([walked, _frame(["P"])])
@@ -203,6 +209,96 @@ def test_raises_when_only_chained_ids_are_present():
     must become U, walked T must stay -- the ids cannot say which this is."""
     with pytest.raises(IdWalkError, match="cannot be told"):
         id_walk(_frame(["T"]), RENUMBERED)
+
+
+def test_a_mixed_wave_escapes_when_one_side_holds_only_chained_ids():
+    """The stated LIMIT of detection (GH #1245 review), pinned so a change to
+    it is seen.  No code path builds such a frame today (0 mixed waves in
+    1,250 measured reads), but these are the two ways it goes wrong."""
+    # walked {P -> Q} beside raw {T}: no raw-only id, so the wave reads as
+    # walked and is left alone -- raw T is served unwalked (should be U).
+    walked = id_walk(_frame(["P"]), RENUMBERED)
+    walked.attrs = {}
+    out = id_walk(pd.concat([walked, _frame(["T"])]), RENUMBERED)
+    assert _ids(out) == ["Q", "T"]
+    # walked {X -> T} beside raw {P}: no walked-only id, so the wave reads as
+    # raw and is renamed -- the walked T moves on to U (walked twice).
+    walked = id_walk(_frame(["X"]), RENUMBERED)
+    walked.attrs = {}
+    out = id_walk(pd.concat([walked, _frame(["P"])]), RENUMBERED)
+    assert _ids(out) == ["Q", "U"]
+
+
+def test_state_raw_renames_an_undecidable_wave():
+    """A caller that KNOWS the frame is unwalked (stage 2 of load_from_waves,
+    derivation_inputs) says so, and a small raw frame of only chained ids is
+    renamed instead of refused: raw T is the household that moves to U."""
+    out = id_walk(_frame(["T"]), RENUMBERED, state="raw")
+    assert _ids(out) == ["U"]
+    out = id_walk(_frame(["T", "S"]), RENUMBERED, state="raw")
+    assert _ids(out) == ["S", "U"]
+
+
+def test_state_raw_still_leaves_a_detectably_walked_wave_alone():
+    """state='raw' resolves only the undecidable case.  A frame that is walked
+    by its own ids (here: reaching stage 2 unflagged, e.g. through the
+    country-parquet fall-through) is still not walked twice, and a mixed wave
+    is still refused."""
+    once = id_walk(_frame(["X", "T", "P", "S"]), RENUMBERED)
+    again = once.copy()
+    again.attrs = {}
+    pd.testing.assert_frame_equal(id_walk(again, RENUMBERED, state="raw"), once)
+    mixed = pd.concat([again, _frame(["P"])])
+    with pytest.raises(IdWalkError, match="mixed"):
+        id_walk(mixed, RENUMBERED, state="raw")
+
+
+def test_state_rejects_an_unknown_value():
+    with pytest.raises(ValueError, match="state"):
+        id_walk(_frame(["X"]), RENUMBERED, state="walked")
+
+
+def test_an_index_only_frame_is_walked():
+    """A frame with rows but no columns is `df.empty` to pandas.  The old guard
+    returned it untouched and flagged -- which is how the panel diagnostics'
+    spine (index only) never reached the walk (GH #1245 review, R1)."""
+    df = _frame(["X", "T", "P", "S"])[[]]
+    assert df.empty and len(df) == 4
+    walked = id_walk(df, RENUMBERED)
+    assert _ids(walked) == ["Q", "S", "T", "U"]
+
+
+def _bare_single_pass(df, updated_ids, hh_index="i", state="unknown"):
+    """id_walk with the exactly-once detection removed (rows guard kept)."""
+    if len(df.index) == 0 or "t" not in (df.index.names or []):
+        return df
+    parts = []
+    for w in df.index.get_level_values("t").unique():
+        d = df[df.index.get_level_values("t") == w]
+        m = updated_ids.get(w) or {}
+        parts.append(d.rename(index=m, level=hh_index) if m else d)
+    return pd.concat(parts)
+
+
+def test_the_panel_diagnostic_exercises_the_walk(monkeypatch):
+    """`diagnostics._check_id_walk_idempotent` re-walks the served spine (an
+    index-only frame).  It passes with the real id_walk and FAILS with the
+    detection removed -- so the check is not vacuous."""
+    from types import SimpleNamespace
+    from lsms_library import diagnostics
+    import lsms_library.local_tools as lt
+
+    spine = id_walk(_frame(["X", "T", "P", "S"])[[]], RENUMBERED)
+    spine.attrs = {}
+
+    def country():
+        return SimpleNamespace(name="Fixtureland", updated_ids=RENUMBERED,
+                               _diagnostics_spine_cache=(spine.copy(), "fixture"))
+
+    assert diagnostics._check_id_walk_idempotent(country()).status == "pass"
+    monkeypatch.setattr(lt, "id_walk", _bare_single_pass)
+    check = diagnostics._check_id_walk_idempotent(country())
+    assert check.status == "fail", check
 
 
 def test_id_walk_error_is_not_swallowed_by_the_fallback_catches():

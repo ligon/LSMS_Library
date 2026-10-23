@@ -2937,7 +2937,10 @@ class Country:
             and not frame.attrs.get('id_converted')
             and self.updated_ids is not None
         ):
-            frame = id_walk(frame, self.updated_ids)
+            # Raw survey rows by construction: tell id_walk so, or a small
+            # frame of only chained ids would be refused as undecidable
+            # (GH #1245 review: Malawi inputs carry 1-2 households per wave).
+            frame = id_walk(frame, self.updated_ids, state='raw')
         return frame
 
     def provenance(self) -> pd.DataFrame:
@@ -5502,7 +5505,11 @@ class Country:
                         and not wave_result.attrs.get('id_converted')
                         and self._updated_ids_cache is not None
                     ):
-                        wave_result = id_walk(wave_result, self.updated_ids)
+                        # A wave's own build: unwalked (GH #1245, state='raw'
+                        # only lets an undecidable wave be renamed; a wave that
+                        # is detectably walked is still left alone).
+                        wave_result = id_walk(wave_result, self.updated_ids,
+                                              state='raw')
                     wave_result = self._augment_index_from_related_tables(
                         wave_result,
                         scheme_entry,
