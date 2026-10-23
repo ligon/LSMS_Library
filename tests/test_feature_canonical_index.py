@@ -512,6 +512,9 @@ class TestFeatureEndToEnd:
             "Ethiopia":   ["i", "t", "v", "plot_id", "j", "u"],
             "GhanaSPS":   ["i", "t", "v", "plot_id", "j", "u", "season"],
             "Malawi":     ["i", "t", "v", "plot", "crop", "u", "condition"],
+            # Tanzania serves `production_obs` since GH #637 (2026-10-23) and
+            # Uganda since GH #1198; these two older shapes are kept because
+            # they exercise the promote-`u` and fabricate-sentinel branches.
             "Tanzania":   ["i", "t", "v", "plot_id", "j"],
             "Uganda":     ["i", "t", "v", "plot", "j", "u", "condition", "season"],
         }
@@ -630,8 +633,9 @@ INPUT_SHAPES = {
     "Benin":    (["i", "t", "v", "input", "crop", "u"], False),
     # Ethiopia, GhanaLSS
     "Ethiopia": (["i", "t", "v", "plot_id", "input", "j"], True),
+    # Malawi, Tanzania (Tanzania since GH #637, 2026-10-23)
     "Malawi":   (["i", "t", "v", "plot_id", "input", "crop", "u"], False),
-    # Mali, Nigeria, Tanzania
+    # Mali, Nigeria (and Tanzania before GH #637)
     "Mali":     (["i", "t", "v", "plot_id", "input", "crop"], True),
     "Uganda":   (["i", "t", "v", "plot_id", "input", "j", "season"], True),
 }
@@ -780,7 +784,8 @@ class TestPlotInputsHarmonize:
 
     def test_u_column_nulls_become_unknown_not_NA(self):
         """GhanaLSS / Ethiopia / Mali / Nigeria / Tanzania carry `u` as a
-        column with nulls (8,763 / 37,370 / 42,089 / 5,546 / 408 rows)."""
+        column with nulls (8,763 / 37,370 / 42,089 / 5,546 / 408 rows).
+        (Tanzania's plot_inputs `u` is an index level since GH #637.)"""
         names = INPUT_SHAPES["Mali"][0]
         df = _frame(names,
                     [("h1", "2017-18", "c1", "1_1", "Seed", "Mil"),

@@ -2,9 +2,9 @@
 (parity-loop GAP 2).
 
 Each buildable wave's ``Tanzania/<wave>/_/plot_inputs.py`` produces a
-parquet with index ``(t, i, plot_id, input, crop)`` and the canonical
-reported columns from data_scheme.yml (Quantity, u, Purchased,
-Quantity_purchased, Improved).  This script concatenates the per-wave
+parquet with index ``(t, i, plot_id, input, crop, u)`` (``u`` a key since
+GH #637) and the canonical reported columns from data_scheme.yml (Quantity,
+Purchased, Quantity_purchased, Improved).  This script concatenates the per-wave
 parquets and applies cross-wave id_walk so the household index uses the
 panel canonical id scheme.
 

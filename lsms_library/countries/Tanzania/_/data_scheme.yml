@@ -157,12 +157,24 @@ Data Scheme:
     materialize: make
 
   crop_production:
-    # Item-level crop harvest (parity-loop GAP 1) at the natural grain
-    # (t, i, plot_id, j) -- one row per crop grown on a plot.  Stacks three
-    # harvest modules per wave: AG_SEC_4A (seasonal/annual), AG_SEC_6A
-    # (perennial fruit), AG_SEC_6B (perennial non-fruit/cash trees); reported
-    # sales (5A/7A/7B) attached at the unambiguous single-plot (hhid, crop)
-    # grain.  j is the canonical Preferred Label from harmonize_crop, which
+    # Item-level crop harvest (parity-loop GAP 1) at the native grain
+    # (t, i, plot_id, j, production_obs) -- one row per crop CODE recorded on
+    # a plot in one harvest module.  Stacks three harvest modules per wave:
+    # AG_SEC_4A (seasonal/annual), AG_SEC_6A (perennial fruit), AG_SEC_6B
+    # (perennial non-fruit/cash trees); reported sales attached at the
+    # unambiguous single-plot (hhid, crop code) grain, each sale module to the
+    # harvest module it asks about (5A -> 4A, 7A -> 6A, 7B -> 6B).
+    #   production_obs : the canonical native-observation coordinate
+    #           (lsms_library/data_info.yml, GH #1198), here
+    #           'reported:<module>:<crop code>' (e.g. 'reported:6B:34').  GH
+    #           #637 rulings (@ligon, 2026-10-23): harmonize_crop LUMPS
+    #           distinct codes under one j (Other Fruits, Citrus Fruits,
+    #           Pulses, ...), and each code keeps its own row, harvest and
+    #           sale; one code recorded in 4A AND a perennial module on one
+    #           plot stays two rows (two recall windows are never added).
+    #           Sum over it only where codes / modules are commensurable for
+    #           your purpose.
+    #   j is the canonical Preferred Label from harmonize_crop, which
     # REUSES harmonize_food Preferred Labels where a crop is a consumed food
     # (Maize (grain), Rice (paddy), Pulses, ...) so crop_production.j joins
     # food_acquired.j; new labels only for non-food crops (Cotton, Sisal,
@@ -175,7 +187,7 @@ Data Scheme:
     # planting_month is part of the GAP-1 schema but is NOT recorded by the
     # NPS instrument (WB cleaning code: "planting month (absent)"), so it is
     # omitted rather than carried all-null.
-    index: (t, i, plot_id, j)
+    index: (t, i, plot_id, j, production_obs)
     Quantity: float
     u: str
     Quantity_sold: float
@@ -187,7 +199,8 @@ Data Scheme:
 
   plot_inputs:
     # Item-level plot inputs (parity-loop GAP 2) at the natural grain
-    # (t, i, plot_id, input, crop) -- one row per input applied to a plot.
+    # (t, i, plot_id, input, crop, u) -- one row per input applied to a plot,
+    # per recorded unit.
     # Stacks the AG_SEC_3A plot-detail input modules (organic fertilizer
     # ag3a_41..45; inorganic fertilizer type 1 ag3a_47..51 and type 2
     # ag3a_54..58; herbicide ag3a_60..63; pesticide ag3a_65a..65c) and the
@@ -203,9 +216,15 @@ Data Scheme:
     #           and food_acquired.j.  pd.NA for plot-level inputs (fertilizer /
     #           herbicide / pesticide).  ~23% of rows are non-seed -> the crop
     #           index level is partially null by construction.
-    #   u     : native unit -- 'kg' for fertilizer (the questionnaire records
-    #           fertilizer in KG); native litre/millilitre/bucket/cup for
-    #           seed / herbicide / pesticide, harmonized by the country u table.
+    #   u     : native unit, an INDEX level (GH #637) -- 'kg' for fertilizer
+    #           (the questionnaire records fertilizer in KG); native
+    #           litre/millilitre/bucket/cup for seed / herbicide / pesticide,
+    #           harmonized by the country u table; 'Unknown' where the unit is
+    #           absent or OTHER (SPECIFY) (#1041).  A key, as in the canonical
+    #           plot_inputs index and in Malawi / the EHCVM countries: two seed
+    #           crop codes sharing one label (Beans + Cowpeas -> Pulses) in two
+    #           different units are two rows, never one incommensurable sum
+    #           (2020-21: 10 such groups; 2019-20: 1).
     # Only 2019-20 and 2020-21 are buildable; 2008-15 has no agriculture source
     # on disk (same as plot_features / crop_production, GH #167).
     # SEASON SCOPE: long-rainy-season modules (AG_SEC_3A / AG_SEC_4A) only,
@@ -216,11 +235,20 @@ Data Scheme:
     # seasons as separate plot-season rows.
     # STORES REPORTED VALUES ONLY -- seed_kg / nitrogen_kg / any-use flags /
     # fertilizer totals are transformations over these rows, NOT columns here.
-    index: (t, i, plot_id, input, crop)
+    index: (t, i, plot_id, input, crop, u)
     Quantity: float
-    u: str
     Purchased: bool
     Quantity_purchased: float
+    # The unit Quantity_purchased is recorded in, canonicalised at build time
+    # to the u Preferred Label (GH #637 ruling 2026-10-23; Burkina #1188
+    # precedent).  Seed: its own unit ag4a_10c_2 -- NOT necessarily u, which
+    # describes Quantity (they differ on 1 / 11 held seed records); OTHER
+    # (SPECIFY) is 'Unknown'.  Organic fertilizer: 'Kg' (the question asks
+    # in KG).  NA where no purchased quantity / unit is recorded.  No
+    # conversion between the two units is implied.
+    Unit_purchased:
+      type: str
+      optional: true
     Improved: bool
     materialize: make
 

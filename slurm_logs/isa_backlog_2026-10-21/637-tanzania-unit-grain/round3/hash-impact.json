@@ -1,0 +1,31 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 25,
+  "moved_by_country": {
+   "Tanzania": 25
+  },
+  "tanzania_total": 25,
+  "moved_non_tanzania": []
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 150,
+  "moved_by_country": {
+   "Tanzania": 150
+  },
+  "tanzania_total": 150,
+  "moved_non_tanzania": []
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "moved_by_country": {},
+  "tanzania_total": null,
+  "moved_non_tanzania": null
+ },
+ "errors": {
+  "base": {},
+  "branch": {}
+ }
+}

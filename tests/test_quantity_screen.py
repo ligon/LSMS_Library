@@ -674,6 +674,33 @@ def test_tanzania_2020_21_coconut_and_timber_rows_fire():
 
     # ... and a bounded total, so a future rule change that turns the screen
     # into a firehose fails here rather than in someone's analysis.
-    assert report["n_implausible"] == 13, [
-        (o["j"], o["value"], o["ratio"]) for o in report["offenders"]]
-    assert report["rows"] == 11_125
+    #
+    # The bound is the set of offenders that survive a POSITIVE-ONLY
+    # reference.  GH #637 (2026-10-23) made Tanzania's perennial "not
+    # harvested in the past 12 months" answers explicit 0.0 kg rows, and the
+    # screen's p90 then counted those zeros (Timber 2020-21: 309 of 346 rows),
+    # which named 13 zero-driven rows on top -- the defect #1259, fixed by PR
+    # #1266 (positive-only reference).  With #1266 merged the full-frame
+    # audit IS the positive-reference set; until then it is a superset.  The
+    # earlier "known excess" block that pinned those 13 rows is retired here,
+    # as #1266 asks of whichever PR lands second.
+    #
+    # 14, not 13: the round-3 ruling (PR #1263) serves one row per native crop
+    # code (``production_obs``) instead of summing the codes harmonize_crop
+    # lumps.  The 2020-21 Other Fruits kg cell holds 1,662 positive rows
+    # instead of 1,102, its p90 falls from 752.5 to 493.6 kg, so the lumped
+    # 77,644 kg (72,400 + 5,244) is now the single code's 72,400 kg and one
+    # 50,625 kg code (ratio 67 before) now crosses 100x.
+    def _key(o):
+        return (o["i"], o["plot"], o["j"], o["value"])
+
+    named_all = {_key(o) for o in report["offenders"]}
+    q = pd.to_numeric(df["Quantity"], errors="coerce")
+    positive = df[~(q <= 0).fillna(False)]
+    pos_reports = audit_quantities(positive, "Quantity", country="Tanzania",
+                                   table="crop_production")
+    assert len(pos_reports) == 1
+    real = {_key(o) for o in pos_reports[0]["offenders"]}
+    assert len(real) == 14, sorted((k[2], k[3]) for k in real)
+    assert real <= named_all, "a positive-reference offender stopped firing"
+    assert report["rows"] == 12_676

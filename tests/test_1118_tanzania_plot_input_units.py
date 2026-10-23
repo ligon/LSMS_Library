@@ -32,6 +32,7 @@ def sources(seed_rows=()):
         'ag3a_65b_2', 'ag3a_65c')})
     defaults = dict(hhid=1, plot=1, crop=1, ag4a_10_1=2,
                     ag4a_10_2=1, ag4a_10c_1=pd.NA,
+                    ag4a_10c_2=pd.NA,  # read since GH #637 (Unit_purchased)
                     ag4a_12=pd.NA, ag4a_08=2)
     sec4 = pd.DataFrame([dict(defaults, **row) for row in seed_rows],
                         columns=list(defaults))
@@ -43,6 +44,11 @@ def build(mod, sec3, sec4):
         'synthetic', sec3, sec4, {'hhid': 'hhid', 'plot': 'plot', 'crop': 'crop'})
 
 
+def served_unit(out, row=0):
+    """The served unit.  ``u`` is an index level since GH #637."""
+    return out.index.get_level_values('u')[row]
+
+
 @pytest.mark.parametrize('quantity', [pd.NA, 0, 3])
 @pytest.mark.parametrize('unit', [pd.NA, 5])
 def test_missing_or_other_unit_is_unknown_with_or_without_amount(
@@ -50,7 +56,7 @@ def test_missing_or_other_unit_is_unknown_with_or_without_amount(
     sec3, sec4 = sources([dict(ag4a_10_1=quantity, ag4a_10_2=unit)])
     out = build(tanzania, sec3, sec4)
     assert len(out) == 1
-    assert out.iloc[0]['u'] == U_UNKNOWN
+    assert served_unit(out) == U_UNKNOWN
     assert (pd.isna(out.iloc[0]['Quantity']) if pd.isna(quantity)
             else out.iloc[0]['Quantity'] == quantity)
     assert pd.isna(out.iloc[0]['Quantity_purchased'])
@@ -64,33 +70,43 @@ def test_blank_labels_normalize_but_nonblank_labels_remain_verbatim(
     sec3, sec4 = sources([dict(ag4a_10_1=quantity)])
     out = build(tanzania, sec3, sec4)
     assert len(out) == 1
-    assert out.iloc[0]['u'] == (label if label.strip() else U_UNKNOWN)
+    assert served_unit(out) == (label if label.strip() else U_UNKNOWN)
     assert (pd.isna(out.iloc[0]['Quantity']) if pd.isna(quantity)
             else out.iloc[0]['Quantity'] == quantity)
 
 
-def test_duplicate_missing_first_unit_does_not_displace_later_known_unit(tanzania):
+def test_duplicate_missing_unit_and_later_known_unit_stay_separate(tanzania):
+    # GH #637 moved this pin.  #1118 asserted ONE row, u='kg', Quantity=2: the
+    # 'first' unit reducer let the second record's recorded unit (kg, no
+    # amount) label the first record's amount (2, unit unknown) -- an amount
+    # whose unit was never recorded served as kilograms.  With ``u`` a key
+    # each record keeps its own unit: the amount stays Unknown, and the
+    # recorded no-amount unit is still served (the #1118 invariant).
     sec3, sec4 = sources([
         dict(crop=1, ag4a_10_1=2, ag4a_10_2=pd.NA),
         dict(crop=2, ag4a_10_1=pd.NA, ag4a_10_2=1),
     ])
     out = build(tanzania, sec3, sec4)
-    assert len(out) == 1
-    assert out.iloc[0]['u'] == 'kg'
-    assert out.iloc[0]['Quantity'] == 2
-    assert pd.isna(out.iloc[0]['Quantity_purchased'])
-    assert list(out.index.names) == ['t', 'i', 'plot_id', 'input', 'crop']
+    assert len(out) == 2
+    flat = out.reset_index().set_index('u')
+    assert flat.loc[U_UNKNOWN, 'Quantity'] == 2
+    assert pd.isna(flat.loc['kg', 'Quantity'])
+    assert flat['Quantity_purchased'].isna().all()
+    assert list(out.index.names) == ['t', 'i', 'plot_id', 'input', 'crop', 'u']
     assert list(out.columns) == tanzania.PLOT_INPUTS_COLUMNS
 
 
-def test_all_missing_duplicate_units_normalize_after_unchanged_reduction(tanzania):
+def test_all_missing_duplicate_units_reduce_to_one_unknown_row(tanzania):
+    # Renamed for GH #637: normalization now PRECEDES the reduction (``u`` is
+    # a key, so a NaN unit must be Unknown before grouping); the result is
+    # the same single Unknown row.
     sec3, sec4 = sources([
         dict(crop=1, ag4a_10_1=pd.NA, ag4a_10_2=pd.NA, ag4a_08=1),
         dict(crop=2, ag4a_10_1=pd.NA, ag4a_10_2=5, ag4a_12=12),
     ])
     out = build(tanzania, sec3, sec4)
     assert len(out) == 1
-    assert out.iloc[0]['u'] == U_UNKNOWN
+    assert served_unit(out) == U_UNKNOWN
     assert pd.isna(out.iloc[0]['Quantity'])
     assert pd.isna(out.iloc[0]['Quantity_purchased'])
     assert out.iloc[0]['Purchased']
@@ -113,12 +129,17 @@ def test_no_amount_source_use_keeps_every_input_and_its_recorded_unit(tanzania):
     assert out['Quantity_purchased'].isna().all()
 
 
-def test_conflicting_recorded_duplicate_units_keep_existing_first_policy(tanzania):
+def test_conflicting_recorded_duplicate_units_are_separate_rows(tanzania):
+    # GH #637 reversed this pin.  #1118 deliberately preserved the 'first'
+    # unit policy and pinned its output -- ONE row, 5 '20 liter bucket' -- as
+    # the residual it handed to #637: 2 buckets + 3 kg summed and served as 5
+    # buckets.  Those quantities are incommensurable; each unit is now its own
+    # row with its own amount.
     sec3, sec4 = sources([
         dict(crop=1, ag4a_10_1=2, ag4a_10_2=2),
         dict(crop=2, ag4a_10_1=3, ag4a_10_2=1),
     ])
     out = build(tanzania, sec3, sec4)
-    assert len(out) == 1
-    assert out.iloc[0]['u'] == '20 liter bucket'
-    assert out.iloc[0]['Quantity'] == 5
+    assert len(out) == 2
+    flat = out.reset_index()
+    assert dict(zip(flat['u'], flat['Quantity'])) == {'20 liter bucket': 2, 'kg': 3}

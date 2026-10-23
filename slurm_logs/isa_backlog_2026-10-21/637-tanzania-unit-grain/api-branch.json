@@ -1,0 +1,382 @@
+{
+ "label": "branch-final",
+ "head": "9a0ed5f3cc81b5d2ce8d1fdffba4f477e33b9f7f",
+ "data_root_had_tanzania_var": false,
+ "plot_inputs": {
+  "seconds": 19.1,
+  "rows": 9709,
+  "index_names": [
+   "i",
+   "t",
+   "v",
+   "plot_id",
+   "input",
+   "crop",
+   "u"
+  ],
+  "columns": [
+   "Quantity",
+   "Purchased",
+   "Quantity_purchased",
+   "Improved"
+  ],
+  "dtypes": {
+   "Quantity": "Float64",
+   "Purchased": "boolean",
+   "Quantity_purchased": "Float64",
+   "Improved": "boolean"
+  },
+  "index_dtypes": {
+   "i": "str",
+   "t": "str",
+   "v": "string",
+   "plot_id": "str",
+   "input": "string",
+   "crop": "string",
+   "u": "string"
+  },
+  "index_unique": true,
+  "rows_by_t": {
+   "2019-20": 1775,
+   "2020-21": 7934
+  },
+  "warnings": {
+   "NullIndexKeyWarning": 1
+  },
+  "u_by_t": {
+   "2019-20|20l Bucket": 85,
+   "2019-20|Kg": 1419,
+   "2019-20|Large Cup": 31,
+   "2019-20|Litre": 69,
+   "2019-20|Millilitre": 54,
+   "2019-20|Small Cup": 30,
+   "2019-20|Unknown": 87,
+   "2020-21|20l Bucket": 380,
+   "2020-21|Kg": 6184,
+   "2020-21|Large Cup": 93,
+   "2020-21|Litre": 487,
+   "2020-21|Millilitre": 373,
+   "2020-21|Small Cup": 91,
+   "2020-21|Unknown": 326
+  },
+  "Quantity_sum_by_t_u": {
+   "2019-20|20l Bucket": 348.5,
+   "2019-20|Kg": 108483.51,
+   "2019-20|Large Cup": 147.0,
+   "2019-20|Litre": 454.0,
+   "2019-20|Millilitre": 22806.0,
+   "2019-20|Small Cup": 74.5,
+   "2019-20|Unknown": 10884.5,
+   "2020-21|20l Bucket": 21187.25,
+   "2020-21|Kg": 12277153.37,
+   "2020-21|Large Cup": 356.0,
+   "2020-21|Litre": 2632.6,
+   "2020-21|Millilitre": 131321.7,
+   "2020-21|Small Cup": 593.5,
+   "2020-21|Unknown": 40399.5
+  },
+  "Quantity_nonnull_by_t": {
+   "2019-20": 1761,
+   "2020-21": 7929
+  },
+  "Quantity_zero_by_t": {
+   "2019-20": 0,
+   "2020-21": 10
+  },
+  "col_sum_by_t": {
+   "Quantity": {
+    "2019-20": 143198.01,
+    "2020-21": 12473643.92
+   },
+   "Quantity_purchased": {
+    "2019-20": 32015.31,
+    "2020-21": 135121.95
+   }
+  }
+ },
+ "crop_production": {
+  "seconds": 11.3,
+  "rows": 14126,
+  "index_names": [
+   "i",
+   "t",
+   "v",
+   "plot_id",
+   "j"
+  ],
+  "columns": [
+   "Quantity",
+   "u",
+   "Quantity_sold",
+   "Value_sold",
+   "harvest_month",
+   "intercropped",
+   "perennial"
+  ],
+  "dtypes": {
+   "Quantity": "Float64",
+   "u": "string",
+   "Quantity_sold": "Float64",
+   "Value_sold": "Float64",
+   "harvest_month": "Float64",
+   "intercropped": "boolean",
+   "perennial": "boolean"
+  },
+  "index_dtypes": {
+   "i": "str",
+   "t": "str",
+   "v": "string",
+   "plot_id": "str",
+   "j": "string"
+  },
+  "index_unique": true,
+  "rows_by_t": {
+   "2019-20": 3001,
+   "2020-21": 11125
+  },
+  "warnings": {
+   "QuantityImplausibleWarning": 2
+  },
+  "u_by_t": {
+   "2019-20|<NA>": 14,
+   "2019-20|Kg": 2987,
+   "2020-21|<NA>": 5,
+   "2020-21|Kg": 11120
+  },
+  "Quantity_sum_by_t_u": {
+   "2019-20|<NA>": 0.0,
+   "2019-20|Kg": 1917599.5,
+   "2020-21|<NA>": 0.0,
+   "2020-21|Kg": 24679822.2
+  },
+  "Quantity_nonnull_by_t": {
+   "2019-20": 2987,
+   "2020-21": 11120
+  },
+  "Quantity_zero_by_t": {
+   "2019-20": 581,
+   "2020-21": 2154
+  },
+  "col_sum_by_t": {
+   "Quantity": {
+    "2019-20": 1917599.5,
+    "2020-21": 24679822.2
+   },
+   "Quantity_sold": {
+    "2019-20": 1412831.0,
+    "2020-21": 11875732.0
+   },
+   "Value_sold": {
+    "2019-20": 189955250.0,
+    "2020-21": 856481400.0
+   }
+  }
+ },
+ "plot_features": {
+  "seconds": 9.0,
+  "rows": 8865,
+  "index_names": [
+   "i",
+   "t",
+   "v",
+   "plot_id"
+  ],
+  "columns": [
+   "Area",
+   "AreaUnit",
+   "SelfReportedArea",
+   "Tenure",
+   "TenureSystem",
+   "SoilType",
+   "Irrigated",
+   "Owned",
+   "Certificate",
+   "ErosionProtection",
+   "Fallow"
+  ],
+  "dtypes": {
+   "Area": "Float64",
+   "AreaUnit": "string",
+   "SelfReportedArea": "Float64",
+   "Tenure": "string",
+   "TenureSystem": "string",
+   "SoilType": "string",
+   "Irrigated": "boolean",
+   "Owned": "boolean",
+   "Certificate": "boolean",
+   "ErosionProtection": "boolean",
+   "Fallow": "boolean"
+  },
+  "index_dtypes": {
+   "i": "str",
+   "t": "str",
+   "v": "string",
+   "plot_id": "str"
+  },
+  "index_unique": true,
+  "rows_by_t": {
+   "2019-20": 2305,
+   "2020-21": 6560
+  },
+  "warnings": {}
+ },
+ "grain_reports_tanzania": 0,
+ "null_index_reports": {
+  "plot_inputs": 1,
+  "crop_production": 0
+ },
+ "quantity_reports_crop_production": {
+  "reports": 2,
+  "n_implausible": [
+   4,
+   26
+  ]
+ },
+ "downstream": {
+  "seed_kg": {
+   "rows": 4379,
+   "index_names": [
+    "t",
+    "i",
+    "plot_id"
+   ],
+   "columns": [
+    "Seed_kg"
+   ],
+   "sums_by_t": {
+    "Seed_kg": {
+     "2019-20": 25425.51,
+     "2020-21": 500941.37
+    }
+   },
+   "nonnull_by_t": {
+    "Seed_kg": {
+     "2019-20": 857,
+     "2020-21": 3522
+    }
+   },
+   "zero_by_t": {
+    "Seed_kg": {
+     "2019-20": 0,
+     "2020-21": 0
+    }
+   },
+   "attrs_keys": [],
+   "warnings": {}
+  },
+  "nitrogen_kg": {
+   "rows": 725,
+   "index_names": [
+    "t",
+    "i",
+    "plot_id"
+   ],
+   "columns": [
+    "Nitrogen_kg"
+   ],
+   "sums_by_t": {
+    "Nitrogen_kg": {
+     "2019-20": 3510.05,
+     "2020-21": 15966.12
+    }
+   },
+   "nonnull_by_t": {
+    "Nitrogen_kg": {
+     "2019-20": 113,
+     "2020-21": 612
+    }
+   },
+   "zero_by_t": {
+    "Nitrogen_kg": {
+     "2019-20": 1,
+     "2020-21": 19
+    }
+   },
+   "attrs_keys": [
+    "nitrogen_input_match"
+   ],
+   "warnings": {
+    "NutrientCoverageWarning": 1
+   }
+  },
+  "harvest_kg": {
+   "rows": 11372,
+   "index_names": [
+    "t",
+    "i",
+    "plot_id",
+    "j"
+   ],
+   "columns": [
+    "Harvest_kg"
+   ],
+   "sums_by_t": {
+    "Harvest_kg": {
+     "2019-20": 1917599.5,
+     "2020-21": 24679822.2
+    }
+   },
+   "nonnull_by_t": {
+    "Harvest_kg": {
+     "2019-20": 2406,
+     "2020-21": 8966
+    }
+   },
+   "zero_by_t": {
+    "Harvest_kg": {
+     "2019-20": 0,
+     "2020-21": 0
+    }
+   },
+   "attrs_keys": [
+    "kg_factor_declared_from",
+    "kg_factor_disagreement",
+    "kg_factor_sources"
+   ],
+   "warnings": {},
+   "kg_factor_sources": {
+    "reported": 0,
+    "shipped": 0,
+    "survey_median": 0,
+    "metric": 14107,
+    "inferred": 0,
+    "none": 19,
+    "reported_implausible": 0,
+    "shipped_implausible": 0,
+    "shipped_matched": 0,
+    "declared": 0
+   }
+  },
+  "yield_kg": {
+   "rows": 5689,
+   "index_names": [
+    "t",
+    "i",
+    "parcel"
+   ],
+   "columns": [
+    "Yield_kg"
+   ],
+   "sums_by_t": {
+    "Yield_kg": {
+     "2019-20": 5401773.071274692,
+     "2020-21": 53664293.47679462
+    }
+   },
+   "nonnull_by_t": {
+    "Yield_kg": {
+     "2019-20": 1161,
+     "2020-21": 4528
+    }
+   },
+   "zero_by_t": {
+    "Yield_kg": {
+     "2019-20": 0,
+     "2020-21": 0
+    }
+   },
+   "attrs_keys": [],
+   "warnings": {}
+  }
+ }
+}
