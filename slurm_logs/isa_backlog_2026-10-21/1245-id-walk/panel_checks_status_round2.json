@@ -1,0 +1,244 @@
+{
+ "Burkina_Faso": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "Ethiopia": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "warn",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "warn",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "EthiopiaRHS": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "fail",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "fail",
+   "attrition_monotonic": "warn",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "fail",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "fail",
+   "attrition_monotonic": "warn",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "GhanaLSS": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "Malawi": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "Mali": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "Niger": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "pass",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "pass",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "Nigeria": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "warn",
+   "panel_ids_targets_exist": "fail",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "warn",
+   "panel_ids_targets_exist": "fail",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "Senegal": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "pass",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "pass",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "pass",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "Tanzania": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "warn",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "warn",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ },
+ "Uganda": {
+  "base": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "warn",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  },
+  "cand_round2": {
+   "has_panel_ids": "pass",
+   "has_updated_ids": "pass",
+   "updated_ids_cover_waves": "warn",
+   "ids_self_consistent": "pass",
+   "panel_ids_targets_exist": "warn",
+   "attrition_monotonic": "pass",
+   "ids_applied_consistently": "pass",
+   "id_walk_idempotent": "pass"
+  }
+ }
+}
