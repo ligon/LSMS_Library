@@ -111,6 +111,9 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - *PR #1262 open* (#592 GPS census, docs only, 0 hashes: 11/18 fixed earlier; 4 waves "not released" with catalog evidence; Malawi IHPS panel geovariables released but NOT HELD).  Filed *#1259* (Site Q p90 includes zeros), *#1260* (acquire the Malawi panel household geovariables; needs credentials, for Ethan), *#1261* (Nigeria outer geo merge).
 - #637 round 2 running (doc fixes plus re-formed Site Q pin; decision: keep =u=Kg= on recorded zeros).  #894 running.  #1261 dispatched.
 
+- *PR #1263 open* (#637 Tanzania tail: plot_inputs keyed on =u=, crop_production stops minting zeros; reviewed against a raw oracle; 5 decisions listed; Site Q pin re-formed around #1259).  #637 narrowed to Malawi x8 + Nigeria x1; read-only diagnosis of those running.
+- Running: #894 (panel_ids Design A), #1261 (Nigeria geo =merge_how: left=), the #637 Malawi/Nigeria tail diagnosis.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
