@@ -82,4 +82,19 @@ Implement @ligon's 2026-10-23 rulings for Uganda.
 
 ---
 ### Phase 3 — verification
-(filled in the task report)
+- `uganda.singleton_v` — OK (anchored on §2 `nigeria.cluster_id`): same
+  `f'{prefix}-{format_id(hhid)}'`, `None` without an id; `format_id`-stable.
+- `uganda.sample` (hook) — OK (§4 dfs-merge constraint, lossless-or-loud): the
+  frame-extension repeats are proved identical before collapse; a disagreeing
+  repeat raises (synthetic test).
+- `uganda._adopt_alternate_cover` — OK (§3 weight conventions): row-level, never
+  fills a gsec1 gap; numeric columns stay numeric (the first cold build caught a
+  string-typed cached weight; fixed in 4924a6c62, pinned by a test).
+- `uganda.cluster_features` (hook) — OK (§4 2005-06 geovar orphans): singleton
+  only for rows with a cover attribute; 2005-06's 368 still dropped.
+- `uganda._plot_key` — OK (§3 `unknown_plot`): bare sentinel; lookups on the
+  components unchanged.
+- `uganda.CROP_NA` — OK (§2 Niger/Mali `CROP_NA`).
+- Not anchored, disclosed: the 6 seed rows with an unmapped crop code that the
+  marker now labels (§6), and the 11 2009-10 `plot_inputs` Seed keys that fold
+  two plot-less lines each (no conflicting reported value).

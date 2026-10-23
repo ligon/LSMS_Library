@@ -362,9 +362,9 @@ class TestClusterFeatures:
         n_single = int(single.sum())
         assert n_single == {'2018-19': 0, '2019-20': 1}[wave], n_single
         vals = vals[~single]
-        assert (vals.str.count('/') == 1).all(), (
-            f"{wave}: v is not a DISTRICT/PARISH composite: "
-            f"{sorted(vals[vals.str.count('/') != 1])[:5]}")
+        n_bad = int((vals.str.count('/') != 1).sum())
+        assert n_bad == 0, (
+            f"{wave}: {n_bad} v value(s) are not a DISTRICT/PARISH composite")
 
     @requires_s3
     def test_2009_10_out_of_frame_households_have_a_cluster(self, built):

@@ -246,8 +246,10 @@ def test_every_served_zero_is_justified_by_the_source(uganda_module, t):
                    if (k[0], k[1], None if pd.isna(k[2]) else k[2], k[3], k[4])
                    not in justified]
     assert len(zeros) > 1000, "expected thousands of genuine 'No' zeros"
-    assert unjustified == [], (
-        f"{len(unjustified)} served zero(s) in {t} have neither a 'No' flag nor "
+    # Count, never the keys: a key carries a household id (public repo).
+    n_unjustified = len(unjustified)
+    assert n_unjustified == 0, (
+        f"{n_unjustified} served zero(s) in {t} have neither a 'No' flag nor "
         f"reported zero days behind them (development: 4,504 in 2009-10, "
         f"569 in 2010-11)")
 
@@ -308,11 +310,13 @@ def test_every_reported_hired_wage_is_served(uganda_module, t):
 
     missing = [k for k in expected_wage if k not in got_wage]
     by_season = pd.Series([k[2] for k in missing], dtype=object).value_counts().to_dict()
-    assert not missing, (
+    # Count, never the keys: a key carries a household id (public repo).
+    n_missing = len(missing)
+    assert n_missing == 0, (
         f"{len(missing)} hired row(s) in {t} carry a reported Wage but are not "
         f"served, by season {by_season} (90fc1e18d: 67 in 2009-10, 18 in 2010-11)")
-    wrong = [k for k, w in expected_wage.items() if got_wage[k] != w]
-    assert wrong == [], f"{len(wrong)} served hired Wage(s) differ from the raw max"
+    n_wrong = sum(got_wage[k] != w for k, w in expected_wage.items())
+    assert n_wrong == 0, f"{n_wrong} served hired Wage(s) differ from the raw max"
     # A NaN-days hired row is served ONLY on a wage: every raw row of its key
     # has no day cell and no "No" flag (a "No" would have served 0 days), and
     # at least one carries a wage.
@@ -321,5 +325,6 @@ def test_every_reported_hired_wage_is_served(uganda_module, t):
            if any(has_days for _, has_days, _ in raw_rows[k])
            or any(f == 2 for f, _, _ in raw_rows[k])
            or not any(pd.notna(w) for _, _, w in raw_rows[k])]
-    assert not bad, (f"{len(bad)} NaN-days hired row(s) in {t} are not "
-                     f"wage-only in the raw source")
+    n_bad = len(bad)
+    assert n_bad == 0, (f"{n_bad} NaN-days hired row(s) in {t} are not "
+                        f"wage-only in the raw source")
