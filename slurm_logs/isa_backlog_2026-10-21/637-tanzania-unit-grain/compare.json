@@ -1,0 +1,80 @@
+{
+ "plot_inputs": {
+  "rows_base": 9698,
+  "rows_branch": 9709,
+  "split_5keys": 11,
+  "extra_rows": 11,
+  "unsplit_rows_identical_incl_u": true,
+  "unsplit_rows": 9687,
+  "split_base_rows": 11,
+  "split_branch_rows": 22,
+  "split_quantity_total_base": 415.5,
+  "split_quantity_total_branch": 415.5,
+  "split_branch_units": {
+   "Kg": 9,
+   "Unknown": 5,
+   "20l Bucket": 3,
+   "Large Cup": 3,
+   "Small Cup": 2
+  },
+  "split_base_units_served": {
+   "Kg": 6,
+   "20l Bucket": 3,
+   "Large Cup": 1,
+   "Small Cup": 1
+  },
+  "split_by_t": {
+   "2020-21": 10,
+   "2019-20": 1
+  },
+  "quantity_total_by_t": {
+   "base": {
+    "2019-20": 143198.01,
+    "2020-21": 12473643.92
+   },
+   "branch": {
+    "2019-20": 143198.01,
+    "2020-21": 12473643.92
+   }
+  }
+ },
+ "seed_kg": {
+  "plots_moved": 10,
+  "all_moved_plots_are_split_plots": true,
+  "delta_by_t": {
+   "2019-20": 50.0,
+   "2020-21": 579.0
+  },
+  "index_identical": true
+ },
+ "crop_production": {
+  "rows": 14126,
+  "index_identical": true,
+  "changed_Quantity": {
+   "0.0-><NA>|2019-20": 14,
+   "0.0-><NA>|2020-21": 5
+  },
+  "changed_u": {
+   "<NA>->value|2020-21": 1863,
+   "<NA>->value|2019-20": 513
+  },
+  "changed_Quantity_sold": 0,
+  "changed_Value_sold": 0,
+  "changed_harvest_month": 0,
+  "changed_intercropped": 0,
+  "changed_perennial": 0,
+  "rows_with_both_Quantity_and_u_changed": 0,
+  "u_changed_rows": 2376,
+  "u_changed_rows_perennial": 2376,
+  "u_changed_rows_quantity_zero": 2376
+ },
+ "nitrogen_kg": {
+  "frame_equal": true
+ },
+ "harvest_kg": {
+  "frame_equal": true
+ },
+ "yield_kg": {
+  "frame_equal": true
+ }
+}

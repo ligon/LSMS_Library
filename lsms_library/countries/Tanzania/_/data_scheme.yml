@@ -187,7 +187,8 @@ Data Scheme:
 
   plot_inputs:
     # Item-level plot inputs (parity-loop GAP 2) at the natural grain
-    # (t, i, plot_id, input, crop) -- one row per input applied to a plot.
+    # (t, i, plot_id, input, crop, u) -- one row per input applied to a plot,
+    # per recorded unit.
     # Stacks the AG_SEC_3A plot-detail input modules (organic fertilizer
     # ag3a_41..45; inorganic fertilizer type 1 ag3a_47..51 and type 2
     # ag3a_54..58; herbicide ag3a_60..63; pesticide ag3a_65a..65c) and the
@@ -203,9 +204,15 @@ Data Scheme:
     #           and food_acquired.j.  pd.NA for plot-level inputs (fertilizer /
     #           herbicide / pesticide).  ~23% of rows are non-seed -> the crop
     #           index level is partially null by construction.
-    #   u     : native unit -- 'kg' for fertilizer (the questionnaire records
-    #           fertilizer in KG); native litre/millilitre/bucket/cup for
-    #           seed / herbicide / pesticide, harmonized by the country u table.
+    #   u     : native unit, an INDEX level (GH #637) -- 'kg' for fertilizer
+    #           (the questionnaire records fertilizer in KG); native
+    #           litre/millilitre/bucket/cup for seed / herbicide / pesticide,
+    #           harmonized by the country u table; 'Unknown' where the unit is
+    #           absent or OTHER (SPECIFY) (#1041).  A key, as in the canonical
+    #           plot_inputs index and in Malawi / the EHCVM countries: two seed
+    #           crop codes sharing one label (Beans + Cowpeas -> Pulses) in two
+    #           different units are two rows, never one incommensurable sum
+    #           (2020-21: 10 such groups; 2019-20: 1).
     # Only 2019-20 and 2020-21 are buildable; 2008-15 has no agriculture source
     # on disk (same as plot_features / crop_production, GH #167).
     # SEASON SCOPE: long-rainy-season modules (AG_SEC_3A / AG_SEC_4A) only,
@@ -216,9 +223,8 @@ Data Scheme:
     # seasons as separate plot-season rows.
     # STORES REPORTED VALUES ONLY -- seed_kg / nitrogen_kg / any-use flags /
     # fertilizer totals are transformations over these rows, NOT columns here.
-    index: (t, i, plot_id, input, crop)
+    index: (t, i, plot_id, input, crop, u)
     Quantity: float
-    u: str
     Purchased: bool
     Quantity_purchased: float
     Improved: bool

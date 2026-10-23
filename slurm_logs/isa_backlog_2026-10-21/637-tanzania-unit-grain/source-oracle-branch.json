@@ -1,0 +1,27 @@
+{
+ "2019-20": {
+  "source_long_rows": 1787,
+  "served_rows": 1775,
+  "groups_mixing_units_at_5key": {
+   "Unknown + recorded unit": 1
+  },
+  "extra_rows_from_unit_split": 1,
+  "remaining_same_unit_dup_groups": 12,
+  "unknown_u_rows_served": 87,
+  "helper_equals_oracle": true,
+  "quantity_conserved_per_key_and_unit": true
+ },
+ "2020-21": {
+  "source_long_rows": 8035,
+  "served_rows": 7934,
+  "groups_mixing_units_at_5key": {
+   "two recorded units": 6,
+   "Unknown + recorded unit": 4
+  },
+  "extra_rows_from_unit_split": 10,
+  "remaining_same_unit_dup_groups": 92,
+  "unknown_u_rows_served": 326,
+  "helper_equals_oracle": true,
+  "quantity_conserved_per_key_and_unit": true
+ }
+}

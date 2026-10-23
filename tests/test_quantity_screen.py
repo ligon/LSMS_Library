@@ -557,6 +557,17 @@ def test_tanzania_2020_21_coconut_and_timber_rows_fire():
 
     # ... and a bounded total, so a future rule change that turns the screen
     # into a firehose fails here rather than in someone's analysis.
-    assert report["n_implausible"] == 13, [
+    #
+    # 13 -> 26 by GH #637 (2026-10-23).  The RULE did not change; the TABLE
+    # did.  Tanzania's perennial modules now read their "harvested in the past
+    # 12 months?" answer (ag6a_06a / ag6b_06a), so 1,863 of this wave's
+    # reported non-harvests are served as 0.0 with u='kg' instead of 0.0 with
+    # u=NA (an accident of the old reducer), and they now sit in the
+    # (t, 'kg', j) reference cells.  A zero-dominated cell's p90 falls --
+    # Timber's from 23,088 kg to 17 kg -- so 11 Timber rows and a few fruit
+    # rows newly exceed 100x it.  The four rows above still fire.  Whether the
+    # reference should exclude non-positive quantities is a question for
+    # quantity_audit.py, recorded on GH #637; not changed here.
+    assert report["n_implausible"] == 26, [
         (o["j"], o["value"], o["ratio"]) for o in report["offenders"]]
     assert report["rows"] == 11_125

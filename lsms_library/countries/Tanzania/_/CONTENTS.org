@@ -1812,19 +1812,58 @@ The 2019 agriculture questionnaire confirms the liquid menu on PDF page 9; the 2
 
 Under the existing [[https://github.com/ligon/LSMS_Library/issues/1041][#1041]] ruling, an absent or whitespace-only unit becomes =U_UNKNOWN= (=Unknown=), with or without a quantity.
 A recorded nonblank unit remains informative when quantity is absent.
-Normalization follows duplicate reduction so an early missing unit cannot displace a later recorded unit selected by =first=.
-Three held 2020-21 duplicate groups have precisely that missing-first, recorded-later pattern.
 The previous helper comment, "u is meaningless where there is no quantity", contradicted that ruling; #1118 removes its quantity-dependent blanking.
-The held-source build has 1,774 / 7,924 rows in 2019-20 / 2020-21, with 86 / 322 missing units normalized; all 19 records without total quantities remain.
+The held-source build after #1118 had 1,774 / 7,924 rows in 2019-20 / 2020-21, with 86 / 322 missing units normalized; all 19 records without total quantities remain.
 
-The existing duplicate reducer is a separate [[https://github.com/ligon/LSMS_Library/issues/637][#637]] residual.
-It sums reported quantities with =min_count=1= and selects the first nonmissing unit when native crop codes share a canonical label, or both inorganic slots name one product.
-The held 2019-20 sources contribute 1,787 rows, reduced to 1,774 in 13 duplicate groups; none has conflicting known units.
-The held 2020-21 sources contribute 8,035 rows, reduced to 7,924 in 101 duplicate groups.
-Six 2020-21 Seed/Pulses groups contain conflicting units: two bucket/kg, one bucket/small cup, two kg/large cup, and one kg/small cup.
-These quantities are incommensurable; the current summed quantity with a first unit remains a defect for #637, preserved by the scoped #1118 correction.
-Their complete before/after helper and Country frames, including attrs, were equal in private verification.
-No IDs or raw group members are recorded here.
+** =u= is part of the grain (GH #637, 2026-10-23)
+
+The declared index is now =(t, i, plot_id, input, crop, u)=: the canonical =plot_inputs= index carries =u=, and so do Malawi's and the seven EHCVM countries' builders ("Rows in different units =u= stay distinct", =malawi.assemble_plot_inputs=).
+Before, =u= was a column and the helper collapsed =(t, i, plot_id, input, crop)= by summing quantities and keeping the first nonmissing unit.
+
+What that collapse merged, measured on the held sources (=slurm_logs/isa_backlog_2026-10-21/637-tanzania-unit-grain/=):
+| wave    | source rows | duplicate 5-key groups | two recorded units | OTHER (=Unknown=) + recorded unit | same unit |
+|---------+-------------+------------------------+--------------------+-----------------------------------+-----------|
+| 2019-20 |       1,787 |                     13 |                  0 |                                 1 |        12 |
+| 2020-21 |       8,035 |                    101 |                  6 |                                 4 |        91 |
+The six two-unit groups are the ones the #1118 review found (Seed / Pulses: two bucket/kg, one bucket/small cup, two kg/large cup, one kg/small cup).
+The five OTHER groups are the same defect in a form that review did not count: a quantity whose unit was recorded as OTHER (SPECIFY), code 5, summed into a kg or large-cup quantity and served under the recorded unit.
+So "2019-20 has no such groups" holds only for two *recorded* units; it has one OTHER + kg group.
+Every one of the 11 is two raw crop codes that =harmonize_crop= lumps under one label, never a repeated source record: no =(hhid, plot, cropid)= repeats in =AG_SEC_4A= and no id is null.
+
+Normalization now *precedes* grouping, reversing #1118's order: =u= is a key, so a NaN unit must already be =Unknown= or the first =groupby(dropna=True)= downstream deletes the row (CLAUDE.md, Site I).
+The order mattered under #1118 only because ='first'= could let an early missing unit displace a later recorded one; with =u= in the key there is no ='first'= on =u=.
+Served rows 1,774 -> 1,775 and 7,924 -> 7,934; the 11 split groups' 415.5 total quantity is unchanged, now as 22 rows each in its own unit; every other row is identical.
+=seed_kg= falls by 50 kg (2019-20) and 579 kg (2020-21): the bucket / cup / Unknown quantities that were being counted as kilograms, on exactly the 10 affected plots.
+=nitrogen_kg= is unchanged (all fertilizer is kg; same-unit groups are still summed).
+The two #1118 tests that pinned the old ='first'= behaviour were reversed, with comments.
+
+The remaining same-unit duplicates (12 / 92 at the 6-key) stay summed with =min_count=1= and their flags OR'd: they are commensurable.
+Two kinds deserve a maintainer's look, not a change:
+- *The same inorganic fertilizer named as both type 1 and type 2 on one plot* (1 in 2019-20, 6 in 2020-21).  Five of the seven pairs carry identical quantities (e.g. 50 + 50 kg Urea), which reads like double entry rather than two applications.  Summing doubles them; the instrument cannot say which.
+- *=Improved= OR'd across lumped crop codes* (1 / 6 same-unit groups disagree; 1 / 8 at the old key): one code's seed recorded improved and the other's not is served as improved.
+
+Not changed, and recorded for the maintainer:
+- =Quantity_purchased= is served with no unit.  Its own unit, =ag4a_10c_2=, differs from the total-quantity unit on 1 (2019-20) and 11 (2020-21) seed records, so on those rows it is in a unit the table does not name.  Burkina Faso's =Unit_purchased= column is the precedent if that is wanted.
+
+* crop_production: the collapse and the "did not harvest" zeros (GH #637, 2026-10-23)
+
+=crop_production_for_wave= stacks =AG_SEC_4A= (seasonal), =6A= (fruit trees) and =6B= (other perennials) at =(t, i, plot_id, j)= and collapses duplicate keys.
+Its unit axis is sound: every harvest variable is recorded in KG, so =u= is ='kg'= or NA and no group mixes units.  Its grain is unchanged.
+
+The collapse is not a rare guard.  It fires on 260 groups (652 rows) in 2019-20 and 958 (2,509) in 2020-21, every one but two being distinct source crop codes that =harmonize_crop= lumps (Other Fruits 187 / 699, Citrus Fruits 33 / 147, Pulses 9 / 90, ...); the other two are one code listed in both =4A= and a perennial module (one of them 860 + 860 kg -- possibly double recording across the two recall windows).
+
+*Invariance by missingness, found here.*  Because the collapse runs over every group once the index is non-unique, singletons included, its plain ='sum'= served every NA quantity as 0.0 -- 2,395 rows (527 / 1,868).
+Measured against the source, 2,376 of them were perennial trees whose household answered =ag6a_06a= / =ag6b_06a= = 2, "not harvested in the past 12 months": every NA quantity in =6A= / =6B= carries that answer, every non-NA one carries YES.
+So their zero was *right* -- by accident, and only while some unrelated key in the wave collided.
+The other 19 (14 / 5) were seasonal rows with neither a quantity nor an =ag4a_19= answer: a fabricated harvest of nothing.
+Fix: the fruit / perennial colmaps now name their "harvested?" question (=harvested='ag6a_06a'= / ='ag6b_06a'=), exactly as the seasonal one already named =ag4a_19=, and the collapse sums with =min_count=1=.
+Served: the 2,376 reported zeros stay 0.0 and now carry =u='kg'=, like the seasonal reported zeros always did; the 19 become NA; nothing else moves.
+=harvest_kg= and =yield_kg= are frame-identical (zero rows contribute nothing); =harvest_kg='s =kg_factor_sources= moves =none= 2,395 -> 19, =metric= +2,376.
+
+*Consequence for Site Q.*  The 2,376 zeros now sit in the =(t, 'kg', j)= reference cells, so a zero-dominated cell's p90 falls -- Timber 2020-21 from 23,088 kg to 17 kg -- and the screen names more rows: 1 -> 4 (2019-20) and 13 -> 26 (2020-21), 11 of the new ones Timber.  The rule did not change; the seasonal reported zeros were already doing this.  =tests/test_quantity_screen.py='s pinned 13 moved to 26 with that explanation.  Whether Site Q's reference should exclude non-positive quantities is a framework question for the maintainer.
+
+*Not changed: the sale columns.*  Sales are recorded per =(hhid, crop code)= and attached to a single-plot harvest row; the collapse keeps the ='first'= sale.  Where two lumped codes on one plot each carry a sale, one is dropped: 14 groups / 1,813 kg / 2,136,000 TSh in 2019-20, 52 / 10,062 kg / 10,762,200 TSh in 2020-21.  =harvest_month= (='max'=, 111 / 396 groups disagree) and =intercropped= (='max'=, 22 / 79) are selected the same way.
+Keeping the codes apart needs a level finer than =j= -- the question #840 answered for =community_prices= with =variety= (the source item code) and #1198 for Uganda with =production_obs= -- and is a grain decision about a published table, left to the maintainer under #637.
 
 * Cluster id renumbering at round 3 (GH #942)
 

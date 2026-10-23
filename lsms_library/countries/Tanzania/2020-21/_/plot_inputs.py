@@ -20,6 +20,6 @@ sec4a = get_dataframe('../Data/ag_sec_4a.dta', convert_categoricals=False)
 colmap = dict(hhid='y5_hhid', plot='plot_id', crop='cropid')
 
 df = plot_inputs_for_wave('2020-21', sec3a, sec4a, colmap)
-assert df.index.is_unique, "plot_inputs 2020-21: (t,i,plot_id,input,crop) not unique"
+assert df.index.is_unique, "plot_inputs 2020-21: (t,i,plot_id,input,crop,u) not unique"
 assert len(df) > 0
 to_parquet(df, 'plot_inputs.parquet')

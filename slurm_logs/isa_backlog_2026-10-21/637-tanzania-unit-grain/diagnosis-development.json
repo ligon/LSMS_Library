@@ -1,0 +1,420 @@
+{
+ "2019-20": {
+  "source": {
+   "s3a": {
+    "rows": 2305,
+    "null_hhid": 0,
+    "null_plot": 0,
+    "key": [
+     "sdd_hhid",
+     "plotnum"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": null
+   },
+   "s4a": {
+    "rows": 1379,
+    "null_hhid": 0,
+    "null_plot": 0,
+    "key": [
+     "sdd_hhid",
+     "plotnum",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s6a": {
+    "rows": 1245,
+    "null_hhid": 0,
+    "null_plot": 0,
+    "key": [
+     "sdd_hhid",
+     "plotnum",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s6b": {
+    "rows": 769,
+    "null_hhid": 0,
+    "null_plot": 0,
+    "key": [
+     "sdd_hhid",
+     "plotnum",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s5a": {
+    "rows": 1076,
+    "null_hhid": 0,
+    "key": [
+     "sdd_hhid",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s7a": {
+    "rows": 804,
+    "null_hhid": 0,
+    "key": [
+     "sdd_hhid",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s7b": {
+    "rows": 364,
+    "null_hhid": 0,
+    "key": [
+     "sdd_hhid",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   }
+  },
+  "plot_inputs": {
+   "source_long_rows": 1787,
+   "helper_pre_collapse_rows": 1787,
+   "helper_rows": 1774,
+   "null_keys_long": {
+    "t": 0,
+    "i": 0,
+    "plot_id": 0,
+    "input": 0,
+    "crop": 408
+   },
+   "dup_groups_by_class": {
+    "commensurable sum(same unit)": 12,
+    "unknown+recorded unit with quantity": 1
+   },
+   "dup_rows_by_class": {
+    "commensurable sum(same unit)": 24,
+    "unknown+recorded unit with quantity": 2
+   },
+   "dup_group_sizes": {
+    "2": 13
+   },
+   "dup_group_flags": {
+    "u_distinct_nonnull>1": 0,
+    "u_mixed_null_and_recorded": 1,
+    "distinct_raw_codes>1": 12,
+    "identical_qty_u_payload": 3,
+    "Improved_disagree": 1,
+    "purchase_unit_distinct>1": 0,
+    "non_seed_group": 1
+   },
+   "incommensurable_patterns": [],
+   "groups_at_5key": 1774,
+   "groups_at_6key_u_unknown_filled": 1775,
+   "dup_groups_at_6key": 12,
+   "helper_pre_rows_eq_long_rows": true
+  },
+  "crop_production": {
+   "helper_rows": 3001,
+   "helper_pre_collapse_rows": 3393,
+   "sales_rows": 2244,
+   "sales_dup_i_code": 0,
+   "source_long_rows": 3393,
+   "null_keys_long": {
+    "t": 0,
+    "i": 0,
+    "plot_id": 0,
+    "j": 0
+   },
+   "dup_groups_by_class": {
+    "distinct crop codes lumped by harmonize_crop": 260
+   },
+   "dup_rows_by_class": {
+    "distinct crop codes lumped by harmonize_crop": 652
+   },
+   "dup_group_sizes": {
+    "2": 166,
+    "3": 62,
+    "4": 27,
+    "5": 4,
+    "6": 1
+   },
+   "dup_group_module_mix": {
+    "fruit+fruit": 140,
+    "fruit+fruit+fruit": 54,
+    "fruit+fruit+fruit+fruit": 18,
+    "fruit+fruit+fruit+fruit+fruit": 4,
+    "fruit+fruit+fruit+fruit+fruit+fruit": 1,
+    "fruit+perennial": 3,
+    "perennial+perennial": 9,
+    "perennial+perennial+perennial": 8,
+    "perennial+perennial+perennial+perennial": 9,
+    "perennial+seasonal": 2,
+    "seasonal+seasonal": 12
+   },
+   "dup_group_flags": {
+    "all_Quantity_NA(sum->0.0)": 42,
+    ">=2 quantities summed": 156,
+    "sale_rows_with_value": 56,
+    "sale_distinct_nonnull>1 (first drops one)": 14,
+    "sale_from_>1_code": 14,
+    "harvest_month_disagree": 111,
+    "intercrop_disagree": 22
+   },
+   "lumped_labels": {
+    "Pulses": 9,
+    "Other Fruits": 187,
+    "Citrus Fruits": 33,
+    "Spices (crop)": 26,
+    "Vegetables (fresh)": 3,
+    "Yams/Cocoyams": 2
+   },
+   "u_values_helper": {
+    "kg": 2474,
+    "<NA>": 527
+   },
+   "helper_pre_rows_eq_long_rows": true
+  }
+ },
+ "2020-21": {
+  "source": {
+   "s3a": {
+    "rows": 6560,
+    "null_hhid": 0,
+    "null_plot": 0,
+    "key": [
+     "y5_hhid",
+     "plot_id"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": null
+   },
+   "s4a": {
+    "rows": 5606,
+    "null_hhid": 0,
+    "null_plot": 0,
+    "key": [
+     "y5_hhid",
+     "plot_id",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s6a": {
+    "rows": 4631,
+    "null_hhid": 0,
+    "null_plot": 0,
+    "key": [
+     "y5_hhid",
+     "plot_id",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s6b": {
+    "rows": 2439,
+    "null_hhid": 0,
+    "null_plot": 0,
+    "key": [
+     "y5_hhid",
+     "plot_id",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s5a": {
+    "rows": 4294,
+    "null_hhid": 0,
+    "key": [
+     "y5_hhid",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s7a": {
+    "rows": 2809,
+    "null_hhid": 0,
+    "key": [
+     "y5_hhid",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   },
+   "s7b": {
+    "rows": 1160,
+    "null_hhid": 0,
+    "key": [
+     "y5_hhid",
+     "cropid"
+    ],
+    "dup_key_rows": 0,
+    "null_cropid": 0
+   }
+  },
+  "plot_inputs": {
+   "source_long_rows": 8035,
+   "helper_pre_collapse_rows": 8035,
+   "helper_rows": 7924,
+   "null_keys_long": {
+    "t": 0,
+    "i": 0,
+    "plot_id": 0,
+    "input": 0,
+    "crop": 2429
+   },
+   "dup_groups_by_class": {
+    "incommensurable(distinct recorded units)": 6,
+    "commensurable sum(same unit)": 91,
+    "unknown+recorded unit with quantity": 4
+   },
+   "dup_rows_by_class": {
+    "incommensurable(distinct recorded units)": 14,
+    "commensurable sum(same unit)": 190,
+    "unknown+recorded unit with quantity": 8
+   },
+   "dup_group_sizes": {
+    "2": 92,
+    "3": 8,
+    "4": 1
+   },
+   "dup_group_flags": {
+    "u_distinct_nonnull>1": 6,
+    "u_mixed_null_and_recorded": 4,
+    "distinct_raw_codes>1": 95,
+    "identical_qty_u_payload": 28,
+    "Improved_disagree": 8,
+    "purchase_unit_distinct>1": 4,
+    "non_seed_group": 6
+   },
+   "incommensurable_patterns": [
+    {
+     "input": "Seed",
+     "crop": "Pulses",
+     "units": [
+      "20 liter bucket",
+      "kg"
+     ],
+     "groups": 2
+    },
+    {
+     "input": "Seed",
+     "crop": "Pulses",
+     "units": [
+      "20 liter bucket",
+      "small cup"
+     ],
+     "groups": 1
+    },
+    {
+     "input": "Seed",
+     "crop": "Pulses",
+     "units": [
+      "kg",
+      "large cup"
+     ],
+     "groups": 2
+    },
+    {
+     "input": "Seed",
+     "crop": "Pulses",
+     "units": [
+      "kg",
+      "small cup"
+     ],
+     "groups": 1
+    }
+   ],
+   "groups_at_5key": 7924,
+   "groups_at_6key_u_unknown_filled": 7934,
+   "dup_groups_at_6key": 92,
+   "helper_pre_rows_eq_long_rows": true
+  },
+  "crop_production": {
+   "helper_rows": 11125,
+   "helper_pre_collapse_rows": 12676,
+   "sales_rows": 8263,
+   "sales_dup_i_code": 4,
+   "source_long_rows": 12676,
+   "null_keys_long": {
+    "t": 0,
+    "i": 0,
+    "plot_id": 0,
+    "j": 0
+   },
+   "dup_groups_by_class": {
+    "distinct crop codes lumped by harmonize_crop": 956,
+    "same crop code in two modules": 2
+   },
+   "dup_rows_by_class": {
+    "distinct crop codes lumped by harmonize_crop": 2505,
+    "same crop code in two modules": 4
+   },
+   "dup_group_sizes": {
+    "2": 621,
+    "3": 200,
+    "4": 70,
+    "5": 34,
+    "6": 21,
+    "7": 9,
+    "8": 1,
+    "9": 1,
+    "11": 1
+   },
+   "dup_group_module_mix": {
+    "fruit+fruit": 515,
+    "fruit+fruit+fruit": 188,
+    "fruit+fruit+fruit+fruit": 68,
+    "fruit+fruit+fruit+fruit+fruit": 33,
+    "fruit+fruit+fruit+fruit+fruit+fruit": 19,
+    "fruit+fruit+fruit+fruit+fruit+fruit+fruit": 9,
+    "fruit+fruit+fruit+fruit+fruit+fruit+fruit+fruit": 1,
+    "fruit+fruit+fruit+fruit+fruit+fruit+fruit+fruit+fruit": 1,
+    "fruit+fruit+fruit+fruit+fruit+fruit+fruit+fruit+fruit+perennial+perennial": 1,
+    "fruit+fruit+fruit+fruit+fruit+perennial": 1,
+    "fruit+fruit+fruit+fruit+perennial+perennial": 1,
+    "fruit+fruit+fruit+seasonal": 1,
+    "fruit+fruit+perennial": 2,
+    "fruit+perennial": 2,
+    "fruit+seasonal": 1,
+    "perennial+perennial": 6,
+    "perennial+perennial+perennial": 2,
+    "perennial+perennial+perennial+perennial": 1,
+    "perennial+seasonal": 11,
+    "perennial+seasonal+seasonal+seasonal+seasonal": 1,
+    "seasonal+seasonal": 86,
+    "seasonal+seasonal+seasonal": 8
+   },
+   "dup_group_flags": {
+    "all_Quantity_NA(sum->0.0)": 150,
+    ">=2 quantities summed": 550,
+    "sale_rows_with_value": 200,
+    "sale_distinct_nonnull>1 (first drops one)": 51,
+    "sale_from_>1_code": 52,
+    "harvest_month_disagree": 396,
+    "intercrop_disagree": 79
+   },
+   "lumped_labels": {
+    "Other Fruits": 699,
+    "Pulses": 90,
+    "Citrus Fruits": 147,
+    "Millet & Sorghum (grain)": 4,
+    "Yams/Cocoyams": 2,
+    "Vegetables (fresh)": 7,
+    "Spices (crop)": 6,
+    "Leafy Greens": 1
+   },
+   "u_values_helper": {
+    "kg": 9257,
+    "<NA>": 1868
+   },
+   "helper_pre_rows_eq_long_rows": true
+  }
+ }
+}

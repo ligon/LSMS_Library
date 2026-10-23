@@ -1,0 +1,63 @@
+{
+ "label": "base",
+ "plot_inputs_warm_equals_cold": true,
+ "Feature_plot_inputs": {
+  "rows": 9698,
+  "index_names": [
+   "country",
+   "t",
+   "v",
+   "i",
+   "plot_id",
+   "input",
+   "j",
+   "u",
+   "season",
+   "currency"
+  ],
+  "index_unique": true,
+  "promoted": {
+   "Tanzania": {
+    "u": 0
+   }
+  },
+  "u_values": [
+   "20l Bucket",
+   "Kg",
+   "Large Cup",
+   "Litre",
+   "Millilitre",
+   "Small Cup",
+   "Unknown"
+  ],
+  "country_rows": 9698
+ },
+ "crop_production_warm_equals_cold": true,
+ "Feature_crop_production": {
+  "rows": 14126,
+  "index_names": [
+   "country",
+   "t",
+   "v",
+   "i",
+   "plot_id",
+   "j",
+   "u",
+   "condition",
+   "season",
+   "production_obs",
+   "currency"
+  ],
+  "index_unique": true,
+  "promoted": {
+   "Tanzania": {
+    "u": 2395
+   }
+  },
+  "u_values": [
+   "Kg",
+   "Unknown"
+  ],
+  "country_rows": 14126
+ }
+}

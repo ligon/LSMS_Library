@@ -1,0 +1,69 @@
+#+title: GH #637 -- Tanzania plot_inputs / crop_production reducers
+
+Branch =fix/637-tanzania-unit-grain-20261023= on development =9a0ed5f3c=.
+Aggregates only: no household ids, no raw records.  Row-level frames and the
+provenance long frames live in the private task root
+(=/local/job40390255/data-private/637-tz/=), never in the tree.
+
+* Scripts (run with cwd and =PYTHONPATH= = the checkout under test, a fresh
+  =LSMS_DATA_DIR= per checkout, BLAS / build workers pinned to one)
+
+| script              | what it does                                                                                       | output here                          |
+|---------------------+----------------------------------------------------------------------------------------------------+--------------------------------------|
+| =diagnose.py=       | runs both helpers in-process on frames from =get_dataframe=, captures the frame each hands its groupby, and classifies every duplicate group against an independent provenance long frame | =diagnosis-development.json=         |
+| =source_oracle.py=  | independent field bindings from the held =AG_SEC_3A= / =4A= keyed on the 6-level key; asserts helper == oracle row-for-row and quantity conserved per (key, unit) | =source-oracle-branch.json=          |
+| =api_snapshot.py=   | cold =Country('Tanzania')= build of =plot_inputs=, =crop_production=, =plot_features=, plus =seed_kg= / =nitrogen_kg= / =harvest_kg= / =yield_kg=, warnings and Site I / Q reports | =api-development.json=, =api-branch.json= |
+| =compare.py=        | cell-by-cell development vs branch from the private pickles                                        | =compare.json=                       |
+| =feature_check.py=  | warm read == cold read; =Feature(t)(['Tanzania'])= rows and canonical alignment                    | =feature-development.json=, =feature-branch.json= |
+| hash census         | =worktrees/1218/.../1218-current-validation/hash_census.py= on both checkouts                      | =hash-impact.json=                   |
+
+* Diagnosis (development, held sources)
+
+Source grain: =AG_SEC_4A/6A/6B= unique on =(hhid, plot, cropid)=, =AG_SEC_3A= on
+=(hhid, plot)=, each sale module on =(hhid, cropid)=; no null id in either wave
+(2019-20 =sdd_hhid= / =plotnum=, 2020-21 =y5_hhid= / =plot_id=).  No group is
+replication of one source record.
+
+** plot_inputs, duplicate =(t, i, plot_id, input, crop)= groups
+
+| wave    | source rows | groups | two recorded units | OTHER + recorded unit | same unit (commensurable) |
+|---------+-------------+--------+--------------------+-----------------------+---------------------------|
+| 2019-20 |       1,787 |     13 |                  0 |                     1 |                        12 |
+| 2020-21 |       8,035 |    101 |                  6 |                     4 |                        91 |
+
+All 11 incommensurable groups are =Seed= with 2-4 lumped raw crop codes.  The
+same-unit groups include 7 fertilizer type-1/type-2 slot pairs naming one
+product (5 with identical quantities).
+
+** crop_production, duplicate =(t, i, plot_id, j)= groups
+
+| wave    | groups (rows) | lumped codes | same code, two modules | unit conflicts | sale dropped by 'first'      |
+|---------+---------------+--------------+------------------------+----------------+------------------------------|
+| 2019-20 | 260 (652)     |          260 |                      0 |              0 | 14 groups, 1,813 kg, 2,136,000 TSh |
+| 2020-21 | 958 (2,509)   |          956 |                      2 |              0 | 52 groups, 10,062 kg, 10,762,200 TSh |
+
+The collapse runs over every group once the index is non-unique, so its plain
+='sum'= served all 2,395 NA quantities (527 / 1,868) as 0.0: 2,376 are perennial
+"not harvested in the past 12 months" (=ag6?_06a= = 2; correct by accident),
+19 (14 / 5) seasonal rows with no quantity and no =ag4a_19= answer (fabricated).
+
+* Fix
+
+- =plot_inputs=: =u= joins the declared index =(t, i, plot_id, input, crop, u)=;
+  a missing unit is =Unknown= before grouping.
+- =crop_production=: perennial colmaps name =ag6a_06a= / =ag6b_06a= as their
+  =harvested= question; the collapse sums with =min_count=1=.  Grain unchanged.
+
+* Result (cold, fresh data roots; development vs branch)
+
+See =compare.json=.  plot_inputs 9,698 -> 9,709 (+1 2019-20, +10 2020-21 =
+exactly the 11 split groups, 11 -> 22 rows, 415.5 total quantity unchanged);
+the other 9,687 rows identical including =u=; per-wave Quantity totals
+unchanged.  crop_production 14,126 rows, index identical; Quantity 0.0 -> NA on
+14 / 5 rows; =u= NA -> Kg on 513 / 1,863 perennial reported zeros; no other
+cell.  =seed_kg= -50 / -579 kg on exactly the 10 split plots; =nitrogen_kg=,
+=harvest_kg=, =yield_kg= frame-identical.  Grain reports 0 -> 0; Site I 1 -> 1
+(the existing =plot_inputs= =crop= NaN level, by construction); Site Q 1 -> 4
+and 13 -> 26 (reported zeros now in kg reference cells; rule unchanged).
+Warm read == cold read on both checkouts.  =Feature('plot_inputs')(['Tanzania'])=
+9,698 -> 9,709, Tanzania no longer in =promoted=.

@@ -4,8 +4,8 @@ parity-loop GAP 1).
 Same three-module harvest stack as 2019-20, but this wave keys on
 ``y5_hhid`` and ``plot_id`` (there is no ``plotnum`` column), matching the
 plot_features grain.  Variable names (ag4a_27 / ag4a_19 / ag4a_24_2 /
-ag4a_04 / ag6a_09 / ag6a_07_4 / ag6a_05 / ag5a_02 / ag5a_03 / ag7a_03 ...)
-are identical to 2019-20.  See ``crop_production_for_wave`` in tanzania.py.
+ag4a_04 / ag6a_09 / ag6a_06a / ag6a_07_4 / ag6a_05 / ag5a_02 / ag5a_03 /
+ag7a_03 ...) are identical to 2019-20.  See ``crop_production_for_wave`` in tanzania.py.
 """
 import sys
 
@@ -26,10 +26,10 @@ colmaps = dict(
                   qty='ag4a_27', harvested='ag4a_19',
                   harvest_month='ag4a_24_2', intercrop='ag4a_04'),
     fruit=dict(hhid='y5_hhid', plot='plot_id', crop='cropid',
-               qty='ag6a_09', harvested=None,
+               qty='ag6a_09', harvested='ag6a_06a',
                harvest_month='ag6a_07_4', intercrop='ag6a_05'),
     perennial=dict(hhid='y5_hhid', plot='plot_id', crop='cropid',
-                   qty='ag6b_09', harvested=None,
+                   qty='ag6b_09', harvested='ag6b_06a',
                    harvest_month='ag6b_07_4', intercrop='ag6b_05'),
     sales_seasonal=dict(hhid='y5_hhid', crop='cropid',
                         qty='ag5a_02', value='ag5a_03'),

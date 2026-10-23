@@ -1143,10 +1143,15 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
       seas  -- AG_SEC_4A  seasonal/annual crops (harvest qty ``ag4a_27``,
                zeroed where ``ag4a_19`` == 2 "did not harvest"; intercrop
                ``ag4a_04``; harvest-end month ``ag4a_24_2``).
-      fruit -- AG_SEC_6A  perennial FRUIT trees (``ag6a_09``; intercrop
-               ``ag6a_05``; end month ``ag6a_07_4``).  perennial=True.
-      peren -- AG_SEC_6B  perennial NON-fruit/cash trees (``ag6b_09`` ...).
+      fruit -- AG_SEC_6A  perennial FRUIT trees (``ag6a_09``, zeroed where
+               ``ag6a_06a`` == 2 "not harvested in the past 12 months";
+               intercrop ``ag6a_05``; end month ``ag6a_07_4``).
                perennial=True.
+      peren -- AG_SEC_6B  perennial NON-fruit/cash trees (``ag6b_09``, zeroed
+               where ``ag6b_06a`` == 2 ...).  perennial=True.
+    The ``harvested`` slot of each colmap names that YES/NO question; a
+    quantity is NA only where it was not recorded and no "did not harvest"
+    answer stands in for it (GH #637).
 
     Reported harvest quantity is recorded in KILOGRAMS by the questionnaire
     ((KG) on every harvest variable), so ``u`` = 'kg' and the native
@@ -1193,10 +1198,13 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
         out['_code'] = code
         out['j'] = code.map(crop_map).astype('string')
         qty = pd.to_numeric(df[cm['qty']], errors='coerce').astype('Float64')
-        # Seasonal: harvest is 0 where respondent did not harvest (ag4a_19==2).
+        # Harvest is 0 where the respondent said it did NOT harvest (== 2):
+        # ag4a_19 (seasonal), ag6a_06a / ag6b_06a (perennial, past 12 months).
+        # Only an explicit 2 zeroes; an unanswered question leaves the
+        # quantity as recorded (NA if none) whatever the column's dtype.
         if cm.get('harvested') is not None:
             harvested = pd.to_numeric(df[cm['harvested']], errors='coerce')
-            qty = qty.where(harvested != 2, 0.0)
+            qty = qty.mask(harvested.eq(2).fillna(False).astype(bool).values, 0.0)
         out['Quantity'] = qty
         out['u'] = pd.Series(['kg'] * len(df), index=df.index, dtype='string')
         out['u'] = out['u'].where(qty.notna(), pd.NA)
@@ -1265,11 +1273,39 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
     df['t'] = t
     df = df.drop(columns=['_code'])
     df = df.set_index(['t', 'i', 'plot_id', 'j'])
-    # Collapse exact-duplicate (t,i,plot,j) rows (same crop listed twice on a
-    # plot across the seasonal+perennial stack is not expected, but guard):
+    # Collapse duplicate (t, i, plot_id, j) rows.  Measured on the held sources
+    # (GH #637, 2026-10-23), this is NOT a rare guard: 260 groups (652 rows)
+    # in 2019-20 and 958 (2,509) in 2020-21, every one but two being DISTINCT
+    # source crop codes that ``harmonize_crop`` lumps under one label (Other
+    # Fruits, Citrus Fruits, Pulses, ...); the other two are one code listed
+    # in both the seasonal and a perennial module.  No source (hhid, plot,
+    # cropid) is repeated within a module and no key is null.
+    #   * u -- every harvest variable is recorded in KG (u is 'kg' or NA), so
+    #     no group mixes units and the Quantity sum is commensurable.
+    #   * Quantity -- ``min_count=1``: a row or group with no recorded
+    #     quantity stays NA.  This collapse runs over EVERY group, singletons
+    #     included, so a plain 'sum' served all 2,395 NA quantities (527 in
+    #     2019-20, 1,868 in 2020-21) as a harvest of 0.0.  2,376 of them were
+    #     perennial trees the household said it had NOT harvested in the past
+    #     12 months (``ag6a_06a`` / ``ag6b_06a`` == 2), so their zero was right
+    #     -- but only by accident, and only while some unrelated key in the
+    #     wave collided; that answer is now read explicitly through the
+    #     colmap's ``harvested`` slot, as ``ag4a_19`` already was.  The other
+    #     19 were seasonal rows with neither a quantity nor an ``ag4a_19``
+    #     answer, and 0.0 fabricated a harvest of nothing.
+    #   * Quantity_sold / Value_sold 'first', harvest_month 'max',
+    #     intercropped / perennial 'max' -- NOT resolved here.  Where two lumped
+    #     codes each carry their own single-plot sale, 'first' serves one and
+    #     drops the other (14 groups / 1,813 kg / 2,136,000 TSh in 2019-20; 52
+    #     / 10,062 kg / 10,762,200 TSh in 2020-21).  Keeping the codes apart
+    #     needs a level finer than ``j`` (the #840 ``variety`` / #1198
+    #     ``production_obs`` question) -- a grain decision recorded for the
+    #     maintainer under GH #637, not taken here.
     if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
         df = df.groupby(level=['t', 'i', 'plot_id', 'j']).agg({
-            'Quantity': 'sum', 'u': 'first',
+            'Quantity': _sum1, 'u': 'first',
             'Quantity_sold': 'first', 'Value_sold': 'first',
             'harvest_month': 'max',
             'intercropped': 'max', 'perennial': 'max',
@@ -1279,10 +1315,10 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
 
 
 # Plot-inputs feature (parity-loop GAP 2).  Item-level inputs applied to a
-# plot at the natural grain (t, i, plot_id, input, crop) -- one row per input
-# applied to a plot -- carrying ONLY reported survey fields.  No seed_kg sum,
-# no nitrogen_kg, no any-use flags, no fertilizer totals: those are
-# transformations over these rows.
+# plot at the natural grain (t, i, plot_id, input, crop, u) -- one row per
+# input applied to a plot, per recorded unit -- carrying ONLY reported survey
+# fields.  No seed_kg sum, no nitrogen_kg, no any-use flags, no fertilizer
+# totals: those are transformations over these rows.
 #   * input  : the input identity, on the shared harmonize_input labels --
 #              seed / organic fertilizer / a named inorganic-fertilizer product
 #              (Urea / DAP / NPK / CAN / SA / TSP / MRP / Other Fertilizer,
@@ -1292,11 +1328,12 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
 #              reported per plot-crop in AG_SEC_4A).  pd.NA for plot-level
 #              inputs (fertilizer / herbicide / pesticide), which are recorded
 #              once per plot with no crop split.
-#   * Quantity + u : reported native quantity and its native unit.  Fertilizer
-#              quantities are in KG; seed/herbicide/pesticide units are the
-#              reported native unit code resolved to a tidy label (kg / litre /
-#              millilitre / 20 liter bucket / small/large cup), harmonized at
-#              API time by the country u table.
+#   * Quantity + u : reported native quantity and its native unit (``u`` is an
+#              index level).  Fertilizer quantities are in KG; seed/herbicide/
+#              pesticide units are the reported native unit code resolved to a
+#              tidy label (kg / litre / millilitre / 20 liter bucket /
+#              small/large cup), harmonized at API time by the country u table;
+#              an absent or OTHER (SPECIFY) unit is ``Unknown`` (#1041).
 #   * Purchased (bool) + Quantity_purchased : whether any of the input was
 #              purchased and (where the survey records it as a SEPARATE
 #              quantity) how much.  Organic fertilizer and seed record a
@@ -1304,7 +1341,10 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
 #              herbicide / pesticide record only a purchased VALUE, so Purchased
 #              there is value>0 and Quantity_purchased is NaN (not fabricated).
 #   * Improved (bool) : seed rows only -- ag4a_08 improved/recycled-improved.
-PLOT_INPUTS_COLUMNS = ['Quantity', 'u', 'Purchased', 'Quantity_purchased',
+#   ``u`` is an INDEX level, not a column (GH #637): a plot-input record in one
+#   unit and another in a different unit are different rows.
+PLOT_INPUTS_INDEX = ['t', 'i', 'plot_id', 'input', 'crop', 'u']
+PLOT_INPUTS_COLUMNS = ['Quantity', 'Purchased', 'Quantity_purchased',
                        'Improved']
 
 # Native seed-unit code (ag4a_10_2 / ag4a_10c_2) -> tidy label.  kg/litre/etc.
@@ -1328,7 +1368,8 @@ def _yn_true(series):
 def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     """Build canonical ``plot_inputs`` for one Tanzania NPS wave.
 
-    Item-level inputs at grain (t, i, plot_id, input, crop) from two modules:
+    Item-level inputs at grain (t, i, plot_id, input, crop, u) from two
+    modules:
       sec3a -- AG_SEC_3A plot detail: organic fertilizer (ag3a_41/42/43/44),
                inorganic fertilizer type 1 (ag3a_47/48/49/51) and type 2
                (ag3a_54/55/56/58), herbicide (ag3a_60/62_1/62_2/63), pesticide
@@ -1350,8 +1391,9 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
 
     Returns
     -------
-    pd.DataFrame indexed by (t, i, plot_id, input, crop) with columns
-    PLOT_INPUTS_COLUMNS.
+    pd.DataFrame indexed by PLOT_INPUTS_INDEX = (t, i, plot_id, input, crop,
+    u) with columns PLOT_INPUTS_COLUMNS.  ``u`` is a key (GH #637): a seed
+    crop label recorded in two units is two rows, never one summed quantity.
     """
     c = colmap
     fert_type_map = _plot_harmonized_codes('harmonize_input')
@@ -1466,30 +1508,44 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     rows += [org, inorg1, inorg2, herb, pest]
     df = pd.concat([r for r in rows if r is not None and len(r)], ignore_index=True)
 
-    df['t'] = t
-    df = df.set_index(['t', 'i', 'plot_id', 'input', 'crop'])
-    # Collapse the rare exact-duplicate (t,i,plot,input,crop) -- a plot listing
-    # the same inorganic-fertilizer product as both type 1 and type 2, or two
-    # raw crop codes that share a canonical Seed crop label (e.g. Beans +
-    # Cowpeas -> Pulses): sum the reported quantities, OR the purchased flag,
-    # keep the first unit.  ``min_count=1`` so an all-NA group stays NA (a plain
-    # ``sum`` would zero the all-NA Quantity_purchased of fertilizer rows, which
-    # record only a purchased VALUE, not a purchased quantity).  ``dropna=False``
-    # keeps the NA-crop (plot-level input) rows.
-    if not df.index.is_unique:
-        def _sum1(s):
-            return s.sum(min_count=1)
-        df = df.groupby(level=['t', 'i', 'plot_id', 'input', 'crop'],
-                        dropna=False).agg({
-            'Quantity': _sum1, 'u': 'first',
-            'Purchased': 'max', 'Quantity_purchased': _sum1,
-            'Improved': 'max',
-        })
-    # Normalize after 'first' has selected any recorded unit in a duplicate
-    # group.  A recorded unit remains informative without a quantity (#1118).
+    # An absent or whitespace-only unit is U_UNKNOWN, with or without a
+    # quantity (#1041 / #1118); a recorded unit is kept verbatim even where no
+    # quantity is recorded.  This runs BEFORE the index is set because ``u`` is
+    # an index level (GH #637, below): a NaN key would be deleted by the first
+    # ``groupby(dropna=True)`` downstream (CLAUDE.md, Site I).
     missing_u = (df['u'].isna()
                  | df['u'].astype('string').str.strip().eq('').fillna(False))
     df.loc[missing_u, 'u'] = U_UNKNOWN
+    df['u'] = df['u'].astype('string')
+
+    df['t'] = t
+    df = df.set_index(PLOT_INPUTS_INDEX)
+    # ``u`` is part of the GRAIN (GH #637), as in the canonical
+    # ``plot_inputs`` index and in Malawi's and the EHCVM countries' builders:
+    # rows recorded in different units stay separate rows.  The remaining
+    # duplicates of the 6-level key are commensurable -- a plot naming the
+    # same inorganic-fertilizer product as both type 1 and type 2 (kg + kg),
+    # or two raw crop codes that share a canonical Seed crop label (e.g. Beans
+    # + Cowpeas -> Pulses) recorded in the SAME unit: sum the reported
+    # quantities, OR the purchased / improved flags.  Before GH #637 ``u`` was
+    # a column reduced with 'first', so a group in two units was served as the
+    # sum of incommensurable quantities under the first unit: in the held
+    # 2020-21 sources 6 Seed/Pulses groups in two recorded units (bucket/kg,
+    # bucket/small cup, kg/large cup, kg/small cup) and 4 more where a
+    # quantity in OTHER (SPECIFY), i.e. ``Unknown``, was summed into a kg or
+    # large-cup quantity; 2019-20 had 1 of the latter kind.  ``min_count=1``
+    # so an all-NA group stays NA (a plain ``sum`` would zero the all-NA
+    # Quantity_purchased of fertilizer rows, which record only a purchased
+    # VALUE, not a purchased quantity).  ``dropna=False`` keeps the NA-crop
+    # (plot-level input) rows.
+    if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+        df = df.groupby(level=PLOT_INPUTS_INDEX, dropna=False).agg({
+            'Quantity': _sum1,
+            'Purchased': 'max', 'Quantity_purchased': _sum1,
+            'Improved': 'max',
+        })
     df = df[PLOT_INPUTS_COLUMNS]
     return df
 
