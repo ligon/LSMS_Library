@@ -13,13 +13,21 @@ same pair to Niger's other four country concatenations, tested here:
 concatenator as its fallback, and a skipping concatenator still serves the
 other waves.
 
-Three tests per table follow #1241's (``tests/test_ehcvm_plot_inputs_identity.py``):
+Per table, following #1241 (``tests/test_ehcvm_plot_inputs_identity.py``):
 the real recipe with a failing ``python`` shim, and the real concatenator run
-on synthetic wave parquets (refusal + positive control).  A fourth runs the
-whole route -- real Makefile, real concatenator, real ``niger.py``, synthetic
-wave scripts -- through ``Country(...)`` under the make backend, in the
-layout of ``tests/test_gh1091_niger_community_builder.py``.  No microdata is
-read; every frame here is synthetic.
+on synthetic wave parquets (refusal, positive control, and the assert that
+every listed wave has a script).  Beyond #1241, the whole route -- real
+Makefile, real concatenator, real ``niger.py``, synthetic wave scripts --
+runs through ``Country(...)`` under the make backend, in the layout of
+``tests/test_gh1091_niger_community_builder.py`` (about 100 s; ``-k 'not
+make_backend'`` is the few-second subset).  No microdata is read; every
+frame here is synthetic.
+
+The runpy tests read wave parquets under ``data_root()``, where the branch
+looks; on the pre-fix tree the concatenators read the in-tree relative path,
+so there they fail on "no wave-level parquets found" rather than on the
+defect.  The end-to-end refusal tests are the ones whose pre-fix failure IS
+the defect ("DID NOT RAISE": the other waves were served).
 """
 from __future__ import annotations
 
