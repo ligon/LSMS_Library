@@ -176,7 +176,8 @@ case folding for 69, and the other 5 are spellings of the same unit
   codes, 8,726 rows.
 - 55 size-qualified codes, 33,048 rows (78.2%): no counterpart in
   `food_acquired.u`. But 65 of the 74 (unit, size) pairs, covering 42,014 rows
-  (99.4%), are observed in household consumed rows' `(s07bq03b, s07bq03c)`,
+  (99.4%), are observed in household consumed rows' (`s07bq03a > 0`)
+  `(s07bq03b, s07bq03c)`,
   and 91,125 of 107,216 household consumed rows (85%) carry a non-zero size
   that `food_acquired.u` drops.
 

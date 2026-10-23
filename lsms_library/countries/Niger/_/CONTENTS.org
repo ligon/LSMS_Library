@@ -1222,14 +1222,14 @@ counts above (42,247 rows, 504 grappes, 55 product codes, 74 unit codes,
   rows, 137 grappes): 20 byte-identical, 140 with different prices, scattered
   through the file (not the 2011-12 contiguous double-entry pattern), mostly
   =poisson séché=, =Maquereau= and imported rice.
-- *Cluster key.*  The 504 grappes, =format_id='d, equal the 504
+- *Cluster key.*  The 504 grappes, run through =format_id=, equal the 504
   =sample(waves=['2018-19'])= =v= values exactly.
 - *The unit code embeds the household SIZE.*  =releveID= = 10 x =s07bq03b=
   unit code + =s07bq03c= size code (0 Taille unique, 1 Petit, 2 Moyen,
   3 Grand, 4 Quart, 5 Demi, 6 Entier) for all 74 used codes (=5126= = 512
   Tiya + 6 Entier; =1000= = 100 Kg + 0).  So the size that =food_acquired.u=
-  drops (it serves =s07bq03b= only; 85% of household consumed rows carry a
-  non-zero size) is exactly what makes a community price comparable: 65 of
+  drops (it serves =s07bq03b= only; 85% of household consumed rows --
+  =s07bq03a > 0= -- carry a non-zero size) is exactly what makes a community price comparable: 65 of
   the 74 (unit, size) pairs, 99.4% of s05 rows, occur in household rows.
   Only the 19 size-0 codes (21.8% of rows) can meet =food_acquired.u=
   without rescaling.  Label exceptions: 5 unit spellings differ from the
