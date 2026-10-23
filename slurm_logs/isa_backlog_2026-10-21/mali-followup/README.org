@@ -23,12 +23,34 @@ scratch directory; only aggregate counts are committed here.
 - =zero_rows.json=, =s2c_repeats.json=, =seed_crop.json=
 - =xc_base_summary.json=, =xc_branch_summary.json=, =xc_compare.json= (cross-country), =hash_impact.json= (census)
 
-* Headline numbers
-- Mali =crop= NaN 145,530 -> 0 (all now ='(not crop-specific)'=); full-index groupby of
+* Provenance
+- =mali_base_summary.json=: base =9a0ed5f3c= (=review-mali= worktree).
+- =mali_branch_summary.json= and =compare_mali.json=: measured on committed head
+  =b1f0acd12= (round 2), recorded in its =head= field.  The working tree differed from
+  that commit only in the ledger and =compare_mali.py=, neither a build input.
+- =xc_branch_summary.json= and =xc_compare.json=: round 1, measured on the
+  uncommitted tree that became =4a50061c1=, although =head= says =9a0ed5f3c=
+  (=git rev-parse HEAD= of an uncommitted tree).  Round 2 changed only the 45 Mali seed
+  rows' =crop=, which neither =nitrogen_kg= nor =seed_kg= reads (both group by
+  =(t, i, plot_id)=); the Mali totals and tally were re-measured on =b1f0acd12= and match.
+- =hash_impact.json=: =data_info_only= and =branch= are round 1 (tree = =4a50061c1=);
+  =branch_round2_b1f0acd12= is the committed round-2 head.
+
+* Round 2 (review of =d69f3b4b5=)
+- Seed rows never get the marker: a recorded crop =harmonize_food= does not map keeps
+  its own label, as =niger._crop_labels= does (=Niger/_/niger.py:440-445=; my cold
+  Niger build: 0 of 31,029 seed rows carry the marker, 11,397 marker rows).  Round 1
+  had put the marker on these 45 rows, citing Niger's CROP_NA comment.
+- =Applied= back to required =bool=.
+
+* Headline numbers (round 2, =b1f0acd12=)
+- Mali =crop= NaN 145,530 -> 0: 145,485 non-seed rows now ='(not crop-specific)'=; the
+  45 seed rows keep their recorded label (=Non-Exploitée= 35, =Non exploitée= 8,
+  =Echalotte= 1, =Poireaux= 1; 2014-15 37, 2017-18 8).  Full-index groupby of
   =Feature('plot_inputs')(['Mali'])= 34,287 -> 179,817 rows; values otherwise identical.
 - =nitrogen_kg= 906,361.83 kg and =seed_kg= 1,455,210.96 kg unchanged; new tally key
   =use_answer_rows= = 66,082 (Mali), 0 for the other 13 countries.
 - Cross-country (14 countries): nitrogen / seed results and tallies identical apart from
   the new key; pooled nitrogen frames exactly equal.
-- Hash census vs base: 24/549 country + 96/2,109 wave hashes move, all Mali; 0/40
-  fingerprints; the =data_info.yml= comment edits alone move 0.
+- Hash census vs base, both rounds: 24/549 country + 96/2,109 wave hashes move, all
+  Mali; 0/40 fingerprints; the =data_info.yml= comment edits alone move 0.

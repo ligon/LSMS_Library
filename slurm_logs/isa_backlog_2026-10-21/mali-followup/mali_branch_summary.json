@@ -18,7 +18,7 @@
   "NullReadWarning: Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-19, 2021-22] while other waves carry it. The column is PRESENT, so the sha",
   "UnicodeWarning: \nOne or more strings in the dta file could not be decoded using utf-8, and\nso the fallback encoding of latin-1 is being used.  This can happen when a file\nhas b"
  ],
- "crop_marker": 145530,
+ "crop_marker": 145485,
  "crop_marker_by_input": {
   "Compost": 2673,
   "DAP": 9644,
@@ -32,7 +32,6 @@
   "Other phytosanitary": 6447,
   "Pesticide": 6460,
   "Phytosanitary products?": 33089,
-  "Seed": 45,
   "Urea": 9642
  },
  "crop_nan": 0,
@@ -98,7 +97,7 @@
   "NullReadWarning: Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-19, 2021-22] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_require",
   "UserWarning: plot_inputs: aligned country frames to the canonical index declared in data_info.yml -- promoted a canonical level carried as a COLUMN into the index for ['Mali'] (nulls filled with the declared senti"
  ],
- "head": "9a0ed5f3cc81b5d2ce8d1fdffba4f477e33b9f7f",
+ "head": "b1f0acd12791a2447b60865ed10bf87369163288",
  "index_names": [
   "i",
   "t",
@@ -157,7 +156,7 @@
   "Seed": 34332,
   "Urea": 9642
  },
- "seed_crop_marker": 45,
+ "seed_crop_marker": 0,
  "seed_crop_nan": 0,
  "seed_kg_rows": 31645,
  "seed_kg_total": 1455210.9572301384,

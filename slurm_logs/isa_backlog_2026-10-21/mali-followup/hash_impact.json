@@ -15,6 +15,33 @@
    "total": 549
   },
   "errors": {},
+  "head": "4a50061c1 (round 1, uncommitted tree)",
+  "wave": {
+   "by_country": {
+    "Mali": 96
+   },
+   "moved": 96,
+   "moved_keys": null,
+   "total": 2109
+  }
+ },
+ "branch_round2_b1f0acd12": {
+  "btf": {
+   "by_country": {},
+   "moved": 0,
+   "moved_keys": [],
+   "total": 40
+  },
+  "country": {
+   "by_country": {
+    "Mali": 24
+   },
+   "moved": 24,
+   "moved_keys": null,
+   "total": 549
+  },
+  "errors": {},
+  "head": "b1f0acd12",
   "wave": {
    "by_country": {
     "Mali": 96
