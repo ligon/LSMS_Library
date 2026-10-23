@@ -3,6 +3,31 @@
 * MORNING BRIEFING for Ethan -- 2026-10-23, Sue / Claude Opus 5.5 (job 40390255)
 Nothing was merged overnight.  Open PRs below.  Every PR body lists its own decisions, evidence and cache cost.
 
+** RULINGS session (2026-10-23 morning, Ethan with Sue): all recorded as PR/issue comments
+- *Merge authorized:* "Merge everything ruled, in one batch", after the follow-up commits land; then one corpus re-warm.  Open question to Ethan: does that include #1232's =uganda_baseline.json= fixture?  (Sue assumes yes unless told.)
+- *Follow-up commits on open PRs (pre-merge):*
+  - #1242 Komondjari: DONE =3d448cefc=.
+  - #1255 wage-only rows: DONE =693a5c67e=; 85 rows, not 7; PR body updated.
+  - #1263 Tanzania =production_obs= + =Unit_purchased= + module separation, and drop the "known excess" test block: running.
+  - #1272 Mali tree totals as a derivation + 2017-18 =min_count=: running.
+  - #1239 Malawi =NumberOfUnits = 1= registered: running.
+- *Accepted as is:* #1227, #1229, #1241 (refusal accepted), #1246/#1248 (widen the =sampling.py= gloss separately), #1257 attach rules, #1266, #1271, #1274 (keep zero rows).
+- *New-PR work ruled (next batch):*
+  - Ethiopia W1 tree rows (#1257 follow-up).
+  - Malawi =production_obs= (#637 A).
+  - Niger =;= -> =&&= + refusal for 4 tables.
+  - #1119 marker =(not crop-specific)= everywhere.
+  - #1120 D1 (cover frames, with weights), D2 (singleton =v=), D3 (=unknown_plot=).
+  - #1244 namespace one Burkina sample's ids.
+  - #1245 single-pass =id_walk=.
+  - #1254 =t= in =median_price_valuation=; #824 rule: use =Unit_sold= / =KgFactor_sold=.
+  - Nigeria W1/W2 =variety= = source code (#637).
+  - Mali =KgFactor= / =KgFactor_sold=.
+  - #771 move the FDC key to config (no rotation).
+  - #1135 measured counts / "not measured".
+  - #1260 acquisition (Sue: narrow two-file fetch plus =push_to_cache_batch=, not =populate_and_push=; awaiting Ethan's OK on the creds route).
+- *Housekeeping:* mirror branch =fix/856-malawi-harvest-unit-text-20261022= deleted (it still exists in the =/local= clone's worktree, which is wiped at job end).
+
 ** Merge plan: ONE corpus re-warm
 #1233 and #1251 each move every hash (549/549, 40/40, 2,109/2,109), and they merge cleanly together.
 Merge them *together with every per-country PR you accept*, before anyone re-warms, so the corpus is rebuilt once.
