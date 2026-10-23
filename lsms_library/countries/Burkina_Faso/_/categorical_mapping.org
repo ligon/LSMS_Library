@@ -470,6 +470,161 @@ script-path tables.  Not paid here; verified on the read path with
 | Sud Ouest         | Sud-Ouest         |
 | Sud-Ouest         | Sud-Ouest         |
 
+* District
+
+GH #1059 (the #811 =Region= problem one level down), 2026-10-23.
+=cluster_features.District= (the province: 2014 EMC =province=, EHCVM
+=s00q02=) carried *96 distinct strings for the 45 provinces* across the
+three waves.  Each wave is internally consistent -- 45 / 45 / 44 strings,
+one per province present -- so nothing warned; only cross-wave pooling
+was wrong:
+
+- 2014 (EMC): upper case, unaccented (=BALE=, =SENO=, =KOULPELOGO=), and
+  one source typo, =loba= -- =Ioba= with a lower-case L for the capital I
+  (all 17 zd are in Sud-Ouest, Ioba's region; no other 2014 string names
+  Ioba);
+- 2018-19 (EHCVM-1): title case, mostly accented (=Balé=, =Bazèga=,
+  =Séno=), but =Kourweogo= unaccented, =KOssi= a case slip, and
+  =Koulpelgo= a letter short of =Koulpélogo=;
+- 2021-22 (EHCVM-2): title case, accented =Kourwéogo= / =Koulpélogo=, but
+  =Bale=, =Bazega=, =Seno= unaccented.
+
+*The rule, and how it follows #971.*  The =Region= table above takes "the
+2021-22 spelling -- the fully hyphenated official form ... with =Mouhoum=
+corrected to =Mouhoun=", i.e. the official form of the name, correcting
+source typos.  For =District= the two halves of that rule split: 2021-22 is
+not uniformly the official form (it drops the accents of Balé, Bazèga and
+Séno that 2018-19 keeps), so this table follows #971's intent, not its
+mechanism: the Preferred Label is the official accented, title-case
+province name *as the data itself spells it* -- every one of the 45 occurs
+verbatim in at least one EHCVM wave, so no label is imported from outside
+the data.  Corrections, named: =loba= -> =Ioba=, =Koulpelgo= ->
+=Koulpélogo=, =KOssi= -> =Kossi=.  Not corrected: =Komandjoari=, which all
+three waves spell the same way (the province is also written =Komondjari=
+elsewhere, a spelling no wave uses); with no disagreement in the data
+there is nothing to harmonize -- a decision left to a human.
+
+*Spellings only -- never one province onto another.*  Every row maps a
+string onto the province it already names.  On the 550 grappes shared by
+2018-19 and 2021-22, District differed for 53: 41 accent or case only, 9
+=Koulpelgo= / =Koulpélogo=, and 3 that name a DIFFERENT province, one
+grappe each -- 19 (=Séno= / =Yagha=), 365 (=Poni= / =Noumbiel=), 549
+(=Kompienga= / =Gourma=).  Those three are a cross-wave identity question
+(is it the same EA?), not a spelling one, so =Yagha=, =Noumbiel= and
+=Gourma= map to themselves and the three still differ after the mapping.
+See =_/CONTENTS.org=, "cluster_features -- =District= spelled 96 ways".
+
+*It cannot change the collapse*: per-wave distinct is 45 / 45 / 44 before
+and after, so no two rows of one wave differ only by spelling and the
+=(t, v)= projection's conflict set (including 2014's GH #1060 province
+variation within =zd=) is untouched; the mapping runs post-collapse in
+=_finalize_result=.  2021-22's 44 is a province with no rows, not a
+spelling residue: no 2021-22 grappe is coded =Kompienga= (grappe 549,
+above, is the one Kompienga grappe of 2018-19 in the 2021-22 subset).
+
+*Cache cost*: this file is a build input, so the edit moves every
+Burkina_Faso cache hash.
+
+#+name: District
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Balé               | Balé            |
+| BALE               | Balé            |
+| Bale               | Balé            |
+| Bam                | Bam             |
+| BAM                | Bam             |
+| Banwa              | Banwa           |
+| BANWA              | Banwa           |
+| Bazèga             | Bazèga          |
+| BAZEGA             | Bazèga          |
+| Bazega             | Bazèga          |
+| Bougouriba         | Bougouriba      |
+| BOUGOURIBA         | Bougouriba      |
+| Boulgou            | Boulgou         |
+| BOULGOU            | Boulgou         |
+| Boulkiemdé         | Boulkiemdé      |
+| BOULKIEMDE         | Boulkiemdé      |
+| Comoé              | Comoé           |
+| COMOE              | Comoé           |
+| Ganzourgou         | Ganzourgou      |
+| GANZOURGOU         | Ganzourgou      |
+| Gnagna             | Gnagna          |
+| GNAGNA             | Gnagna          |
+| Gourma             | Gourma          |
+| GOURMA             | Gourma          |
+| Houet              | Houet           |
+| HOUET              | Houet           |
+| Ioba               | Ioba            |
+| loba               | Ioba            |
+| Kadiogo            | Kadiogo         |
+| KADIOGO            | Kadiogo         |
+| Kénédougou         | Kénédougou      |
+| KENEDOUGOU         | Kénédougou      |
+| Komandjoari        | Komandjoari     |
+| KOMANDJOARI        | Komandjoari     |
+| Kompienga          | Kompienga       |
+| KOMPIENGA          | Kompienga       |
+| Kossi              | Kossi           |
+| KOSSI              | Kossi           |
+| KOssi              | Kossi           |
+| Koulpélogo         | Koulpélogo      |
+| KOULPELOGO         | Koulpélogo      |
+| Koulpelgo          | Koulpélogo      |
+| Kouritenga         | Kouritenga      |
+| KOURITENGA         | Kouritenga      |
+| Kourwéogo          | Kourwéogo       |
+| KOURWEOGO          | Kourwéogo       |
+| Kourweogo          | Kourwéogo       |
+| Léraba             | Léraba          |
+| LERABA             | Léraba          |
+| Loroum             | Loroum          |
+| LOROUM             | Loroum          |
+| Mouhoun            | Mouhoun         |
+| MOUHOUN            | Mouhoun         |
+| Nahouri            | Nahouri         |
+| NAHOURI            | Nahouri         |
+| Namentenga         | Namentenga      |
+| NAMENTENGA         | Namentenga      |
+| Nayala             | Nayala          |
+| NAYALA             | Nayala          |
+| Noumbiel           | Noumbiel        |
+| NOUMBIEL           | Noumbiel        |
+| Oubritenga         | Oubritenga      |
+| OUBRITENGA         | Oubritenga      |
+| Oudalan            | Oudalan         |
+| OUDALAN            | Oudalan         |
+| Passoré            | Passoré         |
+| PASSORE            | Passoré         |
+| Poni               | Poni            |
+| PONI               | Poni            |
+| Sanguié            | Sanguié         |
+| SANGUIE            | Sanguié         |
+| Sanmatenga         | Sanmatenga      |
+| SANMATENGA         | Sanmatenga      |
+| Séno               | Séno            |
+| SENO               | Séno            |
+| Seno               | Séno            |
+| Sissili            | Sissili         |
+| SISSILI            | Sissili         |
+| Soum               | Soum            |
+| SOUM               | Soum            |
+| Sourou             | Sourou          |
+| SOUROU             | Sourou          |
+| Tapoa              | Tapoa           |
+| TAPOA              | Tapoa           |
+| Tuy                | Tuy             |
+| TUY                | Tuy             |
+| Yagha              | Yagha           |
+| YAGHA              | Yagha           |
+| Yatenga            | Yatenga         |
+| YATENGA            | Yatenga         |
+| Ziro               | Ziro            |
+| ZIRO               | Ziro            |
+| Zondoma            | Zondoma         |
+| ZONDOMA            | Zondoma         |
+| Zoundwéogo         | Zoundwéogo      |
+| ZOUNDWEOGO         | Zoundwéogo      |
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
