@@ -1,6 +1,25 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current handoff -- 2026-10-23T01:43:30.672404+00:00
+* Current handoff -- 2026-10-22 evening, Sue / Claude Opus 5.5, job 40390255 (n0114.savio4, 12 cores, ~3 days)
+
+Resumed from the entry below; job 40255479 has ended, so its =/local= worktrees, =C= control prefix and =venv_img= are gone.
+The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact (SHA-256 =46321762...= verified).
+
+- *Mirror synced.*  The filesystem mirror's =development= was at =f8d236694= while GitHub was at =60aa81e9e=; fast-forwarded and pushed (no force).  Mirror tree clean.
+- *#1218 done, PR #1221 open for human merge* (branch =fix/1218-current-integration-20261022=, head =69e89344e=).
+  Merge =ab4e22a8b= of reviewed =5fdbb937d= has the predicted tree =365d55b0=.
+  Candidate tests: 161 pass; same tests on 60aa source: 56 fail.  Real BF =plot_inputs= 2014/2021-22 empties now typed on both backends; populated 2018-19 exactly unchanged; all 549/40/2,109 hashes move (cold re-warm).
+  Evidence: =slurm_logs/isa_backlog_2026-10-21/1218-current-validation/README.org= on that branch.
+- *Gotcha:* =git merge= fires =post-merge=, not the sucoder =post-commit= hook, so a merge commit is NOT auto-published -- push it by hand.
+- *Runtime:* =bin/savio_venv.sh mount= worked on this node (FUSE OK); interpreter =/local/job40390255/venv_img/bin/python=.
+  Private data roots under =/local/job40390255/data-private/= with =dvc-cache= symlinked to the shared L1.
+
+Next: the four remaining stopped lanes below are ledger-only (no source edits yet).
+Proposed order: Malawi #856 and Niger #823 (bounded raw-file diagnoses, based on 60aa), then Uganda #1133, then Mali #1118 (its branch is still based on =f8=; rebase/merge onto current development first).
+
+Sue
+
+* Earlier handoff -- 2026-10-23T01:43:30.672404+00:00
 
 The user requested that this session wrap up with a handoff.
 All five assigned workstreams are stopped; no source diagnostic, build or test remains running.
