@@ -242,7 +242,10 @@ def test_geo_subframe_builds_i_exactly_as_the_main_frame_does(wave):
 
 @pytest.mark.requires_s3
 def test_2016_17_clusters_actually_have_coordinates(cluster_features):
-    """The consequence of the key fix above, measured at the API: 0 -> 779."""
+    """The consequence of the key fix above, measured at the API: 0 -> 779.
+
+    Since GH #1260 the 101 panel-only EAs carry coordinates too (880 of 880);
+    that is pinned in tests/test_gh1260_malawi_panel_geo.py."""
     cf = cluster_features.reset_index()
     w = cf[cf["t"].astype(str) == "2016-17"]
     if w.empty:
@@ -250,7 +253,7 @@ def test_2016_17_clusters_actually_have_coordinates(cluster_features):
     have = int(w["Latitude"].notna().sum())
     assert have >= 700, (
         f"2016-17 should carry GPS for its 779 Cross_Sectional clusters "
-        f"(the 101 Panel clusters have no geovariables file); got {have}"
+        f"(and, since GH #1260, its 101 panel-only clusters); got {have}"
     )
 
 

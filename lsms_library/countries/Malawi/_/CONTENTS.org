@@ -1822,7 +1822,10 @@ alongside 14,955 main rows with no coordinates, and *0 of 880 clusters had
 GPS*.  =df_geo= now builds =i= exactly as =df_main= does; the two files are
 1:1 on =case_id= (12,447 = 12,447), so the join is exact and *779 of 880*
 clusters carry coordinates.  The remaining 101 are the IHPS panel EAs, for
-which IHS4 publishes no geovariables file.
+which IHS4 publishes no geovariables file.  /Corrected by GH #1260:/ IHS4
+(catalog 2936) does not, but the IHPS 2016 entry (2939) does --
+=Panel/HouseholdGeovariablesIHPSY3.dta=, now held and wired; all 880 clusters
+carry coordinates.  See /GH #1260/ below.
 
 Cost of that fix, stated plainly: 7 of the 779 EAs have households whose IHS4
 =lat_modified= differs within the EA (IHS4's displacement is *nearly* but not
@@ -1872,7 +1875,85 @@ the truth about which rows the survey actually geolocated.
 Unchanged and *not* a defect: the 102 IHPS panel EAs of 2019-20 share no
 =ea_id= and no household id with the geo file (0 overlap on either), because
 IHS5 publishes no geovariables for the panel half.  Those clusters carry NaN
-coordinates before and after.
+coordinates before and after.  /Corrected by GH #1260:/ true of IHS5 (catalog
+3818), but the panel half comes from IHPS 2019 (3819), which publishes
+=Panel/householdgeovariables_y4.dta=; it is now held and wired, and all 819
+clusters carry coordinates.  "Not a defect" was wrong: it was an acquisition
+gap.
+
+*** GH #1260: the IHPS panel EAs DO have coordinates -- in the IHPS entries
+Both waves hold two catalog entries in one directory (GH #600), and the
+sentences above judged the panel half by the *cross-sectional* entry's file
+list.  Each IHPS entry publishes a household geovariables file of its own.
+Acquired 2026-10-23 from each entry's own Stata zip (not from a later entry's
+re-release; 3819 re-ships a byte-identical copy of the 2016 file), published
+with =push_to_cache_batch=, and stacked into =df_geo= beneath the IHS file
+exactly as =df_main= stacks the two cover pages:
+
+| wave    | entry | file                                | key       | coordinates                  | rows  |
+|---------+-------+-------------------------------------+-----------+------------------------------+-------|
+| 2016-17 |  2939 | =Panel/HouseholdGeovariablesIHPSY3.dta= | =y3_hhid= | =lat_modified= / =lon_modified= | 2,508 |
+| 2019-20 |  3819 | =Panel/householdgeovariables_y4.dta=    | =y4_hhid= | =lat_mod= / =lon_mod=           | 3,178 |
+
+Each file is exactly 1:1 with its held panel cover (every key on both sides),
+so the =i= merge stays exact (wave frames 14,955 and 14,612 rows, unchanged)
+and =merge_how= stays =outer=, which keeps the orphan signal for free.  5
+(2016) and 3 (2019) panel households have a null coordinate; 5 of 3,175 2019
+coordinates lie outside Malawi's bounding box.
+
+Measured cold, development =9a0ed5f3c= against this change:
+
+| wave    | clusters without GPS | contested Lat/Lon EAs | Site 2 destroyed / conflicting groups |
+|---------+----------------------+-----------------------+---------------------------------------|
+| 2016-17 | 101 -> 0             | 7 -> 108              | 1,994 / 85 -> 2,563 / 111             |
+| 2019-20 | 102 -> 0             | 0 -> 102              | 3,146 / 108 -> 3,184 / 110            |
+
+Every cross-sectional-only cluster is unchanged (778 and 717), as are the
+other three waves, =sample()= and =housing()=.
+
+*The panel coordinates are NOT EA-constant, and that is the survey, not a
+key.*  Unlike the IHS files (one displaced fix per EA), IHPS gives each
+household its *current* location, displaced -- the 2013-14 pattern above
+("the GPS is the proof").  2019-20: restrict to households within 1 km of
+their IHS3 location (=d_ihs3= <= 1) and every one of the 102 EAs collapses to
+exactly one coordinate (2,136 households); the spread is tracked movers.
+2016-17's =distY1Y3= is populated only for 641 households, so the test there
+is the cover's =mover= flag: among the 1,147 =mover= = 0 households, 63 EAs
+have one coordinate, 24 two, 13 three, 1 four and 1 seven -- not exact, so
+=mover= is not the right stayer flag in
+that wave (what it is relative to was not pursued).  So the cluster row now carries ONE
+household's current, displaced location: the grain collapse selects the most
+complete row, ties broken by order, and the outer merge sorts panel ids
+(=NNNN-NNN=) ahead of the cross-sectional ones.  Two consequences, both
+measured:
+- EA =30305580= (sampled in both halves of 2016-17) used to serve IHS4's
+  single EA fix, because its panel rows had no coordinate and so were less
+  complete.  It now serves a panel household's fix.  None of its 30 panel
+  households sits at the IHS4 fix (IHS4 and IHPS displace independently).
+- One 2016-17 panel EA's =Rural= changed (Urban -> Rural, 17 of its 19
+  households Rural): its first household has a null coordinate, so the
+  selection moved to the next.
+An analyst who wants the EA's own location in a panel EA should take the
+stayers' coordinate from the source file, not the cluster row.
+
+*Three things found on the way, not fixed here:*
+- *The held 2016-17 =Data/Panel/= is not all the current 2939 upload.*  93 of
+  its 98 sidecars are byte-identical to the members of
+  =MWI_2010-2013-2016_IHPS_v03_M_Stata.zip= (downloaded 2026-10-23); 5 differ:
+  =ag_mod_e3_16=, =ag_mod_j_16=, =hh_mod_a_filt_16=, =hh_mod_e_16=,
+  =hh_mod_g1_16= (the last 132.7 MB held vs 127.0 MB current).  In
+  =hh_mod_a_filt_16= only =case_id= differs, in all 2,508 rows; =y3_hhid= is
+  identical, so the geo join is unaffected.  2019-20's 97 held =Data/Panel/=
+  sidecars are all byte-identical to the current 3819 zip.
+- *9 IHS5 cross-sectional clusters already served coordinates outside
+  Malawi's bounding box* (144 households, north of -9 and west of 32), before
+  and after this change.
+- *2019-20's =function: cs_i= is not a recognised key*, so it is a no-op: the
+  IHS5 cross-sectional =i= is the bare 12-digit =case_id=, not
+  ='cs-19-'= + =case_id= (2016-17's =mapping: cs_i= does prefix).  =df_main=
+  and =df_geo= spell it identically, so the join is exact, and panel ids
+  (=NNNN-NNN=) cannot collide with it.  The comments that say "case_id
+  through =cs_i=" describe intent, not behaviour.
 
 ** Weights
 | Wave    | Cross-section weight | Panel weight       | Source file                                |

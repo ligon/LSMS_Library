@@ -1,0 +1,7 @@
+hash_census.py (1218-current-validation), base 9a0ed5f3c vs this branch
+country: 26/549 moved
+   Malawi/anthropometry, Malawi/assets, Malawi/cluster_features, Malawi/community_prices, Malawi/crop_production, Malawi/food_acquired, Malawi/food_coping, Malawi/food_expenditures, Malawi/food_prices, Malawi/food_quantities, Malawi/food_security, Malawi/household_characteristics, Malawi/household_roster, Malawi/housing, Malawi/individual_education, Malawi/interview_date, Malawi/livestock, Malawi/months_food_inadequate, Malawi/panel_ids, Malawi/people_last7days, Malawi/plot_features, Malawi/plot_inputs, Malawi/plot_labor, Malawi/sample, Malawi/shocks, Malawi/subjective_well_being
+btf: 0/40 moved
+wave: 52/2109 moved
+   by wave: {'Malawi/2016-17': 26, 'Malawi/2019-20': 26}
+errors base 0 tip 0

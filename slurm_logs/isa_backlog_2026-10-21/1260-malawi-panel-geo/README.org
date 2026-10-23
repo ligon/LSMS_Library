@@ -1,0 +1,77 @@
+#+TITLE: GH #1260 -- Malawi IHPS panel household geovariables
+#+DATE: 2026-10-23
+
+Counts only.  No coordinates and no household or EA ids are recorded here;
+the scripts in =scripts/= print counts only, and every working file
+(zips, extracted =.dta=, build outputs) stayed under the private
+=/local/job40390255/data-private/1260/=.
+
+* Acquisition
+| wave    | entry | zip (WB Stata resource)                 | member                            | md5                              | size    |
+|---------+-------+-----------------------------------------+-----------------------------------+----------------------------------+---------|
+| 2016-17 |  2939 | =MWI_2010-2013-2016_IHPS_v03_M_Stata.zip= | =HouseholdGeovariablesIHPSY3.dta= | =cd3970675b30de62f619b23a8f99b876= | 228,796 |
+| 2019-20 |  3819 | =MWI_2010-2019_IHPS_v06_M_Stata.zip=      | =householdgeovariables_y4.dta=    | =13ffd98972e697a2fbb0ab62463b0ba3= | 359,546 |
+
+- URL from =data_access._find_stata_zip_url= (NADA resources API, the
+  library's WB key); one zip per directory; only the one member extracted,
+  into an empty directory, with a path-safety check; readers run =python -I=.
+- File names are the WB member basenames verbatim (2939's household file has
+  no =_16= suffix at the WB, unlike its plot file), so a future
+  =_extract_all_from_zip= re-acquisition matches the sidecar by basename.
+- 3819's zip re-ships =HouseholdGeovariablesIHPSY3.dta= byte-identical
+  (same md5); the 2016 file was nonetheless taken from 2939, the entry
+  2016-17 holds.
+
+* Verification (=outputs/source_verification.txt=)
+| wave    | rows  | key       | unique | keys in held cover | cover keys in geo | coords non-null | EAs |
+|---------+-------+-----------+--------+--------------------+-------------------+-----------------+-----|
+| 2016-17 | 2,508 | =y3_hhid= | yes    | 2,508 / 2,508      | 2,508 / 2,508     | 2,503           | 102 |
+| 2019-20 | 3,178 | =y4_hhid= | yes    | 3,178 / 3,178      | 3,178 / 3,178     | 3,175           | 102 |
+
+Coordinates are =lat_modified= / =lon_modified= (2016) and =lat_mod= /
+=lon_mod= (2019, float32), confirmed from the files.
+
+* Release identity (=outputs/release_identity.txt=)
+- 2019-20: all 97 held =Data/Panel/= sidecars byte-identical to the 3819 zip.
+- 2016-17: 93 of 98 identical; 5 differ (=ag_mod_e3_16=, =ag_mod_j_16=,
+  =hh_mod_a_filt_16=, =hh_mod_e_16=, =hh_mod_g1_16=).  In the cover only
+  =case_id= differs (all 2,508 rows, both 12-character strings); =y3_hhid=
+  is identical, so the join is unaffected.  Not re-acquired (out of scope).
+
+* Publication
+- =push_to_cache_batch([...], dvc_add=True)= from the worktree, writer creds
+  through a gitignored symlink to the legacy =.dvc/s3_write_creds=.
+  =permissions()= reported =ligonresearch_s3: write= first.
+- Result: exactly two new staged sidecars (=hash: md5=, md5 equal to the
+  file), no =.gitignore= change (=*.dta= is ignored at the root), no
+  existing sidecar changed, =.dvc/config.local= restored (absent).
+- S3 check (=scripts/s3_fetch_test.py=): in-tree files moved out, a fresh
+  =LSMS_DATA_DIR= with an EMPTY =dvc-cache/=; =get_dataframe('../Data/Panel/...')=
+  returned (2,508 x 39) and (3,178 x 45), and each blob appeared in the fresh
+  L1 at =dvc-cache/{md5[:2]}/{md5[2:]}= with the sidecar's md5 -- it came
+  from the S3 GET in =_ensure_dvc_pulled=, not the DVC repo cache.
+
+* Wiring and cold builds (=outputs/build_compare.txt=)
+Development =9a0ed5f3c= (a detached worktree) vs this branch, each in its own
+fresh =LSMS_DATA_DIR=.
+
+| wave    | clusters without GPS | contested Lat/Lon EAs | Site 2 destroyed / conflicting |
+|---------+----------------------+-----------------------+--------------------------------|
+| 2016-17 | 101 -> 0             | 7 -> 108              | 1,994 / 85 -> 2,563 / 111      |
+| 2019-20 | 102 -> 0             | 0 -> 102              | 3,146 / 108 -> 3,184 / 110     |
+
+- Wave frames unchanged in size (14,955 / 14,612): the merge stays 1:1.
+- Cross-sectional-only clusters identical (778 / 717); 2004-05, 2010-11,
+  2013-14 identical; =sample()= and =housing()= =DataFrame.equals= True.
+- Served-value changes outside the newly filled coordinates: EA 30305580
+  (in both halves of 2016-17) now serves a panel household's coordinate
+  instead of IHS4's EA fix; one 2016-17 panel EA's =Rural= went Urban ->
+  Rural (its first household has a null coordinate, so the selection moved).
+- 2019-20 stayers (=d_ihs3= <= 1 km): 2,136 households, every one of 102 EAs
+  has exactly one coordinate -- the within-EA spread is tracked movers.
+- Pre-existing, unchanged: 9 IHS5 cross-sectional clusters serve coordinates
+  outside Malawi's bounding box.
+
+* Hash census (=outputs/hash_census.txt=)
+=Country._table_cache_hash= 26/549 moved, all Malawi; =build_transforms_fingerprint=
+0/40; =Wave._input_hash= 52/2,109, all Malawi 2016-17 and 2019-20.
