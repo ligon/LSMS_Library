@@ -43,6 +43,14 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - Ethan: "there's a lot of precedent already established, so looking at how other countries seem to solve a problem will often be a good guide."  For any open sub-decision, find the cross-country precedent first (data_scheme/data_info/categorical_mapping/wave scripts/derivations.yml), follow the majority or most recent one, and cite it (country, file:line) in the PR.  Only where none exists, choose conservatively and flag it for review.
 - Watchers armed: Slurm scan 40393183 terminal state; this job's deadline-warning file.
 
+** Overnight progress log
+- Retro scan (Slurm 40393183): no regression from #1221/#1222/#1223; summary in =slurm_logs/isa_backlog_2026-10-21/retro-scan-20261022/SUMMARY.org= on this branch.
+- #1221 retro red-team: no refutation.  Design defect found: read-path dtype code entered every build fingerprint (hash depends on pandas =mode.string_storage=).  Fix agent on =fix/1221-empty-frame-fingerprint-20261022= (exclude =_empty_declared_frame= from the closure; empty calendars =[us]=).  Merge it before anyone re-warms after #1221.
+- Filed #1225 (=_coerce_datetime_column= raises on empty MultiIndex Series, swallowed).
+- Niger: red-team says fit as-is; doc fix =a202c8a60=; *PR #1227 open* (Closes #823); residual split to *#1226* (Benin/BF/GB/Senegal s05; Mali stays #821).
+- Malawi: bamboo ruling in (=bf29f212a= on the clean branch); size-qualified baskets left unmapped per Malawi's/Uganda's distinct-size precedent; red-team running before the PR.
+- Mali retro red-team (#1222/#1223) running.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
