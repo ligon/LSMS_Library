@@ -33,6 +33,7 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
 2. An independent cross-PR interaction review is running on that tree.
 3. Pending inclusion: #1272 round 3 (Mali tree value x months, ruled), and #1260 if its acquisition lands in time (otherwise a later batch).
 4. Validation burst (co_carleton): =/global/scratch/fsa/fc_jevons/ligon/isa-batch-20261023/{shard,tests}.sbatch= cold-build every country into the STAGING root =.../isa-batch-20261023/data= from a scratch clone of the integration branch, then the full pytest suite plus the coverage aggregate.
+4b. LAUNCHED 2026-10-23: integration head =d353b7ea7= (27 PRs + #1272); shard array =40406930= (38 countries, %16), tests =40406931= (afterany).  Logs and shards in =/global/scratch/fsa/fc_jevons/ligon/isa-batch-20261023/{logs,shards}=; job ids in =jobids.txt=.  #1260 (Malawi panel GPS) is in round 2, to be added later with a Malawi-only shard re-run.
 5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
 
 ** Merge plan: ONE corpus re-warm
