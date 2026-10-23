@@ -1214,7 +1214,8 @@
 #   * The 2005/06-definitions form is the 8-digit code with its 4th digit
 #     dropped (Form = "drop 4th digit"): all 317 2005-06 -> 2009-10 household
 #     pairs, and every community-file `comm` (320 / 320 / 322 in 2005-06 /
-#     2009-10 / 2010-11), with no collision across the 323 known 8-digit codes.
+#     2009-10 / 2010-11), with no collision across the 322 8-digit codes GSEC1
+#     carries (2005-06 and 2011-12; see the CSEC1 caveat below).
 #   * 2009-10 GSEC1 writes that form for all 317 of its EAs.  2010-11 GSEC1
 #     writes the CURRENT (2010/11) district definitions -- 321 of its 324 codes
 #     match that wave's CSECTION1 `comcod`, only 273 its `comm` -- so 50 EAs
@@ -1234,21 +1235,35 @@
 # CSECTION1, 2010-11 CSECTION1 and 2011-12 CSEC1 carry the same pair (the
 # 7-character code as `comm` or `comcod` with `comm` = comm8 minus its 4th
 # digit; or, in 2011-12, `comm` = comm8 with `comcod` = comm7): every row is
-# corroborated by at least one.
+# corroborated by at least one.  For 14 rows (13 "drop 4th digit" plus
+# 2220022 -> 20530022) that corroboration IS the drop-4th-digit rule alone: no
+# 2011-12 CSEC1 pairing names them, nor a chain from a CSECTION1 row to a CSEC1
+# row.  The rule itself is validated (every community-file `comm`, above), and
+# the chain -- CSEC1 (comm, comcod) -> 2010-11 CSECTION1 row with that comcod
+# -> its `comm` -- agrees with it for 308 of CSEC1's 309 EAs.
+#
+# The 309th is a contradiction in CSEC1, disclosed here: it pairs comcod
+# 3010003 with comm 30130033, but no GSEC1 household in any wave carries
+# 30130033, while 10 households sit on 30130003 in both 2005-06 and 2011-12
+# (and 8 / 9 on 3010003 in 2009-10 / 2010-11).  The table's 3010003 ->
+# 30130003 follows the households; 30130033 is most likely a CSEC1 typo, and
+# it is why that row's "Community files" omits 11.
 #
 # So 49 of the 50 re-coded EAs have TWO 7-character codes here, one per
 # district definition, both mapping to its one 8-digit code (the 50th,
 # 30430016, has no 2009-10 household with a `comm`, so only its 2010/11 form
 # is ever written): the map is a function (7 -> 8); only 8 -> 7 is not, and
 # nothing reads that direction.
-# Two of them (10730027, 30630002) carry both codes WITHIN 2010-11 -- one
-# household writes the 2005/06 form (1070027, 3060002), its EA-mates the
-# 2010/11 form (1150027, 3180002) -- which is why the 2010-11 -> 2011-12
-# boundary alone looked non-bijective (322 codes, 320 EAs).  It is one EA, not
-# an ambiguous pair: the survey's own CSECTION1 (2009-10 and 2010-11) pairs
-# comm 1070027 with comcod 1150027 and comm 3060002 with comcod 3180002 on one
-# community row, and 2011-12 CSEC1 pairs comcod 1150027 with comm 10730027 and
-# comcod 3180002 with comm 30630002.
+# Two of them (10730027, 30630002) carry both codes WITHIN 2010-11, which is
+# why the 2010-11 -> 2011-12 boundary alone looked non-bijective (322 codes,
+# 320 EAs).  In raw 2010-11 GSEC1, 1070027 is written by two households (one
+# original, linked to 2011-12, and one 2010-11 split-off that is never linked)
+# against nine on 1150027; 3060002 by one household against eight on 3180002.
+# (The hh columns count LINKED households only, hence 1 / 8 and 1 / 7.)  It is
+# one EA, not an ambiguous pair: the survey's own CSECTION1 (2009-10 and
+# 2010-11) pairs comm 1070027 with comcod 1150027 and comm 3060002 with comcod
+# 3180002 on one community row, and 2011-12 CSEC1 pairs comcod 1150027 with
+# comm 10730027 and comcod 3180002 with comm 30630002.
 #
 # NOT in the table: 2010-11 code 1530040 (one household; on no linkage and in
 # no community file).  It keeps its 7-character rendering.

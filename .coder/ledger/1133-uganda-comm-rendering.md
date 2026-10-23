@@ -191,3 +191,24 @@ No Uganda table reads any community file (`rg` over Uganda yml/py/Makefile).
 - Hash census: Uganda only -- 28/28 L2-country, 224/224 L2-wave, 0/40 btf.
 - `tests/fixtures/uganda_baseline.json` `var/sample` and
   `var/cluster_features` entries move (out of scope here; values reported).
+
+### Phase 4 - documentation corrections from independent review of `935ba72f9`
+
+Prose and comments only; served `sample` / `cluster_features` /
+`household_roster` re-built and `assert_frame_equal` to the previous head,
+all waves.  Each claim re-measured before editing:
+
+- `10730027` GPS: the 2005/06-form household's fix is 0.0 km from 8 of the 9
+  `1150027` households; the 9th (District MUBENDE) is 34.66 km away, so
+  `1150027` was already NA before the merge.  2010-11 GPS rows 188 -> 186.
+  The lost fix is shared by 9 of the EA's 11 households (9 of 10 with a fix;
+  the 2010-11 split-off has none) -- the review said 10 of 11.
+- `1070027` is 2 raw 2010-11 households (10- and 13-character HHIDs; 1
+  linked); `3060002` is 1.  The table's hh columns count linked households.
+- CSEC1 pairs comcod 3010003 with comm 30130033; no GSEC1 household in any
+  wave carries 30130033; 10 sit on 30130003 in 2005-06 and 2011-12.  GSEC1
+  8-digit codes: 322 (the earlier 323 included this CSEC1-only code).
+- 14 rows (13 drop-4th + 2220022 -> 20530022) have no CSEC1 pairing and no
+  CSECTION1 -> CSEC1 chain; the chain agrees with drop-4th for 308 of 309.
+- 2005-06 `v` vs `csec1.comm`: 0 of 3,123 literal, before and after.
+- Hybrid bullet: drop-4th(`v`) in CSECTION1.comm for 2,399 of 2,410.
