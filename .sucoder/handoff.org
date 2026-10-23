@@ -1,6 +1,54 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-22T23:31:01.988500+00:00
+* Current task -- 2026-10-23T00:19:00.119942+00:00
+
+The user authorized an agent to check consistency and merge outstanding PRs into development.
+ALL 32 IMPLEMENTATION PRS ARE MERGED; goal remains ACTIVE, with country backlog still remaining.
+Latest scoped development commit: a3aad0d43cac1866bab5a91cd59716bb659e9e28.
+Root independent023082/07559f and283832 verify exact final tree2e6e01b09daed769cb5c7764929d994161e11a21 equals reviewed26a301e2f8783e7b6adb58804c09fdd74ba517ec across all15,113 tracked entries; all32 accepted original heads are ancestors.
+Root7ee5d2 independently read all32 exact-head CI run+jobs APIs: unit-tests/windows-smoke SUCCESS and six skipped jobs perPR, including data. No tests or CI replay.
+RootCI receipt SHA13af827b38c924167403d179bd479977d087645b5d7becaa7c46de59fafd64b6; safe copy final32-root-exact-head-ci.json.
+Scoped integration stays1,691 distinct PASS/102normalSKIP across immutable original and failure-only continuations; no single-run/full-suite/corpus/new-dependency/release verdict.
+Original errors and preparation stops remain preserved. PR1217 had a wrong local expected-tree argument after a successful merge; original prediction and independently fetched server parents/tree agree, so no source mismatch or merge replay occurred.
+
+Root complete collectionac0d1b:663 allPRs,557 allissues,151currentlyopen, actual development branch readback.
+Queue399356/283832:22 fully resolved issues closed completed;90 remaining ISA scope records = two active issues, four other landed-partial residuals,84unassigned overlapping records.
+Two global issues218/1121 stay open with completed Malawi/Mali portions; their shared/non-ISA residuals are tracked separately and excluded from the remaining90.
+Remaining records are not90 distinct ready-to-fix bugs.
+Queue JSON/Org and merge-progress-final32.json are updated on docs/isa-backlog-20261022-merge-progress; prior dated checkpoints remain historical.
+
+Merger malawi_1209 is finishing tracker1170 LAST, after root's current body/queue refresh.
+Tracker accepted59cc is retained as an ancestor of additive normal repair7195fe5669cf1dd88b6bbe37b3713010c40f41c1, based on actual finaldevelopmenta3aad.
+Root reviewed/authenticated exact two documentation conflicts: current complete1149 ledger stays byte-exact, earlier queued skeleton preserved in59cc ancestry/export; full current BF notes followed by exact independent1148 WAITING suffix.
+Root conflict acceptance77211ed204f88ec3c45ae22633e38a6cf1d94781c16e0388c869b5d5e96e5a81.
+Final tracker has1118 documentary paths and zero product/test changes versus development; normalpush/finalheadCI/server gates still required. No new user permission is needed.
+Root must update1170body to current32/22/90checkpoint, preserving original details under an explicit historical label, then signal merger to finish.
+
+#1218 source is clean/published5fdbb937d, ledger-first56e1e39fe, minimal six-line empty-calendar amendment.
+Independent exact source review bb618c852c64c2d4377d59413f18cf5b9099ef142e9e98264d07d8dbaef324f6 passes with no source blocker; rootfbc73f verifies all seven review files.
+All original2f45PASS/12calendarFAIL, failed Make startup history, metadata25PASS and full old hash maps retain their actual identities.
+New source-only runtime packet is FROZEN, not executed: READY43687d5583254908f0fa9b1bfd8d8f47a3c34b731b9641aa731fc98524b05aad; manifest60da84bcfa564541df7389a9ae7618dd385ab6ac14fef02acd07eba8ea9958e6 (78files).
+Plan41a238ad1933ccb166844ef982af8dc53e97a00e5f114ffaf521743767c20660; bindings9f91ef04832c546b2591f5ab7ed4a3189af6d82be4f98f9199f5fd6588f1e8ad.
+Root still needs own exact source review/release. Candidate-only census/API/source-policy gates versus SAVEDf7, same57regressions and104unrun supporting cells after exact57deselection are conditional predictions; no base/parent/calibration replay.
+Genuine sixproviders/24copies/fourroots remain held. acquisition_1149 is idle awaiting concrete root release.
+
+Mali1118 remains ledger-only24278 versus truef8; no production fill yet.
+Root authenticated original51file packet and caught stale hostgate scriptSHA before runtime; all originals preserved, additive v2 plan/controller associations reviewed.
+Two original source epochs complete0 with historical3/head metadata/Git-only and only task ledger content difference; no direct historical payload bytes.
+Both v2 calibrations and saved gate complete0; root0f2c8c verifies full62rows=58source/line/PID/time seeds+fourdeniedurllib3IPv6probes, original3launch/boot/streamchains and10startupchildren.
+No zero-network-attempt claim. Calibration rootrelease db0d56a520285f1bc32ba4c2220d5fe46e620e57b97c2635056fdc93f1508dd3.
+Root census-only release C/MALI1118-ROOT-CENSUS-V2-RELEASE.json SHAa42bfb2b8643ac3ff86c53f9b17dd363431a4f0ab3af1dcd36c34d7419eb8655 allows exactly census-base,census-candidate,gate-census under plan0dc66967cca2ea7a5a6beaafbdd9e9943ab404d6678c6f8b28885af266fae87a.
+Base full549/39/1362 census completed0 with1459fullyclassifiedsuffixrows; candidate/gate are underway, expected0moves is not yet a measured result.
+Tests/comparator/providers/copies/decode/normalAPIs/production remain held until actual gates and next exact release. Source-first meaningful-unmapped versus declared-absence classification remains mandatory.
+Root updated live1118body to landed Ethiopia/Tanzania and current remainingMali/Malawi/Nigeria; full historical body retained verbatim.
+
+Future Uganda1133 phase0 brief remains prepared, not dispatched; use final currentdevelopment rather than silently assume f8 when it resumes.
+Archive32 stays accepted but does not cover live1218, independent1215 and later root/Mali/merge receipts. No actor replay for packaging.
+Main checkout stays cleanf8, shared mirror working tree untouched. No deadline warning at the last check; active work continues.
+
+Sue
+
+* Earlier task -- 2026-10-22T23:31:01.988500+00:00
 
 The user expressly authorized reviewing and merging outstanding PRs into development.
 

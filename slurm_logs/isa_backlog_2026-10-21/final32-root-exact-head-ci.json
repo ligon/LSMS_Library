@@ -1,0 +1,587 @@
+{
+  "status": "ALL32_ROOT_INDEPENDENT_EXACT_HEAD_CI_METADATA_VERIFIED",
+  "at_ns": 1792714634194517546,
+  "PRs": [
+    {
+      "PR": 1172,
+      "head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "run_id": 39641986727,
+      "actual_run_head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1173,
+      "head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "run_id": 39636912861,
+      "actual_run_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1175,
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "run_id": 39640824319,
+      "actual_run_head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1176,
+      "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "run_id": 39643227693,
+      "actual_run_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1178,
+      "head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "run_id": 39645861519,
+      "actual_run_head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1180,
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "run_id": 39649319628,
+      "actual_run_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1181,
+      "head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "run_id": 39657028262,
+      "actual_run_head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1182,
+      "head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "run_id": 39654667663,
+      "actual_run_head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1185,
+      "head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "run_id": 39657075627,
+      "actual_run_head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1186,
+      "head": "683cdef024768e8e4d3f467888271967c8454674",
+      "run_id": 39869839490,
+      "actual_run_head": "683cdef024768e8e4d3f467888271967c8454674",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1189,
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "run_id": 39666499914,
+      "actual_run_head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1191,
+      "head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "run_id": 39669180447,
+      "actual_run_head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1192,
+      "head": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "run_id": 39676834859,
+      "actual_run_head": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1193,
+      "head": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "run_id": 39678420581,
+      "actual_run_head": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1194,
+      "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "run_id": 39683305731,
+      "actual_run_head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1195,
+      "head": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "run_id": 39685546468,
+      "actual_run_head": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1197,
+      "head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "run_id": 39696155414,
+      "actual_run_head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1199,
+      "head": "4cd29a8d1e21b094f0921be87c394c7ac5c95925",
+      "run_id": 39871740357,
+      "actual_run_head": "4cd29a8d1e21b094f0921be87c394c7ac5c95925",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1200,
+      "head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "run_id": 39705606211,
+      "actual_run_head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1201,
+      "head": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "run_id": 39718698178,
+      "actual_run_head": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1202,
+      "head": "165a16c5dbb9e388376fd042b86efb9bfac5feb1",
+      "run_id": 39871743227,
+      "actual_run_head": "165a16c5dbb9e388376fd042b86efb9bfac5feb1",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1203,
+      "head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "run_id": 39722612561,
+      "actual_run_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1207,
+      "head": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "run_id": 39735520713,
+      "actual_run_head": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1208,
+      "head": "6f83359bebfe6c27ff058b9684d9c1234fbe418e",
+      "run_id": 39871747993,
+      "actual_run_head": "6f83359bebfe6c27ff058b9684d9c1234fbe418e",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1211,
+      "head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+      "run_id": 39782394614,
+      "actual_run_head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1212,
+      "head": "8bc70f6535d4bf95f9f0b0d213a48c746f999963",
+      "run_id": 39873318721,
+      "actual_run_head": "8bc70f6535d4bf95f9f0b0d213a48c746f999963",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1213,
+      "head": "789bbc0bcaf10115ddf95729d9a38c39c66389b0",
+      "run_id": 39873147483,
+      "actual_run_head": "789bbc0bcaf10115ddf95729d9a38c39c66389b0",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1214,
+      "head": "049a174b35f437653105f9eda6dd801d5a64e156",
+      "run_id": 39874422000,
+      "actual_run_head": "049a174b35f437653105f9eda6dd801d5a64e156",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1216,
+      "head": "721edd501c8f5939c8815f1b58329c786896ee87",
+      "run_id": 39874479563,
+      "actual_run_head": "721edd501c8f5939c8815f1b58329c786896ee87",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1217,
+      "head": "00ad89e6233daeb2bdef19503609b2fe79624a8b",
+      "run_id": 39875668340,
+      "actual_run_head": "00ad89e6233daeb2bdef19503609b2fe79624a8b",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1219,
+      "head": "657fed11a63354886772d0f978cec8adb2ad647e",
+      "run_id": 39856584211,
+      "actual_run_head": "657fed11a63354886772d0f978cec8adb2ad647e",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    },
+    {
+      "PR": 1220,
+      "head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+      "run_id": 39861535004,
+      "actual_run_head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+      "successful_jobs": [
+        "unit-tests",
+        "windows-smoke"
+      ],
+      "skipped_jobs": [
+        "data-tests",
+        "docs",
+        "dvc-lock-check",
+        "dvc-remote-reachability",
+        "refresh-dvc-locks",
+        "windows-script-build"
+      ]
+    }
+  ],
+  "actual_CI_or_tests_rerun": false,
+  "all32_unit_windows_success": true,
+  "each_six_skipped_including_data": true,
+  "no_dependency_installation_or_genuine_corpus_claim": true,
+  "signed": "Sue (GPT-6)"
+}

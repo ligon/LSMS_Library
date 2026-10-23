@@ -1,43 +1,25 @@
 {
-  "captured_at_UTC": "2026-10-22T23:10:58+00:00",
+  "captured_at_UTC": "2026-10-23T00:16:15.307282+00:00",
   "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
-  "method": "Complete gh allPR limit1000 (663 records) and openissue limit1000 (166 records) checkpoint. All107 remaining scope records confirmed open; seven completed development fixes retained separately. Nine implementation PRs merged and23open. Accepted heads are stored separately from live heads;1186 has a mechanical merge repair awaiting CI. Original base_sha values are historical creation/stack prerequisites.",
-  "repository_open_issues": 166,
-  "isa_related_open_issue_records": 107,
-  "pr_linked_issue_records": 22,
-  "active_issue_records": 1,
+  "method": "Complete post-batch gh all-PR/all-issue collections below limit2000, unique issue/PR numbers, actual development branch readback. All32 scoped implementation PRs merged into development;22 completed issue closures independently read back. Two open global issues have completed their ISA country portions and are tracked separately. Original accepted heads and historical creation/stack bases remain distinct from final live heads.",
+  "repository_open_issues": 151,
+  "isa_related_open_issue_records": 90,
+  "pr_linked_issue_records": 5,
+  "active_issue_records": 2,
   "other_open_issue_records": 84,
-  "open_unmerged_implementation_prs": 23,
-  "initial_in_scope_still_open": 89,
-  "new_campaign_issue_records": 18,
+  "open_unmerged_implementation_prs": 0,
+  "initial_in_scope_still_open": 82,
+  "new_campaign_issue_records": 10,
   "original_duplicate_now_closed": 1089,
   "limitations": [
-    "PR-linked does not mean fully implemented: explicit partial scopes remain.",
-    "Open unassigned includes source-authority/design/acquisition/validation/enhancement tasks, not only ready code fixes.",
-    "Initial triage approach/tier retained as historical routing guidance; live issue plus country notes must be reread before dispatch.",
-    "Issue records overlap across countries and partial umbrellas;107openrecords are not107distinctconfirmedbugs.",
-    "Nine verified development merges and seven completed issue closures are recorded. Distinct1691PASS/102normalSKIP outcomes aggregate immutable original and failure-only continuations; no single-run/full-data/new-release verdict.",
-    "Seven completed scope records are retained separately. The other59repository issue headlines were not newly body-retriaged here. Later merge/closure activity may advance this dated checkpoint."
+    "Remaining records overlap across countries, umbrellas, enhancements and source/policy decisions; they are not a count of distinct ready-to-fix bugs.",
+    "Initial tiers and measurements require fresh live issue/country-note reconciliation before dispatch.",
+    "1,691 distinct integration passes and102 normal skips are assembled from original and failure-only continuations, not one full-suite/corpus run.",
+    "Final-head unit/Windows CI passed; six jobs including data were skipped. Mounted runtime/dependency installation and genuine corpus coverage are not certified.",
+    "Issue218 and1121 remain globally open for the explicitly recorded shared/non-ISA residuals; their completed ISA country repairs are outside the remaining goal queue.",
+    "Goal remains active; the implementation merge batch is not full backlog completion or a release."
   ],
   "issues": [
-    {
-      "number": 218,
-      "title": "Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)",
-      "url": "https://github.com/ligon/LSMS_Library/issues/218",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Malawi"
-      ],
-      "implementation_prs": [
-        1208
-      ],
-      "residual": "Malawi registration repair reviewed. Remaining named Makefile cleanup is outside ISA.",
-      "current_active_scope": null,
-      "initial_triage_tier": "A",
-      "initial_triage_approach": "Remove Malawi food_expenditures/food_prices registrations with next Malawi rewarm; optional no-derived-registration guard. OthercountriesMake cleanup outsideISA.",
-      "scope_recheck_required_before_dispatch": false
-    },
     {
       "number": 226,
       "title": "feat: principled auto-aggregation script for harmonize_food's Aggregate Label column",
@@ -621,24 +603,6 @@
       "scope_recheck_required_before_dispatch": true
     },
     {
-      "number": 849,
-      "title": "Uganda: wire reported kg factors in the remaining five waves after preserving native production records",
-      "url": "https://github.com/ligon/LSMS_Library/issues/849",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Uganda"
-      ],
-      "implementation_prs": [
-        1207
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "B",
-      "initial_triage_approach": "Wire reported q6d only after private baseline/candidate per-wave factor agreement, conversion coverage, kg totals and implausible tally. The former #972/#967 dependencies have merged.",
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
       "number": 851,
       "title": "Recall Phase II: integrate approved period= conversion, disclosure and Country/Feature error contract",
       "url": "https://github.com/ligon/LSMS_Library/issues/851",
@@ -862,24 +826,6 @@
       "scope_recheck_required_before_dispatch": true
     },
     {
-      "number": 1006,
-      "title": "Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertions",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1006",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Uganda"
-      ],
-      "implementation_prs": [
-        1191
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "A",
-      "initial_triage_approach": "Use real food_acquired/household_roster prerequisite availability, canonical Price/Quantity numeric assertions, explicit default-v and requested-market m tests; eliminate obsolete migration xfails; keep caches physically private.",
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
       "number": 1033,
       "title": "Nigeria W4 food unit labels carry invented W3 size prefixes; W4's size columns (s7bq2c/s7bq9c/s10bq2c/s10bq9c) are never read",
       "url": "https://github.com/ligon/LSMS_Library/issues/1033",
@@ -981,26 +927,6 @@
       "initial_triage_tier": "C",
       "initial_triage_approach": "Decide whether same-grappe EA identity licenses carry-forward for527 tracked fixes; register derivation and assumption if approved.",
       "scope_recheck_required_before_dispatch": true
-    },
-    {
-      "number": 1058,
-      "title": "Burkina Faso 2021 plot_features: expose 4,180 reported GPS pairs on 7,350 retained parcels",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1058",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Burkina_Faso",
-        "Mali",
-        "Niger"
-      ],
-      "implementation_prs": [
-        1194
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "B",
-      "initial_triage_approach": "Wire BF2021 parcel coordinates in script/schema, then verify Mali/Niger source headers before declaring GPS absent.",
-      "scope_recheck_required_before_dispatch": false
     },
     {
       "number": 1059,
@@ -1119,42 +1045,6 @@
       "scope_recheck_required_before_dispatch": true
     },
     {
-      "number": 1078,
-      "title": "Uganda food cache: confirmed producer race writes nine missing values as zero under current hash",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1078",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Uganda"
-      ],
-      "implementation_prs": [
-        1197
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "B",
-      "initial_triage_approach": "First fix #1062; isolate Uganda-touching tests and prove exact nine NaN-vs-zero cells retain values under concurrency. Do not close from removal of other countries test contamination.",
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
-      "number": 1081,
-      "title": "Derived food/roster methods: reviewed categorical-error preservation awaits merge",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1081",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Ethiopia"
-      ],
-      "implementation_prs": [
-        1195
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "B",
-      "initial_triage_approach": "Re-raise EmptyCategoricalTableError and CategoricalMappingConflictError ahead of generic derived food/roster fallback. Test bare/Aggregate calls and unchanged legitimate legacy fallback.",
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
       "number": 1084,
       "title": "recall windows: read the questionnaires for the 32 not-recorded food cells (period= converts each with no code change)",
       "url": "https://github.com/ligon/LSMS_Library/issues/1084",
@@ -1207,33 +1097,11 @@
       "scope_recheck_required_before_dispatch": true
     },
     {
-      "number": 1091,
-      "title": "Retire duplicate country community-price builders in Mali, Niger and Tanzania",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1091",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Mali",
-        "Niger",
-        "Tanzania"
-      ],
-      "implementation_prs": [
-        1199,
-        1200,
-        1201
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "A",
-      "initial_triage_approach": "Retire country-only concatenation scripts using existing framework wave aggregation under #788 ruling; compare cold default/make API output exactly.",
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
       "number": 1095,
       "title": "Nigeria community_prices: land recorded-unit recovery and decide future unplaced-label retention",
       "url": "https://github.com/ligon/LSMS_Library/issues/1095",
       "github_state": "open",
-      "queue_state": "PR_OPEN",
+      "queue_state": "MERGED_PR_RESIDUAL_OPEN",
       "countries": [
         "Nigeria"
       ],
@@ -1244,7 +1112,8 @@
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Extend community-specific unit canonicalization with recorded labels and reuse _canon_units reporting. Preserve separate intentional unknown-size drop; compare recovered rows/prices per PH quarter and retain remaining unplaced-label warnings.",
-      "scope_recheck_required_before_dispatch": false
+      "scope_recheck_required_before_dispatch": false,
+      "historical_residual_at_prior_checkpoint": "Ten held unit labels recovered by PR. Future unresolved-label retention/collision representation remains a design residual."
     },
     {
       "number": 1096,
@@ -1300,18 +1169,19 @@
       "title": "Malawi applied fertilizer: correct timing-derived units while retaining enumerator kg totals",
       "url": "https://github.com/ligon/LSMS_Library/issues/1111",
       "github_state": "open",
-      "queue_state": "PR_OPEN",
+      "queue_state": "MERGED_PR_RESIDUAL_OPEN",
       "countries": [
         "Malawi"
       ],
       "implementation_prs": [
         1193
       ],
-      "residual": "2010/2019 enumerator-kg repair reviewed. Literal questionnaire/source authority for 2013/2016 remains.",
+      "residual": "2010/2019 enumerator-kg repair landed. Literal questionnaire/source authority for 2013/2016 remains.",
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Read each wave ModuleD Q39 applied-unit list; only then decode applied codebook and read missing slot2 unit; fill remaining missing with U_UNKNOWN.",
-      "scope_recheck_required_before_dispatch": false
+      "scope_recheck_required_before_dispatch": false,
+      "historical_residual_at_prior_checkpoint": "2010/2019 enumerator-kg repair reviewed. Literal questionnaire/source authority for 2013/2016 remains."
     },
     {
       "number": 1116,
@@ -1335,7 +1205,7 @@
       "title": "plot_inputs: complete country missing-unit normalization under the #1041 ruling",
       "url": "https://github.com/ligon/LSMS_Library/issues/1118",
       "github_state": "open",
-      "queue_state": "PR_MERGED_RESIDUAL_OPEN",
+      "queue_state": "ACTIVE_WITH_MERGED_PARTIALS",
       "countries": [
         "Ethiopia",
         "Malawi",
@@ -1347,20 +1217,26 @@
         1181,
         1185
       ],
-      "residual": "Ethiopia/Tanzania PRs reviewed. Malawi/Mali/Nigeria unit normalization remains; other countries outside ISA are separate.",
-      "current_active_scope": "Mali source-only phase0 accepted by root53aeaca1: ledger24278,62source files,14sidecars/4SOURCE records and14provider metadata candidates; no provider bytes. Preparing exact guard/controllers/basecheckout; source-first missing-vs-meaningful-unmapped classification required before productionfill. Existing Ethiopia/Tanzania PRs remain in merge queue; Malawi/Nigeria residuals remain.",
+      "residual": "Ethiopia/Tanzania repairs landed. Mali, Malawi and Nigeria remain; non-ISA countries are separate.",
+      "current_active_scope": "Mali ledger-only24278 versus truef8: two complete source epochs and both guard calibrations pass, with62 denial rows fully accounted. Full initial fingerprint checks are the next released tranche. Provider bytes, source-first classification, production fill and genuine validation remain pending. Malawi must be reconciled after landed1175/1193; Nigeria source-row eligibility remains separate.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Fill every missing unit with existing U_UNKNOWN at build, including native Malawi u index; retain use/cost records with no quantity. Nigeria dropping non-input rows is optional separate decision, not needed to fill.",
       "scope_recheck_required_before_dispatch": false,
       "current_dispatch_assessment": "Mali and Malawi remaining null-unit normalization are stronger next mechanical candidates under settled1041. Stack Malawi after1175/1193; preserve source eligibility, unchanged known units and postcollapse grain. Nigeria fill-vs-drop remains a separate source-eligibility decision.",
-      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00",
+      "historical_residual_at_prior_checkpoint": "Ethiopia/Tanzania PRs reviewed. Malawi/Mali/Nigeria unit normalization remains; other countries outside ISA are separate.",
+      "remaining_isa_countries": [
+        "Mali",
+        "Malawi",
+        "Nigeria"
+      ]
     },
     {
       "number": 1119,
       "title": "#569 residual A: the \"not crop-specific\" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production",
       "url": "https://github.com/ligon/LSMS_Library/issues/1119",
       "github_state": "open",
-      "queue_state": "PR_OPEN",
+      "queue_state": "MERGED_PR_RESIDUAL_OPEN",
       "countries": [
         "Burkina_Faso",
         "Ethiopia",
@@ -1374,11 +1250,12 @@
       "implementation_prs": [
         1203
       ],
-      "residual": "Burkina maize/cowpea label repair reviewed. Shared not-crop-specific marker design remains; non-ISA countries separate.",
+      "residual": "Burkina maize/cowpea label repair landed. Shared not-crop-specific marker design remains; non-ISA countries separate.",
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Repair BF seed maize/cowpea target spellings against crop_production; separately decide shared noncrop marker and NaN replacement. Do not collapse real crop detail.",
-      "scope_recheck_required_before_dispatch": false
+      "scope_recheck_required_before_dispatch": false,
+      "historical_residual_at_prior_checkpoint": "Burkina maize/cowpea label repair reviewed. Shared not-crop-specific marker design remains; non-ISA countries separate."
     },
     {
       "number": 1120,
@@ -1400,29 +1277,11 @@
       "scope_recheck_required_before_dispatch": true
     },
     {
-      "number": 1121,
-      "title": "plot_labor.source: land Mali casing fix and decide remaining taxonomy",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1121",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Mali"
-      ],
-      "implementation_prs": [
-        1186
-      ],
-      "residual": "Mali casing PR reviewed. Shared labor-source taxonomy remains a design residual, largely non-ISA examples.",
-      "current_active_scope": null,
-      "initial_triage_tier": "A",
-      "initial_triage_approach": "Change only Mali harmonize_labor_source Preferred Label cells to family/hired/other and matching comments; preserve richer source vocabularies elsewhere.",
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
       "number": 1123,
       "title": "plot_inputs: land Burkina repair and diagnose remaining country-level identity collapses",
       "url": "https://github.com/ligon/LSMS_Library/issues/1123",
       "github_state": "open",
-      "queue_state": "PR_OPEN",
+      "queue_state": "MERGED_PR_RESIDUAL_OPEN",
       "countries": [
         "Burkina_Faso",
         "Niger"
@@ -1430,11 +1289,12 @@
       "implementation_prs": [
         1189
       ],
-      "residual": "Burkina identity PR reviewed. Niger identity-collapse diagnosis remains; Senegal/CotedIvoire outside ISA.",
+      "residual": "Burkina identity repair landed. Niger identity-collapse diagnosis remains; Senegal/CotedIvoire outside ISA.",
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Measure raw input-slot/crop/unit identities, make seed mapping injective or retain required slot grain; avoid mechanical reducer changes.",
-      "scope_recheck_required_before_dispatch": false
+      "scope_recheck_required_before_dispatch": false,
+      "historical_residual_at_prior_checkpoint": "Burkina identity PR reviewed. Niger identity-collapse diagnosis remains; Senegal/CotedIvoire outside ISA."
     },
     {
       "number": 1127,
@@ -1568,25 +1428,6 @@
       "scope_recheck_required_before_dispatch": true
     },
     {
-      "number": 1149,
-      "title": "add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1149",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Nigeria",
-        "Ethiopia"
-      ],
-      "implementation_prs": [
-        1211
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "B",
-      "initial_triage_approach": "Implement ruled stage/compare/place with recursive case-insensitive existing-sidecar basename matching, collision refusal, zip-relative new paths and recursive retirement report. Use synthetic fixtures before any live acquisition.",
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
       "number": 1150,
       "title": "plot_features: serve the WB plot geovariables (elevation, slope, wetness, distance to dwelling) for Ethiopia W1-W5, and declare Nigeria's PlotSlope (#1127 ruling A)",
       "url": "https://github.com/ligon/LSMS_Library/issues/1150",
@@ -1716,24 +1557,6 @@
       "scope_recheck_required_before_dispatch": true
     },
     {
-      "number": 1188,
-      "title": "Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1188",
-      "github_state": "open",
-      "queue_state": "PR_OPEN_AWAIT_HUMAN_MERGE",
-      "countries": [
-        "Burkina_Faso"
-      ],
-      "implementation_prs": [
-        1219
-      ],
-      "residual": "Shared constructed-empty optional dtype exposure remains1218; original151strict matrix/guarded-execution qualifications retained. Country purchase/gift source routing independently accepted and PR1219awaits human merge.",
-      "current_active_scope": null,
-      "initial_triage_tier": null,
-      "initial_triage_approach": null,
-      "scope_recheck_required_before_dispatch": true
-    },
-    {
       "number": 1190,
       "title": "Malawi plot_inputs: preserve seed purchase-unit identity before aggregating or joining planted quantities",
       "url": "https://github.com/ligon/LSMS_Library/issues/1190",
@@ -1748,79 +1571,6 @@
       "initial_triage_tier": null,
       "initial_triage_approach": null,
       "scope_recheck_required_before_dispatch": true
-    },
-    {
-      "number": 1196,
-      "title": "Cold/warm index StringDtype drift: Niger food_acquired and Uganda cluster_features",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1196",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Niger",
-        "Uganda"
-      ],
-      "implementation_prs": [
-        1212
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": null,
-      "initial_triage_approach": null,
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
-      "number": 1198,
-      "title": "Uganda crop_production: preserve distinct production records before pairing quantities with kg factors",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1198",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Uganda"
-      ],
-      "implementation_prs": [
-        1202
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": null,
-      "initial_triage_approach": null,
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
-      "number": 1204,
-      "title": "Uganda crop_production: merge the reviewed requested-wave assembly repair",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1204",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Uganda"
-      ],
-      "implementation_prs": [
-        1217
-      ],
-      "residual": "Reviewed/root-accepted PR1217 awaits human merge after1207.109/113strictPASS;fournewempty-orderFAIL owned by1215,whose narrowpolicy is human-approved. All nonempty products preserved; held real grain ledgers empty, nonempty transport synthetic-only.",
-      "current_active_scope": null,
-      "initial_triage_tier": null,
-      "initial_triage_approach": null,
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
-      "number": 1205,
-      "title": "Uganda yield_kg: merge the reviewed parcel-area repair and coverage correction",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1205",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Uganda"
-      ],
-      "implementation_prs": [
-        1216
-      ],
-      "residual": "Independently reviewed and root-accepted; stacked PR1216 awaits human review/merge after1207. Source eligibility exclusions and comparator/metadata limits explicit.",
-      "current_active_scope": null,
-      "initial_triage_tier": null,
-      "initial_triage_approach": null,
-      "scope_recheck_required_before_dispatch": false
     },
     {
       "number": 1206,
@@ -1839,62 +1589,6 @@
       "scope_recheck_required_before_dispatch": true
     },
     {
-      "number": 1209,
-      "title": "Malawi: country food_acquired Make builder expects retired wave columns",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1209",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Malawi"
-      ],
-      "implementation_prs": [
-        1213
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": null,
-      "initial_triage_approach": null,
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
-      "number": 1210,
-      "title": "Malawi: invalid food wave request evicts native caches before raising",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1210",
-      "github_state": "open",
-      "queue_state": "PR_OPEN",
-      "countries": [
-        "Malawi",
-        "Shared framework"
-      ],
-      "implementation_prs": [
-        1214
-      ],
-      "residual": "Rootaccepted bounded repair; PR1214awaits humanmerge. Iterator/error timing and broadfingerprint invalidation explicit. Independent privateproofs durablearchive29; CIrun/job metadata inconsistency prevents completed-unit claim.",
-      "current_active_scope": null,
-      "initial_triage_tier": null,
-      "initial_triage_approach": null,
-      "scope_recheck_required_before_dispatch": false
-    },
-    {
-      "number": 1215,
-      "title": "Constructed empty tables: implement the approved declaration-order rule",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1215",
-      "github_state": "open",
-      "queue_state": "PR_OPEN_AWAIT_HUMAN_MERGE",
-      "countries": [
-        "Uganda",
-        "Shared framework"
-      ],
-      "implementation_prs": [
-        1220
-      ],
-      "residual": "Declaration order reviewed and root-accepted in1220. Empty explicit-field types remain separate1218.",
-      "current_active_scope": null,
-      "initial_triage_tier": "B",
-      "initial_triage_approach": "Reuse existing schema/empty/native ordering machinery; measure affected scope before framework edit. Closed1099row/errorbehavior and1204rawcoverage are different owners; no normalizedcomparison or native-data changes.",
-      "scope_recheck_required_before_dispatch": true
-    },
-    {
       "number": 1218,
       "title": "Constructed empty tables ignore declared types of country-local optional fields",
       "url": "https://github.com/ligon/LSMS_Library/issues/1218",
@@ -1906,7 +1600,7 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Clean source2f: actualparent dtype metadata13FAIL3PASS, candidate25PASS; newcandidate census complete with549/39/1362hashmoves and exact orderedAPI/sourcepolicy. Original parent57 has39dtypeFAIL+7Make-child startup blockers+11PASS; exact original child assertion/PID/env unknown. New stdlib toy measured serial Make flags. Root ee834921 authorizes only seven blocked-parent continuations and never-run candidate57 under versioned measured-flag guard; supporting/genuine held.",
+      "current_active_scope": "New source5fdbb937d has a six-line empty-calendar-only amendment and independent source review without blockers. New-revision runtime plan is in preparation; no5f runtime success claimed. Earlier2f metadata25PASS/full549-39-1362 hash movement and45PASS-12calendarFAIL are retained with their actual source identities. Supporting and genuine validation remain pending.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Honor explicit optional types on constructed-empty results using existing dtype machinery, preserving populated outputs. Four root-authenticated BF author cases; independent static account accepted; independent genuine runtime validation still required.",
       "scope_recheck_required_before_dispatch": true
@@ -2032,8 +1726,8 @@
     },
     {
       "number": 1186,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "683cdef024768e8e4d3f467888271967c8454674",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
@@ -2041,249 +1735,295 @@
       "live_base_ref_name": "development",
       "accepted_head_sha": "6e97eaeb488096459d673486c127043f016c4f8d",
       "mechanical_merge_repair": true,
-      "repair_reason": "Accepted1186 head plus currentdevelopment48856358; only Mali EOF note conflict, exact eight PR paths retained; fresh CI pending at checkpoint."
+      "repair_reason": "Accepted1186 head plus currentdevelopment48856358; only Mali EOF note conflict, exact eight PR paths retained; fresh CI pending at checkpoint.",
+      "merged_at_UTC": "2026-10-22T23:17:37Z",
+      "merge_commit": "6213e79353c006f0719eaa814d2ddd10d088d787"
     },
     {
       "number": 1189,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1189",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1"
+      "accepted_head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "merged_at_UTC": "2026-10-22T23:13:23Z",
+      "merge_commit": "2193be00031eea14d55bb23fb5c48b9b86bd4d7c"
     },
     {
       "number": 1191,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1191",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93"
+      "accepted_head_sha": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "merged_at_UTC": "2026-10-22T23:13:32Z",
+      "merge_commit": "7e365fec2d000fca108bdba271cf730d6bd460a1"
     },
     {
       "number": 1192,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "b8b03e448783c6803648623dcf5318673b3ddde1",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1192",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "b8b03e448783c6803648623dcf5318673b3ddde1"
+      "accepted_head_sha": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "merged_at_UTC": "2026-10-22T23:13:41Z",
+      "merge_commit": "02e18ca516061550b93cf175c4504721970120cd"
     },
     {
       "number": 1193,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
       "base": "fix/1109-malawi-organic-quantity-v2-20261021",
       "base_sha": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
       "url": "https://github.com/ligon/LSMS_Library/pull/1193",
-      "live_base_ref_name": "fix/1109-malawi-organic-quantity-v2-20261021",
-      "accepted_head_sha": "fd2356ee94ecfc7448527dc0085b9e4d60368049"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "merged_at_UTC": "2026-10-22T23:14:24Z",
+      "merge_commit": "8b3e92023897a93b318f42a580af3a91109c837c"
     },
     {
       "number": 1194,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "20a5541867ef0b991b01031cd4c766681b537fc0",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1194",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "20a5541867ef0b991b01031cd4c766681b537fc0"
+      "accepted_head_sha": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "merged_at_UTC": "2026-10-22T23:14:33Z",
+      "merge_commit": "6b3e67e0d79ac614489a9a2c19fca1432980b94f"
     },
     {
       "number": 1195,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1195",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0"
+      "accepted_head_sha": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "merged_at_UTC": "2026-10-22T23:14:42Z",
+      "merge_commit": "cb99555a3a70fb5eb5721cae1e6c530ad4d7c765"
     },
     {
       "number": 1197,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1197",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "d46795c303e2409ddb8ed5e4c62efca4e87ca347"
+      "accepted_head_sha": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "merged_at_UTC": "2026-10-22T23:14:53Z",
+      "merge_commit": "9cce8c88aa76e56f5866641ab019573bab431179"
     },
     {
       "number": 1199,
-      "state": "open",
-      "merged": false,
-      "head_sha": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "state": "merged",
+      "merged": true,
+      "head_sha": "4cd29a8d1e21b094f0921be87c394c7ac5c95925",
       "base": "fix/822-mali-community-readings-20261021",
       "base_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
       "url": "https://github.com/ligon/LSMS_Library/pull/1199",
-      "live_base_ref_name": "fix/822-mali-community-readings-20261021",
-      "accepted_head_sha": "b4ad74d5da39f939a7c2ecec030891cb82c02ade"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "merged_at_UTC": "2026-10-22T23:34:21Z",
+      "merge_commit": "609d9bac87a0cc6e8f5cba931b658b0be5cf76d9"
     },
     {
       "number": 1200,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
       "base": "fix/1088-niger-quantity-sentinel-20261021",
       "base_sha": "d602f8d63520e521a730f85551b366c4d45d9a35",
       "url": "https://github.com/ligon/LSMS_Library/pull/1200",
-      "live_base_ref_name": "fix/1088-niger-quantity-sentinel-20261021",
-      "accepted_head_sha": "670de9cc073f6a1436aaf9b55cf6371a244f232d"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "merged_at_UTC": "2026-10-22T23:16:39Z",
+      "merge_commit": "51944a0c5efa870c82430aeb6ad45b7396b0ce58"
     },
     {
       "number": 1201,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
       "base": "fix/1118-tanzania-unknown-units-20261021",
       "base_sha": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
       "url": "https://github.com/ligon/LSMS_Library/pull/1201",
-      "live_base_ref_name": "fix/1118-tanzania-unknown-units-20261021",
-      "accepted_head_sha": "fa457f90edbedfd7282eaf988c8231e4e87ba082"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "merged_at_UTC": "2026-10-22T23:16:48Z",
+      "merge_commit": "2c9b519d7f4f4a590a57046c60da6c37602bb228"
     },
     {
       "number": 1202,
-      "state": "open",
-      "merged": false,
-      "head_sha": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "state": "merged",
+      "merged": true,
+      "head_sha": "165a16c5dbb9e388376fd042b86efb9bfac5feb1",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1202",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "0854303bc5f60daa698b2927fc3b193822a4c090"
+      "accepted_head_sha": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "merged_at_UTC": "2026-10-22T23:34:30Z",
+      "merge_commit": "019b7d05edf2dd92d6dfaeba01cd0c8b9d311302"
     },
     {
       "number": 1203,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
       "base": "fix/1123-burkina-input-identity-20261021",
       "base_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
       "url": "https://github.com/ligon/LSMS_Library/pull/1203",
-      "live_base_ref_name": "fix/1123-burkina-input-identity-20261021",
-      "accepted_head_sha": "3dc9d28510dd783c648413987011832669f8bcf7"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "merged_at_UTC": "2026-10-22T23:16:56Z",
+      "merge_commit": "d432c3f51362d1ef6193bdb1c2e82f5a83cf7ce5"
     },
     {
       "number": 1207,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
       "base": "fix/1198-uganda-production-observations-20261022",
       "base_sha": "0854303bc5f60daa698b2927fc3b193822a4c090",
       "url": "https://github.com/ligon/LSMS_Library/pull/1207",
-      "live_base_ref_name": "fix/1198-uganda-production-observations-20261022",
-      "accepted_head_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "merged_at_UTC": "2026-10-22T23:35:15Z",
+      "merge_commit": "79a374e0b7257aa22a1380da807666d0336de042"
     },
     {
       "number": 1208,
-      "state": "open",
-      "merged": false,
-      "head_sha": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+      "state": "merged",
+      "merged": true,
+      "head_sha": "6f83359bebfe6c27ff058b9684d9c1234fbe418e",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1208",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "d29a56783d08a8a647e2622150a4ee5fbdd7246a"
+      "accepted_head_sha": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+      "merged_at_UTC": "2026-10-22T23:32:59Z",
+      "merge_commit": "529161c4e270e196ffde3587f11ad1655d39bd99"
     },
     {
       "number": 1211,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1211",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "4f9344f42a322c80a42bbbe013fc16116b8f3451"
+      "accepted_head_sha": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+      "merged_at_UTC": "2026-10-22T23:18:56Z",
+      "merge_commit": "725d66b5c4461dea063755690a6202a86754f918"
     },
     {
       "number": 1212,
-      "state": "open",
-      "merged": false,
-      "head_sha": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+      "state": "merged",
+      "merged": true,
+      "head_sha": "8bc70f6535d4bf95f9f0b0d213a48c746f999963",
       "base": "development",
       "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
       "url": "https://github.com/ligon/LSMS_Library/pull/1212",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4"
+      "accepted_head_sha": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+      "merged_at_UTC": "2026-10-22T23:46:49Z",
+      "merge_commit": "1d3c035bd6c64bcd6673adc54e2618ce181a209c"
     },
     {
       "number": 1213,
-      "state": "open",
-      "merged": false,
-      "head_sha": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+      "state": "merged",
+      "merged": true,
+      "head_sha": "789bbc0bcaf10115ddf95729d9a38c39c66389b0",
       "base": "fix/218-malawi-derived-registrations-20261022",
       "base_sha": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
       "url": "https://github.com/ligon/LSMS_Library/pull/1213",
-      "live_base_ref_name": "fix/218-malawi-derived-registrations-20261022",
-      "accepted_head_sha": "47b3c5d76371acc457c5553ebf8adfb1859e115b"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+      "merged_at_UTC": "2026-10-22T23:47:10Z",
+      "merge_commit": "954c18ca4004f6dca99dee64aeee577ffb6cb7d8"
     },
     {
       "number": 1214,
-      "state": "open",
-      "merged": false,
-      "head_sha": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+      "state": "merged",
+      "merged": true,
+      "head_sha": "049a174b35f437653105f9eda6dd801d5a64e156",
       "base": "development",
       "base_sha": "06710190305e0057d9e19d42059753d4cc0db012",
       "url": "https://github.com/ligon/LSMS_Library/pull/1214",
       "live_base_ref_name": "development",
-      "accepted_head_sha": "128cc095a62cbd210e30d2256359acfe53d4a2c5"
+      "accepted_head_sha": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+      "merged_at_UTC": "2026-10-23T00:02:34Z",
+      "merge_commit": "26b8f198294294780958804185ee97550ae59a9b"
     },
     {
       "number": 1216,
-      "state": "open",
-      "merged": false,
-      "head_sha": "884775a461d769fd4bb5181005ca3238513b5b01",
+      "state": "merged",
+      "merged": true,
+      "head_sha": "721edd501c8f5939c8815f1b58329c786896ee87",
       "base": "fix/849-uganda-reported-factors-20261022",
       "base_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
       "url": "https://github.com/ligon/LSMS_Library/pull/1216",
-      "live_base_ref_name": "fix/849-uganda-reported-factors-20261022",
-      "accepted_head_sha": "884775a461d769fd4bb5181005ca3238513b5b01"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "884775a461d769fd4bb5181005ca3238513b5b01",
+      "merged_at_UTC": "2026-10-22T23:58:01Z",
+      "merge_commit": "76556b07b630eb38ed43232eb9d82c1f650674cf"
     },
     {
       "number": 1217,
-      "state": "open",
-      "merged": false,
-      "head_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+      "state": "merged",
+      "merged": true,
+      "head_sha": "00ad89e6233daeb2bdef19503609b2fe79624a8b",
       "base": "fix/849-uganda-reported-factors-20261022",
       "base_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
       "url": "https://github.com/ligon/LSMS_Library/pull/1217",
-      "live_base_ref_name": "fix/849-uganda-reported-factors-20261022",
-      "accepted_head_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+      "merged_at_UTC": "2026-10-23T00:12:16Z",
+      "merge_commit": "8d02d0881943300adadc6073e5b780a783a2f16b"
     },
     {
       "number": 1219,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "657fed11a63354886772d0f978cec8adb2ad647e",
       "base": "fix/1119-burkina-seed-crop-labels-20261022",
       "base_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
       "url": "https://github.com/ligon/LSMS_Library/pull/1219",
-      "live_base_ref_name": "fix/1119-burkina-seed-crop-labels-20261022",
-      "accepted_head_sha": "657fed11a63354886772d0f978cec8adb2ad647e"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "657fed11a63354886772d0f978cec8adb2ad647e",
+      "merged_at_UTC": "2026-10-22T23:19:04Z",
+      "merge_commit": "7080ad52e87fffe9617bf88bdedfaa159dd938a3"
     },
     {
       "number": 1220,
-      "state": "open",
-      "merged": false,
+      "state": "merged",
+      "merged": true,
       "head_sha": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
       "base": "fix/1204-uganda-crop-wave-coverage-20261022",
       "base_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
       "url": "https://github.com/ligon/LSMS_Library/pull/1220",
-      "live_base_ref_name": "fix/1204-uganda-crop-wave-coverage-20261022",
-      "accepted_head_sha": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706"
+      "live_base_ref_name": "development",
+      "accepted_head_sha": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+      "merged_at_UTC": "2026-10-23T00:13:57Z",
+      "merge_commit": "a3aad0d43cac1866bab5a91cd59716bb659e9e28"
     }
   ],
   "signed": "Sue",
@@ -2292,8 +2032,157 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-22T23:13:41.684395+00:00",
+  "active_progress_updated_at_UTC": "2026-10-23T00:16:15.307282+00:00",
   "resolved_in_development_issues": [
+    {
+      "number": 822,
+      "title": "Mali 2014-15 community_prices: restore readings 1-2 and declare native observation slots",
+      "url": "https://github.com/ligon/LSMS_Library/issues/822",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Mali"
+      ],
+      "implementation_prs": [
+        1180
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Melt allthree unit/weight/price triples into obs1-3; read weight as kilograms, preserve all variety/passage readings. #1089 duplicate.",
+      "scope_recheck_required_before_dispatch": false,
+      "merge_commit": "94098ff4503cc2c0cd501e6ddb8ea64558bf1b8e",
+      "closed_state_reason": "completed",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "closed_at_UTC": "2026-10-22T23:09:30Z",
+      "merged_pr_commits": {
+        "1180": "94098ff4503cc2c0cd501e6ddb8ea64558bf1b8e"
+      }
+    },
+    {
+      "number": 849,
+      "title": "Uganda: wire reported kg factors in the remaining five waves after preserving native production records",
+      "url": "https://github.com/ligon/LSMS_Library/issues/849",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1207
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Wire reported q6d only after private baseline/candidate per-wave factor agreement, conversion coverage, kg totals and implausible tally. The former #972/#967 dependencies have merged.",
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:49:34Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1207": "79a374e0b7257aa22a1380da807666d0336de042"
+      }
+    },
+    {
+      "number": 1006,
+      "title": "Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertions",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1006",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1191
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Use real food_acquired/household_roster prerequisite availability, canonical Price/Quantity numeric assertions, explicit default-v and requested-market m tests; eliminate obsolete migration xfails; keep caches physically private.",
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:29:48Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1191": "7e365fec2d000fca108bdba271cf730d6bd460a1"
+      }
+    },
+    {
+      "number": 1034,
+      "title": "Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but served as 'other specify (13x)'",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1034",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [
+        1172
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Add W3 .dta-established Sack/Bag Medium, Basin Medium/Large, Bundle Medium to the 2015-16 u column; avoid changing other waves. Add independently transcribed-label and synthetic food-row tests, then private cold affected table/round accounting.",
+      "scope_recheck_required_before_dispatch": false,
+      "merge_commit": "5f2d198db1a69b25318b851516eea11e9b8f61f6",
+      "closed_state_reason": "completed",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "closed_at_UTC": "2026-10-22T23:09:23Z",
+      "merged_pr_commits": {
+        "1172": "5f2d198db1a69b25318b851516eea11e9b8f61f6"
+      }
+    },
+    {
+      "number": 1058,
+      "title": "Burkina Faso 2021 plot_features: expose 4,180 reported GPS pairs on 7,350 retained parcels",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1058",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Burkina_Faso",
+        "Mali",
+        "Niger"
+      ],
+      "implementation_prs": [
+        1194
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Wire BF2021 parcel coordinates in script/schema, then verify Mali/Niger source headers before declaring GPS absent.",
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:29:50Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1194": "6b3e67e0d79ac614489a9a2c19fca1432980b94f"
+      }
+    },
+    {
+      "number": 1062,
+      "title": "Uganda: Makefile recipes rewrite sibling var/ tables without a hash (fct by nutrition, earnings by income) -- apply the #788 ruling",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1062",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1173
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Split nutrition/FCT target-specific output; income obtains framework-authoritative earnings and enterprise_income then reads verified raw pre-finalize parquets. Remove compiler prerequisites that rewrite siblings. Census all Uganda outputs and compare other country consumers separately.",
+      "scope_recheck_required_before_dispatch": false,
+      "merge_commit": "801e47978ccfc2433727b7bff240fbc4d234b30b",
+      "closed_state_reason": "completed",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "closed_at_UTC": "2026-10-22T23:09:24Z",
+      "merged_pr_commits": {
+        "1173": "801e47978ccfc2433727b7bff240fbc4d234b30b"
+      }
+    },
     {
       "number": 1077,
       "title": "Label selection: handle nonfinite keys and prevent missing-input label fabrication",
@@ -2319,70 +2208,58 @@
       "merge_commit": "b42b3bf68d4ada33a57a128a61d276c18103a423",
       "closed_state_reason": "completed",
       "closed_at_UTC": "2026-10-22T22:47:40Z",
-      "resolution": "PR1182 merged into development; exact merge parents and accepted library/config/test content root-verified. Release publication separate."
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1182": "b42b3bf68d4ada33a57a128a61d276c18103a423"
+      }
     },
     {
-      "number": 822,
-      "title": "Mali 2014-15 community_prices: restore readings 1-2 and declare native observation slots",
-      "url": "https://github.com/ligon/LSMS_Library/issues/822",
-      "github_state": "closed",
-      "queue_state": "RESOLVED_IN_DEVELOPMENT",
-      "countries": [
-        "Mali"
-      ],
-      "implementation_prs": [
-        1180
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "B",
-      "initial_triage_approach": "Melt allthree unit/weight/price triples into obs1-3; read weight as kilograms, preserve all variety/passage readings. #1089 duplicate.",
-      "scope_recheck_required_before_dispatch": false,
-      "merge_commit": "94098ff4503cc2c0cd501e6ddb8ea64558bf1b8e",
-      "closed_state_reason": "completed",
-      "resolution": "Complete scoped fix landed in development; issue body/readback confirmed closed completed. Historical qualifications remain in the issue; separately-owned work is not folded into this fix."
-    },
-    {
-      "number": 1034,
-      "title": "Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but served as 'other specify (13x)'",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1034",
-      "github_state": "closed",
-      "queue_state": "RESOLVED_IN_DEVELOPMENT",
-      "countries": [
-        "Nigeria"
-      ],
-      "implementation_prs": [
-        1172
-      ],
-      "residual": null,
-      "current_active_scope": null,
-      "initial_triage_tier": "A",
-      "initial_triage_approach": "Add W3 .dta-established Sack/Bag Medium, Basin Medium/Large, Bundle Medium to the 2015-16 u column; avoid changing other waves. Add independently transcribed-label and synthetic food-row tests, then private cold affected table/round accounting.",
-      "scope_recheck_required_before_dispatch": false,
-      "merge_commit": "5f2d198db1a69b25318b851516eea11e9b8f61f6",
-      "closed_state_reason": "completed",
-      "resolution": "Complete scoped fix landed in development; issue body/readback confirmed closed completed. Historical qualifications remain in the issue; separately-owned work is not folded into this fix."
-    },
-    {
-      "number": 1062,
-      "title": "Uganda: Makefile recipes rewrite sibling var/ tables without a hash (fct by nutrition, earnings by income) -- apply the #788 ruling",
-      "url": "https://github.com/ligon/LSMS_Library/issues/1062",
+      "number": 1078,
+      "title": "Uganda food cache: confirmed producer race writes nine missing values as zero under current hash",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1078",
       "github_state": "closed",
       "queue_state": "RESOLVED_IN_DEVELOPMENT",
       "countries": [
         "Uganda"
       ],
       "implementation_prs": [
-        1173
+        1197
       ],
       "residual": null,
       "current_active_scope": null,
       "initial_triage_tier": "B",
-      "initial_triage_approach": "Split nutrition/FCT target-specific output; income obtains framework-authoritative earnings and enterprise_income then reads verified raw pre-finalize parquets. Remove compiler prerequisites that rewrite siblings. Census all Uganda outputs and compare other country consumers separately.",
+      "initial_triage_approach": "First fix #1062; isolate Uganda-touching tests and prove exact nine NaN-vs-zero cells retain values under concurrency. Do not close from removal of other countries test contamination.",
       "scope_recheck_required_before_dispatch": false,
-      "merge_commit": "801e47978ccfc2433727b7bff240fbc4d234b30b",
       "closed_state_reason": "completed",
-      "resolution": "Complete scoped fix landed in development; issue body/readback confirmed closed completed. Historical qualifications remain in the issue; separately-owned work is not folded into this fix."
+      "closed_at_UTC": "2026-10-22T23:29:55Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1197": "9cce8c88aa76e56f5866641ab019573bab431179"
+      }
+    },
+    {
+      "number": 1081,
+      "title": "Derived food/roster methods: reviewed categorical-error preservation awaits merge",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1081",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [
+        1195
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Re-raise EmptyCategoricalTableError and CategoricalMappingConflictError ahead of generic derived food/roster fallback. Test bare/Aggregate calls and unchanged legitimate legacy fallback.",
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:29:52Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1195": "cb99555a3a70fb5eb5721cae1e6c530ad4d7c765"
+      }
     },
     {
       "number": 1088,
@@ -2403,7 +2280,41 @@
       "scope_recheck_required_before_dispatch": false,
       "merge_commit": "c598082ee622802ef20f4ca32f7b061d26a7865d",
       "closed_state_reason": "completed",
-      "resolution": "Complete scoped fix landed in development; issue body/readback confirmed closed completed. Historical qualifications remain in the issue; separately-owned work is not folded into this fix."
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "closed_at_UTC": "2026-10-22T23:09:27Z",
+      "merged_pr_commits": {
+        "1176": "c598082ee622802ef20f4ca32f7b061d26a7865d"
+      }
+    },
+    {
+      "number": 1091,
+      "title": "Retire duplicate country community-price builders in Mali, Niger and Tanzania",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1091",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Mali",
+        "Niger",
+        "Tanzania"
+      ],
+      "implementation_prs": [
+        1199,
+        1200,
+        1201
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Retire country-only concatenation scripts using existing framework wave aggregation under #788 ruling; compare cold default/make API output exactly.",
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:42:46Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1199": "609d9bac87a0cc6e8f5cba931b658b0be5cf76d9",
+        "1200": "51944a0c5efa870c82430aeb6ad45b7396b0ce58",
+        "1201": "2c9b519d7f4f4a590a57046c60da6c37602bb228"
+      }
     },
     {
       "number": 1109,
@@ -2424,7 +2335,11 @@
       "scope_recheck_required_before_dispatch": false,
       "merge_commit": "ec067f8008a24bb0708d3b63915d2529120e9849",
       "closed_state_reason": "completed",
-      "resolution": "Complete scoped fix landed in development; issue body/readback confirmed closed completed. Historical qualifications remain in the issue; separately-owned work is not folded into this fix."
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "closed_at_UTC": "2026-10-22T23:09:26Z",
+      "merged_pr_commits": {
+        "1175": "ec067f8008a24bb0708d3b63915d2529120e9849"
+      }
     },
     {
       "number": 1144,
@@ -2445,36 +2360,292 @@
       "scope_recheck_required_before_dispatch": false,
       "merge_commit": "989c7abb023740632a7ca0d83f14d21d1cf7b30b",
       "closed_state_reason": "completed",
-      "resolution": "Complete scoped fix landed in development; issue body/readback confirmed closed completed. Historical qualifications remain in the issue; separately-owned work is not folded into this fix."
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "closed_at_UTC": "2026-10-22T23:09:28Z",
+      "merged_pr_commits": {
+        "1178": "989c7abb023740632a7ca0d83f14d21d1cf7b30b"
+      }
+    },
+    {
+      "number": 1149,
+      "title": "add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1149",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Nigeria",
+        "Ethiopia"
+      ],
+      "implementation_prs": [
+        1211
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Implement ruled stage/compare/place with recursive case-insensitive existing-sidecar basename matching, collision refusal, zip-relative new paths and recursive retirement report. Use synthetic fixtures before any live acquisition.",
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:29:56Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1211": "725d66b5c4461dea063755690a6202a86754f918"
+      }
+    },
+    {
+      "number": 1188,
+      "title": "Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1188",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [
+        1219
+      ],
+      "residual": "Shared constructed-empty optional dtype exposure remains1218; original151strict matrix/guarded-execution qualifications retained. Country purchase/gift source routing independently accepted and PR1219awaits human merge.",
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:29:58Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1219": "7080ad52e87fffe9617bf88bdedfaa159dd938a3"
+      }
+    },
+    {
+      "number": 1196,
+      "title": "Cold/warm index StringDtype drift: Niger food_acquired and Uganda cluster_features",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1196",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Niger",
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1212
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:49:36Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1212": "1d3c035bd6c64bcd6673adc54e2618ce181a209c"
+      }
+    },
+    {
+      "number": 1198,
+      "title": "Uganda crop_production: preserve distinct production records before pairing quantities with kg factors",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1198",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1202
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:49:32Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1202": "019b7d05edf2dd92d6dfaeba01cd0c8b9d311302"
+      }
+    },
+    {
+      "number": 1204,
+      "title": "Uganda crop_production: merge the reviewed requested-wave assembly repair",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1204",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1217
+      ],
+      "residual": "Reviewed/root-accepted PR1217 awaits human merge after1207.109/113strictPASS;fournewempty-orderFAIL owned by1215,whose narrowpolicy is human-approved. All nonempty products preserved; held real grain ledgers empty, nonempty transport synthetic-only.",
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-23T00:14:36Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1217": "8d02d0881943300adadc6073e5b780a783a2f16b"
+      }
+    },
+    {
+      "number": 1205,
+      "title": "Uganda yield_kg: merge the reviewed parcel-area repair and coverage correction",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1205",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1216
+      ],
+      "residual": "Independently reviewed and root-accepted; stacked PR1216 awaits human review/merge after1207. Source eligibility exclusions and comparator/metadata limits explicit.",
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-23T00:03:53Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1216": "76556b07b630eb38ed43232eb9d82c1f650674cf"
+      }
+    },
+    {
+      "number": 1209,
+      "title": "Malawi: country food_acquired Make builder expects retired wave columns",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1209",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [
+        1213
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-22T23:49:38Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1213": "954c18ca4004f6dca99dee64aeee577ffb6cb7d8"
+      }
+    },
+    {
+      "number": 1210,
+      "title": "Malawi: invalid food wave request evicts native caches before raising",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1210",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Malawi",
+        "Shared framework"
+      ],
+      "implementation_prs": [
+        1214
+      ],
+      "residual": "Rootaccepted bounded repair; PR1214awaits humanmerge. Iterator/error timing and broadfingerprint invalidation explicit. Independent privateproofs durablearchive29; CIrun/job metadata inconsistency prevents completed-unit claim.",
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-23T00:03:51Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1214": "26b8f198294294780958804185ee97550ae59a9b"
+      }
+    },
+    {
+      "number": 1215,
+      "title": "Constructed empty tables: implement the approved declaration-order rule",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1215",
+      "github_state": "closed",
+      "queue_state": "RESOLVED_IN_DEVELOPMENT",
+      "countries": [
+        "Uganda",
+        "Shared framework"
+      ],
+      "implementation_prs": [
+        1220
+      ],
+      "residual": "Declaration order reviewed and root-accepted in1220. Empty explicit-field types remain separate1218.",
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Reuse existing schema/empty/native ordering machinery; measure affected scope before framework edit. Closed1099row/errorbehavior and1204rawcoverage are different owners; no normalizedcomparison or native-data changes.",
+      "scope_recheck_required_before_dispatch": true,
+      "closed_state_reason": "completed",
+      "closed_at_UTC": "2026-10-23T00:14:38Z",
+      "resolution": "Complete literal issue scope merged into development. Original review qualifications remain in issue/PR bodies and immutable evidence.",
+      "merged_pr_commits": {
+        "1220": "a3aad0d43cac1866bab5a91cd59716bb659e9e28"
+      }
     }
   ],
-  "merged_implementation_prs": 9,
+  "merged_implementation_prs": 32,
   "development_merge_progress": {
-    "actual_verified_tip": "48856358513baa89a44aefb108b8f447497788a6",
-    "prior_tip": "06710190305e0057d9e19d42059753d4cc0db012",
-    "accepted_head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
-    "root_verified_parents": true,
-    "only_extra_vs_accepted_head": "preexisting poetry.lock advance",
-    "combined_source_head": "718b8af4a39b23587b7f712b92e7b4c664982c36",
-    "combined_source_root_acceptance_SHA256": "3bf9a5677d0125590664033064cfd2c1b84ee509575638cb4739fe29f4e3d3e4",
-    "further_remote_merges_held_pending_test_verdict": false,
-    "local_conflict_marker_commit_not_pushed": true,
-    "merged_PRs": [
-      1172,
-      1173,
-      1175,
-      1176,
-      1178,
-      1180,
-      1181,
-      1182,
-      1185
-    ],
-    "root_scoped_test_acceptance_SHA256": "5cc062186f55c25e433f418f21375a2df10f711842e035a4607673491b5bd1d2",
-    "distinct_latest_test_outcomes": {
-      "PASS": 1691,
-      "SKIP": 102
+    "actual_verified_tip": "a3aad0d43cac1866bab5a91cd59716bb659e9e28",
+    "latest_scoped_merge": "a3aad0d43cac1866bab5a91cd59716bb659e9e28",
+    "implementation_PRs_merged": 32,
+    "implementation_PRs_open": 0,
+    "tracker1170": "Final documentation repair/body refresh and merge are separate from the32 implementation count.",
+    "scoped_distinct_PASS": 1691,
+    "normal_SKIP": 102,
+    "original_failures_and_orchestration_stops_retained": true,
+    "source_acceptance_SHA256": "3bf9a5677d0125590664033064cfd2c1b84ee509575638cb4739fe29f4e3d3e4",
+    "test_acceptance_SHA256": "5cc062186f55c25e433f418f21375a2df10f711842e035a4607673491b5bd1d2"
+  },
+  "isa_country_scope_complete_external_issue_open": [
+    {
+      "number": 218,
+      "title": "Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/218",
+      "github_state": "open",
+      "queue_state": "ISA_COUNTRY_SCOPE_COMPLETE_EXTERNAL_ISSUE_OPEN",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [
+        1208
+      ],
+      "residual": "Malawi registration repair reviewed. Remaining named Makefile cleanup is outside ISA.",
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Remove Malawi food_expenditures/food_prices registrations with next Malawi rewarm; optional no-derived-registration guard. OthercountriesMake cleanup outsideISA.",
+      "scope_recheck_required_before_dispatch": false,
+      "scope_boundary": "Malawi registrations are landed. Remaining named Makefiles are outside ISA; shared legacy code/docs/gitignore cleanup remains on the global issue."
     },
-    "not_a_single_run_green_claim": true
+    {
+      "number": 1121,
+      "title": "plot_labor.source: land Mali casing fix and decide remaining taxonomy",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1121",
+      "github_state": "open",
+      "queue_state": "ISA_COUNTRY_SCOPE_COMPLETE_EXTERNAL_ISSUE_OPEN",
+      "countries": [
+        "Mali"
+      ],
+      "implementation_prs": [
+        1186
+      ],
+      "residual": "Mali casing PR reviewed. Shared labor-source taxonomy remains a design residual, largely non-ISA examples.",
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Change only Mali harmonize_labor_source Preferred Label cells to family/hired/other and matching comments; preserve richer source vocabularies elsewhere.",
+      "scope_recheck_required_before_dispatch": false,
+      "scope_boundary": "Mali casing is landed. Remaining literal labor-source taxonomy decision concerns GhanaSPS/GhanaLSS; no remaining ISA country repair is named."
+    }
+  ],
+  "isa_linked_open_issue_records_including_completed_country_portions": 92,
+  "exclusively_active_issue_records": 1,
+  "initial_in_scope_goal_remaining": 80,
+  "complete_collection_SHA256": {
+    "post32-all-prs.json": "03cfa6e8a9a748322321da632b8d4d890cb0b10f246e5fdbaea7d86277c6c349",
+    "post32-all-issues.json": "678eede942bbdc2fc436cf8441dbcb7db157c61747b658933e96bba4d15f0d72",
+    "post32-development.json": "2e8faf00366e5ae048303448911516dc9dc25cbe0bf472695f0f136cde6e39a7"
   }
 }

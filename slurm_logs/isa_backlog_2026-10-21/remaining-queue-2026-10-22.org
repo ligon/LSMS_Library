@@ -2,483 +2,537 @@
 #+AUTHOR: Sue
 
 * Snapshot
-Captured 2026-10-22T23:10:58+00:00 from complete remote PR and open-issue collections.
-There are 107 ISA-related open issue records: 22 linked to campaign PRs, one exclusively active, and 84 other open records.
-Nine of the 32 implementation PRs are merged; 23 remain open at this checkpoint.
-The seven fully resolved issues closed so far are #822, #1034, #1062, #1077, #1088, #1109 and #1144.
-Partial issues retain their residual work.
-The original inventory had 97 in-scope records; 89 remain open, duplicate #1089 and seven completed issues are closed, and 18 campaign followups were added.
-These overlapping records are not 107 distinct unimplemented bugs.
-The captured development tip is 48856358513baa89a44aefb108b8f447497788a6.
-Root accepted the scoped combined-source checks and 1,691 distinct passing cases with 102 normal skips across original and failure-only continuations.
-Original failures remain preserved; this is not a single-run, full-data, corpus or new-release verdict.
-PR #1186 has a mechanical country-note merge repair at 683cdef0 awaiting fresh CI.
-The mounted runtime remains pinned; initial tiers require live issue and country-note reconciliation before dispatch.
-
-* Resolved in development
-
-** [[https://github.com/ligon/LSMS_Library/issues/1077][#1077]] Nonfinite label keys and missing-input label fabrication
-PR [[https://github.com/ligon/LSMS_Library/pull/1182][#1182]] merged as b42b3bf68; issue closed completed on 2026-10-22.
-Unit and Windows CI passed, and the bounded integration selection passed 230 tests with no skips.
-Root verified the exact merge parents and accepted library/config/test content; only the prior poetry.lock advance differs.
-Release publication is separate.
-
-The following complete repairs also landed; their original review qualifications remain in the linked issue bodies.
-
-- [[https://github.com/ligon/LSMS_Library/issues/822][#822]]: PR #1180, merge 94098ff45.
-- [[https://github.com/ligon/LSMS_Library/issues/1034][#1034]]: PR #1172, merge 5f2d198db.
-- [[https://github.com/ligon/LSMS_Library/issues/1062][#1062]]: PR #1173, merge 801e47978.
-- [[https://github.com/ligon/LSMS_Library/issues/1088][#1088]]: PR #1176, merge c598082ee.
-- [[https://github.com/ligon/LSMS_Library/issues/1109][#1109]]: PR #1175, merge ec067f800.
-- [[https://github.com/ligon/LSMS_Library/issues/1144][#1144]]: PR #1178, merge 989c7abb0.
+Captured 2026-10-23T00:16:15.307282+00:00 from complete remote PR, issue and development-branch collections.
+All 32 implementation PRs are merged into development; 22 fully resolved issues are closed completed.
+There are 90 remaining ISA scope records, including two active issues, four other partial residuals and 84 unassigned records.
+Two additional global issues remain open with completed ISA country portions; their remaining shared/non-ISA work is listed separately.
+These overlapping records are not a count of distinct ready-to-fix bugs.
+The captured development tip is a3aad0d43cac1866bab5a91cd59716bb659e9e28.
+Original failures, skipped data jobs and review limits remain preserved; this is not a full-corpus or release verdict.
 
 * Active work
 
+** [[https://github.com/ligon/LSMS_Library/issues/1118][#1118]] plot_inputs: complete country missing-unit normalization under the #1041 ruling
+Countries: Ethiopia, Malawi, Mali, Nigeria, Tanzania.
+Landed PRs: #1181, #1185.
+Mali ledger-only24278 versus truef8: two complete source epochs and both guard calibrations pass, with62 denial rows fully accounted. Full initial fingerprint checks are the next released tranche. Provider bytes, source-first classification, production fill and genuine validation remain pending. Malawi must be reconciled after landed1175/1193; Nigeria source-row eligibility remains separate.
+Ethiopia/Tanzania repairs landed. Mali, Malawi and Nigeria remain; non-ISA countries are separate.
+
 ** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
 Countries: Burkina_Faso, Shared framework.
-Source 2f83bb2 passes all 25 dtype metadata tests; the actual parent gives 13 meaningful failures and three passes.
-The new candidate census completes with all 549/39/1,362 hashes changed and exact ordered API/source materialization policy.
-The original parent empty-table run retains 39 dtype failures, seven Make-child startup blockers and 11 passes.
-The exact original child assertion/PID/environment are unknown.
-A new stdlib-only Make diagnostic measured the serial recipe flag spelling.
-Root released a versioned guard continuation for only the seven blocked parent cases and the never-run 57 candidate cases; results are pending.
-Supporting and genuine data work remain held.
+New source5fdbb937d has a six-line empty-calendar-only amendment and independent source review without blockers. New-revision runtime plan is in preparation; no5f runtime success claimed. Earlier2f metadata25PASS/full549-39-1362 hash movement and45PASS-12calendarFAIL are retained with their actual source identities. Supporting and genuine validation remain pending.
 
-* Reviewed changes in the authorized development merge queue
-** [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Preserve declaration order in constructed empty tables
-Countries: Uganda, Shared framework.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1220][#1220]], stacked on1217 at a417.
-Independent root acceptance:48 genuine calls;92 strict comparisons=82PASS/10retained orderFAIL;22WARN/head byte-exact. Sealer/postexit0; historical6PKL source-snapshot exception retained. Authorized development merge pending; optional explicit-field types remain1218.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields
-Countries: Burkina_Faso.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1219][#1219]], stacked on1203 at3dc.
-Independent14targeted+397supportingPASS, actualparent7FAIL7PASS; all22877source rows checked. Original151strict=111PASS+40prewriter-storageFAIL; four additional empty references2DefaultPASS2MakeFAIL remain1218. Guarded execution and original SDK/harness/source/cache protection qualifications are preserved in the root acceptance. Authorized development merge pending.
-
-** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
-Countries: Malawi.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1208][#1208]].
-Remaining scope: Malawi registration repair reviewed. Remaining named Makefile cleanup is outside ISA.
-
-** [[https://github.com/ligon/LSMS_Library/issues/849][#849]] Uganda: wire reported kg factors in the remaining five waves after preserving native production records
-Countries: Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1207][#1207]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1006][#1006]] Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertions
-Countries: Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1191][#1191]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1058][#1058]] Burkina Faso 2021 plot_features: expose 4,180 reported GPS pairs on 7,350 retained parcels
-Countries: Burkina_Faso, Mali, Niger.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1194][#1194]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1078][#1078]] Uganda food cache: confirmed producer race writes nine missing values as zero under current hash
-Countries: Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1197][#1197]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1081][#1081]] Derived food/roster methods: reviewed categorical-error preservation awaits merge
-Countries: Ethiopia.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1195][#1195]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1091][#1091]] Retire duplicate country community-price builders in Mali, Niger and Tanzania
-Countries: Mali, Niger, Tanzania.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1199][#1199]], [[https://github.com/ligon/LSMS_Library/pull/1200][#1200]], [[https://github.com/ligon/LSMS_Library/pull/1201][#1201]].
+* Remaining country scope after landed partial repairs
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1095][#1095]] Nigeria community_prices: land recorded-unit recovery and decide future unplaced-label retention
 Countries: Nigeria.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1192][#1192]].
-Remaining scope: Ten held unit labels recovered by PR. Future unresolved-label retention/collision representation remains a design residual.
+Landed PRs: #1192.
+Ten held unit labels recovered by PR. Future unresolved-label retention/collision representation remains a design residual.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1111][#1111]] Malawi applied fertilizer: correct timing-derived units while retaining enumerator kg totals
 Countries: Malawi.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1193][#1193]].
-Remaining scope: 2010/2019 enumerator-kg repair reviewed. Literal questionnaire/source authority for 2013/2016 remains.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1118][#1118]] plot_inputs: complete country missing-unit normalization under the #1041 ruling
-Countries: Ethiopia, Malawi, Mali, Nigeria, Tanzania.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1181][#1181]], [[https://github.com/ligon/LSMS_Library/pull/1185][#1185]].
-Remaining scope: Ethiopia/Tanzania PRs reviewed. Malawi/Mali/Nigeria unit normalization remains; other countries outside ISA are separate.
-Fresh dispatch assessment (2026-10-22): Mali and Malawi are mechanical candidates under the settled #1041 ruling, after reconciling Malawi with #1175/#1193.
-Nigeria's fill-versus-drop source-eligibility decision remains separate; old null-unit counts are historical.
-Mali phase0 source/metadata review is complete at ledger24278; exact runtime controllers are being prepared.
-Provider payloads remain held, and meaningful unmapped units must be distinguished from source absence before a fill.
+Landed PRs: #1193.
+2010/2019 enumerator-kg repair landed. Literal questionnaire/source authority for 2013/2016 remains.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1119][#1119]] #569 residual A: the "not crop-specific" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1203][#1203]].
-Remaining scope: Burkina maize/cowpea label repair reviewed. Shared not-crop-specific marker design remains; non-ISA countries separate.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1121][#1121]] plot_labor.source: land Mali casing fix and decide remaining taxonomy
-Countries: Mali.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1186][#1186]].
-Remaining scope: Mali casing PR reviewed. Shared labor-source taxonomy remains a design residual, largely non-ISA examples.
+Landed PRs: #1203.
+Burkina maize/cowpea label repair landed. Shared not-crop-specific marker design remains; non-ISA countries separate.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1123][#1123]] plot_inputs: land Burkina repair and diagnose remaining country-level identity collapses
 Countries: Burkina_Faso, Niger.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1189][#1189]].
-Remaining scope: Burkina identity PR reviewed. Niger identity-collapse diagnosis remains; Senegal/CotedIvoire outside ISA.
+Landed PRs: #1189.
+Burkina identity repair landed. Niger identity-collapse diagnosis remains; Senegal/CotedIvoire outside ISA.
 
-** [[https://github.com/ligon/LSMS_Library/issues/1149][#1149]] add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively
-Countries: Nigeria, Ethiopia.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1211][#1211]].
+* Completed ISA country scope; global issue still open
 
-** [[https://github.com/ligon/LSMS_Library/issues/1196][#1196]] Cold/warm index StringDtype drift: Niger food_acquired and Uganda cluster_features
-Countries: Niger, Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1212][#1212]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1198][#1198]] Uganda crop_production: preserve distinct production records before pairing quantities with kg factors
-Countries: Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1202][#1202]].
-
-** [[https://github.com/ligon/LSMS_Library/issues/1204][#1204]] Uganda crop_production: merge the reviewed requested-wave assembly repair
-Countries: Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1217][#1217]].
-Remaining scope: Reviewed/root-accepted PR1217 awaits human merge after1207.109/113strictPASS;fournewempty-orderFAIL owned by1215,whose narrowpolicy is human-approved. All nonempty products preserved; held real grain ledgers empty, nonempty transport synthetic-only.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1205][#1205]] Uganda yield_kg: merge the reviewed parcel-area repair and coverage correction
-Countries: Uganda.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1216][#1216]].
-Remaining scope: Independently reviewed and root-accepted; stacked PR1216 awaits human review/merge after1207. Source eligibility exclusions and comparator/metadata limits explicit.
-
-** [[https://github.com/ligon/LSMS_Library/issues/1209][#1209]] Malawi: country food_acquired Make builder expects retired wave columns
+** [[https://github.com/ligon/LSMS_Library/issues/218][#218]] Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)
 Countries: Malawi.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1213][#1213]].
+Landed PRs: #1208.
+Malawi registration repair reviewed. Remaining named Makefile cleanup is outside ISA.
+Malawi registrations are landed. Remaining named Makefiles are outside ISA; shared legacy code/docs/gitignore cleanup remains on the global issue.
 
-** [[https://github.com/ligon/LSMS_Library/issues/1210][#1210]] Malawi: invalid food wave request evicts native caches before raising
-Countries: Malawi, Shared framework.
-PRs: [[https://github.com/ligon/LSMS_Library/pull/1214][#1214]].
-Remaining scope: Rootaccepted bounded repair; PR1214awaits humanmerge. Iterator/error timing and broadfingerprint invalidation explicit. Independent privateproofs durablearchive29; CIrun/job metadata inconsistency prevents completed-unit claim.
+** [[https://github.com/ligon/LSMS_Library/issues/1121][#1121]] plot_labor.source: land Mali casing fix and decide remaining taxonomy
+Countries: Mali.
+Landed PRs: #1186.
+Mali casing PR reviewed. Shared labor-source taxonomy remains a design residual, largely non-ISA examples.
+Mali casing is landed. Remaining literal labor-source taxonomy decision concerns GhanaSPS/GhanaLSS; no remaining ISA country repair is named.
 
-* Remaining unassigned issue records
+* Resolved in development
+All original detailed review qualifications remain in the linked issue bodies.
+
+- [[https://github.com/ligon/LSMS_Library/issues/822][#822]] Mali 2014-15 community_prices: restore readings 1-2 and declare native observation slots; landed PRs #1180.
+
+- [[https://github.com/ligon/LSMS_Library/issues/849][#849]] Uganda: wire reported kg factors in the remaining five waves after preserving native production records; landed PRs #1207.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1006][#1006]] Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertions; landed PRs #1191.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1034][#1034]] Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but served as 'other specify (13x)'; landed PRs #1172.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1058][#1058]] Burkina Faso 2021 plot_features: expose 4,180 reported GPS pairs on 7,350 retained parcels; landed PRs #1194.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1062][#1062]] Uganda: Makefile recipes rewrite sibling var/ tables without a hash (fct by nutrition, earnings by income) -- apply the #788 ruling; landed PRs #1173.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1077][#1077]] Label selection: handle nonfinite keys and prevent missing-input label fabrication; landed PRs #1182.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1078][#1078]] Uganda food cache: confirmed producer race writes nine missing values as zero under current hash; landed PRs #1197.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1081][#1081]] Derived food/roster methods: reviewed categorical-error preservation awaits merge; landed PRs #1195.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1088][#1088]] Niger CS07: recognize the stored 9999.9 missing-quantity code without changing Price; landed PRs #1176.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1091][#1091]] Retire duplicate country community-price builders in Mali, Niger and Tanzania; landed PRs #1199, #1200, #1201.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1109][#1109]] Malawi organic fertilizer: restore reported quantities and units; retain missing amounts without fabricating zero; landed PRs #1175.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1144][#1144]] Nigeria food_acquired j is decoded wave-blind: W1 'Other vegetables' served as 'Leaves', 'Leaves' as 'Dry Pepper' (item twin of #607); landed PRs #1178.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1149][#1149]] add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively; landed PRs #1211.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1188][#1188]] Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields; landed PRs #1219.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1196][#1196]] Cold/warm index StringDtype drift: Niger food_acquired and Uganda cluster_features; landed PRs #1212.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1198][#1198]] Uganda crop_production: preserve distinct production records before pairing quantities with kg factors; landed PRs #1202.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1204][#1204]] Uganda crop_production: merge the reviewed requested-wave assembly repair; landed PRs #1217.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1205][#1205]] Uganda yield_kg: merge the reviewed parcel-area repair and coverage correction; landed PRs #1216.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1209][#1209]] Malawi: country food_acquired Make builder expects retired wave columns; landed PRs #1213.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1210][#1210]] Malawi: invalid food wave request evicts native caches before raising; landed PRs #1214.
+
+- [[https://github.com/ligon/LSMS_Library/issues/1215][#1215]] Constructed empty tables: implement the approved declaration-order rule; landed PRs #1220.
+
+* Other open records requiring fresh dispatch assessment
+
 ** [[https://github.com/ligon/LSMS_Library/issues/226][#226]] feat: principled auto-aggregation script for harmonize_food's Aggregate Label column
 Countries: Malawi, Uganda.
-Initial triage route: Validate beta/weight/coherence criterion against existing aggregation tools before any new estimator; do not auto-curate country buckets.
+Historical triage: C; Validate beta/weight/coherence criterion against existing aggregation tools before any new estimator; do not auto-curate country buckets.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/438][#438]] Extend the WB-parity item-feature stack to non-ISA countries (where survey modules permit)
 Countries: Burkina_Faso.
-Initial triage route: Limit to BF still-live label join/gap issues; reuse1123/1119 rather than reopening structural rollout.
+Historical triage: C; Limit to BF still-live label join/gap issues; reuse1123/1119 rather than reopening structural rollout.
+Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/439][#439]] Exploit LSMS+ individual/intra-household (male vs female) disaggregation -- new feature direction
+** [[https://github.com/ligon/LSMS_Library/issues/439][#439]] Exploit LSMS+ individual/intra-household (male vs female) disaggregation — new feature direction
 Countries: Ethiopia, Malawi, Tanzania, Uganda.
-Initial triage route: Audit actual embedded ISA respondent/owner modules and align existing decided owner axis with plot_cultivation season/role proposal #862. Preserve individual detail; do not bolt a new aggregate onto plot_features.
+Historical triage: C; Audit actual embedded ISA respondent/owner modules and align existing decided owner axis with plot_cultivation season/role proposal #862. Preserve individual detail; do not bolt a new aggregate onto plot_features.
+Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/449][#449]] Pull WB geovariables (weather/distance/soil) for older Tanzania NPS waves (W1-W3)
+** [[https://github.com/ligon/LSMS_Library/issues/449][#449]] Pull WB geovariables (weather/distance/soil) for older Tanzania NPS waves (W1–W3)
 Countries: Tanzania.
-Initial triage route: Acquire permitted W1-W3 per-wave geovars and design explicit join to UPD r_hhid; do not claim UPD already carries them or that they solve community linkage.
+Historical triage: D; Acquire permitted W1-W3 per-wave geovars and design explicit join to UPD r_hhid; do not claim UPD already carries them or that they solve community linkage.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/450][#450]] Expose the LSMS-ISA harmonised dataset (geovariables/weather) as a feature via the household-id bridge
 Countries: Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
-Initial triage route: Decidev2vsfrozenv1/union,covariatesandgrain; then sourcehouseholdbridge only,documentagricultural subsample.
+Historical triage: C; Decidev2vsfrozenv1/union,covariatesandgrain; then sourcehouseholdbridge only,documentagricultural subsample.
+Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/587][#587]] Triage 39 'dropped' (countryxfeaturexwave) cells surfaced by the coverage matrix
+** [[https://github.com/ligon/LSMS_Library/issues/587][#587]] Triage 39 'dropped' (country×feature×wave) cells surfaced by the coverage matrix
 Countries: Nigeria, Ethiopia, Burkina_Faso, Mali, Tanzania.
-Initial triage route: Reconcile household-characteristic deletion #594 and Nigeria date repair #1094. Re-adjudicate remaining Nigeria housing/date and Tanzania food_coping cells using instrument evidence. Mark PH-only C8 and PP-only plot/coping correctly empty rather than fabricating other-round rows.
+Historical triage: B; Reconcile household-characteristic deletion #594 and Nigeria date repair #1094. Re-adjudicate remaining Nigeria housing/date and Tanzania food_coping cells using instrument evidence. Mark PH-only C8 and PP-only plot/coping correctly empty rather than fabricating other-round rows.
+Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/592][#592]] cluster_features: 18 waves across 6 countries have zero GPS (Latitude/Longitude) -- will be hidden by the wave-slice grader fix
+** [[https://github.com/ligon/LSMS_Library/issues/592][#592]] cluster_features: 18 waves across 6 countries have zero GPS (Latitude/Longitude) — will be hidden by the wave-slice grader fix
 Countries: Ethiopia, Nigeria, Malawi, Niger, Uganda.
-Initial triage route: Keep Ethiopia/Nigeria old six-wave fixes reconciled; obtain current per-wave GPS census for remaining Malawi/Uganda cells and document genuinely unreleased Niger cells. Track Nigeria W5 release separately #978. Ask other ISA lanes for current evidence before closure.
+Historical triage: B; Keep Ethiopia/Nigeria old six-wave fixes reconciled; obtain current per-wave GPS census for remaining Malawi/Uganda cells and document genuinely unreleased Niger cells. Track Nigeria W5 release separately #978. Ask other ISA lanes for current evidence before closure.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/637][#637]] Complete the remaining first/last aggregation key-soundness audit after the merged reviews
 Countries: Malawi, Niger, Nigeria, Tanzania.
-Initial triage route: Map11historical tail sites to current code/tests, measure raw entities and keys perwave, repair only demonstrated loss. Treat#1123 added wave sites explicitly; preserve#871 policy.
+Historical triage: B; Map11historical tail sites to current code/tests, measure raw entities and keys perwave, repair only demonstrated loss. Treat#1123 added wave sites explicitly; preserve#871 policy.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/647][#647]] question: Uganda 2019-20 crop_production silently drops the PART-harvest columns (s5aq06*_11/_21)
 Countries: Uganda.
-Initial triage route: Read instrument and decide part-harvest semantics for _11/_21, season B and sibling waves; document inclusion/exclusion reason before adding columns or grain.
+Historical triage: C; Read instrument and decide part-harvest semantics for _11/_21, season B and sibling waves; document inclusion/exclusion reason before adding columns or grain.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/650][#650]] Documentation/ should not be optional: 3 waves carry only a provenance stub, and add_wave() never fetches the real thing
 Countries: Ethiopia, Niger.
-Initial triage route: Define minimum docs standard and extend add_wave related-material fetch with synthetic tests; independently backfill Ethiopia/Niger2021-22 documents through sanctioned reviewed acquisition. Senegal remains outside this campaign.
+Historical triage: D; Define minimum docs standard and extend add_wave related-material fetch with synthetic tests; independently backfill Ethiopia/Niger2021-22 documents through sanctioned reviewed acquisition. Senegal remains outside this campaign.
+Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/660][#660]] bug: Ethiopia -- 120 / 40 households appear in the agriculture files but not the cover page
+** [[https://github.com/ligon/LSMS_Library/issues/660][#660]] bug: Ethiopia — 120 / 40 households appear in the agriculture files but not the cover page
 Countries: Ethiopia.
-Initial triage route: Use cover/release documentation and cached source keys to classify agricultural households absent from household cover; measure W1-W3 as well. Do not invent weights/v or drop observed agriculture.
+Historical triage: C; Use cover/release documentation and cached source keys to classify agricultural households absent from household cover; measure W1-W3 as well. Do not invent weights/v or drop observed agriculture.
+Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/689][#689]] Uganda: `cluster_features` is at PARISH grain from 2013-14 -- coarser than the sampling cluster (EA)
+** [[https://github.com/ligon/LSMS_Library/issues/689][#689]] Uganda: `cluster_features` is at PARISH grain from 2013-14 — coarser than the sampling cluster (EA)
 Countries: Uganda.
-Initial triage route: Reconcile issue with now-existing CONTENTS.org disclosure, then decide user-facing cluster_features schema description, Rural interpretation and evidence for a recoverable real EA. Do not silently blank more or change v.
+Historical triage: C; Reconcile issue with now-existing CONTENTS.org disclosure, then decide user-facing cluster_features schema description, Rural interpretation and evidence for a recoverable real EA. Do not silently blank more or change v.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/771][#771]] Uganda/Ethiopia nutrition.py: Ethiopia has no FCT csv and hits the USDA API on EVERY build; both carry a literal API key; the silent fallback remains
 Countries: Uganda, Ethiopia.
-Initial triage route: Keep tracked Uganda FCT; remove silent build-time network fallback and literal credentials, freeze Ethiopia composition inputs with provenance and exact nutrition deltas. No live API call during triage.
+Historical triage: B; Keep tracked Uganda FCT; remove silent build-time network fallback and literal credentials, freeze Ethiopia composition inputs with provenance and exact nutrition deltas. No live API call during triage.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/778][#778]] Tests that rebuild in the SHARED root under LSMS_NO_CACHE still open the #866 delete-then-rebuild window; assume_cache_fresh has an exists()-then-read race
 Countries: Nigeria.
-Initial triage route: Narrow to policy for assume_cache_fresh serving a country script output without verified stamp. Do not re-fix test isolation or missing-file recovery.
+Historical triage: C; Narrow to policy for assume_cache_fresh serving a country script output without verified stamp. Do not re-fix test isolation or missing-file recovery.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/787][#787]] labels=: resolve ambiguous Preferred Label targets, curate Aggregate variants, fix numeric-target examples
 Countries: Burkina_Faso, Malawi, Niger, Uganda.
-Initial triage route: Decide duplicate Preferred->distincttarget refusal; curate intended country buckets under existing contract; fix Malawi doc-number inconsistency separately.
+Historical triage: C; Decide duplicate Preferred→distincttarget refusal; curate intended country buckets under existing contract; fix Malawi doc-number inconsistency separately.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/791][#791]] Add UEMOA PHMECV as a source: 4 missing EHCVM 2021-22 waves + 8 ERI-ESI studies (access is human-reviewed)
 Countries: Burkina_Faso, Mali, Niger.
-Initial triage route: Keep archive access with human; accept locally obtained approved archive and design rar/bare-dta ingest. Existing missingEHCVM waves are nonISA; ERI-ESI opportunity includesBF/Mali/Niger.
+Historical triage: D; Keep archive access with human; accept locally obtained approved archive and design rar/bare-dta ingest. Existing missingEHCVM waves are nonISA; ERI-ESI opportunity includesBF/Mali/Niger.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/794][#794]] Finish Mali mojibake repair and decide strategy-B migration
 Countries: Burkina_Faso, Mali.
-Initial triage route: Remove completed Mali cp1252 work from issue; retain only format118/double-encoding cohort migration with synchronized crosswalk rekey and matching proof.
+Historical triage: C; Remove completed Mali cp1252 work from issue; retain only format118/double-encoding cohort migration with synchronized crosswalk rekey and matching proof.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/798][#798]] Mali interview_date: rewrite the stale data_scheme.yml:69-73 comment (state the measured collapse loss) and refresh the coverage matrix
 Countries: Mali, Tanzania.
-Initial triage route: Refresh raw-cache versus served coverage matrix on final source; reconcile strictness/accessor residual with existing datetime_parse policies, not reimplement parser.
+Historical triage: A; Refresh raw-cache versus served coverage matrix on final source; reconcile strictness/accessor residual with existing datetime_parse policies, not reimplement parser.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/812][#812]] Investigate remaining EHCVM allocation and strata gaps after Guinea-Bissau/Togo documentation fixes
 Countries: Burkina_Faso, Mali, Niger.
-Initial triage route: Investigate declared strata/allocation from country-specific documentation, then source metadata; distinguish measured allocation from design inference.
+Historical triage: C; Investigate declared strata/allocation from country-specific documentation, then source metadata; distinguish measured allocation from design inference.
+Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/816][#816]] Burkina Faso coverage starts at 2014: the Enquete Prioritaire series (1994, 1998) exists and is a different instrument
+** [[https://github.com/ligon/LSMS_Library/issues/816][#816]] Burkina Faso coverage starts at 2014: the Enquête Prioritaire series (1994, 1998) exists and is a different instrument
 Countries: Burkina_Faso.
-Initial triage route: Confirm catalog/access and held-versus-comparable coverage design before ingest; do not present priority surveys as continuous ISA panel.
+Historical triage: D; Confirm catalog/access and held-versus-comparable coverage design before ingest; do not present priority surveys as continuous ISA panel.
+Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/820][#820]] Ethiopia crop_production reads ESS 11 (field crops) only; the 12 tree/fruit/root module -- more sale records than 11 -- is unwired
+** [[https://github.com/ligon/LSMS_Library/issues/820][#820]] Ethiopia crop_production reads ESS §11 (field crops) only; the §12 tree/fruit/root module -- more sale records than §11 -- is unwired
 Countries: Ethiopia.
-Initial triage route: Wire W1-W3 PH section12 only after questionnaire/source-key audit; concatenate at actual plot/crop/unit grain without fan-out. Independently verify W4/W5 folded instrument before extending them.
+Historical triage: B; Wire W1-W3 PH section12 only after questionnaire/source-key audit; concatenate at actual plot/crop/unit grain without fan-out. Independently verify W4/W5 folded instrument before extending them.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/821][#821]] Mali 2018-19 ships a grappe-grain community price module (s05_co_mli2018.dta, 549/549 grappes) that community_prices never wires; data_scheme.yml wrongly says EHCVM waves have no grappe key
 Countries: Mali.
-Initial triage route: Wire both2018 s05 price readings, size-resolved unit mapping, and correct false absence comment; leave2021 region-grain module as distinct design.
-Fresh dispatch assessment (2026-10-22): the current country notes describe two 2018 price fields and size-qualified units, without the 2014 weight fields mentioned in the issue proposal.
-Authenticate the native fields first; do not fabricate Quantity/Weight or a unit crosswalk.
+Historical triage: B; Wire both2018 s05 price readings, size-resolved unit mapping, and correct false absence comment; leave2021 region-grain module as distinct design.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/823][#823]] Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504/504 grappes); data_scheme.yml says the wave has none -- twin of Mali #821, check the other six EHCVM countries
 Countries: Niger.
-Initial triage route: Wire both s05 readings with size-resolved unit crosswalk, native variety/visit/obs; correct false no-file comment.
-Fresh dispatch assessment (2026-10-22): CONTENTS.org explicitly defers this table while the size-qualified unit crosswalk is missing.
-Quote and reconcile that recorded decision; native label preservation and downstream comparability are separate deliverables.
+Historical triage: B; Wire both s05 readings with size-resolved unit crosswalk, native variety/visit/obs; correct false no-file comment.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/824][#824]] Complete sold-unit audits and use Unit_sold in farmgate consumers
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
-Initial triage route: Audit remaining ISA Ethiopia/Tanzania/Mali/BF sale fields; preserve Tanzania explicitlykg. Update consumers to use reported sold unit while flagging disagreements, not presuming sold unit always right.
+Historical triage: B; Audit remaining ISA Ethiopia/Tanzania/Mali/BF sale fields; preserve Tanzania explicitlykg. Update consumers to use reported sold unit while flagging disagreements, not presuming sold unit always right.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/827][#827]] Malawi community_prices: u and NumberOfUnits jointly blank on 38,506 of 82,635 rows (46%) -- the price basis is unknown for half the yardstick
 Countries: Malawi.
-Initial triage route: Inspect per-wave CK unit/number fields and other-specify text for recoverability; keep blanks unknown, count exclusions and distinguish nonfoods.
+Historical triage: B; Inspect per-wave CK unit/number fields and other-specify text for recoverability; keep blanks unknown, count exclusions and distinguish nonfoods.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/828][#828]] food_expenditures(basis='total') silently equals 'purchased' where a country records no in-kind value; should raise or warn like units= now does
 Countries: Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania.
-Initial triage route: Choose typed refusal vs warning+attrs when total lacks nonpurchase valuation; then reuse structured Feature degrade/carrier pattern.
+Historical triage: C; Choose typed refusal vs warning+attrs when total lacks nonpurchase valuation; then reuse structured Feature degrade/carrier pattern.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/833][#833]] Resolve remaining raw/processed commodity folds after Malawi and Niger repairs
 Countries: Ethiopia, Malawi, Niger, Tanzania, Uganda.
-Initial triage route: Keep processing states separate until exact physical-unit/source evidence; reevaluate Malawi groundnut ratio on corrected sale ladder.
+Historical triage: C; Keep processing states separate until exact physical-unit/source evidence; reevaluate Malawi groundnut ratio on corrected sale ladder.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/837][#837]] Resolve source-grain cluster disagreements without bypassing the signed audit
 Countries: Ethiopia, Tanzania.
-Initial triage route: Investigate source coordinate disagreements and district harmonization without early reduce_to_agreed blanking; preserve signed Site-2 audit and household grain.
+Historical triage: C; Investigate source coordinate disagreements and district harmonization without early reduce_to_agreed blanking; preserve signed Site-2 audit and household grain.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/839][#839]] Correct Mali's stale food-acquired config comment; Tanzania's quantity note is already resolved
 Countries: Mali, Tanzania.
-Initial triage route: Correct Mali food-shape comment with next substantive data_scheme edit; keep Tanzania superseded historical text visibly dated.
+Historical triage: A; Correct Mali food-shape comment with next substantive data_scheme edit; keep Tanzania superseded historical text visibly dated.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/843][#843]] Nigeria crop_production has no sale price in W3-W5 (0 of 37,315 rows): secta3ii is hh-crop grain, the build needs a plot
 Countries: Nigeria.
-Initial triage route: Design a separate household-crop sale frame or explicit non-plot grain that preserves all sales without fan-out. Do not merge one sale into every crop plot or fabricate plot ids.
+Historical triage: C; Design a separate household-crop sale frame or explicit non-plot grain that preserves all sales without fan-out. Do not merge one sale into every crop plot or fabricate plot ids.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/844][#844]] Nigeria asks a farmgate valuation of the whole harvest (sa3q18, 76% of rows) that no table carries
 Countries: Nigeria.
-Initial triage route: Compare reported hypothetical whole-harvest values with sale-price ladder first, per maintainer comment; inspect later-wave question identity, then decide separate declared column and provenance.
+Historical triage: C; Compare reported hypothetical whole-harvest values with sale-price ladder first, per maintainer comment; inspect later-wave question identity, then decide separate declared column and provenance.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/845][#845]] Price provenance: is Price elicited or derived for Panama/GhanaLSS/Guatemala/Serbia; explain Uganda's ~5% gap; decide on a read-time diagnostic
 Countries: Uganda.
-Initial triage route: Explain raw 2009-10 and 2011-12 ~5% Price-versus-Expenditure/Quantity discrepancies; keep other countries source provenance and optional diagnostic decision separate.
+Historical triage: C; Explain raw 2009-10 and 2011-12 ~5% Price-versus-Expenditure/Quantity discrepancies; keep other countries source provenance and optional diagnostic decision separate.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/846][#846]] Tanzania: record a not-asked capability for food price and own-consumption value (Section J qq.2-6 is the C4 evidence)
 Countries: Tanzania.
-Initial triage route: Record questionnaire-backed not-asked capability/verdict via accepted mechanism, checks C1;C2;C4 and Section J citations; do not impute own-consumption values.
+Historical triage: C; Record questionnaire-backed not-asked capability/verdict via accepted mechanism, checks C1;C2;C4 and Section J citations; do not impute own-consumption values.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/851][#851]] Recall Phase II: integrate approved period= conversion, disclosure and Country/Feature error contract
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
-Initial triage route: Implement approved Phase II period= and Contract B with shortfall disclosure; split actual per-household exposure follow-up. Maintain refusal on food_prices and no default scaling.
+Historical triage: C; Implement approved Phase II period= and Contract B with shortfall disclosure; split actual per-household exposure follow-up. Maintain refusal on food_prices and no default scaling.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/855][#855]] Malawi: _livestock_block never reads ag_r07 ("owned exactly 12 months ago"), which is present in all four waves
 Countries: Malawi.
-Initial triage route: Count ag_r07 nullness bywave, choose canonical prior-year stock name, expose separately without replacing current stock or deriving flows at build.
+Historical triage: C; Count ag_r07 nullness bywave, choose canonical prior-year stock name, expose separately without replacing current stock or deriving flows at build.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/856][#856]] Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before deciding on recovery
 Countries: Malawi.
-Initial triage route: Count raw harvest other-unit/crop codes and distinct own-source text per wave; recover only if material, no stored Quantity rescaling.
+Historical triage: B; Count raw harvest other-unit/crop codes and distinct own-source text per wave; recover only if material, no stored Quantity rescaling.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/860][#860]] Nigeria: no factors for heaps/ridges/stands areas; EPAR's two grids disagree by a median of 4.9x
 Countries: Nigeria.
-Initial triage route: Do not adopt competing BID versus observed factors silently. Separate single plots-factor question; preserve GPS and already convertible areas under any chosen extension.
+Historical triage: C; Do not adopt competing BID versus observed factors silently. Separate single plots-factor question; preserve GPS and already convertible areas under any chosen extension.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/862][#862]] Schema proposal: plot_cultivation, a per-season plot decision-maker table (#167's reserved name, #439's convention)
 Countries: Uganda, Tanzania, Ethiopia.
-Initial triage route: Produce accepted plot_cultivation schema with season/pid/role and stated Ethiopia season rule before wiring existing decision-maker columns.
+Historical triage: C; Produce accepted plot_cultivation schema with season/pid/role and stated Ethiopia season rule before wiring existing decision-maker columns.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/864][#864]] Resolve Burkina Faso 2014 quantity semantics and unread autoconsumption values
 Countries: Burkina_Faso.
-Initial triage route: Read p1 quantity grid wording/item skips and p2-p4 own/gift value wording; measure and wire reported streams only after semantics resolved.
+Historical triage: B; Read p1 quantity grid wording/item skips and p2-p4 own/gift value wording; measure and wire reported streams only after semantics resolved.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/881][#881]] DECISION: Nigeria W4 purchased row -- identity derivation labelling the 30-day window (A) or a derived 7-day Expenditure per the #876 EHCVM precedent (B)
 Countries: Nigeria.
-Initial triage route: Choose registered identity disclosure or explicit 7-day derived expenditure while retaining survey purchase event inputs; implement only approved construction.
+Historical triage: C; Choose registered identity disclosure or explicit 7-day derived expenditure while retaining survey purchase event inputs; implement only approved construction.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/882][#882]] DECISION: Niger 2011-12 people_last7days dummies -- keep as served (A), re-point wage_work to ms04q01 so all three are 30-day (B), or serve NA (C)
 Countries: Niger.
-Initial triage route: Choose A documented current mixed30day/12month, B all30day wage analogue, or C NA; do not silently normalize 7day interpretation.
+Historical triage: C; Choose A documented current mixed30day/12month, B all30day wage analogue, or C NA; do not silently normalize 7day interpretation.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/894][#894]] panel_ids: convert Malawi and Nigeria from the cache-parquet path to committed _/panel_ids.json + updated_ids.json (Design A)
 Countries: Malawi, Nigeria.
-Initial triage route: Build source-relative maintainer scripts from existing YAML crosswalks, commit reviewed JSON, remove DESIGN_B_PENDING names; preserve dict/API exactly.
+Historical triage: C; Build source-relative maintainer scripts from existing YAML crosswalks, commit reviewed JSON, remove DESIGN_B_PENDING names; preserve dict/API exactly.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/905][#905]] Finish the vectorized min_count reducer sweep
 Countries: Malawi, Mali, Tanzania.
-Initial triage route: Map current residual sites; convert only demonstrated equivalent reductions; test column order/missingness and <=4ULP. Bundle with country edits.
+Historical triage: C; Map current residual sites; convert only demonstrated equivalent reductions; test column order/missingness and <=4ULP. Bundle with country edits.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/926][#926]] Resolve remaining curated C1 keys and transcoding policy after GhanaLSS repair
 Countries: Burkina_Faso, Mali, Niger, Uganda.
-Initial triage route: Narrow to still-live double-encoding keys and exact transcoding evidence; do not rekey repaired cp1252 class or blindly transcode all tables.
+Historical triage: C; Narrow to still-live double-encoding keys and exact transcoding evidence; do not rekey repaired cp1252 class or blindly transcode all tables.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/978][#978]] Nigeria W5: acquire WB v02 (NGA_2023_GHSP-W5_v02_M) and wire NGA_HouseholdGeovariables_Y5.dta as cluster_features df_geo
 Countries: Nigeria.
-Initial triage route: Resume pre-existing acquisition evidence if present; review revised/new files before store push; wire household-geovars on hhid and replace no-GPS test only after sidecar/source landing.
+Historical triage: D; Resume pre-existing acquisition evidence if present; review revised/new files before store push; wire household-geovars on hhid and replace no-GPS test only after sidecar/source landing.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1000][#1000]] Reconcile Uganda FCT 4003's generic zero note with its specific yellow-variety carotenoid derivation
 Countries: Uganda.
-Initial triage route: Verify cited Kidmose yellow-variety source/preparation basis and carotenoid-to-RAE derivation; reconcile generic zero wording. Preserve density absent source-supported correction.
+Historical triage: C; Verify cited Kidmose yellow-variety source/preparation basis and carotenoid-to-RAE derivation; reconcile generic zero wording. Preserve density absent source-supported correction.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1033][#1033]] Nigeria W4 food unit labels carry invented W3 size prefixes; W4's size columns (s7bq2c/s7bq9c/s10bq2c/s10bq9c) are never read
 Countries: Nigeria.
-Initial triage route: Decide size-less versus code+size labels and PP/PH-specific vocabulary. Preserve cvn kg and raw size inputs; compare native-unit prices separately.
+Historical triage: C; Decide size-less versus code+size labels and PP/PH-specific vocabulary. Preserve cvn kg and raw size inputs; compare native-unit prices separately.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1043][#1043]] Ethiopia crop_production tags a missing harvest unit as 'Other (Specify)' (ethiopia.py:1827), hiding it from the sentinel mask
 Countries: Ethiopia.
-Initial triage route: Count missing-harvest-unit rows per wave and compare harvest kg factor sources under Unknown. Separately verify later-wave sale-unit fillna(Kg); do not change by analogy without evidence.
+Historical triage: C; Count missing-harvest-unit rows per wave and compare harvest kg factor sources under Unknown. Separately verify later-wave sale-unit fillna(Kg); do not change by analogy without evidence.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1045][#1045]] Parse every calendar quantity at build time with one parser (dates, year-months, month-of-year, years); read-time cast becomes a pass-through
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
-Initial triage route: Reuse datetime_parse parser and existing inventory; migrate remaining interview_date and other calendar columns in small country scopes, with explicit timestamp/timezone decision and exact value deltas.
+Historical triage: C; Reuse datetime_parse parser and existing inventory; migrate remaining interview_date and other calendar columns in small country scopes, with explicit timestamp/timezone decision and exact value deltas.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1055][#1055]] DECISION: Ethiopia 2021-22 interview_date dates the post-harvest agriculture visit (1,475 of 4,959 households), not the household interview
 Countries: Ethiopia.
-Initial triage route: Decide how W5 agricultural visit dates are represented relative to W4 household interviews: document, omit wave, find valid timestamp or add visit dimension.
+Historical triage: C; Decide how W5 agricultural visit dates are represented relative to W4 household interviews: document, omit wave, find valid timestamp or add visit dimension.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1056][#1056]] Ethiopia interview_date serves 33 device-clock dates years outside fieldwork (W4 15, W5 18)
 Countries: Ethiopia.
-Initial triage route: Choose source-level null/count versus framework plausibility reporting; retain raw recorded data/evidence and align with Site Q policy before screening.
+Historical triage: C; Choose source-level null/count versus framework plausibility reporting; retain raw recorded data/evidence and align with Site Q policy before screening.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1057][#1057]] DECISION: Burkina Faso 2021-22 cluster_features -- serve the 2018-19 cluster GPS for the 527 tracked grappes (registered derivation)
 Countries: Burkina_Faso.
-Initial triage route: Decide whether same-grappe EA identity licenses carry-forward for527 tracked fixes; register derivation and assumption if approved.
+Historical triage: C; Decide whether same-grappe EA identity licenses carry-forward for527 tracked fixes; register derivation and assumption if approved.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1059][#1059]] Burkina Faso cluster_features District: 50 cross-wave spelling variants (mapping table) and 3 genuine province disagreements on shared grappes
 Countries: Burkina_Faso.
-Initial triage route: Add District curation for50 spelling-only cases under canonical spelling choice; keep three distinct-province conflicts separate and disclose to GPS proposal.
+Historical triage: B; Add District curation for50 spelling-only cases under canonical spelling choice; keep three distinct-province conflicts separate and disclose to GPS proposal.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1060][#1060]] Burkina Faso 2014: province varies within 94 of 900 zd in the source (pre-existing cluster_features GrainCollapseWarning, 1,034 of 10,800 rows)
 Countries: Burkina_Faso.
-Initial triage route: Choose retain most-complete row, modal province or NA for94 source-conflicting EAs; never call this a wiring fix.
+Historical triage: B; Choose retain most-complete row, modal province or NA for94 source-conflicting EAs; never call this a wiring fix.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1063][#1063]] EHCVM household_roster row order differs between builds of the same commit (Benin, Guinea-Bissau; CotedIvoire, Mali, Togo on 10-14)
 Countries: Mali.
-Initial triage route: Identify unordered build step, then sort deterministically without changing values/types/nulls; build twice using same immutable sources.
+Historical triage: C; Identify unordered build step, then sort deterministically without changing values/types/nulls; build twice using same immutable sources.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1068][#1068]] DECISION: native-unit modes treat U_UNKNOWN as a pooled pseudo-unit (food_prices(units='unitvalue'), food_quantities(units='units'))
 Countries: Nigeria, Ethiopia, Malawi, Niger.
-Initial triage route: Decide exclusion-with-count versus NaN versus retained disclosure in native unitvalue/units modes. Avoid pooling Unknown quantities as meaningful physical units.
+Historical triage: C; Decide exclusion-with-count versus NaN versus retained disclosure in native unitvalue/units modes. Avoid pooling Unknown quantities as meaningful physical units.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1071][#1071]] DECISION: the wave and country cache tiers disagree on LSMS_NO_CACHE spelling and on corrupt-file handling
 Countries: Nigeria, Ethiopia.
-Initial triage route: Decide accepted LSMS_NO_CACHE spellings and script/YAML corruption behavior. Keep parser error typing already delivered by #1105 separate.
+Historical triage: C; Decide accepted LSMS_NO_CACHE spellings and script/YAML corruption behavior. Keep parser error typing already delivered by #1105 separate.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1074][#1074]] DECISION: Malawi rows served u=Unknown keep a shipped code-23 survey_kg (29 Mango rows at 10.99 kg per mango, 7,088 kg)
 Countries: Malawi.
-Initial triage route: Decide whether shipped code23 factor remains authoritative on Unknown rows; country-side suppression or framework ladder census are distinct options.
+Historical triage: C; Decide whether shipped code23 factor remains authoritative on Unknown rows; country-side suppression or framework ladder census are distinct options.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1075][#1075]] Malawi leftover unit codes: 2010-11 suffixed codes (16b/16a/12a/21b/12b/03a, 13 rows) and IHS2 '90 kg bag' (2004-05, 4 of 6 uses contradict the label)
 Countries: Malawi.
-Initial triage route: Locate decisive forms for13 suffixed codes; keep IHS2 90kg bag six uses until a per-row rule is explicitly chosen.
+Historical triage: D; Locate decisive forms for13 suffixed codes; keep IHS2 90kg bag six uses until a per-row rule is explicitly chosen.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1084][#1084]] recall windows: read the questionnaires for the 32 not-recorded food cells (period= converts each with no code change)
 Countries: Burkina_Faso, Malawi, Mali, Niger, Uganda.
-Initial triage route: Prioritize ISA questionnaire cells, record exact evidence in food_recall.csv and promote with existing script; preserve not-recorded until read.
+Historical triage: C; Prioritize ISA questionnaire cells, record exact evidence in food_recall.csv and promote with existing script; preserve not-recorded until read.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1087][#1087]] DECISION: how to serve a second source record that disagrees with the first (Niger community_prices, 30 rows)
 Countries: Niger.
-Initial triage route: Choose obs4-6 vs record level vs disclosed first-record selection; do not infer which keying discrepancy is true.
+Historical triage: C; Choose obs4-6 vs record level vs disclosed first-record selection; do not infer which keying discrepancy is true.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1090][#1090]] Niger `cs07q01` "Riz" decodes to `j = 'Autre Riz local'` for both of its varieties
 Countries: Niger.
-Initial triage route: Compare household rice labels and imported/local variety wording, then choose correct j mapping without breaking joins.
+Historical triage: C; Compare household rice labels and imported/local variety wording, then choose correct j mapping without breaking joins.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1096][#1096]] DECISION: Nigeria interview_date serves visit dates for households that were not interviewed (interview_result refused / unavailable / not found)
 Countries: Nigeria.
-Initial triage route: Census recorded outcome/status columns, then decide completed interviews only, explicit status column or documented attempts; do not silently discard attempts.
+Historical triage: C; Census recorded outcome/status columns, then decide completed interviews only, explicit status column or documented attempts; do not silently discard attempts.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1106][#1106]] Malawi `NPK Fertilizer` is Chitowe 23:21:0+4S but is served at the shared map's NPK 17-17-17 (0.17 vs 0.23 N)
 Countries: Malawi.
-Initial triage route: Prefer source-specific Chitowe label mapped0.23 over adding country axis, subject to maintainer choice.
+Historical triage: C; Prefer source-specific Chitowe label mapped0.23 over adding country axis, subject to maintainer choice.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1110][#1110]] `fertilizer_rate`'s default `on='parcel'` mis-joins Malawi and empties Ethiopia; its docstring's "measured no-op on Malawi" is false
 Countries: Ethiopia, Malawi.
-Initial triage route: Measure symmetric parcel reduction versus country-specific explicit plot joining; obtain land-grain choice before changing default. Correct false Malawi no-op docstring along with chosen behavior.
+Historical triage: C; Measure symmetric parcel reduction versus country-specific explicit plot joining; obtain land-grain choice before changing default. Correct false Malawi no-op docstring along with chosen behavior.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1116][#1116]] #600 residual: override records take their note and validation from `_OVERRIDES`, over a hand edit to the file
 Countries: Nigeria, Niger.
-Initial triage route: Decide whether _OVERRIDES/config notes are authoritative or refuse hand-edited divergence; then change documentation or guards.
+Historical triage: C; Decide whether _OVERRIDES/config notes are authoritative or refuse hand-edited divergence; then change documentation or guards.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1120][#1120]] #569 residual C: NaN keys on declared plot-table index levels, now all named by Site I; `LSMS_READ_STRICT=1` newly raises on three reads
 Countries: Uganda, Malawi, Ethiopia, Nigeria.
-Initial triage route: Separate missing plot ids from households absent in sample. Begin Ethiopia cover/module mismatch with #660; preserve rows and audit signal. Require source/id evidence before assigning v or suppressing strict errors.
+Historical triage: B; Separate missing plot ids from households absent in sample. Begin Ethiopia cover/module mismatch with #660; preserve rows and audit signal. Require source/id evidence before assigning v or suppressing strict errors.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1127][#1127]] Ethiopia 2021-22: acquire ESPS-5 v03_M (replaces the plot geovariables file) and re-stamp SOURCE.org (#1114 ruling)
 Countries: Ethiopia.
-Initial triage route: Resume existing authorized acquisition receipt/branch if present; review v03 downloaded content and sidecars before store push. Correct held-release note and SOURCE only with held evidence. Do not re-acquire during diagnosis.
+Historical triage: D; Resume existing authorized acquisition receipt/branch if present; review v03 downloaded content and sidecars before store push. Correct held-release note and SOURCE only with held evidence. Do not re-acquire during diagnosis.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1133][#1133]] Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids
 Countries: Uganda.
-Initial triage route: Inspect CSECTION1 key rendering; reconstruct 322 linked-household pair table and two non-bijective pairs; apply common read-point mapping to sample+cluster_features, preserve community joins, then remeasure and update sampling boundary.
+Historical triage: B; Inspect CSECTION1 key rendering; reconstruct 322 linked-household pair table and two non-bijective pairs; apply common read-point mapping to sample+cluster_features, preserve community joins, then remeasure and update sampling boundary.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1134][#1134]] DECISION (#793 residual): the frozen `DESIGN_TAGS` (2 values) cannot express an undocumented or single-stage design, so no non-Uganda design record can be written until it is widened
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania.
-Initial triage route: Implement existing option-A ruling: not-stated tag only for not-found/derived-from-data; ship one evidence-supported record; add structural tags later with first evidenced use.
+Historical triage: C; Implement existing option-A ruling: not-stated tag only for not-found/derived-from-data; ship one evidence-supported record; add structural tags later with first evidenced use.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1135][#1135]] ClusterIdentityWarning: implement the settled first-line size ruling and verify net-of-movers counts
 Countries: Ethiopia, Nigeria, Tanzania, Uganda.
-Initial triage route: Keep SPAN and no threshold. Add measured cluster-renumber counts and linked-household change share net of movers to boundary records and warning first line; test Nigeria 2016Q1->2018Q3 and a 100% boundary.
-Fresh dispatch assessment (2026-10-22): current source evidence does not satisfy the complete settled measurement contract, and no all-unknown formatter patch is approved.
-The moved-prefix filter is not an all-mover classifier; twenty Nigeria W5 movement statuses remain unknown, and all twelve boundaries still need physical-cluster measurements.
+Historical triage: A; Keep SPAN and no threshold. Add measured cluster-renumber counts and linked-household change share net of movers to boundary records and warning first line; test Nigeria 2016Q1->2018Q3 and a 100% boundary.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1136][#1136]] #793 residual: curate design fields beyond Uganda (NADA DDI probe, per-country evidence, missing strata)
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
-Initial triage route: After #1134, curate evidenced design triples, remaining country panel declarations, ETH Q6, Q7 cluster_reference, audit sampling-report drain. Split deterministic renumbering crosswalk work into its own decision-backed issue.
+Historical triage: C; After #1134, curate evidenced design triples, remaining country panel declarations, ETH Q6, Q7 cluster_reference, audit sampling-report drain. Split deterministic renumbering crosswalk work into its own decision-backed issue.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1146][#1146]] Test-side follow-ups to #1113: baseline generator pins partial parquets; Nigeria sold-unit test latent; cold-session invariance coverage
 Countries: Uganda, Nigeria.
-Initial triage route: Refuse or omit partial-coverage raw var parquets in baseline generation; coverage-gate Nigeria sold-unit test. Keep proposed rebuild-on-skip policy separate for human decision.
+Historical triage: C; Refuse or omit partial-coverage raw var parquets in baseline generation; coverage-gate Nigeria sold-unit test. Keep proposed rebuild-on-skip policy separate for human decision.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1148][#1148]] Household recall exposure: adjudicate passage-status evidence before normalization (Burkina 2014; GhanaLSS follow-up)
 Countries: Burkina_Faso.
-Initial triage route: Read passage cover interview outcomes, carry per-household/per-column asks to period conversion; never count food rows as interviews.
+Historical triage: B; Read passage cover interview outcomes, carry per-household/per-column asks to period conversion; never count food rows as interviews.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1150][#1150]] plot_features: serve the WB plot geovariables (elevation, slope, wetness, distance to dwelling) for Ethiopia W1-W5, and declare Nigeria's PlotSlope (#1127 ruling A)
 Countries: Ethiopia, Nigeria.
-Initial triage route: After #1127, inspect every held plot-geovariables schema; left-join optional raster attributes at holder/household/parcel/field grain. Declare Nigeria PlotSlope and consistent units; register any percent-to-degree derivation. Preserve WB distance tails.
+Historical triage: B; After #1127, inspect every held plot-geovariables schema; left-join optional raster attributes at holder/household/parcel/field grain. Declare Nigeria PlotSlope and consistent units; register any percent-to-degree derivation. Preserve WB distance tails.
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1171][#1171]] Ethiopia nutrition: diagnose the legacy food_acquired Make prerequisite and unused FCT target
 Countries: Ethiopia.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1174][#1174]] Malawi plot_inputs: determine reported use for 437 nonorganic rows whose missing quantities become zero
 Countries: Malawi.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1177][#1177]] Nigeria: verify inherited W4-PH maize-shell and tinned-milk qualifiers against its instrument
 Countries: Nigeria.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1179][#1179]] Mali EAC-I community prices: diagnose positive-priced entries with unresolved unit codes
 Countries: Mali.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1183][#1183]] Ethiopia plot_inputs: diagnose missing seed-purchase answers before recoding them as No/zero
 Countries: Ethiopia.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1184][#1184]] Ethiopia W2 plot_inputs: diagnose all-missing holder/crop seed-purchase quantities summed to zero
 Countries: Ethiopia.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1187][#1187]] Burkina Faso 2018-19: establish the source meaning of unlabelled agricultural input code21
 Countries: Burkina_Faso.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1190][#1190]] Malawi plot_inputs: preserve seed purchase-unit identity before aggregating or joining planted quantities
 Countries: Malawi.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1206][#1206]] Campaign validation: finish exact numeric and object-type saved-result reassessment
 Countries: Cross-country validation.
+Historical triage: None; None
+Reconcile the live issue and complete country notes before dispatch.
+
+* Evidence and scope limits
+- Remaining records overlap across countries, umbrellas, enhancements and source/policy decisions; they are not a count of distinct ready-to-fix bugs.
+- Initial tiers and measurements require fresh live issue/country-note reconciliation before dispatch.
+- 1,691 distinct integration passes and102 normal skips are assembled from original and failure-only continuations, not one full-suite/corpus run.
+- Final-head unit/Windows CI passed; six jobs including data were skipped. Mounted runtime/dependency installation and genuine corpus coverage are not certified.
+- Issue218 and1121 remain globally open for the explicitly recorded shared/non-ISA residuals; their completed ISA country repairs are outside the remaining goal queue.
+- Goal remains active; the implementation merge batch is not full backlog completion or a release.
+
+Sue
