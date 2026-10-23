@@ -17,10 +17,10 @@ committed JSON is the reviewable result of it.  ``LSMS_BUILD_BACKEND=make``
 still reads the blocks directly, and gets the same dicts.
 
 The frame handed to ``local_tools.panel_ids`` is built exactly as the YAML
-path built it: the current id through ``format_id`` (what ``df_data_grabber``
-applies to every ``idxvars`` entry), the previous id as a string (``hhid`` is
-numeric in the source; the library served it through the declared ``str``
-type), rows in source-file order.
+path built it: both ids through ``format_id`` (what ``df_data_grabber``
+applies to every ``idxvars`` entry; for the previous id it gives the same
+string as the declared ``previous_i: str`` cast the library applied, ``hhid``
+being numeric in the source), rows in source-file order.
 
 Nigeria's idiosyncrasies
 ------------------------

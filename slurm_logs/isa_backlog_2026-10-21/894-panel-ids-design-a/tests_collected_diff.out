@@ -1,0 +1,28 @@
+747a748
+> tests/test_panel_id_collisions.py::test_shipped_updated_ids_are_injective[Malawi]
+749a751
+> tests/test_panel_id_collisions.py::test_shipped_updated_ids_are_injective[Nigeria]
+762a765
+> tests/test_panel_ids_persistence.py::test_both_crosswalk_files_ship[Malawi]
+764a768
+> tests/test_panel_ids_persistence.py::test_both_crosswalk_files_ship[Nigeria]
+771a776
+> tests/test_panel_ids_persistence.py::test_clean_does_not_delete_the_committed_sources[Malawi]
+773a779
+> tests/test_panel_ids_persistence.py::test_clean_does_not_delete_the_committed_sources[Nigeria]
+782a789
+> tests/test_panel_ids_persistence.py::test_make_never_regenerates_the_crosswalk[Malawi]
+784a792
+> tests/test_panel_ids_persistence.py::test_make_never_regenerates_the_crosswalk[Nigeria]
+791a800
+> tests/test_panel_ids_persistence.py::test_no_makefile_declares_the_json_as_a_rule_target[Malawi]
+793a803
+> tests/test_panel_ids_persistence.py::test_no_makefile_declares_the_json_as_a_rule_target[Nigeria]
+800a811
+> tests/test_panel_ids_persistence.py::test_the_generator_writes_beside_itself_not_into_cwd[Malawi]
+802a814
+> tests/test_panel_ids_persistence.py::test_the_generator_writes_beside_itself_not_into_cwd[Nigeria]
+809a822
+> tests/test_panel_ids_persistence.py::test_the_maintainer_target_still_regenerates[Malawi]
+811a825
+> tests/test_panel_ids_persistence.py::test_the_maintainer_target_still_regenerates[Nigeria]

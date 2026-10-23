@@ -17,9 +17,10 @@ reviewable result of it.  ``LSMS_BUILD_BACKEND=make`` still reads the blocks
 directly, and gets the same dicts.
 
 The frame handed to ``local_tools.panel_ids`` is built exactly as the YAML
-path built it: the current id through ``format_id`` (what ``df_data_grabber``
-applies to every ``idxvars`` entry), the previous id as a string, one ``t``
-per wave, rows in source-file order.  Row order is not cosmetic:
+path built it: both ids through ``format_id`` (what ``df_data_grabber``
+applies to every ``idxvars`` entry; for the previous id it gives the same
+string as the declared ``previous_i: str`` cast the library applied), one
+``t`` per wave, rows in source-file order.  Row order is not cosmetic:
 ``local_tools.update_id`` gives the bare id to the FIRST household that claims
 a previous household and ``_1``, ``_2``, ... to the rest, so reordering rows
 would move suffixes between real households.
