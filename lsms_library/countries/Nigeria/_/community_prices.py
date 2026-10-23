@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """Concatenate wave-level community_prices for Nigeria GHS-Panel (GAP C).
 
-Item-level reported community food prices at grain (t, v, j, u) from the
-post-harvest COMMUNITY questionnaire's food-price module (Section C8).
+Item-level reported community food prices at grain (t, v, j, u, obs) from
+the post-harvest COMMUNITY questionnaire's food-price module (Section C8);
+`obs` is the C8 reading slot (W3's 1st / 2nd location, 1 elsewhere; GH #637).
 CLUSTER-level (no household i); v = cluster_id(state, lga, ea) is the community EA id -- the COMPOSITE key
 (GH #323: the bare `ea` serial is unique only within an LGA), the SAME
 keyspace as sample().v, so prices join households via their cluster.
@@ -38,9 +39,9 @@ assert pieces, "community_prices: no wave-level parquets found"
 
 df = pd.concat(pieces, axis=0).sort_index()
 # A food item may be priced under more than one base unit in a cluster, but
-# (t, v, j, u) must be unique; the wave scripts already collapse same-cell
-# duplicates.  Guard against any cross-wave overlap (there is none -- each
-# wave owns a distinct PH quarter).
-assert df.index.is_unique, "community_prices: (t,v,j,u) not unique after concat"
+# (t, v, j, u, obs) must be unique; the wave builder guarantees it per wave.
+# Guard against any cross-wave overlap (there is none -- each wave owns a
+# distinct PH quarter).
+assert df.index.is_unique, "community_prices: (t,v,j,u,obs) not unique after concat"
 
 to_parquet(df, '../var/community_prices.parquet')

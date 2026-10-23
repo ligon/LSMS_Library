@@ -1,0 +1,28 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 24,
+  "moved_by_country": {
+   "Nigeria": 24
+  },
+  "nigeria_total": 24
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "moved_by_country": [],
+  "nigeria_total": null
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 240,
+  "moved_by_country": {
+   "Nigeria": 240
+  },
+  "nigeria_total": 240
+ },
+ "errors": {
+  "dev": 0,
+  "branch": 0
+ }
+}
