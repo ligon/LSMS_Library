@@ -671,12 +671,23 @@ unchanged.
 # Niger's harmonize_seed_crop.  The s16b roster has NO crop column — the
 # crop is encoded in the seed-type label ('Semences de petit mil') — so
 # this table resolves each EHCVM seed-type label to a crop Preferred Label.
-# The catch-all seed slots ('Semences d'autres céréales', 'Autres
-# semences', 'Plants/boutures de tubercules', '20') resolve to 'Autre
-# crop'.  Non-seed input labels are absent here (the wave script consults
-# this table only for rows whose input resolved to 'Seed').  SENEGAL DELTA:
-# 'Semences d'arachide' -> 'Arachide' (the dominant Senegal seed crop, not
-# present in the Niger data).
+# Non-seed input labels are absent here (the wave script consults this table
+# only for rows whose input resolved to 'Seed').  SENEGAL DELTA:
+# 'Semences d'arachide' -> 'Arachide' (code 21 in s16b_me_sen2018, the
+# dominant Senegal seed crop, not present in the Niger data).
+#
+# KEEP DISTINCT NATIVE SLOTS DISTINCT (GH #1123).  `crop` is an index level
+# of plot_inputs (t, i, input, crop, u) and every seed label maps to the one
+# input 'Seed', so two seed slots sharing a Preferred Label collide on one
+# key and core keeps one row.  The three catch-all slots present in 2018-19
+# (15 "Semences d'autres céréales" 27 rows, 19 'Plants/boutures de
+# tubercules' 98, 20 'Autres semences' 372) all mapped to 'Autre crop' until
+# GH #1123, and 15 lines were lost (pairs 19+20 and 15+20; 10 with
+# conflicting payloads, 5 with equal ones).  The first two now take the
+# Benin/Togo/Burkina labels 'Autre céréale' and 'Autre tubercule'.  The
+# bare '20' row is unused (code 20 is labelled in 2018-19) and unchanged.
+# The uniqueness guard before to_parquet in 2018-19/_/plot_inputs.py is the
+# enforcement; this comment is not.
 
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
@@ -690,8 +701,8 @@ unchanged.
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
-| Plants/boutures de tubercules | Autre crop          |
+| Semences d'autres céréales    | Autre céréale       |
+| Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
 

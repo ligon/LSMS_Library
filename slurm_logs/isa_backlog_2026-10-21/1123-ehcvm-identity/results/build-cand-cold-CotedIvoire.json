@@ -1,0 +1,45 @@
+{
+ "cold": true,
+ "columns": [
+  "Quantity",
+  "Purchased",
+  "Quantity_purchased"
+ ],
+ "country": "CotedIvoire",
+ "grain_collapse_warnings": 0,
+ "grain_reports": [],
+ "index_names": [
+  "i",
+  "t",
+  "v",
+  "input",
+  "crop",
+  "u"
+ ],
+ "index_unique": true,
+ "label": "cand-cold",
+ "nitrogen_input_match": {
+  "matched_rows": 2930,
+  "unmatched_rows": 8329
+ },
+ "nitrogen_kg": {
+  "by_wave": {
+   "2018-19": 1781030.1155
+  },
+  "rows": 1764,
+  "total": 1781030.1154999998
+ },
+ "report_keys": [],
+ "rows": 11259,
+ "rows_by_wave": {
+  "2018-19": 11259
+ },
+ "seconds": 7.1,
+ "seed_kg": {
+  "by_wave": {
+   "2018-19": 729912.7
+  },
+  "rows": 1122,
+  "total": 729912.7
+ }
+}

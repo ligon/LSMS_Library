@@ -890,3 +890,49 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* plot_inputs: distinct native input slots on the declared key (GH #1123, 2026-10-23)
+
+=plot_inputs= (=2018-19/_/plot_inputs.py=, self-contained) is declared
+=(t, i, input, crop, u)= over =Menage/s16b_me_CIV2018.dta=.  =i= is
+=grappe + menage= with menage zero-padded to three digits and no separator
+(4,889 households, injective); the native key (=grappe=, =menage=,
+=s16bq01=) is unique and non-null over all 11,259 applied lines.
+
+*The collapse, and the fix.*  The 2018-19 =s16bq01= value labels stop at 19
+= =Autres semences= (as in Niger 2018-19; no =Plants/boutures= label, no code
+20).  Code 15 ="Semences d'autres céréales"= (86 lines) and code 19 (404) both
+mapped to =Autre crop=, and 9 households reported both in =Kilogramme=: 8
+pairs with EQUAL payloads (silent -- no grain warning counts them) and 1
+conflicting.  Served 11,250 of 11,259.  Code 15 now maps to =Autre céréale=
+(the Benin/Togo/Burkina label); the unused =Plants/boutures= and bare ='20'=
+rows are unchanged, and the script asserts the declared index unique before
+=to_parquet=.  Served 11,259, =GrainCollapseWarning= 1 -> 0; the crop label
+changes on the 86 code-15 lines and nothing else moves.  =seed_kg= gains
+3,150 kg (9 x 350); =nitrogen_kg= has the same index and total, one
+household differing by 2.8e-14 (summation order after the relabel).
+
+*Prior art that did not land.*  =.coder/ledger/323-benin-togo.md= (July
+2026) names =fix/323-cotedivoire= and =tests/test_gh323_cotedivoire.py= as
+the governing prior art ("CIV already solved this").  Neither exists on
+=development=, and no remote branch of that name exists: the CotedIvoire
+fix never merged, which is why its 9 collisions survived until GH #1123.
+
+*Measured, NOT adjudicated: 350 is the modal input quantity.*  4,444 of the
+11,259 applied lines (39.5%) report =s16bq03a == 350=, 4,442 of them in
+=Kilogramme=, across every input code (e.g. urea 730 of 1,072, maize seed
+536 of 568, rice seed 538 of 570; 82 of 86 code-15 lines).  Senegal 2018-19
+has 0.5% and Niger 2018-19 0.01%.  350 carries no value label (the declared
+missing codes are 2147483622 =Non reponse= and 2147483635 =Ne sait pas=, on
+no applied line), and it occurs in both vagues and on purchased and
+unpurchased lines alike.  It looks like a placeholder rather than a reported
+quantity, and it drives every CotedIvoire =seed_kg= / =nitrogen_kg= total,
+but no document consulted says so.  Served as recorded; a separate issue.
+
+*Not changed.*  =Purchased= / =Quantity_purchased= read =s16bq05= /
+=s16bq07a=, the gift flag and gift quantity (the #1188 finding applies by
+inspection).
+
+*Cache.*  =_/categorical_mapping.org= is a build input of every CotedIvoire
+table: all 21 country hashes move (one CotedIvoire re-warm).  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/1123-ehcvm-identity/=.

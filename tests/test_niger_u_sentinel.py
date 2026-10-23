@@ -89,7 +89,10 @@ EXPECTED_ROWS = {
     # (and the gift subtraction moves more of them to zero); s07bq05 then adds
     # 15,253 new `s='inkind'` rows across the two EHCVM waves.  Net +851.
     "food_acquired": 239877,    # 239,882 before GH #833's sugar fold
-    "plot_inputs": 42426,       # 42,364 before the bundle
+    # 42,364 before the bundle; 42,426 before GH #1123, whose seed-crop split
+    # stops the catch-all collapse eating 6 (2018-19) + 3 (2021-22) native
+    # input lines.  None of the nine carries u == Unknown (counts below).
+    "plot_inputs": 42435,
     # 15,423 before GH #840, which stopped selecting one row per (t, v, j, u)
     # and added the variety / visit / obs levels: 2011-12 8,923 -> 32,369,
     # 2014-15 6,500 -> 13,808; then 46,177 -> 46,043 when the red team showed
