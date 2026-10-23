@@ -1,0 +1,45 @@
+## development (dev) -> round 2 (r2, bd51baf95) -> round 3 (r3)
+cluster_features shapes {'dev': (3235, 5), 'r2': (3235, 5), 'r3': (3235, 5)}
+
+== 2016-17: panel EAs 102
+   dev: clusters without GPS 101 of 880 | panel EAs serving the stayer fix 0 of 102 | EAs with >1 coordinate 7 | panel hh keeping a coordinate 0 of 2508
+   r2: clusters without GPS 0 of 880 | panel EAs serving the stayer fix 101 of 102 | EAs with >1 coordinate 7 | panel hh keeping a coordinate 1422 of 2508
+   r3: clusters without GPS 0 of 880 | panel EAs serving the stayer fix 102 of 102 | EAs with >1 coordinate 8 | panel hh keeping a coordinate 1861 of 2508
+   source: panel hh on their EA fix 1861 (stayers 1442, movers 418, unrecorded 1)
+   shared EA: served = stayer fix: dev False, r2 False, r3 True | Region/District/Rural same as dev: True
+   CS-only clusters identical dev vs r3: True
+   served attribute changes dev -> r3: {'Region': '0 EAs (0 hh)', 'District': '0 EAs (0 hh)', 'Rural': '5 EAs (107 hh)'}
+   served attribute changes r2 -> r3: {'Region': '0 EAs (0 hh)', 'District': '0 EAs (0 hh)', 'Rural': '0 EAs (0 hh)'}
+
+== 2019-20: panel EAs 102
+   dev: clusters without GPS 102 of 819 | panel EAs serving the stayer fix 0 of 102 | EAs with >1 coordinate 0 | panel hh keeping a coordinate 0 of 3178
+   r2: clusters without GPS 0 of 819 | panel EAs serving the stayer fix 102 of 102 | EAs with >1 coordinate 0 | panel hh keeping a coordinate 2136 of 3178
+   r3: clusters without GPS 0 of 819 | panel EAs serving the stayer fix 102 of 102 | EAs with >1 coordinate 0 | panel hh keeping a coordinate 2165 of 3178
+   source: panel hh on their EA fix 2165 (stayers 2136, movers 29, unrecorded 0)
+   CS-only clusters identical dev vs r3: True
+   served attribute changes dev -> r3: {'Region': '4 EAs (108 hh)', 'District': '10 EAs (329 hh)', 'Rural': '4 EAs (117 hh)'}
+   served attribute changes r2 -> r3: {'Region': '0 EAs (0 hh)', 'District': '0 EAs (0 hh)', 'Rural': '0 EAs (0 hh)'}
+sample.parquet dev vs r3 DataFrame.equals True
+housing.parquet dev vs r3 DataFrame.equals True
+other waves identical dev vs r3: {'2004-05': True, '2010-11': True, '2013-14': True}
+
+Site 2 (destroyed, conflicting groups): dev -> r2 -> r3
+  2013-14 (3540, 188) -> (3540, 188) -> (3540, 188)
+  2016-17 (1994, 85) -> (2585, 112) -> (2563, 111)
+  2019-20 (3146, 108) -> (3184, 110) -> (3184, 110)
+
+2013-14 (unchanged): non-stayer coordinate served in 24 of 204 EAs; 11 of the 102 EAs that continue into 2016-17
+stayer fix across rounds, 102 EAs: max |diff| deg 2016 vs 2019 1.86e-06, 2016 vs 2013 0.00e+00
+2016 stayer fix vs served 2010-11 coordinate, 102 EAs: max |diff| deg 1.86e-06
+
+## served attributes vs the true stayers' (dist<=1 km) modal value
+2016-17: served = true stayers' modal value, of 101 panel-only EAs -> dev {'Region': 101, 'District': 73, 'Rural': 94} | r1 {'Region': 101, 'District': 73, 'Rural': 95} | r2 {'Region': 101, 'District': 73, 'Rural': 99} | r3 {'Region': 101, 'District': 73, 'Rural': 99}
+2019-20: served = true stayers' modal value, of 102 panel-only EAs -> dev {'Region': 98, 'District': 85, 'Rural': 94} | r1 {'Region': 98, 'District': 85, 'Rural': 94} | r2 {'Region': 102, 'District': 95, 'Rural': 98} | r3 {'Region': 102, 'District': 95, 'Rural': 98}
+
+## Site 2 conflicting groups by EA (wave frames r1/r2/r3)
+2016-17 conflicting groups r1 111 r2 112 r3 111 | in r2 not r3 1 | in r3 not r2 0 | in r3 not r1 0 | in r1 not r3 0
+   EA conflicting only in r2: households 23 | r1 distinct rows 1
+2019-20 conflicting groups r1 110 r2 110 r3 110 | in r2 not r3 0 | in r3 not r2 0 | in r3 not r1 0 | in r1 not r3 0
+
+## fail-closed, end to end (2019-20 dist_to_IHS3location misspelled in a copied config tree, LSMS_COUNTRIES_ROOT)
+Country('Malawi').cluster_features() -> RuntimeError: Malawi cluster_features: 3178 of 3178 panel households have NO baseline status

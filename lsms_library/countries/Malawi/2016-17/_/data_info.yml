@@ -54,6 +54,15 @@ cluster_features:
             - Cross_Sectional/hh_mod_a_filt.dta
             - Panel/hh_mod_a_filt_16.dta:
                 i: y3_hhid
+                # GH #1260: is the panel household still at its baseline
+                # (IHS3) EA?  'stayer' / 'moved' / 'unrecorded' from
+                # dist_to_IHS3location, read by the `cluster_features` hook
+                # in this wave's mapping.py and dropped there.  A panel-file
+                # override only, so cross-sectional rows carry NaN; a panel
+                # row with a NaN status makes the hook raise.
+                _ihps_baseline_status:
+                    - dist_to_IHS3location
+                    - mapping: ihps_baseline_status
         idxvars:
             i:
                 - case_id
@@ -85,10 +94,33 @@ cluster_features:
             # sign-flipping the indicator between waves.  GH #602.
             Rural: reside
     df_geo:
-        # 2016-17 IHS4 publishes lat/lon per HOUSEHOLD (cross-sectional file
-        # is keyed on case_id, not ea_id).  Panel HHs (~2.5k) lack a geo
-        # file in this wave and end up with NaN lat/lon -- acceptable.
-        file: Cross_Sectional/householdgeovariablesihs4.dta
+        # 2016-17 publishes lat/lon per HOUSEHOLD in BOTH halves, one file
+        # per catalog entry, stacked here exactly as df_main stacks the two
+        # cover pages:
+        #   * Cross_Sectional: IHS4 (catalog 2936), keyed on case_id.
+        #   * Panel: IHPS 2016 (catalog 2939), HouseholdGeovariablesIHPSY3,
+        #     keyed on y3_hhid -- 2,508 rows, 1:1 with Panel/hh_mod_a_filt_16
+        #     (every key on both sides).  Same variable names
+        #     (lat_modified / lon_modified), so only `i` is overridden.
+        # GH #1260: until that file was acquired the 101 panel-only EAs
+        # served no coordinates; this block used to call that "acceptable"
+        # on the belief that no panel geo file was published.  It was
+        # published -- we just did not hold it.
+        #
+        # IHPS coordinates are each household's CURRENT location and IHPS
+        # tracks movers.  The households still at their baseline EA share
+        # one coordinate per EA, the EA's fix; the `cluster_features` hook in
+        # this wave's mapping.py keeps panel coordinates equal to that fix
+        # and blanks the rest -- see GH #1260.
+        #
+        # Two files make get_data pass missing_ok=True, so a mis-spelled
+        # column in either file becomes NaN instead of a KeyError.  The
+        # guard is tests/test_gh1260_malawi_panel_geo.py, which asserts
+        # every panel EA carries coordinates.
+        file:
+            - Cross_Sectional/householdgeovariablesihs4.dta
+            - Panel/HouseholdGeovariablesIHPSY3.dta:
+                i: y3_hhid
         idxvars:
             # `i` MUST be built exactly as df_main builds it.  df_main runs
             # case_id through cs_i ('cs-17-' + format_id) to keep the

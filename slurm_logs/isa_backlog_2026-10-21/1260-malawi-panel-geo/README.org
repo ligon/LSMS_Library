@@ -1,0 +1,147 @@
+#+TITLE: GH #1260 -- Malawi IHPS panel household geovariables
+#+DATE: 2026-10-23
+
+Counts only.  No coordinates and no household or EA ids are recorded here;
+the scripts in =scripts/= print counts only, and every working file
+(zips, extracted =.dta=, build outputs) stayed under the private
+=/local/job40390255/data-private/1260/=.
+
+* Acquisition
+| wave    | entry | zip (WB Stata resource)                 | member                            | md5                              | size    |
+|---------+-------+-----------------------------------------+-----------------------------------+----------------------------------+---------|
+| 2016-17 |  2939 | =MWI_2010-2013-2016_IHPS_v03_M_Stata.zip= | =HouseholdGeovariablesIHPSY3.dta= | =cd3970675b30de62f619b23a8f99b876= | 228,796 |
+| 2019-20 |  3819 | =MWI_2010-2019_IHPS_v06_M_Stata.zip=      | =householdgeovariables_y4.dta=    | =13ffd98972e697a2fbb0ab62463b0ba3= | 359,546 |
+
+- URL from =data_access._find_stata_zip_url= (NADA resources API, the
+  library's WB key); one zip per directory; only the one member extracted,
+  into an empty directory, with a path-safety check; readers run =python -I=.
+- File names are the WB member basenames verbatim (2939's household file has
+  no =_16= suffix at the WB, unlike its plot file), so a future
+  =_extract_all_from_zip= re-acquisition matches the sidecar by basename.
+- 3819's zip re-ships =HouseholdGeovariablesIHPSY3.dta= byte-identical
+  (same md5); the 2016 file was nonetheless taken from 2939, the entry
+  2016-17 holds.
+
+* Verification (=outputs/source_verification.txt=)
+| wave    | rows  | key       | unique | keys in held cover | cover keys in geo | coords non-null | EAs |
+|---------+-------+-----------+--------+--------------------+-------------------+-----------------+-----|
+| 2016-17 | 2,508 | =y3_hhid= | yes    | 2,508 / 2,508      | 2,508 / 2,508     | 2,503           | 102 |
+| 2019-20 | 3,178 | =y4_hhid= | yes    | 3,178 / 3,178      | 3,178 / 3,178     | 3,175           | 102 |
+
+Coordinates are =lat_modified= / =lon_modified= (2016) and =lat_mod= /
+=lon_mod= (2019, float32), confirmed from the files.
+
+* Release identity (=outputs/release_identity.txt=)
+- 2019-20: all 97 held =Data/Panel/= sidecars byte-identical to the 3819 zip.
+- 2016-17: 93 of 98 identical; 5 differ (=ag_mod_e3_16=, =ag_mod_j_16=,
+  =hh_mod_a_filt_16=, =hh_mod_e_16=, =hh_mod_g1_16=).  In the cover only
+  =case_id= differs (all 2,508 rows, both 12-character strings); =y3_hhid=
+  is identical, so the join is unaffected.  Not re-acquired (out of scope).
+
+* Publication
+- =push_to_cache_batch([...], dvc_add=True)= from the worktree, writer creds
+  through a gitignored symlink to the legacy =.dvc/s3_write_creds=.
+  =permissions()= reported =ligonresearch_s3: write= first.
+- Result: exactly two new staged sidecars (=hash: md5=, md5 equal to the
+  file), no =.gitignore= change (=*.dta= is ignored at the root), no
+  existing sidecar changed, =.dvc/config.local= restored (absent).
+- S3 check (=scripts/s3_fetch_test.py=): in-tree files moved out, a fresh
+  =LSMS_DATA_DIR= with an EMPTY =dvc-cache/=; =get_dataframe('../Data/Panel/...')=
+  returned (2,508 x 39) and (3,178 x 45), and each blob appeared in the fresh
+  L1 at =dvc-cache/{md5[:2]}/{md5[2:]}= with the sidecar's md5 -- it came
+  from the S3 GET in =_ensure_dvc_pulled=, not the DVC repo cache.
+
+* Wiring and cold builds (=outputs/build_compare.txt=)
+Development =9a0ed5f3c= (a detached worktree) vs this branch, each in its own
+fresh =LSMS_DATA_DIR=.
+
+| wave    | clusters without GPS | contested Lat/Lon EAs | Site 2 destroyed / conflicting |
+|---------+----------------------+-----------------------+--------------------------------|
+| 2016-17 | 101 -> 0             | 7 -> 108              | 1,994 / 85 -> 2,563 / 111      |
+| 2019-20 | 102 -> 0             | 0 -> 102              | 3,146 / 108 -> 3,184 / 110     |
+
+- Wave frames unchanged in size (14,955 / 14,612): the merge stays 1:1.
+- Cross-sectional-only clusters identical (778 / 717); 2004-05, 2010-11,
+  2013-14 identical; =sample()= and =housing()= =DataFrame.equals= True.
+- Served-value changes outside the newly filled coordinates: EA 30305580
+  (in both halves of 2016-17) now serves a panel household's coordinate
+  instead of IHS4's EA fix; one 2016-17 panel EA's =Rural= went Urban ->
+  Rural (its first household has a null coordinate, so the selection moved).
+- 2019-20 stayers (=d_ihs3= <= 1 km): 2,136 households, every one of 102 EAs
+  has exactly one coordinate -- the within-EA spread is tracked movers.
+- Pre-existing, unchanged: 9 IHS5 cross-sectional clusters serve coordinates
+  outside Malawi's bounding box.
+
+* Round 2: only the stayers' coordinates (=outputs/round2_*.txt=)
+Dispatcher judgement (2026-10-23): a panel cluster must not serve a tracked
+mover's current location.
+
+- Indicator: the panel cover's =dist_to_IHS3location= (both waves; 2019-20's
+  geo =d_ihs3= is identical on all 3,175 households with both).  Households
+  within 1 km share exactly ONE coordinate per EA: 1,442 / 2,136 households,
+  all 102 / 102 EAs covered, 0 EAs split.  2016-17's =mover= flag is not a
+  stayer flag (453 of the 1,443 within 1 km have =mover= = 1).
+- Wiring: a panel-cover override =_ihps_baseline_status= (='stayer'= /
+  ='moved'= / ='unrecorded'=) and a =cluster_features= hook in each wave's
+  =mapping.py= that blanks every non-stayer panel coordinate, and the panel
+  coordinates in an EA the cross-section also covers.  A first version used
+  =+inf= for "unrecorded"; =grab_data='s >1e99 rule rewrote it to NaN and 10
+  stayers lost their coordinate -- caught by =scripts/stayer_gap.py=, fixed
+  by making the status a string.  The hook now keeps exactly the expected
+  stayers (1,422 = 1,442 less 20 in the shared EA; 2,136).
+
+| wave    | clusters without GPS | panel EAs serving the stayer fix | EAs with >1 coordinate | Site 2 destroyed / conflicting |
+|---------+----------------------+----------------------------------+------------------------+--------------------------------|
+| 2016-17 | 101 -> 0 -> 0        | 0 -> 88 -> 101 (of 101)          | 7 -> 108 -> 7          | 1,994/85 -> 2,563/111 -> 2,585/112 |
+| 2019-20 | 102 -> 0 -> 0        | 0 -> 86 -> 102 (of 102)          | 0 -> 102 -> 0          | 3,146/108 -> 3,184/110 -> 3,184/110 |
+
+(development -> round 1 -> round 2.)  Site 2 does not fall because the
+audit counts a blanked coordinate as a value that disagrees with the kept
+stayer row.  EA 30305580: IHS4 fix and IHPS stayer fix are 4.1 km apart; the
+cluster keeps the IHS4 fix, identical to development.  Served =Rural= /
+=Region= / =District= moved in 5 (2016-17) and 4 / 10 / 4 (2019-20) panel
+EAs, every one toward the EA's stayers' modal value.  The round-1 =Rural=
+flip (Urban -> Rural) stands: all 13 stayers in that EA are Rural.
+Cross-sectional clusters, the other waves, =sample()= and =housing()= are
+identical to development.  2013-14 (unchanged, no hook) serves a non-stayer
+coordinate in 24 of 204 clusters.
+
+* Round 3: one coordinate per EA, fail closed (=outputs/round3_compare.txt=)
+After an independent review of =bd51baf95= (its evidence stays in the
+private =review-1260/= directory):
+
+- *Shared EA 30305580 serves the IHPS stayer fix.*  The stayers' fix is the
+  same coordinate in 2013-14, 2016-17 and 2019-20 (max difference 1.9e-6
+  degrees over 102 EAs) and equals the served 2010-11 coordinate; keeping
+  IHS4's made this the only EA whose coordinate jumps (4.1 km) in 2016-17.
+- *Blank by coordinate.*  Per panel EA the stayers' single coordinate is the
+  fix; any panel coordinate equal to it is kept (418 movers + 1 unrecorded
+  in 2016-17, 29 movers in 2019-20 sit on it).  Panel households keeping a
+  coordinate: 1,861 / 2,165.
+- *Stayers first*, so the collapse (ties broken by order) takes a stayer's
+  Region/District/Rural; without it one 2016-17 EA served =Rural= from a
+  mover on the fix.  Served attributes are identical to round 2.
+- *Fail closed.*  A panel id (=NNNN-NNN=) with a null status, a status on a
+  non-panel id, or stayers that disagree raise =RuntimeError=.  End to end
+  with 2019-20's distance variable misspelled: the build raises.
+
+| wave    | clusters without GPS | panel EAs serving the stayer fix | EAs with >1 coordinate | Site 2 destroyed / conflicting |
+|---------+----------------------+----------------------------------+------------------------+--------------------------------|
+| 2016-17 | 101 -> 0 -> 0        | 0 -> 101 -> 102 (of 102)         | 7 -> 7 -> 8            | 1,994/85 -> 2,585/112 -> 2,563/111 |
+| 2019-20 | 102 -> 0 -> 0        | 0 -> 102 -> 102 (of 102)         | 0 -> 0 -> 0            | 3,146/108 -> 3,184/110 -> 3,184/110 |
+
+(development -> round 2 -> round 3.)  The 8th multi-coordinate EA in
+2016-17 is EA 30305580 (IHS4 fix + IHPS fix).  Site 2 groups equal round
+1's exactly; round 2's extra group was an EA whose 23 households agreed
+before the hook.  Downstream attribute moves (development -> round 3, all
+toward the stayers' mode): 2016-17 =Rural= 5 EAs (107 households); 2019-20
+=Region= 4 (108), =District= 10 (329), =Rural= 4 (117).  2013-14 (no hook)
+serves a non-stayer coordinate in 11 of the 102 continuing panel EAs.
+
+SOURCE.org: the #1260 text moved from a second =#+PROVENANCE_NOTE:= into a
+=* Notes= section, so =prov.note= returns the #600 note again; parse ->
+render is identical.
+
+* Hash census (=outputs/hash_census.txt=)
+=Country._table_cache_hash= 26/549 moved, all Malawi; =build_transforms_fingerprint=
+0/40; =Wave._input_hash= 52/2,109, all Malawi 2016-17 and 2019-20.

@@ -1,0 +1,8 @@
+## release identity (held Data/Panel sidecars vs each zip)
+held sidecars 99: identical 94, differ 5, absent from zip 0
+   ag_mod_e3_16.dta held size 138285 zip size 55123
+   ag_mod_j_16.dta held size 61741 zip size 38964
+   hh_mod_a_filt_16.dta held size 424047 zip size 424062
+   hh_mod_e_16.dta held size 13812879 zip size 13727433
+   hh_mod_g1_16.dta held size 132653511 zip size 126970415
+held sidecars 98: identical 98, differ 0, absent from zip 0
