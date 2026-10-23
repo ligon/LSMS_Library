@@ -24,3 +24,11 @@ pytest, branch's test file: base 61 failed / 113 passed (every failure a new
 #1135 test); branch 174 passed.  The scripts are in the burst job dir
 (=warnings_probe.py=, =run.sh=); no household id, coordinate or row is
 recorded here.
+
+* Final head
+
+Re-run at =9986454d3= (job 40420585: the formatter guard commit =1bc2144ec=
+plus docs): census against the same base, again 0 of 549 / 0 of 40 / 0 of
+2,109; served frames and warning texts byte-identical to the =0b471ce87=
+run; =tests/test_sampling.py= 174 passed.
+tests/test_uganda_comm_frame_ea.py (pins the ABSENCE of the warning on Uganda 2010-11/2011-12) at 9986454d3: 30 passed (job 40420956).
