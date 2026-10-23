@@ -41,6 +41,10 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
     - =feature.py:304= (Tanzania 2,395 -> 19);
     - the =data_info.yml= Mali "42 of 42 / 42 of 47" sentence.
     The =malawi.py= docstring is hashed, so bundle it with #1260's Malawi re-run.
+4d. Burst round 1 (=d353b7ea7=): 38/38 shards COMPLETED.  Full suite: 10,428 passed, 2 failed:
+    - =test_shipped_quintal...= is pre-existing (fails on development too);
+    - =test_panama_kgprice_loses_its_currency_rows= is the unitvalue pin, +390 rows, which are the 1997 blank-unit rows now kept as =Unknown= (verified: none shares a key with a genuine =unit= row).  Pin moved on #1251 (=51b073e58=).
+4e. Integration now =7912ea596=: + the #1251 pin, + #1279 (#1260 Malawi panel GPS, red-teamed, 3 rounds), + the docs-tidy branch =docs/batch-tidy-20261023= (=4a5448d89=, Malawi-only hash).  Round 2: Malawi shard =40410294= + full suite =40410295=.
 5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
 
 ** Merge plan: ONE corpus re-warm
