@@ -1,6 +1,42 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-23T00:19:00.119942+00:00
+* Current task -- 2026-10-23T00:34:35.859317+00:00
+
+The user-authorized PR consistency/merge task is COMPLETE: all32 implementation PRs plus tracker1170 are merged into development.
+Latest development60aa81e9eda3b747e25a37c9e7354315b842b408, tree2d1087d6bf8fad64327de4f98ba12bcbc0d1968e; fresh complete openPR collection EMPTY.
+Root independently verified trackerhead7195, bothserverparents/tree/exactbody, CI39877259001unit/windowsSUCCESS+6SKIP and1118documentarypaths/zero product-test-dependencydelta (f45783actual0).
+Final source before tracker exactly equals reviewed26a tree across15113entries, with all32acceptedheads ancestors; independently verified every32CIhead and22completedissueclosures.
+Final summary merge-task-completed.json SHA9ae727fdda3356a7efb99ddf4e1cfa9ac30fae527055b0e39a43898c86597226; merger FINAL-WAVE-HANDOFF.json SHAddcdb40a7baa8c23bd935469d01ada964b28c85073506ab98113632f6d0541ce.
+Trackerbody refreshed/readbackexact after merge; original checkpoints retained verbatim as historical.
+Original1217wrongtreeargument and tracker405draft refusal remain recorded; no completedmerge/test replay.
+Currentqueue90remainingISA scope records (twoactive,fourotherpartialresiduals,84unassigned); two global218/1121issues have completedISA portions trackedseparately.22issuesclosedcompleted.
+Goal remains ACTIVE, not complete: the merge batch is not the whole country backlog.
+Main localcheckout stays cleanf8; GitHubdevelopment is60aa. Do not reset main or edit shared mirror working tree.
+Current public continuation before this final checkpoint was5da12cab5, published/pushed normally; new checkpoint must also commit/publish/push.
+
+Next root action: accept the SAVED5f predata results and release only57regressions+semanticgate, then supporting after actual57PASS.
+#1218 authorfirst5newsource stages allcompleted0; handoff P/CALENDAR5F-PREDATA-HANDOFF-v1-private.json SHA1165eb8d6bc58b3288ed35e7bdd71ad7281b77f1e72c981df9af30e08f17ab12.
+Map e2bddcd3ff5af13dac921434c45548285fe51e110de80efd3e35e3db4c415f7d;549/39/1362actualmoves versusSAVEDf7;1459fullyattributedsuffixrows and0datafiles/oneemptyDVCdir; orderedAPI+11694config/56otherlibrarysource entries exact.
+Root releasefirst5 C/FRAMEWORK1218-CALENDAR5F-PREDATA-ONLY-RELEASE.json SHA7b28a995226ed0258aa1bace1e2f413af697c0376294c9bcdac5692a6443ae1a.
+Exact78fileplan41a238/bindings9f91/READY43687 remainfrozen; original5fhead/source unchanged.
+RootALREADYread remaining57gate diff24535e and entire new104supporting/final-source gates80dda5; no new source blocker found yet. Review supportcatalog/testselections and actual saved first5 outputs before issuing nextexactrelease.
+No base/parent/calibration/metadata replay; unchanged57cells may rerun on genuinely revised5f. Supporting104deselects those57; bothcounts staypredictionsuntilactual. Six genuineproviders/24copies/fourroots stillHELD.
+
+Mali1118: rootacceptedcensus0/0/0moves and released finite synthetic sixstages in C/MALI1118-ROOT-SYNTHETIC-V2-RELEASE.json SHA99e5bdbb3f3768d95e4fab0656d18304daa4fb469133be925ba24207aa447001.
+Originalparent25 actually11FAIL14PASS/0errors/0skips; savedgate-parent-new exits1 at controllerpostcollection assumption, with alloutcomes/prefix/SDK preserved.
+Installedxdist dsession.py:103 skips controller collection; controller has precollection/sessionfinish, workers all3phases with identical25nodeids/testSHA. No test replay to manufacture missing metadata.
+Stopreport C/mali1118-synthetic-v2-tool-records/STOP-REPORT-private.json SHAf1f8a1dc7f970477aad3162d7137ce69b276d933cf33c5811dcf35b7fb3bab76.
+review_malawi_1209 authorized SOURCE-ONLY additive metadata correction (newgate,plan/launcher/guard/predecessor/suffix associations). Rootmustreview exactpinsbefore anynewruntime.
+The correction is now FROZEN/unexecuted: D/XDIST-GATE-v3-FINAL-PINS.json SHAa7d5b0857cfe0b5a94fd598a24ec9973fa3332091f0cc6379a748012c27201bf; plan8325fbfa6b64ebabfe0ab7be0c33fcb6dd0a7dd725e7085b7c1e6eecc2a08106. Eight newfiles,61 priorreceipts unchanged. New gate-parent-new-v3 and four never-run supporting/comparator stages awaitrootreview.
+Candidate18support/comparator/provider/copy/decode/source-first/production/genuine steps remainunstarted/held. Ledger24278/sourcef8unchanged.
+
+Merger malawi_1209 is idle after completedmerge task. It can be reused for prepared Uganda1133SOURCE-ONLYphase0 or independentreview after current gates; use fresh60aadevelopment rather thanf8 and require completeCONTENTSfirst.
+Archive32 does not cover later independent1215/live1218/Mali/rootmergeproofs; preserve original artifacts and plan a finite new durability checkpoint, no actor replay for packaging.
+No infrastructure repair needed; poll deadline naturally. Activecountrygoal work remains, so do not release allocation merely because merge task ended.
+
+Sue
+
+* Earlier task -- 2026-10-23T00:19:00.119942+00:00
 
 The user authorized an agent to check consistency and merge outstanding PRs into development.
 ALL 32 IMPLEMENTATION PRS ARE MERGED; goal remains ACTIVE, with country backlog still remaining.

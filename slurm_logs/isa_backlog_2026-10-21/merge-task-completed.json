@@ -1,0 +1,53 @@
+{
+  "status": "MERGE_TASK_COMPLETE_ALL33_PRS_IN_DEVELOPMENT_NO_OPEN_PRS",
+  "captured_at_UTC": "2026-10-23T00:32:35.854019+00:00",
+  "implementation_PRs_merged": 32,
+  "tracker_PR": 1170,
+  "tracker_head": "7195fe5669cf1dd88b6bbe37b3713010c40f41c1",
+  "tracker_merge": "60aa81e9eda3b747e25a37c9e7354315b842b408",
+  "tracker_server_parents": [
+    "a3aad0d43cac1866bab5a91cd59716bb659e9e28",
+    "7195fe5669cf1dd88b6bbe37b3713010c40f41c1"
+  ],
+  "final_tree": "2d1087d6bf8fad64327de4f98ba12bcbc0d1968e",
+  "open_PR_collection": [],
+  "root_independent_CI_run": 39877259001,
+  "CI_head_verified_by_original_raw_run_readback": "7195fe5669cf1dd88b6bbe37b3713010c40f41c1",
+  "successful_jobs": [
+    "unit-tests",
+    "windows-smoke"
+  ],
+  "skipped_jobs": [
+    "data-tests",
+    "docs",
+    "dvc-lock-check",
+    "dvc-remote-reachability",
+    "refresh-dvc-locks",
+    "windows-script-build"
+  ],
+  "tracker_delta_documentary_paths": 1118,
+  "tracker_delta_path_roots": {
+    ".coder": 4,
+    ".sucoder": 1,
+    "lsms_library": 1,
+    "slurm_logs": 1112
+  },
+  "product_test_dependency_delta": 0,
+  "root_accepted_documentary_blob_compositions_exact": true,
+  "completed_issues": 22,
+  "remaining_ISA_scope_records": 90,
+  "global_issues_with_completed_ISA_country_portions": [
+    218,
+    1121
+  ],
+  "goal_status": "active",
+  "original_stops_preserved": [
+    "PR1217 wrong local expected-tree argument after actual successful merge; original predictor/server content match.",
+    "Tracker initial405 draft refusal before merge; marked ready, exact head/base re-read and draft-gated merge completed."
+  ],
+  "qualifications": "Unit/Windows passed; data jobs skipped.1691 distinct integration passes/102normal skips are retained original/failure-only outcomes, not one full-suite/data/corpus/new-dependency/release verdict. Historical binary entries compare Git identity only.",
+  "merger_handoff_SHA256": "ddcdb40a7baa8c23bd935469d01ada964b28c85073506ab98113632f6d0541ce",
+  "root_server_tree_tool": "cc47ca actual0",
+  "root_tracker_CI_head_tool": "4f3731 actual0",
+  "signed": "Sue (GPT-6)"
+}

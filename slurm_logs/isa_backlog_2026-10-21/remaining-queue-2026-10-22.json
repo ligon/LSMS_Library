@@ -1112,7 +1112,7 @@
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Extend community-specific unit canonicalization with recorded labels and reuse _canon_units reporting. Preserve separate intentional unknown-size drop; compare recovered rows/prices per PH quarter and retain remaining unplaced-label warnings.",
-      "scope_recheck_required_before_dispatch": false,
+      "scope_recheck_required_before_dispatch": true,
       "historical_residual_at_prior_checkpoint": "Ten held unit labels recovered by PR. Future unresolved-label retention/collision representation remains a design residual."
     },
     {
@@ -1180,7 +1180,7 @@
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Read each wave ModuleD Q39 applied-unit list; only then decode applied codebook and read missing slot2 unit; fill remaining missing with U_UNKNOWN.",
-      "scope_recheck_required_before_dispatch": false,
+      "scope_recheck_required_before_dispatch": true,
       "historical_residual_at_prior_checkpoint": "2010/2019 enumerator-kg repair reviewed. Literal questionnaire/source authority for 2013/2016 remains."
     },
     {
@@ -1218,10 +1218,10 @@
         1185
       ],
       "residual": "Ethiopia/Tanzania repairs landed. Mali, Malawi and Nigeria remain; non-ISA countries are separate.",
-      "current_active_scope": "Mali ledger-only24278 versus truef8: two complete source epochs and both guard calibrations pass, with62 denial rows fully accounted. Full initial fingerprint checks are the next released tranche. Provider bytes, source-first classification, production fill and genuine validation remain pending. Malawi must be reconciled after landed1175/1193; Nigeria source-row eligibility remains separate.",
+      "current_active_scope": "Mali source and guard checks passed. Complete country, framework and wave fingerprint maps match the true parent. The 25 synthetic parent controls give 11 failures and 14 passes, with no errors or skips. The saved metadata gate stopped because it required a controller postcollection hook emitted only by xdist workers. An additive correction is frozen for root review; the tests will not be replayed. Provider checks, source-first diagnosis, production changes and genuine validation remain pending. Malawi and Nigeria also remain in this umbrella.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Fill every missing unit with existing U_UNKNOWN at build, including native Malawi u index; retain use/cost records with no quantity. Nigeria dropping non-input rows is optional separate decision, not needed to fill.",
-      "scope_recheck_required_before_dispatch": false,
+      "scope_recheck_required_before_dispatch": true,
       "current_dispatch_assessment": "Mali and Malawi remaining null-unit normalization are stronger next mechanical candidates under settled1041. Stack Malawi after1175/1193; preserve source eligibility, unchanged known units and postcollapse grain. Nigeria fill-vs-drop remains a separate source-eligibility decision.",
       "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00",
       "historical_residual_at_prior_checkpoint": "Ethiopia/Tanzania PRs reviewed. Malawi/Mali/Nigeria unit normalization remains; other countries outside ISA are separate.",
@@ -1254,7 +1254,7 @@
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Repair BF seed maize/cowpea target spellings against crop_production; separately decide shared noncrop marker and NaN replacement. Do not collapse real crop detail.",
-      "scope_recheck_required_before_dispatch": false,
+      "scope_recheck_required_before_dispatch": true,
       "historical_residual_at_prior_checkpoint": "Burkina maize/cowpea label repair reviewed. Shared not-crop-specific marker design remains; non-ISA countries separate."
     },
     {
@@ -1293,7 +1293,7 @@
       "current_active_scope": null,
       "initial_triage_tier": "B",
       "initial_triage_approach": "Measure raw input-slot/crop/unit identities, make seed mapping injective or retain required slot grain; avoid mechanical reducer changes.",
-      "scope_recheck_required_before_dispatch": false,
+      "scope_recheck_required_before_dispatch": true,
       "historical_residual_at_prior_checkpoint": "Burkina identity PR reviewed. Niger identity-collapse diagnosis remains; Senegal/CotedIvoire outside ISA."
     },
     {
@@ -1600,7 +1600,7 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "New source5fdbb937d has a six-line empty-calendar-only amendment and independent source review without blockers. New-revision runtime plan is in preparation; no5f runtime success claimed. Earlier2f metadata25PASS/full549-39-1362 hash movement and45PASS-12calendarFAIL are retained with their actual source identities. Supporting and genuine validation remain pending.",
+      "current_active_scope": "Amended source 5fdbb937d passed independent source review. The author reports that all five new predata stages passed: complete 549/39/1362 maps changed against saved f7, ordered APIs and source policy match, all 1,459 guard events are attributed, and no data files were written. Root saved-result acceptance is next. The 57 regressions, supporting tests and genuine validation remain pending. The earlier candidate's 45 passes and twelve calendar failures retain their actual source identity and original evidence gaps.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Honor explicit optional types on constructed-empty results using existing dtype machinery, preserving populated outputs. Four root-authenticated BF author cases; independent static account accepted; independent genuine runtime validation still required.",
       "scope_recheck_required_before_dispatch": true
@@ -2032,7 +2032,7 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-23T00:16:15.307282+00:00",
+  "active_progress_updated_at_UTC": "2026-10-23T00:34:35.859317+00:00",
   "resolved_in_development_issues": [
     {
       "number": 822,
@@ -2593,7 +2593,14 @@
     "latest_scoped_merge": "a3aad0d43cac1866bab5a91cd59716bb659e9e28",
     "implementation_PRs_merged": 32,
     "implementation_PRs_open": 0,
-    "tracker1170": "Final documentation repair/body refresh and merge are separate from the32 implementation count.",
+    "tracker1170": {
+      "state": "merged",
+      "head": "7195fe5669cf1dd88b6bbe37b3713010c40f41c1",
+      "merge": "60aa81e9eda3b747e25a37c9e7354315b842b408",
+      "CI": 39877259001,
+      "root_verified_open_PRs": 0,
+      "documentary_paths_only": 1118
+    },
     "scoped_distinct_PASS": 1691,
     "normal_SKIP": 102,
     "original_failures_and_orchestration_stops_retained": true,
@@ -2613,12 +2620,13 @@
       "implementation_prs": [
         1208
       ],
-      "residual": "Malawi registration repair reviewed. Remaining named Makefile cleanup is outside ISA.",
+      "residual": "Malawi registrations are landed. Remaining named Makefiles are outside ISA; shared legacy code/docs/gitignore cleanup remains on the global issue.",
       "current_active_scope": null,
       "initial_triage_tier": "A",
       "initial_triage_approach": "Remove Malawi food_expenditures/food_prices registrations with next Malawi rewarm; optional no-derived-registration guard. OthercountriesMake cleanup outsideISA.",
       "scope_recheck_required_before_dispatch": false,
-      "scope_boundary": "Malawi registrations are landed. Remaining named Makefiles are outside ISA; shared legacy code/docs/gitignore cleanup remains on the global issue."
+      "scope_boundary": "Malawi registrations are landed. Remaining named Makefiles are outside ISA; shared legacy code/docs/gitignore cleanup remains on the global issue.",
+      "historical_residual_at_prior_checkpoint": "Malawi registration repair reviewed. Remaining named Makefile cleanup is outside ISA."
     },
     {
       "number": 1121,
@@ -2632,12 +2640,13 @@
       "implementation_prs": [
         1186
       ],
-      "residual": "Mali casing PR reviewed. Shared labor-source taxonomy remains a design residual, largely non-ISA examples.",
+      "residual": "Mali casing is landed. Remaining literal labor-source taxonomy decision concerns GhanaSPS/GhanaLSS; no remaining ISA country repair is named.",
       "current_active_scope": null,
       "initial_triage_tier": "A",
       "initial_triage_approach": "Change only Mali harmonize_labor_source Preferred Label cells to family/hired/other and matching comments; preserve richer source vocabularies elsewhere.",
       "scope_recheck_required_before_dispatch": false,
-      "scope_boundary": "Mali casing is landed. Remaining literal labor-source taxonomy decision concerns GhanaSPS/GhanaLSS; no remaining ISA country repair is named."
+      "scope_boundary": "Mali casing is landed. Remaining literal labor-source taxonomy decision concerns GhanaSPS/GhanaLSS; no remaining ISA country repair is named.",
+      "historical_residual_at_prior_checkpoint": "Mali casing PR reviewed. Shared labor-source taxonomy remains a design residual, largely non-ISA examples."
     }
   ],
   "isa_linked_open_issue_records_including_completed_country_portions": 92,
@@ -2647,5 +2656,6 @@
     "post32-all-prs.json": "03cfa6e8a9a748322321da632b8d4d890cb0b10f246e5fdbaea7d86277c6c349",
     "post32-all-issues.json": "678eede942bbdc2fc436cf8441dbcb7db157c61747b658933e96bba4d15f0d72",
     "post32-development.json": "2e8faf00366e5ae048303448911516dc9dc25cbe0bf472695f0f136cde6e39a7"
-  }
+  },
+  "latest_verified_development_tip": "60aa81e9eda3b747e25a37c9e7354315b842b408"
 }
