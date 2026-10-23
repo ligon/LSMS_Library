@@ -568,6 +568,151 @@ def panel_attrition(df,return_ids=False,waves=None):
 
 
 # ---------------------------------------------------------------------
+# sample (GH #1120 D1) — households recorded only in the AGRICULTURE cover
+# ---------------------------------------------------------------------
+#
+# Ruling (@ligon, 2026-10-23): sample() takes the households the survey
+# recorded in another cover from that cover, with that cover's weight.  For
+# Ethiopia that is the post-planting agriculture cover sect_cover_pp_w{N}:
+# 25 / 27 / 124 / 40 households in W2-W5 (none in W1) carry an EA and a
+# positive weight there but are in neither the household cover nor the
+# roster.  ESS4's are mostly the security exclusion the catalog records
+# ("The household module was not implemented in 30 EAs due to security
+# reasons"); W2/W3's are 2011-12 sample households.  Wherever a household IS
+# in both covers, the agriculture cover's weight equals the household
+# cover's exactly and its EA agrees (every household, every wave), so the
+# weight served is the household weight variable itself, read from the
+# other cover -- not a construction.  See CONTENTS.org "sample(): the
+# agriculture cover's households (GH #1120 D1)".
+
+def ea_id2_crosswalk(*covers):
+    """``{ea_id: ea_id2}`` from the ``(ea_id, ea_id2)`` pairs ``covers`` carry.
+
+    ESS2 re-identified every W1 EA (``ea_id``, 11 characters) as ``ea_id2``
+    (15 characters; a complete bijection, CONTENTS.org "Cluster (PSU)
+    identifier"), and the W2 and W3 household covers carry both columns.  The
+    W3 AGRICULTURE cover carries ``ea_id`` only, so its households need this
+    crosswalk to reach W3's ``v`` keyspace (GH #1120 D1).  ``covers`` are raw
+    frames, read with ``convert_categoricals=False``.  An ``ea_id`` that maps
+    to more than one ``ea_id2`` across them (two do, in the W3 household
+    cover) is AMBIGUOUS and is left out of the result: the caller refuses it
+    rather than choosing one.
+    """
+    pairs = pd.concat([pd.DataFrame({'ea_id': c['ea_id'].apply(format_id).values,
+                                     'ea_id2': c['ea_id2'].apply(format_id).values})
+                       for c in covers], ignore_index=True)
+    pairs = pairs.dropna()
+    pairs = pairs[(pairs['ea_id'].str.strip() != '')
+                  & (pairs['ea_id2'].str.strip() != '')].drop_duplicates()
+    unique = pairs.groupby('ea_id')['ea_id2'].transform('nunique') == 1
+    return pairs[unique].set_index('ea_id')['ea_id2'].to_dict()
+
+
+def with_agriculture_cover_households(sample, t, hh, hh_labels, pp, colmap,
+                                      rural_map, ea_crosswalk=None):
+    """Append to a wave's ``sample`` the households recorded ONLY in the
+    agriculture cover (GH #1120 D1).
+
+    ``sample`` is the wave script's household-cover frame, before
+    ``set_index`` -- columns ``i, v, weight, Rural, strata, panel_weight, t``.
+    It is returned unchanged when the agriculture cover holds no household
+    the household cover lacks (W1), and otherwise with one row appended per
+    such household; no existing row is touched.
+
+    ``hh`` is the household cover read with ``convert_categoricals=False``
+    and ``hh_labels`` the same file read with labels (the frame the script
+    built ``sample`` from), row for row.  ``pp`` is the agriculture cover
+    ``sect_cover_pp_w{N}``, codes.  ``colmap`` names ``hhid``, ``ea`` (the
+    household cover's ``v`` column), ``weight`` and ``rural``; optionally
+    ``pp_ea`` (the agriculture cover's EA column, default ``ea``) and
+    ``region`` (default ``saq01``).  ``rural_map`` is the script's own
+    label -> Rural/Urban map.  ``ea_crosswalk`` maps the agriculture cover's
+    EA onto the household cover's ``v`` keyspace where the two differ (W3:
+    :func:`ea_id2_crosswalk`).
+
+    Rules, each enforced, never assumed:
+
+    * the agriculture cover is HOLDER-grain; a household's rows must agree on
+      EA, weight, region code and rural code (they do: 0 disagreements), and
+      are then one row;
+    * region and rural are decoded by CODE through the household cover's own
+      labels, so a household strata string is spelled exactly as the
+      household cover spells it.  The agriculture covers label the same codes
+      differently (W1-W3 ``Oromiya`` / ``Gambella``; W4/W5 ``4. OROMIA``,
+      ``1. RURAL``), and the ``strata`` table in ``categorical_mapping.org``
+      knows only the household-cover spellings;
+    * a code the household cover never uses, a blank EA, or an EA the
+      crosswalk cannot place (absent or ambiguous) RAISES -- nothing is
+      guessed.
+    """
+    c = colmap
+    region = c.get('region', 'saq01')
+    pp_ea = c.get('pp_ea', c['ea'])
+    hh_ids = set(hh[c['hhid']].apply(format_id).dropna())
+    i = pp[c['hhid']].apply(format_id)
+    keep = (i.notna() & (i.astype('string').str.strip() != '') & ~i.isin(hh_ids)).to_numpy()
+    if not keep.any():
+        return sample
+    a = pd.DataFrame({
+        'i': i[keep].values,
+        '_ea': pp.loc[keep, pp_ea].apply(format_id).values,
+        'weight': pd.to_numeric(pp.loc[keep, c['weight']], errors='coerce').astype(float).values,
+        '_region': pd.to_numeric(pp.loc[keep, region], errors='coerce').values,
+        '_rural': pd.to_numeric(pp.loc[keep, c['rural']], errors='coerce').values,
+    })
+    vary = a.groupby('i')[['_ea', 'weight', '_region', '_rural']].nunique(dropna=False)
+    n_vary = int((vary > 1).any(axis=1).sum())
+    if n_vary:
+        raise ValueError(
+            f"{t}: {n_vary} agriculture-cover household(s) carry more than one "
+            "EA / weight / region / rural code across their holder rows; "
+            "which is the household's is not something the survey says.")
+    a = a.drop_duplicates('i').reset_index(drop=True)
+
+    def _code_labels(col):
+        m = pd.DataFrame({'code': pd.to_numeric(hh[col], errors='coerce').values,
+                          'label': hh_labels[col].astype(str).values})
+        m = m.dropna(subset=['code']).drop_duplicates()
+        if not m['code'].is_unique:
+            raise ValueError(f"{t}: the household cover labels one {col} code two ways")
+        return dict(zip(m['code'], m['label']))
+
+    rmap, umap = _code_labels(region), _code_labels(c['rural'])
+    n_code = int((~a['_region'].isin(list(rmap)) | ~a['_rural'].isin(list(umap))).sum())
+    if n_code:
+        raise ValueError(
+            f"{t}: {n_code} agriculture-cover household(s) carry a {region} / "
+            f"{c['rural']} code the household cover never uses, so there is no "
+            "household-cover label to decode it with.")
+
+    if ea_crosswalk is not None:
+        v = a['_ea'].map(ea_crosswalk)
+    else:
+        v = a['_ea']
+    n_v = int((v.isna() | (v.astype('string').str.strip() == '')).sum())
+    if n_v:
+        raise ValueError(
+            f"{t}: {n_v} agriculture-cover household(s) have no EA in the "
+            "sample's v keyspace (blank, or not placed by the crosswalk -- "
+            "absent from it or ambiguous in it).")
+
+    rural = a['_rural'].map(umap).map(rural_map)
+    strata = (a['_region'].map(rmap).astype(str).str.strip() + ' '
+              + rural.fillna('')).str.strip()
+    extra = pd.DataFrame({
+        'i': a['i'].astype(object).values,
+        'v': v.astype(object).values,
+        'weight': a['weight'].values,
+        'Rural': rural.astype(object).values,
+        'strata': strata.astype(object).values,
+    })
+    extra['panel_weight'] = extra['weight']
+    extra['t'] = t
+    extra = extra[list(sample.columns)]
+    return pd.concat([sample, extra], ignore_index=True)
+
+
+# ---------------------------------------------------------------------
 # plot_features (GH #167) — ESS post-planting parcel/field join
 # ---------------------------------------------------------------------
 #
