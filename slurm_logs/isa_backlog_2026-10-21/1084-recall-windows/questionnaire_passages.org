@@ -20,7 +20,7 @@ citations.
 |------+------+------+-------|
 | 2005-06 | =UNHS.2005-06.Household.Questionnaire.FINAL.pdf= | PDF 18 (printed 17), image-only scan read visually | "Section 14A: Household Consumption Expenditure" / "(Part A) Food, Beverage, and Tobacco (During the Last 7 Days)"; columns 4-11 Qty/Value from purchases (household, away from home), home produce, received in-kind/free; 12 market price, 13 farm gate price |
 | 2005-06 | =UNHS.2005-06.Interviewer.Manual.FINAL.pdf= | PDF 33 (printed 31) | "Part A: Expenditure on Foods, Beverages and Tobacco during Last Seven (7) Days" ... "It is the value of the former over the recall period, i.e., the last 7 days that should go into the consumption aggregate." |
-| 2009-10 | (no questionnaire held) =ddi-documentation-english_microdata-1001.pdf= | PDF 15, PDF 44 | Scope: "Food, beverage, and tobacco (during the last 7 days)"; file description: "Section 15B: Food, Beverage, and Tobacco (During the Last 7 days)" -- catalog metadata, NOT promoted |
+| 2009-10 | (no questionnaire held) =ddi-documentation-english_microdata-1001.pdf= | PDF 15, PDF 44, PDF 17 | Scope: "Food, beverage, and tobacco (during the last 7 days)"; file description: "Section 15B: Food, Beverage, and Tobacco (During the Last 7 days)" -- catalog metadata; p.17 "The UNPS will therefore interview each household twice each year, in visits six months apart" (the cropping-season design).  Recorded at variable-label, see below |
 | 2010-11 | =UNPS_2010-11_Household_Questionnaire.pdf= | PDF 29-30 (printed 27-28) | "Part B: Food, Beverage, and Tobacco (During the Last 7 Days)"; col 3B "How many days was [ITEM] consumed out of the last 7 days?" |
 | 2010-11 | =UNPS_2010-11_Basic-Info-2014.pdf= | PDF 20-21 | "approximately half of the households were randomly selected for the entire household questionnaire to be administered in visit 1 ... The rest of the sample received only the household roster in visit 1 ... and the rest of the household questionnaire along with the household roster update in visit 2" |
 | 2011-12 | =Uganda2011-12HouseholdQuestionnaire.pdf= | PDF 26-27 (printed 24-25) | "Part B: Food, Beverage, and Tobacco (During the Last 7 Days)"; col 3B as 2010-11 |
@@ -130,3 +130,42 @@ read.
 So the delivered flows are 7 days, asked once; 7B.06-7B.08 contribute only
 the unit value of the last purchase, which may be up to 30 days old -- the GH
 #876 caveat already in the CSV notes, unchanged.
+
+** Uganda 2009-10: recorded on @ligon's statement, at variable-label (2026-10-23)
+
+@ligon, 2026-10-23: "Questionnaires for Uganda 2009-10 more or less overlap
+with Uganda 2005-06."  The 2009-10 instrument itself is still not held.
+
+*Column correspondence.*  The build (=2009-10/_/food_acquired.py=) reads
+=GSEC15b.dta=: =itmcd=, =untcd=, =h15bq4=..=h15bq13=.
+
+| 2009-10 column | label | 2005-06 Section 14A (printed) | 2010-11 Part B (printed) | read by build |
+|---+---+---+---+---|
+| itmcd | "item Description  Code" | col 2 Code | col 2 Code | yes |
+| untcd | "Unit of Qty" | col 3 Unit of Quantity | col 3C Unit of Qty | yes |
+| h15bq3b | "How many days was [ITEM] consumed out of the last 7 days?" | *no such column* | col 3B | no |
+| h15bq4 / h15bq5 | "Qty consumed out of purchases" / "Value of consumption out of purchases" | cols 4 / 5 | cols 4 / 5 | yes |
+| h15bq6 / h15bq7 | "... away from home" | cols 6 / 7 | cols 6 / 7 | yes |
+| h15bq8 / h15bq9 | "... out of home produce" | cols 8 / 9 | cols 8 / 9 | yes |
+| h15bq10 / h15bq11 | "... recieved in-kind/free" | cols 10 / 11 | cols 10 / 11 | yes |
+| h15bq12 / h15bq13 | "Market Price" / "Farm-Gate price" | cols 12 / 13 | cols 12 / 13 | yes |
+
+(2010-11 also has col 3A "Did you consume [ITEM]?", which the 2009-10 file
+does not ship.)  Item codes: 2009-10 has 63, including all 61 of 2005-06's,
+plus 100 and 170; 61 are shared with 2010-11's 70.
+
+So the overlap holds for every column the build reads, and fails for exactly
+one column, =h15bq3b=, which carries the only window statement on this wave's
+own data.  Its =q3b= numbering follows 2010-11's 3B.
+
+*Days consumed.*  =h15bq3b= is 8 on 2 of 37,645 answered rows (items 104
+and 139) and 0 on 5; every other row is 1..7.
+
+*Asks.*  One row per (hh, itmcd) over 2,929 households, with no visit
+column, so =n_asks= is 1.
+
+*Rung.*  The record is =variable-label=, not =questionnaire=.  Of the four
+pieces of evidence, the =h15bq3b= label is the only statement of the window
+made about this wave's data.  The 2005-06 form belongs to another survey
+(UNHS) and lacks a column that 2009-10 has.  The DDI is catalog metadata.  The
+maintainer statement is an assertion.  Either rung converts under =period==.
