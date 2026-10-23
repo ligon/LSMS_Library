@@ -67,6 +67,27 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
     - Feature proposals #226 #438 #439 #450 #851 #862 #1136 are IN SCOPE, after the defects drain.
     - #1281: a config KeyError that costs a wave raises (#675 precedent), unless @ligon objects.
     - #1245 is PR #1282 (needs a corpus re-warm).  Malawi 2013-14 GPS branch is in red-team.
+4k. BURST RUNNER (2026-10-23 ~15:50): =/global/scratch/fsa/fc_jevons/ligon/burst/burst.sbatch= (co_carleton / savio4_htc / carleton_htc4_normal; shared clone of a pushed branch plus the venv-image mount; about 80 s to first import).  README and =AGENT_RULES.md= are in the same directory; job dirs are under =jobs/<tag>/=.  Agents run every cold build and data test there.
+4l. IN FLIGHT (~15:55), with worktrees under =/local/job40390255/worktrees/=:
+    - =uganda= (#1120 D1/D2/D3, #1119);
+    - =ethiopia= (#1120 D1, #1119, W1 trees);
+    - =nigeria= (#1120 D1 plus #1261, #1119, W1/W2 variety);
+    - =mw-1314= then =malawi-plot= (2013-14 GPS red-team fixes; #637A, #1120 D3, #1119);
+    - =niger-andand= (&& plus refusal for 4 tables);
+    - =sampling-1135= (#1135 record plus the =redefined= gloss);
+    - reviews: Mali tree sales, =add_wave(subdir=)= (=review-addwave=);
+    - release diff (=data-private/release-diff/REPORT.md=).
+    The country branches sit on =fix/plot-sentinel-vocab-20261023= (=1865cf884=: =unknown_plot= and the =(not crop-specific)= marker in the canonical =data_info.yml=).
+    QUEUED:
+    - #1281 (raise on a config KeyError);
+    - #1254 plus #824 (=median_price_valuation=);
+    - #771 (FDC key);
+    - the Tanzania and GhanaLSS #1119 marker;
+    - Mali KgFactor (after Mali sales);
+    - Burkina: Panel move, then 6277 via =subdir=, after #1276's PR;
+    - acquisitions: Malawi 2024-25, Tanzania W1-W3 geovariables (#449), Burkina 1994/1998 (#816);
+    - feature designs.
+    Filed #1283 (no held-release record for a secondary entry).
 5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
 
 ** Merge plan: ONE corpus re-warm
