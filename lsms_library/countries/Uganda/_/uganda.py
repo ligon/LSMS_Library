@@ -4,6 +4,7 @@ from collections import defaultdict
 from cfe.df_utils import use_indices
 import warnings
 import json
+import functools
 
 if __name__=='__main__':
     import sys
@@ -51,6 +52,67 @@ def v(x):
     GH #196.
     """
     return format_id(x)
+
+
+@functools.lru_cache(maxsize=None)
+def _comm_frame_ea_map():
+    """``{7-character comm: 8-digit frame EA}`` from the reviewed table (GH #1133).
+
+    Read from the ``comm_frame_ea`` table in THIS config tree's
+    ``categorical_mapping.org`` (``Path(__file__)``: the framework loads this
+    module from ``countries_root()``, so an ``LSMS_COUNTRIES_ROOT`` override is
+    honoured).  The org reader parses an all-digit column to int64; both sides
+    go back through ``format_id`` so the keys match the str ``comm`` of GSEC1.
+    """
+    from pathlib import Path
+    from lsms_library.local_tools import get_categorical_mapping
+
+    raw = get_categorical_mapping(tablename='comm_frame_ea', idxvars='comm7',
+                                  dirs=[str(Path(__file__).resolve().parent)],
+                                  comm8='comm8')
+    return {format_id(k): format_id(e) for k, e in raw.items()}
+
+
+def comm_frame_ea(value):
+    """Serve an early-wave ``comm`` as the 8-digit frame EA code (GH #1133).
+
+    Declared in ``data_info.yml`` as ``v: [comm, {mappings: comm_frame_ea}]`` on
+    ``sample`` and ``cluster_features`` in 2009-10 and 2010-11 -- the two waves
+    whose GSEC1 renders ``comm`` as a 7-character string.  2005-06 and 2011-12
+    write the same EA as an int32 8-digit code, so before this one EA carried
+    two ids and ``v`` continuity across 2005-06 -> 2009-10 and 2010-11 ->
+    2011-12 measured 0%.
+
+    The lookup is the reviewed 370-row ``comm_frame_ea`` table, derived from
+    household linkage and corroborated by the community files' own
+    ``comm``/``comcod`` crosswalks -- NOT a digit rule.  320 of its 7-character
+    codes are the 8-digit code with its 4th digit dropped (the "2005/06
+    district definitions" form), but 50 re-code the district field (2010-11
+    GSEC1 writes those EAs in 2010/11 district definitions, matching
+    CSECTION1's ``comcod``), and no rule recovers those.  See the table's
+    header comment and ``CONTENTS.org`` "``v`` across waves".
+
+    * A blank ``comm`` stays ``None`` (``format_id``), so 2009-10's movers and
+      split-offs still fall through to their ``@lat,lon`` bin.
+    * A code the table does not hold is served AS-IS, never guessed: 2010-11
+      ``1530040`` (one household; no linkage, no community-file row).
+
+    Called with a one-column row (the ``mappings: <function>`` form hands the
+    function ``df[['comm']]`` row-wise, as ``Burkina_Faso/2014``'s
+    ``visit_p1`` receives its row) or with a scalar.  Defined beside ``v``
+    rather than as ``v`` itself: the country ``v`` serves every wave, and the
+    table must reach only the two 7-character waves.
+    """
+    if isinstance(value, pd.Series):
+        if len(value) != 1:
+            raise ValueError(
+                f"comm_frame_ea expects ONE source column (comm); got "
+                f"{list(value.index)}")
+        value = value.iloc[0]
+    code = format_id(value)
+    if code is None:
+        return None
+    return _comm_frame_ea_map().get(code, code)
 
 
 # ---------------------------------------------------------------------------

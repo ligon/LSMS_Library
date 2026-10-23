@@ -1197,3 +1197,436 @@
 | 2.0                                                                 | Unknown                      |
 | 3.0                                                                 | Unknown                      |
 | 52.0                                                                | Unknown                      |
+
+# comm_frame_ea (GH #1133): the 8-digit frame EA code for each 7-character
+# `comm` that Uganda's 2009-10 and 2010-11 GSEC1 write.  Applied to `v` on
+# `sample` and `cluster_features` in those two waves by uganda.comm_frame_ea()
+# (YAML `v: [comm, {mappings: comm_frame_ea}]`); keys are matched after
+# format_id, and a code NOT listed is served as-is, never guessed.
+#
+# Why a table and not a digit rule.  2005-06 and 2011-12 GSEC1 carry `comm` as
+# an int32 8-digit code ("EA Code in 2005/06"); 2009-10 and 2010-11 as a
+# 7-character string.  The survey's community files name the two 7-character
+# families: CSECTION1 `comm` = "Community Code According to 2005/06 District
+# Definitions (7 Digits)" and `comcod` = "... According to 2009/10 [2010/2011]
+# District Definitions"; 2011-12 CSEC1 pairs its 8-digit `comm` with a
+# 7-character `comcod` ("Community code current").
+#   * The 2005/06-definitions form is the 8-digit code with its 4th digit
+#     dropped (Form = "drop 4th digit"): all 317 2005-06 -> 2009-10 household
+#     pairs, and every community-file `comm` (320 / 320 / 322 in 2005-06 /
+#     2009-10 / 2010-11), with no collision across the 323 known 8-digit codes.
+#   * 2009-10 GSEC1 writes that form for all 317 of its EAs.  2010-11 GSEC1
+#     writes the CURRENT (2010/11) district definitions -- 321 of its 324 codes
+#     match that wave's CSECTION1 `comcod`, only 273 its `comm` -- so 50 EAs
+#     re-code the district field (Form = "district recode", e.g.
+#     1140003 -> 11030003) and dropping a digit does not recover them.
+#
+# Derivation (aggregates only).  Rows are every (comm7, comm8) pair observed on
+# the same household (`i`; HHID is unchanged across 2005-06 .. 2011-12, so
+# `Waves` declares no id change and updated_ids.json has no early-wave keys)
+# in Country('Uganda').sample() across the four boundaries in the hh columns,
+# synthetic '@' bins excluded: 370 pairs, and no 7-character code is ever seen
+# with two 8-digit codes.  The 2010-11 -> 2011-12 boundary alone gives 322
+# pairs (272 drop-4th-digit, 50 recode); the other 48 come from the 2009-10
+# boundaries: 47 are the 2005/06-definitions codes of re-coded EAs, and one
+# (1020016) is an EA none of whose 2010-11 households links to 2011-12.
+# "Community files" lists which of 2009-10
+# CSECTION1, 2010-11 CSECTION1 and 2011-12 CSEC1 carry the same pair (the
+# 7-character code as `comm` or `comcod` with `comm` = comm8 minus its 4th
+# digit; or, in 2011-12, `comm` = comm8 with `comcod` = comm7): every row is
+# corroborated by at least one.
+#
+# So 49 of the 50 re-coded EAs have TWO 7-character codes here, one per
+# district definition, both mapping to its one 8-digit code (the 50th,
+# 30430016, has no 2009-10 household with a `comm`, so only its 2010/11 form
+# is ever written): the map is a function (7 -> 8); only 8 -> 7 is not, and
+# nothing reads that direction.
+# Two of them (10730027, 30630002) carry both codes WITHIN 2010-11 -- one
+# household writes the 2005/06 form (1070027, 3060002), its EA-mates the
+# 2010/11 form (1150027, 3180002) -- which is why the 2010-11 -> 2011-12
+# boundary alone looked non-bijective (322 codes, 320 EAs).  It is one EA, not
+# an ambiguous pair: the survey's own CSECTION1 (2009-10 and 2010-11) pairs
+# comm 1070027 with comcod 1150027 and comm 3060002 with comcod 3180002 on one
+# community row, and 2011-12 CSEC1 pairs comcod 1150027 with comm 10730027 and
+# comcod 3180002 with comm 30630002.
+#
+# NOT in the table: 2010-11 code 1530040 (one household; on no linkage and in
+# no community file).  It keeps its 7-character rendering.
+#
+# The table must stay ONE contiguous block of `|` rows (the org reader stops at
+# the first non-table line).  tests/test_uganda_comm_frame_ea.py re-derives it
+# from the source files and fails on any difference.
+#+key: comm7
+#+name: comm_frame_ea
+| comm7   | comm8    | Form            | hh 05-06/09-10 | hh 05-06/10-11 | hh 09-10/11-12 | hh 10-11/11-12 | Community files | Notes                                         |
+|---------+----------+-----------------+----------------+----------------+----------------+----------------+-----------------+-----------------------------------------------|
+| 1010002 | 10130002 | drop 4th digit  | 4              | 3              | 3              | 3              | 09 10 11        |                                               |
+| 1020001 | 10210001 | drop 4th digit  | 6              | 5              | 4              | 4              | 09 10 11        |                                               |
+| 1020002 | 10210002 | drop 4th digit  | 8              | 7              | 6              | 6              | 09 10 11        |                                               |
+| 1020003 | 10210003 | drop 4th digit  | 4              | 2              | 2              | 2              | 09 10 11        |                                               |
+| 1020004 | 10210004 | drop 4th digit  | 6              | 4              | 4              | 4              | 09 10 11        |                                               |
+| 1020005 | 10210005 | drop 4th digit  | 4              | 3              | 3              | 3              | 09 10 11        |                                               |
+| 1020006 | 10210006 | drop 4th digit  | 4              | 5              | 4              | 5              | 09 10 11        |                                               |
+| 1020007 | 10210007 | drop 4th digit  | 6              | 7              | 5              | 6              | 09 10 11        |                                               |
+| 1020008 | 10210008 | drop 4th digit  | 6              | 7              | 4              | 5              | 09 10 11        |                                               |
+| 1020009 | 10210009 | drop 4th digit  | 1              | 3              | 0              | 1              | 09 10 11        |                                               |
+| 1020010 | 10210010 | drop 4th digit  | 7              | 4              | 4              | 4              | 09 10 11        |                                               |
+| 1020011 | 10210011 | drop 4th digit  | 5              | 5              | 5              | 7              | 09 10 11        |                                               |
+| 1020012 | 10210012 | drop 4th digit  | 5              | 6              | 5              | 6              | 09 10 11        |                                               |
+| 1020013 | 10210013 | drop 4th digit  | 9              | 8              | 7              | 7              | 09 10 11        |                                               |
+| 1020014 | 10210014 | drop 4th digit  | 5              | 6              | 5              | 8              | 09 10 11        |                                               |
+| 1020015 | 10210015 | drop 4th digit  | 4              | 5              | 4              | 6              | 09 10           |                                               |
+| 1020016 | 10210016 | drop 4th digit  | 3              | 1              | 1              | 0              | 10              |                                               |
+| 1020017 | 10210017 | drop 4th digit  | 8              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 1020018 | 10210018 | drop 4th digit  | 4              | 4              | 4              | 4              | 09 10 11        |                                               |
+| 1020019 | 10210019 | drop 4th digit  | 6              | 7              | 4              | 5              | 09 10 11        |                                               |
+| 1020020 | 10210020 | drop 4th digit  | 6              | 6              | 6              | 6              | 09 10 11        |                                               |
+| 1020021 | 10210021 | drop 4th digit  | 3              | 3              | 3              | 3              | 09 10 11        |                                               |
+| 1020022 | 10210022 | drop 4th digit  | 9              | 7              | 7              | 6              | 09 10 11        |                                               |
+| 1020023 | 10210023 | drop 4th digit  | 4              | 5              | 4              | 5              | 09 10 11        |                                               |
+| 1020024 | 10210024 | drop 4th digit  | 2              | 2              | 2              | 2              | 09 10           |                                               |
+| 1020025 | 10210025 | drop 4th digit  | 7              | 6              | 4              | 4              | 09 10 11        |                                               |
+| 1020026 | 10210026 | drop 4th digit  | 9              | 6              | 5              | 6              | 09 10 11        |                                               |
+| 1020027 | 10210027 | drop 4th digit  | 7              | 3              | 3              | 3              | 09 10 11        |                                               |
+| 1020028 | 10210028 | drop 4th digit  | 7              | 7              | 5              | 5              | 09 10 11        |                                               |
+| 1020029 | 10210029 | drop 4th digit  | 5              | 5              | 5              | 5              | 09 10 11        |                                               |
+| 1020030 | 10210030 | drop 4th digit  | 2              | 2              | 1              | 1              | 09 10 11        |                                               |
+| 1020031 | 10210031 | drop 4th digit  | 4              | 3              | 2              | 2              | 09 10 11        |                                               |
+| 1020032 | 10210032 | drop 4th digit  | 3              | 3              | 3              | 3              | 09 10           |                                               |
+| 1020033 | 10210033 | drop 4th digit  | 3              | 2              | 1              | 2              | 09 10           |                                               |
+| 1020034 | 10210034 | drop 4th digit  | 6              | 4              | 5              | 4              | 09 10 11        |                                               |
+| 1030003 | 10330003 | drop 4th digit  | 8              | 8              | 7              | 9              | 09 10 11        |                                               |
+| 1030005 | 10330005 | drop 4th digit  | 7              | 7              | 6              | 9              | 09 10 11        |                                               |
+| 1040002 | 10410002 | drop 4th digit  | 6              | 8              | 6              | 8              | 09 10 11        |                                               |
+| 1040004 | 10430004 | drop 4th digit  | 6              | 8              | 6              | 10             | 09 10 11        |                                               |
+| 1040006 | 10430006 | drop 4th digit  | 8              | 10             | 8              | 10             | 09 10 11        |                                               |
+| 1040008 | 10430008 | drop 4th digit  | 8              | 9              | 8              | 12             | 09 10 11        |                                               |
+| 1040011 | 10430011 | drop 4th digit  | 9              | 0              | 5              | 0              | 09 10           |                                               |
+| 1040013 | 10430013 | drop 4th digit  | 7              | 0              | 6              | 0              | 09 10           |                                               |
+| 1050001 | 10510001 | drop 4th digit  | 6              | 5              | 4              | 5              | 09 10 11        |                                               |
+| 1050003 | 10510003 | drop 4th digit  | 5              | 4              | 3              | 3              | 09 10 11        |                                               |
+| 1050004 | 10530004 | drop 4th digit  | 7              | 8              | 7              | 10             | 09 10 11        |                                               |
+| 1050008 | 10530008 | drop 4th digit  | 7              | 8              | 7              | 9              | 09 10 11        |                                               |
+| 1050012 | 10530012 | drop 4th digit  | 9              | 9              | 7              | 8              | 09 10 11        |                                               |
+| 1050015 | 10530015 | drop 4th digit  | 8              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 1050019 | 10530019 | drop 4th digit  | 9              | 9              | 9              | 9              | 09 10 11        |                                               |
+| 1050023 | 10530023 | drop 4th digit  | 9              | 10             | 7              | 8              | 09 10 11        |                                               |
+| 1050026 | 10530026 | drop 4th digit  | 8              | 7              | 8              | 9              | 09 10 11        |                                               |
+| 1050030 | 10530030 | drop 4th digit  | 9              | 9              | 5              | 6              | 09 10 11        |                                               |
+| 1050033 | 10530033 | drop 4th digit  | 9              | 8              | 8              | 10             | 09 10 11        |                                               |
+| 1060003 | 10630003 | drop 4th digit  | 8              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 1060005 | 10630005 | drop 4th digit  | 8              | 10             | 8              | 12             | 09 10 11        |                                               |
+| 1060007 | 10630007 | drop 4th digit  | 9              | 10             | 9              | 10             | 09 10 11        |                                               |
+| 1060009 | 10630009 | drop 4th digit  | 8              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 1070001 | 10710001 | drop 4th digit  | 7              | 7              | 6              | 6              | 09 10 11        |                                               |
+| 1070002 | 10710002 | drop 4th digit  | 5              | 7              | 5              | 7              | 09 10 11        |                                               |
+| 1070004 | 10730004 | drop 4th digit  | 9              | 0              | 8              | 0              | 09 10           |                                               |
+| 1070008 | 10730008 | drop 4th digit  | 4              | 5              | 4              | 5              | 09 10 11        |                                               |
+| 1070012 | 10730012 | drop 4th digit  | 5              | 8              | 5              | 9              | 09 10 11        |                                               |
+| 1070016 | 10730016 | drop 4th digit  | 10             | 10             | 10             | 11             | 09 10 11        |                                               |
+| 1070020 | 10730020 | drop 4th digit  | 8              | 10             | 8              | 11             | 09 10 11        |                                               |
+| 1070023 | 10730023 | drop 4th digit  | 8              | 9              | 8              | 9              | 09 10 11        |                                               |
+| 1070027 | 10730027 | drop 4th digit  | 8              | 1              | 7              | 1              | 09 10           | one EA, two district definitions; see 1150027 |
+| 1070031 | 10730031 | drop 4th digit  | 3              | 0              | 3              | 0              | 09 10           |                                               |
+| 1080002 | 10810002 | drop 4th digit  | 7              | 8              | 7              | 10             | 09 10 11        |                                               |
+| 1080003 | 10810003 | drop 4th digit  | 7              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 1080006 | 10830006 | drop 4th digit  | 7              | 7              | 6              | 7              | 09 10 11        |                                               |
+| 1080009 | 10830009 | drop 4th digit  | 8              | 10             | 8              | 11             | 09 10 11        |                                               |
+| 1080013 | 10830013 | drop 4th digit  | 9              | 9              | 9              | 10             | 09 10 11        |                                               |
+| 1080016 | 10830016 | drop 4th digit  | 8              | 8              | 8              | 8              | 09 10 11        |                                               |
+| 1080020 | 10830020 | drop 4th digit  | 8              | 9              | 7              | 10             | 09 10 11        |                                               |
+| 1080023 | 10830023 | drop 4th digit  | 7              | 7              | 6              | 8              | 09 10 11        |                                               |
+| 1080027 | 10830027 | drop 4th digit  | 8              | 7              | 6              | 7              | 09 10 11        |                                               |
+| 1080030 | 10830030 | drop 4th digit  | 6              | 6              | 6              | 6              | 09 10 11        |                                               |
+| 1080033 | 10830033 | drop 4th digit  | 9              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 1090004 | 10930004 | drop 4th digit  | 7              | 10             | 6              | 13             | 09 10 11        |                                               |
+| 1100001 | 11010001 | drop 4th digit  | 8              | 6              | 6              | 10             | 09 10 11        |                                               |
+| 1100003 | 11030003 | drop 4th digit  | 6              | 0              | 6              | 0              | 09 10           |                                               |
+| 1100005 | 11030005 | drop 4th digit  | 9              | 10             | 9              | 10             | 09 10 11        |                                               |
+| 1100007 | 11030007 | drop 4th digit  | 8              | 8              | 8              | 10             | 09 10 11        |                                               |
+| 1100009 | 11030009 | drop 4th digit  | 9              | 10             | 9              | 13             | 09 10 11        |                                               |
+| 1100012 | 11030012 | drop 4th digit  | 6              | 7              | 6              | 7              | 09 10 11        |                                               |
+| 1110001 | 11130001 | drop 4th digit  | 9              | 9              | 8              | 8              | 09 10 11        |                                               |
+| 1110003 | 11130003 | drop 4th digit  | 9              | 9              | 8              | 8              | 09 10 11        |                                               |
+| 1110005 | 11130005 | drop 4th digit  | 5              | 9              | 5              | 10             | 09 10 11        |                                               |
+| 1120001 | 11210001 | drop 4th digit  | 9              | 9              | 8              | 8              | 09 10 11        |                                               |
+| 1120003 | 11230003 | drop 4th digit  | 10             | 9              | 9              | 9              | 09 10 11        |                                               |
+| 1120006 | 11230006 | drop 4th digit  | 6              | 6              | 6              | 7              | 09 10 11        |                                               |
+| 1130002 | 11310002 | drop 4th digit  | 5              | 7              | 4              | 6              | 09 10 11        |                                               |
+| 1130003 | 11310003 | drop 4th digit  | 5              | 6              | 1              | 3              | 09 10 11        |                                               |
+| 1130004 | 11310004 | drop 4th digit  | 6              | 7              | 6              | 7              | 09 10 11        |                                               |
+| 1130006 | 11310006 | drop 4th digit  | 6              | 6              | 6              | 6              | 09 10 11        |                                               |
+| 1130007 | 11310007 | drop 4th digit  | 7              | 6              | 5              | 5              | 09 10 11        |                                               |
+| 1130008 | 11330008 | drop 4th digit  | 10             | 9              | 4              | 6              | 09 10 11        |                                               |
+| 1130010 | 11330010 | drop 4th digit  | 8              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 1130012 | 11330012 | drop 4th digit  | 7              | 8              | 7              | 9              | 09 10 11        |                                               |
+| 1130014 | 11330014 | drop 4th digit  | 7              | 7              | 6              | 7              | 09 10 11        |                                               |
+| 1130016 | 11330016 | drop 4th digit  | 7              | 7              | 6              | 8              | 09 10 11        |                                               |
+| 1130019 | 11330019 | drop 4th digit  | 7              | 8              | 6              | 7              | 09 10           |                                               |
+| 1130021 | 11330021 | drop 4th digit  | 8              | 6              | 5              | 6              | 09 10 11        |                                               |
+| 1130023 | 11330023 | drop 4th digit  | 7              | 6              | 6              | 5              | 09 10 11        |                                               |
+| 1130025 | 11330025 | drop 4th digit  | 8              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 1140003 | 11030003 | district recode | 0              | 8              | 0              | 10             | 09 10 11        |                                               |
+| 1150004 | 10730004 | district recode | 0              | 8              | 0              | 11             | 09 10 11        |                                               |
+| 1150027 | 10730027 | district recode | 0              | 9              | 0              | 8              | 09 10 11        | one EA, two district definitions; see 1070027 |
+| 1150031 | 10730031 | district recode | 0              | 7              | 0              | 7              | 09 10 11        |                                               |
+| 1160011 | 10430011 | district recode | 0              | 9              | 0              | 8              | 09 10 11        |                                               |
+| 1160013 | 10430013 | district recode | 0              | 7              | 0              | 8              | 09 10 11        |                                               |
+| 2010004 | 20130004 | drop 4th digit  | 9              | 9              | 9              | 9              | 09 10 11        |                                               |
+| 2010006 | 20130006 | drop 4th digit  | 9              | 9              | 9              | 9              | 09 10 11        |                                               |
+| 2010008 | 20130008 | drop 4th digit  | 6              | 6              | 6              | 7              | 09 10 11        |                                               |
+| 2010009 | 20130009 | drop 4th digit  | 9              | 8              | 2              | 2              | 09 10 11        |                                               |
+| 2020001 | 20210001 | drop 4th digit  | 6              | 5              | 3              | 3              | 09 10 11        |                                               |
+| 2020005 | 20230005 | drop 4th digit  | 8              | 8              | 7              | 7              | 09 10 11        |                                               |
+| 2020007 | 20230007 | drop 4th digit  | 9              | 10             | 8              | 10             | 09 10 11        |                                               |
+| 2030001 | 20310001 | drop 4th digit  | 7              | 5              | 5              | 4              | 09 10 11        |                                               |
+| 2030004 | 20310004 | drop 4th digit  | 8              | 8              | 7              | 10             | 09 10 11        |                                               |
+| 2030008 | 20330008 | drop 4th digit  | 8              | 8              | 8              | 9              | 10 11           |                                               |
+| 2030013 | 20330013 | drop 4th digit  | 9              | 0              | 8              | 0              | 09 10           |                                               |
+| 2030018 | 20330018 | drop 4th digit  | 9              | 8              | 8              | 10             | 09 10 11        |                                               |
+| 2030023 | 20330023 | drop 4th digit  | 7              | 7              | 6              | 6              | 09 10 11        |                                               |
+| 2030028 | 20330028 | drop 4th digit  | 9              | 7              | 8              | 7              | 09 10 11        |                                               |
+| 2030033 | 20330033 | drop 4th digit  | 9              | 8              | 7              | 10             | 09 10 11        |                                               |
+| 2040002 | 20410002 | drop 4th digit  | 6              | 6              | 3              | 6              | 09 10 11        |                                               |
+| 2040006 | 20410006 | drop 4th digit  | 4              | 4              | 4              | 4              | 09 10           |                                               |
+| 2040009 | 20410009 | drop 4th digit  | 7              | 7              | 7              | 7              | 09 10           |                                               |
+| 2040012 | 20430012 | drop 4th digit  | 9              | 9              | 9              | 9              | 09 10 11        |                                               |
+| 2040014 | 20430014 | drop 4th digit  | 7              | 8              | 7              | 7              | 09 10 11        |                                               |
+| 2040015 | 20430015 | drop 4th digit  | 9              | 9              | 9              | 9              | 09 10           |                                               |
+| 2050001 | 20510001 | drop 4th digit  | 7              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 2050004 | 20530004 | drop 4th digit  | 10             | 10             | 10             | 10             | 09 10 11        |                                               |
+| 2050009 | 20530009 | drop 4th digit  | 9              | 9              | 9              | 10             | 09 10 11        |                                               |
+| 2050013 | 20530013 | drop 4th digit  | 9              | 10             | 9              | 11             | 09 10 11        |                                               |
+| 2050017 | 20530017 | drop 4th digit  | 7              | 8              | 7              | 9              | 09 10 11        |                                               |
+| 2050022 | 20530022 | drop 4th digit  | 9              | 0              | 7              | 0              | 09 10           |                                               |
+| 2050026 | 20530026 | drop 4th digit  | 8              | 0              | 7              | 0              | 09 10           |                                               |
+| 2050030 | 20530030 | drop 4th digit  | 8              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 2060001 | 20630001 | drop 4th digit  | 9              | 0              | 7              | 0              | 09 10           |                                               |
+| 2060003 | 20630003 | drop 4th digit  | 10             | 9              | 8              | 8              | 09 10 11        |                                               |
+| 2070003 | 20730003 | drop 4th digit  | 3              | 0              | 3              | 0              | 09 10           |                                               |
+| 2070005 | 20730005 | drop 4th digit  | 10             | 9              | 9              | 11             | 09 10 11        |                                               |
+| 2070006 | 20730006 | drop 4th digit  | 9              | 10             | 9              | 10             | 09 10 11        |                                               |
+| 2080001 | 20810001 | drop 4th digit  | 8              | 8              | 8              | 11             | 09 10 11        |                                               |
+| 2080003 | 20830003 | drop 4th digit  | 9              | 0              | 9              | 0              | 09 10           |                                               |
+| 2080005 | 20830005 | drop 4th digit  | 8              | 10             | 8              | 14             | 09 10 11        |                                               |
+| 2080007 | 20830007 | drop 4th digit  | 10             | 10             | 10             | 12             | 09 10 11        |                                               |
+| 2080008 | 20830008 | drop 4th digit  | 10             | 10             | 10             | 12             | 09 10 11        |                                               |
+| 2090003 | 20910003 | drop 4th digit  | 0              | 4              | 0              | 4              | 09 10 11        |                                               |
+| 2090006 | 20910006 | drop 4th digit  | 6              | 6              | 3              | 5              | 09 10 11        |                                               |
+| 2090011 | 20930011 | drop 4th digit  | 10             | 0              | 10             | 0              | 09 10           |                                               |
+| 2090014 | 20930014 | drop 4th digit  | 7              | 0              | 7              | 0              | 09 10           |                                               |
+| 2090018 | 20930018 | drop 4th digit  | 9              | 0              | 9              | 0              | 09 10           |                                               |
+| 2090022 | 20930022 | drop 4th digit  | 10             | 0              | 10             | 0              | 09 10           |                                               |
+| 2090026 | 20930026 | drop 4th digit  | 9              | 0              | 7              | 0              | 09 10           |                                               |
+| 2090029 | 20930029 | drop 4th digit  | 9              | 0              | 8              | 0              | 09 10           |                                               |
+| 2090033 | 20930033 | drop 4th digit  | 10             | 10             | 10             | 12             | 09 10 11        |                                               |
+| 2090037 | 20930037 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 2100002 | 21010002 | drop 4th digit  | 5              | 6              | 4              | 4              | 09 10 11        |                                               |
+| 2100004 | 21030004 | drop 4th digit  | 9              | 10             | 7              | 8              | 09 10 11        |                                               |
+| 2100006 | 21030006 | drop 4th digit  | 8              | 9              | 8              | 9              | 09 10 11        |                                               |
+| 2100007 | 21030007 | drop 4th digit  | 8              | 8              | 7              | 10             | 09 10 11        |                                               |
+| 2100009 | 21030009 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 2110003 | 21110003 | drop 4th digit  | 7              | 5              | 6              | 6              | 09 10 11        |                                               |
+| 2110004 | 21130004 | drop 4th digit  | 10             | 10             | 10             | 10             | 09 10 11        |                                               |
+| 2110006 | 21130006 | drop 4th digit  | 6              | 8              | 6              | 8              | 09 10 11        |                                               |
+| 2110007 | 21130007 | drop 4th digit  | 10             | 10             | 10             | 13             | 09 10 11        |                                               |
+| 2110009 | 21130009 | drop 4th digit  | 9              | 9              | 9              | 11             | 09 10 11        |                                               |
+| 2120003 | 21210003 | drop 4th digit  | 5              | 5              | 2              | 3              | 09 10 11        |                                               |
+| 2120006 | 21230006 | drop 4th digit  | 9              | 0              | 8              | 0              | 09 10           |                                               |
+| 2120008 | 21230008 | drop 4th digit  | 9              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 2120009 | 21230009 | drop 4th digit  | 9              | 9              | 8              | 11             | 09 10 11        |                                               |
+| 2120011 | 21230011 | drop 4th digit  | 9              | 9              | 7              | 9              | 09 10 11        |                                               |
+| 2120013 | 21230013 | drop 4th digit  | 8              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 2140002 | 21430002 | drop 4th digit  | 9              | 8              | 7              | 12             | 09 10           |                                               |
+| 2140003 | 21430003 | drop 4th digit  | 5              | 5              | 5              | 5              | 09 10 11        |                                               |
+| 2150001 | 21510001 | drop 4th digit  | 8              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 2150002 | 21530002 | drop 4th digit  | 9              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 2150004 | 21530004 | drop 4th digit  | 8              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 2150006 | 21530006 | drop 4th digit  | 7              | 8              | 7              | 10             | 09 10 11        |                                               |
+| 2150007 | 21530007 | drop 4th digit  | 9              | 10             | 9              | 10             | 09 10 11        |                                               |
+| 2160003 | 20730003 | district recode | 0              | 4              | 0              | 4              | 09 10 11        |                                               |
+| 2170009 | 21030009 | district recode | 0              | 8              | 0              | 9              | 09 10 11        |                                               |
+| 2180037 | 20930037 | district recode | 0              | 8              | 0              | 8              | 09 10 11        |                                               |
+| 2190003 | 20830003 | district recode | 0              | 9              | 0              | 9              | 09 10 11        |                                               |
+| 2200001 | 20630001 | district recode | 0              | 7              | 0              | 7              | 09 10 11        |                                               |
+| 2210006 | 21230006 | district recode | 0              | 9              | 0              | 8              | 09 10 11        |                                               |
+| 2220022 | 20530022 | district recode | 0              | 8              | 0              | 10             | 09 10           |                                               |
+| 2220026 | 20530026 | district recode | 0              | 10             | 0              | 8              | 09 10 11        |                                               |
+| 2230011 | 20930011 | district recode | 0              | 10             | 0              | 12             | 09 10 11        |                                               |
+| 2230014 | 20930014 | district recode | 0              | 7              | 0              | 7              | 09 10 11        |                                               |
+| 2230018 | 20930018 | district recode | 0              | 9              | 0              | 10             | 09 10 11        |                                               |
+| 2230022 | 20930022 | district recode | 0              | 10             | 0              | 10             | 09 10 11        |                                               |
+| 2230026 | 20930026 | district recode | 0              | 9              | 0              | 7              | 09 10 11        |                                               |
+| 2230029 | 20930029 | district recode | 0              | 10             | 0              | 8              | 09 10 11        |                                               |
+| 2240013 | 20330013 | district recode | 0              | 9              | 0              | 11             | 09 10 11        |                                               |
+| 3010003 | 30130003 | drop 4th digit  | 8              | 9              | 8              | 9              | 09 10           |                                               |
+| 3020002 | 30210002 | drop 4th digit  | 4              | 8              | 4              | 8              | 09 10 11        |                                               |
+| 3020003 | 30230003 | drop 4th digit  | 10             | 10             | 10             | 14             | 09 10 11        |                                               |
+| 3020005 | 30230005 | drop 4th digit  | 10             | 10             | 9              | 15             | 09 10 11        |                                               |
+| 3020008 | 30230008 | drop 4th digit  | 9              | 8              | 9              | 10             | 09 10 11        |                                               |
+| 3020010 | 30230010 | drop 4th digit  | 6              | 6              | 6              | 7              | 09 10 11        |                                               |
+| 3020013 | 30230013 | drop 4th digit  | 6              | 8              | 6              | 8              | 09 10 11        |                                               |
+| 3020016 | 30230016 | drop 4th digit  | 10             | 10             | 9              | 11             | 09 10 11        |                                               |
+| 3020018 | 30230018 | drop 4th digit  | 1              | 1              | 1              | 1              | 09 10 11        |                                               |
+| 3020021 | 30230021 | drop 4th digit  | 10             | 0              | 9              | 0              | 09 10           |                                               |
+| 3020023 | 30230023 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 3020028 | 30230028 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 3020030 | 30230030 | drop 4th digit  | 10             | 0              | 10             | 0              | 09 10           |                                               |
+| 3020035 | 30230035 | drop 4th digit  | 8              | 9              | 8              | 11             | 09 10 11        |                                               |
+| 3030002 | 30310002 | drop 4th digit  | 8              | 9              | 8              | 10             | 09 10 11        |                                               |
+| 3030005 | 30310005 | drop 4th digit  | 5              | 0              | 4              | 0              | 09 10           |                                               |
+| 3030006 | 30330006 | drop 4th digit  | 8              | 9              | 7              | 8              | 09 10 11        |                                               |
+| 3030009 | 30330009 | drop 4th digit  | 9              | 8              | 8              | 8              | 09 10 11        |                                               |
+| 3030012 | 30330012 | drop 4th digit  | 10             | 0              | 9              | 0              | 09 10           |                                               |
+| 3030015 | 30330015 | drop 4th digit  | 9              | 10             | 9              | 10             | 09 10 11        |                                               |
+| 3030018 | 30330018 | drop 4th digit  | 8              | 0              | 7              | 0              | 09 10           |                                               |
+| 3030021 | 30330021 | drop 4th digit  | 9              | 0              | 8              | 0              | 09 10           |                                               |
+| 3030024 | 30330024 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 3030027 | 30330027 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 3030030 | 30330030 | drop 4th digit  | 9              | 0              | 8              | 0              | 09 10           |                                               |
+| 3030033 | 30330033 | drop 4th digit  | 8              | 9              | 8              | 9              | 09 10 11        |                                               |
+| 3040002 | 30410002 | drop 4th digit  | 6              | 8              | 5              | 9              | 09 10 11        |                                               |
+| 3040004 | 30410004 | drop 4th digit  | 9              | 9              | 9              | 11             | 09 10 11        |                                               |
+| 3040007 | 30410007 | drop 4th digit  | 0              | 9              | 0              | 13             | 09 10 11        |                                               |
+| 3040009 | 30430009 | drop 4th digit  | 6              | 10             | 6              | 10             | 09 10 11        |                                               |
+| 3040014 | 30430014 | drop 4th digit  | 9              | 10             | 9              | 11             | 09 10 11        |                                               |
+| 3050001 | 30510001 | drop 4th digit  | 5              | 8              | 5              | 8              | 09 10 11        |                                               |
+| 3060001 | 30610001 | drop 4th digit  | 9              | 0              | 7              | 0              | 09 10           |                                               |
+| 3060002 | 30630002 | drop 4th digit  | 8              | 1              | 7              | 1              | 09 10           | one EA, two district definitions; see 3180002 |
+| 3060003 | 30630003 | drop 4th digit  | 10             | 0              | 10             | 0              | 09 10           |                                               |
+| 3060004 | 30630004 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 3060006 | 30630006 | drop 4th digit  | 7              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 3060007 | 30630007 | drop 4th digit  | 8              | 9              | 8              | 9              | 09 10 11        |                                               |
+| 3070002 | 30710002 | drop 4th digit  | 5              | 6              | 5              | 6              | 09 10 11        |                                               |
+| 3070005 | 30710005 | drop 4th digit  | 4              | 5              | 4              | 8              | 09 10 11        |                                               |
+| 3070007 | 30710007 | drop 4th digit  | 4              | 6              | 3              | 8              | 09 10 11        |                                               |
+| 3070009 | 30730009 | drop 4th digit  | 7              | 0              | 6              | 0              | 09 10           |                                               |
+| 3070010 | 30730010 | drop 4th digit  | 10             | 0              | 10             | 0              | 09 10           |                                               |
+| 3070011 | 30730011 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 3070012 | 30730012 | drop 4th digit  | 4              | 7              | 4              | 7              | 09 10 11        |                                               |
+| 3070016 | 30730016 | drop 4th digit  | 8              | 0              | 8              | 0              | 09 10           |                                               |
+| 3070017 | 30730017 | drop 4th digit  | 9              | 9              | 9              | 13             | 09 10 11        |                                               |
+| 3070018 | 30730018 | drop 4th digit  | 10             | 10             | 10             | 12             | 09 10 11        |                                               |
+| 3070020 | 30730020 | drop 4th digit  | 0              | 4              | 0              | 4              | 09 10 11        |                                               |
+| 3070022 | 30730022 | drop 4th digit  | 9              | 9              | 9              | 12             | 09 10 11        |                                               |
+| 3070023 | 30730023 | drop 4th digit  | 9              | 10             | 9              | 11             | 09 10 11        |                                               |
+| 3070025 | 30730025 | drop 4th digit  | 10             | 10             | 10             | 11             | 09 10 11        |                                               |
+| 3080001 | 30830001 | drop 4th digit  | 7              | 6              | 6              | 7              | 09 10 11        |                                               |
+| 3080002 | 30830002 | drop 4th digit  | 9              | 8              | 9              | 8              | 09 10 11        |                                               |
+| 3080004 | 30830004 | drop 4th digit  | 7              | 10             | 7              | 10             | 09 10 11        |                                               |
+| 3090001 | 30930001 | drop 4th digit  | 8              | 10             | 8              | 11             | 09 10 11        |                                               |
+| 3090002 | 30930002 | drop 4th digit  | 8              | 8              | 7              | 11             | 09 10 11        |                                               |
+| 3100001 | 31010001 | drop 4th digit  | 7              | 8              | 7              | 10             | 09 10 11        |                                               |
+| 3100004 | 31010004 | drop 4th digit  | 5              | 8              | 5              | 6              | 09 10 11        |                                               |
+| 3100006 | 31030006 | drop 4th digit  | 9              | 8              | 7              | 7              | 09 10 11        |                                               |
+| 3100007 | 31030007 | drop 4th digit  | 9              | 8              | 7              | 11             | 09 10 11        |                                               |
+| 3100008 | 31030008 | drop 4th digit  | 9              | 8              | 7              | 7              | 09 10 11        |                                               |
+| 3100009 | 31030009 | drop 4th digit  | 9              | 10             | 9              | 10             | 09 10 11        |                                               |
+| 3100010 | 31030010 | drop 4th digit  | 10             | 9              | 8              | 12             | 09 10 11        |                                               |
+| 3100012 | 31030012 | drop 4th digit  | 7              | 8              | 6              | 8              | 09 10 11        |                                               |
+| 3110001 | 31110001 | drop 4th digit  | 8              | 8              | 8              | 8              | 09 10 11        |                                               |
+| 3110003 | 31130003 | drop 4th digit  | 8              | 8              | 8              | 8              | 09 10 11        |                                               |
+| 3110004 | 31130004 | drop 4th digit  | 7              | 8              | 6              | 7              | 09 10 11        |                                               |
+| 3130001 | 31330001 | drop 4th digit  | 10             | 9              | 9              | 10             | 09 10 11        |                                               |
+| 3130002 | 31330002 | drop 4th digit  | 10             | 10             | 10             | 10             | 09 10 11        |                                               |
+| 3130003 | 31330003 | drop 4th digit  | 7              | 9              | 7              | 9              | 09 10 11        |                                               |
+| 3150016 | 30730016 | district recode | 0              | 9              | 0              | 9              | 09 10 11        |                                               |
+| 3160016 | 30430016 | district recode | 0              | 4              | 0              | 4              | 09 10 11        |                                               |
+| 3170009 | 30730009 | district recode | 0              | 7              | 0              | 10             | 09 10 11        |                                               |
+| 3170010 | 30730010 | district recode | 0              | 10             | 0              | 11             | 09 10 11        |                                               |
+| 3170011 | 30730011 | district recode | 0              | 8              | 0              | 9              | 09 10 11        |                                               |
+| 3180001 | 30610001 | district recode | 0              | 8              | 0              | 7              | 09 10 11        |                                               |
+| 3180002 | 30630002 | district recode | 0              | 8              | 0              | 7              | 09 10 11        | one EA, two district definitions; see 3060002 |
+| 3180003 | 30630003 | district recode | 0              | 9              | 0              | 9              | 09 10 11        |                                               |
+| 3180004 | 30630004 | district recode | 0              | 8              | 0              | 8              | 09 10 11        |                                               |
+| 3190005 | 30310005 | district recode | 0              | 7              | 0              | 6              | 09 10 11        |                                               |
+| 3190012 | 30330012 | district recode | 0              | 9              | 0              | 11             | 09 10 11        |                                               |
+| 3200018 | 30330018 | district recode | 0              | 10             | 0              | 10             | 09 10 11        |                                               |
+| 3200021 | 30330021 | district recode | 0              | 10             | 0              | 9              | 09 10 11        |                                               |
+| 3200024 | 30330024 | district recode | 0              | 10             | 0              | 12             | 09 10 11        |                                               |
+| 3200027 | 30330027 | district recode | 0              | 9              | 0              | 10             | 09 10 11        |                                               |
+| 3200030 | 30330030 | district recode | 0              | 9              | 0              | 10             | 09 10 11        |                                               |
+| 3210021 | 30230021 | district recode | 0              | 10             | 0              | 10             | 09 10 11        |                                               |
+| 3210023 | 30230023 | district recode | 0              | 8              | 0              | 8              | 09 10 11        |                                               |
+| 3210028 | 30230028 | district recode | 0              | 9              | 0              | 13             | 09 10 11        |                                               |
+| 3210030 | 30230030 | district recode | 0              | 10             | 0              | 11             | 09 10 11        |                                               |
+| 4010003 | 40130003 | drop 4th digit  | 10             | 7              | 8              | 7              | 09 10 11        |                                               |
+| 4010005 | 40130005 | drop 4th digit  | 8              | 3              | 8              | 3              | 09 10 11        |                                               |
+| 4020002 | 40210002 | drop 4th digit  | 10             | 10             | 9              | 10             | 09 10 11        |                                               |
+| 4020007 | 40230007 | drop 4th digit  | 9              | 9              | 9              | 9              | 09 10 11        |                                               |
+| 4020011 | 40230011 | drop 4th digit  | 8              | 9              | 8              | 8              | 09 10 11        |                                               |
+| 4020016 | 40230016 | drop 4th digit  | 9              | 9              | 9              | 10             | 09 10 11        |                                               |
+| 4020020 | 40230020 | drop 4th digit  | 9              | 9              | 9              | 9              | 09 10 11        |                                               |
+| 4020025 | 40230025 | drop 4th digit  | 8              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 4020030 | 40230030 | drop 4th digit  | 9              | 10             | 9              | 10             | 09 10 11        |                                               |
+| 4030002 | 40310002 | drop 4th digit  | 6              | 4              | 5              | 4              | 09 10 11        |                                               |
+| 4030004 | 40330004 | drop 4th digit  | 6              | 6              | 6              | 6              | 09 10 11        |                                               |
+| 4030006 | 40330006 | drop 4th digit  | 10             | 7              | 10             | 7              | 09 10 11        |                                               |
+| 4030007 | 40330007 | drop 4th digit  | 8              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 4030009 | 40330009 | drop 4th digit  | 8              | 8              | 8              | 10             | 09 10 11        |                                               |
+| 4040003 | 40410003 | drop 4th digit  | 10             | 9              | 9              | 8              | 09 10 11        |                                               |
+| 4040006 | 40430006 | drop 4th digit  | 9              | 8              | 9              | 9              | 09 10 11        |                                               |
+| 4040008 | 40430008 | drop 4th digit  | 10             | 10             | 10             | 13             | 09 10 11        |                                               |
+| 4040010 | 40430010 | drop 4th digit  | 9              | 8              | 7              | 7              | 09 10 11        |                                               |
+| 4040012 | 40430012 | drop 4th digit  | 10             | 9              | 9              | 8              | 09 10 11        |                                               |
+| 4050002 | 40510002 | drop 4th digit  | 8              | 7              | 7              | 6              | 09 10 11        |                                               |
+| 4050005 | 40510005 | drop 4th digit  | 8              | 7              | 8              | 7              | 09 10 11        |                                               |
+| 4050006 | 40530006 | drop 4th digit  | 7              | 5              | 5              | 5              | 09 10 11        |                                               |
+| 4050010 | 40530010 | drop 4th digit  | 10             | 8              | 8              | 8              | 09 10 11        |                                               |
+| 4060003 | 40610003 | drop 4th digit  | 4              | 3              | 3              | 4              | 09 10           |                                               |
+| 4060008 | 40630008 | drop 4th digit  | 10             | 9              | 10             | 10             | 09 10 11        |                                               |
+| 4060010 | 40630010 | drop 4th digit  | 8              | 7              | 8              | 7              | 09 10 11        |                                               |
+| 4060011 | 40630011 | drop 4th digit  | 9              | 7              | 8              | 7              | 09 10 11        |                                               |
+| 4060013 | 40630013 | drop 4th digit  | 10             | 6              | 9              | 5              | 09 10 11        |                                               |
+| 4070002 | 40710002 | drop 4th digit  | 3              | 2              | 3              | 2              | 09 10 11        |                                               |
+| 4070003 | 40730003 | drop 4th digit  | 9              | 8              | 8              | 7              | 09 10 11        |                                               |
+| 4070005 | 40730005 | drop 4th digit  | 7              | 6              | 5              | 5              | 09 10 11        |                                               |
+| 4070007 | 40730007 | drop 4th digit  | 5              | 3              | 5              | 3              | 09 10 11        |                                               |
+| 4070009 | 40730009 | drop 4th digit  | 7              | 5              | 7              | 5              | 09 10 11        |                                               |
+| 4080002 | 40830002 | drop 4th digit  | 10             | 9              | 10             | 10             | 09 10 11        |                                               |
+| 4080004 | 40830004 | drop 4th digit  | 9              | 9              | 9              | 10             | 09 10 11        |                                               |
+| 4090002 | 40910002 | drop 4th digit  | 6              | 5              | 5              | 5              | 09 10 11        |                                               |
+| 4090005 | 40930005 | drop 4th digit  | 8              | 3              | 3              | 3              | 09 10 11        |                                               |
+| 4090007 | 40930007 | drop 4th digit  | 9              | 0              | 9              | 0              | 09 10           |                                               |
+| 4090009 | 40930009 | drop 4th digit  | 5              | 5              | 4              | 4              | 09 10 11        |                                               |
+| 4090011 | 40930011 | drop 4th digit  | 1              | 1              | 1              | 1              | 09 10 11        |                                               |
+| 4100001 | 41010001 | drop 4th digit  | 8              | 6              | 6              | 5              | 09 10 11        |                                               |
+| 4100005 | 41010005 | drop 4th digit  | 2              | 2              | 2              | 2              | 09 10 11        |                                               |
+| 4100008 | 41010008 | drop 4th digit  | 10             | 0              | 9              | 0              | 09 10           |                                               |
+| 4100011 | 41030011 | drop 4th digit  | 9              | 0              | 9              | 0              | 09 10           |                                               |
+| 4100014 | 41030014 | drop 4th digit  | 9              | 0              | 8              | 0              | 09 10           |                                               |
+| 4100017 | 41030017 | drop 4th digit  | 10             | 0              | 10             | 0              | 09 10           |                                               |
+| 4100020 | 41030020 | drop 4th digit  | 8              | 0              | 7              | 0              | 09 10           |                                               |
+| 4100023 | 41030023 | drop 4th digit  | 10             | 0              | 10             | 0              | 09 10           |                                               |
+| 4100026 | 41030026 | drop 4th digit  | 8              | 8              | 7              | 7              | 09 10 11        |                                               |
+| 4100029 | 41030029 | drop 4th digit  | 10             | 10             | 9              | 10             | 09 10 11        |                                               |
+| 4100032 | 41030032 | drop 4th digit  | 8              | 0              | 3              | 0              | 09 10           |                                               |
+| 4100035 | 41030035 | drop 4th digit  | 8              | 0              | 7              | 0              | 09 10           |                                               |
+| 4100038 | 41030038 | drop 4th digit  | 8              | 9              | 8              | 10             | 09 10 11        |                                               |
+| 4110002 | 41110002 | drop 4th digit  | 7              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 4110004 | 41130004 | drop 4th digit  | 8              | 7              | 7              | 7              | 09 10 11        |                                               |
+| 4110006 | 41130006 | drop 4th digit  | 9              | 9              | 9              | 10             | 09 10 11        |                                               |
+| 4110007 | 41130007 | drop 4th digit  | 8              | 8              | 8              | 9              | 09 10 11        |                                               |
+| 4110009 | 41130009 | drop 4th digit  | 10             | 10             | 10             | 10             | 09 10 11        |                                               |
+| 4120003 | 41230003 | drop 4th digit  | 9              | 9              | 9              | 9              | 09 10 11        |                                               |
+| 4120005 | 41230005 | drop 4th digit  | 7              | 8              | 7              | 9              | 09 10 11        |                                               |
+| 4130002 | 41330002 | drop 4th digit  | 10             | 9              | 7              | 8              | 09 10 11        |                                               |
+| 4130003 | 41330003 | drop 4th digit  | 9              | 9              | 8              | 8              | 09 10 11        |                                               |
+| 4130005 | 41330005 | drop 4th digit  | 9              | 5              | 6              | 5              | 09 10 11        |                                               |
+| 4140001 | 41410001 | drop 4th digit  | 8              | 4              | 8              | 4              | 09 10 11        |                                               |
+| 4140003 | 41430003 | drop 4th digit  | 9              | 7              | 9              | 7              | 09 10 11        |                                               |
+| 4140005 | 41430005 | drop 4th digit  | 9              | 7              | 9              | 7              | 09 10 11        |                                               |
+| 4150002 | 41510002 | drop 4th digit  | 5              | 3              | 4              | 3              | 09 10 11        |                                               |
+| 4150004 | 41530004 | drop 4th digit  | 9              | 4              | 6              | 3              | 09 10 11        |                                               |
+| 4150006 | 41530006 | drop 4th digit  | 7              | 6              | 6              | 7              | 09 10 11        |                                               |
+| 4150007 | 41530007 | drop 4th digit  | 9              | 9              | 7              | 8              | 09 10 11        |                                               |
+| 4150009 | 41530009 | drop 4th digit  | 9              | 8              | 9              | 8              | 09 10 11        |                                               |
+| 4160007 | 40930007 | district recode | 0              | 4              | 0              | 4              | 09 10 11        |                                               |
+| 4170008 | 41010008 | district recode | 0              | 10             | 0              | 9              | 09 10 11        |                                               |
+| 4170014 | 41030014 | district recode | 0              | 10             | 0              | 9              | 09 10 11        |                                               |
+| 4170017 | 41030017 | district recode | 0              | 10             | 0              | 11             | 09 10 11        |                                               |
+| 4180011 | 41030011 | district recode | 0              | 8              | 0              | 8              | 09 10 11        |                                               |
+| 4180020 | 41030020 | district recode | 0              | 7              | 0              | 7              | 09 10 11        |                                               |
+| 4180023 | 41030023 | district recode | 0              | 9              | 0              | 9              | 09 10 11        |                                               |
+| 4190032 | 41030032 | district recode | 0              | 7              | 0              | 3              | 09 10 11        |                                               |
+| 4190035 | 41030035 | district recode | 0              | 8              | 0              | 7              | 09 10 11        |                                               |

@@ -44,7 +44,12 @@ sample:
     idxvars:
         i: HHID
     myvars:
-        v: comm
+        # GH #1133: the 7-character comm (2010/11 district definitions for 50
+        # EAs) is served as the 8-digit frame EA through the reviewed
+        # `comm_frame_ea` table, as 2005-06 / 2011-12 write it.
+        v:
+            - comm
+            - mappings: comm_frame_ea
         weight: wgt10
         panel_weight: wgt10  # pre-refreshment — same as cross-sectional
         strata: stratum
@@ -62,7 +67,12 @@ cluster_features:
         file: ../Data/GSEC1.dta
         idxvars:
             i: HHID
-            v: comm
+            # GH #1133: same function as `sample`.  The list form is what lets
+            # it reach an idxvar at all: a bare `v: comm` idxvar is formatted
+            # with format_id only (Wave.column_mapping's scalar-string branch).
+            v:
+                - comm
+                - mappings: comm_frame_ea
         myvars:
             Region:
                 - region
