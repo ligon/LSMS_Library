@@ -20,6 +20,10 @@ gives correct linkage for all three categories:
 
 W4 (2018-19) and W5 (2021-22) draw entirely new samples with no
 backward link.
+
+GH #1120: W2/W3 households recorded ONLY in the agriculture cover
+(sect_cover_pp_w2/w3) are linked by the same two rules -- see the block
+below the W3 household-cover mapping.
 """
 import json
 from pathlib import Path as _Path
@@ -49,6 +53,46 @@ df3['t'] = '2015-16'
 df3['previous_i'] = df3['household_id2']  # identity -- chain does the work
 df3 = df3.rename(columns={'household_id2': 'i'})
 df3 = df3.set_index(['t', 'i'])[['previous_i']]
+
+# --- GH #1120: households recorded ONLY in the AGRICULTURE cover ---
+# sample() takes these households from sect_cover_pp_w{N} (GH #1120 D1), so
+# the crosswalk must walk them as it walks the household cover's.  Evidence
+# (CONTENTS.org "sample(): the agriculture cover's households"): every one of
+# W2's 25 and W3's 27 carries a W1 baseline household_id that IS in the W1
+# household cover, in the same EA, and none is already another household's
+# target here; 25 of W3's 27 were walked in W2 (from the W2 household cover)
+# to exactly the baseline the W3 agriculture cover records, and were left
+# unwalked in W3 -- a panel break.  The household-cover rows above are first,
+# so no household-cover link is renumbered (no new target collides with an
+# existing one; update_id mints no split suffix).  The regenerated JSON ADDS
+# 25 W2 and 27 W3 entries (26 linked, 1 identity: no W2 record of any kind),
+# and MOVES 12 existing W3 entries from identity to their W1 baseline: those
+# households were in W2's agriculture cover only and in W3's household cover,
+# so W2's missing link broke their chain.  For all 12 the new target is in the
+# W1 household cover, has the same EA, and equals W3's own household_id
+# column.  Counts are re-derived in tests/test_gh1120_ethiopia_agriculture_cover.py.
+pp2 = get_dataframe('../2013-14/Data/sect_cover_pp_w2.dta')[
+    ['household_id2', 'household_id']
+]
+pp2['household_id2'] = pp2['household_id2'].apply(format_id)
+pp2['household_id'] = pp2['household_id'].apply(format_id)
+pp2 = pp2[~pp2['household_id2'].isin(set(df2.index.get_level_values('i')))]
+pp2 = pp2.drop_duplicates('household_id2')
+pp2['t'] = '2013-14'
+pp2 = pp2.rename(columns={'household_id2': 'i', 'household_id': 'previous_i'})
+df2 = pd.concat([df2, pp2.set_index(['t', 'i'])[['previous_i']]], axis=0)
+
+# W3: the same identity rule as the household cover (the chain resolver walks
+# each id back through W2); W3's own household_id column is not trusted, as
+# documented above.
+pp3 = get_dataframe('../2015-16/Data/sect_cover_pp_w3.dta')[['household_id2']]
+pp3['household_id2'] = pp3['household_id2'].apply(format_id)
+pp3 = pp3[~pp3['household_id2'].isin(set(df3.index.get_level_values('i')))]
+pp3 = pp3.drop_duplicates('household_id2')
+pp3['t'] = '2015-16'
+pp3['previous_i'] = pp3['household_id2']
+pp3 = pp3.rename(columns={'household_id2': 'i'})
+df3 = pd.concat([df3, pp3.set_index(['t', 'i'])[['previous_i']]], axis=0)
 
 panel_ids_df = pd.concat([df2, df3], axis=0)
 D, updated_ids = panel_ids(panel_ids_df)
