@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 """community_prices for Nigeria GHS-Panel 2010-11 (W1) -- GAP C.
 
-Item-level reported community food prices at grain (t, v, j, u) from the
+Item-level reported community food prices at grain (t, v, j, u, variety, obs) from the
 post-harvest COMMUNITY questionnaire's food-price module (Section C8,
 sectc8_harvestw1.csv).  CLUSTER-level (no household i); v = cluster_id(state, lga, ea) is the
 COMPOSITE community EA id (GH #323), the SAME keyspace as sample().v.  W1 uses the
 community questionnaire's OWN item-code scheme (mapped by name to canonical
 harmonize_food Preferred Labels) and carries no unit column (the unit is the
-per-item fixed questionnaire unit).  t = 2011Q1 (post-harvest quarter).
+per-item fixed questionnaire unit).
+`variety` is the source item code (GH #637, @ligon 2026-10-23): this scheme
+prices size variants of one item as separate codes (base*10+size) and
+several distinct items resolve to one food label, so each code keeps its
+own row under the same `j` -- none is selected.  t = 2011Q1 (post-harvest quarter).
 
 Registered as a wave-level script so the build flows through the framework's
-wave path (getattr(wave, 'community_prices')()), which preserves the (t,v,j,u)
-grain -- the country-level fallback path's map_index() would swap the j level
+wave path (getattr(wave, 'community_prices')()), which preserves the
+declared grain -- the country-level fallback path's map_index() would swap the j level
 to i for a j-without-i index.
 """
 import sys
@@ -27,6 +31,6 @@ df = community_prices_for_wave(t, [dict(
     df=raw, dec=raw, ea='ea', item='item_cd', price='sc8q2', unit=None)],
     mode='names')
 
-assert df.index.is_unique, "community_prices W1: (t,v,j,u) not unique"
+assert df.index.is_unique, "community_prices W1: (t,v,j,u,variety,obs) not unique"
 assert len(df) > 0
 to_parquet(df, 'community_prices.parquet')

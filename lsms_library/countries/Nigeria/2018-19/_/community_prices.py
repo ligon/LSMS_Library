@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """community_prices for Nigeria GHS-Panel 2018-19 (W4) -- GAP C.
 
-Item-level reported community food prices at grain (t, v, j, u) from the
+Item-level reported community food prices at grain (t, v, j, u, variety, obs) from the
 post-harvest COMMUNITY questionnaire's food-price module (Section C8,
 sectc8_harvestw4.dta).  CLUSTER-level (no household i); v = cluster_id(state, lga, ea).
 W4 item_cd is the consumption-module scheme already in harmonize_food
@@ -31,6 +31,6 @@ df = community_prices_for_wave(t, [dict(
     size='c8q2c')],
     mode='codes', crop_labels=crop_labels)
 
-assert df.index.is_unique, "community_prices W4: (t,v,j,u) not unique"
+assert df.index.is_unique, "community_prices W4: (t,v,j,u,variety,obs) not unique"
 assert len(df) > 0
 to_parquet(df, 'community_prices.parquet')

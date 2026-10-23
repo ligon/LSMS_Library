@@ -17,7 +17,9 @@ other wave.  Niger's duplicate-entry drop (a SECOND source record of the same
 slot that repeats a served row) has nothing to act on -- each C8 file is
 ``(ea, item_cd)``-unique -- so a location-2 price equal to location 1's is a
 second slot and is served.  W1/W2's own ``first`` collapse (size variants and
-lumped items) is out of scope and pinned unchanged here.
+lumped items) was removed later the same day by the ``variety`` level (the
+source item code, GH #637 ruling); see ``test_gh637_nigeria_w1w2_variety.py``.
+The declared index is now ``(t, v, j, u, variety, obs)``.
 
 Every test here fails on development ``9a0ed5f3c``: the builder ignores
 ``obs`` and the declared index is ``(t, v, j, u)``.
@@ -72,7 +74,7 @@ class TestDeclaration:
         scheme = load_yaml(countries_root() / 'Nigeria' / '_' / 'data_scheme.yml')
         spec = scheme['Data Scheme']['community_prices']['index']
         assert [t.strip() for t in spec.strip('() ').split(',')] == \
-            ['t', 'v', 'j', 'u', 'obs']
+            ['t', 'v', 'j', 'u', 'variety', 'obs']
 
     def test_w3_script_passes_one_slot_per_location(self):
         src = (countries_root() / 'Nigeria' / '2015-16' / '_'
@@ -91,7 +93,7 @@ class TestBuilder:
         loc1 = _frame([(1, 11, 100.0), (1, 12, 80.0)], obs=1)
         loc2 = _frame([(1, 11, 125.0), (1, 12, 80.0)], obs=2)
         out = _w3(nigeria_module, [loc1, loc2])
-        assert list(out.index.names) == ['t', 'v', 'i', 'j', 'u', 'obs']
+        assert list(out.index.names) == ['t', 'v', 'i', 'j', 'u', 'variety', 'obs']
         got = out.reset_index().set_index(['j', 'obs'])['Price']
         # A differing location-2 price is served, not dropped ...
         assert got[('Millet', 1)] == 100.0 and got[('Millet', 2)] == 125.0
@@ -117,20 +119,19 @@ class TestBuilder:
         with pytest.raises(AssertionError, match='broken key'):
             _w3(nigeria_module, [_frame([(1, 11, 100.0), (1, 11, 90.0)], obs=1)])
 
-    def test_w1_w2_names_mode_still_collapses_to_first(self, nigeria_module):
-        # OUT OF SCOPE for #637 defect C: W1/W2's size variants of one base
-        # item (base*10+size) still collapse to the first price at obs 1.
-        # Pinned so a change there is a deliberate one.
+    def test_w1_w2_size_variants_are_no_longer_collapsed(self, nigeria_module):
+        # Until the GH #637 W1/W2 ruling (2026-10-23) this pinned the opposite:
+        # 1511 / 1512 collapsed to the first price.  Each code is now its own
+        # `variety` row (test_gh637_nigeria_w1w2_variety.py has the rest).
         raw = pd.DataFrame({'state': [1, 1], 'lga': [101, 101], 'ea': [1, 1],
                             'item_cd': [1511, 1512], 'sc8q2': [50, 90]})
         fr = dict(df=raw, dec=raw, ea='ea', item='item_cd', price='sc8q2')
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             out = nigeria_module.community_prices_for_wave('2011Q1', [fr], 'names')
-        # 1511 / 1512 both resolve to base item 151 ('Milk powder', 'tin').
-        assert len(out) == 1
-        assert out.index.get_level_values('obs').tolist() == [1]
-        assert out['Price'].iloc[0] == 50
+        assert len(out) == 2
+        assert out.index.get_level_values('obs').tolist() == [1, 1]
+        assert sorted(out['Price'].tolist()) == [50, 90]
 
 
 def _aws_creds_available() -> bool:
@@ -144,7 +145,9 @@ def _aws_creds_available() -> bool:
 # Served rows per post-harvest round, measured on cold builds 2026-10-23.
 # 2016Q1: 17,344 location-1 + 5,809 location-2 rows (development served
 # 20,562: every location-1 row plus the 3,218 location-2-only rows).
-EXPECTED = {'2011Q1': {1: 27104}, '2013Q1': {1: 27079},
+# 2011Q1 / 2013Q1 were 27,104 / 27,079 until the W1/W2 `variety` level
+# stopped collapsing size variants and lumped items (same day, GH #637).
+EXPECTED = {'2011Q1': {1: 30628}, '2013Q1': {1: 31239},
             '2016Q1': {1: 17344, 2: 5809},
             '2019Q1': {1: 31757}, '2024Q1': {1: 30064}}
 
@@ -162,7 +165,7 @@ class TestBuilt:
             return Country('Nigeria').community_prices()
 
     def test_index_carries_obs(self, cp):
-        assert list(cp.index.names) == ['t', 'v', 'j', 'u', 'obs']
+        assert list(cp.index.names) == ['t', 'v', 'j', 'u', 'variety', 'obs']
         assert cp.index.is_unique
         assert pd.api.types.is_integer_dtype(cp.index.get_level_values('obs'))
 
@@ -186,6 +189,7 @@ class TestBuilt:
         spec.loader.exec_module(mp)
         for frame in (mp.inputs_community_prices('2015-16'),
                       mp.inputs_c8_unrecorded_size_drop('2015-16')):
-            assert 'obs' in frame.columns
+            assert 'obs' in frame.columns and 'variety' in frame.columns
             assert set(frame['obs']) <= {1, 2}
             assert not frame.duplicated(['v', 'obs', 'item_cd']).any()
+            assert not frame.duplicated(['v', 'obs', 'variety']).any()

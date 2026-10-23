@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """community_prices for Nigeria GHS-Panel 2015-16 (W3) -- GAP C.
 
-Item-level reported community food prices at grain (t, v, j, u, obs) from
+Item-level reported community food prices at grain (t, v, j, u, variety, obs) from
 the post-harvest COMMUNITY questionnaire's food-price module (Section C8).  W3
 fields C8 at TWO locations per community, one file each, over the SAME item
 list: sectc8a_harvestw3.dta is "C8a: FOOD PRICES - 1ST LOCATION" (obs = 1) and
@@ -46,6 +46,6 @@ for obs, f in ((1, '../Data/sectc8a_harvestw3.dta'),
 df = community_prices_for_wave(t, frames, mode='codes',
                               crop_labels=crop_labels)
 
-assert df.index.is_unique, "community_prices W3: (t,v,j,u,obs) not unique"
+assert df.index.is_unique, "community_prices W3: (t,v,j,u,variety,obs) not unique"
 assert len(df) > 0
 to_parquet(df, 'community_prices.parquet')

@@ -538,8 +538,9 @@ Data Scheme:
 
   community_prices:
     # Item-level reported community food prices (GAP C) at natural grain
-    # (t, v, j, u).  CLUSTER-level: one row per (cluster/EA x food-item x
-    # unit) from the post-harvest COMMUNITY questionnaire's food-price
+    # (t, v, j, u, variety, obs).  CLUSTER-level: one row per (cluster/EA x
+    # food-item x unit x source item code x reading slot) from the
+    # post-harvest COMMUNITY questionnaire's food-price
     # module (Section C8 "Food Prices", file sectc8_harvest{wN}; W3 splits
     # it across sectc8a / sectc8b; W5 under Post Harvest Wave 5/Community/).
     # There is NO household i, so _join_v_from_sample does NOT apply -- `v`
@@ -597,12 +598,21 @@ Data Scheme:
     # 2026-10-23 the two were collapsed on (t, v, j, u) and location 1 kept:
     # 2,591 location-2 prices dropped (983 of them different), and 3,218
     # location-2-only rows served as if from location 1.  Every other wave
-    # prices one location: obs = 1, native (not the Feature sentinel).  No
-    # `variety` / `visit` level: W3-W5 build collision-free on
-    # (t, v, j, u, obs) (asserted in nigeria.community_prices_for_wave), and
-    # W1/W2's size variants and lumped items still collapse to the first
-    # price pending a ruling (CONTENTS.org).
-    index: (t, v, j, u, obs)
+    # prices one location: obs = 1, native (not the Feature sentinel).
+    #
+    # variety (GH #637, ruling @ligon 2026-10-23, following GH #840 for
+    # Tanzania) -- the SOURCE item code, as a string.  W1/W2's own C8 scheme
+    # prices size variants of one item as separate codes (base*10+size: 1511,
+    # 1512) and several distinct items that the name map lumps under one food
+    # label (Maize, Beer, Fish--fresh, Butter/Margarine, ...).  Until
+    # 2026-10-23 they were collapsed on (t, v, j, u, obs) to the FIRST price
+    # (2,568 W1 / 2,951 W2 groups, 2,303 / 2,605 disagreeing); each code now
+    # keeps its own row under the same `j`, and nothing is selected.  W3-W5
+    # carry their consumption-scheme code, 1:1 with `j` there.  No `visit`
+    # level (C8 is fielded once, in the post-harvest round); Feature() fills
+    # its sentinel.  The full key is asserted unique in
+    # nigeria.community_prices_for_wave.
+    index: (t, v, j, u, variety, obs)
     Price: float
     materialize: make
 
