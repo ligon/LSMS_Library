@@ -18,7 +18,7 @@ detached worktree so the candidate's edits could not leak into it.  Candidate =
 | =derivation_inputs= | =country.py:2934-2940= | raw derivation inputs | flag absent |
 | Ethiopia country scripts | =Ethiopia/_/{anthropometry,crop_production,food_coping,livestock,people_last7days,plot_features,plot_inputs,plot_labor}.py= | concatenated raw wave parquets, in a =make= subprocess | none |
 | Uganda (13) / Tanzania (11) country scripts | =uganda.py:741= / =tanzania.py:794= (their own =id_walk=, always single-pass) | same | none |
-| =diagnostics._check_id_walk_idempotent= | =diagnostics.py:1667= | the served spine, flag cleared | deliberate re-walk |
+| =diagnostics._check_id_walk_idempotent= | =diagnostics.py:1667= | the served spine, flag cleared | deliberate re-walk; VACUOUS on base and round 1: the spine is index-only and =id_walk='s =df.empty= guard returned it unwalked (fixed in round 2, section 4) |
 
 =id_converted= is set only by =id_walk= (and Uganda's / Tanzania's copies);
 it is checked at the three framework sites above.  =Feature= calls the
@@ -36,7 +36,8 @@ Measured over every table of the 11 panel countries (250 tables x 5 routes =
   pyarrow 25.0.1).
 - *L2-wave parquets are PRE-walk* (=Wave.grab_data= / wave scripts emit raw
   ids; no wave script calls =id_walk=).
-- *Applied twice today: yes, on every read of the tables below.*  22
+- *Applied twice today: yes, on every cold, warm and Feature read of the
+  tables below* (never under =assume_cache_fresh=, which walks nothing).  22
   =_finalize_result= walks per route (cold, warm_same, warm_fresh, Feature);
   10 per route are on waves whose map moves ids and are provably
   re-applications (classified =walked=: no =K - V= id, thousands of =V - K=
@@ -60,9 +61,12 @@ Measured over every table of the 11 panel countries (250 tables x 5 routes =
 - =assume_cache_fresh= never walks (=_updated_ids_cache= is not loaded on a
   fresh instance); it serves the post-walk parquet, so it agrees with cold.
 - One stage-2 walk classified =walked= is not a household id at all: Niger
-  2014-15 =community_prices=, where =i= is the FOOD ITEM (16 item codes equal a
-  2011-12 household id).  It renames nothing under either semantics; but the
-  stage-2 walk does run on any table with an =i= level.
+  2014-15 =community_prices=, whose wave frame carries =i= equal to the
+  CLUSTER id =v= on 100% of its 13,691 rows (corrected in round 2; round 1
+  called it a food item).  16 of its 221 codes equal 2014-15 targets
+  (=V - K=) and 0 equal a moving raw id (=K - V=), so nothing is renamed or
+  refused today, under either semantics; but the stage-2 walk does run on any
+  table with an =i= level.
 
 * 2. Corpus effect of single-pass semantics (before any code change)
 
@@ -106,9 +110,10 @@ Measured over every table of the 11 panel countries (250 tables x 5 routes =
 - =panel_checks_status.json=: =check_panel_consistency= for all 11 countries:
   every status identical to base.  Burkina messages: 3,147 -> 3,227 mappings;
   attrition 2018-19 -> 2021-22 3,155 (98%) -> 3,227 (100%).
-  =id_walk_idempotent= passes everywhere.  Counterfactual on the candidate's
-  Burkina root with a BARE single pass monkeypatched in: the same check FAILS
-  (77 (i, t) disappear) -- the detection is load-bearing on real data.
+  =id_walk_idempotent= passes everywhere -- but on round 1 VACUOUSLY (see
+  section 4, R1): the round-1 "counterfactual" only failed because its bare
+  mutant lacked =id_walk='s =df.empty= guard.  The real counterfactual is in
+  section 4.
 - =tests.txt=: 145 + 321 + 24 passed (the last against the candidate's warm
   Burkina root: =derivation_inputs= -> =id_walk= -> join to the served rows).
 - Cost of the per-wave classification: not measurable at this resolution.
@@ -120,9 +125,55 @@ Measured over every table of the 11 panel countries (250 tables x 5 routes =
   for any edit to =id_walk=: it is reached from the tagged =_aggregate_wave_data=,
   and =Wave.grab_data= folds the fingerprint into every wave hash.
 
+* 4. Round 2 (independent review of =89c0df368=; commit =161920d64=)
+
+- *R1 -- the panel diagnostic was vacuous.*  =diagnostics._panel_spine= is an
+  index-only frame (Burkina: 21,037 rows x 0 columns); pandas calls that
+  =empty=, and =id_walk= returned any =df.empty= frame untouched.  The guard
+  now tests for zero rows.  Before changing it: 0 of 2,500 served frames
+  (base + round 1) and 0 of 888 =id_walk= inputs (round 2, =cols_in=) have
+  rows and zero columns, so no served data moves.  =counterfactual_round2.json=
+  (=scripts/cf2.py=, the round-2 warm Burkina root):
+
+  | id_walk in use | =id_walk_idempotent= | warm =food_quantities= 2021-22 households | duplicate index rows (entries) |
+  |----------------+----------------------+-------------------------------------------+-------------------------------|
+  | the real one | pass (spine walked, classified walked, left alone) | 3,216 | 0 (0) |
+  | bare single pass (detection removed, rows guard kept) | FAIL: 77 (i, t) disappear | 3,140 | 735 (1,470) |
+
+  The reviewer measured the same 3,140 / 735 independently.
+- *=state='raw'=.*  Stage 2 of =load_from_waves= and =derivation_inputs= pass
+  it: they know the frame is unwalked, so a wave of only chained / inert ids
+  is renamed instead of refused (a small raw input, e.g. Malawi derivation
+  inputs with 1-2 households per wave, or a one-household Burkina 2021-22
+  frame).  A detectably walked wave is still left alone and a mixed wave still
+  raises.
+- *Stated limit of the mixed check*, pinned in =tests/test_id_walk.py=: a
+  mixed wave escapes when one side holds only chained ids (walked ={Q}= + raw
+  ={T}= is left alone; walked ={T}= + raw ={P}= is renamed, =T= walked twice).
+  0 such frames in any measured read.
+- *Behaviour change for the 10 chain-free countries:* a wave holding both
+  =K - V= and =V - K= ids now raises where base renamed it.  0 occurrences.
+- *Pre-existing, identical on base and candidate* (not caused by #1245):
+  =id_walk= drops rows whose =t= is NaN; cold vs warm dtype differences --
+  =interview_date= =visit= level =Int64= cold, =int64= warm (Burkina,
+  GhanaLSS, Malawi, Niger, Senegal), and Mali =household_roster= =MonthsSpent=
+  =object= cold, =string= warm (checked on =d353b7ea7= in a fresh root).
+  The frame hash here is taken on =astype(str)= values, so it does not see
+  dtypes; =harness_cand_round2.json= adds a dtype fingerprint.
+- *Sweep* (=harness_cand_round2.json=): every table of the 11 countries, all
+  five routes, fresh roots.  =round1_vs_round2.json=: 1,250 of 1,250 served
+  frames identical to round 1.  =base_vs_round2.json=: 1,175 identical to
+  =d353b7ea7=, the other 75 = Burkina's 15 household tables x 5 routes.
+  0 errors, 0 =IdWalkError=, 0 mixed.  =panel_checks_status_round2.json=:
+  every status identical to base, now with the walk exercised.
+- Tests (=tests.txt=): 268 passed (four named files + Feature attrs +
+  derivations, =gh819=, population; =requires_s3= included).
+- =hash_census_round2.json=: 549/549, 40/40, 2,109/2,109 moved vs base (and
+  vs round 1) -- still one corpus-wide cold re-warm.
+
 * Scripts
 =scripts/=: =harness.py= (instrumented read of every table by route),
-=analyze.py=, =compare.py=, =chain_census.py=, =bf_run_noguard.py= /
+=analyze.py=, =compare.py=, =cf2.py= (round-2 counterfactual), =chain_census.py=, =bf_run_noguard.py= /
 =bf_simulate.py= (scratch regeneration and simulation), =other_guards_run.py=,
 =panel_check.py= / =panel_checks.sh=, =dump_ti.py= / =bf_compare.py=,
 =run_country.sh= / =queue.sh=.

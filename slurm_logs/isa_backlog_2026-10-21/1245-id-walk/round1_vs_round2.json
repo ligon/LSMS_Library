@@ -1,0 +1,56 @@
+{
+ "same": {
+  "assume": 250,
+  "cold": 250,
+  "feature": 250,
+  "warm_fresh": 250,
+  "warm_same": 250
+ },
+ "frame_differs": [],
+ "ti_differs": [],
+ "missing": [],
+ "cand_route_disagree": [
+  [
+   "Ethiopia/nutrition",
+   "frame",
+   {
+    "cold": "c9e61250",
+    "warm_same": "c9e61250",
+    "warm_fresh": "c9e61250",
+    "assume": "321042c2"
+   }
+  ],
+  [
+   "Uganda/nutrition",
+   "frame",
+   {
+    "cold": "0036614a",
+    "warm_same": "0036614a",
+    "warm_fresh": "0036614a",
+    "assume": "7afca1a9"
+   }
+  ]
+ ],
+ "base_route_disagree": [
+  [
+   "Ethiopia/nutrition",
+   "frame",
+   {
+    "cold": "c9e61250",
+    "warm_same": "c9e61250",
+    "warm_fresh": "c9e61250",
+    "assume": "321042c2"
+   }
+  ],
+  [
+   "Uganda/nutrition",
+   "frame",
+   {
+    "cold": "0036614a",
+    "warm_same": "0036614a",
+    "warm_fresh": "0036614a",
+    "assume": "7afca1a9"
+   }
+  ]
+ ]
+}

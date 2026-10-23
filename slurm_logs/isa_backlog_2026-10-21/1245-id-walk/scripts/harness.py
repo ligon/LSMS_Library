@@ -70,11 +70,12 @@ def _site():
     return names
 
 
-def wrapped_walk(df, updated_ids, hh_index="i"):
+def wrapped_walk(df, updated_ids, hh_index="i", *a, **k):
     CALLS.append({"kind": "walk", "table": CTX["table"], "route": CTX["route"],
                   "site": _site(), "flag_in": bool(df.attrs.get("id_converted")),
-                  "rows": int(len(df)), "cls": _classify(df, updated_ids, hh_index)})
-    return _orig_walk(df, updated_ids, hh_index)
+                  "rows": int(len(df)), "cols_in": int(len(df.columns)),
+                  "cls": _classify(df, updated_ids, hh_index)})
+    return _orig_walk(df, updated_ids, hh_index, *a, **k)
 
 
 cm.id_walk = wrapped_walk
@@ -110,6 +111,12 @@ def fingerprint(df):
             pd.util.hash_pandas_object(flat.astype(str), index=False).values.tobytes()).hexdigest()
     except Exception as e:  # noqa: BLE001
         fp["frame_hash"] = f"ERR {e!r}"[:120]
+    try:
+        dt = [str(d) for d in df.dtypes] + [str(df.index.get_level_values(n).dtype) for n in df.index.names]
+        fp["dtypes"] = dt
+        fp["dtype_hash"] = hashlib.md5("|".join(dt).encode()).hexdigest()
+    except Exception as e:  # noqa: BLE001
+        fp["dtype_hash"] = f"ERR {e!r}"[:80]
     if "i" in df.index.names and "t" in df.index.names:
         ti = df.index.to_frame(index=False)[["t", "i"]].astype(str).drop_duplicates()
         fp["ti_n"] = int(len(ti))

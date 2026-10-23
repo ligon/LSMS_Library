@@ -3,3 +3,5 @@ named: tests/test_id_walk.py tests/test_panel_ids_persistence.py tests/test_pane
 321 passed, 18 deselected, 2 warnings in 150.97s (0:02:30)
 related: test_gh819_vjoin_order test_population test_derivations test_finalize_order_797 test_no_v_join_declarative test_label_selection test_currency test_conversion test_build_transform_hash test_gh891_wave_subset_cache test_canonical_shape_via_cache_miss (-m 'not requires_s3')
 24 passed: tests/test_ehcvm_7day.py -k Burkina against the candidate's warm Burkina root (incl. test_inputs_join_to_the_served_rows for both EHCVM waves: derivation_inputs -> id_walk -> join to the served rows)
+round 2: 268 passed, 11 warnings in 431.90s (0:07:11)
+  files: test_id_walk test_panel_ids_persistence test_panel_id_collisions test_burkina_faso_panel_ids test_feature_attrs_carriers test_derivations test_gh819_vjoin_order test_population (-n 2 --dist=loadfile; requires_s3 included, no skips)

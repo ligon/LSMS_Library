@@ -64,11 +64,13 @@ guard, and verify served `i` moves only for Burkina's 80.
   id"?  Out of scope here (no crosswalk but Burkina's may change).
 - Should `_FOOD_DERIVED` / country scripts that call the API carry the flag,
   to save the (cheap) re-classification?  Not needed for correctness.
-- The stage-2 walk runs on any table with an `i` level, including
-  `community_prices`, whose `i` is a FOOD ITEM: Niger 2014-15 has 16 item codes
-  equal to 2011-12 household ids.  Renames nothing under either semantics
-  today; an item code equal to a moving household key would be renamed (as it
-  would have been before #1245).  Restrict the walk to household tables?
+- The stage-2 walk runs on any table with an `i` level.  Niger 2014-15
+  `community_prices`' wave frame carries `i` equal to the CLUSTER id `v` on
+  100% of its 13,691 rows (round 1 wrongly called it a food item): 16 of 221
+  codes equal 2014-15 targets (`V - K`), 0 equal a moving raw id (`K - V`), so
+  nothing is renamed or refused today.  A code equal to a moving key would be
+  renamed (as before #1245); one set hitting both classes would now raise.
+  Restrict the walk to household tables?
 - Commit `a7b0e703b`'s message says `food_quantities` is re-walked in "5
   countries"; the completed base run says 6 (Burkina, Ethiopia, GhanaLSS,
   Malawi, Tanzania, Uganda).  The evidence README has the full list.
@@ -86,7 +88,30 @@ Evidence: `slurm_logs/isa_backlog_2026-10-21/1245-id-walk/README.org`.
 - `_close_id_map` removal — OK (§2): no remaining caller (`rg`).
 - Burkina `panel_ids.py` assertion — OK (§4): passes on the real cover; the
   JSON diff is +80 entries, 0 changed.
-- `_check_id_walk_idempotent` — OK (§2): passes for all 11; with a bare single
-  pass monkeypatched in, it fails on Burkina (77 (i, t) disappear).
+- `_check_id_walk_idempotent` — round 1 claimed OK; the review REFUTED it
+  (R1): the spine is index-only, `id_walk`'s `df.empty` guard returned it
+  unwalked, so the check was vacuous, and my round-1 counterfactual only bit
+  because its bare mutant had no such guard.  Round 2 (`161920d64`) guards on
+  zero ROWS.  Now on the real Burkina spine (21,037 rows x 0 columns): pass
+  with `id_walk`, fail with a bare single pass (77 (i, t) disappear).  Warm
+  Burkina `food_quantities` with the bare pass: 3,140 instead of 3,216
+  2021-22 households and 735 duplicate index rows (1,470 entries) -- the
+  reviewer's figures, reproduced.
+
+### Round 2 (GH #1245 review of `89c0df368`)
+- R1 above; no served frame has zero columns (2,500 reads), so the guard fix
+  moves no served data.
+- `state='raw'` at stage 2 and in `derivation_inputs`: only the undecidable
+  case (only chained / inert ids) is renamed instead of refused; a detectably
+  walked wave is still left alone, a mixed wave still raises.
+- The mixed check's limit is stated and pinned (one side holding only chained
+  ids escapes; 0 such frames).
+- Behaviour change for the 10 chain-free countries: a wave holding both
+  `K - V` and `V - K` ids raises where base renamed it (0 occurrences).
+- Pre-existing, identical on both sides: NaN-`t` rows dropped by `id_walk`;
+  `interview_date` `visit` `Int64` cold vs `int64` warm (5 countries); Mali
+  `household_roster` `MonthsSpent` `object` cold vs `string` warm (checked on
+  `d353b7ea7` in a fresh root).
+- Niger `panel_ids.py:151` comment updated (guard unchanged).
 - No REINVENTION: `update_id` / `panel_ids()` untouched; the detection reuses
   nothing because nothing classified ids before.
