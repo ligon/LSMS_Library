@@ -1,9 +1,9 @@
 """The panel crosswalk is a REVIEWED SOURCE, not a build product (GH #914, #894).
 
 ``panel_ids.json`` / ``updated_ids.json`` are committed to the config tree and
-shipped in the wheel.  Nine countries persist the crosswalk that way (design A);
-Malawi and Nigeria derive theirs from per-wave YAML into a cache parquet
-(design B).  This module pins two things:
+shipped in the wheel.  Ten countries persist the crosswalk that way (design
+A); Nigeria derives its own from per-wave YAML into a cache parquet (design B).
+Malawi did too until GH #894.  This module pins two things:
 
 **#914 -- nothing regenerates the crosswalk on the runtime build path.**  Until
 this landed each of the nine Makefiles carried
@@ -38,8 +38,8 @@ not change file content, so the test is read-only with respect to git.
 **#894 -- a twelfth country cannot pick the other design by accident.**
 ``test_every_panel_ids_country_declares_its_design`` enumerates the countries
 declaring ``panel_ids`` and requires each to be design A (tracked JSON on disk)
-or named in ``DESIGN_B_PENDING``.  Converting Malawi and Nigeria to A is #894's
-remaining work; listing them here makes the deferral visible in code.
+or named in ``DESIGN_B_PENDING``.  Converting Nigeria to A is #894's
+remaining work; listing it here makes the deferral visible in code.
 """
 from __future__ import annotations
 
@@ -53,17 +53,17 @@ import pytest
 
 from lsms_library.paths import countries_root
 
-# The nine countries that persist the crosswalk as committed JSON (design A).
+# The countries that persist the crosswalk as committed JSON (design A).
+# Malawi joined in GH #894; its panel_ids.py reads the same per-wave
+# `panel_ids:` blocks in data_info.yml that design B read at run time.
 DESIGN_A = [
-    "Burkina_Faso", "Ethiopia", "EthiopiaRHS", "GhanaLSS", "Mali",
+    "Burkina_Faso", "Ethiopia", "EthiopiaRHS", "GhanaLSS", "Malawi", "Mali",
     "Niger", "Senegal", "Tanzania", "Uganda",
 ]
 
-# Design B (per-wave YAML -> cache parquet only).  #894 item 2 proposes giving
-# these two a committed JSON so the crosswalk has a diff surface at review time;
-# that is behaviour-neutral at the API but needs its own verification, so it is
-# deliberately NOT done here.  Listed rather than grandfathered by silence.
-DESIGN_B_PENDING = {"Malawi", "Nigeria"}
+# Design B (per-wave YAML -> cache parquet only).  GH #894 converts Nigeria
+# in its own commit.  Listed rather than grandfathered by silence.
+DESIGN_B_PENDING = {"Nigeria"}
 
 
 def _root() -> Path:

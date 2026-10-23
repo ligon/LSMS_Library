@@ -157,6 +157,23 @@ $(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parq
 %.parquet: %.py malawi.py
 	(cd $(@D) && python ./$(<F))
 
+# panel_ids.json / updated_ids.json are REVIEWED SOURCES, committed to the
+# config tree -- NOT build products (GH #914, #894).  They deliberately carry
+# no rule.  A rule here fires whenever panel_ids.py happens to be the newer
+# file, and on a pip install which of the two is newer is decided by the
+# millisecond the wheel was unpacked (measured on the real 0.13.0 wheel).  The
+# recipe then writes into site-packages, which on any shared install is not
+# writable by the user running the code -- PermissionError from three layers
+# inside a `make` subprocess.  Regenerating the crosswalk is a deliberate
+# maintainer action, reviewed as a diff to the committed JSON:
+#
+#     make panel-ids
+#
+# panel_ids.py reads each wave's `panel_ids:` block in data_info.yml.
+.PHONY: panel-ids
+panel-ids:
+	python panel_ids.py
+
 clean:
 	-rm $(parquet)
 	-rm $(VAR_DIR)/*.parquet
