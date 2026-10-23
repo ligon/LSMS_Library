@@ -52,3 +52,12 @@ permanent-block tabulation (=scripts/perm_block2.py=) are quoted in
 |------+------|
 | =filter_api_diff_prev_commit_vs_branch.json= | cold builds, #1256 commit vs this commit: rows added by wave / module (§11 or §12) / value (positive or zero), their Birr, their =u=, their =Derivation=; every pre-existing row asserted identical |
 | =filter_downstream_reports_and_sect12_classes.json= | downstream; grain / null-index / quantity report counts (no identifiers); the =Sect12SaleWarning= class 7 and class 8 after the change |
+
+* Combined: development =9a0ed5f3c= -> this branch (with #1257 underneath)
+
+| file | what |
+|------+------|
+| =combined_api_diff_development_vs_branch.json= | the development frame re-labelled by the #1252 map, then rows added, rows dropped (0), and every cell change on common rows by column / wave / transition; positive =Value_sold= and Birr by wave; =Derivation= counts |
+| =combined_downstream_development_vs_branch.json= | =harvest_kg= (+ shipped), =gross_crop_revenue=, =crop_diversity(weight='value')=, within-wave =median_price_valuation=, grain report counts |
+| =hash_census_diff.json= | =1218-current-validation/hash_census.py=, development vs branch |
+| =tests.org= | test lines |

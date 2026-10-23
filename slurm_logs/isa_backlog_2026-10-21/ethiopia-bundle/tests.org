@@ -1,0 +1,50 @@
+#+title: Ethiopia bundle (#1253, #1252, #1256, empty-row-filter ruling) -- test lines
+
+Base runs copy the branch's test file INTO the base checkout's =tests/= (see
+README: =tests/__init__.py= makes pytest import the test file's own repo),
+run it there with the base checkout's warm cold-built data dir, and delete
+the copy.  Import identity printed on every run.
+
+| test file (final version)                                  | base =627d3cfdf=     | branch               |
+|------------------------------------------------------------+----------------------+----------------------|
+| =test_ethiopia_crop_production_1253_sect11_sales.py=        | 9 failed, 5 passed   | 14 passed            |
+| =test_ethiopia_crop_codes_1252_wave_meaning.py=             | 22 failed, 3 passed  | 25 passed            |
+| =test_ethiopia_crop_production_1256_permanent_window.py=    | 11 failed, 3 passed  | 14 passed            |
+| =test_ethiopia_crop_production_empty_row_filter.py=         | 4 failed, 1 passed   | 5 passed             |
+
+What passes on base, and why: #1253 -- the control "a No with blank cells
+is a sale of 0", min_count leaves partly-blank groups alone, the no-apply
+guard, the raw issue count, and W3's oracle (W3 has no all-blank group);
+#1252 -- the W3-W5 raw oracle (those waves' labels were already right);
+#1256 -- W1-W3 scripts do not read the flag; filter -- the control "a row
+with nothing to serve is still dropped".
+
+Related suite, branch HEAD, =-n 3 --dist=loadfile=, =OPENBLAS/OMP/MKL=1=,
+=LSMS_BUILD_WORKERS=1= -- the four new files, test_ethiopia_crop_production_sect12,
+test_ethiopia_food_sources, test_ethiopian_calendar,
+test_ethiopia_shipped_factors, test_gh1038_ethiopia_interview_date_na,
+test_gh1118_ethiopia_plot_input_units, test_gh323_ethiopia_config,
+test_gh875_ethiopia_shocks_one_builder, test_derivations,
+test_962_unit_sentinel, test_crop_kg_factor, test_quantity_screen,
+test_label_selection, test_orgfile_missing_table, test_shipped_factors,
+test_gh866_stale_country_parquet_not_laundered,
+test_feature_canonical_index, test_categorical_mapping_resolution,
+test_build_transform_hash, test_feature_attrs_carriers:
+
+  734 passed, 16 skipped, 2 failed
+
+then =test_ethiopia_shipped_factors.py= re-run after re-baselining its pinned
+=len(cp)= / =none= counts for the ruling's 884 added rows: 21 passed, 1
+failed.  So: 735 passed, 16 skipped, 1 failed.  The one failure,
+=test_shipped_quintal_matches_the_external_answer_key= (=AttributeError:
+'ArrowExtensionArray' object has no attribute 'sum'=), fails identically on
+development =9a0ed5f3c= and on =627d3cfdf= (#820's test lines).
+
+Tests of #820 changed by the ruling (re-baselined or rewritten, not
+loosened): =test_sect12_adds_no_row_and_moves_no_other_cell= (H9's row now
+exists), =test_every_unattached_class_is_counted_in_the_warning= (class 7
+0/0/0, 4 lines served), =test_attached_then_dropped_is_the_existing_empty_row_filter=
+-> =test_a_row_carrying_a_sect12_sale_is_no_longer_dropped=,
+=test_derivation_stamp_is_on_exactly_the_rows_sect12_filled= (H9 stamped),
+=test_the_stamp_rides_to_the_served_table= (key-specific for #1256; 4,672 /
+4,557), =test_positive_sale_rows_per_wave= (2,760 / 2,309 / 1,395 / 1,323).
