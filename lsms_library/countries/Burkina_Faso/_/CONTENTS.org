@@ -1769,10 +1769,12 @@ the two: the 2018-19 cover (=s00_me_bfa2018.dta=, 18 columns) has no 2014
 pointer and =panel_ids.py= records none.  Declared =redefined= rather than
 =unobservable= because =unobservable= is silent on the ground that grouping
 across *disjoint* keyspaces is correct (GhanaLSS 1991-92); here the keyspaces
-overlap.  The vocabulary's own gloss for =redefined= ("a different KIND of
-unit") fits loosely -- both are ZDs; what changes is the sample list the
-serial indexes -- and it is the closest warning-bearing value (=wave-scoped=
-would claim a meaningful crosswalk).  =sample(waves=['2014', '2021-22'])=
+overlap.  The vocabulary's gloss for =redefined= used to read only "a
+different KIND of unit", which fits loosely -- both are ZDs; what changes is
+the sample list the serial indexes.  @ligon kept =redefined= and widened its
+gloss to cover exactly this pattern -- same kind of unit, independent draw,
+overlapping serials (#1246 / #1248 ruling, 2026-10-23; =lsms_library/sampling.py=)
+-- and =wave-scoped= would claim a meaningful crosswalk.  =sample(waves=['2014', '2021-22'])=
 also warns: the span rule counts the 2018-19 boundary between them.
 
 *Household ids collide across this boundary too -- do not measure it by

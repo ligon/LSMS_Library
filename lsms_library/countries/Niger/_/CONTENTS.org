@@ -1888,7 +1888,9 @@ Measured 2026-10-23 on a cold build at development =9a0ed5f3c=, through
   construction (='E_'= prefix in =niger.i=), not evidence.  Declared
   =redefined= by elimination, as for Burkina Faso 2018-19: =unobservable= is
   silent because grouping across *disjoint* keyspaces is correct, and these
-  overlap.
+  overlap.  The =redefined= gloss was widened to cover this pattern -- same
+  kind of unit, independent draw, overlapping serials -- by @ligon's
+  #1246 / #1248 ruling (2026-10-23), so the value is no longer a loose fit.
 - *2018-19 -> 2021-22.*  =s00q07f1= / =s00q07f2= equal =grappe= / =menage=
   for 4,589 of 4,589 households that carry them (as =panel_ids.py= says);
   Region and District agree 476/476 on the shared ids, Rural 473/476, and all

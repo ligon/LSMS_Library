@@ -598,6 +598,33 @@ carrying =v= across them raises a =ClusterIdentityWarning=; every other
 boundary is =stable=.  A 13-entry alias table would make them stable again, but
 it would change served =v= values and is not done here.
 
+*The =moved-= sentinel is not a movement classifier* (GH #1135, measured
+2026-10-21 on the raw covers, aggregates in
+=slurm_logs/isa_backlog_2026-10-21/framework1135-Nigeria-counts/counts-safe.json=).
+"Every other changed =v= ... is a mover's singleton" is true of the *ids*: a
+changed =v= is either a =moved-= singleton or one of the whole-EA LGA recodes
+above.  It is not true that the sentinel marks every *mover*, nor that every
+=ea == 0= household moved.  Each wave's cover asks directly:
+
+| cover                | variable  | label (verbatim)                                      | codes                                                                        |
+|----------------------+-----------+-------------------------------------------------------+------------------------------------------------------------------------------|
+| =secta_plantingw4=   | =hhsmlc=  | DOES THE HOUSEHOLD LIVE AT THE SAME LOCATION?         | 1 yes; 2 moved within locality                                               |
+| =secta_plantingw5=   | =hh_moved= | HAS THE HOUSEHOLD MOVED FROM THE ORIGINAL LOCATION?  | 1 yes, moved close to original dwelling; 2 no, in original dwelling; 3 yes, moved far |
+
+In W5, 480 households that report moving keep a real EA code (461 near, 19
+far), and 254 =ea == 0= households report the original dwelling.  So the
+households whose =v= changes for a non-sentinel reason are *net of the
+sentinel*, not net of movers: at 2019Q1 -> 2023Q3 the 112 split 86 "original
+dwelling", 6 "moved close to it" and 20 with no answer, which makes a
+net-of-movers numerator of 86..106 *only if* "original location" means the W4
+dwelling -- the W5 manual (p. 20) leans that way, but it is not established.
+At 2016Q1 -> 2018Q3 all 10 answer =hhsmlc= = 1, so that boundary's 10 of 1,493
+(0.67%) is net of recorded movers.  =sampling.yml= therefore records a
+net-of-movers count only for 2018Q3; the warning prints "not measured" for
+2023Q3 and never prints the conditional 86..106.  The 12 recoded W5 ids are
+ids: 10 have a household reporting the original dwelling, the other 2 hold the
+20 with no answer.
+
 *** Wave 5 geovariables await acquisition of WB v02 (GH #841 / #978)
 
 The acquired =NGA_2023_GHSP-W5_v01_M= extract recorded in =SOURCE.org=
