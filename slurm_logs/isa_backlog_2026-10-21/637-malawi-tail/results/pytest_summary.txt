@@ -27,3 +27,4 @@ FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_harvest_blanks_from_
 FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_harvest_blanks_from_raw_modules[2013-14]
 FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_harvest_blanks_from_raw_modules[2016-17]
 FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_harvest_blanks_from_raw_modules[2019-20]
+existing Malawi set + new file, round 2 branch: 513 passed, 6 skipped, 101 warnings in 205.21s (0:03:25)

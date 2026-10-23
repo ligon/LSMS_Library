@@ -6,12 +6,14 @@
    "Malawi"
   ],
   "malawi_total": 26,
-  "malawi_moved": 26
+  "moved_vs_7b0ffd569": 26
  },
  "btf": {
   "total": 40,
   "moved": 0,
-  "moved_countries": []
+  "moved_countries": [],
+  "malawi_total": null,
+  "moved_vs_7b0ffd569": 0
  },
  "wave": {
   "total": 2109,
@@ -20,9 +22,7 @@
    "Malawi"
   ],
   "malawi_total": 130,
-  "malawi_moved": 130,
-  "malawi_unmoved": []
+  "moved_vs_7b0ffd569": 130
  },
- "errors_equal": true,
- "n_errors": 0
+ "errors": 0
 }

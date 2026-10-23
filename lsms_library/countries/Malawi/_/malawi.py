@@ -1896,8 +1896,10 @@ def drop_repeated_records(df):
     return df[~df.duplicated(keep='first')]
 
 
-def _sum_reported(s):
-    """Sum reported quantities; a group with NO reported quantity stays NA.
+def _sum_reported(grouped, keys, agg):
+    """``grouped.agg(agg)`` plus ``Quantity`` summed per group; a group with
+    NO reported quantity stays NA.  ``grouped`` is
+    ``df.groupby(keys, as_index=False, dropna=False)``.
 
     A bare ``'sum'`` serves an all-blank group as ``0.0`` -- a harvest of
     nothing that the survey never recorded (GH #637 tail; the Tanzania
@@ -1905,8 +1907,22 @@ def _sum_reported(s):
     [CROP] at all?" question in any wave (G07 asks only whether the harvest is
     COMPLETED), so there is no recorded no-harvest answer to turn into a zero:
     a recorded zero is ``ag_g13a`` / ``ag_p09a == 0`` and is summed as such.
+
+    VECTORISED (``grouped['Quantity'].sum(min_count=1)``), never a per-group
+    Python callable: pandas deep-copies ``attrs`` once per group for those
+    (GH #871), and a callable here cost ~2 s per wave on 52k groups.  The
+    cython sum is pairwise, so a sum of several floats can differ from an
+    in-order sum by a few ULP (GH #905).  Output columns: ``keys``,
+    ``Quantity``, then ``agg``'s in order -- the layout of the dict
+    aggregation (``'Quantity'`` first) this replaced.
     """
-    return s.sum(min_count=1)
+    out = grouped.agg(agg)
+    qty = grouped['Quantity'].sum(min_count=1)
+    # One GroupBy, one group order; checked rather than assumed.
+    if not out[keys].equals(qty[keys]):                    # pragma: no cover
+        raise AssertionError('_sum_reported: group order differs between reducers')
+    out.insert(len(keys), 'Quantity', qty['Quantity'].array)
+    return out
 
 
 def _consolidate_harvest(harvest_pieces):
@@ -1929,9 +1945,8 @@ def _consolidate_harvest(harvest_pieces):
     harv = pd.concat(harvest_pieces, ignore_index=True)
     harv['u'] = harv['u'].astype('string')
     harv['condition'] = harv['condition'].astype('string')
-    return harv.groupby(['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code'],
-                        as_index=False, dropna=False).agg({
-        'Quantity':       _sum_reported,
+    keys = ['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code']
+    return _sum_reported(harv.groupby(keys, as_index=False, dropna=False), keys, {
         # EXACT, not a reduction: `crop_variety` is a function of
         # `_crop_code`, which is in the key, so every row in a group carries
         # the same value.
@@ -2088,8 +2103,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     # which a set_index + groupby would delete on a NaN key (GH #323 3b).
     _grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
     if harv.duplicated(_grain).any():
-        harv = harv.groupby(_grain, as_index=False, dropna=False).agg({
-            'Quantity':       _sum_reported,
+        harv = _sum_reported(harv.groupby(_grain, as_index=False, dropna=False), _grain, {
             'crop_variety':   'first',
             'Quantity_sold':  'first',
             'Value_sold':     'first',

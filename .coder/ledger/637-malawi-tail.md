@@ -71,7 +71,7 @@ defect A (the crop-code merge at the end of `assemble_crop_production`) for
 | quantity | decision | reason |
 |----------|----------|--------|
 | repeat-record drop | new helper `drop_repeated_records` (one line) | no Malawi helper existed; the Niger one is inline in a community-price builder |
-| `min_count=1` sum | new `_sum_reported` in `malawi.py` | same as #1263's `_sum1`; named so both call sites share one documented rule |
+| `min_count=1` sum | new `_sum_reported(grouped, keys, agg)` in `malawi.py` | the `grouped['Quantity'].sum(min_count=1)` vectorised form (#905 Panama, #871's additive overlay), NOT #1263's per-group `_sum1` callable: round 1 used a callable and cost ~2 s per wave (cold `crop_production` 28 s -> 42 s); round 2 is exact-equal to it and back to 29 s |
 | purchase reduction | extend in place | the earlier `(i, _crop_code)` groupby folded into the `(i, crop)` one |
 
 ## §6 Open questions for the human
@@ -94,7 +94,7 @@ defect A (the crop-code merge at the end of `assemble_crop_production`) for
 - `drop_repeated_records` — OK (§3, §4): full-record `duplicated`; called on
   every `get_dataframe` frame of the two 2010-11 scripts (AST-checked in
   `tests/test_gh637_malawi_tail.py`) and in `_crop_pieces`.
-- `_sum_reported` — OK (§2, §4): both crop_production reducers; served 0→NA
+- `_sum_reported` — OK (§2, §4, §5): vectorised, both crop_production reducers; served 0→NA
   32 / 283 / 200 / 276, recorded zeros kept; independent raw oracle equal row
   for row.
 - `assemble_plot_inputs` purchase reduction — OK (§2, §3): seed Quantity

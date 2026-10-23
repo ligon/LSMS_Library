@@ -43,3 +43,20 @@ checkout with an =lsms_library.__file__= assertion prepended: a first attempt
 from the branch's =tests/= directory imported the BRANCH package through
 pytest's rootdir insertion and passed 28 / 28 -- a silent wrong-checkout run,
 which is why the assertion is there.
+
+* Round 2: the min_count sum vectorised
+Round 1 (=7b0ffd569=) summed =Quantity= with a per-group Python callable;
+round 2 uses =grouped['Quantity'].sum(min_count=1)= at both crop_production
+reducers (the defect-B purchase sum was already vectorised).
+- *Equality*: a fresh cold build of round 2 is =assert_frame_equal(...,
+  check_exact=True)= to round 1's build for =crop_production=, =plot_inputs=,
+  =plot_features= and the five downstream frames, every wave, and so are the
+  wave-level parquets; no value differs, not even by a ULP
+  (=results/equality_7b0ffd569_vs_vectorised.json=).  Build logs identical.
+- *Cold =crop_production= build, same load (~5), one at a time*: development
+  28 s, round 1 42 s, round 2 29 s (repeat 30 s; 28 s in the full build).
+  In-process =assemble_crop_production= on the four waves: 3.23 / 1.18 / 3.19
+  / 4.44 s -> 0.29 / 0.19 / 0.30 / 0.39 s.
+- Tests: the same 17 files, 513 passed, 6 skipped.  Hash census vs
+  development: Malawi only, 26 / 26 tables and 130 / 130 waves; 0 / 40
+  framework fingerprints.
