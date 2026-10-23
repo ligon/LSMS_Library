@@ -103,6 +103,11 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - Running: #637-tz (Tanzania unit mixing), #1237 (Malawi Makefile prerequisites), #592 (GPS census and reconcile).
 - Ethiopia follow-ups to bundle into ONE re-warm after #1257 merges: #1252, #1253, #1256.
 
+- *PR #1258 open* (#1237 Malawi Makefile prerequisites; Malawi country tier only, 26 hashes).
+- #637 Tanzania done on branch (=49d43b249=: plot_inputs keyed on =u=, 11 groups split; crop_production fabricated zeros fixed via =min_count=1= plus the harvested flag; 2 test pins moved).  Red-team running.
+- #894 dispatched (Malawi/Nigeria panel_ids -> committed JSON, Design A; must be dict-identical to today's read-time output).
+- HELD for Ethan's ruling on #1241's concatenator refusal: extending the Niger =;= -> =&&= fix plus missing-wave refusal to crop_production/livestock/plot_labor/people_last7days.  Without the refusal, =&&= alone still loses a wave silently through the Python fallback.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
