@@ -14,9 +14,19 @@ tests/test_gh637_tanzania_unit_grain.py (21 tests; TestHeldSources ran -- creden
      two-slot fertilizer sum, reported zeros with an explicit harvested column,
      lumped kg sums)
 
-tests/test_1118_tanzania_plot_input_units.py on branch: 16 passed
-  (two pins reversed with comments: duplicate missing-first unit now two rows;
-   conflicting recorded units now two rows; u read from the index throughout)
+tests/test_1118_tanzania_plot_input_units.py on branch: 16 passed.  Edits:
+  - 2 pins REVERSED, with comments (and renamed):
+      test_duplicate_missing_first_unit_does_not_displace_later_known_unit
+        -> test_duplicate_missing_unit_and_later_known_unit_stay_separate (1 row -> 2)
+      test_conflicting_recorded_duplicate_units_keep_existing_first_policy
+        -> test_conflicting_recorded_duplicate_units_are_separate_rows (1 row -> 2)
+  - 1 RENAMED, same assertions (normalization now precedes the reduction):
+      test_all_missing_duplicate_units_normalize_after_unchanged_reduction
+        -> test_all_missing_duplicate_units_reduce_to_one_unknown_row
+  - 3 tests read u from the index via a new served_unit() helper instead of
+    out.iloc[0]['u'] (u is no longer a column); assertions unchanged.
+tests/test_feature_canonical_index.py: comments only (INPUT_SHAPES shape note,
+  one docstring); no assertion changed.
 
 tests/test_quantity_screen.py::test_tanzania_2020_21_coconut_and_timber_rows_fire
   development code + development warm parquet: passed (n_implausible 13)

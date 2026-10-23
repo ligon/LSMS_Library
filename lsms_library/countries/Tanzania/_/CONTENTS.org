@@ -1835,7 +1835,7 @@ The order mattered under #1118 only because ='first'= could let an early missing
 Served rows 1,774 -> 1,775 and 7,924 -> 7,934; the 11 split groups' 415.5 total quantity is unchanged, now as 22 rows each in its own unit; every other row is identical.
 =seed_kg= falls by 50 kg (2019-20) and 579 kg (2020-21): the bucket / cup / Unknown quantities that were being counted as kilograms, on exactly the 10 affected plots.
 =nitrogen_kg= is unchanged (all fertilizer is kg; same-unit groups are still summed).
-The two #1118 tests that pinned the old ='first'= behaviour were reversed, with comments.
+The two #1118 tests that pinned the old ='first'= behaviour were reversed and renamed, with comments; a third was renamed (normalization now precedes the reduction) and three read =u= from the index.
 
 The remaining same-unit duplicates (12 / 92 at the 6-key) stay summed with =min_count=1= and their flags OR'd: they are commensurable.
 Two kinds deserve a maintainer's look, not a change:

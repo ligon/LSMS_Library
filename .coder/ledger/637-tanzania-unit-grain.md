@@ -102,6 +102,7 @@ accept `u` as a level or a column.
   frame-identical.
 - Tests: `tests/test_gh637_tanzania_unit_grain.py` 21 tests (15 fail on
   development; the 6 that pass there are preserve-controls); #1118 tests
-  adapted (2 pins reversed with comments); `test_quantity_screen.py` pin
+  adapted -- 2 pins reversed (and renamed) with comments, 1 renamed with the
+  same assertions, 3 read `u` from the index; `test_quantity_screen.py` pin
   13 -> 26 with comment.
 - Evidence: `slurm_logs/isa_backlog_2026-10-21/637-tanzania-unit-grain/`.

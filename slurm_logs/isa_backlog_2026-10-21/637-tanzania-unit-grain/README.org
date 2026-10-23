@@ -67,3 +67,25 @@ cell.  =seed_kg= -50 / -579 kg on exactly the 10 split plots; =nitrogen_kg=,
 and 13 -> 26 (reported zeros now in kg reference cells; rule unchanged).
 Warm read == cold read on both checkouts.  =Feature('plot_inputs')(['Tanzania'])=
 9,698 -> 9,709, Tanzania no longer in =promoted=.
+
+* Scope notes
+
+- Beyond adding =u= to =plot_inputs='s key, three =crop_production= edits:
+  =min_count=1= on the Quantity collapse; =harvested='ag6a_06a'= /
+  ='ag6b_06a'= in both wave scripts' perennial colmaps (without it,
+  =min_count=1= alone would turn 2,376 correct reported zeros into NA); and
+  =_block='s zeroing now fires only on an explicit 2
+  (=harvested.eq(2).fillna(False)=) -- no effect on these sources (numpy
+  float codes), a guard against a nullable dtype zeroing unanswered rows.
+  The served cost of making the zero explicit: =u= NA -> Kg on those 2,376 rows.
+- Script path: the helpers were run in-process on frames loaded with
+  =get_dataframe= (=diagnose.py=, =source_oracle.py=, the held-source tests),
+  and end to end through =make= by the cold =Country('Tanzania')= builds; no
+  =runpy=.
+- Diagnosis classes in =diagnosis-development.json=: its
+  ="all_Quantity_NA(sum->0.0)"= flag counts duplicate GROUPS (42 / 150); the
+  served zeros were 2,395 ROWS because the collapse also reduces singletons
+  (=compare.json=).
+- Cross-country: =Feature('plot_inputs')(['Tanzania', 'Malawi'])= stacks with
+  no =GrainCollapseWarning= on either checkout; Malawi 179,949 rows on both,
+  Tanzania 9,698 -> 9,709 (=feature-tanzania-malawi.json=).
