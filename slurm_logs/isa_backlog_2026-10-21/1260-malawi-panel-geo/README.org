@@ -230,3 +230,42 @@ in its own fresh =LSMS_DATA_DIR=.
 =Country._table_cache_hash= 26/549 moved, all Malawi;
 =build_transforms_fingerprint= 0/40; =Wave._input_hash= 26/2,109, all
 =Malawi/2013-14=.
+
+* Round 5: red-team fixes (=outputs/round5_redteam.txt=)
+The red team on =e0b1485ae= reproduced every data claim and refuted the
+tests' privacy; five fixes, all on the same branch:
+
+1. *Failure reports printed real coordinates, EA codes and household ids.*
+   pytest's assertion rewrite prints every sub-expression of a failing
+   =assert= -- frames, Series, a helper's id-list argument -- even under
+   =--tb=short=.  Every data assertion in =tests/test_gh1260_malawi_panel_geo.py=
+   and =tests/test_gh323_malawi_cluster_key.py= now compares scalar locals
+   with count-only messages.  Proof: the red team's two mutations re-run on
+   the new layout (the shared implementation blanks Latitude only; the
+   2013-14 hook renamed away), at =--tb=short= and the default long
+   traceback: 6 and 11 tests fail, and a scan of every output finds 0 EA
+   codes, panel ids, case ids or Malawi-range coordinates in any report
+   line (the only hits are the synthetic test's literal ids in long-traceback
+   source listings).
+2. *Data wrappers skipped on ANY exception.*  Now only on
+   =FileNotFoundError=; country builds (which drop an unavailable source
+   rather than raise) are probed first and built uncaught.
+3. *GH #1281 pinned* as a strict xfail (=raises=AssertionError=) in a
+   private =LSMS_DATA_DIR=; xfails today, fails on development (its
+   precondition =pytest.fail=s), goes red when #1281 lands.
+4. *"One coordinate per EA in every round" corrected* to "in every IHPS
+   round".  One short-term 2013-14 EA is drawn again by IHS4 (16
+   cross-sectional households; IHS4's fix 17.49 km from its IHS3/IHPS fix),
+   pinned by count; IHS4 / IHS5 also draw 5 / 2 IHS3-only EAs again
+   (3.2-29.9 / 8.2-12.2 km).
+5. *One implementation*: =malawi.ihps_panel_cluster_features= with
+   one-line per-wave callers passing only =status_source= (2013-14: the
+   =df_main= myvar; 2016-17 / 2019-20: the panel cover's file override).
+   Identical outputs to the three copies on 1,200 randomized synthetic
+   frames.
+
+Cold builds of all 26 Malawi tables and the five =cluster_features= wave
+frames, =e0b1485ae= vs =3a49809a2=: every one IDENTICAL.  Hash census:
+=Country._table_cache_hash= 26/549 (all Malawi), =Wave._input_hash=
+130/2,109 (all five Malawi waves x 26), =build_transforms_fingerprint= 0/40
+-- =malawi.py= is in every Malawi wave's =binp:= input, as expected.

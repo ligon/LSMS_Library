@@ -63,6 +63,7 @@ the panel household id. Config + data only; no framework change.
 |----------|----------|--------|
 | panel coordinates | reuse `file:` list + per-file override in `df_geo` | a third `dfs:` member would collide on `Latitude`/`Longitude` (`_x`/`_y`); no coalesce transformer exists and adding one is framework work |
 | merge type | keep `outer` | both sides 1:1 on `i` (14,955 / 14,612), so `outer` = `left`; `outer` keeps the orphan signal |
+| one implementation (round 5) | `malawi.ihps_panel_cluster_features` + one-line `cluster_features` callers per wave (`status_source=` the only parameter) | red team: three verbatim copies forced 2013-14 to say "panel-file override"; precedent for a wave wrapper over country-module logic: `Nigeria/2015-16/_/mapping.py` (`sys.path` + `from nigeria import`), `Togo/2018/_/mapping.py`; not named `cluster_features` (country formatting functions would hook 2004-05 / 2010-11) |
 | 2013-14 (round 4) | reuse the round-3 hook verbatim in `2013-14/_/mapping.py`; status as a plain `df_main` myvar | one cover file, all 4,000 households panel; distance populated for all, stayers cover 204/204 EAs, 0 split, fix = 2010-11's in 204/204; a `df_status` sub-df (to turn a misspelling's `KeyError` into the hook's `RuntimeError`) rejected as patching a framework gap in one country's config |
 | cluster coordinate for a panel EA | NEW wave hook (rounds 2-3): the stayers' single coordinate is the EA fix; keep panel coordinates equal to it, blank the rest; stayers first; fail closed | stayers (`dist_to_IHS3location` <= 1 km, the 2013-14 test's rule) share exactly one coordinate per EA, identical across 2013-14 / 2016-17 / 2019-20 and equal to 2010-11's; no precedent filter exists (2013-14 reports, does not filter) |
 | shared EA 30305580 | serve the IHPS stayer fix (round 3; round 2 kept IHS4's) | one coordinate per EA across rounds: IHS4's fix (4.1 km away) would make it the only panel EA that jumps in 2016-17 |
@@ -76,7 +77,8 @@ the panel household id. Config + data only; no framework change.
   hook to 2013-14 (11 of the 102 continuing panel EAs, 24 of 204 in all,
   serve a non-stayer coordinate there)?~~  RESOLVED (@ligon 2026-10-23:
   "Yes, extend it") -- round 4 below.
-- (round 4) A wave whose YAML build raises `KeyError` is dropped by
+- (round 4; FILED as GH #1281, ruled "raise before anything is written";
+  pinned in round 5 as a strict xfail) A wave whose YAML build raises `KeyError` is dropped by
   `build_wave` with a `UserWarning`, and the (N-1)-wave L2-country parquet is
   stamped with the current hash, so every later read serves it with no
   signal that a wave is missing.  2013-14's single cover file makes a
@@ -137,3 +139,19 @@ the panel household id. Config + data only; no framework change.
   `Malawi/2013-14` 26/2,109 wave, 0/40 btf.  The existing
   `fillna(0) <= 1` test now asserts 0 NaN distances (the two rules agree
   only because of it).  Evidence: `outputs/round4_2013-14.txt`.
+- Round 5 (red team on `e0b1485ae`): (1) every data assertion in
+  `tests/test_gh1260_malawi_panel_geo.py` and `test_gh323_malawi_cluster_key.py`
+  compares scalar locals with count-only messages -- pytest's assertion
+  rewrite printed real coordinates, EA codes and household ids even under
+  `--tb=short`; (2) data wrappers skip only on `FileNotFoundError`, country
+  builds are probed then built uncaught; (3) GH #1281 strict xfail in a
+  private `LSMS_DATA_DIR` (fixture after
+  `tests/test_canonical_shape_via_cache_miss.py::private_data_root`);
+  (4) "one coordinate per EA in every round" corrected to "in every IHPS
+  round": one short-term-only 2013-14 EA is drawn again by IHS4 (17.5 km,
+  pinned by count); (5) one implementation in `malawi.py`, thin callers,
+  delegation + per-wave wording tested.  Outputs identical to `e0b1485ae`
+  (cold builds of every Malawi table, burst job `malawi-plot/p1-*`); hash
+  move = every Malawi country and wave hash (malawi.py is in every wave's
+  `binp:`), 0 btf.  Evidence: `outputs/round5_redteam.txt`.
+
