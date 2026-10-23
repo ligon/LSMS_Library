@@ -89,6 +89,10 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - #820 (Ethiopia section 12 tree/fruit/root crops, W1-W3; verify W4/W5 section 11) dispatched.
 - Next candidates: #1120 (households missing from =sample()=, v NaN: Ethiopia/Uganda/Nigeria), #1135 (Site C first-line counts; the net-of-movers measurement is unsettled), Niger =;= chaining residual (after #1241), #821 (after #1227).
 
+- *PR #1249 open* (#1240 Burkina crosswalk; red-team held, its own oracle gave 0 conflicts; unreachable =burkina_faso.panel_ids= removed in =e02a0641d=).  #1245 has the reviewer's three remedy simulations.
+- #1120 DIAGNOSED (posted on #1120 and #660): no id-format mismatches.  Ethiopia = households absent from the household cover but present in the agriculture cover with an EA and weight; Nigeria = frame choice (PP cover only); Uganda = mixed, and its =plot_id= NaN is mostly a builder defect.  Decisions D1 (sample frame), D2 (unlocatable households: singleton v?) and D3 (plot_id sentinel) for Ethan, with recommendations.
+- Filed *#1250*: Uganda =_labor_persondays= serves a MISSING use-flag as "No" (~5,200 fabricated zeros).  Fix agent running (worktree =1250=).
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
