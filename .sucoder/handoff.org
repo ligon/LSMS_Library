@@ -15,6 +15,7 @@ Merge them *together with every per-country PR you accept*, before anyone re-war
 - *Per country* (each re-warms only its country, so it is free inside the corpus re-warm):
   - Malawi: #1229, #1238, #1239, #1258 (country tier only), #1265 (also Nigeria).
   - Niger: #1227, #1241 (also Senegal and CotedIvoire).
+  - Nigeria: #1268 (W3 community prices =obs= 1/2), with #1265.
   - Burkina Faso: #1242, #1249.
   - Uganda: #1232 (moves the =uganda_baseline.json= fixture; approve it), #1255.
   - Mali: #1231.
@@ -51,7 +52,7 @@ Merge them *together with every per-country PR you accept*, before anyone re-war
 1235, 1237, 1240, 1243, 1244, 1245, 1247, 1250, 1252, 1253, 1254, 1256, 1259, 1260, 1261, 1264.  #1123 was narrowed.
 
 ** Still running at the time of writing
-#637 Malawi tail (seed-purchase fan-out, minted zeros, 2010-11 duplicates; vectorising); #637 Nigeria C (W3 second-location =obs=); #824 Burkina 2018-19 =Unit_sold=.
+#637 Malawi tail (vectorising, then PR); #824 Burkina 2018-19 =Unit_sold=; #824 Mali =Unit_sold= + #1267 tree-crop =Quantity=.
 
 * Current handoff -- 2026-10-22 evening, Sue / Claude Opus 5.5, job 40390255 (n0114.savio4, 12 cores, ~3 days)
 
