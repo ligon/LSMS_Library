@@ -99,6 +99,10 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 
 - #820 DONE on branch (=f7f567c82=): section 12 sales attached to existing section 9 rows only (0 rows added; positive Value_sold W1-W3 694/1,347/1,017 -> 854/2,737/2,300); W4/W5 verified unchanged.  Red-team running.  Decisions flagged: W1 tree-crop harvest unserved (6,134 pairs); section 11 wins on collisions; folded-key rule.  Filed *#1252* (codes 19/86 drift), *#1253* (section 11 sale-path fabrications), *#1254* (=median_price_valuation= pools across waves).
 
+- *PR #1255 open* (#1250 Uganda labour flag; 5,185 fabricated zeros removed; raw oracle exact; decision: 7 wage-only rows).  *PR #1257 open* (#820 Ethiopia section 12, round 2: registered =sect12-sale-period= derivation on 9,502 rows, eighth "attached-then-dropped" class).  Filed *#1256* (W4/W5 permanent-crop window).
+- Running: #637-tz (Tanzania unit mixing), #1237 (Malawi Makefile prerequisites), #592 (GPS census and reconcile).
+- Ethiopia follow-ups to bundle into ONE re-warm after #1257 merges: #1252, #1253, #1256.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
