@@ -1,0 +1,185 @@
+{
+ "applied": {
+  "<NA>": 113735,
+  "False": 50134,
+  "True": 15948
+ },
+ "checkout": "/local/job40390255/worktrees/review-mali",
+ "columns": [
+  "Quantity",
+  "u",
+  "Purchased",
+  "Quantity_purchased",
+  "Improved",
+  "Applied"
+ ],
+ "country_groupby_size_sum": 34287,
+ "country_warnings": [
+  "NullIndexKeyWarning: Mali/plot_inputs: declared index level(s) carried NaN key(s): level 'crop' (wave(s) ['2014-15', '2017-18'] with 145,530 NaN row(s)). These row(s) are SERVED and",
+  "NullReadWarning: Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-19, 2021-22] while other waves carry it. The column is PRESENT, so the sha",
+  "UnicodeWarning: \nOne or more strings in the dta file could not be decoded using utf-8, and\nso the fallback encoding of latin-1 is being used.  This can happen when a file\nhas b"
+ ],
+ "crop_marker": 0,
+ "crop_marker_by_input": {},
+ "crop_nan": 145530,
+ "crop_nan_by_input": {
+  "Compost": 2673,
+  "DAP": 9644,
+  "Fungicide": 6458,
+  "Herbicide": 6459,
+  "Inorganic Fertilizer?": 32993,
+  "Manure": 11148,
+  "NPK": 9643,
+  "Other inorganic": 9640,
+  "Other organic": 1189,
+  "Other phytosanitary": 6447,
+  "Pesticide": 6460,
+  "Phytosanitary products?": 33089,
+  "Seed": 45,
+  "Urea": 9642
+ },
+ "feature_groupby_size_sum": 34287,
+ "feature_index_names": [
+  "country",
+  "t",
+  "v",
+  "i",
+  "plot_id",
+  "input",
+  "j",
+  "u",
+  "season",
+  "currency"
+ ],
+ "feature_nan_by_level": {
+  "country": 0,
+  "currency": 0,
+  "i": 0,
+  "input": 0,
+  "j": 145530,
+  "plot_id": 0,
+  "season": 0,
+  "t": 0,
+  "u": 0,
+  "v": 0
+ },
+ "feature_nitrogen_rows": 2869,
+ "feature_nitrogen_tally": {
+  "matched_labels": [
+   "DAP",
+   "NPK",
+   "Urea"
+  ],
+  "matched_rows": 28929,
+  "refused_organic_labels": {
+   "Compost": 2673,
+   "Manure": 11148,
+   "Other organic": 1189
+  },
+  "refused_organic_rows": 15010,
+  "unmatched_labels": {
+   "Compost": 2673,
+   "Fungicide": 6458,
+   "Herbicide": 6459,
+   "Manure": 11148,
+   "Other inorganic": 9640,
+   "Other organic": 1189,
+   "Other phytosanitary": 6447,
+   "Pesticide": 6460,
+   "Seed": 34332
+  },
+  "unmatched_rows": 84806
+ },
+ "feature_nitrogen_total": 906361.8260000597,
+ "feature_rows": 179817,
+ "feature_seed_kg_rows": 31645,
+ "feature_seed_kg_total": 1455210.9572301384,
+ "feature_warnings": [
+  "NullIndexKeyWarning: Mali/plot_inputs: declared index level(s) carried NaN key(s): level 'crop' (wave(s) ['2014-15', '2017-18'] with 145,530 NaN row(s)). These row(s) are SERVED and will vanish in the first groupby (panda",
+  "NullReadWarning: Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-19, 2021-22] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_require",
+  "UserWarning: plot_inputs: aligned country frames to the canonical index declared in data_info.yml -- promoted a canonical level carried as a COLUMN into the index for ['Mali'] (nulls filled with the declared senti"
+ ],
+ "head": "9a0ed5f3cc81b5d2ce8d1fdffba4f477e33b9f7f",
+ "index_names": [
+  "i",
+  "t",
+  "v",
+  "plot_id",
+  "input",
+  "crop"
+ ],
+ "nitrogen_rows": 2869,
+ "nitrogen_tally": {
+  "matched_labels": [
+   "DAP",
+   "NPK",
+   "Urea"
+  ],
+  "matched_rows": 28929,
+  "refused_organic_labels": {
+   "Compost": 2673,
+   "Manure": 11148,
+   "Other organic": 1189
+  },
+  "refused_organic_rows": 15010,
+  "unmatched_labels": {
+   "Compost": 2673,
+   "Fungicide": 6458,
+   "Herbicide": 6459,
+   "Manure": 11148,
+   "Other inorganic": 9640,
+   "Other organic": 1189,
+   "Other phytosanitary": 6447,
+   "Pesticide": 6460,
+   "Seed": 34332
+  },
+  "unmatched_rows": 84806
+ },
+ "nitrogen_total": 906361.8260000597,
+ "nitrogen_warnings": [
+  "NutrientCoverageWarning: nitrogen_kg: fertilizer-shaped input label(s) resolved to NO nitrogen share and contribute nothing to the total -- no share keyed (a gap): 'Other inorganic' (9,640 rows); organic, refused a share by p"
+ ],
+ "null_index_reports": [
+  {
+   "country": "Mali",
+   "findings": [
+    {
+     "level": "crop",
+     "n_nan": 145530,
+     "waves": {
+      "2014-15": 41666,
+      "2017-18": 103864
+     }
+    }
+   ],
+   "rows": 179817,
+   "site": "built-table-index",
+   "table": "plot_inputs"
+  }
+ ],
+ "rows": 179817,
+ "rows_by_input": {
+  "Compost": 2673,
+  "DAP": 9644,
+  "Fungicide": 6458,
+  "Herbicide": 6459,
+  "Inorganic Fertilizer?": 32993,
+  "Manure": 11148,
+  "NPK": 9643,
+  "Other inorganic": 9640,
+  "Other organic": 1189,
+  "Other phytosanitary": 6447,
+  "Pesticide": 6460,
+  "Phytosanitary products?": 33089,
+  "Seed": 34332,
+  "Urea": 9642
+ },
+ "seed_crop_marker": 0,
+ "seed_crop_nan": 45,
+ "seed_kg_rows": 31645,
+ "seed_kg_total": 1455210.9572301384,
+ "seed_rows": 34332,
+ "u_null": 0,
+ "u_unknown": 108171,
+ "use_answer_rows": 66082
+}

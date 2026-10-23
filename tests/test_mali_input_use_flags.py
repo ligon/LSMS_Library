@@ -100,6 +100,13 @@ def test_nitrogen_kg_skips_use_answer_rows_without_warning():
         alone = T.nitrogen_kg(base)
         mixed = T.nitrogen_kg(pd.concat([base, answers]))
     pd.testing.assert_frame_equal(alone, mixed)
-    assert mixed.attrs['nitrogen_input_match'] == alone.attrs['nitrogen_input_match']
+    # Every pre-existing tally key is unchanged by the answer rows; the skip
+    # itself is counted on the one key added for it (use_answer_rows).  This
+    # was a whole-dict equality before that key existed.
+    tally_alone = dict(alone.attrs['nitrogen_input_match'])
+    tally_mixed = dict(mixed.attrs['nitrogen_input_match'])
+    assert tally_alone.pop('use_answer_rows') == 0
+    assert tally_mixed.pop('use_answer_rows') == 2
+    assert tally_mixed == tally_alone
     assert T.is_use_answer_label('Inorganic Fertilizer?')
     assert not T.is_use_answer_label('Inorganic Fertilizer')

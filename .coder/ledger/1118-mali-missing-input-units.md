@@ -170,3 +170,40 @@ library convention for a use ANSWER (`transformations.is_use_answer_label`).
 `nitrogen_kg` drops such rows before label matching, so the Uganda-spelling
 trade-off above (shared label, inflated `matched_rows`) no longer applies.
 `seed_kg` selects the exact `Seed` label and needs no change.
+
+### Phase 4 -- review follow-ups (2026-10-23, Sue / Claude Opus 5.5)
+
+Branch `fix/mali-plot-inputs-followup-20261023` on development `9a0ed5f3c`.
+Evidence: `slurm_logs/isa_backlog_2026-10-21/mali-followup/`.
+
+| fix | change | precedent |
+|---|---|---|
+| marker | `plot_inputs_finalize` fills `crop` with `mali.CROP_NA = '(not crop-specific)'` before the collapse | `Niger/_/niger.py:658-668`, `:693`; the six other EHCVM siblings' `fillna(CROP_NA)` (Benin `:92`, Burkina_Faso `:91`, CotedIvoire `:84`, Guinea-Bissau `:125`, Senegal `:103`, Togo `:105` of `2018*/_/plot_inputs.py`) |
+| unresolved seed crops | the 45 seed rows whose recorded crop `harmonize_food` does not map get the marker | Niger's CROP_NA comment, "any seed row whose crop could not be resolved" (`niger.py:659-660`) |
+| tally | `nitrogen_kg` adds `attrs['nitrogen_input_match']['use_answer_rows']` (always present) | -- (new key; existing keys unchanged) |
+| docs | comment block beside `plot_inputs` in `data_info.yml`; NO `Columns: plot_inputs` entry | no Columns block for plot_inputs exists; `Applied` is declared only per country (Ethiopia, Malawi); a `type: bool` entry would feed `_enforce_canonical_dtypes` (`country.py:7220`) for every country |
+| `Applied` optional | `Applied: {type: bool, optional: true}` | `Malawi/_/data_scheme.yml:306-308`, `Ethiopia/_/data_scheme.yml:234-236` |
+
+Rejected: leaving the 45 seed rows NaN (the brief's fallback when no precedent
+exists -- Niger's comment is one).  Not done: two `harmonize_food` rows for
+`Echalotte` / `Poireaux` (a Mali categorical-mapping change, outside this scope).
+
+- Tests: new/updated 29 fail / 28 pass on base source (the passes are the
+  sweep's non-vacuity check and the `Applied`-declared guard, which base
+  already satisfies; a mutation removing `Applied` from Mali's scheme makes the
+  guard fail); 605 passed / 5 skipped on the branch with the #1118, unit,
+  nitrogen, build-hash, schema and canonical-index suites; the 5 warm-gated
+  skips rerun on a warm private root: 107 passed / 1 skipped (`plot_labor`).
+- Cold `Country('Mali').plot_inputs()`: 179,817 rows both sides; identical
+  after base `crop` NaN -> marker, on exactly 145,530 rows; Site I silent;
+  full-index groupby on `Feature('plot_inputs')(['Mali'])` 34,287 -> 179,817.
+  `nitrogen_kg` 906,361.83 kg / `seed_kg` 1,455,210.96 kg unchanged;
+  `use_answer_rows` 66,082.
+- Cross-country `Feature('plot_inputs')()`, 14 countries: per-country and
+  pooled `nitrogen_kg` / `seed_kg` and tallies identical but for the new key
+  (0 everywhere except Mali); pooled frames exactly equal.
+- Hashes: 24/549 country and 96/2,109 wave (Mali only), 0/40 fingerprints;
+  the `data_info.yml` comments alone move 0.
+- Re-measured for `feature.py`: Nigeria's `plot_inputs.u` holds both nulls
+  (5,546) and literal `Unknown` (178) -- the promotion-collision state -- with
+  no collision (96,620 rows in and out).

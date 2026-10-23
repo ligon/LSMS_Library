@@ -132,11 +132,14 @@ pieces.append(_fert_slot('other_phytosanitary', 's2cq29g', 's2cq29h'))
 # --- plot-level GROUP use answers (s2cq21 / s2cq26) ---
 # The instrument asks "used inorganic fertilizer on this plot?" and "used
 # phytosanitary products on this plot?" once per plot, then a quantity per
-# TYPE.  A type row with Quantity 0 is that type not used inside a "yes" for
-# its group, so the group answer itself is served on its own row, yes AND no
-# (maintainer decision on GH #1118, 2026-10-22).  No quantity, no unit
-# (u -> Unknown in plot_inputs_finalize), no purchase join (the s2d/s7b join
-# is keyed on type codes).  A missing answer carries no content and drops.
+# TYPE.  A type row with Quantity 0 is, almost always, that type not used
+# inside a "yes" for its group, so the group answer itself is served on its
+# own row, yes AND no (maintainer decision on GH #1118, 2026-10-22).  Not
+# always: a 'Manquant' answer drops (below), so a type row under it -- zero
+# OR positive -- has no answer row (2014-15 only; counts in Mali CONTENTS.org).
+# No quantity, no unit (u -> Unknown in plot_inputs_finalize), no crop
+# (crop -> CROP_NA there), no purchase join (the s2d/s7b join is keyed on
+# type codes).  A missing answer carries no content and drops.
 def _use_slot(code, flag_col):
     return pd.DataFrame({
         't': WAVE,

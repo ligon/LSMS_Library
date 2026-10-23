@@ -188,9 +188,13 @@ Data Scheme:
     # crop_production).
     #
     # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
-    #         plot_features.  crop is set on SEED rows only (the seed's crop,
-    #         harmonize_food Preferred Label); NaN for fertilizer/pesticide
-    #         rows (applied at the plot grain, not per-crop).
+    #         plot_features.  crop is the seed's crop (harmonize_food
+    #         Preferred Label) on SEED rows; every row that is not
+    #         crop-specific -- fertilizer / pesticide type rows (applied at the
+    #         plot grain, not per-crop), the two use-answer rows, and a seed
+    #         row whose recorded crop harmonize_food does not map -- carries
+    #         '(not crop-specific)', never NaN (mali.CROP_NA, after
+    #         Niger/_/niger.py:668; the cross-country spelling is GH #1119).
     # input = harmonize_input Preferred Label (Seed / Urea / DAP / NPK /
     #         Other inorganic / Manure / Compost / Other organic / Pesticide /
     #         Fungicide / Herbicide / Other phytosanitary).  These are FIXED
@@ -207,9 +211,17 @@ Data Scheme:
     #         s7dq22 inorganic fertilizer, s2cq26 / s7dq27 phytosanitary
     #         products), Oui -> True, Non -> False, on its own row with input
     #         'Inorganic Fertilizer?' / 'Phytosanitary products?' (no Quantity,
-    #         u = Unknown).  NA on every type row.  The type rows' Quantity 0 is
-    #         that type not used inside a "yes" for its group (GH #1118,
-    #         maintainer decision 2026-10-22).
+    #         u = Unknown).  NA on every type row.  A missing answer
+    #         ('Manquant' / blank) is no row.  An inorganic / phytosanitary
+    #         type row's Quantity 0 sits under a "yes" for its group on
+    #         39,320 of 39,907 such rows (98.5%); the other 587 (2014-15) sit
+    #         under a 'Manquant' answer and so have no answer row, and 30
+    #         2014-15 plots with a positive inorganic quantity have no answer
+    #         row either (GH #1118, maintainer decision 2026-10-22; counts in
+    #         CONTENTS.org).
+    #         Counting plots by input label must filter Applied: these rows
+    #         carry the "no" answers too.  optional: true as in
+    #         Malawi/Ethiopia's plot_inputs (set on answer rows only).
     #
     # NO seed_kg / nitrogen_kg / derived any-use flags / fertilizer totals —
     # those are transformations.py rollups over these item rows.  Built by
@@ -220,7 +232,9 @@ Data Scheme:
     Purchased: bool
     Quantity_purchased: float
     Improved: bool
-    Applied: bool
+    Applied:
+      type: bool
+      optional: true
     materialize: make
   livestock:
     # Item-level animal roster, GAP 4 (parity loop).  One row per

@@ -139,6 +139,19 @@ Index Info:
     # below); only Uganda carries `season`.  `u` and `season` are canonical
     # because Malawi and the EHCVM seven key rows on `u`, and Uganda on
     # `season` -- dropping either would collapse distinct reported line-items.
+    #
+    # USE ANSWERS on `input` (GH #1118, maintainer decision 2026-10-22).  An
+    # `input` label ending in `?` (`transformations.is_use_answer_label`) is
+    # NOT an input: it is the survey's own yes/no answer to a use question
+    # asked once per plot about a GROUP of inputs (Mali: `Inorganic
+    # Fertilizer?`, `Phytosanitary products?`).  Such a row carries the answer
+    # in `Applied` (True / False), no `Quantity`, `u = Unknown`; `Applied` is
+    # NA on the country's ordinary input rows.  The plot-input transforms skip
+    # these rows (`nitrogen_kg` counts them on its tally as
+    # `use_answer_rows`).  COUNTING TRAP: the rows carry the NO answers too,
+    # so counting plots by `input` label counts plots that said "no" --
+    # filter `Applied` first.  A country that serves `?` rows declares
+    # `Applied` in its plot_inputs scheme (tests/test_use_answer_convention.py).
     plot_inputs: (t, v, i, plot_id, input, j, u, season)
     # GH #840.  ONE ROW PER SURVEY-RECORDED PRICE.  A community price form
     # prices a (product, VARIETY) pair, in a field VISIT, as one of several
@@ -195,7 +208,8 @@ Index Info:
   # warm corpus.  In SIX countries the plot_inputs `crop` labels are that
   # country's crop_production labels, spelled the same way: Mali 42 of 42
   # shared, Malawi 26/26, Tanzania 20/20, Nigeria 72/74, Niger 35/43, Benin
-  # 8/11 (counts include the "not crop-specific" marker).  The misses are the
+  # 8/11 (counts include the "not crop-specific" marker; Mali has carried it
+  # since 2026-10-23 and is 42 of 43 with it).  The misses are the
   # marker, catch-alls (Benin `Autre tubercule` / `Autre céréale`) and crops
   # crop_production does not record at all (Niger's seven are real crops --
   # `Carotte`, `Igname`, `Jaxatu`, ...; Nigeria `Date palm`), never the same
@@ -205,8 +219,10 @@ Index Info:
   # (2,156 / 460) where crop_production has `Maïs` and `Niébé` -- so on those
   # two countries the shared axis name does not yet mean a shared vocabulary.
   # What the rename does NOT do is harmonize that marker: it is spelled
-  # `(not crop-specific)` (EHCVM), `Whole Plot` (Ethiopia), `Farm-level`
-  # (GhanaLSS), `n/a` (Nigeria, Uganda) and NaN (Malawi, Mali, Tanzania).
+  # `(not crop-specific)` (EHCVM; Mali since 2026-10-23, after its regional
+  # siblings), `Whole Plot` (Ethiopia), `Farm-level` (GhanaLSS), `n/a`
+  # (Nigeria, Uganda) and NaN (Malawi, Tanzania).  Which spelling is canonical
+  # is GH #1119's open decision.
   # plot_labor needs no alias: every country already spells `plot_id` and
   # `source`.
   level_aliases:

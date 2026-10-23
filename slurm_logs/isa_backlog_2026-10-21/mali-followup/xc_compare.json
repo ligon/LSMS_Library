@@ -1,0 +1,211 @@
+{
+ "all_ok": true,
+ "countries_equal": true,
+ "feature_rows_equal": true,
+ "groupby_size_sum": {
+  "base": {
+   "Benin": 10605,
+   "Burkina_Faso": 22877,
+   "CotedIvoire": 11250,
+   "Ethiopia": 180018,
+   "GhanaLSS": 11282,
+   "Guinea-Bissau": 5534,
+   "Malawi": 112296,
+   "Mali": 34287,
+   "Niger": 42426,
+   "Nigeria": 96557,
+   "Senegal": 9901,
+   "Tanzania": 6868,
+   "Togo": 13730,
+   "Uganda": 83486
+  },
+  "branch": {
+   "Benin": 10605,
+   "Burkina_Faso": 22877,
+   "CotedIvoire": 11250,
+   "Ethiopia": 180018,
+   "GhanaLSS": 11282,
+   "Guinea-Bissau": 5534,
+   "Malawi": 112296,
+   "Mali": 179817,
+   "Niger": 42426,
+   "Nigeria": 96557,
+   "Senegal": 9901,
+   "Tanzania": 6868,
+   "Togo": 13730,
+   "Uganda": 83486
+  }
+ },
+ "j_nan": {
+  "base": {
+   "Benin": 0,
+   "Burkina_Faso": 0,
+   "CotedIvoire": 0,
+   "Ethiopia": 0,
+   "GhanaLSS": 0,
+   "Guinea-Bissau": 0,
+   "Malawi": 67653,
+   "Mali": 145530,
+   "Niger": 0,
+   "Nigeria": 0,
+   "Senegal": 0,
+   "Tanzania": 2830,
+   "Togo": 0,
+   "Uganda": 0
+  },
+  "branch": {
+   "Benin": 0,
+   "Burkina_Faso": 0,
+   "CotedIvoire": 0,
+   "Ethiopia": 0,
+   "GhanaLSS": 0,
+   "Guinea-Bissau": 0,
+   "Malawi": 67653,
+   "Mali": 0,
+   "Niger": 0,
+   "Nigeria": 0,
+   "Senegal": 0,
+   "Tanzania": 2830,
+   "Togo": 0,
+   "Uganda": 0
+  }
+ },
+ "per_country": {
+  "Benin": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Burkina_Faso": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "CotedIvoire": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Ethiopia": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "GhanaLSS": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Guinea-Bissau": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Malawi": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Mali": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 66082
+   }
+  },
+  "Niger": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Nigeria": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Senegal": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Tanzania": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Togo": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  },
+  "Uganda": {
+   "nitrogen_equal": true,
+   "seed_equal": true,
+   "tally_equal_except_new_key": true,
+   "use_answer_rows": {
+    "base": "ABSENT",
+    "branch": 0
+   }
+  }
+ },
+ "pooled": {
+  "frames_exactly_equal": true,
+  "rows_total_equal": true,
+  "tally_equal_except_new_key": true,
+  "use_answer_rows": {
+   "base": "ABSENT",
+   "branch": 66082
+  }
+ },
+ "u_census_equal": true
+}

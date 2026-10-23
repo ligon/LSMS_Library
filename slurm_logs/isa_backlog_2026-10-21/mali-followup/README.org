@@ -1,0 +1,34 @@
+#+title: Mali plot_inputs review follow-ups (2026-10-23)
+
+Branch =fix/mali-plot-inputs-followup-20261023=, base development =9a0ed5f3c=
+(PRs #1222 / #1223).  Every run used =/local/job40390255/venv_img/bin/python=,
+=PYTHONPATH= = the checkout under test (import identity asserted), a fresh
+private =LSMS_DATA_DIR= per run, =OPENBLAS/OMP/MKL_NUM_THREADS=1=,
+=LSMS_BUILD_WORKERS=1=.  Row-level frames (pickles) stayed in a private
+scratch directory; only aggregate counts are committed here.
+
+* Scripts
+| script | what it measures |
+|---+---|
+| =measure_mali.py= | cold =Country('Mali').plot_inputs()= and =Feature('plot_inputs')(['Mali'])=: crop NaN / marker by input, Site I, full-index groupby, =nitrogen_kg= / =seed_kg= totals and tally |
+| =compare_mali.py= | base vs branch frames: identical after base crop NaN -> marker; marker exactly on the base-NaN rows |
+| =measure_cross_country.py= | cold =Feature('plot_inputs')()= over every country: per-country and pooled =nitrogen_kg= / =seed_kg=, tallies; =u= column census for the feature.py docstring |
+| =compare_xc.py= | base vs branch cross-country: identical apart from the new =use_answer_rows= key |
+| =zero_rows_check.py= | served inorganic / phytosanitary type rows by quantity class against the plot's group-answer row |
+| =s2c_repeats.py= | 2014-15 =EACIS2C_p2= repeated (household, plot) keys, =s2cq00=, answer patterns |
+| =seed_crop_probe.py= | why 45 seed rows have no crop (recorded-but-unmapped vs blank) |
+
+* Results (JSON beside each script)
+- =mali_base_summary.json=, =mali_branch_summary.json=, =compare_mali.json=
+- =zero_rows.json=, =s2c_repeats.json=, =seed_crop.json=
+- =xc_base_summary.json=, =xc_branch_summary.json=, =xc_compare.json= (cross-country), =hash_impact.json= (census)
+
+* Headline numbers
+- Mali =crop= NaN 145,530 -> 0 (all now ='(not crop-specific)'=); full-index groupby of
+  =Feature('plot_inputs')(['Mali'])= 34,287 -> 179,817 rows; values otherwise identical.
+- =nitrogen_kg= 906,361.83 kg and =seed_kg= 1,455,210.96 kg unchanged; new tally key
+  =use_answer_rows= = 66,082 (Mali), 0 for the other 13 countries.
+- Cross-country (14 countries): nitrogen / seed results and tallies identical apart from
+  the new key; pooled nitrogen frames exactly equal.
+- Hash census vs base: 24/549 country + 96/2,109 wave hashes move, all Mali; 0/40
+  fingerprints; the =data_info.yml= comment edits alone move 0.

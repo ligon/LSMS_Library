@@ -484,7 +484,7 @@ Every one is a blank raw unit or the survey's own =Manquant= ("missing") label -
 *The idiosyncrasy:* 41,559 of those 42,089 rows carry =Quantity == 0= exactly, straight from the raw quantity column (=s2cq25*=, =s2cq29*=, =s7dq26*=, ... -- the scripts do no zero-fill); 248 carry a positive quantity and 282 none (flag- or purchase-only).
 The use question is asked once per input GROUP on the plot (inorganic =s2cq21= / =s7dq22=, pesticide =s2cq26= / =s7dq27=, ...) and the quantity once per TYPE (urea, DAP, NPK, other).
 On the zero-quantity, blank-unit fertilizer/pesticide slots the group answer is =Oui= (2014-15: 11,577, plus 587 =Manquant=; 2017-18: all 27,786; =flags_1118.py=).
-So these are type-level non-use inside a "yes" for the group -- the plot used inorganic fertilizer, but not this type -- which the content predicate keeps because a non-null zero counts as content.
+So, outside 2014-15's =Manquant= answers, these are type-level non-use inside a "yes" for the group -- the plot used inorganic fertilizer, but not this type -- which the content predicate keeps because a non-null zero counts as content.
 Whether such rows belong in =plot_inputs= at all was left open by #1118; the zeros are served as recorded.
 
 *Resolved 2026-10-22 (maintainer decision): the group answers are served explicitly, and the zero rows stay.*
@@ -492,10 +492,36 @@ Each EAC-I plot's two group answers are their own =plot_inputs= rows: =input= =I
 A missing answer is no row. =Applied= is NA on every type row.
 66,082 rows are added (2014-15: 9,200 inorganic / 9,296 phytosanitary; 2017-18: 23,793 each); every existing row is unchanged, and =nitrogen_kg= / =seed_kg= totals are identical.
 Two things to know when using them:
-- The trailing =?= is a library-wide convention (=transformations.is_use_answer_label=): a label ending in =?= is a use ANSWER, not an input.  =nitrogen_kg= skips such rows before label matching, so they add no mass, no match-tally entry and no =NutrientCoverageWarning=.  The =?= also keeps them apart from Uganda's =Inorganic Fertilizer= (an application of unrecorded type, with a quantity).
+- The trailing =?= is a library-wide convention (=transformations.is_use_answer_label=, documented beside the =plot_inputs= index in =lsms_library/data_info.yml=): a label ending in =?= is a use ANSWER, not an input.  =nitrogen_kg= skips such rows before label matching, so they add no mass, no matched/unmatched tally entry and no =NutrientCoverageWarning=; since 2026-10-23 the tally counts the skip as =use_answer_rows= (66,082 on =Country('Mali').plot_inputs()=).  The =?= also keeps them apart from Uganda's =Inorganic Fertilizer= (an application of unrecorded type, with a quantity).
 - Counting plots by input label must filter =Applied= -- these rows carry the =no= answers too.
-2014-15 =s2c= repeats some (household, plot) keys (2,712 =Oui= rows are 2,702 plots; 1,925 are 1,917), so the existing duplicate collapse serves one answer per plot (=max=).
+2014-15 =s2c= repeats 5 (household, plot) keys over 19 rows (2,712 =Oui= rows are 2,702 plots; 1,925 are 1,917).
+They are distinct roster lines, not duplicated records: =s2cq00= (the line number) differs within every one of the 5.
+The existing duplicate collapse sums their quantities and reduces their flags with =max=, so one answer is served per plot; the answers disagree within 3 of the 5 keys on =s2cq21= and 3 of the 5 on =s2cq26=, and =max= serves =Oui= (=True=) there (=s2c_repeats.py=).
 Evidence: =slurm_logs/isa_backlog_2026-10-21/1118-mali-use-flags/=.
+
+*Where a type row has no answer row (re-measured 2026-10-23, =zero_rows_check.py=).*
+"Zero under a yes" is the rule, not a guarantee.
+Of the 39,907 served inorganic / phytosanitary type rows with =Quantity == 0=, 39,320 (98.5%) sit under a =yes= answer row (inorganic 22,390 of 22,845; phytosanitary 16,930 of 17,062).
+The other 587 are all 2014-15 -- 455 inorganic, 132 phytosanitary -- and sit under a =Manquant= group answer, which serves no answer row (=flags_1118.py=).
+Likewise 30 2014-15 plots (57 type rows) report a positive inorganic quantity and have no =Inorganic Fertilizer?= row, their answer being =Manquant=.
+No plot with a positive type quantity carries a =no= answer, and 2017-18 has no type row without an answer row.
+A consumer joining type rows to their group answer must handle the no-row case.
+Evidence: =slurm_logs/isa_backlog_2026-10-21/mali-followup/=.
+
+** plot_inputs: a row that is not crop-specific carries =(not crop-specific)=, not NaN (2026-10-23)
+
+=crop= is a declared index level of =plot_inputs=, and every row that is not crop-specific used to serve it as NaN: 145,530 of 179,817 rows (Site I's =NullIndexKeyWarning= count; all 66,082 use-answer rows among them).
+The first full-index =groupby= deleted them -- =Feature('plot_inputs')(['Mali'])= grouped on its full index kept 34,287 rows.
+=plot_inputs_finalize= now fills =mali.CROP_NA= = ='(not crop-specific)'=, the sentinel Niger defines (=Niger/_/niger.py:658-668=, filled at =:693=) and all seven EHCVM siblings inline.
+Mali now agrees with its region; which spelling becomes canonical across countries is GH #1119's open decision.
+Measured cold, base =9a0ed5f3c= vs this change: the frames are identical except =crop= NaN -> marker on exactly those 145,530 rows; the full-index =groupby= keeps all 179,817; Site I no longer fires for Mali; =nitrogen_kg= / =seed_kg= totals are unchanged.
+The marker rows by input: =Phytosanitary products?= 33,089; =Inorganic Fertilizer?= 32,993; =Manure= 11,148; =DAP= 9,644; =NPK= 9,643; =Urea= 9,642; =Other inorganic= 9,640; =Pesticide= 6,460; =Herbicide= 6,459; =Fungicide= 6,458; =Other phytosanitary= 6,447; =Compost= 2,673; =Other organic= 1,189; =Seed= 45.
+
+*The idiosyncrasy -- 45 SEED rows carry the marker too.*
+No seed row has a blank crop; these 45 record a crop that =harmonize_food= does not map (=seed_crop_probe.py=).
+Niger's rule covers exactly this ("any seed row whose crop could not be resolved"), so they get the marker.
+- 43 record "not cultivated" as the crop: =Non-Exploitée= (2014-15, 35) and =Non exploitée= (2017-18, 8) -- a seed-roster line for a plot the roster itself calls uncultivated.  Only 1 of the 45 marker seed rows reports a positive quantity.
+- 2 (2014-15) are real crops missing from =harmonize_food=: =Echalotte= (shallot) and =Poireaux= (leek).  These ARE crop-specific and are served under the marker only because the mapping lacks them; two =harmonize_food= rows would fix it (not done here: a Mali config change and its own re-warm).
 
 * cluster_features (GH #323 site 4 / GH #627)
 

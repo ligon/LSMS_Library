@@ -45,7 +45,10 @@ def test_true_missing_unit_on_retained_amount_is_unknown(mali, unit):
     assert got['Quantity'].tolist() == [2.]
     assert got.index.names == ['t', 'i', 'plot_id', 'input', 'crop']
     assert got.index.get_level_values('input').tolist() == ['Urea']
-    assert got.index.get_level_values('crop').isna().all()
+    # Was `.isna().all()`: since the not-crop-specific marker landed
+    # (mali.CROP_NA, after Niger/_/niger.py:668) a urea row's crop is the
+    # marker, never NaN.
+    assert got.index.get_level_values('crop').tolist() == ['(not crop-specific)']
 
 
 @pytest.mark.parametrize('flag', ['Purchased', 'Improved'])
@@ -114,7 +117,9 @@ def test_missing_plot_crop_keys_and_source_frame_are_preserved(mali):
     assert source.attrs == before.attrs
     assert len(got) == 1
     assert got.index.get_level_values('plot_id').isna().all()
-    assert got.index.get_level_values('crop').isna().all()
+    # Was `.isna().all()`: the missing crop key is now the not-crop-specific
+    # marker (mali.CROP_NA); the missing plot key is still preserved as NA.
+    assert got.index.get_level_values('crop').tolist() == ['(not crop-specific)']
     assert got['u'].tolist() == [U_UNKNOWN]
 
 

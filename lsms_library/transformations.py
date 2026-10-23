@@ -5516,12 +5516,20 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
         result.  Country labels must be non-null; country metadata alone
         does not add an axis.  Rows without a convertible quantity do not
         contribute; plots with no contributing fertilizer rows are absent.
+        Use-answer rows (an ``input`` label ending in ``'?'``,
+        :func:`is_use_answer_label`; e.g. Mali's ``Inorganic Fertilizer?``)
+        are SKIPPED before label matching: they add no mass and are neither
+        matched nor unmatched.
         ``attrs['nitrogen_input_match']``
         carries the label-join tally -- ``matched_rows`` /
         ``unmatched_rows`` / ``matched_labels`` / ``unmatched_labels``
         (label -> row count, descending), and ``refused_organic_rows`` /
         ``refused_organic_labels``, the organic subset of the unmatched
-        labels (refused a share by policy, GH #867).
+        labels (refused a share by policy, GH #867) -- all over the rows
+        label matching saw; and ``use_answer_rows``, the number of use-answer rows
+        skipped (always present, ``0`` where there are none), so
+        ``matched_rows + unmatched_rows + use_answer_rows`` is every input
+        row.
 
     Notes
     -----
@@ -5584,6 +5592,9 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
     # lives in _normalise_input_label, where the three candidate spellings
     # are documented together.
     n_share, _match_tally = _nitrogen_shares(inp, content)
+    # The skipped use answers are counted, not hidden: the partition is
+    # matched + unmatched + use_answer.
+    _match_tally['use_answer_rows'] = int(answer.sum())
     n_share.index = df.index
 
     if 'u' not in (df.index.names or []) and 'u' not in df.columns:

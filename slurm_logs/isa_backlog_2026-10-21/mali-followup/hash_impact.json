@@ -1,0 +1,48 @@
+{
+ "branch": {
+  "btf": {
+   "by_country": {},
+   "moved": 0,
+   "moved_keys": [],
+   "total": 40
+  },
+  "country": {
+   "by_country": {
+    "Mali": 24
+   },
+   "moved": 24,
+   "moved_keys": null,
+   "total": 549
+  },
+  "errors": {},
+  "wave": {
+   "by_country": {
+    "Mali": 96
+   },
+   "moved": 96,
+   "moved_keys": null,
+   "total": 2109
+  }
+ },
+ "data_info_only": {
+  "btf": {
+   "by_country": {},
+   "moved": 0,
+   "moved_keys": [],
+   "total": 40
+  },
+  "country": {
+   "by_country": {},
+   "moved": 0,
+   "moved_keys": null,
+   "total": 549
+  },
+  "errors": {},
+  "wave": {
+   "by_country": {},
+   "moved": 0,
+   "moved_keys": null,
+   "total": 2109
+  }
+ }
+}
