@@ -104,7 +104,8 @@ Sampling:
         panel household.  28 of 2018-19's grappes do not recur (23 in
         Tillaberi; cause not recorded).  Through sample() 5,055 `i` are
         shared, not 4,589, and all keep `v`: 466 households flagged
-        PanelHH == "Menage panel" lack s00q07f1/f2, and EHCVM `i` is the same
+        PanelHH == "Menage panel" (accent-folded here; the raw label is
+        accented, as panel_ids.py matches it) lack s00q07f1/f2, and EHCVM `i` is the same
         (grappe, menage) string in both waves -- a linkage-coverage fact, not
         a cluster fact.  `rotating-panel` (part retained, part replaced), not
         `panel`: 1,567 of 6,622 households are "Menage non-panel" (top-ups
