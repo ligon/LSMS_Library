@@ -86,6 +86,13 @@ cluster_features:
             Longitude: LON_DD_MOD
     merge_on:
         - i
+    # GH #1261: the post-planting cover (df_key, the LEFT frame) is
+    # authoritative for which households this block serves.  The geo file
+    # carries ONE household that neither the PP nor the PH cover has, with no
+    # `ea`; under `outer` it arrived with a null `v` and the Site 2 collapse
+    # deleted it (nan_key_rows=1 for 2015Q3 and 2016Q1).  Served
+    # cluster_features is identical either way (measured cold; _/CONTENTS.org).
+    merge_how: left
     final_index:
         - t
         - i

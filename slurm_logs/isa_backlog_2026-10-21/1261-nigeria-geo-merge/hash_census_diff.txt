@@ -1,0 +1,8 @@
+hash census: development 9a0ed5f3c vs branch (2 Nigeria data_info.yml edits)
+btf: 0 of 40 moved 
+country: 24 of 549 moved {'Nigeria': 24}
+  Nigeria country hashes total 24 moved 24
+wave: 96 of 2109 moved {'Nigeria': 96}
+  by wave: {'Nigeria/2012Q3': 24, 'Nigeria/2013Q1': 24, 'Nigeria/2015Q3': 24, 'Nigeria/2016Q1': 24}
+  Nigeria wave hashes total 240
+errors base 0 branch 0

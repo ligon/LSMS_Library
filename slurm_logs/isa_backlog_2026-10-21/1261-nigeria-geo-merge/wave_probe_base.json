@@ -1,0 +1,812 @@
+{
+ "per_wave": {
+  "2010Q3": {
+   "collapse": {
+    "grain_reports": [],
+    "in_dtypes": {
+     "District": "string",
+     "Latitude": "float64",
+     "Longitude": "float64",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 0,
+    "in_null_v": 0,
+    "in_rows": 5000,
+    "out_clusters_moved": 0,
+    "out_rows": 500
+   },
+   "folder": "2010-11",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 5000,
+     "left_rows": 5000,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5000,
+     "right": "df_main",
+     "right_keys": 5000,
+     "right_rows": 5000
+    },
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key+df_main",
+     "left_keys": 5000,
+     "left_rows": 5000,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5000,
+     "right": "df_geo",
+     "right_keys": 5000,
+     "right_rows": 5000
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Latitude": "float64",
+    "Longitude": "float64",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 500
+  },
+  "2011Q1": {
+   "collapse": {
+    "grain_reports": [],
+    "in_dtypes": {
+     "District": "string",
+     "Latitude": "float64",
+     "Longitude": "float64",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 0,
+    "in_null_v": 0,
+    "in_rows": 5000,
+    "out_clusters_moved": 0,
+    "out_rows": 500
+   },
+   "folder": "2010-11",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 5000,
+     "left_rows": 5000,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5000,
+     "right": "df_main",
+     "right_keys": 5000,
+     "right_rows": 5000
+    },
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key+df_main",
+     "left_keys": 5000,
+     "left_rows": 5000,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5000,
+     "right": "df_geo",
+     "right_keys": 5000,
+     "right_rows": 5000
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Latitude": "float64",
+    "Longitude": "float64",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 500
+  },
+  "2012Q3": {
+   "collapse": {
+    "grain_reports": [
+     {
+      "conflicting_groups": 70,
+      "destroyed": 609,
+      "dropped": 4250,
+      "levels": [
+       "t",
+       "v"
+      ],
+      "nan_key_rows": 39,
+      "rows": 4898,
+      "site": "Wave.cluster_features",
+      "wave": "2012Q3"
+     }
+    ],
+    "in_dtypes": {
+     "District": "string",
+     "Latitude": "float64",
+     "Longitude": "float64",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 39,
+    "in_null_v": 39,
+    "in_rows": 4898,
+    "out_clusters_moved": 152,
+    "out_rows": 647
+   },
+   "folder": "2012-13",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 4859,
+     "left_rows": 4859,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 4859,
+     "right": "df_main",
+     "right_keys": 4859,
+     "right_rows": 4859
+    },
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key+df_main",
+     "left_keys": 4859,
+     "left_rows": 4859,
+     "only_left": 96,
+     "only_right": 39,
+     "out_dtypes": {
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 39,
+     "out_rows": 4898,
+     "right": "df_geo",
+     "right_keys": 4802,
+     "right_rows": 4802
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Latitude": "float64",
+    "Longitude": "float64",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 647
+  },
+  "2013Q1": {
+   "collapse": {
+    "grain_reports": [
+     {
+      "conflicting_groups": 70,
+      "destroyed": 609,
+      "dropped": 4250,
+      "levels": [
+       "t",
+       "v"
+      ],
+      "nan_key_rows": 39,
+      "rows": 4898,
+      "site": "Wave.cluster_features",
+      "wave": "2013Q1"
+     }
+    ],
+    "in_dtypes": {
+     "District": "string",
+     "Latitude": "float64",
+     "Longitude": "float64",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 39,
+    "in_null_v": 39,
+    "in_rows": 4898,
+    "out_clusters_moved": 152,
+    "out_rows": 647
+   },
+   "folder": "2012-13",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 4859,
+     "left_rows": 4859,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 4859,
+     "right": "df_main",
+     "right_keys": 4859,
+     "right_rows": 4859
+    },
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key+df_main",
+     "left_keys": 4859,
+     "left_rows": 4859,
+     "only_left": 96,
+     "only_right": 39,
+     "out_dtypes": {
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 39,
+     "out_rows": 4898,
+     "right": "df_geo",
+     "right_keys": 4802,
+     "right_rows": 4802
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Latitude": "float64",
+    "Longitude": "float64",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 647
+  },
+  "2015Q3": {
+   "collapse": {
+    "grain_reports": [
+     {
+      "conflicting_groups": 78,
+      "destroyed": 618,
+      "dropped": 3904,
+      "levels": [
+       "t",
+       "v"
+      ],
+      "nan_key_rows": 1,
+      "rows": 4697,
+      "site": "Wave.cluster_features",
+      "wave": "2015Q3"
+     }
+    ],
+    "in_dtypes": {
+     "District": "string",
+     "Latitude": "float64",
+     "Longitude": "float64",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 1,
+    "in_null_v": 1,
+    "in_rows": 4697,
+    "out_clusters_moved": 306,
+    "out_rows": 792
+   },
+   "folder": "2015-16",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 4696,
+     "left_rows": 4696,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 4696,
+     "right": "df_main",
+     "right_keys": 4696,
+     "right_rows": 4696
+    },
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key+df_main",
+     "left_keys": 4696,
+     "left_rows": 4696,
+     "only_left": 84,
+     "only_right": 1,
+     "out_dtypes": {
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 1,
+     "out_rows": 4697,
+     "right": "df_geo",
+     "right_keys": 4613,
+     "right_rows": 4613
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Latitude": "float64",
+    "Longitude": "float64",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 792
+  },
+  "2016Q1": {
+   "collapse": {
+    "grain_reports": [
+     {
+      "conflicting_groups": 78,
+      "destroyed": 618,
+      "dropped": 3904,
+      "levels": [
+       "t",
+       "v"
+      ],
+      "nan_key_rows": 1,
+      "rows": 4697,
+      "site": "Wave.cluster_features",
+      "wave": "2016Q1"
+     }
+    ],
+    "in_dtypes": {
+     "District": "string",
+     "Latitude": "float64",
+     "Longitude": "float64",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 1,
+    "in_null_v": 1,
+    "in_rows": 4697,
+    "out_clusters_moved": 306,
+    "out_rows": 792
+   },
+   "folder": "2015-16",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 4696,
+     "left_rows": 4696,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 4696,
+     "right": "df_main",
+     "right_keys": 4696,
+     "right_rows": 4696
+    },
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key+df_main",
+     "left_keys": 4696,
+     "left_rows": 4696,
+     "only_left": 84,
+     "only_right": 1,
+     "out_dtypes": {
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 1,
+     "out_rows": 4697,
+     "right": "df_geo",
+     "right_keys": 4613,
+     "right_rows": 4613
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Latitude": "float64",
+    "Longitude": "float64",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 792
+  },
+  "2018Q3": {
+   "collapse": {
+    "grain_reports": [
+     {
+      "conflicting_groups": 129,
+      "destroyed": 1254,
+      "dropped": 4578,
+      "levels": [
+       "t",
+       "v"
+      ],
+      "nan_key_rows": 0,
+      "rows": 5263,
+      "site": "Wave.cluster_features",
+      "wave": "2018Q3"
+     }
+    ],
+    "in_dtypes": {
+     "District": "string",
+     "Latitude": "float64",
+     "Longitude": "float64",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 0,
+    "in_null_v": 0,
+    "in_rows": 5263,
+    "out_clusters_moved": 166,
+    "out_rows": 685
+   },
+   "folder": "2018-19",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 5263,
+     "left_rows": 5263,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5263,
+     "right": "df_main",
+     "right_keys": 5263,
+     "right_rows": 5263
+    },
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key+df_main",
+     "left_keys": 5263,
+     "left_rows": 5263,
+     "only_left": 147,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5263,
+     "right": "df_geo",
+     "right_keys": 5116,
+     "right_rows": 5116
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Latitude": "float64",
+    "Longitude": "float64",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 685
+  },
+  "2019Q1": {
+   "collapse": {
+    "grain_reports": [
+     {
+      "conflicting_groups": 129,
+      "destroyed": 1254,
+      "dropped": 4578,
+      "levels": [
+       "t",
+       "v"
+      ],
+      "nan_key_rows": 0,
+      "rows": 5263,
+      "site": "Wave.cluster_features",
+      "wave": "2019Q1"
+     }
+    ],
+    "in_dtypes": {
+     "District": "string",
+     "Latitude": "float64",
+     "Longitude": "float64",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 0,
+    "in_null_v": 0,
+    "in_rows": 5263,
+    "out_clusters_moved": 166,
+    "out_rows": 685
+   },
+   "folder": "2018-19",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 5263,
+     "left_rows": 5263,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5263,
+     "right": "df_main",
+     "right_keys": 5263,
+     "right_rows": 5263
+    },
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key+df_main",
+     "left_keys": 5263,
+     "left_rows": 5263,
+     "only_left": 147,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5263,
+     "right": "df_geo",
+     "right_keys": 5116,
+     "right_rows": 5116
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Latitude": "float64",
+    "Longitude": "float64",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 685
+  },
+  "2023Q3": {
+   "collapse": {
+    "grain_reports": [],
+    "in_dtypes": {
+     "District": "string",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 0,
+    "in_null_v": 0,
+    "in_rows": 5067,
+    "out_clusters_moved": 393,
+    "out_rows": 911
+   },
+   "folder": "2023-24",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 5067,
+     "left_rows": 5067,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5067,
+     "right": "df_main",
+     "right_keys": 5067,
+     "right_rows": 5067
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 911
+  },
+  "2024Q1": {
+   "collapse": {
+    "grain_reports": [],
+    "in_dtypes": {
+     "District": "string",
+     "Region": "string",
+     "Rural": "str"
+    },
+    "in_nan_key_rows": 0,
+    "in_null_v": 0,
+    "in_rows": 5067,
+    "out_clusters_moved": 393,
+    "out_rows": 911
+   },
+   "folder": "2023-24",
+   "merges": [
+    {
+     "how": "outer",
+     "keys": [
+      "i",
+      "t"
+     ],
+     "left": "df_key",
+     "left_keys": 5067,
+     "left_rows": 5067,
+     "only_left": 0,
+     "only_right": 0,
+     "out_dtypes": {
+      "District": "object",
+      "Region": "object",
+      "Rural": "str",
+      "v": "str"
+     },
+     "out_null_v": 0,
+     "out_rows": 5067,
+     "right": "df_main",
+     "right_keys": 5067,
+     "right_rows": 5067
+    }
+   ],
+   "served_dtypes": {
+    "District": "string",
+    "Region": "string",
+    "Rural": "str"
+   },
+   "served_null_v": 0,
+   "served_rows": 911
+  }
+ },
+ "waves": [
+  "2010Q3",
+  "2011Q1",
+  "2012Q3",
+  "2013Q1",
+  "2015Q3",
+  "2016Q1",
+  "2018Q3",
+  "2019Q1",
+  "2023Q3",
+  "2024Q1"
+ ]
+}

@@ -1,0 +1,262 @@
+{
+ "checkout": "/local/job40390255/worktrees/base-1261",
+ "cluster_features": {
+  "digest": "7f8fc0a24ad085a6",
+  "dtypes": {
+   "District": "string",
+   "Latitude": "Float64",
+   "Longitude": "Float64",
+   "Region": "string",
+   "Rural": "string"
+  },
+  "index": [
+   "t",
+   "v"
+  ],
+  "index_dtypes": {
+   "t": "str",
+   "v": "str"
+  },
+  "rows_by_t": {
+   "2010Q3": 500,
+   "2011Q1": 500,
+   "2012Q3": 647,
+   "2013Q1": 647,
+   "2015Q3": 792,
+   "2016Q1": 792,
+   "2018Q3": 685,
+   "2019Q1": 685,
+   "2023Q3": 911,
+   "2024Q1": 911
+  },
+  "shape": [
+   7070,
+   5
+  ]
+ },
+ "grain_reports_cluster_features": [
+  {
+   "conflicting_groups": 70,
+   "destroyed": 609,
+   "dropped": 4250,
+   "levels": [
+    "t",
+    "v"
+   ],
+   "nan_key_rows": 39,
+   "rows": 4898,
+   "site": "Wave.cluster_features",
+   "wave": "2012Q3"
+  },
+  {
+   "conflicting_groups": 70,
+   "destroyed": 609,
+   "dropped": 4250,
+   "levels": [
+    "t",
+    "v"
+   ],
+   "nan_key_rows": 39,
+   "rows": 4898,
+   "site": "Wave.cluster_features",
+   "wave": "2013Q1"
+  },
+  {
+   "conflicting_groups": 78,
+   "destroyed": 618,
+   "dropped": 3904,
+   "levels": [
+    "t",
+    "v"
+   ],
+   "nan_key_rows": 1,
+   "rows": 4697,
+   "site": "Wave.cluster_features",
+   "wave": "2015Q3"
+  },
+  {
+   "conflicting_groups": 78,
+   "destroyed": 618,
+   "dropped": 3904,
+   "levels": [
+    "t",
+    "v"
+   ],
+   "nan_key_rows": 1,
+   "rows": 4697,
+   "site": "Wave.cluster_features",
+   "wave": "2016Q1"
+  },
+  {
+   "conflicting_groups": 129,
+   "destroyed": 1254,
+   "dropped": 4578,
+   "levels": [
+    "t",
+    "v"
+   ],
+   "nan_key_rows": 0,
+   "rows": 5263,
+   "site": "Wave.cluster_features",
+   "wave": "2018Q3"
+  },
+  {
+   "conflicting_groups": 129,
+   "destroyed": 1254,
+   "dropped": 4578,
+   "levels": [
+    "t",
+    "v"
+   ],
+   "nan_key_rows": 0,
+   "rows": 5263,
+   "site": "Wave.cluster_features",
+   "wave": "2019Q1"
+  }
+ ],
+ "head": "9a0ed5f3cc81b5d2ce8d1fdffba4f477e33b9f7f",
+ "market_lookup_District": {
+  "digest": "9ae0c47a7eb49d8a",
+  "dtypes": {
+   "m": "str"
+  },
+  "index": [
+   "t",
+   "v"
+  ],
+  "index_dtypes": {
+   "t": "str",
+   "v": "str"
+  },
+  "rows_by_t": {
+   "2010Q3": 500,
+   "2011Q1": 500,
+   "2012Q3": 647,
+   "2013Q1": 647,
+   "2015Q3": 792,
+   "2016Q1": 792,
+   "2018Q3": 685,
+   "2019Q1": 685,
+   "2023Q3": 911,
+   "2024Q1": 911
+  },
+  "shape": [
+   7070,
+   1
+  ]
+ },
+ "market_lookup_Region": {
+  "digest": "02883faa7b485934",
+  "dtypes": {
+   "m": "str"
+  },
+  "index": [
+   "t",
+   "v"
+  ],
+  "index_dtypes": {
+   "t": "str",
+   "v": "str"
+  },
+  "rows_by_t": {
+   "2010Q3": 500,
+   "2011Q1": 500,
+   "2012Q3": 647,
+   "2013Q1": 647,
+   "2015Q3": 792,
+   "2016Q1": 792,
+   "2018Q3": 685,
+   "2019Q1": 685,
+   "2023Q3": 911,
+   "2024Q1": 911
+  },
+  "shape": [
+   7070,
+   1
+  ]
+ },
+ "sample": {
+  "digest": "d471ca48896c1927",
+  "dtypes": {
+   "Rural": "string",
+   "panel_weight": "Float64",
+   "strata": "string",
+   "v": "string",
+   "weight": "Float64"
+  },
+  "index": [
+   "i",
+   "t"
+  ],
+  "index_dtypes": {
+   "i": "str",
+   "t": "str"
+  },
+  "rows_by_t": {
+   "2010Q3": 5000,
+   "2011Q1": 5000,
+   "2012Q3": 4859,
+   "2013Q1": 4859,
+   "2015Q3": 4696,
+   "2016Q1": 4696,
+   "2018Q3": 5263,
+   "2019Q1": 5263,
+   "2023Q3": 5067,
+   "2024Q1": 5067
+  },
+  "shape": [
+   49770,
+   5
+  ]
+ },
+ "sample_market_Region": {
+  "digest": "a0ff5e96e4b5bb92",
+  "dtypes": {
+   "Rural": "string",
+   "panel_weight": "Float64",
+   "strata": "string",
+   "weight": "Float64"
+  },
+  "index": [
+   "i",
+   "t",
+   "m"
+  ],
+  "index_dtypes": {
+   "i": "str",
+   "m": "object",
+   "t": "str"
+  },
+  "rows_by_t": {
+   "2010Q3": 5000,
+   "2011Q1": 5000,
+   "2012Q3": 4859,
+   "2013Q1": 4859,
+   "2015Q3": 4696,
+   "2016Q1": 4696,
+   "2018Q3": 5263,
+   "2019Q1": 5263,
+   "2023Q3": 5067,
+   "2024Q1": 5067
+  },
+  "shape": [
+   49770,
+   4
+  ]
+ },
+ "warnings": {
+  "ClusterIdentityWarning: Nigeria/cluster_features: `v` is not a comparable cluster id across 2 wave boundary(ies) i": 1,
+  "ClusterIdentityWarning: Nigeria/sample: `v` is not a comparable cluster id across 2 wave boundary(ies) in this fra": 2,
+  "GrainCollapseWarning: Nigeria/cluster_features/2012Q3: cluster_features was projected from HOUSEHOLD grain onto ": 3,
+  "GrainCollapseWarning: Nigeria/cluster_features/2013Q1: cluster_features was projected from HOUSEHOLD grain onto ": 3,
+  "GrainCollapseWarning: Nigeria/cluster_features/2015Q3: cluster_features was projected from HOUSEHOLD grain onto ": 3,
+  "GrainCollapseWarning: Nigeria/cluster_features/2016Q1: cluster_features was projected from HOUSEHOLD grain onto ": 3,
+  "GrainCollapseWarning: Nigeria/cluster_features/2018Q3: cluster_features was projected from HOUSEHOLD grain onto ": 3,
+  "GrainCollapseWarning: Nigeria/cluster_features/2019Q1: cluster_features was projected from HOUSEHOLD grain onto ": 3,
+  "NullReadWarning: Nigeria/cluster_features: required declared column 'Latitude' is 100% NULL in wave(s) [202": 1,
+  "NullReadWarning: Nigeria/cluster_features: required declared column 'Longitude' is 100% NULL in wave(s) [20": 1,
+  "RuntimeWarning: Issue with categorical mapping: saq13y": 4,
+  "RuntimeWarning: Issue with categorical mapping: saq16y": 4,
+  "RuntimeWarning: Issue with categorical mapping: tracked_obs": 4
+ }
+}

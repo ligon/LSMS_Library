@@ -1,0 +1,67 @@
+{
+ "2010-11": {
+  "cover_only": 0,
+  "geo_columns_cluster": [
+   "zone",
+   "state",
+   "lga",
+   "ea"
+  ],
+  "geo_households": 5000,
+  "geo_only": 0,
+  "geo_only_in_ph_cover": 0,
+  "geo_only_with_ea": 0,
+  "geo_only_with_latitude": 0,
+  "ph_households": 4939,
+  "ph_only_vs_pp": 0,
+  "pp_households": 5000
+ },
+ "2012-13": {
+  "cover_only": 96,
+  "geo_columns_cluster": [
+   "zone",
+   "state",
+   "lga",
+   "ea"
+  ],
+  "geo_households": 4802,
+  "geo_only": 39,
+  "geo_only_clusters": 7,
+  "geo_only_clusters_absent_from_pp_cover": 2,
+  "geo_only_clusters_on_pp_cover": 5,
+  "geo_only_in_ph_cover": 39,
+  "geo_only_with_ea": 39,
+  "geo_only_with_latitude": 39,
+  "ph_households": 4854,
+  "ph_only_vs_pp": 44,
+  "pp_households": 4859
+ },
+ "2015-16": {
+  "cover_only": 84,
+  "geo_columns_cluster": [
+   "zone",
+   "state",
+   "lga",
+   "ea"
+  ],
+  "geo_households": 4613,
+  "geo_only": 1,
+  "geo_only_in_ph_cover": 0,
+  "geo_only_with_ea": 0,
+  "geo_only_with_latitude": 1,
+  "ph_households": 4592,
+  "ph_only_vs_pp": 0,
+  "pp_households": 4696
+ },
+ "2018-19": {
+  "cover_only": 147,
+  "geo_columns_cluster": [],
+  "geo_households": 5116,
+  "geo_only": 0,
+  "geo_only_in_ph_cover": 0,
+  "geo_only_with_latitude": 0,
+  "ph_households": 5025,
+  "ph_only_vs_pp": 0,
+  "pp_households": 5263
+ }
+}

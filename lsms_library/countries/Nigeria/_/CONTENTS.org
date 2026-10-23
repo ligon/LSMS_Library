@@ -582,6 +582,67 @@ counts (70 / 78 / 129) include households with NO coordinate beside ones
 with one, which a whole-row comparison counts as a disagreement.  So the only
 columns that ever made this collapse lossy are exactly the two W5 lacks.
 
+*** The geo merge is =left=, PP cover authoritative, in W2 and W3 (GH #1261)
+
+Every wave's =cluster_features= block reads BOTH rounds' rows from the
+post-planting cover (=df_key= + =df_main=, =secta_plantingw*=), because =v=
+is built from that cover and nowhere else; =df_geo= (the household
+geovariables file) only adds =Latitude= / =Longitude=, merged on =i=.
+=Wave.grab_data= merges =dfs:= in order with the running result on the left,
+so =df_key= is the LEFT frame of both merges.  Measured 2026-10-23, cold, per
+round (both rounds of a folder read the same files, so the two rows of a
+wave are identical):
+
+| folder  | rounds        | PP cover | geo file | geo-only | cover-only | null-=v= rows under =outer= | =merge_how= |
+|---------+---------------+----------+----------+----------+------------+-----------------------------+-------------|
+| 2010-11 | 2010Q3/2011Q1 |    5,000 |    5,000 |        0 |          0 |                           0 | (outer)     |
+| 2012-13 | 2012Q3/2013Q1 |    4,859 |    4,802 |   *39*   |         96 |                        *39* | =left=      |
+| 2015-16 | 2015Q3/2016Q1 |    4,696 |    4,613 |    *1*   |         84 |                         *1* | =left=      |
+| 2018-19 | 2018Q3/2019Q1 |    5,263 |    5,116 |        0 |        147 |                           0 | (outer)     |
+| 2023-24 | 2023Q3/2024Q1 |    5,067 |       -- |       -- |         -- |                           0 | (no =df_geo=) |
+
+Under the default =outer= the geo-only households arrived with a null =v=
+and the Site 2 household -> cluster collapse DELETED them (=groupby= drops a
+null key): the grain report read =nan_key_rows= 39 (2012-13) and 1
+(2015-16) on every round.  =merge_how: left= stops admitting them.  *Served
+=cluster_features= is identical* -- development vs branch, cold, separate
+data roots: =assert_frame_equal= exact (7,070 rows, dtypes included), and
+likewise =sample()=, =_market_lookup('Region')= / =('District')= and
+=_add_market_index(sample(), 'Region')=.  The cover-only households (no
+coordinates) are kept by =left= exactly as by =outer=, and no dtype widens
+(=District= arrives =object= either way; unlike Ethiopia W2, where =outer=
+widened it to =float64=).  The W2 grain report also falls from
+destroyed 609 / dropped 4,250 / 70 conflicting groups to 571 / 4,212 / 69:
+the audit groups NaN keys with =dropna=False=, so the 39 null-=v= rows were
+ALSO counted as one 39-row "conflicting" group (38 destroyed) beside
+=nan_key_rows=.  W3's single null row was a group of one and moved only
+=nan_key_rows=.  W1 and W4 have no geo-only household, so =left= would be a
+no-op there and is not declared (it would only invalidate their L2-wave
+caches).
+
+*What =left= hides, recorded here so it is not lost.*  The 39 W2 geo-only
+households are not noise: all 39 are on the POST-HARVEST cover
+(=secta_harvestw2=) and not the post-planting one -- 39 of the 44 households
+the PH cover has and the PP cover lacks.  The geo file gives each a real
+=(state, lga, ea)= (none is a =Moved= sentinel) and a coordinate; they sit in
+7 EAs, 5 of which are on the PP cover and *2 of which are not*.  Because
+=sample= and =cluster_features= both build =v= from the PP cover for BOTH
+rounds, those 44 households have no =v= in 2013Q1 and those 2 EAs are absent
+from 2013Q1 =cluster_features= -- under =outer= and =left= alike.  The
+=nan_key_rows= 39 report was the only signal pointing at that; =left= removes
+it.  The gap itself is a separate, unfixed question (serving PH-only
+households would change served rows).  W3's one geo-only household is on
+neither cover and the geo file gives it no =ea=, so nothing is hidden there.
+W1, W3 and W4 have no PH-only households (0 / 0 / 0).
+
+*When W5's geovariables arrive* (v02, GH #978: 4,883 geo households against
+5,067 on the cover), measure geo-only households before wiring =df_geo=, and
+declare =merge_how: left= if there are any.
+
+Evidence (aggregates only, re-runnable):
+=slurm_logs/isa_backlog_2026-10-21/1261-nigeria-geo-merge/=.  Test:
+=tests/test_gh1261_nigeria_geo_merge.py=.
+
 ** Strata
 
 | Wave    | Variable  | Values                        | Notes                       |

@@ -78,6 +78,18 @@ cluster_features:
             Longitude: LON_DD_MOD
     merge_on:
         - i
+    # GH #1261: the post-planting cover (df_key, first in `dfs:`, so the LEFT
+    # frame of both merges) is authoritative for which households this block
+    # serves -- `v` comes only from it.  The geo file carries 39 households the
+    # PP cover lacks; under the default `outer` they arrived with a null `v` and
+    # the Site 2 cluster-grain collapse deleted them (grain report
+    # nan_key_rows=39 for 2012Q3 and 2013Q1).  Served cluster_features is
+    # identical either way (measured cold; see _/CONTENTS.org).  Not a data fix:
+    # those 39 are POST-HARVEST-only households (in secta_harvestw2, not
+    # secta_plantingw2; 7 EAs, 2 of them absent from the PP cover), and they
+    # were not served before this either.  `left` removes the grain report that
+    # pointed at them -- CONTENTS.org records the gap instead.
+    merge_how: left
     final_index:
         - t
         - i
