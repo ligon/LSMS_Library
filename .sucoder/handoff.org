@@ -14,8 +14,13 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - *Runtime:* =bin/savio_venv.sh mount= worked on this node (FUSE OK); interpreter =/local/job40390255/venv_img/bin/python=.
   Private data roots under =/local/job40390255/data-private/= with =dvc-cache= symlinked to the shared L1.
 
-Next: the four remaining stopped lanes below are ledger-only (no source edits yet).
-Proposed order: Malawi #856 and Niger #823 (bounded raw-file diagnoses, based on 60aa), then Uganda #1133, then Mali #1118 (its branch is still based on =f8=; rebase/merge onto current development first).
+- *Mali #1118 done (Mali portion), PR #1222 open for human merge* (branch =fix/1118-mali-missing-input-units-20261022=, head =d4ca03f2e=, development merged in).
+  Every null =u= is a blank raw unit or =Manquant=; 42,089 rows NA -> =Unknown=, nothing else moves; Mali-only re-warm (24/549, 96/2,109, 0/40).
+  *Open question for Ethan on the PR:* 41,559 of those rows are =Quantity == 0= type-level non-use inside a group use flag of =Oui= -- drop as content-free or keep?
+- *Malawi #856 and Niger #823:* dispatched to two subagents in worktrees =/local/job40390255/worktrees/{856,823}= (read-only diagnoses; ledger + CONTENTS.org only).
+  On relaunch, check their branches for a published Phase 2 ledger section before redoing them.
+
+Next: review the #856/#823 results, then Uganda #1133 (12-source rendering diagnosis).
 
 Sue
 
