@@ -1055,17 +1055,18 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
     """A 0-row frame with a table's DECLARED shape (GH #1039).
 
     The declared index levels (``str``, as a built index's are) as its index
-    and every declared column, required and ``optional: true``, as an object
-    column for ``_finalize_result``'s canonical dtypes to coerce.  It answers
+    and every declared column, required and ``optional: true``, in original
+    declaration order as an object column for ``_finalize_result``'s canonical
+    dtypes to coerce.  It answers
     a request whose waves all lack the table on a no-builder route
     (GH #1039/#1099): 0 rows, as a warm cache would serve, shaped so
     that ``Country._assert_built_required_columns`` reads it as a well-formed
     empty table rather than as a build that lost its columns.
     """
-    entry = scheme_entry if isinstance(scheme_entry, dict) else None
+    entry = scheme_entry if isinstance(scheme_entry, dict) else {}
     levels = _declared_index_levels(entry)
-    columns = [c for c in _required_scheme_columns(entry) + _optional_scheme_columns(entry)
-               if c not in levels]
+    declared = set(_required_scheme_columns(entry)) | set(_optional_scheme_columns(entry))
+    columns = [c for c in entry if c in declared and c not in levels]
     empty = pd.DataFrame({c: pd.Series(dtype="str" if c in levels else object)
                           for c in levels + columns})
     return empty.set_index(levels) if levels else empty

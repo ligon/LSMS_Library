@@ -3913,3 +3913,21 @@ The older country-builder subset and warm-write measurements above remain
 historical evidence; they are not guarantees about this new route.
 The separate area/key limitation (GH #1205) and support-string null-policy
 observation (GH #1196) remain outside this change.
+
+* Constructed empty crop columns retain declaration order (GH #1215, 2026-10-22)
+
+A barren crop request constructed by the framework retains the original
+=data_scheme.yml= field order, including optional fields in their declared
+positions.
+For this table that order equals the native helper's explicit eight-column
+projection: =Quantity, Quantity_sold, Value_sold, Unit_sold, Condition_sold,
+harvest_month, intercropped, KgFactor=.
+The previous required-before-optional grouping moved the sold-label columns
+behind the two later required fields on this newly exposed GH1204 route.
+
+Required/optional membership, index identity, nullable dtype handling and the
+GH1204 no-build/no-country-cache-write boundary remain unchanged.
+Populated output is not reordered.
+This empty-construction rule does not promise that every country's native
+writer uses declaration order or emits every optional column.
+The separate country-local optional-dict dtype gap is not repaired here.
