@@ -385,6 +385,28 @@ with PR #627; on =development= today the key is inert.
 wave directory contains none), so its Latitude/Longitude are honestly
 absent -- not mis-addressed.  It is NOT wired, and that is correct.
 
+*GH #592 re-check (2026-10-23): corroborated, and refined.*  The claim
+above holds against the catalog as well as the wave directory: WB entry 2676
+(=NER_2014_ECVMA-II_v02_M=, still the latest release) lists 74 data files --
+the 74 we hold -- and documents 2,276 variables, none of them a coordinate
+(the only GPS variable is =AS01Q07=, plot area in m^2).  But "the survey has
+no GPS" would be the wrong reading.  The household questionnaire
+(=ecvma2_quest_men_p1.pdf=, Section 0 B) asks item /21. LATITUDE /
+LONGITUDE/ (its front page also has "Coordonnées GPS du ménage"), and the
+shipped cover file =ECVMA2_MS00P1.dta= jumps from =MS00Q12= to =MS00Q14= and
+from =MS00Q17= to =MS00Q22=: items 13 (village), 18-20 (head's name, phone,
+address) and 21 (coordinates) were withheld from the public release as a
+block.  So 2014-15 is *asked-not-distributed* -- collected, never released;
+neither an acquisition gap nor a wiring gap.
+
+Measured on =development= =9a0ed5f3c=, cold, clusters with coordinates:
+2011-12 270/270; 2014-15 0/270; 2018-19 493/504 (the 11 empty grappes are
+null in =grappe_gps_ner2018.dta= itself, 493 of 504 rows populated -- a
+release-side gap); 2021-22 555/555, from the cover page's =GPS__Latitude= /
+=GPS__Longitude=, which take one value per grappe (0 of 555 grappes hold two
+distinct fixes), so the household -> cluster projection is lossless for the
+coordinates.  Evidence: =slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
+
 * Grain conflicts still open under =LSMS_GRAIN_STRICT=1= (GH #614 / #637)
 
 Fixing the 2011-12 coordinates cleared the GH #323/#515 required-column
