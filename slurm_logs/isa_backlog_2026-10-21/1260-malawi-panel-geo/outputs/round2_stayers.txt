@@ -1,0 +1,36 @@
+## stayer indicator (panel cover dist_to_IHS3location)
+== 2016-17
+cover dist_to_IHS3location: non-null 2506 of 2508 | <=1km 1443 | ==0 92 | quantiles [0.019999999552965164, 0.41999998688697815, 1.3300000429153442, 3.9600000381469727, 8.0600004196167, 60.58000183105469]
+stayers <= 0.5 km: 1283 hh, EAs covered 102 of 102, EAs with >1 distinct coord 0
+stayers <= 1 km: 1442 hh, EAs covered 102 of 102, EAs with >1 distinct coord 0
+stayers <= 2 km: 1595 hh, EAs covered 102 of 102, EAs with >1 distinct coord 0
+stayers <= 5 km: 1807 hh, EAs covered 102 of 102, EAs with >1 distinct coord 1
+stayers per EA: min 4 median 14.0
+mover flag among <=1km stayers {0.0: 990, 1.0: 453}
+households: distance from their EA stayer fix: median km 0.0 | >5km 614 of 2503
+round-1 style selection (first non-null by key) vs stayer fix: EAs differing 13 | >5km 13 | max km 607.6
+shared EA: CS households 16 CS distinct fixes 1 | panel stayers 20 panel stayer distinct fixes 1
+   km between CS fix and panel stayer fix 4.11
+== 2019-20
+cover dist_to_IHS3location: non-null 3176 of 3178 | <=1km 2136 | ==0 2136 | quantiles [0.0, 0.0, 0.0, 7.0, 13.0, 72.0]
+d_ihs3 vs cover distance: both non-null 3175 | max abs diff 0.0 | <=1 agree 3175
+stayers <= 0.5 km: 2136 hh, EAs covered 102 of 102, EAs with >1 distinct coord 0
+stayers <= 1 km: 2136 hh, EAs covered 102 of 102, EAs with >1 distinct coord 0
+stayers <= 2 km: 2136 hh, EAs covered 102 of 102, EAs with >1 distinct coord 0
+stayers <= 5 km: 2165 hh, EAs covered 102 of 102, EAs with >1 distinct coord 12
+stayers per EA: min 9 median 20.0
+households: distance from their EA stayer fix: median km 0.0 | >5km 992 of 3175
+round-1 style selection (first non-null by key) vs stayer fix: EAs differing 16 | >5km 16 | max km 607.6
+
+## hook keeps exactly the stayers (source vs round-2 wave frame)
+expected stayers with coords 1442 | kept 1422 | expected-not-kept 20 | kept-not-expected 0
+panel ids in wave frame matched 2508 of 2508
+non-shared gap rows: their v in CS v set 20 of 20 | ea_id == v 20
+kept-not-expected: dist [] | geo lat null 0
+expected stayers with coords 2136 | kept 2136 | expected-not-kept 0 | kept-not-expected 0
+panel ids in wave frame matched 3178 of 3178
+non-shared gap rows: their v in CS v set 0 of 0 | ea_id == v 0
+kept-not-expected: dist [] | geo lat null 0
+
+## 2013-14 (not changed)
+2013-14: EAs with stayers 204 of 204 | matched to clusters 204 | served coordinate is the stayer fix 180 | not 24

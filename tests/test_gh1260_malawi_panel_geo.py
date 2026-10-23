@@ -18,6 +18,15 @@ pages:
 | 2016-17 | ``Panel/HouseholdGeovariablesIHPSY3.dta`` | ``y3_hhid`` | ``lat_modified`` / ``lon_modified`` |
 | 2019-20 | ``Panel/householdgeovariables_y4.dta``    | ``y4_hhid`` | ``lat_mod`` / ``lon_mod``         |
 
+ONLY THE STAYERS' COORDINATES LOCATE THE EA.  IHPS tracks movers and gives
+each household its CURRENT (displaced) location, so a panel EA's households
+can sit hundreds of km apart.  Households still within 1 km of their baseline
+EA (``dist_to_IHS3location`` on the panel cover) share exactly one coordinate
+per EA.  Each wave's ``mapping.py`` ``cluster_features`` hook blanks every
+other panel coordinate -- and the panel's in an EA the cross-section also
+covers, which keeps the cross-section's EA fix -- so the cluster serves the
+EA's fix rather than whichever household the grain collapse selects.
+
 WHY THE COVERAGE TEST MATTERS.  A two-file ``file:`` list makes ``get_data``
 pass ``missing_ok=True``, so a mis-spelled column in either file becomes an
 all-NaN column instead of a ``KeyError``.  The config tests below cannot see
@@ -44,6 +53,22 @@ PANEL_GEO = {
 }
 COVER = {"2016-17": "Panel/hh_mod_a_filt_16.dta",
          "2019-20": "Panel/hh_mod_a_filt_19.dta"}
+# Panel households that keep a coordinate after the hook: stayers with a
+# coordinate (1,442 / 2,136), less 2016-17's 20 stayers in EA 30305580, the
+# one EA the cross-section also covers (it keeps the IHS4 fix).
+STAYERS_KEPT = {"2016-17": 1422, "2019-20": 2136}
+STATUS_COL = "_ihps_baseline_status"
+
+
+def _mapping_module(wave):
+    """The wave's mapping.py, imported by path (it reads no data at import)."""
+    import importlib.util
+    path = countries_root() / "Malawi" / wave / "_" / "mapping.py"
+    spec = importlib.util.spec_from_file_location(
+        f"malawi_{wave.replace('-', '_')}_mapping", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def _cluster_cfg(wave):
@@ -125,6 +150,57 @@ def test_panel_geo_file_is_dvc_tracked_and_not_in_git(wave):
     assert len(outs) == 1 and outs[0]["path"] == Path(geo_file).name
 
 
+@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+def test_panel_cover_supplies_the_baseline_status(wave):
+    """The hook needs to know which panel households are at baseline; only
+    the panel cover carries ``dist_to_IHS3location``, so it is a panel-file
+    override (cross-sectional rows carry NaN)."""
+    cfg = _cluster_cfg(wave)
+    main = _file_entries(cfg["df_main"]["file"])
+    ov = main[COVER[wave]].get(STATUS_COL)
+    assert ov == ["dist_to_IHS3location", {"mapping": "ihps_baseline_status"}], ov
+    assert STATUS_COL not in cfg["df_main"].get("myvars", {})
+
+
+@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+def test_baseline_status_labels(wave):
+    """A string, not a numeric sentinel: grab_data rewrites any value above
+    1e99 to NaN, so a +inf "unrecorded" read as a cross-sectional row."""
+    f = _mapping_module(wave).ihps_baseline_status
+    assert f(pd.Series([0.0])) == "stayer"
+    assert f(pd.Series([1.0])) == "stayer"
+    assert f(pd.Series([1.01])) == "moved"
+    assert f(pd.Series([float("nan")])) == "unrecorded"
+
+
+@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+def test_hook_keeps_only_the_eas_own_fix(wave):
+    """Synthetic frame: a mover, an unrecorded household and a stayer in a
+    panel-only EA; a cross-sectional household and a panel stayer in a
+    shared EA."""
+    hook = _mapping_module(wave).cluster_features
+    idx = pd.MultiIndex.from_tuples(
+        [(wave, "A", "cs-1"), (wave, "A", "p-1"),
+         (wave, "B", "p-2"), (wave, "B", "p-3"), (wave, "B", "p-4")],
+        names=["t", "v", "i"])
+    df = pd.DataFrame({
+        "Region": ["R"] * 5,
+        "Latitude": [-13.0, -13.1, -14.0, -15.0, -16.0],
+        "Longitude": [34.0, 34.1, 33.0, 33.5, 35.0],
+        STATUS_COL: [pd.NA, "stayer", "stayer", "moved", "unrecorded"],
+    }, index=idx)
+    out = hook(df.copy())
+    assert STATUS_COL not in out.columns
+    lat = out["Latitude"]
+    assert lat.loc[(wave, "A", "cs-1")] == -13.0          # cross-section kept
+    assert pd.isna(lat.loc[(wave, "A", "p-1")])           # shared EA: CS wins
+    assert lat.loc[(wave, "B", "p-2")] == -14.0           # stayer kept
+    assert pd.isna(lat.loc[(wave, "B", "p-3")])           # mover blanked
+    assert pd.isna(lat.loc[(wave, "B", "p-4")])           # unrecorded blanked
+    assert out["Longitude"].isna().equals(lat.isna())
+    assert len(out) == len(df)                            # rows never dropped
+
+
 # ---------------------------------------------------------------------------
 # 2.  Data: source invariants and the coverage they buy.
 # ---------------------------------------------------------------------------
@@ -184,16 +260,33 @@ def test_wave_frame_gives_panel_households_their_coordinates(malawi, wave):
         f"must stay 1:1 on `i` (GH #323 site 4)"
     )
     assert not [c for c in wf.columns if str(c).endswith(("_x", "_y"))]
+    assert STATUS_COL not in wf.columns, "the hook must drop its helper"
     panel = wf[_is_panel(wf["i"])]
     assert len(panel) == n_panel and panel["v"].nunique() == n_ea
     have = int(panel["Latitude"].notna().sum())
-    # 5 (2016-17) and 3 (2019-20) panel households ship a null coordinate.
-    assert have >= n_panel - 10, (
-        f"{wave}: only {have} of {n_panel} panel households carry a "
-        f"Latitude -- a mis-spelled panel coordinate column reads as NaN "
-        f"under missing_ok, not as a KeyError"
+    assert have == STAYERS_KEPT[wave], (
+        f"{wave}: {have} panel households carry a Latitude, expected the "
+        f"{STAYERS_KEPT[wave]} stayers.  Far fewer: a mis-spelled panel "
+        f"coordinate column (NaN under missing_ok, not a KeyError) or a lost "
+        f"baseline status.  Far more: movers' locations are leaking through."
     )
     assert int(panel["Longitude"].notna().sum()) == have
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize("wave", sorted(PANEL_GEO))
+def test_every_panel_ea_has_exactly_one_coordinate(malawi, wave):
+    """What licenses serving the stayers' coordinate as the EA's: they agree.
+    Before the hook 101 / 102 panel EAs carried several (movers)."""
+    n_ea = PANEL_GEO[wave][5]
+    wf = _wave_frame(malawi, wave)
+    panel = wf[_is_panel(wf["i"])]
+    per_ea = panel.dropna(subset=["Latitude"]).groupby("v")[
+        ["Latitude", "Longitude"]].nunique()
+    assert int(((per_ea["Latitude"] > 1) | (per_ea["Longitude"] > 1)).sum()) == 0
+    # every panel EA but the shared one keeps a stayer coordinate
+    shared = 1 if wave == "2016-17" else 0
+    assert len(per_ea) == n_ea - shared
 
 
 @pytest.mark.requires_s3
@@ -214,3 +307,28 @@ def test_every_cluster_has_coordinates(malawi, wave):
     # clusters already served coordinates outside Malawi's box before GH #1260
     # (unchanged by it), and 5 of 3,178 IHPS-2019 households carry one too.
     # Neither is this issue's business.
+
+
+@pytest.mark.requires_s3
+def test_shared_ea_keeps_the_cross_sections_fix(malawi):
+    """EA 30305580 is sampled by both halves of 2016-17.  IHS4 and IHPS
+    displace independently (its two fixes are 4.1 km apart), so the cluster
+    keeps the cross-section's single fix -- what it served before the panel
+    file was held."""
+    wf = _wave_frame(malawi, "2016-17")
+    ea = wf[wf["v"].astype(str) == "30305580"]
+    cs = ea[~_is_panel(ea["i"])]
+    if cs.empty:  # pragma: no cover
+        pytest.skip("EA 30305580 not in this build")
+    assert ea.loc[_is_panel(ea["i"]), "Latitude"].isna().all()
+    fix = cs[["Latitude", "Longitude"]].drop_duplicates()
+    assert len(fix) == 1
+    try:
+        cf = malawi.cluster_features()
+    except Exception as exc:  # noqa: BLE001  # pragma: no cover
+        pytest.skip(f"Malawi cluster_features: {type(exc).__name__}: {exc}")
+    row = cf.xs("2016-17", level="t")
+    row = row[row.index.astype(str) == "30305580"].iloc[0]
+    same = bool(row["Latitude"] == fix["Latitude"].iloc[0]
+                and row["Longitude"] == fix["Longitude"].iloc[0])
+    assert same, "EA 30305580 no longer serves the cross-section's fix"

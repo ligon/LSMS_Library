@@ -26,6 +26,8 @@ the panel household id. Config + data only; no framework change.
 | `Wave.column_mapping` per-file overrides | `lsms_library/country.py:1387` | `file:` list entries `{path: {idxvar or myvar: override}}` | yes | reuse (stack two geo files) |
 | `Wave._merge_subframes` | `lsms_library/country.py:1622` | cartesian guard on the `dfs:` merge | yes | unchanged; 1:1 merge |
 | `country.most_complete_row` / Site 2 audit | `lsms_library/country.py` (`_collapse_to_cluster_grain`) | selects one household row per cluster, reports loss | yes | unchanged; reports grow |
+| `grab_data` df_edit hook dispatch | `lsms_library/country.py:1962` | runs the wave's `cluster_features(df)` on the merged `dfs:` frame | yes | reuse (stayer filter) |
+| `grab_data` >1e99 sentinel rule | `lsms_library/country.py` (`get_data`) | rewrites any value > 1e99 to NaN | yes | constraint: no numeric `inf` sentinel |
 
 ## §3 Definitions & conventions in force
 - Two catalog entries per wave dir, `#+CATALOG_ID:` is a list: CLAUDE.md
@@ -61,15 +63,20 @@ the panel household id. Config + data only; no framework change.
 |----------|----------|--------|
 | panel coordinates | reuse `file:` list + per-file override in `df_geo` | a third `dfs:` member would collide on `Latitude`/`Longitude` (`_x`/`_y`); no coalesce transformer exists and adding one is framework work |
 | merge type | keep `outer` | both sides 1:1 on `i` (14,955 / 14,612), so `outer` = `left`; `outer` keeps the orphan signal |
-| cluster coordinate for a panel EA | unchanged Site 2 selection | core does not aggregate; a stayer-based EA fix would need a country hook, out of scope |
+| cluster coordinate for a panel EA | NEW wave hook: blank non-stayer panel coordinates (round 2, dispatcher judgement 2026-10-23) | stayers (`dist_to_IHS3location` <= 1 km, the 2013-14 test's rule) share exactly one coordinate per EA in both waves; no precedent filter exists (2013-14 reports, does not filter) |
+| shared EA 30305580 | keep the cross-section's fix | IHS4 and IHPS stayer fixes differ by 4.1 km (independent displacement); keeping IHS4's leaves the row identical to development |
 
 ## §6 Open questions for the human
 - 2016-17 held `Data/Panel/`: 5 of 98 files differ from the current 2939 v03
   zip (`hh_mod_a_filt_16` differs only in `case_id`, all rows). Re-acquire as a
   separate issue?
-- A panel EA's cluster coordinate is one household's current location. Serve
-  the stayers' (non-mover) fix instead? Needs a country hook and a stayer flag
-  per wave (2019-20 `d_ihs3 <= 1` works exactly; 2016-17's `mover` does not).
+- Round 2 now serves the stayers' fix in 2016-17 / 2019-20.  Extend the same
+  hook to 2013-14 (24 of 204 clusters serve a non-stayer coordinate there)?
+- Is blanking non-stayer coordinates a "deletion" the derivations registry
+  should name?  Not registered here: the served value is a recorded value,
+  and only the choice of which household supplies it changed.
+- Site 2 still reports every panel EA as conflicting (a blank counts as a
+  value), so the grain report did not fall with the coordinates.
 - 2019-20 `function: cs_i` is a no-op (unrecognised key), so the IHS5 `i` is a
   bare `case_id`. Intended?
 - 9 IHS5 cross-sectional clusters serve coordinates outside Malawi's box
@@ -88,4 +95,9 @@ the panel household id. Config + data only; no framework change.
   `push_to_cache_batch`, no existing sidecar changed.
 - `tests/test_gh1260_malawi_panel_geo.py` — OK (§4): fails on development
   (6 config, 4 data), passes on this branch.
+- Round 2: `Malawi/{2016-17,2019-20}/_/mapping.py` `ihps_baseline_status`,
+  `cluster_features` and the `_ihps_baseline_status` panel-cover override —
+  OK (§5): every panel EA serves its stayer fix (101/101, 102/102), 0 EAs
+  with more than one coordinate, shared EA identical to development.  The
+  11 new or changed tests fail on round 1 (`fd5c12474`).
 - Evidence: `slurm_logs/isa_backlog_2026-10-21/1260-malawi-panel-geo/`.

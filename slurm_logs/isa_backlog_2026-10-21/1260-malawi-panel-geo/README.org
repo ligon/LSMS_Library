@@ -72,6 +72,40 @@ fresh =LSMS_DATA_DIR=.
 - Pre-existing, unchanged: 9 IHS5 cross-sectional clusters serve coordinates
   outside Malawi's bounding box.
 
+* Round 2: only the stayers' coordinates (=outputs/round2_*.txt=)
+Dispatcher judgement (2026-10-23): a panel cluster must not serve a tracked
+mover's current location.
+
+- Indicator: the panel cover's =dist_to_IHS3location= (both waves; 2019-20's
+  geo =d_ihs3= is identical on all 3,175 households with both).  Households
+  within 1 km share exactly ONE coordinate per EA: 1,442 / 2,136 households,
+  all 102 / 102 EAs covered, 0 EAs split.  2016-17's =mover= flag is not a
+  stayer flag (453 of the 1,443 within 1 km have =mover= = 1).
+- Wiring: a panel-cover override =_ihps_baseline_status= (='stayer'= /
+  ='moved'= / ='unrecorded'=) and a =cluster_features= hook in each wave's
+  =mapping.py= that blanks every non-stayer panel coordinate, and the panel
+  coordinates in an EA the cross-section also covers.  A first version used
+  =+inf= for "unrecorded"; =grab_data='s >1e99 rule rewrote it to NaN and 10
+  stayers lost their coordinate -- caught by =scripts/stayer_gap.py=, fixed
+  by making the status a string.  The hook now keeps exactly the expected
+  stayers (1,422 = 1,442 less 20 in the shared EA; 2,136).
+
+| wave    | clusters without GPS | panel EAs serving the stayer fix | EAs with >1 coordinate | Site 2 destroyed / conflicting |
+|---------+----------------------+----------------------------------+------------------------+--------------------------------|
+| 2016-17 | 101 -> 0 -> 0        | 0 -> 88 -> 101 (of 101)          | 7 -> 108 -> 7          | 1,994/85 -> 2,563/111 -> 2,585/112 |
+| 2019-20 | 102 -> 0 -> 0        | 0 -> 86 -> 102 (of 102)          | 0 -> 102 -> 0          | 3,146/108 -> 3,184/110 -> 3,184/110 |
+
+(development -> round 1 -> round 2.)  Site 2 does not fall because the
+audit counts a blanked coordinate as a value that disagrees with the kept
+stayer row.  EA 30305580: IHS4 fix and IHPS stayer fix are 4.1 km apart; the
+cluster keeps the IHS4 fix, identical to development.  Served =Rural= /
+=Region= / =District= moved in 5 (2016-17) and 4 / 10 / 4 (2019-20) panel
+EAs, every one toward the EA's stayers' modal value.  The round-1 =Rural=
+flip (Urban -> Rural) stands: all 13 stayers in that EA are Rural.
+Cross-sectional clusters, the other waves, =sample()= and =housing()= are
+identical to development.  2013-14 (unchanged, no hook) serves a non-stayer
+coordinate in 24 of 204 clusters.
+
 * Hash census (=outputs/hash_census.txt=)
 =Country._table_cache_hash= 26/549 moved, all Malawi; =build_transforms_fingerprint=
 0/40; =Wave._input_hash= 52/2,109, all Malawi 2016-17 and 2019-20.

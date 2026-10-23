@@ -1,0 +1,52 @@
+## development (base) -> round 1 (r1) -> round 2 (r2)
+shapes {'base': (3235, 5), 'r1': (3235, 5), 'r2': (3235, 5)} | index equal True
+
+== 2016-17: wave frame columns ['t', 'v', 'i', 'Region', 'District', 'Rural', 'Latitude', 'Longitude'] rows 14955
+   panel households keeping a coordinate (stayers): 1422 of 2508
+   panel EAs with >1 distinct stayer coordinate: 0 of 101
+   base: clusters without GPS 101 of 880 | panel-only EAs serving the stayer fix 0 of 101
+   r1: clusters without GPS 0 of 880 | panel-only EAs serving the stayer fix 88 of 101
+   r2: clusters without GPS 0 of 880 | panel-only EAs serving the stayer fix 101 of 101
+   served changes base -> r2 (all clusters): {'Region': 0, 'District': 0, 'Rural': 5} | of which panel-only: {'Region': 0, 'District': 0, 'Rural': 5}
+   served changes r1 -> r2 (all clusters): {'Region': 0, 'District': 0, 'Rural': 4} | of which panel-only: {'Region': 0, 'District': 0, 'Rural': 4}
+   CS-only clusters identical base vs r2: True
+   shared EA row identical base vs r2: True
+   contested EAs (base): {'Region': 0, 'District': 0, 'Rural': 75, 'Latitude': 7, 'Longitude': 7}
+   contested EAs (r1): {'Region': 0, 'District': 0, 'Rural': 75, 'Latitude': 108, 'Longitude': 108}
+   contested EAs (r2): {'Region': 0, 'District': 0, 'Rural': 75, 'Latitude': 7, 'Longitude': 7}
+
+== 2019-20: wave frame columns ['t', 'v', 'i', 'Region', 'District', 'Rural', 'Latitude', 'Longitude'] rows 14612
+   panel households keeping a coordinate (stayers): 2136 of 3178
+   panel EAs with >1 distinct stayer coordinate: 0 of 102
+   base: clusters without GPS 102 of 819 | panel-only EAs serving the stayer fix 0 of 102
+   r1: clusters without GPS 0 of 819 | panel-only EAs serving the stayer fix 86 of 102
+   r2: clusters without GPS 0 of 819 | panel-only EAs serving the stayer fix 102 of 102
+   served changes base -> r2 (all clusters): {'Region': 4, 'District': 10, 'Rural': 4} | of which panel-only: {'Region': 4, 'District': 10, 'Rural': 4}
+   served changes r1 -> r2 (all clusters): {'Region': 4, 'District': 10, 'Rural': 4} | of which panel-only: {'Region': 4, 'District': 10, 'Rural': 4}
+   CS-only clusters identical base vs r2: True
+   contested EAs (base): {'Region': 66, 'District': 98, 'Rural': 86, 'Latitude': 0, 'Longitude': 0}
+   contested EAs (r1): {'Region': 66, 'District': 98, 'Rural': 86, 'Latitude': 102, 'Longitude': 102}
+   contested EAs (r2): {'Region': 66, 'District': 98, 'Rural': 86, 'Latitude': 0, 'Longitude': 0}
+
+other waves identical base vs r2: {'2004-05': True, '2010-11': True, '2013-14': True}
+sample.parquet base vs r2 DataFrame.equals True
+housing.parquet base vs r2 DataFrame.equals True
+
+Site 2 grain reports, base -> r1 -> r2
+  2013-14 {'rows': 4000, 'dropped': 3796, 'destroyed': 3540, 'conflicting_groups': 188, 'nan_key_rows': 0} -> {'rows': 4000, 'dropped': 3796, 'destroyed': 3540, 'conflicting_groups': 188, 'nan_key_rows': 0} -> {'rows': 4000, 'dropped': 3796, 'destroyed': 3540, 'conflicting_groups': 188, 'nan_key_rows': 0}
+  2016-17 {'rows': 14955, 'dropped': 14075, 'destroyed': 1994, 'conflicting_groups': 85, 'nan_key_rows': 0} -> {'rows': 14955, 'dropped': 14075, 'destroyed': 2563, 'conflicting_groups': 111, 'nan_key_rows': 0} -> {'rows': 14955, 'dropped': 14075, 'destroyed': 2585, 'conflicting_groups': 112, 'nan_key_rows': 0}
+  2019-20 {'rows': 14612, 'dropped': 13793, 'destroyed': 3146, 'conflicting_groups': 108, 'nan_key_rows': 0} -> {'rows': 14612, 'dropped': 13793, 'destroyed': 3184, 'conflicting_groups': 110, 'nan_key_rows': 0} -> {'rows': 14612, 'dropped': 13793, 'destroyed': 3184, 'conflicting_groups': 110, 'nan_key_rows': 0}
+
+== 2016-17: panel-only EAs whose stayers disagree among themselves: {'Region': 0, 'District': 0, 'Rural': 3}
+   base: served value equals the stayers' modal value, of 101: {'Region': 101, 'District': 73, 'Rural': 94}
+   r1: served value equals the stayers' modal value, of 101: {'Region': 101, 'District': 73, 'Rural': 95}
+   r2: served value equals the stayers' modal value, of 101: {'Region': 101, 'District': 73, 'Rural': 99}
+== 2019-20: panel-only EAs whose stayers disagree among themselves: {'Region': 0, 'District': 37, 'Rural': 16}
+   base: served value equals the stayers' modal value, of 102: {'Region': 98, 'District': 85, 'Rural': 94}
+   r1: served value equals the stayers' modal value, of 102: {'Region': 98, 'District': 85, 'Rural': 94}
+   r2: served value equals the stayers' modal value, of 102: {'Region': 102, 'District': 95, 'Rural': 98}
+round-1 flip EA: served Rural base Urban | r1 Rural | r2 Rural | households 19 stayers 13 | stayers Rural {'rural': 13} | all Rural {'rural': 17, 'urban': 2}
+2016-17 Rural base -> r2 changes: [('Urban', 'Rural'), ('Rural', 'Urban'), ('Urban', 'Rural'), ('Rural', 'Urban'), ('Rural', 'Urban')]
+
+## 2019-20 stayer District disagreement patterns
+18 distinct disagreement patterns; top: [(('Lilongwe', 'Lilongwe City'), 9), (('Blantyre', 'Blantyre City'), 6), (('Mzimba', 'Mzuzu City'), 3), (('Zomba', 'Zomba City'), 3), (('Dowa', 'Kasungu'), 2), (('Chikwawa', 'Nsanje'), 2)]

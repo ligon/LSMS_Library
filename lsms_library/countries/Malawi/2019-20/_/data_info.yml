@@ -54,6 +54,14 @@ cluster_features:
             - Cross_Sectional/hh_mod_a_filt.dta
             - Panel/hh_mod_a_filt_19.dta:
                 i: y4_hhid
+                # GH #1260: is the panel household still at its baseline
+                # (IHS3) EA?  'stayer' / 'moved' / 'unrecorded' from
+                # dist_to_IHS3location, read by the `cluster_features` hook
+                # in this wave's mapping.py and dropped there.  A panel-file
+                # override only, so cross-sectional rows carry NaN.
+                _ihps_baseline_status:
+                    - dist_to_IHS3location
+                    - mapping: ihps_baseline_status
         idxvars:
             i:
                 - case_id
@@ -113,7 +121,10 @@ cluster_features:
         # differ (lat_mod / lon_mod, not ea_lat_mod / ea_lon_mod), hence the
         # per-file overrides.  Unlike the IHS5 file its coordinates are NOT
         # EA-constant: IHPS tracks movers, and each household carries its
-        # CURRENT location (see Malawi/_/CONTENTS.org, GH #1260).
+        # CURRENT location.  The `cluster_features` hook in this wave's
+        # mapping.py keeps only the households still at their baseline EA
+        # (dist_to_IHS3location <= 1 km), which share exactly one coordinate
+        # per EA (see Malawi/_/CONTENTS.org, GH #1260).
         #
         # Two files make get_data pass missing_ok=True, so a mis-spelled
         # override becomes NaN instead of a KeyError.  The guard is
