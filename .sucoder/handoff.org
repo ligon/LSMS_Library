@@ -29,7 +29,14 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - *Niger #823 decisions (Ethan):* D1 serve both readings as recorded; D2 =Quantity= = 1 as a REGISTERED derivation (Niger's own tablet price questionnaire, UEMOA NADA catalog 48 downloads 199/200, records two integer multiple-of-5 prices per product x unit-size and no quantity); D3 code bridge, narrower products take the household's broader =j=; D4 Uganda precedent, size inside =u= (=Tas (Petit)=); D5 obs 3/4; D6 visit = vague; D7 found (WB 4296 ships Chad's template).  The diagnosis agent is wiring it on =fix/823-niger-2018-community-prices-20261022=.
 - *Filed #1224:* EHCVM =food_acquired.u= drops the unit size for 60-88% of consumed rows in all eight countries (evidence under =slurm_logs/isa_backlog_2026-10-21/ehcvm-unit-size/= on this branch).
 
-Next: review the Malawi and Niger implementations (verify published branches, docs-only vs source scope, real-data diffs), open their PRs, file the cowpea issue from the Malawi draft; then Uganda #1133.
+- *Merged:* #1223 -> =9a0ed5f3c= (mirror synced).  #1118 body NARROWED to the residual (Malawi, Nigeria, non-ISA) per backlog-workflow.
+- *Backlog-workflow gaps acknowledged to Ethan and being closed:* no independent red-team before PR, no =scan.py= regression net.  Retro work authorized:
+  - Slurm burst job =40393183= (co_carleton, savio4_htc, 24c/160G/8h): =scan.py --features canonical --jobs 10= cold on base =60aa81e9e= and on =9a0ed5f3c=, side by side; outputs in =/global/scratch/fsa/fc_jevons/ligon/retro-scan-20261022/= (=results-{base,cand}.jsonl=, logs, =DONE=).  Next: diff the two result sets and cluster the deltas (=bench/feature_audit/cluster.py=).
+  - Independent red-team of #1221 running (read-only, worktrees =review-1221= vs =base60aa=).  Queue after it: retro red-team of #1222/#1223 (Mali), then the Malawi PR red-team.
+- *PRIVACY (repo is PUBLIC):* the Malawi agent committed three ROW-LEVEL JSONs (household/plot ids, sale values, free text) on =fix/856-malawi-harvest-unit-text-20261022= -- on the private filesystem mirror only, never on GitHub.  Clean branch for the PR: =fix/856-malawi-unit-text-20261022= (=955bfd5dd=, squashed, those files dropped, warning strings reduced to counts).  Deleting the old branch on the mirror is Ethan's call.  Every agent brief must now forbid committing row-level data.
+- *Malawi decision pending for Ethan:* map =BASKET (BAMBOO)= to dengu too? (re-attaches 9 sales, ~150k MWK; left out as a material qualifier.)
+
+Next: when the reviews and scan land, report; open the Malawi PR only after its red-team; file the cowpea issue (draft in the Malawi branch); then Uganda #1133.
 
 Sue
 
