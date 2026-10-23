@@ -137,3 +137,10 @@ archived test asserting `U_UNKNOWN` there is kept and renamed to say so.
 Finding for a separate decision: 41,559 of the 42,089 rows have `Quantity == 0` from
 the raw source (unused slots, unit skipped).  Eligibility is out of scope here.
 Evidence: `slurm_logs/isa_backlog_2026-10-21/1118-mali-units/`.
+
+Use-flag check (`flags_1118.py`, `flags.json`): on the zero-quantity / blank-unit
+fertilizer and pesticide slots the plot-level GROUP use flag reads `Oui`
+(2014-15 11,577 + 587 `Manquant`; 2017-18 27,786 of 27,786).  The flag is per
+group, the quantity per type, so these rows are type-level non-use inside a
+positive group answer.  The hash census above predates the CONTENTS.org and test
+edits; neither is a build input, so 24/0/96 stands.

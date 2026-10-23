@@ -482,7 +482,9 @@ Measured on the EAC-I sources (=slurm_logs/isa_backlog_2026-10-21/1118-mali-unit
 Every one is a blank raw unit or the survey's own =Manquant= ("missing") label -- 468 rows in 2014-15 -- so no substantive unit label is lost by =_unit_labels=.
 
 *The idiosyncrasy:* 41,559 of those 42,089 rows carry =Quantity == 0= exactly, straight from the raw quantity column (=s2cq25*=, =s2cq29*=, =s7dq26*=, ... -- the scripts do no zero-fill); 248 carry a positive quantity and 282 none (flag- or purchase-only).
-A zero amount with the unit question skipped reads like an input slot the holding did not use, which the content predicate keeps because a non-null zero counts as content.
+The use question is asked once per input GROUP on the plot (inorganic =s2cq21= / =s7dq22=, pesticide =s2cq26= / =s7dq27=, ...) and the quantity once per TYPE (urea, DAP, NPK, other).
+On the zero-quantity, blank-unit fertilizer/pesticide slots the group answer is =Oui= (2014-15: 11,577, plus 587 =Manquant=; 2017-18: all 27,786; =flags_1118.py=).
+So these are type-level non-use inside a "yes" for the group -- the plot used inorganic fertilizer, but not this type -- which the content predicate keeps because a non-null zero counts as content.
 Whether such rows belong in =plot_inputs= at all is an ELIGIBILITY question, deliberately not decided by #1118; the zeros are served as recorded.
 
 * cluster_features (GH #323 site 4 / GH #627)
