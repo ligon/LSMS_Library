@@ -1,0 +1,5 @@
+built in 34.6 s; index ['t', 'v', 'j', 'u'] shape (136566, 2)
+warnings by class {'ClusterIdentityWarning': 1}
+   ClusterIdentityWarning Nigeria/community_prices: `v` is not a comparable cluster id across 2 wave boundary(ies) in this frame (waves 2011Q1 .. 2024Q1):
+  2016Q1 -> 2018Q3: cluster_id_continuity=wave-scoped (household_continuity=rotating-panel; derived-from-data: MEASURED, not documented; confidence high; this boundary lie
+{'2011Q1': 27104, '2013Q1': 27079, '2016Q1': 20562, '2019Q1': 31757, '2024Q1': 30064}
