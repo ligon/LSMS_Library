@@ -1,0 +1,3 @@
+{"table": "plot_inputs", "rows": [179949, 179949], "assert_frame_equal": "equal", "attrs_keys_equal": true, "attrs_equal": true}
+{"table": "livestock", "rows": [39126, 39126], "assert_frame_equal": "equal", "attrs_keys_equal": true, "attrs_equal": true}
+{"table": "community_prices", "rows": [82635, 82635], "assert_frame_equal": "equal", "attrs_keys_equal": true, "attrs_equal": true}

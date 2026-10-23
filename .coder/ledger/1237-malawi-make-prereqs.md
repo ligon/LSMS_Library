@@ -58,3 +58,30 @@ stale frame was served.
 ### Phase 3 — verification
 - Malawi `_/Makefile`, ten per-wave rules — OK (§2 GhanaAHIES/Niger, §4).
   The measurements are in `slurm_logs/isa_backlog_2026-10-21/1237-malawi-make-prereqs/`.
+  - `make -n`, cold root: every requested (table, wave) runs its recipe. The
+    10 no-script stems changed from "runs the recipe" to "No rule"
+    (`make_n_cold_*.txt`).
+  - `make -n -W <wave script>`, warm stand-in root: on development, 0 of 40
+    stems rebuild; on the branch, 40 of 40 do. `-W categorical_mapping.org`
+    rebuilds the 6 tables that read the file and leaves the other 4 current
+    (`make_n_warm_*.txt`).
+  - End to end: a root was warmed with `plot_inputs` on development
+    (Default backend; 179,949 rows), then read under the make backend.
+    Development's Makefile, before and after touching
+    `2013-14/_/plot_inputs.py`, rewrote nothing. The branch's Makefile did
+    nothing before the touch; after it, it rewrote the 2013-14 wave parquet
+    and `var/` and nothing else, and the next read was a no-op again
+    (`e2e_*.json.txt`).
+  - A real `make` on a no-script stem exits 2 both before and after: before
+    because `python` cannot open the missing file, after with "No rule".
+    The library's handling is the same (`no_script_stem_real_make.txt`).
+  - Default backend, cold, development vs branch: `plot_inputs` (179,949
+    rows), `livestock` (39,126) and `community_prices` (82,635) pass
+    `assert_frame_equal`, and their attrs are equal. The Default backend asks
+    only the in-tree `../<w>/_/<t>.parquet` names, which the generic
+    `%.parquet` rule serves, and it never asks for community_prices 2016-17
+    (`eq_default_*.txt`).
+  - Hash census: `_table_cache_hash` moved for 26 of 549 tables, all 26 of
+    them Malawi's. `build_transforms_fingerprint` moved 0 of 40, and
+    `Wave._input_hash` 0 of 2,109, because the country Makefile is not a
+    wave-tier input (`hash_census_diff.txt`).
