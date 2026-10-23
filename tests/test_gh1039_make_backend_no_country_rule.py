@@ -429,6 +429,132 @@ def test_absent_subset_without_make_preserves_unknown_country_rules(
     assert not fakeland2.var.exists()
 
 
+# ---------------------------------------------------------------------------
+# GH #1218 / PR #1221 follow-up: the constructed empty frame is never cached
+# ---------------------------------------------------------------------------
+#
+# A default-backend request asks ``absent_subset_frame`` twice: at the top of
+# ``load_dataframe_with_dvc`` and again inside ``load_from_waves(build_waves)``.
+# If ``_has_country_builder`` answered True and then False (its ``make -n``
+# probe answers True on OSError/timeout), the constructed empty frame came back
+# from the second check and was WRITTEN to var/ with the union coverage
+# manifest.  Review repro on development, Iraq ``shocks``: 8,812 rows of 2012,
+# then one empty 2006-07 request, then 0 rows of 2012.
+
+def _var_waves(fake) -> list[str] | None:
+    from lsms_library.local_tools import read_parquet_cache_waves
+    return read_parquet_cache_waves(fake.var)
+
+
+def _populate_one_wave(fake) -> bytes:
+    """Step 1: the populated wave builds and is cached with coverage [WAVE]."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        assert _x(C.Country(COUNTRY).build_me(waves=[WAVE])) == WAVE_X
+    assert fake.var.exists() and _var_waves(fake) == [WAVE]
+    return fake.var.read_bytes()
+
+
+def _assert_populated_wave_survives(fake, before: bytes | None) -> None:
+    """Step 3: the populated wave still serves its rows from a fresh instance."""
+    if before is not None:
+        assert fake.var.read_bytes() == before, \
+            f"var/ was rewritten; coverage now {_var_waves(fake)}"
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        again = C.Country(COUNTRY).build_me(waves=[WAVE])
+    assert _x(again) == WAVE_X and len(again) == 2, \
+        f"the populated wave now serves {len(again)} rows"
+
+
+def test_constructed_empty_is_marked_never_cache():
+    frame = C._empty_declared_frame({"index": "(t, i)", "x": "float"})
+    assert frame.attrs.get(C._CONSTRUCTED_EMPTY_ATTR) is True
+    assert C._is_constructed_empty(frame)
+    # A built frame that happens to be empty is not a constructed answer.
+    assert not C._is_constructed_empty(pd.DataFrame({"x": pd.Series([], dtype=float)}))
+    assert not C._is_constructed_empty({}) and not C._is_constructed_empty(None)
+
+
+@pytest.mark.parametrize("write_site", ["no_stage", "dvc_fallback"])
+def test_flaky_predicate_cannot_cache_the_constructed_empty(
+        fakeland2, monkeypatch, caplog, write_site):
+    """The reviewer's forced race, hermetic: the predicate says True to the
+    first absence check and False to the second.  At BOTH write sites of
+    ``load_dataframe_with_dvc`` the constructed empty frame must be served and
+    not written; the populated wave's cache and rows must survive."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    fakeland2.build(makefile=None)
+
+    class _NoStageRepo:          # a DVC repo with no materialize stages
+        def __init__(self, *a, **k):
+            pass
+
+        def close(self):
+            pass
+
+    def _no_repo(*a, **k):
+        raise C.DvcException("not a DVC repo (test)")
+
+    monkeypatch.setattr(C, "Repo", _NoStageRepo if write_site == "no_stage" else _no_repo)
+    monkeypatch.setattr(C.Country, "_resolve_materialize_stages", lambda self, m, w: [])
+
+    before = _populate_one_wave(fakeland2)
+
+    real = C.Country._has_country_builder
+    calls = []
+
+    def flaky(self, method_name):
+        calls.append(method_name)
+        return True if len(calls) == 1 else real(self, method_name)
+
+    monkeypatch.setattr(C.Country, "_has_country_builder", flaky)
+    caplog.clear()
+    with caplog.at_level("WARNING"):
+        _assert_empty_and_shaped(_barren(C.Country(COUNTRY)))
+    monkeypatch.setattr(C.Country, "_has_country_builder", real)
+    assert calls == [TABLE, TABLE], f"the race did not happen: {calls}"
+    fell_back = any("DVC unavailable for build_me" in r.getMessage() for r in caplog.records)
+    assert fell_back is (write_site == "dvc_fallback"), "wrong write site exercised"
+    assert _var_waves(fakeland2) == [WAVE]
+    _assert_populated_wave_survives(fakeland2, before)
+
+
+@needs_make
+def test_one_request_cannot_get_two_predicate_answers(fakeland2, monkeypatch):
+    """The other half: the predicate is memoised per instance, so a transient
+    probe failure (OSError -> the fail-safe True) is the answer for the whole
+    request rather than flipping to False on the second absence check.  Real
+    ``make -n`` probe on a wave-only Makefile; only the first probe fails."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    fakeland2.build()                      # wave-only Makefile: no country rule
+    _populate_one_wave(fakeland2)
+
+    real_run = C.subprocess.run
+    probes = []
+
+    def first_probe_fails(command, *args, **kwargs):
+        if isinstance(command, list) and command[:2] == ["make", "-n"]:
+            probes.append(command[-1])
+            if len(probes) == 1:
+                raise OSError(11, "Resource temporarily unavailable (test)")
+        return real_run(command, *args, **kwargs)
+
+    monkeypatch.setattr(C.subprocess, "run", first_probe_fails)
+    c = C.Country(COUNTRY)
+    _assert_empty_and_shaped(_barren(c))
+    assert len(probes) == 1, f"one request probed make {len(probes)} times"
+    assert c._has_country_builder(TABLE) is True, "the memo did not hold"
+    assert len(probes) == 1
+    # The request rebuilt the union (the fail-safe route); var/ now covers
+    # both waves and still holds the populated wave's rows.
+    assert _var_waves(fakeland2) == [WAVE, BARREN]
+    _assert_populated_wave_survives(fakeland2, None)
+    # A fresh instance probes again, and without the fault finds no rule.
+    monkeypatch.setattr(C.subprocess, "run", real_run)
+    assert C.Country(COUNTRY)._has_country_builder(TABLE) is False
+
+
 def test_empty_declared_frame_has_the_declared_shape():
     entry = {"index": "(t, v, i)", "x": "float", "y": {"type": "str", "optional": True},
              "materialize": "make"}

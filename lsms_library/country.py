@@ -1051,6 +1051,21 @@ def _optional_scheme_columns(scheme_entry: Any) -> list[str]:
             and k not in required]
 
 
+# GH #1218 / PR #1221 follow-up: the ``attrs`` key that marks a frame built by
+# ``_empty_declared_frame``.  Such a frame is an ANSWER (the requested waves
+# lack the table), not a BUILD, so no cache write may store it: written to the
+# L2-country parquet with the descent's union coverage manifest, it would claim
+# 0 rows for waves that have rows (measured, Iraq ``shocks``: 8,812 rows of
+# 2012 served as 0).  Every write of a ``load_from_waves`` result checks it via
+# ``_is_constructed_empty``.
+_CONSTRUCTED_EMPTY_ATTR = "_constructed_empty"
+
+
+def _is_constructed_empty(obj: Any) -> bool:
+    """True for a frame ``_empty_declared_frame`` built (never cache it)."""
+    return isinstance(obj, pd.DataFrame) and obj.attrs.get(_CONSTRUCTED_EMPTY_ATTR) is True
+
+
 def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
     """A 0-row frame with a table's DECLARED shape (GH #1039).
 
@@ -1091,6 +1106,9 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
         if isinstance(target, str) and target == "to_datetime":
             empty[c] = pd.Series([], index=empty.index, dtype="datetime64[us]")
     _enforce_declared_dtypes(empty, payload_types)
+    # Served, never cached: every cache write of a load_from_waves result
+    # skips a frame carrying this marker (see _CONSTRUCTED_EMPTY_ATTR).
+    empty.attrs[_CONSTRUCTED_EMPTY_ATTR] = True
     return empty
 
 
@@ -4990,7 +5008,23 @@ class Country:
         ``crop_production``, red team r1) -- but those bytes are exactly what
         the default backend builds and are fingerprinted where that code
         lives, and the make backend writes no L2-country parquet.
+
+        **Memoised per instance and table** (GH #1218 / PR #1221 follow-up).
+        One default-backend request asks twice -- ``absent_subset_frame`` at
+        the top of ``load_dataframe_with_dvc`` and again inside
+        ``load_from_waves`` -- and the probe answers True on an ``OSError``
+        (e.g. a fork failure on a crowded node) or its timeout.  Two different
+        answers within one request let the constructed empty frame reach the
+        cache write with the union coverage manifest.  The first answer,
+        including that fail-safe True, is the instance's answer.
         """
+        memo = vars(self).setdefault("_country_builder_memo", {})
+        if method_name not in memo:
+            memo[method_name] = self._probe_country_builder(method_name)
+        return memo[method_name]
+
+    def _probe_country_builder(self, method_name: str) -> bool:
+        """The uncached rule probe behind :meth:`_has_country_builder`."""
         country_dir = self.file_path / "_"
         if (country_dir / f"{method_name}.py").exists():
             return True
@@ -5518,6 +5552,8 @@ class Country:
             # (GH #964/#968).  Removed in GH #970; nothing here spawns a
             # subprocess, so there is no ``make`` to gate on.
             result = load_from_waves(waves)
+            if _is_constructed_empty(result):
+                return result  # an answer, never a cache (_CONSTRUCTED_EMPTY_ATTR)
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -5632,6 +5668,11 @@ class Country:
                         # GH #891: build the union, cache the union (stamped with
                         # its coverage), return only what was asked for.
                         df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
+                        if _is_constructed_empty(df):
+                            # GH #1218 / #1221 follow-up: absence of the
+                            # REQUESTED waves, constructed -- it must not be
+                            # stamped with the union coverage of build_waves.
+                            return df
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -5831,6 +5872,8 @@ class Country:
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
                 df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
+                if _is_constructed_empty(df):
+                    return df  # never cached; see the no-stage write above
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)

@@ -1,8 +1,9 @@
 {
  "checkouts": {
   "dev": "9a0ed5f3c",
-  "branch": "fix/1221-empty-frame-fingerprint-20261022: lsms_library/ exactly as committed with this file",
-  "base60aa": "60aa81e9e (pre-#1221)"
+  "base60aa": "60aa81e9e (pre-#1221)",
+  "round1": "19c33c809 (exclusion + [us] only)",
+  "branch": "fix/1221-empty-frame-fingerprint-20261022 HEAD: lsms_library/ exactly as committed with this file (round 1 + race fix)"
  },
  "a_dev_vs_branch": {
   "country": {
@@ -38,29 +39,6 @@
    "equal": 0
   }
  },
- "b_decomposition_branch_vs_base60aa_with_helper_excluded_at_runtime": {
-  "country": {
-   "total": 549,
-   "moved": 24,
-   "equal": 525,
-   "moved_by_country": {
-    "Mali": 24
-   }
-  },
-  "btf": {
-   "total": 40,
-   "moved": 0,
-   "equal": 40
-  },
-  "wave": {
-   "total": 2109,
-   "moved": 96,
-   "equal": 2013,
-   "moved_by_country": {
-    "Mali": 96
-   }
-  }
- },
  "c_branch_default_vs_string_storage_python": {
   "country": {
    "total": 549,
@@ -76,6 +54,23 @@
    "total": 2109,
    "moved": 0,
    "equal": 2109
+  }
+ },
+ "round1_vs_branch": {
+  "country": {
+   "total": 549,
+   "moved": 549,
+   "equal": 0
+  },
+  "btf": {
+   "total": 40,
+   "moved": 40,
+   "equal": 0
+  },
+  "wave": {
+   "total": 2109,
+   "moved": 2109,
+   "equal": 0
   }
  },
  "control_dev_default_vs_string_storage_python": {
@@ -110,6 +105,65 @@
    "total": 2109,
    "moved": 0,
    "equal": 2109
+  }
+ },
+ "round1_measurements_at_19c33c809": {
+  "a_dev_vs_round1": {
+   "country": {
+    "total": 549,
+    "moved": 549,
+    "equal": 0
+   },
+   "btf": {
+    "total": 40,
+    "moved": 40,
+    "equal": 0
+   },
+   "wave": {
+    "total": 2109,
+    "moved": 2109,
+    "equal": 0
+   }
+  },
+  "b_round1_vs_base60aa": {
+   "country": {
+    "total": 549,
+    "moved": 549,
+    "equal": 0
+   },
+   "btf": {
+    "total": 40,
+    "moved": 40,
+    "equal": 0
+   },
+   "wave": {
+    "total": 2109,
+    "moved": 2109,
+    "equal": 0
+   }
+  },
+  "b_decomposition_round1_vs_base60aa_with_helper_excluded_at_runtime": {
+   "country": {
+    "total": 549,
+    "moved": 24,
+    "equal": 525,
+    "moved_by_country": {
+     "Mali": 24
+    }
+   },
+   "btf": {
+    "total": 40,
+    "moved": 0,
+    "equal": 40
+   },
+   "wave": {
+    "total": 2109,
+    "moved": 96,
+    "equal": 2013,
+    "moved_by_country": {
+     "Mali": 96
+    }
+   }
   }
  }
 }

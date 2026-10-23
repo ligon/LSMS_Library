@@ -38,6 +38,7 @@
   "Unit_received_as_gift": "string"
  },
  "attrs_keys": [
+  "_constructed_empty",
   "country",
   "id_converted",
   "population",

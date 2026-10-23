@@ -24,6 +24,7 @@
   "Interview end": "datetime64[us]"
  },
  "attrs_keys": [
+  "_constructed_empty",
   "country",
   "derivations",
   "id_converted",

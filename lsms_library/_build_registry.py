@@ -195,6 +195,10 @@ _EXCLUDED_CALLABLES = frozenset({
     # the make backend writes no L2-country parquet.  Without this entry a
     # re-worded log line in it would move every table's hash.
     "lsms_library.country.Country._has_country_builder",
+    # Its uncached body since the per-instance memo (GH #1218 / PR #1221
+    # follow-up); reached only through the predicate, listed so a future
+    # direct call from build code cannot fold the probe into every hash.
+    "lsms_library.country.Country._probe_country_builder",
     # The wave-script RUNNER (GH #968): make if installed, else the wave
     # script directly.  It decides which program executes the script, not
     # what the script writes -- the script text and the country _/Makefile
@@ -202,12 +206,22 @@ _EXCLUDED_CALLABLES = frozenset({
     # invocation (the #964 as_posix fix, the #968 fallback) moved every
     # table's hash.  Pinned by tests/test_windows_portability.py.
     "lsms_library.country._build_wave_script_target",
-    # GH #1218 / PR #1221: the constructed EMPTY answer.  It builds the 0-row,
+    # GH #1218 / PR #1221: the constructed EMPTY answer -- the 0-row,
     # declared-shape frame served for a request whose waves all lack the table
-    # (GH #1039/#1099); both callers in _aggregate_wave_data return it before
-    # any write, so it is never written to any parquet and determines no byte
-    # a cache holds.  PR #1221 made it apply declared dtypes, which pulled the
-    # READ-path dtype code (_enforce_declared_dtypes, _coerce_datetime_column,
+    # (GH #1039/#1099).  It determines no byte a cache holds, and that is
+    # ENFORCED, not incidental, by two guarantees (#1221 follow-up):
+    #   1. it marks its output (country._CONSTRUCTED_EMPTY_ATTR), and every
+    #      cache write of a load_from_waves result skips a marked frame;
+    #   2. Country._has_country_builder is memoised per instance, so the two
+    #      absence checks of one default-backend request (top of
+    #      load_dataframe_with_dvc, then inside load_from_waves) agree.
+    # Without them a True-then-False predicate (its make -n probe answers
+    # True on OSError/timeout) wrote the frame to var/ with the union
+    # coverage manifest: review repro, Iraq `shocks`, 8,812 rows of 2012
+    # served as 0 after one empty 2006-07 request.  Pinned by
+    # tests/test_gh1039_make_backend_no_country_rule.py (the race tests).
+    # PR #1221 made the helper apply declared dtypes, which pulled the READ-
+    # path dtype code (_enforce_declared_dtypes, _coerce_datetime_column,
     # _to_datetime_mixed, _coerce_to_boolean, _SCHEME_DTYPE_MAP and their
     # constants) into every table's closure: every hash then depended on
     # pandas' `mode.string_storage` option (through the StringDtype in

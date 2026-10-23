@@ -1,0 +1,11 @@
+# race.py (independent review's forced race) on Iraq shocks, fresh data root each; counts only
+== dev
+step1 populated 2012 rows 8812 var manifest ['2012']
+step2 empty request rows 0 builder calls 2
+var manifest now ['2006-07', '2012'] parquet rows 0
+step3 populated 2012 rows now 0 (was 8812 )
+== branch
+step1 populated 2012 rows 8812 var manifest ['2012']
+step2 empty request rows 0 builder calls 2
+var manifest now ['2012'] parquet rows 8812
+step3 populated 2012 rows now 8812 (was 8812 )
