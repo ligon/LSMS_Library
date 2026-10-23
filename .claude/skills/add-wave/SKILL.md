@@ -16,7 +16,7 @@ Requires the `add-feature` skill for writing `data_info.yml` configs once the wa
 ## Prerequisites
 
 - `MICRODATA_API_KEY` set (env var or `~/.config/lsms_library/config.yml`)
-- S3 write credentials in `.dvc/s3_write_creds` with a `.dvc/config.local` override (see below)
+- S3 **writer** credentials at `~/.config/lsms_library/s3_write_creds` (or wherever `$LSMS_S3_WRITE_CREDS` points); see [S3 Write Credentials](#s3-write-credentials). No `.dvc/config.local` edit is needed.
 - The country already exists under `lsms_library/countries/`
 
 ## Workflow
@@ -287,25 +287,57 @@ assert '2021-22' in waves
 
 ## S3 Write Credentials
 
-DVC reads credentials from `.dvc/config`:
+The committed `lsms_library/countries/.dvc/config` pins the S3 remote to the
+**reader** key:
 ```ini
 ['remote "ligonresearch_s3"']
     url = s3://dvcbucket0/LSMS
     credentialpath = s3_creds
 ```
 
-The `s3_creds` file contains the **reader** IAM key. To push, you need a **writer** key. The standard pattern:
+To push you need a **writer** key, in the same boto INI format as `s3_creds`:
+```ini
+[default]
+aws_access_key_id = ...
+aws_secret_access_key = ...
+```
 
-1. Place writer credentials in `.dvc/s3_write_creds` (same format as `s3_creds`)
-2. Override `credentialpath` in `.dvc/config.local` (gitignored by DVC):
-   ```ini
-   ['remote "ligonresearch_s3"']
-       credentialpath = s3_write_creds
-   ```
+**Where it goes.** At push time, `_resolve_write_credentialpath`
+(`data_access.py`) takes the first of these that exists and is non-empty:
 
-DVC layers config files: `config.local` overrides `config`. This keeps the reader key as the shared default while granting write access on machines that need it.
+1. `config.s3_write_creds_path()`. This is `$LSMS_S3_WRITE_CREDS` when that is
+   set, and otherwise `s3_write_creds` in the user config directory:
+   `~/.config/lsms_library/s3_write_creds` by default (`$LSMS_CONFIG_DIR` or
+   `$XDG_CONFIG_HOME` relocate it). **This is the place to put it.** It keeps
+   the secret out of the git checkout, and the library can then be installed
+   read-only. The maintainer's writer key lives here.
+2. *Legacy fallback:* `lsms_library/countries/.dvc/s3_write_creds`, the
+   in-tree file used before the user-config layout. It is still honoured,
+   so older editable checkouts keep working. Do not create new ones.
+3. Env vars: `LSMS_S3_WRITE_KEY_ID` + `LSMS_S3_WRITE_KEY` (the secret), or
+   `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`. They are written to a
+   temporary INI file, which is deleted after the push.
 
-**Do not** edit `.dvc/config` to point to write creds -- that file is tracked by git and shared with all users.
+Once a reader key is found, any of the three makes `permissions()` report
+`write` for the S3 remote. Set **both** values of an env-var pair:
+`permissions()` already reports `write` on `LSMS_S3_WRITE_KEY` alone, but the
+push needs the key id as well. `~/.aws/credentials` is never treated as a
+writer key, because nothing in it says whether a key can write.
+
+**No `config.local` editing.** An explicit `credentialpath` beats the boto
+env-var chain, so a plain `dvc push` would authenticate as the reader and
+fail with `AccessDenied`. `push_to_cache_batch()` (and `add_wave()` /
+`populate_and_push()`, which wrap it) therefore runs the push inside
+`_s3_writer_credentialpath`. That context manager snapshots
+`.dvc/config.local`, points the remote's `credentialpath` at the resolved
+writer file with `dvc remote modify --local`, and restores `config.local`
+byte-for-byte afterwards; it deletes the file if there was none before. The
+override exists only while the library is pushing. The older recipe — copy
+the key to `.dvc/s3_write_creds` and hand-edit `.dvc/config.local` to point
+at it — still works through the legacy fallback, but it is not needed.
+
+**Do not** edit `.dvc/config` to point at write creds: it is tracked by git
+and shared with every user.
 
 ## Batched DVC Operations
 
@@ -340,7 +372,7 @@ The relative path `../Data/file.dta` works because scripts run from the wave's `
 ## Common Pitfalls
 
 - **Wave invisible after download**: Check for a hardcoded `Waves` dict in `{country}.py` (Step 3 above).
-- **"No writable DVC remotes"**: Set up `.dvc/config.local` with `credentialpath = s3_write_creds`.
-- **`dvc push` uses reader key**: DVC reads `credentialpath` from config. The `config.local` override must point to the writer credentials file.
+- **"No writable DVC remotes"**: no writer key was found. Put it at `~/.config/lsms_library/s3_write_creds` (or set `$LSMS_S3_WRITE_CREDS` to its path), or export `LSMS_S3_WRITE_KEY_ID` / `LSMS_S3_WRITE_KEY`; then check `data_access.permissions()`. The legacy `lsms_library/countries/.dvc/s3_write_creds` is still read as a fallback.
+- **Push authenticates as the reader (`AccessDenied`)**: the committed `credentialpath` names the reader key. The library swaps the writer key in for the duration of its own push (a temporary `.dvc/config.local` override, restored afterwards), so push through `push_to_cache_batch()` / `add_wave()` / `populate_and_push()`, never a hand-run `dvc push`. If it still fails, no writer key was resolved — see the previous bullet.
 - **`dvc add` timeout on cluster**: The default 120s timeout is too short for cluster scratch filesystems. `push_to_cache_batch()` uses adaptive timeouts (600s + 30s per file).
 - **System `dvc` missing `dvc-s3`**: Use `.venv/bin/dvc`. The `_dvc_cmd()` helper handles this.
