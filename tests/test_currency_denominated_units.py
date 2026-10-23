@@ -602,4 +602,10 @@ def test_panama_kgprice_loses_its_currency_rows():
     # so the 10,571 rows whose "unit value" was Expenditure / 7.70 no longer
     # exist.  kgprice/kgvalue 483,661 unchanged; unitprice 501,027 -> 490,456
     # for the same reason.  Measured cold in a private LSMS_DATA_DIR.
-    assert len(c.food_prices(units='unitvalue')) == 490_456
+    # MOVED 490_456 -> 490_846 by GH #1234 (2026-10-23): 390 1997 rows whose
+    # source unit is blank used to reach food_prices with a null `u` on a cold
+    # build (map_index ran only on the warm read gate) and were deleted as
+    # null keys; they now carry the `Unknown` sentinel cold and warm, and keep
+    # their own key (none shares (t, v, i, j, s) with a genuine 'unit' row).
+    # Measured on the cold integration build of 2026-10-23.
+    assert len(c.food_prices(units='unitvalue')) == 490_846
