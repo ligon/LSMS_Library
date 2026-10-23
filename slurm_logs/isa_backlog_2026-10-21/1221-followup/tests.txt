@@ -1,26 +1,50 @@
-# pytest summary lines, PR #1221 follow-up (2026-10-22). -n 3 --dist=loadfile, LSMS_BUILD_WORKERS=1, BLAS pinned, fresh LSMS_DATA_DIR.
-# 'dev' = detached 9a0ed5f3c worktree with this branch's two edited test files copied in; 'branch' = branch HEAD (round 1 + race fix).
+# pytest summary lines, PR #1221 follow-up (2026-10-22). -n 3 --dist=loadfile (reviewer copies: serial), LSMS_BUILD_WORKERS=1, BLAS pinned, fresh LSMS_DATA_DIR.
 
+### Round 3 (branch HEAD: completed-answer memo + len==0 guard)
+## tests/test_build_transform_hash.py tests/test_gh1039_make_backend_no_country_rule.py
+branch: 169 passed, 3 warnings in 102.99s (0:01:42)
+## the five builder-routing files (test_gh1091_niger/tanzania_community_builder, test_gh1204, test_gh1209, test_mali_community_prices_builder)
+branch: 92 passed, 89 warnings in 215.75s (0:03:35)
+## new/rewritten race tests (-k never_cache|never_skipped|flaky_predicate|faulted_probe|not_sticky) with the round-2 head 9cae52de7 code
+9cae52de7: 4 failed, 3 passed, 105 deselected in 10.21s
+              1 FAILED test_a_faulted_probe_cannot_cache_the_empty_or_stick
+              1 FAILED test_a_marked_frame_with_rows_is_never_skipped
+              2 FAILED test_a_transient_probe_fault_is_not_sticky
+## review's probe tests (tests_branchcopy: test_review_sticky.py, test_review_sticky_cold.py, test_gh1039_branch.py -k sticky|cold|...), read-only, branch HEAD code
+branch: 1 failed, 31 passed, 80 deselected, 1 warning in 11.06s
+              1 FAILED test_one_request_cannot_get_two_predicate_answers
+        (that copy is round 2's test, which pinned the refuted instance-level True; rewritten here as test_a_faulted_probe_cannot_cache_the_empty_or_stick)
+        [make] probes=3
+        [make] 1 barren, faulted: 3 rows x=[99.0]
+        [make] 2 barren, same instance: 0 rows x=[]
+        [make] 3 populated, same instance: 2 rows x=[1.0, 2.0]
+        [make] 4 barren, fresh instance: 0 rows x=[]
+        [dvc] probes=3
+        [dvc] 1 barren, faulted: 0 rows x=[]
+        [dvc] 2 barren, same instance: 0 rows x=[]
+        [dvc] 3 populated, same instance: 2 rows x=[1.0, 2.0]
+        [dvc] 4 barren, fresh instance: 0 rows x=[]
+        [dvc-cold] 1 barren faulted: 0 rows
+        [dvc-cold] 2 barren same instance: 0 rows
+        [dvc-cold] 3 barren same instance: 0 rows
+        [dvc-cold] probes=2 var exists=False
+
+### Round 2 (9cae52de7); 'dev' = detached 9a0ed5f3c with round 2's test files copied in
 ## tests/test_build_transform_hash.py tests/test_gh1039_make_backend_no_country_rule.py
 dev:    18 failed, 148 passed, 3 warnings in 94.20s (0:01:34)
-              1 FAILED tests/test_build_transform_hash.py::test_empty_constructor_dtype_code_is_not_in_any_build_closure
-              1 FAILED tests/test_build_transform_hash.py::test_hashes_do_not_depend_on_pandas_string_storage
-              1 FAILED tests/test_gh1039_make_backend_no_country_rule.py::test_constructed_empty_is_marked_never_cache
-             12 FAILED tests/test_gh1039_make_backend_no_country_rule.py::test_constructed_empty_uses_existing_explicit_nullable_types
-              2 FAILED tests/test_gh1039_make_backend_no_country_rule.py::test_flaky_predicate_cannot_cache_the_constructed_empty
-              1 FAILED tests/test_gh1039_make_backend_no_country_rule.py::test_one_request_cannot_get_two_predicate_answers
+              1 FAILED test_constructed_empty_is_marked_never_cache
+             12 FAILED test_constructed_empty_uses_existing_explicit_nullable_types
+              1 FAILED test_empty_constructor_dtype_code_is_not_in_any_build_closure
+              2 FAILED test_flaky_predicate_cannot_cache_the_constructed_empty
+              1 FAILED test_hashes_do_not_depend_on_pandas_string_storage
+              1 FAILED test_one_request_cannot_get_two_predicate_answers
 branch: 166 passed, 3 warnings in 99.67s (0:01:39)
-
 ## tests/test_gh1045_parse_datetime.py tests/test_derivations.py (unchanged files)
 dev:    123 passed, 2 skipped, 8 warnings in 355.93s (0:05:55)
-branch: 123 passed, 2 skipped, 8 warnings in 358.73s (0:05:58)
-        SKIPPED [1] tests/test_gh1045_parse_datetime.py:1077: Mali interview_date not cached here
-        SKIPPED [1] tests/test_gh1045_parse_datetime.py:1077: Tanzania interview_date not cached here
-
-## tests touching _has_country_builder / absent-subset routing (no test_gh1099* file exists):
-## test_gh1091_niger_community_builder.py test_gh1091_tanzania_community_builder.py test_gh1204_uganda_crop_wave_coverage.py test_gh1209_malawi_food_builder.py test_mali_community_prices_builder.py
+branch: 123 passed, 2 skipped, 8 warnings in 358.73s (0:05:58)   (2 skips: Mali/Tanzania interview_date not cached in a fresh data root)
+## the five builder-routing files
 dev:    92 passed, 89 warnings in 204.67s (0:03:24)
 branch: 92 passed, 89 warnings in 195.43s (0:03:15)
 
-## round 1 only (19c33c809), branch: tests/test_gh798_datetime_mixed.py tests/test_gh1038_ethiopia_interview_date_na.py
+### Round 1 (19c33c809), branch: tests/test_gh798_datetime_mixed.py tests/test_gh1038_ethiopia_interview_date_na.py
 branch: 21 passed, 3 skipped in 6.70s   (skips: Mali/Tanzania/Ethiopia interview_date not cached in a fresh data root)

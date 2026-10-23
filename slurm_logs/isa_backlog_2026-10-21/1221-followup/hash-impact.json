@@ -3,7 +3,7 @@
   "dev": "9a0ed5f3c",
   "base60aa": "60aa81e9e (pre-#1221)",
   "round1": "19c33c809 (exclusion + [us] only)",
-  "branch": "fix/1221-empty-frame-fingerprint-20261022 HEAD: lsms_library/ exactly as committed with this file (round 1 + race fix)"
+  "branch": "round 2 HEAD 9cae52de7 for every key except round3_branch_head"
  },
  "a_dev_vs_branch": {
   "country": {
@@ -165,5 +165,30 @@
     }
    }
   }
+ },
+ "round3_branch_head": {
+  "note": "Round 3 (completed-answer memo, len==0 guard). No full census rerun; build_transforms_fingerprint for all 40 tables recomputed in-process, plus a 3-fingerprint string_storage spot check in fresh processes.",
+  "btf_moved_vs_round2_9cae52de7": "40/40",
+  "btf_moved_vs_dev_9a0ed5f3c": "40/40",
+  "btf_moved_vs_base60aa": "40/40",
+  "string_storage_spot_check": {
+   "default": {
+    "StringDtype_storage": "pyarrow",
+    "btf_prefix16": {
+     "household_roster": "5df320c985b25c9e",
+     "interview_date": "8240327ceeaadf24",
+     "plot_inputs": "5df320c985b25c9e"
+    }
+   },
+   "python": {
+    "StringDtype_storage": "python",
+    "btf_prefix16": {
+     "household_roster": "5df320c985b25c9e",
+     "interview_date": "8240327ceeaadf24",
+     "plot_inputs": "5df320c985b25c9e"
+    }
+   }
+  },
+  "string_storage_spot_check_moved": "0/3"
  }
 }

@@ -1062,8 +1062,13 @@ _CONSTRUCTED_EMPTY_ATTR = "_constructed_empty"
 
 
 def _is_constructed_empty(obj: Any) -> bool:
-    """True for a frame ``_empty_declared_frame`` built (never cache it)."""
-    return isinstance(obj, pd.DataFrame) and obj.attrs.get(_CONSTRUCTED_EMPTY_ATTR) is True
+    """True for a frame ``_empty_declared_frame`` built (never cache it).
+
+    Requires 0 rows as well as the marker: ``attrs`` can ride onto a frame
+    with rows (``reindex``, ``combine_first``, ``align``, ``.loc``
+    enlargement in pandas 3), and such a frame must never skip a write."""
+    return (isinstance(obj, pd.DataFrame) and len(obj) == 0
+            and obj.attrs.get(_CONSTRUCTED_EMPTY_ATTR) is True)
 
 
 def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
@@ -5009,22 +5014,30 @@ class Country:
         the default backend builds and are fingerprinted where that code
         lives, and the make backend writes no L2-country parquet.
 
-        **Memoised per instance and table** (GH #1218 / PR #1221 follow-up).
-        One default-backend request asks twice -- ``absent_subset_frame`` at
-        the top of ``load_dataframe_with_dvc`` and again inside
-        ``load_from_waves`` -- and the probe answers True on an ``OSError``
-        (e.g. a fork failure on a crowded node) or its timeout.  Two different
-        answers within one request let the constructed empty frame reach the
-        cache write with the union coverage manifest.  The first answer,
-        including that fail-safe True, is the instance's answer.
+        **Memoised per instance and table -- COMPLETED answers only** (GH
+        #1218 / PR #1221 follow-up).  When the probe cannot run (an
+        ``OSError`` such as a fork failure on a crowded node, or its timeout)
+        the answer is the fail-safe True for THAT call only, and the next call
+        probes again.  Memoising the fail-safe made one transient fault last
+        for the instance's lifetime: under ``LSMS_BUILD_BACKEND=make`` later
+        requests then served a rule-less ``var/`` (Burkina Faso
+        ``interview_date(waves=['2014'])``: 21,028 rows of 2018-19 instead of
+        0).  So one request may still see True and then False; what keeps the
+        constructed empty frame out of the cache is the marker guard
+        (``_CONSTRUCTED_EMPTY_ATTR``), not this memo.
         """
         memo = vars(self).setdefault("_country_builder_memo", {})
-        if method_name not in memo:
-            memo[method_name] = self._probe_country_builder(method_name)
-        return memo[method_name]
+        if method_name in memo:
+            return memo[method_name]
+        answer = self._probe_country_builder(method_name)
+        if answer is None:
+            return True             # fail-safe, not memoised: re-probe next call
+        memo[method_name] = answer
+        return answer
 
-    def _probe_country_builder(self, method_name: str) -> bool:
-        """The uncached rule probe behind :meth:`_has_country_builder`."""
+    def _probe_country_builder(self, method_name: str) -> bool | None:
+        """The uncached rule probe behind :meth:`_has_country_builder`;
+        ``None`` when the ``make -n`` probe could not complete."""
         country_dir = self.file_path / "_"
         if (country_dir / f"{method_name}.py").exists():
             return True
@@ -5058,7 +5071,7 @@ class Country:
             except (OSError, subprocess.SubprocessError) as error:
                 logger.debug(f"GH #1039 rule probe failed for "
                              f"{self.name}/{method_name}: {error!r}")
-                return True
+                return None     # no answer; the caller fails safe (True)
         if probe.returncode == 0:
             return True
         no_rule = [line for line in probe.stderr.splitlines()

@@ -1,7 +1,7 @@
 #+title: PR #1221 follow-up -- the constructed empty frame: out of the fingerprint, and never cached
 
 Claude Opus 5.5, 2026-10-22, job 40390255.  Branch =fix/1221-empty-frame-fingerprint-20261022= on development =9a0ed5f3c=.
-Round 1 is commit =19c33c809= (exclusion + =[us]=); round 2 closes the write race an independent review of round 1 found.
+Round 1 is commit =19c33c809= (exclusion + =[us]=); round 2, =9cae52de7=, closes the write race an independent review of round 1 found; round 3 (branch HEAD) corrects round 2's memo, which a second review refuted.
 
 * The defects
 
@@ -19,15 +19,17 @@ Round 1 is commit =19c33c809= (exclusion + =[us]=); round 2 closes the write rac
 * The change
 
 1. ="lsms_library.country._empty_declared_frame"= is in =_build_registry._EXCLUDED_CALLABLES=, beside =_finalize_result= and the read gates.
-   The exclusion is sound BECAUSE of the two guarantees in item 3; its comment says so and cites the race.
+   The exclusion is sound BECAUSE of the marker guard in item 3; its comment says so and cites the race.
 2. Empty calendar payload columns are built as =datetime64[us]=, the GH #1045 stored resolution (=datetime_parse= has no named constant; it spells the literal ="datetime64[us]"=).  They used to come out =[s]=.
-3. The race, both halves:
-   - =_empty_declared_frame= marks its output (=attrs['_constructed_empty'] = True=, constant =_CONSTRUCTED_EMPTY_ATTR=).  Every cache write of a =load_from_waves= result skips a marked frame via =_is_constructed_empty=: the no-stage write and the DVC-unavailable fallback write in =load_dataframe_with_dvc=, and the JSON-cache write (unreachable for the marker today, guarded anyway).  No other =to_parquet= writes a =load_from_waves= result: the reproduce-failure fallback and both make-backend routes return without writing, and =country.py:2275= is the L2-wave write inside =grab_data=.
-   - =Country._has_country_builder= is memoised per instance and table (=vars(self)['_country_builder_memo']=).  The first answer, including the fail-safe True on =OSError=/timeout, is the instance's answer.  The probe body moved to =_probe_country_builder=, also listed in =_EXCLUDED_CALLABLES=.
+3. The race:
+   - *The guarantee.*  =_empty_declared_frame= marks its output (=attrs['_constructed_empty'] = True=, constant =_CONSTRUCTED_EMPTY_ATTR=).  Every cache write of a =load_from_waves= result skips a marked 0-row frame via =_is_constructed_empty= (round 3: a marked frame WITH rows is never skipped, since =reindex=, =combine_first=, =align= and =.loc= enlargement carry =attrs= onto rows in pandas 3): the no-stage write and the DVC-unavailable fallback write in =load_dataframe_with_dvc=, and the JSON-cache write (unreachable for the marker today, guarded anyway).  No other =to_parquet= writes a =load_from_waves= result: the reproduce-failure fallback and both make-backend routes return without writing, and =country.py:2275= is the L2-wave write inside =grab_data=.
+   - *The memo (round 3).*  =Country._has_country_builder= memoises COMPLETED probe answers per instance and table (=vars(self)['_country_builder_memo']=).  When the =make -n= probe raises =OSError= or times out, =_probe_country_builder= returns =None= and the predicate answers the fail-safe True for that call only; the next call probes again.  One request can therefore still see True then False; the marker guard is what keeps that harmless.  Round 2 memoised the fail-safe True too, which the second review refuted (section "Round 3").  The probe body is =_probe_country_builder=, also listed in =_EXCLUDED_CALLABLES=.
 
 Closure after round 2, against =60aa='s 186 names: minus =_empty_declared_frame=, plus =_is_constructed_empty= and =_CONSTRUCTED_EMPTY_ATTR= (the write guard is build-path: it decides what is written).  None of the eight read-path symbols is in it.  Other routes: =_enforce_declared_dtypes= is also called at =country.py:4008=, inside the excluded =_finalize_result=; no =countries/**/*.py= imports any of the eight.
 
 * Tests (=tests.txt=)
+
+Measured at round 2 =9cae52de7=; round 3's runs are in the section "Round 3".
 
 | command | development =9a0ed5f3c= | branch |
 |---------+-----------------------+--------|
@@ -37,7 +39,7 @@ Closure after round 2, against =60aa='s 186 names: minus =_empty_declared_frame=
 
 The 18 development failures are the intended set:
 - round 1: the flipped closure test, the fresh-process =string_storage= test, and the 12 calendar parametrizations (=[s]= vs =[us]=);
-- round 2: =test_constructed_empty_is_marked_never_cache=; =test_flaky_predicate_cannot_cache_the_constructed_empty[no_stage]= and =[dvc_fallback]= (hermetic port of the review's race, one per write site: development writes coverage =['2001','2002']=); and =test_one_request_cannot_get_two_predicate_answers= (only the first real =make -n= probe raises =OSError=: development probes twice).
+- round 2: =test_constructed_empty_is_marked_never_cache=; =test_flaky_predicate_cannot_cache_the_constructed_empty[no_stage]= and =[dvc_fallback]= (hermetic port of the review's race, one per write site: development writes coverage =['2001','2002']=); and =test_one_request_cannot_get_two_predicate_answers= (only the first real =make -n= probe raises =OSError=: development probes twice; replaced in round 3).
 No =test_gh1099*= file exists; the GH #1099 tests live in the GH #1039 file.
 
 * Race repro on real data (=race-iraq-shocks.txt=)
@@ -48,11 +50,42 @@ No =test_gh1099*= file exists; the GH #1099 tests live in the GH #1039 file.
 | 2. =shocks(['2006-07'])=, predicate True then False | 0 rows; =var/= rewritten: 0 rows covering =['2006-07','2012']= | 0 rows; =var/= unchanged: 8,812 rows covering =['2012']= |
 | 3. =shocks(['2012'])= | *0 rows* | *8,812 rows* |
 
-=race.py= replaces the method at class level, which bypasses the memo, so this run exercises the marker guard.  The memo is exercised by =test_one_request_cannot_get_two_predicate_answers=.
+=race.py= replaces the method at class level, which bypasses the memo, so this run exercises the marker guard.  Round 3 (branch HEAD) gives the same result: step 3 serves 8,812 rows, =var/= unchanged.
+
+* Round 3: the memo, as written in round 2, was refuted
+
+A second review of =9cae52de7= mutation-tested the marker guard: it closes the race on its own.
+It refuted the memo.  Storing the fail-safe True made one transient probe fault last for the instance's lifetime:
+- under =LSMS_BUILD_BACKEND=make=, later calls on that instance served a rule-less =var/=;
+- on a cold default-backend root, every later barren request on it raised =Could not materialize=;
+- development re-probes and answers correctly in both cases.
+
+Fix: memoise only completed probe answers (above), and require 0 rows in =_is_constructed_empty=.
+=test_one_request_cannot_get_two_predicate_answers= pinned the refuted instance-level True and is replaced by =test_a_faulted_probe_cannot_cache_the_empty_or_stick=.
+That test asserts =var/= stays byte-identical, the populated wave survives, and the same instance's completed answer is False.
+New: =test_a_transient_probe_fault_is_not_sticky[make|dvc]= and =test_a_marked_frame_with_rows_is_never_skipped=.
+
+| check | round 2 =9cae52de7= | round 3 (branch HEAD) |
+|-------+---------------------+-----------------------|
+| the 4 new/rewritten tests | 4 failed | pass |
+| Fakeland, make backend, poisoned =var/=: call 2 (barren) / call 3 (populated), same instance | 3 rows x=99 / 3 rows x=99 | 0 / 2 rows x={1,2} |
+| Fakeland, cold default backend: later barren calls, same instance | =Could not materialize= | 0 rows; no =var/= written |
+| Burkina Faso =interview_date=, make backend, warm =var/=: call 2 =['2014']=, same instance (=sticky-make-burkina-interview_date.txt=) | 21,028 rows of 2018-19 | 0 rows (development: 0) |
+| Iraq =race.py= step 3 | 8,812 | 8,812 |
+
+Call 1, the faulted call itself, keeps development's behaviour: on the make backend the fail-safe True still routes it to the country target, which serves the rule-less =var/= (Burkina Faso: 21,028 rows on development, round 2 and round 3 alike).
+That is pre-existing and out of scope here.
+
+Round-3 tests (=tests.txt=): =test_build_transform_hash.py= + =test_gh1039_make_backend_no_country_rule.py= 169 passed; the five builder-routing files 92 passed.
+The review's probe tests (=tests_branchcopy=, run read-only) pass except its copy of round 2's =test_one_request_cannot_get_two_predicate_answers=, which asserts the refuted memo.
+Hashes: =_is_constructed_empty= is fingerprinted code, so all 40 fingerprints move again against round 2; against development it is still one re-warm.
+=string_storage= spot check, fresh processes: 3 of 3 fingerprints identical under =pyarrow= and =python=.
 
 * Hash census (=hash-impact.json=)
 
 =hash_census.py= is a copy of =1218-current-validation/hash_census.py=.
+
+Measured at round 2 =9cae52de7=; round 3's spot check is in the section above.
 
 | comparison | country (549) | fingerprint (40) | wave (2,109) |
 |------------+---------------+------------------+--------------|
@@ -94,4 +127,7 @@ cd $CK && env PYTHONPATH=$CK LSMS_DATA_DIR=$DR OPENBLAS_NUM_THREADS=1 OMP_NUM_TH
   $PY census_exclude_helper.py $CK out.json                # round-1 decomposition, on 60aa81e9e
   [LSMS_BUILD_BACKEND=make] $PY probe_empty.py $CK interview_date 2014 out.json
   $PY race.py $CK Iraq shocks 2006-07 2012                 # the review's forced race
+  LSMS_BUILD_BACKEND=make $PY sticky_make_real.py $CK Burkina_Faso interview_date 2014 2018-19
+                                                           # round 3; warm var/ first with a default-backend
+                                                           # interview_date(waves=['2018-19'])
 #+end_src

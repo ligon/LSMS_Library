@@ -167,7 +167,7 @@ Evidence and scripts: `slurm_logs/isa_backlog_2026-10-21/1218-current-validation
 An independent review of the merged #1221 measured a design defect in the
 "complete closure hashing; no cache exclusions" stance of section 4. The
 constructed empty frame is SERVED, never written, so it is not a build input --
-but only BECAUSE of the two guarantees in the race paragraph below; round 1's
+but only BECAUSE of the marker guard in the race paragraphs below; round 1's
 claim that both callers return it before any write was refuted by a second
 review. Folding it pulled eight read-path symbols
 (`_enforce_declared_dtypes`, `_coerce_datetime_column`, `_to_datetime_mixed`,
@@ -221,3 +221,24 @@ and leaves `var/` untouched; hermetic ports (both write sites, plus a real
 on the branch. The guard is build-path and folded, so all hashes move again
 relative to round 1 (still one re-warm against development); `string_storage`
 independence holds (0 of 2,698 moved).
+
+Round 3, same branch (third review, of `9cae52de7`). The marker guard was
+mutation-tested and closes the race on its own; the memo was REFUTED.
+Memoising the fail-safe True made one transient probe fault last for the
+instance's lifetime. Under the make backend, later calls on that instance served
+a rule-less `var/`: Burkina `interview_date(waves=['2014'])` gave 21,028 rows of
+2018-19 where development gives 0. On a cold default-backend root every later
+barren request raised `Could not materialize`. Development re-probes and answers
+correctly in both cases.
+
+Corrected: `_has_country_builder` memoises only COMPLETED probe answers; a
+faulted probe returns the fail-safe True for that call and the next call probes
+again. One request can therefore still see True then False, and the marker guard
+is the guarantee that nothing is written. `_is_constructed_empty` now also
+requires 0 rows, because `attrs` ride onto frames with rows (`reindex`,
+`combine_first`, `align`, `.loc` enlargement in pandas 3). Measured on the new
+head: Burkina call 2 serves 0 rows; Iraq race step 3 serves 8,812; the four
+new/rewritten tests fail on `9cae52de7` and pass here; 3 of 3 fingerprints are
+identical under `string_storage='python'`. The guard edit is fingerprinted, so
+all hashes move again relative to round 2 (still one re-warm against
+development).

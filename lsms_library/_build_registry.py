@@ -195,9 +195,10 @@ _EXCLUDED_CALLABLES = frozenset({
     # the make backend writes no L2-country parquet.  Without this entry a
     # re-worded log line in it would move every table's hash.
     "lsms_library.country.Country._has_country_builder",
-    # Its uncached body since the per-instance memo (GH #1218 / PR #1221
-    # follow-up); reached only through the predicate, listed so a future
-    # direct call from build code cannot fold the probe into every hash.
+    # Its uncached body since the per-instance memo of completed answers
+    # (GH #1218 / PR #1221 follow-up); reached only through the predicate,
+    # listed so a future direct call from build code cannot fold the probe
+    # into every hash.
     "lsms_library.country.Country._probe_country_builder",
     # The wave-script RUNNER (GH #968): make if installed, else the wave
     # script directly.  It decides which program executes the script, not
@@ -209,16 +210,19 @@ _EXCLUDED_CALLABLES = frozenset({
     # GH #1218 / PR #1221: the constructed EMPTY answer -- the 0-row,
     # declared-shape frame served for a request whose waves all lack the table
     # (GH #1039/#1099).  It determines no byte a cache holds, and that is
-    # ENFORCED, not incidental, by two guarantees (#1221 follow-up):
-    #   1. it marks its output (country._CONSTRUCTED_EMPTY_ATTR), and every
-    #      cache write of a load_from_waves result skips a marked frame;
-    #   2. Country._has_country_builder is memoised per instance, so the two
-    #      absence checks of one default-backend request (top of
-    #      load_dataframe_with_dvc, then inside load_from_waves) agree.
-    # Without them a True-then-False predicate (its make -n probe answers
-    # True on OSError/timeout) wrote the frame to var/ with the union
-    # coverage manifest: review repro, Iraq `shocks`, 8,812 rows of 2012
-    # served as 0 after one empty 2006-07 request.  Pinned by
+    # ENFORCED, not incidental, by the marker guard (#1221 follow-up): it
+    # marks its output (country._CONSTRUCTED_EMPTY_ATTR), and every cache
+    # write of a load_from_waves result skips a marked 0-row frame.  Without
+    # it, the two absence checks of one default-backend request (top of
+    # load_dataframe_with_dvc, then inside load_from_waves) could disagree --
+    # the make -n probe answers True on OSError/timeout -- and True-then-False
+    # wrote the frame to var/ with the union coverage manifest: review repro,
+    # Iraq `shocks`, 8,812 rows of 2012 served as 0 after one empty 2006-07
+    # request.  Country._has_country_builder memoises COMPLETED probe answers
+    # only; a faulted probe's fail-safe True is not stored (a stored one
+    # served a rule-less var/ under the make backend for the instance's
+    # lifetime), so one request can still see True then False and the guard
+    # is what makes that harmless.  Pinned by
     # tests/test_gh1039_make_backend_no_country_rule.py (the race tests).
     # PR #1221 made the helper apply declared dtypes, which pulled the READ-
     # path dtype code (_enforce_declared_dtypes, _coerce_datetime_column,
