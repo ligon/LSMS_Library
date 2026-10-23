@@ -1,6 +1,32 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-23T00:56:10.287216+00:00
+* Current task -- 2026-10-23T01:05:29.083946+00:00
+
+The user-authorized merge batch is COMPLETE:32 implementation PRs+tracker1170 into development60aa81e9. Goal remains ACTIVE:90remainingrecords,3active/4otherpartial/83unassigned,22closedcompleted; lastcompleteGitHubcollection checkpoint retained below.
+Docs lastpublished/pusheda9efb4e20 before this update; commit/publish/push this checkpoint normally. Maincheckout remainscleanf8; sharedmirrorworkingtreeuntouched.
+
+#1218:57targeted and104additional tests PASS at exact5f; exact57deselected from104. Originalsavedgate e34eb2exit1 preserved. Additivev3 savedgate08a4c3actual0; finalsource51703/bce9eeactual0 peroriginalauthorreturns.
+Rootrelease C/FRAMEWORK1218-SUPPORT104-SAVED-V3-RELEASE.json SHA50d0102260b17861c7fac14e3a090b401c08e56e61c4abd3b9a4492f075f18c6; source/diff/rootindependent actual104read and243guardrowchecks below.
+Finalreport14915trackedpaths/1068dirs/14865regularsourceSHA/47symlinks/3opaquehistoricalmetadataonly; root470481readsavedreport. Authoracquisition_1149 freezingimmutable5ffinalhandoff/exactoriginaltwoSDKreturns; rootmustverifythatpacket whenavailable, no actorreplay.
+IMPORTANTbeforegenuine: root331354/5b31ea/6685eb shows actualdevelopment60aa has85changedcountry.py lines plusdata_access/local_tools/transformations sincef7;3e30dfshowscurrentBFconfig differsfromfixed657 by4paths100insertions12deletions. Testingold5f/f7+657 wouldleave finalintegrationunverified.
+Author now prepares SOURCE-ONLY additive mechanical integration in NEWcheckout/branch onto60aa, ledger-first/preserve5f+f7 exactsnapshots/ancestry. Rootmustreviewmerge-tree/conflicts/finalminimalpatch beforeproductruntime. Do notmutate frozen5f or silentlyresolve substantiveconflicts.
+Oldheadgenuineplanfinalization held asdraft; future6provider24copy4root plan mustbindactualintegratedcandidate vsactual60aa/config andnewbudget/source. No genuinepayloadhash/copy/decode/API performed/released.
+
+Mali1118 frozen syntheticpacket remainsaccepted e71854603d3a9660271dc034f1af4176d7372e6ef1786787809de19fb8bc38bb: parent14PASS11contractFAIL, supporting18PASS,30comparatorfaultreject+2positiveassertions, allhistoryretained.
+review_malawi_1209 is SOURCE-ONLY preparing G=P/genuine-preparation-v1. Full14provider/56copy/4root/18sourcefirst plan, exact newguardcalibrations/auth/copy/resolverpreflight/native-source-assembly andinstalledStataReader.readobserver allneedrootreviewbeforeexecution. Seepreviousentryforbudgets/labels/fixedunits/sourceauthorityconstraints. No providerbytes/productionfill/API yet.
+Latestrootsteering: stageONLY14copies33,322,098B into eventualcandidateDefaultL1 for18sourcefirstreads; defer42copies/3othernormalroots untilsourceauthoritypermitscandidate/current60aacomparison. No fifthroot; totalceiling56copies4roots staysproposal. Finalnormalcomparisonmustusefuturecandidateintegratedonto60aa vsactual60aa ratherthanobsoletef8context; originalsyntheticevidencekeepsitsactualidentity. SOURCE-ONLYprovideraliasreceiptsmustbindexistinghomecache symlink→canonicalscratchendpoints/fullancestorlinks, notclaimallancestorsnonsymlink.
+
+Uganda1133 phase0 COMPLETE/rootaccepted: C/UGANDA1133-ROOT-PHASE0-SOURCE-ACCEPTANCE.json SHA95e2d0bac18390f2b105001b94b8ef871f7d030cdb27839918273410a7f35128. Root42fca4readfullPHASE0; aa0d0dverified14manifest+68sourceSHA/fullphysical inclCLAUDElink/AGENTStarget/clean875c/onlyledgerdiff;20endpointCURRENTLSTATONLY+20sidecarSHAexact,17sizelesssidecars.
+P=C/uganda1133-phase0 READY5c4ca58322f720b6ea9a7efe1fb9ce855934f292ba932a2c4a6477f2b3390d3b/MANIFESTf13236edffbe42165eccd27fd600d58483a7e063ea4e615663182c2e258d652a/report4280022f36b6c434e315be5993e17c027686261950af9800152bce171d83a639.
+Agentmalawi_1209 now prepares SOURCE-ONLY firsttranche inNEWprefix:12earlycover/geo/communityproviders4,931,955B,12distinct0600singlelayoutcopies/one diagnosticL1, freshfullauth+actualDVCresolverpreflight+finite nativekey/variable-value-label/EAmeaningdiagnosis. No canonicalwidth/digitrule/sourcepatchchosen; later4normalroots80copies remainproposal.
+Scalarindexvsmyvarformatterroutes bothneedcoverage. CurrentUgandahasNOregisteredCSECTION1/communityendpoint; useactualrawsources ratherthaninventjoinAPI. Historical322/272/50/twoambiguouspairclaims unmeasured. Existinghouseholdlinkagemachinery/sourceoriginEA/movers/GPSbins/laterparishsemantics preserved.
+Runtime/import/calibration/census/test/providerbytehash/copy/decode/API/production/acquisition notyetreleased forUganda.
+
+Archive32 doesnotcoverthese laterprivateevidence prefixes; preserveimmutablerecords and arrangefinitenextdurabilitycheckpointwithoutactorreplay. Existingallocationhas~21hours/no deadlinewarning atlastcheck; activeworkcontinues.
+
+Sue
+
+* Earlier task -- 2026-10-23T00:56:10.287216+00:00
 
 Merge task remains COMPLETE: all32 implementation PRs and tracker1170 are merged development60aa81e9eda3b747e25a37c9e7354315b842b408; earlier exact source/CI/closure records below remain authoritative.
 Goal stays ACTIVE with90remainingISA records:3active,4otherpartialresiduals,83unassigned.22issuesclosedcompleted; two globallyopen completedISAportions remain separate.

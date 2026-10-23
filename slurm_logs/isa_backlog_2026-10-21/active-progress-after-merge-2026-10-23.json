@@ -1,5 +1,5 @@
 {
-  "updated_at_UTC": "2026-10-23T00:56:10.287216+00:00",
+  "updated_at_UTC": "2026-10-23T01:05:29.083946+00:00",
   "goal_status": "ACTIVE",
   "merge_task": "COMPLETE:32 implementation PRs and tracker1170 merged development60aa81e9",
   "remaining_records": 90,
@@ -11,7 +11,7 @@
       "number": 1218,
       "url": "https://github.com/ligon/LSMS_Library/issues/1218",
       "queue_state": "ACTIVE",
-      "current_active_scope": "Amended source 5fdbb937d passed independent source review. Root accepted complete predata maps and all 57 targeted regressions, including the twelve unchanged calendar cases that previously failed. The additional 104 tests pass with exactly those 57 deselected, but their saved metadata gate stopped on a direct-script absolute argv; a narrow saved-result correction is being prepared, with no test replay. Final source protection and genuine validation remain pending. All earlier failures retain their actual source identity and evidence gaps."
+      "current_active_scope": "Amended source 5fdbb937d passed independent source review, all 57 targeted regressions and 104 additional tests with the 57 deselected. The narrow saved-result correction and complete final source protection passed; the original metadata-gate failure remains recorded. Before genuine validation, the agent is preparing an isolated additive integration onto current development 60aa81e9: framework and Burkina Faso changes have landed since the original f7/657 comparison context. Existing evidence retains its exact original source identity. No genuine payload checks, copies or decoding have run."
     },
     {
       "number": 1118,
@@ -23,15 +23,16 @@
       "number": 1133,
       "url": "https://github.com/ligon/LSMS_Library/issues/1133",
       "queue_state": "ACTIVE",
-      "current_active_scope": "Source-only phase 0 is active on development 60aa81e9 plus ledger-first commit 875c135bb3e74a0421286433ab02160badbe7abc. Complete Uganda notes confirm that cluster identifiers mean origin EA, actual community/GPS bins or parish across different waves. Static code shows that scalar-string wave index mappings can bypass the named formatter used by sample mappings. The agent is mapping sample/community joins and source authority before choosing a fix. Twenty provider endpoints are inventoried by metadata only; no provider payload hashing, copying, decoding or runtime has run. Historical 322/272/50 pair counts remain unverified claims."
+      "current_active_scope": "Source-only phase 0 is complete and root-accepted on development 60aa81e9 plus ledger-first commit 875c135bb3e74a0421286433ab02160badbe7abc. Scalar-string cluster-index mappings bypass the named formatter used by sample mappings, so changing the formatter alone is insufficient. Cluster meaning changes across waves; historical 322/272/50 pair counts remain unverified. The agent is preparing a bounded twelve-provider diagnosis of early covers, geovariables and four raw community files before choosing canonical rendering. Twenty eventual validation providers are inventoried by metadata only; no provider payload hashing, copying, decoding or runtime has run."
     }
   ],
   "root_saved_result_acceptances": {
     "1218_57": "3bea52526e9e3ddbb97aea3b30416b0333a112a3e03664f8c502d02ae0f2be3e",
-    "Mali1118_synthetic": "e71854603d3a9660271dc034f1af4176d7372e6ef1786787809de19fb8bc38bb"
+    "Mali1118_synthetic": "e71854603d3a9660271dc034f1af4176d7372e6ef1786787809de19fb8bc38bb",
+    "Uganda1133_phase0": "95e2d0bac18390f2b105001b94b8ef871f7d030cdb27839918273410a7f35128"
   },
   "limits": [
-    "104 supporting tests passed; saved metadata gate failed on absolute direct-script argv and remains unresolved at this checkpoint.",
+    "104 supporting tests, additive saved-result correction and final source protection passed on exact 5f source. A new current-development integration is source-only preparation; genuine validation is pending.",
     "No genuine providers or production fill executed for Mali; reader-label observer is source-only preparation.",
     "No Uganda runtime or payload operation executed.",
     "Original failures and evidence limitations retained; no full-suite/corpus/release claim."
