@@ -193,8 +193,8 @@ Data Scheme:
     # self-contained from Niger).  One row per REPORTED (field, parcel,
     # crop) harvest line — REPORTED values only (harvest_kg / yield /
     # main_crop are transformations, never columns).  2018-19 only: s16c
-    # records harvest qty+unit (s16cq12a/b), sold qty (s16cq16a), sale
-    # value (s16cq17) and the intercrop flag (s16cq07) at this plot-crop
+    # records harvest qty+unit (s16cq12a/b), sold qty+unit (s16cq16a/b),
+    # sale value (s16cq17) and the intercrop flag (s16cq07) at this plot-crop
     # grain.  crop joins food via harmonize_food Preferred Labels; u via
     # the u table; unmapped labels pass through unchanged.  u is in the
     # index because one (plot, crop) can be reported in several units.
@@ -207,6 +207,20 @@ Data Scheme:
     Quantity: float
     Quantity_sold: float
     Value_sold: float
+    # THE SALE HAS ITS OWN UNIT (GH #824; Niger 2018-19 precedent).  `u` is
+    # the HARVEST unit (s16cq12b); s16cq16b records the unit of the sold
+    # quantity s16cq16a on the same plot-crop line, on the same 7 labels, and
+    # is carried here as the per-row column Unit_sold, canonicalised at build
+    # time through the same `u` table.  It differs from `u` on 546 of the
+    # 5,347 priced rows (Quantity_sold > 0 and Value_sold > 0).  Where the two
+    # disagree the row is a data-quality FLAG, not an identification
+    # (canonical data_info.yml, Unit_sold note): exclude or resolve, and
+    # report the count.  NA-bearing, never sentinel-filled -- NA means "no
+    # sale, or no sold unit recorded".  `optional` because a row with no sale
+    # has no sold unit.
+    Unit_sold:
+      type: str
+      optional: true
     harvest_month:
       type: float
       optional: true

@@ -1,0 +1,46 @@
+#+title: GH #824 -- Burkina Faso 2018-19 =crop_production.Unit_sold=
+
+Aggregates only.  Row-level frames (the served tables, the wave parquets) stay
+under =/local/job40390255/data-private/824-bf/= and are not committed.
+
+* Files
+- =compare_oracle.py= / =compare_oracle.json= -- development vs branch served
+  frames (rows, index, every pre-existing column), =Unit_sold= coverage on
+  priced rows, the disagreeing =(u, Unit_sold)= label cells, a raw oracle of
+  =s16cq16b= against the wave parquet, and the audit's price test re-run on
+  the served branch table.
+- =hash_diff.py= / =hash_census_diff.json= -- the cache-hash census
+  (=worktrees/1218/.../1218-current-validation/hash_census.py=) diffed between
+  the two checkouts.
+- =build_summary_{development,branch}.json= -- shape, dtypes, warning
+  categories and audit-report counts of each cold build (warning text and
+  household ids removed).
+- =tests.txt= -- result lines of the new test on both checkouts and of the
+  existing Burkina crop / input tests plus =test_feature_canonical_index.py=.
+
+* Headline
+| | development =9a0ed5f3c= | branch |
+|---+---+---|
+| rows | 15,587 | 15,587 |
+| index + pre-existing columns | -- | exact-equal |
+| =Unit_sold= non-null | absent | 5,356 |
+| priced rows with =Unit_sold= | -- | 5,347 / 5,347 |
+| priced =Unit_sold != u= | -- | 546 |
+| raw oracle (wave parquet) | -- | 15,593 / 15,593 match |
+| sold unit closer price denominator | -- | 361 / 451 (80.0%); 334 / 414 at min_n=10 |
+| grain / Site I / Site Q | 0 / 0 / 1 | 0 / 0 / 1 (same row) |
+| hash census | -- | Burkina only: 24/24 country, 24 2018-19 wave, 0/40 btf |
+
+* Reproduce
+Each checkout gets its own =LSMS_DATA_DIR= with only =dvc-cache= symlinked to
+the shared L1; =PYTHONPATH= is the checkout and the import is asserted by
+real path; =OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 LSMS_BUILD_WORKERS=1=.
+
+1. Cold build in each checkout: =ll.Country('Burkina_Faso').crop_production()=,
+   saved to =<data_dir>/served_crop_production.parquet=.
+2. =python compare_oracle.py <branch> <dev served> <branch served>
+   <branch data_dir>/Burkina_Faso/2018-19/_/crop_production.parquet compare_oracle.json=
+3. =python hash_census.py <checkout> hash_<label>.json= in each checkout, then
+   =python hash_diff.py hash_base.json hash_branch.json hash_census_diff.json=.
+4. =pytest tests/test_gh824_burkina_unit_sold.py=: development 8 failed /
+   3 passed; branch 11 passed.
