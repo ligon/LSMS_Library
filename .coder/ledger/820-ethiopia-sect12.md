@@ -29,6 +29,8 @@ that W4/W5 §11 already carries those crops.
 
 ## §3 Definitions & conventions in force
 
+- Derived values: `CLAUDE.md` "Derived Values" (the fit rule -- "a value served under a name implying a different window -- the function is the identity and the registry is the point"); field contract `lsms_library/derivations.py`; `Derivation` declared `str`, `optional: true` under `Columns: crop_production` in `lsms_library/data_info.yml` (verified), never in a country `data_scheme.yml`.
+
 - Grain, `plot_id`, `i` per wave: `Ethiopia/_/CONTENTS.org` "plot_features" and
   "Household id emitted as i"; `holder_id` must be in every join key.
 - `crop_production` columns: `lsms_library/data_info.yml` Columns.crop_production;
@@ -36,7 +38,10 @@ that W4/W5 §11 already carries those crops.
 - No silent aggregation in core; collapse selects the most complete row (GH #871):
   `CLAUDE.md` "Grain Collapse".
 - Derivations: attachment of a reported holder-crop value to its unique plot is the
-  §11 precedent and is not registered there; no value here is constructed.
+  §11 precedent and is not registered there.  Round 1 concluded "no value here is
+  constructed"; round 2 REFUTED that as incomplete: the number is §12's answer, but
+  its WINDOW (last completed production period / 12 months) is not the season of the
+  row it is served on, so it is registered (`sect12-sale-period`) and stamped.
 
 ## §4 Invariants & assumptions
 
@@ -58,12 +63,15 @@ that W4/W5 §11 already carries those crops.
 | repeated §12 pair | new rule: ambiguous, counted | Malawi "attach nothing and COUNT IT"; a sum is a construction |
 | Q6=No + blank | reuse §11 reading (0) | survey answer "did not sell" |
 | W1 §12 harvest (Q3) | not served; open decision | needs a plot key §12 lacks; no precedent |
-| W4/W5 | no change | §11 verified to carry the crops |
+| W4/W5 | no change | §11 verified to carry the crops; their 12-month permanent-crop window is unmarked -- GH #1256, not stamped here |
+| §12 window (round 2) | registered derivation `Ethiopia::crop_production::sect12-sale-period` | CLAUDE.md "Derived Values" fit rule: a value served under a name implying a different window; identity function `derive_sect12_sale`, inputs `inputs_sect12_sale` (`Ethiopia/_/derivations.yml`) |
+| attached-then-dropped (round 2) | count as class 7; filter unchanged | ruling: report, do not change the drop filter in this PR |
 
 ## §6 Open questions for the human
 
 - W1: serve §12 Q3 tree-crop harvest (6,134 pairs; 3,740 on a unique §4 field)? Blocks W1 tree-crop harvest and 1,679 W1 sales.
-- Collisions: should §12 win where §11 is all-blank (W2 13, W3 7 pairs with a positive §12 value only)?
+- Collisions: should §12 win where §11 says Q1 sold = No but §12 records a positive sale?  W2 12, W3 7 non-repeated pairs -- every one a §11 "No", none a blank §11 line (the earlier wording here, "§11 all-blank", was wrong; round-2 review).
+- The empty-row filter in `crop_production_for_wave` ignores `Value_sold`: it drops §12 class-7 lines (W2 299 / 22 positive / 3,909 Birr; W3 62 / 7 / 7,430) and, on development, §11 rows with a positive value (W1-W5: 0 / 1 / 2 / 27 / 32; 1,500 / 7,750 / 41,442 / 33,482 Birr).  Left unchanged by ruling; a fix moves served rows.
 - Wave-keyed `harmonize_crop` for codes 19 / 86 (moves served `j`).
 - §11 path's bare `.sum()` / "No" overwrite / blank-unit-as-Kg (46/9/0/9/8 zero groups).
 
@@ -74,3 +82,6 @@ that W4/W5 §11 already carries those crops.
 - `crop_production_for_wave(sale12=...)` — OK (§5): `sale12=None` reproduces development exactly (W4/W5 untouched; synthetic test).
 - `harmonize_crop` 103/105 — OK (§4): no §9/§4 row in any wave uses either code.
 - Not a REINVENTION of Tanzania's `_sales_block`: that sums across modules, which this deliberately does not.
+- `derive_sect12_sale` / `inputs_sect12_sale` / `Ethiopia/_/derivations.yml` — OK (anchored on CLAUDE.md "Derived Values" and the GhanaLSS 9B / EHCVM precedents): loader accepts the entry; both callables resolve; `tests/test_derivations.py` drift test passes in both directions; the stamp equals the §12-filled cells row for row (9,502 served rows) and the served values are identical to `f7f567c82` except the new column.
+- `_report_sect12_sales` — OK (§4): asserts the eight classes partition the lines read; class 7 = W2 299, W3 62 lines, matching the independent oracle's "attached_lines_no_served_row".
+- `median_price_valuation` default pools across waves (GH #1254): not touched (framework).

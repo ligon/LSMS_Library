@@ -14,12 +14,12 @@ D = f'{checkout}/lsms_library/countries/Ethiopia'
 def rd(w, f, cat=False):
     return get_dataframe(f'{D}/{w}/Data/{f}', convert_categoricals=cat)
 reports = {}
-orig = E._attach_sect12_sales
+orig = E._report_sect12_sales
 def spy(*a, **k):
-    out, rep = orig(*a, **k)
+    rep = orig(*a, **k)
     reports[rep['wave']] = rep
-    return out, rep
-E._attach_sect12_sales = spy
+    return rep
+E._report_sect12_sales = spy
 cfg = {
  '2011-12': dict(n=1, hh='household_id', q='ph_s9q12_a', unit=None, hm='ph_s9q13_b', ic=None, s_qty='ph_s11q03_a', s_val='ph_s11q04_a', su=None, su12=None),
  '2013-14': dict(n=2, hh='household_id2', q='ph_s9q04_a', unit='ph_s9q04_b', hm='ph_s9q07_b', ic='ph_s9q01', s_qty='ph_s11q03_a', s_val='ph_s11q04', su=None, su12=None),

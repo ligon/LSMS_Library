@@ -8,13 +8,13 @@
     "positive_value_lines": 1967,
     "birr": 2047372.5
    },
+   "flag_no_but_positive_lines": 0,
    "placeholder": {
     "lines": 873,
     "pairs": 873,
     "positive_value_lines": 0,
     "birr": 0.0
    },
-   "flag_no_but_positive_lines": 0,
    "repeated": {
     "lines": 0,
     "pairs": 0,
@@ -45,15 +45,24 @@
     "positive_value_lines": 0,
     "birr": 0.0
    },
+   "rows_value_filled": 544,
+   "rows_positive_value_filled": 160,
+   "rows_quantity_filled": 544,
+   "rows_stamped": 544,
+   "attached_then_dropped": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
    "attached": {
     "lines": 563,
     "pairs": 563,
     "positive_value_lines": 160,
     "birr": 61284.0
    },
-   "rows_value_filled": 544,
-   "rows_positive_value_filled": 160,
-   "rows_quantity_filled": 544
+   "rows_stamped_served": 544,
+   "rows_positive_value_served": 160
   },
   "2013-14": {
    "wave": "2013-14",
@@ -63,13 +72,13 @@
     "positive_value_lines": 2725,
     "birr": 3423724.0
    },
+   "flag_no_but_positive_lines": 9,
    "placeholder": {
     "lines": 0,
     "pairs": 0,
     "positive_value_lines": 0,
     "birr": 0.0
    },
-   "flag_no_but_positive_lines": 9,
    "repeated": {
     "lines": 239,
     "pairs": 113,
@@ -100,15 +109,24 @@
     "positive_value_lines": 0,
     "birr": 0.0
    },
-   "attached": {
-    "lines": 4773,
-    "pairs": 4773,
-    "positive_value_lines": 1412,
-    "birr": 967615.0
-   },
    "rows_value_filled": 4957,
    "rows_positive_value_filled": 1464,
-   "rows_quantity_filled": 1376
+   "rows_quantity_filled": 1376,
+   "rows_stamped": 4957,
+   "attached_then_dropped": {
+    "lines": 299,
+    "pairs": 299,
+    "positive_value_lines": 22,
+    "birr": 3909.0
+   },
+   "attached": {
+    "lines": 4474,
+    "pairs": 4474,
+    "positive_value_lines": 1390,
+    "birr": 963706.0
+   },
+   "rows_stamped_served": 4748,
+   "rows_positive_value_served": 1442
   },
   "2015-16": {
    "wave": "2015-16",
@@ -118,13 +136,13 @@
     "positive_value_lines": 2627,
     "birr": 3984341.0
    },
+   "flag_no_but_positive_lines": 0,
    "placeholder": {
     "lines": 0,
     "pairs": 0,
     "positive_value_lines": 0,
     "birr": 0.0
    },
-   "flag_no_but_positive_lines": 0,
    "repeated": {
     "lines": 35,
     "pairs": 17,
@@ -155,15 +173,24 @@
     "positive_value_lines": 0,
     "birr": 0.0
    },
-   "attached": {
-    "lines": 4559,
-    "pairs": 4559,
-    "positive_value_lines": 1290,
-    "birr": 1070306.0
-   },
    "rows_value_filled": 4557,
    "rows_positive_value_filled": 1290,
-   "rows_quantity_filled": 971
+   "rows_quantity_filled": 971,
+   "rows_stamped": 4557,
+   "attached_then_dropped": {
+    "lines": 62,
+    "pairs": 62,
+    "positive_value_lines": 7,
+    "birr": 7430.0
+   },
+   "attached": {
+    "lines": 4497,
+    "pairs": 4497,
+    "positive_value_lines": 1283,
+    "birr": 1062876.0
+   },
+   "rows_stamped_served": 4495,
+   "rows_positive_value_served": 1283
   }
  },
  "w4_w5_verification": {
