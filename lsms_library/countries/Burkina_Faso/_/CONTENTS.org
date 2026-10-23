@@ -1621,6 +1621,82 @@ The local data-scheme edit moves all 24 Burkina country hashes, and the wave-scr
 The other 525 country hashes, 1,344 declared-wave hashes and all 39 framework fingerprints remain exact.
 Only input and sample outputs were rebuilt in this task; the wider hash scope does not establish other outputs.
 
+* 2026-10-23 -- =crop_production= carries the SOLD unit, =Unit_sold= (GH #824)
+
+*The idiosyncrasy.*  =crop_production= is built for 2018-19 only, from the
+EHCVM =s16c_me_bfa2018.dta=, one row per (field, parcel, crop) harvest line.
+That line records TWO units: the harvest quantity =s16cq12a= in =s16cq12b=
+(the index level =u=), and the sold quantity =s16cq16a= in its own
+=s16cq16b=, beside the sale value =s16cq17=.  Both use the same seven labels
+(=Sac gros=, =Sac moyen=, =Plat yorouba=, =Tine=, =Kg=, =Unité=,
+=Autres (à préciser)=).  The builder is a self-contained copy of Niger
+2018-19 taken before GH #824, so it never read =s16cq16b=: =Quantity_sold=
+was served beside the harvest =u= with nothing saying the sale unit can
+differ.  The 2014 EMC is a different instrument (sale block =Y22A/Y22B/Y22C/Y23=,
+with a reported kg-per-sold-unit factor), and 2021-22 moves the sale to the
+crop-level =s16d=; neither wave has a =crop_production= builder, and wiring
+them is a decision, not part of this fix.  =i= is =burkina_faso.ehcvm_i=
+(grappe + '0' + two-digit menage), unchanged.
+
+*The fix mirrors Niger 2018-19* (=Niger/2018-19/_/crop_production.py=,
+=Niger/_/niger.py:_finish_crop_production=, commit =04c1efbf9=).
+=Unit_sold= is a per-row column, never an index level.  It is canonicalised at
+BUILD time through the same =u= table as the harvest unit, because read-time
+mapping only reaches a column named =u= (the GH #1188 point).  That table keys
+=Kg=, =Tine= and =Unité= to themselves and passes the other four labels
+through unchanged, identically on both sides.  =Unit_sold= is NA-bearing and
+never sentinel-filled.  The =Unknown= fold copied from Niger is a no-op guard
+here, since this =u= table maps nothing to =Unknown=.  =_/data_scheme.yml=
+declares it =optional: true=; the canonical =data_info.yml= already declared
+it.  The sale sits on the harvest row, so no row is added, removed or re-keyed.
+
+*Measured* on cold builds in separate =LSMS_DATA_DIR=s, development
+=9a0ed5f3c= against the branch:
+
+| | development | branch |
+|---+---+---|
+| served rows | 15,587 | 15,587 |
+| index, and every pre-existing column | -- | exact-equal |
+| =Unit_sold= non-null | absent | 5,356 |
+| priced rows (=Quantity_sold > 0=, =Value_sold > 0=) | 5,347 | 5,347, all with =Unit_sold= |
+| priced, =Unit_sold == u= / =!= u= | -- | 4,801 (89.8%) / 546 |
+| grain / Site I / Site Q reports | 0 / 0 / 1 | 0 / 0 / 1 (the same row) |
+
+The other 9 rows carrying a sold unit report =Quantity_sold > 0= and no
+=Value_sold=.  Raw oracle: =s16cq16b=, mapped through the =u= table by an
+independent reader, equals the wave parquet's =Unit_sold= on all 15,593 source
+lines.  The six lines the public finaliser drops (every payload column
+missing) carry no sold unit, so the new column resurrects none of them.  The
+largest disagreeing cells are =u= =Sac gros= sold as =Plat yorouba= (126),
+=Tine= (68) and =Sac moyen= (62).
+
+*Which unit is right is a per-country fact.*  On the served table the sold
+unit is the closer price denominator on 361 of 451 benchmarkable disagreeing
+rows (80.0%; 334 of 414 at ten benchmark rows).  Uganda measured 40.5%.  The
+canonical rule therefore stands as written: a disagreement is a FLAG, to be
+excluded or resolved and counted, not an identification.  In Burkina it
+usually resolves toward =Unit_sold=.
+
+*Not changed, and each is a decision for @ligon* (GH #824 audit, 2026-10-23):
+- =transformations.median_price_valuation= still converts =Quantity_sold=
+  with the harvest =u=.  On this wave the audit counted 30 mis-scaled pooled
+  rows and 31 kilogram sales wrongly excluded, a +0.18% move in valued
+  harvest.
+- The shelled/unshelled state (=s16cq12c= / =s16cq16c=, differing on 313
+  priced rows) is not added as a =condition= level.
+- 2014 and 2021-22 stay unbuilt.
+
+The 540 rows whose missing harvest =u= is served as the literal =unit= are
+GH #1234 (PR #1251), not this fix.
+
+*Cache.*  =_/data_scheme.yml= is a whole-file country input, so all 24 Burkina
+country hashes move.  The wave script moves the 24 declared 2018-19 wave
+hashes.  The 2014 and 2021-22 wave hashes, all 40 build-transform fingerprints
+and the other 525 country hashes are unchanged.  Pinned by
+=tests/test_gh824_burkina_unit_sold.py=; aggregates in
+=slurm_logs/isa_backlog_2026-10-21/824-burkina-unit-sold/=; ledger
+=.coder/ledger/824-burkina-unit-sold.md=.
+
 * 2026-10-21 -- WAITING per-household food exposure: retained interview results disagree (GH #1148)
 
 Read-only diagnosis at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
