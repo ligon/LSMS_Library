@@ -1,0 +1,904 @@
+{
+ "files_and_variables_swept": {
+  "2011-12": {
+   "sect10_ph_w1.dta": [
+    "crop_code"
+   ],
+   "sect11_ph_w1.dta": [
+    "crop_code"
+   ],
+   "sect12_ph_w1.dta": [
+    "crop_code"
+   ],
+   "sect3_pp_w1.dta": [
+    "pp_s3q31_b",
+    "pp_s3q31_d"
+   ],
+   "sect4_pp_w1.dta": [
+    "crop_code"
+   ],
+   "sect9_ph_w1.dta": [
+    "crop_code"
+   ]
+  },
+  "2013-14": {
+   "Crop_CF_Wave2.dta": [
+    "crop_code"
+   ],
+   "sect10_ph_w2.dta": [
+    "crop_code",
+    "ph_s10q00c"
+   ],
+   "sect11_ph_w2.dta": [
+    "crop_code"
+   ],
+   "sect12_ph_w2.dta": [
+    "crop_code"
+   ],
+   "sect3_pp_w2.dta": [
+    "pp_s3q31_b",
+    "pp_s3q31_d"
+   ],
+   "sect4_pp_w2.dta": [
+    "crop_code",
+    "pp_s4q01_b"
+   ],
+   "sect5_pp_w2.dta": [
+    "crop_code"
+   ],
+   "sect9_ph_w2.dta": [
+    "crop_code",
+    "ph_s9q0c"
+   ],
+   "sect9a_ph_w2.dta": [
+    "crop_code",
+    "ph_s9q0d"
+   ]
+  },
+  "2015-16": {
+   "Crop_CF_Wave3.dta": [
+    "crop_code"
+   ],
+   "sect10_ph_w3.dta": [
+    "crop_code"
+   ],
+   "sect11_ph_w3.dta": [
+    "crop_code"
+   ],
+   "sect12_ph_w3.dta": [
+    "crop_code"
+   ],
+   "sect3_pp_w3.dta": [
+    "pp_s3q31_b",
+    "pp_s3q31_d"
+   ],
+   "sect4_pp_w3.dta": [
+    "pp_s4q01_b"
+   ],
+   "sect5_pp_w3.dta": [
+    "crop_code",
+    "pp_s5q00"
+   ],
+   "sect7_pp_w3.dta": [
+    "pp_s7q20b_a",
+    "pp_s7q20b_b",
+    "pp_s7q20b_c"
+   ],
+   "sect9_ph_w3.dta": [
+    "crop_code"
+   ],
+   "sect9a_ph_w3.dta": [
+    "crop_code",
+    "ph_s9q01_b"
+   ]
+  },
+  "2018-19": {
+   "Crop_CF_Wave4.dta": [
+    "crop_code"
+   ],
+   "sect10_ph_w4.dta": [
+    "s9q00b"
+   ],
+   "sect11_ph_w4.dta": [
+    "s11q01"
+   ],
+   "sect3_pp_w4.dta": [
+    "s3q33b",
+    "s3q33d"
+   ],
+   "sect4_pp_w4.dta": [
+    "s4q01b"
+   ],
+   "sect5_pp_w4.dta": [
+    "s5q0B"
+   ],
+   "sect9_ph_w4.dta": [
+    "s9q00b"
+   ],
+   "sect9a_pp_w4.dta": [
+    "s4q01b"
+   ]
+  },
+  "2021-22": {
+   "crop_cf_wave5.dta": [
+    "crop_code"
+   ],
+   "sect10_ph_w5.dta": [
+    "s9q00b"
+   ],
+   "sect11_ph_w5.dta": [
+    "s11q01b"
+   ],
+   "sect3_pp_w5.dta": [
+    "s3q33b_1",
+    "s3q33b_2",
+    "s3q33b_3"
+   ],
+   "sect4_pp_w5.dta": [
+    "s4q01b"
+   ],
+   "sect5_pp_w5.dta": [
+    "s5q0B"
+   ],
+   "sect9_ph_w5.dta": [
+    "s9q00b"
+   ],
+   "sect9a_pp_w5.dta": [
+    "s4q01b"
+   ]
+  }
+ },
+ "codes_seen": 114,
+ "codes_whose_label_text_varies": {
+  "9": {
+   "2011-12": {
+    "ROMAN": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "ROMAN": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "MUNG BEAN/ MASHO": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ],
+    "ROMAN": [
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c"
+    ]
+   },
+   "2018-19": {
+    "MUNG BEAN/ MASHO": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect4_pp_w4.dta:s4q01b",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "MUNG BEAN/ MASHO": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3",
+     "sect4_pp_w5.dta:s4q01b"
+    ],
+    "MUNG BEAN OR MASHO": [
+     "sect10_ph_w5.dta:s9q00b",
+     "sect5_pp_w5.dta:s5q0B",
+     "sect9_ph_w5.dta:s9q00b",
+     "sect9a_pp_w5.dta:s4q01b"
+    ]
+   }
+  },
+  "19": {
+   "2011-12": {
+    "CACTUS": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "CACTUS": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "RED KIDENY BEANS": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ],
+    "CACTUS": [
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c"
+    ]
+   },
+   "2018-19": {
+    "RED KIDENY BEANS": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect4_pp_w4.dta:s4q01b",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "RED KIDENY BEANS": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3",
+     "sect4_pp_w5.dta:s4q01b"
+    ],
+    "REDKIDENY BEANS": [
+     "sect10_ph_w5.dta:s9q00b",
+     "sect5_pp_w5.dta:s5q0B",
+     "sect9_ph_w5.dta:s9q00b",
+     "sect9a_pp_w5.dta:s4q01b"
+    ]
+   }
+  },
+  "25": {
+   "2011-12": {
+    "NUEG": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "NUEG": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "NUEG": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ]
+   },
+   "2018-19": {
+    "NUEG": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect4_pp_w4.dta:s4q01b",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "NUEG": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3",
+     "sect4_pp_w5.dta:s4q01b"
+    ],
+    "NUEG OR NIGERSEED": [
+     "sect10_ph_w5.dta:s9q00b",
+     "sect5_pp_w5.dta:s5q0B",
+     "sect9_ph_w5.dta:s9q00b",
+     "sect9a_pp_w5.dta:s4q01b"
+    ]
+   }
+  },
+  "30": {
+   "2011-12": {
+    "SAVORY": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "SAVORY": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "SAVORY": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ]
+   },
+   "2018-19": {
+    "SAVORY": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect4_pp_w4.dta:s4q01b",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "SAVORY": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3",
+     "sect4_pp_w5.dta:s4q01b"
+    ],
+    "SAVORY OR ROSEMARY": [
+     "sect10_ph_w5.dta:s9q00b",
+     "sect5_pp_w5.dta:s5q0B",
+     "sect9_ph_w5.dta:s9q00b",
+     "sect9a_pp_w5.dta:s4q01b"
+    ]
+   }
+  },
+  "40": {
+   "2011-12": {
+    "WHITE LUMIN": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "WHITE LUMIN": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "WHITE LUMIN": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ]
+   },
+   "2018-19": {
+    "WHITE LUMIN": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ],
+    "WHITE CUMIN": [
+     "sect4_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "WHITE LUMIN": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3"
+    ],
+    "WHITECUMIN": [
+     "sect10_ph_w5.dta:s9q00b",
+     "sect5_pp_w5.dta:s5q0B",
+     "sect9_ph_w5.dta:s9q00b",
+     "sect9a_pp_w5.dta:s4q01b"
+    ],
+    "WHITE CUMIN": [
+     "sect4_pp_w5.dta:s4q01b"
+    ]
+   }
+  },
+  "86": {
+   "2011-12": {
+    "FALLOW LAND": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ],
+    "TEMPORARY GR": [
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "TEMPORARY GR": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "TEMPORARY GR": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ]
+   },
+   "2018-19": {
+    "TEMPORARY GR": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect4_pp_w4.dta:s4q01b",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "TEMPORARY GR": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3",
+     "sect4_pp_w5.dta:s4q01b"
+    ]
+   }
+  },
+  "89": {
+   "2011-12": {
+    "FOREST LAND": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "FOREST LAND/ EUCALYPTUS TREE": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c"
+    ]
+   }
+  },
+  "98": {
+   "2011-12": {
+    "OTHER ROOT CROPS": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ],
+    "OTHER ROOT C": [
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "OTHER ROOT C": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "OTHER ROOT C": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ]
+   },
+   "2018-19": {
+    "OTHER ROOT C": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect4_pp_w4.dta:s4q01b",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "OTHER ROOT C": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3",
+     "sect4_pp_w5.dta:s4q01b"
+    ],
+    "OTHER ROOT CROP": [
+     "sect10_ph_w5.dta:s9q00b",
+     "sect5_pp_w5.dta:s5q0B",
+     "sect9_ph_w5.dta:s9q00b",
+     "sect9a_pp_w5.dta:s4q01b"
+    ]
+   }
+  },
+  "99": {
+   "2011-12": {
+    "OTHER LAND": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "OTHER LAND": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "OTHER LAND": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ]
+   },
+   "2018-19": {
+    "OTHER LAND": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect4_pp_w4.dta:s4q01b",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "OTHER LAND": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3",
+     "sect4_pp_w5.dta:s4q01b"
+    ],
+    "OTHER LAND USE": [
+     "sect10_ph_w5.dta:s9q00b",
+     "sect5_pp_w5.dta:s5q0B",
+     "sect9_ph_w5.dta:s9q00b",
+     "sect9a_pp_w5.dta:s4q01b"
+    ]
+   }
+  },
+  "121": {
+   "2011-12": {
+    "OTHER CASH CROPS": [
+     "sect10_ph_w1.dta:crop_code",
+     "sect11_ph_w1.dta:crop_code",
+     "sect12_ph_w1.dta:crop_code",
+     "sect9_ph_w1.dta:crop_code"
+    ],
+    "OTHER CASE CROPS": [
+     "sect3_pp_w1.dta:pp_s3q31_b",
+     "sect3_pp_w1.dta:pp_s3q31_d",
+     "sect4_pp_w1.dta:crop_code"
+    ]
+   },
+   "2013-14": {
+    "OTHER CASE CROPS": [
+     "Crop_CF_Wave2.dta:crop_code",
+     "sect10_ph_w2.dta:crop_code",
+     "sect10_ph_w2.dta:ph_s10q00c",
+     "sect11_ph_w2.dta:crop_code",
+     "sect12_ph_w2.dta:crop_code",
+     "sect3_pp_w2.dta:pp_s3q31_b",
+     "sect3_pp_w2.dta:pp_s3q31_d",
+     "sect4_pp_w2.dta:crop_code",
+     "sect4_pp_w2.dta:pp_s4q01_b",
+     "sect5_pp_w2.dta:crop_code",
+     "sect9_ph_w2.dta:crop_code",
+     "sect9_ph_w2.dta:ph_s9q0c",
+     "sect9a_ph_w2.dta:crop_code",
+     "sect9a_ph_w2.dta:ph_s9q0d"
+    ]
+   },
+   "2015-16": {
+    "OTHER CASE CROPS": [
+     "Crop_CF_Wave3.dta:crop_code",
+     "sect10_ph_w3.dta:crop_code",
+     "sect11_ph_w3.dta:crop_code",
+     "sect12_ph_w3.dta:crop_code",
+     "sect3_pp_w3.dta:pp_s3q31_b",
+     "sect3_pp_w3.dta:pp_s3q31_d",
+     "sect4_pp_w3.dta:pp_s4q01_b",
+     "sect5_pp_w3.dta:crop_code",
+     "sect5_pp_w3.dta:pp_s5q00",
+     "sect7_pp_w3.dta:pp_s7q20b_a",
+     "sect7_pp_w3.dta:pp_s7q20b_b",
+     "sect7_pp_w3.dta:pp_s7q20b_c",
+     "sect9_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:crop_code",
+     "sect9a_ph_w3.dta:ph_s9q01_b"
+    ]
+   },
+   "2018-19": {
+    "OTHER CASE CROPS": [
+     "Crop_CF_Wave4.dta:crop_code",
+     "sect10_ph_w4.dta:s9q00b",
+     "sect11_ph_w4.dta:s11q01",
+     "sect3_pp_w4.dta:s3q33b",
+     "sect3_pp_w4.dta:s3q33d",
+     "sect4_pp_w4.dta:s4q01b",
+     "sect5_pp_w4.dta:s5q0B",
+     "sect9_ph_w4.dta:s9q00b",
+     "sect9a_pp_w4.dta:s4q01b"
+    ]
+   },
+   "2021-22": {
+    "OTHER CASE CROPS": [
+     "crop_cf_wave5.dta:crop_code",
+     "sect11_ph_w5.dta:s11q01b",
+     "sect3_pp_w5.dta:s3q33b_1",
+     "sect3_pp_w5.dta:s3q33b_2",
+     "sect3_pp_w5.dta:s3q33b_3",
+     "sect4_pp_w5.dta:s4q01b"
+    ]
+   }
+  }
+ },
+ "classification": {
+  "9": "MEANING: ROMAN (W1, W2; W3 stale sect7_pp_w3 set) -> MUNG BEAN/MASHO (W3 on)",
+  "19": "MEANING: CACTUS (W1, W2; W3 stale sect3_pp_w3 / sect7_pp_w3 sets) -> RED KIDENY BEANS (W3 on)",
+  "25": "spelling / prefix / truncation only (same meaning)",
+  "30": "spelling / prefix / truncation only (same meaning)",
+  "40": "spelling / prefix / truncation only (same meaning)",
+  "86": "MEANING: FALLOW LAND (W1 post-harvest files) / TEMPORARY GR (W1 post-planting files, W2 on)",
+  "89": "same meaning, refined: FOREST LAND (W1) -> FOREST LAND/ EUCALYPTUS TREE (W2)",
+  "98": "spelling / prefix / truncation only (same meaning)",
+  "99": "spelling / prefix / truncation only (same meaning)",
+  "121": "spelling / prefix / truncation only (same meaning)"
+ }
+}

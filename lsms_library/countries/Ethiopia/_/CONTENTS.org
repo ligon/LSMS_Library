@@ -1878,6 +1878,8 @@ with no precedent in this repo, so it is NOT done and is an open decision
   cactus sale).  Code 86 likewise reads FALLOW LAND in W1 but TEMPORARY GR
   from W2 on (one W4 §9 row is served ='Fallow Land'=).  Fixing it is a
   wave-keyed =harmonize_crop= and moves served =j= -- its own issue.
+  *FIXED by GH #1252*, see "Crop codes that change meaning by wave" below
+  (the W4 code-86 §9 row has neither unit nor quantity and is not served).
 - W1 §9 is a 7,750-row file against §4's 29,317 and W2/W3 §9's ~30,000;
   4,440 of W1 §11's 8,808 (holder, crop) pairs (818 positive sales) have no
   §9 row either.  Not explained by the tree-crop exclusion alone (§11
@@ -1970,6 +1972,79 @@ null-index and quantity reports are identical.  Downstream:
 =gross_crop_revenue= totals identical, households carrying one -8 / -4 / 0 /
 -1 / 0 (households whose only "sale" was an all-blank group); =harvest_kg=
 and the within-wave =median_price_valuation= identical.
+
+** Crop codes that change meaning by wave (GH #1252, 2026-10-23)
+
+ESS crop codes are NOT stable across waves.  A sweep of the Stata value
+labels of every crop-code variable in every crop module, every wave (§3 /
+§4 / §5 / §7 post-planting, §9 / §9a / §10 / §11 / §12 post-harvest, the WB
+=Crop_CF= tables; 114 codes;
+=slurm_logs/isa_backlog_2026-10-21/ethiopia-bundle/1252_crop_label_sweep.json=)
+finds three that change MEANING:
+
+| code | W1 2011-12 | W2 2013-14 | from W3 2015-16 |
+|------+------------+------------+-----------------|
+|    9 | ROMAN | ROMAN | Mung Bean/ MASHO |
+|   19 | CACTUS | CACTUS | RED KIDENY BEANS |
+|   86 | FALLOW LAND (post-harvest files) / TEMPORARY GR (post-planting files) | TEMPORARY GR | TEMPORARY GR |
+
+Seven more differ only in spelling, a =NN.= prefix or Stata's 12-character
+truncation (25 NUEG / NUEG OR NIGERSEED, 30 SAVORY (OR ROSEMARY), 40 WHITE
+LUMIN / CUMIN, 89 FOREST LAND -> FOREST LAND/ EUCALYPTUS TREE, 98 OTHER ROOT
+C(ROPS), 99 OTHER LAND (USE), 121 OTHER CASE / CASH CROPS).  W3 itself still
+ships two STALE label sets saying ROMAN / CACTUS (=sect3_pp_w3=
+=pp_s3q31_b/_d= and =sect7_pp_w3= =pp_s7q20b_*=); nothing here decodes
+either.  86 in W1 is ambiguous within the wave (the files =crop_production=
+reads say FALLOW LAND); W1 keeps that reading.
+
+*Fix:* =harmonize_crop= keeps one label per code -- each code's meaning from
+2015-16 on (86 is now ='Temporary Grass'=, expanding the truncation as 98 and
+121 are) -- and a new wave-keyed =harmonize_crop_wave= overrides only the
+five cells that differ: (W1, 9) and (W2, 9) ='Roman'=, (W1, 19) and (W2, 19)
+='Cactus'=, (W1, 86) ='Fallow Land'=.  =ethiopia._eth_crop_label_map_for_wave(t)=
+is the one reader, and every per-wave decode uses it --
+=crop_production_for_wave=, =plot_inputs_for_wave= (seed crops),
+=_crop_cf_table= (the shipped kg factors: =Crop_CF_Wave2= labels 19 CACTUS
+and 9 ROMAN, 15 + 1 (crop, unit) keys) and =inputs_sect12_sale=.
+='Roman'= is the survey's own word (Amharic for pomegranate, not checked
+against a code book), kept as written like Amboshika or Kazmir; no
+=harmonize_food= label exists for cactus or pomegranate, so no
+=food_acquired.j= join is lost (none existed: kidney beans / mung beans are
+not what these rows were).
+
+Why not the categorical-mapping cascade (CLAUDE.md, GH #953): a wave-level
+=categorical_mapping.org= overrides WHOLE-TABLE, so W1 and W2 would each
+carry a full 113-row copy of =harmonize_crop= that every later edit must
+repeat -- and it would never be read, because the crop decode reads the
+country file BY PATH at build time (CLAUDE.md fact 2) and nothing
+auto-applies a table named =harmonize_crop= to an index level named =j=.
+The in-file precedent is the wave-keyed =harmonize_area_unit= /
+=harmonize_acquire= / =harmonize_species=; the override lists 5 cells.  No
+country has a wave-level crop table.
+
+=perennial= is the same drift: =PERENNIAL_CROP_CODES= is the WB's
+ETH_ESS1.do list, written against W1's labels (19 = CACTUS) and reused
+unchanged in the ESS2-ESS5 do-files, so W3-W5 red kidney beans were served
+=perennial = True=.  The survey's own per-crop permanent/tree flag (PP §4
+=s4q15=) says 4 of 308 W4 and 0 of 316 W5 kidney-bean rows.  A code in
+=PERENNIAL_CODE_MEANING= (={19: 'Cactus'}=) now counts as perennial only in
+waves where it carries that meaning.  Code 9 is not on the WB list (a
+pomegranate tree would be perennial, but adding it is a new judgement, not
+a drift fix); 86 serves no crop row outside W1.
+
+Measured cold, the #1253 commit -> this change: 85,519 rows both;
+re-labelled =crop_production= rows W1 5 Cactus + 1 Roman, W2 35 + 11 (the
+issue's "45" is raw §9 rows: 5 + 40; 5 W2 cactus rows have neither unit nor
+quantity and are removed by the empty-row filter); with the before-frame
+re-labelled the index is identical, and the only other cells that move are
+=perennial= True -> False on 692 / 245 / 291 W3 / W4 / W5 kidney-bean rows.
+=plot_inputs=: W1 13 Cactus + 1 Roman, W2 39 + 15, and 4 W4 rows 'Fallow
+Land' -> 'Temporary Grass'; nothing else.  Raw oracle: on every served plot
+holding a code 9 / 19 / 86 §9 row (with a unit or quantity), the served =j=
+includes the label that §9 file's OWN value label gives -- 7 / 46 / 788 /
+290 / 297 plots, all agree (before: W1 1 of 7, W2 0 of 46).  =harvest_kg=
+(with and without the shipped factors), =gross_crop_revenue=, the
+within-wave =median_price_valuation= and every audit report are identical.
 
 ** Crop-side WB conversion factors: held, unwired (2026-09-09)
 

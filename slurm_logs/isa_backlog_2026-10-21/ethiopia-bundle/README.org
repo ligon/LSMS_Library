@@ -23,3 +23,13 @@ test, runs it there, and deletes the copy.
 | =1253_change_attribution.json= | every changed cell (wave parquets) attributed to sub-fix (a) / (b) / (c) by the raw §11 lines of its (holder, crop) |
 | =1253_raw_oracle.json= | an independent recomputation of the §11 aggregate from the raw =.dta=, checked against the branch's and the base's wave parquets |
 | =1253_downstream_and_reports.json= | =harvest_kg=, =gross_crop_revenue=, within-wave =median_price_valuation=, grain / null-read / null-index / quantity reports, warning categories |
+
+* GH #1252 -- crop codes that change meaning by wave
+
+| file | what |
+|------+------|
+| =1252_crop_label_sweep.json= | every crop-code variable's Stata value labels, every crop module, every wave: files/variables swept, the codes whose label text varies, and which of those change MEANING (9, 19, 86) |
+| =1252_crop_production_diff_prev_commit_vs_branch.json= | cold builds, #1253 commit vs this commit: rows re-labelled per (wave, label); with the before-frame re-labelled the index is identical; every other changed cell (=perennial= only) |
+| =1252_plot_inputs_diff_base_vs_branch.json= | the same for =plot_inputs= (base =627d3cfdf=; #1253 does not touch it) |
+| =1252_raw_oracle.json= | per wave: served plots holding a code 9/19/86 §9 row whose served =j= includes the label the §9 FILE's own value label gives |
+| =1252_downstream_and_reports.json= | =harvest_kg= (+ shipped), =gross_crop_revenue=, within-wave =median_price_valuation=, audit reports |

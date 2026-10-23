@@ -1212,9 +1212,11 @@ def food_coping_for_wave(t, df, hhid):
 #   intercropped    field was a mixed stand (bool)
 #   perennial       crop is a perennial/tree crop (bool, crop-code property)
 #
-# crop labels: code-keyed `harmonize_crop` table whose Preferred Labels
-# REUSE the food labels (Maize, Sorghum, Teff, Wheat, Barley, Rice, ...)
-# so crop_production.j joins food_acquired.j; non-food crops (Cotton,
+# crop labels: code-keyed `harmonize_crop` table (overridden per wave by
+# `harmonize_crop_wave` for the codes whose meaning changes -- 9, 19, 86;
+# GH #1252) whose Preferred Labels REUSE the food labels (Maize,
+# Sorghum, Teff, Wheat, Barley, Rice, ...) so crop_production.j joins
+# food_acquired.j; non-food crops (Cotton,
 # Enset, Gesho, Chat, Coffee, ...) get their own Preferred Labels.
 #
 # SALES GRAIN CAVEAT: the §11 sale module is keyed (household, holder,
@@ -1266,9 +1268,52 @@ PERENNIAL_CROP_CODES = frozenset({
 })
 
 
+#: A WB perennial code whose meaning changes between waves counts as perennial
+#: only in the waves where it carries the meaning the list was written for.
+#: ETH_ESS1.do built the list against W1's labels, where 19 is CACTUS; from
+#: 2015-16 code 19 is RED KIDNEY BEANS, a field legume (the WB do-files reuse
+#: the W1 list unchanged in ESS2-ESS5).  The survey's own per-crop flag agrees:
+#: W4 PP s4q15 says permanent/tree for 4 of 308 kidney-bean rows, W5 for 0 of
+#: 316 (GH #1252).  Code 9 (ROMAN in W1/W2) is not on the WB list and is not
+#: added; 86 has no served crop row outside W1.
+PERENNIAL_CODE_MEANING = {19: 'Cactus'}
+
+
 def _eth_crop_label_map():
-    """Load the code-keyed harmonize_crop table -> {crop_code: Preferred Label}."""
+    """Load the code-keyed harmonize_crop table -> {crop_code: Preferred Label}.
+
+    The code-keyed table gives each code's meaning from 2015-16 on; where the
+    wave is known, use :func:`_eth_crop_label_map_for_wave` (GH #1252)."""
     return _harmonize_code_label('harmonize_crop')
+
+
+def _eth_crop_label_map_for_wave(t):
+    """``harmonize_crop`` for wave ``t``: the code-keyed table overlaid with
+    that wave's rows of the wave-keyed ``harmonize_crop_wave`` (GH #1252).
+
+    Three ESS crop codes change meaning across waves -- 9 ROMAN (W1/W2) ->
+    MUNG BEAN, 19 CACTUS (W1/W2) -> RED KIDNEY BEANS, 86 FALLOW LAND (W1
+    post-harvest) -> TEMPORARY GR -- so a code-keyed decode served W1/W2
+    cactus as kidney beans.  The override table lists only the (wave, code)
+    cells that differ; every other code falls through.  Every per-wave crop
+    decode goes through here (``crop_production_for_wave``,
+    ``plot_inputs_for_wave``, ``_crop_cf_table``, ``inputs_sect12_sale``), so
+    a row's ``j`` and its shipped kg factor are decoded alike."""
+    out = dict(_eth_crop_label_map())
+    t = str(t)
+    out.update({c: lab for (w, c), lab in
+                _harmonize_wave_keyed('harmonize_crop_wave').items() if w == t})
+    return out
+
+
+def _perennial_codes_for_wave(t, crop_map=None):
+    """:data:`PERENNIAL_CROP_CODES` for wave ``t`` (GH #1252): a code in
+    :data:`PERENNIAL_CODE_MEANING` counts only where the wave's label is the
+    meaning the WB list was written for."""
+    crop_map = _eth_crop_label_map_for_wave(t) if crop_map is None else crop_map
+    return frozenset(c for c in PERENNIAL_CROP_CODES
+                     if c not in PERENNIAL_CODE_MEANING
+                     or crop_map.get(c) == PERENNIAL_CODE_MEANING[c])
 
 
 def _clean_unit_label(series):
@@ -1468,7 +1513,9 @@ def _crop_cf_table(t):
             "duplicate with a stated rule here -- harvest_kg's shipped layer "
             "refuses an ambiguous table rather than picking one.")
 
-    df['j'] = df['crop_code'].map(_eth_crop_label_map()).astype('string')
+    # the wave's own crop decode (GH #1252): Crop_CF_Wave2 labels 19 CACTUS
+    # and 9 ROMAN, exactly as the W2 crop rows they must join.
+    df['j'] = df['crop_code'].map(_eth_crop_label_map_for_wave(t)).astype('string')
     df['u'] = _clean_unit_label(lab['unit_cd']).values
     df['t'] = t
 
@@ -1750,7 +1797,7 @@ def inputs_sect12_sale(wave):
     out.index = pd.MultiIndex.from_arrays(
         [pd.Series(wave, index=raw.index).values,
          raw[hh].apply(format_id).values,
-         code.map(_eth_crop_label_map()).astype('string').values],
+         code.map(_eth_crop_label_map_for_wave(wave)).astype('string').values],
         names=['t', 'i', 'j'])
     return out
 
@@ -2062,7 +2109,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         on the rows §12 filled, NA elsewhere).
     """
     c = colmap
-    crop_map = _eth_crop_label_map()
+    crop_map = _eth_crop_label_map_for_wave(t)   # GH #1252: codes drift by wave
 
     h = harvest.copy()
     # plot_id identical to plot_features.
@@ -2118,9 +2165,11 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     else:
         out['intercropped'] = pd.Series(pd.NA, index=out.index, dtype='boolean')
 
-    # perennial: crop-code property.
+    # perennial: crop-code property, of the code's meaning IN THIS WAVE
+    # (GH #1252: 19 is CACTUS in W1/W2, RED KIDNEY BEANS from W3).
+    perennial_codes = _perennial_codes_for_wave(t, crop_map)
     out['perennial'] = out['_code'].map(
-        lambda x: (int(x) in PERENNIAL_CROP_CODES) if pd.notna(x) else pd.NA
+        lambda x: (int(x) in perennial_codes) if pd.notna(x) else pd.NA
     ).astype('boolean')
 
     # planting_month from §4, joined on (plot_id, crop_code).
@@ -2408,7 +2457,7 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
     from lsms_library.transformations import U_UNKNOWN
 
     c = colmap
-    crop_map = _eth_crop_label_map()
+    crop_map = _eth_crop_label_map_for_wave(t)   # GH #1252: codes drift by wave
     pieces = []
 
     # ---- SEED (plot-crop) -------------------------------------------
