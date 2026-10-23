@@ -27,13 +27,14 @@ Key functions
   optional zero-padding. Auto-applied to ``idxvars`` by
   :func:`df_data_grabber`, but NOT to ``myvars`` — see ``CLAUDE.md``.
 - :func:`id_walk` — applies a country's ``updated_ids`` mapping to
-  rewrite household IDs into a canonical wave's coordinates.
-  Idempotent by construction: each wave's mapping is closure-resolved
-  via :func:`_close_id_map` before application, so running ``id_walk``
-  twice on the same DataFrame produces the same result. The
-  ``df.attrs['id_converted']`` flag remains as a fast-path
-  optimization — losing it (e.g. via :meth:`.set_index` or
-  :meth:`.merge`) is no longer a correctness hazard.
+  rewrite household IDs into a canonical wave's coordinates.  A
+  single-pass rename (GH #1245): every id goes to its own target, chains
+  are never followed.  Exactly once: each wave is classified from its
+  own ids (:func:`_walk_partition`) and an already-walked wave is left
+  alone, so running ``id_walk`` twice produces the same result.  The
+  ``df.attrs['id_converted']`` flag remains as a fast path; losing it
+  (e.g. via :meth:`.merge`, or a table derived from a served one) is not
+  a correctness hazard.
 - :func:`panel_ids` — returns households observed in at least two
   waves after applying ``id_walk``.
 - :func:`map_index` — remaps an old parquet's index structure to the
@@ -3443,10 +3444,12 @@ class RecursiveDict(UserDict):
 
     Used to collapse household-ID rewrite chains like ``A → B → C`` into
     a single lookup: ``RecursiveDict({'A': 'B', 'B': 'C'})['A'] == 'C'``.
-    Keys that are not themselves values are returned unchanged. Backs
-    :func:`id_walk` when applying a country's ``updated_ids`` mapping
-    across waves. See the "Panel ID Transitive Chains" section of
-    ``CLAUDE.md`` for the downstream consequences of getting this wrong.
+    Keys that are not themselves values are returned unchanged.  Its keys
+    are ``(wave, id)`` pairs, so a chain here crosses WAVES (the
+    ``panel_ids`` record); it is NOT how :func:`id_walk` applies a wave's
+    ``updated_ids`` map, which is a single-pass rename within one wave
+    (GH #1245).  See the "Panel ID Transitive Chains" section of
+    ``CLAUDE.md``.
     """
     def __init__(self,*arg,**kw):
       super(RecursiveDict, self).__init__(*arg, **kw)
@@ -3660,127 +3663,124 @@ def panel_ids(Waves: dict[str, Any] | pd.DataFrame) -> tuple[RecursiveDict, dict
         updated_wave[wave_year] = wave_matches
     return recursive_D, updated_wave
 
-def _close_id_map(mapping: dict[str, str], wave: str | None = None) -> dict[str, str]:
-    """Resolve transitive chains in an id-rename mapping.
+class IdWalkError(Exception):
+    """``id_walk`` cannot tell whether a wave's household ids are raw or walked.
 
-    ``pandas.DataFrame.rename(index=mapping)`` performs a single
-    substitution per index entry (``x -> mapping.get(x, x)``); it does
-    not iterate to a fixed point.  When ``mapping`` contains a chain
-    ``{A: B, B: C}`` the rename only advances each entry by one link,
-    leaving the result in a non-canonical state.  A *second* application
-    then advances the survivors another step, which is how
-    already-walked rows can collide with already-canonical rows and
-    produce duplicate ``(i, t)`` tuples.  This is the bug class fixed
-    in commit ``4db41a27`` (Burkina Faso 2021-22) by patching the
-    ``df.attrs`` propagation; closure-resolving the mapping fixes the
-    underlying non-idempotence at the source.
+    Raised for a wave whose ids are *mixed* -- some exist only before a walk,
+    others only after it -- or which hold nothing but ids that are both a
+    moving key and another key's target (see :func:`_walk_partition`).  Either
+    way, renaming would risk walking some rows twice and not renaming would
+    risk serving raw ids, so the walk refuses (GH #1245).
 
-    Given ``{A: B, B: C}`` returns ``{A: C, B: C}``: every value in the
-    returned mapping is a *terminal* id — it is never itself a key
-    (except for self-mappings, which are left intact as harmless
-    no-ops).  Applying the closed mapping twice is therefore the same
-    as applying it once.
-
-    Cycles (``A -> B -> A``) raise ``ValueError`` since they indicate
-    corrupt panel-id data — there is no consistent terminal id.
-
-    Parameters
-    ----------
-    mapping : dict[str, str]
-        One wave's slice of ``updated_ids``.
-    wave : str, optional
-        Wave label, used only in error messages.
-
-    Returns
-    -------
-    dict[str, str]
-        Closure-resolved mapping with the same domain as ``mapping``.
+    Subclasses ``Exception``, not ``RuntimeError`` / ``ValueError`` /
+    ``KeyError``: the derived-table and legacy-fallback paths in ``country.py``
+    catch those three and would quietly retry another build.
     """
-    closed: dict[str, str] = {}
-    for k in mapping:
-        # Walk until ``v`` is terminal: not a key, or self-mapped.
-        # A self-map is the natural fixed point and not a cycle.  Any
-        # other revisit of an id is a true cycle.
-        seen = [k]
-        v = mapping[k]
-        while v in mapping and mapping[v] != v:
-            if v in seen:
-                chain = ' -> '.join(seen + [v])
-                raise ValueError(
-                    f"Cycle detected in updated_ids"
-                    f"{f' for wave {wave!r}' if wave else ''}: {chain}"
-                )
-            seen.append(v)
-            v = mapping[v]
-        closed[k] = v
-    return closed
+
+
+def _walk_partition(mapping: dict[str, str]) -> tuple[frozenset, frozenset, frozenset]:
+    """Split one wave's ``updated_ids`` map into the id classes ``id_walk`` uses.
+
+    With ``K`` the keys that move (``mapping[k] != k``) and ``V`` their targets:
+
+    - ``raw_only = K - V``: an id that moves and is nobody's target.  It can
+      appear only BEFORE a walk -- after one, every moved row holds a target and
+      every unmoved row holds an id that is not a moving key.  Exact.
+    - ``walked_only = V - K``: a target that does not itself move.  It can
+      appear only AFTER a walk, provided no current-wave household that keeps
+      its id already holds it -- the condition under which the walk is
+      collision-free (``panel_ids.py`` guards and ``update_id`` ensure it).
+    - ``chained = K & V``: a moving key that is also another key's target.  It
+      appears on both sides, which is exactly why a closure-resolved map sent a
+      household to the wrong id (GH #1245) and why a second single-pass
+      application would move it again.
+    """
+    moving = {k: v for k, v in mapping.items() if k != v}
+    keys, targets = set(moving), set(moving.values())
+    return (frozenset(keys - targets), frozenset(targets - keys),
+            frozenset(keys & targets))
 
 
 def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: str = 'i') -> pd.DataFrame:
-    '''
-    Updates household IDs in panel data across different waves separately.
+    '''Re-key household ids into the panel's canonical ids, EXACTLY ONCE.
 
     Parameters:
         df (DataFrame): Panel data with a MultiIndex, including 't' for wave and 'i' (default) for household ID.
-        updated_ids (dict): A dictionary mapping each wave to another dictionary that maps original household IDs to updated IDs.
-            Format:
-                {wave_1: {original_id: new_id, ...},
-                 wave_2: {original_id: new_id, ...}, ...}
+        updated_ids (dict): ``{wave: {current_id: canonical_id, ...}, ...}``.
         hh_index (str): Index name for the household ID level (default is 'i').
 
-    Example:
-        updated_ids = {
-            '2013-14': {'0001-001': '101012150028', '0009-001': '101015620053', '0005-001': '101012150022'},
-            '2016-17': {'0001-002': '0001-001', '0003-001': '0005-001', '0005-001': '0009-001'}
-        }
+    Single-pass rename (GH #1245)
+    ------------------------------
+    Each wave's map is applied as ONE substitution, ``x -> mapping.get(x, x)``,
+    never following chains.  Within a wave the keys are that wave's raw ids and
+    the values are canonical (earlier-wave) ids: two namespaces sharing one
+    string space.  When a survey renumbers households (Burkina Faso 2021-22),
+    household ``X`` maps to ``T`` (its true earlier id) while the household
+    whose raw id is ``T`` maps to ``U``.  The old closure resolution
+    (``_close_id_map``) sent ``X`` on to ``U`` -- the wrong household -- which
+    is why Burkina's ``panel_ids.py`` dropped every such link.
 
-        In this example, IDs are updated independently for each wave.
-        Because the same original household ID across different waves may not represent the same household.
-        Specifically, household '0005-001' in wave '2016-17' corresponds to household '0009-001' from wave '2013-14', not '0005-001' from '2013-14'.
+    Exactly once
+    ------------
+    A single-pass rename is NOT idempotent when a map has such chains: a second
+    application moves ``T`` on to ``U``.  And frames are offered to ``id_walk``
+    more than once: ``_finalize_result`` re-walks any frame that has lost
+    ``attrs['id_converted']``, which a table DERIVED from an already-served one
+    always has (measured on d353b7ea7: ``food_quantities`` is walked twice,
+    Uganda ``nutrition`` three times).  So each wave decides from its own ids,
+    using the classes of :func:`_walk_partition`:
 
-    The function handles these wave-specific mappings separately, ensuring accurate household identification over time.
+    ============================  =========================================
+    the wave holds                action
+    ============================  =========================================
+    a ``raw_only`` id only        rename (unwalked)
+    a ``walked_only`` id only     leave as is (already walked)
+    both                          raise :class:`IdWalkError` (mixed)
+    neither, but a ``chained`` id raise :class:`IdWalkError` (undecidable)
+    neither, and no ``chained``   rename (a no-op on these ids)
+    ============================  =========================================
 
-    Idempotence
-    -----------
-    Each wave's mapping is closure-resolved via :func:`_close_id_map`
-    before application, so ``id_walk(id_walk(df, ui)) == id_walk(df, ui)``
-    by construction.  ``df.attrs['id_converted']`` is still set as a
-    fast-path hint — the framework checks it in ``_finalize_result`` to
-    skip a redundant pass — but losing the flag (e.g. via
-    :meth:`.set_index`, :meth:`.merge`) is no longer a correctness
-    hazard.  See ``tests/test_id_walk.py`` for the regression cases.
+    So ``id_walk(id_walk(df)) == id_walk(df)`` again, now by detection rather
+    than by closure, and losing ``attrs`` is not a correctness hazard.  The
+    flag is still set: callers use it to skip the work.  A wave with no map, or
+    an empty one, is returned untouched.  See ``tests/test_id_walk.py``.
     '''
     # Guard: a frame with no rows (e.g. a wave whose source yielded nothing)
     # or one lacking a 't' level has no waves to split on; the final
     # ``pd.concat([])`` would otherwise raise "No objects to concatenate".
-    # Empty-in -> empty-out, and the id_converted flag keeps it idempotent.
     if df.empty or 't' not in (df.index.names or []):
         df.attrs['id_converted'] = True
         return df
 
-    #seperate df into different waves:
     dfs = {}
-    waves = df.index.get_level_values('t').unique()
-    for wave in waves:
-        dfs[wave] = df[df.index.get_level_values('t') == wave].copy()
-    #update ids for each wave
-    for wave, df_wave in dfs.items():
-        #update ids
-        if wave in updated_ids and updated_ids[wave]:
-            closed = _close_id_map(updated_ids[wave], wave=wave)
-            df_wave = df_wave.rename(index=closed, level=hh_index)
-            #update the dataframe with the new ids
-            dfs[wave] = df_wave
-        else:
-            continue
-    #combine the updated dataframes
+    for wave in df.index.get_level_values('t').unique():
+        df_wave = df[df.index.get_level_values('t') == wave].copy()
+        mapping = updated_ids.get(wave)
+        if mapping:
+            raw_only, walked_only, chained = _walk_partition(mapping)
+            ids = set(df_wave.index.get_level_values(hh_index).unique())
+            n_raw, n_walked = len(ids & raw_only), len(ids & walked_only)
+            if n_raw and n_walked:
+                raise IdWalkError(
+                    f"id_walk: wave {wave!r} holds {n_raw} id(s) that exist only "
+                    f"before a walk and {n_walked} that exist only after one -- "
+                    f"unwalked and walked rows mixed in one frame, or a crosswalk "
+                    f"target held by a household that keeps its id; e.g. "
+                    f"{sorted(ids & raw_only)[:3]} / {sorted(ids & walked_only)[:3]}")
+            if not n_raw and not n_walked and ids & chained:
+                raise IdWalkError(
+                    f"id_walk: wave {wave!r} holds only ids that are both a moving "
+                    f"key and another key's target "
+                    f"(e.g. {sorted(ids & chained)[:3]}), so whether it is already "
+                    f"walked cannot be told from its ids (GH #1245)")
+            if not n_walked:
+                df_wave = df_wave.rename(index=mapping, level=hh_index)
+        dfs[wave] = df_wave
     df = pd.concat(dfs.values(), axis=0)
-
-    # df= df.rename(index=updated_ids,level=['t', hh_index])
     df.attrs['id_converted'] = True
     return df
 
-        
+
 def conversion_table_matching_global(df: pd.DataFrame, conversions: pd.DataFrame, conversion_label_name: str, num_matches: int = 3, cutoff: float = 0.6) -> tuple[pd.DataFrame, dict[str, str]]:
     """
     Returns a Dataframe containing matches and Dictionary mapping top choice

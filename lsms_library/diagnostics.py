@@ -1667,17 +1667,20 @@ def _check_panel_ids_targets_exist(country) -> Check:
 def _check_id_walk_idempotent(country) -> Check:
     """Applying ``id_walk`` to an already-canonical spine must be a no-op.
 
-    The framework sets ``df.attrs['id_converted'] = True`` after
-    ``id_walk`` to prevent double-application. Operations like
-    ``merge()`` and ``set_index()`` drop ``.attrs`` in pandas 2.x, and
-    any downstream helper that touches a DataFrame without preserving
-    ``.attrs`` can cause ``id_walk`` to run twice — which for countries
-    with transitive ID chains produces duplicate rows.
+    ``id_walk`` is a single-pass rename (GH #1245), which is NOT idempotent
+    on its own when a wave's map has a chain (Burkina Faso 2021-22: 80
+    households move onto an id another household moves off; a second pass
+    would move them again).  Exactly-once rests on ``id_walk`` recognising
+    an already-walked wave from its own ids and leaving it alone -- the
+    ``df.attrs['id_converted']`` flag is only a fast path, and a table
+    derived from a served one arrives without it.
 
-    This check reruns ``id_walk`` manually on the spine and confirms
-    the row count and index set are unchanged. It would have caught
-    the Burkina Faso 2021-22 attrs bug from commit 4db41a27 (392
-    duplicate tuples out of ~78,000).
+    This check clears the flag, reruns ``id_walk`` on the served spine and
+    confirms the row count and index set are unchanged.  A served spine
+    that ``id_walk`` refuses (``IdWalkError``: raw and walked ids mixed in
+    one wave) fails the check.  The pre-closure form of this check would
+    have caught the Burkina Faso 2021-22 attrs bug from commit 4db41a27
+    (392 duplicate tuples out of ~78,000).
     """
     try:
         from .local_tools import id_walk
@@ -1698,9 +1701,10 @@ def _check_id_walk_idempotent(country) -> Check:
 
         # Re-apply id_walk. Even though the spine already went through
         # _finalize_result once, running id_walk again on a clean copy
-        # should produce the same set of (i, t) tuples.
+        # should produce the same set of (i, t) tuples: id_walk must
+        # recognise every walked wave and leave it alone (GH #1245).
         #
-        # Clear .attrs so id_walk doesn't early-exit on the flag.
+        # Clear .attrs so the flag cannot be what saves it.
         replayed = spine.copy()
         replayed.attrs = {}
         replayed = id_walk(replayed, ui, hh_index="i")
