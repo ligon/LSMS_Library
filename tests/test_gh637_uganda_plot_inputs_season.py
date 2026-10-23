@@ -32,7 +32,10 @@ WHAT THESE TESTS DO NOT CLAIM.  84,216 is NOT "every reported line-item".  The
 builder's de-dup step still discards 273 of the 84,489 rows it constructs --
 135 deleted outright by ``groupby(dropna=True)`` because ``plot`` is NaN, and
 138 merged away across 135 same-season duplicate groups, every one of them an
-``input='Seed'`` pair from AGSEC4A.  That residual is pre-existing (pre-fix it
+``input='Seed'`` pair from AGSEC4A.  [GH #1120 D3, 2026-10-23: the 135 now
+carry ``plot_id = 'unknown_plot'`` and are served -- 2009-10's 130 as 119 rows
+(11 Seed keys fold two plot-less lines each, with no conflicting reported
+value), 2011-12's 5 as 5 -- so the pinned total is 84,340.]  That residual is pre-existing (pre-fix it
 was 1,470), is documented with per-wave counts in
 ``uganda.plot_inputs_for_wave``, and is tracked on GH #637.  The numbers below
 are POST-COLLAPSE row counts, and they are pinned so that residual cannot grow
@@ -76,16 +79,20 @@ pytestmark = requires_s3
 # is not the same as the number of reported line-items).  Pre-fix the API
 # returned the sum of these MINUS 1,197 (230/179/157/113/92/172/254
 # respectively).
+# GH #1120 D3 (2026-10-23): 2009-10 +119 and 2011-12 +5 are exactly the rows
+# whose blank parcel/plot id used to make `plot_id` NaN, which the de-dup step
+# DELETED; they now carry 'unknown_plot' (cold base-vs-branch build: 124 rows
+# added, all 'unknown_plot', 0 removed, 0 changed on the common rows).
 EXPECTED_ROWS_BY_WAVE = {
-    '2009-10': 13993,
+    '2009-10': 14112,
     '2010-11': 13554,
-    '2011-12': 12353,
+    '2011-12': 12358,
     '2013-14': 11834,
     '2015-16': 11981,
     '2018-19': 10367,
     '2019-20': 10134,
 }
-EXPECTED_ROWS = sum(EXPECTED_ROWS_BY_WAVE.values())          # 84_216
+EXPECTED_ROWS = sum(EXPECTED_ROWS_BY_WAVE.values())          # 84_340
 
 
 @pytest.fixture(scope='module')
@@ -188,26 +195,33 @@ def test_2013_14_nan_plot_seed_row_survives(plot_inputs):
 
     Adding `season` makes the 2013-14 index unique, so the builder's de-dup
     collapse no longer runs in that wave -- and therefore no longer DELETES a
-    row whose `plot` is NaN via ``groupby(..., dropna=True)``.  So one of the
+    row whose `plot` is blank via ``groupby(..., dropna=True)``.  So one of the
     "+113 recovered" rows in 2013-14 is not a season split at all, and
     2013-14's `Quantity` total rises by 3.0 (335,392.005 -> 335,395.005).
     Every other wave's total is unchanged, which is why "Quantity totals are
     unchanged" is not a true statement about this change.
 
+    Since GH #1120 D3 (2026-10-23) the row's `plot_id` is the registered
+    epistemic sentinel ``'unknown_plot'``, no longer NaN.  It is still the
+    wave's only plot-less row (the raw AGSEC4A has one blank parcel+plot line).
+
     Fails pre-fix: the row is not in the output at all.
     """
     flat = plot_inputs.reset_index()
-    row = flat[(flat['t'] == '2013-14') & flat['plot_id'].isna()
+    n_nan = int((flat['t'] == '2013-14').mul(flat['plot_id'].isna()).sum())
+    assert n_nan == 0, f'{n_nan} 2013-14 row(s) with a NaN plot_id'
+    row = flat[(flat['t'] == '2013-14') & (flat['plot_id'] == 'unknown_plot')
                & (flat['input'] == 'Seed') & (flat['j'] == 'Cassava')]
-    assert len(row) == 1, (
-        f'expected exactly one 2013-14 NaN-`plot_id` Seed/Cassava row (household '
-        f'2113000606, Quantity 3.0, "Sack (100 kgs)"); got {len(row)}.  '
-        f'Pre-fix it was deleted by `groupby(dropna=True)` inside the de-dup '
-        f'collapse (GH #637).'
+    n = len(row)
+    assert n == 1, (
+        f'expected exactly one 2013-14 unknown_plot Seed/Cassava row '
+        f'(Quantity 3.0, "Sack (100 kgs)"); got {n}.  Pre-fix it was deleted '
+        f'by `groupby(dropna=True)` inside the de-dup collapse (GH #637).'
     )
-    assert float(row['Quantity'].iloc[0]) == 3.0
-    total = flat.loc[flat['t'] == '2013-14', 'Quantity'].sum()
-    assert round(float(total), 3) == 335395.005, (
+    q = float(row['Quantity'].iloc[0])
+    assert q == 3.0, f'{q} != 3.0'
+    total = round(float(flat.loc[flat['t'] == '2013-14', 'Quantity'].sum()), 3)
+    assert total == 335395.005, (
         f'2013-14 Quantity total is {total}, expected 335395.005 '
         f'(pre-fix: 335392.005)'
     )

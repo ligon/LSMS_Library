@@ -7,7 +7,8 @@ These codify the invariants restored by:
   same canonical string encoding (no float-stringification mismatch).
 * GH #197: ``household_characteristics()`` warns loudly when roster
   rows are dropped due to NaN ``v``; the warning names the per-wave
-  count.
+  count.  Since GH #1120 D2 Uganda has no such rows, so the test now
+  asserts the warning does NOT fire.
 * GH #161: ``cluster_features()`` is at ``(t, v)`` grain with no
   duplicate keys, no stray ``i`` column, and ``District`` values are
   not float-stringified (no ``"101.0"`` -> the canonical ``"101"``).
@@ -57,8 +58,8 @@ def uga_cf(uga):
 
 
 @pytest.fixture(scope='module')
-def uga_hc_warnings(uga):
-    """Capture warnings emitted by ``household_characteristics()`` once.
+def uga_hc(uga):
+    """``household_characteristics()`` and the warnings it emits, built once.
 
     Skips the dependent tests cleanly on environments without DVC/S3
     credentials (where ``household_characteristics()`` triggers a
@@ -67,8 +68,8 @@ def uga_hc_warnings(uga):
     try:
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter('always')
-            _ = uga.household_characteristics()
-        return list(caught)
+            hc = uga.household_characteristics()
+        return hc, list(caught)
     except Exception as exc:  # pragma: no cover
         pytest.skip(f"household_characteristics() failed: {exc!r}")
 
@@ -113,29 +114,34 @@ class TestVEncodingMatchesAcrossTables:
 # ---------------------------------------------------------------------------
 
 
-class TestSilentHHDropWarns:
-    """``household_characteristics()`` must warn when groupby drops NaN-v
-    roster rows, naming the per-wave row count."""
+class TestNoRosterHouseholdFallsIntoTheMoverBucket:
+    """GH #197 / #268 made the NaN-``v`` roster rows loud: they are kept under
+    the SHARED ``'Mover'`` sentinel and a per-wave warning names them.
 
-    def test_warning_emitted_with_per_wave_breakdown(self, uga_hc_warnings):
-        # Some Uganda waves have NaN-v roster rows (panel-refresh movers,
-        # 2018-19 parish-name gaps).  Since GH #268 these rows are no
-        # longer silently dropped -- they are retained under a 'Mover'
-        # sentinel and the warning reports the per-wave count.  The
-        # warning must still fire and name the affected waves.
-        # ``uga_hc_warnings`` is the captured list from the module-scoped
-        # fixture (skips on no-DVC environments).
+    Since GH #1120 D2 (@ligon 2026-10-23) Uganda has no such rows: every
+    household ``sample()`` holds has a ``v`` -- a cluster, or its own
+    ``moved-{hhid}`` singleton -- and the frame holds every roster household
+    (2018-19's 66 GSEC2/AGSEC1-only households included).  So the warning
+    must NOT fire, and no household may land in the shared bucket, where it
+    would be welded to every other unlocated household.  Before #1120 this
+    class asserted the opposite (that the warning fires): 2009-10 110 /
+    2013-14 7 / 2018-19 346 / 2019-20 3 roster rows had no ``v``.
+    """
+
+    def test_no_sentinel_warning(self, uga_hc):
+        _, caught = uga_hc
         relevant = [
-            w for w in uga_hc_warnings
+            w for w in caught
             if 'household_characteristics' in str(w.message)
             and 'sentinel' in str(w.message)
         ]
-        assert relevant, (
-            "Expected a UserWarning naming the sentinel-'Mover' roster rows; "
-            f"got: {[str(w.message)[:80] for w in uga_hc_warnings]}"
-        )
-        msg = str(relevant[0].message)
-        assert 'per-wave' in msg, f"Warning missing per-wave breakdown: {msg}"
+        n = len(relevant)
+        assert n == 0, f"{n} 'Mover' sentinel warning(s): a roster row has no v"
+
+    def test_no_household_in_the_mover_bucket(self, uga_hc):
+        hc, _ = uga_hc
+        n = int((hc.index.get_level_values('v') == 'Mover').sum())
+        assert n == 0, f"{n} household(s) in the shared 'Mover' bucket"
 
 
 # ---------------------------------------------------------------------------
