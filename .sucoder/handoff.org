@@ -75,6 +75,11 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - Lanes now running: #1123 red-team; #1234 (map_index 'unit' -> Unknown; census + cost first); #1059 (Burkina District spelling table on the #971/#811 Region precedent).
 - *Ordering note:* #1225 (=_coerce_datetime_column= empty MultiIndex) should wait for #1233, after which it costs 0 hashes.
 
+- *PR #1241 open* (#1123: Niger 2018-19/2021-22, Senegal, CotedIvoire seed-slot collisions on the #1189 pattern, plus the make-backend whole-wave hazard closed); #1123 narrowed to Niger 2011-12/2014-15 (design decision: a slot level).  Filed *#1235* earlier (CotedIvoire 350).
+- #1059 done (96 -> 45 District labels; 3 genuine province disagreements reported); red-team running.
+- *Filed #1240 (HIGH)*: Burkina panel_ids.json -- 1,088 of 3,132 2018-19 targets lack the '0' separator; verified the API serves those 2021-22 households under ids absent from 2018-19 (2,053 of 3,227 link).  Fix agent running (generator + regenerate the JSON + linkage checks).
+- #1234 (map_index 'unit') agent still running.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
