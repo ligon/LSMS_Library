@@ -189,23 +189,25 @@ def test_raw_oracle_served_label_is_the_files_own(cp, wave):
 
 @pytest.mark.requires_s3
 def test_served_relabelled_rows_and_perennial(cp):
-    """Measured cold 2026-10-23: W1 serves 5 Cactus / 1 Roman rows, W2 35 / 11
-    (the issue's 45 cactus rows are raw §9 rows; 5 W2 ones have neither unit
-    nor quantity and are not served).  No W1/W2 row is 'Red Kidney Beans' or
-    'Mung bean'.  ``perennial``: True on every Cactus row, False on every Red
-    Kidney Beans row (692 / 245 / 291 in W3 / W4 / W5 were True)."""
+    """Measured cold 2026-10-23: W1 serves 5 Cactus / 1 Roman rows, W2 37 / 12
+    (35 / 11 before the same day's ruling that a row carrying a sale value is
+    never dropped; the issue's 45 cactus rows are raw §9 rows, 3 W2 ones
+    have no unit, no quantity and no sale and are not served).  No W1/W2 row
+    is 'Red Kidney Beans' or 'Mung bean'.  ``perennial``: True on every
+    Cactus row, False on every Red Kidney Beans row (692 / 245 / 291 in W3 /
+    W4 / W5 were True; 693 / 247 / 292 rows after the ruling)."""
     t = np.asarray(cp.index.get_level_values("t"), dtype=object)
     j = np.asarray(cp.index.get_level_values("j"), dtype=object)
     n = lambda w, lab: int(((t == w) & (j == lab)).sum())  # noqa: E731
     assert (n("2011-12", "Cactus"), n("2011-12", "Roman")) == (5, 1)
-    assert (n("2013-14", "Cactus"), n("2013-14", "Roman")) == (35, 11)
+    assert (n("2013-14", "Cactus"), n("2013-14", "Roman")) == (37, 12)
     for w in ("2011-12", "2013-14"):
         assert n(w, "Red Kidney Beans") == 0 and n(w, "Mung bean") == 0
     per = cp["perennial"]
     assert per[j == "Cactus"].eq(True).all()
     assert per[j == "Red Kidney Beans"].eq(False).all()
     assert {w: n(w, "Red Kidney Beans") for w in ("2015-16", "2018-19", "2021-22")} \
-        == {"2015-16": 692, "2018-19": 245, "2021-22": 291}
+        == {"2015-16": 693, "2018-19": 247, "2021-22": 292}
 
 
 @pytest.mark.requires_s3

@@ -1715,6 +1715,20 @@ cold build after clearing the Ethiopia cache):
 | attached, then dropped | 0                  | *299 / 22 / 3,909*       | *62 / 7 / 7,430*         |
 | attached and served | 563 / 160 / 61,284    | 4,474 / 1,390 / 963,706  | 4,497 / 1,283 / 1,062,876 |
 
+*UPDATED 2026-10-23 (@ligon ruling: a row carrying a sale value is never
+dropped -- see "Empty-row filter keeps a row that carries a sale value"
+below).*  The two bottom rows are now:
+
+| class            | 2011-12                  | 2013-14                  | 2015-16                  |
+|------------------+--------------------------+--------------------------+--------------------------|
+| attached, then dropped | 0                  | 90 / 0 / 0               | 0                        |
+| attached and served | 563 / 160 / 61,284    | 4,683 / 1,412 / 967,615  | 4,559 / 1,290 / 1,070,306 |
+
+No line that brings a sale value can be in class 7 any more (asserted in
+=_report_sect12_sales=).  W2's 90 are lines that fill NOTHING -- Q6 not No,
+Q7 and Q8 blank -- attached to a §9 row with no unit, no quantity and no
+sale, which is still dropped as empty.  The other six classes are unchanged.
+
 *Class 7, "attached, then dropped"* (GH #820 round 2, found by an
 independent review -- the first version of this table called every
 single-plot line "attached").  The line attaches to its only §9 plot, but
@@ -1725,11 +1739,16 @@ filter is unchanged: those §9 rows were dropped on development too, with or
 without a sale.  Minimal case (W2): a single-plot §9 row with no unit and
 no quantity, and a §12 line with Q8 > 0 in Kg -- the Kg quantity cannot
 join a row with no unit, so the row keeps no =Quantity_sold= and goes.
+(*Superseded 2026-10-23*: the filter now keeps a row with a =Value_sold=;
+such a row is served as =u= ='Other (Specify)'= with its value.)
 
 The same filter drops rows carrying a *§11* sale too, measured on
 development's own build (rows with a positive / any =Value_sold= removed by
 it): W1 0 / 0, W2 1 / 155 (1,500 Birr), W3 2 / 17 (7,750), W4 27 / 171
-(41,442), W5 32 / 277 (33,482).  Not changed here.
+(41,442), W5 32 / 277 (33,482).  Not changed here.  (*Changed
+2026-10-23* by the ruling below: every one of these rows is kept, except the
+3 W2 and 3 W4 whose value was the all-blank group GH #1253 stopped serving
+as 0.)
 
 *The W2 chain, reconciled* (positive =Value_sold=): 1,412 positive lines
 attach (classes 7 + 8) -> they fill *1,464* §9 rows before the filter,
@@ -1739,7 +1758,9 @@ once, identically -> the filter removes the 22 rows of the 22 positive class-7 l
 de-duplicates those 52 identical rows (losslessly: =GrainCollapseWarning=
 "destroyed" is 2 before and after) -> *1,390* served rows, one per positive
 class-8 line.  W3: 1,290 -> 1,290 -> 1,283 (7 dropped; no duplicates) ->
-1,283.  W1: 160 throughout.
+1,283.  W1: 160 throughout.  *Since the 2026-10-23 ruling* the filter
+removes none of them: W2 1,464 -> 1,464 -> 1,412 served (one per positive
+attached line), W3 1,290 -> 1,290 -> 1,290.
 
 Rules, each the conservative choice where no precedent decides it:
 - *§11 wins a collision* and the two are never summed: every row §11
@@ -2035,7 +2056,8 @@ pomegranate tree would be perennial, but adding it is a new judgement, not
 a drift fix); 86 serves no crop row outside W1.
 
 Measured cold, the #1253 commit -> this change: 85,519 rows both;
-re-labelled =crop_production= rows W1 5 Cactus + 1 Roman, W2 35 + 11 (the
+re-labelled =crop_production= rows W1 5 Cactus + 1 Roman, W2 35 + 11 (37 +
+12 after the empty-row-filter ruling below; the
 issue's "45" is raw §9 rows: 5 + 40; 5 W2 cactus rows have neither unit nor
 quantity and are removed by the empty-row filter); with the before-frame
 re-labelled the index is identical, and the only other cells that move are
@@ -2097,7 +2119,8 @@ empty-row filter, on served rows only.
 
 Measured cold, the #1252 commit -> this change: 85,519 rows both, identical
 index; the only cells that move are =Derivation= <NA> -> the key on 3,713 W4
-and 3,723 W5 rows (588 / 534 with a positive =Value_sold=; top crops Coffee
+and 3,723 W5 rows (3,796 / 3,875 after the empty-row-filter ruling below;
+588 / 534 with a positive =Value_sold=; top crops Coffee
 786 / 847, Chat 651 / 627, Banana 423 / 529, Enset 401 / 377, Mango 356 /
 353).  An independent recomputation from the raw §4 / §9 files gives
 exactly the stamped set (0 mismatches either way).  Against =perennial=:
@@ -2107,6 +2130,51 @@ exactly the stamped set (0 mismatches either way).  Against =perennial=:
 not flag).  Downstream (=harvest_kg=, =gross_crop_revenue=, the within-wave
 =median_price_valuation=) and every audit report identical: the stamp moves
 no value.
+
+** Empty-row filter keeps a row that carries a sale value (@ligon ruling, 2026-10-23)
+
+=crop_production_for_wave= drops a §9 row with no unit and nothing to serve
+as an empty placeholder.  The filter was =u= missing AND no =Quantity= AND
+no =Quantity_sold=; it ignored =Value_sold=, so it also dropped rows that
+§11 or §12 had given a sale value (the GH #820 review's finding: §11 rows
+with a positive value 1 / 2 / 27 / 32 in W2-W5, 155 / 17 / 171 / 277 with
+any value; §12 class 7, 29 positive lines, 11,339 Birr).  Ruling: a row
+carrying a sale value is never dropped -- the filter now also requires
+=Value_sold= to be missing.  Such a row is served with =u= ='Other
+(Specify)'= (the existing tag for a row with no recorded unit) and only its
+=Value_sold= (unit-free; no quantity can attach to a row with no unit).  A
+"No" is a recorded sale value of 0, so its row is kept too.
+
+Measured cold, the GH #1256 commit -> this change, through
+=Country('Ethiopia').crop_production()=: 85,519 -> 86,403 rows; *every
+pre-existing row identical*; every added row has =u= ='Other (Specify)'=,
+no =Quantity= / =Quantity_sold=, and a =Value_sold=:
+
+| wave    | §11 rows: positive / zero | Birr   | §12 rows: positive / zero | Birr  | total |
+|---------+---------------------------+--------+---------------------------+-------+-------|
+| 2011-12 | 0 / 0                     | 0      | 0 / 0                     | 0     |     0 |
+| 2013-14 | 1 / 151                   | 1,500  | 22 / 187                  | 3,909 |   361 |
+| 2015-16 | 2 / 15                    | 7,750  | 7 / 55                    | 7,430 |    79 |
+| 2018-19 | 27 / 141                  | 41,442 | --                        | --    |   168 |
+| 2021-22 | 31 / 245                  | 33,382 | --                        | --    |   276 |
+
+Reconciliation with the review's counts (development's own build): the §11
+rows kept are its 155 / 17 / 171 / 277 rows-with-a-value less the 3 W2 and
+3 W4 rows whose "value" was the all-blank 0 GH #1253 removed (those rows
+are genuinely empty and still dropped); W5's 277 wave-parquet rows (32
+positive, 33,482 Birr) serve as 276 (31, 33,382) because two of them are
+the same Gishita plot listed twice in §9, identical but for =intercropped=:
+the core collapse serves one (=GrainCollapseWarning= W5 +1 group, +1 row
+destroyed; the other three waves' reports unchanged).  §12: all 29
+positive lines (11,339 Birr) now served; class 7 holds no line with a
+value.  Stamps: =sect12-sale-period= W2 4,463 -> 4,672, W3 4,495 -> 4,557;
+=permanent-crop-12-month-window= W4 3,713 -> 3,796, W5 3,723 -> 3,875.
+=NullIndexKeyWarning= (=v= missing): 382 -> 387 rows (W4 +4, W5 +1 -- added
+rows of households =sample()= does not carry; the W4 orphan rate noted under
+"Household id emitted as i").  Downstream: =gross_crop_revenue= +5,409 /
++15,180 / +41,442 / +33,382 Birr in W2-W5 (+30 / +7 / +24 / +45
+households); =harvest_kg= and the within-wave =median_price_valuation=
+identical (the added rows carry no quantity).
 
 ** Crop-side WB conversion factors: held, unwired (2026-09-09)
 

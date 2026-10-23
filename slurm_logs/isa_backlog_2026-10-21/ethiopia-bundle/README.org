@@ -45,3 +45,10 @@ test, runs it there, and deletes the copy.
 The §4 =s4q15= by-crop tabulation (=scripts/s4q15.py=) and the §11
 permanent-block tabulation (=scripts/perm_block2.py=) are quoted in
 =Ethiopia/_/CONTENTS.org=.
+
+* Ruling (@ligon, 2026-10-23) -- the empty-row filter keeps a row that carries a sale value
+
+| file | what |
+|------+------|
+| =filter_api_diff_prev_commit_vs_branch.json= | cold builds, #1256 commit vs this commit: rows added by wave / module (§11 or §12) / value (positive or zero), their Birr, their =u=, their =Derivation=; every pre-existing row asserted identical |
+| =filter_downstream_reports_and_sect12_classes.json= | downstream; grain / null-index / quantity report counts (no identifiers); the =Sect12SaleWarning= class 7 and class 8 after the change |

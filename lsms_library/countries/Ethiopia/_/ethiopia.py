@@ -1959,11 +1959,13 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
        two, so a fill would change which row is served for a key that is
        already a GrainCollapseWarning.
     7. *attached, then dropped* -- the line attached to its plot, but every
-       §9 row it attached to is then removed by the build's existing
-       empty-row filter in :func:`crop_production_for_wave` (``u`` missing,
-       no ``Quantity``, no ``Quantity_sold``; it never looks at
-       ``Value_sold``).  Counted there, after the filter; the filter itself
-       is unchanged.
+       §9 row it attached to is then removed by the build's empty-row filter
+       in :func:`crop_production_for_wave` (``u`` missing and nothing to
+       serve).  Since the 2026-10-23 ruling that filter keeps any row with a
+       ``Value_sold``, so a line that carries a sale value can no longer land
+       here (asserted in :func:`_report_sect12_sales`); only a line that
+       filled nothing (Q6 not No, Q7 and Q8 blank) can, on a row that is
+       genuinely empty.  Counted there, after the filter.
     8. *attached and served* -- exactly one §9 plot: ``Value_sold`` is
        filled, and ``Quantity_sold`` where the sale unit equals the row's
        harvest ``u`` (as for §11; a §12 sale with no recorded unit attaches
@@ -2137,6 +2139,10 @@ def _report_sect12_sales(t, rep, kept):
     survived = pd.MultiIndex.from_frame(att[['_holder', '_code']]).isin(alive)
     rep['attached_then_dropped'] = _sect12_tally(att[~survived])
     rep['attached'] = _sect12_tally(att[survived])
+    # A row carrying a sale value is never dropped (ruling 2026-10-23): no
+    # line that brought a Value_sold may be in class 7.
+    assert att.loc[~survived, 'Value_sold'].isna().all(), \
+        f"{t}: §12 lines with a sale value were dropped by the empty-row filter"
     stamped = kept['Derivation'] == SECT12_SALE_DERIVATION if 'Derivation' in kept else None
     rep['rows_stamped_served'] = int(stamped.fillna(False).sum()) if stamped is not None else 0
     rep['rows_positive_value_served'] = int(
@@ -2436,14 +2442,20 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     out = out.dropna(subset=['i', 'plot_id', 'j'])
     # `u` is an index level (cannot be null).  A row may legitimately
     # report a quantity with an unrecorded unit -> tag it 'Other (Specify)'
-    # (a value already in the `u` table); rows with neither a quantity nor
-    # a recorded unit are empty placeholders -> drop.  (This filter does not
-    # look at Value_sold, so it also drops a row that carries a sale VALUE
-    # but no unit, quantity or sold quantity -- for §11 as for §12.  Left as
-    # it is; §12's casualties are counted below as class 7.  GH #820.)
+    # (a value already in the `u` table); rows with no recorded unit and
+    # NOTHING to serve -- no quantity, no sold quantity, no sale value --
+    # are empty placeholders -> drop.
+    #
+    # A row carrying a sale VALUE is never dropped (@ligon ruling,
+    # 2026-10-23, on the GH #820 review's finding): this filter used to
+    # ignore Value_sold, so a §9 row with no unit and no quantity lost the
+    # §11 or §12 sale attached to it (§11: 1 / 2 / 27 / 32 rows with a
+    # positive value in W2-W5; §12: 29 positive lines, 11,339 Birr).  Such a
+    # row is now served with u = 'Other (Specify)' (the no-unit tag above)
+    # and only its Value_sold, which is unit-free.
     empty_u = out['u'].isna()
     out = out[~(empty_u & out['Quantity'].isna()
-                & out['Quantity_sold'].isna())]
+                & out['Quantity_sold'].isna() & out['Value_sold'].isna())]
     if rep12 is not None:
         # The private keys are still on the frame: the §12 report needs them
         # to tell an attached line that SURVIVED the two filters above from

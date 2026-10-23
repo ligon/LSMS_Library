@@ -161,8 +161,15 @@ def test_sect11_wins_a_collision_and_is_never_summed_with_sect12(eth):
 
 
 def test_sect12_adds_no_row_and_moves_no_other_cell(eth):
+    """§12 adds no §9 row and moves no cell §11 filled.  Since the 2026-10-23
+    ruling that a row carrying a sale value is never dropped, a §9 row that
+    would have been dropped as EMPTY (no unit, no quantity) is kept when §12
+    gives it a value -- H9, the one such row here; every other row is equal."""
     base, _ = _build(eth, with12=False)
     new, _ = _build(eth)
+    h9 = new.index.get_level_values("plot_id").str.startswith("H9_")
+    assert int(h9.sum()) == 1
+    new = new[~h9]
     assert base.index.equals(new.index)
     other = [c for c in base.columns if c not in ("Quantity_sold", "Value_sold")]
     pd.testing.assert_frame_equal(base[other], new[other])
@@ -176,24 +183,33 @@ def test_every_unattached_class_is_counted_in_the_warning(eth):
     _, msgs = _build(eth)
     m = msgs[0]
     assert "read 11 lines" in m
-    assert "attached and served 3 lines" in m          # H1, H6, H7
+    assert "attached and served 4 lines" in m          # H1, H6, H7, H9
     for cls, lines in [("placeholder", 1), ("repeated", 2), ("collides_s11", 1),
                        ("no_s9_row", 1), ("several_s9_plots", 1),
-                       ("folded_key", 1), ("attached_then_dropped", 1)]:
+                       ("folded_key", 1), ("attached_then_dropped", 0)]:
         assert re.search(rf"\b{cls} {lines}/", m), (cls, m)
-    assert "attached_then_dropped 1/1/25" in m           # H9's Q8 = 25 Birr
+    # H9 used to be class 7 (1/1/25): its only §9 row has no unit and no
+    # quantity, and the empty-row filter ignored Value_sold.  A row carrying a
+    # sale value is never dropped now (ruling 2026-10-23).
+    assert "attached_then_dropped 0/0/0" in m
     assert "kept as reported: 1" in m
 
 
-def test_attached_then_dropped_is_the_existing_empty_row_filter(eth):
-    """Class 7 (GH #820 round 2): H9's §12 sale attaches to its only §9 row,
-    which records neither a unit nor a quantity, and the build's existing
-    empty-row filter (it never looks at Value_sold) then removes the row.
-    The filter is unchanged: the row is gone with or without §12."""
+def test_a_row_carrying_a_sect12_sale_is_no_longer_dropped(eth):
+    """Former class 7 (GH #820 round 2): H9's §12 sale attaches to its only §9
+    row, which records neither a unit nor a quantity.  The empty-row filter
+    used to ignore Value_sold and remove the row; since the 2026-10-23 ruling
+    a row carrying a sale value is never dropped, so H9 is served with its
+    25 Birr, the no-unit tag 'Other (Specify)' and the §12 stamp.  Without
+    §12 the row carries nothing and is still dropped."""
     base, _ = _build(eth, with12=False)
     new, _ = _build(eth)
-    for df in (base, new):
-        assert not df.index.get_level_values("plot_id").str.startswith("H9_").any()
+    assert not base.index.get_level_values("plot_id").str.startswith("H9_").any()
+    h9 = _row(new, "H9", "Sugar Cane")
+    assert h9["Value_sold"].tolist() == [25.0]
+    assert h9["Quantity"].isna().all() and h9["Quantity_sold"].isna().all()
+    assert list(h9.index.get_level_values("u")) == ["Other (Specify)"]
+    assert list(h9["Derivation"]) == ["Ethiopia::crop_production::sect12-sale-period"]
 
 
 def test_derivation_stamp_is_on_exactly_the_rows_sect12_filled(eth):
@@ -201,6 +217,11 @@ def test_derivation_stamp_is_on_exactly_the_rows_sect12_filled(eth):
     new, _ = _build(eth)
     key = eth.SECT12_SALE_DERIVATION
     assert key == "Ethiopia::crop_production::sect12-sale-period"
+    # H9's row exists only because §12 gave it a value (ruling 2026-10-23: a
+    # row carrying a sale value is never dropped); it carries the key.
+    h9 = new.index.get_level_values("plot_id").str.startswith("H9_")
+    assert list(new.loc[h9, "Derivation"]) == [key]
+    new = new[~h9]
     filled = ((base["Value_sold"].isna() & new["Value_sold"].notna())
               | (base["Quantity_sold"].isna() & new["Quantity_sold"].notna()))
     stamped = new["Derivation"] == key
@@ -379,7 +400,9 @@ def test_the_stamp_rides_to_the_served_table(cp):
     d = cp["Derivation"]
     t = cp.index.get_level_values("t")
     got = {w: int(((d == key).fillna(False) & (t == w)).sum()) for w in sorted(set(t))}
-    assert got == {"2011-12": 544, "2013-14": 4463, "2015-16": 4495,
+    # 4,463 / 4,495 before the 2026-10-23 empty-row-filter ruling: W2's 209 and
+    # W3's 62 stamped rows with no unit and no quantity are no longer dropped.
+    assert got == {"2011-12": 544, "2013-14": 4672, "2015-16": 4557,
                    "2018-19": 0, "2021-22": 0}, got
     stamped = (d == key).fillna(False).to_numpy(dtype=bool)
     assert (cp.loc[stamped, ["Quantity_sold", "Value_sold"]].notna().any(axis=1)).all()
@@ -425,5 +448,8 @@ def test_positive_sale_rows_per_wave(cp):
     v = cp["Value_sold"]
     t = cp.index.get_level_values("t")
     got = {w: int(((v > 0) & (t == w)).sum()) for w in sorted(set(t))}
-    assert got == {"2011-12": 854, "2013-14": 2737, "2015-16": 2300,
-                   "2018-19": 1368, "2021-22": 1292}, got
+    # 2,737 / 2,300 / 1,368 / 1,292 before the 2026-10-23 ruling that a row
+    # carrying a sale value is never dropped (+23 / +9 / +27 / +31 rows whose
+    # §9 row has no unit and no quantity; GH #1253 moved no positive value).
+    assert got == {"2011-12": 854, "2013-14": 2760, "2015-16": 2309,
+                   "2018-19": 1395, "2021-22": 1323}, got

@@ -269,13 +269,17 @@ def test_served_zero_sale_counts_per_wave(cp):
     rows: 3,187 / 7,402 / 6,975 / 4,378 / 2,727 -> 3,141 / 7,396 / 6,975 /
     4,372 / 2,719 (sub-fix (a)).  ``Quantity_sold == 0`` rows: 3,187 / 2,585 /
     542 / 816 / 819 -> 3,142 / 2,581 / 0 / 0 / 0 ((a) in W1/W2; (c) in W3-W5,
-    where every remaining "No" has no sale unit).  No row added or dropped."""
+    where every remaining "No" has no sale unit).  No row added or dropped by
+    GH #1253 itself; the later empty-row-filter ruling (2026-10-23) keeps the
+    rows that carry a sale value, among them 338 / 70 / 141 / 245 W2-W5 rows
+    whose "No" serves Value_sold 0 -- hence the Value_sold counts below and
+    86,403 rows."""
     t = cp.index.get_level_values("t")
     waves = sorted(set(t))
     v0 = {w: int(((cp["Value_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
     q0 = {w: int(((cp["Quantity_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
-    assert v0 == {"2011-12": 3141, "2013-14": 7396, "2015-16": 6975,
-                  "2018-19": 4372, "2021-22": 2719}, v0
+    assert v0 == {"2011-12": 3141, "2013-14": 7734, "2015-16": 7045,
+                  "2018-19": 4513, "2021-22": 2964}, v0
     assert q0 == {"2011-12": 3142, "2013-14": 2581, "2015-16": 0,
                   "2018-19": 0, "2021-22": 0}, q0
-    assert len(cp) == 85519
+    assert len(cp) == 86403
