@@ -116,6 +116,11 @@ and with it goes its re-derivation `Price = Expenditure / Quantity` on EVERY
 row: 8 purchased 2008 rows (`unit` 2, `pound` 3, `gram` 3) now serve the wave
 script's own Price (a mean of per-row prices) instead.
 
+**Closure** (`closure_probe_branch.json`): the function-level import folds as the
+constant `lsms_library.local_tools.U_UNKNOWN='Unknown'`; `map_index` stays in
+the closure; no `lsms_library.transformations` callable is reached
+(`test_no_transformations_symbol_reaches_any_fingerprint` passes).
+
 **Cost**: AST-visible no-op in `map_index` moved 549/549 country,
 40/40 `build_transforms_fingerprint`, 2,109/2,109 wave hashes (38 countries);
 the fix moves the same.  Corpus-wide cold re-warm, both tiers.
