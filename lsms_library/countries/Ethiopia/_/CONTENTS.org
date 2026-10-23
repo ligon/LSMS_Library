@@ -1762,8 +1762,10 @@ Rules, each the conservative choice where no precedent decides it:
   §9's =ph_s9q04_b= and §11's =ph_s11q03_b= (checked), and is decoded
   through the same =_clean_unit_label=.  As for §11, =Quantity_sold= lands
   only where the sale unit equals the row's harvest =u=: of the 1,290
-  positive W3 §12 sales attached, 971 carry a quantity and 312 (24%) do not
-  because the sale was recorded in another unit (mostly a Kg sale on a
+  positive W3 §12 sales that attach (classes 7 + 8, i.e. before the
+  empty-row filter; 1,283 are served), 971 carry a quantity, 7 are class 7
+  (their row has no unit), and 312 (24%) do not because the sale was
+  recorded in another unit (mostly a Kg sale on a
   Madaberia / Quintal / Bunch harvest row) -- the analogue of Malawi's
   22.2%.  A W3 "No" records no unit, so its 0 attaches to =Value_sold= only
   (3,273 such lines).  W1/W2 Q7 is KG by the instrument, so their zeros and

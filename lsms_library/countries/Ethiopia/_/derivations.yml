@@ -103,8 +103,9 @@ Ethiopia::crop_production::sect12-sale-period:
     2015-16 (independent review, GH #820 round 2; re-measured in
     slurm_logs/isa_backlog_2026-10-21/820-ethiopia-sect12/).  The
     attachment itself was re-derived by an independent oracle from the raw
-    files (GH #820 round-2 review): every class count matched and no
-    section-11 cell was overwritten.  W4/W5 carry the same window inside
+    files (GH #820 round-2 review), and every class count matched; that no
+    section-11 cell is overwritten is asserted by the build itself
+    (ethiopia._attach_sect12_sales).  W4/W5 carry the same window inside
     section 11, unmarked (GH #1256).
   contents: Ethiopia/_/CONTENTS.org, "§12 wired as a second sale source (GH #820)"
   since: '2026-10-23'
