@@ -69,12 +69,14 @@ def test_built_plot_inputs_marker_count():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         df = Country('Nigeria').plot_inputs()
-    crop = df.index.get_level_values('crop')
-    inputs = df.index.get_level_values('input')
-    n_marker = int((crop == MARKER).sum())
-    n_old = int((crop == 'n/a').sum())
-    n_seed_marker = int(((crop == MARKER) & (inputs == 'Seed')).sum())
-    n_nonseed_other = int(((crop != MARKER) & (inputs != 'Seed')).sum())
+    crop = pd.Series(df.index.get_level_values('crop'), dtype='string')
+    inputs = pd.Series(df.index.get_level_values('input'), dtype='string')
+    marker = crop.eq(MARKER).fillna(False)
+    seed = inputs.eq('Seed').fillna(False)
+    n_marker = int(marker.sum())
+    n_old = int(crop.eq('n/a').fillna(False).sum())
+    n_seed_marker = int((marker & seed).sum())
+    n_nonseed_other = int((~marker & ~seed).sum())
     assert n_old == 0, n_old
     assert n_marker == 34641, n_marker
     assert n_seed_marker == 0, n_seed_marker
