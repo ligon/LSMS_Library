@@ -113,4 +113,24 @@ derivation), Malawi Module P / Q (single-plot sale attachment), and
 ---
 ### Phase 3 — verification
 
-(filled after the cold builds; see the report)
+Cold builds of all 24 Ethiopia tables, development `57d255585` vs the branch,
+frame-diffed with base rows re-keyed through the crosswalk delta.
+
+- `with_agriculture_cover_households` — OK (§3 sample is the `v` source; §4
+  holder grain / code decode): sample +216 rows, household-cover rows
+  frame-equal; `v` NaN -> 0 in every table; weights move only by the mean-1
+  renormalisation (max 0.74%, W4).
+- `ea_id2_crosswalk` — OK (§4 ambiguity refused; prefix cross-check asserted).
+- `panel_ids.py` delta — OK (§3 committed source): +25 / +27 entries, 12 W3
+  entries identity -> W1 baseline; 21 tables' W2/W3 rows re-key, otherwise
+  identical.
+- `CROP_NA` — OK, REUSE (§2 EHCVM / Mali name and value): 69,024 `plot_inputs`
+  rows relabelled, nothing else.
+- `_mint_sect12_rows` — OK (§2 reuses the section-12 attach for the sale;
+  §4 key-collision rule): +3,437 W1 rows, every pre-existing row identical.
+- window-key widening + MULTI_SEP join — OK (§2 MULTI_SEP reused, not copied;
+  a string constant reaches no build fingerprint).
+- Empty-row filter — not changed; verified landed (`0663ac4fe`).
+
+Hash census: Ethiopia 25 / 25 country and 125 / 125 wave hashes; 0 / 40
+`build_transforms_fingerprint`; no other country.
