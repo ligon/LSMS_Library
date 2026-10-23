@@ -56,8 +56,9 @@ provinces, which is a cross-wave identity question to report, not fix.
 | canonical spelling | extend #971's rule | 2021-22 is not uniformly official for District (drops Balé/Bazèga/Séno accents), so: official accented title-case form *as attested in the data*; all 45 labels occur verbatim in an EHCVM wave |
 
 ## §6 Open questions for the human
-- `Komandjoari` (all three waves) vs the commonly published `Komondjari`:
-  kept as the data spells it; change only if the official spelling is wanted.
+- `Komandjoari` (all three waves) vs the official `Komondjari` -- RESOLVED
+  (@ligon, 2026-10-23): serve the official `Komondjari`; the data's spelling
+  is an Alternate Spelling row.
 - The three province disagreements (below): which wave's province is right?
   Bears on any 2018-19 → 2021-22 GPS carry-forward (GH #1050).
 

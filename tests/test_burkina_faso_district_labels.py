@@ -58,7 +58,7 @@ TABLE = "District"
 PROVINCES = frozenset({
     "Balé", "Bam", "Banwa", "Bazèga", "Bougouriba", "Boulgou", "Boulkiemdé",
     "Comoé", "Ganzourgou", "Gnagna", "Gourma", "Houet", "Ioba", "Kadiogo",
-    "Kénédougou", "Komandjoari", "Kompienga", "Kossi", "Koulpélogo",
+    "Kénédougou", "Komondjari", "Kompienga", "Kossi", "Koulpélogo",
     "Kouritenga", "Kourwéogo", "Léraba", "Loroum", "Mouhoun", "Nahouri",
     "Namentenga", "Nayala", "Noumbiel", "Oubritenga", "Oudalan", "Passoré",
     "Poni", "Sanguié", "Sanmatenga", "Séno", "Sissili", "Soum", "Sourou",
@@ -108,7 +108,14 @@ RAW_SPELLINGS = {
 #: The two rows that are more than accent / case: a lower-case L for the
 #: capital I (2014; all 17 zd are in Sud-Ouest, Ioba's region), and a
 #: letter dropped (2018-19).
-NAMED_CORRECTIONS = {"loba": "Ioba", "Koulpelgo": "Koulpélogo"}
+NAMED_CORRECTIONS = {"loba": "Ioba", "Koulpelgo": "Koulpélogo",
+                     # Ruling (@ligon, 2026-10-23): serve the official name
+                     # (ISO 3166-2 BF-KMD) for the spelling all waves use.
+                     "Komandjoari": "Komondjari", "KOMANDJOARI": "Komondjari"}
+
+#: Preferred Labels deliberately NOT attested in any wave: official names
+#: served by ruling instead of the data's spelling.
+OFFICIAL_NOT_ATTESTED = frozenset({"Komondjari"})
 
 #: Shared 2018-19 / 2021-22 grappes that name a DIFFERENT province in each
 #: wave (one grappe each).  An identity question, deliberately NOT mapped.
@@ -158,7 +165,11 @@ class TestTable:
         """No label is imported from outside the data (the canonical-spelling
         rule in the table's prose)."""
         attested = set().union(*RAW_SPELLINGS.values())
-        assert PROVINCES <= attested, sorted(PROVINCES - attested)
+        assert PROVINCES - OFFICIAL_NOT_ATTESTED <= attested, \
+            sorted(PROVINCES - OFFICIAL_NOT_ATTESTED - attested)
+        # ...and each exception really is absent from the data, so the
+        # set cannot silently grow into a licence to import labels.
+        assert not (OFFICIAL_NOT_ATTESTED & attested), OFFICIAL_NOT_ATTESTED & attested
 
     def test_table_is_idempotent(self, district_table):
         for canon in PROVINCES:

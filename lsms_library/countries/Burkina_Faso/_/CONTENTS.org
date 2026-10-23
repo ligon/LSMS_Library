@@ -712,9 +712,9 @@ rather than its /mechanism/ (take the 2021-22 spelling), because 2021-22 is not 
 Preferred Label is the official accented, title-case province name /as the
 data itself spells it/ -- all 45 occur verbatim in at least one EHCVM wave.
 Named corrections: =loba= -> =Ioba=, =Koulpelgo= -> =Koulpélogo=,
-=KOssi= -> =Kossi=.  =Komandjoari= is kept as spelled: all three waves
-agree on it, although the province is also written =Komondjari= elsewhere
-(open for a human to decide).
+=KOssi= -> =Kossi=.  =Komandjoari=, which all three waves write, is served
+as the official =Komondjari= (ISO 3166-2 BF-KMD) -- the one label not
+attested in the data (ruling, @ligon 2026-10-23).
 
 Measured on cold builds of development =9a0ed5f3c= vs the branch (evidence:
 =slurm_logs/isa_backlog_2026-10-21/1059-burkina-district/=):

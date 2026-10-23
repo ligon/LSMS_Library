@@ -499,10 +499,10 @@ mechanism: the Preferred Label is the official accented, title-case
 province name *as the data itself spells it* -- every one of the 45 occurs
 verbatim in at least one EHCVM wave, so no label is imported from outside
 the data.  Corrections, named: =loba= -> =Ioba=, =Koulpelgo= ->
-=Koulpélogo=, =KOssi= -> =Kossi=.  Not corrected: =Komandjoari=, which all
-three waves spell the same way (the province is also written =Komondjari=
-elsewhere, a spelling no wave uses); with no disagreement in the data
-there is nothing to harmonize -- a decision left to a human.
+=Koulpélogo=, =KOssi= -> =Kossi=.  One label is NOT attested in the data:
+=Komondjari=, the official name (ISO 3166-2 BF-KMD), served for the
+=Komandjoari= that all three waves write (ruling, @ligon 2026-10-23:
+serve the official name).
 
 *Spellings only -- never one province onto another.*  Every row maps a
 string onto the province it already names.  On the 550 grappes shared by
@@ -560,8 +560,9 @@ Burkina_Faso cache hash.
 | KADIOGO            | Kadiogo         |
 | Kénédougou         | Kénédougou      |
 | KENEDOUGOU         | Kénédougou      |
-| Komandjoari        | Komandjoari     |
-| KOMANDJOARI        | Komandjoari     |
+| Komondjari         | Komondjari      |
+| Komandjoari        | Komondjari      |
+| KOMANDJOARI        | Komondjari      |
 | Kompienga          | Kompienga       |
 | KOMPIENGA          | Kompienga       |
 | Kossi              | Kossi           |
