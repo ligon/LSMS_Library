@@ -1793,7 +1793,9 @@ for 3,227 of 3,227 panel households, in 550 grappes, all among 2018-19's
 =Rural= differs on *7* grappes -- not previously recorded.  Both are attribute
 recodes on a grappe the households were tracked within, not a renumbering.
 
-** TODO =panel_ids.py= builds the 2018-19 id in the wrong format: 1,105 of 3,227 links lost, 3 mislinked
+** DONE =panel_ids.py= builds the 2018-19 id in the wrong format: 1,105 of 3,227 links lost, 3 mislinked
+
+Fixed by GH #1240 (PR #1249; see that section below): correct links 2,041 -> 3,147, wrong-household links 12 -> 8.  The residual (80 unlinkable, 8 on another household's id) is GH #1245.
 
 Found while measuring the boundary above (GH #1243); not filed, not fixed.
 =panel_ids.py= builds each 2021-22 household's =previous_i= as
