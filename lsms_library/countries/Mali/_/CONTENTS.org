@@ -1473,8 +1473,10 @@ multiplied out:
 Read a tree row this way:
 - 2014-15: =Quantity= and =Quantity_sold= are per harvest month, while
   =Value_sold= is the TOTAL.  So =Value_sold / Quantity_sold= is NOT a price;
-  it overstates the price by =months_harvested= (median 2 among priced rows,
-  above 1 on 63.5% of them in the audit);
+  it overstates the price by =months_harvested=.  On the 198 served priced
+  rows that factor has median 2 and is above 1 on 65.1% (the audit's raw
+  count was 63.5%); 3 of those rows report 0 months harvested beside a
+  sale, and 3 have no month count;
 - 2017-18: all three are per harvest month, so the ratio IS a price per
   =Unit_sold=;
 - a 12-month quantity is =Quantity * months_harvested=.  That is a construction,

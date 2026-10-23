@@ -119,3 +119,22 @@ reducer (the Niger key + gate is copied, not generalised); a price rule
 
 ---
 ### Phase 3 — verification (fill at task end)
+
+- `crop_production_finalize` (`Unit_sold` canonicalisation, one-unit gate) --
+  OK (anchored on §2 `_unit_labels`, §3 build-time canonicalisation, §2 Niger
+  key/gate): the same `_unit_labels` call as `u`; the gate mirrors
+  `Niger/2021-22/_/crop_production.py:93-105` and is inert (0 groups).
+- 2017-18 `s7g` sale block -- OK (§2 Niger 2021-22 pattern; §4 rows must not
+  move): keyed `(i, crop, Unit_sold)`, `sum` kept at `min_count=0` so no
+  `Quantity_sold` / `Value_sold` value moves (the NA->0 fill it preserves is
+  reported, not fixed).
+- `derive_3b_per_harvest_month` / `derive_11f_per_harvest_month` + registry
+  keys -- OK (§3 derived values: identity for a window rename; one name per
+  wave rule): no 12-month construction; `Derivation` not in `data_scheme.yml`.
+- `months_harvested` -- OK (§5): reported, declared optional, NA on field rows.
+- `u` table row `Chargement de camion` -- OK (§2 extend): 2 harvest rows gain a
+  label they always had.
+- 9999.9 sentinel -- OK (§4, explained diff): extends the function's own
+  99/9999 rule; 1 `Quantity` (NA before and after) and 1 `Quantity_sold`.
+- No REINVENTION found: no new unit table, no new reducer, no price rule.
+- Cache: hash census Mali-only (24/24 country, 96/96 wave, 0/40 btf).
