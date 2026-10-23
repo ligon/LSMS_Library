@@ -1,0 +1,21 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 24,
+  "countries_moved": [
+   "Mali"
+  ]
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "countries_moved": []
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 96,
+  "countries_moved": [
+   "Mali"
+  ]
+ }
+}

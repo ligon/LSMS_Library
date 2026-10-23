@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
+from lsms_library.transformations import U_UNKNOWN
 from collections import defaultdict
 
 def i(value):
@@ -484,6 +485,12 @@ def plot_inputs_finalize(df):
         'Improved':           g['Improved'].max(),
     })
     out = out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']]
+    # GH #1118 under the #1041 ruling: a retained record with no unit carries
+    # the canonical sentinel, never NaN.  Filled AFTER the collapse so a blank
+    # duplicate cannot displace a real unit via g['u'].first().  Measured on
+    # the EAC-I sources, every such null is a blank raw unit or the survey's
+    # own 'Manquant' label; no substantive label is lost by _unit_labels.
+    out['u'] = out['u'].fillna(U_UNKNOWN)
     return out.sort_index()
 
 
