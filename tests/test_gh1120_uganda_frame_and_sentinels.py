@@ -163,16 +163,21 @@ def test_alternate_cover_district_is_canonicalised_like_the_cover(uganda_module)
     District the households agree on (measured: 2015-16 '229')."""
     u = uganda_module
     df = pd.DataFrame({
-        "t": ["2015-16"] * 2, "i": ["G1", "AG"],
-        "v": ["12345678", np.nan], "District": ["229", np.nan],
-        "Region": ["Northern", np.nan], "_cover": ["G1", np.nan],
-        "_ag_v": [12345678.0, 12345678.0], "_ag_District": [229, 229],
-        "_ag_Region": ["Northern", "Northern"],
+        "t": ["2015-16"] * 3, "i": ["G1", "AG", "AG2"],
+        "v": ["12345678", np.nan, np.nan], "District": ["229", np.nan, np.nan],
+        "Region": ["Northern", np.nan, np.nan], "_cover": ["G1", np.nan, np.nan],
+        "_ag_v": [12345678.0, 12345678.0, 23456789.0],
+        "_ag_District": [229, 229, 229],
+        "_ag_Region": ["Northern", "Northern", "Northern"],
     }).set_index(["t", "v"])
     out = u.cluster_features(df)
-    n = len(out)
-    assert n == 1, f"{n} != 1"
-    assert out.iloc[0]["District"] == "229"
+    temps = [c for c in out.columns if str(c).startswith("_")]
+    assert temps == [], f"{len(temps)} temporary column(s) left"
+    # AG joins the gsec1 parish without blanking its District; AG2's parish
+    # has no gsec1 household and becomes a cluster row from AGSEC1 alone.
+    got = {v: out.loc[("2015-16", v), "District"]
+           for v in out.index.get_level_values("v")}
+    assert got == {"12345678": "229", "23456789": "229"}, got
 
 
 def test_cluster_features_hook_singletons_cover_rows_only(uganda_module):
