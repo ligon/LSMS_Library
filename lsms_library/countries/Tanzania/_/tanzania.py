@@ -1523,11 +1523,14 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     # ``u`` is part of the GRAIN (GH #637), as in the canonical
     # ``plot_inputs`` index and in Malawi's and the EHCVM countries' builders:
     # rows recorded in different units stay separate rows.  The remaining
-    # duplicates of the 6-level key are commensurable -- a plot naming the
-    # same inorganic-fertilizer product as both type 1 and type 2 (kg + kg),
-    # or two raw crop codes that share a canonical Seed crop label (e.g. Beans
-    # + Cowpeas -> Pulses) recorded in the SAME unit: sum the reported
-    # quantities, OR the purchased / improved flags.  Before GH #637 ``u`` was
+    # duplicates of the 6-level key are summed (reported quantities; OR the
+    # purchased / improved flags): a plot naming the same inorganic-fertilizer
+    # product as both type 1 and type 2 (kg + kg), or two raw crop codes that
+    # share a canonical Seed crop label (e.g. Beans + Cowpeas -> Pulses)
+    # recorded in the SAME unit.  One known exception is NOT commensurable:
+    # two codes that BOTH recorded OTHER (SPECIFY) are summed into one
+    # ``Unknown`` row although two "other" units are not known to be the same
+    # unit (2 groups per wave in the held sources; residual, see CONTENTS.org).  Before GH #637 ``u`` was
     # a column reduced with 'first', so a group in two units was served as the
     # sum of incommensurable quantities under the first unit: in the held
     # 2020-21 sources 6 Seed/Pulses groups in two recorded units (bucket/kg,
