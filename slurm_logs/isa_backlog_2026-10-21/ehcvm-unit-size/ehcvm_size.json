@@ -1,0 +1,140 @@
+{
+ "Benin/2018-19": {
+  "consumed_rows": 187672,
+  "sized_rows": 163372,
+  "share": 0.871,
+  "top_sizes": {
+   "Petit": 71427,
+   "Moyen": 49915,
+   "Grand": 17827,
+   "Sans Brassée": 17419,
+   "Avec 1 Brassée": 3301,
+   "Autre taille": 2142
+  }
+ },
+ "Burkina_Faso/2018-19": {
+  "consumed_rows": 136888,
+  "sized_rows": 107325,
+  "share": 0.784,
+  "top_sizes": {
+   "Petit": 49260,
+   "Moyen": 40804,
+   "Grand": 17261
+  }
+ },
+ "Burkina_Faso/2021-22": {
+  "consumed_rows": 68677,
+  "sized_rows": 55577,
+  "share": 0.809,
+  "top_sizes": {
+   "Petit": 25021,
+   "Moyen": 21995,
+   "Grand": 8561
+  }
+ },
+ "CotedIvoire/2018-19": {
+  "consumed_rows": 292741,
+  "sized_rows": 253151,
+  "share": 0.865,
+  "top_sizes": {
+   "Petit": 121101,
+   "Moyen": 92936,
+   "Grand": 36566,
+   "Quart": 2023,
+   "Demi": 400,
+   "Entier": 125
+  }
+ },
+ "Guinea-Bissau/2018-19": {
+  "consumed_rows": 125483,
+  "sized_rows": 125483,
+  "share": 1.0,
+  "top_sizes": {
+   "Tamanho Ãºnico": 49912,
+   "Pequeno": 38988,
+   "Medio": 19426,
+   "Grande": 17157
+  }
+ },
+ "Mali/2018-19": {
+  "consumed_rows": 159968,
+  "sized_rows": 114692,
+  "share": 0.717,
+  "top_sizes": {
+   "Petit": 59266,
+   "Moyen": 37829,
+   "Grand": 17597
+  }
+ },
+ "Mali/2021-22": {
+  "consumed_rows": 146360,
+  "sized_rows": 104849,
+  "share": 0.716,
+  "top_sizes": {
+   "Petit": 56689,
+   "Moyen": 35055,
+   "Grand": 13105
+  }
+ },
+ "Niger/2018-19": {
+  "consumed_rows": 107216,
+  "sized_rows": 91125,
+  "share": 0.85,
+  "top_sizes": {
+   "Petit": 33326,
+   "Moyen": 28921,
+   "Entier": 12470,
+   "Grand": 10499,
+   "Demi": 3276,
+   "Quart": 2633
+  }
+ },
+ "Niger/2021-22": {
+  "consumed_rows": 130519,
+  "sized_rows": 114751,
+  "share": 0.879,
+  "top_sizes": {
+   "1. Petit": 60198,
+   "2. Moyen": 26421,
+   "6. Entier": 12373,
+   "3. Grand": 10408,
+   "5. Demi": 3018,
+   "4. Quart": 2333
+  }
+ },
+ "Senegal/2018-19": {
+  "consumed_rows": 214392,
+  "sized_rows": 155665,
+  "share": 0.726,
+  "top_sizes": {
+   "Petit": 74636,
+   "Moyen": 63730,
+   "Grand": 13172,
+   "TrÃ¨s petit": 4127
+  }
+ },
+ "Senegal/2021-22": {
+  "consumed_rows": 219717,
+  "sized_rows": 154791,
+  "share": 0.705,
+  "top_sizes": {
+   "1. Petit": 78997,
+   "2. Moyen": 65178,
+   "3. Grand": 10467,
+   "7. Très Petite": 149
+  }
+ },
+ "Togo/2018": {
+  "consumed_rows": 112087,
+  "sized_rows": 92834,
+  "share": 0.828,
+  "top_sizes": {
+   "Petit": 43508,
+   "Moyen": 30286,
+   "Grand": 15252,
+   "Entier": 2511,
+   "Demi": 611,
+   "Quart": 458
+  }
+ }
+}

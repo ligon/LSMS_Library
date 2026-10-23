@@ -1,0 +1,8 @@
+#+title: EHCVM food_acquired -- the unit SIZE the served u drops
+
+Sue (Claude Opus 5.5), 2026-10-22, read-only.
+=ehcvm_size_census.py= reads each EHCVM wave's =food_acquired= source through =get_dataframe= and counts consumed rows (=s07bq03a > 0=) whose =s07bq03c= is not the size-free code.
+Run from a checkout: =python ehcvm_size_census.py <checkout> out.json= with =PYTHONPATH=<checkout>= and a private =LSMS_DATA_DIR=.
+
+Correction to the raw JSON: Guinea-Bissau's size-free label is Portuguese (=Tamanho único=, mojibake in the file), which the script's French match misses.
+Excluding its 49,912 rows gives 75,571 of 125,483 consumed rows sized (0.602), not 1.0.
