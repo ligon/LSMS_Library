@@ -41,6 +41,12 @@ GH #840 kept the number of (t, v, j, u) CELLS unchanged. GH #822 restores
 Mali readings 1/2 and expands those cells 23,646 -> 39,245 while retaining
 every old cell and every reading-3 value (now obs=3). Its source census is
 recorded in slurm_logs/isa_backlog_2026-10-21/Mali/822/.
+
+GH #823 adds Niger 2018-19 (EHCVM s05, 84,444 rows, 42,087 cells) without
+touching a 2011-12 / 2014-15 row.  s05 has no variety field (the canonical
+``unknown_variety``) and TWO readings per record, so its second records are
+``obs`` 3-4, not 4-6; the CS07 tests below are scoped to the CS07 waves and
+``tests/test_gh823_niger_s05_community_prices.py`` pins the s05 rules.
 """
 from __future__ import annotations
 
@@ -78,12 +84,12 @@ BUILDERS = {
 EXPECTED_ROWS = {
     "Mali": {"2014-15": 155931},
     # 32,369 / 13,808 before the r1 duplicate-entry drop (-17 / -117).
-    "Niger": {"2011-12": 32352, "2014-15": 13691},
+    "Niger": {"2011-12": 32352, "2014-15": 13691, "2018-19": 84444},
     "Tanzania": {"2019-20": 3076, "2020-21": 14623},
 }
 EXPECTED_CELLS = {
     "Mali": {"2014-15": 39245},
-    "Niger": {"2011-12": 8923, "2014-15": 6500},
+    "Niger": {"2011-12": 8923, "2014-15": 6500, "2018-19": 42087},
     "Tanzania": {"2019-20": 2769, "2020-21": 13062},
 }
 
@@ -382,6 +388,10 @@ class TestNigerQuantitySentinels:
             assert out.loc[4, "Quantity"] == 1.0
 
 
+# The CS07 waves (three slots per record); 2018-19 is s05 (two slots).
+NIGER_CS07 = ["2011-12", "2014-15"]
+
+
 def _build(country):
     import lsms_library as ll
     try:
@@ -413,6 +423,9 @@ class TestBuilt:
     @pytest.mark.parametrize("country", sorted(DECLARED))
     def test_variety_is_a_code_not_a_float_string(self, country):
         v = _build(country).index.get_level_values("variety")
+        # Niger 2018-19 (s05) names no variety: the canonical sentinel, which
+        # is a declared value, not a mis-formatted code (GH #823).
+        v = v[v != "unknown_variety"]
         assert v.str.fullmatch(r"\d+").all(), v[~v.str.fullmatch(r"\d+")].unique()[:5]
 
     @pytest.mark.parametrize("country", sorted(DECLARED))
@@ -448,6 +461,7 @@ class TestBuilt:
 
     def test_niger_second_records_are_slots_four_to_six(self):
         df = _build("Niger")
+        df = df[df.index.get_level_values("t").isin(NIGER_CS07)]
         obs = df.index.get_level_values("obs")
         assert set(obs) <= {1, 2, 3, 4, 5, 6}
         late = df[obs > 3]
@@ -463,6 +477,7 @@ class TestBuilt:
         # copy, not a reading -- serving it double-weights that price in any
         # cluster mean, median or count.  134 such rows before the fix.
         x = _build("Niger").reset_index()
+        x = x[x["t"].isin(NIGER_CS07)].copy()
         x["slot"] = (x["obs"] - 1) % 3 + 1
         content = ["t", "v", "j", "u", "variety", "visit", "slot",
                    "Price", "Quantity", "Description"]

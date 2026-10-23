@@ -1,0 +1,40 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 23,
+  "by_country": {
+   "Niger": 23
+  },
+  "only_base": [],
+  "only_branch": [],
+  "niger_total": 23
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "by_country": {},
+  "only_base": [],
+  "only_branch": []
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 92,
+  "by_country": {
+   "Niger": 92
+  },
+  "only_base": [],
+  "only_branch": [],
+  "niger_moved_by_wave": {
+   "Niger/2011-12": 23,
+   "Niger/2014-15": 23,
+   "Niger/2018-19": 23,
+   "Niger/2021-22": 23
+  },
+  "niger_wave_total": {
+   "Niger/2021-22": 23,
+   "Niger/2014-15": 23,
+   "Niger/2018-19": 23,
+   "Niger/2011-12": 23
+  }
+ }
+}

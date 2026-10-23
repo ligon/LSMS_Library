@@ -1290,24 +1290,35 @@ def _finish_people_last7days(df, t):
 # post-harvest passage first, then questionnaire order -- and this comment's
 # own `obs` sentence below was not true of the code.
 #
-# WAVE COVERAGE: only the two ECVMA waves carry an EA-level community price
-# module.  The EHCVM waves (2018-19, 2021-22) replaced it with a separate
-# region/market-level price survey (ehcvm_prix_ner2021: region × milieu ×
-# point_de_vente, NO grappe — not the EA grain; and ehcvm_nsu, a region/strata
-# p50/mu MEDIAN — a forbidden imputation), and 2018-19 ships no community price
-# file at all.  So those two waves are silently absent (the country-level
-# concatenator skips a wave with no parquet), NOT faked.
+# WAVE COVERAGE: three of the four waves carry a GRAPPE-level community price
+# module -- the two ECVMA waves (CS07) and EHCVM 2018-19 (section 5 of the
+# community questionnaire, s05_co_ner2018.dta; wired by GH #823).  2021-22's
+# community questionnaire stops at s04_co, and its only price files are
+# ehcvm_prix_ner2021 (region × milieu × point_de_vente, NO grappe -- not the EA
+# grain) and ehcvm_nsu (a region/strata p50/mu MEDIAN -- a forbidden
+# imputation), so 2021-22 has no wave script and is absent, NOT faked.  (This
+# comment used to say 2018-19 "ships no community price file at all"; it does,
+# and 2018-19 ships no ehcvm_prix / ehcvm_nsu file.)
 #
-# Community-price instrument by wave (both ECVMA; module CS07):
-#   2011-12  ecvmacoms07_p1 (passage 1) + ecvmacoms07_p2 (passage 2).
+# Community-price instrument by wave:
+#   2011-12  ECVMA CS07: ecvmacoms07_p1 (passage 1) + ecvmacoms07_p2 (passage 2).
 #            grappe; cs07q01 item; THREE (price, qty, unit) triples:
 #            (cs07q03, cs07q04, cs07q05), (cs07q06, cs07q07, cs07q08),
 #            (cs07q09, cs07q10, cs07q11).  Unit is a STRING column per triple.
-#   2014-15  comprixcs07.  grappe; cs07q01 item; ONE unit column cs07q03
-#            shared by THREE (price, qty) pairs: (cs07q04, cs07q05),
+#   2014-15  ECVMA CS07: comprixcs07.  grappe; cs07q01 item; ONE unit column
+#            cs07q03 shared by THREE (price, qty) pairs: (cs07q04, cs07q05),
 #            (cs07q06, cs07q07), (cs07q08, cs07q09).
-# Both load convert_categoricals=True so the item / unit labels arrive as the
-# strings harmonize_food / u key on.
+#   2018-19  EHCVM s05: s05_co_ner2018.  One row per (grappe, s05q01 product,
+#            s05q02 unit-size) with TWO price readings, s05q03 "Relevé 1 Prix"
+#            and s05q04 "Relevé 2 Prix" -> obs 1 / 2, and NO quantity: the
+#            Niger CAPI price questionnaire prices ONE item of the selected
+#            unit-size (Quantity = 1 is the registered derivation
+#            Niger::community_prices::one-item-per-price).  No variety field
+#            (variety = the canonical 'unknown_variety'); visit = vague.  See
+#            _s05_code_maps / _s05_community_prices below.
+# The CS07 files load convert_categoricals=True so the item / unit labels
+# arrive as the strings harmonize_food / u key on; s05 is joined to the
+# household food module BY CODE instead (see _s05_code_maps).
 #
 # COLUMNS (reported, item-level):
 #   Price    — the surveyed price the enumerator recorded for `Quantity` units
@@ -1327,17 +1338,22 @@ def _finish_people_last7days(df, t):
 # distinct rows without summing.
 
 
-def _community_prices_maps():
+def _community_prices_maps(dirs=None):
     """Load the harmonize_food (item -> j Preferred Label) and u (unit ->
     Preferred Label) string maps, keyed on Original Label — exactly the two
     shared label tables crop_production / food_acquired use, so a priced food
-    joins consumed food and harvested crop on (j, u)."""
+    joins consumed food and harvested crop on (j, u).
+
+    ``dirs`` defaults to the cwd-relative wave/country rungs a wave script
+    sees; a caller running elsewhere (a registry ``inputs`` callable) passes
+    the absolute wave and country ``_/`` directories instead."""
+    kw = {} if dirs is None else {'dirs': [str(d) for d in dirs]}
     item_map = tools.get_categorical_mapping(
         tablename='harmonize_food', idxvars='Original Label',
-        **{'Preferred Label': 'Preferred Label'})
+        **kw, **{'Preferred Label': 'Preferred Label'})
     unit_map = tools.get_categorical_mapping(
         tablename='u', idxvars='Original Label',
-        **{'Preferred Label': 'Preferred Label'})
+        **kw, **{'Preferred Label': 'Preferred Label'})
     return item_map, unit_map
 
 
@@ -1551,6 +1567,187 @@ def _finish_community_prices(df, t):
     df = df[keep]
     df = df.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs']).sort_index()
     return df
+
+
+# ---------------------------------------------------------------------------
+# EHCVM 2018-19 section 5 (s05_co_ner2018.dta) -- GH #823
+# ---------------------------------------------------------------------------
+#
+# The instrument (Niger CAPI "Qx Communautaire Prix- NIGER_V1_VF", UEMOA
+# regional catalogue entry 48; NOT the Excel file WB catalog 4296 ships under
+# Niger's name, which is Chad's template): per market, product existence, up
+# to six unit-sizes (5.02), then "5.03 Relevé 1 Prix (en FCFA)" and "5.04
+# Relevé 2 Prix (en FCFA)", both integer, multiple of 5, > 0.  No quantity,
+# no variety.  Measured on the held file (Niger CONTENTS.org, GH #823):
+# 42,247 rows, 504 grappes, every grappe in one vague, 160 (grappe, product,
+# unit-size) keys twice -- 20 byte-identical, 140 with different prices.
+
+#: The two price readings, in form order -> obs 1, 2.
+S05_PRICE_SLOTS = ('s05q03', 's05q04')
+#: s05 names no variety finer than the product: the canonical sentinel
+#: (lsms_library/data_info.yml, missing_level_sentinels: community_prices).
+S05_VARIETY = 'unknown_variety'
+#: The served columns a second record's slot must repeat to be a copy (the
+#: GH #840 content-equality drop; `slot` stands in for the manufactured obs).
+_S05_CONTENT = ['v', 'j', 'u', 'variety', 'visit', 'slot', 'Price',
+                'Description']
+
+
+def _s05_unit_label(code, hh_units, hh_sizes, unit_map, decode=lambda s: s):
+    """Served ``u`` for one s05 ``releveID`` code.
+
+    ``releveID = 10 * s07bq03b + s07bq03c``: the community unit-size code is
+    the HOUSEHOLD food module's unit code with its size code (0 Taille unique,
+    1 Petit, 2 Moyen, 3 Grand, 4 Quart, 5 Demi, 6 Entier) as the last digit
+    (all 74 used codes; Niger CONTENTS.org).  The unit part is resolved through
+    the household's own label for that unit code, by the household pipeline
+    (mojibake decode, then the ``u`` table), so a size-0 code serves exactly
+    the ``u`` Niger ``food_acquired`` serves (``Kg``, ``Litre``, ``Tiya``).  A
+    sized code keeps its size INSIDE the label, Uganda's ``Unit (Size)`` form
+    with the household's own size word: ``Tas (Petit)``, ``Tiya (Entier)``.
+    Never ``Tas, petit`` -> ``Tas``: a small heap is not a heap, and no
+    conversion between sizes exists.
+
+    The size comes from the code's DIGIT, never from the s05 value label:
+    releveID 1252 / 1253 are labelled ``Louche ..., grand`` / ``..., moyen``
+    in the .dta, the reverse of the digit, while the CAPI instrument's own
+    code list prints 1252 = moyen, 1253 = grand -- the digit agrees with the
+    instrument.
+
+    A code whose unit or size part the household label sets lack raises
+    ``KeyError``: there is no honest label to serve."""
+    unit_code, size_code = divmod(int(code), 10)
+    base = decode(str(hh_units[unit_code]).strip()).strip()
+    base = unit_map.get(base, base)
+    if size_code == 0:
+        return base
+    size = decode(str(hh_sizes[size_code]).strip()).strip()
+    return f'{base} ({size})'
+
+
+def _s05_code_maps(item_codes, unit_codes, hh_categories, item_map, unit_map,
+                   decode=lambda s: s):
+    """``(j_by_code, u_by_code)`` for the s05 product and unit-size codes.
+
+    Joined to the household food module BY CODE (GH #823 decision D3): the
+    s05 file and s07b_me_ner2018 share the ``produitID`` code list, but not its
+    strings -- s05 stores clean UTF-8 (``Thé vert``), s07b the double-encoded
+    form 2018-19's ``mapping.py`` repairs (``ThÃ©``), and three s05 codes name
+    a NARROWER product than the household's label for the same code (67
+    ``Pastèque`` vs ``Pastèque, Melon``; 77 ``Courge/courgette`` vs
+    ``Aubergine, Courge/Courgette``; 130 ``Thé vert`` vs ``Thé``).  So ``j`` is
+    the household's label for the code through the household pipeline
+    (``harmonize_food`` on the raw label, then the decode) -- the j Niger
+    ``food_acquired`` serves -- and the s05 label is kept as ``Description``.
+
+    ``hh_categories`` is ``get_dataframe(s07b, categories_only=True)``:
+    ``{variable: {code: label}}`` for ``s07bq01``, ``s07bq03b`` and
+    ``s07bq03c``.  Both maps must be one-to-one over the codes served, or two
+    source keys would share a served key; that raises."""
+    hh_items = {int(k): v for k, v in hh_categories['s07bq01'].items()}
+    hh_units = {int(k): v for k, v in hh_categories['s07bq03b'].items()}
+    hh_sizes = {int(k): v for k, v in hh_categories['s07bq03c'].items()}
+    j_by_code = {}
+    for code in sorted({int(c) for c in item_codes}):
+        raw = str(hh_items[code]).strip()
+        j_by_code[code] = str(decode(item_map.get(raw, raw))).strip()
+    u_by_code = {int(c): _s05_unit_label(c, hh_units, hh_sizes, unit_map, decode)
+                 for c in sorted({int(c) for c in unit_codes})}
+    for name, m in (('product', j_by_code), ('unit-size', u_by_code)):
+        labels = pd.Series(m)
+        clash = labels[labels.duplicated(keep=False)]
+        if len(clash):
+            raise ValueError(f"s05 {name} codes share a served label: "
+                             f"{clash.to_dict()}")
+    return j_by_code, u_by_code
+
+
+def _s05_community_prices(codes, labels, j_by_code, u_by_code):
+    """Reshape s05_co_ner2018 into long community_prices rows -- one per
+    recorded price.  Returns columns ``v, j, u, variety, visit, obs,
+    Description, Price`` (no Quantity: the file records none).
+
+    ``codes`` is the file read with ``convert_categoricals=False``, ``labels``
+    the same file with labels (same rows, same order); ``labels`` supplies
+    only ``Description``, the s05 product label as recorded.
+
+    * Rows whose ``Existe`` is not 1 carry no price (none in the held file).
+    * A byte-identical repeat of an earlier row (20 in the held file) is a
+      copy and is dropped before ranking (the GH #840 lossless class).
+    * Records sharing a (grappe, s05q01, s05q02) key are ranked in file
+      order; slot ``k`` of the ``r``-th record is ``obs = k + 2 * r`` --
+      s05q03 / s05q04 are obs 1 / 2, a second record's are obs 3 / 4 (the
+      CS07 ``slot + 3 * rank`` convention, two slots here).  140 keys in the
+      held file have a second, disagreeing record (GH #823 decision D5).
+    * After the melt, a second record's slot identical in every served column
+      to the first record's SAME slot is a copy and is dropped (10 in the held
+      file); every other reading is served, none averaged or selected.
+    * Rows with no usable price (NA / not positive) are dropped (none in the
+      held file: its prices are already cleaned).
+
+    ``v`` = format_id(grappe), the ``sample()`` keyspace; ``visit`` = vague
+    (each grappe is fielded in exactly one vague); ``variety`` = the
+    canonical ``unknown_variety``."""
+    if len(codes) != len(labels):
+        raise ValueError("_s05_community_prices: `codes` and `labels` must be "
+                         "the same file in the same order")
+    codes = codes.reset_index(drop=True)
+    labels = labels.reset_index(drop=True)
+    keep = (pd.to_numeric(codes['Existe'], errors='coerce') == 1)
+    keep &= ~codes.duplicated(keep='first')
+    codes, labels = codes[keep], labels[keep]
+    key = ['grappe', 's05q01', 's05q02']
+    rank = codes.groupby(key, sort=False).cumcount()
+
+    v = codes['grappe'].map(tools.format_id).astype('string')
+    j = codes['s05q01'].map(lambda c: j_by_code[int(c)]).astype('string')
+    u = codes['s05q02'].map(lambda c: u_by_code[int(c)]).astype('string')
+    visit = pd.to_numeric(codes['vague']).astype('int64')
+    description = labels['s05q01'].astype('string').str.strip()
+    pieces = []
+    for slot, col in enumerate(S05_PRICE_SLOTS, start=1):
+        pieces.append(pd.DataFrame({
+            'v': v.values, 'j': j.values, 'u': u.values,
+            'variety': S05_VARIETY, 'visit': visit.values,
+            'obs': (slot + len(S05_PRICE_SLOTS) * rank).values, 'slot': slot,
+            'Description': description.values,
+            'Price': pd.to_numeric(codes[col], errors='coerce')
+                       .astype('Float64').values,
+        }))
+    out = pd.concat(pieces, ignore_index=True)
+    out = out[out['Price'].notna() & (out['Price'] > 0)]
+    out = (out.sort_values('obs', kind='stable')
+              .drop_duplicates(_S05_CONTENT, keep='first')
+              .drop(columns='slot')
+              .sort_index())
+    return out
+
+
+def _s05_raw_inputs(decode=lambda s: s, wave='2018-19'):
+    """The raw s05 answers behind every served 2018-19 community price, at
+    the SOURCE-ROW grain, under their original variable names (grappe, vague,
+    Existe, s05q01, s05q02, s05q03, s05q04), plus the served join keys
+    ``t, v, j, u, visit`` computed by the build's own code maps.  All 42,247
+    rows, the 20 byte-identical copies included: one source row is up to two
+    served rows (obs 1/2, or 3/4 for a key's second record)."""
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Niger'
+    wave_dir, country_dir = root / wave / '_', root / '_'
+    src = str(root / wave / 'Data' / 's05_co_ner2018.dta')
+    codes = tools.get_dataframe(src, convert_categoricals=False)
+    hh_cats = tools.get_dataframe(str(root / wave / 'Data' / 's07b_me_ner2018.dta'),
+                                  categories_only=True)
+    item_map, unit_map = _community_prices_maps(dirs=[wave_dir, country_dir])
+    j_by_code, u_by_code = _s05_code_maps(codes['s05q01'].unique(),
+                                          codes['s05q02'].unique(), hh_cats,
+                                          item_map, unit_map, decode)
+    out = codes.copy()
+    out['t'] = wave
+    out['v'] = codes['grappe'].map(tools.format_id).astype('string')
+    out['j'] = codes['s05q01'].map(lambda c: j_by_code[int(c)]).astype('string')
+    out['u'] = codes['s05q02'].map(lambda c: u_by_code[int(c)]).astype('string')
+    out['visit'] = pd.to_numeric(codes['vague']).astype('int64')
+    return out.set_index(['t', 'v', 'j', 'u', 'visit'])
 
 
 def interview_date(df):

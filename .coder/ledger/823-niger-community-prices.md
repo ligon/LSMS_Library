@@ -257,6 +257,96 @@ agreeing sellers or a copied reading; what the 140 conflicting duplicate keys
 are; which of the `Louche` label or code is right; why the DDI says three
 records where two are shipped.
 
-### Phase 3 — verification
+### Phase 3 — wiring and verification (2026-10-22)
 
-Pending source read and root review. No new or changed production symbol exists to verify.
+Decisions D1-D7 were taken by @ligon on 2026-10-22, relayed by the
+coordinator, and implemented on branch
+`fix/823-niger-2018-community-prices-20261022` (development `9a0ed5f3c`
+merged).  D7 resolved the instrument question: Niger's own CAPI price
+questionnaire ("Qx Communautaire Prix- NIGER_V1_VF") is on the UEMOA regional
+catalogue, entry 48 (`/download/199`, `/download/200`).  It records two
+integer, multiple-of-5 prices per selected unit-size, with no quantity and no
+variety.  The non-integer prices (F3) were therefore produced after collection.
+The CAPI code list also prints `1252 = moyen`, `1253 = grand`, so the `.dta`
+value label is the swapped one.
+
+**What changed.**
+
+| file | change |
+|---|---|
+| `Niger/2018-19/_/community_prices.py` | new wave script (s05 → seven-level table) |
+| `Niger/_/niger.py` | `_s05_unit_label`, `_s05_code_maps`, `_s05_community_prices`, `_s05_raw_inputs`; `_community_prices_maps(dirs=None)`; corrected WAVE COVERAGE comment |
+| `Niger/2018-19/_/mapping.py` | `derive_s05_one_item_per_price` and `inputs_community_prices`, the registry callables (the Nigeria #834/#900 wave-scoped placement) |
+| `Niger/_/derivations.yml` | `Niger::community_prices::one-item-per-price` (waves 2018-19, columns Quantity, bases questionnaire + modelling-choice) |
+| `Niger/_/data_scheme.yml` | comments only (coverage, 2018-19 levels, Quantity); no key added; `Derivation` is NOT declared there (`test_nothing_in_a_data_scheme_names_a_derivation`) |
+| `Niger/_/CONTENTS.org` | new section "2018-19 community prices are wired (GH #823)"; stale passages annotated |
+| tests | new `tests/test_gh823_niger_s05_community_prices.py`; Niger 2018-19 baselines in `test_community_prices_variety.py` (CS07-only tests scoped to the CS07 waves; `unknown_variety` exempt from the code check) and `test_niger_u_sentinel.py` (46,043 → 130,487 rows, 2018-19: 0 `Unknown`) |
+
+The canonical `data_info.yml` was not edited: `Derivation` was already declared `optional`
+under `community_prices` (Nigeria #834).  No precedent serves community `Quantity = 1` elsewhere.
+Ethiopia reads a recorded quantity, and GhanaLSS and Malawi carry `NumberOfUnits`.
+
+**Rules as built (§2-4 checked).**
+- `u`: `releveID = 10 × s07bq03b + s07bq03c`.  A size-0 code takes the household unit label through
+  the household pipeline (decode, then the `u` table).  A sized code becomes `<unit> (<Size>)` with
+  the household's size word (Uganda's `Heap (Small)` form).  The size comes from the digit.  The two
+  code→label maps must be one-to-one or the build raises.
+- `j`: matched by code to the household `s07bq01` label, through `harmonize_food` and the decode.
+  `Description` keeps the s05 label.
+- `obs = slot + 2·rank` (rank in file order within the key).  20 byte-identical rows are dropped
+  before ranking; 10 second-record slots that repeat the first record's same slot are dropped after
+  the melt.  Both are the #840 lossless class, so `_finish_community_prices`'s duplicate-key
+  assertion holds unchanged.
+- `Quantity = 1.0` (Float64) and `Derivation` are stamped by the registered function after
+  `_finish_community_prices`, i.e. after every drop.
+
+**Verification.**
+- Focused test `tests/test_gh823_niger_s05_community_prices.py`.  The 17 synthetic tests cover the
+  unit rule (size 0, sized, Louche 1252/1253, unknown code), the code bridge (narrower products,
+  collision), obs numbering with a duplicate key, the byte-identical copy and the repeated slot,
+  `Existe`, and `Quantity`/`Derivation`/the registry entry.  On development (`9a0ed5f3c`) all 17
+  fail at fixture setup (registry key absent, `_s05_*` absent).  On the branch all 17 pass, plus
+  3 data-gated tests.
+- `test_gh823…`, `test_community_prices_variety.py`, `test_gh1091_niger_community_builder.py`
+  and `test_derivations.py`: **153 passed**, 0 skipped (data-gated tiers ran).  Neighbours
+  `test_niger_u_sentinel.py`, `test_feature_canonical_index.py`, `test_962_unit_sentinel.py`
+  and `test_no_c1_controls_in_curated_labels.py`: 187 passed, 3 skipped (warm-cache gates).  The 2
+  failures were `test_niger_u_sentinel`'s pinned Niger community counts, updated as above; its
+  `community_prices` cases then passed (4/4).
+- Real data, cold, separate private data roots (`validate_823.py`; aggregates in
+  `validate_823.json`):
+  - 2011-12 / 2014-15 are **identical** to development in every column development serves
+    (46,043 rows, `assert_frame_equal(check_exact=True)`).  The only new column is `Derivation`,
+    which is NA on those rows.
+  - 2018-19: **84,444 rows** (the Phase 2 projection) in 504 grappes, 55 `j` and 74 `u`.
+    `obs` 1/2 = 42,087 each, 3 = 134, 4 = 136; `visit` 1 = 42,117, 2 = 42,327; `variety` all
+    `unknown_variety`; `Quantity` all 1.0; `Derivation` all the key.  Top units:
+    `Sachet (Petit)` 8,658, `Unité (Petit)` 6,046, `Tas (Petit)` 5,744, `Sachet (Moyen)` 5,180,
+    `Kg` 5,076.
+  - Shared labels with Niger 2018-19 `food_acquired`: all 55 `j`; 16 of 19 size-0 `u`
+    (18,181 rows).  `Filet au Kg`, `Sac (10 Kg)` and `Sac (5 kg)` (206 rows) are household units
+    no served food row uses.  0 of 55 sized labels (66,057 rows), as decided.
+  - `Feature('community_prices')(['Niger'])`: 130,487 rows, canonical index plus `country` /
+    `currency`; `attrs['derivations']` carries the key at 84,444 rows.
+  - `derivation_inputs(key)`: 42,247 source rows with the original names.  42,087 of 42,087
+    served `(t, v, j, u, visit)` keys are found, and every input key is served.  0 served rows
+    are unmatched.  On 83,854 single-record obs 1-2 rows the served Price equals the source
+    reading.
+  - The branch frame also carries `attrs['recall']`.  This is pre-existing: `attach_recall`
+    attaches Niger's 2018-19 FOOD recall record to any table covering that wave.  Metadata
+    only; noted, not changed.
+- Cache (`hash_census.py`, base vs branch; `hash_impact_823.json`): 23 of 549 country hashes
+  (Niger only), 0 of 40 `build_transforms_fingerprint`, 92 of 2,109 wave hashes (Niger only,
+  23 per wave).  One Niger re-warm.
+
+**Publication.**  Row-level outputs (built frames, `derivation_inputs`, duplicate-key detail, full
+warning text) were written only under `/local/job40390255/data-private/lane-823/`.  The committed
+JSON holds counts, labels and hashes summaries, and warning *classes* only.
+
+**Not determined / residual.**
+- What the 140 conflicting duplicate keys are (two enumerators of the same product is possible;
+  the file has no enumerator id).
+- The origin of the 0.85 ratios and of the non-integer prices.
+- `.coder/coverage/latest.csv` still grades the cell `absent` until the next `make matrix`.
+- `food_acquired.u` still drops `s07bq03c`, so sized community prices have no household `u` to
+  join without rebuilding the pair.
