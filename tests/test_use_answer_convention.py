@@ -12,9 +12,12 @@ Three checks:
 * every country whose ``harmonize_input`` table (at any categorical-mapping
   level: country ``_/``, wave ``{w}/_/``, file or directory spelling) serves a
   ``?`` label declares ``Applied`` in its ``plot_inputs`` scheme -- a ``?``
-  row with no declared ``Applied`` column would be served without its answer;
-* Mali declares ``Applied`` ``optional: true``, as Ethiopia and Malawi do
-  (``Ethiopia/_/data_scheme.yml``, ``Malawi/_/data_scheme.yml``);
+  row with no declared ``Applied`` column would be served without its answer.
+  Scope: ``harmonize_input`` tables ONLY; a ``?`` label written inline in a
+  script (GhanaLSS writes its ``input`` labels as constants in its wave
+  ``plot_inputs.py``) or read from another table is not seen;
+* Mali's ``Applied`` stays REQUIRED (plain ``bool``), unlike Ethiopia's and
+  Malawi's optional one, so the built-table guards keep checking it;
 * ``nitrogen_kg`` counts the use-answer rows it skips on
   ``attrs['nitrogen_input_match']['use_answer_rows']`` -- always present, so
   ``matched_rows + unmatched_rows + use_answer_rows`` is every input row.
@@ -97,16 +100,18 @@ def test_a_country_serving_use_answers_declares_applied(country):
         f"plot_inputs scheme in {path} does not declare `Applied`")
 
 
-def test_mali_applied_is_optional_like_ethiopia_and_malawi():
-    """`Applied` is set on the answer rows only and NA on every type row;
-    Ethiopia and Malawi declare their `Applied` `optional: true`, and so does
-    Mali."""
-    for country in ('Ethiopia', 'Malawi', 'Mali'):
-        spec, path = _plot_inputs_spec(country)
-        applied = spec['Applied']
-        assert isinstance(applied, dict), (country, applied)
-        assert applied.get('type') == 'bool', (country, applied)
-        assert applied.get('optional') is True, (country, path, applied)
+def test_mali_applied_stays_required():
+    """Mali's `Applied` is a REQUIRED column, unlike Ethiopia's and Malawi's
+    `optional: true` one.  `optional: true` would remove it from
+    `country._required_scheme_columns`, which switches off
+    `Country._assert_built_required_columns` and Site B (null_read_audit) for
+    it -- and buys nothing: Site B warns only when a wave's column is 100%
+    null, both EAC-I waves serve answer rows, and the base build emitted 0
+    `Applied` warnings.  Keep the guard."""
+    from lsms_library.country import _required_scheme_columns
+    spec, path = _plot_inputs_spec('Mali')
+    assert spec['Applied'] == 'bool', (path, spec['Applied'])
+    assert 'Applied' in _required_scheme_columns(spec), path
 
 
 _NAMES = ['t', 'i', 'plot_id', 'input', 'crop']

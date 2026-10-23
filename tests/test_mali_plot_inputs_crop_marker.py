@@ -5,13 +5,14 @@ every fertilizer / pesticide type row and both group use-answer rows served
 `crop` = NaN -- 145,530 of 179,817 rows (Site I's count) -- and the first
 full-index groupby deleted them: `Feature('plot_inputs')(['Mali'])` grouped
 on its full index kept 34,287 rows.  `mali.plot_inputs_finalize` now fills
-`mali.CROP_NA = '(not crop-specific)'`, the sentinel Niger defines
-(`Niger/_/niger.py:658-668`, filled at `:693`) and all seven EHCVM siblings
-inline.  Niger's comment also covers "any seed row whose crop could not be
-resolved", so a seed row whose recorded crop harmonize_food does not map
-(Mali: `Non-Exploitée` / `Non exploitée`, `Echalotte`, `Poireaux` -- 45
-served rows) gets the marker too.  The cross-country canonical marker is
-GH #1119's open decision.  The module is loaded from THIS checkout's source.
+`mali.CROP_NA = '(not crop-specific)'` on every NON-SEED row, the sentinel
+Niger defines (`Niger/_/niger.py:668`, filled at `:693`) and all seven EHCVM
+siblings inline.  A seed row never gets the marker: as `niger._crop_labels`
+does (`Niger/_/niger.py:440-445`), a recorded crop harmonize_food does not
+map keeps its own label (Mali: `Non-Exploitée` / `Non exploitée`,
+`Echalotte`, `Poireaux` -- 45 served rows).  The cross-country canonical
+marker is GH #1119's open decision.  The module is loaded from THIS
+checkout's source.
 """
 import importlib.util
 from pathlib import Path
@@ -69,14 +70,32 @@ def test_use_answer_rows_carry_the_marker(mali, code, answer):
     assert got['Applied'].tolist() == [answer]
 
 
-def test_seed_crop_mapped_is_kept_and_unmapped_gets_the_marker(mali):
+def test_seed_crop_mapped_is_kept_and_unmapped_keeps_its_recorded_label(mali):
+    """Niger's rule (niger._crop_labels, niger.py:440-445): an unmapped
+    recorded crop passes through; a seed row is never given the marker."""
     frame = pd.DataFrame([row('seed', crop='Ail', u='Kg', Quantity=2.),
-                          row('seed', plot_id='1_2', crop='Non-Exploitée', u='Kg',
-                              Quantity=1.)])
+                          row('seed', plot_id='1_2', crop=' Non-Exploitée ', u='Kg',
+                              Quantity=1.),
+                          row('seed', plot_id='1_3', crop='Echalotte', u='Kg',
+                              Quantity=1.),
+                          row('seed', plot_id='1_4', crop=pd.NA, u='Kg', Quantity=1.)])
     got = mali.plot_inputs_finalize(frame)
     crops = dict(zip(got.index.get_level_values('plot_id'),
                      got.index.get_level_values('crop')))
-    assert crops == {'1_1': 'Ail', '1_2': MARKER}
+    assert crops['1_1'] == 'Ail'
+    assert crops['1_2'] == 'Non-Exploitée'
+    assert crops['1_3'] == 'Echalotte'
+    # A seed row with no recorded crop is crop-specific, crop unknown: it is
+    # NOT given the marker (none occurs in the Mali sources today).
+    assert pd.isna(crops['1_4'])
+    assert MARKER not in got.index.get_level_values('crop')
+
+
+def test_crop_production_labels_are_untouched(mali):
+    """The pass-through lives in plot_inputs_finalize; _crop_labels, which
+    crop_production shares, still maps an unknown label to NA."""
+    out = mali._crop_labels(pd.Series(['Ail', 'Non-Exploitée']))
+    assert out.iloc[0] == 'Ail' and pd.isna(out.iloc[1])
 
 
 def test_no_nan_on_crop_and_the_collapse_is_unchanged(mali):

@@ -510,18 +510,24 @@ Evidence: =slurm_logs/isa_backlog_2026-10-21/mali-followup/=.
 
 ** plot_inputs: a row that is not crop-specific carries =(not crop-specific)=, not NaN (2026-10-23)
 
-=crop= is a declared index level of =plot_inputs=, and every row that is not crop-specific used to serve it as NaN: 145,530 of 179,817 rows (Site I's =NullIndexKeyWarning= count; all 66,082 use-answer rows among them).
+=crop= is a declared index level of =plot_inputs=, and 145,530 of 179,817 rows used to serve it as NaN (Site I's =NullIndexKeyWarning= count): every non-seed row -- all 66,082 use-answer rows among them -- and 45 seed rows.
 The first full-index =groupby= deleted them -- =Feature('plot_inputs')(['Mali'])= grouped on its full index kept 34,287 rows.
-=plot_inputs_finalize= now fills =mali.CROP_NA= = ='(not crop-specific)'=, the sentinel Niger defines (=Niger/_/niger.py:658-668=, filled at =:693=) and all seven EHCVM siblings inline.
+Now, following Niger exactly:
+- every NON-SEED row carries =mali.CROP_NA= = ='(not crop-specific)'=, the sentinel Niger defines (=Niger/_/niger.py:668=, filled at =:693=) and all seven EHCVM siblings inline -- 145,485 rows;
+- a SEED row is crop-specific and never gets the marker: a recorded crop =harmonize_food= does not map keeps its own label, as =niger._crop_labels= passes one through (=Niger/_/niger.py:440-445=; on a cold Niger build 0 of 31,029 seed rows carry the marker).  The pass-through lives in =plot_inputs_finalize=, not =_crop_labels=, which =crop_production= shares.
 Mali now agrees with its region; which spelling becomes canonical across countries is GH #1119's open decision.
-Measured cold, base =9a0ed5f3c= vs this change: the frames are identical except =crop= NaN -> marker on exactly those 145,530 rows; the full-index =groupby= keeps all 179,817; Site I no longer fires for Mali; =nitrogen_kg= / =seed_kg= totals are unchanged.
-The marker rows by input: =Phytosanitary products?= 33,089; =Inorganic Fertilizer?= 32,993; =Manure= 11,148; =DAP= 9,644; =NPK= 9,643; =Urea= 9,642; =Other inorganic= 9,640; =Pesticide= 6,460; =Herbicide= 6,459; =Fungicide= 6,458; =Other phytosanitary= 6,447; =Compost= 2,673; =Other organic= 1,189; =Seed= 45.
+The marker rows by input: =Phytosanitary products?= 33,089; =Inorganic Fertilizer?= 32,993; =Manure= 11,148; =DAP= 9,644; =NPK= 9,643; =Urea= 9,642; =Other inorganic= 9,640; =Pesticide= 6,460; =Herbicide= 6,459; =Fungicide= 6,458; =Other phytosanitary= 6,447; =Compost= 2,673; =Other organic= 1,189.
+Measured cold against base =9a0ed5f3c= (numbers and commit in =slurm_logs/isa_backlog_2026-10-21/mali-followup/=): only =crop= changes; the full-index =groupby= keeps every row; Site I no longer fires for Mali; =nitrogen_kg= / =seed_kg= totals are unchanged.
 
-*The idiosyncrasy -- 45 SEED rows carry the marker too.*
-No seed row has a blank crop; these 45 record a crop that =harmonize_food= does not map (=seed_crop_probe.py=).
-Niger's rule covers exactly this ("any seed row whose crop could not be resolved"), so they get the marker.
-- 43 record "not cultivated" as the crop: =Non-Exploitée= (2014-15, 35) and =Non exploitée= (2017-18, 8) -- a seed-roster line for a plot the roster itself calls uncultivated.  Only 1 of the 45 marker seed rows reports a positive quantity.
-- 2 (2014-15) are real crops missing from =harmonize_food=: =Echalotte= (shallot) and =Poireaux= (leek).  These ARE crop-specific and are served under the marker only because the mapping lacks them; two =harmonize_food= rows would fix it (not done here: a Mali config change and its own re-warm).
+*The idiosyncrasy -- 45 SEED rows record a crop =harmonize_food= does not map.*
+No seed row has a blank crop (=seed_crop_probe.py=); these 45 are served under their recorded label.
+- 43 record "not cultivated" as the crop: =Non-Exploitée= (2014-15, 35) and =Non exploitée= (2017-18, 8) -- a seed-roster line for a plot the roster itself calls uncultivated.  Only 1 of the 45 reports a positive quantity.
+- 2 (2014-15) are real crops missing from =harmonize_food=: =Echalotte= (shallot) and =Poireaux= (leek).  Two =harmonize_food= rows would give them Preferred Labels (not done here: a Mali config change and its own re-warm).
+Because these labels are not =harmonize_food= Preferred Labels, they do not join =crop_production=, whose =_crop_labels= maps them to NA.
+
+*=Applied= is REQUIRED here, unlike Ethiopia and Malawi.*
+Ethiopia and Malawi declare =Applied= =optional: true=; Mali declares plain =Applied: bool=.
+=optional= would drop it from =_required_scheme_columns= (=country.py=), switching off =_assert_built_required_columns= and Site B for it, and buys nothing: Site B warns only on a wave where the column is 100% null, both EAC-I waves serve answer rows, and the base build emitted 0 =Applied= warnings.
 
 * cluster_features (GH #323 site 4 / GH #627)
 

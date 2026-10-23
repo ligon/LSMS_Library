@@ -153,7 +153,11 @@ Index Info:
     # `use_answer_rows`).  COUNTING TRAP: the rows carry the NO answers too,
     # so counting plots by `input` label counts plots that said "no" --
     # filter `Applied` first.  A country that serves `?` rows declares
-    # `Applied` in its plot_inputs scheme (tests/test_use_answer_convention.py).
+    # `Applied` in its plot_inputs scheme.  tests/test_use_answer_convention.py
+    # checks this ONLY for `?` labels in a `harmonize_input` table (country or
+    # wave categorical_mapping, file or directory spelling); a `?` label
+    # written inline in a script (GhanaLSS writes its `input` labels as
+    # constants in its plot_inputs.py) or read from any other table escapes it.
     plot_inputs: (t, v, i, plot_id, input, j, u, season)
     # GH #840.  ONE ROW PER SURVEY-RECORDED PRICE.  A community price form
     # prices a (product, VARIETY) pair, in a field VISIT, as one of several
@@ -211,7 +215,9 @@ Index Info:
   # country's crop_production labels, spelled the same way: Mali 42 of 42
   # shared, Malawi 26/26, Tanzania 20/20, Nigeria 72/74, Niger 35/43, Benin
   # 8/11 (counts include the "not crop-specific" marker; Mali has carried it
-  # since 2026-10-23 and is 42 of 43 with it).  The misses are the
+  # since 2026-10-23, and its unmapped seed crops pass through -- `Echalotte`,
+  # `Poireaux`, `Non-Exploitée` / `Non exploitée` -- so Mali is now 42 of 47).
+  # The misses are the
   # marker, catch-alls (Benin `Autre tubercule` / `Autre céréale`) and crops
   # crop_production does not record at all (Niger's seven are real crops --
   # `Carotte`, `Igname`, `Jaxatu`, ...; Nigeria `Date palm`), never the same
