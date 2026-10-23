@@ -333,7 +333,10 @@ onward.
 ESS data are collected using a post-planting / post-harvest (PP/PH)
 design, but the =sample= feature uses the household-level cover page
 (=sect_cover_hh_w{N}.dta=), which provides one row per household per
-wave (not per visit).
+wave (not per visit) -- plus, since GH #1120 D1 (2026-10-23), the
+households the survey recorded ONLY in the post-planting agriculture
+cover =sect_cover_pp_w{N}.dta=.  See "sample(): the agriculture cover's
+households" below.
 
 World Bank Microdata Library catalog entries:
 - Wave 1 (2011-12): https://microdata.worldbank.org/index.php/catalog/2053
@@ -398,8 +401,11 @@ Unverified, and the first thing to check before deriving a crosswalk:
 ** Sampling Weights
 *** Weight variables per wave
 
-All weights are in the household cover page (=sect_cover_hh_w{N}.dta=).
-Each wave provides a single weight variable; there is no separate
+All weights are in the household cover page (=sect_cover_hh_w{N}.dta=)
+-- and the same variable, with the same value for every household in
+both, is in the agriculture cover (=sect_cover_pp_w{N}.dta=), which is
+where the agriculture-only households' weights are read from (GH #1120
+D1).  Each wave provides a single weight variable; there is no separate
 panel weight.
 
 | Wave    | Weight variable | Coverage          | Min   | Max      |
@@ -431,6 +437,110 @@ mean-one) -- only ratios and shares are.  See
 | 2015-16 |       4954 | Slight attrition from wave 2       |
 | 2018-19 |       6770 | New sample frame, larger coverage  |
 | 2021-22 |       4959 | Tigray excluded due to conflict    |
+
+These are the HOUSEHOLD-COVER counts.  =sample()= also carries the
+agriculture-only households since GH #1120 D1: 3,969 / 5,287 / 4,981 /
+6,894 / 4,999 rows (next section).
+
+** sample(): the agriculture cover's households (GH #1120 D1, 2026-10-23)
+
+Ruling (@ligon, 2026-10-23): =sample()= takes the households the survey
+recorded in another cover from that cover, with that cover's weight.  In
+W2-W5 some households are in the post-planting AGRICULTURE cover
+(=sect_cover_pp_w{N}=, holder grain) with an EA and a positive weight, but
+in neither the household cover nor the roster.  Their plot-table rows were
+served with =v= = NaN (GH #1120 diagnosis; plot_labor 1,823 rows, plot_inputs
+882, plot_features 942, crop_production 387).  Counts from the raw covers:
+
+| wave    | agriculture-only households | in EAs with no household-cover row |
+|---------+-----------------------------+------------------------------------|
+| 2011-12 |                           0 | --                                 |
+| 2013-14 |                          25 | 1 (1 EA)                           |
+| 2015-16 |                          27 | 10 (1 EA)                          |
+| 2018-19 |                         124 | 64 (6 EAs)                         |
+| 2021-22 |                          40 | 29 (3 EAs)                         |
+
+(The diagnosis's 15 / 14 / 75 / 26 are the households that REACH the plot
+tables; the sample takes every agriculture-only household.)  ESS4's are
+largely the catalog's security exclusion ("The household module was not
+implemented in 30 EAs due to security reasons", catalog 3823); every W2/W3
+one is a 2011-12 sample household (its W1 =household_id= is in the W1
+household cover, same EA).
+
+*Why the agriculture cover's weight is the household's weight.*  For every
+household in BOTH covers, the agriculture cover's =pw*= equals the
+household cover's exactly and the EA agrees: 3,119 / 3,646 / 3,695 /
+2,775 / 2,039 households, 0 disagreements.  The served weight is the
+survey's own variable, read from the other cover; no construction, so no
+derivation is registered.
+
+*How* (=ethiopia.with_agriculture_cover_households=, called by every wave's
+=sample.py=; household-cover rows untouched, frame-equal per wave):
+- the cover is holder grain; a household's rows must agree on EA, weight,
+  region and rural code (asserted; 0 disagree), then are one row;
+- *region and rural are decoded by CODE through the household cover's own
+  labels.*  The agriculture covers label the SAME codes differently -- W1-W3
+  =Oromiya=, =Gambella=, =Dire Dawa=, =Benishangul Gumuz= where the household
+  cover writes =Oromia=, =Gambelia=, =Diredwa=, =Benshagul Gumuz=; W4/W5
+  number them (=4. OROMIA=, =1. RURAL=) -- and the =strata= table in
+  =categorical_mapping.org= knows only the household spellings.  Codes
+  agree between the covers on every household in both; a code the
+  household cover never uses raises.  Every added row's =strata= is a
+  string the household rows already produce;
+- *W3's agriculture cover carries only the W1-style =ea_id=* (11
+  characters), not =ea_id2=.  =v= comes through =ethiopia.ea_id2_crosswalk=
+  over the =(ea_id, ea_id2)= pairs of the W3 AND W2 household covers (the
+  W3 household cover lacks one of the 18 EAs -- 10 households); 2 =ea_id=
+  map to two =ea_id2= in the W3 household cover and are refused, not chosen
+  (no agriculture-only household is in them).  Cross-check, asserted in the
+  script: ESS2/ESS3 build =household_id2= as =ea_id2= + a 3-digit serial
+  (true of 4,954 / 4,954 W3 household-cover rows and 3,779 / 3,779 W2
+  agriculture-cover rows), so each crosswalked =v= is its household's prefix.
+
+*Measured, cold, development =57d255585= -> this branch*: =sample= 25,914 ->
+26,130 rows (+216); =v= NaN rows -> 0 in every Ethiopia table
+(=NullIndexKeyWarning= gone from =plot_labor=, =plot_inputs=,
+=plot_features=, =crop_production= and =interview_date= -- the last one is the
+W5 post-harvest household noted under "interview_date", which IS in the
+agriculture cover).  *Site I (=LSMS_READ_STRICT=) now reports nothing for
+any Ethiopia table.*  Every other cell of every table is unchanged, except
+the within-wave mean-1 weight normalisation, which moves every W2-W5 weight
+by at most 0.12% / 0.07% / 0.74% / 0.12% (W1 unchanged).
+
+*Not done, and recorded.*  The new =v= values in EAs with no household-cover
+row (1 / 1 / 6 / 3 EAs in W2-W5) join no =cluster_features= row, so a
+=market== lookup gives those households NA.  The agriculture cover carries
+region / zone / woreda for them; adding those EAs to =cluster_features= is
+outside D1's ruling.
+
+** Panel crosswalk: the agriculture-only households are walked (GH #1120, 2026-10-23)
+
+=panel_ids.py= built the W2/W3 crosswalk from the household covers only, so
+the households above were never walked.  Evidence, from the raw covers:
+every one of W2's 25 and W3's 27 carries a W1 baseline =household_id= that
+IS in the W1 household cover, in the same EA; none is already another
+household's target; and 25 of W3's 27 were walked in W2 (from the W2
+household cover) to exactly the baseline the W3 agriculture cover records,
+yet left unwalked in W3 -- a panel break the household-cover-only crosswalk
+created.  So they link, by the same two rules (W2 =household_id2 ->
+household_id=; W3 identity chained through W2; W3's own =household_id=
+column is still not trusted), household-cover rows first.
+
+Regenerated with =make -C lsms_library/countries/Ethiopia/_ panel-ids= (the
+unchanged script first reproduced the committed JSON byte-for-byte).  JSON
+diff, counts only: =updated_ids= 2013-14 3,776 -> 3,801 (+25, all linked);
+2015-16 4,954 -> 4,981 (+27: 26 linked, 1 with no W2 record of any kind stays
+itself) *and 12 existing entries moved* from identity to the W1 baseline --
+households in W2's agriculture cover only and in W3's household cover,
+whose chain W2's missing link had broken (for all 12 the target is in the W1
+household cover, in the same EA, and equals W3's own =household_id= column);
+=panel_ids.json= 4,954 -> 4,981.  No target is shared by two keys; no split
+suffix is minted.
+
+Effect on the served tables (W2/W3 rows whose =i= moves to the W1 id, cold
+builds): 21 tables, e.g. =household_roster= 59 rows, =food_acquired= 155,
+=assets= 420, =plot_labor= 381, =livestock= 77, =sample= 12; re-keyed through
+that delta, every one of those rows is otherwise identical.
 
 ** Household ID changes across waves
 
@@ -983,6 +1093,9 @@ sect3<->sect2 JOIN itself uses =household_id= (present in both files
 and consistent within a wave).  Overall orphan rate vs =sample()=
 after id_walk: 1.4% (W1 0.0%, W2 0.7%, W3 0.7%, W4 4.2%, W5 2.0%) --
 a handful of farm households slightly off the cover-page spine.
+*Since GH #1120 D1 (2026-10-23) the orphan rate is 0*: those households are
+the agriculture cover's, which =sample()= now carries (plot_features rows
+with no =v=: 942 -> 0).
 
 ** GPS redaction
 
@@ -1919,7 +2032,9 @@ pairs sit on exactly one §4 field (828 positive sales), 2,067 on several.
 Serving them would mean minting harvest rows at a §4-derived =plot_id= (or
 a sentinel) on a different recall window from §9's -- a new construction
 with no precedent in this repo, so it is NOT done and is an open decision
-(GH #820 report).
+(GH #820 report).  *SUPERSEDED 2026-10-23 by the @ligon ruling on PR #1257*:
+those crops are now served as rows of their own -- see "W1 tree / fruit /
+root crops served as rows (GH #820 ruling)" below.
 
 *Pre-existing, found while doing this, NOT changed:*
 - The §11 path sums its (holder, crop) values with a bare =.sum()=, so an
@@ -2210,6 +2325,93 @@ rows of households =sample()= does not carry; the W4 orphan rate noted under
 +15,180 / +41,442 / +33,382 Birr in W2-W5 (+30 / +7 / +24 / +45
 households); =harvest_kg= and the within-wave =median_price_valuation=
 identical (the added rows carry no quantity).
+
+*The ruling's third part is this filter, and it had already landed.*  The
+PR #1257 rulings (@ligon, 2026-10-23) say "Empty-row filter: fix it so that a
+row carrying a sale value is never dropped (=& Value_sold.isna()=)".  That is
+commit =0663ac4fe= (PR #1274), on development at =ethiopia.py:2457-2458=
+(=:2818-2819= on the GH #1120 branch); nothing further was needed.
+
+** W1 tree / fruit / root crops served as rows (GH #820 ruling, 2026-10-23)
+
+Rulings (@ligon, 2026-10-23, on PR #1257): "W1 tree crops: serve them as new
+rows.  Harvest comes from §12 Q3 and the sale from Q6-Q8.  Rows are keyed to
+the crop's §4 field where it is unique and stamped with the window
+derivation." and "Attach rules: keep both.  A several-plot crop gets no §12
+sale, and §11 wins on a collision."
+
+*The idiosyncrasy.*  W1's §9 is headed "EXCLUDE TREE/ROOT CROPS" (W2/W3's
+"INCLUDE"), and §12 is "SECTION 12. TREES/FRUIT/ROOT CROPS (FOR ALL REPORTED
+IN SECTION 4, such as: potatoes, taro/gondere, sweet potatoes, enset, fruits,
+coffee, pineapple, chat, sugarcane, cassava)", keyed (holder, crop) with no
+field.  Q3 "What was the total amount of [FRUIT/ROOT CROP] harvested in the
+past 12 months?" is KG, as are Q7 (quantity sold) and the =ph_s12q07= label;
+Q8 is BIRR (=2011-12/Documentation/2b_Post_Harvest_English.pdf=, PDF p.13).
+So in W1 these crops had a sale with no row and a harvest in no table.
+
+*Rule* (=ethiopia._mint_sect12_rows=, gated on the W1 colmap naming
+=s12_harvest='ph_s12q03'=).  A §12 line becomes a =crop_production= row when,
+in order:
+1. it has a holder and a crop code, its (holder, crop) is on no other §12
+   line and is NOT in §11 -- the sale attach's own exclusions, same order, so
+   §11 wins (W1: 873 placeholder lines, 0 repeated, 0 in §11);
+2. its (holder, crop) has no §9 row (a crop with one is served by §9, and
+   its §12 sale attaches there, unchanged);
+3. the (holder, crop) is on exactly ONE §4 field, which keys the row
+   (=plot_id= = holder_parcel_field, as everywhere) -- a crop on several fields
+   gets no row (the SALES GRAIN CAVEAT: a holder-level answer is never split);
+4. it serves something: Q3, or a sale read by =derive_sect12_sale= (a "No"
+   with Q7/Q8 blank is a recorded 0).  A recorded Q3 of 0 IS served, as 0 Kg;
+5. its key =(i, plot_id, j, 'Kg')= is not already a §9 row's or another
+   candidate's (two codes =harmonize_crop= folds onto one label on one field).
+The row is =u= = 'Kg', =Quantity= = Q3; =harvest_month= stays NA (Q2 is the end
+of a production period, not a harvest month; it is in =derivation_inputs=).
+=planting_month=, =intercropped= (W1's §3 plot-roster flag) and =perennial=
+reach it through the same joins as every §9 row, because it is minted before
+them.  Its sale is NOT set by the mint: as a one-plot (holder, crop) it goes
+through the reviewed §12 attach (=_attach_sect12_sales=), which fills Q6-Q8
+and stamps =sect12-sale-period=.
+
+*Stamps.*  Q3 is the harvest "in the past 12 months", served beside §9's
+season harvests -- the window =permanent-crop-12-month-window= registers, its
+=waves:= widened to 2011-12 (the brief: "reuse them, widening =waves:= as
+needed").  A minted row that serves Q3 carries it; one that also serves a §12
+sale carries both keys, joined by the registry's =MULTI_SEP=:
+=Ethiopia::crop_production::permanent-crop-12-month-window+Ethiopia::crop_production::sect12-sale-period=.
+=derivation_inputs(window key, wave='2011-12')= returns every §12 line and
+every §4 crop line (the field), original names, =(t, i, j)=.  *Open naming
+question:* W1 §12 includes root crops and vegetables (the window rows'
+=perennial=: 1,983 True, 1,287 False; top crops Leafy Greens 320, Coffee 276,
+Berbere 262, Pumpkin 204, Enset 194), so "permanent-crop" names the window,
+not the crop; the entry's rule says so.
+
+*Measured, cold, development =57d255585= -> this branch*
+(=Country('Ethiopia').crop_production()=):
+
+| | before | after |
+|---+--------+-------|
+| rows (all waves) | 86,403 | 89,840 |
+| W1 rows | 7,744 | 11,181 |
+| W1 rows with a positive =Value_sold= | 854 | 1,682 |
+| W1 rows carrying =sect12-sale-period= | 544 | 3,960 |
+| W1 rows carrying the window key | 0 | 3,270 (3,249 with both keys) |
+| W1 =harvest_kg= (every split) | 653,661 kg | 999,466 kg |
+| W1 =gross_crop_revenue= | 600,749 Birr, 1,731 hh | 1,085,134 Birr, 2,291 hh |
+
+Every pre-existing row is identical in every column (frame diff; W2-W5 and
+the 7,744 W1 rows).  Minted: 3,437 of the 6,134 W1 "no §9 row" lines (3,270
+with a Q3 harvest, 345,805 kg; 828 with a positive sale, 484,385 Birr).  Not
+minted, lines / positive-value lines / Birr: several §4 fields 2,067 / 772 /
+1,279,768; no §4 field 327 / 79 / 61,225; nothing to serve 294 / 0 / 0; key
+occupied 9 / 0 / 0 (counted at build time by =Sect12SaleWarning=; the §12 class
+table above now reads, for W1: no §9 row 2,697 / 851 / 1,340,992, attached
+and served 4,000 / 988).  =harvest_kg= =metric= rises by exactly 3,437 in
+every split and =none= does not move; W2-W5 =harvest_kg=, =gross_crop_revenue=
+and every audit report are unchanged.  Site Q names 3 new W1 rows (Kariya
+4,000 kg x195, Hops 8,400 kg x168, Garlic 2,960 kg x118 of their cell's p90 --
+12-month totals, counted and served, never clipped).  Window symptom: on
+minted rows carrying both a harvest and a sold quantity, sold exceeds harvest
+on 24 of 3,174 (0.8%), against 82 of 2,544 (3.2%) of W1's §9 rows.
 
 ** Crop-side WB conversion factors: held, unwired (2026-09-09)
 

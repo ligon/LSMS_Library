@@ -397,20 +397,25 @@ def test_the_stamp_rides_to_the_served_table(cp):
     against development (9,502).  Every stamped row carries a sale cell, and
     the attrs summary counts exactly the stamped rows."""
     key = "Ethiopia::crop_production::sect12-sale-period"
-    d = cp["Derivation"]
+    window = "Ethiopia::crop_production::permanent-crop-12-month-window"
+    d = cp["Derivation"].astype("string")
     t = cp.index.get_level_values("t")
-    got = {w: int(((d == key).fillna(False) & (t == w)).sum()) for w in sorted(set(t))}
+    carries = d.str.contains(key, regex=False).fillna(False)
+    got = {w: int((carries & (t == w)).sum()) for w in sorted(set(t))}
     # 4,463 / 4,495 before the 2026-10-23 empty-row-filter ruling: W2's 209 and
     # W3's 62 stamped rows with no unit and no quantity are no longer dropped.
-    assert got == {"2011-12": 544, "2013-14": 4672, "2015-16": 4557,
+    # W1 544 -> 3,960 on the W1 tree-crop ruling (PR #1257): the 3,416 rows
+    # minted from §12 that serve a §12 sale (3,437 minted; 21 serve Q3 only).
+    assert got == {"2011-12": 3960, "2013-14": 4672, "2015-16": 4557,
                    "2018-19": 0, "2021-22": 0}, got
-    stamped = (d == key).fillna(False).to_numpy(dtype=bool)
+    stamped = carries.to_numpy(dtype=bool)
     assert (cp.loc[stamped, ["Quantity_sold", "Value_sold"]].notna().any(axis=1)).all()
-    # GH #1256 adds a second key, on W4/W5 rows only; no row carries both.
-    window = "Ethiopia::crop_production::permanent-crop-12-month-window"
-    assert set(d.dropna()) <= {key, window}
-    assert not (d == window).fillna(False)[np.isin(np.asarray(t, dtype=object),
-                                                   list(W13))].any()
+    # GH #1256 adds a second key, on W4/W5 rows; since the W1 ruling it is also
+    # on W1's minted rows that serve a §12 Q3 harvest, joined with this key
+    # where the row also serves a §12 sale ('+').  Never on W2/W3.
+    assert set(d.dropna()) <= {key, window, window + "+" + key}
+    w23 = np.isin(np.asarray(t, dtype=object), ["2013-14", "2015-16"])
+    assert not d.str.contains(window, regex=False).fillna(False)[w23].any()
     summ = cp.attrs["derivations"]["Ethiopia"][key]
     assert summ["rows"] == int(stamped.sum())
     assert summ["columns"] == ["Quantity_sold", "Value_sold"]
@@ -451,5 +456,7 @@ def test_positive_sale_rows_per_wave(cp):
     # 2,737 / 2,300 / 1,368 / 1,292 before the 2026-10-23 ruling that a row
     # carrying a sale value is never dropped (+23 / +9 / +27 / +31 rows whose
     # §9 row has no unit and no quantity; GH #1253 moved no positive value).
-    assert got == {"2011-12": 854, "2013-14": 2760, "2015-16": 2309,
+    # W1 854 -> 1,682 on the W1 tree-crop ruling (PR #1257): +828 rows minted
+    # from §12 that carry a positive sale (484,385 Birr).
+    assert got == {"2011-12": 1682, "2013-14": 2760, "2015-16": 2309,
                    "2018-19": 1395, "2021-22": 1323}, got

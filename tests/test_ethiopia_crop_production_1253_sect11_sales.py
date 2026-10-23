@@ -278,8 +278,12 @@ def test_served_zero_sale_counts_per_wave(cp):
     waves = sorted(set(t))
     v0 = {w: int(((cp["Value_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
     q0 = {w: int(((cp["Quantity_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
-    assert v0 == {"2011-12": 3141, "2013-14": 7734, "2015-16": 7045,
+    # W1 3,141 / 3,142 -> 5,728 / 5,728 and 86,403 -> 89,840 rows on the W1
+    # tree-crop ruling (PR #1257): the 3,437 rows minted from §12 include
+    # 2,587 whose §12 "No" serves Value_sold 0 (2,586 with Quantity_sold 0:
+    # W1's Q7 is KG, the minted row's u).  No §11 cell moved.
+    assert v0 == {"2011-12": 5728, "2013-14": 7734, "2015-16": 7045,
                   "2018-19": 4513, "2021-22": 2964}, v0
-    assert q0 == {"2011-12": 3142, "2013-14": 2581, "2015-16": 0,
+    assert q0 == {"2011-12": 5728, "2013-14": 2581, "2015-16": 0,
                   "2018-19": 0, "2021-22": 0}, q0
-    assert len(cp) == 86403
+    assert len(cp) == 89840

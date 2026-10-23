@@ -139,7 +139,9 @@ def test_derive_permanent_crop_window_is_the_identity(eth):
 def test_the_derivation_is_registered_and_resolves():
     from lsms_library.derivations import derivation_records
     rec = derivation_records("Ethiopia")[KEY]
-    assert rec.waves == ["2018-19", "2021-22"]
+    # 2011-12 since the W1 tree-crop ruling (PR #1257): W1's minted §12 rows
+    # serve §12 Q3, a harvest "in the past 12 months".
+    assert rec.waves == ["2011-12", "2018-19", "2021-22"]
     assert rec.columns == ["Quantity", "Quantity_sold", "Value_sold"]
     assert rec.resolve().__name__ == "derive_permanent_crop_window"
     assert rec.resolve("inputs").__name__ == "inputs_permanent_crop_window"
@@ -153,7 +155,8 @@ def test_w4_w5_scripts_read_the_permanent_flag(wave):
 
 @pytest.mark.parametrize("wave", ["2011-12", "2013-14", "2015-16"])
 def test_w1_w3_scripts_do_not(wave):
-    """W1-W3 put permanent crops in §12 (``sect12-sale-period``, GH #820)."""
+    """W1-W3 put permanent crops in §12 (``sect12-sale-period``, GH #820);
+    W1's minted §12 rows get the window key from §12 Q3, not from a §4 flag."""
     assert "pl_permanent" not in (ROOT / wave / "_" / "crop_production.py").read_text()
 
 
@@ -176,9 +179,12 @@ def test_the_stamp_rides_to_the_served_table(cp):
     day's ruling that a row carrying a sale value is never dropped.)  The
     attrs summary counts them."""
     t = np.asarray(cp.index.get_level_values("t"), dtype=object)
-    d = (cp["Derivation"] == KEY).fillna(False).to_numpy(dtype=bool)
+    d = (cp["Derivation"].astype("string").str.contains(KEY, regex=False)
+         .fillna(False).to_numpy(dtype=bool))
     got = {w: int((d & (t == w)).sum()) for w in sorted(set(t))}
-    assert got == {"2011-12": 0, "2013-14": 0, "2015-16": 0,
+    # W1 3,270 since the W1 tree-crop ruling (PR #1257): the minted §12 rows
+    # that serve a Q3 harvest (3,249 of them also carry sect12-sale-period).
+    assert got == {"2011-12": 3270, "2013-14": 0, "2015-16": 0,
                    "2018-19": 3796, "2021-22": 3875}, got
     assert cp.loc[d, ["Quantity", "Quantity_sold", "Value_sold"]].notna().any(axis=1).all()
     summ = cp.attrs["derivations"]["Ethiopia"][KEY]

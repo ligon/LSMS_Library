@@ -134,4 +134,6 @@ def test_served_rows_whose_only_number_is_a_sale_value(cp):
                    "2018-19": 168, "2021-22": 276}, got
     # and the filter still drops the genuinely empty rows
     assert not (only_value & cp["Value_sold"].isna().to_numpy()).any()
-    assert len(cp) == 86403
+    # 89,840 since the W1 tree-crop ruling (PR #1257): +3,437 W1 rows minted
+    # from §12, all u = 'Kg' -- none is a value-only 'Other (Specify)' row.
+    assert len(cp) == 89840

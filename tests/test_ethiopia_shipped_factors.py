@@ -403,11 +403,25 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     they have no kg: ``none`` rises by exactly 884 in all four splits
     (44,994 -> 45,878; 14,993 -> 15,877; 58,971 -> 59,855; 15,046 -> 15,930)
     and every other count and every ``Harvest_kg`` total is unchanged.
+
+    2026-10-23, W1 tree-crop ruling (PR #1257): 3,437 W1 rows minted from §12
+    for the tree / fruit / root crops W1's §9 excludes (86,403 -> 89,840),
+    all ``u = 'Kg'`` -- so ``metric`` rises by exactly 3,437 in all four
+    splits (40,525 -> 43,962; 7,821 -> 11,258; 26,548 -> 29,985; 7,768 ->
+    11,205), ``none`` does not move, and W1's kilograms rise by the 345,805 kg
+    of §12 Q3 in every split (653,661 -> 999,466; still no shipped file and
+    no Quintal row, so W1 is identical with and without the shipped table).
+    Totals: before 8,799,669.51 -> 9,145,474.51, after 12,696,657.32 ->
+    13,042,462.32 (ratio 1.4429 -> 1.4261); blind before 1,905,712.51 ->
+    2,251,517.51, blind after 12,685,707.32 -> 13,031,512.32.  The blind
+    ``> 6 *`` ratio was a property of W1 contributing nothing the shipped
+    table could not see; it is now 5.788, pinned exactly below rather than
+    loosened.
     """
     import lsms_library as ll
 
     cp = ll.Country("Ethiopia").crop_production()
-    assert len(cp) == 86_403
+    assert len(cp) == 89_840
     # Ethiopia asks NO per-row conversion factor, so `reported` is
     # structurally empty and `reported_vs_shipped` can never be populated.
     assert "KgFactor" not in cp.columns
@@ -420,7 +434,7 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     b, a = before.attrs["kg_factor_sources"], after.attrs["kg_factor_sources"]
     assert before.attrs["kg_factor_declared_from"] == "attrs"
     assert b["shipped"] == 0 and b["shipped_matched"] == 0
-    assert b["metric"] == 40_525 and b["none"] == 45_878
+    assert b["metric"] == 43_962 and b["none"] == 45_878
     assert b["declared"] == a["declared"] == 13_977
     # 2026-09-18, GH #832: `shipped` / `shipped_matched` 62,164 -> 62,705 and
     # `none` 15,587 -> 15,046, both by the SAME 541 rows.  Those are 2015-16
@@ -433,7 +447,7 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     # 12,680,617.28 -> 12,685,707.32; the ratio asserted below rises
     # 6.654 -> 6.657, so `> 6 *` still holds as written.
     assert a["shipped"] == 62_705 and a["shipped_matched"] == 62_705
-    assert a["metric"] == 7_821 and a["none"] == 15_877
+    assert a["metric"] == 11_258 and a["none"] == 15_877
     # Ethiopia's crop units are ALL read off a label, never guessed.  Pinned
     # as its own assertion rather than folded into the counts above: if the
     # price-ratio inference ever starts serving this country, that is a fact
@@ -447,10 +461,10 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     bt = before.groupby(level="t")["Harvest_kg"].sum()
     at = after.groupby(level="t")["Harvest_kg"].sum()
     assert float(bt["2011-12"]) == pytest.approx(float(at["2011-12"]))
-    assert float(bt["2011-12"]) == pytest.approx(653_661.0)
-    assert float(bt.sum()) == pytest.approx(8_799_669.50962, rel=1e-9)
-    assert float(at.sum()) == pytest.approx(12_696_657.323532, rel=1e-9)
-    assert float(at.sum()) / float(bt.sum()) == pytest.approx(1.4429, abs=1e-4)
+    assert float(bt["2011-12"]) == pytest.approx(999_466.0)
+    assert float(bt.sum()) == pytest.approx(9_145_474.50962, rel=1e-9)
+    assert float(at.sum()) == pytest.approx(13_042_462.323532, rel=1e-9)
+    assert float(at.sum()) / float(bt.sum()) == pytest.approx(1.4261, abs=1e-4)
 
     # The declaration switched OFF reproduces every pre-#931 number, so the
     # move above is the declared layer and nothing else.
@@ -458,15 +472,15 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     blind_a = harvest_kg(cp, shipped_factors=shipped, unit_kg={})
     ob, oa = (blind_b.attrs["kg_factor_sources"],
               blind_a.attrs["kg_factor_sources"])
-    assert ob["metric"] == 26_548 and ob["none"] == 59_855
-    assert oa["metric"] == 7_768 and oa["none"] == 15_930
+    assert ob["metric"] == 29_985 and ob["none"] == 59_855
+    assert oa["metric"] == 11_205 and oa["none"] == 15_930
     assert ob["declared"] == oa["declared"] == 0
     assert float(blind_b["Harvest_kg"].sum()) == pytest.approx(
-        1_905_712.50962, rel=1e-9)
+        2_251_517.50962, rel=1e-9)
     assert float(blind_a["Harvest_kg"].sum()) == pytest.approx(
-        12_685_707.323532, rel=1e-9)
-    assert float(blind_a["Harvest_kg"].sum()) > 6 * float(
-        blind_b["Harvest_kg"].sum())
+        13_031_512.323532, rel=1e-9)
+    assert float(blind_a["Harvest_kg"].sum()) / float(
+        blind_b["Harvest_kg"].sum()) == pytest.approx(5.7879, abs=1e-4)
 
 
 def test_the_declared_quintal_matches_the_external_answer_key():
