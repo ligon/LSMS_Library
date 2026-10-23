@@ -747,8 +747,9 @@ themselves and the three still differ.  Measured on the cover pages
 |    365 | Sud-Ouest | Poni (12 of 12)               | Noumbiel (6 of 6)             | 6 of 6                                                 | yes             |
 |    549 | Est       | Kompienga (12 of 12)          | Gourma (6 of 6)               | 6 of 6                                                 | no              |
 
-Every household of each grappe agrees within its wave, the Region agrees
-across waves, and each pair is two neighbouring provinces of that region.
+Every household of each grappe agrees within its wave and the Region agrees
+across waves (both measured); each pair is two neighbouring provinces of
+that region (geography, not measured here).
 Every 2021-22 household in these grappes is a tracked 2018-19 household of
 the SAME grappe (EHCVM-2 is a panel sub-sample within the 2018-19 EAs; see
 "THE THING TO KNOW" above), so the panel evidence points to one EA whose
