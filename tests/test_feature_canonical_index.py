@@ -512,6 +512,9 @@ class TestFeatureEndToEnd:
             "Ethiopia":   ["i", "t", "v", "plot_id", "j", "u"],
             "GhanaSPS":   ["i", "t", "v", "plot_id", "j", "u", "season"],
             "Malawi":     ["i", "t", "v", "plot", "crop", "u", "condition"],
+            # Tanzania serves `production_obs` since GH #637 (2026-10-23) and
+            # Uganda since GH #1198; these two older shapes are kept because
+            # they exercise the promote-`u` and fabricate-sentinel branches.
             "Tanzania":   ["i", "t", "v", "plot_id", "j"],
             "Uganda":     ["i", "t", "v", "plot", "j", "u", "condition", "season"],
         }

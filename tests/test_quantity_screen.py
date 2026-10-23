@@ -20,7 +20,6 @@ sibling for the factor half of the same "count, never clip" contract.
 from __future__ import annotations
 
 import warnings
-from collections import Counter
 
 import numpy as np
 import pandas as pd
@@ -560,43 +559,31 @@ def test_tanzania_2020_21_coconut_and_timber_rows_fire():
     # into a firehose fails here rather than in someone's analysis.
     #
     # The bound is the set of offenders that survive a POSITIVE-ONLY
-    # reference: 13, the same 13 rows this test pinned before GH #637.
-    # GH #637 (2026-10-23) made Tanzania's perennial "not harvested in the
-    # past 12 months" answers (ag6a_06a / ag6b_06a == 2) explicit 0.0 kg rows
-    # (they had been 0.0 with u=NA by an accident of the old reducer), so they
-    # now sit in the (t, 'kg', j) reference cells.  The screen's p90 counts
-    # those zeros -- Timber 2020-21 is 309 zeros of 346 rows, and its
-    # reference falls from 23,088 kg to 17 kg -- so 13 more rows are named
-    # in this wave.  That excess is the screen's defect, GH #1259, not new
-    # data: it is pinned below as a KNOWN, EXPLAINED excess, separately, so
-    # that a growth in the real offender set still fails here, and so that
-    # fixing #1259 (the excess vanishes) fails here too, loudly, until this
-    # pin is retired.
+    # reference.  GH #637 (2026-10-23) made Tanzania's perennial "not
+    # harvested in the past 12 months" answers explicit 0.0 kg rows, and the
+    # screen's p90 then counted those zeros (Timber 2020-21: 309 of 346 rows),
+    # which named 13 zero-driven rows on top -- the defect #1259, fixed by PR
+    # #1266 (positive-only reference).  With #1266 merged the full-frame
+    # audit IS the positive-reference set; until then it is a superset.  The
+    # earlier "known excess" block that pinned those 13 rows is retired here,
+    # as #1266 asks of whichever PR lands second.
+    #
+    # 14, not 13: the round-3 ruling (PR #1263) serves one row per native crop
+    # code (``production_obs``) instead of summing the codes harmonize_crop
+    # lumps.  The 2020-21 Other Fruits kg cell holds 1,662 positive rows
+    # instead of 1,102, its p90 falls from 752.5 to 493.6 kg, so the lumped
+    # 77,644 kg (72,400 + 5,244) is now the single code's 72,400 kg and one
+    # 50,625 kg code (ratio 67 before) now crosses 100x.
     def _key(o):
         return (o["i"], o["plot"], o["j"], o["value"])
 
-    named_all = {_key(o): o for o in report["offenders"]}
+    named_all = {_key(o) for o in report["offenders"]}
     q = pd.to_numeric(df["Quantity"], errors="coerce")
     positive = df[~(q <= 0).fillna(False)]
     pos_reports = audit_quantities(positive, "Quantity", country="Tanzania",
                                    table="crop_production")
     assert len(pos_reports) == 1
     real = {_key(o) for o in pos_reports[0]["offenders"]}
-    assert len(real) == 13, sorted((k[2], k[3]) for k in real)
-    assert real <= set(named_all), "a positive-reference offender stopped firing"
-
-    excess = set(named_all) - real
-    assert Counter(k[2] for k in excess) == {
-        "Timber": 10, "Citrus Fruits": 1, "Coconuts": 1, "Ripe Bananas": 1,
-    }, sorted((k[2], k[3]) for k in excess)
-    # ... and every excess row is explained by zeros in its own cell: it was
-    # judged against a reference below the positive-only p90 of that cell.
-    for k in excess:
-        j = k[2]
-        in_cell = ((df.index.get_level_values("j") == j)
-                   & df["u"].eq("kg").fillna(False).to_numpy(dtype=bool))
-        cell = q[in_cell]
-        assert (cell == 0).any(), j
-        assert named_all[k]["reference"] < cell[cell > 0].quantile(0.9), j
-    assert report["n_implausible"] == len(real) + len(excess)
-    assert report["rows"] == 11_125
+    assert len(real) == 14, sorted((k[2], k[3]) for k in real)
+    assert real <= named_all, "a positive-reference offender stopped firing"
+    assert report["rows"] == 12_676

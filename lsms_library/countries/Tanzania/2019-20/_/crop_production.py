@@ -1,14 +1,17 @@
 """crop_production for Tanzania NPS 2019-20 (NPS-SDD, Extended Panel;
 parity-loop GAP 1).
 
-Item-level harvest at grain (t, i, plot_id, j) from three modules:
+Item-level harvest at grain (t, i, plot_id, j, production_obs) -- one row per
+crop code per module, production_obs = 'reported:<module>:<crop code>' (GH
+#637) -- from three modules:
   AG_SEC_4A  seasonal/annual crops  (ag4a_27 kg; ag4a_19 harvested y/n;
              ag4a_04 intercrop; ag4a_24_2 harvest-end month)
   AG_SEC_6A  perennial FRUIT trees  (ag6a_09 kg; ag6a_06a harvested in the
              past 12 months y/n; ag6a_05; ag6a_07_4)
   AG_SEC_6B  perennial non-fruit    (ag6b_09 kg; ag6b_06a; ag6b_05; ag6b_07_4)
 Reported sales (qty kg + value TSH) at (hhid, crop) grain are attached only
-to single-plot (hhid, crop) rows: AG_SEC_5A seasonal, 7A fruit, 7B non-fruit.
+where the (hhid, crop) is on a single plot of the module its sale module asks
+about: AG_SEC_5A seasonal -> 4A, 7A fruit -> 6A, 7B non-fruit -> 6B.
 Emits raw sdd_hhid as ``i``; the country-level concatenator applies id_walk
 and the framework joins ``v`` from sample().
 """
@@ -48,6 +51,6 @@ df = crop_production_for_wave(
     '2019-20', seas, fruit, peren,
     sales=dict(seasonal=s5, fruit=s7a, perennial=s7b),
     colmaps=colmaps)
-assert df.index.is_unique, "crop_production 2019-20: (t,i,plot_id,j) not unique"
+assert df.index.is_unique, "crop_production 2019-20: (t,i,plot_id,j,production_obs) not unique"
 assert len(df) > 0
 to_parquet(df, 'crop_production.parquet')

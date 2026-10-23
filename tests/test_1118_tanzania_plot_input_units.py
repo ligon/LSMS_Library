@@ -32,6 +32,7 @@ def sources(seed_rows=()):
         'ag3a_65b_2', 'ag3a_65c')})
     defaults = dict(hhid=1, plot=1, crop=1, ag4a_10_1=2,
                     ag4a_10_2=1, ag4a_10c_1=pd.NA,
+                    ag4a_10c_2=pd.NA,  # read since GH #637 (Unit_purchased)
                     ag4a_12=pd.NA, ag4a_08=2)
     sec4 = pd.DataFrame([dict(defaults, **row) for row in seed_rows],
                         columns=list(defaults))

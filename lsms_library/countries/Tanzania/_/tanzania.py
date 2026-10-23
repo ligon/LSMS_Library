@@ -1109,9 +1109,11 @@ def plot_features_for_wave(t, sec02, sec3a, colmap):
 
 
 # Crop-production feature (parity-loop GAP 1).  Item-level harvest at the
-# natural grain (t, i, plot_id, j) -- one row per crop grown on a plot --
-# carrying ONLY reported survey fields.  No harvest_kg sum, no yield, no
-# main_crop, no value-share: those are transformations over these rows.
+# native grain (t, i, plot_id, j, production_obs) -- one row per crop CODE
+# recorded on a plot in one harvest module -- carrying ONLY reported survey
+# fields.  No harvest_kg sum, no yield, no main_crop, no value-share: those
+# are transformations over these rows.
+CROP_PRODUCTION_INDEX = ['t', 'i', 'plot_id', 'j', 'production_obs']
 CROP_PRODUCTION_COLUMNS = [
     'Quantity', 'u', 'Quantity_sold', 'Value_sold',
     'harvest_month', 'intercropped', 'perennial',
@@ -1128,6 +1130,14 @@ def _crop_labels(tablename='harmonize_crop'):
     Tanzania/_/categorical_mapping.org.  Reuses ``_plot_harmonized_codes``
     (codes with a blank Preferred Label collapse to pd.NA)."""
     return _plot_harmonized_codes(tablename)
+
+
+# The three NPS harvest modules, by questionnaire section, and the sale module
+# that asks about each one's crops (5A seasonal sales, 7A fruit sales, 7B
+# other-permanent-crop sales).  The section id qualifies ``production_obs``
+# (GH #637, rulings of 2026-10-23), so one crop code recorded in two modules
+# on one plot -- two recall windows -- stays two rows.
+_CROP_MODULES = {'seasonal': '4A', 'fruit': '6A', 'perennial': '6B'}
 
 
 def _months_to_int(series):
@@ -1153,18 +1163,32 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
     quantity is NA only where it was not recorded and no "did not harvest"
     answer stands in for it (GH #637).
 
+    GRAIN (GH #637, maintainer rulings 2026-10-23).  One row per NATIVE
+    harvest record, ``(t, i, plot_id, j, production_obs)``.  ``j`` is the
+    ``harmonize_crop`` label, which LUMPS distinct crop codes (Other Fruits,
+    Citrus Fruits, Pulses, ...); ``production_obs`` is the canonical native
+    observation coordinate (``lsms_library/data_info.yml``, GH #1198), here
+    ``reported:<module>:<crop code>`` -- e.g. ``reported:4A:34`` -- for the
+    module's section id (``_CROP_MODULES``) and the instrument's own crop
+    code.  So each lumped code keeps its own row, harvest and sale, and one
+    code recorded in the seasonal AND a perennial module on one plot is two
+    rows, never one sum over two recall windows.  The source is unique on
+    (hhid, plot, crop code) within a module, so the index is unique by
+    construction; a repeat is raised, never reduced.
+
     Reported harvest quantity is recorded in KILOGRAMS by the questionnaire
     ((KG) on every harvest variable), so ``u`` = 'kg' and the native
     ``Quantity`` is the reported kg -- NO unit conversion is performed here.
 
-    Sales are recorded at the (hhid, crop) grain (no plot): seasonal in
-    AG_SEC_5A (``ag5a_02`` qty kg, ``ag5a_03`` value), perennial in 7A/7B.
-    We attach ``Quantity_sold`` / ``Value_sold`` to a harvest row ONLY when
-    the (hhid, crop) maps to exactly ONE plot in that wave -- so a reported
-    household-crop sale is carried without being split or duplicated across
-    plots (splitting would fabricate an allocation, which is a
-    transformation, not a reported value).  Where a crop spans >1 plot the
-    sold columns stay NaN.
+    Sales are recorded at the (hhid, crop code) grain (no plot), each in the
+    sale module that asks about one harvest module: AG_SEC_5A (``ag5a_02``
+    qty kg, ``ag5a_03`` value) for 4A, 7A for 6A, 7B for 6B.  A sale is
+    attached to a harvest row ONLY when its (hhid, crop code) is recorded on
+    exactly ONE plot in the harvest module its own sale module asks about --
+    so a reported household-crop sale is carried without being split or
+    duplicated across plots or modules (splitting would fabricate an
+    allocation, which is a transformation, not a reported value).  Where a
+    code spans >1 plot of that module the sold columns stay NaN.
 
     planting_month is ABSENT in NPS (the WB cleaning code notes
     "planting month (absent)") -> NaN.
@@ -1182,12 +1206,18 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
 
     Returns
     -------
-    pd.DataFrame indexed by (t, i, plot_id, j) with columns
-    CROP_PRODUCTION_COLUMNS.
+    pd.DataFrame indexed by CROP_PRODUCTION_INDEX = (t, i, plot_id, j,
+    production_obs) with columns CROP_PRODUCTION_COLUMNS.
+
+    Raises
+    ------
+    ValueError
+        If a kept harvest row has no crop code (its native coordinate cannot
+        be named) or two rows share one native coordinate.
     """
     crop_map = _crop_labels()
 
-    def _block(df, cm, perennial):
+    def _block(df, cm, perennial, module):
         """One harvest module -> tidy (i, plot_id, code, fields) frame."""
         if df is None or len(df) == 0:
             return None
@@ -1196,6 +1226,7 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
         out['plot_id'] = df[cm['plot']].apply(format_id)
         code = pd.to_numeric(df[cm['crop']], errors='coerce').astype('Int64')
         out['_code'] = code
+        out['_module'] = module
         out['j'] = code.map(crop_map).astype('string')
         qty = pd.to_numeric(df[cm['qty']], errors='coerce').astype('Float64')
         # Harvest is 0 where the respondent said it did NOT harvest (== 2):
@@ -1215,9 +1246,9 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
         return out
 
     pieces = [
-        _block(seas, colmaps['seasonal'], False),
-        _block(fruit, colmaps['fruit'], True),
-        _block(peren, colmaps['perennial'], True),
+        _block(seas, colmaps['seasonal'], False, _CROP_MODULES['seasonal']),
+        _block(fruit, colmaps['fruit'], True, _CROP_MODULES['fruit']),
+        _block(peren, colmaps['perennial'], True, _CROP_MODULES['perennial']),
     ]
     pieces = [p for p in pieces if p is not None]
     if not pieces:
@@ -1226,9 +1257,18 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
 
     # Drop rows with no resolvable crop label AND no quantity (pure noise).
     df = df[~(df['j'].isna() & df['Quantity'].isna())].copy()
+    if df['_code'].isna().any():
+        raise ValueError(
+            f"crop_production {t}: {int(df['_code'].isna().sum())} harvest "
+            "row(s) carry a quantity but no crop code, so their native "
+            "production_obs coordinate cannot be named")
 
     # --- reported sales, attached at the unambiguous single-plot grain ----
-    def _sales_block(raw, cm):
+    # Each sale module asks about ONE harvest module's crops, so a sale is
+    # matched to that module's rows only (GH #637 ruling on decision 5: the
+    # seasonal and perennial records of one code are separate rows, and a
+    # sale must not be stamped on both).
+    def _sales_block(raw, cm, module):
         if raw is None or len(raw) == 0:
             return None
         s = pd.DataFrame(index=raw.index)
@@ -1237,30 +1277,27 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
         s['Quantity_sold'] = pd.to_numeric(raw[cm['qty']], errors='coerce').astype('Float64')
         s['Value_sold'] = pd.to_numeric(raw[cm['value']], errors='coerce').astype('Float64')
         s = s.dropna(subset=['_code'])
-        # Multiple sale rows per (i, crop) (e.g. fruit + non-fruit listed under
-        # the same code) -> sum reported quantities/values.
+        # A repeated (i, crop) within one sale module -> sum its reported
+        # quantities/values (none in the held sources; defensive).
         s = (s.groupby(['i', '_code'], dropna=False)[['Quantity_sold', 'Value_sold']]
                .sum(min_count=1).reset_index())
+        s['_module'] = module
         return s
 
     sales_pieces = [
-        _sales_block(sales.get('seasonal'), colmaps['sales_seasonal']),
-        _sales_block(sales.get('fruit'), colmaps['sales_fruit']),
-        _sales_block(sales.get('perennial'), colmaps['sales_perennial']),
+        _sales_block(sales.get(k), colmaps[f'sales_{k}'], _CROP_MODULES[k])
+        for k in ('seasonal', 'fruit', 'perennial')
     ]
     sales_pieces = [s for s in sales_pieces if s is not None]
+    sale_key = ['i', '_code', '_module']
     if sales_pieces:
         all_sales = pd.concat(sales_pieces, ignore_index=True)
-        all_sales = (all_sales.groupby(['i', '_code'], dropna=False)
-                     [['Quantity_sold', 'Value_sold']].sum(min_count=1)
-                     .reset_index())
-        # Only attach where (i, crop) lives on exactly one plot (no fabricated
-        # split across plots).
-        plot_count = df.groupby(['i', '_code'])['plot_id'].transform('nunique')
-        single = df[['i', '_code']].copy()
-        single['_single'] = (plot_count == 1).values
-        df = df.merge(all_sales, on=['i', '_code'], how='left')
-        df.loc[~single['_single'].values, ['Quantity_sold', 'Value_sold']] = pd.NA
+        # Attach only where (i, crop, module) lives on exactly one plot (no
+        # fabricated split across plots).
+        plot_count = df.groupby(sale_key)['plot_id'].transform('nunique')
+        single = (plot_count == 1).values
+        df = df.merge(all_sales, on=sale_key, how='left', validate='many_to_one')
+        df.loc[~single, ['Quantity_sold', 'Value_sold']] = pd.NA
     else:
         df['Quantity_sold'] = pd.Series([pd.NA] * len(df), dtype='Float64')
         df['Value_sold'] = pd.Series([pd.NA] * len(df), dtype='Float64')
@@ -1269,47 +1306,29 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
     # the row is not silently dropped, but flag via the sentinel label.
     df['j'] = df['j'].where(df['j'].notna(),
                             df['_code'].astype('string').radd('crop_'))
+    # The native observation coordinate: section id + the instrument's crop
+    # code, on EVERY row, so a token never depends on its siblings.
+    df['production_obs'] = ('reported:' + df['_module'] + ':'
+                            + df['_code'].astype('string')).astype('string')
 
     df['t'] = t
-    df = df.drop(columns=['_code'])
-    df = df.set_index(['t', 'i', 'plot_id', 'j'])
-    # Collapse duplicate (t, i, plot_id, j) rows.  Measured on the held sources
-    # (GH #637, 2026-10-23), this is NOT a rare guard: 260 groups (652 rows)
-    # in 2019-20 and 958 (2,509) in 2020-21, every one but two being DISTINCT
-    # source crop codes that ``harmonize_crop`` lumps under one label (Other
-    # Fruits, Citrus Fruits, Pulses, ...); the other two are one code listed
-    # in both the seasonal and a perennial module.  No source (hhid, plot,
-    # cropid) is repeated within a module and no key is null.
-    #   * u -- every harvest variable is recorded in KG (u is 'kg' or NA), so
-    #     no group mixes units and the Quantity sum is commensurable.
-    #   * Quantity -- ``min_count=1``: a row or group with no recorded
-    #     quantity stays NA.  This collapse runs over EVERY group, singletons
-    #     included, so a plain 'sum' served all 2,395 NA quantities (527 in
-    #     2019-20, 1,868 in 2020-21) as a harvest of 0.0.  2,376 of them were
-    #     perennial trees the household said it had NOT harvested in the past
-    #     12 months (``ag6a_06a`` / ``ag6b_06a`` == 2), so their zero was right
-    #     -- but only by accident, and only while some unrelated key in the
-    #     wave collided; that answer is now read explicitly through the
-    #     colmap's ``harvested`` slot, as ``ag4a_19`` already was.  The other
-    #     19 were seasonal rows with neither a quantity nor an ``ag4a_19``
-    #     answer, and 0.0 fabricated a harvest of nothing.
-    #   * Quantity_sold / Value_sold 'first', harvest_month 'max',
-    #     intercropped / perennial 'max' -- NOT resolved here.  Where two lumped
-    #     codes each carry their own single-plot sale, 'first' serves one and
-    #     drops the other (14 groups / 1,813 kg / 2,136,000 TSh in 2019-20; 52
-    #     / 10,062 kg / 10,762,200 TSh in 2020-21).  Keeping the codes apart
-    #     needs a level finer than ``j`` (the #840 ``variety`` / #1198
-    #     ``production_obs`` question) -- a grain decision recorded for the
-    #     maintainer under GH #637, not taken here.
+    df = df.drop(columns=['_code', '_module'])
+    df = df.set_index(CROP_PRODUCTION_INDEX)
+    # No collapse (GH #637).  Before the maintainer's 2026-10-23 rulings this
+    # helper collapsed (t, i, plot_id, j), which fired on 260 groups (652
+    # rows) in 2019-20 and 958 (2,509) in 2020-21: distinct crop codes that
+    # ``harmonize_crop`` lumps under one label, plus 3 codes recorded in both
+    # 4A and 6B on one plot.  It summed their quantities across codes and
+    # recall windows and kept the 'first' code's sale (dropping 14 / 52
+    # sales: 1,813 kg / 2,136,000 TSh and 10,062 kg / 10,762,200 TSh), the
+    # 'max' harvest_month and intercropped flag.  ``production_obs`` now keeps
+    # each record, so a repeat here is a source defect: raise, never reduce.
     if not df.index.is_unique:
-        def _sum1(s):
-            return s.sum(min_count=1)
-        df = df.groupby(level=['t', 'i', 'plot_id', 'j']).agg({
-            'Quantity': _sum1, 'u': 'first',
-            'Quantity_sold': 'first', 'Value_sold': 'first',
-            'harvest_month': 'max',
-            'intercropped': 'max', 'perennial': 'max',
-        })
+        dups = df.index[df.index.duplicated()].unique()
+        raise ValueError(
+            f"crop_production {t}: {len(dups)} native coordinate(s) repeated "
+            f"on {CROP_PRODUCTION_INDEX}; one source record per (module, "
+            f"hhid, plot, crop code) is assumed, e.g. {list(dups[:3])}")
     df = df[CROP_PRODUCTION_COLUMNS]
     return df
 
@@ -1340,12 +1359,24 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
 #              purchased quantity (ag3a_44 / ag4a_10c_1); inorganic fert /
 #              herbicide / pesticide record only a purchased VALUE, so Purchased
 #              there is value>0 and Quantity_purchased is NaN (not fabricated).
+#   * Unit_purchased (str) : the unit Quantity_purchased is recorded in (GH #637
+#              ruling 2026-10-23, the Burkina #1188 precedent), canonicalised at
+#              BUILD time to the u Preferred Label the API serves on ``u``
+#              (``_unit_preferred_labels``) -- the API's name-matched mapping
+#              reaches ``u`` only, never this column.  Seed: its OWN unit,
+#              ag4a_10c_2, which differs from the total-quantity unit ag4a_10_2
+#              on 1 (2019-20) and 11 (2020-21) held records; OTHER (SPECIFY) is
+#              ``Unknown``, as on ``u``; NA where no unit was recorded (the
+#              question is skipped when nothing was purchased).  Organic
+#              fertilizer: ``Kg``, which the question itself fixes ("How much
+#              was purchased? (KG)", ag3a_44).  NA where no purchased quantity
+#              is recorded.
 #   * Improved (bool) : seed rows only -- ag4a_08 improved/recycled-improved.
 #   ``u`` is an INDEX level, not a column (GH #637): a plot-input record in one
 #   unit and another in a different unit are different rows.
 PLOT_INPUTS_INDEX = ['t', 'i', 'plot_id', 'input', 'crop', 'u']
 PLOT_INPUTS_COLUMNS = ['Quantity', 'Purchased', 'Quantity_purchased',
-                       'Improved']
+                       'Unit_purchased', 'Improved']
 
 # Native seed-unit code (ag4a_10_2 / ag4a_10c_2) -> tidy label.  kg/litre/etc.
 # are harmonized to the canonical u Preferred Label at API time by the country
@@ -1356,6 +1387,30 @@ _SEED_UNIT_LABELS = {
 }
 # Native herbicide/pesticide-unit code (ag3a_62_2 / ag3a_65b_2) -> tidy label.
 _LIQUID_UNIT_LABELS = {1: 'kg', 2: 'litre', 3: 'millilitre', 4: pd.NA}
+
+
+def _unit_preferred_labels():
+    """{tidy unit label -> the ``u`` Preferred Label the API serves}.
+
+    The country ``u`` table (``Tanzania/_/categorical_mapping.org``) over the
+    cross-country one (``lsms_library/categorical_mapping/u.org``), country
+    rows winning -- the same composition the read-time additive merge gives
+    ``u`` (``'kg'`` is mapped to ``'Kg'`` only by the cross-country table).
+    Used to canonicalise ``Unit_purchased`` at BUILD time: the API maps a
+    column only when its name matches a table, so ``Unit_purchased`` would
+    otherwise keep the raw tidy spelling while ``u`` is served canonical.
+    Both files are build inputs of every Tanzania wave hash (GH #757).
+    """
+    from pathlib import Path
+    from lsms_library.local_tools import get_categorical_mapping
+
+    kw = {'Preferred Label': 'Preferred Label'}
+    out = dict(get_categorical_mapping(tablename='u', idxvars='Original Label',
+                                       dirs=[], **kw))
+    out.update(get_categorical_mapping(tablename='u', idxvars='Original Label',
+                                       dirs=[str(Path(__file__).parent) + '/'],
+                                       **kw))
+    return out
 
 
 def _yn_true(series):
@@ -1398,6 +1453,17 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     c = colmap
     fert_type_map = _plot_harmonized_codes('harmonize_input')
     crop_map = _crop_labels()
+    preferred = _unit_preferred_labels()
+
+    def canonical_unit(label, recorded):
+        """A tidy unit label -> its served ``u`` Preferred Label.  A unit
+        code that was recorded but is OTHER (SPECIFY) is ``U_UNKNOWN``, as on
+        ``u``; an unrecorded one stays NA ("not asked" is not a unit)."""
+        if pd.isna(label):
+            return U_UNKNOWN if recorded else pd.NA
+        return preferred.get(label, label)
+
+    na_unit = pd.array([pd.NA] * len(sec3a), dtype='string')
 
     def _ids(df):
         return (df[c['hhid']].apply(format_id), df[c['plot']].apply(format_id))
@@ -1411,6 +1477,16 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
         qty = pd.to_numeric(sec4a['ag4a_10_1'], errors='coerce').astype('Float64')
         unit = pd.to_numeric(sec4a['ag4a_10_2'], errors='coerce').astype('Int64')
         pqty = pd.to_numeric(sec4a['ag4a_10c_1'], errors='coerce').astype('Float64')
+        # The purchased quantity's OWN unit (GH #637 ruling on decision 3).
+        # Its Stata dictionary is the total unit's (KG / 20 LITER BUCKET /
+        # SMALL CUP / LARGE CUP / OTHER (SPECIFY)) in both held extracts, but
+        # the recorded code is read from ag4a_10c_2 itself: equal codes on
+        # two variables do not make one unit (#1188).
+        punit = (pd.to_numeric(sec4a['ag4a_10c_2'], errors='coerce').astype('Int64')
+                 .map(lambda x: pd.NA if pd.isna(x)
+                      else canonical_unit(_SEED_UNIT_LABELS.get(int(x), pd.NA),
+                                          recorded=True))
+                 .astype('string'))
         paid = pd.to_numeric(sec4a['ag4a_12'], errors='coerce').astype('Float64')
         seedtype = pd.to_numeric(sec4a['ag4a_08'], errors='coerce').astype('Int64')
         seed = pd.DataFrame({
@@ -1422,6 +1498,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
             # Purchased if a purchased quantity OR an amount paid is recorded.
             'Purchased': ((pqty.fillna(0) > 0) | (paid.fillna(0) > 0)).values,
             'Quantity_purchased': pqty.values,
+            'Unit_purchased': punit.values,
             'Improved': seedtype.map({1: True, 2: False, 3: True})
                         .astype('boolean').values,
         })
@@ -1452,6 +1529,11 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
         'Quantity_purchased': pd.to_numeric(sec3a['ag3a_44'], errors='coerce').astype('Float64').values,
         'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
     })
+    # ag3a_44 is asked in KG by the question itself ("How much was
+    # purchased? (KG)"), as ag3a_42 is, hence u = 'kg' above.
+    org['Unit_purchased'] = (
+        pd.Series(canonical_unit('kg', recorded=True), index=org.index, dtype='string')
+        .where(org['Quantity_purchased'].notna(), pd.NA))
     org = org[used.fillna(False).values]
 
     # inorganic fertilizer, first and second type
@@ -1470,6 +1552,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
             # purchased qty -> Purchased = value>0; Quantity_purchased NaN.
             'Purchased': (val.fillna(0) > 0).astype('boolean').values,
             'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+            'Unit_purchased': na_unit,
             'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
         })
         return d[u.fillna(False).values]
@@ -1487,6 +1570,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
         'u': _liquid_unit('ag3a_62_2').values,
         'Purchased': (valh.fillna(0) > 0).astype('boolean').values,
         'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        'Unit_purchased': na_unit,
         'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
     })
     herb = herb[uh.fillna(False).values]
@@ -1501,6 +1585,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
         'u': _liquid_unit('ag3a_65b_2').values,
         'Purchased': (valp.fillna(0) > 0).astype('boolean').values,
         'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        'Unit_purchased': na_unit,
         'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
     })
     pest = pest[up.fillna(False).values]
@@ -1541,14 +1626,37 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     # Quantity_purchased of fertilizer rows, which record only a purchased
     # VALUE, not a purchased quantity).  ``dropna=False`` keeps the NA-crop
     # (plot-level input) rows.
+    # The type-1 / type-2 fertilizer pairs stay summed by ruling (@ligon,
+    # 2026-10-23: the form asks two slots, read as two applications); the
+    # identical-quantity pairs are recorded in CONTENTS.org as possible
+    # double entry.
+    #   Unit_purchased -- Quantity_purchased is summed only where every
+    # purchased quantity in the group is in ONE recorded purchase unit; a
+    # group whose purchase units disagree would be an incommensurable sum,
+    # so it is raised, never reduced (none in the held sources: 0 of the
+    # 11 / 86 lumped Seed groups).  Rows without a recorded purchase unit
+    # carry no purchased quantity to add (the unit is asked only when one is
+    # recorded), so they do not disagree.
     if not df.index.is_unique:
         def _sum1(s):
             return s.sum(min_count=1)
+
+        def _agreed_unit(s):
+            units = s.dropna().unique()
+            if len(units) > 1:
+                raise ValueError(
+                    f"plot_inputs {t}: purchased quantities in different "
+                    f"units {sorted(map(str, units))} share one key "
+                    f"{s.index[0]!r}; Quantity_purchased cannot be summed")
+            return units[0] if len(units) else pd.NA
+
         df = df.groupby(level=PLOT_INPUTS_INDEX, dropna=False).agg({
             'Quantity': _sum1,
             'Purchased': 'max', 'Quantity_purchased': _sum1,
+            'Unit_purchased': _agreed_unit,
             'Improved': 'max',
         })
+        df['Unit_purchased'] = df['Unit_purchased'].astype('string')
     df = df[PLOT_INPUTS_COLUMNS]
     return df
 

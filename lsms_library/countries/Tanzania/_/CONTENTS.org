@@ -1849,17 +1849,56 @@ The remaining duplicates of the 6-level key (12 / 92) stay summed with =min_coun
 Two OTHER units are not known to be the same unit (#1041: =Unknown= is not a unit).
 They are NOT split here: =u= cannot tell them apart, and separating them needs a row ordinal (the #840 / #1198 question again).
 The downstream effect is nil today because =Unknown= receives no kg factor.
-Two further kinds deserve a maintainer's look, not a change:
-- *The same inorganic fertilizer named as both type 1 and type 2 on one plot* (1 in 2019-20, 6 in 2020-21).  Five of the seven pairs carry identical quantities (e.g. 50 + 50 kg Urea), which reads like double entry rather than two applications.  Summing doubles them; the instrument cannot say which.
+The 2019-20 60 + 100 group also recorded both *purchased* quantities in OTHER (=ag4a_10c_2= = 5), so its =Quantity_purchased= 160 is the same residual under =Unit_purchased= ='Unknown'= (the only such group in either wave).
+One further kind deserves a maintainer's look, not a change:
 - *=Improved= OR'd across lumped crop codes* (1 / 6 groups at the 6-level key disagree; 1 / 8 at the old key): one code's seed recorded improved and the other's not is served as improved.
 
-Not changed, and recorded for the maintainer:
-- =Quantity_purchased= is served with no unit.  Its own unit, =ag4a_10c_2=, differs from the total-quantity unit on 1 (2019-20) and 11 (2020-21) seed records, so on those rows it is in a unit the table does not name.  Burkina Faso's =Unit_purchased= column is the precedent if that is wanted.
+** Fertilizer type-1 / type-2 pairs: summed, possibly double entry (GH #637 ruling, 2026-10-23)
+
+=AG_SEC_3A= asks for two inorganic fertilizers per plot (type 1 =ag3a_47..51=, type 2 =ag3a_54..58=).
+On 7 plots the same product is named in both slots, and the helper sums the two quantities under one =(t, i, plot_id, input, crop, u)= key.
+*Ruling (@ligon, 2026-10-23): keep summing* -- the form asks two slots, and they are read as two applications.
+But five of the seven pairs carry *identical* quantities, and four of those five also carry identical purchase values, which reads like double entry rather than two applications.
+They are recorded here as *possible double entry*; nothing in the data distinguishes the two readings.
+| wave    | product          | type 1 (kg) | type 2 (kg) | type 1 value (TSh) | type 2 value (TSh) | identical quantity |
+|---------+------------------+-------------+-------------+--------------------+--------------------+--------------------|
+| 2019-20 | Urea             |          50 |         100 |             35,000 |            120,000 | no                 |
+| 2020-21 | Urea             |          12 |          12 |             15,600 |             15,600 | yes                |
+| 2020-21 | Urea             |          50 |          50 |             56,000 |             56,000 | yes                |
+| 2020-21 | NPK              |           7 |           7 |             10,500 |             10,500 | yes                |
+| 2020-21 | NPK              |          16 |         250 |             20,000 |              2,500 | no                 |
+| 2020-21 | Other Fertilizer |          75 |          75 |                  0 |             75,000 | yes                |
+| 2020-21 | Urea             |          50 |          50 |             72,000 |             72,000 | yes                |
+(Measured on the held =AG_SEC_3A= / =ag_sec_3a=, 2026-10-23: both slots used on 47 / 295 plots, the same product on 1 / 6.  Every pair names the same product code, codes 2 / 6 / 8.)
+If the identical pairs are one application entered twice, =nitrogen_kg= double counts 12 + 50 + 50 kg of urea and 7 kg of NPK on those plots.
+=tests/test_gh637_tanzania_unit_grain.py::test_same_fertilizer_in_both_inorganic_slots_is_still_summed= pins the sum.
+
+** =Unit_purchased= (GH #637 ruling, 2026-10-23)
+
+=Quantity_purchased= used to be served with no unit.
+*Ruling (@ligon, 2026-10-23):* serve the unit of seed =Quantity_purchased= as =Unit_purchased=, canonicalised at build time, following Burkina Faso's #1188 column.
+It is declared =optional: true= (=type: str=).
+- Seed: the purchased quantity's own unit, =ag4a_10c_2=, not =u= (=ag4a_10_2=, the total's unit).
+  Both variables carry the same Stata dictionary in both held extracts (KG / 20 LITER BUCKET / SMALL CUP / LARGE CUP / OTHER (SPECIFY)), but the code is read from =ag4a_10c_2= itself: equal codes on two variables do not make one unit (#1188).
+  OTHER (SPECIFY) is =Unknown=, as on =u=.
+  The unit is recorded exactly where a positive purchased quantity is (494 / 2,141 records), and is NA elsewhere: the question is skipped when nothing was bought, and "not asked" is not a unit.
+- Organic fertilizer: =Kg= where =Quantity_purchased= is recorded, because the question itself is "How much was purchased? (KG)" (=ag3a_44=), as =ag3a_42= is for =u=.
+  The ruling names seed; the organic case is added so that no served =Quantity_purchased= is left without its unit (14 / 96 rows).
+- Inorganic fertilizer, herbicide, pesticide: NA.  They record a purchased value, not a purchased quantity.
+"Canonicalised at build time" means the spelling the API serves on =u=: =Kg=, =20l Bucket=, =Small Cup=, =Large Cup=, =Unknown=.
+=_unit_preferred_labels= composes this country's =u= table over the cross-country one (=lsms_library/categorical_mapping/u.org=, the only source of ='kg' -> 'Kg'=), country rows winning, as the read-time additive merge does.
+The build has to do this itself: the API maps a column only when its name matches a table, so it never touches =Unit_purchased=.
+Both files are inputs of every Tanzania wave hash (GH #757).
+=Unit_purchased= differs from the served =u= on 1 record in 2019-20 (Kg total, small-cup purchase) and 11 in 2020-21 (Kg -> 20l Bucket 3, 20l Bucket -> Kg 2, Unknown -> Kg 2, and one each of 20l Bucket -> Unknown, Kg -> Unknown, Large Cup -> Kg, Small Cup -> 20l Bucket).
+On those rows =Quantity_purchased= and =Quantity= are in different units; no conversion between them is implied.
+Where the 6-level collapse sums two lumped codes' purchased quantities, it requires their purchase units to agree and raises otherwise.  No group in either wave disagrees (0 of 11 / 86 lumped Seed groups).
+Served rows are unchanged otherwise: index identical and every other column frame-equal to =5239daecd=.
 
 * crop_production: the collapse and the "did not harvest" zeros (GH #637, 2026-10-23)
 
 =crop_production_for_wave= stacks =AG_SEC_4A= (seasonal), =6A= (fruit trees) and =6B= (other perennials) at =(t, i, plot_id, j)= and collapses duplicate keys.
 Its unit axis is sound: every harvest variable is recorded in KG, so =u= is ='kg'= or NA and no group mixes units.  Its grain is unchanged.
+(Superseded by the maintainer's rulings of the same day: the grain is now the native record and the collapse is gone -- see "Native records: =production_obs=" below.  This entry records the round-1/2 state.)
 
 The collapse is not a rare guard.  It fires on 260 groups (652 rows) in 2019-20 and 958 (2,509) in 2020-21, every one but two being distinct source crop codes that =harmonize_crop= lumps (Other Fruits 187 / 699, Citrus Fruits 33 / 147, Pulses 9 / 90, ...); the other two are one code listed in both =4A= and a perennial module (one of them 860 + 860 kg -- possibly double recording across the two recall windows).
 
@@ -1878,8 +1917,45 @@ Development's own seasonal reported zeros had no measured effect: development wi
 Ruling (2026-10-23): keep =u='kg'= on recorded zeros -- Tanzania's own seasonal zeros and Ethiopia's convention -- because the defect is the screen's; filed as #1259.
 =tests/test_quantity_screen.py= therefore pins the 13 offenders of 2020-21 that survive a positive-only reference as the real bound, and the 13 zero-driven rows (10 Timber, 1 Citrus Fruits, 1 Coconuts, 1 Ripe Bananas) as a known, explained excess citing #1259; the test fails if either set changes.
 
-*Not changed: the sale columns.*  Sales are recorded per =(hhid, crop code)= and attached to a single-plot harvest row; the collapse keeps the ='first'= sale.  Where two lumped codes on one plot each carry a sale, one is dropped: 14 groups / 1,813 kg / 2,136,000 TSh in 2019-20, 52 / 10,062 kg / 10,762,200 TSh in 2020-21.  =harvest_month= (='max'=, 111 / 396 groups disagree) and =intercropped= (='max'=, 22 / 79) are selected the same way.
-Keeping the codes apart needs a level finer than =j= -- the question #840 answered for =community_prices= with =variety= (the source item code) and #1198 for Uganda with =production_obs= -- and is a grain decision about a published table, left to the maintainer under #637.
+*Superseded by the rulings below: the sale columns.*  Sales are recorded per =(hhid, crop code)= and attached to a single-plot harvest row; the collapse kept the ='first'= sale.  Where two lumped codes on one plot each carried a sale, one was dropped: 14 groups / 1,813 kg / 2,136,000 TSh in 2019-20, 52 / 10,062 kg / 10,762,200 TSh in 2020-21.  =harvest_month= (='max'=, 111 / 396 groups disagree) and =intercropped= (='max'=, 22 / 79) were selected the same way.
+Keeping the codes apart needs a level finer than =j= -- the question #840 answered for =community_prices= with =variety= (the source item code) and #1198 for Uganda with =production_obs=.
+
+** Native records: =production_obs= (GH #637 rulings, 2026-10-23)
+
+*Rulings (@ligon, 2026-10-23).*  Decision 1: populate the canonical =production_obs= level with the native crop code, so each code that shares a =harmonize_crop= label keeps its own row, harvest and sale (the #1198 precedent).  Decision 5: one code recorded in the seasonal and a perennial module on one plot stays *separate by module*, so quantities from different recall windows are never added.
+
+The declared index is now =(t, i, plot_id, j, production_obs)=, the order Uganda uses (=production_obs= last).
+=production_obs= is =reported:<module>:<crop code>=, e.g. =reported:4A:34= / =reported:6B:34=, on every row, so a token never depends on its siblings.
+The module is the questionnaire section (=4A= seasonal, =6A= fruit trees, =6B= other permanent crops) and the code is the instrument's own =cropid=, an instrument ID in the =data_info.yml= grammar.
+The source is unique on =(hhid, plot, cropid)= within each module and no key is null, so the index is unique by construction.
+The collapse is gone: a repeated native record or a quantity without a crop code now raises instead of being reduced.
+Like Uganda's, the coordinate is not a panel entity: a code's token is stable across waves only because the crop-code list is.
+
+Sales follow the module.  =5A= asks about =4A='s crops, =7A= about =6A='s and =7B= about =6B='s, so each sale module attaches only to its own harvest module's rows, and the single-plot rule is applied within that module.
+Without this, a sale would be stamped on both rows of a code recorded in two modules.
+In the held sources every sale has a harvest row in its own module (0 orphans).
+
+Measured, cold builds of development =9a0ed5f3c=, the PR head before the rulings =5239daecd= and the new head, private =LSMS_DATA_DIR=s (=slurm_logs/isa_backlog_2026-10-21/637-tanzania-unit-grain/round3/=):
+| wave    | rows before | rows after | added | split =(t,i,plot_id,j)= keys | sales recovered                 |
+|---------+-------------+------------+-------+------------------------------+---------------------------------|
+| 2019-20 |       3,001 |      3,393 |  +392 |                          260 | 14 keys, 1,813 kg, 2,136,000 TSh  |
+| 2020-21 |      11,125 |     12,676 | +1,551 |                         958 | 52 keys, 10,062 kg, 10,762,200 TSh |
+- Of the 1,551 rows added in 2020-21, 1,548 are lumped codes and 3 are module pairs; 2019-20 has no module pair.
+  The three pairs are all =4A= + =6B=: =Pulses= 860 + 860 kg and 60 + 60 kg, and =Other Crop= 20 kg in =4A= with a recorded "not harvested" 0 kg in =6B=.
+  The first version of the PR counted 2, because the =Other Crop= pair shares its =(t, i, plot_id, j)= group with other lumped codes.
+  None of the three pairs has a recorded sale attached: the Pulses sales sit on two plots of each module, and the Other Crop sale record is empty.
+- Within each split key the quantities sum to the old value; every other old key's single row is identical in every column but one.
+- That one row is a =7B= sale of 130 kg / 120,000 TSh in 2020-21, now attached to its =6B= row.
+  The code (Pulses) is on one =6B= plot and on two other plots in =4A=, so the old cross-module single-plot rule refused it; it is that household's only attached sale.
+- Per household, served =Quantity_sold= / =Value_sold= now equal the raw =5A= / =7A= / =7B= sums over every sale whose code is on one plot of its module, in both waves (1,414,644 kg / 192,091,250 TSh; 11,885,924 kg / 867,363,600 TSh).
+  Sales on more than one plot of their module are still not allocated (225,484 kg / 133,353,650 TSh; 1,090,662 kg / 487,636,720 TSh).
+- =harvest_month= and =intercropped= are now each code's own answer; they disagree within 111 / 396 and 22 / 79 old keys, where ='max'= picked one.
+- =gross_crop_revenue= rises by exactly the recovered sales, 189,955,250 -> 192,091,250 TSh and 856,481,400 -> 867,363,600 TSh.  66 household-wave totals change (one is new, the 7B sale above) and none falls.
+- =harvest_kg= and =yield_kg= are frame-identical.  They sum to =(t, i, plot_id, j)= themselves, across =production_obs= and so across the module pairs too (1,720 kg Pulses for the 860 + 860 plot).  Keeping recall windows apart below that grain is the table's job; =harvest_kg='s plot-crop sum is a separate transformation question, not changed here.
+- =Feature('crop_production')(['Tanzania', 'Malawi'])= assembles with a unique index: Tanzania keeps its =reported:= tokens and Malawi gets the =unresolved_observation= sentinel.
+- No grain, Site I or new warnings.
+
+*Site Q after the rulings.*  The 2020-21 positive-reference offender set is *14*, not 13.  Un-lumping puts 1,662 positive rows in the Other Fruits kg cell instead of 1,102, so its p90 falls from 752.5 to 493.6 kg.  The lumped 77,644 kg (72,400 + 5,244) becomes the single code's 72,400 kg, still named, and one 50,625 kg code that sat at 67x now sits at 102.6x.  2019-20 is unchanged (1).  Under PR #1266's positive-only reference (#1259) the full screen names exactly these 14; without it the screen names 30 (4 in 2019-20).  =tests/test_quantity_screen.py= pins the 14 and retires the "known excess" block, as #1266 asks of whichever PR lands second.
 
 * Cluster id renumbering at round 3 (GH #942)
 

@@ -43,6 +43,6 @@ df = crop_production_for_wave(
     '2020-21', seas, fruit, peren,
     sales=dict(seasonal=s5, fruit=s7a, perennial=s7b),
     colmaps=colmaps)
-assert df.index.is_unique, "crop_production 2020-21: (t,i,plot_id,j) not unique"
+assert df.index.is_unique, "crop_production 2020-21: (t,i,plot_id,j,production_obs) not unique"
 assert len(df) > 0
 to_parquet(df, 'crop_production.parquet')
