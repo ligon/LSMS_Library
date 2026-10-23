@@ -30,6 +30,7 @@ exactly where a redirected ``to_parquet`` would.
 """
 from __future__ import annotations
 
+import copy
 import inspect
 import shutil
 import warnings
@@ -463,8 +464,11 @@ def test_empty_declared_frame_keeps_interleaved_optional_declaration_order():
     assert frame.empty and list(frame.index.names) == ['t', 'i']
     assert all(str(frame.index.get_level_values(n).dtype) == 'str'
                for n in frame.index.names)
-    # This constructor does not coerce measures or expand dict dtype policy.
-    assert all(dtype == object for dtype in frame.dtypes)
+    # GH #1218 intentionally extends this empty-only dtype contract; the
+    # declaration order and index contract from GH #1215 stay the same.
+    assert list(frame.dtypes) == [pd.StringDtype(), pd.Float64Dtype(),
+                                  pd.BooleanDtype(), pd.Int64Dtype(),
+                                  pd.Float64Dtype(), pd.StringDtype()]
 
 
 @pytest.mark.parametrize('entry,columns,levels', [
@@ -482,6 +486,183 @@ def test_empty_declared_order_preserves_existing_shapes(entry, columns, levels):
     assert frame.empty
     assert list(frame.columns) == columns
     assert list(frame.index.names) == levels
+
+
+# GH #1218: type and optional membership are independent declarations.
+@pytest.mark.parametrize('form', ['scalar', 'required', 'implicit-required', 'optional'])
+@pytest.mark.parametrize('declared,expected', [
+    ('str', pd.StringDtype()), ('string', pd.StringDtype()),
+    ('bool', pd.BooleanDtype()), ('int', pd.Int64Dtype()),
+    ('float', pd.Float64Dtype()),
+    ('datetime', 'calendar'), ('date', 'calendar'), ('timestamp', 'calendar'),
+])
+def test_constructed_empty_uses_existing_explicit_nullable_types(form, declared, expected):
+    spec = declared if form == 'scalar' else {
+        'type': declared, 'optional': form == 'optional'}
+    if form == 'implicit-required':
+        spec.pop('optional')
+    entry = {'index': '(t, i)', 'Local': spec}
+    before = copy.deepcopy(entry)
+    frame = C._empty_declared_frame(entry)
+    if expected == 'calendar':
+        # Match the existing pandas calendar conversion, including resolution.
+        expected = pd.to_datetime(pd.Series([], dtype=object), format='mixed').dtype
+    pd.testing.assert_series_equal(
+        frame.Local, pd.Series([], index=frame.index, dtype=expected, name='Local'),
+        check_exact=True)
+    assert entry == before, 'empty construction mutated a source declaration'
+
+
+@pytest.mark.parametrize('declared', [
+    None, 'unknown', {'type': 'unknown', 'optional': True},
+    {'optional': True}, {'type': None, 'optional': True},
+    {'type': ['a', 'b'], 'optional': True},
+    {'type': {'name': 'float'}, 'optional': True},
+    {'type': True, 'optional': True}, {'type': 1, 'optional': False},
+])
+def test_constructed_empty_does_not_guess_missing_or_unknown_types(declared):
+    entry = {'index': '(t, i)', 'Local': declared}
+    before = copy.deepcopy(entry)
+    frame = C._empty_declared_frame(entry)
+    assert frame.empty and list(frame.columns) == ['Local']
+    assert frame.Local.dtype == object
+    assert entry == before
+
+
+@pytest.mark.parametrize('labels', [[], ['a', 'b']])
+def test_constructed_empty_keeps_existing_bare_list_string_semantics(labels):
+    frame = C._empty_declared_frame({'Local': labels})
+    pd.testing.assert_series_equal(
+        frame.Local, pd.Series([], dtype=pd.StringDtype(), name='Local'),
+        check_exact=True)
+
+
+def test_constructed_empty_payload_types_never_recast_declared_index_names():
+    entry = {'index': ['LocalInt', 'LocalString'],
+             'LocalInt': {'type': 'int', 'optional': False},
+             'LocalString': {'type': 'bool', 'optional': True},
+             'Payload': {'type': 'float', 'optional': True}}
+    frame = C._empty_declared_frame(entry)
+    expected = pd.MultiIndex.from_arrays(
+        [pd.Series([], dtype='str'), pd.Series([], dtype='str')],
+        names=['LocalInt', 'LocalString'])
+    pd.testing.assert_index_equal(frame.index, expected, exact=True)
+    for actual, original in zip(frame.index.codes, expected.codes):
+        assert actual.dtype == original.dtype
+    for actual, original in zip(frame.index.levels, expected.levels):
+        assert type(actual.dtype) is type(original.dtype)
+        assert actual.dtype.storage == original.dtype.storage
+        assert type(actual.dtype.na_value) is type(original.dtype.na_value)
+    assert list(frame.columns) == ['Payload']
+    assert frame.Payload.dtype == pd.Float64Dtype()
+
+
+def test_constructed_empty_canonical_dtype_still_wins_in_finalize(fakeland2):
+    country = fakeland2.build(makefile=None)
+    entry = {'index': '(t, i)', 'Age': {'type': 'bool', 'optional': True}}
+    frame = C._empty_declared_frame(entry)
+    assert frame.Age.dtype == pd.BooleanDtype()
+    expected = C._SCHEME_DTYPE_MAP[C._load_canonical_dtypes()['household_roster']['Age']]
+    assert expected != frame.Age.dtype, 'fixture must conflict with canonical Age'
+    result = country._finalize_result(frame, entry, 'household_roster')
+    assert result.empty and result.Age.dtype == expected
+
+
+@pytest.mark.parametrize('optional', [False, True])
+def test_populated_dict_coercion_and_optional_absence_remain_unchanged(optional):
+    frame = pd.DataFrame({'Local': [1.25, None]})
+    frame.attrs['marker'] = ('native', 'unchanged')
+    expected = frame.copy(deep=True)
+    C._enforce_declared_dtypes(frame, {
+        'Local': {'type': 'bool', 'optional': optional},
+        'Absent': {'type': 'str', 'optional': True},
+    })
+    pd.testing.assert_frame_equal(frame, expected, check_exact=True)
+    assert frame.attrs == expected.attrs
+    assert 'Absent' not in frame.columns
+
+
+_LOCAL_OPTIONAL_FIELDS = """\
+    Unit_purchased: {type: str, optional: true}
+    Received_as_gift: {type: bool, optional: true}
+    Quantity_received_as_gift: {type: float, optional: true}
+    Unit_received_as_gift: {type: str, optional: true}
+"""
+
+
+@needs_make
+@pytest.mark.parametrize('backend', ['dvc', 'make'])
+def test_optional_type_declarations_do_not_require_populated_fields(
+        fakeland2, monkeypatch, backend):
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
+    scheme = _SCHEME_TWO_WAVES.replace(
+        '    x: float\n', '    x: float\n' + _LOCAL_OPTIONAL_FIELDS)
+    (fakeland2.country_dir / '_' / 'data_scheme.yml').write_text(scheme)
+    country = fakeland2.build()
+    frame = country.build_me(waves=[WAVE])
+    assert _x(frame) == WAVE_X
+    assert list(frame.columns) == ['x']
+    assert frame.x.dtype == pd.Float64Dtype()
+
+
+@pytest.fixture
+def typed_fakeland(fakeland2):
+    """Identical explicit country-local types on both framework heads."""
+    scheme = _SCHEME_TWO_WAVES.replace(
+        '    x: float\n', '    x: float\n' + _LOCAL_OPTIONAL_FIELDS)
+    (fakeland2.country_dir / '_' / 'data_scheme.yml').write_text(scheme)
+    script = _WAVE_SCRIPT.replace('"x": [1.0, 2.0]', '''"x": [1.0, 2.0],
+    "Unit_purchased": pd.Series(["bag", pd.NA], dtype="string"),
+    "Received_as_gift": pd.Series([True, pd.NA], dtype="boolean"),
+    "Quantity_received_as_gift": pd.Series([2.0, pd.NA], dtype="Float64"),
+    "Unit_received_as_gift": pd.Series(["tin", pd.NA], dtype="string")''')
+    (fakeland2.country_dir / WAVE / '_' / f'{TABLE}.py').write_text(script)
+    return fakeland2
+
+
+def _assert_local_empty_types(frame):
+    assert frame.empty
+    assert list(frame.columns) == [
+        'x', 'Unit_purchased', 'Received_as_gift',
+        'Quantity_received_as_gift', 'Unit_received_as_gift']
+    assert list(frame.dtypes) == [pd.Float64Dtype(), pd.StringDtype(),
+                                  pd.BooleanDtype(), pd.Float64Dtype(),
+                                  pd.StringDtype()]
+
+
+@needs_make
+@pytest.mark.parametrize('backend', ['dvc', 'make'])
+@pytest.mark.parametrize('prior', ['cold', 'supported', 'all'])
+def test_constructed_empty_country_local_types_across_no_builder_routes(
+        typed_fakeland, monkeypatch, backend, prior):
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
+    country = typed_fakeland.build()
+    if prior != 'cold':
+        populated = country.build_me(waves=[WAVE] if prior == 'supported' else None)
+        assert _x(populated) == WAVE_X
+        assert populated.Unit_purchased.dtype == pd.StringDtype()
+        assert populated.Received_as_gift.dtype == pd.BooleanDtype()
+    before = {p: (p.read_bytes(), p.stat().st_mode, p.stat().st_mtime_ns)
+              for p in typed_fakeland.country_dir.parent.parent.rglob('*.parquet')}
+    _assert_local_empty_types(_barren(country))
+    after = {p: (p.read_bytes(), p.stat().st_mode, p.stat().st_mtime_ns)
+             for p in typed_fakeland.country_dir.parent.parent.rglob('*.parquet')}
+    assert after == before, 'absent-wave request changed a populated cache'
+
+
+@needs_make
+def test_constructed_empty_after_declared_wave_produces_no_rows(typed_fakeland):
+    # This wave declares the table, so absent_subset_frame cannot short-circuit.
+    # Its real script writes a shaped empty result; load_from_waves reaches the
+    # separate no-country-builder/no-results constructor.
+    script = _WAVE_SCRIPT.replace('["2001", "2001"]', '[]').replace(
+        '["h1", "h2"]', '[]').replace('[1.0, 2.0]', '[]')
+    (typed_fakeland.country_dir / WAVE / '_' / f'{TABLE}.py').write_text(script)
+    country = typed_fakeland.build()
+    _assert_local_empty_types(country.build_me(waves=[WAVE]))
+    assert typed_fakeland.wave_out.exists(), 'declared wave script did not run'
+    assert pd.read_parquet(typed_fakeland.wave_out).empty
+    assert not typed_fakeland.var.exists()
 
 
 # ---------------------------------------------------------------------------

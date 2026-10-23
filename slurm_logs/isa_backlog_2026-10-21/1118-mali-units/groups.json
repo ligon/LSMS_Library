@@ -1,0 +1,34 @@
+{
+ "2014-15": {
+  "inorganic": {
+   "plots_flag_oui": 2712,
+   "oui_with_a_positive_type": 2537,
+   "oui_all_types_zero_or_missing": 175,
+   "zero_slots_on_oui_plots": 6471,
+   "zero_slots_on_all_zero_oui_plots": 698
+  },
+  "pesticide": {
+   "plots_flag_oui": 1925,
+   "oui_with_a_positive_type": 1815,
+   "oui_all_types_zero_or_missing": 110,
+   "zero_slots_on_oui_plots": 5106,
+   "zero_slots_on_all_zero_oui_plots": 440
+  }
+ },
+ "2017-18": {
+  "inorganic": {
+   "plots_flag_oui": 6814,
+   "oui_with_a_positive_type": 6810,
+   "oui_all_types_zero_or_missing": 4,
+   "zero_slots_on_oui_plots": 15944,
+   "zero_slots_on_all_zero_oui_plots": 16
+  },
+  "pesticide": {
+   "plots_flag_oui": 4515,
+   "oui_with_a_positive_type": 4508,
+   "oui_all_types_zero_or_missing": 7,
+   "zero_slots_on_oui_plots": 11842,
+   "zero_slots_on_all_zero_oui_plots": 28
+  }
+ }
+}

@@ -473,6 +473,20 @@ also =EACIALI_p{1,2}.dta= (2014-15) carry the same two cp1252 strings in the
 str column =s13q01l=, now decoded too; the wave keys =j= on the labelled
 code =s13q01=, not on that column, so nothing served moves there.
 
+** plot_inputs: a missing unit is =Unknown=, and most such rows report a ZERO quantity (GH #1118, 2026-10-22)
+
+=plot_inputs_finalize= (=mali.py=) now serves a retained record with no unit as =U_UNKNOWN= (='Unknown'=), filled after the duplicate collapse, per the #1041 ruling.
+Before, =Country('Mali').plot_inputs()= served those units as NA while =Feature()= served =Unknown=; the two now agree.
+
+Measured on the EAC-I sources (=slurm_logs/isa_backlog_2026-10-21/1118-mali-units/=), 42,089 served rows change (2014-15 14,053; 2017-18 28,036).
+Every one is a blank raw unit or the survey's own =Manquant= ("missing") label -- 468 rows in 2014-15 -- so no substantive unit label is lost by =_unit_labels=.
+
+*The idiosyncrasy:* 41,559 of those 42,089 rows carry =Quantity == 0= exactly, straight from the raw quantity column (=s2cq25*=, =s2cq29*=, =s7dq26*=, ... -- the scripts do no zero-fill); 248 carry a positive quantity and 282 none (flag- or purchase-only).
+The use question is asked once per input GROUP on the plot (inorganic =s2cq21= / =s7dq22=, pesticide =s2cq26= / =s7dq27=, ...) and the quantity once per TYPE (urea, DAP, NPK, other).
+On the zero-quantity, blank-unit fertilizer/pesticide slots the group answer is =Oui= (2014-15: 11,577, plus 587 =Manquant=; 2017-18: all 27,786; =flags_1118.py=).
+So these are type-level non-use inside a "yes" for the group -- the plot used inorganic fertilizer, but not this type -- which the content predicate keeps because a non-null zero counts as content.
+Whether such rows belong in =plot_inputs= at all is an ELIGIBILITY question, deliberately not decided by #1118; the zeros are served as recorded.
+
 * cluster_features (GH #323 site 4 / GH #627)
 
 ** 2021-22 was the worst =dfs:= cartesian in the corpus — fixed
