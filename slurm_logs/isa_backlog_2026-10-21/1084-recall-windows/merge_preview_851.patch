@@ -1,0 +1,646 @@
+diff --git a/.coder/coverage/food_recall.csv b/.coder/coverage/food_recall.csv
+index 78740078e..d4ca8e318 100644
+--- a/.coder/coverage/food_recall.csv
++++ b/.coder/coverage/food_recall.csv
+@@ -1,8 +1,8 @@
+ country,wave,recall_verbatim,recall_days,n_visits,total_exposure_days,n_items_delivered,basis,evidence,within_wave_variation,notes,n_asks_by_column
+ Benin,2018-19,,,,,,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
+ Burkina_Faso,2014,consommation des 7 derniers jours (per passage),7,4,28,55,config-comment,lsms_library/build_transforms.py:700 (add_visit_level: 'Motivating case (GH #323)'); lsms_library/countries/Burkina_Faso/_/CONTENTS.org:35; lsms_library/countries/Burkina_Faso/_/CONTENTS.org ('*Passage 1 is the only one with a quantity grid.*' under 'Headline findings'; no line number -- the anchor drifted twice),,"non-food module ran in only 3 of 4 passages (21d).  Quantity is asked at passage 1 ONLY (qachat/uachat/qautocons are passage-1 variables; passages 2-4 record money only), so n_asks_by_column Quantity=1: food_quantities covers 7 days, food_expenditures 28.  Measured on the delivered food_acquired (2026-10-19): Quantity non-null at visit 1 only (108,659 rows; 0 at visits 2-4), Expenditure at all four visits.  GH #851 red team r1, R1.",Quantity=1
+-Burkina_Faso,2018-19,,,,,130,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
+-Burkina_Faso,2021-22,,,1,,152,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  The 'two-periods' within_wave_variation flag recorded exactly this Quantity/Expenditure mismatch as 'unconfirmed'; it is now CONFIRMED (the variable labels say so) and FIXED, so the flag is cleared.  recall_days stays blank because nobody has read this wave's questionnaire -- blank beats plausible.",
++Burkina_Faso,2018-19,Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?,7,1,7,130,questionnaire,"2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague1.xls (and _vague2.xls, identical) sheet S7b_Conso_Al r1 'SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS', r6 7B.03 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'",,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Read 2026-10-23 (GH #1084).  Section 7B is headed 'CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_bfa2018.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label '7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours').  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 6,959 households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.",
++Burkina_Faso,2021-22,Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?,7,1,7,152,questionnaire,2021-22/Documentation/Questionnaire/bfa_ehcvm2_vague1.pdf (and bfa_ehcvm2_vague2.pdf) PDF p.38 (printed 37) -- 'SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'; 7B.03 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?',,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  The 'two-periods' within_wave_variation flag recorded exactly this Quantity/Expenditure mismatch as 'unconfirmed'; it is now CONFIRMED (the variable labels say so) and FIXED, so the flag is cleared.  recall_days stays blank because nobody has read this wave's questionnaire -- blank beats plausible.  Read 2026-10-23 (GH #1084).  Section 7B is headed 'CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_bfa2021.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label '7B.03a. Quelle est la quantité totale du %rostertitle% consommé par le ménage au', cut at 80 characters; the printed 7B.03 completes it).  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 3,227 (grappe, menage) households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.  This reading is what the earlier 'recall_days stays blank' sentence was waiting for.",
+ Cambodia,2019-20,,,,,,not-recorded,,,,
+ CotedIvoire,2018-19,,,,,,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
+ Ethiopia,2011-12,Over the past one week (7 days),7,1,7,25,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS,
+@@ -27,16 +27,16 @@ GhanaSPS,2013-14,,,,,90,not-recorded,,,"README.org ""since last visit"" refers t
+ GhanaSPS,2017-18,,,,,93,not-recorded,,,"README.org ""since last visit"" refers to GLSS, not GhanaSPS",
+ Guatemala,2000,gasto ult 15 dias / cantidad compro: LAST 15 DAYS (actual),15,1,15,96,variable-label,"lsms_library/countries/Guatemala/_/CONTENTS.org:573,577,595; 2000/_/food_acquired.py:18",,"instrument also has usual-month and months-per-year vars, deliberately unused; rung corrected: verbatim is a Stata variable label, not an instrument quote; instrument mixes recall periods by variable (15-day actual vs usual-month); the build uses ONLY the 15-day variables, so the DELIVERED window is single-valued",
+ Guinea-Bissau,2018-19,,,,,,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
+-Malawi,2004-05,,,,,115,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption",
+-Malawi,2010-11,,,,,116,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption",
+-Malawi,2013-14,,,,,116,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption",
+-Malawi,2016-17,,,,,132,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption",
+-Malawi,2019-20,,,,,133,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption",
++Malawi,2004-05,"Over the past one week (7 days), did you or others in your household consume any [. . .]?",7,1,7,115,questionnaire,"2004-05/Documentation/IHS-2 HH questionnaire final draft.pdf PDF pp.21-25 (printed 21-25) -- 'MODULE I: CONSUMPTION OF FOOD OVER PAST ONE WEEK'; I02 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'; I03 'How much in total did your household consume in the past week?'; I04 'How much came from purchases?', I05 'How much did you spend?', I06 'How much came from own-production?', I07 'How much came from gifts and other sources?'",,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window recorded here is MODULE I's own (I02/I03), not the rCSI battery the data_scheme comment belongs to.  Build reads sec_i.dta i03a/b, i04a/b, i05, i06a/b, i07a/b = I03..I07 (labels 'How much in total did your HH consume in the past week', 'How much came from purchases? Quantity', 'How much did you spend?', ...).  ONE ask: one row per (case_id, item) in sec_i.dta.",
++Malawi,2010-11,"Over the past one week (7 days), did you or others in your household consume any [. . .]?",7,1,7,116,questionnaire,"2010-11/Documentation/IHS3.Household.Qx.FINAL.pdf PDF pp.28-33 (printed 28-33) -- 'MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK' on every page; G01 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'; G03 'How much in total did your household consume in the past week?'; G04 purchases, G05 'How much did you spend?', G06 own-production, G07 gifts and other sources",,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G's own (G01/G03), not the rCSI battery.  Build reads Full_Sample/Household/hh_mod_g1.dta hh_g03a..hh_g07b = G03..G07 (labels 'How much in total did your household consume in the past week (Quantity)?', ...).  ONE ask: one row per (case_id, hh_g02) bar 6 duplicated pairs in 1,521,568; the 3,246-household IHPS baseline sub-sample was visited twice for AGRICULTURE (Malawi/_/CONTENTS.org, 'Sub-samples'), not for Module G.",
++Malawi,2013-14,"Over the past one week (7 days), did you or others in your household consume any [. . .]?",7,1,7,116,questionnaire,"2013-14/Documentation/IHPS.Household.Qx.FINAL.PRINT.pdf PDF pp.30-37 -- 'MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK'; G01 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'; G03 'How much in total did your household consume in the past week?'; G04-G07 as IHS3",,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G's own, not the rCSI battery.  Build reads HH_MOD_G1_13.dta hh_g03a..hh_g07b = G03..G07 (same labels as IHS3), and not the short MODULE B2 food list on PDF p.8.  ONE ask: one row per (y2_hhid, hh_g02).",
++Malawi,2016-17,"Over the past one week (7 days), did you or others in your household consume any [. . .]?",7,1,7,132,questionnaire,"2016-17/Documentation/fourth_integrated_household_survey_2016_2017_household_questionnaire.pdf PDF pp.30-37 -- 'MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK'; G01 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'; G03 'How much in total did your household consume in the past week?'.  Panel rows: 2016-17/Documentation/ihps_2016_bid_updated_final.pdf PDF pp.10-11 (Module G 'collects information on all food consumed by the household in the past 7 days') and p.8 (household questionnaire administered in full once: Panel Group A at visit 1, Group B at visit 2)",,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G's own, not the rCSI battery.  Build reads Cross_Sectional/hh_mod_g1.dta AND Panel/hh_mod_g1_16.dta, hh_g03a..hh_g07b = G03..G07; both files label hh_g03a 'How much in total did your household consume in the past week? Quantity'.  The held questionnaire is IHS4's, the cross-section's instrument; the IHPS 2016 panel's own household questionnaire is NOT among the held documents, so for the panel rows the window rests on the panel BID's Module G description and the matching .dta labels, not on a held instrument.  ONE ask in both files: one row per household-item.",
++Malawi,2019-20,"Over the past one week (7 days), did you or others in your household consume any [. . .]?",7,1,7,133,questionnaire,"2019-20/Documentation/fifth_integrated_household_survey_2019_2020_and_the_integrated_household_panel_survey_2019_household_questionnaire.pdf PDF pp.39-46 -- G01 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'; G03 'How much in total did your household consume in the past week?'; module title 'MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK' (p.46).  One ask: 2019-20/Documentation/fifth_integrated_household_survey_ihs5_2019_2020_basic_information_document.pdf PDF pp.17-18 ('the cross-sectional households were visited only once')",,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G's own, not the rCSI battery.  One instrument for IHS5 and IHPS 2019 (its title says so).  Build reads Cross_Sectional/HH_MOD_G1.dta and Panel/hh_mod_g1_19.dta hh_g03a..hh_g07b = G03..G07 (hh_g01 label 'Over the past one week, did you or others in your household consume any [ITEM]?').  ONE ask: one row per household-item in both files.",
+ Mali,2014-15,A consomme le produit au cours des 7 derniers jours,7,2,14,122,variable-label,"lsms_library/countries/Mali/2014-15/_/mapping.py:9 (s13q02 label); lsms_library/countries/Mali/2014-15/_/data_info.yml:133 (food_acquired reads EACIALI_p1.dta and EACIALI_p2.dta); both files hold the same 3,804 (grappe, menage) households, measured 2026-10-19; lsms_library/countries/Mali/_/CONTENTS.org (heading '2026-10-19 -- food_acquired 2014-15: the food module is asked at BOTH EACI passages, and the build SUMS them (GH #851)'; no line number -- the anchor drifted twice)",,"The 7-day module is asked at BOTH EACI passages of one panel (p1 mostly Jul-Aug 2014, p2 mostly Dec 2014), and the build SUMS them: mapping.py drops visit and the additive collapse adds the two recalls.  Served 2014-15 purchased Expenditure 5,652,532,205 = p1 2,980,757,701 + p2 2,671,774,504 (s13q03c), exactly.  n_visits was 1 until GH #851 red team r1 (R2), 2026-10-19.",
+-Mali,2018-19,,,,,138,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
+-Mali,2021-22,,,,,145,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
+-Niger,2018-19,,,,,135,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
+-Niger,2021-22,,,,,154,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
++Mali,2018-19,Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?,7,1,7,138,questionnaire,"2018-19/Documentation/mli_ehcvm1_qnr_household_excel_vague1.xls (and _vague2.xls, identical) sheet S7b_Conso_Al r1 'SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS', r6 7B.03 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'",,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Read 2026-10-23 (GH #1084).  Section 7B is headed 'CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_mli2018.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label '7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours').  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 6,596 households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.",
++Mali,2021-22,Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?,7,1,7,145,questionnaire,2021-22/Documentation/mli_ehcvm2_qnr_men_excel_vague1.pdf (and _vague2.pdf) PDF p.38 (printed 37) -- 'SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'; 7B.03 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?',,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Read 2026-10-23 (GH #1084).  Section 7B is headed 'CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_mli2021.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label '7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours').  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 6,138 households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.",
++Niger,2018-19,Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?,7,1,7,135,questionnaire,"2018-19/Documentation/ner_ehcvm1_qnr_household_excel_vague1.xls (and _vague2.xls, identical) sheet S7b_Conso_Al r1 'SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS', r6 7B.03 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'",,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Read 2026-10-23 (GH #1084).  Section 7B is headed 'CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_ner2018.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label '7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours').  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 5,987 households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.",
++Niger,2021-22,,,,,154,not-recorded,,,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Tried 2026-10-23 (GH #1084), left not-recorded: no questionnaire is held for this wave -- 2021-22/Documentation holds only SOURCE.org (catalog 6276).  s07b_me_ner2021.dta's own labels say 7 days ('7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours'), which is variable-label grade, not the instrument; and the Mali / Burkina Faso 2021-22 forms are sibling countries' instruments.  To close it, acquire the NER EHCVM-2 household questionnaire.",
+ Nigeria,2010Q3,total 7-day consumption of each item,7,1,7,90,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,,
+ Nigeria,2011Q1,total 7-day consumption of each item,7,1,7,90,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,,
+ Nigeria,2012Q3,total 7-day consumption of each item,7,1,7,96,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,,
+@@ -58,11 +58,11 @@ Tanzania,2014-15,consumed at home during the last week,7,1,7,60,config-comment,l
+ Tanzania,2019-20,consumed at home during the last week,7,1,7,59,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument",
+ Tanzania,2020-21,consumed at home during the last week,7,1,7,57,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument",
+ Togo,2018,total quantity of [XX] consumed in the past 7 days,7,1,7,,questionnaire,lsms_library/countries/Togo/2018/Documentation/tgo_ehcvm1_qnr_household_excel_vague1.xls sheet S7b header 'B Consommation alimentaire des 7 derniers jours et achat des 30 derniers jours'; s07bq03a Stata label '7B.03a. Qtite tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours',,"GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row's own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s='inkind'.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.",
+-Uganda,2005-06,,,,,61,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module",
+-Uganda,2009-10,,,,,63,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module",
+-Uganda,2010-11,,,,,70,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module",
+-Uganda,2011-12,,,,,71,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module",
+-Uganda,2013-14,,,,,77,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module",
+-Uganda,2015-16,,,,,77,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module",
+-Uganda,2018-19,,,,,117,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module",
++Uganda,2005-06,"(Part A) Food, Beverage, and Tobacco (During the Last 7 Days)",7,1,7,61,questionnaire,"2005-06/Documentation/UNHS.2005-06.Household.Questionnaire.FINAL.pdf PDF p.18 (printed 17; image-only scan, read visually) -- Section 14A banner '(Part A) Food, Beverage, and Tobacco (During the Last 7 Days)' over columns 4-11 (qty / value from purchases at home, away from home, home produce, in-kind), 12 market price, 13 farm-gate price; 2005-06/Documentation/UNHS.2005-06.Interviewer.Manual.FINAL.pdf PDF p.33 (printed 31): 'Part A: Expenditure on Foods, Beverages and Tobacco during Last Seven (7) Days' ... 'the recall period, i.e., the last 7 days'",,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  UNHS 2005-06, not UNPS: the food module is Section 14A (GSEC14A.dta), and the build's h14aq4..h14aq13 are the printed columns 4..13 (their labels, e.g. 'hh consumption out of purchase.quantity', name no window; the banner does).  ONE ask: a single grid with no visit columns, and GSEC14A.dta has one row per (HHID, h14aq2) bar 1 duplicated pair in 40,393.  The manual's two visits are for the two cropping seasons; nothing places the food grid at both, and the data show one.",
++Uganda,2009-10,,,,,63,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Tried 2026-10-23 (GH #1084), left not-recorded: no household questionnaire is held for this wave.  2009-10/Documentation holds only ddi-documentation-english_microdata-1001.pdf, the DDI codebook of catalog 1001 (UNHS 2005-06 + UNPS 2009-10).  It says 'Food, beverage, and tobacco (during the last 7 days)' (Scope, PDF p.15) and 'Section 15B: Food, Beverage, and Tobacco (During the Last 7 days)' (file description, PDF p.44) -- catalog metadata, not the instrument -- and GSEC15b.dta labels h15bq3b 'How many days was [ITEM] consumed out of the last 7 days?' (variable-label grade, and on the days-consumed column only: the quantity / value labels name no window; h15bq3b is 8 on 2 of 37,645 answered rows).  Not promoted: the rung needs the instrument, and the 2010-11 form is a sibling wave.  To close it, acquire the UNPS 2009-10 household questionnaire.",
++Uganda,2010-11,"Part B: Food, Beverage, and Tobacco (During the Last 7 Days)",7,1,7,70,questionnaire,"2010-11/Documentation/UNPS_2010-11_Household_Questionnaire.pdf PDF pp.29-30 (printed 27-28) -- Section 15 Part B banner on both pages; col 3B 'How many days was [ITEM] consumed out of the last 7 days?'; cols 4-13 qty / value from purchases at home, away from home, home produce, in-kind, market and farm-gate price.  One ask: 2010-11/Documentation/UNPS_2010-11_Basic-Info-2014.pdf PDF pp.20-21 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)",,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15b.dta h15bq4..h15bq13 = printed columns 4..13.  Their Stata labels carry the UN-SUBSTITUTED fill ('... in the past [RECALL]?', h15bq3b '... in the past [PERIOD] ...'), the template GSEC15C also carries; for FOOD the printed form fixes it at 7 days and the data agree: h15bq3b (days consumed out of the window) lies in 1..7 on all 35,222 answered rows.  One row per (hh, itmcd).",
++Uganda,2011-12,"Part B: Food, Beverage, and Tobacco (During the Last 7 Days)",7,1,7,71,questionnaire,"2011-12/Documentation/Uganda2011-12HouseholdQuestionnaire.pdf PDF pp.26-27 (printed 24-25) -- Section 15 Part B banner on both pages; col 3B 'How many days was [ITEM] consumed out of the last 7 days?'; cols 4-13 as 2010-11.  One ask: 2011-12/Documentation/unps_2011_12_bid_rev2014july.pdf PDF p.26 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)",,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15B.dta h15bq4..h15bq13 = printed columns 4..13; labels carry the un-substituted [RECALL] / [PERIOD] fill; h15bq3b lies in 1..7 on all 38,740 answered rows.  One row per (HHID, itmcd).",
++Uganda,2013-14,"Part B: Food, Beverage, and Tobacco (During the Last 7 Days)",7,1,7,77,questionnaire,2013-14/Documentation/unps_2013_14_household_qx.pdf PDF pp.9-11 (p.9 printed 7) -- Section 15 Part B banner on p.9 and its continuation p.11; col 3B 'How many days was [ITEM] consumed out of the last 7 days?'; cols 4-13 as 2010-11,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15B.dta h15bq4..h15bq13 = printed columns 4..13; labels carry the un-substituted [RECALL] / [PERIOD] fill; h15bq3b lies in 1..7 on all 50,387 answered rows.  ONE ask: a single grid with no visit columns, and one row per (HHID, itmcd) bar 7 duplicated pairs in 50,415.  This wave's Basic Information Document does not restate the visit-1 / visit-2 split of the household questionnaire that 2010-11, 2011-12 and 2015-16 document, so the count rests on the form and the data.",
++Uganda,2015-16,"Part B: Food, Beverage, and Tobacco (During the Last 7 Days)",7,1,7,77,questionnaire,"2015-16/Documentation/unps_2015_16_household_qx.pdf PDF pp.11-13 (p.11 printed 8) -- Section 15 Part B banner on pp.11-12; col 3B 'How many days was [ITEM] consumed out of the last 7 days?'; cols 4-13 as 2010-11.  One ask: 2015-16/Documentation/ddi-documentation-english_microdata-3460.pdf PDF p.6 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)",,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  CAPI-era wave (same DDI p.6: 'Given the CAPI system being used'), so the printed form is a rendering of the electronic instrument; the labels carry the un-substituted [recall] / [period] fill, but h15bq3b lies in 1..7 on all 49,749 answered rows, which a per-item window longer than 7 days would not produce.  Build reads gsec15b.dta h15bq4..h15bq13 = printed columns 4..13.  One row per (HHID, itmcd).",
++Uganda,2018-19,Part B: Food and Beverage (During the Last 7 Days),7,1,7,117,questionnaire,"2018-19/Documentation/unps_hhq.pdf PDF pp.10-18 -- Section 15 Part B banner on every page of the grid, and each quantity question ends 'during the last 7 days' (e.g. 'How many [CEB03C] of [ITEM] did your household consume out of purchases at home during the last 7 days?'); GSEC15B.dta labels agree (CEB04 'How many days were [ITEM] consumed out of the last 7 days?', CEB06 'Quantity of hhold [item] purchased for consumptn at home during the last 7 days')",,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  The printed form and the shipped .dta NUMBER the columns differently: the form's CEB04/CEB05 (purchases at home, qty / value) .. CEB10/CEB11 (in-kind) are CEB06/CEB07 .. CEB012/CEB013 in GSEC15B.dta, which also splits the market price into CEB14a/b/c -- the wave script's own comment ('notations on Q don't seem to match!') is right.  The build reads the .dta names, and the labels of what it reads (CEB06, CEB08, CEB10, CEB012: '... during the last 7 days') match the content of the printed questions, so the window is the same 7 days either way.  ONE ask: no visit grid; one row per (hhid, CEB01); CEB04 lies in 1..7 on all 53,207 answered rows.",
+ Uganda,2019-20,Part B: Food and Beverage (During the Last 7 Days),7,1,7,116,questionnaire,"2019-20/Documentation/Uganda 2019-20 Questionnaire.pdf pp.10-18 -- Section 15 Part B banner on every page of the grid, and CEB06 / CEB07 / CEB10 / CEB012 each end ""during the last 7 days""; gsec15b.dta labels agree (CEB04 ""How many days were [ITEM] consumed out of the last 7 days?"")",,"ONE ask, no visit grid: the whole of Part B is a single 7-day window covering all four acquisition channels (purchased at home / away / own production / in-kind). CEB04 records days consumed out of the 7, so the exposure is the week itself, not a per-visit interval. The former note (""CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"") said why this was unfilled; the GSEC15B questionnaire fills it. Uganda 2005-06..2018-19 stay not-recorded -- their instruments have not been read.",
+diff --git a/docs/guide/recall.md b/docs/guide/recall.md
+index 72aee654c..d4998ea3c 100644
+--- a/docs/guide/recall.md
++++ b/docs/guide/recall.md
+@@ -204,7 +204,9 @@ error names — remains a *subset request*: under `units='kgs'` its rows can
+ differ from the `Feature` rows for the same waves, for the GH #850 reason
+ above.
+ 
+-## Coverage today: **32 of 67** cells convert
++## Coverage today: **48 of 67** cells convert
++
++GH #1084 (2026-10-23) promoted 16 more cells by reading their questionnaires (rows marked † below); the row totals in this paragraph were measured before that and cover the earlier 32 only.
+ 
+ Measured 2026-10-19 on a warm corpus (red-team r1 fixes applied, on
+ `development` at `2f3104c5f`): `Feature('food_expenditures')(period='year')`
+@@ -231,14 +233,18 @@ summed per country from `Country(c).food_acquired()`, the same 32 cells are
+ | Serbia | 2007 | 7 | 1 x 7 | config-comment |
+ | Tanzania | 2008-09, 2010-11, 2012-13, 2014-15, 2019-20, 2020-21 | 7 | 1 x 7 | config-comment |
+ | Togo | 2018 | 7 | 1 x 7 | questionnaire |
+-| Uganda | 2019-20 | 7 | 1 x 7 | questionnaire |
++| Uganda | 2019-20; † 2005-06, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19 | 7 | 1 x 7 | questionnaire |
++| † Burkina_Faso | 2018-19, 2021-22 | 7 | 1 x 7 (EHCVM section 7B; `vague` is a sample split) | questionnaire |
++| † Malawi | 2004-05, 2010-11, 2013-14, 2016-17, 2019-20 | 7 | 1 x 7 (IHS2 Module I / IHS3+ Module G, not the rCSI battery) | questionnaire |
++| † Mali | 2018-19, 2021-22 | 7 | 1 x 7 (EHCVM section 7B) | questionnaire |
++| † Niger | 2018-19 | 7 | 1 x 7 (EHCVM section 7B) | questionnaire |
+ 
+-The 35 that do not:
++The 19 that do not:
+ 
+ | why | cells |
+ |---|---|
+ | **window varies within the wave** (3) | GhanaLSS 1991-92 — by stratum: urban 10 asks x 3 days = 30, rural 7 x 2 = 14 (GLSS3 interviewer manual §1.9); Nigeria 2018Q3, 2019Q1 — by acquisition source `s` |
+-| **`not-recorded`** (32) — nobody has read the questionnaire | Benin 2018-19; Burkina_Faso 2018-19, 2021-22; Cambodia 2019-20; CotedIvoire 2018-19; EthiopiaRHS 1989, 1994a, 1994b, 1995, 1997; GhanaSPS 2009-10, 2013-14, 2017-18; Guinea-Bissau 2018-19; Malawi 2004-05, 2010-11, 2013-14, 2016-17, 2019-20; Mali 2018-19, 2021-22; Niger 2018-19, 2021-22; Senegal 2018-19, 2021-22; Uganda 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19 |
++| **`not-recorded`** (16) — nobody has read the questionnaire, or none is held | Benin 2018-19; Cambodia 2019-20; CotedIvoire 2018-19; EthiopiaRHS 1989, 1994a, 1994b, 1995, 1997; GhanaSPS 2009-10, 2013-14, 2017-18; Guinea-Bissau 2018-19; Niger 2021-22 (no questionnaire held); Senegal 2018-19, 2021-22; Uganda 2009-10 (no questionnaire held) |
+ 
+ Nepal and Peru declare `food_acquired` but have no `recall.yml` (and no built
+ food data on most installs); a wave with no record is refused like a
+@@ -252,6 +258,8 @@ run visits 2–11 (`ddfe2726c`, +1); GLSS1/2 recorded 12A's fortnight and served
+ questionnaire grade (`04e716295`, +1). `tests/test_recall_period.py` fails if
+ this page's bold count drifts from the live records again.
+ 
++**Why 48.** GH #1084 (2026-10-23) read the held ISA questionnaires and recorded every window as 7 days asked once, at questionnaire grade: Uganda +6, Malawi +5, Mali +2, Burkina Faso +2, Niger +1. Two ISA cells stay `not-recorded` because no questionnaire is held (Uganda 2009-10, Niger 2021-22); their `.dta` labels say 7 days, which is variable-label grade. Quotes and pages: `slurm_logs/isa_backlog_2026-10-21/1084-recall-windows/`.
++
+ The not-recorded half is the work queue: reading one questionnaire per series
+ and recording it in `food_recall.csv` converts its cells with no code change
+ (`.coder/HANDOFF_recall_research.md` ranks the series by leverage) — once the
+@@ -279,9 +287,9 @@ convertible cell, by delivery class:
+ 
+ | class | cells | check |
+ |---|---|---|
+-| `visit-level` — the country declares `visit` in `food_acquired`'s index | Burkina_Faso 2014; GhanaLSS 1987-88, 1988-89, 1998-99, 2005-06, 2012-13, 2016-17 | **generic**: per flow column, the visits carrying a value must equal `n_asks_for(column)` |
+-| `declared-visit` — a YAML wave naming a `visit` idxvar or several source files, its `visit` dropped by a hook | Mali 2014-15 (2 files), Togo 2018 (`vague`, a sample split) | **generic for the YAML path, per flow column**: for each of `Expenditure` / `Quantity`, the most distinct visits (files, or `visit` values within a file) in which any household has a value in a `myvars` source feeding that column must equal `n_asks_for(column)`, and the record carries `n_asks_by_column` exactly when the columns differ; a column no source feeds fails with "classify by hand". Red team r2 found the first cut column-blind (it counted the files a household had any row in), so Burkina Faso 2014 with its `visit` dropped passed the wrong r1 record; that counterfactual is now a test and fails. With no data, `n_asks` must equal the file count and an override may not exceed it |
+-| `one-ask-by-inspection` — a script-path wave with no `visit` level | the other 23 | **table-driven**: listed by hand with the source the script reads, pinned to `n_asks == 1` |
++| `visit-level` — the country declares `visit` in `food_acquired`'s index | Burkina_Faso 2014, 2018-19, 2021-22; GhanaLSS 1987-88, 1988-89, 1998-99, 2005-06, 2012-13, 2016-17 | **generic**: per flow column, the visits carrying a value must equal `n_asks_for(column)` |
++| `declared-visit` — a YAML wave naming a `visit` idxvar or several source files, its `visit` dropped by a hook | Mali 2014-15 (2 files); Togo 2018, Mali 2018-19, 2021-22, Niger 2018-19 (`vague`, a sample split) | **generic for the YAML path, per flow column**: for each of `Expenditure` / `Quantity`, the most distinct visits (files, or `visit` values within a file) in which any household has a value in a `myvars` source feeding that column must equal `n_asks_for(column)`, and the record carries `n_asks_by_column` exactly when the columns differ; a column no source feeds fails with "classify by hand". Red team r2 found the first cut column-blind (it counted the files a household had any row in), so Burkina Faso 2014 with its `visit` dropped passed the wrong r1 record; that counterfactual is now a test and fails. With no data, `n_asks` must equal the file count and an override may not exceed it |
++| `one-ask-by-inspection` — a script-path wave with no `visit` level | the other 34 | **table-driven**: listed by hand with the source the script reads, pinned to `n_asks == 1` |
+ 
+ A convertible cell in no class fails the suite, so a record promoted from
+ `not-recorded` cannot convert until someone has said how its asks are
+diff --git a/lsms_library/countries/Benin/_/recall.yml b/lsms_library/countries/Benin/_/recall.yml
+index ea6349ee3..132a21431 100644
+--- a/lsms_library/countries/Benin/_/recall.yml
++++ b/lsms_library/countries/Benin/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Burkina_Faso/_/recall.yml b/lsms_library/countries/Burkina_Faso/_/recall.yml
+index ade009a07..37939c9fe 100644
+--- a/lsms_library/countries/Burkina_Faso/_/recall.yml
++++ b/lsms_library/countries/Burkina_Faso/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+@@ -31,13 +31,20 @@ Recall:
+     notes: 'non-food module ran in only 3 of 4 passages (21d).  Quantity is asked at passage 1 ONLY (qachat/uachat/qautocons are passage-1 variables; passages 2-4 record money only), so n_asks_by_column Quantity=1: food_quantities covers 7 days, food_expenditures 28.  Measured on the delivered food_acquired (2026-10-19): Quantity non-null at visit 1 only (108,659 rows; 0 at visits 2-4), Expenditure at all four visits.  GH #851 red team r1, R1.'
+     n_items_delivered: 55
+   '2018-19':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'
++    evidence: '2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague1.xls (and _vague2.xls, identical) sheet S7b_Conso_Al r1 ''SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'', r6 7B.03 ''Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'''
++    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Read 2026-10-23 (GH #1084).  Section 7B is headed ''CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS''; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_bfa2018.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label ''7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours'').  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 6,959 households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.'
+     n_items_delivered: 130
+   '2021-22':
+-    basis: not-recorded
++    basis: questionnaire
+     ask_count_basis: declared
++    recall_days: 7
+     n_asks: 1
+-    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  The ''two-periods'' within_wave_variation flag recorded exactly this Quantity/Expenditure mismatch as ''unconfirmed''; it is now CONFIRMED (the variable labels say so) and FIXED, so the flag is cleared.  recall_days stays blank because nobody has read this wave''s questionnaire -- blank beats plausible.'
++    recall_verbatim: 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'
++    evidence: '2021-22/Documentation/Questionnaire/bfa_ehcvm2_vague1.pdf (and bfa_ehcvm2_vague2.pdf) PDF p.38 (printed 37) -- ''SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS''; 7B.03 ''Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'''
++    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  The ''two-periods'' within_wave_variation flag recorded exactly this Quantity/Expenditure mismatch as ''unconfirmed''; it is now CONFIRMED (the variable labels say so) and FIXED, so the flag is cleared.  recall_days stays blank because nobody has read this wave''s questionnaire -- blank beats plausible.  Read 2026-10-23 (GH #1084).  Section 7B is headed ''CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS''; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_bfa2021.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label ''7B.03a. Quelle est la quantité totale du %rostertitle% consommé par le ménage au'', cut at 80 characters; the printed 7B.03 completes it).  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 3,227 (grappe, menage) households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.  This reading is what the earlier ''recall_days stays blank'' sentence was waiting for.'
+     n_items_delivered: 152
+diff --git a/lsms_library/countries/Cambodia/_/recall.yml b/lsms_library/countries/Cambodia/_/recall.yml
+index 4decdfbaf..ffff136e9 100644
+--- a/lsms_library/countries/Cambodia/_/recall.yml
++++ b/lsms_library/countries/Cambodia/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/CotedIvoire/_/recall.yml b/lsms_library/countries/CotedIvoire/_/recall.yml
+index ea6349ee3..132a21431 100644
+--- a/lsms_library/countries/CotedIvoire/_/recall.yml
++++ b/lsms_library/countries/CotedIvoire/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Ethiopia/_/recall.yml b/lsms_library/countries/Ethiopia/_/recall.yml
+index 5130d77a6..ad98f0492 100644
+--- a/lsms_library/countries/Ethiopia/_/recall.yml
++++ b/lsms_library/countries/Ethiopia/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/EthiopiaRHS/_/recall.yml b/lsms_library/countries/EthiopiaRHS/_/recall.yml
+index 755874ca1..5bcca802a 100644
+--- a/lsms_library/countries/EthiopiaRHS/_/recall.yml
++++ b/lsms_library/countries/EthiopiaRHS/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/GhanaLSS/_/recall.yml b/lsms_library/countries/GhanaLSS/_/recall.yml
+index 73d6fc05d..cba1ba878 100644
+--- a/lsms_library/countries/GhanaLSS/_/recall.yml
++++ b/lsms_library/countries/GhanaLSS/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/GhanaSPS/_/recall.yml b/lsms_library/countries/GhanaSPS/_/recall.yml
+index 0de8bfe55..f77554fc5 100644
+--- a/lsms_library/countries/GhanaSPS/_/recall.yml
++++ b/lsms_library/countries/GhanaSPS/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Guatemala/_/recall.yml b/lsms_library/countries/Guatemala/_/recall.yml
+index f301df4ae..4a26e44db 100644
+--- a/lsms_library/countries/Guatemala/_/recall.yml
++++ b/lsms_library/countries/Guatemala/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Guinea-Bissau/_/recall.yml b/lsms_library/countries/Guinea-Bissau/_/recall.yml
+index ea6349ee3..132a21431 100644
+--- a/lsms_library/countries/Guinea-Bissau/_/recall.yml
++++ b/lsms_library/countries/Guinea-Bissau/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Malawi/_/recall.yml b/lsms_library/countries/Malawi/_/recall.yml
+index 09f827db4..1834152d8 100644
+--- a/lsms_library/countries/Malawi/_/recall.yml
++++ b/lsms_library/countries/Malawi/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+@@ -20,27 +20,47 @@
+ 
+ Recall:
+   '2004-05':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
++    evidence: '2004-05/Documentation/IHS-2 HH questionnaire final draft.pdf PDF pp.21-25 (printed 21-25) -- ''MODULE I: CONSUMPTION OF FOOD OVER PAST ONE WEEK''; I02 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; I03 ''How much in total did your household consume in the past week?''; I04 ''How much came from purchases?'', I05 ''How much did you spend?'', I06 ''How much came from own-production?'', I07 ''How much came from gifts and other sources?'''
++    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window recorded here is MODULE I''s own (I02/I03), not the rCSI battery the data_scheme comment belongs to.  Build reads sec_i.dta i03a/b, i04a/b, i05, i06a/b, i07a/b = I03..I07 (labels ''How much in total did your HH consume in the past week'', ''How much came from purchases? Quantity'', ''How much did you spend?'', ...).  ONE ask: one row per (case_id, item) in sec_i.dta.'
+     n_items_delivered: 115
+   '2010-11':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
++    evidence: '2010-11/Documentation/IHS3.Household.Qx.FINAL.pdf PDF pp.28-33 (printed 28-33) -- ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK'' on every page; G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''; G04 purchases, G05 ''How much did you spend?'', G06 own-production, G07 gifts and other sources'
++    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own (G01/G03), not the rCSI battery.  Build reads Full_Sample/Household/hh_mod_g1.dta hh_g03a..hh_g07b = G03..G07 (labels ''How much in total did your household consume in the past week (Quantity)?'', ...).  ONE ask: one row per (case_id, hh_g02) bar 6 duplicated pairs in 1,521,568; the 3,246-household IHPS baseline sub-sample was visited twice for AGRICULTURE (Malawi/_/CONTENTS.org, ''Sub-samples''), not for Module G.'
+     n_items_delivered: 116
+   '2013-14':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
++    evidence: '2013-14/Documentation/IHPS.Household.Qx.FINAL.PRINT.pdf PDF pp.30-37 -- ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK''; G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''; G04-G07 as IHS3'
++    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own, not the rCSI battery.  Build reads HH_MOD_G1_13.dta hh_g03a..hh_g07b = G03..G07 (same labels as IHS3), and not the short MODULE B2 food list on PDF p.8.  ONE ask: one row per (y2_hhid, hh_g02).'
+     n_items_delivered: 116
+   '2016-17':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
++    evidence: '2016-17/Documentation/fourth_integrated_household_survey_2016_2017_household_questionnaire.pdf PDF pp.30-37 -- ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK''; G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''.  Panel rows: 2016-17/Documentation/ihps_2016_bid_updated_final.pdf PDF pp.10-11 (Module G ''collects information on all food consumed by the household in the past 7 days'') and p.8 (household questionnaire administered in full once: Panel Group A at visit 1, Group B at visit 2)'
++    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own, not the rCSI battery.  Build reads Cross_Sectional/hh_mod_g1.dta AND Panel/hh_mod_g1_16.dta, hh_g03a..hh_g07b = G03..G07; both files label hh_g03a ''How much in total did your household consume in the past week? Quantity''.  The held questionnaire is IHS4''s, the cross-section''s instrument; the IHPS 2016 panel''s own household questionnaire is NOT among the held documents, so for the panel rows the window rests on the panel BID''s Module G description and the matching .dta labels, not on a held instrument.  ONE ask in both files: one row per household-item.'
+     n_items_delivered: 132
+   '2019-20':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
++    evidence: '2019-20/Documentation/fifth_integrated_household_survey_2019_2020_and_the_integrated_household_panel_survey_2019_household_questionnaire.pdf PDF pp.39-46 -- G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''; module title ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK'' (p.46).  One ask: 2019-20/Documentation/fifth_integrated_household_survey_ihs5_2019_2020_basic_information_document.pdf PDF pp.17-18 (''the cross-sectional households were visited only once'')'
++    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own, not the rCSI battery.  One instrument for IHS5 and IHPS 2019 (its title says so).  Build reads Cross_Sectional/HH_MOD_G1.dta and Panel/hh_mod_g1_19.dta hh_g03a..hh_g07b = G03..G07 (hh_g01 label ''Over the past one week, did you or others in your household consume any [ITEM]?'').  ONE ask: one row per household-item in both files.'
+     n_items_delivered: 133
+diff --git a/lsms_library/countries/Mali/_/recall.yml b/lsms_library/countries/Mali/_/recall.yml
+index d91836d66..f55fb8957 100644
+--- a/lsms_library/countries/Mali/_/recall.yml
++++ b/lsms_library/countries/Mali/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+@@ -29,12 +29,20 @@ Recall:
+     notes: 'The 7-day module is asked at BOTH EACI passages of one panel (p1 mostly Jul-Aug 2014, p2 mostly Dec 2014), and the build SUMS them: mapping.py drops visit and the additive collapse adds the two recalls.  Served 2014-15 purchased Expenditure 5,652,532,205 = p1 2,980,757,701 + p2 2,671,774,504 (s13q03c), exactly.  n_visits was 1 until GH #851 red team r1 (R2), 2026-10-19.'
+     n_items_delivered: 122
+   '2018-19':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'
++    evidence: '2018-19/Documentation/mli_ehcvm1_qnr_household_excel_vague1.xls (and _vague2.xls, identical) sheet S7b_Conso_Al r1 ''SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'', r6 7B.03 ''Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'''
++    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Read 2026-10-23 (GH #1084).  Section 7B is headed ''CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS''; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_mli2018.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label ''7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours'').  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 6,596 households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.'
+     n_items_delivered: 138
+   '2021-22':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'
++    evidence: '2021-22/Documentation/mli_ehcvm2_qnr_men_excel_vague1.pdf (and _vague2.pdf) PDF p.38 (printed 37) -- ''SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS''; 7B.03 ''Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'''
++    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Read 2026-10-23 (GH #1084).  Section 7B is headed ''CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS''; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_mli2021.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label ''7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours'').  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 6,138 households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.'
+     n_items_delivered: 145
+diff --git a/lsms_library/countries/Niger/_/recall.yml b/lsms_library/countries/Niger/_/recall.yml
+index d72004838..fcae7390f 100644
+--- a/lsms_library/countries/Niger/_/recall.yml
++++ b/lsms_library/countries/Niger/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+@@ -20,12 +20,16 @@
+ 
+ Recall:
+   '2018-19':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'
++    evidence: '2018-19/Documentation/ner_ehcvm1_qnr_household_excel_vague1.xls (and _vague2.xls, identical) sheet S7b_Conso_Al r1 ''SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS'', r6 7B.03 ''Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'''
++    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Read 2026-10-23 (GH #1084).  Section 7B is headed ''CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS''; 7B.03 asks the 7-day total, 7B.04 / 7B.05 the own-produced and other-source parts of it, and 7B.06-7B.08 the LAST purchase within 30 days, which supplies only the unit value.  So both served flows sit on the 7-day window and the price can be up to 30 days old, as GH #876 found.  Build reads s07b_me_ner2018.dta: s07bq03a, s07bq04, s07bq05, s07bq07a/b/c, s07bq08 = 7B.03-7B.08 (s07bq03a label ''7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours'').  Section 7A (meals away from home, also 7 days) is not read.  ONE ask: each household is interviewed in exactly one vague (0 of 5,987 households in both), and the vague 1 and vague 2 questionnaires carry identical 7B text.'
+     n_items_delivered: 135
+   '2021-22':
+     basis: not-recorded
+     ask_count_basis: unknown
+-    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'
++    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  Tried 2026-10-23 (GH #1084), left not-recorded: no questionnaire is held for this wave -- 2021-22/Documentation holds only SOURCE.org (catalog 6276).  s07b_me_ner2021.dta''s own labels say 7 days (''7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours''), which is variable-label grade, not the instrument; and the Mali / Burkina Faso 2021-22 forms are sibling countries'' instruments.  To close it, acquire the NER EHCVM-2 household questionnaire.'
+     n_items_delivered: 154
+diff --git a/lsms_library/countries/Nigeria/_/recall.yml b/lsms_library/countries/Nigeria/_/recall.yml
+index 62af8937b..f54243b14 100644
+--- a/lsms_library/countries/Nigeria/_/recall.yml
++++ b/lsms_library/countries/Nigeria/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Panama/_/recall.yml b/lsms_library/countries/Panama/_/recall.yml
+index dc42a473b..264c00015 100644
+--- a/lsms_library/countries/Panama/_/recall.yml
++++ b/lsms_library/countries/Panama/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Senegal/_/recall.yml b/lsms_library/countries/Senegal/_/recall.yml
+index 439f359f8..eb2244f1b 100644
+--- a/lsms_library/countries/Senegal/_/recall.yml
++++ b/lsms_library/countries/Senegal/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Serbia/_/recall.yml b/lsms_library/countries/Serbia/_/recall.yml
+index 609c8d4ce..752f92f52 100644
+--- a/lsms_library/countries/Serbia/_/recall.yml
++++ b/lsms_library/countries/Serbia/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Tanzania/_/recall.yml b/lsms_library/countries/Tanzania/_/recall.yml
+index 2827ef385..f45da226d 100644
+--- a/lsms_library/countries/Tanzania/_/recall.yml
++++ b/lsms_library/countries/Tanzania/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Togo/_/recall.yml b/lsms_library/countries/Togo/_/recall.yml
+index 6ab9bb942..103532fea 100644
+--- a/lsms_library/countries/Togo/_/recall.yml
++++ b/lsms_library/countries/Togo/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+diff --git a/lsms_library/countries/Uganda/_/recall.yml b/lsms_library/countries/Uganda/_/recall.yml
+index bc3b2b11c..d39f93ec9 100644
+--- a/lsms_library/countries/Uganda/_/recall.yml
++++ b/lsms_library/countries/Uganda/_/recall.yml
+@@ -6,7 +6,7 @@
+ #
+ #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
+ #
+-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
++# Only 28 of the corpus's 51 stated windows are questionnaire-grade.  A
+ # `config-comment` rung means a maintainer asserted the number, not that an
+ # instrument states it -- consumers are entitled to discount it, and a
+ # `not-recorded` rung means nobody has looked, which is NOT the same as "no
+@@ -20,39 +20,63 @@
+ 
+ Recall:
+   '2005-06':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: '(Part A) Food, Beverage, and Tobacco (During the Last 7 Days)'
++    evidence: '2005-06/Documentation/UNHS.2005-06.Household.Questionnaire.FINAL.pdf PDF p.18 (printed 17; image-only scan, read visually) -- Section 14A banner ''(Part A) Food, Beverage, and Tobacco (During the Last 7 Days)'' over columns 4-11 (qty / value from purchases at home, away from home, home produce, in-kind), 12 market price, 13 farm-gate price; 2005-06/Documentation/UNHS.2005-06.Interviewer.Manual.FINAL.pdf PDF p.33 (printed 31): ''Part A: Expenditure on Foods, Beverages and Tobacco during Last Seven (7) Days'' ... ''the recall period, i.e., the last 7 days'''
++    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  UNHS 2005-06, not UNPS: the food module is Section 14A (GSEC14A.dta), and the build''s h14aq4..h14aq13 are the printed columns 4..13 (their labels, e.g. ''hh consumption out of purchase.quantity'', name no window; the banner does).  ONE ask: a single grid with no visit columns, and GSEC14A.dta has one row per (HHID, h14aq2) bar 1 duplicated pair in 40,393.  The manual''s two visits are for the two cropping seasons; nothing places the food grid at both, and the data show one.'
+     n_items_delivered: 61
+   '2009-10':
+     basis: not-recorded
+     ask_count_basis: unknown
+-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
++    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Tried 2026-10-23 (GH #1084), left not-recorded: no household questionnaire is held for this wave.  2009-10/Documentation holds only ddi-documentation-english_microdata-1001.pdf, the DDI codebook of catalog 1001 (UNHS 2005-06 + UNPS 2009-10).  It says ''Food, beverage, and tobacco (during the last 7 days)'' (Scope, PDF p.15) and ''Section 15B: Food, Beverage, and Tobacco (During the Last 7 days)'' (file description, PDF p.44) -- catalog metadata, not the instrument -- and GSEC15b.dta labels h15bq3b ''How many days was [ITEM] consumed out of the last 7 days?'' (variable-label grade, and on the days-consumed column only: the quantity / value labels name no window; h15bq3b is 8 on 2 of 37,645 answered rows).  Not promoted: the rung needs the instrument, and the 2010-11 form is a sibling wave.  To close it, acquire the UNPS 2009-10 household questionnaire.'
+     n_items_delivered: 63
+   '2010-11':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Part B: Food, Beverage, and Tobacco (During the Last 7 Days)'
++    evidence: '2010-11/Documentation/UNPS_2010-11_Household_Questionnaire.pdf PDF pp.29-30 (printed 27-28) -- Section 15 Part B banner on both pages; col 3B ''How many days was [ITEM] consumed out of the last 7 days?''; cols 4-13 qty / value from purchases at home, away from home, home produce, in-kind, market and farm-gate price.  One ask: 2010-11/Documentation/UNPS_2010-11_Basic-Info-2014.pdf PDF pp.20-21 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)'
++    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15b.dta h15bq4..h15bq13 = printed columns 4..13.  Their Stata labels carry the UN-SUBSTITUTED fill (''... in the past [RECALL]?'', h15bq3b ''... in the past [PERIOD] ...''), the template GSEC15C also carries; for FOOD the printed form fixes it at 7 days and the data agree: h15bq3b (days consumed out of the window) lies in 1..7 on all 35,222 answered rows.  One row per (hh, itmcd).'
+     n_items_delivered: 70
+   '2011-12':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Part B: Food, Beverage, and Tobacco (During the Last 7 Days)'
++    evidence: '2011-12/Documentation/Uganda2011-12HouseholdQuestionnaire.pdf PDF pp.26-27 (printed 24-25) -- Section 15 Part B banner on both pages; col 3B ''How many days was [ITEM] consumed out of the last 7 days?''; cols 4-13 as 2010-11.  One ask: 2011-12/Documentation/unps_2011_12_bid_rev2014july.pdf PDF p.26 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)'
++    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15B.dta h15bq4..h15bq13 = printed columns 4..13; labels carry the un-substituted [RECALL] / [PERIOD] fill; h15bq3b lies in 1..7 on all 38,740 answered rows.  One row per (HHID, itmcd).'
+     n_items_delivered: 71
+   '2013-14':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Part B: Food, Beverage, and Tobacco (During the Last 7 Days)'
++    evidence: '2013-14/Documentation/unps_2013_14_household_qx.pdf PDF pp.9-11 (p.9 printed 7) -- Section 15 Part B banner on p.9 and its continuation p.11; col 3B ''How many days was [ITEM] consumed out of the last 7 days?''; cols 4-13 as 2010-11'
++    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15B.dta h15bq4..h15bq13 = printed columns 4..13; labels carry the un-substituted [RECALL] / [PERIOD] fill; h15bq3b lies in 1..7 on all 50,387 answered rows.  ONE ask: a single grid with no visit columns, and one row per (HHID, itmcd) bar 7 duplicated pairs in 50,415.  This wave''s Basic Information Document does not restate the visit-1 / visit-2 split of the household questionnaire that 2010-11, 2011-12 and 2015-16 document, so the count rests on the form and the data.'
+     n_items_delivered: 77
+   '2015-16':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Part B: Food, Beverage, and Tobacco (During the Last 7 Days)'
++    evidence: '2015-16/Documentation/unps_2015_16_household_qx.pdf PDF pp.11-13 (p.11 printed 8) -- Section 15 Part B banner on pp.11-12; col 3B ''How many days was [ITEM] consumed out of the last 7 days?''; cols 4-13 as 2010-11.  One ask: 2015-16/Documentation/ddi-documentation-english_microdata-3460.pdf PDF p.6 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)'
++    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  CAPI-era wave (same DDI p.6: ''Given the CAPI system being used''), so the printed form is a rendering of the electronic instrument; the labels carry the un-substituted [recall] / [period] fill, but h15bq3b lies in 1..7 on all 49,749 answered rows, which a per-item window longer than 7 days would not produce.  Build reads gsec15b.dta h15bq4..h15bq13 = printed columns 4..13.  One row per (HHID, itmcd).'
+     n_items_delivered: 77
+   '2018-19':
+-    basis: not-recorded
+-    ask_count_basis: unknown
+-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
++    basis: questionnaire
++    ask_count_basis: declared
++    recall_days: 7
++    n_asks: 1
++    recall_verbatim: 'Part B: Food and Beverage (During the Last 7 Days)'
++    evidence: '2018-19/Documentation/unps_hhq.pdf PDF pp.10-18 -- Section 15 Part B banner on every page of the grid, and each quantity question ends ''during the last 7 days'' (e.g. ''How many [CEB03C] of [ITEM] did your household consume out of purchases at home during the last 7 days?''); GSEC15B.dta labels agree (CEB04 ''How many days were [ITEM] consumed out of the last 7 days?'', CEB06 ''Quantity of hhold [item] purchased for consumptn at home during the last 7 days'')'
++    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  The printed form and the shipped .dta NUMBER the columns differently: the form''s CEB04/CEB05 (purchases at home, qty / value) .. CEB10/CEB11 (in-kind) are CEB06/CEB07 .. CEB012/CEB013 in GSEC15B.dta, which also splits the market price into CEB14a/b/c -- the wave script''s own comment (''notations on Q don''t seem to match!'') is right.  The build reads the .dta names, and the labels of what it reads (CEB06, CEB08, CEB10, CEB012: ''... during the last 7 days'') match the content of the printed questions, so the window is the same 7 days either way.  ONE ask: no visit grid; one row per (hhid, CEB01); CEB04 lies in 1..7 on all 53,207 answered rows.'
+     n_items_delivered: 117
+   '2019-20':
+     basis: questionnaire
+diff --git a/tests/test_recall_period.py b/tests/test_recall_period.py
+index b28ab9016..b025142c0 100644
+--- a/tests/test_recall_period.py
++++ b/tests/test_recall_period.py
+@@ -919,6 +919,28 @@ ONE_ASK_BY_INSPECTION = {
+     ("Tanzania", "2019-20"): "2019-20/_/food_acquired.py reads HH_SEC_J1.dta",
+     ("Tanzania", "2020-21"): "2020-21/_/food_acquired.py reads hh_sec_j1.dta",
+     ("Uganda", "2019-20"): "2019-20/_/food_acquired.py reads HH/gsec15b.dta",
++    # GH #1084 (2026-10-23): read from the questionnaires; one grid, no visit
++    # columns, one row per household-item in every source named.
++    ("Uganda", "2005-06"): "2005-06/_/food_acquired.py reads GSEC14A.dta "
++                           "(UNHS Section 14A)",
++    ("Uganda", "2010-11"): "2010-11/_/food_acquired.py reads GSEC15b.dta",
++    ("Uganda", "2011-12"): "2011-12/_/food_acquired.py reads GSEC15B.dta",
++    ("Uganda", "2013-14"): "2013-14/_/food_acquired.py reads GSEC15B.dta",
++    ("Uganda", "2015-16"): "2015-16/_/food_acquired.py reads gsec15b.dta",
++    ("Uganda", "2018-19"): "2018-19/_/food_acquired.py reads GSEC15B.dta",
++    ("Malawi", "2004-05"): "2004-05/_/food_acquired.py reads sec_i.dta "
++                           "(IHS2 Module I)",
++    ("Malawi", "2010-11"): "2010-11/_/food_acquired.py reads "
++                           "Full_Sample/Household/hh_mod_g1.dta",
++    ("Malawi", "2013-14"): "2013-14/_/food_acquired.py reads HH_MOD_G1_13.dta",
++    ("Malawi", "2016-17"): "2016-17/_/food_acquired.py reads "
++                           "Cross_Sectional/hh_mod_g1.dta and "
++                           "Panel/hh_mod_g1_16.dta -- two samples, each "
++                           "household in one",
++    ("Malawi", "2019-20"): "2019-20/_/food_acquired.py reads "
++                           "Cross_Sectional/HH_MOD_G1.dta and "
++                           "Panel/hh_mod_g1_19.dta -- two samples, each "
++                           "household in one",
+ }
+ 
+ 
+@@ -1043,9 +1065,11 @@ class TestDeliveredExposureConfig:
+         got = {}
+         for c, w, _ in _convertible_cells():
+             got.setdefault(_delivery_class(c, w), set()).add((c, w))
+-        assert got["declared-visit"] == {("Mali", "2014-15"), ("Togo", "2018")}
++        assert got["declared-visit"] == {("Mali", "2014-15"), ("Togo", "2018"),
++                                         ("Mali", "2018-19"), ("Mali", "2021-22"),
++                                         ("Niger", "2018-19")}
+         assert {c for c, _ in got["visit-level"]} == {"Burkina_Faso", "GhanaLSS"}
+-        assert len(got["one-ask-by-inspection"]) == 23
++        assert len(got["one-ask-by-inspection"]) == 34
+ 
+ 
+ def _flow_column_of(name):
