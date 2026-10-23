@@ -83,3 +83,50 @@ own text (IHS2 Module I, IHS3+ Module G).
 
 The 2013-14 form also prints a short "MODULE B2: FOOD CONSUMPTION" list (PDF
 8); the build does not read it.
+
+* EHCVM (Mali, Niger, Burkina Faso 2018-19 / 2021-22)
+
+All five held instruments carry the same Section 7B.  Quoted from the Mali
+2018-19 vague 1 form; the others were checked line for line (the vague 1 and
+vague 2 forms of each wave are identical in 7B).
+
+#+begin_quote
+SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS
+(7B.02) Votre ménage a-t-il consommé [PRODUIT] au cours des 7 derniers jours?
+(7B.03) Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?
+(7B.04) Parmi cette quantité consommée, quelle est celle qui provient de la production propre du ménage (...)?
+(7B.05) Parmi cette quantité consommée, quelle est celle qui provient d'autres sources (cadeau, prélèvement de son propre commerce, troc, etc.)?
+(7B.06) Quelle est la dernière fois que le [PRODUIT] a été acheté dans le ménage? 1=Hier 2=7 dernier jours 3=30 derniers jours 4=Plus de 30 jours 5=Jamais
+(7B.07) Quelle est la quantité du [PRODUIT] acheté la dernière fois?
+(7B.08) Quelle est la valeur du [PRODUIT] acheté la dernière fois?
+#+end_quote
+
+| country / wave | file | where |
+|----------------+------+-------|
+| Mali 2018-19 | =mli_ehcvm1_qnr_household_excel_vague1.xls=, =_vague2.xls= | sheet =S7b_Conso_Al=, r1 (title), r4-r6 (7B.01-7B.08) |
+| Mali 2021-22 | =mli_ehcvm2_qnr_men_excel_vague1.pdf=, =_vague2.pdf= | PDF 38 (printed 37), cont'd PDF 39 |
+| Niger 2018-19 | =ner_ehcvm1_qnr_household_excel_vague1.xls=, =_vague2.xls= | sheet =S7b_Conso_Al=, r1, r4-r6 |
+| Niger 2021-22 | *no questionnaire held* (=Documentation/= has only =SOURCE.org=, catalog 6276) | -- left not-recorded |
+| Burkina Faso 2018-19 | =Questionnaire/bfa_ehcvm1_qnr_household_excel_vague1.xls=, =_vague2.xls= | sheet =S7b_Conso_Al=, r1, r4-r6 |
+| Burkina Faso 2021-22 | =Questionnaire/bfa_ehcvm2_vague1.pdf=, =bfa_ehcvm2_vague2.pdf= | PDF 38 (printed 37), cont'd PDF 39 |
+
+** Build check
+
+Every wave's =data_info.yml= reads =s07b_me_<iso><year>.dta=: =Quantity=
+s07bq03a (7B.03), =Produced= s07bq04, =GiftQuantity= s07bq05, and the
+last-purchase triple s07bq07a/b/c + s07bq08 that =ehcvm.derive_ehcvm_purchase_value=
+turns into a unit value (GH #876).  Section 7A (meals away from home) is not
+read.
+
+| file | s07bq03a label | households in more than one =vague= |
+|------+----------------+-------------------------------------|
+| Mali 2018-19 =s07b_me_mli2018.dta= | "7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours" | 0 of 6,596 |
+| Mali 2021-22 =s07b_me_mli2021.dta= | same | 0 of 6,138 |
+| Niger 2018-19 =s07b_me_ner2018.dta= | same | 0 of 5,987 |
+| Niger 2021-22 =s07b_me_ner2021.dta= | same (variable-label grade only; NOT promoted) | 0 of 6,622 |
+| Burkina Faso 2018-19 =s07b_me_bfa2018.dta= | same | 0 of 6,959 |
+| Burkina Faso 2021-22 =s07b_me_bfa2021.dta= | "7B.03a. Quelle est la quantité totale du %rostertitle% consommé par le ménage au" (cut at 80 characters) | 0 of 3,227 (grappe, menage) keys |
+
+So the delivered flows are 7 days, asked once; 7B.06-7B.08 contribute only
+the unit value of the last purchase, which may be up to 30 days old -- the GH
+#876 caveat already in the CSV notes, unchanged.
