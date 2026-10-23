@@ -440,6 +440,50 @@ def test_empty_declared_frame_has_the_declared_shape():
     assert C._empty_declared_frame(None).empty
 
 
+def test_empty_declared_frame_keeps_interleaved_optional_declaration_order():
+    entry = {
+        'index': '(t, i)',
+        'Unit': {'type': 'str', 'optional': True},
+        'Quantity': 'float',
+        'Flag': {'type': 'bool', 'optional': True},
+        'Count': 'int',
+        'Factor': {'type': 'float', 'optional': True},
+        'Label': {'type': 'str', 'optional': False},
+        't': 'str',
+        'i': {'type': 'str', 'optional': True},
+        'materialize': 'make',
+        'backend': 'make',
+        'aggregation': {'Quantity': 'sum'},
+        1: 'str',
+    }
+    frame = C._empty_declared_frame(entry)
+    # A source declaration is the oracle; requiredness is not a sort key.
+    assert list(frame.columns) == ['Unit', 'Quantity', 'Flag', 'Count',
+                                   'Factor', 'Label']
+    assert frame.empty and list(frame.index.names) == ['t', 'i']
+    assert all(str(frame.index.get_level_values(n).dtype) == 'str'
+               for n in frame.index.names)
+    # This constructor does not coerce measures or expand dict dtype policy.
+    assert all(dtype == object for dtype in frame.dtypes)
+
+
+@pytest.mark.parametrize('entry,columns,levels', [
+    ({'Z': 'float', 'A': 'str'}, ['Z', 'A'], [None]),
+    ({'Z': {'type': 'float', 'optional': True},
+      'A': {'type': 'str', 'optional': True}}, ['Z', 'A'], [None]),
+    ({'index': '(t, i)', 't': 'str', 'i': 'str'}, [], ['t', 'i']),
+    ({'index': '(t, i)', 'Z': 'float',
+      'A': {'type': 'str', 'optional': False}}, ['Z', 'A'], ['t', 'i']),
+    (None, [], [None]),
+    ('not a mapping', [], [None]),
+])
+def test_empty_declared_order_preserves_existing_shapes(entry, columns, levels):
+    frame = C._empty_declared_frame(entry)
+    assert frame.empty
+    assert list(frame.columns) == columns
+    assert list(frame.index.names) == levels
+
+
 # ---------------------------------------------------------------------------
 # A country builder that EXISTS keeps the legacy route
 # ---------------------------------------------------------------------------

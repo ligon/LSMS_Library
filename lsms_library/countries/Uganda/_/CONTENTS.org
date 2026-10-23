@@ -3805,3 +3805,129 @@ The same existing route difference also leaves Default with two all-null optiona
 Those complete frames are not identical and were not normalized to claim equality.
 The recorded native 2019-20 writer input, prepared frame, footer and returned Make subset agree; the country footer and returned Default subset also agree.
 The reader repair leaves the EA/GPS-bin/parish conventions, missing-Region caveat, source joins and cluster reducers unchanged.
+
+* Parcel yield after household walking (GH #1205, 2026-10-22)
+
+The native crop constructor joins the explicit formatted source household,
+parcel and plot fields as =hhid-parcel-plot=.
+The Default household walk changes =i= but retains the native household
+embedded in =plot_id=.
+The former parcel extractor required the embedded prefix to equal the current
+=i=, so it returned the whole plot string after a valid household walk.
+This is a wiring defect, separate from missing or nonpositive area.
+The source-backed check finds an exact inverse from the right for all 56,841
+retained unique native plot tuples; the parcel and plot suffixes are nonempty
+ASCII-decimal tokens in all 140,961 associated raw harvest rows.
+These checks use the actual source columns, not a guessed household width or
+a choice of key based on improved area matches.
+
+=yield_kg= now uses that native constructor inverse only for a Country operand
+carrying the existing =attrs['country']='Uganda'=, when the current-=i= prefix
+branch misses and the native household and numeric suffix checks pass.
+An explicit country index level or column disables the new fallback, even
+with a stale scalar country attribute.
+It also requires the common household key =i= and rejects an explicit
+conflicting area-country attribute; unmarked area operands retain the declared
+DataFrame contract.
+Unmarked, other-country and malformed identifiers keep the former fallback.
+No source or public =plot_id= is rewritten, and no index field or grain is
+introduced.
+The separate =fertilizer_rate= route remains under GH #1110.
+
+At the post-factor source =491daf5654b9ee45332bec97e1296ae821ff46d5=, the
+133,761 crop observations and 42,841 area rows remain exact.
+The area frame contains 37,636 positive rows and 37,634 positive parcel keys.
+Before this repair, 42,481 converted route keys partition into 14,520 exact
+positive-area matches, 438 exact-but-ineligible keys, 27,521 directly witnessed
+native-household prefix failures and two native parcels absent from the area
+rosters.
+The prefix-failure group has 21,165 positive-area, 6,348 ineligible-area and
+eight absent-area witnesses.
+These are fallback route keys, not additive additional yields: multiple crop
+plots can belong to the same parcel.
+The prospective =(t, canonical_i, raw_parcel)= census over all retained crop
+and all area witnesses finds no keys with multiple native households, so there
+is no household-alias area/harvest collision to adjudicate in this repair.
+
+| Wave    | Former route keys | Former yield keys | Source-parcel keys | Yield keys |
+|---------+-------------------+-------------------+--------------------+------------|
+| 2009-10 |              4400 |              4024 |               4400 |       4024 |
+| 2010-11 |              4230 |              4212 |               4230 |       4212 |
+| 2011-12 |              4249 |              4247 |               4249 |       4247 |
+| 2013-14 |              6671 |              1889 |               4685 |       4685 |
+| 2015-16 |              8419 |                90 |               4946 |       4944 |
+| 2018-19 |              7764 |                 5 |               4799 |       1027 |
+| 2019-20 |              6748 |                53 |               4650 |       4616 |
+| Total   |             42481 |             14520 |              31959 |      27755 |
+
+The result equals the independent oracle that takes parcel identity directly
+from the raw source columns and applies the existing converted-harvest sum,
+positive-area sum, inner join and division.
+It adds 13,235 yield keys, loses none, and leaves every former yield value
+unchanged at its existing key.
+The full crop and area operands, =harvest_kg= and literal-plot yield remain
+exact; the literal route still returns zero rows.
+The remaining 4,204 converted source parcels do not have a matching positive
+area under this existing route.
+The unchanged area preference, 2,500-acre clamp, nonpositive-area screen,
+A/B area sum and factor ladder are not repaired or reinterpreted here.
+The earlier blanket "100% of crop rows" statement was false; coverage depends
+on both convertible harvest and eligible area.
+The pre-factor 14,022/40,409 measurement above remains a historical result,
+not a target for this factor-stage diagnosis.
+
+Normal Default cold and fresh-process warm controls retain six exact complete
+frames and unchanged warm cache bytes, modes and mtimes.
+The first source-oracle comparison stopped because its index join retained
+unused levels whereas the API constructs observed-only levels; the corrected
+expected axes follow that API contract and preserve the actual frames.
+The #1204 Make subset route, #1196 storage difference, #829 release WAITING
+entry and other scientific/unit caveats retain their separate meanings.
+
+* Requested crop waves use framework assembly (GH #1204, 2026-10-22)
+
+The country =_/crop_production.py= compiler and its country-parquet Make rule
+are retired.
+That compiler concatenated every native wave without accepting a requested
+wave set, which explains the supported and barren subset caveat recorded above.
+The existing framework now assembles this table on both Default and Make,
+using the same seven native loaders, canonical household ID walk and
+wave-to-country grain-audit transport.
+The reviewed household map terminates in one step in every wave, so replacing
+the compiler's local walk with the existing framework walk changes no binding.
+
+2005-06 remains genuinely barren: it has crop-area allocation without
+crop-level harvest quantities.
+The existing typed-empty path answers that request before a country-cache
+rebuild or write; it preserves any other waves already cached.
+Default supported builds retain the existing coverage manifest and monotone
+union rule.
+Make uses requested native waves and writes no country crop parquet.
+The direct =make crop_production= target builds only the native wave parquets.
+
+This changes routing, not the source observation, identifier, factor or
+scientific contracts recorded under GH #1198 and GH #849.
+Native =production_obs=, reported factors, the conditional legacy null-key
+boundary, the sample join and the 2015-16 sale-value correction are unchanged.
+The older country-builder subset and warm-write measurements above remain
+historical evidence; they are not guarantees about this new route.
+The separate area/key limitation (GH #1205) and support-string null-policy
+observation (GH #1196) remain outside this change.
+
+* Constructed empty crop columns retain declaration order (GH #1215, 2026-10-22)
+
+A barren crop request constructed by the framework retains the original
+=data_scheme.yml= field order, including optional fields in their declared
+positions.
+For this table that order equals the native helper's explicit eight-column
+projection: =Quantity, Quantity_sold, Value_sold, Unit_sold, Condition_sold,
+harvest_month, intercropped, KgFactor=.
+The previous required-before-optional grouping moved the sold-label columns
+behind the two later required fields on this newly exposed GH1204 route.
+
+Required/optional membership, index identity, nullable dtype handling and the
+GH1204 no-build/no-country-cache-write boundary remain unchanged.
+Populated output is not reordered.
+This empty-construction rule does not promise that every country's native
+writer uses declaration order or emits every optional column.
+The separate country-local optional-dict dtype gap is not repaired here.

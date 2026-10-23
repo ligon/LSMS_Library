@@ -1055,17 +1055,18 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
     """A 0-row frame with a table's DECLARED shape (GH #1039).
 
     The declared index levels (``str``, as a built index's are) as its index
-    and every declared column, required and ``optional: true``, as an object
-    column for ``_finalize_result``'s canonical dtypes to coerce.  It answers
+    and every declared column, required and ``optional: true``, in original
+    declaration order as an object column for ``_finalize_result``'s canonical
+    dtypes to coerce.  It answers
     a request whose waves all lack the table on a no-builder route
     (GH #1039/#1099): 0 rows, as a warm cache would serve, shaped so
     that ``Country._assert_built_required_columns`` reads it as a well-formed
     empty table rather than as a build that lost its columns.
     """
-    entry = scheme_entry if isinstance(scheme_entry, dict) else None
+    entry = scheme_entry if isinstance(scheme_entry, dict) else {}
     levels = _declared_index_levels(entry)
-    columns = [c for c in _required_scheme_columns(entry) + _optional_scheme_columns(entry)
-               if c not in levels]
+    declared = set(_required_scheme_columns(entry)) | set(_optional_scheme_columns(entry))
+    columns = [c for c in entry if c in declared and c not in levels]
     empty = pd.DataFrame({c: pd.Series(dtype="str" if c in levels else object)
                           for c in levels + columns})
     return empty.set_index(levels) if levels else empty
@@ -2984,6 +2985,17 @@ class Country:
         # #data_scheme = set(data_list).union(set(py_ls).union(required_list))
 
         # return list(data_scheme)
+
+    def _validate_waves(self, waves):
+        """Prepare an explicit selection before any cache or derived work."""
+        # Snapshot iterators once; preserve order/duplicates and the existing
+        # invalid-key error without constructing valid Waves (ledger 1210, section 4).
+        selected = waves if isinstance(waves, list) else list(waves)
+        available = self.waves
+        for year in selected:
+            if year not in available:
+                self[year]
+        return selected
 
     def __getitem__(self, year: str) -> Wave:
         # Ensure the year is one of the available waves
@@ -5019,6 +5031,8 @@ class Country:
 
         if waves is None:
             waves = self.waves
+        else:
+            waves = self._validate_waves(waves)
 
         scheme_entry = self._materialization_entry(method_name)
         materialize_backend = None
@@ -6261,6 +6275,10 @@ class Country:
                     # Attach the LCU label as an index level so the post-step
                     # convert() can relabel it to the target basis.
                     currency = 'index'
+                # Validate before valuation's geographic lookup or a legacy
+                # derived fallback can touch data (ledger 1210, sections 2/4).
+                if waves is not None:
+                    waves = self._validate_waves(waves)
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
