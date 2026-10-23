@@ -1741,3 +1741,59 @@ records 10,224 / 6,961 / 3,218.
 
 *Cache*: none.  =sampling.yml= is not a build input (=.yml= is outside
 =_BUILD_INPUT_SUFFIXES=) and =CONTENTS.org= is excluded as documentation.
+
+* 2026-10-23 -- the panel crosswalk named 2018-19 ids in the 2021-22 format (GH #1240)
+
+*The idiosyncrasy: the household id is built differently in each EHCVM wave.*
+2018-19 binds =i: [grappe, menage]= to its own =2018-19/_/mapping.py:i=,
+which is =burkina_faso.ehcvm_i=: =grappe + '0' + menage.zfill(2)=.
+2021-22 has no override and falls back to the country =i=: =grappe + menage.zfill(3)=,
+which equals the survey's =hhid= for 3,227 / 3,227 cover rows.
+The two agree for a menage up to 99 and differ for a three-digit menage:
+=(2, 126)= is ='20126'= in 2018-19 and ='2126'= in 2021-22.
+The survey's =hhid_EHCVM1= is in the *2021-22* form (3,227 / 3,227).
+It is therefore not the id the 2018-19 tables serve whenever the 2018-19 menage has three digits.
+
+*What was wrong.*  =panel_ids.py= built each target as =grappe_EHCVM1 + menage_EHCVM1.zfill(3)=, the =hhid_EHCVM1= form.
+Of the 3,227 panel households, 1,108 have a three-digit 2018-19 menage.
+Under the old crosswalk:
+- 1,088 targets were ids that no 2018-19 table serves;
+- 3 were the served id of a DIFFERENT 2018-19 household (=(90, 102)= became ='90102'=, which is =(9, 102)=);
+- 17 were dropped by the chain guard.
+
+At the API (=sample()= and =household_roster()=, fresh data root), 2,053 of 3,227 2021-22 households carried an id also served in 2018-19.
+Only 2,041 of those were the right household.
+
+*Fix.*  =panel_ids.py= now builds both ids with the country's own formatters: =ehcvm_i= for targets and =i= for sources.
+The sources are asserted equal to =hhid=.
+Following Mali and Senegal, every target must also be a 2018-19 cover household (0 orphans).
+The regenerated crosswalk has 3,147 entries, up from 3,132:
+- 1,089 targets changed and 17 entries were added;
+- 2 entries were removed, both with unserved targets whose corrected targets are occupied 2021-22 ids;
+- every change is in a three-digit-menage household, and 0 sources changed.
+
+Linkage at the API went from 2,053 to 3,155 households.
+The right household is now linked for 3,147 (was 2,041); 8 are linked to a different household (was 12).
+Every crosswalk target is the source's own =(grappe_EHCVM1, menage_EHCVM1)= household.
+As a check that does not rely on the crosswalk, the household heads were compared across each linked pair.
+For the 1,106 newly linked households, 93.9% of heads have the same sex and 74.6% are 1-5 years older.
+The 2,041 previously linked households give 94.0% and 74.8%.
+
+*Still open: 80 households cannot link, and 8 of them are served under another household's id.*
+2021-22 renumbered =menage= within the grappe: only 477 of 3,227 households kept their 2018-19 menage.
+As a result, a household's 2018-19 id is sometimes another household's 2021-22 id.
+=id_walk= closure-resolves a wave's map (=local_tools._close_id_map=), so ={A: B, B: C}= would serve both as =C=.
+The chain guard therefore drops every entry whose target is an occupied 2021-22 id: 80 entries, down from 95.
+A dropped household keeps its 2021-22 id.
+For 8 of the 80, that id is the served 2018-19 id of a DIFFERENT household, and no head is 1-5 years older across the pair (0 of 8).
+*For these two waves, an =i= match on a household that is not in =updated_ids.json= is not evidence that it is the same household.*
+Removing the residue needs a change to =id_walk= semantics or a disjoint id namespace for one wave.
+Both are framework or design decisions and are not taken here.
+
+*Also measured, not reconciled.*  On a fresh data root =sample()= serves 7,010 2018-19 and 3,227 2021-22 households.
+The =DONE sample= section above records "6,961 households across 585 clusters" and "3,218 households across 550 clusters".
+This change does not alter either count.
+
+Cache: =panel_ids.py= and both JSON files are build inputs, so every Burkina Faso hash moves and no other country's does.
+Ledger: =.coder/ledger/1240-burkina-panel-ids.md=.
+Aggregate evidence: =slurm_logs/isa_backlog_2026-10-21/1240-burkina-panel-ids/=.

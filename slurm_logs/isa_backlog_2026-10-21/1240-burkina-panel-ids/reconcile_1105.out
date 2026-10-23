@@ -1,0 +1,7 @@
+old formula: not_served | in committed JSON: chain_skipped = 17
+old formula: not_served | in committed JSON: not_served = 1088
+old formula: served_WRONG_household | in committed JSON: served_WRONG_household = 3
+old formula: served_right | in committed JSON: chain_skipped = 78
+old formula: served_right | in committed JSON: served_right = 2041
+lost before chain guard (old target not a served id): 1105
+of which in committed JSON (issue count): 1088 ; chain-skipped: 17
