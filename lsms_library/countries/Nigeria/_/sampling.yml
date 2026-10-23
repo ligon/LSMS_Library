@@ -8,8 +8,12 @@
 #
 # Keys are the API wave labels, which for Nigeria are the post-planting /
 # post-harvest ROUNDS (2010Q3, 2011Q1, ...): a PP -> PH boundary is a revisit
-# of the same households within one wave directory.  The first round (2010Q3)
-# has no preceding wave and so no entry.
+# within one wave directory.  Since GH #1120 D1 (2026-10-23) each round's `v`
+# comes from that round's OWN cover page, so a household that moved BETWEEN
+# the two visits changes `v` at a PP -> PH boundary too (to a `moved-{hhid}`
+# singleton) -- still `stable`, for the reason given below: a mover's
+# singleton, not a renumbered EA.  The first round (2010Q3) has no preceding
+# wave and so no entry.
 #
 # `v` is the composite `state/lga/ea` built from raw codes (CONTENTS.org,
 # "Cluster (PSU) identifier"), and a real EA keeps it -- EXCEPT where the raw
@@ -31,61 +35,68 @@ Sampling:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit of the 2010Q3 households.  Measured: 5,000 of
-        5,000 linked households keep `v` (500 EAs, one-to-one).
+        Post-harvest revisit of the 2010Q3 households, from the PH cover.
+        Measured: 4,939 of 4,939 linked households keep `v` (500 EAs); the PH
+        cover does not list 61 of the 5,000 PP households.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Nigeria rows); re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Nigeria rows); re-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
 
   '2012Q3':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Measured: 4,707 of 4,859 linked households (96.9%) keep `v`; the rest
-        are tracked movers given a singleton `moved-{hhid}` (152 in W2), not
+        Measured: 4,696 of 4,841 linked households (97.0%) keep `v`; the 145
+        that change are tracked movers given a singleton `moved-{hhid}`, not
         renumbered EAs.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel); re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel); re-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
 
   '2013Q1':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit.  Measured: 4,859 of 4,859 linked households keep
-        `v`.
+        Post-harvest revisit, from the PH cover.  Measured: 4,814 of 4,831
+        linked households (99.6%) keep `v`; the 17 that change moved between
+        the two visits (15 to a `moved-{hhid}` singleton, 2 from one), not
+        renumbered EAs.  The PH cover adds 44 households the PP household
+        cover lacks (21 of them also in 2012Q3, from the PP agriculture
+        cover).
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 're-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
 
   '2015Q3':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Measured: 4,437 of 4,597 linked households (96.5%) keep `v`; the rest
-        are tracked movers given a singleton `moved-{hhid}` (306 in W3).
+        Measured: 4,469 of 4,610 linked households (96.9%) keep `v`; the 141
+        that change are tracked movers given a singleton `moved-{hhid}`.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel); re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel); re-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
 
   '2016Q1':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit.  Measured: 4,696 of 4,696 linked households keep
-        `v`.
+        Post-harvest revisit, from the PH cover.  Measured: 4,551 of 4,592
+        linked households (99.1%) keep `v`; the 41 that change moved between
+        the two visits (`moved-{hhid}` singletons).  104 PP households are not
+        on the PH cover.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 're-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
 
   '2018Q3':
     panel:
@@ -97,24 +108,26 @@ Sampling:
         neither id occurring in the other wave); every other EA keeps its id.
         W4 is a partial refresh: 360 new EAs plus a 159-EA "long panel" of the
         2010 sample (BID, quoted in CONTENTS.org).  Measured over the
-        long-panel households: 1,414 of 1,493 (94.7%) keep `v`; of the 79 that
-        change, 69 are movers' `moved-{hhid}` singletons and 10 are that EA.
+        long-panel households: 1,429 of 1,493 (95.7%) keep `v`; of the 64 that
+        change, 54 are movers' `moved-{hhid}` singletons and 10 are that EA.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'CONTENTS.org, "Sub-samples: refresh and long panel"; re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Sub-samples: refresh and long panel"; re-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
 
   '2019Q1':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit.  Measured: 5,263 of 5,263 linked households keep
-        `v`.
+        Post-harvest revisit, from the PH cover.  Measured: 4,959 of 5,025
+        linked households (98.7%) keep `v`; the 66 that change moved between
+        the two visits (`moved-{hhid}` singletons).  238 PP households are not
+        on the PH cover.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 're-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
 
   '2023Q3':
     panel:
@@ -125,22 +138,25 @@ Sampling:
         their composite `v` changes whole (21/2111/260 -> 21/2112/260,
         5/509/1064 -> 5/508/1064, ...; no old id occurs in W5 and no new id in
         W4); every other EA keeps its id.  W5 revisits both W4 sub-samples
-        (long panel and refresh).  Measured: 4,724 of 5,067 linked households
-        (93.2%) keep `v`; of the 343 that change, 231 are movers'
+        (long panel and refresh).  Measured: 4,741 of 5,019 linked households
+        (94.5%) keep `v`; of the 278 that change, 166 are movers'
         `moved-{hhid}` singletons and 112 are those 12 EAs.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'CONTENTS.org, "Sub-samples: long panel (1,590 -> 1,376) and refresh"; re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Sub-samples: long panel (1,590 -> 1,376) and refresh"; re-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
 
   '2024Q1':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit.  Measured: 5,067 of 5,067 linked households keep
-        `v`.
+        Post-harvest revisit, from the PH cover.  Measured: 4,707 of 4,771
+        linked households (98.7%) keep `v`; the 64 that change moved between
+        the two visits (`moved-{hhid}` singletons).  296 PP households are not
+        on the PH cover, and the PH round holds no household in 8 of the PP
+        round's 518 EAs.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 're-measured 2026-10-23 through Country("Nigeria").sample() after GH #1120 D1'
