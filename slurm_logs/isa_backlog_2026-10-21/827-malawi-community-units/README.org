@@ -1,0 +1,58 @@
+#+title: GH #827 -- Malawi community_prices: why =u= was blank on 38,506 rows
+
+Branch =fix/827-malawi-community-units-20261023= from development
+=9a0ed5f3c=.  Aggregate results only (no EA ids); row-level frames stay in
+the private data directory.
+
+* Scripts (run from the checkout under test, =PYTHONPATH= = that checkout)
+- =scripts/diag.py= -- raw Module CK files per wave/half: blank counts,
+  availability, raw unit-code distribution, per-item unit coverage, the
+  2010-11 =com_ck00b3_os= text -> =results/diag_raw.json=.
+- =scripts/diag2.py= -- struck vs. unit-asked items, item x code tables for
+  codes 16-23 and off-list codes -> =results/diag2.json=.
+- =scripts/served_causes.py= (+ =food21.py=) -- classifies every served
+  row of the development build by cause -> =results/served_causes_base*.json=.
+- =scripts/ckc_strings.py= -- 2019-20 =ckc= (NumberOfUnits) free text ->
+  =results/ckc_strings.json=.
+- =scripts/build_cp.py= -- cold build of =Country('Malawi').community_prices()=
+  into a fresh =LSMS_DATA_DIR=.
+- =scripts/compare.py= -- development vs. branch on =(t, v, j)=: rows, =u=
+  moves by cause and label, Price / NumberOfUnits / Available identity ->
+  =results/compare.json=.
+- =scripts/hh_compare.py= -- recovered rows vs. household purchase unit
+  values on =(t, v, j, u)= -> =results/hh_compare.json=.
+- =scripts/pdftext.py=, =scripts/render.py= -- text and page-image of the
+  IHS3 Community questionnaire (=PDF_PYLIB= = a private pypdf / PyMuPDF
+  install; not project dependencies).
+- Hash census: =1218-current-validation/hash_census.py= on both checkouts ->
+  =results/hash_census_diff.json=.
+
+* Headline
+The 38,506 rows were never null at the API: =local_tools.map_index=
+(local_tools.py:3934-3935) renames a null =u= to the literal ='unit'=.  By
+cause (development build, 82,635 rows):
+
+| cause                                                          | 2010-11 | 2013-14 | 2019-20 |  total |
+|----------------------------------------------------------------+---------+---------+---------+--------|
+| item whose unit cell the form STRIKES OUT, priced              |   9,784 |   2,201 |   9,656 | 21,641 |
+| struck item, not available (no price)                          |   3,269 |   1,050 |   2,656 |  6,975 |
+| struck item, no price, availability not "No"                   |       2 |       6 |       7 |     15 |
+| unit-asked item, not available (skip pattern; no price)        |   4,525 |     964 |   4,151 |  9,640 |
+| unit-asked item, priced, unit code blank                       |      26 |      33 |       2 |     61 |
+| unit-asked item, priced, code on no CK list                    |       1 |     157 |       0 |    158 |
+| unit-asked item, no price, availability not "No"               |       3 |       2 |      11 |     16 |
+| total                                                          |  17,610 |   4,413 |  16,483 | 38,506 |
+
+On the 21 food items (19 unit-asked + Soft Drink / Beer, which are
+struck): 6,357 unit-less rows = 3,324 not available (no price) + 3,003
+priced Soft Drink / Beer (now =Bottle=) + 26 priced unit-asked rows with a
+blank (13) or off-list (13) code (now =Unknown=) + 4 other
+(=results/food21.json=).  Against household purchase unit values on
+=(t, v, j, u)= the recovered rows match 0 cells (=results/hh_compare.json=).
+The issue's "recovering the blank half would double the usable yardstick"
+does not hold.
+
+After the fix: 0 rows ='unit'=, 0 null; 28,631 rows carry the item's
+fixed unit (Piece 16,960, 50 kg Bag 3,394, Bottle 3,393, Packet 1,697,
+50 kg per Kilometre 1,697, Day 1,490), 9,875 =Unknown=.  Price,
+NumberOfUnits and Available identical on all 82,635 rows.

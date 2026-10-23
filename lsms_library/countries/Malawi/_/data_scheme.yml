@@ -477,7 +477,11 @@ Data Scheme:
     #         join nothing, by design.
     #   u  -- native reported unit on the shared harmonize_price_unit -> `u`
     #         Preferred Label axis, so community_prices.u joins
-    #         food_acquired.u / crop_production.u.
+    #         food_acquired.u / crop_production.u.  GH #827: for the 17
+    #         items whose unit cell the form strikes out, the unit the ITEM
+    #         fixes (Bottle, Packet, 50 kg Bag, Day, ..., Piece) with
+    #         NumberOfUnits left NA (not asked); a blank or off-list code
+    #         is `Unknown`.  See CONTENTS.org.
     # Reported columns only:
     #   Price         -- the surveyed price (MK) for NumberOfUnits of the
     #                    item in unit u.

@@ -1168,14 +1168,19 @@ Three things follow, all of them easy to get wrong:
 2. *The basis is explicit*: the per-unit price is =Price / NumberOfUnits=.
    Do not assume =NumberOfUnits= is 1; it is 50 for 2,345 rows, 250 for
    1,085, 500 for 875.
-3. *The unit is a free field, not pre-printed*, and is often blank.
-   =u= is missing for *38,506 of 82,635* rows and =NumberOfUnits= for
-   38,356; the two are missing together (of the 31,959 rows on the 21 FOOD
-   items, 25,587 have both and 6,338 have neither -- only 34 rows have one
-   without the other).  All 17 non-food items (soap, hoe, bicycle, ganyu
-   wage, the two grinding *services*) are 100% unit-less.  A blank unit is
-   *unknown*, not "one piece": these rows have no usable per-unit price
-   and must be dropped and counted, never filled.
+3. *The unit is a free field for 34 of the 51 items; for the other 17 the
+   form STRIKES IT OUT* (corrected by GH #827, entry below).  Before #827
+   this point read: "The unit is a free field, not pre-printed, and is
+   often blank ... All 17 non-food items (soap, hoe, bicycle, ganyu wage,
+   the two grinding services) are 100% unit-less.  A blank unit is
+   unknown, not 'one piece': these rows have no usable per-unit price and
+   must be dropped and counted, never filled."  The page image shows a
+   diagonal line through NUMBER OF UNITS and UNIT CODES on CK3, CK4,
+   CK30-CK35, CK42, CK44-CK51: the item fixes the unit ("Coca-Cola, Fanta
+   (bottle)", "Ganyu wage, 1 day").  Those rows now carry that unit; a
+   blank or off-list code on the other 34 items is =Unknown=.  (The 17 are
+   not all non-food -- Soft Drink and Beer are struck -- and Bar Soap is
+   not struck: it carries a unit on 99-100% of priced rows.)
 
 *The 19/51 label overlap with =food_acquired= is not the defect it looks
 like.*  =harmonize_price_item= prices 51 items of which only *21 are
@@ -1199,6 +1204,104 @@ is present in both =cluster_features.v= and =sample().v= in all three
 waves (768/768, 204/204, 727/727).  2019-20 has 727 priced EAs against
 819 in =cluster_features= -- the 92 without a community interview are the
 IHPS panel EAs.
+
+** 2026-10-23 -- the 38,506 unit-less rows: why, and what is served (GH #827)
+
+*They were never null at the API.*  =local_tools.map_index=
+(local_tools.py:3934-3935, framework, not changed here) renames a null
+=u= to the literal string ='unit'= on every read, so development served
+38,506 rows of =u == 'unit'= -- a spelling =_U_SENTINELS= does not know,
+which neither this file nor GH #827 had noticed.
+
+*Causes, measured on a cold development build (9a0ed5f3c; raw Module CK
+files read with =convert_categoricals=False=; scripts and aggregate JSON in
+=slurm_logs/isa_backlog_2026-10-21/827-malawi-community-units/=):*
+
+| cause                                                       | 2010-11 | 2013-14 | 2019-20 CS + Panel |  total |
+|-------------------------------------------------------------+---------+---------+--------------------+--------|
+| struck item (unit cell struck out), priced                  |   9,784 |   2,201 | 8,641 + 1,015      | 21,641 |
+| struck item, not available                                  |   3,269 |   1,050 | 2,366 + 290        |  6,975 |
+| struck item, no price, availability not "No"                |       2 |       6 | 7 + 0              |     15 |
+| unit-asked item, not available (skip "NO...2 >> NEXT ITEM") |   4,525 |     964 | 3,695 + 456        |  9,640 |
+| unit-asked item, priced, unit code blank                    |      26 |      33 | 2 + 0              |     61 |
+| unit-asked item, priced, code on no CK list                 |       1 |     157 | 0                  |    158 |
+| unit-asked item, no price, availability not "No"            |       3 |       2 | 11 + 0             |     16 |
+
+No unit code family is unmapped: IHS3 (=COM_CK00B3A=) and IHS5 (=CKD=)
+ship identical Stata value labels for codes 1-21, matching
+=harmonize_price_unit=.  The off-list codes are 2013-14's 0 (10), 22 (47),
+23 (88), 50 (7), 25 / 48 / 69 / 200 / 500 (1 each) and 2010-11's one 23.
+No other variable carries the unit: 2010-11's =com_ck00b3_os= text is on
+code-21 rows (975 of 1,020) and on 12 unit-blank rows, none of them priced;
+2013-14 and 2019-20 ship no specify column.  2019-20's NumberOfUnits field
+=ckc= is a string and holds free text on 41 rows: 13 ="##N/A##"= (no unit
+code either) and 28 priced rows that DO carry a unit code ("50g", "cup",
+"sachet", "2 tablets", "500g", ...).  Those 28 are not unit-less and are
+left as served (=NumberOfUnits= NA) -- reading them is a free-text
+decision.  Separately, 2013-14's availability field carries off-list codes
+0 / 3 / 5 on 4 priced rows, which =(av == 1)= serves as =Available= False;
+not changed here.
+
+*The household yardstick does not double.*  The issue argued that
+recovering the blank half "would double the usable yardstick" against
+=food_prices(units='unitvalue')=.  On the 21 food items (31,959 rows) the
+unit-less rows are 6,357: 3,324 not available (no price), 3,003 priced
+Soft Drink / Beer (struck; now =Bottle=), 26 priced rows of unit-asked
+foods with a blank (13) or off-list (13) code -- now =Unknown=, which is
+not a unit -- and 4 other.  Matched against household purchase unit
+values on =(t, v, j, u)= the recovered rows find *0 cells*: Soft Drink is
+not a =food_acquired.j= label, and the household table spells beer's unit
+=Bottle= only in 2016-17, a wave with no Module CK (=Bottles= in 2010-11,
+=Bottle (Small)= in 2019-20; not unified here).  The unit-bearing
+community rows (=NumberOfUnits= > 0, per-unit price) still agree with
+household unit values at a median ratio of *1.000* over 10,964 matched
+cells.
+
+*What is served now* (=malawi._price_block=; rows 82,635 before and after;
+=Price=, =NumberOfUnits=, =Available= identical on every row):
+- *Struck items carry the unit the item fixes* (=_CK_ITEM_FIXED_UNIT=),
+  on every row of the item, available or not -- Nigeria W1/W2's precedent
+  (=nigeria.py=, =_W1W2_PRICE_UNIT=: "the questionnaire fixes one unit per
+  item").  Transcribed from the printed item text: CK3/CK4 =50 kg Bag=
+  (3,394 rows), CK31/CK32 =Bottle= (3,393), CK33 =Packet= (1,697), CK42
+  =50 kg per Kilometre= (1,697), CK51 =Day= (1,490).  =Bottle=, =Day= and
+  =50 kg per Kilometre= are new on Malawi's unit axis.  *Inferred*, not
+  transcribed: CK30, CK34, CK35, CK44-CK50 =Piece= (16,960) -- count goods
+  whose text names no unit ("single" on CK49/CK50 is a bed size).  The
+  pre-#827 text above said a blank unit is "not 'one piece'"; for these
+  items the unit is not blank but not asked, and =Piece= is the count
+  label the form's own code list uses.  A decision for a human; one dict.
+  =_price_block= refuses a struck item that records a unit code, so a
+  future wave that asks it is not silently overwritten.
+- *=NumberOfUnits= is not filled on struck items*: the form struck that
+  cell too.  Whether to serve 1 is open.
+- *A unit-asked item with a blank or off-list code is =Unknown=* (9,875
+  rows: 9,640 "No" rows the skip pattern leaves without price or unit, 219
+  priced -- 61 blank, 158 off-list -- and 16 with neither a price nor a
+  "No"), the Malawi rule for codes "on no instrument's list" (GH #1042
+  entry below).  =u= is a declared index
+  level, so the Nigeria plot_inputs "no amount -> keep NA" precedent (whose
+  premise is a =u= COLUMN) does not apply.
+- *Not decoded, a decision*: 2013-14's codes 22 / 23 may be the IHPS
+  household / market list's =22 SATCHET/TUBE=, =23 OTHER (SPECIFY)=
+  (2013-14 never uses CK code 20, against 479 in 2010-11 and 937 in
+  2019-20; its 22 falls on items 2010-11 codes 20, its 23 on items 2010-11
+  codes 21).  No IHPS 2013 CK page ships (=IHPS.Community.Qx.FINAL.PRINT=
+  ends at Module CJ) and =COM_MOD_K_13= has no value labels, and the whole
+  household list would also unprint 2013-14's 12 (5 rows), 16 (3) and 21
+  (1).  Code 23 is =Unknown= on either reading; 47 rows of code 22 are the
+  contested set.
+- *Not touched*: =Other (Specify)= (2,876 rows; 2010-11's
+  =com_ck00b3_os= says "2 TABLET PACKET" 157, "METERS" 147, "PACKET" 119,
+  "WHOLE CHICKEN" 91, "SPOON" 64, ...) -- a GH #1042-style free-text
+  follow-up, not a blank.
+- *CK42 label drift*: the 2010-11 Stata label says "(per 50kg)"; the
+  printed IHS3 page and the IHS5 label say "(per 50kg per kilometer)".  The
+  printed form governs.
+
+Cost: every Malawi cache hash (26 L2-country, 130 L2-wave), no other
+country, no framework fingerprint.  Tests:
+=tests/test_gh827_malawi_community_units.py=.
 
 * plot_features (GH #167)
 

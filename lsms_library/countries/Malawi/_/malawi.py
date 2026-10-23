@@ -3987,6 +3987,9 @@ def assemble_people_last7days(t, pieces):
 # median/mean -- those are transformations.  There is no household i, so
 # v is NATIVE in the index (the framework's _join_v_from_sample does not
 # apply).  2016-17 (IHS4) collected no Module CK -> absent for that wave.
+# u is never null (GH #827): the item's fixed unit for the 17 items whose
+# unit cell the form strikes out (_CK_ITEM_FIXED_UNIT), else the decoded
+# unit code, else `Unknown`.
 
 def _price_item_code_map():
     """{int item code 1-51: Preferred Label} for community_prices `j`."""
@@ -3996,6 +3999,48 @@ def _price_item_code_map():
 def _price_unit_code_map():
     """{int unit code 1-21: Preferred Label} for community_prices `u`."""
     return _malawi_code_map('harmonize_price_unit')
+
+
+# GH #827.  The Module CK form STRIKES OUT the NUMBER OF UNITS and UNIT
+# CODES cells for these 17 items (IHS3 Community questionnaire, SECTION CK,
+# printed p. 20, `2010-11/Documentation/IHS3.Community.Qx.FINAL.pdf`: a
+# diagonal line through both cells on CK3, CK4, CK30-CK35, CK42, CK44-CK51).
+# The unit is not asked because the ITEM fixes it -- "Coca-Cola, Fanta
+# (bottle)", "Cigarettes, Embassy (packet)", "Cost to grind 50 kg bag of
+# maize", "Ganyu wage, 1 day, adult male" -- and no unit code or count is
+# recorded on any of their rows in any wave or half (2010-11, 2013-14,
+# 2019-20 Cross_Sectional and Panel: 0 of 28,631 served rows, 21,641 of
+# them priced).  Precedent:
+# Nigeria W1/W2 community prices, where "the questionnaire fixes one unit
+# per item, so the per-item unit is supplied" (nigeria.py, `_W1W2_PRICE_UNIT`).
+# The unit is the item's, so it is supplied on EVERY row of the item,
+# available or not.  Labels transcribe the printed item text where it names
+# a basis (bottle, packet, 50 kg bag, per 50 kg per kilometre, 1 day); the
+# count goods whose text names none (trousers, battery, watch, hoe, panga,
+# sickle, axe, bicycle, mattress, net -- "single" on CK49/CK50 is a bed size,
+# not a count) are served `Piece`, Malawi's own count label (CK code 9).
+# `Piece` is an INFERENCE from the struck count cell, not a transcription;
+# see Malawi/_/CONTENTS.org.  NumberOfUnits is NOT filled: the form struck
+# that cell too, and a count the survey did not record is not invented.
+_CK_ITEM_FIXED_UNIT = {
+    3: '50 kg Bag',            # Cost to grind 50 kg bag of maize
+    4: '50 kg Bag',            # Cost to grind 50 kg bag of rice
+    30: 'Piece',               # Trousers (kaunjika)
+    31: 'Bottle',              # Coca-Cola, Fanta (bottle)
+    32: 'Bottle',              # Carlsberg beer (bottle)
+    33: 'Packet',              # Cigarettes, Embassy (packet)
+    34: 'Piece',               # Battery (dry cell) for radio
+    35: 'Piece',               # Watch, digital (simple), plastic
+    42: '50 kg per Kilometre', # Motorized transport of crop output (per 50kg per kilometer)
+    44: 'Piece',               # Hand hoe, without handle
+    45: 'Piece',               # Panga
+    46: 'Piece',               # Sickle
+    47: 'Piece',               # Axe
+    48: 'Piece',               # Bicycle
+    49: 'Piece',               # Foam mattress (10 cm, single)
+    50: 'Piece',               # Mosquito net (white, not treated with insecticide, single)
+    51: 'Day',                 # Ganyu wage, 1 day, adult male
+}
 
 
 def _strip_ck(series):
@@ -4014,7 +4059,18 @@ def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
     convert_categoricals=False so codes are numeric / 'CK<n>' strings).
     Returns a long DataFrame with columns [t, v, j, u, _item_code, Price,
     NumberOfUnits, Available] -- NO aggregation, one row per source row.
+
+    ``u`` is never null (GH #827): an item whose form strikes out the unit
+    cell gets the unit the item fixes (``_CK_ITEM_FIXED_UNIT``); on every
+    other item a unit code that is blank, or on no Module CK list (codes
+    outside 1-21: 2013-14's 0/22/23/25/48/50/69/200/500, 2010-11's one 23),
+    is the missing-unit sentinel ``U_UNKNOWN`` -- the Malawi rule for codes
+    "on no instrument's list" (CONTENTS.org, GH #1042).  A null on the
+    declared ``u`` level is not served as a gap: ``local_tools.map_index``
+    renames it to the literal ``'unit'`` on every read.
     """
+    from lsms_library.transformations import U_UNKNOWN
+
     item_map = _price_item_code_map()
     unit_map = _price_unit_code_map()
 
@@ -4030,7 +4086,21 @@ def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
         u = ucode.map(unit_map)
         u = u.astype('string').where(u.notna(), pd.NA)
     else:
+        ucode = pd.Series(pd.NA, index=df.index, dtype='Int64')
         u = pd.Series(pd.NA, index=df.index, dtype='string')
+
+    fixed = code.isin(list(_CK_ITEM_FIXED_UNIT))
+    fixed = fixed.fillna(False).astype(bool)
+    recorded_on_fixed = fixed & ucode.notna()
+    if recorded_on_fixed.any():
+        raise ValueError(
+            f'community_prices {t}: {int(recorded_on_fixed.sum())} row(s) record a '
+            'unit code on an item whose Module CK unit cell is struck out '
+            f'(item codes {sorted(set(code[recorded_on_fixed].dropna().astype(int)))}); '
+            '_CK_ITEM_FIXED_UNIT would overwrite a recorded answer -- re-check '
+            'the instrument for this wave (GH #827).')
+    u = u.mask(fixed, code.map(_CK_ITEM_FIXED_UNIT).astype('string'))
+    u = u.mask(u.isna() & code.notna(), U_UNKNOWN)
 
     price = (pd.to_numeric(df[price_col], errors='coerce').astype('Float64')
              if price_col in df.columns
@@ -4070,9 +4140,12 @@ def assemble_community_prices(t, pieces):
 
     Returns a DataFrame indexed (t, v, j, u) with reported columns Price,
     NumberOfUnits, Available.  Drops rows whose item failed to resolve to a
-    Preferred Label (j NaN) -- those cannot sit on the shared j axis.  Where
-    a unit failed to resolve (u NaN, rare 2013-14 data-entry artifacts) the
-    row is kept with u = <NA> in the index (the price is still reported).
+    Preferred Label (j NaN) -- those cannot sit on the shared j axis.  ``u``
+    arrives non-null from _price_block (GH #827): the item's fixed unit
+    where the form strikes out the unit cell, else the decoded code, else
+    the missing-unit sentinel ``Unknown`` (a blank or off-list code, which
+    includes every not-available row of an item whose unit IS asked -- the
+    skip pattern jumps past price and unit).  The row is kept either way.
     """
     cat = pd.concat(pieces, ignore_index=True)
     cat = cat[cat['j'].notna()].drop(columns=['_item_code'])
