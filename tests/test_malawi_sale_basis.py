@@ -79,23 +79,54 @@ SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 ROWS = {
     '2010-11': {W: 947, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
     '2013-14': {W: 341, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
-    '2016-17': {W: 449, P: 8, OV: 2, N: 42, NR: 37, CS: 47, CH: 23},
-    '2019-20': {W: 1041, P: 29, OV: 2, N: 67, NR: 131, CS: 85, CH: 51},
+    '2016-17': {W: 520, P: 8, OV: 2, N: 42, NR: 37, CS: 46, CH: 23},
+    '2019-20': {W: 1137, P: 29, OV: 2, N: 67, NR: 131, CS: 84, CH: 51},
 }
+#: GH #856 (2026-10-22) moved the two IHS4/IHS5 waves: recovering 90 KG BAG /
+#: BASKET (DENGU) from the unit specify text on BOTH sides attached 71 / 97
+#: wildcard sales (perennial harvest rows coded 3 / 11 meeting a Module Q
+#: sale written 13 + text; 53 of the 2016-17 ones are Q's 'BASKET
+#: (UNSPECIFIED SIZE)', Sue's decision of 2026-10-22) and lost one wildcard
+#: sale in 2019-20 (OX-CART harvest vs 'BUSKET' sale -- different units).
+#: CS lost one sale per wave: in 2016-17 it became unresolved (its (crop,
+#: 'Other (Specify)') price cell lost the recovered rows); in 2019-20 it left
+#: the ladder altogether (the sale's '90KG BAY' is now a 90 kg bag, its
+#: harvest row's '09KG BAG' is left, so no row of its unit exists).  Was
+#: W 449 / 1041, CS 47 / 85.
 #: Total Value_sold per wave, before (the GH #833 bundle) -> after.  The
 #: overrule rung of 2026-09-25 moved 2016-17 by +37,000 (409,053,925 ->
 #: 409,090,925) and 2019-20 by +120,000 (527,653,548 -> 527,773,548).
 VALUE_SOLD_BEFORE = {'2010-11': 126_816_048.0, '2013-14': 94_338_845.0,
                      '2016-17': 394_826_755.0, '2019-20': 496_063_698.0}
 VALUE_SOLD_AFTER = {'2010-11': 130_650_105.0, '2013-14': 94_992_745.0,
-                    '2016-17': 409_090_925.0, '2019-20': 527_773_548.0}
+                    '2016-17': 409_967_725.0, '2019-20': 529_435_948.0}
+#: GH #856 moved 2016-17 by +876,800 (409,090,925 -> 409,967,725) and 2019-20
+#: by +1,662,400 (527,773,548 -> 529,435,948): 3,601,200 MWK newly attached,
+#: 1,062,000 detached (see the ROWS comment above and CONTENTS.org, GH #856).
+#: Of that, the 'BASKET (BAMBOO)' ruling (@ligon 2026-10-22) re-attached 9
+#: exact-match sales (+150,000) and detached 3 tomato sales (-875,000) whose
+#: harvest row says 'BASKET (SMALL)' or nothing; 'BASKET (UNSPECIFIED SIZE)'
+#: (Sue, 2026-10-22) attached 53 wildcard sales (+833,200); the bag typo
+#: '90 KG BAD' re-attached one exact-match sale (+10,000).
 #: Sales the ladder still suppresses (attrs['sale_basis_mismatch']), per
 #: wave: before 303 / 59 / 247 / 503 (64,110,157 MWK); after the ladder of
 #: 2026-09-24, 94 / 21 / 90 / 140 (13,805,180 MWK); the overrule rung took 2
 #: / 2 sales (37,000 / 120,000 MWK) out of 2016-17 / 2019-20.
 UNRESOLVED = {'2010-11': (94, 1_088_250.0), '2013-14': (21, 315_300.0),
-              '2016-17': (88, 5_972_600.0), '2019-20': (138, 6_272_030.0)}
+              '2016-17': (89, 6_009_600.0), '2019-20': (137, 6_244_030.0)}
+#: (GH #856: was 88 / 5,972,600 and 138 / 6,272,030.  2016-17: one groundnut
+#: sale moved from contradiction-price-sale to unresolved (+37,000).  2019-20:
+#: one unresolved sale (28,000) left the set -- its own text is not
+#: recovered but its candidate harvest row's is, so no row of its unit is
+#: left to contradict.)
 #: attrs['sale_basis_ladder'][DEL]['grounds'], summed over the four waves.
+#: GH #856 left the SUM unchanged, by coincidence, and it was checked rather
+#: than assumed (slurm_logs/isa_backlog_2026-10-21/856-harvest-unit-text/
+#: ladder_tallies_*.json, a per-wave replay): contradiction_no_separation
+#: moves 70 -> 71 in 2016-17 and 105 -> 104 in 2019-20 (the two sales in the
+#: UNRESOLVED comment above), so 271 stays 271.  At bf29f212a, before the bag
+#: typos mapped, it was 272: the 2019-20 '90KG BAY' groundnut sale was
+#: unresolved there, and now leaves the ladder instead.
 UNRESOLVED_GROUNDS = {'contradiction_no_separation': 271,
                       'contradiction_price_undecided': 57,
                       'na_sale_price_undecided': 6,
@@ -246,6 +277,10 @@ class TestScripts:
             assert half['hhid'] in src, (wave, half['hhid'])
             for k in ('gplot', 'gcrop', 'pplot', 'icrop', 'qcrop'):
                 assert half[k] in src, (wave, k, half[k])
+            # GH #856: the unit specify-text columns, where a wave passes them.
+            for k in ('gtext', 'ptext', 'itext', 'qtext'):
+                if half.get(k):
+                    assert f"'{half[k]}'" in src, (wave, k, half[k])
 
 
 # ---------------------------------------------------------------------------

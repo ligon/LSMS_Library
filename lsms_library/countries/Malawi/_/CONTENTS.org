@@ -136,6 +136,15 @@ harvest uses:
 :    6 NO. 10 PLATE, 7 NO. 12 PLATE, 8 bunch, 9 piece, 10 bale,
 :    11 BASKET (DENGU), 12 OX - CART, 13 OTHER (SPECIFY)}
 
+(Those are the 2010-11 labels.  Module G's =ag_g13b= list is NOT the same in
+later waves: its labels drop code 3 (90 KG BAG) from 2013-14 (2 rows still
+carry it) and codes 3 and 11 (BASKET (DENGU)) from 2016-17, and the 2016-17 /
+2019-20 G data carry no row of either -- respondents put them under 13 + text.
+Module P's =ag_p09b= keeps both in 2016-17 / 2019-20 (2013-14 P lacks 11).
+The SALE lists (=ag_i02b=, =ag_q02b=) drop both from 2016-17 as well (2013-14
+I lacks 3 and 11, Q lacks 3).  Since 2026-10-22 the build recovers the plain
+restatements -- see "the harvest-side OTHER (SPECIFY) residue" below, GH #856.)
+
 Until 2026-09-08 the wave scripts read =ag_i02a= / =ag_i03= but *not*
 =ag_i02b=, and =assemble_crop_production= merged the household-crop sale
 onto the plot-crop harvest row on =(i, _crop_code)= alone.  *The two units
@@ -716,6 +725,220 @@ The same fix made the silent drop LOUD: the =crop.notna()= filter in
 counts (the comment above it had long claimed a log that never existed,
 #856).
 
+* crop_production: the harvest-side OTHER (SPECIFY) residue, measured (GH #856, 2026-10-22)
+
+Measured from the raw G/P files the four wave scripts read, before deciding on
+any recovery.  Script, JSON and the full per-cell table:
+=slurm_logs/isa_backlog_2026-10-21/856-harvest-residue/=; the analysis is in
+=.coder/ledger/856-malawi-harvest-residue.md= (Phase 2).  Nothing in the build
+changed.  Counted on the rows =_harvest_block= keeps (non-null crop code);
+Module G sums to the 112,691 quoted in the #854 entry below.
+
+| wave    | builder rows | unit 13 OTHER (SPECIFY) | generic-other crop (G 48; P 18 / 21) | either |
+|---------+--------------+-------------------------+--------------------------------------+--------|
+| 2010-11 |       33,610 | 247 (0.73%)             | 364 (1.08%)                          | 1.80%  |
+| 2013-14 |       12,699 | 218 (1.72%)             | 210 (1.65%)                          | 3.35%  |
+| 2016-17 |       37,187 | 1,055 (2.84%)           | 522 (1.40%)                          | 4.17%  |
+| 2019-20 |       52,098 | 896 (1.72%)             | 1,569 (3.01%)                        | 4.63%  |
+| all     |      135,594 | 2,416 (1.78%)           | 2,665 (1.97%)                        | 3.69%  |
+
+Codes are the files' own labels: unit 13 everywhere; seasonal 48; perennial 18
+up to 2013-14 and 21 from 2016-17.  Seasonal 10/16/26 ("OTHER TOBACCO /
+GROUNDNUT / RICE (SPECIFY)") name the crop and are not counted as Other.
+
+*Where the specify text is* (none of these is read by the build):
+
+| wave / half         | G crop text  | G unit text   | P crop text  | P unit text   |
+|---------------------+--------------+---------------+--------------+---------------|
+| 2010-11 Full_Sample | =ag_g0d_os=  | =ag_g13b_os=  | =ag_p0d_os=  | =ag_p09b_os=  |
+| 2013-14             | not held     | not held      | not held     | not held      |
+| 2016-17 / 2019-20   | *none*       | =ag_g13b_oth= | =ag_p0c_oth= (XS), =ag_p0d_oth= (Panel) | =ag_p09b_oth= |
+
+*Idiosyncrasies found while measuring:*
+
+- *Our 2013-14 extract has no other-specify text.*  =AG_MOD_G_13= and =AG_MOD_P_13= have
+  no specify column; both carry =occ=, labelled "Line Occurrence Sequence for
+  O/S Merge", and no held 2013-14 file is an O/S file.  That wave's 218 unit-13
+  and 210 Other-crop rows can be counted but never named from what we hold.
+- *The IHS4/IHS5 Module G unit list dropped 90 KG BAG and BASKET (DENGU)* (see
+  the note under the code list at the top of this file).  Of the 1,645 code-13
+  G rows in 2016-17 and 2019-20, about 886 (54%) restate one of those two
+  (=90 KG BAG= / =90KG BAG= / =90KG= ..., =DENGU= / =BASKET= ...).  So
+  =u = 'Other (Specify)'= in those waves hides most of what 2010-11 serves as
+  =90 kg Bag= and =Basket (Dengu)= -- a cross-wave break on =u=, small in rows.
+  IHS4/IHS5 Module P kept both codes; its unit text is count-style instead (=MKOKO= 172
+  of 205 in 2010-11; =CLUSTER(S)=, =TREE(S)=, =DOZEN=, =CASE= later).
+- *Seasonal G has no crop-name text after 2013-14 -- Module D has it.*
+  =ag_mod_d='s plot crop list carries =ag_d20_oth= / =ag_d20b_oth= "Other Crop";
+  joined on (household, gardenid, plotid) it names every G code-48 row it can
+  read (2016-17 Panel 111/111, 2019-20 XS 990/990, Panel 234/234).  The
+  2016-17 XS =ag_mod_d.dta= does not read through =get_dataframe= (the latin-1
+  bad byte noted under plot_features), so its 371 rows are undetermined.
+- *Seasonal "Other" is mostly COWPEA*, which =harmonize_crop= has no code for:
+  919 rows spell it out (=COWPEAS= 157 in 2010-11 G; =COW PEAS= / =COWPEAS= 65,
+  584, 113 via Module D), 56% of the 1,634 code-48 rows with one held text;
+  2010-11 adds =NSEULA= 77 and =MSEWULA= 8.  The rest is a long tail (=MUCUNA=,
+  =NKHUNGUDZU=, =CUCUMBER=, =SESAME= / =CHITOWE=, ...) plus a few crops that do
+  have codes (=CASSAVA=, =SORGHUM=, =PIGEON PEAS=).  Perennial "Other" is mostly
+  sugar cane (a SEASONAL code, 39) and trees: 2019-20 XS =SUGARCANE= 106,
+  =ACACIA= and misspellings ~37, =BLUEGUM= 20.
+- *IHS4/IHS5 Module P asks FRESH / DRY.*  =ag_p09_1= "What was the condition
+  of [TREE/PERM CROP]?" (1 FRESH, 2 DRY, 3 NOT APPLICABLE) is in all four
+  IHS4/IHS5 P files, answered on 2,989 / 767 / 7,050 / 1,410 rows
+  (2016-17 XS / Panel, 2019-20 XS / Panel).  This contradicts "P asks no
+  condition question" as written in the #833 and #854 entries and in
+  =categorical_mapping.org=; it does not contradict "P never asks S/U".
+  Unread by the build; not part of #856.
+- Small: 2016-17 XS P =ag_p09a= holds one =999999= (a sentinel served as a
+  quantity); off-scheme unit codes 50 (2010-11 G), 3/18/25 (2013-14 G), 0
+  (2013-14 P), one to three rows each.
+
+*Decision (2026-10-22, @ligon approved both recommendations):* the residue is
+small in volume (1.8% / 2.0% of rows) but concentrated -- the two dropped unit
+codes and cowpea.  No general free-text cleaner.  The UNIT half is done (next
+entry); the cowpea half is drafted as its own issue (a new Preferred Label and
+a G-D plot join), not filed yet.  Until it lands, read a seasonal (Module G)
+=crop = 'Other'= as "cowpea in about half the rows whose text we hold" (it is
+not cowpea on the perennial side).
+
+** DONE The 90 kg bag / dengu recovery (GH #856, 2026-10-22)
+
+=malawi._UNIT_TEXT_RECODE= recodes a 13 OTHER (SPECIFY) row whose OWN unit
+specify text is an exact, measured restatement of 90 KG BAG or BASKET (DENGU)
+back to code 3 / 11 *before* =harmonize_crop_unit= is consulted, so the row is
+served the very label a 2010-11 code-3 / code-11 row gets: =u= is continuous
+across waves.  Wired in the 2016-17 and 2019-20 wave scripts for all four
+modules (=unit_text== =ag_g13b_oth= / =ag_p09b_oth= on =_harvest_block=,
+=unit_sold_text== =ag_i02b_oth= / =ag_q02b_oth= on =_sale_block=) and in
+=_crop_pieces=, so =derivation_inputs= still joins the served rows.  2010-11
+has none of the strings and 2013-14 ships no text; their scripts are
+unchanged.  =Quantity= never moves.  A label harmonisation of the survey's own
+answer (the class of =harmonize_crop_unit= / =_PERENNIAL_RECODE=), so no
+=Derivation= key; counts ride on =attrs['unit_text_recovered']= at the wave
+level.
+
+*Scope*: only the two codes the 2016-17 / 2019-20 G, I and Q lists DROPPED --
+3 (90 KG BAG) and 11 (BASKET (DENGU)).  Texts that restate a code still on the
+list are left as typed (see the follow-up table below).
+
+*What is recovered*: exact strings only (=strip=, collapsed whitespace,
+upper-case): =90 KG BAG=, =90KG BAG=, =90KG=, =90KG BAGS=, =90 KG BAGS=,
+=90KGS=, =90 KGS=, =90 KG=, =90KGBAG=, =90 KGBAG=, =BAGS OF 90 KGS=, and the
+typos =90 KG BAD=, =90KG BAY= -> 3; =DENGU=, =BASKET=, =BASKETS=, =BUSKET=,
+every unqualified dengu-basket pairing (=BASKET (DENGU)=, =BASKET (DENGUE)=,
+=DENGU/BASKET=, ...), =BASKET (BAMBOO)= and =BASKET (UNSPECIFIED SIZE)= -> 11.
+949 + 367 raw lines across G/P/I/Q.  *Deliberately left* =Other (Specify)=: a
+count prefix (=1 90 KG=), a typo that could be another size (=09KG BAG=: a 9
+kg bag?), every basket or dengu qualified by a size, weave or content, and
+every bag of a size the lists never coded.  Judgement calls: plain =BASKET= ->
+dengu (the only basket the code list offers); a bare weight with no container
+word (=90KG=, =90 KG=, =90KGS=, =90 KGS=: 21 lines) -> =90 kg Bag= (same
+kilograms; the label says "Bag"); and the two unambiguous bag typos, as the
+basket typos =BUSKET= / =BASKET (DENGUE)= already map.
+
+*Ruling (@ligon, 2026-10-22): =BASKET (BAMBOO)= is the dengu.*  It is the only
+bamboo-basket spelling in our files: 13 Module I sale lines, all 2016-17 (10
+cross-sectional, 3 panel), none on the harvest side.  The same households'
+harvest rows say =DENGU= / =BASKET= for the same crop.
+
+*Decision (Sue, coordinator, 2026-10-22; FOR MAINTAINER REVIEW at the PR):
+=BASKET (UNSPECIFIED SIZE)= is the dengu.*  61 lines: Module Q 2016-17 59
+(53 cross-sectional, 6 panel), Module P 2016-17 2.  "Unspecified size" names
+no size, so it is the plain basket, which already maps.  The precedent is
+Malawi's own =u= table, which keeps plain =Heap= (=10=) as the size-free unit
+distinct from the sized heaps (=10a= .. =10c=).
+
+*Still left, for a separate decision* (raw code-13 lines, G/P/I/Q, all
+waves):
+
+| string                         | lines | where                          |
+|--------------------------------+-------+--------------------------------|
+| =BASKET (LARGE)=               |    13 | Q 2016-17 10, G 2016-17 3      |
+| =LARGE BASKET=                 |    11 | 2019-20: G 4, I 4, Q 3         |
+| =WEAVING BASKET=               |     3 | Q 2016-17 2, G 2019-20 1       |
+| =BASKET (SMALL)=               |     2 | G 2016-17                      |
+| =SMALL BASKET=                 |     2 | G / I 2019-20 panel            |
+| =DENGU(GOGODA)=                |     2 | G 2019-20                      |
+| =MEDIUM WEAVING BASKET=        |     1 | G 2016-17                      |
+| =LARGE DENGU=, =DENGU(LARGE)=  |  1, 1 | P, Q 2019-20                   |
+| =LARGE BASKETS=, =MEDIAM BASKET= | 1, 1 | I, Q 2019-20                   |
+| =BASKET OF ...= (2 strings)    |  1, 1 | G 2019-20 (content, not a unit)|
+| =1 90 KG=, =09KG BAG=          |  1, 1 | G 2019-20                      |
+
+*Possible follow-up: texts restating a code STILL on the list* (left by
+design; token match over raw code-13 lines, G/P/I/Q -- includes sized and
+halved variants, so a plain restatement is fewer; every string and its count
+is in =strings_856.json=):
+
+| unit (code)        | lines | e.g.                                            |
+|--------------------+-------+-------------------------------------------------|
+| 50 kg Bag (2)      |    19 | =50 KG BAG= 11, =50KG BAG= 4, =50KGBAG= 1, halves |
+| Pail (4 / 5)       |    66 | =PAIL (MEDIUM)= 9, =40LITRE PAIL= 9, =PAIL (LARGE)= 8, =PAIL (SMALL)= 6, =PAIL= 6 |
+| Bunch (8)          |    11 | =BUNCH= 8, =BUNCHES= 2                          |
+| Plate (6 / 7)      |     8 | =PHAZI PLATE= 4, =NO 12 PLATE= 1                |
+| Piece (9)          |    11 | =PIECE= 5, =PIECES= 5                           |
+| Bale (10)          |     6 | =80 KG BALE= 3, =85 KG BALE= 2, =BALE= 1        |
+| Ox-Cart (12)       |     4 | =OXCART=, =OX-CART=, two halves                 |
+
+*Both sides or neither.*  The sale attach keys on =u=.  Recovering only the
+harvest side was measured: it detached *158 sales (16.8M MWK)* that both sides
+had written 13 + "90 KG BAG".  So the sale modules take the same recovery.
+
+*Measured, cold, against development 6ffeb3caf* (=slurm_logs/isa_backlog_2026-10-21/856-harvest-unit-text/=):
+
+| wave    | rows -> =90 kg Bag= | rows -> =Basket (Dengu)= | of which perennial |
+|---------+---------------------+--------------------------+--------------------|
+| 2016-17 |                 486 |                       39 |                 14 |
+| 2019-20 |                 215 |                      148 |                  8 |
+
+888 rows change =u= and nothing else; no row is added or lost; 2010-11 and
+2013-14 are untouched.  Sales: *168 perennial harvest rows coded 3 / 11 gain a
+sale* (a Module Q sale written 13 + text could not meet them before -- P kept
+the codes, Q did not), all on the unknown-condition wildcard; 53 of them are
+Q's =BASKET (UNSPECIFIED SIZE)=.  *6 sales detach* (1,062,000 MWK):
+- 3 tomato sales in 2016-17 (875,000 MWK) written =BASKET (BAMBOO)= against a
+  harvest row that says =BASKET (SMALL)= (2) or gives no text (1).  These met
+  only on 13 = 13 before; the bamboo ruling serves the sale as the dengu, and a
+  small basket is not asserted to be one;
+- 1 OX-CART harvest vs a =BUSKET= sale (different units: correctly detached);
+- 1 groundnut in 2019-20: harvest =09KG BAG= (left) vs sale =90KG BAY= (now a
+  90 kg bag);
+- 1 groundnut in 2016-17 decided by price, whose (crop, =Other (Specify)=)
+  price cell lost the recovered rows (now unresolved).
+Net *+2,539,200 MWK* attached (2016-17 +876,800; 2019-20 +1,662,400): the
+bamboo ruling +150,000 / -875,000; =BASKET (UNSPECIFIED SIZE)= +833,200 (53
+sales); the =90 KG BAD= typo re-attaches one sale (+10,000).  No =Derivation=
+count moved except the unknown-condition wildcard (2016-17 449 -> 520,
+2019-20 1,041 -> 1,137) and contradiction-price-sale (47 -> 46, 85 -> 84).
+
+*kg*: no row whose =u= did not change moves its factor.  Default
+=harvest_kg_factors=: the 701 recovered =90 kg Bag= rows gain the declared
+90 kg (=metric=, was =none=); the 187 =Basket (Dengu)= rows stay =none= (no
+declared mass).  With the shipped IHS5 tables: 641 =90 kg Bag= rows and 157
+=Basket (Dengu)= rows gain a =shipped= factor (median 99.9 and 8.39 kg; the
+file's own values, by crop / condition / region), 60 take the declared 90 kg,
+30 baskets stay =none=.  Harvest kg, default: 2016-17 7,978,622 -> 8,171,321
+(+2.4%), 2019-20 19,605,840 -> 19,690,710 (+0.4%); with the shipped tables:
+8,228,278 -> 8,432,686 (+2.5%) and 20,244,377 -> 20,327,857 (+0.4%).  2010-11
+and 2013-14 do not move.
+
+*Caveats on those numbers.*
+- One 2016-17 Nkwani row reports =Quantity= 2016 -- a year typed into the
+  quantity field, already flagged by the quantity screen (Site Q).  It moves
+  from =Other (Specify)= to =Basket (Dengu)= and, with the shipped tables,
+  contributes 22,643 kg: about 11% of the 2016-17 shipped-path increase
+  (204,408 kg).  Nothing here repairs it.
+- The quantity screen sees the moved rows too.  2016-17 flags one row fewer
+  (7 -> 6): a Cassava =Other (Specify)= row drops out because its cell's p90
+  rises from 14 to 24 once the recovered rows leave that cell; the Nkwani row
+  above is still flagged, now in the =Basket (Dengu)= cell (ratio 144 -> 106).
+  In 2019-20 the count stays 13, but a Cabbage =Other (Specify)= row's ratio
+  falls from 153 to 103 (the cell's p90 15 -> 22.4); it is still flagged.
+
+*Cache*: every Malawi L2-country (26) and L2-wave (130) hash moves, no other
+country's, and no =build_transforms_fingerprint= (0 of 40) -- =malawi.py= is
+in every Malawi table's input hash.
+
 * crop_production: the harvest CONDITION, and the two SHIPPED IHS5 conversion tables (GH #854, 2026-09-09)
 
 Two things that read as separate items are one: Malawi's IHS5 v04 release
@@ -788,7 +1011,10 @@ foreign category").  New table =harmonize_crop_condition= in
 not pedantry: the first is the survey's own answer (code 3 -- this crop has
 no shell to speak of), the second is the sentinel =malawi.py= mints for a
 NULL or off-scheme code and for every perennial Module-P row, which asks no
-condition question.  The off-scheme codes are real: 2013-14 has one =5=, and
+S/U question.  (*Correction, GH #856, 2026-10-22*: IHS4/IHS5 Module P does
+ask a condition question -- =ag_p09_1= FRESH / DRY / NOT APPLICABLE -- but it
+is a DRYNESS question, not the S/U form, and is unread; 2010-11 and 2013-14 P
+ask neither.  See the GH #856 entry.)  The off-scheme codes are real: 2013-14 has one =5=, and
 the 2016-17 panel has =15=, =10= and a *non-integral* =4.5=.  That 4.5 is why
 =_crop_conditions= maps element-wise instead of going through
 =.astype('Int64')= like every other Malawi code map -- pandas 3.0 raises
@@ -1315,8 +1541,9 @@ Chicken-layer 310 / -broiler 312, Turkey 314 / Guinea fowl 316, Beehive
 scheme (Bull 304, Ox 3304, Donkey/Horse 3305, Chicken 3310,
 Turkey/Guinea Fowl 3314, Dove/Pigeon 319).  Each code -> one canonical
 species (no within-wave collapse, so =(t, i, animal)= stays unique); code
-318 "Other (Specify)" -> NaN -> dropped from the index, like
-=crop_production='s "Other" crop.
+318 "Other (Specify)" -> NaN -> dropped from the index.  (This used to say
+"like =crop_production='s "Other" crop"; it is not like it: crop codes 48 and
+1018 map to the label =Other= and are SERVED -- 2,665 rows, GH #856.)
 
 Keep-filter: a roster row is retained when the household genuinely holds
 the species -- per-species ownership flag =ag_r01= == Yes, OR any
