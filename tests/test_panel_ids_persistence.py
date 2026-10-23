@@ -1,9 +1,9 @@
 """The panel crosswalk is a REVIEWED SOURCE, not a build product (GH #914, #894).
 
 ``panel_ids.json`` / ``updated_ids.json`` are committed to the config tree and
-shipped in the wheel.  Ten countries persist the crosswalk that way (design
-A); Nigeria derives its own from per-wave YAML into a cache parquet (design B).
-Malawi did too until GH #894.  This module pins two things:
+shipped in the wheel.  All eleven panel countries persist the crosswalk that
+way (design A); Malawi and Nigeria used to derive theirs from per-wave YAML
+into a cache parquet (design B) until GH #894.  This module pins two things:
 
 **#914 -- nothing regenerates the crosswalk on the runtime build path.**  Until
 this landed each of the nine Makefiles carried
@@ -38,8 +38,9 @@ not change file content, so the test is read-only with respect to git.
 **#894 -- a twelfth country cannot pick the other design by accident.**
 ``test_every_panel_ids_country_declares_its_design`` enumerates the countries
 declaring ``panel_ids`` and requires each to be design A (tracked JSON on disk)
-or named in ``DESIGN_B_PENDING``.  Converting Nigeria to A is #894's
-remaining work; listing it here makes the deferral visible in code.
+or named in ``DESIGN_B_PENDING``.  Malawi and Nigeria were listed there until
+GH #894 converted them; the set is empty now, and a country added to it must
+say why.
 """
 from __future__ import annotations
 
@@ -54,16 +55,18 @@ import pytest
 from lsms_library.paths import countries_root
 
 # The countries that persist the crosswalk as committed JSON (design A).
-# Malawi joined in GH #894; its panel_ids.py reads the same per-wave
-# `panel_ids:` blocks in data_info.yml that design B read at run time.
+# Malawi and Nigeria joined in GH #894; their panel_ids.py reads the same
+# per-wave `panel_ids:` blocks in data_info.yml that design B read at run time.
 DESIGN_A = [
     "Burkina_Faso", "Ethiopia", "EthiopiaRHS", "GhanaLSS", "Malawi", "Mali",
-    "Niger", "Senegal", "Tanzania", "Uganda",
+    "Niger", "Nigeria", "Senegal", "Tanzania", "Uganda",
 ]
 
-# Design B (per-wave YAML -> cache parquet only).  GH #894 converts Nigeria
-# in its own commit.  Listed rather than grandfathered by silence.
-DESIGN_B_PENDING = {"Nigeria"}
+# Design B (per-wave YAML -> cache parquet only).  Empty since GH #894 moved
+# Malawi and Nigeria to design A (their served dicts were verified equal to
+# design B's before and after).  A country listed here must say why; it is
+# listed rather than grandfathered by silence.
+DESIGN_B_PENDING: set[str] = set()
 
 
 def _root() -> Path:
