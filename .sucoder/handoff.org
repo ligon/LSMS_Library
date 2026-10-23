@@ -1,6 +1,37 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-23T00:34:35.859317+00:00
+* Current task -- 2026-10-23T00:56:10.287216+00:00
+
+Merge task remains COMPLETE: all32 implementation PRs and tracker1170 are merged development60aa81e9eda3b747e25a37c9e7354315b842b408; earlier exact source/CI/closure records below remain authoritative.
+Goal stays ACTIVE with90remainingISA records:3active,4otherpartialresiduals,83unassigned.22issuesclosedcompleted; two globallyopen completedISAportions remain separate.
+Docs branch is docs/isa-backlog-20261022-merge-progress, lastpublished/pushedb93d9133b before this checkpoint. Main checkout stays cleanf8; never reset it or edit shared mirror working tree.
+
+#1218 5f source remains exact; roota29243 independently accepted53saved fullreceipts+78source+5productionpaths, original57JUnit/Popen/boot/maps/bothworkercollections and all10startups/3probes.
+Actual57PASS/0FAIL/0ERROR/0SKIP includes all12unchangedcalendarcontrols that failed2f. Rootrelease C/FRAMEWORK1218-CALENDAR5F-SUPPORT104-RELEASE.json SHA3bea52526e9e3ddbb97aea3b30416b0333a112a3e03664f8c502d02ae0f2be3e.
+New104supportactor61723/486ad3 actual0, PID599804,104PASS with57deselected; root2df394 independently read actualterminal/JUnit/sourcehead.
+Savedgate e34eb2 actual1 at gate_supporting_calendar5f_v2.py:152: expectedrelative recipeargv, but direct no-Makefile fallback PID600850 invokes the exact cwd/build_me.py via absolutepath. Original allobservationssaved beforeassertion.
+Author acquisition_1149 is preparing additive saved-result gate only, source/tests/guard frozen, no actor replay. Root must review exactscriptendpoint and frozenliteral recipes plus allsaved event accounting, then allow savedgate and finalsourceprotector only.
+Genuine6providers/24copies/4roots remain HELD; author may prepareSOURCE-ONLY finite exactplan/controllers after freezes. No genuinebytehash/copy/decode/API yet.
+Earlier45PASS/12FAIL, parentfailures, diagnostic and unknownhistoricaltraces stay preserved.
+
+Mali1118 syntheticpacket is frozen/accepted. Root53d39f verifies9packet+70source+73savedrecord receipts, all7originalPopen/boot/wait/terminalchains, parent25actual14PASS11FAIL all11atunknownunitcontractassertion, supporting18PASS, comparator30faultREJECT+2positiveassertions,60syntheticoperandmetadataonly,full2987guardrows including7source/PID/timeboundprobes.
+Root acceptance C/MALI1118-ROOT-SYNTHETIC-COMPLETION-ACCEPTANCE.json SHAe71854603d3a9660271dc034f1af4176d7372e6ef1786787809de19fb8bc38bb.
+Originalparentgate1 preserved; additivev3 fiveconditionalstagesactual0; no repeatedtests. Positiveoperands are not separatelyserialized.
+review_malawi_1209 prepares standalone P/genuine-preparation-v1 SOURCE-ONLY:14providers33,322,098B;56copies133,288,392B;4roots;18source-first native reads reusecandidateDefaultL1; no fifthroot.
+Source-first must distinguish actualabsence vsmeaningfulunmapped units and quantityvariable-label fixedunit authority before a fill AFTERexistinggroupby.first. No scientificreducer/eligibility/sourceauthority change by assumption.
+Native ligonlibrary discards Stata variablelabels; proposed observer now wraps original StataReader.read once AFTERnormalread/header, returnsidenticalframe, callsvariable_labels only after already-open proof and restoresfinally. Earlier__enter__proposal is unexecuted/superseded. Root needs full installedsource/observerdiff review before release.
+Providerfullauth/copy/read-onlyactualDVCpreflight/18sourcecalls each require exactnewfinitereviewedplan; no providerpayload or production/runtime released yet. Candidateledger24278/basef8 unchanged.
+
+Uganda1133 agent malawi_1209 now ACTIVE SOURCE-ONLYphase0. Actual60aa+ledger875c135bb3e74a0421286433ab02160badbe7abc publishednormally/clean. CompleteCONTENTS3933lines read; origin-EA vsactualcommunity/GPSbins vsparish plus documentedcontradictions retained.
+Staticrouteconcern Wave.column_mapping scalar-stringidxvars bypassformatter that samplemyvars use; sample/cluster/communityjoins allmustbeproved. No digit-ruleguess.
+20logical/20distinctMD5providerendpoints metadataonly,17sidecarsnosize. Proposedfirstdiagnostic12providers4,931,955B; allwave sampledependency requires20fornormalvalidation. Proposed92copies50,388,443B acrossdiagnostic+fourcomparisonroots, notauthorizedruntime.
+Historical322/272/50measurements remainclaims. Root awaits exactphase0source/test/join/decisionmapandpins; no import/test/census/providerbytehash/copy/decode/API yet.
+
+Archive32 does NOT cover later live1218/Mali/Uganda/rootmergeproofs; arrange finite durability checkpoint when ownersquiescent, never replayactors forpackaging. Deadlinewarningabsent at4213f7; jobstillrunning~22hours. Workcontinues; no infrastructure repair or release needed whileactive.
+
+Sue
+
+* Earlier task -- 2026-10-23T00:34:35.859317+00:00
 
 The user-authorized PR consistency/merge task is COMPLETE: all32 implementation PRs plus tracker1170 are merged into development.
 Latest development60aa81e9eda3b747e25a37c9e7354315b842b408, tree2d1087d6bf8fad64327de4f98ba12bcbc0d1968e; fresh complete openPR collection EMPTY.

@@ -1,0 +1,40 @@
+{
+  "updated_at_UTC": "2026-10-23T00:56:10.287216+00:00",
+  "goal_status": "ACTIVE",
+  "merge_task": "COMPLETE:32 implementation PRs and tracker1170 merged development60aa81e9",
+  "remaining_records": 90,
+  "active_records": 3,
+  "other_partial_residuals": 4,
+  "unassigned_records": 83,
+  "issue_progress": [
+    {
+      "number": 1218,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1218",
+      "queue_state": "ACTIVE",
+      "current_active_scope": "Amended source 5fdbb937d passed independent source review. Root accepted complete predata maps and all 57 targeted regressions, including the twelve unchanged calendar cases that previously failed. The additional 104 tests pass with exactly those 57 deselected, but their saved metadata gate stopped on a direct-script absolute argv; a narrow saved-result correction is being prepared, with no test replay. Final source protection and genuine validation remain pending. All earlier failures retain their actual source identity and evidence gaps."
+    },
+    {
+      "number": 1118,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1118",
+      "queue_state": "ACTIVE_WITH_MERGED_PARTIALS",
+      "current_active_scope": "Mali synthetic checks are accepted: the unchanged parent gives 11 missing-unit contract failures and 14 passes; 18 supporting scientific conversion tests pass. Thirty distinct comparator faults are rejected and two separate positive assertions pass. The original metadata-gate failure is preserved; an additive saved-result correction passed without repeating tests. Source-first diagnosis is being prepared for 14 providers, before any production fill. Provider payload checks, source-first decoding, the conditional production change and genuine validation remain pending. Malawi and Nigeria also remain in this umbrella."
+    },
+    {
+      "number": 1133,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1133",
+      "queue_state": "ACTIVE",
+      "current_active_scope": "Source-only phase 0 is active on development 60aa81e9 plus ledger-first commit 875c135bb3e74a0421286433ab02160badbe7abc. Complete Uganda notes confirm that cluster identifiers mean origin EA, actual community/GPS bins or parish across different waves. Static code shows that scalar-string wave index mappings can bypass the named formatter used by sample mappings. The agent is mapping sample/community joins and source authority before choosing a fix. Twenty provider endpoints are inventoried by metadata only; no provider payload hashing, copying, decoding or runtime has run. Historical 322/272/50 pair counts remain unverified claims."
+    }
+  ],
+  "root_saved_result_acceptances": {
+    "1218_57": "3bea52526e9e3ddbb97aea3b30416b0333a112a3e03664f8c502d02ae0f2be3e",
+    "Mali1118_synthetic": "e71854603d3a9660271dc034f1af4176d7372e6ef1786787809de19fb8bc38bb"
+  },
+  "limits": [
+    "104 supporting tests passed; saved metadata gate failed on absolute direct-script argv and remains unresolved at this checkpoint.",
+    "No genuine providers or production fill executed for Mali; reader-label observer is source-only preparation.",
+    "No Uganda runtime or payload operation executed.",
+    "Original failures and evidence limitations retained; no full-suite/corpus/release claim."
+  ],
+  "signed": "Sue"
+}

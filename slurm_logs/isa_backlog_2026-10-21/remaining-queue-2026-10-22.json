@@ -5,8 +5,8 @@
   "repository_open_issues": 151,
   "isa_related_open_issue_records": 90,
   "pr_linked_issue_records": 5,
-  "active_issue_records": 2,
-  "other_open_issue_records": 84,
+  "active_issue_records": 3,
+  "other_open_issue_records": 83,
   "open_unmerged_implementation_prs": 0,
   "initial_in_scope_still_open": 82,
   "new_campaign_issue_records": 10,
@@ -1218,7 +1218,7 @@
         1185
       ],
       "residual": "Ethiopia/Tanzania repairs landed. Mali, Malawi and Nigeria remain; non-ISA countries are separate.",
-      "current_active_scope": "Mali source and guard checks passed. Complete country, framework and wave fingerprint maps match the true parent. The 25 synthetic parent controls give 11 failures and 14 passes, with no errors or skips. The saved metadata gate stopped because it required a controller postcollection hook emitted only by xdist workers. An additive correction is frozen for root review; the tests will not be replayed. Provider checks, source-first diagnosis, production changes and genuine validation remain pending. Malawi and Nigeria also remain in this umbrella.",
+      "current_active_scope": "Mali synthetic checks are accepted: the unchanged parent gives 11 missing-unit contract failures and 14 passes; 18 supporting scientific conversion tests pass. Thirty distinct comparator faults are rejected and two separate positive assertions pass. The original metadata-gate failure is preserved; an additive saved-result correction passed without repeating tests. Source-first diagnosis is being prepared for 14 providers, before any production fill. Provider payload checks, source-first decoding, the conditional production change and genuine validation remain pending. Malawi and Nigeria also remain in this umbrella.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Fill every missing unit with existing U_UNKNOWN at build, including native Malawi u index; retain use/cost records with no quantity. Nigeria dropping non-input rows is optional separate decision, not needed to fill.",
       "scope_recheck_required_before_dispatch": true,
@@ -1317,13 +1317,13 @@
       "title": "Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids",
       "url": "https://github.com/ligon/LSMS_Library/issues/1133",
       "github_state": "open",
-      "queue_state": "OPEN_UNASSIGNED",
+      "queue_state": "ACTIVE",
       "countries": [
         "Uganda"
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": null,
+      "current_active_scope": "Source-only phase 0 is active on development 60aa81e9 plus ledger-first commit 875c135bb3e74a0421286433ab02160badbe7abc. Complete Uganda notes confirm that cluster identifiers mean origin EA, actual community/GPS bins or parish across different waves. Static code shows that scalar-string wave index mappings can bypass the named formatter used by sample mappings. The agent is mapping sample/community joins and source authority before choosing a fix. Twenty provider endpoints are inventoried by metadata only; no provider payload hashing, copying, decoding or runtime has run. Historical 322/272/50 pair counts remain unverified claims.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Inspect CSECTION1 key rendering; reconstruct 322 linked-household pair table and two non-bijective pairs; apply common read-point mapping to sample+cluster_features, preserve community joins, then remeasure and update sampling boundary.",
       "scope_recheck_required_before_dispatch": true
@@ -1600,7 +1600,7 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Amended source 5fdbb937d passed independent source review. The author reports that all five new predata stages passed: complete 549/39/1362 maps changed against saved f7, ordered APIs and source policy match, all 1,459 guard events are attributed, and no data files were written. Root saved-result acceptance is next. The 57 regressions, supporting tests and genuine validation remain pending. The earlier candidate's 45 passes and twelve calendar failures retain their actual source identity and original evidence gaps.",
+      "current_active_scope": "Amended source 5fdbb937d passed independent source review. Root accepted complete predata maps and all 57 targeted regressions, including the twelve unchanged calendar cases that previously failed. The additional 104 tests pass with exactly those 57 deselected, but their saved metadata gate stopped on a direct-script absolute argv; a narrow saved-result correction is being prepared, with no test replay. Final source protection and genuine validation remain pending. All earlier failures retain their actual source identity and evidence gaps.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Honor explicit optional types on constructed-empty results using existing dtype machinery, preserving populated outputs. Four root-authenticated BF author cases; independent static account accepted; independent genuine runtime validation still required.",
       "scope_recheck_required_before_dispatch": true
@@ -2032,7 +2032,7 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-23T00:34:35.859317+00:00",
+  "active_progress_updated_at_UTC": "2026-10-23T00:56:10.287216+00:00",
   "resolved_in_development_issues": [
     {
       "number": 822,
@@ -2650,7 +2650,7 @@
     }
   ],
   "isa_linked_open_issue_records_including_completed_country_portions": 92,
-  "exclusively_active_issue_records": 1,
+  "exclusively_active_issue_records": 2,
   "initial_in_scope_goal_remaining": 80,
   "complete_collection_SHA256": {
     "post32-all-prs.json": "03cfa6e8a9a748322321da632b8d4d890cb0b10f246e5fdbaea7d86277c6c349",

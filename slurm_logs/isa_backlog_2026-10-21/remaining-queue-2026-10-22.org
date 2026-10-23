@@ -12,7 +12,7 @@ See merge-task-completed.json for the final merge record.
 
 Captured 2026-10-23T00:16:15.307282+00:00 from complete remote PR, issue and development-branch collections.
 All 32 implementation PRs are merged into development; 22 fully resolved issues are closed completed.
-There are 90 remaining ISA scope records, including two active issues, four other partial residuals and 84 unassigned records.
+There are 90 remaining ISA scope records, including three active issues, four other partial residuals and 83 unassigned records.
 Two additional global issues remain open with completed ISA country portions; their remaining shared/non-ISA work is listed separately.
 These overlapping records are not a count of distinct ready-to-fix bugs.
 The captured development tip is a3aad0d43cac1866bab5a91cd59716bb659e9e28.
@@ -20,17 +20,24 @@ Original failures, skipped data jobs and review limits remain preserved; this is
 
 * Active work
 
+Updated 2026-10-23T00:56:10.287216+00:00; the complete remote issue collection remains the dated snapshot above.
+
 ** [[https://github.com/ligon/LSMS_Library/issues/1118][#1118]] plot_inputs: complete country missing-unit normalization under the #1041 ruling
 
 Countries: Ethiopia, Malawi, Mali, Nigeria, Tanzania.
 Landed PRs: #1181, #1185.
-Mali source and guard checks passed. Complete country, framework and wave fingerprint maps match the true parent. The 25 synthetic parent controls give 11 failures and 14 passes, with no errors or skips. The saved metadata gate stopped because it required a controller postcollection hook emitted only by xdist workers. An additive correction is frozen for root review; the tests will not be replayed. Provider checks, source-first diagnosis, production changes and genuine validation remain pending. Malawi and Nigeria also remain in this umbrella.
+Mali synthetic checks are accepted: the unchanged parent gives 11 missing-unit contract failures and 14 passes; 18 supporting scientific conversion tests pass. Thirty distinct comparator faults are rejected and two separate positive assertions pass. The original metadata-gate failure is preserved; an additive saved-result correction passed without repeating tests. Source-first diagnosis is being prepared for 14 providers, before any production fill. Provider payload checks, source-first decoding, the conditional production change and genuine validation remain pending. Malawi and Nigeria also remain in this umbrella.
 Ethiopia/Tanzania repairs landed. Mali, Malawi and Nigeria remain; non-ISA countries are separate.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
 
 Countries: Burkina_Faso, Shared framework.
-Amended source 5fdbb937d passed independent source review. The author reports that all five new predata stages passed: complete 549/39/1362 maps changed against saved f7, ordered APIs and source policy match, all 1,459 guard events are attributed, and no data files were written. Root saved-result acceptance is next. The 57 regressions, supporting tests and genuine validation remain pending. The earlier candidate's 45 passes and twelve calendar failures retain their actual source identity and original evidence gaps.
+Amended source 5fdbb937d passed independent source review. Root accepted complete predata maps and all 57 targeted regressions, including the twelve unchanged calendar cases that previously failed. The additional 104 tests pass with exactly those 57 deselected, but their saved metadata gate stopped on a direct-script absolute argv; a narrow saved-result correction is being prepared, with no test replay. Final source protection and genuine validation remain pending. All earlier failures retain their actual source identity and evidence gaps.
+
+** [[https://github.com/ligon/LSMS_Library/issues/1133][#1133]] Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids
+
+Countries: Uganda.
+Source-only phase 0 is active on development 60aa81e9 plus ledger-first commit 875c135bb3e74a0421286433ab02160badbe7abc. Complete Uganda notes confirm that cluster identifiers mean origin EA, actual community/GPS bins or parish across different waves. Static code shows that scalar-string wave index mappings can bypass the named formatter used by sample mappings. The agent is mapping sample/community joins and source authority before choosing a fix. Twenty provider endpoints are inventoried by metadata only; no provider payload hashing, copying, decoding or runtime has run. Historical 322/272/50 pair counts remain unverified claims.
 
 * Remaining country scope after landed partial repairs
 
@@ -530,11 +537,6 @@ Countries: Ethiopia.
 Historical triage: D; Resume existing authorized acquisition receipt/branch if present; review v03 downloaded content and sidecars before store push. Correct held-release note and SOURCE only with held evidence. Do not re-acquire during diagnosis.
 Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/1133][#1133]] Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids
-
-Countries: Uganda.
-Historical triage: B; Inspect CSECTION1 key rendering; reconstruct 322 linked-household pair table and two non-bijective pairs; apply common read-point mapping to sample+cluster_features, preserve community joins, then remeasure and update sampling boundary.
-Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1134][#1134]] DECISION (#793 residual): the frozen `DESIGN_TAGS` (2 values) cannot express an undocumented or single-stage design, so no non-Uganda design record can be written until it is widened
 
