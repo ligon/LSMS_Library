@@ -85,3 +85,23 @@ The form prices one unit of the named item."  Key
   diffed by =scripts/r2_hash_diff.py=): development =9a0ed5f3c= -> r2 and
   PR head =8dea4ecf2= -> r2 both move Malawi only -- 26/26 L2-country,
   130/130 L2-wave, 0/40 =build_transforms_fingerprint=.
+
+* r3 (2026-10-23): cigarettes excluded
+Round-2 ruling (@ligon, 2026-10-23): exclude CK33 cigarettes from
+=NumberOfUnits = 1= -- their prices are bimodal (about 541 of 1,599 priced
+rows at single-cigarette prices), so a 1 would assert "one packet" on
+about a third of them.  =u= stays =Packet=.
+
+- =scripts/r3_oracle.py= -> =results/r3_oracle.json=: struck code other
+  than 33 + recorded price + empty count = 20,042 (2010-11 9,037; 2013-14
+  2,009; 2019-20 Cross_Sectional 8,053 + Panel 943); priced cigarette rows
+  with an empty count 1,599 (747 / 192 / 588 + 72).
+- =scripts/r3_compare.py= -> =results/r3_compare.json=: =3be88e0ad= (r2)
+  vs r3, cold builds: 82,635 rows both; =u=, =Price=, =Available=
+  identical on every row; =NumberOfUnits= and =Derivation= differ on
+  exactly the 1,599 priced cigarette rows (1 -> NA, key -> NA), all
+  =u = Packet=; the key now on exactly the oracle's 20,042 rows;
+  =attrs['derivations']= rows 20,042.
+- =results/r3_hash_census_diff.json=: development =9a0ed5f3c= -> r3 and
+  =3be88e0ad= -> r3 both move Malawi only -- 26/26 L2-country, 130/130
+  L2-wave, 0/40 =build_transforms_fingerprint=.

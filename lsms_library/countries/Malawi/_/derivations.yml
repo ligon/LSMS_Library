@@ -522,6 +522,7 @@ Malawi::crop_production::sale-basis-unresolved:
 # 2026-10-23, PR #1239): "on struck-unit items, NumberOfUnits = 1 as a
 # registered derivation, consistent with Niger D2.  The form prices one unit
 # of the named item."  Precedent: Niger::community_prices::one-item-per-price.
+# Round 2 (@ligon, 2026-10-23): EXCLUDE cigarettes (CK33) -- bimodal prices.
 
 Malawi::community_prices::struck-item-one-unit:
   waves: ['2010-11', '2013-14', '2019-20']
@@ -531,9 +532,15 @@ Malawi::community_prices::struck-item-one-unit:
     Module CK items whose NUMBER OF UNITS and UNIT CODES cells the form
     strikes out -- CK3, CK4, CK30-CK35, CK42, CK44-CK51 (2013-14's list
     lacks CK51) -- when the row records a price (not NA; a recorded 0
-    counts) and no count.  The count is in the row's own `u`, the unit the
-    item text fixes (malawi._CK_ITEM_FIXED_UNIT: 50 kg Bag, Bottle, Packet,
-    50 kg per Kilometre, Day, Piece).  A recorded count is never
+    counts) and no count.  EXCLUDED: CK33 "Cigarettes, Embassy (packet)"
+    (malawi._CK_ONE_UNIT_EXCLUDED; ruling @ligon 2026-10-23).  Its prices
+    are bimodal -- about 541 of its 1,599 priced rows sit at
+    single-cigarette prices -- so a 1 would assert "one packet" on about a
+    third of the rows the data say were priced per stick; its
+    NumberOfUnits stays NA, with no key, and its `u` stays `Packet` (the
+    printed text).  So 16 items carry the key.  The count is in the row's
+    own `u`, the unit the item text fixes (malawi._CK_ITEM_FIXED_UNIT: 50
+    kg Bag, Bottle, 50 kg per Kilometre, Day, Piece).  A recorded count is never
     overwritten (none exists on these items in any held file); a row with
     no price gets no count, because a count says what a price refers to and
     there is no price for it to qualify; items whose unit IS asked are
@@ -555,7 +562,8 @@ Malawi::community_prices::struck-item-one-unit:
         "Coca-Cola, Fanta (bottle)", "Carlsberg beer (bottle)", "Cigarettes,
         Embassy (packet)", "Motorized transport of crop output (per 50kg per
         kilometer)", "Ganyu wage, 1 day, adult male".  The count is not asked
-        because the item fixes it.
+        because the item fixes it.  (The cigarette item names a unit too,
+        but is excluded by the rule: its recorded prices contradict it.)
       basis: questionnaire
       evidence: >-
         IHS3 Community questionnaire p. 20, "SECTION CK: PRICES"
@@ -577,23 +585,25 @@ Malawi::community_prices::struck-item-one-unit:
         Malawi/_/CONTENTS.org, "the 38,506 unit-less rows" (the Piece
         inference, accepted @ligon 2026-10-23 on PR #1239).
     - text: >-
-        every recorded price is taken to be per one unit of the item as
-        printed, including the rows the data contradict: about 541 of the
-        1,599 priced Cigarettes (Packet) rows sit at single-cigarette
-        prices, and six 2019-20 Cross_Sectional mosquito-net rows record a
-        price of 0 MK.  They are served NumberOfUnits = 1 like the rest and
-        are not relabelled, rescaled, dropped or flagged beyond the key.
+        every recorded price on the 16 keyed items is taken to be per one
+        unit of the item as printed, including six 2019-20 Cross_Sectional
+        mosquito-net rows that record a price of 0 MK: they are served
+        NumberOfUnits = 1 like the rest and are not dropped or reversed.
+        The one item whose data contradict the reading -- CK33 cigarettes,
+        bimodal between packet and single-stick prices -- is EXCLUDED by
+        the rule (ruling @ligon 2026-10-23), not served as recorded.
       basis: modelling-choice
       evidence: >-
         Malawi/_/CONTENTS.org, "the 38,506 unit-less rows" (cigarettes);
-        slurm_logs/isa_backlog_2026-10-21/827-malawi-community-units/results/r2_oracle.json
-        (zero prices).
+        slurm_logs/isa_backlog_2026-10-21/827-malawi-community-units/results/r3_oracle.json
+        (zero prices, cigarette counts).
   validated_against: >-
     the instrument only.  No held file records a count on these items, so
     the one-unit reading cannot be checked against data; the cigarette
-    price bimodality is the one piece of data that cuts against it for
-    one item.  Raw oracle (cold build, 2026-10-23): the struck items' rows
-    with a recorded price and an empty count are 21,641 (2010-11 9,784;
-    2013-14 2,201; 2019-20 9,656), exactly the rows that carry the key.
+    price bimodality is the one piece of data that cuts against it, and
+    that item is excluded.  Raw oracle (cold build, 2026-10-23): the struck
+    items' rows with a recorded price and an empty count are 21,641, of
+    which 1,599 are CK33 cigarettes; the other 20,042 (2010-11 9,037;
+    2013-14 2,009; 2019-20 8,996) are exactly the rows that carry the key.
   contents: 'Malawi/_/CONTENTS.org, "the 38,506 unit-less rows: why, and what is served (GH #827)"'
   since: '2026-10-23'

@@ -3993,7 +3993,8 @@ def assemble_people_last7days(t, pieces):
 # OF UNITS cell too, and a PRICED row of one is served NumberOfUnits = 1, the
 # registered derivation Malawi::community_prices::struck-item-one-unit
 # (derive_ck_struck_one_unit; ruling @ligon 2026-10-23, the analogue of
-# Niger's community_prices one-item-per-price).
+# Niger's community_prices one-item-per-price) -- except CK33 cigarettes,
+# whose bimodal prices leave the count NA (_CK_ONE_UNIT_EXCLUDED).
 
 def _price_item_code_map():
     """{int item code 1-51: Preferred Label} for community_prices `j`."""
@@ -4030,7 +4031,8 @@ def _price_unit_code_map():
 # struck that cell too, and no row records one): the 1 a priced row of these
 # items is served is a construction, the registered derivation
 # CK_STRUCK_ONE_UNIT, stamped by derive_ck_struck_one_unit after the collapse
-# in assemble_community_prices.
+# in assemble_community_prices -- on every struck item EXCEPT CK33 cigarettes
+# (_CK_ONE_UNIT_EXCLUDED: bimodal packet / single-stick prices).
 _CK_ITEM_FIXED_UNIT = {
     3: '50 kg Bag',            # Cost to grind 50 kg bag of maize
     4: '50 kg Bag',            # Cost to grind 50 kg bag of rice
@@ -4079,9 +4081,9 @@ def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
     renames it to the literal ``'unit'`` on every read.
 
     ``NumberOfUnits`` is the RECORDED count here, NA on every struck item
-    (the form strikes that cell).  The 1 a priced struck row is served is
-    added later, after the collapse, by ``derive_ck_struck_one_unit`` in
-    ``assemble_community_prices``.
+    (the form strikes that cell).  The 1 a priced struck row (CK33
+    cigarettes excepted) is served is added later, after the collapse, by
+    ``derive_ck_struck_one_unit`` in ``assemble_community_prices``.
     """
     from lsms_library.transformations import U_UNKNOWN
 
@@ -4163,7 +4165,8 @@ def assemble_community_prices(t, pieces):
     includes every not-available row of an item whose unit IS asked -- the
     skip pattern jumps past price and unit).  The row is kept either way.
     After the collapse, ``derive_ck_struck_one_unit`` serves
-    ``NumberOfUnits = 1`` on a priced struck-item row and stamps the key.
+    ``NumberOfUnits = 1`` on a priced struck-item row (CK33 cigarettes
+    excepted) and stamps the key.
     """
     cat = pd.concat(pieces, ignore_index=True)
     cat = cat[cat['j'].notna()]
@@ -4211,6 +4214,15 @@ def assemble_community_prices(t, pieces):
 # one unit of the named item."  Registry entry: Malawi/_/derivations.yml.
 CK_STRUCK_ONE_UNIT = 'Malawi::community_prices::struck-item-one-unit'
 
+#: Struck items EXCLUDED from CK_STRUCK_ONE_UNIT (ruling @ligon 2026-10-23,
+#: round 2).  CK33 "Cigarettes, Embassy (packet)": its prices are bimodal --
+#: about 541 of the 1,599 priced rows sit at single-cigarette prices -- so a
+#: served 1 would assert "one packet" on about a third of the rows the data
+#: say were priced per stick.  Its `u` stays `Packet` (the printed text, from
+#: _CK_ITEM_FIXED_UNIT); its NumberOfUnits stays NA and carries no key.
+_CK_ONE_UNIT_EXCLUDED = {33: 'Cigarettes, Embassy (packet): prices bimodal, '
+                             'packet vs single cigarette'}
+
 
 def derive_ck_struck_one_unit(df):
     """``NumberOfUnits = 1`` on a PRICED row of a struck Module CK item,
@@ -4224,9 +4236,11 @@ def derive_ck_struck_one_unit(df):
     any of their rows, so the 1 is a construction from the form, not an
     answer, and the row carries the key.
 
-    Target rows: item code in ``_CK_ITEM_FIXED_UNIT``, ``Price`` recorded (not
-    NA; a recorded 0 counts -- six 2019-20 mosquito-net rows), and
-    ``NumberOfUnits`` NA.  A recorded count is never overwritten.  A row with
+    Target rows: item code in ``_CK_ITEM_FIXED_UNIT`` and NOT in
+    ``_CK_ONE_UNIT_EXCLUDED`` (CK33 cigarettes, whose prices are bimodal
+    packet / single stick), ``Price`` recorded (not NA; a recorded 0 counts --
+    six 2019-20 mosquito-net rows), and ``NumberOfUnits`` NA.  A recorded
+    count is never overwritten.  A row with
     no price gets no count: a count says what quantity a price refers to, and
     Niger's ``one-item-per-price`` (the precedent) stamps only rows that carry
     a price -- its reshape serves no unpriced row.  Unit-asked items are
@@ -4244,6 +4258,7 @@ def derive_ck_struck_one_unit(df):
     out = df.copy()
     code = pd.to_numeric(out['_item_code'], errors='coerce').astype('Int64')
     struck = code.isin(list(_CK_ITEM_FIXED_UNIT)).fillna(False).astype(bool)
+    struck &= ~code.isin(list(_CK_ONE_UNIT_EXCLUDED)).fillna(False).astype(bool)
     nunits = out['NumberOfUnits'].astype('Float64')
     target = struck & out['Price'].notna() & nunits.isna()
     out['NumberOfUnits'] = nunits.mask(target, 1.0)

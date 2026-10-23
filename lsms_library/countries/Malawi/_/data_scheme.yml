@@ -489,9 +489,11 @@ Data Scheme:
     #                    On the 17 struck items the form strikes this cell
     #                    too: a PRICED row is served 1, the registered
     #                    derivation Malawi::community_prices::struck-item-
-    #                    one-unit (21,641 rows; the key is in the
+    #                    one-unit (20,042 rows; the key is in the
     #                    `Derivation` column, NA on reported rows); an
-    #                    unpriced row stays NA (GH #827, ruling 2026-10-23).
+    #                    unpriced row stays NA, and so does every CK33
+    #                    cigarette row -- bimodal packet / single-stick
+    #                    prices (GH #827, rulings 2026-10-23).
     #   Available     -- in-market availability flag (com_ck00c/cka, 1=Yes).
     # A per-unit price (Price / NumberOfUnits), kg-standardisation, and any
     # cross-cluster median/mean or community->household price imputation are

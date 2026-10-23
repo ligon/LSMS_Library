@@ -1,0 +1,69 @@
+{
+ "rows_r2": 82635,
+ "rows_r3": 82635,
+ "cigarette_j": "Cigarettes",
+ "columns_equal": true,
+ "join": {
+  "both": 82635,
+  "left_only": 0,
+  "right_only": 0
+ },
+ "u_differ": 0,
+ "Price_differ": 0,
+ "Available_differ": 0,
+ "NumberOfUnits_differ": 1599,
+ "Derivation_differ": 1599,
+ "nunits_and_derivation_differ_on_same_rows": true,
+ "changed_all_cigarette": true,
+ "changed_from": {
+  "1.0": 1599
+ },
+ "changed_to": {
+  "<NA>": 1599
+ },
+ "changed_by_t": {
+  "2010-11": 747,
+  "2013-14": 192,
+  "2019-20": 660
+ },
+ "changed_u": {
+  "Packet": 1599
+ },
+ "cigarette_rows_r3": 1697,
+ "cigarette_priced_r3": 1599,
+ "cigarette_nunits_notna_r3": 0,
+ "cigarette_keyed_r3": 0,
+ "cigarette_u_r3": {
+  "Packet": 1697
+ },
+ "keyed_total_r3": 20042,
+ "keyed_by_t_r3": {
+  "2010-11": 9037,
+  "2013-14": 2009,
+  "2019-20": 8996
+ },
+ "keyed_by_u_r3": {
+  "Piece": 13083,
+  "Bottle": 3003,
+  "50 kg Bag": 2158,
+  "Day": 1001,
+  "50 kg per Kilometre": 797
+ },
+ "oracle_rows": 20042,
+ "keyed_eq_oracle": true,
+ "nunits_eq1_r2": 53815,
+ "nunits_eq1_r3": 52216,
+ "price_sum_r2": 132618171.0,
+ "price_sum_r3": 132618171.0,
+ "attrs_derivations_r3": {
+  "Malawi": {
+   "Malawi::community_prices::struck-item-one-unit": {
+    "rows": 20042,
+    "columns": [
+     "NumberOfUnits"
+    ],
+    "in": "community_prices"
+   }
+  }
+ }
+}

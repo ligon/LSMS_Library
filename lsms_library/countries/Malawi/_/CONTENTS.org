@@ -1269,7 +1269,7 @@ cells.
 
 *What is served now* (=malawi._price_block=; rows 82,635 before and after;
 =Price= and =Available= identical on every row; =NumberOfUnits= identical
-except the 21,641 derived 1s, the second bullet):
+except the 20,042 derived 1s, the second bullet):
 - *Struck items carry the unit the item fixes* (=_CK_ITEM_FIXED_UNIT=),
   on every row of the item, available or not -- Nigeria W1/W2's precedent
   (=nigeria.py=, =_W1W2_PRICE_UNIT=: "the questionnaire fixes one unit per
@@ -1285,8 +1285,9 @@ except the 21,641 derived 1s, the second bullet):
   #1239); one dict.
   =_price_block= refuses a struck item that records a unit code, so a
   future wave that asks it is not silently overwritten.
-- *=NumberOfUnits= on struck items is 1 where a price is recorded -- a
-  registered derivation.*  The form strikes the count cell too, so no
+- *=NumberOfUnits= on struck items is 1 where a price is recorded --
+  cigarettes excepted -- a registered derivation.*  The form strikes the
+  count cell too, so no
   row records one (0 of 28,631).  Ruling (@ligon, 2026-10-23, PR #1239):
   "on struck-unit items, =NumberOfUnits = 1= as a registered derivation,
   consistent with Niger D2.  The form prices one unit of the named item."
@@ -1295,25 +1296,33 @@ except the 21,641 derived 1s, the second bullet):
   =Derivation = Malawi::community_prices::struck-item-one-unit= (registry:
   =Malawi/_/derivations.yml=; raw rows: =derivation_inputs= of that key,
   one Module CK row per stamped row under its own variable names).
-  - *Which rows*: struck item, =Price= recorded (not NA), =NumberOfUnits=
-    NA -- 21,641 rows (2010-11 9,784; 2013-14 2,201; 2019-20 9,656 =
-    8,641 Cross_Sectional + 1,015 Panel), equal row-for-row to the same
-    selection made on the raw files.  By served =u=: =Piece= 13,083,
-    =Bottle= 3,003, =50 kg Bag= 2,158, =Packet= 1,599, =Day= 1,001, =50 kg
-    per Kilometre= 797.
+  - *Which rows*: struck item other than CK33 cigarettes, =Price=
+    recorded (not NA), =NumberOfUnits= NA -- 20,042 rows (2010-11 9,037;
+    2013-14 2,009; 2019-20 8,996 = 8,053 Cross_Sectional + 943 Panel),
+    equal row-for-row to the same selection made on the raw files.  By
+    served =u=: =Piece= 13,083, =Bottle= 3,003, =50 kg Bag= 2,158, =Day=
+    1,001, =50 kg per Kilometre= 797.
+  - *Cigarettes (CK33) are EXCLUDED* (round-2 ruling, @ligon 2026-10-23):
+    their prices are bimodal (bullet below: about 541 of the 1,599 priced
+    rows sit at single-cigarette prices), so a 1 would assert "one packet"
+    on about a third of the rows the data say were priced per stick.  All
+    1,697 cigarette rows keep =NumberOfUnits= NA and carry no key (the
+    1,599 priced: 2010-11 747, 2013-14 192, 2019-20 660); =u= stays
+    =Packet=, the printed text (=malawi._CK_ONE_UNIT_EXCLUDED=).  A
+    per-packet or per-stick price for them is the analyst's call.
   - *Unpriced rows keep NA* (6,990: 6,975 "No" + 15 with neither a price
     nor a "No").  Niger's =one-item-per-price= (PR #1227, the precedent)
     stamps only rows that carry a price -- its reshape serves no unpriced
     row -- and a count says what a price refers to; with no price there is
     nothing for it to qualify.  Malawi serves the unpriced rows, so the
     choice is explicit here.
-  - *Inside the 21,641, and stamped like the rest*: six 2019-20
+  - *Inside the 20,042, and stamped like the rest*: six 2019-20
     Cross_Sectional mosquito-net (CK50) rows record a price of exactly 0
     MK (served 1 net at 0 MK -- not dropped, not reversed; Niger's reshape
     would have dropped a non-positive price); 14 2013-14 rows carry a
     price beside a blank (12) or off-list (0, 5) availability code
-    (=Available= NA / False); and the ~541 single-cigarette-priced
-    =Packet= rows (bullet below) are served as one packet, as printed.
+    (=Available= NA / False).  (Under the first ruling the 1,599 priced
+    cigarette rows were stamped too, 21,641 in all; round 2 removed them.)
   - A recorded count is never overwritten (none exists); items whose unit
     IS asked are untouched (their recorded count, or NA, as before).
   - Cost: one =malawi.py= edit, so every Malawi hash again -- the same
@@ -1359,7 +1368,9 @@ except the 21,641 derived 1s, the second bullet):
   200, the packet mass at 100-400 MK); 2013-14 43 of 192 at <= 50 MK;
   2019-20 292 of 660 at 20-50 MK, against packets at 400-1,000 MK (306).
   The label transcribes the form; these rows are NOT relabelled or
-  rescaled, so a per-packet comparison must screen them.
+  rescaled, so a per-packet comparison must screen them.  For the same
+  reason cigarettes are the one struck item served NO derived
+  =NumberOfUnits = 1= (round-2 ruling, @ligon 2026-10-23; bullet above).
 
 Cost: every Malawi cache hash (26 L2-country, 130 L2-wave), no other
 country, no framework fingerprint.  Tests:

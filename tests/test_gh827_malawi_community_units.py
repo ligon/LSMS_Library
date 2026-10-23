@@ -11,11 +11,12 @@ They were never blank at the API: ``local_tools.map_index`` renames a null
   fixes the unit ("Coca-Cola, Fanta (bottle)", "Ganyu wage, 1 day").  They
   now carry that unit (``malawi._CK_ITEM_FIXED_UNIT``; precedent Nigeria
   W1/W2 ``_W1W2_PRICE_UNIT``).  The form strikes the count cell too, so no
-  row records a count; the 21,641 PRICED rows of these items are served
+  row records a count; the 20,042 PRICED rows of these items are served
   ``NumberOfUnits = 1`` as the registered derivation
   ``Malawi::community_prices::struck-item-one-unit`` (ruling @ligon
   2026-10-23; precedent Niger ``one-item-per-price``).  Unpriced rows keep
-  NA.
+  NA, and so do the 1,599 priced CK33 cigarette rows (round-2 ruling,
+  2026-10-23: their prices are bimodal, packet vs single stick).
 * 9,875 rows on items whose unit IS asked, with a blank code or a code on no
   Module CK list (9,640 not-available rows the skip pattern jumps past, 61
   priced with a blank code, 158 priced with an off-list code, 16 other) --
@@ -235,6 +236,27 @@ class TestStruckItemOneUnit:
         with pytest.raises(ValueError, match='already carries'):
             malawi_mod.derive_ck_struck_one_unit(d)
 
+    def test_cigarettes_are_excluded(self, malawi_mod):
+        """Round-2 ruling (@ligon, 2026-10-23): a priced CK33 cigarette row
+        keeps NumberOfUnits NA and no key -- its prices are bimodal (packet
+        vs single stick) -- while its unit stays `Packet`."""
+        out = _assembled(malawi_mod, [
+            ('101', 33, 1, 1500.0, None, None),     # a packet price
+            ('102', 33, 1, 20.0, None, None),       # a single-stick price
+            ('102', 31, 1, 200.0, None, None)])     # Coca-Cola: still keyed
+        labels = malawi_mod._price_item_code_map()
+        cig = out.xs(labels[33], level='j')
+        assert cig['u'].tolist() == ['Packet', 'Packet']
+        assert cig['NumberOfUnits'].isna().all()
+        assert cig['Derivation'].isna().all()
+        assert out.loc[('102', labels[31]), 'Derivation'] == KEY
+        assert set(malawi_mod._CK_ONE_UNIT_EXCLUDED) == {33}
+
+    def test_the_exclusion_is_named_in_the_rule(self):
+        from lsms_library.derivations import derivation_records
+        rule = derivation_records(COUNTRY)[KEY].rule
+        assert 'EXCLUDED: CK33' in rule and 'bimodal' in rule
+
     def test_the_key_is_registered(self, malawi_mod):
         from lsms_library.derivations import derivation_records, resolve_callable
         rec = derivation_records(COUNTRY)[KEY]
@@ -262,10 +284,13 @@ ROWS = {'2010-11': 39_166, '2013-14': 6_511, '2019-20': 36_958}
 #: `u == 'Unknown'` per wave after #827 (was 0; those rows read 'unit').
 UNKNOWN = {'2010-11': 4_555, '2013-14': 1_156, '2019-20': 4_164}
 #: Rows served NumberOfUnits = 1 under KEY, per wave: the struck items' rows
-#: with a recorded price and no count, counted on the RAW Module CK files
-#: (r2 oracle, 2026-10-23; 2019-20 = Cross_Sectional 8,641 + Panel 1,015).
-STAMPED = {'2010-11': 9_784, '2013-14': 2_201, '2019-20': 9_656}
-STAMPED_TOTAL = 21_641
+#: with a recorded price and no count, CK33 cigarettes excluded, counted on
+#: the RAW Module CK files (r3 oracle, 2026-10-23; 2019-20 = Cross_Sectional
+#: 8,053 + Panel 943).  With cigarettes it was 9,784 / 2,201 / 9,656 = 21,641.
+STAMPED = {'2010-11': 9_037, '2013-14': 2_009, '2019-20': 8_996}
+STAMPED_TOTAL = 20_042
+#: Priced CK33 cigarette rows per wave (747 / 192 / 660), excluded from KEY.
+CIGARETTES_PRICED = {'2010-11': 747, '2013-14': 192, '2019-20': 660}
 
 
 @pytest.fixture(scope='module')
@@ -293,24 +318,40 @@ class TestDelivered:
         assert int((u == U_UNKNOWN).sum()) == UNKNOWN[wave]
 
     def test_struck_items_carry_their_fixed_unit_and_one_when_priced(self, delivered, malawi_mod):
-        """Ruling (@ligon, 2026-10-23): the 21,641 priced struck rows are
-        served NumberOfUnits = 1 under the registry key; the 6,990 unpriced
-        ones (6,975 "No" + 15 with neither a price nor a "No") keep NA."""
+        """Ruling (@ligon, 2026-10-23): the 20,042 priced struck rows other
+        than cigarettes are served NumberOfUnits = 1 under the registry key;
+        the 6,990 unpriced ones (6,975 "No" + 15 with neither a price nor a
+        "No") and the 1,599 priced cigarette rows keep NA."""
         labels = malawi_mod._price_item_code_map()
         want = {labels[c]: u for c, u in STRUCK.items()}
         d = delivered.reset_index()
         d = d[d['j'].isin(want)]
         assert len(d) == 28_631
         assert d['u'].eq(d['j'].map(want)).fillna(False).all()
+        cig = d['j'] == labels[33]
         priced = d['Price'].notna()
-        assert int(priced.sum()) == STAMPED_TOTAL
+        keyed = priced & ~cig
+        assert int(keyed.sum()) == STAMPED_TOTAL
         # NA-strict: on a nullable column `(x == v).all()` SKIPS NA, so an
         # all-NA column would pass it vacuously (it did, on the PR head).
-        assert d.loc[priced, 'NumberOfUnits'].eq(1.0).fillna(False).all()
-        assert d.loc[priced, 'Derivation'].eq(KEY).fillna(False).all()
-        assert d.loc[~priced, 'NumberOfUnits'].isna().all()
-        assert d.loc[~priced, 'Derivation'].isna().all()
+        assert d.loc[keyed, 'NumberOfUnits'].eq(1.0).fillna(False).all()
+        assert d.loc[keyed, 'Derivation'].eq(KEY).fillna(False).all()
+        assert d.loc[~keyed, 'NumberOfUnits'].isna().all()
+        assert d.loc[~keyed, 'Derivation'].isna().all()
         assert int((~priced).sum()) == 6_990
+        assert int((priced & cig).sum()) == sum(CIGARETTES_PRICED.values())
+
+    @pytest.mark.parametrize('wave', sorted(CIGARETTES_PRICED))
+    def test_cigarettes_keep_their_packet_and_no_count(self, delivered, malawi_mod, wave):
+        """Round-2 ruling (@ligon, 2026-10-23): CK33 cigarette prices are
+        bimodal (packet vs single stick), so no row is served a count of 1
+        or the key; `u` stays `Packet`."""
+        cig = delivered.xs(wave, level='t').xs(
+            malawi_mod._price_item_code_map()[33], level='j')
+        assert set(cig.index.get_level_values('u')) == {'Packet'}
+        assert int(cig['Price'].notna().sum()) == CIGARETTES_PRICED[wave]
+        assert cig['NumberOfUnits'].isna().all()
+        assert cig['Derivation'].isna().all()
 
     @pytest.mark.parametrize('wave', sorted(STAMPED))
     def test_derivation_rows_per_wave(self, delivered, wave):
