@@ -1595,3 +1595,76 @@ Unknown, partial, contradictory and undecoded household results need an explicit
 Aggregate evidence, source hashes, reproduction commands and the proposed country/shared boundary are in =slurm_logs/isa_backlog_2026-10-21/burkina-1148/REPORT.md=; the prior-art ledger is =.coder/ledger/1148-burkina-interview-status.md=.
 Raw records, household keys and full logs remain private.
 Existing record and passage-config checks: 35 passed, two deselected.
+
+* 2026-10-23 -- =v= across wave boundaries: =_/sampling.yml= declared (GH #1243)
+
+=_/sampling.yml= now records, per wave boundary, whether =v= names the same
+cluster as in the preceding wave (GH #942 Site C, panel-only format as in
+Ethiopia/Nigeria).  The idiosyncrasy: *=v= is a sample serial in every wave,
+not a frame code*, and the serials of two independent draws overlap.
+
+| Boundary           | =household_continuity= | =cluster_id_continuity= | Warns? |
+|--------------------+------------------------+-------------------------+--------|
+| 2014 -> 2018-19    | independent            | redefined               | yes    |
+| 2018-19 -> 2021-22 | panel                  | stable                  | no     |
+
+*2014 -> 2018-19.*  EMC 2014 serves =v= = =zd= (900 ZD, 1-900; called
+=grappe= in =emc2014_welfare.dta=), EHCVM-1 =v= = =grappe= (585 ZD, 1-585):
+two separate PPS draws, each numbering its own sample from 1.  Measured
+2026-10-23 on a cold build (development =9a0ed5f3c=), on the 585 shared
+integers: =Region= differs for 517, =District= for 540 (case- and
+accent-folded, =Koulpelgo= = =Koulpelogo=; unfolded, all 585 differ, since
+GH #1059 has not landed), =Rural= for 282.  The same id names an unrelated
+cluster, so a cross-wave =groupby('v')= merges 585 pairs.  No household links
+the two: the 2018-19 cover (=s00_me_bfa2018.dta=, 18 columns) has no 2014
+pointer and =panel_ids.py= records none.  Declared =redefined= rather than
+=unobservable= because =unobservable= is silent on the ground that grouping
+across *disjoint* keyspaces is correct (GhanaLSS 1991-92); here the keyspaces
+overlap.  The vocabulary's own gloss for =redefined= ("a different KIND of
+unit") fits loosely -- both are ZDs; what changes is the sample list the
+serial indexes -- and it is the closest warning-bearing value (=wave-scoped=
+would claim a meaningful crosswalk).  =sample(waves=['2014', '2021-22'])=
+also warns: the span rule counts the 2018-19 boundary between them.
+
+*Household ids collide across this boundary too -- do not measure it by
+shared =i=.*  2014 builds =i= as =zd + menage.zfill(3)= (=burkina_faso.i=),
+2018-19 as =grappe + '0' + menage.zfill(2)= (=2018-19/_/mapping.py=); for a
+two-digit =menage= the two strings are identical whenever the serials are.
+583 =i= are shared by 2014 and 2018-19 and all 583 "keep" =v=, which a naive
+Site C measurement reads as =stable=; their clusters' =Region= agrees for 80
+of 583 -- an id collision, not 583 households.  A cross-wave =groupby('i')=
+over 2014 and 2018-19 merges unrelated households.  Site C covers only =v=;
+the =i= collision is recorded here, not fixed (it would change served =i=).
+
+*2018-19 -> 2021-22.*  In the raw 2021-22 cover, =grappe == grappe_EHCVM1=
+for 3,227 of 3,227 panel households, in 550 grappes, all among 2018-19's
+585: EHCVM-2 tracked households within their EA (BID p. 4, quoted above).
+=Region= agrees 550/550.  =District= names a different province on 3 grappes
+(GH #1059: =Séno=/=Yagha=, =Poni=/=Noumbiel=, =Kompienga=/=Gourma=), and
+=Rural= differs on *7* grappes -- not previously recorded.  Both are attribute
+recodes on a grappe the households were tracked within, not a renumbering.
+
+** TODO =panel_ids.py= builds the 2018-19 id in the wrong format: 1,105 of 3,227 links lost, 3 mislinked
+
+Found while measuring the boundary above (GH #1243); not filed, not fixed.
+=panel_ids.py= builds each 2021-22 household's =previous_i= as
+=grappe_EHCVM1 + menage_EHCVM1.zfill(3)= (its docstring says the same of
+2018-19), but 2018-19 =sample()= builds =i= as =grappe + '0' +
+menage.zfill(2)= -- the divergence =burkina_faso.ehcvm_i='s docstring
+already describes for the agriculture rosters.  The two agree only for a
+two-digit =menage=.  Measured: they agree for 2,119 of 3,227 panel
+households; of the 1,108 with a three-digit 2018-19 =menage=, 1,105 targets
+match no 2018-19 household (the link is lost) and 3 match a *different*
+2018-19 household (the formats let grappe 20 / menage 105 and grappe 2 /
+menage 105 both spell ="20105"=).  Through the API, 2018-19 and 2021-22 share
+only 2,053 =i= (2,050 keep =v=; the 3 that "change" are those mislinks),
+against 3,227 linked in the raw file.  Fixing it regenerates
+=panel_ids.json= / =updated_ids.json= (a =.json= build input, so every
+Burkina Faso cache hash moves) and changes served 2021-22 =i=.
+
+*Also measured, not reconciled*: =sample()= serves 10,411 / 7,010 / 3,227
+households for 2014 / 2018-19 / 2021-22; the "DONE sample" section above
+records 10,224 / 6,961 / 3,218.
+
+*Cache*: none.  =sampling.yml= is not a build input (=.yml= is outside
+=_BUILD_INPUT_SUFFIXES=) and =CONTENTS.org= is excluded as documentation.
