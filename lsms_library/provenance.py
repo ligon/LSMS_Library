@@ -58,13 +58,15 @@ the last two matters:
 A wave directory is **not** in 1:1 correspondence with a catalog entry (GH
 #600), in either direction, so two of the keys above are **lists**:
 
-``#+CATALOG_ID: 2936, 2939``
+``#+CATALOG_ID: 2936, 3819``
     The directory holds the files of *several* catalog entries.
     ``Malawi/2016-17/`` is one: ``Data/Cross_Sectional/`` is the Fourth
-    Integrated Household Survey (2936) and ``Data/Panel/`` is the 2016 wave of
-    the Integrated Household Panel Survey (2939) — 97 of its 98 files appear in
-    2939's World Bank datafile list and **none** in 2936's.  Recording only the
-    first made ``discover_waves()`` report a study we hold as missing.
+    Integrated Household Survey (2936) and ``Data/Panel/`` is the 2016 round
+    of the Integrated Household Panel Survey as re-released in 3819
+    (``MWI_2010-2019_IHPS_v06_M``) -- all 99 held files byte-identical to its
+    2016-round members (GH #1277; the record named 2939, which it now
+    ``#+CATALOG_COVERS:``).  Recording only the first made
+    ``discover_waves()`` report a study we hold as missing.
 
 ``#+CATALOG_COVERS: 76, 1050, 2252, 2862``
     The entry we hold **subsumes** the content of other entries whose files we
@@ -186,8 +188,8 @@ _KEYWORD_RE = re.compile(r"^[ \t]*#\+([A-Z_]+):[ \t]*(.*?)[ \t]*$", re.MULTILINE
 _URL_RE = re.compile(r"https?://[^\s\]\)]+")
 _CATALOG_ID_RE = re.compile(r"/catalog/(\d+)")
 
-# Separator inside a list-valued keyword: ``#+CATALOG_ID: 2936, 2939``.  Commas
-# or whitespace, so both ``2936,2939`` and ``2936 2939`` parse.
+# Separator inside a list-valued keyword: ``#+CATALOG_ID: 2936, 3819``.  Commas
+# or whitespace, so both ``2936,3819`` and ``2936 3819`` parse.
 _LIST_SEP_RE = re.compile(r"[,\s]+")
 
 # Human-written prose in a legacy SOURCE.org (e.g. the EthiopiaRHS round map)

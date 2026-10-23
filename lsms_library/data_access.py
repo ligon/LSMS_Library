@@ -1912,9 +1912,10 @@ def _record_acquired_release(country: str, wave: str,
     # them): Ethiopia 6161's v03 only renamed a file, so acquiring it leaves
     # v02's eth_plotgeovariables_y5.dta beside Pub_ETH_PlotGeovariables_Y5.
     # The release is still held whole; say what else is there.  The scan is
-    # recursive: Nigeria/2023-24's Data/ holds 0 top-level entries and 106
-    # sidecars under subdirectories (``Post Harvest Wave 5/...``), which a
-    # top-level listing reported as nothing (red team r1, R5 iii).  The
+    # recursive: when it was written, Nigeria/2023-24's Data/ held 0
+    # top-level entries and 106 sidecars under subdirectories (``Post Harvest
+    # Wave 5/...``), which a top-level listing reported as nothing (red team
+    # r1, R5 iii).  The
     # GH1149 compares resolved paths, not basenames: a nested leftover cannot
     # disappear merely because a different directory ships the same name.
     shipped = {p.resolve() for p in acq.members}
@@ -2254,9 +2255,9 @@ def local_catalog_ids(country: str) -> dict[str, list[str]]:
       ``Uganda/2005-06/`` and ``Uganda/2009-10/``;
     * one dir, several entries -- ``Malawi/2016-17/`` holds the Fourth
       Integrated Household Survey (2936) in ``Data/Cross_Sectional/`` **and**
-      the 2016 wave of the Integrated Household Panel Survey (2939) in
-      ``Data/Panel/``.  Reading only the first id reported a study we hold as
-      missing (GH #600).
+      the 2016 round of the Integrated Household Panel Survey, as re-released
+      in 3819, in ``Data/Panel/`` (GH #1277).  Reading only the first id
+      reported a study we hold as missing (GH #600).
     """
     held: dict[str, list[str]] = {}
     for wave in _local_waves(country):
@@ -2392,8 +2393,9 @@ def discover_waves(country: str,
         ``stale-release``
             A wave dir records this catalog id, and the release it records
             holding (``#+CATALOG_IDNO:``) is older than the catalog's latest
-            (this row's ``idno``) -- Nigeria/2023-24 holds ``v01_M`` of 6410,
-            the catalog is at ``v02_M``.  Held (``local=True``), and an
+            (this row's ``idno``) -- as Nigeria/2023-24 was when it held
+            ``v01_M`` of 6410 and the catalog moved to ``v02_M`` (2026-09-16).
+            Held (``local=True``), and an
             acquisition target: ``add_wave`` / ``populate_and_push`` fetch the
             newer release (GH #1128).  Judged per ENTRY: the primary on
             ``#+CATALOG_IDNO:``, a secondary on its ``#+CATALOG_HELD:`` line
@@ -2593,7 +2595,7 @@ def add_wave(country: str, catalog_id: str,
         only there, and only those files are pushed.  This is how a wave
         directory holds a second, disjoint catalog entry -- the #600
         pattern, e.g. ``Malawi/2016-17``'s ``Data/Cross_Sectional/`` (2936)
-        and ``Data/Panel/`` (2939) -- without touching the files the first
+        and ``Data/Panel/`` (3819) -- without touching the files the first
         entry holds when their names coincide.  It must be ONE directory
         name directly inside ``Data/``.  ``SOURCE.org`` records which
         subdirectory holds which entry, one ``#+CATALOG_SUBDIR: <id> <subdir>``

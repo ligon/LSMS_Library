@@ -52,7 +52,7 @@ anything containing it (GH #600):
 | status | meaning | `local` |
 |---|---|---|
 | `yes` | a wave dir records this catalog id | `True` |
-| `stale-release` | a wave dir records this catalog id, but holds an older release (`#+CATALOG_IDNO:` for the dir's primary entry, its `#+CATALOG_HELD:` line for a secondary, GH #1283) than the catalog's latest — Nigeria 2023-24 holds `v01_M`, the catalog is at `v02_M`. The backfill records the newer one as `#+CATALOG_LATEST_IDNO:`, so `rg CATALOG_LATEST_IDNO lsms_library/countries` is the queue (GH #1128) | `True` |
+| `stale-release` | a wave dir records this catalog id, but holds an older release (`#+CATALOG_IDNO:` for the dir's primary entry, its `#+CATALOG_HELD:` line for a secondary, GH #1283) than the catalog's latest — Nigeria 2023-24 was the first: it held `v01_M` of 6410 when the catalog moved to `v02_M` on 2026-09-16. The backfill records the newer one as `#+CATALOG_LATEST_IDNO:`, so `rg CATALOG_LATEST_IDNO lsms_library/countries` is the queue (GH #1128) | `True` |
 | `covered` | we don't hold its files, but a release we *do* hold subsumes its content — Tanzania's `2008-15/` holds the Uniform Panel Dataset (3814), whose `round` column carries NPS rounds 1–4 (76, 1050, 2252, 2862) | `False` |
 | `derived` | built *out of* entries we hold, **all** of them — Nigeria 5835 is the four GHS-Panel waves, harmonized | `False` |
 | `unknown` | we cannot say: a matching dir records no WB id, **or** the label is a logical wave inside a multi-round folder that no record accounts for | `False` |
@@ -67,8 +67,10 @@ Survey **3827** both span 2018–2019), and one catalog entry can span two of
 our wave dirs (Uganda **1001** covers both `2005-06/` and `2009-10/`).
 
 **But the id is not a 1:1 key either.** `#+CATALOG_ID:` is a **list** — one dir
-can hold several entries (`Malawi/2016-17/` is `2936, 2939`: IHS4 in
-`Data/Cross_Sectional/`, the 2016 IHPS panel wave in `Data/Panel/`). Entries a
+can hold several entries (`Malawi/2016-17/` is `2936, 3819`: IHS4 in
+`Data/Cross_Sectional/`, and in `Data/Panel/` the 2016 IHPS round as
+re-released in 3819, `v06_M`, which the record says `#+CATALOG_COVERS: 2939`;
+GH #1277). Entries a
 held release *subsumes* go in `#+CATALOG_COVERS:` — **covered is not held**, and
 claiming otherwise is the same false claim pointed the other way. Relations
 *between catalog entries* (a study re-catalogued in a second repository; a
@@ -183,8 +185,11 @@ Pass `verbose=True` (default) for spinners and a summary table. Use `verbose=Fal
 ### Step 2b: A second catalog entry in a wave we already hold (GH #1276)
 
 Some waves hold two disjoint WB entries, the #600 pattern: `Malawi/2016-17/` is
-IHS4 (2936) in `Data/Cross_Sectional/` plus the IHPS panel wave (2939) in
-`Data/Panel/`. Burkina Faso 2021-22 is to hold 6224 (EHCVM-P, the panel
+IHS4 (2936) in `Data/Cross_Sectional/` plus the 2016 IHPS round of 3819
+(`MWI_2010-2019_IHPS_v06_M`) in `Data/Panel/`, and 2019-20 is 3818 plus the
+2019 round of the same 3819; each record carries
+`#+CATALOG_SUBDIR: 3819 Panel` and `#+CATALOG_HELD: 3819 MWI_2010-2019_IHPS_v06_M …`
+(GH #1277). Burkina Faso 2021-22 is to hold 6224 (EHCVM-P, the panel
 component) in `Data/Panel/` and 6277 (EHCVM-2, the cross-section) in
 `Data/Cross_Section/`.
 
