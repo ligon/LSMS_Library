@@ -161,3 +161,34 @@ Merge commit `ab4e22a8b` has tree `365d55b06b70faa0e2b17a775e8ac48b511f3043`, th
   2,109/2,109 wave hashes move -- a corpus-wide cold re-warm.
 
 Evidence and scripts: `slurm_logs/isa_backlog_2026-10-21/1218-current-validation/README.org`.
+
+### 2026-10-22 - follow-up to PR #1221: the empty frame leaves the build fingerprint (Claude Opus 5.5)
+
+An independent review of the merged #1221 measured a design defect in the
+"complete closure hashing; no cache exclusions" stance of section 4. The
+constructed empty frame is SERVED, never written (both callers return it
+before any write; a real-data probe on both backends finds no `<table>.parquet`
+written), so it is not a build input. Folding it pulled eight read-path symbols
+(`_enforce_declared_dtypes`, `_coerce_datetime_column`, `_to_datetime_mixed`,
+`_coerce_to_boolean`, `_SCHEME_DTYPE_MAP`, `_SCHEME_SKIP_KEYS`, `_STR_TO_BOOL`,
+`_YEAR_LAST_DATE`) into every table's closure. Every hash then depended on
+pandas' `mode.string_storage` (549/549, 40/40, 2,109/2,109 moved on
+development; 0 on 60aa), and any edit to the read-time date cast cost a
+corpus-wide re-warm.
+
+Branch `fix/1221-empty-frame-fingerprint-20261022`:
+
+- `country._empty_declared_frame` is added to `_EXCLUDED_CALLABLES`, the same
+  convention as `_finalize_result` and the read gates. The closure is now 60aa's
+  minus the helper itself; the `_ser` nullable-dtype support stays (tested
+  directly), but no build closure reaches `_SCHEME_DTYPE_MAP` now.
+- Empty calendar payloads are `datetime64[us]` (the GH #1045 stored unit),
+  no longer `[s]`. Populated Burkina `interview_date` waves already serve `[us]`.
+- Cache cost: one more corpus-wide cold re-warm (development to branch: all
+  hashes move). No pre-#1221 cache becomes valid again (0 equal), because 60aa
+  already folded the helper's own source; with the helper excluded on 60aa at
+  runtime, all 40 fingerprints equal the branch's and only Mali's hashes
+  (changed by #1222/#1223) differ. Under `string_storage='python'` the branch
+  moves 0 hashes.
+
+Evidence: `slurm_logs/isa_backlog_2026-10-21/1221-followup/README.org`.

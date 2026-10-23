@@ -1,0 +1,78 @@
+#+title: PR #1221 follow-up -- the constructed empty frame leaves the build fingerprint
+
+Claude Opus 5.5, 2026-10-22, job 40390255.  Branch =fix/1221-empty-frame-fingerprint-20261022= on development =9a0ed5f3c=.
+
+* The defect
+
+PR #1221 (=326b6e3de=, GH #1218) made =country._empty_declared_frame= apply declared dtypes.
+That helper is reached from the tagged =Country._aggregate_wave_data=, so its closure is in every table's =build_transforms_fingerprint=.
+Through it, eight READ-path symbols entered every closure (measured by closure-part name, =326b6e3de= against =60aa81e9e=):
+=_enforce_declared_dtypes=, =_coerce_datetime_column=, =_to_datetime_mixed=, =_coerce_to_boolean=, =_SCHEME_DTYPE_MAP=, =_SCHEME_SKIP_KEYS=, =_STR_TO_BOOL=, =_YEAR_LAST_DATE= (all =lsms_library.country.=).
+=_SCHEME_DTYPE_MAP= holds =pd.StringDtype()=, whose storage is fixed at import by =mode.string_storage=, so every hash depended on that pandas option.
+
+The frame is returned before any write on both callers; the probe below confirms no =<table>.parquet= appears in the data root on either backend.
+
+* The change
+
+1. ="lsms_library.country._empty_declared_frame"= is in =_build_registry._EXCLUDED_CALLABLES=, beside =_finalize_result= and the read gates.
+   After it, the closure is exactly =60aa81e9e='s 186 names minus =_empty_declared_frame= (185); none of the eight remains.
+   Other routes: =_enforce_declared_dtypes= is also called at =country.py:4008=, inside the already-excluded =_finalize_result=; no =countries/**/*.py= imports any of the eight, so =framework_imports_fingerprint= cannot reach them.
+   (=lsms_library.datetime_parse._YEAR_LAST_DATE= is still in the closure, through the tagged parser, scoped to =interview_date=, as on =60aa=.)
+2. Empty calendar payload columns are built as =datetime64[us]=, the GH #1045 stored resolution.
+   =datetime_parse= has no named constant; it spells the unit as the literal ="datetime64[us]"=, and the helper uses the same literal.
+   Previously they came out =datetime64[s]= (pandas' inference on an empty object Series).
+
+* Tests (=tests.txt=)
+
+| command | development =9a0ed5f3c= | branch |
+|---------+-----------------------+--------|
+| =test_build_transform_hash.py= + =test_gh1039_make_backend_no_country_rule.py= (branch versions) | 14 failed, 148 passed | 162 passed |
+| =test_gh1045_parse_datetime.py= + =test_derivations.py= | 123 passed, 2 skipped | 123 passed, 2 skipped |
+
+The 14 development failures are the intended ones: the flipped closure test, the new fresh-process =string_storage= test, and the 12 calendar parametrizations of =test_constructed_empty_uses_existing_explicit_nullable_types= (=[s]= vs =[us]=).
+The skips are cache-gated (Mali/Tanzania =interview_date= not cached in a fresh data root).
+
+* Hash census (=hash-impact.json=)
+
+=hash_census.py= is a copy of =1218-current-validation/hash_census.py=.
+
+| comparison | country (549) | fingerprint (40) | wave (2,109) |
+|------------+---------------+------------------+--------------|
+| (a) development -> branch, moved | 549 | 40 | 2,109 |
+| (b) branch = pre-#1221 =60aa81e9e=, equal | 0 | 0 | 0 |
+| (b') branch = =60aa= with the helper excluded at runtime, equal | 525 | 40 | 2,013 |
+| (c) branch, =string_storage= default -> =python=, moved | 0 | 0 | 0 |
+| control: development, default -> =python=, moved | 549 | 40 | 2,109 |
+| control: =60aa=, default -> =python=, moved | 0 | 0 | 0 |
+
+(b) is 0 by construction: =60aa='s closure already contained =_empty_declared_frame='s own source (#1039); the exclusion drops that part, so no pre-#1221 cache becomes valid again.
+Merging is one more corpus-wide cold re-warm.
+(b') isolates that: with the same exclusion applied to =60aa= at runtime (=census_exclude_helper.py=), all 40 fingerprints match the branch.
+The 24 country and 96 wave hashes that still differ are all Mali, whose config changed on development after #1221 (#1222, #1223).
+(c) is run by =census_string_storage.py=, which sets the option before the library is imported.
+
+* Real data (=probe/=, =probe_empty.py=)
+
+Burkina Faso, fresh data root per cell, default and =LSMS_BUILD_BACKEND=make=.
+
+| request | development | branch |
+|---------+-------------+--------|
+| =plot_inputs(waves=['2014'])= | 0 rows; =Float64=, =boolean=, =Float64=, =string=, =boolean=, =Float64=, =string= | identical |
+| =interview_date(waves=['2014'])= | 0 rows; =Interview start=, =Interview end=: =datetime64[s]= | =datetime64[us]= |
+
+Within each backend, development and branch agree on index names and dtypes, column order, =attrs= keys and warning classes.
+After casting development's two calendar columns to =[us]=, =assert_frame_equal(check_exact=True)= passes.
+No =<table>.parquet= was written under the data root in any cell.
+Populated control, branch: =interview_date(waves=['2018-19'])= (21,028 rows) and =['2021-22']= (9,681 rows) serve both columns as =datetime64[us]=, so the empty answer now has the populated unit.
+
+* Reproduce
+
+From each checkout, with =PY=/local/job40390255/venv_img/bin/python= and =DR= a fresh data root whose =dvc-cache= links the shared L1:
+
+#+begin_src shell
+cd $CK && env PYTHONPATH=$CK LSMS_DATA_DIR=$DR OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 \
+  $PY hash_census.py $CK out.json                          # (a), (b)
+  $PY census_string_storage.py python $CK out.json         # (c)
+  $PY census_exclude_helper.py $CK out.json                # (b'), on 60aa81e9e
+  [LSMS_BUILD_BACKEND=make] $PY probe_empty.py $CK interview_date 2014 out.json
+#+end_src

@@ -1080,11 +1080,16 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
         else:
             payload_types[c] = value
     # Empty calendars need no value inference (GH #1218; ledger sections 2/4).
+    # They are built at the library's stored date resolution, microseconds
+    # (GH #1045: ``datetime_parse`` spells it ``"datetime64[us]"``; it has no
+    # named constant), not whatever pandas infers for an empty object column
+    # (``[s]``).  ``_coerce_datetime_column`` passes a datetime64 column
+    # through untouched, so neither enforcer re-parses or re-resolves it.
     for c, declared_type in payload_types.items():
         target = (_SCHEME_DTYPE_MAP.get(declared_type)
                   if isinstance(declared_type, str) else None)
         if isinstance(target, str) and target == "to_datetime":
-            empty[c] = _to_datetime_mixed(empty[c], where=c)
+            empty[c] = pd.Series([], index=empty.index, dtype="datetime64[us]")
     _enforce_declared_dtypes(empty, payload_types)
     return empty
 

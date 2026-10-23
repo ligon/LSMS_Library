@@ -1,0 +1,18 @@
+# pytest summary lines, PR #1221 follow-up (2026-10-22). -n 3 --dist=loadfile, LSMS_BUILD_WORKERS=1, BLAS pinned, fresh LSMS_DATA_DIR.
+# 'dev' = detached 9a0ed5f3c worktree with this branch's two edited test files copied in; 'branch' = this commit.
+
+## tests/test_build_transform_hash.py tests/test_gh1039_make_backend_no_country_rule.py
+dev:    14 failed, 148 passed, 3 warnings in 96.62s (0:01:36)
+              1 FAILED tests/test_build_transform_hash.py::test_empty_constructor_dtype_code_is_not_in_any_build_closure
+              1 FAILED tests/test_build_transform_hash.py::test_hashes_do_not_depend_on_pandas_string_storage
+             12 FAILED tests/test_gh1039_make_backend_no_country_rule.py::test_constructed_empty_uses_existing_explicit_nullable_types
+branch: 162 passed, 3 warnings in 97.14s (0:01:37)
+
+## tests/test_gh1045_parse_datetime.py tests/test_derivations.py (unchanged files)
+dev:    123 passed, 2 skipped, 8 warnings in 355.93s (0:05:55)
+branch: 123 passed, 2 skipped, 8 warnings in 353.46s (0:05:53)
+        SKIPPED [1] tests/test_gh1045_parse_datetime.py:1077: Mali interview_date not cached here
+        SKIPPED [1] tests/test_gh1045_parse_datetime.py:1077: Tanzania interview_date not cached here
+
+## extra, branch only: tests/test_gh798_datetime_mixed.py tests/test_gh1038_ethiopia_interview_date_na.py
+branch: 21 passed, 3 skipped in 6.70s   (skips: Mali/Tanzania/Ethiopia interview_date not cached in a fresh data root)

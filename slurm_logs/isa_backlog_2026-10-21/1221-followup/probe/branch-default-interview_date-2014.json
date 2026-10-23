@@ -1,0 +1,37 @@
+{
+ "backend": "default",
+ "table": "interview_date",
+ "wave": "2014",
+ "rows": 0,
+ "index_names": [
+  "i",
+  "t",
+  "v",
+  "visit"
+ ],
+ "index_dtypes": [
+  "str",
+  "str",
+  "string",
+  "str"
+ ],
+ "columns": [
+  "Interview start",
+  "Interview end"
+ ],
+ "dtypes": {
+  "Interview start": "datetime64[us]",
+  "Interview end": "datetime64[us]"
+ },
+ "attrs_keys": [
+  "country",
+  "derivations",
+  "id_converted",
+  "population",
+  "population_resolution"
+ ],
+ "warning_classes": [
+  "NullReadWarning"
+ ],
+ "table_parquets_written": []
+}

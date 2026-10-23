@@ -202,6 +202,20 @@ _EXCLUDED_CALLABLES = frozenset({
     # invocation (the #964 as_posix fix, the #968 fallback) moved every
     # table's hash.  Pinned by tests/test_windows_portability.py.
     "lsms_library.country._build_wave_script_target",
+    # GH #1218 / PR #1221: the constructed EMPTY answer.  It builds the 0-row,
+    # declared-shape frame served for a request whose waves all lack the table
+    # (GH #1039/#1099); both callers in _aggregate_wave_data return it before
+    # any write, so it is never written to any parquet and determines no byte
+    # a cache holds.  PR #1221 made it apply declared dtypes, which pulled the
+    # READ-path dtype code (_enforce_declared_dtypes, _coerce_datetime_column,
+    # _to_datetime_mixed, _coerce_to_boolean, _SCHEME_DTYPE_MAP and their
+    # constants) into every table's closure: every hash then depended on
+    # pandas' `mode.string_storage` option (through the StringDtype in
+    # _SCHEME_DTYPE_MAP), and any edit to the read-time date cast cold-
+    # rebuilt the corpus.  Excluded for the reason _finalize_result is.
+    # Pinned by tests/test_build_transform_hash.py::
+    # test_empty_constructor_dtype_code_is_not_in_any_build_closure.
+    "lsms_library.country._empty_declared_frame",
     # The null-content audit (null_read_audit): pure REPORTING.  It measures the
     # frame and warns; it provably returns its input unchanged, so no byte of
     # any parquet depends on it.  `check_read` is called from `get_dataframe`,

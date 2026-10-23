@@ -505,8 +505,10 @@ def test_constructed_empty_uses_existing_explicit_nullable_types(form, declared,
     before = copy.deepcopy(entry)
     frame = C._empty_declared_frame(entry)
     if expected == 'calendar':
-        # Match the existing pandas calendar conversion, including resolution.
-        expected = pd.to_datetime(pd.Series([], dtype=object), format='mixed').dtype
+        # The library's stored date resolution (GH #1045: build-time dates
+        # are datetime64[us]), not pandas' inference on an empty object
+        # column, which is [s] (PR #1221 follow-up).
+        expected = 'datetime64[us]'
     pd.testing.assert_series_equal(
         frame.Local, pd.Series([], index=frame.index, dtype=expected, name='Local'),
         check_exact=True)
