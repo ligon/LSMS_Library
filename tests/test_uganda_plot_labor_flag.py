@@ -128,10 +128,12 @@ def test_builder_serves_no_fabricated_zero(uganda_module):
         ("2009-10", hh1, f"{hh1}-1-4", "family", "A"): 7.0,
         ("2009-10", hh1, f"{hh1}-1-4", "hired", "A"): 3.0,
     }
-    # The plot-less "No" row is a genuine reported zero and is still served
-    # (its NaN plot_id is GH #1120 D3, unchanged here); the two stubs are not.
-    nan_plot = {k: v for k, v in got.items() if pd.isna(k[2])}
-    clean = {k: v for k, v in got.items() if not pd.isna(k[2])}
+    # The plot-less "No" row is a genuine reported zero and is still served;
+    # the two stubs are not.  Since GH #1120 D3 its plot_id is the registered
+    # epistemic sentinel 'unknown_plot', no longer NaN.
+    assert not any(pd.isna(k[2]) for k in got), "a NaN plot_id key is served"
+    nan_plot = {k: v for k, v in got.items() if k[2] == "unknown_plot"}
+    clean = {k: v for k, v in got.items() if k[2] != "unknown_plot"}
     assert clean == expected
     assert sorted((k[1], k[3], v) for k, v in nan_plot.items()) == [
         (hh2, "family", 0.0), (hh2, "hired", 0.0)]
