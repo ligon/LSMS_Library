@@ -1167,7 +1167,11 @@ Three things follow, all of them easy to get wrong:
    community *now*.
 2. *The basis is explicit*: the per-unit price is =Price / NumberOfUnits=.
    Do not assume =NumberOfUnits= is 1; it is 50 for 2,345 rows, 250 for
-   1,085, 500 for 875.
+   1,085, 500 for 875.  The one exception is constructed, not reported:
+   on the 17 items whose count cell the form strikes out, a priced row is
+   served 1 under the registry key
+   =Malawi::community_prices::struck-item-one-unit= (GH #827, below) --
+   filter on =Derivation= to tell the two apart.
 3. *The unit is a free field for 34 of the 51 items; for the other 17 the
    form STRIKES IT OUT* (corrected by GH #827, entry below).  Before #827
    this point read: "The unit is a free field, not pre-printed, and is
@@ -1264,7 +1268,8 @@ household unit values at a median ratio of *1.000* over 10,964 matched
 cells.
 
 *What is served now* (=malawi._price_block=; rows 82,635 before and after;
-=Price=, =NumberOfUnits=, =Available= identical on every row):
+=Price= and =Available= identical on every row; =NumberOfUnits= identical
+except the 21,641 derived 1s, the second bullet):
 - *Struck items carry the unit the item fixes* (=_CK_ITEM_FIXED_UNIT=),
   on every row of the item, available or not -- Nigeria W1/W2's precedent
   (=nigeria.py=, =_W1W2_PRICE_UNIT=: "the questionnaire fixes one unit per
@@ -1276,11 +1281,43 @@ cells.
   whose text names no unit ("single" on CK49/CK50 is a bed size).  The
   pre-#827 text above said a blank unit is "not 'one piece'"; for these
   items the unit is not blank but not asked, and =Piece= is the count
-  label the form's own code list uses.  A decision for a human; one dict.
+  label the form's own code list uses.  Accepted (@ligon, 2026-10-23, PR
+  #1239); one dict.
   =_price_block= refuses a struck item that records a unit code, so a
   future wave that asks it is not silently overwritten.
-- *=NumberOfUnits= is not filled on struck items*: the form struck that
-  cell too.  Whether to serve 1 is open.
+- *=NumberOfUnits= on struck items is 1 where a price is recorded -- a
+  registered derivation.*  The form strikes the count cell too, so no
+  row records one (0 of 28,631).  Ruling (@ligon, 2026-10-23, PR #1239):
+  "on struck-unit items, =NumberOfUnits = 1= as a registered derivation,
+  consistent with Niger D2.  The form prices one unit of the named item."
+  Served by =malawi.derive_ck_struck_one_unit= after the =(t, v, j, u)=
+  collapse in =assemble_community_prices=; each such row carries
+  =Derivation = Malawi::community_prices::struck-item-one-unit= (registry:
+  =Malawi/_/derivations.yml=; raw rows: =derivation_inputs= of that key,
+  one Module CK row per stamped row under its own variable names).
+  - *Which rows*: struck item, =Price= recorded (not NA), =NumberOfUnits=
+    NA -- 21,641 rows (2010-11 9,784; 2013-14 2,201; 2019-20 9,656 =
+    8,641 Cross_Sectional + 1,015 Panel), equal row-for-row to the same
+    selection made on the raw files.  By served =u=: =Piece= 13,083,
+    =Bottle= 3,003, =50 kg Bag= 2,158, =Packet= 1,599, =Day= 1,001, =50 kg
+    per Kilometre= 797.
+  - *Unpriced rows keep NA* (6,990: 6,975 "No" + 15 with neither a price
+    nor a "No").  Niger's =one-item-per-price= (PR #1227, the precedent)
+    stamps only rows that carry a price -- its reshape serves no unpriced
+    row -- and a count says what a price refers to; with no price there is
+    nothing for it to qualify.  Malawi serves the unpriced rows, so the
+    choice is explicit here.
+  - *Inside the 21,641, and stamped like the rest*: six 2019-20
+    Cross_Sectional mosquito-net (CK50) rows record a price of exactly 0
+    MK (served 1 net at 0 MK -- not dropped, not reversed; Niger's reshape
+    would have dropped a non-positive price); 14 2013-14 rows carry a
+    price beside a blank (12) or off-list (0, 5) availability code
+    (=Available= NA / False); and the ~541 single-cigarette-priced
+    =Packet= rows (bullet below) are served as one packet, as printed.
+  - A recorded count is never overwritten (none exists); items whose unit
+    IS asked are untouched (their recorded count, or NA, as before).
+  - Cost: one =malawi.py= edit, so every Malawi hash again -- the same
+    re-warm this PR already pays; =derivations.yml= moves nothing.
 - *A unit-asked item with a blank or off-list code is =Unknown=* (9,875
   rows: 9,640 "No" rows the skip pattern leaves without price or unit, 219
   priced -- 61 blank, 158 off-list -- and 16 with neither a price nor a
@@ -1301,7 +1338,8 @@ cells.
   repeat.  =COM_MOD_K_13= has no value labels.  So nothing printed says
   which list 2013-14's codes were entered on, and the whole household list
   would also unprint 2013-14's 12 (5 rows), 16 (3) and 21 (1).  Code 23 is
-  =Unknown= on either reading; 47 rows of code 22 are the contested set.
+  =Unknown= on either reading; 47 rows of code 22 are the contested set,
+  served =Unknown= -- accepted (@ligon, 2026-10-23, PR #1239).
 - *Not touched*: =Other (Specify)= (2,876 rows; 2010-11's
   =com_ck00b3_os= says "2 TABLET PACKET" 157, "METERS" 147, "PACKET" 119,
   "WHOLE CHICKEN" 91, "SPOON" 64, ...) -- a GH #1042-style free-text

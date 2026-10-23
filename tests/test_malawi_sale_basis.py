@@ -128,9 +128,17 @@ def _source():
 # static: the registry
 # ---------------------------------------------------------------------------
 
+def _ladder():
+    """Malawi's crop_production registry entries -- the sale-basis ladder.
+    Scoped to the table: the country file also registers other tables'
+    derivations (community_prices, GH #827), which are not rungs."""
+    return {k: r for k, r in derivation_records(COUNTRY).items()
+            if r.table == 'crop_production'}
+
+
 class TestRegistry:
     def test_eight_entries_one_per_rung(self):
-        r = derivation_records(COUNTRY)
+        r = _ladder()
         assert set(r) == set(KEYS) | {DEL}
         for key in KEYS:
             rec = r[key]
@@ -178,7 +186,7 @@ class TestRegistry:
         assert 'sits between' not in r[P].rule.lower().replace('sits between the medians resolves', 'X')
 
     def test_every_callable_resolves(self):
-        r = derivation_records(COUNTRY)
+        r = _ladder()
         fns = set()
         for key, rec in r.items():
             assert callable(resolve_callable(rec.function)), key

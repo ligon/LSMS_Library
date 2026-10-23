@@ -59,4 +59,29 @@ does not hold.
 After the fix: 0 rows ='unit'=, 0 null; 28,631 rows carry the item's
 fixed unit (Piece 16,960, 50 kg Bag 3,394, Bottle 3,393, Packet 1,697,
 50 kg per Kilometre 1,697, Day 1,490), 9,875 =Unknown=.  Price,
-NumberOfUnits and Available identical on all 82,635 rows.
+NumberOfUnits and Available identical on all 82,635 rows (r1; r2 below
+serves =NumberOfUnits = 1= on 21,641 of them).
+
+* r2 (2026-10-23): =NumberOfUnits = 1= on priced struck rows, registered
+Ruling (@ligon, 2026-10-23, PR #1239): "on struck-unit items,
+=NumberOfUnits = 1= as a registered derivation, consistent with Niger D2.
+The form prices one unit of the named item."  Key
+=Malawi::community_prices::struck-item-one-unit= (=Malawi/_/derivations.yml=).
+
+- =scripts/r2_oracle.py= -> =results/r2_oracle.json=: on the RAW Module CK
+  files, struck code + recorded price + empty count = 21,641 rows (2010-11
+  9,784; 2013-14 2,201; 2019-20 Cross_Sectional 8,641 + Panel 1,015).  0
+  struck rows record a count or a unit code in any file; 6 record a price
+  of 0 (2019-20 CS, CK50 mosquito net).
+- =scripts/r2_build_cp.py= (cold, one fresh =LSMS_DATA_DIR= per side) and
+  =scripts/r2_compare.py= -> =results/r2_compare.json=: PR head
+  =8dea4ecf2= vs r2, joined on =(t, v, j)=: 82,635 rows both; =u=, =Price=,
+  =Available= identical on every row; =NumberOfUnits= differs on 21,641
+  rows, all NA -> 1, exactly the oracle's =(t, v, j)= set; =Derivation=
+  carries the key on exactly those rows; =attrs['derivations']= reports
+  =rows: 21641, columns: [NumberOfUnits]=.  Unpriced struck rows (6,990)
+  keep NA.
+- =results/r2_hash_census_diff.json= (=1218-current-validation/hash_census.py=,
+  diffed by =scripts/r2_hash_diff.py=): development =9a0ed5f3c= -> r2 and
+  PR head =8dea4ecf2= -> r2 both move Malawi only -- 26/26 L2-country,
+  130/130 L2-wave, 0/40 =build_transforms_fingerprint=.
