@@ -15,27 +15,21 @@ sub-type lines (bœuf/vache/... -> Cattle) onto one row per (household,
 canonical species), so the ``(t, i, animal)`` index is UNIQUE within each
 wave and the concatenation stays unique across waves (the four ``t`` values
 are disjoint).  No rows are lost to the framework's canonical-index de-dup.
-"""
-import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet
+EVERY wave in WAVES has a ``livestock.py`` script, so a missing wave parquet
+means that script failed or was never run -- never "not wired". It is
+refused, not skipped (``niger.concat_wave_parquets``, GH #1123, extended
+from plot_inputs on 2026-10-23): under ``LSMS_BUILD_BACKEND=make`` this
+script is also the fallback the framework runs after a failed ``make``, and
+skipping the absent wave there would serve the other waves with no Python
+warning.
+"""
+from lsms_library.local_tools import to_parquet
+from niger import concat_wave_parquets
 
 
 WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
 
-pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/livestock.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired for livestock (no .py script / no parquet).
-        # DVC raises PathMissingError here, not FileNotFoundError.
-        continue
-    pieces.append(df)
-
-assert pieces, 'livestock: no wave-level parquets found'
-
-p = pd.concat(pieces)
+p = concat_wave_parquets('livestock', WAVES)
 
 to_parquet(p, '../var/livestock.parquet')
