@@ -267,7 +267,12 @@ Sampling:
         this boundary measured 0 of 2,510 and was declared `wave-scoped`
         (2026-10-19; `unobservable` was rejected because the linkage is verified).
         One 2010-11 code (1530040, one household, no linkage) is not in the table
-        and keeps its 7-character rendering.
+        and keeps its 7-character rendering.  Since GH #1120 D2 (2026-10-23)
+        2011-12's frame also holds 57 households only its agriculture cover
+        records, 30 of them linked to 2010-11; no 2011-12 file locates them, so
+        each is its own `moved-{hhid}` singleton -- a household fact, not a
+        renumbering (Nigeria's stable boundaries carry its movers the same
+        way).  The 2,510 households both covers locate all keep `v`.
       source_type: derived-from-data
       confidence: high
       source_file: 'lsms_library/countries/Uganda/_/categorical_mapping.org'

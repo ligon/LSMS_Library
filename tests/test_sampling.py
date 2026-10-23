@@ -861,7 +861,17 @@ class TestTheReproduction:
         idx = s.reset_index()[["i", "t", "v"]].dropna()
         wide = idx.pivot_table(index="i", columns="t", values="v",
                                aggfunc="first").dropna()
-        assert (wide["2010-11"] == wide["2011-12"]).sum() == len(wide) == 2510
+        # GH #1120 D2: 30 linked households are recorded in 2011-12 only by
+        # its agriculture cover, so their 2011-12 v is a `moved-{hhid}`
+        # singleton (a household fact, not a renumbering -- Nigeria's stable
+        # boundaries carry its movers the same way).  Every household both
+        # covers locate keeps its v.
+        single = wide["2011-12"].astype(str).str.startswith("moved-")
+        n_single = int(single.sum())
+        assert n_single == 30, n_single
+        located = wide[~single]
+        n_kept = int((located["2010-11"] == located["2011-12"]).sum())
+        assert n_kept == len(located) == 2510, (n_kept, len(located))
         S._clear_sampling_reports()
         _, caught = warns(lambda: self._fresh("Uganda").sample(
             waves=["2005-06", "2009-10"]))

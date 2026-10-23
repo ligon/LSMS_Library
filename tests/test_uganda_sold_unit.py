@@ -589,7 +589,14 @@ def test_built_wave_carries_a_populated_sold_unit(uganda_module, wave, filename,
 # GH1198, 2026-10-22: source-cold native observations retain their own sold
 # labels and quantities, including the old reducer's blanked/conflicting rows.
 # Actual parent/current counts: 41,162 -> 41,241; paired-field oracle exact.
-SALE_ROWS_KNOWING_BOTH = 41_241         # Quantity_sold > 0, u != Unknown, Unit_sold notna
+# GH #1120 D3, 2026-10-23: 41,241 -> 41,340.  The +99 are rows of the 403
+# crop_production records whose blank parcel/plot id used to make plot_id NaN
+# (deleted by the builder's null-key exclusion); they are now served as
+# plot_id = 'unknown_plot' (cold base-vs-branch: 403 rows added, 0 removed, 0
+# changed).  Agreement 0.96135 -> 0.96139, 2009-10 A coverage 0.9679 ->
+# 0.9673 and the largest cell (165) stay inside their tolerances, so the
+# dated prose figures (40,083 / 41,162, 96.1%) remain accurate as dated.
+SALE_ROWS_KNOWING_BOTH = 41_340         # Quantity_sold > 0, u != Unknown, Unit_sold notna
 AGREEMENT_SHARE = 0.9613                # Unit_sold == u on those rows
 LARGEST_DISAGREEMENT_CELL = 165         # PRICED rows, u='Sack (100 kgs)' Unit_sold='Kg'
 W2009_10_A_COVERAGE = 0.968             # Unit_sold non-null / sale rows

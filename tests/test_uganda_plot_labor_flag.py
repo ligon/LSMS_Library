@@ -230,6 +230,8 @@ def test_every_served_zero_is_justified_by_the_source(uganda_module, t):
         hh = u._format_agsec_hhid(df[cm["hhid"]], t)
         pid = (hh.astype(str) + "-" + df[cm["parcel"]].apply(format_id).astype(str)
                + "-" + df[cm["plot"]].apply(format_id).astype(str))
+        # GH #1120 D3: a blank parcel / plot id is served as 'unknown_plot'.
+        pid = pid.where(pid.notna(), "unknown_plot")
         for source, flag_col, code in (("family", cm["family_flag"], 0),
                                        ("hired", cm["hired_flag"], 2)):
             cells = df[cm[source]].apply(lambda s: pd.to_numeric(s, errors="coerce"))
@@ -292,6 +294,8 @@ def test_every_reported_hired_wage_is_served(uganda_module, t):
         hh = u._format_agsec_hhid(df[cm["hhid"]], t)
         pid = (hh.astype(str) + "-" + df[cm["parcel"]].apply(format_id).astype(str)
                + "-" + df[cm["plot"]].apply(format_id).astype(str))
+        # GH #1120 D3: a blank parcel / plot id is served as 'unknown_plot'.
+        pid = pid.where(pid.notna(), "unknown_plot")
         wage = pd.to_numeric(df[cm["wage"]], errors="coerce")
         flag = pd.to_numeric(df[cm["hired_flag"]], errors="coerce")
         days = df[cm["hired"]].apply(lambda s: pd.to_numeric(s, errors="coerce"))

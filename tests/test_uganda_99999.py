@@ -355,11 +355,19 @@ def test_2009_10_no_99999_quantity_sentinel_remains(uganda_module, in_2009_10_wa
     # GH1198 (2026-10-22): 141 formerly coalesced native records are retained.
     # Sentinel eligibility, 360 existing null-key exclusions and all quantities
     # remain the same; the preceding historical count describes the old grain.
-    assert len(df) == 22549, (
-        f"row count changed: {len(df)} (expected 22,549 native observations)"
+    # GH #1120 D3 (2026-10-23): the 360 null-key exclusions are no longer
+    # excluded -- their blank parcel/plot id is served as plot_id =
+    # 'unknown_plot' -- so 22,549 -> 22,909 rows and 2,323 -> 2,327 households
+    # (4 households whose only harvest rows were plot-less); Quantity sum
+    # 967,662.84 -> 975,866.04.  No 99999 is among them.
+    n = len(df)
+    assert n == 22909, (
+        f"row count changed: {n} (expected 22,909 native observations)"
     )
+    n_unknown = int((df.index.get_level_values('plot_id') == 'unknown_plot').sum())
+    assert n_unknown == 360, f"{n_unknown} unknown_plot rows (expected 360)"
     hh = df.index.get_level_values('i')
-    assert hh.nunique() == 2323, f"household count changed: {hh.nunique()} (expected 2,323)"
+    assert hh.nunique() == 2327, f"household count changed: {hh.nunique()} (expected 2,327)"
     total = df["Quantity"].sum()
     assert 0 < total < 5_000_000, (
         f"Quantity sum {total} is not in the corrected order of magnitude "

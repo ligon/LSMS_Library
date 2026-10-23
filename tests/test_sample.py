@@ -465,6 +465,11 @@ class TestUganda2009HybridV:
       - 2 410 HH have a numeric-string `comm` (317 distinct EAs);
       - 541 HH have a synthetic `@lat,lon` label (~339 distinct bins);
       - 24 HH are genuinely NA (no comm AND no coords).
+
+    GH #1120 D2 (@ligon 2026-10-23): those 24 are no longer NA -- each is its
+    own singleton cluster `moved-{hhid}` -- and the frame also holds the 4
+    households only AGSEC3B / GSEC12 record (3 split-off ids + 1), each a
+    singleton too: 2975 -> 2979 rows, 24 NA -> 0, 28 singletons.
     """
 
     @pytest.fixture()
@@ -478,13 +483,18 @@ class TestUganda2009HybridV:
             pytest.skip("no 2009-10 wave in Uganda sample()")
 
     def test_row_count(self, s09):
-        assert len(s09) == 2975, f"expected 2975 HH, got {len(s09)}"
+        assert len(s09) == 2979, f"expected 2979 HH, got {len(s09)}"
 
     def test_na_exact(self, s09):
-        assert s09["v"].isna().sum() == 24, (
-            f"expected exactly 24 NA v's (geo-missing tail), got "
-            f"{s09['v'].isna().sum()}"
-        )
+        n_na = int(s09["v"].isna().sum())
+        assert n_na == 0, f"expected no NA v (GH #1120 D2), got {n_na}"
+        single = s09["v"].astype("string").str.startswith("moved-").fillna(False)
+        n_single = int(single.sum())
+        assert n_single == 28, (
+            f"expected 28 singleton v's (24 no-comm-no-GPS + 4 frame "
+            f"extension), got {n_single}")
+        n_distinct = s09.loc[single, "v"].nunique()
+        assert n_distinct == 28, f"singletons shared: {n_distinct} distinct"
 
     def test_no_empty_strings(self, s09):
         empty = (s09["v"] == "").sum()
@@ -496,13 +506,15 @@ class TestUganda2009HybridV:
         v = s09["v"].astype("string")
         numeric = v.str.fullmatch(r"\d+", na=False)
         synthetic = v.str.startswith("@").fillna(False)
+        single = v.str.startswith("moved-").fillna(False)   # GH #1120 D2
         na = v.isna()
         # No overlap.
         assert not (numeric & synthetic).any()
         assert not (numeric & na).any()
         assert not (synthetic & na).any()
+        assert not (single & (numeric | synthetic | na)).any()
         # Cover everyone.
-        assert (numeric | synthetic | na).all()
+        assert (numeric | synthetic | single | na).all()
 
     def test_real_comm_count(self, s09):
         numeric = s09["v"].astype("string").str.fullmatch(r"\d+", na=False)
@@ -586,13 +598,26 @@ class TestUgandaRegionOnSample:
     def test_region_coverage_per_wave(self, uga_sample):
         """All waves except (possibly) 2019-20 should have ≥99% HH with
         a populated Region.  2019-20 has a handful of NA in the
-        refreshment tail."""
+        refreshment tail.
+
+        GH #1120 D2: the frame also holds households only a NON-cover file
+        records (2009-10 4, 2011-12 57, 2018-19 66, each a `moved-{hhid}`
+        singleton); no file states their Region.  They are counted
+        separately, so the cover households' coverage is still checked."""
+        unlocated = {"2009-10": 4, "2011-12": 57, "2018-19": 66}
         for wave, sub in uga_sample.groupby("t"):
-            non_null = sub["Region"].notna().sum()
-            frac = non_null / len(sub)
+            v = sub["v"].astype("string")
+            no_region = sub["Region"].isna()
+            ext = v.str.startswith("moved-").fillna(False) & no_region
+            n_ext = int(ext.sum())
+            if wave != "2019-20":
+                assert n_ext == unlocated.get(wave, 0), (wave, n_ext)
+            cover = sub[~ext]
+            non_null = cover["Region"].notna().sum()
+            frac = non_null / len(cover)
             assert frac >= 0.995, (
                 f"{wave}: only {frac:.1%} of HH have Region populated "
-                f"({non_null}/{len(sub)})"
+                f"({non_null}/{len(cover)})"
             )
 
 
