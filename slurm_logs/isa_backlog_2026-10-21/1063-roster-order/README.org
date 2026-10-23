@@ -1,0 +1,171 @@
+#+TITLE: GH #1063 -- EHCVM household_roster row order: diagnosis and fix
+#+DATE: 2026-10-23
+
+Base: development =9a0ed5f3c= (checkout =worktrees/base-1240=).  Branch:
+=fix/1063-ehcvm-roster-order-20261023=.  Every build ran in a fresh private
+=LSMS_DATA_DIR= (=data-private/1063/<root>=, =dvc-cache= symlinked to the shared
+L1), with =OPENBLAS/OMP/MKL_NUM_THREADS=1=, =nice -n 19=, and at most 4 cores in
+use.  Import identity was asserted in every build (=scripts/build.py=).  This
+directory holds aggregates only: positions and counts, no household ids.
+
+* Root cause
+
+=lsms_library/country.py= (development, line 1931), in =Wave.grab_data='s
+=dfs:= branch:
+
+#+begin_src python
+merge_on =list(set('t').union(data_info.get('merge_on')))#a list
+#+end_src
+
+Python randomises =str= hashing per process, so the order of that list is
+drawn from =PYTHONHASHSEED= each time the interpreter starts.  For example,
+={'t','v','i'}= iterates as =v,i,t= under seed 1 and as =t,i,v= under seed 3.
+=pd.merge(..., how='outer')= sorts its result lexicographically by the keys in
+the order given.  With two or more non-=t= keys, a process therefore wrote the
+L2-wave parquet sorted either by cluster or by household id.  =t= is constant
+inside one =dfs:= build, so it never matters.
+
+The issue's "cold vs warm" and "re-seed vs earlier reads" pairs were two
+processes with different seeds.  Builds under the same seed are
+order-identical, whatever the backend or worker count:
+
+| condition varied                             | result                                                         |
+|----------------------------------------------+----------------------------------------------------------------|
+| two cold builds, same random/fixed seed      | identical (Benin: A=B=seed1=seed12345)                          |
+| =LSMS_BUILD_BACKEND=make= vs default         | differed once, but =make= under seed 3 = default under seed 3   |
+| =PYTHONHASHSEED= 1 vs 3 (=[v, i]= flips)     | *differs* (table below)                                         |
+| =LSMS_BUILD_WORKERS= 1 vs 2 (dev, seed 1)    | identical                                                       |
+| branch seed 3 + workers 4 vs seed 1 + workers 1 | identical (both axes varied together, as run)               |
+
+* Fix
+
+#+begin_src python
+merge_on = list(dict.fromkeys(['t', *data_info.get('merge_on')]))
+#+end_src
+
+The keys are =t=, then the declared =merge_on= order.  For the EHCVM rosters
+(=merge_on: [v, i]=, =final_index: [v, i, pid]=) the rows are therefore ordered by
+the index prefix =(t, v, i)=, with ties in member-file order.  This is not a
+blanket sort, so a =dfs:= block that was already deterministic keeps its order.
+
+* Which blocks can depend on key order (census of all 90 =dfs:= blocks)
+
+- 14 blocks are =outer= with >= 2 non-=t= keys, in 10 =(country, table)= cells:
+  =household_roster= for Benin, Burkina_Faso (x2), CotedIvoire, Guinea-Bissau,
+  Mali (x2), Niger (x2), Senegal (x2) and Togo; Nigeria 2012-13 =assets=
+  (=[i, j]=); and Serbia 2007 =sample= (=[opstina, popkrug]=).
+- 70 blocks have one non-=t= key.  Because =t= is constant, =(t,k)= and =(k,t)=
+  sort identically.
+- 6 blocks are GhanaSPS =merge_how: left=.  A left join preserves left order.
+- No sub-df maps =t=, and every =merge_on= is a list.
+
+* Order identity, affected cells (=affected.json=)
+
+Seeds were chosen to flip the two keys in the old set.  For =[v, i]=, seed 1
+gives =v= first and seed 3 gives =i= first.  For =[i, j]= and
+=[opstina, popkrug]=, seed 1 gives the declared order and seed 0 the reverse.
+"Warm" is a fresh process (seed 3) re-reading the branch seed-1 root.
+
+| cell                    |    rows | dev s_a vs s_b: positions differing (waves) | branch s_a vs s_b | branch cold vs warm | branch vs dev (declared-order seed) | sorted equal, branch vs dev |
+|-------------------------+---------+----------------------------------------------+-------------------+---------------------+-------------------------------------+-----------------------------|
+| Mali roster             | 220,732 | 6,474 (2018-19, 2021-22); first pos 131,246   | identical         | index order identical* | identical                        | yes                         |
+| CotedIvoire roster      | 111,788 | 12,725 (2018-19)                              | identical         | identical           | identical                           | yes                         |
+| Burkina_Faso roster     | 146,517 | 17,627 (2018-19, 2021-22)                     | identical         | identical           | identical                           | yes                         |
+| Niger roster            | 121,956 | 14,268 (2018-19, 2021-22)                     | identical         | identical           | identical                           | yes                         |
+| Senegal roster          | 129,650 | 21,639 (2018-19, 2021-22)                     | identical         | identical           | identical                           | yes                         |
+| Togo roster             |  27,480 | 4,882 (2018)                                  | identical         | identical           | identical                           | yes                         |
+| Guinea-Bissau roster    |  42,839 | 727 (2018-19)                                 | identical         | identical           | identical                           | yes                         |
+| Benin roster            |  42,343 | 14,491 (2018-19); first pos 0                 | identical         | identical           | identical                           | yes                         |
+| Serbia sample           |   5,557 | 5,557 (2007)                                  | identical         | identical           | identical                           | yes                         |
+| Nigeria assets          | 865,318 | 0 served (wave tier differs, below)           | identical         | identical           | identical (both seeds)              | yes                         |
+
+=*= Mali cold vs warm has an identical index order.  =MonthsSpent= is =object=
+cold and =StringDtype= warm.  That is the 2026-10-14 dtype round-trip finding
+(=release_landing_2026-10-14/dtype-roundtrip/REPORT.md=), and it reproduces on
+development under one seed (=dev_mali_s1w1= vs =_warm=).  It is out of scope
+here.
+
+So the served order of nine cells changes against the development builds that
+drew the "other" seed, and is unchanged against those that drew the declared
+order.
+
+Nigeria =assets= is the exception.  Its served frame was seed-invariant on
+development and is unchanged, but its 2012Q3 and 2013Q1 L2-wave parquets were
+not (175,855 of 175,857 positions differ between seeds 1 and 0).  Some step
+between the wave tier and the served frame re-sorts it.  That step was not
+investigated.
+
+* Order identity at the L2-wave tier (=wave_tier.json=)
+
+The issue also saw the wave parquets differ.  Each root's
+={wave}/_/<table>.parquet= was compared under seed 1 and the flipping seed:
+
+| tree        | wave parquets compared | order differs |
+|-------------+------------------------+---------------|
+| development |                     30 | 15: every EHCVM wave, Serbia 2007, Nigeria 2012Q3 and 2013Q1 |
+| branch      |                     30 | 0             |
+
+* Served-order footprint outside the affected cells (=footprint.json=)
+
+These cells were compared as development seed 1 vs seed 3 and branch seed 1 vs
+development under each seed.  All 27 comparisons are frame-identical, with
+order:
+
+- GhanaSPS =household_roster= (54,251 rows; multi-key =left= merges)
+- Uganda =cluster_features= (4,805; single-key =dfs:=)
+- Malawi =cluster_features= (3,235; single-key =dfs:=)
+- Azerbaijan =housing= (2,016; single-key =dfs:=)
+- Tajikistan =sample= (12,523; single-key =dfs:=)
+- Guyana =sample= (1,807; single-key =ed_key=)
+- Serbia =household_roster= (17,375; no =dfs:=)
+- Togo =sample= and Mali =sample= (6,171 / 24,939; EHCVM single-key =dfs:=)
+
+* Cache cost (=hash_census_diff.json=)
+
+The census was run with =hash_census.py= from
+=worktrees/1218/slurm_logs/isa_backlog_2026-10-21/1218-current-validation/=, on
+development vs the branch working tree.  =Wave.grab_data= is
+=@build_transform()=, so this edit moves every table:
+
+| hash                              | moved / total |
+|-----------------------------------+---------------|
+| =Country._table_cache_hash=       | 549 / 549     |
+| =build_transforms_fingerprint=    | 40 / 40       |
+| =Wave._input_hash=                | 2,109 / 2,109 |
+
+This is a corpus-wide cold re-warm.  It is meant to be bundled with the
+re-warm that open PRs #1233/#1251 already force.
+
+The branch census ran after the =country.py= edit and before the
+=Mali/_/CONTENTS.org= note.  =CONTENTS.org= is excluded from the =_/*.org= hash
+inputs (=CLAUDE.md=, "Cache Behavior"), so the committed tree gives the same
+counts.
+
+Every build and test here ran in a private =LSMS_DATA_DIR=.  The related suite
+used a copy of the shared warm cache at =data-private/1063/tests-br=.  The
+shared root (=/global/scratch/.../cache/lsms_library=) was not rebuilt at
+branch hashes.
+
+* Test
+
+=tests/test_gh1063_roster_order.py=:
+- two synthetic tests with no microdata, run as subprocesses under seeds probed
+  to flip =v=/=i=;
+- one static pin on the source;
+- one =requires_s3= test that builds Benin's served roster cold twice.
+
+| run                     | synthetic (3)                        | Benin (requires_s3)                       |
+|-------------------------+--------------------------------------+-------------------------------------------|
+| development =9a0ed5f3c= | 3 failed (seed 0 -> cluster order, seed 3 -> household order) | failed: index level 0 differs at 33.6% |
+| branch                  | 3 passed (~17 s; two ~5 s imports per test) | passed (~35-45 s, two concurrent builds) |
+
+=test_merge_key_order_is_spelled_without_a_set= is a deliberate static pin.
+It breaks if the line is refactored into a helper.  The two subprocess tests are
+what discriminate, so it can be dropped without losing coverage.
+
+Related suite on the branch: 21 files, 622 passed and 2 skipped.  Both skips
+are by design: the Togo/Benin parametrization in =test_gh323_benin_togo.py:142=.
+
+The seed probe must not use =python -I= or =-E=: isolated mode ignores
+=PYTHONHASHSEED=.  The first draft did, so its probe drew random seeds and the
+test passed on development by chance.  It is fixed and commented in the test.

@@ -1,0 +1,39 @@
+PR #1263 interaction (2026-10-23)
+
+#1263 head:      5239daecdbac44ba20be712531062590a19b91b9
+this branch:     d6ac4d35e (first #1259 commit)
+git merge-tree --write-tree 5239daecd d6ac4d35e -> 429f874b88eba2415f3e21c9eba41a1706893339, exit 0 (no conflict;
+tests/test_quantity_screen.py auto-merges: #1263 edits the tail pin, #1259 adds tests before the strict-mode section)
+Scratch merge (detached worktree at 5239daecd, 'git merge --no-commit --no-ff d6ac4d35e', never committed):
+write-tree == 429f874b8..., i.e. exactly the merge-tree result.
+
+Data: Tanzania crop_production cold-built from 5239daecd into a private LSMS_DATA_DIR (the test reads
+<data_root>/Tanzania/2020-21/_/crop_production.parquet, 11,125 rows).
+
+tests/test_quantity_screen.py
+  #1263 head alone, same data:   39 passed in 4.72s
+  merge (#1263 + #1259):         1 failed, 42 passed in 4.33s
+
+The one failure is #1263's re-formed pin, by design:
+  FAILED tests/test_quantity_screen.py::test_tanzania_2020_21_coconut_and_timber_rows_fire
+  tests/test_quantity_screen.py:704
+  >       assert Counter(k[2] for k in excess) == {
+  E       assert Counter() == {'Citrus Frui... 'Timber': 10}
+  E         Right contains 4 more items:
+  E         {'Citrus Fruits': 1, 'Coconuts': 1, 'Ripe Bananas': 1, 'Timber': 10}
+
+Assertions before it pass on the merge: len(real) == 13, real <= set(named_all).
+The 'known excess' is empty: the full-frame audit now names exactly the positive-subframe set.
+Under the merged rule the wave parquet reports n_implausible == 13, rows == 11,125 -- the
+pre-#637 pin ('assert report["n_implausible"] == 13') holds again.
+
+Sequencing:
+  - #1263 first, then #1259: #1259 must retire the excess block (delete the Counter / per-excess
+    loop, keep or restore 'n_implausible == 13'); #1259's own new tests are unaffected.
+  - #1259 first, then #1263: #1263's pin fails on rebase/merge until its excess block is
+    dropped; its 'real' (positive-subframe) bound already equals the full audit.
+
+Repeated on the final branch commit 2d5759325 (warning text + test docstring only):
+merge-tree -> 30b6e9f9eb4bb832e206b4fa8935c950d5c59b10, exit 0; scratch merge write-tree identical;
+tests/test_quantity_screen.py: 1 failed, 42 passed -- the same single failure at the same assertion.
+The scratch merge was aborted; the detached worktree is back at 5239daecd, clean.

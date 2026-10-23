@@ -1,0 +1,3512 @@
+{
+ "cells": [
+  {
+   "wave": "2010-11",
+   "half": "Full_Sample",
+   "module": "G",
+   "file": "Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_g.dta",
+   "columns": {
+    "crop": "ag_g0d",
+    "quantity": "ag_g13a",
+    "unit": "ag_g13b",
+    "crop_specify": "ag_g0d_os",
+    "unit_specify": "ag_g13b_os"
+   },
+   "column_labels": {
+    "ag_g0d": "CROP CODE",
+    "ag_g13a": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)",
+    "ag_g13b": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT)",
+    "ag_g0d_os": "Crop Code (Other Specify)",
+    "ag_g13b_os": "How much [CROP] did you harvest from this [PLOT]... (Unit) (Other Specify)"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER (SPECIFY)"
+    },
+    "crop_other": {
+     "48": "OTHER (SPECIFY"
+    },
+    "crop_variety_other": {
+     "10": "OTHER TOBACCO (SPECIFY)",
+     "16": "OTHER GROUNDNUT(SPECIFY)",
+     "26": "OTHER RICE(SPECIFY)"
+    }
+   },
+   "n_raw_rows": 28143,
+   "n_builder_rows": 27813,
+   "n_qty_notna": 27797,
+   "n_qty_pos": 26671,
+   "quantity_max": 12000.0,
+   "unit13": {
+    "rows": 42,
+    "share_of_builder_rows": 0.00151,
+    "rows_qty_notna": 42,
+    "share_of_qty_notna_rows": 0.001511,
+    "rows_qty_pos": 42,
+    "share_of_qty_pos_rows": 0.001575
+   },
+   "crop_other": {
+    "rows": 328,
+    "share_of_builder_rows": 0.011793,
+    "rows_qty_notna": 326,
+    "share_of_qty_notna_rows": 0.011728,
+    "rows_qty_pos": 301,
+    "share_of_qty_pos_rows": 0.011286
+   },
+   "crop_variety_other": {
+    "rows": 138,
+    "share_of_builder_rows": 0.004962,
+    "rows_qty_notna": 138,
+    "share_of_qty_notna_rows": 0.004965,
+    "rows_qty_pos": 136,
+    "share_of_qty_pos_rows": 0.005099
+   },
+   "unit13_or_crop_other": {
+    "rows": 366,
+    "share_of_builder_rows": 0.013159,
+    "rows_qty_notna": 364,
+    "share_of_qty_notna_rows": 0.013095,
+    "rows_qty_pos": 339,
+    "share_of_qty_pos_rows": 0.01271
+   },
+   "unit13_and_crop_other": 4,
+   "unit_codes": {
+    "value_counts": {
+     "1": 5377,
+     "2": 14611,
+     "3": 599,
+     "4": 242,
+     "5": 1631,
+     "6": 4,
+     "7": 5,
+     "8": 9,
+     "9": 28,
+     "10": 434,
+     "11": 1484,
+     "12": 2203,
+     "13": 42,
+     "50": 1
+    },
+    "n_unit_missing": 1143,
+    "in_data_not_labelled": [
+     50
+    ],
+    "labelled_not_in_data": []
+   },
+   "crop_other_share_of_kilogram_quantity": 0.003365,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 41,
+     "code_no_text": 1,
+     "text_other_code": 4
+    },
+    "profile_on_code13": {
+     "rows_with_text": 41,
+     "n_distinct": 16,
+     "n_singletons": 6,
+     "strings_to_cover_80pct": 9,
+     "strings_to_cover_90pct": 12,
+     "top": [
+      [
+       "LICHELO",
+       12
+      ],
+      [
+       "GRANARY",
+       7
+      ],
+      [
+       "NHOKWE",
+       2
+      ],
+      [
+       "TIN",
+       2
+      ],
+      [
+       "70 KG BAG",
+       2
+      ],
+      [
+       "UNSHIELDED",
+       2
+      ],
+      [
+       "TON",
+       2
+      ],
+      [
+       "1 TON",
+       2
+      ],
+      [
+       "BASIN",
+       2
+      ],
+      [
+       "70 KGS",
+       2
+      ],
+      [
+       "TRADITIONAL NKHOKWE",
+       1
+      ],
+      [
+       "3 TON TRUCK",
+       1
+      ],
+      [
+       "2 TOER",
+       1
+      ],
+      [
+       "OXCART",
+       1
+      ],
+      [
+       "0KG",
+       1
+      ],
+      [
+       "PIECES",
+       1
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 0,
+     "restates_dengu_basket (code 11)": 0,
+     "other_explicit_kg_size": 5,
+     "container_word (basin/pail/bucket/tin/litre)": 4,
+     "unclassified": 32
+    },
+    "text_on_other_codes_by_unit_code": {
+     "2": 3
+    },
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 41
+    }
+   },
+   "crop_specify": {
+    "quadrant_generic_other": {
+     "code_and_text": 326,
+     "code_no_text": 2,
+     "text_other_code": 150
+    },
+    "text_rows_by_crop_code": {
+     "1": 1,
+     "5": 2,
+     "10": 3,
+     "11": 1,
+     "16": 54,
+     "20": 1,
+     "21": 1,
+     "26": 79,
+     "27": 1,
+     "33": 1,
+     "36": 1,
+     "42": 4,
+     "46": 1,
+     "48": 326
+    },
+    "profile_on_generic_other": {
+     "rows_with_text": 326,
+     "n_distinct": 26,
+     "n_singletons": 13,
+     "strings_to_cover_80pct": 3,
+     "strings_to_cover_90pct": 7,
+     "top": [
+      [
+       "COWPEAS",
+       157
+      ],
+      [
+       "NSEULA",
+       77
+      ],
+      [
+       "NKHUNGUDZU",
+       31
+      ],
+      [
+       "CUCUMBER",
+       10
+      ],
+      [
+       "MSEWULA",
+       8
+      ],
+      [
+       "CHITOWE",
+       6
+      ],
+      [
+       "MANKHAMBA",
+       5
+      ],
+      [
+       "KALONGONDA",
+       4
+      ],
+      [
+       "EGGPLANT",
+       4
+      ],
+      [
+       "MPHOZA",
+       4
+      ],
+      [
+       "AFRICAN BEANS",
+       3
+      ],
+      [
+       "ZITHEBA",
+       2
+      ],
+      [
+       "NKHAKA",
+       2
+      ],
+      [
+       "TOBACCO",
+       1
+      ],
+      [
+       "PUMPKIN",
+       1
+      ],
+      [
+       "FINGERMILLET",
+       1
+      ],
+      [
+       "TSABOLA",
+       1
+      ],
+      [
+       "BUFFALO BEANS",
+       1
+      ],
+      [
+       "RAPE",
+       1
+      ],
+      [
+       "MPHONDA",
+       1
+      ],
+      [
+       "GREEN PAPER",
+       1
+      ],
+      [
+       "CHITHEBA",
+       1
+      ],
+      [
+       "KAPILE",
+       1
+      ],
+      [
+       "KAWALA",
+       1
+      ],
+      [
+       "MIKHAKA",
+       1
+      ],
+      [
+       "KABUTHU",
+       1
+      ]
+     ]
+    },
+    "generic_other_rows_text_says_cowpea": 157,
+    "profile_on_variety_other": {
+     "rows_with_text": 136,
+     "n_distinct": 12,
+     "n_singletons": 6,
+     "strings_to_cover_80pct": 2,
+     "strings_to_cover_90pct": 3,
+     "top": [
+      [
+       "RICE",
+       74
+      ],
+      [
+       "GROUNDNUTS",
+       45
+      ],
+      [
+       "KASAWAYA",
+       5
+      ],
+      [
+       "KALULU",
+       2
+      ],
+      [
+       "MAWAA",
+       2
+      ],
+      [
+       "KIDNEY BEANS",
+       2
+      ],
+      [
+       "MISI",
+       1
+      ],
+      [
+       "SHUARA",
+       1
+      ],
+      [
+       "KALISERE",
+       1
+      ],
+      [
+       "CHIZEWE",
+       1
+      ],
+      [
+       "KAMCHILA",
+       1
+      ],
+      [
+       "CHIKOPA",
+       1
+      ]
+     ]
+    }
+   },
+   "extra_text_on_generic_other": {},
+   "visit_value_counts": {
+    "1": 20540,
+    "2": 7273
+   }
+  },
+  {
+   "wave": "2010-11",
+   "half": "Full_Sample",
+   "module": "P",
+   "file": "Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_p.dta",
+   "columns": {
+    "crop": "ag_p0d",
+    "quantity": "ag_p09a",
+    "unit": "ag_p09b",
+    "crop_specify": "ag_p0d_os",
+    "unit_specify": "ag_p09b_os"
+   },
+   "column_labels": {
+    "ag_p0d": "TREE/PERMANENT CROP CODE",
+    "ag_p09a": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)",
+    "ag_p09b": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U)",
+    "ag_p0d_os": "Tree/Permanent Crop Code (Other Specify)",
+    "ag_p09b_os": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER (SPECIFY)"
+    },
+    "crop_other": {
+     "18": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {}
+   },
+   "n_raw_rows": 12531,
+   "n_builder_rows": 5797,
+   "n_qty_notna": 5781,
+   "n_qty_pos": 5643,
+   "quantity_max": 2000.0,
+   "unit13": {
+    "rows": 205,
+    "share_of_builder_rows": 0.035363,
+    "rows_qty_notna": 204,
+    "share_of_qty_notna_rows": 0.035288,
+    "rows_qty_pos": 203,
+    "share_of_qty_pos_rows": 0.035974
+   },
+   "crop_other": {
+    "rows": 36,
+    "share_of_builder_rows": 0.00621,
+    "rows_qty_notna": 36,
+    "share_of_qty_notna_rows": 0.006227,
+    "rows_qty_pos": 32,
+    "share_of_qty_pos_rows": 0.005671
+   },
+   "crop_variety_other": {
+    "rows": 0,
+    "share_of_builder_rows": 0.0,
+    "rows_qty_notna": 0,
+    "share_of_qty_notna_rows": 0.0,
+    "rows_qty_pos": 0,
+    "share_of_qty_pos_rows": 0.0
+   },
+   "unit13_or_crop_other": {
+    "rows": 240,
+    "share_of_builder_rows": 0.041401,
+    "rows_qty_notna": 239,
+    "share_of_qty_notna_rows": 0.041342,
+    "rows_qty_pos": 234,
+    "share_of_qty_pos_rows": 0.041467
+   },
+   "unit13_and_crop_other": 1,
+   "unit_codes": {
+    "value_counts": {
+     "1": 103,
+     "2": 1781,
+     "3": 143,
+     "4": 119,
+     "5": 263,
+     "6": 1,
+     "7": 2,
+     "8": 269,
+     "9": 135,
+     "10": 2,
+     "11": 2384,
+     "12": 246,
+     "13": 205
+    },
+    "n_unit_missing": 144,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": []
+   },
+   "crop_other_share_of_kilogram_quantity": 0.011926,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 205,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 205,
+     "n_distinct": 9,
+     "n_singletons": 3,
+     "strings_to_cover_80pct": 1,
+     "strings_to_cover_90pct": 2,
+     "top": [
+      [
+       "MKOKO",
+       172
+      ],
+      [
+       "CASE",
+       18
+      ],
+      [
+       "WHEELBARROW",
+       5
+      ],
+      [
+       "CHITAALA",
+       3
+      ],
+      [
+       "IN FARM",
+       2
+      ],
+      [
+       "PIECES",
+       2
+      ],
+      [
+       "NONE",
+       1
+      ],
+      [
+       "10 CASES",
+       1
+      ],
+      [
+       "276 KILOGRAMS",
+       1
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 0,
+     "restates_dengu_basket (code 11)": 0,
+     "other_explicit_kg_size": 1,
+     "container_word (basin/pail/bucket/tin/litre)": 0,
+     "unclassified": 204
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 203
+    }
+   },
+   "crop_specify": {
+    "quadrant_generic_other": {
+     "code_and_text": 22,
+     "code_no_text": 14,
+     "text_other_code": 17
+    },
+    "text_rows_by_crop_code": {
+     "10": 13,
+     "13": 1,
+     "16": 3,
+     "18": 22
+    },
+    "profile_on_generic_other": {
+     "rows_with_text": 22,
+     "n_distinct": 16,
+     "n_singletons": 11,
+     "strings_to_cover_80pct": 12,
+     "strings_to_cover_90pct": 14,
+     "top": [
+      [
+       "APPLE",
+       3
+      ],
+      [
+       "MABLOSE",
+       2
+      ],
+      [
+       "PEACHES",
+       2
+      ],
+      [
+       "STAFERA",
+       2
+      ],
+      [
+       "MAPULESI",
+       2
+      ],
+      [
+       "MAHUA",
+       1
+      ],
+      [
+       "MATOH",
+       1
+      ],
+      [
+       "PLUMS",
+       1
+      ],
+      [
+       "GRANADILLAS",
+       1
+      ],
+      [
+       "JAMBULA",
+       1
+      ],
+      [
+       "BWEMBA",
+       1
+      ],
+      [
+       "MASAWU",
+       1
+      ],
+      [
+       "MASTAFELA",
+       1
+      ],
+      [
+       "MPOZA",
+       1
+      ],
+      [
+       "MPONZA",
+       1
+      ],
+      [
+       "POZA",
+       1
+      ]
+     ]
+    },
+    "generic_other_rows_text_says_cowpea": 0,
+    "profile_on_variety_other": null
+   },
+   "extra_text_on_generic_other": {},
+   "visit_value_counts": {
+    "1": 4319,
+    "2": 1478
+   }
+  },
+  {
+   "wave": "2013-14",
+   "half": "Panel",
+   "module": "G",
+   "file": "Malawi/2013-14/Data/AG_MOD_G_13.dta",
+   "columns": {
+    "crop": "ag_g0b",
+    "quantity": "ag_g13a",
+    "unit": "ag_g13b",
+    "crop_specify": null,
+    "unit_specify": null
+   },
+   "column_labels": {
+    "ag_g0b": "CROP CODE",
+    "ag_g13a": "How much [CROP] did you harvest from this [PLOT] during the 2012/2013 rainy seas",
+    "ag_g13b": "How much [CROP] did you harvest from this [PLOT] during the 2012/2013 rainy seas"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER (SPECIFY)"
+    },
+    "crop_other": {
+     "48": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {
+     "10": "OTHER TOBACCO (SPECIFY)",
+     "16": "OTHER GROUNDNUT (SPECIFY)",
+     "26": "OTHER RICE (SPECIFY)"
+    }
+   },
+   "n_raw_rows": 10169,
+   "n_builder_rows": 9985,
+   "n_qty_notna": 9720,
+   "n_qty_pos": 9482,
+   "quantity_max": 22000.0,
+   "unit13": {
+    "rows": 96,
+    "share_of_builder_rows": 0.009614,
+    "rows_qty_notna": 96,
+    "share_of_qty_notna_rows": 0.009877,
+    "rows_qty_pos": 96,
+    "share_of_qty_pos_rows": 0.010124
+   },
+   "crop_other": {
+    "rows": 167,
+    "share_of_builder_rows": 0.016725,
+    "rows_qty_notna": 162,
+    "share_of_qty_notna_rows": 0.016667,
+    "rows_qty_pos": 152,
+    "share_of_qty_pos_rows": 0.01603
+   },
+   "crop_variety_other": {
+    "rows": 47,
+    "share_of_builder_rows": 0.004707,
+    "rows_qty_notna": 45,
+    "share_of_qty_notna_rows": 0.00463,
+    "rows_qty_pos": 45,
+    "share_of_qty_pos_rows": 0.004746
+   },
+   "unit13_or_crop_other": {
+    "rows": 261,
+    "share_of_builder_rows": 0.026139,
+    "rows_qty_notna": 256,
+    "share_of_qty_notna_rows": 0.026337,
+    "rows_qty_pos": 246,
+    "share_of_qty_pos_rows": 0.025944
+   },
+   "unit13_and_crop_other": 2,
+   "unit_codes": {
+    "value_counts": {
+     "1": 1853,
+     "2": 5119,
+     "3": 2,
+     "4": 188,
+     "5": 1044,
+     "6": 1,
+     "7": 4,
+     "8": 96,
+     "9": 54,
+     "10": 134,
+     "11": 2,
+     "12": 888,
+     "13": 96,
+     "18": 1,
+     "25": 1
+    },
+    "n_unit_missing": 502,
+    "in_data_not_labelled": [
+     3,
+     18,
+     25
+    ],
+    "labelled_not_in_data": []
+   },
+   "crop_other_share_of_kilogram_quantity": 0.005587,
+   "unit_specify": null,
+   "crop_specify": null,
+   "extra_text_on_generic_other": {}
+  },
+  {
+   "wave": "2013-14",
+   "half": "Panel",
+   "module": "P",
+   "file": "Malawi/2013-14/Data/AG_MOD_P_13.dta",
+   "columns": {
+    "crop": "ag_p0c",
+    "quantity": "ag_p09a",
+    "unit": "ag_p09b",
+    "crop_specify": null,
+    "unit_specify": null
+   },
+   "column_labels": {
+    "ag_p0c": "TREE/PERMANENT CROP CODE",
+    "ag_p09a": "How much [TREE / PERMANENT CROP] did you harvest during the last 12 months? (QUA",
+    "ag_p09b": "How much [TREE / PERMANENT CROP] did you harvest during the last 12 months? (UNI"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER (SPECIFY)"
+    },
+    "crop_other": {
+     "18": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {}
+   },
+   "n_raw_rows": 4505,
+   "n_builder_rows": 2714,
+   "n_qty_notna": 2695,
+   "n_qty_pos": 2623,
+   "quantity_max": 99.0,
+   "unit13": {
+    "rows": 122,
+    "share_of_builder_rows": 0.044952,
+    "rows_qty_notna": 122,
+    "share_of_qty_notna_rows": 0.045269,
+    "rows_qty_pos": 122,
+    "share_of_qty_pos_rows": 0.046512
+   },
+   "crop_other": {
+    "rows": 43,
+    "share_of_builder_rows": 0.015844,
+    "rows_qty_notna": 43,
+    "share_of_qty_notna_rows": 0.015955,
+    "rows_qty_pos": 41,
+    "share_of_qty_pos_rows": 0.015631
+   },
+   "crop_variety_other": {
+    "rows": 0,
+    "share_of_builder_rows": 0.0,
+    "rows_qty_notna": 0,
+    "share_of_qty_notna_rows": 0.0,
+    "rows_qty_pos": 0,
+    "share_of_qty_pos_rows": 0.0
+   },
+   "unit13_or_crop_other": {
+    "rows": 165,
+    "share_of_builder_rows": 0.060796,
+    "rows_qty_notna": 165,
+    "share_of_qty_notna_rows": 0.061224,
+    "rows_qty_pos": 163,
+    "share_of_qty_pos_rows": 0.062143
+   },
+   "unit13_and_crop_other": 0,
+   "unit_codes": {
+    "value_counts": {
+     "0": 3,
+     "1": 59,
+     "2": 1309,
+     "3": 79,
+     "4": 134,
+     "5": 456,
+     "6": 2,
+     "7": 1,
+     "8": 155,
+     "9": 136,
+     "10": 1,
+     "12": 169,
+     "13": 122
+    },
+    "n_unit_missing": 88,
+    "in_data_not_labelled": [
+     0
+    ],
+    "labelled_not_in_data": []
+   },
+   "crop_other_share_of_kilogram_quantity": 0.073156,
+   "unit_specify": null,
+   "crop_specify": null,
+   "extra_text_on_generic_other": {}
+  },
+  {
+   "wave": "2016-17",
+   "half": "Cross_Sectional",
+   "module": "G",
+   "file": "Malawi/2016-17/Data/Cross_Sectional/ag_mod_g.dta",
+   "columns": {
+    "crop": "crop_code",
+    "quantity": "ag_g13a",
+    "unit": "ag_g13b",
+    "crop_specify": null,
+    "unit_specify": "ag_g13b_oth"
+   },
+   "column_labels": {
+    "crop_code": "Consistent CC across Modules",
+    "ag_g13a": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)",
+    "ag_g13b": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT)",
+    "ag_g13b_oth": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (OTHER UNIT)",
+    "ag_g0e_1_oth": "What is the other specified primary variety of CROP being cultivated on [PLOT]",
+    "primary_variety": "Primary Variety"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER (SPECIFY)"
+    },
+    "crop_other": {
+     "48": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {
+     "10": "TOBACCO: OTHER SPECIFY",
+     "16": "GROUNDNUT: OTHER SPECIFY",
+     "26": "RICE: OTHER SPECIFY"
+    }
+   },
+   "n_raw_rows": 26506,
+   "n_builder_rows": 25975,
+   "n_qty_notna": 25932,
+   "n_qty_pos": 23783,
+   "quantity_max": 20000.0,
+   "unit13": {
+    "rows": 795,
+    "share_of_builder_rows": 0.030606,
+    "rows_qty_notna": 795,
+    "share_of_qty_notna_rows": 0.030657,
+    "rows_qty_pos": 795,
+    "share_of_qty_pos_rows": 0.033427
+   },
+   "crop_other": {
+    "rows": 371,
+    "share_of_builder_rows": 0.014283,
+    "rows_qty_notna": 367,
+    "share_of_qty_notna_rows": 0.014152,
+    "rows_qty_pos": 247,
+    "share_of_qty_pos_rows": 0.010386
+   },
+   "crop_variety_other": {
+    "rows": 143,
+    "share_of_builder_rows": 0.005505,
+    "rows_qty_notna": 142,
+    "share_of_qty_notna_rows": 0.005476,
+    "rows_qty_pos": 140,
+    "share_of_qty_pos_rows": 0.005887
+   },
+   "unit13_or_crop_other": {
+    "rows": 1148,
+    "share_of_builder_rows": 0.044196,
+    "rows_qty_notna": 1144,
+    "share_of_qty_notna_rows": 0.044115,
+    "rows_qty_pos": 1024,
+    "share_of_qty_pos_rows": 0.043056
+   },
+   "unit13_and_crop_other": 18,
+   "unit_codes": {
+    "value_counts": {
+     "1": 4670,
+     "2": 13786,
+     "4": 563,
+     "5": 2517,
+     "6": 1,
+     "7": 3,
+     "8": 46,
+     "9": 84,
+     "10": 380,
+     "12": 937,
+     "13": 795
+    },
+    "n_unit_missing": 2193,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": []
+   },
+   "crop_other_share_of_kilogram_quantity": 0.005055,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 758,
+     "code_no_text": 37,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 758,
+     "n_distinct": 48,
+     "n_singletons": 9,
+     "strings_to_cover_80pct": 7,
+     "strings_to_cover_90pct": 17,
+     "top": [
+      [
+       "90 KG BAG",
+       434
+      ],
+      [
+       "BASIN (SMALL)",
+       45
+      ],
+      [
+       "70 KG BAG",
+       35
+      ],
+      [
+       "DENGU",
+       31
+      ],
+      [
+       "TIN",
+       27
+      ],
+      [
+       "BASIN LA MULINGO",
+       26
+      ],
+      [
+       "BASIN",
+       19
+      ],
+      [
+       "100 KG BAG",
+       12
+      ],
+      [
+       "LICHELO",
+       9
+      ],
+      [
+       "50 KG BAG",
+       7
+      ],
+      [
+       "PAIL (MEDIUM)",
+       7
+      ],
+      [
+       "PAIL (SMALL)",
+       6
+      ],
+      [
+       "BAGS",
+       6
+      ],
+      [
+       "PAIL (LARGE)",
+       6
+      ],
+      [
+       "PAIL",
+       6
+      ],
+      [
+       "NKHOKWE",
+       6
+      ],
+      [
+       "CHIGOBA",
+       6
+      ],
+      [
+       "GRANARY",
+       4
+      ],
+      [
+       "BUCKET",
+       4
+      ],
+      [
+       "HEAP (LARGE)",
+       4
+      ],
+      [
+       "HEAP",
+       4
+      ],
+      [
+       "WINNOWER",
+       4
+      ],
+      [
+       "PAIL (40 LITRE)",
+       3
+      ],
+      [
+       "75 KG BAG",
+       3
+      ],
+      [
+       "TONE",
+       3
+      ],
+      [
+       "BASKET (LARGE)",
+       3
+      ],
+      [
+       "BASIN (LARGE)",
+       3
+      ],
+      [
+       "TINA",
+       3
+      ],
+      [
+       "PHAZI PLATE",
+       3
+      ],
+      [
+       "10 KG BAG",
+       2
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 434,
+     "restates_dengu_basket (code 11)": 39,
+     "other_explicit_kg_size": 65,
+     "container_word (basin/pail/bucket/tin/litre)": 158,
+     "unclassified": 62
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 758
+    }
+   },
+   "crop_specify": null,
+   "extra_text_on_generic_other": {
+    "ag_g0e_1_oth": {
+     "rows_with_text": 1,
+     "n_distinct": 1,
+     "n_singletons": 1,
+     "strings_to_cover_80pct": 1,
+     "strings_to_cover_90pct": 1,
+     "top": [
+      [
+       "LOCAL MAIZE",
+       1
+      ]
+     ]
+    },
+    "primary_variety": {
+     "rows_with_text": 1,
+     "n_distinct": 1,
+     "n_singletons": 1,
+     "strings_to_cover_80pct": 1,
+     "strings_to_cover_90pct": 1,
+     "top": [
+      [
+       "LOCAL MAIZE",
+       1
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "wave": "2016-17",
+   "half": "Cross_Sectional",
+   "module": "P",
+   "file": "Malawi/2016-17/Data/Cross_Sectional/ag_mod_p.dta",
+   "columns": {
+    "crop": "ag_p0c",
+    "quantity": "ag_p09a",
+    "unit": "ag_p09b",
+    "crop_specify": "ag_p0c_oth",
+    "unit_specify": "ag_p09b_oth"
+   },
+   "column_labels": {
+    "ag_p0c": "TREE/PERMANENT CROP CODE",
+    "ag_p09a": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)",
+    "ag_p09b": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U)",
+    "ag_p0c_oth": "Tree/Permanent Crop Code (Other Specify)",
+    "ag_p09b_oth": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)",
+    "ag_p0_crops": "FOR EACH PLOT, LIST ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12MONTHS"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER(SPECIFY)"
+    },
+    "crop_other": {
+     "21": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {}
+   },
+   "n_raw_rows": 4251,
+   "n_builder_rows": 3959,
+   "n_qty_notna": 3933,
+   "n_qty_pos": 3361,
+   "quantity_max": 999999.0,
+   "unit13": {
+    "rows": 130,
+    "share_of_builder_rows": 0.032837,
+    "rows_qty_notna": 130,
+    "share_of_qty_notna_rows": 0.033054,
+    "rows_qty_pos": 130,
+    "share_of_qty_pos_rows": 0.038679
+   },
+   "crop_other": {
+    "rows": 39,
+    "share_of_builder_rows": 0.009851,
+    "rows_qty_notna": 39,
+    "share_of_qty_notna_rows": 0.009916,
+    "rows_qty_pos": 36,
+    "share_of_qty_pos_rows": 0.010711
+   },
+   "crop_variety_other": {
+    "rows": 0,
+    "share_of_builder_rows": 0.0,
+    "rows_qty_notna": 0,
+    "share_of_qty_notna_rows": 0.0,
+    "rows_qty_pos": 0,
+    "share_of_qty_pos_rows": 0.0
+   },
+   "unit13_or_crop_other": {
+    "rows": 167,
+    "share_of_builder_rows": 0.042182,
+    "rows_qty_notna": 167,
+    "share_of_qty_notna_rows": 0.042461,
+    "rows_qty_pos": 164,
+    "share_of_qty_pos_rows": 0.048795
+   },
+   "unit13_and_crop_other": 2,
+   "unit_codes": {
+    "value_counts": {
+     "1": 56,
+     "2": 1738,
+     "3": 210,
+     "4": 123,
+     "5": 449,
+     "7": 1,
+     "8": 158,
+     "9": 111,
+     "11": 326,
+     "12": 59,
+     "13": 130
+    },
+    "n_unit_missing": 598,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": [
+     6,
+     10
+    ]
+   },
+   "crop_other_share_of_kilogram_quantity": 0.0,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 130,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 130,
+     "n_distinct": 25,
+     "n_singletons": 10,
+     "strings_to_cover_80pct": 8,
+     "strings_to_cover_90pct": 14,
+     "top": [
+      [
+       "CLUSTER",
+       55
+      ],
+      [
+       "TREE",
+       18
+      ],
+      [
+       "DOZEN",
+       8
+      ],
+      [
+       "CASE",
+       7
+      ],
+      [
+       "90 KG BAG",
+       5
+      ],
+      [
+       "TIN",
+       5
+      ],
+      [
+       "90KGBAG",
+       3
+      ],
+      [
+       "BASIN (SMALL)",
+       3
+      ],
+      [
+       "TONNE",
+       3
+      ],
+      [
+       "BUNCH",
+       3
+      ],
+      [
+       "50 KG BAG",
+       2
+      ],
+      [
+       "PIECE",
+       2
+      ],
+      [
+       "BASKET (UNSPECIFIED SIZE)",
+       2
+      ],
+      [
+       "BASIN (UNSPECIFIED SIZE)",
+       2
+      ],
+      [
+       "PAIL (UNSPECIFIED SIZE)",
+       2
+      ],
+      [
+       "90KG",
+       1
+      ],
+      [
+       "10 KG BAG",
+       1
+      ],
+      [
+       "BASKET",
+       1
+      ],
+      [
+       "MIKOKO",
+       1
+      ],
+      [
+       "PAIL (LARGE)",
+       1
+      ],
+      [
+       "70 KG BAG",
+       1
+      ],
+      [
+       "WINNOWER",
+       1
+      ],
+      [
+       "BASINS(DISH)",
+       1
+      ],
+      [
+       "NDOWA",
+       1
+      ],
+      [
+       "BASIN",
+       1
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 9,
+     "restates_dengu_basket (code 11)": 3,
+     "other_explicit_kg_size": 4,
+     "container_word (basin/pail/bucket/tin/litre)": 15,
+     "unclassified": 99
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 130
+    }
+   },
+   "crop_specify": {
+    "quadrant_generic_other": {
+     "code_and_text": 39,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "text_rows_by_crop_code": {
+     "21": 39
+    },
+    "profile_on_generic_other": {
+     "rows_with_text": 39,
+     "n_distinct": 19,
+     "n_singletons": 11,
+     "strings_to_cover_80pct": 12,
+     "strings_to_cover_90pct": 16,
+     "top": [
+      [
+       "MALAMBE",
+       9
+      ],
+      [
+       "SUGARCANE",
+       5
+      ],
+      [
+       "JACKFRUIT",
+       3
+      ],
+      [
+       "BOABAB TREE",
+       3
+      ],
+      [
+       "COCOA",
+       2
+      ],
+      [
+       "CASSAVA",
+       2
+      ],
+      [
+       "MULBERRY",
+       2
+      ],
+      [
+       "TAMARIND TREE",
+       2
+      ],
+      [
+       "PINE",
+       1
+      ],
+      [
+       "PALM TREE",
+       1
+      ],
+      [
+       "ENGLISHMAIZE",
+       1
+      ],
+      [
+       "STRAWBERRY",
+       1
+      ],
+      [
+       "WATERBERRY",
+       1
+      ],
+      [
+       "DEFFFERENTKINDS",
+       1
+      ],
+      [
+       "PEACHES",
+       1
+      ],
+      [
+       "LICHESI",
+       1
+      ],
+      [
+       "APPLES",
+       1
+      ],
+      [
+       "PLUM",
+       1
+      ],
+      [
+       "LOKOTI",
+       1
+      ]
+     ]
+    },
+    "generic_other_rows_text_says_cowpea": 0,
+    "profile_on_variety_other": null
+   },
+   "extra_text_on_generic_other": {
+    "ag_p0_crops": {
+     "rows_with_text": 39,
+     "n_distinct": 26,
+     "n_singletons": 19,
+     "strings_to_cover_80pct": 19,
+     "strings_to_cover_90pct": 23,
+     "top": [
+      [
+       "MALAMBE",
+       5
+      ],
+      [
+       "SUGAR CANE",
+       4
+      ],
+      [
+       "JEKE FOOD",
+       3
+      ],
+      [
+       "COCOA",
+       2
+      ],
+      [
+       "BWEMBA",
+       2
+      ],
+      [
+       "BAOBAB TREES",
+       2
+      ],
+      [
+       "MALAMBE TREES",
+       2
+      ],
+      [
+       "PINE",
+       1
+      ],
+      [
+       "PALM OIL TREE",
+       1
+      ],
+      [
+       "\"NKONDEZI CASSAVA \"",
+       1
+      ],
+      [
+       "\"MKOMBEZI CASSAVA \"",
+       1
+      ],
+      [
+       "\"ENGLISH MAIZE \"",
+       1
+      ],
+      [
+       "\"MULBERRIES \"",
+       1
+      ],
+      [
+       "\"MATUBENI OR MULBERRY \"",
+       1
+      ],
+      [
+       "STRAWBERRY",
+       1
+      ]
+     ]
+    }
+   },
+   "ag_p09_1_condition": {
+    "label": "What was the condition of [TREE/PERM CROP]?",
+    "value_labels": {
+     "1": "fresh",
+     "2": "dry",
+     "3": "NOT APPLICABLE."
+    },
+    "value_counts": {
+     "1": 2325,
+     "NA": 970,
+     "2": 350,
+     "3": 314
+    }
+   }
+  },
+  {
+   "wave": "2016-17",
+   "half": "Panel",
+   "module": "G",
+   "file": "Malawi/2016-17/Data/Panel/ag_mod_g_16.dta",
+   "columns": {
+    "crop": "crop_code",
+    "quantity": "ag_g13a",
+    "unit": "ag_g13b",
+    "crop_specify": null,
+    "unit_specify": "ag_g13b_oth"
+   },
+   "column_labels": {
+    "crop_code": "Consistent CC across Modules",
+    "ag_g13a": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)",
+    "ag_g13b": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT)",
+    "ag_g13b_oth": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (OTHER UNIT)",
+    "ag_g0e_oth": "What is the other specified primary variety of CROP being cultivated on [PLOT]",
+    "primary_variety": "Primary Variety"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER (SPECIFY)"
+    },
+    "crop_other": {
+     "48": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {
+     "10": "TOBACCO: OTHER SPECIFY",
+     "16": "GROUNDNUT: OTHER SPECIFY",
+     "26": "RICE: OTHER SPECIFY"
+    }
+   },
+   "n_raw_rows": 6289,
+   "n_builder_rows": 6289,
+   "n_qty_notna": 6171,
+   "n_qty_pos": 5353,
+   "quantity_max": 23000.0,
+   "unit13": {
+    "rows": 105,
+    "share_of_builder_rows": 0.016696,
+    "rows_qty_notna": 105,
+    "share_of_qty_notna_rows": 0.017015,
+    "rows_qty_pos": 94,
+    "share_of_qty_pos_rows": 0.01756
+   },
+   "crop_other": {
+    "rows": 111,
+    "share_of_builder_rows": 0.01765,
+    "rows_qty_notna": 110,
+    "share_of_qty_notna_rows": 0.017825,
+    "rows_qty_pos": 74,
+    "share_of_qty_pos_rows": 0.013824
+   },
+   "crop_variety_other": {
+    "rows": 26,
+    "share_of_builder_rows": 0.004134,
+    "rows_qty_notna": 25,
+    "share_of_qty_notna_rows": 0.004051,
+    "rows_qty_pos": 20,
+    "share_of_qty_pos_rows": 0.003736
+   },
+   "unit13_or_crop_other": {
+    "rows": 211,
+    "share_of_builder_rows": 0.033551,
+    "rows_qty_notna": 210,
+    "share_of_qty_notna_rows": 0.03403,
+    "rows_qty_pos": 164,
+    "share_of_qty_pos_rows": 0.030637
+   },
+   "unit13_and_crop_other": 5,
+   "unit_codes": {
+    "value_counts": {
+     "1": 1887,
+     "2": 3044,
+     "4": 108,
+     "5": 460,
+     "8": 11,
+     "9": 7,
+     "10": 38,
+     "12": 210,
+     "13": 105
+    },
+    "n_unit_missing": 419,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": [
+     6,
+     7
+    ]
+   },
+   "crop_other_share_of_kilogram_quantity": 0.006443,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 57,
+     "code_no_text": 48,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 57,
+     "n_distinct": 11,
+     "n_singletons": 5,
+     "strings_to_cover_80pct": 3,
+     "strings_to_cover_90pct": 6,
+     "top": [
+      [
+       "90 KG BAG",
+       41
+      ],
+      [
+       "TIN",
+       3
+      ],
+      [
+       "50 KG BAG",
+       2
+      ],
+      [
+       "HEAP (LARGE)",
+       2
+      ],
+      [
+       "BASIN",
+       2
+      ],
+      [
+       "DENGU",
+       2
+      ],
+      [
+       "TONE",
+       1
+      ],
+      [
+       "80 KG BAG",
+       1
+      ],
+      [
+       "CHIGOBA",
+       1
+      ],
+      [
+       "BASKET",
+       1
+      ],
+      [
+       "PAIL (20 LITRE)",
+       1
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 41,
+     "restates_dengu_basket (code 11)": 3,
+     "other_explicit_kg_size": 3,
+     "container_word (basin/pail/bucket/tin/litre)": 6,
+     "unclassified": 4
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 57
+    }
+   },
+   "crop_specify": null,
+   "extra_text_on_generic_other": {
+    "ag_g0e_oth": {
+     "rows_with_text": 7,
+     "n_distinct": 3,
+     "n_singletons": 2,
+     "strings_to_cover_80pct": 2,
+     "strings_to_cover_90pct": 3,
+     "top": [
+      [
+       "NKHOBWE",
+       5
+      ],
+      [
+       "HYBRID MAIZE",
+       1
+      ],
+      [
+       "NKHWANI",
+       1
+      ]
+     ]
+    },
+    "primary_variety": {
+     "rows_with_text": 7,
+     "n_distinct": 3,
+     "n_singletons": 2,
+     "strings_to_cover_80pct": 2,
+     "strings_to_cover_90pct": 3,
+     "top": [
+      [
+       "NKHOBWE",
+       5
+      ],
+      [
+       "HYBRID MAIZE",
+       1
+      ],
+      [
+       "NKHWANI",
+       1
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "wave": "2016-17",
+   "half": "Panel",
+   "module": "P",
+   "file": "Malawi/2016-17/Data/Panel/ag_mod_p_16.dta",
+   "columns": {
+    "crop": "crop_code",
+    "quantity": "ag_p09a",
+    "unit": "ag_p09b",
+    "crop_specify": "ag_p0d_oth",
+    "unit_specify": "ag_p09b_oth"
+   },
+   "column_labels": {
+    "crop_code": "TREE/PERMANENT CROP CODE",
+    "ag_p09a": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)",
+    "ag_p09b": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U)",
+    "ag_p0d_oth": "Tree/Permanent Crop Code (Other Specify)",
+    "ag_p09b_oth": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)",
+    "ag_p0_crops": "FOR EACH PLOT, LIST ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12MONTHS"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER(SPECIFY)"
+    },
+    "crop_other": {
+     "21": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {}
+   },
+   "n_raw_rows": 1064,
+   "n_builder_rows": 964,
+   "n_qty_notna": 951,
+   "n_qty_pos": 767,
+   "quantity_max": 7000.0,
+   "unit13": {
+    "rows": 25,
+    "share_of_builder_rows": 0.025934,
+    "rows_qty_notna": 25,
+    "share_of_qty_notna_rows": 0.026288,
+    "rows_qty_pos": 25,
+    "share_of_qty_pos_rows": 0.032595
+   },
+   "crop_other": {
+    "rows": 1,
+    "share_of_builder_rows": 0.001037,
+    "rows_qty_notna": 1,
+    "share_of_qty_notna_rows": 0.001052,
+    "rows_qty_pos": 1,
+    "share_of_qty_pos_rows": 0.001304
+   },
+   "crop_variety_other": {
+    "rows": 0,
+    "share_of_builder_rows": 0.0,
+    "rows_qty_notna": 0,
+    "share_of_qty_notna_rows": 0.0,
+    "rows_qty_pos": 0,
+    "share_of_qty_pos_rows": 0.0
+   },
+   "unit13_or_crop_other": {
+    "rows": 26,
+    "share_of_builder_rows": 0.026971,
+    "rows_qty_notna": 26,
+    "share_of_qty_notna_rows": 0.02734,
+    "rows_qty_pos": 26,
+    "share_of_qty_pos_rows": 0.033898
+   },
+   "unit13_and_crop_other": 0,
+   "unit_codes": {
+    "value_counts": {
+     "1": 7,
+     "2": 361,
+     "3": 40,
+     "4": 31,
+     "5": 123,
+     "6": 3,
+     "7": 1,
+     "8": 37,
+     "9": 37,
+     "10": 1,
+     "11": 94,
+     "12": 6,
+     "13": 25
+    },
+    "n_unit_missing": 198,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": []
+   },
+   "crop_other_share_of_kilogram_quantity": 0.0,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 25,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 25,
+     "n_distinct": 7,
+     "n_singletons": 3,
+     "strings_to_cover_80pct": 3,
+     "strings_to_cover_90pct": 5,
+     "top": [
+      [
+       "CLUSTER",
+       15
+      ],
+      [
+       "BASIN (SMALL)",
+       3
+      ],
+      [
+       "90 KG BAG",
+       2
+      ],
+      [
+       "TREE",
+       2
+      ],
+      [
+       "BUCKET",
+       1
+      ],
+      [
+       "PIECE",
+       1
+      ],
+      [
+       "HALF50KGBAG",
+       1
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 2,
+     "restates_dengu_basket (code 11)": 0,
+     "other_explicit_kg_size": 1,
+     "container_word (basin/pail/bucket/tin/litre)": 4,
+     "unclassified": 18
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 25
+    }
+   },
+   "crop_specify": {
+    "quadrant_generic_other": {
+     "code_and_text": 1,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "text_rows_by_crop_code": {
+     "21": 1
+    },
+    "profile_on_generic_other": {
+     "rows_with_text": 1,
+     "n_distinct": 1,
+     "n_singletons": 1,
+     "strings_to_cover_80pct": 1,
+     "strings_to_cover_90pct": 1,
+     "top": [
+      [
+       "SUGARCANE",
+       1
+      ]
+     ]
+    },
+    "generic_other_rows_text_says_cowpea": 0,
+    "profile_on_variety_other": null
+   },
+   "extra_text_on_generic_other": {
+    "ag_p0_crops": {
+     "rows_with_text": 1,
+     "n_distinct": 1,
+     "n_singletons": 1,
+     "strings_to_cover_80pct": 1,
+     "strings_to_cover_90pct": 1,
+     "top": [
+      [
+       "T01_SUGARCANE",
+       1
+      ]
+     ]
+    }
+   },
+   "ag_p09_1_condition": {
+    "label": "What was the condition of [TREE/PERM CROP]?",
+    "value_labels": {
+     "1": "FRESH",
+     "2": "DRY",
+     "3": "NOT APPLICABLE."
+    },
+    "value_counts": {
+     "1": 629,
+     "NA": 197,
+     "3": 95,
+     "2": 43
+    }
+   }
+  },
+  {
+   "wave": "2019-20",
+   "half": "Cross_Sectional",
+   "module": "G",
+   "file": "Malawi/2019-20/Data/Cross_Sectional/ag_mod_g.dta",
+   "columns": {
+    "crop": "crop_code",
+    "quantity": "ag_g13a",
+    "unit": "ag_g13b",
+    "crop_specify": null,
+    "unit_specify": "ag_g13b_oth"
+   },
+   "column_labels": {
+    "crop_code": "Crop ID",
+    "ag_g13a": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)",
+    "ag_g13b": "How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT)",
+    "ag_g13b_oth": "Specify Unit",
+    "ag_g0e_1_oth": "Please specify other variety"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER (SPECIFY)"
+    },
+    "crop_other": {
+     "48": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {
+     "10": "OTHER TOBACCO (SPECIFY)",
+     "16": "OTHER GROUNDNUT (SPECIFY)",
+     "26": "OTHER RICE (SPECIFY)"
+    }
+   },
+   "n_raw_rows": 32677,
+   "n_builder_rows": 32651,
+   "n_qty_notna": 32609,
+   "n_qty_pos": 30879,
+   "quantity_max": 56000.0,
+   "unit13": {
+    "rows": 600,
+    "share_of_builder_rows": 0.018376,
+    "rows_qty_notna": 600,
+    "share_of_qty_notna_rows": 0.0184,
+    "rows_qty_pos": 600,
+    "share_of_qty_pos_rows": 0.019431
+   },
+   "crop_other": {
+    "rows": 990,
+    "share_of_builder_rows": 0.030321,
+    "rows_qty_notna": 990,
+    "share_of_qty_notna_rows": 0.03036,
+    "rows_qty_pos": 884,
+    "share_of_qty_pos_rows": 0.028628
+   },
+   "crop_variety_other": {
+    "rows": 354,
+    "share_of_builder_rows": 0.010842,
+    "rows_qty_notna": 353,
+    "share_of_qty_notna_rows": 0.010825,
+    "rows_qty_pos": 348,
+    "share_of_qty_pos_rows": 0.01127
+   },
+   "unit13_or_crop_other": {
+    "rows": 1564,
+    "share_of_builder_rows": 0.047901,
+    "rows_qty_notna": 1564,
+    "share_of_qty_notna_rows": 0.047962,
+    "rows_qty_pos": 1458,
+    "share_of_qty_pos_rows": 0.047217
+   },
+   "unit13_and_crop_other": 26,
+   "unit_codes": {
+    "value_counts": {
+     "1": 6497,
+     "2": 17909,
+     "4": 902,
+     "5": 3769,
+     "6": 9,
+     "7": 5,
+     "8": 84,
+     "9": 141,
+     "10": 326,
+     "12": 636,
+     "13": 600
+    },
+    "n_unit_missing": 1773,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": []
+   },
+   "crop_other_share_of_kilogram_quantity": 0.018303,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 600,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 600,
+     "n_distinct": 108,
+     "n_singletons": 61,
+     "strings_to_cover_80pct": 23,
+     "strings_to_cover_90pct": 48,
+     "top": [
+      [
+       "90KG BAG",
+       97
+      ],
+      [
+       "DENGU",
+       60
+      ],
+      [
+       "BASKET",
+       58
+      ],
+      [
+       "90 KG BAG",
+       57
+      ],
+      [
+       "BASIN LARGE",
+       32
+      ],
+      [
+       "70 KG BAGS",
+       24
+      ],
+      [
+       "CHIGOBA",
+       24
+      ],
+      [
+       "BASIN",
+       23
+      ],
+      [
+       "SMALL BASIN",
+       15
+      ],
+      [
+       "90KG",
+       10
+      ],
+      [
+       "70 KG BAG",
+       10
+      ],
+      [
+       "BASIN SMALL",
+       8
+      ],
+      [
+       "BAGS",
+       7
+      ],
+      [
+       "70KG",
+       7
+      ],
+      [
+       "TONES",
+       6
+      ],
+      [
+       "90KG BAGS",
+       6
+      ],
+      [
+       "BASKET (DENGU)",
+       6
+      ],
+      [
+       "70KG BAG",
+       5
+      ],
+      [
+       "LARGE PAIL",
+       5
+      ],
+      [
+       "BASKETS",
+       5
+      ],
+      [
+       "BAG",
+       5
+      ],
+      [
+       "BASINS",
+       5
+      ],
+      [
+       "5 LITRE BASIN",
+       5
+      ],
+      [
+       "50KG BAG",
+       4
+      ],
+      [
+       "HEAP",
+       4
+      ],
+      [
+       "LARGE BASKET",
+       4
+      ],
+      [
+       "NDOWA",
+       4
+      ],
+      [
+       "40LITRE PAIL",
+       3
+      ],
+      [
+       "LARGE BUNDLES",
+       3
+      ],
+      [
+       "WHEELBARROW",
+       3
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 179,
+     "restates_dengu_basket (code 11)": 145,
+     "other_explicit_kg_size": 62,
+     "container_word (basin/pail/bucket/tin/litre)": 117,
+     "unclassified": 97
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 600
+    }
+   },
+   "crop_specify": null,
+   "extra_text_on_generic_other": {
+    "ag_g0e_1_oth": {
+     "rows_with_text": 0,
+     "n_distinct": 0,
+     "n_singletons": 0,
+     "strings_to_cover_80pct": 0,
+     "strings_to_cover_90pct": 0,
+     "top": []
+    }
+   }
+  },
+  {
+   "wave": "2019-20",
+   "half": "Cross_Sectional",
+   "module": "P",
+   "file": "Malawi/2019-20/Data/Cross_Sectional/ag_mod_p.dta",
+   "columns": {
+    "crop": "ag_p0c",
+    "quantity": "ag_p09a",
+    "unit": "ag_p09b",
+    "crop_specify": "ag_p0c_oth",
+    "unit_specify": "ag_p09b_oth"
+   },
+   "column_labels": {
+    "ag_p0c": "CROP CODE",
+    "ag_p09a": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)",
+    "ag_p09b": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U)",
+    "ag_p0c_oth": "SPECIFY CROP CODE",
+    "ag_p09b_oth": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)",
+    "ag_p0_crops": "FOR EACH PLOT, LIST ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12MONTHS"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER(SPECIFY)"
+    },
+    "crop_other": {
+     "21": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {}
+   },
+   "n_raw_rows": 7893,
+   "n_builder_rows": 7883,
+   "n_qty_notna": 7859,
+   "n_qty_pos": 7050,
+   "quantity_max": 12000.0,
+   "unit13": {
+    "rows": 137,
+    "share_of_builder_rows": 0.017379,
+    "rows_qty_notna": 137,
+    "share_of_qty_notna_rows": 0.017432,
+    "rows_qty_pos": 137,
+    "share_of_qty_pos_rows": 0.019433
+   },
+   "crop_other": {
+    "rows": 312,
+    "share_of_builder_rows": 0.039579,
+    "rows_qty_notna": 312,
+    "share_of_qty_notna_rows": 0.0397,
+    "rows_qty_pos": 213,
+    "share_of_qty_pos_rows": 0.030213
+   },
+   "crop_variety_other": {
+    "rows": 0,
+    "share_of_builder_rows": 0.0,
+    "rows_qty_notna": 0,
+    "share_of_qty_notna_rows": 0.0,
+    "rows_qty_pos": 0,
+    "share_of_qty_pos_rows": 0.0
+   },
+   "unit13_or_crop_other": {
+    "rows": 430,
+    "share_of_builder_rows": 0.054548,
+    "rows_qty_notna": 430,
+    "share_of_qty_notna_rows": 0.054714,
+    "rows_qty_pos": 331,
+    "share_of_qty_pos_rows": 0.04695
+   },
+   "unit13_and_crop_other": 19,
+   "unit_codes": {
+    "value_counts": {
+     "1": 364,
+     "2": 3125,
+     "3": 275,
+     "4": 369,
+     "5": 1091,
+     "6": 2,
+     "7": 5,
+     "8": 601,
+     "9": 311,
+     "10": 1,
+     "11": 613,
+     "12": 156,
+     "13": 137
+    },
+    "n_unit_missing": 833,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": []
+   },
+   "crop_other_share_of_kilogram_quantity": 0.02173,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 137,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 137,
+     "n_distinct": 55,
+     "n_singletons": 32,
+     "strings_to_cover_80pct": 28,
+     "strings_to_cover_90pct": 42,
+     "top": [
+      [
+       "CLUSTER",
+       14
+      ],
+      [
+       "CLUSTERS",
+       13
+      ],
+      [
+       "TREES",
+       8
+      ],
+      [
+       "BUNDLES",
+       7
+      ],
+      [
+       "DOZEN",
+       7
+      ],
+      [
+       "5 LITRE BUCKET",
+       6
+      ],
+      [
+       "HALF",
+       5
+      ],
+      [
+       "CASE",
+       4
+      ],
+      [
+       "DOZENS",
+       4
+      ],
+      [
+       "BUNCH",
+       4
+      ],
+      [
+       "5 LITER CHIGOBA",
+       4
+      ],
+      [
+       "5 LITRES CHIGOBA",
+       3
+      ],
+      [
+       "BASIN LARGE",
+       3
+      ],
+      [
+       "SMALL BASIN",
+       3
+      ],
+      [
+       "MIKOKO",
+       3
+      ],
+      [
+       "90KG BAG",
+       3
+      ],
+      [
+       "BASIN SMALL",
+       2
+      ],
+      [
+       "MTOLO",
+       2
+      ],
+      [
+       "TAN",
+       2
+      ],
+      [
+       "70 KG BAGS",
+       2
+      ],
+      [
+       "40LITRE PAIL",
+       2
+      ],
+      [
+       "CASES",
+       2
+      ],
+      [
+       "BASIN",
+       2
+      ],
+      [
+       "POLES",
+       1
+      ],
+      [
+       "LARGE DENGU",
+       1
+      ],
+      [
+       "LARGE BASINS",
+       1
+      ],
+      [
+       "BUCKET",
+       1
+      ],
+      [
+       "90KG",
+       1
+      ],
+      [
+       "PIECES",
+       1
+      ],
+      [
+       "70 KG BAG",
+       1
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 5,
+     "restates_dengu_basket (code 11)": 2,
+     "other_explicit_kg_size": 9,
+     "container_word (basin/pail/bucket/tin/litre)": 31,
+     "unclassified": 90
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 137
+    }
+   },
+   "crop_specify": {
+    "quadrant_generic_other": {
+     "code_and_text": 311,
+     "code_no_text": 1,
+     "text_other_code": 0
+    },
+    "text_rows_by_crop_code": {
+     "21": 311
+    },
+    "profile_on_generic_other": {
+     "rows_with_text": 311,
+     "n_distinct": 111,
+     "n_singletons": 89,
+     "strings_to_cover_80pct": 49,
+     "strings_to_cover_90pct": 80,
+     "top": [
+      [
+       "SUGARCANE",
+       106
+      ],
+      [
+       "ACACIA",
+       23
+      ],
+      [
+       "BLUEGUM",
+       20
+      ],
+      [
+       "MABULOSI",
+       7
+      ],
+      [
+       "MALAINA",
+       7
+      ],
+      [
+       "ALCACIA",
+       7
+      ],
+      [
+       "SUGAR CANE",
+       6
+      ],
+      [
+       "GRANADILLA",
+       5
+      ],
+      [
+       "APPLES",
+       5
+      ],
+      [
+       "BWEMBA",
+       4
+      ],
+      [
+       "COCOA",
+       4
+      ],
+      [
+       "SUGARCANES",
+       4
+      ],
+      [
+       "ACCACIA",
+       4
+      ],
+      [
+       "ACECIA",
+       3
+      ],
+      [
+       "BAMBOO",
+       3
+      ],
+      [
+       "TOPITOPI",
+       2
+      ],
+      [
+       "MULBERRIES",
+       2
+      ],
+      [
+       "KADALE TREES",
+       2
+      ],
+      [
+       "MKHUTHE",
+       2
+      ],
+      [
+       "MANDALENA",
+       2
+      ],
+      [
+       "MASIMBI",
+       2
+      ],
+      [
+       "MOLINGA",
+       2
+      ],
+      [
+       "NJAYA",
+       1
+      ],
+      [
+       "PEACH",
+       1
+      ],
+      [
+       "THOPETHOPE",
+       1
+      ],
+      [
+       "BLUGUEM",
+       1
+      ],
+      [
+       "MAURINGA TREE (CHAMMWAMBA)",
+       1
+      ],
+      [
+       "GRADELIZAS",
+       1
+      ],
+      [
+       "MACADAMIA",
+       1
+      ],
+      [
+       "APPLE'S",
+       1
+      ]
+     ]
+    },
+    "generic_other_rows_text_says_cowpea": 0,
+    "profile_on_variety_other": null
+   },
+   "extra_text_on_generic_other": {
+    "ag_p0_crops": {
+     "rows_with_text": 312,
+     "n_distinct": 123,
+     "n_singletons": 97,
+     "strings_to_cover_80pct": 61,
+     "strings_to_cover_90pct": 92,
+     "top": [
+      [
+       "SUGARCANE",
+       91
+      ],
+      [
+       "ACACIA",
+       20
+      ],
+      [
+       "BLUEGUM",
+       18
+      ],
+      [
+       "SUGAR CANE",
+       10
+      ],
+      [
+       "ALCACIA",
+       8
+      ],
+      [
+       "MABULOSI",
+       7
+      ],
+      [
+       "MALAINA",
+       7
+      ],
+      [
+       "GRANADILLA",
+       5
+      ],
+      [
+       "SUGARCANES",
+       5
+      ],
+      [
+       "COCOA",
+       4
+      ],
+      [
+       "APPLES",
+       4
+      ],
+      [
+       "ACCACIA",
+       4
+      ],
+      [
+       "BWEMBA",
+       3
+      ],
+      [
+       "T01 SUGARCANE",
+       3
+      ],
+      [
+       "SUNGARCANE",
+       3
+      ]
+     ]
+    }
+   },
+   "ag_p09_1_condition": {
+    "label": "What was the condition of [TREE/PERM CROP]?",
+    "value_labels": {
+     "1": "FRESH",
+     "2": "DRY",
+     "3": "NOT APPLICABLE."
+    },
+    "value_counts": {
+     "1": 6218,
+     "NA": 833,
+     "2": 561,
+     "3": 271
+    }
+   }
+  },
+  {
+   "wave": "2019-20",
+   "half": "Panel",
+   "module": "G",
+   "file": "Malawi/2019-20/Data/Panel/ag_mod_g_19.dta",
+   "columns": {
+    "crop": "crop_code",
+    "quantity": "ag_g13a",
+    "unit": "ag_g13b",
+    "crop_specify": null,
+    "unit_specify": "ag_g13b_oth"
+   },
+   "column_labels": {
+    "crop_code": "Crop ID",
+    "ag_g13a": "G13a. How much %rostertitle% did you harvest from this plot during the reference",
+    "ag_g13b": "G13b. UNIT",
+    "ag_g13b_oth": "G13b_oth. SPECIFY UNIT",
+    "ag_g0e_1_oth": "Please specify other variety"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER (SPECIFY)"
+    },
+    "crop_other": {
+     "48": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {
+     "10": "OTHER TOBACCO (SPECIFY)",
+     "16": "OTHER GROUNDNUT (SPECIFY)",
+     "26": "OTHER RICE (SPECIFY)"
+    }
+   },
+   "n_raw_rows": 9984,
+   "n_builder_rows": 9978,
+   "n_qty_notna": 9769,
+   "n_qty_pos": 9103,
+   "quantity_max": 48000.0,
+   "unit13": {
+    "rows": 145,
+    "share_of_builder_rows": 0.014532,
+    "rows_qty_notna": 145,
+    "share_of_qty_notna_rows": 0.014843,
+    "rows_qty_pos": 145,
+    "share_of_qty_pos_rows": 0.015929
+   },
+   "crop_other": {
+    "rows": 234,
+    "share_of_builder_rows": 0.023452,
+    "rows_qty_notna": 208,
+    "share_of_qty_notna_rows": 0.021292,
+    "rows_qty_pos": 194,
+    "share_of_qty_pos_rows": 0.021312
+   },
+   "crop_variety_other": {
+    "rows": 96,
+    "share_of_builder_rows": 0.009621,
+    "rows_qty_notna": 95,
+    "share_of_qty_notna_rows": 0.009725,
+    "rows_qty_pos": 94,
+    "share_of_qty_pos_rows": 0.010326
+   },
+   "unit13_or_crop_other": {
+    "rows": 373,
+    "share_of_builder_rows": 0.037382,
+    "rows_qty_notna": 347,
+    "share_of_qty_notna_rows": 0.035521,
+    "rows_qty_pos": 333,
+    "share_of_qty_pos_rows": 0.036581
+   },
+   "unit13_and_crop_other": 6,
+   "unit_codes": {
+    "value_counts": {
+     "1": 2263,
+     "2": 4811,
+     "4": 393,
+     "5": 1145,
+     "7": 2,
+     "8": 25,
+     "9": 41,
+     "10": 79,
+     "12": 198,
+     "13": 145
+    },
+    "n_unit_missing": 876,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": [
+     6
+    ]
+   },
+   "crop_other_share_of_kilogram_quantity": 0.013088,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 145,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 145,
+     "n_distinct": 43,
+     "n_singletons": 30,
+     "strings_to_cover_80pct": 14,
+     "strings_to_cover_90pct": 29,
+     "top": [
+      [
+       "90 KG BAG",
+       33
+      ],
+      [
+       "70 KG BAG",
+       22
+      ],
+      [
+       "5L BUCKET",
+       19
+      ],
+      [
+       "BASIN SMALL",
+       15
+      ],
+      [
+       "BASKET",
+       5
+      ],
+      [
+       "5 LITRE BASIN",
+       4
+      ],
+      [
+       "DENGU",
+       4
+      ],
+      [
+       "MEDIUM PAIL",
+       3
+      ],
+      [
+       "LICHERO",
+       2
+      ],
+      [
+       "TONNE",
+       2
+      ],
+      [
+       "5LITRE BUCKET",
+       2
+      ],
+      [
+       "LARGE BUNDLES",
+       2
+      ],
+      [
+       "BASIN",
+       2
+      ],
+      [
+       "LARGE HEAPS",
+       1
+      ],
+      [
+       "BAG",
+       1
+      ],
+      [
+       "HEAP",
+       1
+      ],
+      [
+       "MEDIUM MTANGA",
+       1
+      ],
+      [
+       "HEADS",
+       1
+      ],
+      [
+       "40LITRE PAIL",
+       1
+      ],
+      [
+       "BASKET (DENGU)",
+       1
+      ],
+      [
+       "CUP",
+       1
+      ],
+      [
+       "5 LITRE BUCKET",
+       1
+      ],
+      [
+       "LARGE BUNDLES SUGARCANE",
+       1
+      ],
+      [
+       "60KG",
+       1
+      ],
+      [
+       "SMALL BASKET",
+       1
+      ],
+      [
+       "LARGE BASIN",
+       1
+      ],
+      [
+       "BIG VITETE",
+       1
+      ],
+      [
+       "DISHES",
+       1
+      ],
+      [
+       "120 KG BAGS",
+       1
+      ],
+      [
+       "NDOWA",
+       1
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 33,
+     "restates_dengu_basket (code 11)": 12,
+     "other_explicit_kg_size": 24,
+     "container_word (basin/pail/bucket/tin/litre)": 52,
+     "unclassified": 24
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 145
+    }
+   },
+   "crop_specify": null,
+   "extra_text_on_generic_other": {
+    "ag_g0e_1_oth": {
+     "rows_with_text": 0,
+     "n_distinct": 0,
+     "n_singletons": 0,
+     "strings_to_cover_80pct": 0,
+     "strings_to_cover_90pct": 0,
+     "top": []
+    }
+   }
+  },
+  {
+   "wave": "2019-20",
+   "half": "Panel",
+   "module": "P",
+   "file": "Malawi/2019-20/Data/Panel/ag_mod_p_19.dta",
+   "columns": {
+    "crop": "crop_code",
+    "quantity": "ag_p09a",
+    "unit": "ag_p09b",
+    "crop_specify": "ag_p0d_oth",
+    "unit_specify": "ag_p09b_oth"
+   },
+   "column_labels": {
+    "crop_code": "CROP CODE",
+    "ag_p09a": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)",
+    "ag_p09b": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U)",
+    "ag_p0d_oth": "SPECIFY CROP CODE",
+    "ag_p09b_oth": "How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)",
+    "ag_p0_crops": "FOR EACH PLOT, LIST ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12MONTHS"
+   },
+   "confirmed_codes": {
+    "unit_other": {
+     "13": "OTHER(SPECIFY)"
+    },
+    "crop_other": {
+     "21": "OTHER (SPECIFY)"
+    },
+    "crop_variety_other": {}
+   },
+   "n_raw_rows": 1601,
+   "n_builder_rows": 1586,
+   "n_qty_notna": 1583,
+   "n_qty_pos": 1410,
+   "quantity_max": 700.0,
+   "unit13": {
+    "rows": 14,
+    "share_of_builder_rows": 0.008827,
+    "rows_qty_notna": 14,
+    "share_of_qty_notna_rows": 0.008844,
+    "rows_qty_pos": 14,
+    "share_of_qty_pos_rows": 0.009929
+   },
+   "crop_other": {
+    "rows": 33,
+    "share_of_builder_rows": 0.020807,
+    "rows_qty_notna": 33,
+    "share_of_qty_notna_rows": 0.020846,
+    "rows_qty_pos": 26,
+    "share_of_qty_pos_rows": 0.01844
+   },
+   "crop_variety_other": {
+    "rows": 0,
+    "share_of_builder_rows": 0.0,
+    "rows_qty_notna": 0,
+    "share_of_qty_notna_rows": 0.0,
+    "rows_qty_pos": 0,
+    "share_of_qty_pos_rows": 0.0
+   },
+   "unit13_or_crop_other": {
+    "rows": 47,
+    "share_of_builder_rows": 0.029634,
+    "rows_qty_notna": 47,
+    "share_of_qty_notna_rows": 0.02969,
+    "rows_qty_pos": 40,
+    "share_of_qty_pos_rows": 0.028369
+   },
+   "unit13_and_crop_other": 0,
+   "unit_codes": {
+    "value_counts": {
+     "1": 99,
+     "2": 682,
+     "3": 50,
+     "4": 68,
+     "5": 251,
+     "7": 1,
+     "8": 68,
+     "9": 71,
+     "11": 96,
+     "12": 10,
+     "13": 14
+    },
+    "n_unit_missing": 176,
+    "in_data_not_labelled": [],
+    "labelled_not_in_data": [
+     6,
+     10
+    ]
+   },
+   "crop_other_share_of_kilogram_quantity": 0.0,
+   "unit_specify": {
+    "quadrant": {
+     "code_and_text": 14,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "profile_on_code13": {
+     "rows_with_text": 14,
+     "n_distinct": 12,
+     "n_singletons": 10,
+     "strings_to_cover_80pct": 10,
+     "strings_to_cover_90pct": 11,
+     "top": [
+      [
+       "70 KG BAG",
+       2
+      ],
+      [
+       "DOZEN",
+       2
+      ],
+      [
+       "90 KG BAG",
+       1
+      ],
+      [
+       "DENGU",
+       1
+      ],
+      [
+       "BASIN SMALL",
+       1
+      ],
+      [
+       "5 LITRE CHIGOBA",
+       1
+      ],
+      [
+       "CLUSTER",
+       1
+      ],
+      [
+       "CASE",
+       1
+      ],
+      [
+       "TONE",
+       1
+      ],
+      [
+       "TREES",
+       1
+      ],
+      [
+       "BUNCH",
+       1
+      ],
+      [
+       "SMALL BASIN",
+       1
+      ]
+     ]
+    },
+    "indicative_buckets_on_code13": {
+     "restates_90kg_bag (code 3)": 1,
+     "restates_dengu_basket (code 11)": 1,
+     "other_explicit_kg_size": 2,
+     "container_word (basin/pail/bucket/tin/litre)": 3,
+     "unclassified": 7
+    },
+    "text_on_other_codes_by_unit_code": {},
+    "qty_on_code13_with_text": {
+     "rows_qty_pos": 14
+    }
+   },
+   "crop_specify": {
+    "quadrant_generic_other": {
+     "code_and_text": 33,
+     "code_no_text": 0,
+     "text_other_code": 0
+    },
+    "text_rows_by_crop_code": {
+     "21": 33
+    },
+    "profile_on_generic_other": {
+     "rows_with_text": 33,
+     "n_distinct": 17,
+     "n_singletons": 12,
+     "strings_to_cover_80pct": 11,
+     "strings_to_cover_90pct": 14,
+     "top": [
+      [
+       "ACACIA",
+       6
+      ],
+      [
+       "SUGAR CANE",
+       6
+      ],
+      [
+       "APPLE",
+       4
+      ],
+      [
+       "MALAMBE",
+       3
+      ],
+      [
+       "MALAINA",
+       2
+      ],
+      [
+       "LOCUSTS",
+       1
+      ],
+      [
+       "BERRY",
+       1
+      ],
+      [
+       "JACARANDA",
+       1
+      ],
+      [
+       "MANGO",
+       1
+      ],
+      [
+       "JAMBULA",
+       1
+      ],
+      [
+       "MABULOSI",
+       1
+      ],
+      [
+       "CHEMBEMWANA",
+       1
+      ],
+      [
+       "MPESA",
+       1
+      ],
+      [
+       "MPHUZO",
+       1
+      ],
+      [
+       "MANYUMWA",
+       1
+      ],
+      [
+       "JAKEY FOOD",
+       1
+      ],
+      [
+       "GRANADILLA",
+       1
+      ]
+     ]
+    },
+    "generic_other_rows_text_says_cowpea": 0,
+    "profile_on_variety_other": null
+   },
+   "extra_text_on_generic_other": {
+    "ag_p0_crops": {
+     "rows_with_text": 33,
+     "n_distinct": 20,
+     "n_singletons": 12,
+     "strings_to_cover_80pct": 14,
+     "strings_to_cover_90pct": 17,
+     "top": [
+      [
+       "ACACIA",
+       5
+      ],
+      [
+       "MALAMBE",
+       3
+      ],
+      [
+       "SUGARCANE",
+       3
+      ],
+      [
+       "APPLES",
+       2
+      ],
+      [
+       "MALAINA",
+       2
+      ],
+      [
+       "SUGAR CANE",
+       2
+      ],
+      [
+       "MANGO",
+       2
+      ],
+      [
+       "APPLE",
+       2
+      ],
+      [
+       "LOCUSTS",
+       1
+      ],
+      [
+       "BERRIES",
+       1
+      ],
+      [
+       "JACARANDA",
+       1
+      ],
+      [
+       "ACCAIA",
+       1
+      ],
+      [
+       "JAMBULA",
+       1
+      ],
+      [
+       "SUGARCANES",
+       1
+      ],
+      [
+       "MABULOSI",
+       1
+      ]
+     ]
+    }
+   },
+   "ag_p09_1_condition": {
+    "label": "What was the condition of [TREE/PERM CROP]?",
+    "value_labels": {
+     "1": "FRESH",
+     "2": "DRY",
+     "3": "NOT APPLICABLE."
+    },
+    "value_counts": {
+     "1": 1177,
+     "NA": 176,
+     "2": 170,
+     "3": 63
+    }
+   }
+  }
+ ],
+ "module_d_crop_text_for_g48": [
+  {
+   "wave": "2016-17",
+   "half": "Cross_Sectional",
+   "module_d": "Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta",
+   "unreadable": "ValueError; latin-1: ValueError: /local/job40390255/data-private/lane-856/Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta has a Stata header but cannot be decoded"
+  },
+  {
+   "wave": "2016-17",
+   "half": "Panel",
+   "module_d": "Malawi/2016-17/Data/Panel/ag_mod_d_16.dta",
+   "read": "get_dataframe",
+   "d_text_columns": [
+    "ag_d20_oth"
+   ],
+   "g_code48_rows": 111,
+   "matched_to_d_plot": 111,
+   "d_plot_lists_code48": 110,
+   "d_plot_has_other_crop_text": 111,
+   "d_plot_has_exactly_one_other_text": 111,
+   "unambiguous_text_says_cowpea": 65,
+   "profile_unambiguous_text": {
+    "rows_with_text": 111,
+    "n_distinct": 19,
+    "n_singletons": 13,
+    "strings_to_cover_80pct": 3,
+    "strings_to_cover_90pct": 8,
+    "top": [
+     [
+      "COWPEAS",
+      65
+     ],
+     [
+      "MUCUNA",
+      18
+     ],
+     [
+      "CASSAVA",
+      6
+     ],
+     [
+      "CHINESE RAPE",
+      4
+     ],
+     [
+      "SESAME",
+      3
+     ],
+     [
+      "OKRA",
+      2
+     ],
+     [
+      "PUMPKIN",
+      1
+     ],
+     [
+      "HYBRIDMAIZE",
+      1
+     ],
+     [
+      "TREES",
+      1
+     ],
+     [
+      "LOCALMAIZE",
+      1
+     ],
+     [
+      "MISALE",
+      1
+     ],
+     [
+      "SWEETPOTATO",
+      1
+     ],
+     [
+      "EGGPLANT",
+      1
+     ],
+     [
+      "KAPIRIPIRI",
+      1
+     ],
+     [
+      "MBELEMENDE",
+      1
+     ],
+     [
+      "KABAYIFA",
+      1
+     ],
+     [
+      "NKHWANI",
+      1
+     ],
+     [
+      "NONE",
+      1
+     ],
+     [
+      "MGONKHO",
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "wave": "2019-20",
+   "half": "Cross_Sectional",
+   "module_d": "Malawi/2019-20/Data/Cross_Sectional/ag_mod_d.dta",
+   "read": "get_dataframe",
+   "d_text_columns": [
+    "ag_d20_oth",
+    "ag_d20b_oth"
+   ],
+   "g_code48_rows": 990,
+   "matched_to_d_plot": 990,
+   "d_plot_lists_code48": 990,
+   "d_plot_has_other_crop_text": 990,
+   "d_plot_has_exactly_one_other_text": 963,
+   "unambiguous_text_says_cowpea": 584,
+   "profile_unambiguous_text": {
+    "rows_with_text": 963,
+    "n_distinct": 62,
+    "n_singletons": 31,
+    "strings_to_cover_80pct": 6,
+    "strings_to_cover_90pct": 12,
+    "top": [
+     [
+      "COW PEAS",
+      584
+     ],
+     [
+      "MUCUNA",
+      62
+     ],
+     [
+      "NKHUNGUDZU",
+      53
+     ],
+     [
+      "CUCUMBER",
+      41
+     ],
+     [
+      "SESAME",
+      29
+     ],
+     [
+      "CASSAVA",
+      29
+     ],
+     [
+      "CHITOWE",
+      17
+     ],
+     [
+      "LABLAB",
+      13
+     ],
+     [
+      "MPHONDA",
+      13
+     ],
+     [
+      "NKHAKA",
+      10
+     ],
+     [
+      "EGG PLANT",
+      9
+     ],
+     [
+      "NAMALUNGA",
+      8
+     ],
+     [
+      "NTCHESI",
+      7
+     ],
+     [
+      "MAPIRA",
+      5
+     ],
+     [
+      "POPCORN MAIZE",
+      5
+     ],
+     [
+      "MZAMA",
+      5
+     ],
+     [
+      "COCO YAM",
+      5
+     ],
+     [
+      "TCHANA",
+      5
+     ],
+     [
+      "WATER MELON",
+      4
+     ],
+     [
+      "OKRA",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "wave": "2019-20",
+   "half": "Panel",
+   "module_d": "Malawi/2019-20/Data/Panel/ag_mod_d_19.dta",
+   "read": "get_dataframe",
+   "d_text_columns": [
+    "ag_d20_oth"
+   ],
+   "g_code48_rows": 234,
+   "matched_to_d_plot": 234,
+   "d_plot_lists_code48": 231,
+   "d_plot_has_other_crop_text": 234,
+   "d_plot_has_exactly_one_other_text": 234,
+   "unambiguous_text_says_cowpea": 113,
+   "profile_unambiguous_text": {
+    "rows_with_text": 234,
+    "n_distinct": 37,
+    "n_singletons": 16,
+    "strings_to_cover_80pct": 10,
+    "strings_to_cover_90pct": 18,
+    "top": [
+     [
+      "COW PEAS",
+      113
+     ],
+     [
+      "MUCUNA",
+      22
+     ],
+     [
+      "CHITOWE",
+      12
+     ],
+     [
+      "CUCUMBER",
+      11
+     ],
+     [
+      "EGG PLANT",
+      8
+     ],
+     [
+      "SORGHUM",
+      8
+     ],
+     [
+      "NKHUNGUDZU",
+      5
+     ],
+     [
+      "PUMPKIN",
+      4
+     ],
+     [
+      "SESAME",
+      4
+     ],
+     [
+      "MISALE",
+      4
+     ],
+     [
+      "TOBBACO",
+      4
+     ],
+     [
+      "HIBISCUS",
+      3
+     ],
+     [
+      "CASSAVA",
+      3
+     ],
+     [
+      "PIGEON PEAS",
+      3
+     ],
+     [
+      "NZAMA",
+      2
+     ],
+     [
+      "MPHONDA",
+      2
+     ],
+     [
+      "NAMALUNGA",
+      2
+     ],
+     [
+      "COCO YAM",
+      2
+     ],
+     [
+      "LABLAB",
+      2
+     ],
+     [
+      "MPIRU",
+      2
+     ]
+    ]
+   }
+  }
+ ]
+}

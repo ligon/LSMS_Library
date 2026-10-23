@@ -1,0 +1,17 @@
+# sticky_make_real.py (round-3 review): Burkina_Faso interview_date, LSMS_BUILD_BACKEND=make, first make -n probe raises OSError.
+# var/ warmed first by a default-backend interview_date(waves=['2018-19']) in the same fresh data root. Counts only.
+# development (from the review's log, not re-run here): 1 -> 21028 (2018-19), 2 -> 0, 3 -> 21028, 4 -> 0, probes 3
+== round 2 9cae52de7
+warm: default backend 2018-19 rows 21028 var manifest ['2018-19']
+1 2014 faulted rows 21028 by t {'2018-19': 21028}
+2 2014 same instance rows 21028 by t {'2018-19': 21028}
+3 2018-19 same instance rows 21028 by t {'2018-19': 21028}
+4 2014 fresh instance rows 0 by t {}
+make -n probes 2
+== round 3 (branch HEAD)
+warm: default backend 2018-19 rows 21028 var manifest ['2018-19']
+1 2014 faulted rows 21028 by t {'2018-19': 21028}
+2 2014 same instance rows 0 by t {}
+3 2018-19 same instance rows 21028 by t {'2018-19': 21028}
+4 2014 fresh instance rows 0 by t {}
+make -n probes 3

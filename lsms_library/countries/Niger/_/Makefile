@@ -51,12 +51,23 @@ $(VAR_DIR)/crop_production.parquet: crop_production.py niger.py categorical_mapp
 # country-level var/ parquet is built by the concatenator, which reads each
 # wave's parquet; the country script is run unconditionally to (re)build the
 # wave parquets it reads, then concatenates.
+#
+# The wave scripts are chained with `&&`, NOT `;` (GH #1123).  The recipe is
+# ONE shell line, so with `;` only the LAST command's exit status reached
+# make: a wave script that failed -- e.g. the 2018-19 / 2021-22 uniqueness
+# guard -- was ignored, the concatenator ran without that wave's parquet, and
+# LSMS_BUILD_BACKEND=make served the other waves with no Python warning
+# (measured: an injected 2018-19 collision returned 29,034 rows, all 13,401
+# of 2018-19 gone).  `&&` is the `(cd $(@D) && python ...)` idiom every
+# pattern rule here already uses, extended across the waves; the
+# prerequisite form of Malawi/_/Makefile:71-77 would also stop on a failed
+# wave, but it lets make mtime-skip a wave parquet, which this recipe's
+# unconditional re-run exists to avoid.
 INPUT_WAVES := 2011-12 2014-15 2018-19 2021-22
 
 $(VAR_DIR)/plot_inputs.parquet: plot_inputs.py niger.py categorical_mapping.org \
 		$(foreach w,$(INPUT_WAVES),../$(w)/_/plot_inputs.py)
-	$(foreach w,$(INPUT_WAVES),(cd ../$(w)/_ && python plot_inputs.py);)
-	python plot_inputs.py
+	$(foreach w,$(INPUT_WAVES),(cd ../$(w)/_ && python plot_inputs.py) &&) python plot_inputs.py
 
 ../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py niger.py categorical_mapping.org
 	(cd $(@D) && python plot_inputs.py)

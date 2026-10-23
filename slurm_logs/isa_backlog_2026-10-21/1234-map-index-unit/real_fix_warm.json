@@ -1,0 +1,289 @@
+{
+ "CotedIvoire/crop_production": {
+  "by_t": {
+   "2018-19": {
+    "Unknown": 6358,
+    "null": 0,
+    "rows": 22216,
+    "unit": 0
+   }
+  },
+  "columns": [
+   "Quantity",
+   "Quantity_sold",
+   "Value_sold",
+   "harvest_month",
+   "intercropped"
+  ],
+  "dup_index": 0,
+  "index": [
+   "i",
+   "t",
+   "v",
+   "plot_id",
+   "crop",
+   "u"
+  ],
+  "rows": 22216,
+  "seconds": 1.4,
+  "u_in_index": true,
+  "warnings": {
+   "QuantityImplausibleWarning": 1
+  }
+ },
+ "Feature=Malawi/crop_production": {
+  "by_t": {
+   "2010-11": {
+    "Unknown": 1279,
+    "null": 0,
+    "rows": 33420,
+    "unit": 0
+   },
+   "2013-14": {
+    "Unknown": 594,
+    "null": 0,
+    "rows": 12616,
+    "unit": 0
+   },
+   "2016-17": {
+    "Unknown": 3408,
+    "null": 0,
+    "rows": 37170,
+    "unit": 0
+   },
+   "2019-20": {
+    "Unknown": 3621,
+    "null": 0,
+    "rows": 51872,
+    "unit": 0
+   }
+  },
+  "columns": [
+   "Quantity",
+   "crop_variety",
+   "Quantity_sold",
+   "Value_sold",
+   "planting_month",
+   "harvest_month",
+   "intercropped",
+   "perennial",
+   "Derivation"
+  ],
+  "dup_index": 0,
+  "index": [
+   "country",
+   "t",
+   "v",
+   "i",
+   "plot_id",
+   "j",
+   "u",
+   "condition",
+   "season",
+   "production_obs",
+   "currency"
+  ],
+  "rows": 135078,
+  "seconds": 3.8,
+  "u_in_index": true,
+  "warnings": {
+   "NullIndexKeyWarning": 1,
+   "PopulationHeterogeneityWarning": 1,
+   "QuantityImplausibleWarning": 2,
+   "UserWarning": 1
+  }
+ },
+ "Malawi/crop_production": {
+  "by_t": {
+   "2010-11": {
+    "Unknown": 1279,
+    "null": 0,
+    "rows": 33420,
+    "unit": 0
+   },
+   "2013-14": {
+    "Unknown": 594,
+    "null": 0,
+    "rows": 12616,
+    "unit": 0
+   },
+   "2016-17": {
+    "Unknown": 3408,
+    "null": 0,
+    "rows": 37170,
+    "unit": 0
+   },
+   "2019-20": {
+    "Unknown": 3621,
+    "null": 0,
+    "rows": 51872,
+    "unit": 0
+   }
+  },
+  "columns": [
+   "Quantity",
+   "crop_variety",
+   "Quantity_sold",
+   "Value_sold",
+   "planting_month",
+   "harvest_month",
+   "intercropped",
+   "perennial",
+   "Derivation"
+  ],
+  "dup_index": 0,
+  "index": [
+   "i",
+   "t",
+   "v",
+   "plot_id",
+   "crop",
+   "u",
+   "condition"
+  ],
+  "rows": 135078,
+  "seconds": 2.5,
+  "u_in_index": true,
+  "warnings": {
+   "NullIndexKeyWarning": 1,
+   "QuantityImplausibleWarning": 2
+  }
+ },
+ "Malawi/plot_inputs": {
+  "by_t": {
+   "2010-11": {
+    "Unknown": 375,
+    "null": 0,
+    "rows": 46576,
+    "unit": 0
+   },
+   "2013-14": {
+    "Unknown": 104,
+    "null": 0,
+    "rows": 16188,
+    "unit": 0
+   },
+   "2016-17": {
+    "Unknown": 5576,
+    "null": 0,
+    "rows": 52494,
+    "unit": 0
+   },
+   "2019-20": {
+    "Unknown": 20,
+    "null": 0,
+    "rows": 64691,
+    "unit": 0
+   }
+  },
+  "columns": [
+   "Quantity",
+   "Quantity_purchased",
+   "Purchased",
+   "Improved",
+   "Applied"
+  ],
+  "dup_index": 0,
+  "index": [
+   "i",
+   "t",
+   "v",
+   "plot_id",
+   "input",
+   "crop",
+   "u"
+  ],
+  "rows": 179949,
+  "seconds": 2.6,
+  "u_in_index": true,
+  "warnings": {
+   "NullIndexKeyWarning": 1,
+   "NullReadWarning": 1
+  }
+ },
+ "Mali/food_acquired": {
+  "by_t": {
+   "2014-15": {
+    "Unknown": 1534,
+    "null": 0,
+    "rows": 122085,
+    "unit": 0
+   },
+   "2018-19": {
+    "Unknown": 0,
+    "null": 0,
+    "rows": 162032,
+    "unit": 0
+   },
+   "2021-22": {
+    "Unknown": 0,
+    "null": 0,
+    "rows": 146929,
+    "unit": 0
+   }
+  },
+  "columns": [
+   "Quantity",
+   "Expenditure",
+   "Derivation"
+  ],
+  "dup_index": 10,
+  "index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "rows": 431046,
+  "seconds": 3.0,
+  "u_in_index": true,
+  "warnings": {
+   "QuantityImplausibleWarning": 2
+  }
+ },
+ "Panama/food_acquired": {
+  "by_t": {
+   "1997": {
+    "Unknown": 437,
+    "null": 0,
+    "rows": 155742,
+    "unit": 25825
+   },
+   "2003": {
+    "Unknown": 1,
+    "null": 0,
+    "rows": 194866,
+    "unit": 0
+   },
+   "2008": {
+    "Unknown": 5,
+    "null": 0,
+    "rows": 220334,
+    "unit": 33244
+   }
+  },
+  "columns": [
+   "Quantity",
+   "Expenditure",
+   "Price"
+  ],
+  "dup_index": 0,
+  "index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "rows": 570942,
+  "seconds": 3.8,
+  "u_in_index": true,
+  "warnings": {
+   "NullReadWarning": 2,
+   "QuantityImplausibleWarning": 3
+  }
+ }
+}

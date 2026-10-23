@@ -1,0 +1,204 @@
+{
+ "CotedIvoire/crop_production": {
+  "base_only": 6358,
+  "base_only_u": {
+   "unit": 6358
+  },
+  "branch_only": 6358,
+  "branch_only_u": {
+   "Unknown": 6358
+  },
+  "clean_relabel_only": true,
+  "columns_equal": true,
+  "common": 15858,
+  "common_diff": 0,
+  "common_diff_by_u": {},
+  "dup_index_base": 0,
+  "dup_index_branch": 0,
+  "index_equal": true,
+  "matched": 6358,
+  "matched_u_pairs": {
+   "unit->Unknown": 6358
+  },
+  "matched_value_diff": 0,
+  "relabelled_by_t": {
+   "2018-19": 6358
+  },
+  "rows_base": 22216,
+  "rows_branch": 22216,
+  "u_counts": {
+   "base_Unknown": 0,
+   "base_null": 0,
+   "base_unit": 6358,
+   "branch_Unknown": 6358,
+   "branch_null": 0,
+   "branch_unit": 0
+  },
+  "unmatched_base_only": 0,
+  "unmatched_branch_only": 0
+ },
+ "Malawi/crop_production": {
+  "base_only": 8902,
+  "base_only_u": {
+   "unit": 8902
+  },
+  "branch_only": 8902,
+  "branch_only_u": {
+   "Unknown": 8902
+  },
+  "clean_relabel_only": true,
+  "columns_equal": true,
+  "common": 126176,
+  "common_diff": 0,
+  "common_diff_by_u": {},
+  "dup_index_base": 0,
+  "dup_index_branch": 0,
+  "index_equal": true,
+  "matched": 8902,
+  "matched_u_pairs": {
+   "unit->Unknown": 8902
+  },
+  "matched_value_diff": 0,
+  "relabelled_by_t": {
+   "2010-11": 1279,
+   "2013-14": 594,
+   "2016-17": 3408,
+   "2019-20": 3621
+  },
+  "rows_base": 135078,
+  "rows_branch": 135078,
+  "u_counts": {
+   "base_Unknown": 0,
+   "base_null": 0,
+   "base_unit": 8902,
+   "branch_Unknown": 8902,
+   "branch_null": 0,
+   "branch_unit": 0
+  },
+  "unmatched_base_only": 0,
+  "unmatched_branch_only": 0
+ },
+ "Malawi/plot_inputs": {
+  "base_only": 6067,
+  "base_only_u": {
+   "unit": 6067
+  },
+  "branch_only": 6067,
+  "branch_only_u": {
+   "Unknown": 6067
+  },
+  "clean_relabel_only": true,
+  "columns_equal": true,
+  "common": 173882,
+  "common_diff": 0,
+  "common_diff_by_u": {},
+  "dup_index_base": 0,
+  "dup_index_branch": 0,
+  "index_equal": true,
+  "matched": 6067,
+  "matched_u_pairs": {
+   "unit->Unknown": 6067
+  },
+  "matched_value_diff": 0,
+  "relabelled_by_t": {
+   "2010-11": 370,
+   "2013-14": 101,
+   "2016-17": 5576,
+   "2019-20": 20
+  },
+  "rows_base": 179949,
+  "rows_branch": 179949,
+  "u_counts": {
+   "base_Unknown": 8,
+   "base_null": 0,
+   "base_unit": 6067,
+   "branch_Unknown": 6075,
+   "branch_null": 0,
+   "branch_unit": 0
+  },
+  "unmatched_base_only": 0,
+  "unmatched_branch_only": 0
+ },
+ "Mali/food_acquired": {
+  "base_only": 1534,
+  "base_only_u": {
+   "unit": 1534
+  },
+  "branch_only": 1534,
+  "branch_only_u": {
+   "Unknown": 1534
+  },
+  "clean_relabel_only": true,
+  "columns_equal": true,
+  "common": 429492,
+  "common_diff": 0,
+  "common_diff_by_u": {},
+  "dup_index_base": 10,
+  "dup_index_branch": 10,
+  "index_equal": true,
+  "matched": 1534,
+  "matched_u_pairs": {
+   "unit->Unknown": 1534
+  },
+  "matched_value_diff": 0,
+  "relabelled_by_t": {
+   "2014-15": 1534
+  },
+  "rows_base": 431046,
+  "rows_branch": 431046,
+  "u_counts": {
+   "base_Unknown": 0,
+   "base_null": 0,
+   "base_unit": 1534,
+   "branch_Unknown": 1534,
+   "branch_null": 0,
+   "branch_unit": 0
+  },
+  "unmatched_base_only": 0,
+  "unmatched_branch_only": 0
+ },
+ "Panama/food_acquired": {
+  "base_only": 440,
+  "base_only_u": {
+   "unit": 440
+  },
+  "branch_only": 443,
+  "branch_only_u": {
+   "Unknown": 443
+  },
+  "clean_relabel_only": false,
+  "columns_equal": true,
+  "common": 570499,
+  "common_diff": 11,
+  "common_diff_by_u": {
+   "gram": 3,
+   "pound": 3,
+   "unit": 5
+  },
+  "dup_index_base": 0,
+  "dup_index_branch": 0,
+  "index_equal": true,
+  "matched": 440,
+  "matched_u_pairs": {
+   "unit->Unknown": 440
+  },
+  "matched_value_diff": 0,
+  "relabelled_by_t": {
+   "1997": 437,
+   "2003": 1,
+   "2008": 2
+  },
+  "rows_base": 570939,
+  "rows_branch": 570942,
+  "u_counts": {
+   "base_Unknown": 0,
+   "base_null": 0,
+   "base_unit": 59509,
+   "branch_Unknown": 443,
+   "branch_null": 0,
+   "branch_unit": 59069
+  },
+  "unmatched_base_only": 0,
+  "unmatched_branch_only": 3
+ }
+}

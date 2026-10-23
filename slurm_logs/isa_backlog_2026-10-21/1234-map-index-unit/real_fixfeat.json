@@ -1,0 +1,65 @@
+{
+ "Feature=Malawi/crop_production": {
+  "by_t": {
+   "2010-11": {
+    "Unknown": 1279,
+    "null": 0,
+    "rows": 33420,
+    "unit": 0
+   },
+   "2013-14": {
+    "Unknown": 594,
+    "null": 0,
+    "rows": 12616,
+    "unit": 0
+   },
+   "2016-17": {
+    "Unknown": 3408,
+    "null": 0,
+    "rows": 37170,
+    "unit": 0
+   },
+   "2019-20": {
+    "Unknown": 3621,
+    "null": 0,
+    "rows": 51872,
+    "unit": 0
+   }
+  },
+  "columns": [
+   "Quantity",
+   "crop_variety",
+   "Quantity_sold",
+   "Value_sold",
+   "planting_month",
+   "harvest_month",
+   "intercropped",
+   "perennial",
+   "Derivation"
+  ],
+  "dup_index": 0,
+  "index": [
+   "country",
+   "t",
+   "v",
+   "i",
+   "plot_id",
+   "j",
+   "u",
+   "condition",
+   "season",
+   "production_obs",
+   "currency"
+  ],
+  "rows": 135078,
+  "seconds": 30.4,
+  "u_in_index": true,
+  "warnings": {
+   "NullIndexKeyWarning": 1,
+   "PopulationHeterogeneityWarning": 1,
+   "QuantityImplausibleWarning": 2,
+   "RuntimeWarning": 18,
+   "UserWarning": 1
+  }
+ }
+}

@@ -1,0 +1,23 @@
+{
+ "food21_rows": 31959,
+ "food21_u_blank": 6357,
+ "food21_blank_by_cause": {
+  "struck_item_priced": 3003,
+  "asked_item_not_available": 2938,
+  "struck_item_not_available": 386,
+  "asked_item_priced_unit_blank": 13,
+  "asked_item_priced_code_unlisted_23": 10,
+  "struck_item_unpriced_other": 4,
+  "asked_item_priced_code_unlisted_48": 1,
+  "asked_item_priced_code_unlisted_50": 1,
+  "asked_item_priced_code_unlisted_0": 1
+ },
+ "food21_blank_by_cause_item": {
+  "struck_item_not_available/Bottled/ Canned Beer": 363,
+  "struck_item_not_available/Soft Drink (Bottle)": 23,
+  "struck_item_priced/Bottled/ Canned Beer": 1330,
+  "struck_item_priced/Soft Drink (Bottle)": 1673,
+  "struck_item_unpriced_other/Bottled/ Canned Beer": 3,
+  "struck_item_unpriced_other/Soft Drink (Bottle)": 1
+ }
+}

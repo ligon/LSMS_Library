@@ -194,13 +194,16 @@ Index Info:
   # was checked rather than assumed (GH #569, 2026-10-19), per country, on the
   # warm corpus.  In SIX countries the plot_inputs `crop` labels are that
   # country's crop_production labels, spelled the same way: Mali 42 of 42
-  # shared, Malawi 26/26, Tanzania 20/20, Nigeria 72/74, Niger 35/43, Benin
+  # shared, Malawi 26/26, Tanzania 20/20, Nigeria 72/74, Niger 35/45, Benin
   # 8/11 (counts include the "not crop-specific" marker).  The misses are the
-  # marker, catch-alls (Benin `Autre tubercule` / `Autre céréale`) and crops
+  # marker, catch-alls (Benin and, since GH #1123, Niger `Autre tubercule` /
+  # `Autre céréale`) and crops
   # crop_production does not record at all (Niger's seven are real crops --
   # `Carotte`, `Igname`, `Jaxatu`, ...; Nigeria `Date palm`), never the same
-  # crop spelled twice.  That claim is NOT true everywhere: Burkina_Faso (5 of
-  # 9) and Senegal (6 of 10) spell two crops differently in the two tables --
+  # crop spelled twice.  (Niger was 35/43 before GH #1123 split its seed
+  # catch-alls.)  That claim is NOT true everywhere: Burkina_Faso (5 of
+  # 9) and Senegal (6 of 12; 6 of 10 before GH #1123) spell two crops
+  # differently in the two tables --
   # plot_inputs `Maïs en grain` (2,274 / 735 rows) and `Niébé/Haricots secs`
   # (2,156 / 460) where crop_production has `Maïs` and `Niébé` -- so on those
   # two countries the shared axis name does not yet mean a shared vocabulary.

@@ -1,0 +1,100 @@
+{
+ "method": "hash_census.py (this directory) run from base-1240 (development 9a0ed5f3c) and from this branch's final tree (the commit that adds this file: d6ac4d35e plus the reworded warning text); config/source reads only, private LSMS_DATA_DIR",
+ "runs": {
+  "branch working tree before the docstring re-measure": {
+   "country": {
+    "development": 549,
+    "branch": 549,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "btf": {
+    "development": 40,
+    "branch": 40,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "wave": {
+    "development": 2109,
+    "branch": 2109,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "errors": {
+    "development": 0,
+    "branch": 0
+   }
+  },
+  "d6ac4d35e": {
+   "country": {
+    "development": 549,
+    "branch": 549,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "btf": {
+    "development": 40,
+    "branch": 40,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "wave": {
+    "development": 2109,
+    "branch": 2109,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "errors": {
+    "development": 0,
+    "branch": 0
+   }
+  },
+  "final tree (this commit)": {
+   "country": {
+    "development": 549,
+    "branch": 549,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "btf": {
+    "development": 40,
+    "branch": 40,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "wave": {
+    "development": 2109,
+    "branch": 2109,
+    "moved": 0,
+    "moved_keys": [],
+    "only_development": 0,
+    "only_branch": 0
+   },
+   "errors": {
+    "development": 0,
+    "branch": 0
+   }
+  }
+ },
+ "stash_probe": {
+  "method": "slurm_logs/gh857_quantity_screen/hash_probe.py in this worktree, with and without 'git stash push -- lsms_library/quantity_audit.py' (12 Country._table_cache_hash + 5 build_transforms_fingerprint)",
+  "values": 17,
+  "moved": []
+ }
+}

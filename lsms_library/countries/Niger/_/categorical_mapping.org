@@ -1075,15 +1075,36 @@
 # crop is encoded in the seed-type label ('Semences de petit mil').  This
 # table resolves each EHCVM seed-type label to the crop's harmonize_food
 # `Preferred Label`, so seed rows carry the SAME `crop` value a consumed
-# food / grown crop would (the shared j axis).  The catch-all seed slots
-# ('Semences d'autres céréales', 'Autres semences', 'Plants/boutures de
-# tubercules') resolve to 'Autre crop' (no single crop named).  The bare
-# label '20' is the 2018-19 trailing seed slot whose value-label text was
-# not stored (it is 'Autres semences' = code 20 in the sibling 2021-22
-# wave), so it also maps to 'Autre crop'.  Non-seed input labels are absent
-# here (the wave script only consults this table for rows whose input
+# food / grown crop would (the shared j axis).  Non-seed input labels are
+# absent here (the wave script only consults this table for rows whose input
 # resolved to 'Seed').  The ECVMA waves do NOT use this table — they read
 # the crop from the roster's own crop column.
+#
+# KEEP DISTINCT NATIVE SLOTS DISTINCT (GH #1123).  `crop` is an index level
+# of plot_inputs (t, i, input, crop, u) and harmonize_input maps every seed
+# label to the single input 'Seed', so two seed slots sharing a Preferred
+# Label collide on one key and core keeps one row.  Until GH #1123 the three
+# catch-all slots all mapped to 'Autre crop', and households reporting two
+# of them in one unit lost a line: 6 in 2018-19 (slots 15+19), 3 in 2021-22
+# (15+20, 19+20).  "Semences d'autres céréales" and "Plants/boutures de
+# tubercules" now take the Benin/Togo/Burkina labels 'Autre céréale' and
+# 'Autre tubercule'; 'Autres semences' keeps 'Autre crop'.  The uniqueness
+# guard before to_parquet in 2018-19/_/ and 2021-22/_/plot_inputs.py is the
+# enforcement; this comment is not.
+#
+# CODES ARE NOT LABELS ACROSS THE TWO EHCVM WAVES.  2018-19's s16bq01 value
+# labels stop at 19 = 'Autres semences' (no 'Plants/boutures' label at all);
+# 2021-22 inserts 19 = 'Plants/boutures de tubercules' and moves 'Autres
+# semences' to 20.  Both scripts resolve by LABEL, so that shift is harmless
+# -- except for the bare key '20', which is a CODE: 2018-19 code 20 occurs on
+# 382 applied rows and carries no value label.  Its meaning is UNKNOWN; an
+# earlier comment here called it 'Autres semences' by borrowing the 2021-22
+# code, which is a different code list (and 2018-19 already has its own
+# 'Autres semences' at 19).  It keeps its legacy 'Autre crop' (and
+# harmonize_input 'Seed') binding, unverified: with the two splits above it
+# collides with nothing (3 households report both 19 and 20, always in
+# different units).  Burkina's source-qualified 'Unknown [...]' fallback was
+# NECESSARY there and is not here; the guard catches a future collision.
 
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
@@ -1096,8 +1117,8 @@
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
-| Plants/boutures de tubercules | Autre crop          |
+| Semences d'autres céréales    | Autre céréale       |
+| Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
 

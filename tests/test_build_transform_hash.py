@@ -567,23 +567,111 @@ def test_standalone_nullable_dtype_changes_reach_closure(monkeypatch, before_spe
     assert R._closure_parts(uses_dtype, set()) != before
 
 
-def test_empty_constructor_dtype_map_is_in_build_closure_and_value_sensitive(monkeypatch):
+# The READ-path dtype code PR #1221 pulled into every closure through
+# ``_empty_declared_frame`` (measured on 326b6e3de against 60aa81e9e).
+_EMPTY_FRAME_READ_PATH = (
+    "lsms_library.country._empty_declared_frame",
+    "lsms_library.country._enforce_declared_dtypes",
+    "lsms_library.country._coerce_datetime_column",
+    "lsms_library.country._to_datetime_mixed",
+    "lsms_library.country._coerce_to_boolean",
+    "lsms_library.country._SCHEME_DTYPE_MAP",
+    "lsms_library.country._SCHEME_SKIP_KEYS",
+    "lsms_library.country._STR_TO_BOOL",
+    "lsms_library.country._YEAR_LAST_DATE",
+)
+
+
+def test_empty_constructor_dtype_code_is_not_in_any_build_closure(monkeypatch):
+    """GH #1218 / PR #1221 follow-up: the constructed empty frame is served,
+    never written, so neither it nor the read-path dtype code it calls may
+    reach a build fingerprint.  Until the exclusion they did, and every hash
+    depended on ``mode.string_storage`` (through ``_SCHEME_DTYPE_MAP``'s
+    ``StringDtype``) and on the text of the read-time date cast.
+
+    Structural (no part names any of them, from any entry point), then
+    measured: re-typing a ``_SCHEME_DTYPE_MAP`` entry, or a no-op edit to the
+    helper or to ``_coerce_datetime_column``, moves no fingerprint."""
     import pandas as pd
     from lsms_library import country
 
+    # The build code still reaches it (else the checks below pass vacuously).
+    import inspect
+    assert "_empty_declared_frame(" in inspect.getsource(
+        country.Country._aggregate_wave_data)
     R.clear_caches()
     try:
-        parts = R._closure_parts(country.Country._aggregate_wave_data, set())
-        assert any(p.startswith('lsms_library.country._empty_declared_frame=') for p in parts)
-        assert any(p.startswith('lsms_library.country._enforce_declared_dtypes=') for p in parts)
-        assert any(p.startswith('lsms_library.country._SCHEME_DTYPE_MAP=') for p in parts)
-        before = R.build_transforms_fingerprint('household_roster')
+        names = {p.split('=', 1)[0] for p in _all_parts()}
+        leaked = sorted(names & set(_EMPTY_FRAME_READ_PATH))
+        assert not leaked, f"read-path dtype code leaked into the build closure: {leaked}"
+        assert "lsms_library.country._empty_declared_frame" in R._EXCLUDED_CALLABLES
+        tables = sorted({t for _q, (_f, ts) in R._BUILD_TRANSFORMS.items() for t in ts}
+                        | {'household_roster', 'interview_date', 'plot_inputs'})
+        before = {t: R.build_transforms_fingerprint(t) for t in tables + [None]}
         with monkeypatch.context() as patch:
             patch.setitem(country._SCHEME_DTYPE_MAP, 'bool', pd.Int64Dtype())
+            patch.setitem(country._SCHEME_DTYPE_MAP, 'str',
+                          pd.StringDtype(storage='python'))
             R.clear_caches()
-            assert R.build_transforms_fingerprint('household_roster') != before
+            assert {t: R.build_transforms_fingerprint(t) for t in before} == before
+        for target in (country._empty_declared_frame, country._coerce_datetime_column):
+            with monkeypatch.context() as patch:
+                real = inspect.getsource
+                patch.setattr(inspect, "getsource",
+                              lambda o, _t=target, _r=real: _r(o) + "\n_redteam_probe = 1\n"
+                              if inspect.unwrap(o) is _t else _r(o))
+                R.clear_caches()
+                assert {t: R.build_transforms_fingerprint(t) for t in before} == before, \
+                    target.__name__
     finally:
         R.clear_caches()
+
+
+def test_hashes_do_not_depend_on_pandas_string_storage(tmp_path):
+    """GH #1218 / PR #1221 follow-up, in fresh processes: the fingerprint and
+    three small countries' ``_table_cache_hash`` values are identical with
+    ``mode.string_storage`` set to ``'python'`` BEFORE the library is imported
+    (``_SCHEME_DTYPE_MAP`` snapshots ``pd.StringDtype()`` at import) and left at
+    its default.  On 326b6e3de every hash moved."""
+    import json
+    import subprocess
+    import sys
+
+    code = """
+import json, os, sys, warnings
+import pandas as pd
+if sys.argv[1] != 'default':
+    pd.set_option('mode.string_storage', sys.argv[1])
+import lsms_library
+from lsms_library import _build_registry as R
+from lsms_library.country import Country, _SCHEME_DTYPE_MAP
+warnings.simplefilter('ignore')
+out = {'storage': _SCHEME_DTYPE_MAP['str'].storage, 'file': lsms_library.__file__,
+       'btf': {str(t): R.build_transforms_fingerprint(t)
+               for t in (None, 'household_roster', 'interview_date', 'plot_inputs')},
+       'tch': {}}
+for name in ('Kosovo', 'Guyana', 'Tajikistan'):
+    c = Country(name, preload_panel_ids=False)
+    for t in sorted(c.data_scheme)[:3]:
+        out['tch'][name + '/' + t] = c._table_cache_hash(t, c.waves)
+print(json.dumps(out))
+"""
+    env = dict(os.environ, LSMS_DATA_DIR=str(tmp_path / 'data'))
+    results = {}
+    for storage in ('default', 'python'):
+        proc = subprocess.run([sys.executable, '-B', '-c', code, storage],
+                              capture_output=True, text=True, env=env)
+        assert proc.returncode == 0, proc.stderr[-2000:]
+        results[storage] = json.loads(proc.stdout.strip().splitlines()[-1])
+    pkg = os.path.dirname(lsms_library.__file__)
+    for r in results.values():
+        assert os.path.dirname(r['file']) == pkg, r['file']
+    # The option took effect, so the comparison below can fail.
+    assert results['python']['storage'] == 'python'
+    assert results['default']['storage'] != 'python', results['default']['storage']
+    assert len(results['default']['tch']) >= 3
+    assert results['python']['btf'] == results['default']['btf']
+    assert results['python']['tch'] == results['default']['tch']
 
 
 @pytest.mark.parametrize('factory', ['Int32Dtype', 'Float32Dtype', 'CategoricalDtype'])

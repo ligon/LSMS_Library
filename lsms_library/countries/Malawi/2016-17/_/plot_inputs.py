@@ -6,9 +6,10 @@ like plot_features / crop_production.  Plot key is gardenid_plotid in both
 halves (Module D and Module G agree).
 
 Module D layout is the IHS4/IHS5 generation: slot-1 fertilizer type
-ag_d39a / applied-qty ag_d39d / unit ag_d39e; slot-2 type ag_d39g /
-applied-qty ag_d39j (no distinct slot-2 applied-unit column -> u NaN for
-slot 2).  Module G carries a harmonized `crop_code`, the seed columns
+ag_d39a / enumerator-total kg ag_d39d; slot-2 type ag_d39g /
+enumerator-total kg ag_d39j. Native quantity/unit pairs b/c and h/i
+are separate from these selected totals; ag_d39e records timing.
+Module G carries a harmonized `crop_code`, the seed columns
 ag_g04a/ag_g04b, and the improved-seed flag ag_g0f (2 = improved).
 Module H purchased seed: ag_h16a/b + ag_h19, ag_h26a/b + ag_h29;
 crop_code.
@@ -68,19 +69,23 @@ def _plotkey(df):
             + df['plotid'].apply(format_id))
 
 
-def _fert_args(d):
-    return dict(type1='ag_d39a', qty1='ag_d39d', unit1='ag_d39e',
-                type2='ag_d39g', qty2='ag_d39j', unit2=None)
-
-
 def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value):
     for df in (d, g, h):
         df['hhid'] = hh_of(df)
     d['plotkey'] = _plotkey(d)
     g['plotkey'] = _plotkey(g)
+    # Q39 (IHS4 agriculture questionnaire, PDF/printed p.12) labels d/j
+    # TOTAL KGs; both extracts' Stata labels agree.  Bind those unchanged
+    # amounts before the additive full-key grouping (ledger #1111), without
+    # interpreting timing as a unit.
+    fertilizer = _fertilizer_block(
+        d, hhid='hhid', plotkey='plotkey',
+        type1='ag_d39a', qty1='ag_d39d', unit1=None,
+        type2='ag_d39g', qty2='ag_d39j', unit2=None, t=WAVE)
+    fertilizer['u'] = pd.Series('Kilogramme', index=fertilizer.index,
+                                dtype='string')
     pieces = [
-        _fertilizer_block(d, hhid='hhid', plotkey='plotkey', t=WAVE,
-                          **_fert_args(d)),
+        fertilizer,
         _organic_block(d, hhid='hhid', plotkey='plotkey', flag='ag_d36',
                        t=WAVE),
         _pesticide_block(d, hhid='hhid', plotkey='plotkey', gate='ag_d40',

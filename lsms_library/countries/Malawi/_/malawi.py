@@ -1207,9 +1207,140 @@ def _crop_conditions(series):
     return out.astype('object').where(out.notna(), _CONDITION_UNKNOWN)
 
 
+# --- harvest/sale UNIT other-specify text that restates a coded unit -------
+#
+# GH #856 (step 2, approved by @ligon 2026-10-22).  The crop-harvest unit code
+# list printed in 2010-11 for Module G (ag_g13b), P (ag_p09b), I (ag_i02b) and
+# Q (ag_q02b) offers 3 = 90 KG BAG and 11 = BASKET (DENGU).  In IHS4/IHS5
+# (2016-17, 2019-20) the value labels of G, I and Q DROP both codes (G's
+# drops 3 already in 2013-14), and those files carry ZERO rows on either
+# code -- against 599 and 1,484 Module G rows in 2010-11.  Respondents wrote
+# them under 13 = OTHER (SPECIFY) instead, with the unit in the specify text
+# (ag_g13b_oth / ag_p09b_oth / ag_i02b_oth / ag_q02b_oth).  P kept both codes;
+# its few restatements are slips, recovered the same way so that a P harvest
+# and its Q sale stay comparable.
+#
+# The recovery recodes such a row's INTEGER code back to 3 or 11 before
+# `harmonize_crop_unit` is consulted, so it is served exactly the `u` label a
+# 2010-11 code-3 / code-11 row is served and `u` is continuous across waves.
+# It is a label harmonisation of the survey's own answer (the same class as
+# `harmonize_crop_unit` and `_PERENNIAL_RECODE`), not a constructed value, so
+# it carries no `Derivation` key; the rows recovered are COUNTED in
+# `attrs['unit_text_recovered']`.  `Quantity` is the respondent's count of
+# those units and is never touched.
+#
+# SCOPE: only the two codes the 2016-17 / 2019-20 G, I and Q lists DROPPED --
+# 3 (90 KG BAG) and 11 (BASKET (DENGU)) -- are recovered.  A text restating a
+# code still on the list (e.g. '50 KG BAG' = code 2, 'PAIL ...', 'BUNCH',
+# 'PLATE', 'PIECE', 'BALE', 'OX-CART') is deliberately left as typed: the
+# respondent could have used that code and did not, which is a different
+# question (a possible follow-up, see CONTENTS.org).
+#
+# EXACT matches only, after `_normalise_unit_text` (strip, collapse
+# whitespace, upper-case), against strings measured in OUR files
+# (slurm_logs/isa_backlog_2026-10-21/856-harvest-unit-text/) -- no regex, no
+# outside list.  Deliberately NOT recovered, so they stay 'Other (Specify)':
+#   * a count prefix, or a typo that could be another size: '1 90 KG',
+#     '09KG BAG' (a 9 kg bag?);
+#   * any basket or dengu QUALIFIED by a size, weave or content, because
+#     code 11 names no size and a qualified one may not be that unit:
+#     'BASKET (LARGE)', 'BASKET (SMALL)', 'LARGE BASKET(S)', 'SMALL BASKET',
+#     'MEDIAM BASKET', 'LARGE DENGU', 'DENGU(LARGE)', 'DENGU(GOGODA)',
+#     'WEAVING BASKET', 'MEDIUM WEAVING BASKET', 'BASKET OF ...';
+#   * every bag of a size the lists never had a code for ('70 KG BAG',
+#     '100 KG BAG', ...).
+# Judgement calls, each recorded for maintainer review:
+#   * plain 'BASKET' / 'BASKETS' / 'BUSKET' -> the dengu, the only basket the
+#     code list offers;
+#   * a bare weight with no container word ('90KG', '90 KG', '90KGS',
+#     '90 KGS': 21 lines) -> the 90 kg bag (same kilograms; the label says
+#     'Bag');
+#   * the two unambiguous bag typos '90 KG BAD' and '90KG BAY' (1 line each)
+#     -> the 90 kg bag, as the basket typos 'BUSKET' / 'BASKET (DENGUE)' map;
+#   * 'BASKET (BAMBOO)' -> the dengu.  RULING (@ligon, 2026-10-22): the only
+#     bamboo-basket spelling in our files, 13 Module I lines in 2016-17; the
+#     same households' harvest rows say 'DENGU' / 'BASKET' for the same crop;
+#   * 'BASKET (UNSPECIFIED SIZE)' -> the dengu.  DECISION (Sue, coordinator,
+#     2026-10-22; for maintainer review at the PR): 61 lines, 59 of them
+#     Module Q 2016-17.  "Unspecified size" names no size, so it is the plain
+#     basket, which already maps -- as Malawi's own `u` table keeps plain
+#     'Heap' as the size-free unit distinct from the sized heaps.
+_UNIT_OTHER_SPECIFY = 13
+_UNIT_TEXT_RECODE = {
+    3: frozenset({
+        '90 KG BAG', '90KG BAG', '90 KG BAGS', '90KG BAGS', '90KGBAG',
+        '90 KGBAG', '90KG', '90 KG', '90KGS', '90 KGS', 'BAGS OF 90 KGS',
+        '90 KG BAD', '90KG BAY',                # typos of the bag
+    }),
+    11: frozenset({
+        'DENGU', 'BASKET', 'BASKETS', 'BUSKET',
+        'BASKET (DENGU)', 'BASKET(DENGU)', 'BASKET ( DENGU)',
+        'BASKET ( DENGU )', 'BASKET (DENGUE)', 'BASKET DENGU',
+        'BASKET-DENGU', 'BASKET/ DENGU', 'DENGU/BASKET', 'DENGU ( BASKET )',
+        'DENGU( BASKET )', 'DENGU/BUSKET', 'BUSKET/DENGU',
+        'BASKET (BAMBOO)',                      # ruling, @ligon 2026-10-22
+        'BASKET (UNSPECIFIED SIZE)',            # decision, Sue 2026-10-22
+    }),
+}
+
+
+def _normalise_unit_text(series):
+    """Strip, collapse internal whitespace and upper-case a specify-text
+    Series; blank -> NA.  The form `_UNIT_TEXT_RECODE` is written in."""
+    s = pd.Series(series).astype('string').str.strip()
+    s = s.str.replace(r'\s+', ' ', regex=True).str.upper()
+    return s.where(s.notna() & (s != ''), pd.NA)
+
+
+def _recover_unit_code(code, text):
+    """Recode OTHER (SPECIFY) unit rows whose text restates code 3 or 11.
+
+    *code* is the integer unit code (nullable ``Int64``); *text* is the
+    module's own unit specify-text column, aligned to it (or None for a file
+    that ships none).  Returns ``(code, recovered_to)``: the code with those
+    rows set to 3 / 11, and an ``Int64`` Series holding the code each row
+    was recovered TO (NA where nothing moved) for the caller to count.  A
+    row is touched only when its code IS 13: text on any other code never
+    relabels it."""
+    code = pd.Series(code).astype('Int64')
+    recovered_to = pd.Series(pd.NA, index=code.index, dtype='Int64')
+    if text is None:
+        return code, recovered_to
+    norm = _normalise_unit_text(pd.Series(text, index=code.index))
+    other = (code == _UNIT_OTHER_SPECIFY).fillna(False).astype(bool)
+    for target, spellings in _UNIT_TEXT_RECODE.items():
+        hit = other & norm.isin(spellings).fillna(False).astype(bool)
+        recovered_to = recovered_to.mask(hit, target)
+    return code.mask(recovered_to.notna(), recovered_to).astype('Int64'), recovered_to
+
+
+def _unit_codes(df, unit, unit_text):
+    """The module's integer unit codes, with the GH #856 recovery applied.
+
+    ``unit_text`` names the module's own unit specify-text column; a name
+    that is not in the file raises (a mis-typed column must not silently
+    turn the recovery off)."""
+    if unit is None or unit not in df.columns:
+        na = pd.Series(pd.NA, index=df.index, dtype='Int64')
+        return na, na
+    code = pd.to_numeric(df[unit], errors='coerce').astype('Int64')
+    if unit_text is None:
+        return _recover_unit_code(code, None)
+    if unit_text not in df.columns:
+        raise KeyError(f'unit specify-text column {unit_text!r} not in the '
+                       f'module (columns: {sorted(df.columns)[:12]} ...)')
+    return _recover_unit_code(code, df[unit_text])
+
+
+def _recovered_counts(recovered_to):
+    """``{3: n, 11: n}`` from a ``recovered_to`` Series."""
+    vc = recovered_to.dropna().astype(int).value_counts()
+    return {k: int(vc.get(k, 0)) for k in _UNIT_TEXT_RECODE}
+
+
 def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
                    plant_m=None, plant_y=None, harv_m=None, intercrop=None,
-                   perennial=False, t=None):
+                   perennial=False, t=None, unit_text=None):
     """Reshape one harvest module (G or P) to canonical long rows.
 
     All keyword args are RAW column names in ``df`` (or None when the
@@ -1224,8 +1355,16 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     since GAP 1, so the column was always asserted to exist and never read.
     It is now an INDEX LEVEL of ``crop_production`` -- see
     ``_/data_scheme.yml`` and ``lsms_library/data_info.yml``.  Module P
-    (perennial) asks no such question and passes None, which sentinels its
-    rows to ``unknown_condition``.
+    (perennial) asks no S/U question and passes None, which sentinels its
+    rows to ``unknown_condition``.  (IHS4/IHS5 Module P does ask a FRESH /
+    DRY question, ``ag_p09_1``; it is not read -- see CONTENTS.org, GH #856.)
+
+    ``unit_text`` is the module's own unit specify-text column (2016-17 /
+    2019-20: ``ag_g13b_oth`` for G, ``ag_p09b_oth`` for P).  Where given, a
+    13 OTHER (SPECIFY) row whose text restates code 3 (90 KG BAG) or 11
+    (BASKET (DENGU)) -- the two codes the IHS4/IHS5 lists dropped -- is
+    served that code's label (GH #856, ``_UNIT_TEXT_RECODE``); the count
+    rides on ``attrs['unit_text_recovered']``.  ``Quantity`` never moves.
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
@@ -1240,9 +1379,10 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     # the grain would split no key and only widen the index.
     crop_variety = _map_codes(crop_code_int, _malawi_code_map(_VARIETY_TABLE))
 
-    u = (pd.to_numeric(df[unit], errors='coerce').astype('Int64').map(unit_map)
-         if unit is not None and unit in df.columns
-         else pd.Series(pd.NA, index=df.index, dtype='string'))
+    # GH #856: 13 OTHER (SPECIFY) rows whose own specify text restates a
+    # coded unit are recoded to that code first (see `_UNIT_TEXT_RECODE`).
+    ucode, recovered_to = _unit_codes(df, unit, unit_text)
+    u = ucode.map(unit_map)
     u = u.astype('string').where(u.notna(), pd.NA)
 
     quantity = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
@@ -1293,12 +1433,16 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     # Drop rows with no crop identity (crop code missing) — not a planted
     # item.  Keep rows with a crop even if Quantity is NaN (reported "no
     # harvest yet"/refused are legitimately item rows).
-    out = out[out['crop'].notna() | out['_crop_code'].notna()]
+    keep = (out['crop'].notna() | out['_crop_code'].notna()).to_numpy()
+    out = out[keep]
+    out.attrs['unit_text_recovered'] = _recovered_counts(
+        recovered_to[keep])
     return out
 
 
 def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
-                unit_sold=None, condition=None, perennial=False):
+                unit_sold=None, condition=None, perennial=False,
+                unit_sold_text=None):
     """Reshape one sale module (I or Q) to (i, _crop_code, u, condition_sold).
 
     Returns a DataFrame with columns [i, _crop_code, u, condition_sold,
@@ -1310,10 +1454,19 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
 
     ``unit_sold`` is the sale module's OWN unit column (Module I ag_i02b,
     Module Q ag_q02b).  The sale quantity is asked in its own unit, on the
-    same code list as the harvest unit (verified from the Stata value
+    same code list as the harvest unit (verified from the 2010-11 Stata value
     labels: ag_i02b / ag_q02b / ag_g13b all carry
-    {1 kilogram, 2 50 KG BAG, 3 90 KG BAG, 4 PAIL (SMALL), ... 13 OTHER}),
+    {1 kilogram, 2 50 KG BAG, 3 90 KG BAG, 4 PAIL (SMALL), ... 13 OTHER}; in
+    2016-17 / 2019-20 all three DROP 3 and 11, see ``unit_sold_text``),
     and it DIFFERS from the harvest unit for 22.2% of 2010-11 sale rows.
+
+    ``unit_sold_text`` is the sale module's own unit specify-text column
+    (2016-17 / 2019-20: ``ag_i02b_oth`` / ``ag_q02b_oth``).  The SAME
+    recovery as the harvest side (GH #856, ``_UNIT_TEXT_RECODE``) applies:
+    a 13 OTHER (SPECIFY) sale whose text restates 90 KG BAG or BASKET
+    (DENGU) gets that code's label.  It has to be both sides or neither: the
+    attach keys on ``u``, so recovering only the harvest row would detach a
+    sale both sides reported as 13 + "90 KG BAG" (158 such, measured).
     Carrying it is what lets ``assemble_crop_production`` attach a sale only
     to the harvest row measured in the SAME unit, so that
     ``Value_sold / Quantity_sold`` is a price per the row's declared ``u``.
@@ -1344,11 +1497,9 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     unit_map = _malawi_code_map('harmonize_crop_unit')
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
 
-    if unit_sold is not None and unit_sold in df.columns:
-        u = pd.to_numeric(df[unit_sold], errors='coerce').astype('Int64').map(unit_map)
-        u = u.astype('string').where(u.notna(), pd.NA)
-    else:
-        u = pd.Series(pd.NA, index=df.index, dtype='string')
+    ucode, recovered_to = _unit_codes(df, unit_sold, unit_sold_text)
+    u = ucode.map(unit_map)
+    u = u.astype('string').where(u.notna(), pd.NA)
 
     if condition is not None and condition in df.columns:
         cond_sold = _crop_conditions(df[condition])
@@ -1371,10 +1522,13 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
         'Quantity_sold':  qs.values,
         'Value_sold':     vs.values,
     })
-    out = out[out['_crop_code'].notna()]
+    keep = out['_crop_code'].notna().to_numpy()
+    out = out[keep]
     grp = out.groupby(['i', '_crop_code', 'u', 'condition_sold'],
                       as_index=False, dropna=False).agg(
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+    # Counted on the module's LINES, before the groupby sums them.
+    grp.attrs['unit_text_recovered'] = _recovered_counts(recovered_to[keep])
     return grp
 
 
@@ -1904,6 +2058,15 @@ def _consolidate_harvest(harvest_pieces):
     })
 
 
+def _sum_recovered(pieces):
+    """Sum the ``attrs['unit_text_recovered']`` counts of block outputs."""
+    total = {k: 0 for k in _UNIT_TEXT_RECODE}
+    for piece in pieces:
+        for k, n in piece.attrs.get('unit_text_recovered', {}).items():
+            total[int(k)] = total.get(int(k), 0) + int(n)
+    return total
+
+
 def assemble_crop_production(t, harvest_pieces, sale_pieces):
     """Combine reshaped harvest (_harvest_block) and sale (_sale_block)
     pieces into the canonical crop_production DataFrame for wave ``t``.
@@ -1948,6 +2111,11 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     -- registered as the deletion ``sale-basis-unresolved``), and
     ``attrs['sale_basis_ladder']`` (sales and MWK per rung).
     """
+    # GH #856: how many OTHER (SPECIFY) unit rows each block recovered to a
+    # coded unit from its own specify text, summed over the wave's pieces.
+    recovered = {'harvest': _sum_recovered(harvest_pieces),
+                 'sale': _sum_recovered(sale_pieces or [])}
+
     harv = _consolidate_harvest(harvest_pieces)
 
     if sale_pieces:
@@ -2067,6 +2235,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     out.attrs['sale_suppressed'] = tally
     out.attrs['sale_basis_mismatch'] = mismatch
     out.attrs['sale_basis_ladder'] = tallies['sale_basis_ladder']
+    out.attrs['unit_text_recovered'] = recovered
     return out
 
 
@@ -2078,6 +2247,13 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
 # source table below transcribes the four wave scripts
 # (`Malawi/<wave>/_/crop_production.py`), which stay the build's source of
 # truth; a test checks every file named here is named in its script.
+
+#: GH #856: the unit specify-text columns the 2016-17 / 2019-20 scripts hand
+#: `_harvest_block` (``unit_text``) and `_sale_block` (``unit_sold_text``).
+#: 2010-11 has none of the recovered strings and 2013-14 ships no text, so
+#: their halves name none (`dict.get` -> None).
+_UNIT_TEXT_COLS = dict(gtext='ag_g13b_oth', ptext='ag_p09b_oth',
+                       itext='ag_i02b_oth', qtext='ag_q02b_oth')
 
 _CROP_SALE_SOURCES = {
     '2010-11': [dict(half='full', dir='Data/Full_Sample/Agriculture',
@@ -2094,22 +2270,22 @@ _CROP_SALE_SOURCES = {
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
                      hhid='case_id', prefix='cs-17-', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
-                     icrop='crop_code', qcrop='crop_code'),
+                     icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS),
                 dict(half='panel', dir='Data/Panel',
                      g='ag_mod_g_16.dta', p='ag_mod_p_16.dta', i='ag_mod_i_16.dta', q='ag_mod_q_16.dta',
                      hhid='y3_hhid', prefix='', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
-                     icrop='crop_code', qcrop='crop_code')],
+                     icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS)],
     '2019-20': [dict(half='xs', dir='Data/Cross_Sectional',
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
                      hhid='case_id', prefix='', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
-                     icrop='crop_code', qcrop='crop_code'),
+                     icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS),
                 dict(half='panel', dir='Data/Panel',
                      g='ag_mod_g_19.dta', p='ag_mod_p_19.dta', i='ag_mod_i_19.dta', q='ag_mod_q_19.dta',
                      hhid='y4_hhid', prefix='', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
-                     icrop='crop_code', qcrop='crop_code')],
+                     icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS)],
 }
 
 #: The sale modules' variables, in questionnaire order, per module.
@@ -2148,20 +2324,26 @@ def _crop_pieces(wave):
             _harvest_block(g, hhid='hhid', plotkey=h['gplot'], cropcode=h['gcrop'],
                            qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
                            plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
-                           intercrop='ag_g01', perennial=False, t=wave),
+                           intercrop='ag_g01', perennial=False, t=wave,
+                           unit_text=h.get('gtext')),
             _harvest_block(p, hhid='hhid', plotkey=h['pplot'], cropcode=pcrop,
                            qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
-                           harv_m='ag_p06c', perennial=True, t=wave),
+                           harv_m='ag_p06c', perennial=True, t=wave,
+                           unit_text=h.get('ptext')),
         ]
-        for mod, df, cropcol, perennial in (('I', i_mod, h['icrop'], False),
-                                            ('Q', q, h['qcrop'], True)):
-            names = _SALE_RAW_VARS[mod]
-            flag, qty, unit, cond, value = names
+        for mod, df, cropcol, perennial, utext in (
+                ('I', i_mod, h['icrop'], False, h.get('itext')),
+                ('Q', q, h['qcrop'], True, h.get('qtext'))):
+            names = _SALE_RAW_VARS[mod] + ([utext] if utext else [])
+            flag, qty, unit, cond, value = _SALE_RAW_VARS[mod]
             sale.append(_sale_block(df, hhid='hhid', cropcode=cropcol, sold_flag=flag,
                                     qty_sold=qty, value_sold=value, unit_sold=unit,
-                                    condition=cond, perennial=perennial))
+                                    condition=cond, perennial=perennial,
+                                    unit_sold_text=utext))
             crop_label, code = _crop_codes(df[cropcol], perennial=perennial)
-            u = pd.to_numeric(df[unit], errors='coerce').astype('Int64').map(unit_map)
+            # The served `u`, decoded exactly as `_sale_block` decodes it
+            # (GH #856 recovery included), so the lines join the served rows.
+            u = _unit_codes(df, unit, utext)[0].map(unit_map)
             cond_sold = (_crop_conditions(df[cond]) if cond in df.columns
                          else pd.Series(_CONDITION_UNKNOWN, index=df.index, dtype='object'))
             line = pd.DataFrame({
@@ -3987,6 +4169,14 @@ def assemble_people_last7days(t, pieces):
 # median/mean -- those are transformations.  There is no household i, so
 # v is NATIVE in the index (the framework's _join_v_from_sample does not
 # apply).  2016-17 (IHS4) collected no Module CK -> absent for that wave.
+# u is never null (GH #827): the item's fixed unit for the 17 items whose
+# unit cell the form strikes out (_CK_ITEM_FIXED_UNIT), else the decoded
+# unit code, else `Unknown`.  On those 17 items the form strikes the NUMBER
+# OF UNITS cell too, and a PRICED row of one is served NumberOfUnits = 1, the
+# registered derivation Malawi::community_prices::struck-item-one-unit
+# (derive_ck_struck_one_unit; ruling @ligon 2026-10-23, the analogue of
+# Niger's community_prices one-item-per-price) -- except CK33 cigarettes,
+# whose bimodal prices leave the count NA (_CK_ONE_UNIT_EXCLUDED).
 
 def _price_item_code_map():
     """{int item code 1-51: Preferred Label} for community_prices `j`."""
@@ -3996,6 +4186,54 @@ def _price_item_code_map():
 def _price_unit_code_map():
     """{int unit code 1-21: Preferred Label} for community_prices `u`."""
     return _malawi_code_map('harmonize_price_unit')
+
+
+# GH #827.  The Module CK form STRIKES OUT the NUMBER OF UNITS and UNIT
+# CODES cells for these 17 items: a diagonal line through both cells on
+# CK3, CK4, CK30-CK35, CK42, CK44-CK51 on IHS3 Community questionnaire p. 20
+# (`2010-11/Documentation/IHS3.Community.Qx.FINAL.pdf`), IHPS Market
+# questionnaire p. 12 ("MODULE E: PRICES", the 2013-14 list, which lacks
+# CK51), and IHS5 Community questionnaire p. 20.
+# The unit is not asked because the ITEM fixes it -- "Coca-Cola, Fanta
+# (bottle)", "Cigarettes, Embassy (packet)", "Cost to grind 50 kg bag of
+# maize", "Ganyu wage, 1 day, adult male" -- and no unit code or count is
+# recorded on any of their rows in any wave or half (2010-11, 2013-14,
+# 2019-20 Cross_Sectional and Panel: 0 of 28,631 served rows, 21,641 of
+# them priced).  Precedent:
+# Nigeria W1/W2 community prices, where "the questionnaire fixes one unit
+# per item, so the per-item unit is supplied" (nigeria.py, `_W1W2_PRICE_UNIT`).
+# The unit is the item's, so it is supplied on EVERY row of the item,
+# available or not.  Labels transcribe the printed item text where it names
+# a basis (bottle, packet, 50 kg bag, per 50 kg per kilometre, 1 day); the
+# count goods whose text names none (trousers, battery, watch, hoe, panga,
+# sickle, axe, bicycle, mattress, net -- "single" on CK49/CK50 is a bed size,
+# not a count) are served `Piece`, Malawi's own count label (CK code 9).
+# `Piece` is an INFERENCE from the struck count cell, not a transcription;
+# see Malawi/_/CONTENTS.org.  NumberOfUnits is not READ here (the form
+# struck that cell too, and no row records one): the 1 a priced row of these
+# items is served is a construction, the registered derivation
+# CK_STRUCK_ONE_UNIT, stamped by derive_ck_struck_one_unit after the collapse
+# in assemble_community_prices -- on every struck item EXCEPT CK33 cigarettes
+# (_CK_ONE_UNIT_EXCLUDED: bimodal packet / single-stick prices).
+_CK_ITEM_FIXED_UNIT = {
+    3: '50 kg Bag',            # Cost to grind 50 kg bag of maize
+    4: '50 kg Bag',            # Cost to grind 50 kg bag of rice
+    30: 'Piece',               # Trousers (kaunjika)
+    31: 'Bottle',              # Coca-Cola, Fanta (bottle)
+    32: 'Bottle',              # Carlsberg beer (bottle)
+    33: 'Packet',              # Cigarettes, Embassy (packet)
+    34: 'Piece',               # Battery (dry cell) for radio
+    35: 'Piece',               # Watch, digital (simple), plastic
+    42: '50 kg per Kilometre', # Motorized transport of crop output (per 50kg per kilometer)
+    44: 'Piece',               # Hand hoe, without handle
+    45: 'Piece',               # Panga
+    46: 'Piece',               # Sickle
+    47: 'Piece',               # Axe
+    48: 'Piece',               # Bicycle
+    49: 'Piece',               # Foam mattress (10 cm, single)
+    50: 'Piece',               # Mosquito net (white, not treated with insecticide, single)
+    51: 'Day',                 # Ganyu wage, 1 day, adult male
+}
 
 
 def _strip_ck(series):
@@ -4014,7 +4252,23 @@ def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
     convert_categoricals=False so codes are numeric / 'CK<n>' strings).
     Returns a long DataFrame with columns [t, v, j, u, _item_code, Price,
     NumberOfUnits, Available] -- NO aggregation, one row per source row.
+
+    ``u`` is never null (GH #827): an item whose form strikes out the unit
+    cell gets the unit the item fixes (``_CK_ITEM_FIXED_UNIT``); on every
+    other item a unit code that is blank, or on no Module CK list (codes
+    outside 1-21: 2013-14's 0/22/23/25/48/50/69/200/500, 2010-11's one 23),
+    is the missing-unit sentinel ``U_UNKNOWN`` -- the Malawi rule for codes
+    "on no instrument's list" (CONTENTS.org, GH #1042).  A null on the
+    declared ``u`` level is not served as a gap: ``local_tools.map_index``
+    renames it to the literal ``'unit'`` on every read.
+
+    ``NumberOfUnits`` is the RECORDED count here, NA on every struck item
+    (the form strikes that cell).  The 1 a priced struck row (CK33
+    cigarettes excepted) is served is added later, after the collapse, by
+    ``derive_ck_struck_one_unit`` in ``assemble_community_prices``.
     """
+    from lsms_library.transformations import U_UNKNOWN
+
     item_map = _price_item_code_map()
     unit_map = _price_unit_code_map()
 
@@ -4030,7 +4284,21 @@ def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
         u = ucode.map(unit_map)
         u = u.astype('string').where(u.notna(), pd.NA)
     else:
+        ucode = pd.Series(pd.NA, index=df.index, dtype='Int64')
         u = pd.Series(pd.NA, index=df.index, dtype='string')
+
+    fixed = code.isin(list(_CK_ITEM_FIXED_UNIT))
+    fixed = fixed.fillna(False).astype(bool)
+    recorded_on_fixed = fixed & ucode.notna()
+    if recorded_on_fixed.any():
+        raise ValueError(
+            f'community_prices {t}: {int(recorded_on_fixed.sum())} row(s) record a '
+            'unit code on an item whose Module CK unit cell is struck out '
+            f'(item codes {sorted(set(code[recorded_on_fixed].dropna().astype(int)))}); '
+            '_CK_ITEM_FIXED_UNIT would overwrite a recorded answer -- re-check '
+            'the instrument for this wave (GH #827).')
+    u = u.mask(fixed, code.map(_CK_ITEM_FIXED_UNIT).astype('string'))
+    u = u.mask(u.isna() & code.notna(), U_UNKNOWN)
 
     price = (pd.to_numeric(df[price_col], errors='coerce').astype('Float64')
              if price_col in df.columns
@@ -4069,22 +4337,34 @@ def assemble_community_prices(t, pieces):
     the canonical community_prices DataFrame for wave ``t``.
 
     Returns a DataFrame indexed (t, v, j, u) with reported columns Price,
-    NumberOfUnits, Available.  Drops rows whose item failed to resolve to a
-    Preferred Label (j NaN) -- those cannot sit on the shared j axis.  Where
-    a unit failed to resolve (u NaN, rare 2013-14 data-entry artifacts) the
-    row is kept with u = <NA> in the index (the price is still reported).
+    NumberOfUnits, Available, and ``Derivation`` (the registry key on a
+    derived row, NA on a reported one).  Drops rows whose item failed to
+    resolve to a Preferred Label (j NaN) -- those cannot sit on the shared j
+    axis.  ``u``
+    arrives non-null from _price_block (GH #827): the item's fixed unit
+    where the form strikes out the unit cell, else the decoded code, else
+    the missing-unit sentinel ``Unknown`` (a blank or off-list code, which
+    includes every not-available row of an item whose unit IS asked -- the
+    skip pattern jumps past price and unit).  The row is kept either way.
+    After the collapse, ``derive_ck_struck_one_unit`` serves
+    ``NumberOfUnits = 1`` on a priced struck-item row (CK33 cigarettes
+    excepted) and stamps the key.
     """
     cat = pd.concat(pieces, ignore_index=True)
-    cat = cat[cat['j'].notna()].drop(columns=['_item_code'])
+    cat = cat[cat['j'].notna()]
 
     # Collapse any exact (v, j, u) duplicates (none expected -- (ea, item)
     # is unique per wave -- but guard the index).  first() keeps the single
-    # reported record.
+    # reported record.  `_item_code` rides along so the derivation below
+    # tests the item CODE, not its label.
     cat = cat.groupby(['t', 'v', 'j', 'u'], as_index=False, dropna=False).agg({
+        '_item_code':    'first',
         'Price':         'first',
         'NumberOfUnits': 'first',
         'Available':     'first',
     })
+    # Stamped AFTER the collapse (CLAUDE.md "Derived Values", step 3).
+    cat = derive_ck_struck_one_unit(cat).drop(columns=['_item_code'])
 
     # community_prices is a CLUSTER table -- there is no household i, the
     # natural grain is (t, v, j, u).  But the framework's
@@ -4102,10 +4382,126 @@ def assemble_community_prices(t, pieces):
     # reaches the API.
     cat['i'] = cat['v']
     out = cat.set_index(['t', 'v', 'i', 'j', 'u'])
-    out = out[['Price', 'NumberOfUnits', 'Available']]
+    out = out[['Price', 'NumberOfUnits', 'Available', 'Derivation']]
 
     chk = out.reset_index()
     assert not chk.duplicated(['t', 'v', 'j', 'u']).any(), \
         f"Non-unique (t,v,j,u) in community_prices {t}"
     assert len(out) > 0, f"community_prices {t} produced no rows"
     return out
+
+
+# GH #827 ruling (@ligon, 2026-10-23): "on struck-unit items, NumberOfUnits =
+# 1 as a registered derivation, consistent with Niger D2.  The form prices
+# one unit of the named item."  Registry entry: Malawi/_/derivations.yml.
+CK_STRUCK_ONE_UNIT = 'Malawi::community_prices::struck-item-one-unit'
+
+#: Struck items EXCLUDED from CK_STRUCK_ONE_UNIT (ruling @ligon 2026-10-23,
+#: round 2).  CK33 "Cigarettes, Embassy (packet)": its prices are bimodal --
+#: about 541 of the 1,599 priced rows sit at single-cigarette prices -- so a
+#: served 1 would assert "one packet" on about a third of the rows the data
+#: say were priced per stick.  Its `u` stays `Packet` (the printed text, from
+#: _CK_ITEM_FIXED_UNIT); its NumberOfUnits stays NA and carries no key.
+_CK_ONE_UNIT_EXCLUDED = {33: 'Cigarettes, Embassy (packet): prices bimodal, '
+                             'packet vs single cigarette'}
+
+
+def derive_ck_struck_one_unit(df):
+    """``NumberOfUnits = 1`` on a PRICED row of a struck Module CK item,
+    stamped with the registry key ``CK_STRUCK_ONE_UNIT`` in ``Derivation``.
+
+    On the 17 items of ``_CK_ITEM_FIXED_UNIT`` the form strikes out both the
+    NUMBER OF UNITS and the UNIT CODES cells (IHS3 Community p. 20, IHPS
+    Market p. 12, IHS5 Community p. 20): the item text names the unit
+    ("Coca-Cola, Fanta (bottle)", "Ganyu wage, 1 day, adult male") and the
+    price asked is the price of one of it.  No held file records a count on
+    any of their rows, so the 1 is a construction from the form, not an
+    answer, and the row carries the key.
+
+    Target rows: item code in ``_CK_ITEM_FIXED_UNIT`` and NOT in
+    ``_CK_ONE_UNIT_EXCLUDED`` (CK33 cigarettes, whose prices are bimodal
+    packet / single stick), ``Price`` recorded (not NA; a recorded 0 counts --
+    six 2019-20 mosquito-net rows), and ``NumberOfUnits`` NA.  A recorded
+    count is never overwritten.  A row with
+    no price gets no count: a count says what quantity a price refers to, and
+    Niger's ``one-item-per-price`` (the precedent) stamps only rows that carry
+    a price -- its reshape serves no unpriced row.  Unit-asked items are
+    untouched.
+
+    Takes a frame with ``_item_code`` (the bare 1-51 code), ``Price`` and
+    ``NumberOfUnits`` -- the collapsed frame inside
+    ``assemble_community_prices``, or a ``_price_block`` output -- and returns
+    a copy with ``Derivation`` added (the key on a target row, NA elsewhere).
+    No options; the raw rows are ``inputs_community_prices_struck_one_unit``.
+    """
+    if 'Derivation' in df.columns:
+        raise ValueError('derive_ck_struck_one_unit: the frame already carries '
+                         'a Derivation column; combine keys explicitly')
+    out = df.copy()
+    code = pd.to_numeric(out['_item_code'], errors='coerce').astype('Int64')
+    struck = code.isin(list(_CK_ITEM_FIXED_UNIT)).fillna(False).astype(bool)
+    struck &= ~code.isin(list(_CK_ONE_UNIT_EXCLUDED)).fillna(False).astype(bool)
+    nunits = out['NumberOfUnits'].astype('Float64')
+    target = struck & out['Price'].notna() & nunits.isna()
+    out['NumberOfUnits'] = nunits.mask(target, 1.0)
+    out['Derivation'] = pd.Series(pd.NA, index=out.index,
+                                  dtype='string').mask(target, CK_STRUCK_ONE_UNIT)
+    return out
+
+
+#: The Module CK price file(s) per wave, read exactly as the wave scripts
+#: (``<wave>/_/community_prices.py``) read them: the path under
+#: ``<wave>/Data/``, the ``_price_block`` column keywords, and whether the
+#: item code is the 'CK<n>' string (2013-14).  Used by the registry
+#: ``inputs`` callable; the data-gated #827 test checks it joins the
+#: served rows.
+_CK_PRICE_SOURCES = {
+    '2010-11': [('Full_Sample/Community/com_ck.dta',
+                 dict(ea_col='ea_id', item_col='com_ck00a', price_col='com_ck00b1',
+                      nunits_col='com_ck00b2', unit_col='com_ck00b3',
+                      avail_col='com_ck00c'), False)],
+    '2013-14': [('COM_MOD_K_13.dta',
+                 dict(ea_col='ea_id', item_col='com_ck00a', price_col='com_ck00b1',
+                      nunits_col='com_ck00b2', unit_col='com_ck00b3',
+                      avail_col='com_ck00c'), True)],
+    '2019-20': [(rel, dict(ea_col='ea_id', item_col='com_ck00a', price_col='ckb',
+                           nunits_col='ckc', unit_col='ckd', avail_col='cka'), False)
+                for rel in ('Cross_Sectional/com_ck.dta', 'Panel/com_ck_19.dta')],
+}
+
+
+def inputs_community_prices_struck_one_unit(wave):
+    """The registry ``inputs`` callable for ``CK_STRUCK_ONE_UNIT``: the raw
+    Module CK rows behind every served row that carries the key, one source
+    row per served row, under the ORIGINAL variable names (2010-11 / 2013-14
+    ``ea_id, com_ck00a, com_ck00c, com_ck00b1, com_ck00b2, com_ck00b3``;
+    2019-20 ``ea_id, com_ck00a, cka, ckb, ckc, ckd``) plus ``source_file``
+    (the file under ``<wave>/Data/``; 2019-20 has two halves).  Indexed by
+    the served ``(t, v, j, u)``, computed by the build's own
+    ``_price_block``, so each stamped row finds the record it came from.
+    """
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in _CK_PRICE_SOURCES:
+        raise ValueError(f'community_prices Module CK is read for '
+                         f'{sorted(_CK_PRICE_SOURCES)}, not {wave!r}')
+    data = countries_root() / 'Malawi' / wave / 'Data'
+    frames = []
+    for rel, cols, strip_ck in _CK_PRICE_SOURCES[wave]:
+        raw = get_dataframe(str(data / rel),
+                            convert_categoricals=False).reset_index(drop=True)
+        block = derive_ck_struck_one_unit(
+            _price_block(raw, t=wave, strip_ck=strip_ck, **cols))
+        hit = block[(block['Derivation'] == CK_STRUCK_ONE_UNIT).fillna(False)
+                    & block['j'].notna()]
+        rows = raw.loc[hit.index].copy()
+        # _price_block keeps the source row's position as its index; check it.
+        recorded = pd.to_numeric(rows[cols['price_col']], errors='coerce')
+        assert recorded.astype('Float64').equals(hit['Price'].astype('Float64')), \
+            f'{wave} {rel}: inputs rows do not align with _price_block'
+        rows['source_file'] = rel
+        for k in ('t', 'v', 'j', 'u'):
+            rows[k] = hit[k].values
+        frames.append(rows)
+    out = pd.concat(frames, ignore_index=True)
+    return out.set_index(['t', 'v', 'j', 'u'])

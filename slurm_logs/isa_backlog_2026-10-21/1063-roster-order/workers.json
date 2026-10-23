@@ -1,0 +1,22 @@
+[
+ {
+  "label": "br_s3w4_vs_br_s1w1:Mali",
+  "a": "v_br_s3_w4_Mali_household_roster",
+  "b": "v_br_s1_w1_Mali_household_roster",
+  "rows_a": 220732,
+  "rows_b": 220732,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1w2_vs_dev_s1w1:Mali",
+  "a": "v_dev_s1_w2_Mali_household_roster",
+  "b": "v_dev_s1_w1_Mali_household_roster",
+  "rows_a": 220732,
+  "rows_b": 220732,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ }
+]

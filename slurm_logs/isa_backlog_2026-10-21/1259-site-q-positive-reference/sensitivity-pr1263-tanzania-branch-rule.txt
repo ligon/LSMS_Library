@@ -1,0 +1,29 @@
+lsms_library: /local/job40390255/worktrees/1259/lsms_library/__init__.py
+data_root: /local/job40390255/data-private/1259/merge
+1 warm countries: ['Tanzania']
+
+shipped rule: quantile=0.9 floor=1.0 min_cell=30 K=100.0
+
+quantile=0.9 floor=0.0 min_cell=30 -> K=10:78 K=30:33 K=50:22 K=100:14 K=150:12 K=200:10 K=300:8 K=500:8
+quantile=0.9 floor=1.0 min_cell=30 -> K=10:78 K=30:33 K=50:22 K=100:14 K=150:12 K=200:10 K=300:8 K=500:8
+
+quantile=0.95 floor=0.0 min_cell=30 -> K=10:46 K=30:22 K=50:15 K=100:10 K=150:8 K=200:8 K=300:7 K=500:5
+quantile=0.95 floor=1.0 min_cell=30 -> K=10:46 K=30:22 K=50:15 K=100:10 K=150:8 K=200:8 K=300:7 K=500:5
+
+quantile=0.99 floor=0.0 min_cell=30 -> K=10:12 K=30:6 K=50:6 K=100:4 K=150:3 K=200:1 K=300:0 K=500:0
+quantile=0.99 floor=1.0 min_cell=30 -> K=10:12 K=30:6 K=50:6 K=100:4 K=150:3 K=200:1 K=300:0 K=500:0
+
+
+SHIPPED rule fires on 14 of 14,126 rows (0.0991%)
+14,107 rows have a reference; 19 do not (thin cell, or a NaN quantity)
+ratio quantiles -- look for a gap; there is none:
+count     14107.000000
+mean          1.924061
+std          98.770725
+min           0.000000
+90%           0.854000
+99%           5.471693
+99.9%        90.620109
+99.99%     2505.490144
+max       11029.411765
+Name: ratio, dtype: float64

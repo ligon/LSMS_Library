@@ -1,0 +1,26 @@
+{
+ "btf": {
+  "both_none": 0,
+  "moved": 40,
+  "total": 40,
+  "unmoved_examples": []
+ },
+ "country": {
+  "both_none": 0,
+  "countries_moved": 38,
+  "moved": 549,
+  "total": 549,
+  "unmoved_examples": []
+ },
+ "errors": {
+  "a": 0,
+  "b": 0
+ },
+ "wave": {
+  "both_none": 0,
+  "countries_moved": 38,
+  "moved": 2109,
+  "total": 2109,
+  "unmoved_examples": []
+ }
+}
