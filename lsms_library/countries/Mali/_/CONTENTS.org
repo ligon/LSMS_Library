@@ -1133,6 +1133,16 @@ are identical.  This proof does not turn general cold/warm dtype equality
 into an API guarantee; GH #645's existing regression checks preserved row
 counts for education tables, not exact roster scalar types.
 
+The row-order difference is explained, and it is not a Mali idiosyncrasy
+(GH #1063, 2026-10-23).  =Wave.grab_data= built the =dfs:= merge keys as
+=list(set('t').union(merge_on))=, so their order followed =PYTHONHASHSEED=,
+and an =outer= merge sorts by the keys in that order.  The two EHCVM waves
+(=merge_on: [v, i]=) were therefore written sorted by cluster in some
+processes and by household id in others.  Measured on development: 6,474 of
+220,732 positions differ between seeds, all in 2018-19 and 2021-22.  The EAC-I
+waves were unaffected.  The keys now come in a fixed order (=t=, then the
+declared =merge_on=), so cold, cold and warm builds are order-identical.
+
 ** Existing documentation/source contradiction: eligibility is not duration
 
 The earlier =Household Presence / MonthsSpent= section says EHCVM binary

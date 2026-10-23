@@ -1928,7 +1928,16 @@ class Wave:
                 # content hash cannot tell a degraded build from a complete one.
                 dropped: list[dict[str, Any]] = []
                 _forget_wave_build_drops(self.country.name, request, self.year)
-                merge_on =list(set('t').union(data_info.get('merge_on')))#a list
+                # GH #1063: the merge keys in a FIXED order -- 't' first, then
+                # the declared `merge_on` order.  This used to be
+                # `list(set('t').union(merge_on))`, whose iteration order
+                # follows PYTHONHASHSEED (string hashing is randomised per
+                # process).  An `outer` merge sorts its result
+                # lexicographically by the keys IN THE ORDER GIVEN, so with
+                # two or more non-`t` keys (the EHCVM rosters' [v, i]) every
+                # process drew one of two row orders at random -- same values,
+                # same index set, different order between any two builds.
+                merge_on = list(dict.fromkeys(['t', *data_info.get('merge_on')]))
                 # `merge_how:` (GH #323) picks the join type for this block.
                 # Defaults to the historical 'outer', so every existing `dfs:`
                 # block is unchanged.  Declare `merge_how: left` where the
