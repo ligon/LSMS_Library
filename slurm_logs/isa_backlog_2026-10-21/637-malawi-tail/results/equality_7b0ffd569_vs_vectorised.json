@@ -1,0 +1,81 @@
+{
+ "crop_production": {
+  "exact_equal": true,
+  "waves": [
+   "2010-11",
+   "2013-14",
+   "2016-17",
+   "2019-20"
+  ],
+  "rows": 135078
+ },
+ "plot_inputs": {
+  "exact_equal": true,
+  "waves": [
+   "2010-11",
+   "2013-14",
+   "2016-17",
+   "2019-20"
+  ],
+  "rows": 179949
+ },
+ "plot_features": {
+  "exact_equal": true,
+  "waves": [
+   "2010-11",
+   "2013-14",
+   "2016-17",
+   "2019-20"
+  ],
+  "rows": 68339
+ },
+ "down_seed_kg": {
+  "exact_equal": true,
+  "waves": [
+   "2010-11",
+   "2013-14",
+   "2016-17",
+   "2019-20"
+  ],
+  "rows": 64477
+ },
+ "down_nitrogen_kg": {
+  "exact_equal": true,
+  "waves": [
+   "2010-11",
+   "2013-14",
+   "2016-17",
+   "2019-20"
+  ],
+  "rows": 36916
+ },
+ "down_harvest_kg": {
+  "exact_equal": true,
+  "waves": [
+   "2010-11",
+   "2013-14",
+   "2016-17",
+   "2019-20"
+  ],
+  "rows": 62327
+ },
+ "down_harvest_kg_shipped": {
+  "exact_equal": true,
+  "waves": [
+   "2010-11",
+   "2013-14",
+   "2016-17",
+   "2019-20"
+  ],
+  "rows": 70684
+ },
+ "down_yield_kg": {
+  "exact_equal": true,
+  "waves": [
+   "2010-11",
+   "2013-14"
+  ],
+  "rows": 18919
+ },
+ "wave_level_parquets": "crop_production, plot_inputs: exact-equal in all four waves"
+}

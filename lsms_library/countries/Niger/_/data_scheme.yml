@@ -412,7 +412,8 @@ Data Scheme:
     # Item-level community/market food prices (GAP C, parity loop 2026-06-14).
     # One row per REPORTED (cluster/EA × food item × unit × observation)
     # surveyed price from the ECVMA *community* price questionnaire (section
-    # CS07).  This is the OURS-ONLY parity arm: the WB panel surveys no
+    # CS07; 2011-12, 2014-15) and the EHCVM community price section (s05;
+    # 2018-19, GH #823).  This is the OURS-ONLY parity arm: the WB panel surveys no
     # community prices (their crop_price_EA is an HH-median imputation,
     # programs.do:31-89), so this records a surveyed price where they only
     # impute.  REPORTED values only -- any median / mean across clusters, or a
@@ -469,21 +470,41 @@ Data Scheme:
     # framework behavior shared across all community_prices countries, not a
     # wiring defect.  The cached parquet carries the correct `j` index level.
     #
-    # WAVE COVERAGE: only the two ECVMA waves carry an EA-level community price
-    # module (script-path):
+    # WAVE COVERAGE: three waves carry a grappe-level community price module
+    # (all script-path):
     #   2011-12 ecvmacoms07_p1 + ecvmacoms07_p2  (three price/qty/UNIT triples,
     #                                             both field passages)
     #   2014-15 comprixcs07                       (one unit col, three price/qty
     #                                             pairs)
-    # The EHCVM waves (2018-19, 2021-22) replaced the community price module
-    # with a separate region/market-level price survey (ehcvm_prix: region ×
-    # milieu × point_de_vente, NO grappe -- not the EA grain; and ehcvm_nsu, a
-    # region/strata p50/mu MEDIAN -- a forbidden imputation).  [The claim that
-    # stood here, "2018-19 ships no community price file at all", is FALSE:
-    # s05_co_ner2018.dta is a grappe-grain price module, unwired -- see
-    # CONTENTS.org "2018-19 DOES ship a cluster-grain community price file".]
-    # Those two waves are silently absent (the concatenator skips a wave with
-    # no parquet), NOT faked.
+    #   2018-19 s05_co_ner2018 (EHCVM section 5;  (two price readings per
+    #           GH #823)                           grappe x product x unit-size,
+    #                                             no quantity)
+    # 2021-22 has none: its community questionnaire stops at s04_co, and its
+    # only price files are ehcvm_prix (region × milieu × point_de_vente, NO
+    # grappe -- not the EA grain) and ehcvm_nsu (a region/strata p50/mu MEDIAN
+    # -- a forbidden imputation).  It has no wave script and is absent, NOT
+    # faked.  [This comment used to say the ECVMA waves were the only ones and
+    # that both EHCVM waves replaced the module with ehcvm_prix; 2018-19 ships
+    # s05_co and no ehcvm_prix / ehcvm_nsu file at all.]
+    #
+    # 2018-19 (s05) differs from CS07, measured (CONTENTS.org, GH #823):
+    #   variety -- 'unknown_variety', the canonical sentinel: s05 names no
+    #          variety finer than the product.
+    #   visit -- vague (1/2).  Each grappe is fielded in exactly ONE vague, so
+    #          this is the fielding period, not a repeat visit (as in
+    #          food_acquired's visit: vague).
+    #   obs -- s05q03 "Relevé 1" = 1, s05q04 "Relevé 2" = 2; a key's second,
+    #          disagreeing record = 3 / 4 (slot + 2 * rank).
+    #   j -- BY CODE: the household s07bq01 label of the same produitID code,
+    #          through harmonize_food (the s05 label is the Description).
+    #   u -- BY CODE: releveID = 10 * household unit code + size code; size 0
+    #          serves the household unit label (Kg, Tiya), a sized code
+    #          `<unit> (<Size>)` (Tas (Petit), Tiya (Entier)) -- size is part of
+    #          the unit, never dropped and never converted.
+    #   Quantity -- 1, the registered derivation
+    #          Niger::community_prices::one-item-per-price (the instrument
+    #          prices one item of the selected unit-size; the file records no
+    #          quantity).  Those rows carry the key in `Derivation`.
     #
     # COLUMNS (reported, item-level):
     #   Price    -- the surveyed price recorded for `Quantity` units of the item
@@ -492,7 +513,9 @@ Data Scheme:
     #   Quantity -- the measured quantity Price was recorded for, in unit `u`
     #               (e.g. Price=11000 for Quantity=50, u='Sac de 50 kg').  The
     #               per-kg unit value Price/Quantity (×kg-factor) is a transform.
-    #   Description -- the cs07q02 variety label of that file.
+    #               2018-19: 1, a registered derivation (see above).
+    #   Description -- the cs07q02 variety label of that file; 2018-19: the
+    #               s05q01 product label as recorded.
     index: (t, v, j, u, variety, visit, obs)
     Price: float
     Quantity: float

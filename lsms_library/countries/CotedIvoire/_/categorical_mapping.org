@@ -222,6 +222,19 @@
 | Autres semences                           | Seed                |
 | 20                                        | Seed                |
 
+# harmonize_seed_crop: KEEP DISTINCT NATIVE SLOTS DISTINCT (GH #1123).  `crop`
+# is an index level of plot_inputs (t, i, input, crop, u) and every seed
+# label maps to the one input 'Seed', so two seed slots sharing a Preferred
+# Label collide on one key and core keeps one row.  In s16b_me_CIV2018 code 15
+# "Semences d'autres céréales" (86 applied rows) and code 19 'Autres semences'
+# (404) both mapped to 'Autre crop' until GH #1123; 9 households reported
+# both in the same unit and lost a line (8 with equal payloads, 1
+# conflicting).  Code 15 now takes the Benin/Togo/Burkina label 'Autre
+# céréale'.  The 2018-19 value labels stop at 19, so 'Plants/boutures de
+# tubercules' and bare '20' occur on no row and are left unchanged (Burkina
+# kept its unused cells too); the uniqueness guard before to_parquet in
+# 2018-19/_/plot_inputs.py catches any future collision.
+
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
 |-------------------------------+---------------------|
@@ -233,7 +246,7 @@
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
+| Semences d'autres céréales    | Autre céréale       |
 | Plants/boutures de tubercules | Autre crop          |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |

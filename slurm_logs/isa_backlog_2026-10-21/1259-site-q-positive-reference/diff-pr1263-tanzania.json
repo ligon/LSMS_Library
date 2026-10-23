@@ -1,0 +1,55 @@
+{
+ "crop_production.Quantity": {
+  "countries": {
+   "Tanzania": {
+    "arrived": 0,
+    "by_wave_crop_unit": {
+     "left | 2019-20 | Timber | kg": 3,
+     "left | 2020-21 | Citrus Fruits | kg": 1,
+     "left | 2020-21 | Coconuts | kg": 1,
+     "left | 2020-21 | Ripe Bananas | kg": 1,
+     "left | 2020-21 | Timber | kg": 10
+    },
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": {
+      "max": 0.893,
+      "median": 0.893,
+      "min": 0.168,
+      "n": 16
+     }
+    },
+    "fired_after": 14,
+    "fired_before": 30,
+    "judged_after": 14126,
+    "judged_before": 14126,
+    "left": 16,
+    "reasons": {
+     "left: rung t,u,j -> t,u, reference rose": 3,
+     "left: same rung, reference rose (zeros no longer in the quantile)": 13
+    },
+    "rows": 14126,
+    "rows_changing_rung": 288,
+    "rung_moves": {
+     "t,u,j -> t,u": 288
+    }
+   }
+  },
+  "rung_transitions_all_countries": {
+   "t -> t": 19,
+   "t,u -> t,u": 190,
+   "t,u,j -> t,u": 288,
+   "t,u,j -> t,u,j": 13629
+  },
+  "total": {
+   "arrived": 0,
+   "fired_after": 14,
+   "fired_before": 30,
+   "judged_after": 14126,
+   "judged_before": 14126,
+   "left": 16,
+   "rows": 14126,
+   "rows_changing_rung": 288
+  }
+ }
+}

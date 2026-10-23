@@ -155,15 +155,20 @@ That is design **A**, and it is the convention (#894). A panel crosswalk is a
 *harmonization decision*, not a derived measurement: it is small (GhanaLSS is
 714 mappings, 4 ms to recompute), identical for every user, and the input to
 every longitudinal result -- so it belongs where a change to it shows up as a
-reviewable line-level diff. Nine countries do this: Burkina_Faso, Ethiopia,
-EthiopiaRHS, GhanaLSS, Mali, Niger, Senegal, Tanzania, Uganda.
+reviewable line-level diff. All eleven panel countries do this: Burkina_Faso,
+Ethiopia, EthiopiaRHS, GhanaLSS, Malawi, Mali, Niger, Nigeria, Senegal,
+Tanzania, Uganda.
 
-Malawi and Nigeria are design **B** (per-wave `data_info.yml` wiring, cache
-parquet only). `Country._compute_panel_ids` branches on which it got -- A
-returns a `dict`, B a `DataFrame` that `panel_ids(df)` converts -- so both
-arrive at the same API. Converting them to A is #894's remaining work; they are
-named in `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` so a *twelfth*
-country cannot pick a design by accident.
+Malawi and Nigeria were design **B** (per-wave `data_info.yml` wiring, cache
+parquet only) until #894. `Country._compute_panel_ids` still branches on which
+it got -- A returns a `dict`, B a `DataFrame` that `panel_ids(df)` converts --
+and `LSMS_BUILD_BACKEND=make` still takes the B route from the YAML blocks.
+Their `panel_ids.py` reads the same per-wave `panel_ids:` blocks (Pattern 1
+above), builds the frame exactly as the YAML path did (`format_id` on both ids,
+source-file row order, which decides who keeps the bare id in a split), and
+calls `panel_ids(df)`; the dicts were verified equal to design B's.
+`tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` is now empty, so a
+*twelfth* country cannot pick a design by accident.
 
 ### Never make the JSON a Make target
 

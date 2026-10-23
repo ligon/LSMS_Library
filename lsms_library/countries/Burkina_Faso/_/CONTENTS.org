@@ -662,16 +662,18 @@ flag is country-grain; dropping it would make Site B report a genuine
 absence in 2014 and 2021-22 on every read.  =tests/test_burkina_faso_cluster_gps.py=
 pins that the flag stays only while some wave maps no coordinate.
 
-*Also seen, not fixed.*  =District= is spelled inconsistently across waves
--- the =Region= problem (GH #811) one level down: 96 distinct strings pooled
-for 45 provinces.  Of the 53 shared 2018-19/2021-22 grappes whose District
-differs, 41 differ only in accents/case (=Séno=/=Seno=, =Balé=/=Bale=,
-=Bazèga=/=Bazega=, =KOssi=/=Kossi=, =Kourweogo=/=Kourwéogo=), 9 are
-=Koulpelgo=/=Koulpélogo= (one province, a letter dropped -- a spelling
+*Also seen, not fixed here.*  =District= is spelled inconsistently across
+waves -- the =Region= problem (GH #811) one level down: 96 distinct strings
+pooled for 45 provinces.  Of the 53 shared 2018-19/2021-22 grappes whose
+District differs, 41 differ only in accents/case (=Séno=/=Seno=,
+=Balé=/=Bale=, =Bazèga=/=Bazega=, =KOssi=/=Kossi=, =Kourweogo=/=Kourwéogo=),
+9 are =Koulpelgo=/=Koulpélogo= (one province, a letter dropped -- a spelling
 variant), and 3 name a different province (=Séno=/=Yagha=,
 =Poni=/=Noumbiel=, =Kompienga=/=Gourma=, one grappe each).  The 50
 spelling variants are a =District= categorical-mapping table; the 3 are a
-cross-wave identity question (red-team r1, 2026-10-18).
+cross-wave identity question (red-team r1, 2026-10-18).  /Spellings fixed
+2026-10-23 (GH #1059); the 3 are recorded, not resolved -- see the DONE entry
+"=District= spelled 96 ways for 45 provinces" below./
 
 *Also seen, not fixed: 2014's grain warning is a SOURCE property.*  The
 pre-existing 2014 =cluster_features= report (1,034 of 10,800 rows, 94
@@ -687,6 +689,77 @@ province rather than an EA straddling a boundary.
 Burkina_Faso =Country._table_cache_hash= values move; the 2021-22 wave
 hashes, every other country and every =build_transforms_fingerprint= are
 unchanged.
+
+** DONE cluster_features -- =District= spelled 96 ways for 45 provinces (GH #1059, 2026-10-23)
+
+=cluster_features.District= (2014 EMC =province=, EHCVM =s00q02=) served 96
+distinct strings for the 45 provinces.  Each wave is internally consistent
+-- 45 / 45 / 44 strings, one per province present -- so nothing warned;
+only cross-wave pooling was wrong.  2014 writes every province in
+unaccented capitals (=BALE=, =SENO=) plus one source typo, =loba= (=Ioba=
+with a lower-case L for the capital I; its 17 zd are all in Sud-Ouest, Ioba's
+region, and no other 2014 string names Ioba).  2018-19 is title case and
+mostly accented, but carries =KOssi=, =Kourweogo= and =Koulpelgo= (a letter
+short of =Koulpélogo=).  2021-22 is title case with =Kourwéogo= /
+=Koulpélogo= accented but =Bale=, =Bazega=, =Seno= not.
+
+Fixed with a =#+name: District= table in =_/categorical_mapping.org=
+(auto-applied by column name at read time, as =Region= is).  Like =Region=
+this is a DECISION, not a pairing read off another column (cf. the =Region=
+entry above: Burkina has no strata vocabulary to inherit).  The rule follows
+#971's /intent/ (the official form of the name, source typos corrected)
+rather than its /mechanism/ (take the 2021-22 spelling), because 2021-22 is not uniformly the official form here: the
+Preferred Label is the official accented, title-case province name /as the
+data itself spells it/ -- all 45 occur verbatim in at least one EHCVM wave.
+Named corrections: =loba= -> =Ioba=, =Koulpelgo= -> =Koulpélogo=,
+=KOssi= -> =Kossi=.  =Komandjoari=, which all three waves write, is served
+as the official =Komondjari= (ISO 3166-2 BF-KMD) -- the one label not
+attested in the data (ruling, @ligon 2026-10-23).
+
+Measured on cold builds of development =9a0ed5f3c= vs the branch (evidence:
+=slurm_logs/isa_backlog_2026-10-21/1059-burkina-district/=):
+- District distinct per wave 45 / 45 / 44 before and after; pooled 96 -> 45.
+  2021-22's 44 is a province with no rows: no 2021-22 grappe is coded
+  =Kompienga= (of 2018-19's four Kompienga grappes 548-551, only 549 is in
+  the 2021-22 subset, and it is coded =Gourma= there).
+- 954 of 2,035 rows relabelled (2014: all 900; 2018-19: 25 = =KOssi= 9 +
+  =Kourweogo= 7 + =Koulpelgo= 9; 2021-22: 29 = =Bale= 7 + =Bazega= 13 +
+  =Seno= 9).  Index, =Region=, =Rural=, =Latitude=, =Longitude= frame-equal;
+  =sample= frame-equal (it has no District column); the
+  =_market_lookup('District')= used by =market='District'= relabels the same
+  way (96 -> 45 market labels, row for row the mapped base).
+- On the 550 shared 2018-19 / 2021-22 grappes, District differs for 53
+  before and 3 after.
+- The 2014 grain report (GH #1060: =province= varies within 94 =zd=;
+  1,034 of 10,800 rows) is unchanged, byte for byte: the mapping runs
+  post-collapse in =_finalize_result=, and no 2014 group differs by
+  spelling alone (one spelling per province per wave).
+
+*Not resolved: three shared grappes name a different province in each
+wave.*  This is a cross-wave identity question (is it the same EA?), not a
+spelling one, so the table maps =Yagha=, =Noumbiel= and =Gourma= to
+themselves and the three still differ.  Measured on the cover pages
+(=s00_me_bfa2018.dta=, =s00_me_bfa2021.dta=):
+
+| grappe | Region    | 2018-19 District (households) | 2021-22 District (households) | 2021-22 households whose =grappe_EHCVM1= is this grappe | 2018-19 GPS fix |
+|--------+-----------+-------------------------------+-------------------------------+--------------------------------------------------------+-----------------|
+|     19 | Sahel     | Séno (12 of 12)               | Yagha (6 of 6)                | 6 of 6                                                 | yes             |
+|    365 | Sud-Ouest | Poni (12 of 12)               | Noumbiel (6 of 6)             | 6 of 6                                                 | yes             |
+|    549 | Est       | Kompienga (12 of 12)          | Gourma (6 of 6)               | 6 of 6                                                 | no              |
+
+Every household of each grappe agrees within its wave and the Region agrees
+across waves (both measured); each pair is two neighbouring provinces of
+that region (geography, not measured here).
+Every 2021-22 household in these grappes is a tracked 2018-19 household of
+the SAME grappe (EHCVM-2 is a panel sub-sample within the 2018-19 EAs; see
+"THE THING TO KNOW" above), so the panel evidence points to one EA whose
+province was coded differently in the two waves -- which wave is right is
+undecided.  The 2018-19 GPS fixes of grappes 19 and 365 could adjudicate
+(365's is one of the 2-decimal fixes noted above); 549 has none.  This
+bears on any carry-forward of the 2018-19 GPS to 2021-22 (GH #1050).
+
+Cache: =_/categorical_mapping.org= is a build input, so every
+Burkina_Faso cache hash moves; no other country's.
 
 ** DONE household_roster
 *** 2014 wave (EMC): Relationship code 6 ships a literal "?" (GH #801)
@@ -1595,6 +1668,79 @@ Unknown, partial, contradictory and undecoded household results need an explicit
 Aggregate evidence, source hashes, reproduction commands and the proposed country/shared boundary are in =slurm_logs/isa_backlog_2026-10-21/burkina-1148/REPORT.md=; the prior-art ledger is =.coder/ledger/1148-burkina-interview-status.md=.
 Raw records, household keys and full logs remain private.
 Existing record and passage-config checks: 35 passed, two deselected.
+
+* 2026-10-23 -- =v= across wave boundaries: =_/sampling.yml= declared (GH #1243)
+
+=_/sampling.yml= now records, per wave boundary, whether =v= names the same
+cluster as in the preceding wave (GH #942 Site C, panel-only format as in
+Ethiopia/Nigeria).  The idiosyncrasy: *=v= is a sample serial in every wave,
+not a frame code*, and the serials of two independent draws overlap.
+
+| Boundary           | =household_continuity= | =cluster_id_continuity= | Warns? |
+|--------------------+------------------------+-------------------------+--------|
+| 2014 -> 2018-19    | independent            | redefined               | yes    |
+| 2018-19 -> 2021-22 | panel                  | stable                  | no     |
+
+*2014 -> 2018-19.*  EMC 2014 serves =v= = =zd= (900 ZD, 1-900; called
+=grappe= in =emc2014_welfare.dta=), EHCVM-1 =v= = =grappe= (585 ZD, 1-585):
+two separate PPS draws, each numbering its own sample from 1.  Measured
+2026-10-23 on a cold build (development =9a0ed5f3c=), on the 585 shared
+integers: =Region= differs for 517, =District= for 540 (case- and
+accent-folded, =Koulpelgo= = =Koulpelogo=; unfolded, all 585 differ, since
+GH #1059 has not landed), =Rural= for 282.  The same id names an unrelated
+cluster, so a cross-wave =groupby('v')= merges 585 pairs.  No household links
+the two: the 2018-19 cover (=s00_me_bfa2018.dta=, 18 columns) has no 2014
+pointer and =panel_ids.py= records none.  Declared =redefined= rather than
+=unobservable= because =unobservable= is silent on the ground that grouping
+across *disjoint* keyspaces is correct (GhanaLSS 1991-92); here the keyspaces
+overlap.  The vocabulary's own gloss for =redefined= ("a different KIND of
+unit") fits loosely -- both are ZDs; what changes is the sample list the
+serial indexes -- and it is the closest warning-bearing value (=wave-scoped=
+would claim a meaningful crosswalk).  =sample(waves=['2014', '2021-22'])=
+also warns: the span rule counts the 2018-19 boundary between them.
+
+*Household ids collide across this boundary too -- do not measure it by
+shared =i=.*  2014 builds =i= as =zd + menage.zfill(3)= (=burkina_faso.i=),
+2018-19 as =grappe + '0' + menage.zfill(2)= (=2018-19/_/mapping.py=); for a
+two-digit =menage= the two strings are identical whenever the serials are.
+583 =i= are shared by 2014 and 2018-19 and all 583 "keep" =v=, which a naive
+Site C measurement reads as =stable=; their clusters' =Region= agrees for 80
+of 583 -- an id collision, not 583 households.  A cross-wave =groupby('i')=
+over 2014 and 2018-19 merges unrelated households.  Site C covers only =v=;
+the =i= collision is recorded here, not fixed (it would change served =i=).
+
+*2018-19 -> 2021-22.*  In the raw 2021-22 cover, =grappe == grappe_EHCVM1=
+for 3,227 of 3,227 panel households, in 550 grappes, all among 2018-19's
+585: EHCVM-2 tracked households within their EA (BID p. 4, quoted above).
+=Region= agrees 550/550.  =District= names a different province on 3 grappes
+(GH #1059: =Séno=/=Yagha=, =Poni=/=Noumbiel=, =Kompienga=/=Gourma=), and
+=Rural= differs on *7* grappes -- not previously recorded.  Both are attribute
+recodes on a grappe the households were tracked within, not a renumbering.
+
+** TODO =panel_ids.py= builds the 2018-19 id in the wrong format: 1,105 of 3,227 links lost, 3 mislinked
+
+Found while measuring the boundary above (GH #1243); not filed, not fixed.
+=panel_ids.py= builds each 2021-22 household's =previous_i= as
+=grappe_EHCVM1 + menage_EHCVM1.zfill(3)= (its docstring says the same of
+2018-19), but 2018-19 =sample()= builds =i= as =grappe + '0' +
+menage.zfill(2)= -- the divergence =burkina_faso.ehcvm_i='s docstring
+already describes for the agriculture rosters.  The two agree only for a
+two-digit =menage=.  Measured: they agree for 2,119 of 3,227 panel
+households; of the 1,108 with a three-digit 2018-19 =menage=, 1,105 targets
+match no 2018-19 household (the link is lost) and 3 match a *different*
+2018-19 household (the formats let grappe 20 / menage 105 and grappe 2 /
+menage 105 both spell ="20105"=).  Through the API, 2018-19 and 2021-22 share
+only 2,053 =i= (2,050 keep =v=; the 3 that "change" are those mislinks),
+against 3,227 linked in the raw file.  Fixing it regenerates
+=panel_ids.json= / =updated_ids.json= (a =.json= build input, so every
+Burkina Faso cache hash moves) and changes served 2021-22 =i=.
+
+*Also measured, not reconciled*: =sample()= serves 10,411 / 7,010 / 3,227
+households for 2014 / 2018-19 / 2021-22; the "DONE sample" section above
+records 10,224 / 6,961 / 3,218.
+
+*Cache*: none.  =sampling.yml= is not a build input (=.yml= is outside
+=_BUILD_INPUT_SUFFIXES=) and =CONTENTS.org= is excluded as documentation.
 
 * 2026-10-23 -- the panel crosswalk named 2018-19 ids in the 2021-22 format (GH #1240)
 

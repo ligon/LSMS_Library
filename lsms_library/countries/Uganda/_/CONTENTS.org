@@ -2093,6 +2093,30 @@ See =.coder/ledger/1062-uganda-sibling-writes.md= and the scoped verification re
   Pre-existing; unrelated to GH #323.  If a =unps_geovars_2019_20= file
   exists it should be wired in.
 :END:
+GH #592 answer (2026-10-23; the TODO keyword is left for a maintainer to
+close): *no such file was released.*  WB entry 3902
+(=UGA_2019_UNPS_v03_M=, still the latest release) lists 109 data files --
+the 109 we hold -- and none is a geovariables file; of its 1,963 documented
+variables none is a coordinate (the only GPS variables are parcel / plot
+AREA, =s2aq4=, =s2aq04=, =s2aq04_1=, =s2aq04_1_1=, and the flag
+=s2aq05_211_1= "Was GPS captured?").  It is the only wave here with no
+=unps_geovars_*= file (2005-06 holds a copy of 2009-10's).  The instrument
+DID record location: the household questionnaire's cover item "9. GPS
+COORDINATES" (LAT / LONG), and the BID (=unps2019_20_bid.pdf=, §3.1): "The
+GPS was used to collect information on household location".  The shipped
+=GSEC1= keeps cover items 2, 3, 4 and 7 (=s1aq02a=, =s1aq03a=, =s1aq04a=,
+=urban=) and drops item 9.  So 2019-20 is *asked-not-distributed*: 0 of 824
+clusters with coordinates, correctly unwired.
+
+The other waves' shortfall (measured cold on =development= =9a0ed5f3c=:
+2005-06 251/322, 2009-10 605/656, 2010-11 188/320, 2011-12 161/321, 2013-14
+619/706, 2015-16 743/875, 2018-19 618/781) is NOT a release or wiring gap.
+It is almost entirely =reduce_to_agreed= blanking where a cluster's
+households report different fixes -- Latitude cells blanked 70 / 51 / 135 /
+160 / 82 / 106 / 163 in those waves (=GrainConflictWarning=, on every
+build) -- the panel-dispersal and parish-not-EA causes recorded under
+=cluster_features= above.  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
 ** DONE =crop_production.intercropped= was wired to the SEED-USE question
 
 Found 2026-07-21 while closing the "silent colmap" gap above, by reading

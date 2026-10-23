@@ -478,6 +478,53 @@ Starting with wave 4 (2018-19), a refreshment sample of new households
 was drawn alongside the continuing panel.  Wave 5 (2023-24) continues
 this rotating panel design.
 
+** Panel crosswalk: =_/panel_ids.py= and the committed JSON (GH #894, 2026-10-23)
+
+The household panel crosswalk is a COMMITTED SOURCE ("design A", the
+convention in =CLAUDE.md=): =_/panel_ids.json= and =_/updated_ids.json=,
+regenerated with =make panel-ids= and reviewed as a diff.  Until GH #894
+Nigeria was "design B": the library read the =panel_ids:= blocks in
+=2012-13/_/data_info.yml= and =2015-16/_/data_info.yml= at run time and kept
+the result only as a cache parquet.  =panel_ids.py= reads those SAME blocks
+and =nigeria.wave_folder_map=; the blocks stay, and =LSMS_BUILD_BACKEND=make=
+still derives the dicts from them.
+
+Verified against development =9a0ed5f3c= on cold builds: =panel_ids= (14,251
+entries) and =updated_ids= (4,859 / 4,859 / 4,696 / 4,696 for 2012Q3 / 2013Q1
+/ 2015Q3 / 2016Q1) equal entry for entry; =sample()= and
+=household_roster()= equal under =assert_frame_equal= in all ten rounds;
+=check_panel_consistency= identical before and after (5 pass, 2 warn, 1
+fail; see below).  =Country('Nigeria').panel_ids= is now a plain dict of
+="t,i" -> "t0,i0"= strings, as for the other countries; design B returned a
+=RecursiveDict= keyed by tuples.
+
+What it encodes, reproduced as found -- *not* fixed by #894:
+- *PP/PH*: one directory, two rounds.  The directory's single block names the
+  post-planting cover page (=secta_plantingw2= / =secta_plantingw3=), and the
+  library ran it once per round, so the PH round's ids are the PP cover's ids.
+- =previous_i: hhid= is an identity (hhid is stable across waves), so every
+  =updated_ids= map is the identity and =id_walk= renames nothing.  The
+  caveat under plot_features below ("there is no per-wave remapping dict") is
+  right in effect but not literally: the dicts exist, and map each id to
+  itself.
+- =panel_ids= chains =2013Q1 -> 2012Q3= (the PH round to the PP round of the
+  same visit), =2015Q3 -> 2013Q1= and =2016Q1 -> 2015Q3=.  W1 (=2010Q3= /
+  =2011Q1=), W4 (=2018Q3= / =2019Q1=) and W5 (=2023Q3= / =2024Q1=) declare no
+  block and are absent from both dicts.
+- The PP cover lists households with no =household_roster= rows: 113 / 128 /
+  85 / 115 of the 2012Q3 / 2013Q1 / 2015Q3 / 2016Q1 ids (every one IS in
+  =sample()=).  So =check_panel_consistency= FAILS =panel_ids_targets_exist=
+  with 328 of 14,251 current-wave and 328 previous-wave ids missing from the
+  roster.
+- Because the link is an identity, 99 of the 4,696 =2015Q3 -> 2013Q1= entries
+  point at an =hhid= that is not on the W2 cover at all (not in 2013Q1
+  =sample()=).
+
+Proposed follow-up (one issue): decide whether the crosswalk should (a) span
+W1 and W4/W5, (b) link only households the target round actually observed,
+and (c) stop linking a PH round to its own PP round.  Any of these changes
+the committed JSON, so each shows up as a reviewable diff.
+
 ** Cluster (PSU) identifier
 
 *=ea= ALONE IS NOT THE CLUSTER ID* (GH #323).  It is a serial number unique
@@ -581,6 +628,26 @@ and cannot disagree with anyone).  The audit's larger "conflicting tuples"
 counts (70 / 78 / 129) include households with NO coordinate beside ones
 with one, which a whole-row comparison counts as a disagreement.  So the only
 columns that ever made this collapse lossy are exactly the two W5 lacks.
+
+GH #592 re-check (2026-10-23): unchanged.  The catalog search now returns
+=NGA_2023_GHSP-W5_v02_M= for entry 6410, and its file list includes
+=nga_householdgeovariables_y5= (4,883 cases, 55 variables, coordinates
+=lat_mod= / =lon_mod=); we still hold v01.  Cold on =development=
+=9a0ed5f3c=, clusters with coordinates: W1 500/500 (both rounds), W2
+645/647, W3 784/792, W4 671/685, W5 0/911.  The six W1-W4 rounds GH #592
+listed at zero are all populated now (the casing / =merge_on: [i]= fixes
+recorded in each wave's =data_info.yml=).  The W2-W4 shortfall is
+release-side: 96 / 84 / 147 cover-page households are absent from that
+wave's geovariables file (W2 also has 1 present with a null fix).  Per
+column, the household -> cluster projection disagrees ONLY on the
+coordinates (=Region= / =District= / =Rural=: 0 groups in every round);
+groups holding >1 distinct fix (rounded to 6 dp): 6 / 24 / 49, and groups
+mixing a fix with no fix: 65 / 57 / 92.  Those agree with the 5 / 24 / 50
+above: W2's sixth is the null-=v= group of the 39 geovariables-only
+households the default =outer= merge admits (the =nan_key_rows: 39= in that
+round's grain report), and unrounded W4 gives 50 (one cluster's two fixes
+differ only beyond the 6th decimal).  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
 
 ** Strata
 
@@ -1209,6 +1276,88 @@ are transformations).  The WB panel surveys no community prices (their
 crop_price_EA is an HH-median imputation), so this is strictly richer.
 
 124,539 priced rows across 5 waves x 584 clusters x 139 food items x 30 units.
+
+** W3 prices TWO locations per community: the =obs= level (GH #637 defect C, 2026-10-23)
+
+*The idiosyncrasy.*  W3 (2015-16) is the one wave whose C8 has two reading
+slots.  =PH_W3_Community_Quest.pdf= lists "8 Food Prices / a. First location
+18 / b. Second location 24" in its SECTIONS table; C8a is headed "FOOD PRICES
+- 1ST LOCATION" and C8b "FOOD PRICES - 2ND LOCATION", and each opens with its
+own location block (type MARKETPLACE / SHOPS/STALLS / OTHERS, name,
+description, date of collection, GPS) over the SAME item list.  The shipped
+files carry none of that location block: =sectc8a_harvestw3.dta= and
+=sectc8b_harvestw3.dta= hold only =zone state lga sector ea item_cd c8q1 c8q2
+c8q2b c8q3=, with =c8q1= (available?) = 1 on every row and every price > 0.
+Each file is =(ea, item_cd)=-unique and covers all 487 EAs.
+
+*How the second page was used differs by EA.*  In 78 EAs (53 in zone 4) it
+re-prices most of the first page's list: 4,323 shared =(ea, item)= cells.  In
+the other 409 it prices a short tail -- median 10 items, 87% of those 4,032
+rows codes 70-77 (tomatoes, onions, garden eggs, okra, peppers) or 160-163
+-- that the first location did not price at all.  So the wave script's old
+"different item ranges" was false as a statement about the files (all 110
+=sectc8b= codes occur in =sectc8a=) but describes the 409-EA pattern.
+
+*The defect.*  =community_prices_for_wave= collapsed =(t, v, j, u)= with
+=Price: 'first'=, so location 1 always won.  Of the 2,591 cells both
+locations priced (after the size drop and unit canonicalisation), 983 held a
+DIFFERENT location-2 price (ratio median 1.25, max 21.4) that was dropped,
+and 1,608 an equal one; and the 3,218 location-2-only rows were served
+indistinguishable from location 1.
+
+*The fix* is the GH #840 =obs= level (=lsms_library/data_info.yml= Index
+Info: "the form's reading slot").  =obs = 1= is C8a, =obs = 2= is C8b; every
+other wave prices one location and carries a native =obs = 1=.  The declared
+index is =(t, v, j, u, obs)=, so =Feature('community_prices')= no longer
+fabricates Nigeria's =obs= (=variety= / =visit= stay sentinels).
+
+| PH round | before | after | obs 1 | obs 2 |
+|----------+--------+--------+--------+-------|
+| 2011Q1   | 27,104 | 27,104 | 27,104 |     0 |
+| 2013Q1   | 27,079 | 27,079 | 27,079 |     0 |
+| 2016Q1   | 20,562 | 23,153 | 17,344 | 5,809 |
+| 2019Q1   | 31,757 | 31,757 | 31,757 |     0 |
+| 2024Q1   | 30,064 | 30,064 | 30,064 |     0 |
+
+Every pre-fix row is still served with the identical =Price= and
+=Derivation=: 17,344 at =obs = 1=, and the 3,218 location-2-only rows at
+=obs = 2= -- the slot they always came from.  The other four rounds are
+frame-equal apart from the added level.
+
+*No duplicate entries are dropped (0 rows), and why.*  Niger's #840 drop
+removes a SECOND SOURCE RECORD of the same slot that repeats a served row; its
+content key includes the slot, so two slots that agree are both served (and
+GhanaLSS serves equal vendor prices).  Here there is no second record of any
+slot, and C8b is not a re-entry of C8a: no EA's location-2 block repeats its
+location 1 (the most-identical EA agrees on 88% of shared items on every raw
+field; Niger's re-shipped blocks were 99.8% byte-identical), and location 1
+vs location 2 in one EA agree on 64.6% of same-unit prices against a 48.6%
+base rate for location 1 in two different EAs of the same LGA.  An equal
+price at the second location is an observation.
+
+*Reading it.*  =obs == 1= gives one location per community, but loses the
+409-EA vegetable / drinks tail, which exists only at =obs = 2=.  The
+=first= collapse still runs for W1/W2 only (see the next paragraph);
+W3-W5 are asserted collision-free on =(t, v, j, u, obs)=, so it selects
+nothing there.  This supersedes the "(t, v, j, u)" grain stated in this
+section's opening paragraph and the shim paragraph below, and the #1095
+note's "existing first-row reducer remain[s] in force" now holds for W1/W2
+only.
+
+*Still open -- W1/W2 (a maintainer decision, not changed here).*  W1/W2's
+own code scheme collapses on =(t, v, j, u, obs = 1)= to the first price:
+size variants of one base item (=base*10+size=; 1,770 W1 / 1,921 W2 groups)
+and distinct items the name map lumps under one label (Maize, Beer,
+Fish--fresh, Butter/Margarine, ...; 798 / 1,030 groups), with Price
+conflicts in 2,303 / 2,605 groups (GH #637 tail diagnosis).  A =variety=
+level (the source item code, as #840 did for Tanzania) is the sketched fix.
+
+*Observed, not fixed.*  The W3 deletion / derivation =inputs= frames now
+carry =obs=, so they join the served grain.  The W3 =inputs_community_prices=
+frame returns 341 rows, but the derivation stamps 1: the other 340 are on
+the unit "other specify" with a quantity in the free-text =c8q2b=, and are
+served undivided under =u = 'other specify'= (988 W3 rows in all).  This
+predates #637 and is identical on development.
 
 ** Source files (post-harvest community round)
 

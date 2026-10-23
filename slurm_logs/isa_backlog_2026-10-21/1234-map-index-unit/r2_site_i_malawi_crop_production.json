@@ -1,0 +1,15 @@
+{
+ "development_cold": {
+  "plot_id": 41,
+  "u": 8902
+ },
+ "development_warm": {
+  "plot_id": 41
+ },
+ "fix_cold": {
+  "plot_id": 41
+ },
+ "fix_warm": {
+  "plot_id": 41
+ }
+}

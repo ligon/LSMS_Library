@@ -46,7 +46,11 @@ def test_recorded_c8_unit_survives_actual_builder(nigeria, unit, expected):
     """Ten failing baseline controls bind the builder, not just an alias map."""
     out = _call(nigeria, unit)
     assert len(out) == 1
-    assert out.index.names == ['t', 'v', 'i', 'j', 'u']
+    # GH #637 (2026-10-23) moved this pin: the builder's index gained the
+    # C8 reading slot `obs` (W3's 1st / 2nd location; 1 for a frame that
+    # declares none, as here).  Pinned to that value, not dropped.
+    assert out.index.names == ['t', 'v', 'i', 'j', 'u', 'obs']
+    assert out.index.get_level_values('obs').tolist() == [1]
     assert out.index.get_level_values('u').tolist() == [expected]
     assert out.Price.iloc[0] == 500
     assert out.index.get_level_values('v').equals(out.index.get_level_values('i'))

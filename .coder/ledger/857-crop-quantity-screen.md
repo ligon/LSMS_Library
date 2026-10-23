@@ -278,3 +278,16 @@ p99 = 3.6, p99.9 = 21.0, p99.99 = 233.7, max = 14,285.7 — still **no gap**.
 - Threshold constants — **OK (§3)**: report-only, never applied to a value; the
   "count, never clip" sentence at `transformations.py:1730` is honoured
   literally — the audit returns its input frame unchanged, by contract.
+
+---
+### Superseded in part by GH #1259 (2026-10-23)
+
+The reference quantile and the `QUANTITY_MIN_CELL` floor now count **strictly
+positive** values only; see `.coder/ledger/1259-site-q-positive-reference.md`.
+Three statements above are now history, not current state:
+- The 151-row firing count. On a cold build of development `9a0ed5f3c` it is
+  129 under this ledger's rule and 120 under #1259's.
+- "Why `reference > 0`". It is implied by construction now.
+- The floor's motivating case. Uganda 2010-11 `Others specify` had a p90 of 0.6
+  because 697 of its 775 rows were zeros. Its positive p90 is 92.7, so the four
+  rows that §6 calls a unit-label defect no longer fire either.

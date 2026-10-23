@@ -1,0 +1,296 @@
+{
+ "2010-11/ag_mod_g.dta": {
+  "rows": 28143,
+  "cols": 36,
+  "encoding": "full",
+  "repeat_records": 9,
+  "records_in_repeat_groups": 18,
+  "repeat_qty": {
+   "ag_g13a": 42.0,
+   "ag_g04a": 548.0
+  },
+  "repeat_qty_nonnull": {
+   "ag_g13a": 9,
+   "ag_g04a": 9
+  }
+ },
+ "2010-11/ag_mod_p.dta": {
+  "rows": 12531,
+  "cols": 26,
+  "encoding": "full",
+  "repeat_records": 1,
+  "records_in_repeat_groups": 2,
+  "repeat_qty": {
+   "ag_p09a": 25.0
+  },
+  "repeat_qty_nonnull": {
+   "ag_p09a": 1
+  }
+ },
+ "2010-11/ag_mod_i.dta": {
+  "rows": 24081,
+  "cols": 102,
+  "encoding": "full",
+  "repeat_records": 61,
+  "records_in_repeat_groups": 120,
+  "repeat_qty": {
+   "ag_i02a": 2313.0,
+   "ag_i03": 491970.0
+  },
+  "repeat_qty_nonnull": {
+   "ag_i02a": 6,
+   "ag_i03": 6
+  }
+ },
+ "2010-11/ag_mod_q.dta": {
+  "rows": 12330,
+  "cols": 94,
+  "encoding": "full",
+  "repeat_records": 15,
+  "records_in_repeat_groups": 29,
+  "repeat_qty": {
+   "ag_q02a": 0.0,
+   "ag_q03": 0.0
+  },
+  "repeat_qty_nonnull": {
+   "ag_q02a": 0,
+   "ag_q03": 0
+  }
+ },
+ "2010-11/ag_mod_d.dta": {
+  "rows": 19265,
+  "cols": 218,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2010-11/ag_mod_h.dta": {
+  "rows": 24009,
+  "cols": 68,
+  "encoding": "full",
+  "repeat_records": 45,
+  "records_in_repeat_groups": 82,
+  "repeat_qty": {
+   "ag_h16a": 271.0,
+   "ag_h26a": 0.0,
+   "ag_h07a": 10.0,
+   "ag_h38a": 30.0
+  },
+  "repeat_qty_nonnull": {
+   "ag_h16a": 7,
+   "ag_h26a": 0,
+   "ag_h07a": 4,
+   "ag_h38a": 2
+  }
+ },
+ "2013-14/AG_MOD_G_13.dta": {
+  "rows": 10169,
+  "cols": 32,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2013-14/AG_MOD_P_13.dta": {
+  "rows": 4505,
+  "cols": 21,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2013-14/AG_MOD_I_13.dta": {
+  "rows": 8542,
+  "cols": 70,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2013-14/AG_MOD_Q_13.dta": {
+  "rows": 4423,
+  "cols": 58,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2013-14/AG_MOD_D_13.dta": {
+  "rows": 6490,
+  "cols": 191,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2013-14/AG_MOD_H_13.dta": {
+  "rows": 8524,
+  "cols": 46,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Cross_Sectional/ag_mod_g.dta": {
+  "rows": 26506,
+  "cols": 36,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Cross_Sectional/ag_mod_p.dta": {
+  "rows": 4251,
+  "cols": 32,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Cross_Sectional/ag_mod_i.dta": {
+  "rows": 22362,
+  "cols": 62,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Cross_Sectional/ag_mod_q.dta": {
+  "rows": 3882,
+  "cols": 56,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Cross_Sectional/ag_mod_d.dta": {
+  "rows": 15724,
+  "cols": 288,
+  "encoding": "excluded:ag_d55_2oth",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Cross_Sectional/ag_mod_h.dta": {
+  "rows": 22362,
+  "cols": 36,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Panel/ag_mod_g_16.dta": {
+  "rows": 6289,
+  "cols": 46,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Panel/ag_mod_p_16.dta": {
+  "rows": 1064,
+  "cols": 33,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Panel/ag_mod_i_16.dta": {
+  "rows": 4745,
+  "cols": 81,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Panel/ag_mod_q_16.dta": {
+  "rows": 962,
+  "cols": 77,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Panel/ag_mod_d_16.dta": {
+  "rows": 4042,
+  "cols": 296,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2016-17/Panel/ag_mod_h_16.dta": {
+  "rows": 4745,
+  "cols": 52,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Cross_Sectional/ag_mod_g.dta": {
+  "rows": 32677,
+  "cols": 35,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Cross_Sectional/ag_mod_p.dta": {
+  "rows": 7893,
+  "cols": 30,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Cross_Sectional/ag_mod_i.dta": {
+  "rows": 26139,
+  "cols": 70,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Cross_Sectional/ag_mod_q.dta": {
+  "rows": 7216,
+  "cols": 56,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Cross_Sectional/ag_mod_d.dta": {
+  "rows": 17693,
+  "cols": 279,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Cross_Sectional/ag_mod_h.dta": {
+  "rows": 26139,
+  "cols": 40,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Panel/ag_mod_g_19.dta": {
+  "rows": 9984,
+  "cols": 44,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Panel/ag_mod_p_19.dta": {
+  "rows": 1601,
+  "cols": 31,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Panel/ag_mod_i_19.dta": {
+  "rows": 7289,
+  "cols": 90,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Panel/ag_mod_q_19.dta": {
+  "rows": 1436,
+  "cols": 77,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Panel/ag_mod_d_19.dta": {
+  "rows": 5570,
+  "cols": 248,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ },
+ "2019-20/Panel/ag_mod_h_19.dta": {
+  "rows": 7327,
+  "cols": 60,
+  "encoding": "full",
+  "repeat_records": 0,
+  "records_in_repeat_groups": 0
+ }
+}

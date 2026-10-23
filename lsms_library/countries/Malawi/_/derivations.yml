@@ -65,6 +65,7 @@ Malawi::crop_production::sale-basis-unknown-wildcard:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         Module Q asks no shelled/unshelled question before 2016-17, and
@@ -125,6 +126,7 @@ Malawi::crop_production::sale-basis-from-price:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         a shelled unit of a crop sells at a premium over an unshelled unit
@@ -229,6 +231,7 @@ Malawi::crop_production::sale-basis-from-price-overrule:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: >-
         a recorded S/U answer on the sale side, against a harvest row that
@@ -284,6 +287,7 @@ Malawi::crop_production::sale-basis-not-applicable:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         the instrument scopes shelled/unshelled to "ALL APPLICABLE CROPS"
@@ -346,6 +350,7 @@ Malawi::crop_production::sale-basis-no-reference:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         the instrument scopes shelled/unshelled to "ALL APPLICABLE CROPS"
@@ -408,6 +413,7 @@ Malawi::crop_production::contradiction-price-sale:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: >-
         where two recorded answers disagree, a price that sits
@@ -448,6 +454,7 @@ Malawi::crop_production::contradiction-price-harvest:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: as contradiction-price-sale; the two keys exist so that the direction is countable (217 vs 102 in the probe).
       basis: modelling-choice
@@ -490,6 +497,7 @@ Malawi::crop_production::sale-basis-unresolved:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         a sale that cannot be expressed at the row's declared grain (t, i,
@@ -513,3 +521,97 @@ Malawi::crop_production::sale-basis-unresolved:
     harvest-side / 550,400 MWK); claimed by tier A 0.  See CONTENTS.org.
   contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
   since: '2026-09-24'
+
+# GH #827 (2026-10-23).  community_prices: the Module CK form strikes out the
+# NUMBER OF UNITS and UNIT CODES cells on 17 items whose text names the unit.
+# The unit is supplied by malawi._CK_ITEM_FIXED_UNIT (an index value, so it is
+# visible in the frame and exempt from the registry); the COUNT is invisible
+# -- a 1 that no row records -- so it is registered here.  Ruling (@ligon,
+# 2026-10-23, PR #1239): "on struck-unit items, NumberOfUnits = 1 as a
+# registered derivation, consistent with Niger D2.  The form prices one unit
+# of the named item."  Precedent: Niger::community_prices::one-item-per-price.
+# Round 2 (@ligon, 2026-10-23): EXCLUDE cigarettes (CK33) -- bimodal prices.
+
+Malawi::community_prices::struck-item-one-unit:
+  waves: ['2010-11', '2013-14', '2019-20']
+  columns: [NumberOfUnits]
+  rule: >-
+    NumberOfUnits = 1 on a served community_prices row of one of the 17
+    Module CK items whose NUMBER OF UNITS and UNIT CODES cells the form
+    strikes out -- CK3, CK4, CK30-CK35, CK42, CK44-CK51 (2013-14's list
+    lacks CK51) -- when the row records a price (not NA; a recorded 0
+    counts) and no count.  EXCLUDED: CK33 "Cigarettes, Embassy (packet)"
+    (malawi._CK_ONE_UNIT_EXCLUDED; ruling @ligon 2026-10-23).  Its prices
+    are bimodal -- about 541 of its 1,599 priced rows sit at
+    single-cigarette prices -- so a 1 would assert "one packet" on about a
+    third of the rows the data say were priced per stick; its
+    NumberOfUnits stays NA, with no key, and its `u` stays `Packet` (the
+    printed text).  So 16 items carry the key.  The count is in the row's
+    own `u`, the unit the item text fixes (malawi._CK_ITEM_FIXED_UNIT: 50
+    kg Bag, Bottle, 50 kg per Kilometre, Day, Piece).  A recorded count is never
+    overwritten (none exists on these items in any held file); a row with
+    no price gets no count, because a count says what a price refers to and
+    there is no price for it to qualify; items whose unit IS asked are
+    untouched.  Price is served as recorded; nothing is divided, rescaled
+    or converted.  Stamped after the (t, v, j, u) collapse in
+    malawi.assemble_community_prices.
+  function: lsms_library.countries.Malawi._.malawi:derive_ck_struck_one_unit
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_community_prices_struck_one_unit
+  raw_variables:
+    - 2010-11 Full_Sample/Community/com_ck and 2013-14 COM_MOD_K_13 -- ea_id, com_ck00a (item; 'CK<n>' in 2013-14), com_ck00c (available), com_ck00b1 (price, MK), com_ck00b2 (number of units), com_ck00b3 (unit code)
+    - 2019-20 Cross_Sectional/com_ck and Panel/com_ck_19 -- ea_id, com_ck00a (item), cka (available), ckb (price, MK), ckc (number of units), ckd (unit code)
+  assumptions:
+    - text: >-
+        the price recorded for a struck item is the price of ONE unit of the
+        named item.  The form asks "What is the price for the item?" under
+        MK | NUMBER OF UNITS | UNIT CODES and draws a diagonal line through
+        NUMBER OF UNITS and UNIT CODES on these 17 items, whose printed text
+        names the unit: "Cost to grind 50 kg bag of maize" / "... rice",
+        "Coca-Cola, Fanta (bottle)", "Carlsberg beer (bottle)", "Cigarettes,
+        Embassy (packet)", "Motorized transport of crop output (per 50kg per
+        kilometer)", "Ganyu wage, 1 day, adult male".  The count is not asked
+        because the item fixes it.  (The cigarette item names a unit too,
+        but is excluded by the rule: its recorded prices contradict it.)
+      basis: questionnaire
+      evidence: >-
+        IHS3 Community questionnaire p. 20, "SECTION CK: PRICES"
+        (2010-11/Documentation/IHS3.Community.Qx.FINAL.pdf); IHPS Market
+        questionnaire p. 12, "MODULE E: PRICES"
+        (2013-14/Documentation/IHPS.Market.Questionnaire.FINAL.PRINT.pdf);
+        IHS5 Community questionnaire p. 20, "MODULE CK: PRICES".  Ruling
+        @ligon 2026-10-23 on PR #1239.  0 of the 28,631 served struck-item
+        rows record a count or a unit code.
+    - text: >-
+        for the ten count goods whose text names no unit (CK30 trousers,
+        CK34 battery, CK35 watch, CK44 hand hoe, CK45 panga, CK46 sickle,
+        CK47 axe, CK48 bicycle, CK49 foam mattress, CK50 mosquito net;
+        "single" on CK49 / CK50 is a bed size) the one unit is one item,
+        served in `u = Piece`.  The struck count cell and the singular item
+        name are the only evidence; no printed text says "per piece".
+      basis: modelling-choice
+      evidence: >-
+        Malawi/_/CONTENTS.org, "the 38,506 unit-less rows" (the Piece
+        inference, accepted @ligon 2026-10-23 on PR #1239).
+    - text: >-
+        every recorded price on the 16 keyed items is taken to be per one
+        unit of the item as printed, including six 2019-20 Cross_Sectional
+        mosquito-net rows that record a price of 0 MK: they are served
+        NumberOfUnits = 1 like the rest and are not dropped or reversed.
+        The one item whose data contradict the reading -- CK33 cigarettes,
+        bimodal between packet and single-stick prices -- is EXCLUDED by
+        the rule (ruling @ligon 2026-10-23), not served as recorded.
+      basis: modelling-choice
+      evidence: >-
+        Malawi/_/CONTENTS.org, "the 38,506 unit-less rows" (cigarettes);
+        slurm_logs/isa_backlog_2026-10-21/827-malawi-community-units/results/r3_oracle.json
+        (zero prices, cigarette counts).
+  validated_against: >-
+    the instrument only.  No held file records a count on these items, so
+    the one-unit reading cannot be checked against data; the cigarette
+    price bimodality is the one piece of data that cuts against it, and
+    that item is excluded.  Raw oracle (cold build, 2026-10-23): the struck
+    items' rows with a recorded price and an empty count are 21,641, of
+    which 1,599 are CK33 cigarettes; the other 20,042 (2010-11 9,037;
+    2013-14 2,009; 2019-20 8,996) are exactly the rows that carry the key.
+  contents: 'Malawi/_/CONTENTS.org, "the 38,506 unit-less rows: why, and what is served (GH #827)"'
+  since: '2026-10-23'

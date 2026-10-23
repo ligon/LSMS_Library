@@ -1,0 +1,62 @@
+{
+ "2010-11": {
+  "oracle_rows": 27612,
+  "built_seed_rows": 27612,
+  "only_oracle": 0,
+  "only_built": 0,
+  "quantity_mismatch": 3,
+  "purchased_mismatch": 4,
+  "oracle_seed_qty": 830615.3999999948,
+  "built_seed_qty": 830623.3999999948,
+  "oracle_qp_total": 31797.0,
+  "built_qp_total": 31739.0,
+  "oracle_qp_rows": 1294,
+  "built_qp_rows": 1294,
+  "purchase_ic_with_2plus_codes": null
+ },
+ "2013-14": {
+  "oracle_rows": 9942,
+  "built_seed_rows": 9942,
+  "only_oracle": 0,
+  "only_built": 0,
+  "quantity_mismatch": 1,
+  "purchased_mismatch": 1,
+  "oracle_seed_qty": 324288.50000008196,
+  "built_seed_qty": 324297.50000008196,
+  "oracle_qp_total": 50382.69999998808,
+  "built_qp_total": 50378.69999998808,
+  "oracle_qp_rows": 1628,
+  "built_qp_rows": 1628,
+  "purchase_ic_with_2plus_codes": null
+ },
+ "2016-17": {
+  "oracle_rows": 32264,
+  "built_seed_rows": 32264,
+  "only_oracle": 0,
+  "only_built": 0,
+  "quantity_mismatch": 23,
+  "purchased_mismatch": 22,
+  "oracle_seed_qty": 827722.99,
+  "built_seed_qty": 827867.99,
+  "oracle_qp_total": 68627.0,
+  "built_qp_total": 68470.0,
+  "oracle_qp_rows": 1879,
+  "built_qp_rows": 1879,
+  "purchase_ic_with_2plus_codes": null
+ },
+ "2019-20": {
+  "oracle_rows": 42478,
+  "built_seed_rows": 42478,
+  "only_oracle": 0,
+  "only_built": 0,
+  "quantity_mismatch": 9,
+  "purchased_mismatch": 9,
+  "oracle_seed_qty": 1134377.2,
+  "built_seed_qty": 1134500.2,
+  "oracle_qp_total": 93688.79999999999,
+  "built_qp_total": 93607.79999999999,
+  "oracle_qp_rows": 2216,
+  "built_qp_rows": 2216,
+  "purchase_ic_with_2plus_codes": null
+ }
+}

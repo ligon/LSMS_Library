@@ -1,0 +1,263 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 49%]
+........................................................ssssssssssssssss [ 59%]
+sssssssssssssssssssssssssssssssssssss................................... [ 69%]
+........................................................................ [ 79%]
+..................ss....sssss........................................... [ 89%]
+........................X............................................... [ 99%]
+..                                                                       [100%]
+=============================== warnings summary ===============================
+tests/test_gh1039_make_backend_no_country_rule.py::test_absent_subset_does_not_turn_a_failed_full_build_into_empty
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5191: UserWarning: No Makefile or script found for Fakeland/_ build_me.
+    warnings.warn(f"No Makefile or script found for {self.name}/{wave or '_'} {method_name}.")
+
+tests/test_962_unit_sentinel.py::test_runtime_sentinel_semantics_with_working_inference_control
+  /local/job40390255/worktrees/1237/tests/test_962_unit_sentinel.py:264: UnpriceableRowsWarning: food_prices(units='kgvalue'): dropped 20 of 60 priceable rows (33.3%) because Price was inf (0), NaN (20) or zero (0).  These rows are DROPPED, not returned as NaN, so the gap is otherwise invisible.  The causes are DIFFERENT and only the first is always a defect: an inf Price means the survey recorded an Expenditure against a ZERO Quantity -- typically a 0-as-missing sentinel or a quantity variable mapped to the wrong survey question (GH #591).  A NaN Price means the quantity was missing OR the unit has no kg factor.  A further 60 row(s) were dropped because their unit is CURRENCY-DENOMINATED (u='Value': the survey deliberately elicited value, not a physical amount).  Those are BY DESIGN -- the factor is 1/price at (j, t, m) and no per-label constant can represent it (GH #770) -- so they are EXCLUDED from the count and the fraction above, which report the residual real loss.  See GH #591, GH #770, GH #864.
+    prices = food_prices_from_acquired(out, units=mode)
+
+tests/test_962_unit_sentinel.py::test_runtime_sentinel_semantics_with_working_inference_control
+  /local/job40390255/worktrees/1237/tests/test_962_unit_sentinel.py:264: UnpriceableRowsWarning: food_prices(units='kgprice'): dropped 20 of 60 priceable rows (33.3%) because Price was inf (0), NaN (20) or zero (0).  These rows are DROPPED, not returned as NaN, so the gap is otherwise invisible.  The causes are DIFFERENT and only the first is always a defect: an inf Price means the survey recorded an Expenditure against a ZERO Quantity -- typically a 0-as-missing sentinel or a quantity variable mapped to the wrong survey question (GH #591).  A NaN Price means the quantity was missing OR the unit has no kg factor.  See GH #591, GH #770, GH #864.
+    prices = food_prices_from_acquired(out, units=mode)
+
+tests/test_gh1039_make_backend_no_country_rule.py::test_country_script_keeps_the_make_route
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5244: UserWarning: Makefile execution failed for Fakeland/_ build_me: Command '['make', '-s', '-j6', '/local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_country_script_keeps_the_0/data/Fakeland/var/build_me.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_gh1039_make_backend_no_country_rule.py::test_country_script_keeps_the_make_route
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5244: UserWarning: Makefile execution failed for Fakeland/_ build_me: Command '['make', '-s', '-j6', '/local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_country_script_keeps_the_0/countries/Fakeland/var/build_me.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_cache_applies_location_index
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Cache miss for TestCountry/test_data (STALE: parquet carries no cache hash (GH #809)): FULL REBUILD from source of 1 wave(s) (ALL), not a cache read.
+    df = load_with_dvc_cache(method_name)
+
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_fallback_warning_names_the_miss_reason
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Cache miss for TestCountry/test_data (STALE: stored content hash differs from the current inputs): FULL REBUILD from source of 1 wave(s) (2020-21), not a cache read.
+    df = load_with_dvc_cache(method_name)
+
+tests/test_cache_hash_invalidation.py::test_hashless_country_parquet_is_rebuilt_not_trusted
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Cache miss for Albania/housing (STALE: parquet carries no cache hash (GH #809)): FULL REBUILD from source of 6 wave(s) (2002, 2003, 2004, 2005, 2008, 2012), not a cache read.
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[None-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req0/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 6 wave(s) (2008-09, 2010-11, 2012-13, 2014-15, 2019-20, 2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[None-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req1/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 6 wave(s) (2008-09, 2010-11, 2012-13, 2014-15, 2019-20, 2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_cache_hash_invalidation.py::test_stale_country_parquet_is_not_served
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Albania/housing is being rebuilt from source AGAIN in this process (STALE: stored content hash differs from the current inputs); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/lsms_hashtest_ontfxfeu/Albania/var/housing.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 6 wave(s) (2002, 2003, 2004, 2005, 2008, 2012).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_cache_hash_invalidation.py: 12 warnings
+  /local/job40390255/worktrees/1237/lsms_library/country.py:2192: UserWarning: Makefile not found in /local/job40390255/worktrees/1237/lsms_library/countries/Albania/_. Unable to generate required data.
+    warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+
+tests/test_cache_hash_invalidation.py::test_stale_country_parquet_is_not_served
+tests/test_cache_hash_invalidation.py::test_stale_country_read_evicts_hashless_wave_parquet
+  /local/job40390255/worktrees/1237/lsms_library/null_read_audit.py:380: NullReadWarning: Albania/sample: required declared column 'Rural' is 100% NULL in wave(s) [2003, 2004] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Albania/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_cache_hash_invalidation.py::test_stale_country_parquet_is_not_served
+tests/test_cache_hash_invalidation.py::test_stale_country_read_evicts_hashless_wave_parquet
+  /local/job40390255/worktrees/1237/lsms_library/null_read_audit.py:380: NullReadWarning: Albania/sample: required declared column 'strata' is 100% NULL in wave(s) [2004] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Albania/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested5-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req10/target/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2019-20).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested5-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req10/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2019-20).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested5-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req11/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2019-20).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested6-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req12/target/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested6-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req12/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested6-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req13/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_cache_hash_invalidation.py::test_stale_country_read_evicts_hashless_wave_parquet
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Albania/housing is being rebuilt from source AGAIN in this process (STALE: stored content hash differs from the current inputs); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/lsms_hashtest_atvm0x_0/Albania/var/housing.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 6 wave(s) (2002, 2003, 2004, 2005, 2008, 2012).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_cache_hash_invalidation.py::test_stale_country_read_evicts_hashless_wave_parquet
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Albania/sample is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/lsms_hashtest_atvm0x_0/Albania/var/sample.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 6 wave(s) (2002, 2003, 2004, 2005, 2008, 2012).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested8-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req16/target/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 2 wave(s) (2019-20, 2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested8-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req16/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 2 wave(s) (2019-20, 2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_niger_community_builder.py::test_requests_use_only_the_requested_native_waves[None-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Niger/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_requests_use_only_the_req0/reference/Niger/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 4 wave(s) (2011-12, 2014-15, 2018-19, 2021-22).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested8-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req17/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 2 wave(s) (2019-20, 2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py: 14 warnings
+  /local/job40390255/worktrees/1237/lsms_library/country.py:7832: GrainCollapseWarning: Uganda/crop_production/2018-19: reduce_to_agreed(on_conflict='na') on (t, i, plot_id, j, u, condition, season, production_obs) found 1 of 3 index group(s) whose rows DISAGREE, and BLANKED 1 cell(s) rather than pick a winner (conflicted groups per column: Unit_sold: 1; e.g. synthetic GH1204 transport fixture). No row was dropped: the group is served with the withheld value missing. Such a group is a pre-existing defect in the source (a broken identifier or a missing index level), made visible by the reducer -- fix it there. Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323.
+    _emit_grain_report(report)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Uganda/crop_production is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw2/test_alternating_requests_keep0/data/Uganda/var/crop_production.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2018-19).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Cache miss for Uganda/crop_production (coverage: parquet was built from ['2018-19'], request needs ['2005-06', '2009-10', '2010-11', '2011-12', '2013-14', '2015-16', '2018-19', '2019-20']): FULL REBUILD from source of 8 wave(s) (2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20), not a cache read.
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[make]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:7832: GrainCollapseWarning: Uganda/crop_production/2009-10: reduce_to_agreed(on_conflict='na') on (t, i, plot_id, j, u, condition, season, production_obs) found 1 of 3 index group(s) whose rows DISAGREE, and BLANKED 1 cell(s) rather than pick a winner (conflicted groups per column: Unit_sold: 1; e.g. synthetic GH1204 transport fixture). No row was dropped: the group is served with the withheld value missing. Such a group is a pre-existing defect in the source (a broken identifier or a missing index level), made visible by the reducer -- fix it there. Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323.
+    _emit_grain_report(report)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[make]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:7832: GrainCollapseWarning: Uganda/crop_production/2010-11: reduce_to_agreed(on_conflict='na') on (t, i, plot_id, j, u, condition, season, production_obs) found 1 of 3 index group(s) whose rows DISAGREE, and BLANKED 1 cell(s) rather than pick a winner (conflicted groups per column: Unit_sold: 1; e.g. synthetic GH1204 transport fixture). No row was dropped: the group is served with the withheld value missing. Such a group is a pre-existing defect in the source (a broken identifier or a missing index level), made visible by the reducer -- fix it there. Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323.
+    _emit_grain_report(report)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[make]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:7832: GrainCollapseWarning: Uganda/crop_production/2011-12: reduce_to_agreed(on_conflict='na') on (t, i, plot_id, j, u, condition, season, production_obs) found 1 of 3 index group(s) whose rows DISAGREE, and BLANKED 1 cell(s) rather than pick a winner (conflicted groups per column: Unit_sold: 1; e.g. synthetic GH1204 transport fixture). No row was dropped: the group is served with the withheld value missing. Such a group is a pre-existing defect in the source (a broken identifier or a missing index level), made visible by the reducer -- fix it there. Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323.
+    _emit_grain_report(report)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[make]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:7832: GrainCollapseWarning: Uganda/crop_production/2013-14: reduce_to_agreed(on_conflict='na') on (t, i, plot_id, j, u, condition, season, production_obs) found 1 of 3 index group(s) whose rows DISAGREE, and BLANKED 1 cell(s) rather than pick a winner (conflicted groups per column: Unit_sold: 1; e.g. synthetic GH1204 transport fixture). No row was dropped: the group is served with the withheld value missing. Such a group is a pre-existing defect in the source (a broken identifier or a missing index level), made visible by the reducer -- fix it there. Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323.
+    _emit_grain_report(report)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[make]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:7832: GrainCollapseWarning: Uganda/crop_production/2015-16: reduce_to_agreed(on_conflict='na') on (t, i, plot_id, j, u, condition, season, production_obs) found 1 of 3 index group(s) whose rows DISAGREE, and BLANKED 1 cell(s) rather than pick a winner (conflicted groups per column: Unit_sold: 1; e.g. synthetic GH1204 transport fixture). No row was dropped: the group is served with the withheld value missing. Such a group is a pre-existing defect in the source (a broken identifier or a missing index level), made visible by the reducer -- fix it there. Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323.
+    _emit_grain_report(report)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_alternating_requests_keep_raw_coverage_true[make]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:7832: GrainCollapseWarning: Uganda/crop_production/2019-20: reduce_to_agreed(on_conflict='na') on (t, i, plot_id, j, u, condition, season, production_obs) found 1 of 3 index group(s) whose rows DISAGREE, and BLANKED 1 cell(s) rather than pick a winner (conflicted groups per column: Unit_sold: 1; e.g. synthetic GH1204 transport fixture). No row was dropped: the group is served with the withheld value missing. Such a group is a pre-existing defect in the source (a broken identifier or a missing index level), made visible by the reducer -- fix it there. Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323.
+    _emit_grain_report(report)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[supported-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Uganda/crop_production is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw2/test_barren_crop_order_matches2/data/Uganda/var/crop_production.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2018-19).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested9-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req18/target/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 2 wave(s) (2008-09, 2019-20).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested9-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req18/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 2 wave(s) (2008-09, 2019-20).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1204_uganda_crop_wave_coverage.py::test_barren_crop_order_matches_native_declaration_without_cache_writes[all-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Uganda/crop_production is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw2/test_barren_crop_order_matches4/data/Uganda/var/crop_production.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 8 wave(s) (2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_niger_community_builder.py::test_requests_use_only_the_requested_native_waves[None-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Niger/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_requests_use_only_the_req1/reference/Niger/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 4 wave(s) (2011-12, 2014-15, 2018-19, 2021-22).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_niger_community_builder.py::test_requests_use_only_the_requested_native_waves[requested1-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Niger/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_requests_use_only_the_req2/target/Niger/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2011-12).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_niger_community_builder.py::test_requests_use_only_the_requested_native_waves[requested1-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Niger/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_requests_use_only_the_req2/reference/Niger/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2011-12).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_requests_use_only_the_requested_native_waves[requested9-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_requests_use_only_the_req19/reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 2 wave(s) (2008-09, 2019-20).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_pakistan_cluster_features.py::test_extraction_is_cluster_grain
+  /local/job40390255/worktrees/1237/lsms_library/country.py:2192: UserWarning: Makefile not found in /local/job40390255/worktrees/1237/lsms_library/countries/Pakistan/_. Unable to generate required data.
+    warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+
+tests/test_gh1209_malawi_food_builder.py::test_native_wave_assembly_preserves_requested_food[waves1-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Malawi/food_acquired is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw2/test_native_wave_assembly_pres2/data/Malawi/var/food_acquired.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2013-14).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_niger_community_builder.py::test_requests_use_only_the_requested_native_waves[requested1-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Niger/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_requests_use_only_the_req3/reference/Niger/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2011-12).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_niger_community_builder.py::test_requests_use_only_the_requested_native_waves[requested2-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Niger/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_requests_use_only_the_req4/target/Niger/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2014-15).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_niger_community_builder.py::test_requests_use_only_the_requested_native_waves[requested2-dvc]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Niger/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_requests_use_only_the_req4/reference/Niger/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2014-15).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_niger_community_builder.py::test_requests_use_only_the_requested_native_waves[requested2-make]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Niger/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw1/test_requests_use_only_the_req5/reference/Niger/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2014-15).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_populated_make_preserves_verified_default_country_cache[requested0]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_populated_make_preserves_0/populated/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 6 wave(s) (2008-09, 2010-11, 2012-13, 2014-15, 2019-20, 2020-21).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_populated_make_preserves_verified_default_country_cache[requested0]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_populated_make_preserves_0/populated-reference/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 1 wave(s) (2019-20).
+    df = load_with_dvc_cache(method_name)
+
+tests/test_gh1091_tanzania_community_builder.py::test_populated_make_preserves_verified_default_country_cache[requested1]
+  /local/job40390255/worktrees/1237/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Tanzania/community_prices is being rebuilt from source AGAIN in this process (no parquet); the previous rebuild covered the same waves with the same inputs, so its parquet was not written, was overwritten, or is not being read back.  Check that /local/job40390255/tmp/pytest-of-ligon/pytest-121/popen-gw0/test_populated_make_preserves_1/populated/Tanzania/var/community_prices.parquet is writable and that its cache hash is stable between calls (GH #920).  Rebuilding 6 wave(s) (2008-09, 2010-11, 2012-13, 2014-15, 2019-20, 2020-21).
+    df = load_with_dvc_cache(method_name)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+661 passed, 60 skipped, 1 xpassed, 114 warnings in 232.07s (0:03:52)

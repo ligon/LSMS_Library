@@ -89,15 +89,20 @@ EXPECTED_ROWS = {
     # (and the gift subtraction moves more of them to zero); s07bq05 then adds
     # 15,253 new `s='inkind'` rows across the two EHCVM waves.  Net +851.
     "food_acquired": 239877,    # 239,882 before GH #833's sugar fold
-    "plot_inputs": 42426,       # 42,364 before the bundle
+    # 42,364 before the bundle; 42,426 before GH #1123, whose seed-crop split
+    # stops the catch-all collapse eating 6 (2018-19) + 3 (2021-22) native
+    # input lines.  None of the nine carries u == Unknown (counts below).
+    "plot_inputs": 42435,
     # 15,423 before GH #840, which stopped selecting one row per (t, v, j, u)
     # and added the variety / visit / obs levels: 2011-12 8,923 -> 32,369,
     # 2014-15 6,500 -> 13,808; then 46,177 -> 46,043 when the red team showed
     # 134 of the obs 4-6 rows were duplicate ENTRIES repeating a served row
     # (2011-12 32,369 -> 32,352, 2014-15 13,808 -> 13,691).  Still 0 `Unknown`
     # rows (below): the 795 unit-less CS07 observations are dropped, not
-    # filled (CONTENTS.org).
-    "community_prices": 46043,
+    # filled (CONTENTS.org).  GH #823 then wired 2018-19 (EHCVM s05): +84,444
+    # rows, none of them `Unknown` (every s05 unit-size code names a unit), and
+    # the 46,043 CS07 rows unchanged.
+    "community_prices": 130487,
 }
 EXPECTED_SENTINEL = {
     "crop_production": 4909,    # 4,920 before GH #865 dropped 11 all-sentinel lines
@@ -111,7 +116,7 @@ EXPECTED_SENTINEL_BY_WAVE = {
     "crop_production": {"2011-12": 3135, "2014-15": 373, "2018-19": 441, "2021-22": 960},  # 2011-12 3,146 before GH #865
     "food_acquired": {"2018-19": 0, "2021-22": 8},   # 12 before GH #876
     "plot_inputs": {"2011-12": 44, "2014-15": 15, "2018-19": 2, "2021-22": 13},   # 2021-22 14 before GH #865
-    "community_prices": {"2011-12": 0, "2014-15": 0},
+    "community_prices": {"2011-12": 0, "2014-15": 0, "2018-19": 0},  # 2018-19: GH #823
 }
 
 
