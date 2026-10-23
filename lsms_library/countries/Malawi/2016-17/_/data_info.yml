@@ -58,7 +58,8 @@ cluster_features:
                 # (IHS3) EA?  'stayer' / 'moved' / 'unrecorded' from
                 # dist_to_IHS3location, read by the `cluster_features` hook
                 # in this wave's mapping.py and dropped there.  A panel-file
-                # override only, so cross-sectional rows carry NaN.
+                # override only, so cross-sectional rows carry NaN; a panel
+                # row with a NaN status makes the hook raise.
                 _ihps_baseline_status:
                     - dist_to_IHS3location
                     - mapping: ihps_baseline_status
@@ -107,10 +108,10 @@ cluster_features:
         # published -- we just did not hold it.
         #
         # IHPS coordinates are each household's CURRENT location and IHPS
-        # tracks movers, so only the households still at their baseline EA
-        # locate the EA.  The `cluster_features` hook in this wave's
-        # mapping.py blanks every other panel coordinate (and the panel's in
-        # the one EA the cross-section also covers) -- see GH #1260.
+        # tracks movers.  The households still at their baseline EA share
+        # one coordinate per EA, the EA's fix; the `cluster_features` hook in
+        # this wave's mapping.py keeps panel coordinates equal to that fix
+        # and blanks the rest -- see GH #1260.
         #
         # Two files make get_data pass missing_ok=True, so a mis-spelled
         # column in either file becomes NaN instead of a KeyError.  The

@@ -63,20 +63,27 @@ the panel household id. Config + data only; no framework change.
 |----------|----------|--------|
 | panel coordinates | reuse `file:` list + per-file override in `df_geo` | a third `dfs:` member would collide on `Latitude`/`Longitude` (`_x`/`_y`); no coalesce transformer exists and adding one is framework work |
 | merge type | keep `outer` | both sides 1:1 on `i` (14,955 / 14,612), so `outer` = `left`; `outer` keeps the orphan signal |
-| cluster coordinate for a panel EA | NEW wave hook: blank non-stayer panel coordinates (round 2, dispatcher judgement 2026-10-23) | stayers (`dist_to_IHS3location` <= 1 km, the 2013-14 test's rule) share exactly one coordinate per EA in both waves; no precedent filter exists (2013-14 reports, does not filter) |
-| shared EA 30305580 | keep the cross-section's fix | IHS4 and IHPS stayer fixes differ by 4.1 km (independent displacement); keeping IHS4's leaves the row identical to development |
+| cluster coordinate for a panel EA | NEW wave hook (rounds 2-3): the stayers' single coordinate is the EA fix; keep panel coordinates equal to it, blank the rest; stayers first; fail closed | stayers (`dist_to_IHS3location` <= 1 km, the 2013-14 test's rule) share exactly one coordinate per EA, identical across 2013-14 / 2016-17 / 2019-20 and equal to 2010-11's; no precedent filter exists (2013-14 reports, does not filter) |
+| shared EA 30305580 | serve the IHPS stayer fix (round 3; round 2 kept IHS4's) | one coordinate per EA across rounds: IHS4's fix (4.1 km away) would make it the only panel EA that jumps in 2016-17 |
+| who supplies Region/District/Rural | stayer-first row order before the collapse | `most_complete_row` breaks ties by original order; a mover sitting on the fix is as complete as a stayer |
 
 ## §6 Open questions for the human
 - 2016-17 held `Data/Panel/`: 5 of 98 files differ from the current 2939 v03
   zip (`hh_mod_a_filt_16` differs only in `case_id`, all rows). Re-acquire as a
   separate issue?
-- Round 2 now serves the stayers' fix in 2016-17 / 2019-20.  Extend the same
-  hook to 2013-14 (24 of 204 clusters serve a non-stayer coordinate there)?
+- Rounds 2-3 serve the stayers' fix in 2016-17 / 2019-20.  Extend the same
+  hook to 2013-14 (11 of the 102 continuing panel EAs, 24 of 204 in all,
+  serve a non-stayer coordinate there)?
+- Downstream: `with_region` and `market='Region'` / `'District'` see the
+  moved attributes -- 2019-20 Region 4 EAs (108 households), District 10
+  (329), Rural 4 (117); 2016-17 Rural 5 (107); all toward the stayers' mode.
+- The hook's stayer-first ordering relies on `most_complete_row`'s documented
+  order tie-break; a change to that contract would move these attributes.
 - Is blanking non-stayer coordinates a "deletion" the derivations registry
   should name?  Not registered here: the served value is a recorded value,
   and only the choice of which household supplies it changed.
-- Site 2 still reports every panel EA as conflicting (a blank counts as a
-  value), so the grain report did not fall with the coordinates.
+- Site 2 still reports every panel EA with a blanked mover as conflicting (a
+  blank counts as a value); round 3 is back at round 1's exact groups.
 - 2019-20 `function: cs_i` is a no-op (unrecognised key), so the IHS5 `i` is a
   bare `case_id`. Intended?
 - 9 IHS5 cross-sectional clusters serve coordinates outside Malawi's box
@@ -101,3 +108,9 @@ the panel household id. Config + data only; no framework change.
   with more than one coordinate, shared EA identical to development.  The
   11 new or changed tests fail on round 1 (`fd5c12474`).
 - Evidence: `slurm_logs/isa_backlog_2026-10-21/1260-malawi-panel-geo/`.
+- Round 3: the hook keeps panel coordinates equal to the EA's stayer fix,
+  orders stayers first and raises on a null status / off-shape status /
+  disagreeing stayers — OK (§5): 102/102 panel EAs serve the stayer fix in
+  both waves, shared EA included; Site 2 groups equal round 1's; served
+  attributes equal round 2's.  15 of the file's 31 tests fail on round 2
+  (`bd51baf95`).  SOURCE.org `prov.note` is the #600 note again.

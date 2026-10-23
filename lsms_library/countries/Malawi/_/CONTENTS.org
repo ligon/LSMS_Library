@@ -1911,65 +1911,104 @@ in 2019-20; 2019-20's geo file repeats it as =d_ihs3=, identical on all 3,175
 households with both).  Restrict to households within 1 km and every panel EA
 collapses to EXACTLY ONE coordinate -- the EA's displaced fix:
 
-| wave    | stayers (<= 1 km, with a coordinate) | EAs covered | EAs with >1 stayer coordinate | stayers per EA |
-|---------+--------------------------------------+-------------+-------------------------------+----------------|
+| wave    | stayers (<= 1 km, with a coordinate) | EAs covered | EAs with >1 stayer coordinate | stayers per EA   |
+|---------+--------------------------------------+-------------+-------------------------------+------------------|
 | 2016-17 | 1,442 of 2,503                       | 102 of 102  | 0                             | min 4, median 14 |
 | 2019-20 | 2,136 of 3,175                       | 102 of 102  | 0                             | min 9, median 20 |
 
-(It holds at 2 km too; at 5 km one 2016-17 EA and twelve 2019-20 EAs split.)
-2016-17's own geo variable =distY1Y3= is populated for only 641 households,
-and the cover's =mover= flag ("moved in 2013 or 2016") is not a stayer flag:
-453 of the 1,443 households within 1 km have =mover= = 1, and the =mover= = 0
-households split in 39 EAs.
+(It holds at 2 km too; at 5 km one 2016-17 EA and twelve 2019-20 EAs split.
+2019-20's distance is 0 for every stayer and its smallest positive value is
+5.0 km.)  2016-17's own geo variable =distY1Y3= is populated for only 641
+households, and the cover's =mover= flag ("moved in 2013 or 2016") is not a
+stayer flag: 453 of the 1,443 households within 1 km have =mover= = 1.
 
-*So only the stayers' coordinates reach the cluster.*  Each wave's
-=_/mapping.py= has a =cluster_features= hook, fed by a panel-cover override
-=_ihps_baseline_status= (='stayer'= / ='moved'= / ='unrecorded'=, from
-=dist_to_IHS3location=, dropped by the hook).  It blanks -- never drops -- the
-coordinates of every panel household that is not a stayer, so the grain
-collapse's most-complete row in a panel EA is a stayer's.  Without it the
-cluster served whichever household the collapse selected: a mover's location
-in 13 (2016-17) and 16 (2019-20) panel EAs, up to 608 km from the EA's fix.
+*One coordinate per EA, across rounds.*  The stayers' fix is the same
+coordinate in every IHPS round -- 2013-14, 2016-17 and 2019-20 agree within
+2e-6 degrees (under 1 m) for all 102 panel EAs -- and equals the EA's served
+2010-11 coordinate.  It is THE coordinate of the EA, so the cluster serves it.
+
+*The hook* (=_/mapping.py= =cluster_features= in each wave, fed by a
+panel-cover override =_ihps_baseline_status= = ='stayer'= / ='moved'= /
+='unrecorded'=, dropped by the hook):
+1. *Finds* each panel EA's fix from its stayers, and *raises* if they
+   disagree.
+2. *Keeps* every panel coordinate that equals the fix and blanks the rest --
+   judged by coordinate, not by distance alone, because the distance only
+   finds the fix.  418 movers and 1 unrecorded household (2016-17) and 29
+   movers (2019-20) sit exactly on their EA's fix and keep it: 1,861 / 2,165
+   panel households keep a coordinate.  This also settles the unrecorded
+   case the way 2013-14's measurement does (=fillna(0) <= 1=): an unrecorded
+   household on the fix keeps it.  Coordinates are blanked, never rows
+   dropped.
+3. *Puts stayers first.*  A mover on the fix is as complete a row as a
+   stayer, but its =Region= / =District= / =Rural= describe where it lives
+   now; the grain collapse breaks ties by order (=most_complete_row=), so
+   stayer-first means the cluster takes a stayer's attributes.  Without it
+   one 2016-17 EA served =Rural= from a mover while its stayers are all
+   Urban.
+4. *Fails closed.*  A panel household (id =NNNN-NNN=, the =y{3,4}_hhid=
+   shape) with a NULL status means =dist_to_IHS3location= did not arrive --
+   renamed or misspelled upstream, which =missing_ok= turns into an all-NaN
+   column, and every mover's location would then be served.  The hook
+   raises; so does a status on a non-panel id.  Measured end to end with
+   the variable misspelled in 2019-20: =Country('Malawi').cluster_features()=
+   raises =RuntimeError= ("3178 of 3178 panel households have NO baseline
+   status").
 The status is a STRING on purpose: a first version returned =+inf= for an
 unrecorded distance, and =grab_data='s >1e99 missing-value rule rewrote it to
-NaN, so that household looked cross-sectional and blanked its EA's stayers.
+NaN.
 
-*EA =30305580=* is sampled in both halves of 2016-17.  Its 16 IHS4 households
-share one fix; its 20 IHPS stayers share another, *4.1 km away* -- IHS4 and
-IHPS displace independently, so they do not agree.  The hook blanks the panel
-coordinates in any EA the cross-section also covers, so the cluster keeps the
-IHS4 fix: the row is identical to development's.  (Every coordinate here is a
-random offset of the same EA; keeping the cross-section's is a choice for
-stability, not accuracy.)
+*EA =30305580=* is sampled in both halves of 2016-17.  Its 16 IHS4
+households share one fix; its 20 IHPS stayers share another, *4.1 km away*
+(IHS4 and IHPS displace independently).  The cluster serves the *IHPS*
+stayers' fix: it is the EA's coordinate in 2010-11, 2013-14 and 2019-20, so
+keeping IHS4's would make this the only one of 102 panel EAs whose
+coordinate jumps in 2016-17.  Its =Region= / =District= / =Rural= are
+unchanged from development.  (An earlier version of this change kept the
+IHS4 fix "for stability"; that held only against development, not across
+rounds.)
 
-Measured cold, development =9a0ed5f3c= -> first wiring (every panel
-household's coordinate) -> this change (stayers only):
+Measured cold, development =9a0ed5f3c= -> round 2 (=bd51baf95=: stayers
+only, IHS4 fix in the shared EA) -> this change:
 
-| wave    | clusters without GPS | panel EAs serving the stayer fix | EAs with >1 distinct coordinate | Site 2 destroyed / conflicting groups |
-|---------+----------------------+----------------------------------+---------------------------------+---------------------------------------|
-| 2016-17 | 101 -> 0 -> 0        | 0 -> 88 -> 101 (of 101)           | 7 -> 108 -> 7                   | 1,994/85 -> 2,563/111 -> 2,585/112    |
-| 2019-20 | 102 -> 0 -> 0        | 0 -> 86 -> 102 (of 102)           | 0 -> 102 -> 0                   | 3,146/108 -> 3,184/110 -> 3,184/110   |
+| wave    | clusters without GPS | panel EAs serving the stayer fix | EAs with >1 coordinate | panel households keeping a coordinate | Site 2 destroyed / conflicting groups |
+|---------+----------------------+----------------------------------+------------------------+---------------------------------------+---------------------------------------|
+| 2016-17 | 101 -> 0 -> 0        | 0 -> 101 -> 102 (of 102)         | 7 -> 7 -> 8            | 0 -> 1,422 -> 1,861 (of 2,508)        | 1,994/85 -> 2,585/112 -> 2,563/111    |
+| 2019-20 | 102 -> 0 -> 0        | 0 -> 102 -> 102 (of 102)         | 0 -> 0 -> 0            | 0 -> 2,136 -> 2,165 (of 3,178)        | 3,146/108 -> 3,184/110 -> 3,184/110   |
 
-The 7 in 2016-17 are the pre-existing IHS4 cross-sectional EAs.  The Site 2
-counts do NOT fall back, and that is the audit working as documented: it
-counts a blank as a value ("Missing values count as values"), so a mover's
-blanked coordinate disagrees with the stayer row the collapse keeps.  Every
-cross-sectional-only cluster (778 / 717), EA =30305580=, the other three
-waves, =sample()= and =housing()= are identical to development.
+- *EAs with >1 coordinate*: the 7 are pre-existing IHS4 cross-sectional
+  EAs; the 8th is EA =30305580=, which now holds both its IHS4 and its IHPS
+  fix.
+- *Site 2* is back at the first wiring's level (2,563/111), one group below
+  round 2: keeping movers on the fix removes a false conflict in a 2016-17
+  EA whose 23 households all agreed before the hook.  It does not fall
+  further because the audit counts a blank as a value ("Missing values count
+  as values"), so a blanked mover still disagrees with the stayer row kept.
+- *Unchanged from development*: every cross-sectional-only cluster (778 /
+  717), the other three waves, =sample()= and =housing()=.
 
-*Other served values move with the selection*, because a stayer's row is now
-the one kept: development -> this change, 2016-17 =Rural= in 5 panel EAs
-(2 Urban -> Rural, 3 Rural -> Urban); 2019-20 =Region= 4, =District= 10,
-=Rural= 4, all panel EAs.  Each moved TOWARD the EA's stayers: the served
-value equals the stayers' modal value in 99 of 101 (=Rural=, 2016-17; was 94)
-and 102 / 95 / 98 of 102 (=Region= / =District= / =Rural=, 2019-20; was 98 /
-85 / 94).  (2019-20 stayers themselves disagree on =District= in 37 EAs,
-mostly city vs. district -- Lilongwe / Lilongwe City, Blantyre / Blantyre
-City.)  The first wiring's =Rural= flip in one 2016-17 panel EA (Urban ->
-Rural, 17 of 19 households Rural) stands: all 13 of its stayers are Rural.
+*Downstream: the served attributes moved, and anything keyed on them sees
+it* -- =with_region=, and =market='Region'= / =market='District'= on any
+table, read these cluster attributes.  Development -> this change, all in
+panel EAs, all toward the stayers' modal value:
 
-*Not extended to 2013-14*, which has the same structure and no hook: 24 of
-its 204 clusters serve a non-stayer coordinate (development, unchanged).
+| wave    | Region            | District           | Rural              |
+|---------+-------------------+--------------------+--------------------|
+| 2016-17 | 0                 | 0                  | 5 EAs (107 hh)     |
+| 2019-20 | 4 EAs (108 hh)    | 10 EAs (329 hh)    | 4 EAs (117 hh)     |
+
+The served value equals the stayers' modal value in 99 of 101 panel-only
+EAs for =Rural= in 2016-17 (was 94), and 102 / 95 / 98 of 102 for =Region= /
+=District= / =Rural= in 2019-20 (was 98 / 85 / 94).  2019-20's stayers
+themselves disagree on =District= in 37 EAs, mostly city vs. district
+(Lilongwe / Lilongwe City, Blantyre / Blantyre City).  The first wiring's
+=Rural= flip in one 2016-17 panel EA (Urban -> Rural, 17 of 19 households
+Rural) stands: all its stayers are Rural.
+
+*Not extended to 2013-14* (follow-up; no hook, unchanged): it still serves a
+non-stayer coordinate in 11 of the 102 panel EAs that continue into 2016-17
+(24 of its 204 EAs in all).  Malawi's three IHPS waves therefore treat
+movers differently until it is.
 
 *Three things found on the way, not fixed here:*
 - *The held 2016-17 =Data/Panel/= is not all the current 2939 upload.*  93 of

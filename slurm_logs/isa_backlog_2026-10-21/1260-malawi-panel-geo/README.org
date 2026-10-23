@@ -106,6 +106,42 @@ Cross-sectional clusters, the other waves, =sample()= and =housing()= are
 identical to development.  2013-14 (unchanged, no hook) serves a non-stayer
 coordinate in 24 of 204 clusters.
 
+* Round 3: one coordinate per EA, fail closed (=outputs/round3_compare.txt=)
+After an independent review of =bd51baf95= (its evidence stays in the
+private =review-1260/= directory):
+
+- *Shared EA 30305580 serves the IHPS stayer fix.*  The stayers' fix is the
+  same coordinate in 2013-14, 2016-17 and 2019-20 (max difference 1.9e-6
+  degrees over 102 EAs) and equals the served 2010-11 coordinate; keeping
+  IHS4's made this the only EA whose coordinate jumps (4.1 km) in 2016-17.
+- *Blank by coordinate.*  Per panel EA the stayers' single coordinate is the
+  fix; any panel coordinate equal to it is kept (418 movers + 1 unrecorded
+  in 2016-17, 29 movers in 2019-20 sit on it).  Panel households keeping a
+  coordinate: 1,861 / 2,165.
+- *Stayers first*, so the collapse (ties broken by order) takes a stayer's
+  Region/District/Rural; without it one 2016-17 EA served =Rural= from a
+  mover on the fix.  Served attributes are identical to round 2.
+- *Fail closed.*  A panel id (=NNNN-NNN=) with a null status, a status on a
+  non-panel id, or stayers that disagree raise =RuntimeError=.  End to end
+  with 2019-20's distance variable misspelled: the build raises.
+
+| wave    | clusters without GPS | panel EAs serving the stayer fix | EAs with >1 coordinate | Site 2 destroyed / conflicting |
+|---------+----------------------+----------------------------------+------------------------+--------------------------------|
+| 2016-17 | 101 -> 0 -> 0        | 0 -> 101 -> 102 (of 102)         | 7 -> 7 -> 8            | 1,994/85 -> 2,585/112 -> 2,563/111 |
+| 2019-20 | 102 -> 0 -> 0        | 0 -> 102 -> 102 (of 102)         | 0 -> 0 -> 0            | 3,146/108 -> 3,184/110 -> 3,184/110 |
+
+(development -> round 2 -> round 3.)  The 8th multi-coordinate EA in
+2016-17 is EA 30305580 (IHS4 fix + IHPS fix).  Site 2 groups equal round
+1's exactly; round 2's extra group was an EA whose 23 households agreed
+before the hook.  Downstream attribute moves (development -> round 3, all
+toward the stayers' mode): 2016-17 =Rural= 5 EAs (107 households); 2019-20
+=Region= 4 (108), =District= 10 (329), =Rural= 4 (117).  2013-14 (no hook)
+serves a non-stayer coordinate in 11 of the 102 continuing panel EAs.
+
+SOURCE.org: the #1260 text moved from a second =#+PROVENANCE_NOTE:= into a
+=* Notes= section, so =prov.note= returns the #600 note again; parse ->
+render is identical.
+
 * Hash census (=outputs/hash_census.txt=)
 =Country._table_cache_hash= 26/549 moved, all Malawi; =build_transforms_fingerprint=
 0/40; =Wave._input_hash= 52/2,109, all Malawi 2016-17 and 2019-20.
