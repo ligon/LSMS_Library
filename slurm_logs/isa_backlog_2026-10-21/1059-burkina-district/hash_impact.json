@@ -1,0 +1,29 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 24,
+  "moved_by_country": {
+   "Burkina_Faso": 24
+  },
+  "burkina_total": 24,
+  "burkina_not_moved": []
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "moved_by_country": []
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 72,
+  "moved_by_country": {
+   "Burkina_Faso": 72
+  },
+  "burkina_total": 72,
+  "burkina_not_moved": []
+ },
+ "errors": [
+  0,
+  0
+ ]
+}

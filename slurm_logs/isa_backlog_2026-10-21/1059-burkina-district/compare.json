@@ -1,0 +1,71 @@
+{
+ "table_rows": 96,
+ "table_labels": 45,
+ "cf_index_equal": true,
+ "cf_columns_equal": true,
+ "cf_non_district_frame_equal": true,
+ "cf_district_equals_mapped_base": true,
+ "cf_district_rows_relabelled": 954,
+ "cf_district_rows_relabelled_per_wave": {
+  "2014": 900,
+  "2018-19": 25,
+  "2021-22": 29
+ },
+ "cf_district_null_base_branch": [
+  0,
+  0
+ ],
+ "base_spellings_not_in_table": [],
+ "sample_frame_equal": true,
+ "market_rows_base_branch": [
+  2035,
+  2035
+ ],
+ "market_m_equals_mapped_base": true,
+ "market_m_distinct_pooled_base_branch": [
+  96,
+  45
+ ],
+ "shared_grappes": [
+  550,
+  550
+ ],
+ "shared_differs_base_branch": [
+  53,
+  3
+ ],
+ "shared_residue_branch": [
+  [
+   "19",
+   "Séno",
+   "Yagha"
+  ],
+  [
+   "365",
+   "Poni",
+   "Noumbiel"
+  ],
+  [
+   "549",
+   "Kompienga",
+   "Gourma"
+  ]
+ ],
+ "base_diffs_kept_are_province_pairs": [
+  [
+   "19",
+   "Séno",
+   "Yagha"
+  ],
+  [
+   "365",
+   "Poni",
+   "Noumbiel"
+  ],
+  [
+   "549",
+   "Kompienga",
+   "Gourma"
+  ]
+ ]
+}
