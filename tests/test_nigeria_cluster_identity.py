@@ -215,69 +215,118 @@ def test_moved_sentinel_does_not_fire_in_the_baseline_wave(sample):
 # ROUND SAFETY -- the pp/ph question
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize('pp,ph', ROUNDS)
-def test_v_is_round_invariant_within_a_wave(sample, pp, ph):
-    """A household must get the SAME cluster in the planting and the harvest
-    quarter of one wave.
+# GH #1120 D1 (ruling @ligon, 2026-10-23): each ROUND reads its OWN cover page
+# -- the post-planting cover for the PP quarter, the post-harvest cover for the
+# PH quarter.  This REVERSES the choice the tests below used to pin ("both
+# quarters of a wave read the SAME post-planting cover page ... if someone
+# later points the harvest quarter at secta_harvest*.dta, 17/41/66/64
+# households in W2/W3/W4/W5 would flip to a `moved-` singleton").  That is
+# exactly what now happens, deliberately: those households relocated BETWEEN
+# the two visits, and the PH cover records it.  Measured on the raw covers
+# (2026-10-23) and pinned below.
 
-    It does, by construction: both quarters of a wave read the SAME post-planting
-    cover page (the wave folder has one data_info.yml and both Wave(t)s use it),
-    so there is no second geo-coding to drift from.  This test is the guard that
-    keeps it that way -- e.g. if someone later points the harvest quarter at
-    secta_harvest*.dta, 17/41/66/64 households in W2/W3/W4/W5 would flip to a
-    `moved-` singleton (they relocate BETWEEN the two visits) and `v` would stop
-    being a stable within-wave cluster key.
-    """
+# Households in each round of `sample` (= that round's cover page; 2012Q3 also
+# takes the 21 households only the PP agriculture cover lists).
+HOUSEHOLDS = {
+    '2010Q3': 5000, '2011Q1': 4939,
+    '2012Q3': 4880, '2013Q1': 4854,
+    '2015Q3': 4696, '2016Q1': 4592,
+    '2018Q3': 5263, '2019Q1': 5025,
+    '2023Q3': 5067, '2024Q1': 4771,
+}
+# Households in BOTH rounds of a wave whose `v` differs between them: every one
+# a mover recorded on one cover with ea == 0 (`moved-{hhid}`).
+ROUND_MOVERS = {'2010Q3': 0, '2012Q3': 17, '2015Q3': 41, '2018Q3': 66,
+                '2023Q3': 64}
+
+
+@pytest.mark.parametrize('pp,ph', ROUNDS)
+def test_v_changes_within_a_wave_only_for_a_mover(sample, pp, ph):
+    """A household in both rounds keeps its REAL cluster: `v` differs between
+    the PP and PH quarter only where one round's cover records the household
+    as moved (a `moved-` singleton) -- never from one real EA to another
+    (no within-wave EA renumbering).  The count is pinned."""
     s = sample.reset_index()
     a = s[s.t == pp][['i', 'v']].rename(columns={'v': 'v_pp'})
     b = s[s.t == ph][['i', 'v']].rename(columns={'v': 'v_ph'})
     m = a.merge(b, on='i', how='inner')
     assert len(m) > 0, f'no households shared between {pp} and {ph}'
     differs = m[m.v_pp != m.v_ph]
-    assert len(differs) == 0, (
-        f'{len(differs)} households change cluster between {pp} and {ph}; '
-        f'`v` must be constant within a wave.  e.g.\n{differs.head().to_string()}'
-    )
+    n = int(len(differs))
+    assert n == ROUND_MOVERS[pp], f'{pp}/{ph}: {n} households change v, want {ROUND_MOVERS[pp]}'
+    real_to_real = int((~differs.v_pp.astype(str).str.startswith('moved-')
+                        & ~differs.v_ph.astype(str).str.startswith('moved-')).sum())
+    assert real_to_real == 0, f'{pp}/{ph}: {real_to_real} households move between REAL EAs'
+
+
+def test_each_round_has_its_own_covers_households(sample):
+    """sample is keyed (i, t) with t the QUARTER, and each quarter holds the
+    households of ITS OWN cover page (GH #1120 D1) -- so the two rounds of a
+    wave no longer match: the PH cover drops PP households it did not revisit
+    and (W2) adds 44 the PP cover lacks.  Before the ruling every PH round
+    copied its PP round (49,770 rows)."""
+    assert set(sample.index.names) == {'i', 't'}
+    dups = int(sample.index.duplicated().sum())
+    assert dups == 0, f'{dups} duplicate (i, t)'
+    got = {str(t): int(n) for t, n in
+           sample.reset_index().groupby('t')['i'].nunique().items()}
+    assert got == HOUSEHOLDS, got
+    n = int(len(sample))
+    assert n == sum(HOUSEHOLDS.values()), n
+
+
+def test_w2_post_harvest_only_households_have_a_cluster(sample):
+    """GH #1120 / #1261: 44 households are on W2's post-harvest cover and not
+    its post-planting cover.  Served from the PP cover they had NO 2013Q1 `v`
+    (plot_labor's 108 NaN-`v` rows).  Now they are in 2013Q1 with a real
+    cluster and the PH cover's own (null) weights; 21 of them, which the PP
+    agriculture cover also lists, are in 2012Q3 too, likewise unweighted."""
+    s = sample.reset_index()
+    pp = set(s[s.t == '2012Q3'].i)
+    ph = s[s.t == '2013Q1'].set_index('i')
+    only = ph.loc[sorted(set(ph.index) - pp)]
+    n_ph_only = int(len(only))
+    # 44 PH-only on the household covers; 21 of them are in 2012Q3 via the
+    # PP agriculture cover, so 23 are absent from the 2012Q3 sample.
+    assert n_ph_only == 23, n_ph_only
+    n_moved = int(only.v.astype(str).str.startswith('moved-').sum())
+    assert n_moved == 0, n_moved
+    n_weighted = int(only.weight.notna().sum())
+    assert n_weighted == 0, n_weighted
+    # 4,810 households are on both W2 household covers, plus the 21.
+    n_both = int(len(pp & set(ph.index)))
+    assert n_both == 4831, n_both
 
 
 @pytest.mark.parametrize('pp,ph', CF_ROUNDS)
-def test_cluster_features_carries_both_rounds_and_they_agree(cf, pp, ph):
-    """Both quarters must be present, with the same cluster set and identical
-    attributes -- neither round may overwrite or collide with the other."""
+def test_cluster_features_follows_each_rounds_cover(cf, sample, pp, ph):
+    """Both quarters are present.  Each round's cluster set is exactly the
+    clusters of that round's `sample` (one keyspace per round), so the two
+    rounds now differ by the movers' singletons and by EAs a round did not
+    visit; on the REAL EAs both rounds hold, Region / District / Rural
+    agree."""
     c = cf.reset_index()
+    s = sample.reset_index()
+    for t in (pp, ph):
+        got = set(c[c.t == t].v)
+        want = set(s[s.t == t].v)
+        n_missing, n_extra = len(want - got), len(got - want)
+        assert n_missing == 0 and n_extra == 0, (t, n_missing, n_extra)
     A = c[c.t == pp].set_index('v').drop(columns='t')
     B = c[c.t == ph].set_index('v').drop(columns='t')
-
-    assert len(A) > 0, f'{pp} missing from cluster_features'
-    assert len(B) > 0, f'{ph} missing from cluster_features'
-    assert set(A.index) == set(B.index), (
-        f'{pp} and {ph} disagree on the cluster set '
-        f'({len(A)} vs {len(B)} clusters)'
-    )
-    for col in ['Region', 'District', 'Rural', 'Latitude', 'Longitude']:
-        x, y = A[col], B.loc[A.index, col]
+    real = [v for v in A.index.intersection(B.index)
+            if not str(v).startswith('moved-')]
+    assert len(real) > 0
+    for col in ['Region', 'District', 'Rural']:
+        x, y = A.loc[real, col], B.loc[real, col]
         mismatched = int(((x != y) & ~(x.isna() & y.isna())).sum())
         assert mismatched == 0, (
-            f'{col} differs between {pp} and {ph} for {mismatched} cluster(s)'
-        )
-
-
-def test_sample_is_one_row_per_household_per_round(sample):
-    """sample is keyed (i, t) with t the QUARTER, so a household in a pp/ph wave
-    has exactly two rows -- one per round.  The GH #323 rekey changed `v`'s
-    VALUE, and must not have changed this grain (development and this branch both
-    return 49,770 rows)."""
-    assert sample.index.names == ['i', 't'] or set(sample.index.names) == {'i', 't'}
-    assert int(sample.index.duplicated().sum()) == 0
-
-    s = sample.reset_index()
-    for pp, ph in ROUNDS:
-        n_pp = s[s.t == pp]['i'].nunique()
-        n_ph = s[s.t == ph]['i'].nunique()
-        assert n_pp == n_ph and n_pp > 0, (
-            f'{pp} has {n_pp} households but {ph} has {n_ph}; both rounds of a '
-            f'wave are populated from the same cover page and must match'
-        )
+            f'{col} differs between {pp} and {ph} for {mismatched} cluster(s)')
+    # Every real EA the PH round holds was in the PP round.
+    real_b = {v for v in B.index if not str(v).startswith('moved-')}
+    real_a = {v for v in A.index if not str(v).startswith('moved-')}
+    n_new = len(real_b - real_a)
+    assert n_new == 0, f'{ph}: {n_new} real EA(s) absent from {pp}'
 
 
 # --------------------------------------------------------------------------

@@ -125,16 +125,219 @@ def cluster_id(state, lga, ea, hhid=None):
 
 
 def v(row):
-    """`v` formatting function, auto-bound by df_data_grabber.
+    """`v` for one cover-page row (a ``df_data_grabber`` row function).
 
-    Declared in the wave YAML as ``v: [state, lga, ea, hhid]`` (idxvars for
-    cluster_features, myvars for sample), so BOTH tables -- and
-    community_prices, via cluster_id() -- share one keyspace by
-    construction.  They must: sample.v is what _join_v_from_sample() stamps
-    onto every household table, and community_prices.v has to join it.
+    ``sample`` and ``cluster_features`` both build ``v`` with this function
+    from ``[state, lga, ea, hhid]`` read as raw codes (``_cover_frame``), so
+    the two tables -- and community_prices, via cluster_id() -- share one
+    keyspace by construction.  They must: sample.v is what
+    _join_v_from_sample() stamps onto every household table, and
+    community_prices.v has to join it.  (Until GH #1120 the wave YAML
+    declared ``v: [state, lga, ea, hhid]`` and this was auto-bound as a
+    formatting function; it still would be, for any YAML that names ``v``.)
     """
     return cluster_id(row.get('state'), row.get('lga'), row.get('ea'),
                       row.get('hhid'))
+
+
+# ---------------------------------------------------------------------
+# sample / cluster_features -- ONE COVER PAGE PER ROUND (GH #1120 D1)
+# ---------------------------------------------------------------------
+#
+# Every wave folder holds two rounds, and each round ships its OWN household
+# cover page: secta_planting{wN} (post-planting, t = PP_QUARTER) and
+# secta_harvest{wN} (post-harvest, t = PH_QUARTER).  Until 2026-10-23 the
+# wave YAML read the PP cover for BOTH rounds (one data_info.yml per folder,
+# so both Wave(t)s ran the same block), which tagged a PH round with the PP
+# round's households and clusters.  Measured on the raw covers:
+#
+#   wave     PP hh  PH hh  PP-only  PH-only  v differs (common hh)
+#   2010-11  5,000  4,939      61        0       0
+#   2012-13  4,859  4,854      49       44      17
+#   2015-16  4,696  4,592     104        0      41
+#   2018-19  5,263  5,025     238        0      66
+#   2023-24  5,067  4,771     296        0      64
+#
+# Weights are identical on every common household (weight and panel_weight,
+# all five waves).  Every `v` difference is a mover: the PH cover records
+# ea == 0 (-> `moved-{hhid}`) for a household that relocated between the two
+# visits (W2 also has 2 the other way: moved at PP, a real EA at PH).  The
+# 44 W2 PH-only households carry state/lga/ea and NULL weights; served under
+# the PP cover they had no 2013Q1 `v` at all, which is the 108 NaN-`v`
+# plot_labor rows of GH #1120 and the 39 geo-only households of GH #1261.
+#
+# RULING (@ligon, 2026-10-23, GH #1120 D1): per round, sample() takes
+# households from THAT ROUND's own cover, with that cover's weight -- the PP
+# cover for Q3 rows, the PH cover for Q1 rows.  A household's cluster is a
+# per-ROUND fact (Tanzania 2008-15/_/sample.py says the same of its four
+# rounds).  cluster_features follows the same covers so that sample.v and
+# cluster_features.v stay one keyspace in every round.
+#
+# The ruling's general form ("households the survey recorded in another
+# cover come from that cover, with that cover's weight"; Ethiopia: the
+# agriculture cover) also reaches one more W2 file: the PP AGRICULTURE cover
+# (Post Planting Wave 2/Agriculture/secta_plantingw2.dta) lists 21 of the 44
+# PH-only households -- the post-planting agriculture module was fielded for
+# them although the PP household cover does not list them.  plot_inputs
+# (t = PP_QUARTER) serves 63 rows for 20 of them, which no PH cover can give a
+# 2012Q3 `v`.  They are added to 2012Q3 from that cover (`pp_supplement`),
+# households already on the PP household cover winning; it has no weight
+# columns, so their weight / panel_weight are NA.  Its state/lga/ea agree
+# with the PH cover's on all 21.
+#
+# #1261: the geovariables join is a LEFT join onto the round's cover.  Under
+# the old outer YAML merge, 39 geo-only W2 households arrived with a null `v`
+# and the cluster-grain collapse deleted them; all 39 are on the PH cover, so
+# 2013Q1 now serves them with a real `v`, and leaving them out of 2012Q3 (the
+# 18 that no PP cover lists) hides nothing.  The one W3 geo-only household is
+# on neither cover and has no `ea`.
+
+# `sector` label -> Rural, the union of the per-wave YAML mappings it
+# replaces (W1/W2 spell rural/RURAL, W3-W5 '1. URBAN' / '2. Rural').
+_COVER_RURAL = {
+    '1. URBAN': 'Urban', '2. RURAL': 'Rural',
+    '1. Urban': 'Urban', '2. Rural': 'Rural',
+    'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural',
+    'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban',
+}
+
+# W5's `strata` is an unlabelled 1-6 code: the zone it names.
+_W5_STRATA = {1: 'North Central', 2: 'North East', 3: 'North West',
+              4: 'South East', 5: 'South South', 6: 'South West'}
+
+# Per wave folder: each round's cover (relative to the folder's Data/), the
+# weight variables (identical names on both covers), the strata source, an
+# optional PP supplement cover, and the household geovariables file (file,
+# latitude, longitude; None for W5 -- GH #841 / #978).  The coordinate
+# columns' CASING differs by wave (W1/W4 lowercase, W2/W3 uppercase); a wrong
+# name raises a KeyError here.  Under the old YAML it was the GH #515 soft drop
+# of the whole geo sub-frame, which is how W2-W4 once lost their coordinates.
+ROUND_COVERS = {
+    '2010-11': dict(
+        pp='Post Planting Wave 1/Household/secta_plantingw1.dta',
+        ph='Post Harvest Wave 1/Household/secta_harvestw1.dta',
+        weight='wt_wave1', panel_weight='wt_wave1', strata='zone',
+        geo=('nga_householdgeovariables_y1.csv', 'lat_dd_mod', 'lon_dd_mod')),
+    '2012-13': dict(
+        pp='Post Planting Wave 2/Household/secta_plantingw2.dta',
+        ph='Post Harvest Wave 2/Household/secta_harvestw2.dta',
+        pp_supplement='Post Planting Wave 2/Agriculture/secta_plantingw2.dta',
+        weight='wt_wave2', panel_weight='wt_combined', strata='zone',
+        geo=('nga_householdgeovars_y2.csv', 'LAT_DD_MOD', 'LON_DD_MOD')),
+    '2015-16': dict(
+        pp='secta_plantingw3.dta', ph='secta_harvestw3.dta',
+        weight='wt_wave3', panel_weight='wt_w1_w2_w3', strata='zone',
+        geo=('NGA_HouseholdGeovars_Y3.dta', 'LAT_DD_MOD', 'LON_DD_MOD')),
+    '2018-19': dict(
+        pp='secta_plantingw4.dta', ph='secta_harvestw4.dta',
+        weight='wt_wave4', panel_weight='wt_longpanel', strata='strata',
+        geo=('nga_householdgeovars_y4.dta', 'lat_dd_mod', 'lon_dd_mod')),
+    '2023-24': dict(
+        pp='Post Planting Wave 5/Household/secta_plantingw5.dta',
+        ph='Post Harvest Wave 5/Household/secta_harvestw5.dta',
+        weight='wt_cross_wave5', panel_weight='wt_longpanel_wave5',
+        strata=('strata', _W5_STRATA), geo=None),
+}
+
+
+def _data_path(folder, fn):
+    from lsms_library.paths import countries_root
+    return str(countries_root() / 'Nigeria' / folder / 'Data' / fn)
+
+
+def _cover_frame(fn, spec, *, weights=True):
+    """One cover page at household grain (index ``i``).
+
+    Read exactly as the pre-#1120 YAML blocks read it: ``v`` from the raw
+    CODES (``convert_categoricals=False``; see the keyspace note above), the
+    rest from the decoded labels.  Columns: v, weight, panel_weight, strata,
+    Rural, Region (= zone), District (= state).  ``weights=False`` (a cover
+    with no weight columns) serves weight / panel_weight as NA.
+    """
+    from lsms_library.local_tools import df_data_grabber
+    key = df_data_grabber(fn, {'i': 'hhid'}, convert_categoricals=False,
+                          v=(['state', 'lga', 'ea', 'hhid'], v))
+    strata = spec['strata']
+    strata = (strata if isinstance(strata, str)
+              else ([strata[0]], strata[1]))
+    myvars = dict(strata=strata, Rural=('sector', _COVER_RURAL),
+                  Region='zone', District='state')
+    if weights:
+        myvars.update(weight=spec['weight'], panel_weight=spec['panel_weight'])
+    main = df_data_grabber(fn, {'i': 'hhid'}, **myvars)
+    if not weights:
+        main['weight'] = np.nan
+        main['panel_weight'] = np.nan
+    assert key.index.is_unique and main.index.is_unique, \
+        f'{fn}: a cover page lists a household twice'
+    out = key.join(main, how='outer')
+    assert out['v'].notna().all(), f'{fn}: a cover row with no cluster'
+    return out
+
+
+def round_covers(folder):
+    """``{t: household-grain cover frame}`` for the two rounds of *folder*.
+
+    The PP round reads the PP household cover (plus ``pp_supplement``'s
+    households that cover does not list); the PH round reads the PH
+    household cover.  GH #1120 D1 -- see the section note above.
+    """
+    spec = ROUND_COVERS[folder]
+    out = {}
+    for rnd, t in (('pp', PP_QUARTER[folder]), ('ph', PH_QUARTER[folder])):
+        df = _cover_frame(_data_path(folder, spec[rnd]), spec)
+        sup = spec.get(rnd + '_supplement')
+        if sup:
+            extra = _cover_frame(_data_path(folder, sup), spec, weights=False)
+            df = pd.concat([df, extra[~extra.index.isin(df.index)]])
+        out[t] = df
+    return out
+
+
+def sample_for_wave(folder):
+    """``sample`` for one wave folder: both rounds, each from its own cover.
+
+    Index ``(t, i)``; columns v, weight, panel_weight, strata, Rural.
+    """
+    cols = ['v', 'weight', 'panel_weight', 'strata', 'Rural']
+    parts = []
+    for t, df in round_covers(folder).items():
+        parts.append(df[cols].assign(t=t).set_index('t', append=True))
+    out = pd.concat(parts).reorder_levels(['t', 'i']).sort_index()
+    assert out.index.is_unique, f'sample {folder}: (t, i) not unique'
+    return out
+
+
+def cluster_features_for_wave(folder):
+    """``cluster_features`` for one wave folder at HOUSEHOLD grain.
+
+    Index ``(t, i, v)``; columns Region, District, Rural, Latitude,
+    Longitude.  ``Wave.cluster_features`` projects it onto ``(t, v)``
+    through the audited Site 2 collapse.  The geovariables are household
+    level, so they join on ``i`` -- LEFT, onto the round's cover (#1261:
+    the cover says which households the round holds; see above).  W5 ships
+    no geovariables file yet (GH #841 / #978): Latitude / Longitude are NA.
+    """
+    from lsms_library.local_tools import df_data_grabber
+    spec = ROUND_COVERS[folder]
+    geo = None
+    if spec['geo'] is not None:
+        fn, lat, lon = spec['geo']
+        geo = df_data_grabber(_data_path(folder, fn), {'i': 'hhid'},
+                              Latitude=lat, Longitude=lon)
+        assert geo.index.is_unique, f'{fn}: a household has two fixes'
+    cols = ['v', 'Region', 'District', 'Rural']
+    parts = []
+    for t, df in round_covers(folder).items():
+        df = df[cols]
+        if geo is not None:
+            df = df.join(geo, how='left')
+        else:
+            df = df.assign(Latitude=np.nan, Longitude=np.nan)
+        parts.append(df.assign(t=t).set_index(['t', 'v'], append=True))
+    out = pd.concat(parts).reorder_levels(['t', 'i', 'v']).sort_index()
+    assert out.index.is_unique, f'cluster_features {folder}: (t, i) not unique'
+    return out
 
 
 # ---------------------------------------------------------------------
