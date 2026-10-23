@@ -1,0 +1,18 @@
+2014-15 field: served rows joined 9984; Unit_sold == oracle on 9984; mismatches 0
+  served 2014-15 field rows 9984
+2014-15 trees: served 357, joined 358
+  Quantity == raw exp_q: 358 of 358
+  Quantity_sold == raw exp_qs: 358 of 358
+  Value_sold == raw exp_v: 358 of 358
+  months_harvested == raw exp_m: 358 of 358
+  Unit_sold == raw exp_unit_sold: 358 of 358
+  u == raw exp_u: 358 of 358
+  served Quantity == raw s3bq09 (the old wiring) where they differ from s3bq10a: 0
+2017-18 field: served rows joined 24449; Unit_sold == oracle on 24449; mismatches 0
+2017-18 trees: served 270, joined 270
+  Quantity == raw exp_q: 270 of 270
+  Quantity_sold == raw exp_qs: 270 of 270
+  Value_sold == raw exp_v: 270 of 270
+  months_harvested == raw exp_m: 270 of 270
+  Unit_sold == raw exp_unit_sold: 270 of 270
+  u == raw exp_u: 270 of 270

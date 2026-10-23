@@ -1,0 +1,126 @@
+#+title: GH #824 (Mali) + GH #1267 -- evidence, aggregates only
+
+Branch =fix/824-mali-unit-sold-20261023=, base development =9a0ed5f3c=.
+Row-level outputs (served frames, downstream frames, build logs whose
+warnings name households) stay in the private data dir; this directory holds
+the scripts and their aggregate outputs only.
+
+* Environment
+
+- Two checkouts: the worktree under test and a detached worktree at
+  =9a0ed5f3c=.  Each ran with its own fresh =LSMS_DATA_DIR= (only a
+  =dvc-cache= symlink to the shared L1; for the cross-country test run both
+  roots were additionally seeded with a COPY of the shared warm cache minus
+  =dvc-cache= and =Mali=, so Mali stayed cold in both).
+- =scripts/run.sh= pins =PYTHONPATH= to the checkout, BLAS threads to 1,
+  =LSMS_BUILD_WORKERS=1=, =nice -n 19=; every script asserts the import by
+  real path.  =find lsms_library/countries -name '*.parquet'= empty in both
+  checkouts after every run.
+- Python: the mounted venv image.  The =dvc= CLI was not used.
+
+* What each script is
+
+| script               | output                         | what                                                    |
+|----------------------+--------------------------------+---------------------------------------------------------|
+| =build.py=           | (private) served frame + logs  | cold =Country('Mali').crop_production()=, warnings, Site Q/B/I/grain reports, =harvest_kg= / =gross_crop_revenue= / =yield_kg= |
+| =compare.py=         | =out/compare.txt=, =out/unit_sold_table.csv= | base vs branch, column by column; =Unit_sold= table   |
+| =compare2.py=        | =out/compare2_aggregates.txt=  | the tree-row coincidences, edge rows, downstream equality |
+| =oracle.py=          | =out/oracle.txt=               | raw oracle (units canonicalised from the org table directly, keys re-walked through =updated_ids=) |
+| =probe_*.py=, =stale_claims.py= | (stdout)            | raw-file probes behind the CONTENTS note                |
+| hash census          | =out/hash_diff.txt=            | =1218-current-validation/hash_census.py=, base vs branch |
+
+* Results
+
+** Rows and columns (cold, base vs branch)
+
+35,060 rows both; index identical.  Added =Unit_sold=, =months_harvested=,
+=Derivation=.  Changed values:
+
+| column        | rows | where                    | why                                              |
+|---------------+------+--------------------------+--------------------------------------------------|
+| =Quantity=    |  241 | 2014-15 tree rows        | #1267: =s3bq09= (month count) -> =s3bq10a= (harvest per month); 357 re-sourced, 116 coincide (88 0=0, 27 equal, 1 NA=NA) |
+| =Quantity_sold= |  1 | 2014-15 tree row         | 3B's float missing code 9999.9 (its unit is =Manquant=) joins the 99/9999 sentinel rule |
+| =u=           |    2 | 2017-18 tree rows        | =Chargement de camion= joined the =u= table (NA -> =Chargement camion=) |
+
+=Value_sold=, =planting_month=, =harvest_month=, =intercropped=, =perennial=:
+identical.  =Derivation=: 357 rows =3b-per-harvest-month= (2014-15 trees), 270
+=11f-per-harvest-month= (2017-18 trees), 0 on field rows.  =months_harvested=:
+non-null only on tree rows (2014-15: 351 of 357, 0..12; 2017-18: 270 of 270).
+
+** =Unit_sold= on priced rows (=Quantity_sold > 0= and =Value_sold > 0=), by label
+
+| wave    | rows  | priced | Unit_sold set | knows both | agree | differ | audit differ |
+|---------+-------+--------+---------------+------------+-------+--------+--------------|
+| 2014-15 | field |    569 |           568 |        567 |   472 |     95 | 95 of 572    |
+| 2014-15 | trees |    198 |           196 |        190 |   148 |     42 | 42 of 191    |
+| 2017-18 | field |    451 |           451 |        449 |   362 |     87 | 87 of 449    |
+| 2017-18 | trees |    127 |           127 |        127 |   109 |     18 | 18 of 127    |
+
+The audit's knows-both ran on raw rows, before the build drops unmapped crop
+labels and collapses duplicates.  2017-18 (=u= =Autre=, =Unit_sold= =Tonne=):
+30 priced rows (the code-10 label clash).  Gates: 0 duplicate groups sold in
+two units (2014-15), 0 (household, crop) sold in two units (2017-18).
+
+** Raw oracle (=out/oracle.txt=)
+
+=Unit_sold= equals the raw sold unit on 9,984 / 9,984 2014-15 field rows and
+24,449 / 24,449 2017-18 field rows; every tree column (=Quantity=,
+=Quantity_sold=, =Value_sold=, =months_harvested=, =Unit_sold=, =u=) equals the
+raw roster on 358 / 358 (2014-15; two raw rows share one served key, both
+all-zero) and 270 / 270 (2017-18) joined rows.
+
+** Warnings, before and after
+
+Identical sets: =NullIndexKeyWarning= (=plot_id= NaN on the 627 tree rows),
+=NullReadWarning= (=intercropped= 100% null in 2017-18), Site Q 2 offenders in
+2014-15 and 16 in 2017-18 with byte-identical offender lists (md5
+=06e9e582...= / =a1dd1646...= on both sides), 0 grain reports.  Site Q's tree
+cells now hold harvest quantities instead of month counts; no tree row fires.
+(Before the 9999.9 rule, one tree row served =9999.9= and fired; it is NA now,
+as it was on development.)
+
+** Downstream (=out/compare2_aggregates.txt=)
+
+=harvest_kg=, =gross_crop_revenue= (by household and by crop) and =yield_kg=
+are frame-equal before and after.  =harvest_kg= drops the NaN-=plot_id= tree
+rows, =Value_sold= did not change, and Mali's =yield_kg= is empty on both
+(=plot_features= covers only the EHCVM waves, =crop_production= only the EAC-I
+ones).
+
+** Hash census (=out/hash_diff.txt=)
+
+=Country._table_cache_hash=: 24 of 549 moved, all Mali (24 of 24).
+=Wave._input_hash=: 96 of 2,109 moved, all Mali (96 of 96).
+=build_transforms_fingerprint=: 0 of 40.  No other country.
+
+* Tests
+
+All with =-n 3 --dist=loadfile=, =LSMS_BUILD_WORKERS=1=, BLAS pinned.
+
+| run                                                         | development =9a0ed5f3c=          | this branch                          |
+|-------------------------------------------------------------+----------------------------------+--------------------------------------|
+| new: =test_gh824_mali_unit_sold.py= + =test_gh1267_mali_tree_quantity.py= (30) | 30 failed (files copied in transiently) | 30 passed                    |
+| existing =rg -l Mali tests/= (37 files) + =test_derivations.py= | 1,350 passed, 6 skipped          | 1,350 passed, 6 skipped (rerun, =-rs=) |
+| the same 39 files incl. the 2 new ones, first branch run    | --                               | 1,379 passed, 7 skipped              |
+| =test_schema_consistency.py=, =test_categorical_mapping_resolution.py=, =test_build_transform_hash.py= | --  | 380 passed, 1 skipped (=LSMS_EXPECTED_ROOT= unset) |
+
+The six skips are identical on both sides and are cache or L1 conditions:
+=Mali interview_date not cached here= (x2) and four =L1 blob not cached=
+(=test_gh805_cp1252_reader.py=).  The first branch run's seventh skip did not
+recur.  Its reasons were not printed (=-rfE=); it was one of the
+cache-state-conditional skips in these files (e.g. =test_nigeria_sold_unit.py='s
+"warm parquet mid-rebuild"), under concurrent xdist workers.  It was not
+identified.
+
+* Not done here (decisions)
+
+- 12-month tree totals (=Quantity * months_harvested=): the brief forbade a
+  constructed total; precedent exists (GhanaLSS =9b-sale-amount-per-unit=;
+  =MLI_EACI2.do:242/313/353=).
+- =median_price_valuation='s =Unit_sold= rule, and skipping
+  =3b-per-harvest-month= rows there (their =Value_sold / Quantity_sold= is not a
+  price).
+- =KgFactor_sold=: clean per-unit factors for field crops (572 / 577 2014-15
+  raw priced, 647 / 647 2017-18); mixed per-unit / total for trees.
+- =condition= (2017-18 =s7gq21c= shelled state); the EHCVM harvest blocks.
+- The 2017-18 NA-sale -> 0 fill (1,653 / 1,662 served rows), kept identical.

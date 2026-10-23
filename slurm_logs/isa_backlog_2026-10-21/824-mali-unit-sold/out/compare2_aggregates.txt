@@ -1,0 +1,7 @@
+coinciding 2014-15 tree rows 116 : both 0 88  both NA 1  equal positive 27 ; of which months==Quantity==1 16
+rows with Unit_sold but Q_sold==0&V_sold==0 or Q_sold NA: 2 (one 2014-15 tree row whose Quantity_sold is a sentinel and Value_sold 999999; one 2017-18 field row recorded 0 sold in Moude)
+2014-15 tree Quantity (per-harvest-month harvest, native units) quantiles {0.5: 3.0, 0.9: 56.0, 0.99: 573.0, 1.0: 2005.0}
+harvest_kg shape (2175, 1) (2175, 1) index equal True frame equal True cols ['Harvest_kg']
+gross_crop_revenue shape (7415, 1) (7415, 1) index equal True frame equal True cols ['Gross_crop_revenue']
+gross_crop_revenue_j shape (17548, 1) (17548, 1) index equal True frame equal True cols ['Gross_crop_revenue']
+yield_kg shape (0, 1) (0, 1) index equal True frame equal True cols ['Yield_kg']
