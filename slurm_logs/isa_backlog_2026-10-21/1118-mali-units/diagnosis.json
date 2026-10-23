@@ -1,0 +1,299 @@
+{
+ "2014-15": {
+  "raw_rows": 115101,
+  "kept_rows_pre_collapse": 33084,
+  "kept_null_u_pre_collapse": 14096,
+  "raw_absent": 13628,
+  "unmapped_nonblank": 468,
+  "unmapped_labels": [
+   [
+    "Manquant",
+    468
+   ]
+  ],
+  "raw_absent_quantity_profile": {
+   "rows": 13628,
+   "quantity_na": 35,
+   "quantity_zero": 13593,
+   "quantity_positive": 0,
+   "quantity_negative": 0,
+   "quantity_positive_quantiles": {},
+   "purchased_qty_present": 1089
+  },
+  "raw_absent_by_input": [
+   [
+    "NPK",
+    2255
+   ],
+   [
+    "Other inorganic",
+    2237
+   ],
+   [
+    "DAP",
+    1828
+   ],
+   [
+    "Other phytosanitary",
+    1808
+   ],
+   [
+    "Fungicide",
+    1474
+   ],
+   [
+    "Seed",
+    1464
+   ],
+   [
+    "Pesticide",
+    1353
+   ],
+   [
+    "Urea",
+    606
+   ],
+   [
+    "Herbicide",
+    603
+   ]
+  ],
+  "final_rows": 33008,
+  "final_null_u": 14053,
+  "final_null_u_with_quantity": 14018,
+  "final_null_u_without_quantity": 35,
+  "final_null_u_by_input": [
+   [
+    "NPK",
+    2269
+   ],
+   [
+    "Other inorganic",
+    2234
+   ],
+   [
+    "DAP",
+    1851
+   ],
+   [
+    "Other phytosanitary",
+    1817
+   ],
+   [
+    "Fungicide",
+    1468
+   ],
+   [
+    "Seed",
+    1464
+   ],
+   [
+    "Pesticide",
+    1377
+   ],
+   [
+    "Urea",
+    647
+   ],
+   [
+    "Herbicide",
+    631
+   ],
+   [
+    "Manure",
+    161
+   ],
+   [
+    "Other organic",
+    98
+   ],
+   [
+    "Compost",
+    36
+   ]
+  ],
+  "final_u_values": [
+   [
+    NaN,
+    14053
+   ],
+   [
+    "Kg",
+    10736
+   ],
+   [
+    "Cart (donkey)",
+    3395
+   ],
+   [
+    "Litre",
+    1836
+   ],
+   [
+    "Sac",
+    1006
+   ],
+   [
+    "Cart (ox)",
+    949
+   ],
+   [
+    "Gramme",
+    582
+   ],
+   [
+    "Sachet",
+    307
+   ],
+   [
+    "Autre",
+    144
+   ]
+  ]
+ },
+ "2017-18": {
+  "raw_rows": 289964,
+  "kept_rows_pre_collapse": 80727,
+  "kept_null_u_pre_collapse": 28036,
+  "raw_absent": 28036,
+  "unmapped_nonblank": 0,
+  "unmapped_labels": [],
+  "raw_absent_quantity_profile": {
+   "rows": 28036,
+   "quantity_na": 246,
+   "quantity_zero": 27786,
+   "quantity_positive": 4,
+   "quantity_negative": 0,
+   "quantity_positive_quantiles": {
+    "0.1": 2.3,
+    "0.25": 2.75,
+    "0.5": 12.0,
+    "0.75": 21.0,
+    "0.9": 21.0
+   },
+   "purchased_qty_present": 2920
+  },
+  "raw_absent_by_input": [
+   [
+    "Other inorganic",
+    5720
+   ],
+   [
+    "NPK",
+    5119
+   ],
+   [
+    "Other phytosanitary",
+    4244
+   ],
+   [
+    "DAP",
+    4110
+   ],
+   [
+    "Fungicide",
+    3845
+   ],
+   [
+    "Pesticide",
+    2552
+   ],
+   [
+    "Herbicide",
+    1204
+   ],
+   [
+    "Urea",
+    996
+   ],
+   [
+    "Seed",
+    246
+   ]
+  ],
+  "final_rows": 80727,
+  "final_null_u": 28036,
+  "final_null_u_with_quantity": 27790,
+  "final_null_u_without_quantity": 246,
+  "final_null_u_by_input": [
+   [
+    "Other inorganic",
+    5720
+   ],
+   [
+    "NPK",
+    5119
+   ],
+   [
+    "Other phytosanitary",
+    4244
+   ],
+   [
+    "DAP",
+    4110
+   ],
+   [
+    "Fungicide",
+    3845
+   ],
+   [
+    "Pesticide",
+    2552
+   ],
+   [
+    "Herbicide",
+    1204
+   ],
+   [
+    "Urea",
+    996
+   ],
+   [
+    "Seed",
+    246
+   ]
+  ],
+  "final_u_values": [
+   [
+    NaN,
+    28036
+   ],
+   [
+    "Kg",
+    26906
+   ],
+   [
+    "Sac",
+    10012
+   ],
+   [
+    "Cart (donkey)",
+    7979
+   ],
+   [
+    "Litre",
+    5547
+   ],
+   [
+    "Cart (ox)",
+    1082
+   ],
+   [
+    "Sachet",
+    557
+   ],
+   [
+    "Autre",
+    274
+   ],
+   [
+    "Gramme",
+    248
+   ],
+   [
+    "Tonne",
+    86
+   ]
+  ]
+ }
+}

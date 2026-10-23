@@ -110,3 +110,30 @@ The historical 42,089-null issue count is not fresh runtime evidence.
 ### Phase3 verification
 
 Pending: phase0 ledger only; no product edit or runtime evidence exists.
+
+### Phase 2 -- source authority measured and fix applied (2026-10-22, Sue / Claude Opus 5.5)
+
+Branch now merges development `60aa81e9e`.  `diagnose_1118.py` runs both real wave
+scripts in-process with `plot_inputs_finalize` wrapped (nothing written):
+
+| wave | retained null `u` (pre-collapse) | blank raw | non-blank unmapped | served null `u` |
+|---|---|---|---|---|
+| 2014-15 | 14,096 | 13,628 | 468 (all `Manquant`) | 14,053 |
+| 2017-18 | 28,036 | 28,036 | 0 | 28,036 |
+
+`Manquant` is the survey's missing label, so §6's gate is answered: no substantive
+label is lost by `_unit_labels`.  The fill (`out['u'].fillna(U_UNKNOWN)` after the
+collapse) is applied.  The #1041 ruling covers flag/purchase-only rows too, so the
+archived test asserting `U_UNKNOWN` there is kept and renamed to say so.
+
+- Tests: new file 11 fail / 14 pass on 60aa source; 25 pass on the candidate, with
+  `test_962_unit_sentinel`, `test_867_nitrogen_content`, `test_gh1093_declared_unit_consumers`
+  (156 passed, 2 skipped in total).
+- Cold `Country('Mali').plot_inputs()`: 113,735 rows both sides, index identical,
+  every non-`u` column exact; `u` changes on exactly 42,089 rows, NA -> `Unknown`.
+  `Feature('plot_inputs')(['Mali'])` now matches `Country()`.
+- Hashes: 24/549 country and 96/2,109 wave hashes move, all Mali; 0/40 fingerprints.
+
+Finding for a separate decision: 41,559 of the 42,089 rows have `Quantity == 0` from
+the raw source (unused slots, unit skipped).  Eligibility is out of scope here.
+Evidence: `slurm_logs/isa_backlog_2026-10-21/1118-mali-units/`.
