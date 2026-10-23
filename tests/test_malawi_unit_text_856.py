@@ -48,9 +48,12 @@ G_ROWS = [
     (13, 'DENGU', 'Basket (Dengu)'),              # mapped
     (13, 'basket (bamboo)', 'Basket (Dengu)'),    # ruling 2026-10-22
     (13, 'BASKET (LARGE)', 'Other (Specify)'),    # size-qualified: left
-    (13, 'BASKET (UNSPECIFIED SIZE)', 'Other (Specify)'),  # left
+    (13, 'BASKET (UNSPECIFIED SIZE)', 'Basket (Dengu)'),  # Sue 2026-10-22
+    (13, 'BASKET (SMALL)', 'Other (Specify)'),    # size-qualified: left
     (13, '70 KG BAG', 'Other (Specify)'),         # no code for it: left
-    (13, '90 KG BAD', 'Other (Specify)'),         # typo: left
+    (13, '90 KG BAD', '90 kg Bag'),               # unambiguous bag typo
+    (13, '09KG BAG', 'Other (Specify)'),          # typo that could be 9 kg
+    (13, '50 KG BAG', 'Other (Specify)'),         # restates code 2: left
     (13, '', 'Other (Specify)'),                  # no text
     (2, '90 KG BAG', '50 kg Bag'),                # text on a non-13 code: inert
     (3, '', '90 kg Bag'),                         # code 3 unchanged
@@ -91,7 +94,7 @@ class TestHarvestBlock:
 
     def test_recovered_rows_are_counted(self, malawi_mod):
         out = _harvest(malawi_mod, _g_frame(), unit_text='ag_g13b_oth')
-        assert out.attrs['unit_text_recovered'] == {3: 2, 11: 3}
+        assert out.attrs['unit_text_recovered'] == {3: 3, 11: 4}
 
     def test_without_unit_text_nothing_changes(self, malawi_mod):
         """`unit_text=None` is the pre-#856 behaviour, row for row."""
@@ -131,7 +134,7 @@ class TestWhitelist:
         assert cmap[3] == '90 kg Bag' and cmap[11] == 'Basket (Dengu)'
 
     @pytest.mark.parametrize('left', [
-        '1 90 KG', '90 KG BAD', '90KG BAY', 'BASKET (UNSPECIFIED SIZE)',
+        '1 90 KG', '09KG BAG',
         'BASKET (LARGE)', 'BASKET (SMALL)', 'LARGE BASKET',
         'LARGE BASKETS', 'SMALL BASKET', 'MEDIAM BASKET', 'WEAVING BASKET',
         'MEDIUM WEAVING BASKET', 'LARGE DENGU', 'DENGU(LARGE)',
@@ -149,7 +152,9 @@ Q_ROWS = [
     (13, 'BASKET (DENGUE)', 'Basket (Dengu)'),
     (13, '90KG BAG', '90 kg Bag'),
     (13, 'BASKET (BAMBOO)', 'Basket (Dengu)'),    # ruling 2026-10-22
-    (13, 'BASKET (UNSPECIFIED SIZE)', 'Other (Specify)'),
+    (13, 'BASKET (UNSPECIFIED SIZE)', 'Basket (Dengu)'),  # Sue 2026-10-22
+    (13, 'BASKET (LARGE)', 'Other (Specify)'),    # size-qualified: left
+    (13, '90KG BAY', '90 kg Bag'),                # unambiguous bag typo
     (13, 'CLUSTER', 'Other (Specify)'),
     (9, 'DENGU', 'Piece'),                        # non-13 code: inert
 ]
@@ -182,7 +187,7 @@ class TestSaleBlock:
                     unit_sold_text='ag_q02b_oth').set_index('i')
         got = [out.loc[f'h{k}', 'u'] for k in range(len(Q_ROWS))]
         assert got == [r[2] for r in Q_ROWS]
-        assert out.attrs['unit_text_recovered'] == {3: 1, 11: 3}
+        assert out.attrs['unit_text_recovered'] == {3: 2, 11: 4}
 
     def test_sale_quantity_and_value_never_move(self, malawi_mod):
         df = _q_frame()
@@ -194,7 +199,7 @@ class TestSaleBlock:
     def test_without_unit_sold_text_nothing_changes(self, malawi_mod):
         out = _sale(malawi_mod, _q_frame()).set_index('i')
         got = [out.loc[f'h{k}', 'u'] for k in range(len(Q_ROWS))]
-        assert got == ['Other (Specify)'] * 6 + ['Piece']
+        assert got == ['Other (Specify)'] * 8 + ['Piece']
 
 
 class TestAttachIsSymmetric:
@@ -258,6 +263,24 @@ class TestBambooBasketRuling:
     def test_qualified_baskets_are_still_left(self, malawi_mod):
         dengu = malawi_mod._UNIT_TEXT_RECODE[11]
         assert 'BASKET (BAMBOO)' in dengu
-        for left in ('BASKET (UNSPECIFIED SIZE)', 'BASKET (LARGE)',
-                     'LARGE BASKET', 'LARGE DENGU', 'WEAVING BASKET'):
+        for left in ('BASKET (LARGE)', 'BASKET (SMALL)', 'LARGE BASKET',
+                     'LARGE DENGU', 'DENGU(LARGE)', 'WEAVING BASKET'):
             assert left not in dengu
+
+    def test_unspecified_size_is_the_plain_basket(self, malawi_mod):
+        """Sue's decision (2026-10-22, for maintainer review): 'unspecified
+        size' names no size, so it is the plain basket, which maps."""
+        assert 'BASKET (UNSPECIFIED SIZE)' in malawi_mod._UNIT_TEXT_RECODE[11]
+
+    def test_bag_typos_map_but_an_ambiguous_size_does_not(self, malawi_mod):
+        bag = malawi_mod._UNIT_TEXT_RECODE[3]
+        assert {'90 KG BAD', '90KG BAY'} <= bag
+        assert '09KG BAG' not in bag
+
+    def test_texts_restating_a_listed_code_are_left(self, malawi_mod):
+        """Scope: only the DROPPED codes 3 and 11 are recovered."""
+        every = set().union(*malawi_mod._UNIT_TEXT_RECODE.values())
+        for listed in ('50 KG BAG', 'PAIL (LARGE)', 'BUNCH', 'PIECE', 'BALE',
+                       'OX-CART', 'NO 10 PLATE'):
+            assert listed not in every
+        assert set(malawi_mod._UNIT_TEXT_RECODE) == {3, 11}

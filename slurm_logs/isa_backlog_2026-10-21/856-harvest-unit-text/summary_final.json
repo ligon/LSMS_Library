@@ -1,6 +1,6 @@
 {
  "checkout": "/local/job40390255/worktrees/856-clean",
- "build_seconds": 34.7,
+ "build_seconds": 33.7,
  "rows": 135078,
  "index": [
   "i",
@@ -60,26 +60,26 @@
   "2016-17|50 kg Bag": 18920,
   "2016-17|90 kg Bag": 735,
   "2016-17|Bale": 419,
-  "2016-17|Basket (Dengu)": 454,
+  "2016-17|Basket (Dengu)": 456,
   "2016-17|Bunch": 251,
   "2016-17|Kilogramme": 6620,
   "2016-17|No 10 Plate": 4,
   "2016-17|No 12 Plate": 5,
-  "2016-17|Other (Specify)": 532,
+  "2016-17|Other (Specify)": 530,
   "2016-17|Ox-Cart": 1212,
   "2016-17|Pail (Large)": 3547,
   "2016-17|Pail (Small)": 825,
   "2016-17|Piece": 238,
   "2016-17|<NA>": 3408,
   "2019-20|50 kg Bag": 26436,
-  "2019-20|90 kg Bag": 538,
+  "2019-20|90 kg Bag": 539,
   "2019-20|Bale": 406,
   "2019-20|Basket (Dengu)": 853,
   "2019-20|Bunch": 778,
   "2019-20|Kilogramme": 9182,
   "2019-20|No 10 Plate": 10,
   "2019-20|No 12 Plate": 13,
-  "2019-20|Other (Specify)": 530,
+  "2019-20|Other (Specify)": 529,
   "2019-20|Ox-Cart": 993,
   "2019-20|Pail (Large)": 6241,
   "2019-20|Pail (Small)": 1718,
@@ -103,30 +103,30 @@
  ],
  "kg_default": {
   "source_counts": {
-   "metric": 93264,
-   "none": 41814
+   "metric": 93265,
+   "none": 41813
   },
   "harvest_kg_by_wave": {
    "2010-11": 8509405.249989979,
    "2013-14": 2336456.0,
    "2016-17": 8171320.7,
-   "2019-20": 19690619.8
+   "2019-20": 19690709.8
   },
-  "rows_with_factor": 93264
+  "rows_with_factor": 93265
  },
  "kg_shipped": {
   "source_counts": {
-   "shipped": 94110,
-   "none": 23646,
+   "shipped": 94111,
+   "none": 23645,
    "metric": 17322
   },
   "harvest_kg_by_wave": {
    "2010-11": 8497721.806078488,
    "2013-14": 2477271.537440069,
    "2016-17": 8432685.806473527,
-   "2019-20": 20327805.031052366
+   "2019-20": 20327857.23105313
   },
-  "rows_with_factor": 111432
+  "rows_with_factor": 111433
  },
  "shipped_table_u_labels": [
   "50 kg Bag",

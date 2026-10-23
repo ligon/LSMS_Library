@@ -1229,31 +1229,48 @@ def _crop_conditions(series):
 # `attrs['unit_text_recovered']`.  `Quantity` is the respondent's count of
 # those units and is never touched.
 #
+# SCOPE: only the two codes the 2016-17 / 2019-20 G, I and Q lists DROPPED --
+# 3 (90 KG BAG) and 11 (BASKET (DENGU)) -- are recovered.  A text restating a
+# code still on the list (e.g. '50 KG BAG' = code 2, 'PAIL ...', 'BUNCH',
+# 'PLATE', 'PIECE', 'BALE', 'OX-CART') is deliberately left as typed: the
+# respondent could have used that code and did not, which is a different
+# question (a possible follow-up, see CONTENTS.org).
+#
 # EXACT matches only, after `_normalise_unit_text` (strip, collapse
 # whitespace, upper-case), against strings measured in OUR files
 # (slurm_logs/isa_backlog_2026-10-21/856-harvest-unit-text/) -- no regex, no
 # outside list.  Deliberately NOT recovered, so they stay 'Other (Specify)':
-#   * a count prefix or a typo: '1 90 KG', '90 KG BAD', '90KG BAY';
-#   * any basket or dengu QUALIFIED by size, weave or content, because
+#   * a count prefix, or a typo that could be another size: '1 90 KG',
+#     '09KG BAG' (a 9 kg bag?);
+#   * any basket or dengu QUALIFIED by a size, weave or content, because
 #     code 11 names no size and a qualified one may not be that unit:
-#     'BASKET (UNSPECIFIED SIZE)', 'BASKET (LARGE)', 'BASKET (SMALL)',
-#     'LARGE BASKET(S)', 'SMALL BASKET', 'MEDIAM BASKET', 'LARGE DENGU',
-#     'DENGU(LARGE)', 'DENGU(GOGODA)', 'WEAVING BASKET',
-#     'MEDIUM WEAVING BASKET', 'BASKET OF ...';
-#   * every other bag size ('70 KG BAG', '100 KG BAG', ...): no code exists.
-# Two judgement calls: a plain 'BASKET' / 'BASKETS' / 'BUSKET' is read as the
-# dengu, the only basket the code list offers; and a bare weight with no
-# container word ('90KG', '90 KG', '90KGS', '90 KGS': 21 lines) is read as the
-# 90 kg bag -- the kilograms are the same either way, the label says 'Bag'.
-# One ruling (@ligon, 2026-10-22): 'BASKET (BAMBOO)' -- the only bamboo-basket
-# spelling in our files, 13 Module I lines in 2016-17 -- IS the dengu.  The same
-# households' harvest rows say 'DENGU' / 'BASKET' for the same crop, and
-# leaving it out detached 9 sales that had attached on 13 = 13.
+#     'BASKET (LARGE)', 'BASKET (SMALL)', 'LARGE BASKET(S)', 'SMALL BASKET',
+#     'MEDIAM BASKET', 'LARGE DENGU', 'DENGU(LARGE)', 'DENGU(GOGODA)',
+#     'WEAVING BASKET', 'MEDIUM WEAVING BASKET', 'BASKET OF ...';
+#   * every bag of a size the lists never had a code for ('70 KG BAG',
+#     '100 KG BAG', ...).
+# Judgement calls, each recorded for maintainer review:
+#   * plain 'BASKET' / 'BASKETS' / 'BUSKET' -> the dengu, the only basket the
+#     code list offers;
+#   * a bare weight with no container word ('90KG', '90 KG', '90KGS',
+#     '90 KGS': 21 lines) -> the 90 kg bag (same kilograms; the label says
+#     'Bag');
+#   * the two unambiguous bag typos '90 KG BAD' and '90KG BAY' (1 line each)
+#     -> the 90 kg bag, as the basket typos 'BUSKET' / 'BASKET (DENGUE)' map;
+#   * 'BASKET (BAMBOO)' -> the dengu.  RULING (@ligon, 2026-10-22): the only
+#     bamboo-basket spelling in our files, 13 Module I lines in 2016-17; the
+#     same households' harvest rows say 'DENGU' / 'BASKET' for the same crop;
+#   * 'BASKET (UNSPECIFIED SIZE)' -> the dengu.  DECISION (Sue, coordinator,
+#     2026-10-22; for maintainer review at the PR): 61 lines, 59 of them
+#     Module Q 2016-17.  "Unspecified size" names no size, so it is the plain
+#     basket, which already maps -- as Malawi's own `u` table keeps plain
+#     'Heap' as the size-free unit distinct from the sized heaps.
 _UNIT_OTHER_SPECIFY = 13
 _UNIT_TEXT_RECODE = {
     3: frozenset({
         '90 KG BAG', '90KG BAG', '90 KG BAGS', '90KG BAGS', '90KGBAG',
         '90 KGBAG', '90KG', '90 KG', '90KGS', '90 KGS', 'BAGS OF 90 KGS',
+        '90 KG BAD', '90KG BAY',                # typos of the bag
     }),
     11: frozenset({
         'DENGU', 'BASKET', 'BASKETS', 'BUSKET',
@@ -1262,6 +1279,7 @@ _UNIT_TEXT_RECODE = {
         'BASKET-DENGU', 'BASKET/ DENGU', 'DENGU/BASKET', 'DENGU ( BASKET )',
         'DENGU( BASKET )', 'DENGU/BUSKET', 'BUSKET/DENGU',
         'BASKET (BAMBOO)',                      # ruling, @ligon 2026-10-22
+        'BASKET (UNSPECIFIED SIZE)',            # decision, Sue 2026-10-22
     }),
 }
 

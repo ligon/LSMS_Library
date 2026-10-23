@@ -817,30 +817,42 @@ answer (the class of =harmonize_crop_unit= / =_PERENNIAL_RECODE=), so no
 =Derivation= key; counts ride on =attrs['unit_text_recovered']= at the wave
 level.
 
+*Scope*: only the two codes the 2016-17 / 2019-20 G, I and Q lists DROPPED --
+3 (90 KG BAG) and 11 (BASKET (DENGU)).  Texts that restate a code still on the
+list are left as typed (see the follow-up table below).
+
 *What is recovered*: exact strings only (=strip=, collapsed whitespace,
 upper-case): =90 KG BAG=, =90KG BAG=, =90KG=, =90KG BAGS=, =90 KG BAGS=,
-=90KGS=, =90 KGS=, =90 KG=, =90KGBAG=, =90 KGBAG=, =BAGS OF 90 KGS= -> 3;
-=DENGU=, =BASKET=, =BASKETS=, =BUSKET=, every unqualified dengu-basket
-pairing (=BASKET (DENGU)=, =BASKET (DENGUE)=, =DENGU/BASKET=, ...) and
-=BASKET (BAMBOO)= -> 11.  947 + 306 raw lines across G/P/I/Q.  *Deliberately
-left* =Other (Specify)=: typos and count prefixes (=1 90 KG=, =90 KG BAD=,
-=90KG BAY=), every basket or dengu qualified by size, weave or content, and
-every other bag size.  Two judgement calls: plain =BASKET= -> dengu (the only
-basket the code list offers), and a bare weight with no container word
-(=90KG=, =90 KG=, =90KGS=, =90 KGS=: 21 lines) -> =90 kg Bag= (the same
-kilograms; the label says "Bag").
+=90KGS=, =90 KGS=, =90 KG=, =90KGBAG=, =90 KGBAG=, =BAGS OF 90 KGS=, and the
+typos =90 KG BAD=, =90KG BAY= -> 3; =DENGU=, =BASKET=, =BASKETS=, =BUSKET=,
+every unqualified dengu-basket pairing (=BASKET (DENGU)=, =BASKET (DENGUE)=,
+=DENGU/BASKET=, ...), =BASKET (BAMBOO)= and =BASKET (UNSPECIFIED SIZE)= -> 11.
+949 + 367 raw lines across G/P/I/Q.  *Deliberately left* =Other (Specify)=: a
+count prefix (=1 90 KG=), a typo that could be another size (=09KG BAG=: a 9
+kg bag?), every basket or dengu qualified by a size, weave or content, and
+every bag of a size the lists never coded.  Judgement calls: plain =BASKET= ->
+dengu (the only basket the code list offers); a bare weight with no container
+word (=90KG=, =90 KG=, =90KGS=, =90 KGS=: 21 lines) -> =90 kg Bag= (same
+kilograms; the label says "Bag"); and the two unambiguous bag typos, as the
+basket typos =BUSKET= / =BASKET (DENGUE)= already map.
 
 *Ruling (@ligon, 2026-10-22): =BASKET (BAMBOO)= is the dengu.*  It is the only
 bamboo-basket spelling in our files: 13 Module I sale lines, all 2016-17 (10
 cross-sectional, 3 panel), none on the harvest side.  The same households'
 harvest rows say =DENGU= / =BASKET= for the same crop.
 
+*Decision (Sue, coordinator, 2026-10-22; FOR MAINTAINER REVIEW at the PR):
+=BASKET (UNSPECIFIED SIZE)= is the dengu.*  61 lines: Module Q 2016-17 59
+(53 cross-sectional, 6 panel), Module P 2016-17 2.  "Unspecified size" names
+no size, so it is the plain basket, which already maps.  The precedent is
+Malawi's own =u= table, which keeps plain =Heap= (=10=) as the size-free unit
+distinct from the sized heaps (=10a= .. =10c=).
+
 *Still left, for a separate decision* (raw code-13 lines, G/P/I/Q, all
 waves):
 
 | string                         | lines | where                          |
 |--------------------------------+-------+--------------------------------|
-| =BASKET (UNSPECIFIED SIZE)=    |    61 | Q 2016-17 59, P 2016-17 2      |
 | =BASKET (LARGE)=               |    13 | Q 2016-17 10, G 2016-17 3      |
 | =LARGE BASKET=                 |    11 | 2019-20: G 4, I 4, Q 3         |
 | =WEAVING BASKET=               |     3 | Q 2016-17 2, G 2019-20 1       |
@@ -851,6 +863,22 @@ waves):
 | =LARGE DENGU=, =DENGU(LARGE)=  |  1, 1 | P, Q 2019-20                   |
 | =LARGE BASKETS=, =MEDIAM BASKET= | 1, 1 | I, Q 2019-20                   |
 | =BASKET OF ...= (2 strings)    |  1, 1 | G 2019-20 (content, not a unit)|
+| =1 90 KG=, =09KG BAG=          |  1, 1 | G 2019-20                      |
+
+*Possible follow-up: texts restating a code STILL on the list* (left by
+design; token match over raw code-13 lines, G/P/I/Q -- includes sized and
+halved variants, so a plain restatement is fewer; every string and its count
+is in =strings_856.json=):
+
+| unit (code)        | lines | e.g.                                            |
+|--------------------+-------+-------------------------------------------------|
+| 50 kg Bag (2)      |    19 | =50 KG BAG= 11, =50KG BAG= 4, =50KGBAG= 1, halves |
+| Pail (4 / 5)       |    66 | =PAIL (MEDIUM)= 9, =40LITRE PAIL= 9, =PAIL (LARGE)= 8, =PAIL (SMALL)= 6, =PAIL= 6 |
+| Bunch (8)          |    11 | =BUNCH= 8, =BUNCHES= 2                          |
+| Plate (6 / 7)      |     8 | =PHAZI PLATE= 4, =NO 12 PLATE= 1                |
+| Piece (9)          |    11 | =PIECE= 5, =PIECES= 5                           |
+| Bale (10)          |     6 | =80 KG BALE= 3, =85 KG BALE= 2, =BALE= 1        |
+| Ox-Cart (12)       |     4 | =OXCART=, =OX-CART=, two halves                 |
 
 *Both sides or neither.*  The sale attach keys on =u=.  Recovering only the
 harvest side was measured: it detached *158 sales (16.8M MWK)* that both sides
@@ -860,38 +888,52 @@ had written 13 + "90 KG BAG".  So the sale modules take the same recovery.
 
 | wave    | rows -> =90 kg Bag= | rows -> =Basket (Dengu)= | of which perennial |
 |---------+---------------------+--------------------------+--------------------|
-| 2016-17 |                 486 |                       37 |                 12 |
-| 2019-20 |                 214 |                      148 |                  8 |
+| 2016-17 |                 486 |                       39 |                 14 |
+| 2019-20 |                 215 |                      148 |                  8 |
 
-885 rows change =u= and nothing else; no row is added or lost; 2010-11 and
-2013-14 are untouched.  Sales: *115 perennial harvest rows coded 3 / 11 gain
-a sale* (a Module Q sale written 13 + text could not meet them before -- P kept
-the codes, Q did not), all on the unknown-condition wildcard; *7 sales
-detach* (1,072,000 MWK):
-- 3 tomato sales in 2016-17 (875,000 MWK) written
-  =BASKET (BAMBOO)= against a harvest row that says =BASKET (SMALL)= (2) or
-  gives no text (1).  These met only on 13 = 13 before; the bamboo ruling
-  serves the sale as the dengu, and a small basket is not asserted to be one;
+888 rows change =u= and nothing else; no row is added or lost; 2010-11 and
+2013-14 are untouched.  Sales: *168 perennial harvest rows coded 3 / 11 gain a
+sale* (a Module Q sale written 13 + text could not meet them before -- P kept
+the codes, Q did not), all on the unknown-condition wildcard; 53 of them are
+Q's =BASKET (UNSPECIFIED SIZE)=.  *6 sales detach* (1,062,000 MWK):
+- 3 tomato sales in 2016-17 (875,000 MWK) written =BASKET (BAMBOO)= against a
+  harvest row that says =BASKET (SMALL)= (2) or gives no text (1).  These met
+  only on 13 = 13 before; the bamboo ruling serves the sale as the dengu, and a
+  small basket is not asserted to be one;
 - 1 OX-CART harvest vs a =BUSKET= sale (different units: correctly detached);
-- 1 =90 KG BAD= harvest vs a =90 KG BAG= sale;
-- 2 groundnut sales decided by price whose (crop, =Other (Specify)=) price
-  cell lost the recovered rows.
-Net *+1,696,000 MWK* attached (2016-17 +43,600; 2019-20 +1,652,400).  Before
-the bamboo ruling it was +2,421,000, with 13 sales detached: 9 =BASKET
-(BAMBOO)= sales against a =DENGU= / =BASKET= harvest, which the ruling
-re-attaches (+150,000), in exchange for the 3 tomato sales above (-875,000).
-No =Derivation= count moved with the ruling (all 12 are exact matches).
+- 1 groundnut in 2019-20: harvest =09KG BAG= (left) vs sale =90KG BAY= (now a
+  90 kg bag);
+- 1 groundnut in 2016-17 decided by price, whose (crop, =Other (Specify)=)
+  price cell lost the recovered rows (now unresolved).
+Net *+2,539,200 MWK* attached (2016-17 +876,800; 2019-20 +1,662,400): the
+bamboo ruling +150,000 / -875,000; =BASKET (UNSPECIFIED SIZE)= +833,200 (53
+sales); the =90 KG BAD= typo re-attaches one sale (+10,000).  No =Derivation=
+count moved except the unknown-condition wildcard (2016-17 449 -> 520,
+2019-20 1,041 -> 1,137) and contradiction-price-sale (47 -> 46, 85 -> 84).
 
 *kg*: no row whose =u= did not change moves its factor.  Default
-=harvest_kg_factors=: the 700 recovered =90 kg Bag= rows gain the declared
-90 kg (=metric=, was =none=); the 185 =Basket (Dengu)= rows stay =none= (no
-declared mass).  With the shipped IHS5 tables: 640 =90 kg Bag= rows and 157
+=harvest_kg_factors=: the 701 recovered =90 kg Bag= rows gain the declared
+90 kg (=metric=, was =none=); the 187 =Basket (Dengu)= rows stay =none= (no
+declared mass).  With the shipped IHS5 tables: 641 =90 kg Bag= rows and 157
 =Basket (Dengu)= rows gain a =shipped= factor (median 99.9 and 8.39 kg; the
 file's own values, by crop / condition / region), 60 take the declared 90 kg,
-28 baskets stay =none=.  Harvest kg, default: 2016-17 7,978,622 -> 8,171,321
-(+2.4%), 2019-20 19,605,840 -> 19,690,620 (+0.4%); with the shipped tables:
-8,228,278 -> 8,432,686 (+2.5%) and 20,244,377 -> 20,327,805 (+0.4%).  2010-11
+30 baskets stay =none=.  Harvest kg, default: 2016-17 7,978,622 -> 8,171,321
+(+2.4%), 2019-20 19,605,840 -> 19,690,710 (+0.4%); with the shipped tables:
+8,228,278 -> 8,432,686 (+2.5%) and 20,244,377 -> 20,327,857 (+0.4%).  2010-11
 and 2013-14 do not move.
+
+*Caveats on those numbers.*
+- One 2016-17 Nkwani row reports =Quantity= 2016 -- a year typed into the
+  quantity field, already flagged by the quantity screen (Site Q).  It moves
+  from =Other (Specify)= to =Basket (Dengu)= and, with the shipped tables,
+  contributes 22,643 kg: about 11% of the 2016-17 shipped-path increase
+  (204,408 kg).  Nothing here repairs it.
+- The quantity screen sees the moved rows too.  2016-17 flags one row fewer
+  (7 -> 6): a Cassava =Other (Specify)= row drops out because its cell's p90
+  rises from 14 to 24 once the recovered rows leave that cell; the Nkwani row
+  above is still flagged, now in the =Basket (Dengu)= cell (ratio 144 -> 106).
+  In 2019-20 the count stays 13, but a Cabbage =Other (Specify)= row's ratio
+  falls from 153 to 103 (the cell's p90 15 -> 22.4); it is still flagged.
 
 *Cache*: every Malawi L2-country (26) and L2-wave (130) hash moves, no other
 country's, and no =build_transforms_fingerprint= (0 of 40) -- =malawi.py= is

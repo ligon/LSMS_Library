@@ -378,76 +378,108 @@ the repository is public and World Bank microdata may not be redistributed.
 strings in `summary_*.json` were reduced to class, wave and counts for the same
 reason.  The aggregate numbers above are unchanged.
 
-### Phase 3b -- `BASKET (BAMBOO)` ruling (2026-10-22)
+### Phase 3b -- rulings, review fixes and final numbers (2026-10-22)
 
-**Ruling.** @ligon (via the coordinator): `BASKET (BAMBOO)` maps to
-`Basket (Dengu)` on both the harvest and the sale side. Implemented on the
-clean branch `fix/856-malawi-unit-text-20261022`, whose parent is development
-`9a0ed5f3c`. The only change is one entry in `malawi._UNIT_TEXT_RECODE[11]`,
-plus the comment.
+**Decisions taken on the clean branch.** The branch is
+`fix/856-malawi-unit-text-20261022`, whose parent is development `9a0ed5f3c`.
+1. **`BASKET (BAMBOO)` -> `Basket (Dengu)`.** Ruling by @ligon. It is the
+   only bamboo-basket spelling on a code-13 row in our G/P/I/Q files: 13
+   Module I lines in 2016-17, none on the harvest side.
+2. **`BASKET (UNSPECIFIED SIZE)` -> `Basket (Dengu)`.** Decision by Sue,
+   for maintainer review at the PR. "Unspecified size" names no size, so it
+   is the plain basket. Precedent: Malawi's `u` table keeps plain `Heap`
+   apart from the sized heaps. It has 61 lines: Q 2016-17 59, P 2016-17 2.
+3. **`90 KG BAD`, `90KG BAY` -> `90 kg Bag`.** These are unambiguous bag
+   typos, mapped for consistency with the basket typos. `09KG BAG` stays
+   left, because it could mean 9 kg.
+4. **Scope comment corrected.** Only the dropped codes 3 and 11 are
+   recovered. Code 2 (50 kg) and the other listed codes still exist, and
+   texts restating them are deliberately left and sized as a follow-up in
+   `CONTENTS.org`:
 
-**Spellings.** `BASKET (BAMBOO)` is the only string containing `BAMB` on a
-code-13 row in any G/P/I/Q file we hold (`strings_856.py` now scans `BAMB`
-too). It has 13 lines, all Module I in 2016-17 (10 cross-sectional, 3
-panel), and none on the harvest side. Code 11 now recovers 306 raw lines
-(was 293); code 3 is unchanged at 947.
+   | listed unit | lines | reviewer's narrower count |
+   |---|---:|---:|
+   | `50 KG` bag | 19 | 16 |
+   | PAIL | 66 | 38 |
+   | BUNCH | 11 | 10 |
+   | PLATE | 8 | 8 |
+   | PIECE | 11 | 7 |
+   | BALE | 6 | 1 |
+   | OX-CART | 4 | 1 |
 
-**Still left, for a separate decision.** Raw code-13 lines over G/P/I/Q:
+   My counts are token matches; every string is in `strings_856.json`.
+5. **`derivations.yml`.** The four `_oth` columns are now in `raw_variables`
+   of all 8 sale-basis entries; `ag_p09b_oth` appears only where the entry
+   already lists Module P. `.yml` is not a build input.
 
-| string | lines |
-|---|---:|
-| `BASKET (UNSPECIFIED SIZE)` | 61 |
-| `BASKET (LARGE)` | 13 |
-| `LARGE BASKET` | 11 |
-| `WEAVING BASKET` | 3 |
-| `BASKET (SMALL)` | 2 |
-| `SMALL BASKET` | 2 |
-| `DENGU(GOGODA)` | 2 |
-| `MEDIUM WEAVING BASKET` | 1 |
-| `LARGE DENGU` | 1 |
-| `DENGU(LARGE)` | 1 |
-| `LARGE BASKETS` | 1 |
-| `MEDIAM BASKET` | 1 |
-| the two `BASKET OF ...` | 1 each |
-
-The typos `1 90 KG`, `90 KG BAD` and `90KG BAY` are also still left.
+**Strings** (`strings_856.json`): code 3 recovers 949 raw lines (947 + the
+2 typos); code 11 recovers 367 (293 + 13 bamboo + 61 unspecified). The table
+of size- and weave-qualified baskets still left is in `CONTENTS.org`; the
+largest are `BASKET (LARGE)` 13 and `LARGE BASKET` 11.
 
 **Real data.** Cold build of this head against the same development build
 (`base-856`, `6ffeb3caf`; the only commits between it and `9a0ed5f3c` touch
 Mali and `nitrogen_kg`):
 
-| | before the ruling | with the ruling |
-|---|---|---|
-| rows whose `u` changed | 885 (2016-17: 486 bag / 37 basket; 2019-20: 214 / 148) | **885, identical** -- no harvest row says `BASKET (BAMBOO)` |
-| sales gained | 115 | **115** |
-| sales lost | 13 (347,000 MWK) | **7 (1,072,000 MWK)** |
-| net MWK attached | +2,421,000 | **+1,696,000** (2016-17 +43,600; 2019-20 +1,652,400) |
-| rows carrying a sale | 24,172 | 24,178 (base 24,070) |
-| harvest kg | 2016-17 +2.4%, 2019-20 +0.4% | **unchanged** (kg does not depend on the sale) |
+| | Phase 3 (pre-ruling) | bamboo only (`bf29f212a`) | **this head** |
+|---|---:|---:|---:|
+| rows whose `u` changed | 885 | 885 | **888** |
+| sales gained | 115 | 115 | **168** |
+| sales lost | 13 / 347,000 | 7 / 1,072,000 | **6 / 1,062,000** |
+| net MWK attached | +2,421,000 | +1,696,000 | **+2,539,200** |
+| harvest kg (default), 2016-17 / 2019-20 | +2.4% / +0.4% | same | same (2019-20 +90 kg) |
 
-**Why the net went DOWN.** The ruling re-attaches the 9 `BASKET (BAMBOO)`
-sales whose harvest row says `DENGU` / `BASKET` (+150,000 MWK, all exact
-matches). It also detaches 3 tomato sales in 2016-17 (-875,000 MWK) whose
-sale says `BASKET (BAMBOO)` but whose harvest row says `BASKET (SMALL)` (2)
-or gives no text (1). Those had met only on 13 = 13; now the sale is served
-as the dengu and a small basket is not asserted to be one. If
-`BASKET (SMALL)` were also ruled the dengu, 2 of the 3 would likely
-re-attach (not built). No
-`Derivation` count moved: all 12 are exact matches. The pinned
-`VALUE_SOLD_AFTER['2016-17']` is now 409,134,525 (was 409,859,525); every
-other pin is unchanged.
+At this head:
+- **`u` changes:** 2016-17: 486 -> 90 kg Bag, 39 -> Basket (Dengu), 14 of
+  them perennial. 2019-20: 215 and 148, 8 perennial.
+- **Rows differing from development:** 1,062. 888 change `u` only; 168 gain
+  a sale; 6 lose one.
+- **Sales gained:** 53 of the 168 are Module Q `BASKET (UNSPECIFIED SIZE)`
+  sales meeting perennial harvest rows coded 11 (+833,200 MWK).
+- **Sales lost:**
 
-**Rows that differ from development: 1,007.** 885 change `u` and nothing
-else. 122 keep their `u` but their sale fields move: 115 gain a sale and 7
-lose one.
+  | sales | MWK | why |
+  |---:|---:|---|
+  | 3 | 875,000 | 2016-17 tomato: sale `BASKET (BAMBOO)` vs harvest `BASKET (SMALL)` or no text |
+  | 1 | 70,000 | `OX-CART` harvest vs `BUSKET` sale |
+  | 1 | 80,000 | 2019-20 groundnut: harvest `09KG BAG` vs sale `90KG BAY` |
+  | 1 | 37,000 | 2016-17 groundnut decided by price, now unresolved |
+
+  The cotton row (`90 KG BAD` harvest vs `90 KG BAG` sale) re-attaches
+  (+10,000).
+- **kg:** no unchanged-`u` row's factor moves. The kg for the typo rows:
+  default 2019-20 +90 kg; with the shipped tables 2019-20 +52 kg.
+
+**Pinned constants** (`tests/test_malawi_sale_basis.py`):
+- 2016-17 wildcard: 467 -> 520.
+- `VALUE_SOLD_AFTER`: 2016-17 409,967,725; 2019-20 529,435,948.
+- `UNRESOLVED` 2019-20: (138, 6,324,030) -> (137, 6,244,030).
+- `UNRESOLVED_GROUNDS['contradiction_no_separation']` stays **271**, now
+  with a provenance comment. The reviewer was right that `bf29f212a` gives
+  272 (2016-17 70 -> 71). At this head 2019-20 also moves 105 -> 104: the
+  `90KG BAY` groundnut sale was unresolved at `bf29f212a`, and now that it is
+  recovered it has no harvest row of its unit, so it leaves the ladder. The
+  sum is back to 271. This was measured by a per-wave replay
+  (`ladder_tallies.py`) on both `9a0ed5f3c` and this head, not assumed.
+- **Possible strengthening, not done here:** the test at line ~764 compares
+  only the keys of `UNRESOLVED_GROUNDS`, so a stale count cannot fail it.
+  Comparing the summed values would have caught the 272.
+
+**Quantity screen** (Site Q, recomputed on both builds):
+- 2016-17 flags 7 -> 6. A Cassava `Other (Specify)` row drops out because
+  its cell's p90 goes 14 -> 24.
+- 2016-17's Nkwani row with `Quantity` 2016 (a year in the quantity field)
+  stays flagged, now in the `Basket (Dengu)` cell (ratio 144 -> 106). With
+  the shipped tables it contributes 22,643 kg, 11.1% of the 2016-17
+  shipped-path increase (204,408 kg).
+- 2019-20 stays at 13 flags. A Cabbage `Other (Specify)` row's ratio goes
+  153 -> 103. The reviewer reported 104; that was presumably measured at
+  `bf29f212a`.
 
 **Tests.**
-- `test_malawi_unit_text_856.py`: 32 tests (adds the bamboo row on both
-  sides, a `DENGU` harvest meeting a `BASKET (BAMBOO)` sale, and a check
-  that the size-qualified baskets stay left). Against the pre-ruling
-  `malawi.py`: 5 failed, 27 passed. With the ruling: 32 passed.
+- `test_malawi_unit_text_856.py`: 33 passed.
 - The six Malawi harvest/sale/unit files plus `test_derivations.py`:
-  **213 passed, 0 failed, 0 skipped**, data-gated tests included.
+  **214 passed, 0 failed, 0 skipped**, data-gated tests included.
 
 **Cache.** `hash_census.py` on `9a0ed5f3c` against this head:
 - Malawi L2-country: 26 of 26 move.
@@ -455,7 +487,7 @@ lose one.
 - Build-transform fingerprints: 0 of 40 move.
 - No other country moves.
 
-**Publication.** Row-level outputs (`diff_base_bamboo.json`,
-`moved_sale_texts_bamboo.json`, logs) live under the private
-`856-private/` directory, not in the repository. `build_and_measure.py` now
-cuts every saved warning before its first `i=` listing.
+**Publication.** Row-level outputs (the diffs, the raw texts, logs, the
+ladder decision frames) live under the private `856-private/` directory. The
+committed `ladder_tallies_*.json` and `strings_856.json` are aggregate
+counts. `build_and_measure.py` cuts saved warnings before any `i=` listing.

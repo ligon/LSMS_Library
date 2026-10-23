@@ -14,17 +14,27 @@ P=/local/job40390255/data-private
 (cd $BASE && env $ENV PYTHONPATH=$BASE LSMS_DATA_DIR=$P/base-856 $PY $D/build_and_measure.py $BASE $P/base-856/compare-base)
 #    harvest-only state (old branch, commit 8b637dee4) and the pre-ruling head
 #    (old branch ab5da2d5a) were built into $P/lane-856/compare-A and
-#    compare-final; the current head (with the BASKET (BAMBOO) ruling):
-(cd $BR && env $ENV PYTHONPATH=$BR LSMS_DATA_DIR=$P/lane-856/root-bamboo $PY $D/build_and_measure.py $BR $P/lane-856/compare-bamboo)
-cp $P/lane-856/compare-bamboo/summary.json $D/summary_final.json   # warning text is cut before any i= listing
+#    compare-final; the bamboo-ruling head bf29f212a into compare-bamboo
+#    (root-bamboo); the current head (bamboo + unspecified-size + bag typos):
+(cd $BR && env $ENV PYTHONPATH=$BR LSMS_DATA_DIR=$P/lane-856/root-r2 $PY $D/build_and_measure.py $BR $P/lane-856/compare-r2)
+cp $P/lane-856/compare-r2/summary.json $D/summary_final.json   # warning text is cut before any i= listing
 
 # 2. row-level comparison (pure pandas over the parquets above)
 $PY -I $D/compare.py $P/base-856/compare-base $P/lane-856/compare-A $P/856-private/diff_base_harvest_only.json
 $PY -I $D/compare.py $P/base-856/compare-base $P/lane-856/compare-final $P/856-private/diff_base_final.json
 $PY -I $D/compare.py $P/base-856/compare-base $P/lane-856/compare-bamboo $P/856-private/diff_base_bamboo.json
+$PY -I $D/compare.py $P/base-856/compare-base $P/lane-856/compare-r2 $P/856-private/diff_base_r2.json
 
 # 3. raw texts behind every sale whose attachment moved; recovered / left strings
-(cd $BR && env $ENV PYTHONPATH=$BR LSMS_DATA_DIR=$P/lane-856 $PY $D/detached_texts.py $P/856-private/diff_base_bamboo.json $P/856-private/moved_sale_texts_bamboo.json)
+(cd $BR && env $ENV PYTHONPATH=$BR LSMS_DATA_DIR=$P/lane-856 $PY $D/detached_texts.py $P/856-private/diff_base_r2.json $P/856-private/moved_sale_texts_r2.json)
+
+# 3b. sale-basis ladder replayed per wave (aggregate tallies the pinned
+#     constants describe), on the branch's parent and on this head
+(cd $BASEDEV && env $ENV PYTHONPATH=$BASEDEV LSMS_DATA_DIR=$P/base-856 $PY $D/ladder_tallies.py $BASEDEV $D/ladder_tallies_base.json)
+(cd $BR && env $ENV PYTHONPATH=$BR LSMS_DATA_DIR=$P/lane-856 $PY $D/ladder_tallies.py $BR $D/ladder_tallies_branch.json)
+#     (the quantity-screen and per-sale ladder comparisons behind the
+#     CONTENTS.org caveats print row-level detail, so their scripts live in
+#     $P/856-private/: qaudit.py, dec_diff.py)
 (cd $BR && env $ENV PYTHONPATH=$BR LSMS_DATA_DIR=$P/lane-856 $PY $D/strings_856.py $D/strings_856.json)
 
 # 4. cache-hash census on both checkouts, then the diff

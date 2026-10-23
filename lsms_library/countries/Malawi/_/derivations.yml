@@ -65,6 +65,7 @@ Malawi::crop_production::sale-basis-unknown-wildcard:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         Module Q asks no shelled/unshelled question before 2016-17, and
@@ -125,6 +126,7 @@ Malawi::crop_production::sale-basis-from-price:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         a shelled unit of a crop sells at a premium over an unshelled unit
@@ -229,6 +231,7 @@ Malawi::crop_production::sale-basis-from-price-overrule:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: >-
         a recorded S/U answer on the sale side, against a harvest row that
@@ -284,6 +287,7 @@ Malawi::crop_production::sale-basis-not-applicable:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         the instrument scopes shelled/unshelled to "ALL APPLICABLE CROPS"
@@ -346,6 +350,7 @@ Malawi::crop_production::sale-basis-no-reference:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         the instrument scopes shelled/unshelled to "ALL APPLICABLE CROPS"
@@ -408,6 +413,7 @@ Malawi::crop_production::contradiction-price-sale:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: >-
         where two recorded answers disagree, a price that sits
@@ -448,6 +454,7 @@ Malawi::crop_production::contradiction-price-harvest:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: as contradiction-price-sale; the two keys exist so that the direction is countable (217 vs 102 in the probe).
       basis: modelling-choice
@@ -490,6 +497,7 @@ Malawi::crop_production::sale-basis-unresolved:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         a sale that cannot be expressed at the row's declared grain (t, i,

@@ -7,6 +7,7 @@ list).  Raw module rows, all four modules, every wave with text.
 """
 import collections
 import importlib.util
+import re
 import json
 import os
 import subprocess
@@ -39,7 +40,15 @@ for w, half, sfx in [('2010-11', 'Full_Sample/Agriculture', ''),
                       ucol, ucol + os_))
 
 target = {s: code for code, ss in mw._UNIT_TEXT_RECODE.items() for s in ss}
-near = ('90', 'DENG', 'BASK', 'BUSK', 'BAMB')
+#: Texts naming a unit the code list STILL offers (left by design: the scope
+#: is the two dropped codes 3 and 11).  Token match, first hit wins; counted
+#: so the follow-up is sized.
+LISTED = [('50 kg Bag (code 2)', r'(?:^|\D)50\s*-?\s*KG'),
+          ('Pail (codes 4/5)', r'PAIL'), ('Bunch (code 8)', r'BUNCH'),
+          ('Plate (codes 6/7)', r'PLATE'), ('Piece (code 9)', r'PIECE'),
+          ('Bale (code 10)', r'\bBALES?\b'), ('Ox-Cart (code 12)', r'OX\s*-?\s*CART')]
+listed = collections.defaultdict(collections.Counter)
+near = ('90', '09KG', 'DENG', 'BASK', 'BUSK', 'BAMB')
 rec = collections.defaultdict(collections.Counter)
 left = collections.defaultdict(collections.Counter)
 for w, half, mod, rel, ucol, tcol in FILES:
@@ -51,8 +60,13 @@ for w, half, mod, rel, ucol, tcol in FILES:
         cell = f'{mod}:{w}:{half.split("/")[0]}'
         if s in target:
             rec[s][cell] += int(n)
-        elif any(k in s for k in near):
+            continue
+        if any(k in s for k in near):
             left[s][cell] += int(n)
+        for name, rx in LISTED:
+            if re.search(rx, s):
+                listed[name][s] += int(n)
+                break
 
 out = {
     'recovered': {s: {'to_code': target[s], 'total': sum(c.values()), 'by_cell': dict(c)}
@@ -60,6 +74,10 @@ out = {
     'unused_whitelist_entries': sorted(set(target) - set(rec)),
     'left_near_misses': {s: {'total': sum(c.values()), 'by_cell': dict(c)}
                          for s, c in sorted(left.items(), key=lambda kv: -sum(kv[1].values()))},
+    'left_restating_a_listed_code': {
+        name: {'total': sum(c.values()), 'exact_plain': int(c.get(name.split(' (')[0].upper(), 0)),
+               'strings': dict(c.most_common())}
+        for name, c in listed.items()},
 }
 Path(sys.argv[1]).write_text(json.dumps(out, indent=1) + '\n')
 for code in (3, 11):
@@ -67,3 +85,4 @@ for code in (3, 11):
     print('code', code, 'raw rows recovered', tot)
 print('unused whitelist entries:', out['unused_whitelist_entries'])
 print('left:', {s: v['total'] for s, v in out['left_near_misses'].items()})
+print('left, restating a listed code:', {k: v['total'] for k, v in out['left_restating_a_listed_code'].items()})

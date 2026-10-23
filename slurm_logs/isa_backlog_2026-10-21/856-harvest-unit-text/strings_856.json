@@ -61,6 +61,15 @@
     "Q:2019-20:Panel": 16
    }
   },
+  "BASKET (UNSPECIFIED SIZE)": {
+   "to_code": 11,
+   "total": 61,
+   "by_cell": {
+    "P:2016-17:Cross_Sectional": 2,
+    "Q:2016-17:Cross_Sectional": 53,
+    "Q:2016-17:Panel": 6
+   }
+  },
   "90KG": {
    "to_code": 3,
    "total": 15,
@@ -190,6 +199,13 @@
     "G:2019-20:Cross_Sectional": 1
    }
   },
+  "90 KG BAD": {
+   "to_code": 3,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
   "BASKET ( DENGU)": {
    "to_code": 11,
    "total": 1,
@@ -202,6 +218,13 @@
    "total": 1,
    "by_cell": {
     "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "90KG BAY": {
+   "to_code": 3,
+   "total": 1,
+   "by_cell": {
+    "I:2019-20:Cross_Sectional": 1
    }
   },
   "90 KGBAG": {
@@ -256,14 +279,6 @@
  },
  "unused_whitelist_entries": [],
  "left_near_misses": {
-  "BASKET (UNSPECIFIED SIZE)": {
-   "total": 61,
-   "by_cell": {
-    "P:2016-17:Cross_Sectional": 2,
-    "Q:2016-17:Cross_Sectional": 53,
-    "Q:2016-17:Panel": 6
-   }
-  },
   "BASKET (LARGE)": {
    "total": 13,
    "by_cell": {
@@ -331,7 +346,7 @@
     "G:2019-20:Cross_Sectional": 1
    }
   },
-  "90 KG BAD": {
+  "09KG BAG": {
    "total": 1,
    "by_cell": {
     "G:2019-20:Cross_Sectional": 1
@@ -341,12 +356,6 @@
    "total": 1,
    "by_cell": {
     "P:2019-20:Cross_Sectional": 1
-   }
-  },
-  "90KG BAY": {
-   "total": 1,
-   "by_cell": {
-    "I:2019-20:Cross_Sectional": 1
    }
   },
   "LARGE BASKETS": {
@@ -365,6 +374,95 @@
    "total": 1,
    "by_cell": {
     "Q:2019-20:Panel": 1
+   }
+  }
+ },
+ "left_restating_a_listed_code": {
+  "Ox-Cart (code 12)": {
+   "total": 4,
+   "exact_plain": 1,
+   "strings": {
+    "OXCART": 1,
+    "HALF OXCART": 1,
+    "OX-CART": 1,
+    "HALF.OXCART": 1
+   }
+  },
+  "Piece (code 9)": {
+   "total": 11,
+   "exact_plain": 5,
+   "strings": {
+    "PIECES": 5,
+    "PIECE": 5,
+    "BUNDLES OF 12 PIECES SUGARCANE": 1
+   }
+  },
+  "Bunch (code 8)": {
+   "total": 11,
+   "exact_plain": 8,
+   "strings": {
+    "BUNCH": 8,
+    "BUNCHES": 2,
+    "BIG BUNCHES": 1
+   }
+  },
+  "50 kg Bag (code 2)": {
+   "total": 19,
+   "exact_plain": 11,
+   "strings": {
+    "50 KG BAG": 11,
+    "50KG BAG": 4,
+    "50KGBAG": 1,
+    "HALF50KGBAG": 1,
+    "HALF BAG OF 50KG": 1,
+    "50KG AND HALF": 1
+   }
+  },
+  "Pail (codes 4/5)": {
+   "total": 66,
+   "exact_plain": 6,
+   "strings": {
+    "PAIL (MEDIUM)": 9,
+    "40LITRE PAIL": 9,
+    "PAIL (LARGE)": 8,
+    "PAIL (SMALL)": 6,
+    "PAIL": 6,
+    "LARGE PAIL": 5,
+    "PAIL (40 LITRE)": 3,
+    "PAIL (20 LITRE)": 3,
+    "MEDIUM PAIL": 3,
+    "PAIL (UNSPECIFIED SIZE)": 2,
+    "PAIL MEDIUM": 2,
+    "PAIL (40L)": 1,
+    "10 LITRE PAIL": 1,
+    "PAIL LARGE": 1,
+    "20LITRES PAIL": 1,
+    "SMALL PAIL": 1,
+    "PAIL( MEDIUM)": 1,
+    "PAIL CHIGOBA": 1,
+    "GABA PAILS": 1,
+    "LARGE PAILS": 1,
+    "HALF LARGE PAIL": 1
+   }
+  },
+  "Plate (codes 6/7)": {
+   "total": 8,
+   "exact_plain": 1,
+   "strings": {
+    "PHAZI PLATE": 4,
+    "NO 12 PLATE": 1,
+    "PHAZI PLATE HEAPED": 1,
+    "PLATE": 1,
+    "PLATES": 1
+   }
+  },
+  "Bale (code 10)": {
+   "total": 6,
+   "exact_plain": 1,
+   "strings": {
+    "80 KG BALE": 3,
+    "85 KG BALE": 2,
+    "BALE": 1
    }
   }
  }
