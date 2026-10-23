@@ -3932,7 +3932,15 @@ def map_index(df: pd.DataFrame) -> pd.DataFrame:
         mapping_rules['w'] = 't'
 
     if 'u' in df.index.names:
-        df = df.rename(index={k: 'unit' for k in ['<NA>', 'nan', pd.NA]}, level='u')
+        # A missing unit is the canonical sentinel, never a minted spelling
+        # (GH #1041 ruling; GH #1234).  This used to mint the literal 'unit',
+        # which reads as a real unit and collides with genuine ones (Panama's
+        # 'unidad').  Function-level import: transformations imports
+        # local_tools.  Same keys as before: pd.NA (a StringDtype NA-policy
+        # level) and the stringified 'nan' / '<NA>'.  A NaN-policy NaN is
+        # still not matched by this rename (GH #1118 residual).
+        from .transformations import U_UNKNOWN
+        df = df.rename(index={k: U_UNKNOWN for k in ['<NA>', 'nan', pd.NA]}, level='u')
 
     if mapping_rules:
         df = df.rename_axis(index=mapping_rules)
