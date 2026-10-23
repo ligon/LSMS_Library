@@ -73,6 +73,7 @@ from .paths import countries_root, data_root
 from .provenance import (
     WaveProvenance,
     acquired_release,
+    held_secondary_entry,
     read_provenance,
     source_org_path,
     write_provenance,
@@ -116,6 +117,47 @@ def _fetch_destination(path: Path, populate_cache: bool = False) -> Path:
     if populate_cache:
         return _COUNTRIES_DIR / path
     return data_root() / path
+
+
+def _normalise_subdir(subdir: str | os.PathLike | None) -> str | None:
+    """Validate an acquisition ``subdir=`` (GH #1276) -> its POSIX spelling.
+
+    A subdirectory of the wave's ``Data/``, written relative to it
+    (``'Cross_Section'``, ``'Panel/Wave 5'``).  Refused, before any download:
+    an absolute path, a drive letter, a backslash, and an empty, ``.`` or
+    ``..`` segment -- the last also catches a trailing slash.  ``None`` means
+    no subdirectory (the whole of ``Data/``, the behaviour before #1276).
+    """
+    if subdir is None:
+        return None
+    text = os.fspath(subdir)
+    segments = text.split("/") if isinstance(text, str) else []
+    if (not segments or "\\" in text or text.startswith("/")
+            or re.match(r"^[A-Za-z]:", text)
+            or any(s.strip() in ("", ".", "..") for s in segments)):
+        raise ValueError(
+            f"subdir must be a relative path inside Data/ with no empty, '.' "
+            f"or '..' segment, e.g. 'Cross_Section': {subdir!r}")
+    return "/".join(segments)
+
+
+def _acquisition_data_dir(country: str, wave: str,
+                          subdir: str | None = None) -> Path:
+    """Where an acquisition extracts a release: ``{wave}/Data/`` or, with
+    ``subdir=``, ``{wave}/Data/{subdir}/`` (GH #1276).
+
+    That directory is also the whole scope of the extraction: sidecar
+    matching, placement and the leftover report all stay inside it
+    (:func:`_extract_all_from_zip` is given it as ``dest_dir``), so a second
+    catalog entry acquired into its own subdirectory never matches or touches
+    the files another entry holds elsewhere in ``Data/``.  The location is
+    decided by :func:`_fetch_destination`, the single function that decides
+    where acquisition writes.
+    """
+    sub = _normalise_subdir(subdir)
+    parts = sub.split("/") if sub else []
+    return _fetch_destination(Path(country, wave, "Data", *parts),
+                              populate_cache=True)
 
 
 def _acquisition(func):
@@ -1148,6 +1190,11 @@ def _extract_all_from_zip(download_url: str, zip_filename: str,
     An existing sidecar's unique, case-insensitive basename fixes the member's
     destination, including nested layouts. New members keep their zip-relative
     paths. Ambiguous or escaping destinations raise before any placement.
+    *dest_dir* is the whole scope: only sidecars beneath it are matched, and
+    nothing is placed outside it. ``add_wave`` / ``populate_and_push`` pass
+    ``Data/<subdir>/`` under ``subdir=`` (GH #1276), so a second catalog entry
+    whose member names equal files another entry holds elsewhere in ``Data/``
+    neither overwrites them nor makes their sidecars ambiguous.
 
     Return the files written. ``report['members']`` also includes existing
     files verified byte-identical to the staged member; those need no write.
@@ -1305,15 +1352,22 @@ class _AcquiredRelease(NamedTuple):
     skipped: tuple[Path, ...]       # differing untracked files, NOT verified
     error: str | None               # the download / extraction failed
     members: tuple[Path, ...] = ()  # written OR verified byte-identical
+    subdir: str | None = None       # Data/<subdir>/ it was confined to (GH #1276)
 
 
-def _acquired_data_files(country: str, wave: str) -> list[Path]:
-    """Actual release membership, including verified identical nested files."""
+def _acquired_data_files(country: str, wave: str,
+                         subdir: str | None = None) -> list[Path]:
+    """Actual release membership, including verified identical nested files.
+
+    Confined to ``Data/<subdir>/`` under ``subdir=`` (GH #1276): the members
+    an extraction records never leave its directory, and the fallback scan
+    below covers only that subtree.
+    """
     acq = _ACQUIRED_RELEASES.get((country, wave))
     if acq is not None:
         return sorted(acq.members)
     # Retain the local push-only behavior when no WB acquisition occurred.
-    data_dir = _COUNTRIES_DIR / country / wave / "Data"
+    data_dir = _acquisition_data_dir(country, wave, subdir)
     return sorted(f for f in data_dir.rglob("*")
                   if f.is_file() and f.name.lower().endswith(
                       (".dta", ".csv", ".sav", ".dta.gz")))
@@ -1683,6 +1737,13 @@ def _record_acquired_release(country: str, wave: str,
     *entry* is the catalog row for the entry, if the caller already has it;
     otherwise it is looked up (for the DOI, title and years).  Returns the
     record written, or ``None``.
+
+    An acquisition confined to ``Data/<subdir>/`` (GH #1276) of an entry
+    that is NOT the record's primary one is a secondary entry: it is
+    appended to ``#+CATALOG_ID:`` and nothing else changes (see
+    :func:`lsms_library.provenance.held_secondary_entry`); the record is
+    returned, and written only if the id was not listed yet.  Without
+    ``subdir=``, acquiring another entry replaces the primary one, as before.
     """
     acq = _ACQUIRED_RELEASES.pop((country, wave), None)
     if acq is None or not acq.members:
@@ -1709,7 +1770,11 @@ def _record_acquired_release(country: str, wave: str,
     # GH1149 compares resolved paths, not basenames: a nested leftover cannot
     # disappear merely because a different directory ships the same name.
     shipped = {p.resolve() for p in acq.members}
-    data_dir = _COUNTRIES_DIR / country / wave / "Data"
+    # Under subdir= (GH #1276) the release was confined to Data/<subdir>/, and
+    # so is this scan: another entry's files elsewhere in Data/ are not
+    # leftovers of this one.
+    data_dir = _acquisition_data_dir(country, wave, acq.subdir)
+    where = f"Data/{acq.subdir}/" if acq.subdir else "Data/"
     others = sorted(
         str(f.relative_to(data_dir)) for f in data_dir.rglob("*")
         if f.is_file()
@@ -1718,11 +1783,33 @@ def _record_acquired_release(country: str, wave: str,
         and (f.with_suffix("") if f.suffix == ".dvc" else f).resolve()
         not in shipped)
     if others:
-        logger.warning("%s/%s: Data/ also holds %d file(s) (searched "
+        logger.warning("%s/%s: %s also holds %d file(s) (searched "
                        "recursively) that %s does not ship: %s. They "
                        "remain outside the acquired release; check the wave's config does "
                        "not read them (GH #1149).",
-                       country, wave, len(others), acq.idno, ", ".join(others))
+                       country, wave, where, len(others), acq.idno,
+                       ", ".join(others))
+    existing = read_provenance(_COUNTRIES_DIR, country, wave)
+    if (acq.subdir is not None and existing.is_worldbank
+            and existing.catalog_id != acq.catalog_id):
+        # A SECONDARY entry, held in its own subdirectory (GH #1276, the #600
+        # pattern).  It joins #+CATALOG_ID:; the primary entry's held release
+        # and every other key stay as they were.  There is no field for this
+        # entry's release, so say which one landed and where it belongs.
+        prov = held_secondary_entry(existing, acq.catalog_id)
+        noted = acq.idno.strip() in f"{existing.note or ''}\n{existing.notes or ''}"
+        (logger.info if noted else logger.warning)(
+            "%s/%s: %s (%s) is held in %s as a secondary catalog entry beside "
+            "the primary %s; #+CATALOG_ID: lists it. SOURCE.org has no field "
+            "for a secondary entry's held release (#+CATALOG_IDNO: describes "
+            "%s), so %s is recorded only where a human writes it: in "
+            "#+PROVENANCE_NOTE:, as Malawi/2016-17 does (GH #600, #1276).%s",
+            country, wave, acq.catalog_id, acq.idno, where,
+            existing.catalog_id, existing.catalog_id, acq.idno,
+            "" if noted else " The note does not name it yet.")
+        if prov is not existing:
+            write_provenance(_COUNTRIES_DIR, prov)
+        return prov
     if entry is None or str(entry.get("id")) != acq.catalog_id:
         entry = None
         spec = _COUNTRY_CATALOG.get(country)
@@ -1734,7 +1821,7 @@ def _record_acquired_release(country: str, wave: str,
     same = str(entry.get("idno") or "").strip() == acq.idno.strip()
     ys, ye = entry.get("year_start"), entry.get("year_end")
     prov = acquired_release(
-        read_provenance(_COUNTRIES_DIR, country, wave),
+        existing,
         country=country, wave=wave, catalog_id=acq.catalog_id,
         idno=acq.idno,
         # The row's DOI is its idno's; a row for another release says nothing.
@@ -1751,7 +1838,8 @@ def _record_acquired_release(country: str, wave: str,
 
 @_acquisition
 def populate_and_push(country: str, wave: str,
-                      remote: str | None = None) -> list[Path]:
+                      remote: str | None = None,
+                      subdir: str | None = None) -> list[Path]:
     """Download all data files for a wave from WB and push to DVC cache.
 
     Convenience wrapper that follows the procedure in CONTRIBUTING.org:
@@ -1779,28 +1867,50 @@ def populate_and_push(country: str, wave: str,
         Wave identifier, e.g. ``"2013-14"``.
     remote : str, optional
         DVC remote to push to.  Defaults to the configured default.
+    subdir : str, optional
+        Confine the acquisition to ``Data/<subdir>/`` (GH #1276): extract
+        there, match existing sidecars only there, and push only those files.
+        ``populate_and_push`` always fetches the wave's PRIMARY entry (the
+        URL in ``SOURCE.org``), so this is for re-acquiring that entry into
+        its own subdirectory.  On a wave whose record lists more than one
+        catalog entry it is refused -- which entry a subdirectory holds is not
+        recorded -- and :func:`add_wave`, which names the entry, is the call
+        to use.
 
     Returns
     -------
     list[Path]
         Paths of files successfully pushed.
     """
+    subdir = _normalise_subdir(subdir)
+    if subdir is not None:
+        held = read_provenance(_COUNTRIES_DIR, country, wave).catalog_ids
+        if len(held) > 1:
+            raise ValueError(
+                f"{country}/{wave} holds {len(held)} catalog entries "
+                f"({', '.join(held)}); populate_and_push fetches only the "
+                f"primary one ({held[0]}) and cannot tell which entry "
+                f"Data/{subdir}/ holds. Name it: add_wave({country!r}, "
+                f"'<catalog id>', wave={wave!r}, subdir={subdir!r}, "
+                "confirm=False).")
     # Use a dummy filename to trigger the download; populate_cache=True
     # extracts everything from the zip.
     _ACQUIRED_RELEASES.pop((country, wave), None)      # this call's, only
     dummy = f"{country}/{wave}/Data/_probe_.dta"
-    get_data_file(dummy, populate_cache=True)
+    # Without subdir= the call is exactly the pre-#1276 one.
+    get_data_file(dummy, populate_cache=True,
+                  **({"_subdir": subdir} if subdir is not None else {}))
 
     # Acquisition only: extract into the config tree so the caller can
     # `dvc add` what landed.  The read path never reaches this (see
     # _fetch_destination).
-    data_dir = _COUNTRIES_DIR / country / wave / "Data"
+    data_dir = _acquisition_data_dir(country, wave, subdir)
     if not data_dir.exists():
         _ACQUIRED_RELEASES.pop((country, wave), None)
         logger.warning("No Data directory after download: %s", data_dir)
         return []
 
-    data_files = _acquired_data_files(country, wave)
+    data_files = _acquired_data_files(country, wave, subdir)
     if not data_files:
         _ACQUIRED_RELEASES.pop((country, wave), None)
         logger.warning("No data files found in %s", data_dir)
@@ -2261,7 +2371,8 @@ def add_wave(country: str, catalog_id: str,
              confirm: bool = True,
              push: bool = True,
              remote: str | None = None,
-             verbose: bool = True) -> list[Path]:
+             verbose: bool = True,
+             subdir: str | None = None) -> list[Path]:
     """Download a new survey wave from the WB and register it locally.
 
     Creates the directory structure (``Data/``, ``Documentation/``,
@@ -2297,6 +2408,19 @@ def add_wave(country: str, catalog_id: str,
     verbose : bool
         If True (default), show progress spinners and a summary table.
         Requires ``rich`` (degrades to plain logging if unavailable).
+    subdir : str, optional
+        Acquire into ``Data/<subdir>/`` of the wave and nowhere else (GH
+        #1276): the files are extracted there, existing sidecars are matched
+        only there, and only those files are pushed.  This is how a wave
+        directory holds a second, disjoint catalog entry -- the #600
+        pattern, e.g. ``Malawi/2016-17``'s ``Data/Cross_Sectional/`` (2936)
+        and ``Data/Panel/`` (2939) -- without touching the files the first
+        entry holds when their names coincide.  Re-acquiring either entry
+        with its own ``subdir=`` is unambiguous.  When *catalog_id* is not the
+        record's primary entry it is appended to ``#+CATALOG_ID:`` and nothing
+        else in ``SOURCE.org`` changes; the record has no field for a
+        secondary entry's held release, which goes in ``#+PROVENANCE_NOTE:``
+        by hand.  ``None`` (the default) is the whole of ``Data/``, as before.
 
     Returns
     -------
@@ -2306,6 +2430,7 @@ def add_wave(country: str, catalog_id: str,
     """
     import time
 
+    subdir = _normalise_subdir(subdir)      # refuse before any download
     con = _get_console(verbose)
 
     def status(msg):
@@ -2366,6 +2491,8 @@ def add_wave(country: str, catalog_id: str,
             lines = Text()
             lines.append(f"  Country:    {country}\n")
             lines.append(f"  Wave:       {wave}{status_note}\n")
+            if subdir is not None:
+                lines.append(f"  Into:       Data/{subdir}/ only\n")
             lines.append(f"  Catalog:    {catalog_url}\n")
             lines.append(f"  IDNO:       {idno}\n")
             lines.append(f"  Push to S3: {'yes' if push else 'no'}")
@@ -2373,6 +2500,8 @@ def add_wave(country: str, catalog_id: str,
         else:
             print(f"\n  Country:    {country}")
             print(f"  Wave:       {wave}{status_note}")
+            if subdir is not None:
+                print(f"  Into:       Data/{subdir}/ only")
             print(f"  Catalog:    {catalog_url}")
             print(f"  IDNO:       {idno}")
             print(f"  Push to S3: {'yes' if push else 'no'}")
@@ -2415,15 +2544,19 @@ def add_wave(country: str, catalog_id: str,
     with status(f"Downloading Stata zip from World Bank ..."):
         _ACQUIRED_RELEASES.pop((country, wave), None)  # this call's, only
         dummy = f"{country}/{wave}/Data/_probe_.dta"
+        # Without subdir= the call is exactly the pre-#1276 one.
+        confine = {"_subdir": subdir} if subdir is not None else {}
         if needs_source_override:
             # Route this acquisition explicitly without replacing any existing
             # record before the requested release actually lands (#1128).
-            get_data_file(dummy, populate_cache=True, _source_url=catalog_url)
+            get_data_file(dummy, populate_cache=True, _source_url=catalog_url,
+                          **confine)
         else:
-            get_data_file(dummy, populate_cache=True)
+            get_data_file(dummy, populate_cache=True, **confine)
 
-    data_dir = wave_dir / "Data"
-    data_files = _acquired_data_files(country, wave) if data_dir.exists() else []
+    data_dir = _acquisition_data_dir(country, wave, subdir)
+    data_files = (_acquired_data_files(country, wave, subdir)
+                  if data_dir.exists() else [])
 
     if not data_files:
         _ACQUIRED_RELEASES.pop((country, wave), None)
@@ -2471,8 +2604,11 @@ def add_wave(country: str, catalog_id: str,
         raise
     if not push or confirmed == expected:
         held = _record_acquired_release(country, wave, entry=entry)
-        if held is not None:
+        if held is not None and held.catalog_id == cat_id:
             log(f"SOURCE.org: holds {held.idno}")
+        elif held is not None:
+            log(f"SOURCE.org: lists {cat_id} beside primary {held.catalog_id} "
+                f"(record {idno} in #+PROVENANCE_NOTE:)")
     else:
         _ACQUIRED_RELEASES.pop((country, wave), None)
         logger.warning(
@@ -2547,7 +2683,8 @@ def _as_countries_relative(path: Path) -> Path:
 
 def get_data_file(path: str | Path,
                   populate_cache: bool = False, *,
-                  _source_url: str | None = None) -> Path | None:
+                  _source_url: str | None = None,
+                  _subdir: str | None = None) -> Path | None:
     """Obtain a raw data file, trying local -> DVC remotes -> World Bank.
 
     Parameters
@@ -2562,6 +2699,10 @@ def get_data_file(path: str | Path,
         Internal acquisition-only routing override. Requires populate_cache
         and the acquisition opt-in context; ordinary reads use SOURCE.org.
         This keeps an existing record intact until add_wave succeeds.
+    _subdir : str, optional
+        Internal acquisition-only confinement (GH #1276): extract the release
+        into ``Data/<_subdir>/`` and match sidecars only there.  Same guard as
+        *_source_url*.
 
     Returns
     -------
@@ -2573,6 +2714,11 @@ def get_data_file(path: str | Path,
         from .local_tools import _ALLOW_INTREE_SOURCES
         if not populate_cache or not _ALLOW_INTREE_SOURCES.get():
             raise ValueError("A source URL override requires acquisition mode")
+    if _subdir is not None:
+        from .local_tools import _ALLOW_INTREE_SOURCES
+        if not populate_cache or not _ALLOW_INTREE_SOURCES.get():
+            raise ValueError("A subdir confinement requires acquisition mode")
+        _subdir = _normalise_subdir(_subdir)
     path = _as_countries_relative(Path(path))
     # Read from the config tree if the file is already there (a maintainer
     # checkout with real data in it is a normal working state, and every
@@ -2699,16 +2845,17 @@ def get_data_file(path: str | Path,
         return None
 
     download_url, zip_filename = result
-    data_dir = _COUNTRIES_DIR / country / wave / "Data"
 
     if populate_cache:
+        # The release's whole scope: Data/, or Data/<subdir>/ (GH #1276).
+        data_dir = _acquisition_data_dir(country, wave, _subdir)
         report: dict = {}
         extracted = _extract_all_from_zip(download_url, zip_filename,
                                           data_dir, api_key, report=report)
         _ACQUIRED_RELEASES[(country, wave)] = _AcquiredRelease(
             catalog_id=catalog_id, idno=idno, extracted=tuple(extracted),
             skipped=tuple(report["skipped"]), error=report["error"],
-            members=tuple(report["members"]))
+            members=tuple(report["members"]), subdir=_subdir)
         if abs_path.exists():
             return abs_path
         for f in report["members"]:

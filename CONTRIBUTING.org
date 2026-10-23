@@ -206,6 +206,15 @@
    take the lock, but retries contention with exponential backoff and
    jitter, so concurrent writers queue rather than fail.
 
+   A second WB catalog entry of a wave we already hold (the #600
+   pattern, =Malawi/2016-17='s =Cross_Sectional/= + =Panel/=) is acquired
+   into its own subdirectory with
+   =add_wave(country, id, wave=..., subdir='Cross_Section')=, which
+   confines extraction, sidecar matching and the push to
+   =Data/Cross_Section/= (GH #1276).  The procedure, including moving the
+   first entry into its own subdirectory and the hand-written
+   =#+PROVENANCE_NOTE:=, is Step 2b of =.claude/skills/add-wave/SKILL.md=.
+
    #+begin_quote
    Never =rm= a DVC lock file to "clear a stale lock" --- it may belong
    to a live sibling process, and removing it corrupts that writer.

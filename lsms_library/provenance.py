@@ -95,6 +95,12 @@ record names two of them, under different keys (GH #1114 / #1128):
     ``rg CATALOG_LATEST_IDNO lsms_library/countries`` is the queue of waves
     whose newer release has not been acquired.
 
+Both pairs describe the PRIMARY entry only.  A secondary entry acquired into
+its own subdirectory (``add_wave(..., subdir=...)``, GH #1276) is appended to
+``#+CATALOG_ID:`` and nothing else; the record has no field for the release of
+a secondary entry, which is written by hand in ``#+PROVENANCE_NOTE:`` (see
+:func:`held_secondary_entry`).
+
 Everything under :data:`NOTES_HEADING` belongs to a human and is carried
 verbatim, ``#+KEY:`` lines included (GH #1115): ``GhanaSPS/2017-18`` records a
 second, Dataverse vintage of ten files as ``#+SECONDARY_SOURCE*`` lines in the
@@ -631,6 +637,41 @@ def acquired_release(existing: WaveProvenance | None, *, country: str,
         recorded=recorded, superseded_url=superseded,
         notes=existing.notes if existing is not None else None,
         extra=dict(existing.extra) if existing is not None else {})
+
+
+def held_secondary_entry(existing: WaveProvenance,
+                         catalog_id: str) -> WaveProvenance:
+    """The record to write once an acquisition into a SUBDIRECTORY of
+    ``Data/`` holds the files of *catalog_id*, an entry other than the
+    directory's primary one (GH #1276; the #600 pattern of
+    ``Malawi/2016-17``).
+
+    ``#+CATALOG_ID:`` is a list, so *catalog_id* is appended to it.  Nothing
+    else moves.  The held-release keys (``#+CATALOG_IDNO:`` /
+    ``#+CATALOG_DOI:``), the latest-seen trio and every other ``CATALOG_*``
+    key describe the PRIMARY entry, and they stay as they were.  The record
+    has no field for a secondary entry's held release
+    (``data_access.local_held_idnos`` says so, and ``discover_waves`` reads a
+    secondary id as ``yes``), so that release is recorded by hand in
+    ``#+PROVENANCE_NOTE:``, as ``Malawi/2016-17`` does.  No template note is
+    written here: Malawi's notes record evidence (WB datafile-list counts,
+    dates) that only a human can supply.
+
+    Returns *existing* itself, unchanged, when *catalog_id* is already listed,
+    so a re-acquisition of the secondary entry need not rewrite the file.
+    """
+    catalog_id = str(catalog_id)
+    if not existing.is_worldbank:
+        raise ValueError(
+            f"{existing.country}/{existing.wave} records no World Bank primary "
+            f"entry, so {catalog_id} cannot be added beside one")
+    if catalog_id == existing.catalog_id:
+        raise ValueError(
+            f"{catalog_id} is the primary entry of {existing.country}/"
+            f"{existing.wave}; its held release is recorded by acquired_release")
+    if catalog_id in existing.catalog_ids:
+        return existing
+    return replace(existing, catalog_ids=[*existing.catalog_ids, catalog_id])
 
 
 def read_provenance(countries_dir: Path, country: str,

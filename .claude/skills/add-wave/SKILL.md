@@ -41,8 +41,9 @@ Returns a list of dicts annotated with:
 **Acquisition candidates are `no` (a new wave) and `stale-release` (a newer
 release of a wave we hold).** Acquisition stages the complete archive before
 placing data files (GH #1149). For an existing wave, each member's basename
-matches a unique existing `.dvc` sidecar recursively under `Data/`, ignoring
-case, and the file lands at that sidecar's path. Multiple matching sidecars or
+matches a unique existing `.dvc` sidecar recursively under `Data/` (only under
+`Data/<subdir>/` with `subdir=`, GH #1276), ignoring case, and the file lands
+at that sidecar's path. Multiple matching sidecars or
 colliding destinations raise before placement. New files, and every file of a
 new wave without sidecars, retain their zip-relative paths. A `no` has to be
 *earned* — it is a confident claim that we neither hold this study nor
@@ -78,6 +79,7 @@ evidence.
 entry** — a `Panel/` + `Cross_Sectional/` split is the tell. The WB datafile API
 settles it in one call: `/index.php/api/catalog/{id}/data_files?id_format=id`
 lists an entry's files; compare against the `.dta` you actually downloaded.
+To *acquire* a second entry into a wave we already hold, see Step 2b.
 
 `#+CATALOG_IDNO:` / `#+CATALOG_DOI:` name the release a directory HOLDS; only
 `add_wave` / `populate_and_push` move them, once the whole release has demonstrably landed, and they clear the
@@ -177,6 +179,59 @@ This will:
    then show a rich progress summary
 
 Pass `verbose=True` (default) for spinners and a summary table. Use `verbose=False` for scripted/non-interactive use.
+
+### Step 2b: A second catalog entry in a wave we already hold (GH #1276)
+
+Some waves hold two disjoint WB entries, the #600 pattern: `Malawi/2016-17/` is
+IHS4 (2936) in `Data/Cross_Sectional/` plus the IHPS panel wave (2939) in
+`Data/Panel/`. Burkina Faso 2021-22 is to hold 6224 (EHCVM-P, the panel
+component) in `Data/Panel/` and 6277 (EHCVM-2, the cross-section) in
+`Data/Cross_Section/`.
+
+**Do not run a plain `add_wave` for the second entry.** Acquisition matches
+members to existing sidecars *by file name*, anywhere under `Data/`. 52 of
+6277's 55 member names equal files 6224 holds, so it would overwrite them,
+record 6277 as the wave's only entry, and leave every later re-acquisition
+`Ambiguous sidecars`. Use `subdir=`, which confines extraction, sidecar
+matching, the leftover report and the push to `Data/<subdir>/`:
+
+1. **Move the held entry into its own subdirectory first.** This is a config
+   edit, reviewed in its own PR. `git mv` each `Data/<file>.dvc` to
+   `Data/<Sub>/<file>.dvc`, and move any raw workspace copy with it (`*.dta`
+   is gitignored). A sidecar's `path:` is the bare file name, relative to the
+   sidecar, so it stays valid. Blobs are content-addressed, so nothing is
+   re-pushed, and no `dvc` command is needed. Then update every reference to
+   those files: `file:` in the wave's `data_info.yml`, `../Data/<file>` in
+   wave scripts, and country scripts that reach into the wave
+   (`../{wave}/Data/<file>`). Those are build inputs, so this moves the wave's
+   cache hashes. Moving first matters for re-acquisition: if the first entry
+   stays at the top of `Data/`, it can only be re-acquired without `subdir=`,
+   and that is ambiguous once both entries coexist.
+2. **Acquire the second entry into its own subdirectory:**
+   ```python
+   add_wave("Burkina_Faso", "6277", wave="2021-22", subdir="Cross_Section",
+            confirm=False)
+   ```
+   The other subdirectory's files and sidecars are left byte-identical.
+3. **Provenance.** The new id is appended to `#+CATALOG_ID:` (`6224, 6277`)
+   once the whole release has landed and been pushed. Nothing else in
+   `SOURCE.org` moves: `#+CATALOG_IDNO:` / `#+CATALOG_DOI:` still describe the
+   primary entry. **The record has no field for a secondary entry's held
+   release.** Write it by hand in `#+PROVENANCE_NOTE:`, as
+   `Malawi/2016-17/Documentation/SOURCE.org` does: which subdirectory holds
+   which entry, the secondary's idno, the evidence, and the date.
+   `add_wave` warns until the note names the release it acquired.
+   `discover_waves` reads a secondary id as `yes`. It cannot judge it
+   `stale-release`.
+4. **Re-acquisition**, of either entry, names the entry and its subdirectory:
+   `add_wave(country, "<id>", wave=..., subdir="<its subdir>", confirm=False)`.
+   `populate_and_push(country, wave, subdir=...)` always fetches the
+   **primary** entry (the URL in `SOURCE.org`). It is therefore refused on a
+   record that lists more than one entry; otherwise it would put the primary's
+   files over the secondary's same-named ones.
+
+Without `subdir=`, acquisition behaves as it did before, including the
+ambiguity error.
 
 ### Step 3: Register the wave in `{country}.py`
 
