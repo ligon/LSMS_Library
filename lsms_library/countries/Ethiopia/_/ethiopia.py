@@ -1996,6 +1996,40 @@ def derive_permanent_crop_window(quantity, quantity_sold, value_sold):
                          'Value_sold': value_sold})
 
 
+#: W1 (GH #820 ruling, 2026-10-23): §12 crops with no §9 row are served as
+#: rows of their own (:func:`_mint_sect12_rows`); their ``Quantity`` is §12 Q3,
+#: the harvest "in the past 12 months", so they carry the same window key.
+PERMANENT_WINDOW_S12_WAVES = ('2011-12',)
+
+#: §4 (post-planting crop roster) variables that key a minted W1 row to its
+#: field: the crop's unique (holder, parcel, field).
+SECT4_FIELD_VARIABLES = ['holder_id', 'parcel_id', 'field_id', 'crop_code']
+
+
+def _inputs_sect12_minted_rows(wave):
+    """The raw answers behind W1's minted §12 rows: EVERY §12 line
+    (``module = 'sect12_ph'``, :data:`SECT12_RAW_VARIABLES`) and EVERY §4 crop
+    line (``module = 'sect4_pp'``, :data:`SECT4_FIELD_VARIABLES` -- the field
+    the row is keyed to), indexed ``(t, i, j)`` with the original names.  A
+    served row's §12 line is found by ``(t, i, j)`` plus its holder (the
+    prefix of ``plot_id``); its §4 line by ``(t, i, j)`` plus ``plot_id``."""
+    from lsms_library.paths import countries_root
+    fn, hh = SECT12_FILES[wave]
+    d = countries_root() / 'Ethiopia' / wave / 'Data'
+    cmap = _eth_crop_label_map_for_wave(wave)
+    a = inputs_sect12_sale(wave)
+    a.insert(0, 'module', 'sect12_ph')
+    s4 = get_dataframe(str(d / 'sect4_pp_w1.dta'), convert_categoricals=False)
+    b = s4[SECT4_FIELD_VARIABLES].copy()
+    b.insert(0, 'module', 'sect4_pp')
+    c4 = pd.to_numeric(s4['crop_code'], errors='coerce').astype('Int64')
+    b.index = pd.MultiIndex.from_arrays(
+        [pd.Series(wave, index=s4.index).values,
+         s4[hh].apply(format_id).values,
+         c4.map(cmap).astype('string').values], names=['t', 'i', 'j'])
+    return pd.concat([a, b])
+
+
 def inputs_permanent_crop_window(wave):
     """The raw answers behind the ``permanent-crop-12-month-window`` rows (GH #1256).
 
@@ -2017,11 +2051,14 @@ def inputs_permanent_crop_window(wave):
     holder.  Nothing is cached.
     """
     from lsms_library.paths import countries_root
+    if wave in PERMANENT_WINDOW_S12_WAVES:
+        return _inputs_sect12_minted_rows(wave)
     if wave not in PERMANENT_WINDOW_SOURCES:
         raise ValueError(
             f"the permanent-crop 12-month window is an ESS4 / ESPS-5 §9/§11 "
-            f"design ({sorted(PERMANENT_WINDOW_SOURCES)}), not {wave!r}; W1-W3 "
-            f"put permanent crops in §12 (sect12-sale-period).")
+            f"design ({sorted(PERMANENT_WINDOW_SOURCES)}) and W1's §12 rows "
+            f"({list(PERMANENT_WINDOW_S12_WAVES)}), not {wave!r}; W2/W3 serve "
+            f"§12 sales on §9 rows (sect12-sale-period).")
     src = PERMANENT_WINDOW_SOURCES[wave]
     d = countries_root() / 'Ethiopia' / wave / 'Data'
     cmap = _eth_crop_label_map_for_wave(wave)
@@ -2269,7 +2306,7 @@ def _sect12_tally(frame):
             'birr': float(v[v > 0].sum()) if (v > 0).any() else 0.0}
 
 
-def _report_sect12_sales(t, rep, kept):
+def _report_sect12_sales(t, rep, kept, mint=None):
     """Finish the §12 report AFTER the empty-row filter, and warn (GH #820).
 
     ``kept`` is the post-filter frame of :func:`crop_production_for_wave`,
@@ -2299,23 +2336,181 @@ def _report_sect12_sales(t, rep, kept):
     assert sum(rep[k]['lines'] for k in classes) == rep['read']['lines'], \
         f"{t}: §12 classes do not partition the {rep['read']['lines']} lines read"
     lost = classes[:-1]
+    mint_msg = ''
+    if mint is not None:
+        # W1 (GH #820 ruling): the "no §9 row" lines that became rows of
+        # their own.  The minted lines are inside the eight classes above
+        # (as attached lines, once they have a row); this is the breakdown
+        # of the lines that were candidates for a row.
+        mcls = ('several_s4_fields', 'no_s4_field', 'nothing_to_serve', 'key_occupied')
+        assert (mint['minted']['lines'] + sum(mint[k]['lines'] for k in mcls)
+                == mint['no_s9_row']['lines']), f"{t}: §12 mint classes do not partition"
+        mint_msg = (
+            f"  ROWS MINTED from §12 for crops with no §9 row: "
+            f"{mint['minted']['lines']} of {mint['no_s9_row']['lines']} candidate "
+            f"lines ({mint['minted_rows_with_quantity']} with a Q3 harvest, "
+            f"{mint['minted_kg']:,.0f} kg; {mint['minted']['positive_value_lines']} "
+            f"with a positive sale value), at the crop's unique §4 field; not "
+            f"minted (lines / positive-value lines / Birr): "
+            + '; '.join(f"{k} {mint[k]['lines']}/{mint[k]['positive_value_lines']}/"
+                        f"{mint[k]['birr']:,.0f}" for k in mcls) + '.')
     warnings.warn(
         f"Ethiopia/crop_production {t}: §12 (tree/fruit/vegetable/root crop "
         f"sales, GH #820) read {rep['read']['lines']} lines "
         f"({rep['read']['positive_value_lines']} with a positive sale value); "
         f"attached and served {rep['attached']['lines']} lines "
         f"({rep['attached']['positive_value_lines']} positive), stamping "
-        f"{rep['rows_stamped_served']} §9 rows {SECT12_SALE_DERIVATION} "
+        f"{rep['rows_stamped_served']} rows {SECT12_SALE_DERIVATION} "
         f"({rep['rows_positive_value_served']} with a positive Value_sold; "
         f"{rep['rows_stamped']} were filled before the empty-row filter).  "
         f"NOT attached, by class (lines / positive-value lines / Birr): "
         + '; '.join(f"{k} {rep[k]['lines']}/{rep[k]['positive_value_lines']}/"
                     f"{rep[k]['birr']:,.0f}" for k in lost)
         + f".  Q6=No beside a positive Q7/Q8, kept as reported: "
-        f"{rep['flag_no_but_positive_lines']}.  Build-time only: a warm read "
+        f"{rep['flag_no_but_positive_lines']}." + mint_msg + "  Build-time only: a warm read "
         f"does not repeat this.  See ethiopia._attach_sect12_sales.",
         Sect12SaleWarning, stacklevel=3)
     return rep
+
+
+def _mint_sect12_rows(t, out, sale12, planting, sale, colmap):
+    """Add W1 rows for the §12 tree / fruit / root crops §9 excludes (GH #820 ruling).
+
+    Ruling (@ligon, 2026-10-23, on PR #1257): "W1 tree crops: serve them as
+    new rows.  Harvest comes from §12 Q3 and the sale from Q6-Q8.  Rows are
+    keyed to the crop's §4 field where it is unique and stamped with the
+    window derivation."  W1's §9 is headed "EXCLUDE TREE/ROOT CROPS", so these
+    crops have no §9 row for the §12 sale to attach to (the "no §9 row" class
+    of :func:`_attach_sect12_sales`); §12 is keyed (holder, crop) and "FOR ALL
+    REPORTED IN SECTION 4", and §4 lists each such crop by field.
+
+    ``out`` is the in-progress frame of :func:`crop_production_for_wave`
+    (one row per §9 line, private ``_holder`` / ``_code`` keys), ``sale12``
+    the raw §12 file, ``planting`` the raw §4 file, ``sale`` the raw §11 file;
+    ``colmap`` names ``s12_harvest`` (Q3, KG by the instrument) besides the
+    §12 / §4 / id columns :func:`crop_production_for_wave` already uses.
+
+    A §12 line becomes a row only if, in order (each excluded class COUNTED):
+
+    1. it has a holder and a crop code, its (holder, crop) is on no other §12
+       line and is not in §11 -- the same exclusions, in the same order, as
+       the sale attach (W1: 873 / 0 / 0 lines), so §11 still wins;
+    2. its (holder, crop) has NO §9 row (a crop with one is served by §9, and
+       its §12 sale attaches there);
+    3. the (holder, crop) is on exactly ONE §4 field -- the row's ``plot_id``
+       (``holder_parcel_field``, as for every other row).  A crop on several
+       fields gets no row, as a holder-level sale is never split across
+       plots (the SALES GRAIN CAVEAT); one on no §4 field has no key;
+    4. it serves something: Q3, or a sale under :func:`derive_sect12_sale`
+       (a "No" with Q7 / Q8 blank is a recorded sale of 0).  A recorded Q3 of
+       0 IS served, as ``0`` Kg (Ethiopia's and Tanzania's #637 convention
+       for recorded zeros);
+    5. its key ``(i, plot_id, j, 'Kg')`` is not already a §9 row's or
+       another candidate's -- two crop codes ``harmonize_crop`` folds onto
+       one label on one field (the "folded key" rule of the sale attach).
+
+    The row carries ``Quantity`` = Q3 and ``u`` = 'Kg' (Q3 and Q7 are KG in
+    W1); ``harvest_month`` stays NA (§12 Q2 is the end of a production
+    period, not a harvest month; it is in ``derivation_inputs``).  The sale
+    is NOT set here: the row is a one-plot (holder, crop), so the reviewed
+    sale attach fills Q6-Q8 onto it and stamps ``sect12-sale-period``.  The
+    caller stamps :data:`PERMANENT_CROP_WINDOW_DERIVATION` on every minted
+    row that serves a ``Quantity``: Q3 is the harvest "in the past 12
+    months", served beside §9's season harvests.
+
+    Returns ``(out, report)``; ``out`` gains a private boolean ``_minted``.
+    """
+    c = colmap
+    s = sale12
+    crop_map = _eth_crop_label_map_for_wave(t)
+    code = pd.to_numeric(s[c['s12_crop_code']], errors='coerce').astype('Int64')
+    holder = s[c['holder_id']].apply(format_id).astype('string')
+    holder = holder.where(holder.str.strip().str.len() > 0, pd.NA)
+    sold = derive_sect12_sale(s[c['s12_sold_flag']].values,
+                              s[c['s12_qty']].values, s[c['s12_value']].values)
+    f = pd.DataFrame({
+        '_holder': holder.values, '_code': code.values,
+        'i': s[c['hhid']].apply(format_id).astype('string').values,
+        'Quantity': pd.to_numeric(s[c['s12_harvest']], errors='coerce').astype('Float64').values,
+        'Quantity_sold': sold['Quantity_sold'].values,
+        'Value_sold': sold['Value_sold'].values,
+    })
+    rep = {'wave': t, 'read': _sect12_tally(f)}
+
+    # 1. the sale attach's own exclusions, same order
+    f = f[f['_holder'].notna() & f['_code'].notna()]
+    f = f[~f.duplicated(['_holder', '_code'], keep=False)]
+    if sale is not None and c.get('s_crop_code') in getattr(sale, 'columns', ()):
+        s11 = pd.DataFrame({
+            '_holder': sale[c['holder_id']].apply(format_id).astype('string').values,
+            '_code': pd.to_numeric(sale[c['s_crop_code']], errors='coerce').astype('Int64').values,
+        }).dropna().drop_duplicates()
+        f = f[~pd.MultiIndex.from_frame(f[['_holder', '_code']]).isin(
+            pd.MultiIndex.from_frame(s11))]
+
+    # 2. no §9 row
+    s9 = out[['_holder', '_code']].astype({'_holder': 'string'}).dropna()
+    has9 = pd.MultiIndex.from_frame(f[['_holder', '_code']]).isin(
+        pd.MultiIndex.from_frame(s9)) if len(s9) else np.zeros(len(f), dtype=bool)
+    f = f[~has9].copy()
+    rep['no_s9_row'] = _sect12_tally(f)
+
+    # 3. the (holder, crop)'s §4 fields
+    p = planting
+    p4 = pd.DataFrame({
+        '_holder': p[c['holder_id']].apply(format_id).astype('string').values,
+        '_code': pd.to_numeric(p[c['pl_crop_code']], errors='coerce').astype('Int64').values,
+        'plot_id': (p[c['holder_id']].apply(format_id).astype(str) + '_'
+                    + p[c['parcel_id']].apply(format_id).astype(str) + '_'
+                    + p[c['field_id']].apply(format_id).astype(str)).values,
+        '_i4': p[c['hhid']].apply(format_id).astype('string').values,
+    }).dropna(subset=['_holder', '_code'])
+    nf = (p4.groupby(['_holder', '_code'])['plot_id'].nunique()
+            .rename('_nfields').reset_index())
+    f = f.merge(nf, on=['_holder', '_code'], how='left')
+    f['_nfields'] = f['_nfields'].fillna(0)
+    rep['several_s4_fields'] = _sect12_tally(f[f['_nfields'] > 1])
+    rep['no_s4_field'] = _sect12_tally(f[f['_nfields'] == 0])
+    f = f[f['_nfields'] == 1].drop(columns='_nfields')
+    one = p4.drop_duplicates(['_holder', '_code', 'plot_id'])
+    f = f.merge(one, on=['_holder', '_code'], how='left')
+    n_hh = int((f['i'] != f['_i4']).fillna(True).sum())
+    assert n_hh == 0, f"{t}: {n_hh} §12 lines' household differs from their §4 field's"
+    f = f.drop(columns='_i4')
+
+    # 4. something to serve
+    empty = (f['Quantity'].isna() & f['Quantity_sold'].isna()
+             & f['Value_sold'].isna()).to_numpy()
+    rep['nothing_to_serve'] = _sect12_tally(f[empty])
+    f = f[~empty].copy()
+
+    # 5. the key is free
+    f['j'] = f['_code'].map(crop_map).astype('string')
+    f['u'] = 'Kg'
+    key_cols = ['i', 'plot_id', 'j', 'u']
+    old = out[key_cols].astype('string').dropna()
+    taken = pd.MultiIndex.from_frame(f[key_cols].astype('string')).isin(
+        pd.MultiIndex.from_frame(old))
+    clash = f.duplicated(key_cols, keep=False).to_numpy()
+    occupied = taken | clash | f['j'].isna().to_numpy()
+    rep['key_occupied'] = _sect12_tally(f[occupied])
+    f = f[~occupied]
+    rep['minted'] = _sect12_tally(f)
+    rep['minted_rows_with_quantity'] = int(f['Quantity'].notna().sum())
+    rep['minted_kg'] = float(f['Quantity'].sum())
+
+    new = pd.DataFrame({
+        't': t, 'i': f['i'].astype(object).values, 'plot_id': f['plot_id'].values,
+        '_holder': f['_holder'].astype(object).values, '_code': f['_code'].values,
+        'j': f['j'].values, 'Quantity': f['Quantity'].values, 'u': 'Kg',
+    })
+    new['harvest_month'] = pd.Series(pd.NA, index=new.index,
+                                     dtype=out['harvest_month'].dtype)
+    new['_minted'] = True
+    out = out.copy()
+    out['_minted'] = False
+    out = pd.concat([out, new[list(out.columns)]], ignore_index=True)
+    return out, rep
 
 
 def crop_production_for_wave(t, harvest, planting, sale, colmap,
@@ -2357,6 +2552,10 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
                               (s_unit None => Kg, W1 sales report kilos)
             s12_crop_code, s12_sold_flag, s12_qty, s12_value — §12 cols
                               (required when ``sale12`` is given)
+            s12_harvest     — §12 Q3, the 12-month harvest (KG).  W1 ONLY:
+                              when given, §12 crops with no §9 row become rows
+                              of their own at the crop's unique §4 field
+                              (:func:`_mint_sect12_rows`; GH #820 ruling)
     intercrop : pd.DataFrame or None
         Optional plot-roster (sect3_pp) carrying a plot-level mixed-stand
         flag, used for W1 (which has no §9 stand variable).  When given,
@@ -2379,7 +2578,10 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         ``sale12`` is given -- Derivation (string: ``SECT12_SALE_DERIVATION``
         on the rows §12 filled, NA elsewhere) or -- only when colmap names
         ``pl_permanent`` -- Derivation (``PERMANENT_CROP_WINDOW_DERIVATION``
-        on the permanent-crop rows, NA elsewhere).
+        on the permanent-crop rows, NA elsewhere).  W1's minted §12 rows
+        carry ``PERMANENT_CROP_WINDOW_DERIVATION`` where they serve a Q3
+        harvest, joined with ``SECT12_SALE_DERIVATION`` (``'+'``) where they
+        also serve a §12 sale.
     """
     c = colmap
     crop_map = _eth_crop_label_map_for_wave(t)   # GH #1252: codes drift by wave
@@ -2418,13 +2620,27 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
                             if c.get('harvest_month') and c['harvest_month'] in h.columns
                             else pd.NA)
 
+    # GH #820 ruling (@ligon, 2026-10-23, PR #1257): W1's tree / fruit / root
+    # crops, which W1 §9 excludes, become rows of their own from §12 -- keyed
+    # to the crop's unique §4 field, harvest from Q3; the sale attach below
+    # fills Q6-Q8.  Gated on the colmap naming Q3 (W1 only).  Minted BEFORE
+    # the joins below, so planting month, the mixed-stand flag and the
+    # perennial flag reach these rows exactly as they reach §9's.
+    mint_rep = None
+    if sale12 is not None and c.get('s12_harvest'):
+        if planting is None:
+            raise ValueError(f"{t}: minting §12 rows needs the §4 planting file")
+        out, mint_rep = _mint_sect12_rows(t, out, sale12, planting, sale, c)
+
     # intercropped: §9 mixed-stand (1=pure -> False, 2=mixed -> True), or
     # plot-roster fallback for W1.
     if c.get('intercrop') and c['intercrop'] in h.columns:
         ic = pd.to_numeric(h[c['intercrop']], errors='coerce').astype('Int64')
         icbool = pd.Series(pd.NA, index=h.index, dtype='boolean')
         icbool = icbool.mask(ic == 1, False).mask(ic == 2, True)
-        out['intercropped'] = icbool.values
+        # positional over the §9 rows, which come first in `out` (a minted
+        # §12 row, if any, has no §9 stand answer and stays NA)
+        out['intercropped'] = pd.Series(icbool.values, dtype='boolean').reindex(out.index)
     elif intercrop is not None and c.get('ic_flag'):
         ic_pid = (intercrop[c['ic_holder_id']].apply(format_id).astype(str) + '_'
                   + intercrop[c['ic_parcel_id']].apply(format_id).astype(str) + '_'
@@ -2605,7 +2821,27 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         # The private keys are still on the frame: the §12 report needs them
         # to tell an attached line that SURVIVED the two filters above from
         # one whose every row they removed.
-        _report_sect12_sales(t, rep12, out)
+        _report_sect12_sales(t, rep12, out, mint=mint_rep)
+    if '_minted' in out.columns:
+        # GH #820 ruling, W1: a minted §12 row's harvest is §12 Q3, "harvested
+        # in the past 12 months", served beside §9's season harvests -- the
+        # window PERMANENT_CROP_WINDOW_DERIVATION registers (its `waves:`
+        # widened to 2011-12).  Its sale, if any, already carries
+        # SECT12_SALE_DERIVATION from the attach; a row with both carries
+        # both, joined by the registry's MULTI_SEP (sorted, as
+        # derivations.union_keys writes them).
+        from lsms_library.derivations import MULTI_SEP
+        minted = out['_minted'].to_numpy(dtype=bool)
+        win = minted & out['Quantity'].notna().to_numpy()
+        stamp = out['Derivation'].astype('string')
+        stamp[win] = [MULTI_SEP.join(sorted(
+            {PERMANENT_CROP_WINDOW_DERIVATION}
+            | (set(str(x).split(MULTI_SEP)) if pd.notna(x) else set())))
+            for x in stamp[win]]
+        n_bare = int((minted & stamp.isna().to_numpy()).sum())
+        assert n_bare == 0, f"{t}: {n_bare} minted §12 rows carry no derivation key"
+        out['Derivation'] = stamp
+        out = out.drop(columns=['_minted'])
     if '_permanent' in out.columns:
         # GH #1256: W4/W5 put a PERMANENT crop's harvest (§9 Q4/Q5, "for
         # permanent crop harvested between March 10, 2018 to March 9, 2019")

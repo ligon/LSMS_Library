@@ -29,7 +29,12 @@ Ethiopia::crop_production::sect12-sale-period:
     WINDOW, not the number: section 12 asks about the crop COLLECTED in the
     last completed production period (Q2) / harvested in the last twelve
     months (Q3), while the row it is served on -- and section 11's sales
-    beside it -- describe this agricultural season's harvest.
+    beside it -- describe this agricultural season's harvest.  In W1 the
+    same attach also fills the rows minted from section 12 for crops W1's
+    section 9 excludes (one row per (holder, crop) at the crop's unique
+    section-4 field, Quantity = Q3; @ligon ruling 2026-10-23, PR #1257): a
+    row that serves both carries both keys, this one and
+    permanent-crop-12-month-window, joined by '+'.
   function: lsms_library.countries.Ethiopia._.ethiopia:derive_sect12_sale
   inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_sect12_sale
   raw_variables:
@@ -76,7 +81,9 @@ Ethiopia::crop_production::sect12-sale-period:
         a holder-level sale belongs to the crop's only section-9 plot (and to
         no row where the crop is on several plots); the section-12 file is
         keyed (household, holder, crop) with no parcel or field, the grain of
-        section 11
+        section 11.  In W1, for a crop section 9 excludes, the only plot is
+        the minted row at the crop's unique section-4 field (rule of
+        permanent-crop-12-month-window)
       basis: config-comment
       evidence: >-
         Ethiopia/_/ethiopia.py, SALES GRAIN CAVEAT (the section-11 rule since
@@ -111,7 +118,7 @@ Ethiopia::crop_production::sect12-sale-period:
   since: '2026-10-23'
 
 Ethiopia::crop_production::permanent-crop-12-month-window:
-  waves: ['2018-19', '2021-22']
+  waves: ['2011-12', '2018-19', '2021-22']
   columns: [Quantity, Quantity_sold, Value_sold]
   rule: >-
     THE IDENTITY, on every W4/W5 row whose crop the post-planting crop roster
@@ -124,6 +131,25 @@ Ethiopia::crop_production::permanent-crop-12-month-window:
     2019), while the season rows beside it -- and the same columns in
     W1-W3 -- describe this agricultural season.  A section-9 row with no
     section-4 line, or whose section-4 lines disagree, is not stamped.
+    W1 (2011-12; @ligon ruling 2026-10-23 on PR #1257, widening this key's
+    waves): W1's section 9 EXCLUDES tree/root crops, so its section-12
+    (TREES/FRUIT/ROOT CROPS, "FOR ALL REPORTED IN SECTION 4") crops are
+    served as rows of their own -- one per (holder, crop) that is on no
+    section-12 line twice, not in section 11, has no section-9 row and is on
+    exactly ONE section-4 field, which keys the row (plot_id =
+    holder_parcel_field); u = Kg, Quantity = section-12 Q3 (KG), THE
+    IDENTITY.  A (holder, crop) on several fields, on none, with nothing to
+    serve, or whose key a section-9 row or another candidate already holds
+    (two codes harmonize_crop folds onto one label) gets no row; each class
+    is counted at build time.  This key is stamped on such a row when it
+    serves a Q3 harvest: Q3 is the harvest "in the past 12 months", served
+    beside section 9's season harvests.  Its section-12 sale (Q6-Q8) is
+    filled by the section-12 attach and labelled sect12-sale-period, so a
+    row serving both carries both keys, joined by '+'.  W1 has no
+    section-4 permanent flag of the W4 kind: section 12's roster is the
+    instrument's own selection, and it includes root crops and vegetables
+    (potato, sweet potato, garlic, leafy greens) that are not permanent --
+    the WINDOW is what this key records, not the crop's permanence.
   function: lsms_library.countries.Ethiopia._.ethiopia:derive_permanent_crop_window
   inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_permanent_crop_window
   raw_variables:
@@ -134,6 +160,8 @@ Ethiopia::crop_production::permanent-crop-12-month-window:
     - sect11_ph_w4.s11q01 / sect11_ph_w5.s11q01b (crop code)
     - sect11_ph_w{4,5}.s11q02a1 / s11q02a2 / s11q02b1 / s11q02b2 (Q2 last completed production period) / s11q03a1 / s11q03a2 (Q3 harvest in the last 12 months) / s11q04 (Q4 trees)
     - sect11_ph_w{4,5}.s11q07 (Q7 sold any?) / s11q11a / s11q11b (Q11 quantity sold, unit) / s11q12 (Q12 value of sales, Birr)
+    - sect12_ph_w1.holder_id / household_id / crop_code / ph_s12q02_a-d (Q2 production period) / ph_s12q03 (Q3 harvest in the past 12 months, KG) / ph_s12q06 / ph_s12q07 / ph_s12q08 (W1 minted rows)
+    - sect4_pp_w1.holder_id / parcel_id / field_id / crop_code (the crop's section-4 field, which keys a W1 minted row)
   assumptions:
     - text: >-
         ESS4 puts a PERMANENT crop's harvest and sales on a fixed window:
@@ -182,11 +210,39 @@ Ethiopia::crop_production::permanent-crop-12-month-window:
         CLAUDE.md "Derived Values" fit rule ("a value served under a name
         implying a different window -- the function is the identity and the
         registry is the point")
+    - text: >-
+        W1 section 12 Q3 asks "What was the total amount of [FRUIT/ROOT CROP]
+        harvested in the past 12 months?" in KG (column header "KG"; Q7 "What
+        was the total quanity sold?" KG; Q8 BIRR), of a roster headed
+        "SECTION 12. TREES/FRUIT/ROOT CROPS (FOR ALL REPORTED IN SECTION 4,
+        such as: potatoes, taro/gondere, sweet potatoes, enset, fruits,
+        coffee, pineapple, chat, sugarcane, cassava)"; W1 section 9 is
+        headed "EXCLUDE TREE/ROOT CROPS"
+      basis: questionnaire
+      evidence: >-
+        2011-12/Documentation/2b_Post_Harvest_English.pdf PDF p.13 (section
+        12, Q2-Q8); sect12_ph_w1 variable labels (ph_s12q03 "What was the
+        total amount of [Fruit/Root Crop] harvested in the past 12 months?")
+    - text: >-
+        W1 serves these crops as NEW rows, harvest from section-12 Q3 and sale
+        from Q6-Q8, keyed to the crop's section-4 field where that field is
+        unique; a crop on several plots gets no section-12 sale (and so no
+        row) and section 11 wins on a collision.  The holder-crop answer is
+        attributed to that one field: section 4 lists the crop on no other
+        field of the holder
+      basis: modelling-choice
+      evidence: >-
+        @ligon rulings 2026-10-23 on PR #1257 ("W1 tree crops: serve them as
+        new rows ... keyed to the crop's section-4 field where it is unique
+        and stamped with the window derivation"; "Attach rules: keep both")
   validated_against: >-
     The window is a stated difference, not a calibrated one: nothing rescales
     it, so there is no target to validate against.  The stamp is checked
     against the raw files: the stamped rows are exactly the served W4/W5
     rows whose (holder, parcel, field, crop) has every section-4 Q15 line
-    = 1 (GH #1256 test file; counts in Ethiopia/_/CONTENTS.org).
-  contents: 'Ethiopia/_/CONTENTS.org, "W4/W5 permanent crops: a 12-month window (GH #1256)"'
+    = 1 (GH #1256 test file; counts in Ethiopia/_/CONTENTS.org).  W1: every
+    stamped row's Quantity equals the section-12 Q3 of its (holder, crop)
+    and its plot_id is that crop's only section-4 field, recomputed from
+    the raw files (tests/test_ethiopia_w1_tree_crops.py).
+  contents: 'Ethiopia/_/CONTENTS.org, "W4/W5 permanent crops: a 12-month window (GH #1256)" and "W1 tree / fruit / root crops served as rows (GH #820 ruling)"'
   since: '2026-10-23'

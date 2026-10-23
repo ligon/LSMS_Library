@@ -16,8 +16,11 @@ i = household_id (matches sample().i for W1).
 §12 (GH #820): Q6 sold flag ph_s12q06, Q7 quantity sold ph_s12q07 (KG,
 per the W1 questionnaire header and variable label), Q8 value ph_s12q08
 (Birr).  W1 §9 EXCLUDES tree/root crops by its own header, so most §12
-pairs have no §9 row to attach to; those are counted, not served -- see
-ethiopia._attach_sect12_sales and Ethiopia/_/CONTENTS.org.
+pairs have no §9 row to attach to.  Since the @ligon ruling of 2026-10-23
+(PR #1257) those crops are served as rows of their own: keyed to the
+crop's unique §4 field, harvest from §12 Q3 ph_s12q03 ("harvested in the
+past 12 months", KG), sale from Q6-Q8 -- see ethiopia._mint_sect12_rows
+and Ethiopia/_/CONTENTS.org.
 """
 import sys
 
@@ -47,6 +50,7 @@ colmap = dict(
     s_qty='ph_s11q03_a', s_value='ph_s11q04_a',   # sale qty kilos, value Birr
     s12_crop_code='crop_code', s12_sold_flag='ph_s12q06',
     s12_qty='ph_s12q07', s12_value='ph_s12q08',     # §12 qty KG, value Birr
+    s12_harvest='ph_s12q03',       # §12 Q3, 12-month harvest KG (mints rows)
 )
 
 df = crop_production_for_wave('2011-12', harvest, planting, sale, colmap,
