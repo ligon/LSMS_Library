@@ -172,3 +172,19 @@ Supersedes §5 rows 2-3 and §5's "window disclosure", and closes §6 bullet 1.
   mixed-window pairing the ruling serves; it cannot separate both-monthly from
   both-total.
 - Cache: hash census vs development Mali-only (see the evidence README).
+
+---
+## Round 3 — tree `Value_sold` scaled (@ligon, 2026-10-23)
+
+Supersedes §5' row "tree `Value_sold` | as recorded".
+
+| quantity | decision | reason |
+|---|---|---|
+| tree `Value_sold` | per-month value x `months_harvested`, both waves; added to `tree-twelve-month-total`'s `columns` | ruling round 3, on an order-of-magnitude check (cashew 275 / 500 FCFA/kg matches published farm-gate prices only on this reading; multi-month rows at 2-3% of retail and bananas at 0.4 kg/plant/year on the total reading); the slope test bounds total-reporters at ~55% / ~40% |
+| edges on the value | same rule as the quantities: 0 -> 0; months 0 or NA beside a positive value -> NA | ruling round 3 |
+| 999999 on the value | masked before the product, tree rows only | 2014-15's six-digit field maximum (nothing exceeds it; 7 of 12 field rows carrying it sold 0), so a code; x 2 it would read 1,999,998. Not in the ruling: reported as a deviation |
+
+Phase 3'' -- oracle 358/358, 270/270 on `Value_sold`; price == per-month
+ratio on 190/190, 127/127; warnings identical to e95040028; hash census
+Mali only.  The printed-form conflict ("montant total de cette vente") stays
+recorded in CONTENTS with the sources that would settle it.

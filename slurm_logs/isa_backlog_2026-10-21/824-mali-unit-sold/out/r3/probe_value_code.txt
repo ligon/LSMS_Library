@@ -1,0 +1,6 @@
+EACIS3A_p2.dta s3aq24: value labels None; n>0 603; ==999999 12 (qty there: 0 7, NA 0, >0 5); >=999999 12; ==99999 0; ==9999 0; max 999999.0
+EACIS3B_p2.dta s3bq14: value labels None; n>0 200; ==999999 3 (qty there: 0 0, NA 0, >0 3); >=999999 3; ==99999 0; ==9999 0; max 999999.0
+   tree rows with value 999999: month count values [2, 2, 1]
+eaci17_s7gp2.dta s7gq22: value labels None; n>0 647; ==999999 0 (qty there: 0 0, NA 0, >0 0); >=999999 54; ==99999 0; ==9999 0; max 4000000.0
+eaci17_s11fp1.dta s11fq15: value labels None; n>0 127; ==999999 0 (qty there: 0 0, NA 0, >0 0); >=999999 7; ==99999 0; ==9999 0; max 4500000.0
+   tree rows with value 999999: month count values []

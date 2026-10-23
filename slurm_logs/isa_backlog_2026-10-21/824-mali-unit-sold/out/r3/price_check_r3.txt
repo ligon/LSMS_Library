@@ -1,0 +1,20 @@
+== e95
+  2014-15: priced tree rows 192; price == per-month value / per-month qty sold on 65
+  2017-18: priced tree rows 127; price == per-month value / per-month qty sold on 28
+  2014-15 tree price per Kg sold (FCFA/kg), crops with n >= 5:
+     Mangue               n= 10 median 101
+     Noix de cajou        n= 13 median 150
+     Orange               n=  5 median 500
+  2017-18 tree price per Kg sold (FCFA/kg), crops with n >= 5:
+     Mangue               n=  9 median 42
+     Noix de cajou        n= 21 median 250
+== r3
+  2014-15: priced tree rows 190; price == per-month value / per-month qty sold on 190
+  2017-18: priced tree rows 127; price == per-month value / per-month qty sold on 127
+  2014-15 tree price per Kg sold (FCFA/kg), crops with n >= 5:
+     Mangue               n=  9 median 300
+     Noix de cajou        n= 12 median 275
+     Orange               n=  5 median 500
+  2017-18 tree price per Kg sold (FCFA/kg), crops with n >= 5:
+     Mangue               n=  9 median 125
+     Noix de cajou        n= 21 median 500

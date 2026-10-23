@@ -1,0 +1,15 @@
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDeclared::test_one_twelve_month_total_spans_both_waves
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_2014_15_quantities_are_per_month_times_months
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_2017_18_scales_all_three
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_missing_codes_are_masked_before_the_product
+FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_priced_rows_and_label_disagreements_reproduce[2014-15-tree]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_2014_15_quantities_and_value_are_twelve_month_totals
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_2017_18_quantities_and_value_are_twelve_month_totals
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_value_over_quantity_sold_is_the_per_month_ratio[2014-15-s3bq14-s3bq13a-190]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_value_over_quantity_sold_is_the_per_month_ratio[2017-18-s11fq15-s11fq14a-127]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_price_per_kg_sold[2014-15-Mangue]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_price_per_kg_sold[2014-15-Noix de cajou]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_price_per_kg_sold[2017-18-Mangue]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_price_per_kg_sold[2017-18-Noix de cajou]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_edge_rule_na_counts[2014-15-Value_sold]
+14 failed, 35 passed, 6 warnings in 16.76s

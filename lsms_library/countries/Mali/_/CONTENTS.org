@@ -1422,16 +1422,16 @@ and "knows both" means =Unit_sold= and =u= are both non-null:
 | wave    | rows  | priced | Unit_sold set | knows both | agree | differ | sold in Kg |
 |---------+-------+--------+---------------+------------+-------+--------+------------|
 | 2014-15 | field |    569 |           568 |        567 |   472 |     95 |         83 |
-| 2014-15 | trees |    192 |           190 |        186 |   144 |     42 |         37 |
+| 2014-15 | trees |    190 |           188 |        184 |   144 |     40 |         35 |
 | 2017-18 | field |    451 |           451 |        449 |   362 |     87 |         67 |
 | 2017-18 | trees |    127 |           127 |        127 |   109 |     18 |         45 |
 
 The four disagreement counts reproduce the raw-file audit (#824 comment,
 2026-10-23); its "knows both" ran on raw rows, before the build's crop-label
 drop and duplicate collapse (572 / 191).  The 2014-15 tree row was 198 / 196 /
-190 / 148 / 42 / 38 before the ruling of 2026-10-23 made the tree sold
-quantity a 12-month total (NA on the 6 priced rows whose month count is 0 or
-missing; section below).  A disagreement is a FLAG, not an
+190 / 148 / 42 / 38 before the rulings of 2026-10-23 made the tree sold
+quantity and value 12-month totals: NA on the 6 priced rows whose month count
+is 0 or missing, and on 2 whose value is the 999999 code (section below).  A disagreement is a FLAG, not an
 identification (canonical =data_info.yml=, =Unit_sold= note).
 =median_price_valuation= does not read =Unit_sold= yet (a decision, for every
 country carrying the column).
@@ -1464,91 +1464,124 @@ script's docstring copied "qty=s3bq09".  Both tree rosters ask the same shape
 labelled "Montant de la vente mensuelle moyenne des produits issus de ces
 arbres", but the printed 11F.15 is word for word 3B.14: "Quel a ete le montant
 total de cette vente ? (En FCFA)" / "What is the total amount of this sale? (in
-FCFA)".  (=s3bq14='s label is the neutral "Montant de la vente".)  An earlier
-version of this section, and of =derivations.yml=, read the label and said the
-2017-18 value was monthly; the WB =MLI_EACI2.do:353= also follows the label
+FCFA)".  (=s3bq14='s label is the neutral "Montant de la vente".)  The WB
+=MLI_EACI2.do:353= follows the 2017-18 label
 (=harvest_sold_value_per = s11fq10 * s11fq15=).
 
-*Served (ruling @ligon 2026-10-23, PR #1272)*:
-- =Quantity= = harvest per month x =months_harvested= and =Quantity_sold= =
-  quantity sold per month x =months_harvested=, in both waves: the 12-month
-  totals a field-crop row serves.  One registered derivation,
+*Served (rulings @ligon 2026-10-23, PR #1272, rounds 1 and 3)*:
+- =Quantity= = harvest per month x =months_harvested=, =Quantity_sold= =
+  quantity sold per month x =months_harvested=, and (round 3) =Value_sold= =
+  sale value x =months_harvested=, in both waves: the 12-month totals a
+  field-crop row serves.  One registered derivation,
   =Mali::crop_production::tree-twelve-month-total= (=_/derivations.yml=,
   =mali.derive_tree_twelve_month_total=), stamped on all 627 tree rows; it
   replaces the two #1267 identity keys (=3b-per-harvest-month=,
   =11f-per-harvest-month=).  The per-month answers come back by their original
   names from =Country('Mali').derivation_inputs(key)=;
-- =Value_sold= as recorded in both waves -- the printed "montant total" (the
-  2014-15 reading is the ruling; for 2017-18 the ruling asked for the choice to
-  be justified from the instrument, and the instrument says total).  So
-  =Value_sold / Quantity_sold= is a price per =Unit_sold= on every tree row;
+- so =Value_sold / Quantity_sold= is the per-month value over the per-month
+  quantity sold, a price per =Unit_sold=, on every tree row of both waves
+  (190 / 190 and 127 / 127 priced rows, measured);
 - =months_harvested= (0..12) stays.
 
-*The edge rule*, decided from the data (counts are on the producing roster):
-- the missing codes 99 / 9999 / 9999.9 are masked on the PER-MONTH answer
-  before the product; =crop_production_finalize= no longer masks a tree total
-  (a genuine total can be 99; none is today);
+*The edge rule* (counts are on the producing roster), the same for all three
+columns:
+- missing codes are masked on the PER-MONTH answer before the product: 99 /
+  9999 / 9999.9 on the quantities; 999999 on the value.  999999 is 2014-15's
+  six-digit field maximum: no value in =s3aq24= or =s3bq14= exceeds it, and 7
+  of the 12 field rows that carry it report 0 sold, so it is a code, not an
+  amount.  Multiplied by 2 it would read 1,999,998 FCFA.  It is masked on the
+  3 tree rows that carry it (2, 2 and 1 months); the 12 field rows keep it, as
+  before (see "Found on the way").  The quantity codes are not applied to the
+  value: 9,999 FCFA is an amount.  =crop_production_finalize= no longer masks
+  a tree total (a genuine total can be 99; none is today);
 - a per-month answer of 0 gives 0 whatever the month count;
-- a missing month count (2014-15 =s3bq09= = 99) gives NA: 3 harvest and 3 sale
-  rows;
+- a missing month count (2014-15 =s3bq09= = 99) gives NA: 3 harvest, 3 sale
+  and 3 value rows;
 - *a month count of 0 beside a POSITIVE per-month answer gives NA.*  2014-15
-  has 3 such harvest rows and 3 such sale rows, each sale with a recorded value
-  (35,000 to 100,000 FCFA); 2017-18 has 1 harvest row (11F.10 code 0 is
-  "Aucune recolte (Arbre fruitier n'a pas commence a produire)") and no sale
-  row.  The two answers contradict each other, so no total is formed and the
-  recorded =Value_sold= stays.  The WB do-file serves 0 there
-  (=replace harvest_sold_kg_per = 0 if s11fq10==0=); a 0 quantity beside a
-  recorded sale is the manufactured zero ruling 2 removes elsewhere;
+  has 3 such harvest rows, 3 such sale rows and 3 such value rows (35,000 to
+  100,000 FCFA); 2017-18 has 1 harvest row (11F.10 code 0 is "Aucune recolte
+  (Arbre fruitier n'a pas commence a produire)") and no sale row.  The two
+  answers contradict each other, so no total is formed.  The WB do-file
+  serves 0 there (=replace harvest_sold_kg_per = 0 if s11fq10==0=); a 0
+  beside a recorded sale is the manufactured zero ruling 2 removes elsewhere;
 - a missing per-month answer stays NA (2017-18: 85 "Aucune recolte" rows).
 
-What moved (cold builds; development =9a0ed5f3c=, e2836e5d2 and this commit):
+What moved (cold builds; development =9a0ed5f3c=, e2836e5d2 (round 0),
+e95040028 (rounds 1-2) and this commit):
 
-| wave    | column          | changed vs e2836e5d2 | sum before -> after | NA before -> after |
-|---------+-----------------+----------------------+---------------------+--------------------|
-| 2014-15 | =Quantity=      |                  154 | 12,758 -> 34,163    | 2 -> 7             |
-| 2014-15 | =Quantity_sold= |                  137 | 15,875 -> 41,026    | 2 -> 8             |
-| 2017-18 | =Quantity=      |                  117 | 33,595 -> 163,434   | 85 -> 86           |
-| 2017-18 | =Quantity_sold= |                  100 | 706,855 -> 2,604,230 | 85 -> 85          |
+| wave    | column          | changed vs e2836e5d2 | sum before -> after  | NA before -> after |
+|---------+-----------------+----------------------+----------------------+--------------------|
+| 2014-15 | =Quantity=      |                  154 | 12,758 -> 34,163     | 2 -> 7             |
+| 2014-15 | =Quantity_sold= |                  137 | 15,875 -> 41,026     | 2 -> 8             |
+| 2014-15 | =Value_sold=    |                  134 | 2.28e7 -> 5.51e7     | 153 -> 162         |
+| 2017-18 | =Quantity=      |                  117 | 33,595 -> 163,434    | 85 -> 86           |
+| 2017-18 | =Quantity_sold= |                  100 | 706,855 -> 2,604,230 | 85 -> 85           |
+| 2017-18 | =Value_sold=    |                   99 | 2.96e7 -> 1.01e8     | 143 -> 143         |
 
-(Sums are across mixed units; they show the scale, not a quantity.)
-=Value_sold= is unchanged on every tree row.  Priced 2014-15 tree rows
-(=Quantity_sold > 0= and =Value_sold > 0=) fall 198 -> 192: the six whose month
-count is 0 or missing.  On the 192 the price falls by exactly =months_harvested=
-(the e2836e5d2 ratio overstated it, as this section used to say); on 2017-18's
-127 priced tree rows the price falls by =months_harvested= on the 99 with more
-than one month -- the e2836e5d2 claim that the 2017-18 ratio already was a price
-rested on the label.  Site Q gains one 2014-15 offender: a mango row of 2,005
-=Panier= per month over 3 months, served 6,015.  =harvest_kg= / =yield_kg=
-still drop the tree rows (their =plot_id= is NA), and =gross_crop_revenue= is
-unchanged on them, because =Value_sold= did not move.
+(Quantity sums are across mixed units; they show the scale, not a quantity.
+=Value_sold= is FCFA.  Against e95040028 only =Value_sold= moves: the same 134
+and 99 rows.)  Priced 2014-15 tree rows (=Quantity_sold > 0= and =Value_sold >
+0=) fall 198 -> 190: the six whose month count is 0 or missing, and two
+carrying the 999999 value code.  The served price per =Unit_sold= is the
+per-month ratio on all 190 and all 127 -- the same ratio development and
+e2836e5d2 served (both months cancel), and e95040028 divided by
+=months_harvested=.  Tree rows sold in Kg,
+median FCFA/kg: cashew (=Noix de cajou=) 275 (n = 12, 2014-15) and 500 (n =
+21, 2017-18), mango 300 and 125, orange 500 (2014-15).  =gross_crop_revenue=
+(by household) rises from 8.04e7 to 1.127e8 FCFA in 2014-15 and from 1.619e8 to
+2.332e8 in 2017-18: 175 households change, 171 up and 4 down (households
+losing a 2014-15 tree value that is now NA).  Site Q gains one 2014-15 offender: a mango row
+of 2,005 =Panier= per month over 3 months, served 6,015.  =harvest_kg= /
+=yield_kg= still drop the tree rows (their =plot_id= is NA).
 
-*** WAITING The value's window: the instrument and the data disagree
+*** Decision: the sale value is on the per-month footing (ruling @ligon 2026-10-23, PR #1272 round 3)
 
-The ruling pairs a MONTHLY quantity sold (3B.13 / 11F.14, "en moyenne chaque
-mois") with a TOTAL value (3B.14 / 11F.15, "montant total").  If that is what
-respondents answered, =value / per-month quantity sold= rises one-for-one with
-the month count.  It does not, in either wave.  Within crop x sold-unit cells,
-the slope of =log(value / per-month quantity sold)= on =log(months harvested)=
-is:
-- 2014-15: -0.05 (se 0.30), n = 156 rows in 20 cells;
-- 2017-18: -0.52 (se 0.47), n = 104 rows in 15 cells.
+*The conflict, unresolved by any document here.*  The printed form asks the
+value as a total -- "Quel a ete le montant total de cette vente ? (En FCFA)",
+3B.14 / 11F.15 -- immediately after a quantity asked "en moyenne chaque mois"
+(3B.13 / 11F.14).  "Cette vente" may be read as the monthly sale just
+described.  The 2017-18 Stata label reads the value as monthly ("Montant de
+la vente mensuelle moyenne"); the 2014-15 label is neutral.  Round 1 of this
+PR served the value as recorded (the printed "total").  Round 3 reverses that
+on the evidence below and scales it with the quantity.
 
-A total predicts a slope of 1, so both waves reject it at about 3 se.  Two
-caveats bound what this shows.
-- The test cannot tell "both monthly" (the 2017-18 label; WB 2017-18) from
-  "both total" (respondents ignored "en moyenne chaque mois").  It rejects only
-  the mixed pairing that is served.
-- A price that falls with harvest length (larger growers, a glut) would bias
-  the slope down.
+*The evidence* (an independent order-of-magnitude check, aggregates in
+=/local/job40390255/data-private/mali-value/out/=, plus this PR's slope
+test):
+- *Cashew prices.*  Cashew sold in Kg prices at 275 FCFA/kg (2014-15) and 500
+  (2017-18) when the value is on the same footing as the per-month quantity --
+  the Cote d'Ivoire and Benin farm-gate prices of those years.  The
+  value-as-total reading gives about half that.
+- *Long harvests.*  Under the total reading, rows harvested 6 months or more
+  price at 2-3% of Mali retail.  Under the per-month reading, fruit rows
+  harvested 2-3 and 4-12 months price at 25% and 16% of retail, in line with
+  one-month rows (25%), where the two readings coincide.
+- *Yields.*  Under the total reading 2017-18 bananas yield 0.4 kg per plant per
+  year, which is not plausible.
+- *The slope test.*  Within crop x sold-unit cells, the slope of =log(value /
+  per-month quantity sold)= on =log(months)= is -0.05 (se 0.30, n = 156) in
+  2014-15 and -0.52 (se 0.47, n = 104) in 2017-18.  A total predicts 1.  The
+  test bounds the share of respondents who reported a total at roughly 55%
+  (2014-15) and 40% (2017-18).
+- *Confidence:* high for 2017-18, where the label agrees; moderate for 2014-15.
+- *Point of comparison:* the WB do-files are inconsistent with each other.
+  2014-15 uses the sold quantity and the value both unscaled
+  (=MLI_EACI1.do:348/397=); 2017-18 scales both (=MLI_EACI2.do:313/353=).
+  Neither pairs a monthly quantity with a total value.
 
-The WB harmonised do-files never adopt the mixed pairing either.  2014-15 uses
-the sold quantity and the value both unscaled (=MLI_EACI1.do:348/397=);
-2017-18 scales both (=MLI_EACI2.do:313/353=).  So the served price may be
-understated by =months_harvested= on multi-month rows.  If the value is in fact
-monthly, the remedy is to scale =Value_sold= too, keeping the ratio and making
-it a 12-month revenue.  That would be one line in =mali.tree_crop_rows= and one
-column in the registry entry.  Re-runnable:
-=slurm_logs/isa_backlog_2026-10-21/824-mali-unit-sold/scripts/probe_value_window.py=.
+*What would settle it:*
+- the EAC-I enumerator manual's instructions for 3B.14 and 11F.15 (cited at
+  question 4.12 of the 2017-18 form, not among the shipped files);
+- the 2017-18 CAPI/CSPro data dictionary (question text as entered);
+- the INSTAT / CPS-SDR EAC-I report tables (published tree-crop sales or
+  prices);
+- FAOSTAT producer prices for Mali (cashew, mango, orange, banana), 2014 and
+  2017.
+
+If one of them shows the value is a total, the remedy is one line in
+=mali.tree_crop_rows= and one column in the registry entry.  The per-month
+answers stay recoverable through =derivation_inputs= either way.  Re-runnable:
+=slurm_logs/isa_backlog_2026-10-21/824-mali-unit-sold/scripts/r2/probe_value_window.py=.
 
 ** 2017-18 unrecorded sales are NA; the 1,607 are the Leger questionnaire (ruling 2026-10-23)
 
@@ -1604,8 +1637,11 @@ explicit =Non=.
 - 135 of the 270 2017-18 producing tree rows record where the trees stand
   (=s11fq05c= block, =s11fq05d= parcel), but their =plot_id= is served NA.  The
   location is unwired.
-- One 2014-15 tree row reports =Value_sold = 999999= with a sentinel quantity.
-  This is pre-existing; the existing sentinel rule covers quantities only.
+- 999999 is a 2014-15 sale-value code (the six-digit field maximum; nothing
+  exceeds it in =s3aq24= or =s3bq14=).  On the 3 tree rows that carry it, it
+  is masked before the month product (round 3).  The 12 FIELD rows keep it as
+  recorded, 7 of them beside a zero quantity sold.  That is pre-existing; the
+  field sentinel rule covers quantities only.
 - One 2014-15 mango row records 2,005 =Panier= harvested per month (a
   year-like number); it is now Site Q's third 2014-15 offender at 6,015.
 

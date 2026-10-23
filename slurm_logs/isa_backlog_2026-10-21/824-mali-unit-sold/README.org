@@ -187,3 +187,28 @@ unchanged #824 tests; the two new ones that pass are a regression pin (2017-18
 tree =Quantity_sold= NA = 85, unchanged by the ruling) and the Leger raw-data
 finding, which does not depend on the code.  The 3 skips are identical on both
 sides (=Mali interview_date not cached here= x2, one L1 blob not cached).
+
+* Round 3 -- tree =Value_sold= scaled by =months_harvested= (ruling 2026-10-23)
+
+The ruling rests on an independent order-of-magnitude check (aggregates in
+=/local/job40390255/data-private/mali-value/out/=).  One cold build of this
+commit (=r3=), compared with the =e95040028= build (=e95=, the round-2
+=new= frame) and development.  Scripts in =scripts/r3/= (plus the round-2
+=compare_r2.py= / =downstream_r2.py=), aggregate outputs in =out/r3/=.
+
+- e95 -> r3: only =Value_sold= moves -- 134 2014-15 and 99 2017-18 tree rows;
+  9 of the 134 become NA: 3 with a 0 month count, 3 with a missing one, and 3
+  carrying the 999999 value code (=probe_value_code.txt=: 2014-15's six-digit
+  field maximum).  Every other column identical.
+- Raw oracle (=oracle_r3.txt=): tree =Value_sold= 358 / 358 and 270 / 270 (and
+  every other column as in round 2); at e95 224 / 358 and 171 / 270.
+- Price (=price_check_r3.txt=): =Value_sold / Quantity_sold= equals the
+  per-month ratio on 190 / 190 and 127 / 127 priced tree rows; cashew sold in
+  Kg 275 FCFA/kg (n = 12) and 500 (n = 21), against 150 and 250 at e95.
+- =gross_crop_revenue= (=gcr_r3.txt=): 2014-15 8.04e7 -> 1.127e8, 2017-18
+  1.619e8 -> 2.332e8; 175 households change (171 up, 4 down).
+- Warnings identical to e95; hash census vs development and vs e95: Mali
+  only (24 / 549, 96 / 2,109, 0 / 40).
+- Tests: the two PR files 49 passed; on e95040028 14 failed, 35 passed
+  (=tests_r3_files_on_e95.txt=).  Mali files + =test_derivations.py=: 1,402
+  passed, 3 skipped (development 1,353 + the 49; same 3 skips).

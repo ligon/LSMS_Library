@@ -183,11 +183,12 @@ Data Scheme:
     # ruling 2026-10-23).  The survey asks a tree's harvest and quantity
     # sold as an AVERAGE PER HARVEST MONTH (2014-15 3B.10 / 3B.13; 2017-18
     # 11F.11 / 11F.14) beside months_harvested (3B.09 / 11F.10), and the
-    # sale value as "le montant total de cette vente" (3B.14 / 11F.15).
-    # Served: Quantity and Quantity_sold = per-month answer x
+    # sale value (3B.14 / 11F.15) on the same per-month footing (rounds 1
+    # and 3; the printed form says "montant total", see CONTENTS.org).
+    # Served: Quantity, Quantity_sold and Value_sold = per-month answer x
     # months_harvested, one registered derivation for both waves
-    # (Mali/_/derivations.yml), and Value_sold as recorded -- so all three
-    # are 12-month totals, as on a field-crop row.  The per-month answers
+    # (Mali/_/derivations.yml) -- so all three are 12-month totals, as on
+    # a field-crop row.  The per-month answers
     # come back from Country('Mali').derivation_inputs(key).  Until GH
     # #1267 the 2014-15 tree Quantity was s3bq09, the month count.
     #

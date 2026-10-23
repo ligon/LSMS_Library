@@ -51,10 +51,12 @@ TABLE = "crop_production"
 #: crop-label drop; the disagreement counts reproduce exactly.  2014-15 tree
 #: was (198, 196, 190, 42) at e2836e5d2: under the PR #1272 ruling the sold
 #: quantity is a 12-month total, NA on the 6 priced rows whose month count is
-#: 0 (3) or missing (3), whose recorded sale value stays.
+#: 0 (3) or missing (3) -> (192, 190, 186, 42) at e95040028; round 3 scales
+#: the value too and masks its 999999 code, which 2 more priced rows carry
+#: (both sold in Kg, beside a different harvest unit: differ 42 -> 40).
 PRICED = {
     ("2014-15", "field"): (569, 568, 567, 95),
-    ("2014-15", "tree"): (192, 190, 186, 42),
+    ("2014-15", "tree"): (190, 188, 184, 40),
     ("2017-18", "field"): (451, 451, 449, 87),
     ("2017-18", "tree"): (127, 127, 127, 18),
 }
