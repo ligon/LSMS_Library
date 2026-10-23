@@ -1,0 +1,18 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 549
+ },
+ "btf": {
+  "total": 40,
+  "moved": 40
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 2109
+ },
+ "errors": {
+  "base": 0,
+  "cand": 0
+ }
+}

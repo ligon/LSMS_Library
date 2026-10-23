@@ -57,11 +57,14 @@ import functools
 import hashlib
 import importlib
 import inspect
+import math
 import re
 import sys
 import textwrap
 import types
 from typing import Callable
+
+from pandas import BooleanDtype, Float64Dtype, Int64Dtype, NA, StringDtype
 
 # qualname -> (callable, tables).  ``tables == ()`` means "every table".
 _BUILD_TRANSFORMS: dict[str, tuple[Callable, tuple]] = {}
@@ -403,6 +406,9 @@ def _import_map(fn) -> dict:
     return out
 
 
+_NULLABLE_DTYPE_TYPES = (BooleanDtype, Int64Dtype, Float64Dtype, StringDtype)
+
+
 def _ser(obj, seen, parts) -> str:
     """Deterministic serialisation of a referenced build constant.
 
@@ -416,6 +422,22 @@ def _ser(obj, seen, parts) -> str:
     # matching behavior; reuse the deterministic dispatch (ledger #780, §4).
     if isinstance(obj, re.Pattern):
         return f"<re.Pattern {obj.pattern!r} flags={obj.flags}>"
+    # GH1218: reuse the explicit dispatch/standalone convention (ledger sections2-4).
+    # These fixed nullable families occur in country._SCHEME_DTYPE_MAP. String
+    # additionally carries storage and NA-versus-NaN behavior; its name alone
+    # does not capture the complete build input. Unknown families still reject.
+    if type(obj) in _NULLABLE_DTYPE_TYPES:
+        if type(obj) is StringDtype:
+            if type(obj.storage) is not str or obj.storage not in ('python', 'pyarrow'):
+                raise TypeError('unsupported StringDtype storage in build constant')
+            if obj.na_value is NA:
+                missing = 'pandas.NA'
+            elif type(obj.na_value) is float and math.isnan(obj.na_value):
+                missing = 'NaN'
+            else:
+                raise TypeError('unsupported StringDtype missing value in build constant')
+            return f"<pandas.StringDtype storage={obj.storage!r} na={missing}>"
+        return f"<pandas.{type(obj).__name__}>"
     if isinstance(obj, (str, int, float, bool, type(None))):
         return repr(obj)
     if callable(obj) and _is_ours(obj):
@@ -440,7 +462,8 @@ def _ser(obj, seen, parts) -> str:
 
 
 # Types we know how to fold into the fingerprint as a referenced constant.
-_CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool, re.Pattern)
+_CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool, re.Pattern,
+                *_NULLABLE_DTYPE_TYPES)
 
 
 def _all_co_names(code) -> set:

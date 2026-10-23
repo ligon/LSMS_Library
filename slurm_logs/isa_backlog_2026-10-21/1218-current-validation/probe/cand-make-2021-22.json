@@ -1,0 +1,59 @@
+{
+ "checkout": "/local/job40390255/worktrees/1218",
+ "backend": "make",
+ "wave": "2021-22",
+ "rows": 0,
+ "index_names": [
+  "i",
+  "t",
+  "v",
+  "input",
+  "crop",
+  "u"
+ ],
+ "index_dtypes": [
+  "str",
+  "str",
+  "string",
+  "str",
+  "str",
+  "str"
+ ],
+ "columns": [
+  "Quantity",
+  "Purchased",
+  "Quantity_purchased",
+  "Unit_purchased",
+  "Received_as_gift",
+  "Quantity_received_as_gift",
+  "Unit_received_as_gift"
+ ],
+ "dtypes": {
+  "Quantity": "Float64",
+  "Purchased": "boolean",
+  "Quantity_purchased": "Float64",
+  "Unit_purchased": "string",
+  "Received_as_gift": "boolean",
+  "Quantity_received_as_gift": "Float64",
+  "Unit_received_as_gift": "string"
+ },
+ "na_value_types": {
+  "Quantity": "NAType",
+  "Purchased": "NAType",
+  "Quantity_purchased": "NAType",
+  "Unit_purchased": "NAType",
+  "Received_as_gift": "NAType",
+  "Quantity_received_as_gift": "NAType",
+  "Unit_received_as_gift": "NAType"
+ },
+ "attrs_keys": [
+  "country",
+  "id_converted",
+  "population",
+  "population_resolution",
+  "unit_kg"
+ ],
+ "warning_classes": [
+  "NullReadWarning"
+ ]
+}
