@@ -1224,7 +1224,12 @@ The 368 (2005-06) and the surviving NaN-key rows are still DELETED — that
 is decision D2 of =slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org=
 (Site 3 deletes and reports; it does not retain).  What changed is that
 they are now deleted *out loud*, with a count, at the place that knows
-why.
+why.  /Since GH #1120 D2 (2026-10-23)/ the surviving NaN-key rows of 2009-10
+(24), 2013-14 (1) and 2019-20 (1) are cover households, and each is now a
+one-household =moved-{hhid}= cluster row carrying its own =Region= / =Rural=
+/ =District=; only 2005-06's 368 geovar-only rows are still deleted.  The
+table is 4,803 -> 4,837 rows (those 26 plus 8 2015-16 parishes only AGSEC1
+households occupy, D1).
 
 * Harvest condition on =crop_production= (GH #323 / #637)
 
