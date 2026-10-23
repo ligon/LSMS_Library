@@ -1186,12 +1186,14 @@ households matched before walking, 100% after).
 waves "ship no cluster-level community price questionnaire" and that
 2018-19 "ships no community price file at all".  *That is false for
 2018-19.*  =2018-19/Data/s05_co_ner2018.dta= is section 5 of the EHCVM
-community questionnaire -- 42,247 rows x 7 columns at (grappe, vague)
-grain:
+community questionnaire -- 42,247 rows x 7 columns.  [Corrected 2026-10-22,
+GH #823: the grain is (grappe, product, unit-size), NOT (grappe, vague); a
+grappe is in one vague.  See "Measured" below.]
 
 - =Existe=   "[PRODUIT] existe dans ce marche ?"  (constant 1: pre-filtered)
 - =s05q01=   "5.01.Code produit"  -- 55 codes, value label set =produitID=,
   *the same label set as the household food module* =s07b_me_ner2018.s07bq01=
+  [2026-10-22: same set NAME and codes, NOT the same strings -- see below]
 - =s05q02=   "5.02.Selectionner les unites tailles ..." -- 74 codes,
   label set =releveID= (=Kg=, =Litre=, =Tas, petit/moyen/grand=, =Tiya=, ...)
 - =s05q03= / =s05q04=  "Releve 1 / Releve 2 - Prix (en FCFA)"
@@ -1204,6 +1206,72 @@ where =food_acquired.u= is not (=Tas=), so a unit crosswalk is needed
 first.  The claim IS correct for 2021-22: its community questionnaire
 stops at =s04_co=, and =ehcvm_prix_ner2021.dta= is region x milieu x
 =point_de_vente= with no =grappe=.
+
+*** Measured 2026-10-22 (GH #823 phase 2; still unwired)
+
+Read-only measurement; numbers, script and crosswalk CSVs in
+=slurm_logs/isa_backlog_2026-10-21/823-niger-s05/=, proposal and open
+decisions in =.coder/ledger/823-niger-community-prices.md= (Phase 2).  The
+counts above (42,247 rows, 504 grappes, 55 product codes, 74 unit codes,
+=Existe= constant 1) are confirmed; the read file's md5 equals the sidecar's.
+
+- *Grain.*  One row per (grappe, =s05q01= product, =s05q02= unit-size) with
+  two price columns.  No variety, seller, market or record field.  Each grappe
+  is in one =vague= (0 of 504 in two; s05 =vague= = the household cover's for
+  504/504; vague 1 = 249 grappes, vague 2 = 255).  160 keys occur twice (320
+  rows, 137 grappes): 20 byte-identical, 140 with different prices, scattered
+  through the file (not the 2011-12 contiguous double-entry pattern), mostly
+  =poisson séché=, =Maquereau= and imported rice.
+- *Cluster key.*  The 504 grappes, =format_id='d, equal the 504
+  =sample(waves=['2018-19'])= =v= values exactly.
+- *The unit code embeds the household SIZE.*  =releveID= = 10 x =s07bq03b=
+  unit code + =s07bq03c= size code (0 Taille unique, 1 Petit, 2 Moyen,
+  3 Grand, 4 Quart, 5 Demi, 6 Entier) for all 74 used codes (=5126= = 512
+  Tiya + 6 Entier; =1000= = 100 Kg + 0).  So the size that =food_acquired.u=
+  drops (it serves =s07bq03b= only; 85% of household consumed rows carry a
+  non-zero size) is exactly what makes a community price comparable: 65 of
+  the 74 (unit, size) pairs, 99.4% of s05 rows, occur in household rows.
+  Only the 19 size-0 codes (21.8% of rows) can meet =food_acquired.u=
+  without rescaling.  Label exceptions: 5 unit spellings differ from the
+  household's (=Canette=/=Cannette=, =Filet au kilogramme=/=Filet au Kg=,
+  =Louche (Djoni/Djini)=/=Louche=), and =1252= is labelled =grand= and
+  =1253= =moyen=, the reverse of the size digit (79 rows; which is wrong is
+  unknown).
+- *Item labels differ by file.*  s05 stores =produitID= in clean UTF-8
+  (=Thé vert=), s07b in the double-encoded form =mapping.py= repairs
+  (=ThÃ©=); code 23 is =Viande de boe__uf= in s05 (not the =bÅ__uf= that
+  =_LOST_PREFIX_REPLACEMENTS= targets).  So =harmonize_food= on the s05 label
+  lands 41 of 55 codes on a household =j=; joining by CODE lands 55 of 55.
+  Three codes name a NARROWER product in the community module: 67 =Pastèque=
+  (household =Pastèque, Melon=), 77 =Courge/courgette= (=Aubergine,
+  Courge/Courgette=), 130 =Thé vert= (=Thé=).
+- *Prices are cleaned and partly computed.*  0 NA, 0 zero, 0 sentinel in
+  either column; FCFA 1.98-90,000, median 500.  The two readings are equal in
+  70.5% of rows; an exact 0.85 ratio holds in 1,296 rows (=s05q04= =
+  0.85 x =s05q03=, 380 grappes) and 767 the other way (296 grappes), against
+  433 rows at 0.8 and 571 at 0.9; origin unknown.  9.4% / 10.1% of
+  values are non-integer with denominators 2, 3, 4, 8, 6 -- a recorded FCFA
+  amount cannot be 33.33, so they were divided before distribution
+  (consistent with price / quantity for small heaps: 19% of =petit= prices,
+  0.8% of size-0 ones).  No quantity is shipped.  The file is sorted on
+  =s05q04/s05q03= (Spearman 0.98 / 0.95 with row order outside the 29,737-row
+  equal block), so its contiguous ratio blocks are a sort artefact.
+- *No Niger community instrument is held.*  The two
+  =Documentation/ner_ehcvm1_qnr_community_excel_vague{1,2}.xls= files that
+  WB catalog 4296 lists as Niger's community questionnaires are the
+  REPUBLIQUE DU TCHAD instrument (EHCVM 2017/2018; =Riz de Laï=,
+  =Riz de Bongor=).  Its price section has three relevés of (Quantité, Prix)
+  numbered 5.03-5.08; Niger's file has 5.03 = Relevé 1 Prix and 5.04 =
+  Relevé 2 Prix, and the DDI (p. 80) says "three price records".  Do not cite
+  the =.xls= as Niger evidence.
+- *2018-19 has no =ehcvm_prix= / =ehcvm_nsu= file.*  Its community sidecars
+  are =s00a_co=, =s00b_co=, =s01_co= - =s05_co=.  So the =data_scheme.yml=
+  comment (=community_prices=, "WAVE COVERAGE") that only the ECVMA waves
+  carry an EA-level price module and that "the EHCVM waves (2018-19,
+  2021-22) replaced" it with =ehcvm_prix= is false for 2018-19 on both
+  counts, beyond the bracketed correction already there; =niger.py='s
+  matching comment block repeats it.  Left unedited: both files are in every
+  Niger cache hash.
 
 ** CS07's =Quantity= is a WEIGHT, and sometimes in the wrong unit
 
