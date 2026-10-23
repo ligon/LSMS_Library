@@ -1711,8 +1711,10 @@ time; lines / positive-value lines / Birr):
 
 Rules, each the conservative choice where no precedent decides it:
 - *§11 wins a collision* and the two are never summed: every row §11
-  filled stays byte-identical.  (W2: of 63 colliding pairs, 14 carry a
-  positive value in both modules, 13 only in §12; W3: 1 and 7.)
+  filled stays byte-identical.  (Raw files: W2 has 63 (holder, crop) pairs
+  in both modules, of which 14 carry a positive value in both and 13 only in
+  §12; W3 40 pairs, 1 and 7.  The class table counts 61 W2 lines because the
+  repeated-pair lines are removed first.)
 - *A repeated (holder, crop) is ambiguous*, attached nowhere -- not summed
   (§11's own path sums its repeats; see "pre-existing" below).  The W2
   repeats are mostly Coffee (62 lines), Other fruits, Enset, Godere, Chat;
@@ -1721,7 +1723,17 @@ Rules, each the conservative choice where no precedent decides it:
   Q7/Q8 next to a "No" (W2: 9 lines) is kept as reported -- the §11 path
   instead overwrites such a value with 0.
 - *No sale unit is not Kg.*  W3 records Q7's unit; a blank one attaches no
-  =Quantity_sold= (the §11 path fills a blank sale unit with ='Kg'=).
+  =Quantity_sold= (the §11 path fills a blank sale unit with ='Kg'=).  W3's
+  =ph_s12q0b= carries the identical 62-label =unit_code= value-label set as
+  §9's =ph_s9q04_b= and §11's =ph_s11q03_b= (checked), and is decoded
+  through the same =_clean_unit_label=.  As for §11, =Quantity_sold= lands
+  only where the sale unit equals the row's harvest =u=: of the 1,290
+  positive W3 §12 sales attached, 971 carry a quantity and 312 (24%) do not
+  because the sale was recorded in another unit (mostly a Kg sale on a
+  Madaberia / Quintal / Bunch harvest row) -- the analogue of Malawi's
+  22.2%.  A W3 "No" records no unit, so its 0 attaches to =Value_sold= only
+  (3,273 such lines).  W1/W2 Q7 is KG by the instrument, so their zeros and
+  sales attach to the =Kg= harvest rows.
 - *A folded key* -- the target §9 row shares =(i, plot_id, j, u)= with a
   row of another crop code that =harmonize_crop= folds onto the same label
   (KALE 56 / SPINACH 69 -> ='Leafy Greens'=) -- is not filled: the core
