@@ -188,3 +188,56 @@ Phase 3'' -- oracle 358/358, 270/270 on `Value_sold`; price == per-month
 ratio on 190/190, 127/127; warnings identical to e95040028; hash census
 Mali only.  The printed-form conflict ("montant total de cette vente") stays
 recorded in CONTENTS with the sources that would settle it.
+
+---
+## Round 4 — the tree sale served as recorded (revised ruling @ligon 2026-10-23)
+
+Supersedes round 2's §5' row "tree `Quantity`, `Quantity_sold`" for the sold
+quantity, and round 3's row "tree `Value_sold`".  Base: development
+`57d255585` (round 3 merged), branch
+`fix/mali-tree-sales-as-recorded-20261023`.
+
+### §2'' Prior art reused
+
+| symbol | path | reuse |
+|---|---|---|
+| `Ethiopia::crop_production::sect12-sale-period` (#1257 / #820) | `Ethiopia/_/derivations.yml` | **the precedent** -- identity derivation naming a window; structure of the entry (window rule, questionnaire + modelling-choice assumptions, "nothing rescales it" validation) |
+| `Ethiopia::crop_production::permanent-crop-12-month-window` (#1274 / #1256) | same | the identity function shape (`derive_permanent_crop_window` returns its inputs as a frame) |
+| `Ethiopia/_/ethiopia.py:_no_sale_reading` | | the edge rule: an answer beside a contradicting flag is kept as reported -- applied to a sale beside a 0 / missing month count |
+| `derivations.MULTI_SEP` / `union_keys` / `_key_counts` | `lsms_library/derivations.py` | two keys on one row: `'+'`-joined, sorted; `_key_counts` already splits it, so `attrs` counts each key.  `datetime_parse.assign_datetime` already writes the same joined form; `rg Derivation lsms_library/*.py` finds no consumer that compares the column to a single key |
+
+### §5'' Reuse decision
+
+| quantity | decision | reason |
+|---|---|---|
+| tree `Quantity` | unchanged: per-month harvest x `months_harvested`, `tree-twelve-month-total` (columns now `[Quantity]`) | ruling: the form and the 2017-18 manual ask the harvest per month |
+| tree `Quantity_sold`, `Value_sold` | AS RECORDED (codes masked: 99 / 9999 / 9999.9 on the quantity, 999999 on the value), new identity key `Mali::crop_production::tree-sale-window` on tree rows with a positive sale | revised ruling; manuals say "total" for the value, the price levels say the value sits on the per-month quantity's footing; the instrument cannot settle month vs season |
+| a sale beside a 0 / missing month count | served as recorded (6 rows, 2014-15) | the month count no longer enters the sale; Ethiopia `_no_sale_reading` precedent |
+| `inputs` callables | split: `inputs_tree_twelve_month_total` returns the harvest variables, `inputs_tree_sale_window` the sale variables (shared reader `_tree_roster_inputs`); `raw_variables` partition the roster's measured answers | each key returns what it derives from |
+| the stamp | `mali.stamp_tree_derivations(df)`, called by both wave scripts after the collapse | one implementation of the two-key rule |
+
+### Phase 3'''' — verification
+
+- Cold builds (fresh `LSMS_DATA_DIR` each), development `57d255585` vs the
+  branch: index identical; only tree `Quantity_sold` (137 / 100 rows),
+  `Value_sold` (131 / 99) and `Derivation` (331) move; `Quantity`, units,
+  `months_harvested` and every field row identical.
+- Raw oracle (`out/r4/oracle_r4.txt`, written from the raw rosters): every
+  tree column and the `Derivation` value 357 / 357 and 270 / 270; development
+  fails it on 137 / 131 and 100 / 99 rows of the sale columns.
+- Price: identical on all 190 / 127 rows priced on both sides; 2014-15
+  priced tree rows 190 -> 196.  **2014-15 cashew per-Kg median moves 275
+  (n=12) -> 300 (n=13)**: one returning edge row is a cashew sale in Kg.  No
+  price moved; the median of a larger set did.
+- Downstream: `harvest_kg` / `yield_kg` frame-equal; `gross_crop_revenue`
+  2014-15 1.127e8 -> 7.738e7, 2017-18 2.332e8 -> 1.619e8 (173 households, 171
+  down, 2 up).  Site Q offender lists byte-identical.
+- Hash census vs development: Mali only.
+- Tests: the two files fail 14 + 5 errors on development, pass on the branch.
+
+### §6'' Open
+
+- `median_price_valuation` / `gross_crop_revenue` read tree `Value_sold` as a
+  campaign sale; under the revised ruling it is the recorded (month-or-season)
+  value.  Whether the framework should rescale or skip `tree-sale-window`
+  rows is a framework decision, out of scope.

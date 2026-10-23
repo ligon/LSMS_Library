@@ -1,0 +1,16 @@
+2014-15 tree: priced dev 190, new 196; priced in both 190, price identical on 190; new-only priced 6
+2017-18 tree: priced dev 127, new 127; priced in both 127, price identical on 127; new-only priced 0
+== dev: tree price per Kg sold (FCFA/kg), crops with n >= 5
+   2014-15 Mangue           n=  9 median 300.0
+   2014-15 Noix de cajou    n= 12 median 275.0
+   2014-15 Orange           n=  5 median 500.0
+   2017-18 Mangue           n=  9 median 125.0
+   2017-18 Noix de cajou    n= 21 median 500.0
+== new: tree price per Kg sold (FCFA/kg), crops with n >= 5
+   2014-15 Mangue           n=  9 median 300.0
+   2014-15 Noix de cajou    n= 13 median 300.0
+   2014-15 Orange           n=  5 median 500.0
+   2017-18 Mangue           n=  9 median 125.0
+   2017-18 Noix de cajou    n= 21 median 500.0
+gross_crop_revenue: rows 6968 -> 6968; by wave sum 2014-15 1.127e+08 -> 7.738e+07, 2017-18 2.332e+08 -> 1.619e+08; changed in place 173 (up 2, down 171) by wave {'2017-18': 88, '2014-15': 85}; added 0, dropped 0
+gross_crop_revenue_j: rows 15877 -> 15883; by wave sum 2014-15 1.127e+08 -> 7.738e+07, 2017-18 2.332e+08 -> 1.619e+08; changed in place 224 (up 0, down 224) by wave {'2014-15': 125, '2017-18': 99}; added 6, dropped 0

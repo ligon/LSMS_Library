@@ -1,0 +1,16 @@
+== dev
+      1 1 NullIndexKeyWarning
+      3 1 NullReadWarning
+      3 1 QuantityImplausibleWarning
+      1 22 UnicodeWarning
+     offenders md5 dc78858d89f73ff0e34a1e88cf6f032f
+     offenders md5 a1dd16467d3ab48d089afdd42128a161
+derivations attrs {"Mali": {"Mali::crop_production::tree-twelve-month-total": {"rows": 627, "columns": ["Quantity", "Quantity_sold", "Value_sold"], "in": "crop_production"}}}
+== new
+      1 1 NullIndexKeyWarning
+      3 1 NullReadWarning
+      3 1 QuantityImplausibleWarning
+      1 22 UnicodeWarning
+     offenders md5 dc78858d89f73ff0e34a1e88cf6f032f
+     offenders md5 a1dd16467d3ab48d089afdd42128a161
+derivations attrs {"Mali": {"Mali::crop_production::tree-twelve-month-total": {"rows": 627, "columns": ["Quantity"], "in": "crop_production"}, "Mali::crop_production::tree-sale-window": {"rows": 331, "columns": ["Quantity_sold", "Value_sold"], "in": "crop_production"}}}

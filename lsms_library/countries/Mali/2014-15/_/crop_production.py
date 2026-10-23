@@ -19,10 +19,9 @@ Variable map (Stata labels and the 2014-15 PH questionnaire, sections 3A/3B):
   perennial: crop=s3bq01 still_prod=s3bq03 months_harvested=s3bq09
              harvest_qty PER HARVEST MONTH=s3bq10a unit=s3bq10b
              sold_qty PER HARVEST MONTH=s3bq13a SOLD UNIT=s3bq13b
-             sold_value TOTAL=s3bq14
-             (served: Quantity = s3bq10a x s3bq09, Quantity_sold =
-             s3bq13a x s3bq09, Value_sold = s3bq14 x s3bq09 -- 12-month
-             totals)
+             sold_value=s3bq14 (printed and in the manual: "montant total")
+             (served: Quantity = s3bq10a x s3bq09, the 12-month harvest;
+             Quantity_sold = s3bq13a and Value_sold = s3bq14 AS RECORDED)
   cultivation: field=s1cq01 parcel=s1cq02 crop=s1cq03 plant_month=s1cq11b
              intercrop=s1cq05 (Pure / Association de cultures)
 
@@ -38,12 +37,17 @@ the NUMBER OF HARVEST MONTHS.  That was copied from the WB MLI_EACI1.do
 ``harvest_kg_per = s3bq09 * s3bq10b`` -- months times the unit CODE.  3B DOES
 record the harvest: s3bq10a, "Durant ces mois, quelle quantite a ete recoltee
 en moyenne chaque mois?", and the sale s3bq13a likewise per month, while the
-3B.14 value s3bq14 is printed "montant total de cette vente" but sits on the
-same footing as the per-month quantity in the data.  Served (rulings @ligon
-2026-10-23 on PR #1272, rounds 1 and 3): the 12-month totals, each of the
-three answers x s3bq09, so Value_sold / Quantity_sold is a price; the rows
-carry mali.DERIVATION_TREES, and the per-month answers come back from
-Country('Mali').derivation_inputs(DERIVATION_TREES).
+3B.14 value s3bq14 is printed "montant total de cette vente", and the
+enumerator manual (WB catalog 2583, PDF p. 68) asks the enumerator to
+"determiner le montant total de la vente"; the price levels put it on the
+same footing as the per-month quantity.  Served (rulings @ligon 2026-10-23
+on PR #1272, the sale revised after the document search, following the
+Ethiopia #1257 precedent): Quantity = s3bq10a x s3bq09, the 12-month harvest
+(mali.DERIVATION_TREES, every tree row); Quantity_sold = s3bq13a and
+Value_sold = s3bq14 AS RECORDED, not multiplied by the month count -- the key
+mali.DERIVATION_TREE_SALES, on tree rows with a positive sale, names the
+unsettled window.  The raw answers come back from
+Country('Mali').derivation_inputs(key).
 """
 import sys
 
@@ -52,7 +56,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (i as mali_i, crop_production_finalize, producing_trees,
-                  tree_crop_rows, DERIVATION_TREES)
+                  tree_crop_rows, stamp_tree_derivations)
 
 WAVE = '2014-15'
 
@@ -115,11 +119,12 @@ seasonal = seasonal.drop(columns=['planting_month', 'intercropped']).merge(
 # with no harvest).  Keep only s3bq03 == 'Oui' (currently producing) — the
 # 358 rows that carry an actual harvest, matching WB `drop if s3bq03==2`.
 # The measured columns come from mali.tree_crop_rows, which calls the
-# registered derivation mali.derive_tree_twelve_month_total -- so the
-# registry and the build cannot drift: Quantity = s3bq10a x s3bq09,
-# Quantity_sold = s3bq13a x s3bq09 (per-month answers times months
-# harvested; missing codes masked before the product), Value_sold = s3bq14
-# x s3bq09, months_harvested = s3bq09.
+# registered derivations mali.derive_tree_twelve_month_total and
+# mali.derive_tree_sale_window -- so the registry and the build cannot
+# drift: Quantity = s3bq10a x s3bq09 (the per-month harvest times months
+# harvested; missing codes masked before the product), Quantity_sold =
+# s3bq13a and Value_sold = s3bq14 as recorded (missing codes masked),
+# months_harvested = s3bq09.
 s3b = producing_trees(get_dataframe('../Data/EACIS3B_p2.dta').copy(), WAVE)
 s3b['i'] = _hhid(s3b)
 perennial = pd.DataFrame({
@@ -135,9 +140,10 @@ perennial = pd.DataFrame({
 
 df = pd.concat([seasonal, perennial], ignore_index=True)
 df = crop_production_finalize(df)
-# Stamp AFTER the collapse (CLAUDE.md "Derived Values", registering step 3).
-df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
-df.loc[df['perennial'].fillna(False).astype(bool), 'Derivation'] = DERIVATION_TREES
+# Stamp AFTER the collapse (CLAUDE.md "Derived Values", registering step 3):
+# the harvest key on every tree row, the sale-window key beside it on a tree
+# row with a positive sale.
+df['Derivation'] = stamp_tree_derivations(df)
 
 assert len(df) > 0, "crop_production 2014-15 produced no rows"
 assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2014-15"

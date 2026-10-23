@@ -180,18 +180,22 @@ Data Scheme:
     # (canonical data_info.yml, Unit_sold note).  NA-bearing, never
     # sentinel-filled: NA means no sale, or no sold unit recorded.
     #
-    # TREE ROWS ARE 12-MONTH TOTALS BUILT FROM PER-MONTH ANSWERS (GH #1267;
-    # ruling 2026-10-23).  The survey asks a tree's harvest and quantity
-    # sold as an AVERAGE PER HARVEST MONTH (2014-15 3B.10 / 3B.13; 2017-18
-    # 11F.11 / 11F.14) beside months_harvested (3B.09 / 11F.10), and the
-    # sale value (3B.14 / 11F.15) on the same per-month footing (rounds 1
-    # and 3; the printed form says "montant total", see CONTENTS.org).
-    # Served: Quantity, Quantity_sold and Value_sold = per-month answer x
-    # months_harvested, one registered derivation for both waves
-    # (Mali/_/derivations.yml) -- so all three are 12-month totals, as on
-    # a field-crop row.  The per-month answers
-    # come back from Country('Mali').derivation_inputs(key).  Until GH
-    # #1267 the 2014-15 tree Quantity was s3bq09, the month count.
+    # TREE ROWS: A 12-MONTH HARVEST, AND THE SALE AS RECORDED (GH #1267;
+    # rulings 2026-10-23, the sale revised after the document search).  The
+    # survey asks a tree's harvest and quantity sold as an AVERAGE PER
+    # HARVEST MONTH (2014-15 3B.10 / 3B.13; 2017-18 11F.11 / 11F.14) beside
+    # months_harvested (3B.09 / 11F.10), and the sale value (3B.14 /
+    # 11F.15) as "le montant total de cette vente" -- a TOTAL in both
+    # enumerator manuals, on the per-month quantity's footing in the price
+    # levels (see CONTENTS.org).  Served: Quantity = per-month harvest x
+    # months_harvested, the 12-month harvest (key tree-twelve-month-total,
+    # every tree row); Quantity_sold and Value_sold AS RECORDED, not
+    # multiplied (key tree-sale-window, an identity naming the unsettled
+    # window, on tree rows with a positive sale) -- Value_sold /
+    # Quantity_sold is a price per Unit_sold; multiply both by
+    # months_harvested for the 12-month reading (Mali/_/derivations.yml).
+    # The raw answers come back from Country('Mali').derivation_inputs(key).
+    # Until GH #1267 the 2014-15 tree Quantity was s3bq09, the month count.
     #
     # 2017-18 UNRECORDED SALES ARE NA (ruling 2026-10-23): 0 only where
     # s7gq20 == 'Non'.  The Leger questionnaire asks 7G.20 (sold?) but not

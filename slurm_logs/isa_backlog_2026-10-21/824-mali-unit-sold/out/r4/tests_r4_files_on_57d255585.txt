@@ -1,0 +1,20 @@
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDeclared::test_one_twelve_month_total_spans_both_waves
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDeclared::test_the_sale_has_its_own_window_key
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDeclared::test_wave_scripts_build_trees_through_the_derivation[2014-15]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDeclared::test_wave_scripts_build_trees_through_the_derivation[2017-18]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_2014_15_harvest_is_per_month_times_months_and_the_sale_as_recorded
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_2017_18_scales_the_harvest_only
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_missing_codes_are_masked_and_the_sale_is_not_multiplied
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_the_sale_derivation_is_the_identity
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_stamp_puts_the_sale_key_on_positive_sales_only
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_rows_and_their_keys
+FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_priced_rows_and_label_disagreements_reproduce[2014-15-tree]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_price_per_kg_sold[2014-15-Noix de cajou]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_edge_rule_na_counts[2014-15-Quantity_sold]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_edge_rule_na_counts[2014-15-Value_sold]
+ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_2014_15_harvest_is_twelve_month_and_sale_as_recorded
+ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_2017_18_harvest_is_twelve_month_and_sale_as_recorded
+ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_a_sale_beside_a_zero_or_missing_month_count_is_served
+ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_value_over_quantity_sold_is_the_recorded_ratio[2014-15-s3bq14-s3bq13a]
+ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_value_over_quantity_sold_is_the_recorded_ratio[2017-18-s11fq15-s11fq14a]
+14 failed, 34 passed, 6 warnings, 5 errors in 17.59s

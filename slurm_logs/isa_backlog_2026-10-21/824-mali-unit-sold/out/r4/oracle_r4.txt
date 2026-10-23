@@ -1,0 +1,41 @@
+2014-15 trees: served 357, joined 357 (served keys with 2 raw rows: 1)
+  2014-15 tree Quantity == oracle: 357 of 357
+  2014-15 tree Quantity_sold == oracle: 357 of 357
+  2014-15 tree Value_sold == oracle: 357 of 357
+  2014-15 tree months_harvested == oracle: 357 of 357
+  2014-15 tree Derivation == oracle: 357 of 357
+  2014-15 sale key on 203 rows; positive-sale rows 203; of which priced (Qs>0 & V>0) 196, Qs>0 & V==0 4, Qs>0 & V NA 2, V>0 & Qs not >0 1
+  2014-15 positive sale beside months 0: 3 rows; served Quantity_sold non-null 3, Value_sold non-null 3; Quantity (harvest) NA 2
+  2014-15 positive sale beside months missing: 3 rows; served Quantity_sold non-null 3, Value_sold non-null 3; Quantity (harvest) NA 3
+  2014-15 rescaling check: served Quantity_sold x months_harvested == raw per-month x months on 357 of 357
+2017-18 trees: served 270, joined 270 (served keys with 2 raw rows: 0)
+  2017-18 tree Quantity == oracle: 270 of 270
+  2017-18 tree Quantity_sold == oracle: 270 of 270
+  2017-18 tree Value_sold == oracle: 270 of 270
+  2017-18 tree months_harvested == oracle: 270 of 270
+  2017-18 tree Derivation == oracle: 270 of 270
+  2017-18 sale key on 128 rows; positive-sale rows 128; of which priced (Qs>0 & V>0) 127, Qs>0 & V==0 0, Qs>0 & V NA 1, V>0 & Qs not >0 0
+  2017-18 positive sale beside months 0: 0 rows; served Quantity_sold non-null 0, Value_sold non-null 0; Quantity (harvest) NA 0
+  2017-18 positive sale beside months missing: 0 rows; served Quantity_sold non-null 0, Value_sold non-null 0; Quantity (harvest) NA 0
+  2017-18 rescaling check: served Quantity_sold x months_harvested == raw per-month x months on 270 of 270
+== the same oracle against development 57d255585's served frame
+2014-15 trees: served 357, joined 357 (served keys with 2 raw rows: 1)
+  2014-15 tree Quantity == oracle: 357 of 357
+  2014-15 tree Quantity_sold == oracle: 220 of 357
+  2014-15 tree Value_sold == oracle: 226 of 357
+  2014-15 tree months_harvested == oracle: 357 of 357
+  2014-15 tree Derivation == oracle: 154 of 357
+  2014-15 sale key on 0 rows; positive-sale rows 203; of which priced (Qs>0 & V>0) 190, Qs>0 & V==0 4, Qs>0 & V NA 2, V>0 & Qs not >0 1
+  2014-15 positive sale beside months 0: 3 rows; served Quantity_sold non-null 0, Value_sold non-null 0; Quantity (harvest) NA 2
+  2014-15 positive sale beside months missing: 3 rows; served Quantity_sold non-null 0, Value_sold non-null 0; Quantity (harvest) NA 3
+  2014-15 rescaling check: served Quantity_sold x months_harvested == raw per-month x months on 223 of 357
+2017-18 trees: served 270, joined 270 (served keys with 2 raw rows: 0)
+  2017-18 tree Quantity == oracle: 270 of 270
+  2017-18 tree Quantity_sold == oracle: 170 of 270
+  2017-18 tree Value_sold == oracle: 171 of 270
+  2017-18 tree months_harvested == oracle: 270 of 270
+  2017-18 tree Derivation == oracle: 142 of 270
+  2017-18 sale key on 0 rows; positive-sale rows 128; of which priced (Qs>0 & V>0) 127, Qs>0 & V==0 0, Qs>0 & V NA 1, V>0 & Qs not >0 0
+  2017-18 positive sale beside months 0: 0 rows; served Quantity_sold non-null 0, Value_sold non-null 0; Quantity (harvest) NA 0
+  2017-18 positive sale beside months missing: 0 rows; served Quantity_sold non-null 0, Value_sold non-null 0; Quantity (harvest) NA 0
+  2017-18 rescaling check: served Quantity_sold x months_harvested == raw per-month x months on 170 of 270

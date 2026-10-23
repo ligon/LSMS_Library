@@ -212,3 +212,82 @@ commit (=r3=), compared with the =e95040028= build (=e95=, the round-2
 - Tests: the two PR files 49 passed; on e95040028 14 failed, 35 passed
   (=tests_r3_files_on_e95.txt=).  Mali files + =test_derivations.py=: 1,402
   passed, 3 skipped (development 1,353 + the 49; same 3 skips).
+
+* Round 4 -- the tree sale served as recorded (revised ruling 2026-10-23)
+
+Ruling (@ligon, after the document search): tree =Quantity_sold= and
+=Value_sold= follow the Ethiopia #1257 precedent -- served AS RECORDED (no
+x =months_harvested=) under an identity key that names the window conflict,
+=Mali::crop_production::tree-sale-window=; the harvest =Quantity= stays
+per-month x months under =tree-twelve-month-total=; =months_harvested= stays.
+Branch =fix/mali-tree-sales-as-recorded-20261023=, base development
+=57d255585= (round 3 merged, scaled sales).
+
+Two cold builds, each in its own fresh =LSMS_DATA_DIR= under
+=/local/job40390255/data-private/mali-sales/= (only a =dvc-cache= symlink):
+a detached worktree at =57d255585= (=dev=) and this branch (=new=).  Built
+with =scripts/r2/run.sh= + =scripts/r2/build_r2.py= (=R2_OUT= pointed at the
+private dir); compared with =scripts/r2/compare_r2.py= and
+=downstream_r2.py=.  New scripts in =scripts/r4/=, aggregate outputs in
+=out/r4/=; row-level frames and logs stay private.
+
+| script                 | output                    | what                                                         |
+|------------------------+---------------------------+--------------------------------------------------------------|
+| =r2/compare_r2.py= + =r2/downstream_r2.py= | =compare_r4.txt= | dev -> new, column by column, wave x row kind; downstream |
+| =r4/oracle_r4.py=      | =oracle_r4.txt=           | raw oracle from the rosters (harvest product, recorded sale, the two-key stamp, edge rows), run on new and on dev |
+| =r4/price_check_r4.py= | =price_check_r4.txt=      | price on rows priced on both sides; per-Kg medians; =gross_crop_revenue= by wave |
+| (build logs)           | =warnings_r4.txt=         | warning categories and counts, Site Q offender md5s          |
+| hash census            | =hash_diff_r4.txt=        | =1218-current-validation/hash_census.py= on both checkouts, =r2/hash_diff.py= |
+
+** Results
+
+- 35,060 rows on both; index identical.  dev -> new: =Quantity_sold= 237 rows
+  (2014-15 tree 137, 2017-18 tree 100), =Value_sold= 230 (131, 99), 6 of each
+  NA -> value (the 2014-15 sales beside a 0 or missing month count);
+  =Derivation= 331 rows gain the sale key.  =Quantity=, =u=, =Unit_sold=,
+  =months_harvested= and every other column identical; every field row
+  identical.
+- Sums: 2014-15 tree =Quantity_sold= 41,026 -> 15,875, =Value_sold= 5.51e7 ->
+  1.98e7; 2017-18 2,604,233 -> 706,855 and 1.01e8 -> 2.96e7 -- back at
+  =e2836e5d2='s values, less the three 999999 codes in 2014-15.
+- =Derivation=: =tree-twelve-month-total= on all 627 tree rows; the joined
+  =tree-sale-window+tree-twelve-month-total= on 331 (2014-15 203 = 196 priced
+  + 4 zero value + 2 value code + 1 value without a positive quantity;
+  2017-18 128 = 127 priced + 1 without a value).  =attrs['derivations']=:
+  627 and 331.
+- Raw oracle: every tree column and the =Derivation= value 357 / 357
+  (2014-15) and 270 / 270 (2017-18); on dev the sale columns match 220 / 226
+  of 357 and 170 / 171 of 270.
+- Price: identical on all 190 (2014-15) and 127 (2017-18) rows priced on
+  both sides; priced 2014-15 tree rows 190 -> 196.  Per-Kg medians unchanged
+  except *2014-15 cashew 275 (n=12) -> 300 (n=13)*: one returning edge row is
+  a cashew sale in Kg.
+- Downstream: =harvest_kg=, =yield_kg= frame-equal; =gross_crop_revenue=
+  2014-15 1.127e8 -> 7.738e7, 2017-18 2.332e8 -> 1.619e8 (173 households: 171
+  down, 2 up -- both carry a returning edge sale); by crop 224 down, 6 added.
+- Warnings: identical categories and counts; Site Q offender lists
+  byte-identical (md5 =dc78858d...= / =a1dd1646...=).
+- Hash census vs development: country 24 / 549 (Mali 24 / 24), wave 96 / 2,109
+  (Mali 96 / 96), =build_transforms_fingerprint= 0 / 40.  No other country.
+
+** Tests (round 4)
+
+All with =-n 3 --dist=loadfile=, =LSMS_BUILD_WORKERS=1=, BLAS pinned, each
+checkout on its own fresh data root.
+
+| run                                                              | result                                       |
+|------------------------------------------------------------------+----------------------------------------------|
+| the two PR files (53 tests), this branch                         | 53 passed                                    |
+| the same files copied onto =57d255585= (removed afterwards)      | 14 failed, 5 errors, 34 passed (=out/r4/tests_r4_files_on_57d255585.txt=) |
+| the two files + =test_derivations.py=, final commit, fresh root  | 97 passed (=out/r4/tests_r4_files_on_branch.txt=) |
+| =rg -l Mali tests/= + =test_derivations.py= (42 files), =57d255585= | 1,430 passed, 15 skipped                   |
+| the same 42 files, this branch                                   | 1,434 passed, 15 skipped                     |
+
+The 5 errors on =57d255585= are the =raw_sale= fixture's =derivation_inputs=
+call (the sale key does not exist there).  The 15 skips are identical on both
+sides and are cache-state conditions of a fresh root (=Mali interview_date
+not cached here=, =Uganda food_acquired parquet not cached=, =fewer than three
+... caches are warm=, Ethiopia / Malawi =plot_inputs= not warm, no warm Nigeria
+=crop_production=).  After a last docstring edit to the 2017-18 wave script,
+a fresh cold build was frame-equal to the measured one (served table and all
+four downstream frames) and the census was re-run on the final tree.

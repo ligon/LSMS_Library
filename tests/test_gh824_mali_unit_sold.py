@@ -49,14 +49,17 @@ TABLE = "crop_production"
 #: Units compared by canonical LABEL.  The raw-file audit (GH #824 comment,
 #: 2026-10-23) counted 572 / 191 knows-both before the build's collapse and
 #: crop-label drop; the disagreement counts reproduce exactly.  2014-15 tree
-#: was (198, 196, 190, 42) at e2836e5d2: under the PR #1272 ruling the sold
-#: quantity is a 12-month total, NA on the 6 priced rows whose month count is
-#: 0 (3) or missing (3) -> (192, 190, 186, 42) at e95040028; round 3 scales
-#: the value too and masks its 999999 code, which 2 more priced rows carry
-#: (both sold in Kg, beside a different harvest unit: differ 42 -> 40).
+#: was (198, 196, 190, 42) at e2836e5d2: under the PR #1272 rulings the sold
+#: quantity (rounds 1-3) and value (round 3) were 12-month totals, NA on the
+#: 6 priced rows whose month count is 0 (3) or missing (3), and round 3
+#: masked the 999999 value code, which 2 more priced rows carry (both sold
+#: in Kg, beside a different harvest unit: differ 42 -> 40) -> (190, 188,
+#: 184, 40) at development 57d255585.  The revised ruling serves the sale as
+#: recorded, so the 6 return (none is a disagreement) and the 2 code rows
+#: stay out.
 PRICED = {
     ("2014-15", "field"): (569, 568, 567, 95),
-    ("2014-15", "tree"): (190, 188, 184, 40),
+    ("2014-15", "tree"): (196, 194, 188, 40),
     ("2017-18", "field"): (451, 451, 449, 87),
     ("2017-18", "tree"): (127, 127, 127, 18),
 }
