@@ -34,6 +34,11 @@ Classification, measured: see §6 and the report.
 - Builder contract: "One row per (plot, source, season) with a non-NaN reported
   PersonDays value". This is the `plot_labor_for_wave` docstring, and the
   builder enforces it with `piece[piece['PersonDays'].notna()]`.
+  **Amended by the follow-up (ruling @ligon 2026-10-23):** a HIRED row is also
+  served on a reported `Wage` alone, with `PersonDays` NaN. This is Malawi's
+  rule, `Malawi/_/malawi.py:3766-3767`; Mali's
+  `test_wage_only_hired_observation_keeps_missing_person_days` pins the same
+  contract there.
 - `plot_labor` grain and columns: `Uganda/_/data_scheme.yml` `plot_labor:` and
   canonical `lsms_library/data_info.yml` (`plot_labor:` index, GH #569).
 - Stata semantics: `replace x = 0 if flag==2` with a missing flag is false
@@ -59,14 +64,15 @@ Classification, measured: see §6 and the report.
 | "No" gate | extend (`mask((flag==code).fillna(False))`) | identical semantics to the WB `replace … if flag==code` |
 | plot-less residual | none (report) | GH #1120 D3 |
 | `dropna=False` max fold | none (report) | needs a sentinel or row ordinal = D3 |
-| hired rows with Wage but no days | none (dropped per contract; report) | keeping them (Malawi's rule) is a contract change |
+| hired rows with Wage but no days | **extend (follow-up)**: `keep = PD.notna() \| (hired & Wage.notna())` | ruled 2026-10-23; Malawi's wage disjunct only, NOT its `PD > 0` half |
 
 ## §6 Open questions for the human
 - **D3** (GH #1120): 95 NaN-`plot_id` rows remain, 50 of them positive. The max
   fold collapses distinct plot-less source rows (2009-10 70 → 45 keys).
-- Seven hired rows with a missing flag, no days and a reported Wage (414,000
+- ~~Seven hired rows with a missing flag, no days and a reported Wage (414,000
   UGX in all) are no longer served. Should `plot_labor` keep Wage-only hired
-  rows, as Malawi's builder does?
+  rows, as Malawi's builder does?~~ **Ruled yes (@ligon 2026-10-23)**; see
+  Phase 4. The class is 85 rows, not 7.
 - Sibling `.where(x != code, 0)` instances in Niger, Tanzania and Ethiopia read
   numpy-float gates today, so they do not fire. They are one nullable cast away
   from the same defect. A shared helper or a lint could close that.
@@ -82,3 +88,22 @@ Classification, measured: see §6 and the report.
   behaviour change.
 - Cache — 28/28 Uganda L2-country, 224/224 Uganda L2-wave, 0/40 btf; no other
   country moved.
+
+### Phase 4 — follow-up: wage-only hired rows (ruling @ligon 2026-10-23)
+- Rule: `plot_labor_for_wave` keeps `PersonDays.notna() | (source == 'hired' &
+  Wage.notna())`. This is Malawi's wage disjunct (`malawi.py:3766-3767`).
+  Malawi's `PersonDays > 0` half is not adopted: Uganda's "No" zeros are
+  reported values (#1250), and nobody ruled on dropping them.
+- Measured, cold, `90fc1e18d` vs the follow-up: 164,692 -> 164,777 rows. 85
+  added, 0 removed, 0 common-key changes (`PersonDays`, `Wage`, `v`). The added
+  key set equals the raw oracle's wage-only set by join. 2009-10 A 38, B 29;
+  2010-11 A 7, B 11. By flag: 78 "Yes", 7 missing. 2 have a zero wage. The 78
+  were never served on development either, so the PR body's "7" undercounted
+  the class by 78.
+- "No" + wage: 17 raw rows are served with `PersonDays = 0` and their wage,
+  before and after. That agrees with Malawi.
+- D3: no added row lacks a plot, none folds, and Site I is unchanged.
+- Downstream: `total_*_labor_days` are byte-identical. The median-wage
+  valuation has the same price pool (21,513) and the same price and value on
+  common rows. The new rows are valued NaN.
+- Evidence: `slurm_logs/isa_backlog_2026-10-21/1250-uganda-labor-flag/r2/`.

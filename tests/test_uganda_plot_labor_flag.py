@@ -20,6 +20,12 @@ Two families:
   credentials); re-derives every served zero of 2009-10 and 2010-11 (the two
   waves with both gates) from the raw AGSEC3A/3B and requires a "No" flag or
   reported zero days behind it.  Reads raw files directly; no Country() cache.
+
+Follow-up (ruling @ligon 2026-10-23): a HIRED row with a reported Wage and no
+reported days is served on its wage with ``PersonDays`` NaN, following Malawi
+(``malawi.py:3766-3767``).  ``test_wage_only_hired_rows_are_served``
+(synthetic) and ``test_every_reported_hired_wage_is_served`` (data-gated, every
+wave) pin it; both fail on 90fc1e18d, which served only rows with days.
 """
 from __future__ import annotations
 
@@ -129,8 +135,74 @@ def test_builder_serves_no_fabricated_zero(uganda_module):
     assert clean == expected
     assert sorted((k[1], k[3], v) for k, v in nan_plot.items()) == [
         (hh2, "family", 0.0), (hh2, "hired", 0.0)]
+    # This fixture has no wage-only hired row (no row with a Wage and no
+    # days), so every served row carries days; the wage-only rule is pinned
+    # by test_wage_only_hired_rows_are_served below.
     assert df["PersonDays"].notna().all()
     assert df.loc[("2009-10", hh1, f"{hh1}-1-4", "hired", "A"), "Wage"] == 900.0
+
+
+# ---------------------------------------------------------------------------
+# Wage-only hired rows (ruling @ligon 2026-10-23, the #1250 follow-up)
+# ---------------------------------------------------------------------------
+#
+# A hired row with a reported Wage and no reported days is served on its wage,
+# with PersonDays NaN -- Malawi's rule (malawi.py:3766-3767, ``| (source ==
+# 'hired') & Wage.notna()``).  Family / other rows keep the days-only rule,
+# and reported zeros stay (Malawi's ``PersonDays > 0`` half is NOT adopted).
+
+def _agsec3a_2009_10_wages():
+    """Synthetic 2009-10 AGSEC3A rows exercising every wage-only class."""
+    nan = np.nan
+    rows = [
+        # HHID,       parcel, plot, fam_n, fam_d, h_flag, man,  wom,  chi,  wage
+        ("1013000201", 1.0, 1.0, 2.0, 6.0, 1.0, nan, nan, nan, 5000.0),  # Yes, no days, wage
+        ("1013000201", 1.0, 2.0, nan, nan, nan, nan, nan, nan, 6000.0),  # flag NA, no days, wage
+        ("1013000201", 1.0, 3.0, nan, nan, 1.0, nan, nan, nan, 0.0),     # Yes, no days, wage 0
+        ("1013000201", 1.0, 4.0, nan, nan, 2.0, 4.0, nan, nan, 7000.0),  # No, days, wage
+        ("1013000201", 1.0, 5.0, nan, nan, 2.0, nan, nan, nan, 8000.0),  # No, no days, wage
+        ("1013000201", 1.0, 6.0, nan, nan, 1.0, nan, nan, nan, nan),     # Yes, nothing
+        ("1013000201", 1.0, 7.0, nan, nan, nan, nan, nan, nan, nan),     # stub
+        ("1013000201", 1.0, 8.0, nan, nan, 3.0, nan, nan, nan, 9000.0),  # off-scheme flag, wage
+    ]
+    cols = ["HHID", "a3aq1", "a3aq3", "a3aq38", "a3aq39", "a3aq41",
+            "a3aq42a", "a3aq42b", "a3aq42c", "a3aq43"]
+    return pd.DataFrame(rows, columns=cols)
+
+
+def test_wage_only_hired_rows_are_served(uganda_module):
+    u = uganda_module
+    df = u.plot_labor_for_wave("2009-10", _agsec3a_2009_10_wages(), None,
+                               u.LABOR_COLMAPS["2009-10"])
+    hh = "1013000201"
+
+    def row(plot, source):
+        return df.loc[("2009-10", hh, f"{hh}-1-{plot}", source, "A")]
+
+    served = {(k[2], k[3]) for k in df.index}
+    # Served on the wage alone, PersonDays NaN (not 0): Yes, missing flag,
+    # a reported zero wage, and an off-scheme flag code.
+    for plot, wage in ((1, 5000.0), (2, 6000.0), (3, 0.0), (8, 9000.0)):
+        r = row(plot, "hired")
+        assert pd.isna(r["PersonDays"]), (plot, r["PersonDays"])
+        assert r["Wage"] == wage, (plot, r["Wage"])
+    # "No" + wage: the gate zeroes the days and the wage is served beside them
+    # (served before this change too; Malawi would serve it as well).
+    for plot, wage in ((4, 7000.0), (5, 8000.0)):
+        r = row(plot, "hired")
+        assert r["PersonDays"] == 0.0 and r["Wage"] == wage, (plot, r.tolist())
+    # Neither days nor wage: not served.
+    assert (f"{hh}-1-6", "hired") not in served
+    assert (f"{hh}-1-7", "hired") not in served
+    # The family source keeps the days-only rule: plot 1 has family days, the
+    # other plots none, and a hired wage on the row is not a family wage.
+    assert row(1, "family")["PersonDays"] == 6.0
+    assert {p for p, s in served if s == "family"} == {f"{hh}-1-1"}
+    # Every NaN-PersonDays row is a hired row with a reported wage.
+    nan_days = df[df["PersonDays"].isna()]
+    assert len(nan_days) == 4
+    assert set(nan_days.index.get_level_values("source")) == {"hired"}
+    assert nan_days["Wage"].notna().all()
 
 
 # ---------------------------------------------------------------------------
@@ -174,3 +246,74 @@ def test_every_served_zero_is_justified_by_the_source(uganda_module, t):
         f"{len(unjustified)} served zero(s) in {t} have neither a 'No' flag nor "
         f"reported zero days behind them (development: 4,504 in 2009-10, "
         f"569 in 2010-11)")
+
+
+# ---------------------------------------------------------------------------
+# data-gated: every reported hired wage is served (the #1250 follow-up)
+# ---------------------------------------------------------------------------
+
+_RAW_FILES = {"2019-20": ("Data/Agric/agsec3a.dta", "Data/Agric/agsec3b.dta")}
+# Hired rows served on a wage alone (PersonDays NaN), per wave, measured by the
+# raw oracle on 2026-10-23 (slurm_logs/.../1250-uganda-labor-flag/r2/): 78 with
+# a "Yes" flag and 7 with a missing flag, all in 2009-10 and 2010-11.  At
+# 90fc1e18d none of them was served.
+_WAGE_ONLY_ROWS = {"2009-10": 67, "2010-11": 18, "2011-12": 0, "2013-14": 0,
+                   "2015-16": 0, "2018-19": 0, "2019-20": 0}
+
+
+@pytest.mark.parametrize("t", sorted(_WAGE_ONLY_ROWS))
+def test_every_reported_hired_wage_is_served(uganda_module, t):
+    if not _aws_creds_available():
+        pytest.skip("S3 credentials unavailable; cannot read raw AGSEC3A/3B")
+    from lsms_library.local_tools import format_id, get_dataframe
+
+    u = uganda_module
+    colmap = u.LABOR_COLMAPS[t]
+    files = dict(zip("AB", _RAW_FILES.get(t, ("Data/AGSEC3A.dta", "Data/AGSEC3B.dta"))))
+    raw = {s: get_dataframe(str(countries_root() / "Uganda" / t / files[s]),
+                            convert_categoricals=False)
+           for s in colmap}
+    served = u.plot_labor_for_wave(t, raw.get("A"), raw.get("B"), colmap)
+    hired = served.xs("hired", level="source")
+
+    def norm(p):
+        return None if pd.isna(p) else p
+
+    got_wage = {(k[1], norm(k[2]), k[3]): w for k, w in hired["Wage"].items()}
+    got_nan_days = {(k[1], norm(k[2]), k[3])
+                    for k in hired.index[hired["PersonDays"].isna()]}
+
+    # Independent of _labor_persondays: raw float flag, raw day cells, raw wage.
+    expected_wage, raw_rows = {}, {}
+    for season, df in raw.items():
+        cm = colmap[season]
+        hh = u._format_agsec_hhid(df[cm["hhid"]], t)
+        pid = (hh.astype(str) + "-" + df[cm["parcel"]].apply(format_id).astype(str)
+               + "-" + df[cm["plot"]].apply(format_id).astype(str))
+        wage = pd.to_numeric(df[cm["wage"]], errors="coerce")
+        flag = pd.to_numeric(df[cm["hired_flag"]], errors="coerce")
+        days = df[cm["hired"]].apply(lambda s: pd.to_numeric(s, errors="coerce"))
+        for i, p, w, f, has_days in zip(hh, pid, wage, flag,
+                                        days.notna().any(axis=1)):
+            key = (i, norm(p), season)
+            raw_rows.setdefault(key, []).append((f, bool(has_days), w))
+            if pd.notna(w):
+                expected_wage[key] = max(w, expected_wage.get(key, -np.inf))
+
+    missing = [k for k in expected_wage if k not in got_wage]
+    by_season = pd.Series([k[2] for k in missing], dtype=object).value_counts().to_dict()
+    assert not missing, (
+        f"{len(missing)} hired row(s) in {t} carry a reported Wage but are not "
+        f"served, by season {by_season} (90fc1e18d: 67 in 2009-10, 18 in 2010-11)")
+    wrong = [k for k, w in expected_wage.items() if got_wage[k] != w]
+    assert wrong == [], f"{len(wrong)} served hired Wage(s) differ from the raw max"
+    # A NaN-days hired row is served ONLY on a wage: every raw row of its key
+    # has no day cell and no "No" flag (a "No" would have served 0 days), and
+    # at least one carries a wage.
+    assert len(got_nan_days) == _WAGE_ONLY_ROWS[t]
+    bad = [k for k in got_nan_days
+           if any(has_days for _, has_days, _ in raw_rows[k])
+           or any(f == 2 for f, _, _ in raw_rows[k])
+           or not any(pd.notna(w) for _, _, w in raw_rows[k])]
+    assert not bad, (f"{len(bad)} NaN-days hired row(s) in {t} are not "
+                     f"wage-only in the raw source")

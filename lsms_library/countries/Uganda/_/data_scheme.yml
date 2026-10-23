@@ -463,9 +463,11 @@ Data Scheme:
     #                2013-14/2015-16 it is the row-sum of the per-family-worker
     #                day cells of one question.  It is NOT a cross-plot /
     #                cross-source aggregate (total_*_labor_days are those, and
-    #                stay in transformations).
+    #                stay in transformations).  NaN on a wage-only hired row.
     #   Wage       — reported cash paid to HIRED labor (the survey's q43/q36
-    #                wage cell).  NaN on family / other rows.
+    #                wage cell).  NaN on family / other rows.  A hired row is
+    #                served on its Wage alone when no days were reported
+    #                (Malawi's rule; @ligon 2026-10-23, GH #1250 follow-up).
     #
     # Coverage (family / hired availability per wave):
     #   2009-10, 2010-11  family (q39) + hired (q42a-c) + wage (q43)

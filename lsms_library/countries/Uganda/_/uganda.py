@@ -2990,6 +2990,7 @@ ANTHRO_FILES = {
 # total_labor_days / total_family_labor_days / total_hired_labor_days and the
 # median-wage hired_labor_value.  We keep the PRE-collapse REPORTED rows:
 #   PersonDays  -- reported person-days of that source on the plot-season
+#                  (NaN on a wage-only HIRED row: wage reported, no days)
 #   Wage        -- reported cash paid to HIRED labor (NaN for family/other)
 # The WB sums and median-wage valuation are TRANSFORMATIONS, never stored here
 # (total_labor_days = groupby(['t','i']).PersonDays.sum(); hired_labor_value =
@@ -3167,7 +3168,13 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
     pd.DataFrame indexed by ``(t, i, plot, source, season)`` with REPORTED
     columns ``PersonDays`` (Float64) and ``Wage`` (Float64, hired rows only;
     NaN for family/other).  One row per (plot, source, season) with a non-NaN
-    reported PersonDays value.
+    reported PersonDays value, and also one per HIRED (plot, season) whose
+    PersonDays is NaN but whose ``Wage`` was reported (zero included).  Such a
+    wage-only row is served with ``PersonDays`` NaN, not 0 (@ligon, 2026-10-23,
+    GH #1250 follow-up), following Malawi's ``_plot_labor_block``
+    (``Malawi/_/malawi.py:3766-3767``), which keeps a hired row on its wage
+    alone.  Malawi's rule also drops ``PersonDays == 0`` rows; that half is
+    NOT adopted here, because a "No" flag's zero is a reported value.
     """
     pieces = []
     for season, df3 in (('A', df3a), ('B', df3b)):
@@ -3211,10 +3218,17 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
                 'Wage': (wage.values if source == 'hired'
                          else np.full(len(df3), np.nan)),
             })
-            # Keep only rows with a reported person-day value (drop the
+            # Keep rows with a reported person-day value (drop the
             # question-not-asked NaNs); a plot with 0 reported days for a
             # source that WAS asked is a genuine reported zero and stays.
-            piece = piece[piece['PersonDays'].notna()]
+            # A HIRED row is also kept on a reported Wage alone, with
+            # PersonDays left NaN (@ligon 2026-10-23; Malawi's rule,
+            # malawi.py:3766-3767).  A "No" flag's row already carries
+            # PersonDays 0, so it is served with its wage either way.
+            keep = piece['PersonDays'].notna()
+            if source == 'hired':
+                keep = keep | piece['Wage'].notna()
+            piece = piece[keep]
             if len(piece):
                 pieces.append(piece)
 
