@@ -77,7 +77,8 @@ def _harvest():
         ("HH5", "H5", 1, 1, 46, 4.0),    # mango, two §12 lines -> repeated
         ("HH6", "H6", 1, 1, 74, 9.0),    # enset, Q6 No, blank  -> 0
         ("HH7", "H7", 1, 1, 71, 1.0),    # chat, Q6 No, Q8 > 0  -> kept
-    ]
+        ("HH9", "H9", 1, 1, 76, np.nan), # sugar cane, NO unit, NO quantity:
+    ]                                    #   attached, then dropped (class 7)
     return pd.DataFrame(rows, columns=["household_id", "holder_id", "parcel_id",
                                        "field_id", "crop_code", "qty"])
 
@@ -100,8 +101,16 @@ def _sale12():
          ("H6", 74, 2, nan, nan),
          ("H7", 71, 2, nan, 30.0),
          ("H8", 84, 1, 2.0, 50.0),     # no §9 row at all
+         ("H9", 76, 1, 2.0, 25.0),     # its only §9 row is then dropped
          ("", nan, nan, nan, nan)],    # blank roster line
         columns=["holder_id", "crop_code", "q06", "q07", "q08"])
+
+
+def _harvest_units():
+    """Every §9 row is in kilograms except H9's, which records no unit."""
+    h = _harvest()
+    return pd.Series(np.where(h["holder_id"] == "H9", None, "1. Kilogram"),
+                     dtype=object)
 
 
 def _build(eth, with12=True, unit_labels=None, sale12=None):
@@ -112,7 +121,8 @@ def _build(eth, with12=True, unit_labels=None, sale12=None):
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         df = eth.crop_production_for_wave("2011-12", _harvest(), None, _sale11(),
-                                          COLMAP, **kw)
+                                          COLMAP, unit_labels=_harvest_units(),
+                                          **kw)
     msgs = [str(w.message) for w in caught
             if w.category.__name__ == "Sect12SaleWarning"]
     return df, msgs
@@ -162,21 +172,81 @@ def test_sect12_adds_no_row_and_moves_no_other_cell(eth):
 
 
 def test_every_unattached_class_is_counted_in_the_warning(eth):
+    """Eight classes partition the lines read (the builder asserts it)."""
     _, msgs = _build(eth)
     m = msgs[0]
-    assert "read 10 lines" in m
+    assert "read 11 lines" in m
+    assert "attached and served 3 lines" in m          # H1, H6, H7
     for cls, lines in [("placeholder", 1), ("repeated", 2), ("collides_s11", 1),
                        ("no_s9_row", 1), ("several_s9_plots", 1),
-                       ("folded_key", 1)]:
+                       ("folded_key", 1), ("attached_then_dropped", 1)]:
         assert re.search(rf"\b{cls} {lines}/", m), (cls, m)
+    assert "attached_then_dropped 1/1/25" in m           # H9's Q8 = 25 Birr
     assert "kept as reported: 1" in m
+
+
+def test_attached_then_dropped_is_the_existing_empty_row_filter(eth):
+    """Class 7 (GH #820 round 2): H9's §12 sale attaches to its only §9 row,
+    which records neither a unit nor a quantity, and the build's existing
+    empty-row filter (it never looks at Value_sold) then removes the row.
+    The filter is unchanged: the row is gone with or without §12."""
+    base, _ = _build(eth, with12=False)
+    new, _ = _build(eth)
+    for df in (base, new):
+        assert not df.index.get_level_values("plot_id").str.startswith("H9_").any()
+
+
+def test_derivation_stamp_is_on_exactly_the_rows_sect12_filled(eth):
+    base, _ = _build(eth, with12=False)
+    new, _ = _build(eth)
+    key = eth.SECT12_SALE_DERIVATION
+    assert key == "Ethiopia::crop_production::sect12-sale-period"
+    filled = ((base["Value_sold"].isna() & new["Value_sold"].notna())
+              | (base["Quantity_sold"].isna() & new["Quantity_sold"].notna()))
+    stamped = new["Derivation"] == key
+    assert (stamped.fillna(False).to_numpy(dtype=bool)
+            == filled.to_numpy(dtype=bool)).all()
+    assert set(new["Derivation"].dropna()) == {key}
+    assert int(filled.sum()) == 3                         # H1, H6, H7
+    # the section-11 rows carry no key
+    assert _row(new, "H1", "Teff")["Derivation"].isna().all()
+    assert _row(new, "H4", "Banana")["Derivation"].isna().all()
+    # a wave without section 12 gets no Derivation column at all
+    assert "Derivation" not in base.columns
+
+
+def test_derive_sect12_sale_is_the_identity_but_for_a_blank_no(eth):
+    nan = np.nan
+    out = eth.derive_sect12_sale([1, 2, 2, 2, nan, 1],
+                                 [3.0, nan, nan, 4.0, 5.0, nan],
+                                 [60.0, nan, 30.0, nan, 7.0, nan])
+    assert out["Quantity_sold"].tolist()[:2] == [3.0, 0.0]
+    assert out["Value_sold"].tolist()[:3] == [60.0, 0.0, 30.0]
+    assert pd.isna(out["Quantity_sold"].iloc[2])          # No + Q8 > 0: as reported
+    assert pd.isna(out["Value_sold"].iloc[3])             # No + Q7 > 0: as reported
+    assert out.iloc[4].tolist() == [5.0, 7.0]             # flag missing: as reported
+    assert out.iloc[5].isna().all()                       # Yes, blank: stays blank
+
+
+def test_the_derivation_is_registered_and_resolves(eth):
+    from lsms_library.derivations import derivation_records
+    derivation_records.cache_clear()
+    rec = derivation_records("Ethiopia")[eth.SECT12_SALE_DERIVATION]
+    assert rec.waves == ["2011-12", "2013-14", "2015-16"]
+    assert rec.columns == ["Quantity_sold", "Value_sold"]
+    assert rec.function == "lsms_library.countries.Ethiopia._.ethiopia:derive_sect12_sale"
+    assert rec.inputs == "lsms_library.countries.Ethiopia._.ethiopia:inputs_sect12_sale"
+    assert "questionnaire" in rec.bases and "modelling-choice" in rec.bases
+    assert rec.resolve().__name__ == "derive_sect12_sale"
+    assert rec.resolve("inputs").__name__ == "inputs_sect12_sale"
 
 
 def test_a_sect12_sale_without_a_unit_attaches_value_but_no_quantity(eth):
     """W3 records Q7's unit (ph_s12q0b).  No unit is NOT assumed to be Kg."""
-    labels = pd.Series(["1. Kilogram", "1. Kilogram", "1. Kilogram",
-                        "1. Kilogram", "1. Kilogram", "1. Kilogram", None,
-                        None, "1. Kilogram", None])
+    labels = pd.Series(["1. Kilogram", "1. Kilogram", "1. Kilogram",   # H1 H2 H3
+                        "1. Kilogram", "1. Kilogram", "1. Kilogram",   # H4 H5 H5
+                        None, None, "1. Kilogram", "1. Kilogram",      # H6 H7 H8 H9
+                        None])                                         # blank
     s12 = _sale12()
     df, _ = _build(eth, unit_labels=labels, sale12=s12)
     assert _row(df, "H1", "Coffee")["Quantity_sold"].tolist() == [3.0]
@@ -295,6 +365,50 @@ def test_tree_crops_carry_sale_values_in_w2_w3(cp):
         for crop in ("Coffee", "Chat/Kat", "Banana", "Hops (gesho)"):
             n = int(((v > 0) & (t == wave) & (j == crop)).sum())
             assert n >= 100, (wave, crop, n)
+
+
+@pytest.mark.requires_s3
+def test_the_stamp_rides_to_the_served_table(cp):
+    """Measured 2026-10-23: rows carrying the key, after the core collapse.
+    W1 544, W2 4,463, W3 4,495 (W2: 4,748 in the wave parquet, 285 of them
+    on identical duplicate §9 rows the core collapse de-duplicates
+    losslessly); none in W4/W5.  Equal, row for row, to the cells §12 filled
+    against development (9,502).  Every stamped row carries a sale cell, and
+    the attrs summary counts exactly the stamped rows."""
+    key = "Ethiopia::crop_production::sect12-sale-period"
+    d = cp["Derivation"]
+    t = cp.index.get_level_values("t")
+    got = {w: int(((d == key).fillna(False) & (t == w)).sum()) for w in sorted(set(t))}
+    assert got == {"2011-12": 544, "2013-14": 4463, "2015-16": 4495,
+                   "2018-19": 0, "2021-22": 0}, got
+    stamped = (d == key).fillna(False).to_numpy(dtype=bool)
+    assert (cp.loc[stamped, ["Quantity_sold", "Value_sold"]].notna().any(axis=1)).all()
+    assert set(d.dropna()) == {key}
+    summ = cp.attrs["derivations"]["Ethiopia"][key]
+    assert summ["rows"] == int(stamped.sum())
+    assert summ["columns"] == ["Quantity_sold", "Value_sold"]
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize("wave", sorted(W13))
+def test_derivation_inputs_are_the_raw_lines_and_join_to_the_served_rows(cp, wave):
+    """Every §12 line, by its original names, indexed (t, i, j); every stamped
+    served row's (t, i, j) is among them (``derivation_inputs`` walks ``i``
+    through ``updated_ids`` as the served table is walked)."""
+    import lsms_library as ll
+    c = ll.Country("Ethiopia")
+    raw = c.derivation_inputs("Ethiopia::crop_production::sect12-sale-period",
+                              wave=wave)
+    n = W13[wave]
+    assert list(raw.index.names) == ["t", "i", "j"]
+    assert len(raw) == len(_raw(wave, f"sect12_ph_w{n}.dta"))
+    assert {"holder_id", "crop_code", "ph_s12q02_a", "ph_s12q02_d",
+            "ph_s12q06", "ph_s12q07", "ph_s12q08"} <= set(raw.columns)
+    served = cp[(cp["Derivation"].notna()) &
+                (cp.index.get_level_values("t") == wave)]
+    sk = set(served.reset_index().set_index(["t", "i", "j"]).index)
+    missing = sk - set(raw.index)
+    assert not missing, (len(missing), len(sk))
 
 
 @pytest.mark.requires_s3

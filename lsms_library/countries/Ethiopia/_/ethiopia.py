@@ -1239,7 +1239,12 @@ def food_coping_for_wave(t, df, hhid):
 # keyed (household, holder, crop) -- the SAME grain as §11, no parcel/field
 # -- so it is attached by exactly the SALES GRAIN CAVEAT rule above
 # (`_attach_sect12_sales`).  It never adds a row: it only fills
-# Quantity_sold / Value_sold on §9 rows that §11 left empty.
+# Quantity_sold / Value_sold on §9 rows that §11 left empty, and stamps
+# those rows `Derivation = 'Ethiopia::crop_production::sect12-sale-period'`
+# (registered in Ethiopia/_/derivations.yml): §12's Q2/Q3 put its sales in
+# the LAST COMPLETED PRODUCTION PERIOD (or the last 12 months), not in the
+# season the §9 row and §11's sales describe -- a value served under a name
+# implying a different window.
 #
 # What §12 is NOT used for: its own harvest question (Q3, a 12-month /
 # last-production-period total per holder-crop).  In W2/W3 §9 is headed
@@ -1620,7 +1625,114 @@ def crop_conversion_factors(waves=None, region=False):
 
 class Sect12SaleWarning(UserWarning):
     """ESS §12 (tree/fruit/vegetable/root crop) sale lines that were read
-    but NOT attached to a ``crop_production`` row (GH #820)."""
+    but NOT attached to a ``crop_production`` row (GH #820).
+
+    Raised at BUILD time, inside the wave script's ``make`` subprocess, so a
+    warm read of the cached table never shows it (the framework has no
+    stamp-and-replay for a country warning).  The durable record of its
+    counts is ``Ethiopia/_/CONTENTS.org``, "§12 wired as a second sale
+    source"; re-derive them with a cold build (``LSMS_NO_CACHE=1`` is soft
+    for script-path waves -- clear the Ethiopia cache instead)."""
+
+
+#: The registry key stamped on ``crop_production.Derivation`` for every row
+#: whose ``Quantity_sold`` / ``Value_sold`` came from §12 (GH #820).  Entry:
+#: ``Ethiopia/_/derivations.yml``.  What is derived is the WINDOW: §12 Q6-Q8
+#: are sales of the crop collected in the last completed production period
+#: (or the last 12 months), served on a season-harvest row beside §11's
+#: season sales.
+SECT12_SALE_DERIVATION = 'Ethiopia::crop_production::sect12-sale-period'
+
+#: The waves that ship §12 (sect12_ph), its file, and the household id the
+#: wave's crop_production emits as ``i`` (household_id2 in W2/W3, which is
+#: what matches sample().i -- see CONTENTS.org "Household id emitted as i").
+SECT12_FILES = {
+    '2011-12': ('sect12_ph_w1.dta', 'household_id'),
+    '2013-14': ('sect12_ph_w2.dta', 'household_id2'),
+    '2015-16': ('sect12_ph_w3.dta', 'household_id2'),
+}
+
+#: §12's original variables, as they are spelled in each wave's file: keys,
+#: the production period (Q2: EC year / month, begin and end), the harvest
+#: (Q3; W3 adds a unit), and the disposition (Q6 sold?, Q7 quantity sold --
+#: W3 adds its unit ph_s12q0b --, Q8 value sold).
+SECT12_RAW_VARIABLES = {
+    '2011-12': ['holder_id', 'crop_code', 'ph_s12q02_a', 'ph_s12q02_b',
+                'ph_s12q02_c', 'ph_s12q02_d', 'ph_s12q03', 'ph_s12q06',
+                'ph_s12q07', 'ph_s12q08'],
+    '2013-14': ['holder_id', 'crop_code', 'ph_s12q02_a', 'ph_s12q02_b',
+                'ph_s12q02_c', 'ph_s12q02_d', 'ph_s12q03', 'ph_s12q06',
+                'ph_s12q07', 'ph_s12q08'],
+    '2015-16': ['holder_id', 'crop_code', 'ph_s12q02_a', 'ph_s12q02_b',
+                'ph_s12q02_c', 'ph_s12q02_d', 'ph_s12q03_a', 'ph_s12q03_b',
+                'ph_s12q06', 'ph_s12q07', 'ph_s12q0b', 'ph_s12q08'],
+}
+
+
+def derive_sect12_sale(sold_flag, quantity_sold, value_sold):
+    """§12 Q6/Q7/Q8 -> the ``Quantity_sold`` / ``Value_sold`` it serves (GH #820).
+
+    THE IDENTITY, plus the one reading §11 also makes: Q6 == 2 ("NO", skip to
+    Q10a) with Q7 and Q8 both blank is a sale of 0.  A positive Q7 or Q8 next
+    to a "No" is returned exactly as reported (the §11 path overwrites it
+    with 0; this does not).  Everything else is returned unchanged.
+
+    The derivation registered for it
+    (``Ethiopia::crop_production::sect12-sale-period``) is about the WINDOW,
+    not the arithmetic: the numbers are §12's answers, but §12 asks about
+    the crop collected in the last completed production period (Q2; "IF
+    THERE IS NO PARTICULAR PRODUCTION PERIOD, USE THE LAST 12 MONTHS"), and
+    the row they are served on is a season-harvest row beside §11's season
+    sales -- CLAUDE.md "Derived Values", "a value served under a name
+    implying a different window -- the function is the identity and the
+    registry is the point".  No options, by rule.
+
+    Returns a DataFrame with columns ``Quantity_sold`` and ``Value_sold``
+    (Float64), aligned with the inputs.
+    """
+    flag = pd.to_numeric(pd.Series(sold_flag), errors='coerce').astype('Int64')
+    q = pd.to_numeric(pd.Series(quantity_sold), errors='coerce').astype('Float64')
+    v = pd.to_numeric(pd.Series(value_sold), errors='coerce').astype('Float64')
+    q.index = flag.index
+    v.index = flag.index
+    no = (flag == 2).fillna(False)
+    pos = ((q > 0) | (v > 0)).fillna(False)
+    zero = no & ~pos
+    q = q.mask(zero & q.isna(), 0.0)
+    v = v.mask(zero & v.isna(), 0.0)
+    return pd.DataFrame({'Quantity_sold': q, 'Value_sold': v})
+
+
+def inputs_sect12_sale(wave):
+    """The raw §12 answers behind the ``sect12-sale-period`` rows (GH #820).
+
+    Re-reads ``sect12_ph_w{N}.dta`` through ``get_dataframe`` (codes, not
+    labels) and returns EVERY line, unfiltered, indexed ``(t, i, j)`` --
+    ``i`` the wave-native household id the wave's ``crop_production`` emits
+    (``derivation_inputs`` walks it through ``updated_ids`` as the served
+    table is walked), ``j`` the crop through the same ``harmonize_crop`` decode
+    -- with the ORIGINAL variable names as columns
+    (:data:`SECT12_RAW_VARIABLES`).  The input grain is (holder, crop), so
+    ``holder_id`` is a column: a served row's holder is the prefix of its
+    ``plot_id`` (``holder_parcel_field``).  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+    if wave not in SECT12_FILES:
+        raise ValueError(
+            f"ESS §12 (sect12_ph) ships only for {sorted(SECT12_FILES)}, not "
+            f"{wave!r}: ESS4 / ESPS-5 fold the tree-crop module into §11.")
+    fn, hh = SECT12_FILES[wave]
+    path = countries_root() / 'Ethiopia' / wave / 'Data' / fn
+    raw = get_dataframe(str(path), convert_categoricals=False)
+    code = pd.to_numeric(raw['crop_code'], errors='coerce').astype('Int64')
+    cols = SECT12_RAW_VARIABLES[wave]
+    out = raw[cols].copy()
+    out.index = pd.MultiIndex.from_arrays(
+        [pd.Series(wave, index=raw.index).values,
+         raw[hh].apply(format_id).values,
+         code.map(_eth_crop_label_map()).astype('string').values],
+        names=['t', 'i', 'j'])
+    return out
 
 
 def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
@@ -1637,9 +1749,10 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     means the instrument fixes the unit at KG (W1/W2 Q7, "(KG)").  ``sale``
     is the raw §11 file, used only to find (holder, crop) collisions.
 
-    Every §12 line lands in exactly ONE of these classes, and every class
-    but the last is COUNTED and warned (:class:`Sect12SaleWarning`), never
-    silently dropped:
+    Every §12 line lands in exactly ONE of these classes (the partition is
+    asserted in :func:`_report_sect12_sales`), and every class but the last
+    is COUNTED and warned (:class:`Sect12SaleWarning`), never silently
+    dropped:
 
     1. *placeholder* -- no holder or no crop code (W1 ships 873 blank
        roster lines).  Nothing to key on.
@@ -1656,25 +1769,34 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
        case: W1 §9 EXCLUDES tree/root crops).  Nothing to attach to.
     5. *several §9 plots* -- the SALES GRAIN CAVEAT: a holder-level sale is
        never split across plots.
-    5b. *folded key* -- the one §9 row shares its declared key
+    6. *folded key* -- the one §9 row shares its declared key
        (i, plot_id, j, u) with a row of another crop code that
        ``harmonize_crop`` folds onto the same label (KALE / SPINACH ->
        'Leafy Greens').  The core collapse picks the more complete of the
        two, so a fill would change which row is served for a key that is
        already a GrainCollapseWarning.
-    6. *attached* -- exactly one §9 plot: ``Value_sold`` is filled, and
-       ``Quantity_sold`` where the sale unit equals the row's harvest ``u``
-       (as for §11; a §12 sale with no recorded unit attaches no quantity,
-       it is NOT assumed to be Kg).
+    7. *attached, then dropped* -- the line attached to its plot, but every
+       §9 row it attached to is then removed by the build's existing
+       empty-row filter in :func:`crop_production_for_wave` (``u`` missing,
+       no ``Quantity``, no ``Quantity_sold``; it never looks at
+       ``Value_sold``).  Counted there, after the filter; the filter itself
+       is unchanged.
+    8. *attached and served* -- exactly one §9 plot: ``Value_sold`` is
+       filled, and ``Quantity_sold`` where the sale unit equals the row's
+       harvest ``u`` (as for §11; a §12 sale with no recorded unit attaches
+       no quantity, it is NOT assumed to be Kg).
 
-    Sold flag Q6 == 2 (No) with Q7/Q8 blank is read as a sale of 0, as §11
-    is.  Unlike the §11 path, a line with a POSITIVE Q7 or Q8 next to a "No"
-    is left exactly as reported (neither overwritten nor zero-filled) and is
-    counted.
+    The values are :func:`derive_sect12_sale` of Q6/Q7/Q8 -- the identity,
+    plus Q6 = No with Q7/Q8 blank read as 0 -- and every row whose sale
+    columns it fills is stamped ``Derivation =`` :data:`SECT12_SALE_DERIVATION`
+    (a REGISTERED derivation: §12 sells the last production period's crop,
+    the row is a season row; ``Ethiopia/_/derivations.yml``).
 
     The pass only fills cells §11 left NaN (asserted), and the row count and
     row keys are asserted unchanged: §12 cannot add, drop or duplicate a
-    row.  Returns ``(out, report)``.
+    row.  Returns ``(out, report)``; the report carries a private
+    ``'_attached'`` frame of the attached (holder, crop) pairs, which
+    :func:`_report_sect12_sales` consumes.
     """
     c = colmap
     s = sale12
@@ -1684,9 +1806,9 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     code = pd.to_numeric(s[c['s12_crop_code']], errors='coerce').astype('Int64')
     holder = s[c['holder_id']].apply(format_id).astype('string')
     holder = holder.where(holder.str.strip().str.len() > 0, pd.NA)
+    sold = derive_sect12_sale(s[c['s12_sold_flag']].values,
+                              s[c['s12_qty']].values, s[c['s12_value']].values)
     flag = pd.to_numeric(s[c['s12_sold_flag']], errors='coerce').astype('Int64')
-    qty = pd.to_numeric(s[c['s12_qty']], errors='coerce').astype('Float64')
-    val = pd.to_numeric(s[c['s12_value']], errors='coerce').astype('Float64')
     if sale12_unit_labels is not None:
         sunit = _clean_unit_label(
             pd.Series(sale12_unit_labels.values, index=s.index)).astype('string')
@@ -1694,34 +1816,27 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
         sunit = pd.Series('Kg', index=s.index, dtype='string')
     f = pd.DataFrame({
         '_holder': holder.values, '_code': code.values, '_sunit': sunit.values,
-        '_flag': flag.values, 'Quantity_sold': qty.values, 'Value_sold': val.values,
+        '_flag': flag.values,
+        'Quantity_sold': sold['Quantity_sold'].values,
+        'Value_sold': sold['Value_sold'].values,
     })
 
-    def _tally(frame):
-        v = frame['Value_sold']
-        return {'lines': int(len(frame)),
-                'pairs': int(frame[['_holder', '_code']].drop_duplicates().shape[0]),
-                'positive_value_lines': int((v > 0).fillna(False).sum()),
-                'birr': float(v[v > 0].sum()) if (v > 0).any() else 0.0}
+    rep = {'wave': t, 'read': _sect12_tally(f)}
 
-    rep = {'wave': t, 'read': _tally(f)}
-
-    # 1. placeholder lines
-    blank = (f['_holder'].isna() | f['_code'].isna()).to_numpy()
-    rep['placeholder'] = _tally(f[blank])
-    f = f[~blank].copy()
-
-    # Q6 == No: a blank Q7/Q8 is a sale of 0; a positive one is kept and counted.
+    # Q6 == No beside a positive Q7/Q8: left as reported by derive_sect12_sale;
+    # counted here.
     no = (f['_flag'] == 2).fillna(False).to_numpy()
     pos = ((f['Quantity_sold'] > 0) | (f['Value_sold'] > 0)).fillna(False).to_numpy()
     rep['flag_no_but_positive_lines'] = int((no & pos).sum())
-    zero = no & ~pos       # a contradictory line is left exactly as reported
-    f.loc[zero & f['Quantity_sold'].isna().to_numpy(), 'Quantity_sold'] = 0.0
-    f.loc[zero & f['Value_sold'].isna().to_numpy(), 'Value_sold'] = 0.0
+
+    # 1. placeholder lines
+    blank = (f['_holder'].isna() | f['_code'].isna()).to_numpy()
+    rep['placeholder'] = _sect12_tally(f[blank])
+    f = f[~blank].copy()
 
     # 2. repeated (holder, crop) lines -> ambiguous, attached nowhere
     rpt = f.duplicated(['_holder', '_code'], keep=False).to_numpy()
-    rep['repeated'] = _tally(f[rpt])
+    rep['repeated'] = _sect12_tally(f[rpt])
     f = f[~rpt].copy()
 
     # 3. collision with §11 -> §11 wins
@@ -1734,7 +1849,7 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
             pd.MultiIndex.from_frame(s11[['_holder', '_code']]))
     else:
         coll = np.zeros(len(f), dtype=bool)
-    rep['collides_s11'] = _tally(f[coll])
+    rep['collides_s11'] = _sect12_tally(f[coll])
     f = f[~coll].copy()
 
     # 4./5. plot linkage through the §9 rows (the SALES GRAIN CAVEAT)
@@ -1744,11 +1859,11 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     nplots['_holder'] = nplots['_holder'].astype('string')
     f = f.merge(nplots, on=['_holder', '_code'], how='left')
     f['_nplots'] = f['_nplots'].fillna(0)
-    rep['no_s9_row'] = _tally(f[f['_nplots'] == 0])
-    rep['several_s9_plots'] = _tally(f[f['_nplots'] > 1])
+    rep['no_s9_row'] = _sect12_tally(f[f['_nplots'] == 0])
+    rep['several_s9_plots'] = _sect12_tally(f[f['_nplots'] > 1])
     f = f[f['_nplots'] == 1]
 
-    # 5b. a FOLDED key: the target row shares its declared key
+    # 6. a FOLDED key: the target row shares its declared key
     # (i, plot_id, j, u) with a row of a DIFFERENT crop code, because
     # harmonize_crop folds both codes onto one label (KALE 56 / SPINACH 69
     # -> 'Leafy Greens').  The core grain collapse then serves whichever of
@@ -1767,10 +1882,10 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     folded = key.loc[ncodes > 1, ['_holder', '_code']].drop_duplicates()
     fold = pd.MultiIndex.from_frame(f[['_holder', '_code']]).isin(
         pd.MultiIndex.from_frame(folded)) if len(folded) else np.zeros(len(f), dtype=bool)
-    rep['folded_key'] = _tally(f[fold])
+    rep['folded_key'] = _sect12_tally(f[fold])
     f = f[~fold]
 
-    # 6. attach.  Unique on (holder, crop) by construction (step 2) --
+    # 7./8. attach.  Unique on (holder, crop) by construction (step 2) --
     # asserted, because a fan-out here would silently duplicate a sale.
     assert not f.duplicated(['_holder', '_code']).any(), \
         f"{t}: §12 attach frame not unique on (holder, crop)"
@@ -1799,31 +1914,74 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
         out.loc[hit_v, 'Value_sold'] = work.loc[hit_v, '_v12'].astype(float).to_numpy()
     if hit_q.any():
         out.loc[hit_q, 'Quantity_sold'] = work.loc[hit_q, '_q12'].astype(float).to_numpy()
+    # The registered stamp, on exactly the rows whose sale columns §12 filled.
+    stamp = pd.Series(pd.NA, index=out.index, dtype='string')
+    stamp[hit_v | hit_q] = SECT12_SALE_DERIVATION
+    out['Derivation'] = stamp
     assert (out[['i', 'plot_id', '_holder', '_code', 'u']].astype('string')
             .equals(keys0.reset_index(drop=True).astype('string'))), \
         f"{t}: §12 attach moved a row key"
 
-    rep['attached'] = _tally(f)
+    rep['_attached'] = f[['_holder', '_code', 'Value_sold']].reset_index(drop=True)
     rep['rows_value_filled'] = int(hit_v.sum())
     rep['rows_positive_value_filled'] = int((work.loc[hit_v, '_v12'] > 0).sum())
     rep['rows_quantity_filled'] = int(hit_q.sum())
+    rep['rows_stamped'] = int((hit_v | hit_q).sum())
+    return out, rep
 
-    lost = {k: rep[k] for k in ('placeholder', 'repeated', 'collides_s11',
-                                'no_s9_row', 'several_s9_plots', 'folded_key')}
+
+def _sect12_tally(frame):
+    """Lines / (holder, crop) pairs / positive-value lines / Birr of a §12 class."""
+    v = frame['Value_sold']
+    return {'lines': int(len(frame)),
+            'pairs': int(frame[['_holder', '_code']].drop_duplicates().shape[0]),
+            'positive_value_lines': int((v > 0).fillna(False).sum()),
+            'birr': float(v[v > 0].sum()) if (v > 0).any() else 0.0}
+
+
+def _report_sect12_sales(t, rep, kept):
+    """Finish the §12 report AFTER the empty-row filter, and warn (GH #820).
+
+    ``kept`` is the post-filter frame of :func:`crop_production_for_wave`,
+    still carrying ``_holder`` / ``_code``.  An attached pair none of whose
+    target rows survived is class 7, *attached then dropped*; the rest are
+    class 8, *attached and served*.  Asserts the eight classes partition the
+    lines read.  Returns the report (without its private frame).
+    """
+    att = rep.pop('_attached')
+    alive = pd.MultiIndex.from_frame(
+        kept[['_holder', '_code']].astype({'_holder': 'string'}).dropna())
+    survived = pd.MultiIndex.from_frame(att[['_holder', '_code']]).isin(alive)
+    rep['attached_then_dropped'] = _sect12_tally(att[~survived])
+    rep['attached'] = _sect12_tally(att[survived])
+    stamped = kept['Derivation'] == SECT12_SALE_DERIVATION if 'Derivation' in kept else None
+    rep['rows_stamped_served'] = int(stamped.fillna(False).sum()) if stamped is not None else 0
+    rep['rows_positive_value_served'] = int(
+        (stamped.fillna(False) & (kept['Value_sold'] > 0).fillna(False)).sum()
+    ) if stamped is not None else 0
+    classes = ('placeholder', 'repeated', 'collides_s11', 'no_s9_row',
+               'several_s9_plots', 'folded_key', 'attached_then_dropped',
+               'attached')
+    assert sum(rep[k]['lines'] for k in classes) == rep['read']['lines'], \
+        f"{t}: §12 classes do not partition the {rep['read']['lines']} lines read"
+    lost = classes[:-1]
     warnings.warn(
         f"Ethiopia/crop_production {t}: §12 (tree/fruit/vegetable/root crop "
         f"sales, GH #820) read {rep['read']['lines']} lines "
         f"({rep['read']['positive_value_lines']} with a positive sale value); "
-        f"filled Value_sold on {rep['rows_value_filled']} §9 rows "
-        f"({rep['rows_positive_value_filled']} positive) and Quantity_sold on "
-        f"{rep['rows_quantity_filled']}.  NOT attached, by class "
-        f"(lines / positive-value lines / Birr): "
-        + '; '.join(f"{k} {v['lines']}/{v['positive_value_lines']}/{v['birr']:,.0f}"
-                    for k, v in lost.items())
+        f"attached and served {rep['attached']['lines']} lines "
+        f"({rep['attached']['positive_value_lines']} positive), stamping "
+        f"{rep['rows_stamped_served']} §9 rows {SECT12_SALE_DERIVATION} "
+        f"({rep['rows_positive_value_served']} with a positive Value_sold; "
+        f"{rep['rows_stamped']} were filled before the empty-row filter).  "
+        f"NOT attached, by class (lines / positive-value lines / Birr): "
+        + '; '.join(f"{k} {rep[k]['lines']}/{rep[k]['positive_value_lines']}/"
+                    f"{rep[k]['birr']:,.0f}" for k in lost)
         + f".  Q6=No beside a positive Q7/Q8, kept as reported: "
-        f"{rep['flag_no_but_positive_lines']}.  See ethiopia._attach_sect12_sales.",
-        Sect12SaleWarning, stacklevel=2)
-    return out, rep
+        f"{rep['flag_no_but_positive_lines']}.  Build-time only: a warm read "
+        f"does not repeat this.  See ethiopia._attach_sect12_sales.",
+        Sect12SaleWarning, stacklevel=3)
+    return rep
 
 
 def crop_production_for_wave(t, harvest, planting, sale, colmap,
@@ -1879,7 +2037,9 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     pd.DataFrame indexed by ``(t, i, plot_id, j, u)`` with columns
         Quantity (float), Quantity_sold (float), Value_sold (float),
         planting_month (Int64), harvest_month (Int64),
-        intercropped (boolean), perennial (boolean).
+        intercropped (boolean), perennial (boolean), and -- only when
+        ``sale12`` is given -- Derivation (string: ``SECT12_SALE_DERIVATION``
+        on the rows §12 filled, NA elsewhere).
     """
     c = colmap
     crop_map = _eth_crop_label_map()
@@ -2018,25 +2178,38 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
 
     # §12 (W1-W3): the tree/fruit/vegetable/root-crop sale module, which §11
     # excludes by its own header.  Fills only what §11 left empty (GH #820).
+    rep12 = None
     if sale12 is not None:
-        out, _ = _attach_sect12_sales(t, out, sale12, c,
-                                      sale12_unit_labels=sale12_unit_labels,
-                                      sale=sale)
+        out, rep12 = _attach_sect12_sales(t, out, sale12, c,
+                                          sale12_unit_labels=sale12_unit_labels,
+                                          sale=sale)
 
-    out = out.drop(columns=['_holder', '_code'])
     out = out.dropna(subset=['i', 'plot_id', 'j'])
     # `u` is an index level (cannot be null).  A row may legitimately
     # report a quantity with an unrecorded unit -> tag it 'Other (Specify)'
     # (a value already in the `u` table); rows with neither a quantity nor
-    # a recorded unit are empty placeholders -> drop.
+    # a recorded unit are empty placeholders -> drop.  (This filter does not
+    # look at Value_sold, so it also drops a row that carries a sale VALUE
+    # but no unit, quantity or sold quantity -- for §11 as for §12.  Left as
+    # it is; §12's casualties are counted below as class 7.  GH #820.)
     empty_u = out['u'].isna()
     out = out[~(empty_u & out['Quantity'].isna()
                 & out['Quantity_sold'].isna())]
+    if rep12 is not None:
+        # The private keys are still on the frame: the §12 report needs them
+        # to tell an attached line that SURVIVED the two filters above from
+        # one whose every row they removed.
+        _report_sect12_sales(t, rep12, out)
+    out = out.drop(columns=['_holder', '_code'])
     out['u'] = out['u'].fillna('Other (Specify)')
     out = out.set_index(['t', 'i', 'plot_id', 'j', 'u'])
-    # Stable column order.
-    out = out[['Quantity', 'Quantity_sold', 'Value_sold',
-               'planting_month', 'harvest_month', 'intercropped', 'perennial']]
+    # Stable column order.  `Derivation` exists only where §12 was read
+    # (W1-W3): its registry key on the rows §12 filled, NA elsewhere.
+    cols = ['Quantity', 'Quantity_sold', 'Value_sold',
+            'planting_month', 'harvest_month', 'intercropped', 'perennial']
+    if 'Derivation' in out.columns:
+        cols.append('Derivation')
+    out = out[cols]
     return out
 
 

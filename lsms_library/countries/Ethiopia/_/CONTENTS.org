@@ -1695,8 +1695,13 @@ and asserts both.  §12 Q3 (harvest) is NOT read: in W2/W3 every §12
 (holder, crop) pair has a §9 field row (W2 7,399 of 7,399, W3 7,317 of
 7,317 distinct pairs), so Q3 would double-count the harvest §9 serves.
 
-Every §12 line lands in exactly one class (=Sect12SaleWarning= at build
-time; lines / positive-value lines / Birr):
+Every §12 line lands in exactly one of EIGHT classes -- the builder
+asserts the partition -- counted by =Sect12SaleWarning= (lines /
+positive-value lines / Birr).  *That warning is raised in the wave
+script's =make= subprocess, at BUILD time only: a warm read of the cached
+table never shows it*, and the framework has no stamp-and-replay for a
+country warning, so this table is the durable record (re-derive with a
+cold build after clearing the Ethiopia cache):
 
 | class            | 2011-12                  | 2013-14                  | 2015-16                  |
 |------------------+--------------------------+--------------------------+--------------------------|
@@ -1707,14 +1712,43 @@ time; lines / positive-value lines / Birr):
 | no §9 row        | *6,134 / 1,679 / 1,825,378* | 0                     | 0                        |
 | several §9 plots | 300 / 128 / 160,711      | 2,452 / 1,186 / 2,227,273 | 2,695 / 1,318 / 2,893,216 |
 | folded key       | 2 / 0 / 0                | 0                        | 6 / 0 / 0                |
-| attached (§9 rows filled; positive) | 544; 160 | 4,957; 1,464            | 4,557; 1,290             |
+| attached, then dropped | 0                  | *299 / 22 / 3,909*       | *62 / 7 / 7,430*         |
+| attached and served | 563 / 160 / 61,284    | 4,474 / 1,390 / 963,706  | 4,497 / 1,283 / 1,062,876 |
+
+*Class 7, "attached, then dropped"* (GH #820 round 2, found by an
+independent review -- the first version of this table called every
+single-plot line "attached").  The line attaches to its only §9 plot, but
+every §9 row it attached to is then removed by the build's EXISTING
+empty-row filter in =crop_production_for_wave= -- =u= missing AND no
+=Quantity= AND no =Quantity_sold= -- which never looks at =Value_sold=.  The
+filter is unchanged: those §9 rows were dropped on development too, with or
+without a sale.  Minimal case (W2): a single-plot §9 row with no unit and
+no quantity, and a §12 line with Q8 > 0 in Kg -- the Kg quantity cannot
+join a row with no unit, so the row keeps no =Quantity_sold= and goes.
+
+The same filter drops rows carrying a *§11* sale too, measured on
+development's own build (rows with a positive / any =Value_sold= removed by
+it): W1 0 / 0, W2 1 / 155 (1,500 Birr), W3 2 / 17 (7,750), W4 27 / 171
+(41,442), W5 32 / 277 (33,482).  Not changed here.
+
+*The W2 chain, reconciled* (positive =Value_sold=): 1,412 positive lines
+attach (classes 7 + 8) -> they fill *1,464* §9 rows before the filter,
+52 more than lines because some sit on a §9 row the file lists more than
+once, identically -> the filter removes the 22 rows of the 22 positive class-7 lines ->
+*1,442* positive stamped rows in the wave parquet -> the core grain collapse
+de-duplicates those 52 identical rows (losslessly: =GrainCollapseWarning=
+"destroyed" is 2 before and after) -> *1,390* served rows, one per positive
+class-8 line.  W3: 1,290 -> 1,290 -> 1,283 (7 dropped; no duplicates) ->
+1,283.  W1: 160 throughout.
 
 Rules, each the conservative choice where no precedent decides it:
 - *§11 wins a collision* and the two are never summed: every row §11
   filled stays byte-identical.  (Raw files: W2 has 63 (holder, crop) pairs
   in both modules, of which 14 carry a positive value in both and 13 only in
   §12; W3 40 pairs, 1 and 7.  The class table counts 61 W2 lines because the
-  repeated-pair lines are removed first.)
+  repeated-pair lines are removed first; among those non-repeated pairs the
+  §12-only positives are 12 (W2) and 7 (W3), and in EVERY one of them §11
+  answered Q1 sold = No -- none is a blank §11 line.)
 - *A repeated (holder, crop) is ambiguous*, attached nowhere -- not summed
   (§11's own path sums its repeats; see "pre-existing" below).  The W2
   repeats are mostly Coffee (62 lines), Other fruits, Enset, Godere, Chat;
@@ -1761,10 +1795,43 @@ sides).  Rows with a positive =Value_sold=:
 2015-16 Coffee 0 -> 138, Chat/Kat 0 -> 158, Hops (gesho) 0 -> 122, Banana
 0 -> 114 positive-sale rows (per-crop table in
 =slurm_logs/isa_backlog_2026-10-21/820-ethiopia-sect12/=).  Of the 2,833
-newly positive rows, 2,170 are on =perennial= crop codes.  W3 serves 2,300
+newly positive rows, 2,170 are on =perennial= crop codes -- so =perennial=
+does NOT mark the §12 rows (663 are vegetables); =Derivation= does (below).
+W3 serves 2,300
 of the 1,984 + 2,627 raw positive sale lines: *about half of the §12 sales
 belong to a holder-crop grown on several plots* and cannot be attached
 without splitting them -- exactly the §11 situation.
+
+*The rows §12 filled are a REGISTERED derivation* (GH #820 round 2):
+=Derivation = 'Ethiopia::crop_production::sect12-sale-period'= on exactly
+those rows -- 544 / 4,463 / 4,495 served rows in W1-W3, 9,502 in all, equal
+row for row to the cells §12 filled against development; none in W4/W5.
+Entry: =Ethiopia/_/derivations.yml=; function =ethiopia.derive_sect12_sale=
+(the identity, plus Q6 = No with Q7/Q8 blank read as 0); inputs
+=ethiopia.inputs_sect12_sale= (every §12 line, original names, indexed
+=(t, i, j)=, via =Country('Ethiopia').derivation_inputs(key, wave=...)=).
+What is derived is the WINDOW, not the number -- CLAUDE.md "Derived Values":
+"a value served under a name implying a different window -- the function is
+the identity and the registry is the point".  §12 Q6-Q8 ask about the crop
+*collected* in the "last completed production period ... (IF THERE IS NO
+PARTICULAR PRODUCTION PERIOD, USE THE LAST 12 MONTHS)" (Q2) / "harvested in
+the last twelve months" (Q3); §11 Q1 asks about this season's harvested
+roster crop, which is what the §9 row describes.  Measured on positive-sale
+§12 lines (=ph_s12q02_a-d=): the period's median length is 3 months in every
+wave; 8.1% / 11.9% / 12.6% (W1 / W2 / W3) span 12 months or more; 6.1% /
+5.6% / 6.0% ended in an Ethiopian-calendar year before the post-harvest
+visit's (2004 / 2006 / 2008).  The symptom, on served rows carrying both a
+harvest =Quantity= and a =Quantity_sold= (same row, so same =u=): sold
+exceeds harvest on 7.5% of §12 rows vs 5.4% of §11 rows in 2013-14 (439 vs
+406 rows) and 2.7% vs 1.4% in 2015-16 (971 vs 643); W1 has only 7 such §12
+rows.  The value is served as recorded and labelled; it is not rescaled to
+a season and not dropped.
+
+*Known gap, NOT stamped here: W4/W5 carry the same window inside §11.*  The
+ESS4 §11 header says "FOR PERMANENT CROPS PLEASE INCLUDE CROP HARVESTED
+BETWEEN MARCH 10, 2018 TO MARCH 9, 2019" -- a 12-month window for the
+permanent crops ESS4 folded into §11 -- and those sales are served
+unmarked.  Filed as GH #1256.
 
 Downstream, warm, same two builds: =harvest_kg= (with and without
 =crop_conversion_factors()=) is *identical* in every wave -- no
@@ -1774,7 +1841,11 @@ Downstream, warm, same two builds: =harvest_kg= (with and without
 REPORTED sales, and those sales were unread.  A within-wave
 =median_price_valuation(geo_levels=['v'], item_keys=('t','j'))= of the
 shipped-factor kg harvest values 51.5% / 62.0% more W2/W3 rows: tree crops
-now have observed prices.
+now have observed prices.  *Call it within-wave, as here.*  The public
+default =item_keys=('j',)= POOLS prices across waves, so this change moves
+W4/W5 valuations by -19.0% / -18.2% (independent review, GH #820 round 2)
+although every W4/W5 row is byte-identical -- the W1-W3 §12 prices enter
+W4/W5's ladder.  Filed as GH #1254.
 
 *W1 is the odd wave, and most of its §12 is NOT served.*  W1 §9 EXCLUDES
 tree/root crops, so 6,134 of W1's 6,999 coded §12 pairs (1,679 positive
@@ -2033,7 +2104,10 @@ questions (the last production period, the 12-month harvest, the number of
 trees).
 No =sect12_ph= file ships for either wave.  W5 has no local questionnaire;
 its evidence is the data alone.  Pinned in
-=tests/test_ethiopia_crop_production_sect12.py=.
+=tests/test_ethiopia_crop_production_sect12.py=.  What W4/W5 DO lack is a
+label: their §11 sales of permanent crops cover a 12-month window ("CROP
+HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019") and are served
+unmarked, where W1-W3's §12 sales now carry =sect12-sale-period= (GH #1256).
 
 ** _/food_acquired.py lacks the id_walk that _/crop_production.py has
 

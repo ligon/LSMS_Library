@@ -1,0 +1,110 @@
+# Derivations -- served numbers in this country's tables that are NOT survey
+# answers but CONSTRUCTIONS from raw answers, or answers served under a name
+# implying a different window.  One entry per registry key,
+# `country::table::name`; the same key sits in the served table's
+# `Derivation` column on every row it produced.  Loader and field contract:
+# lsms_library/derivations.py.  Design: SkunkWorks/derived_values.org.
+#
+# An entry must say what it did (rule, function), to what (inputs,
+# raw_variables) and why (assumptions, each with a basis) -- the loader
+# refuses one that cannot.  `modelling-choice` is a basis that NAMES a choice
+# no document supplies; it is not evidence and is not laundered into one.
+#
+# Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
+
+Ethiopia::crop_production::sect12-sale-period:
+  waves: ['2011-12', '2013-14', '2015-16']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    On a section-9 field-crop harvest row that section 11 left without a
+    sale: Quantity_sold = section-12 Q7 and Value_sold = Q8 of the same
+    (holder, crop) -- THE IDENTITY -- except that Q6 = 2 (No) with Q7 and Q8
+    both blank is a sale of 0, as section 11 reads it.  Attached only where
+    the (holder, crop) is on ONE section-12 line, is not in section 11
+    (section 11 wins and the two are never summed), is grown on exactly one
+    section-9 plot (the SALES GRAIN CAVEAT) and that plot's key is not
+    shared with another crop code harmonize_crop folds onto the same label;
+    Quantity_sold only where Q7's unit (KG in W1/W2 by the instrument;
+    ph_s12q0b in W3) equals the row's harvest u.  What is derived is the
+    WINDOW, not the number: section 12 asks about the crop COLLECTED in the
+    last completed production period (Q2) / harvested in the last twelve
+    months (Q3), while the row it is served on -- and section 11's sales
+    beside it -- describe this agricultural season's harvest.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_sect12_sale
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_sect12_sale
+  raw_variables:
+    - sect12_ph_w{1,2,3}.holder_id
+    - sect12_ph_w{1,2,3}.crop_code
+    - sect12_ph_w{1,2,3}.ph_s12q02_a / ph_s12q02_b / ph_s12q02_c / ph_s12q02_d (Q2 production period, EC year and month, begin and end)
+    - sect12_ph_w{1,2}.ph_s12q03 (Q3 harvest, KG) / sect12_ph_w3.ph_s12q03_a + ph_s12q03_b (Q3 harvest, quantity and unit)
+    - sect12_ph_w{1,2,3}.ph_s12q06 (Q6 sold any?)
+    - sect12_ph_w{1,2,3}.ph_s12q07 (Q7 quantity sold)
+    - sect12_ph_w3.ph_s12q0b (Q7 unit, W3 only)
+    - sect12_ph_w{1,2,3}.ph_s12q08 (Q8 value sold, Birr)
+  assumptions:
+    - text: >-
+        section 12's sale questions (Q6 "Did you sell any of the
+        [TREES/FRUIT/ROOT CROP] collected?", Q7, Q8) refer to the crop of the
+        "last completed production period ... (IF THERE IS NO PARTICULAR
+        PRODUCTION PERIOD, USE THE LAST 12 MONTHS)" (Q2), whose harvest Q3
+        asks "in the last twelve months" (W1: "in the past 12 months");
+        section 11 asks about this season's harvested roster crop.  So a
+        section-12 sale on a section-9 row is served under a window it was
+        not asked in.  Measured on positive-sale lines: the period's median
+        length is 3 months; 8.1% / 11.9% / 12.6% (W1 / W2 / W3) span 12
+        months or more; 6.1% / 5.6% / 6.0% ended in an Ethiopian-calendar
+        year before the post-harvest visit's
+      basis: questionnaire
+      evidence: >-
+        W1 2b_Post_Harvest_English.pdf PDF p.13; W2
+        Post_Harvest_Questionnaire_English_wave2.pdf PDF p.15; W3 ESS3 Post
+        Harvest Questionnaire_English.pdf PDF p.18 (section 12, Q2 / Q3 /
+        Q6-Q8); period figures from ph_s12q02_a-d,
+        slurm_logs/isa_backlog_2026-10-21/820-ethiopia-sect12/
+    - text: >-
+        the section-12 value is SERVED on the season row as recorded --
+        not rescaled to a season, not dropped -- and the row is labelled
+        instead.  A user who wants only season sales filters on this key;
+        the raw period is one derivation_inputs call away
+      basis: modelling-choice
+      evidence: >-
+        GH #820 round 2 (dispatcher ruling, 2026-10-23), under CLAUDE.md
+        "Derived Values" fit rule ("a value served under a name implying a
+        different window -- the function is the identity and the registry
+        is the point")
+    - text: >-
+        a holder-level sale belongs to the crop's only section-9 plot (and to
+        no row where the crop is on several plots); the section-12 file is
+        keyed (household, holder, crop) with no parcel or field, the grain of
+        section 11
+      basis: config-comment
+      evidence: >-
+        Ethiopia/_/ethiopia.py, SALES GRAIN CAVEAT (the section-11 rule since
+        GAP 1); measured grain in Ethiopia/_/CONTENTS.org, "section 12 wired"
+    - text: >-
+        Q6 = 2 (No) skips Q7 and Q8 ("NO....2 (>Q10a)"), so a No with both
+        blank is a sale of 0; a positive Q7 or Q8 beside a No is kept as
+        reported (9 lines in W2)
+      basis: questionnaire
+      evidence: W2 Post_Harvest_Questionnaire_English_wave2.pdf PDF p.15, Q6 skip
+    - text: >-
+        Q7's unit is KG in W1 and W2 (the column header and the variable
+        label "What was the total quantity sold? (KG)"); W3 records it in
+        ph_s12q0b on the same 62-label unit_code list as the section-9
+        harvest unit
+      basis: variable-label
+      evidence: sect12_ph_w1/w2 ph_s12q07 labels; sect12_ph_w3 ph_s12q0b value labels (unit_code)
+  validated_against: >-
+    The window is a stated difference, not a calibrated one: nothing rescales
+    it, so there is no target to validate against.  Its symptom is measured:
+    on served rows carrying both a harvest Quantity and a Quantity_sold in
+    the same unit, the sold quantity EXCEEDS the harvest on 7.5% of
+    section-12 rows vs 5.4% of section-11 rows in 2013-14 and 2.7% vs 1.4% in
+    2015-16 (independent review, GH #820 round 2; re-measured in
+    slurm_logs/isa_backlog_2026-10-21/820-ethiopia-sect12/).  The
+    attachment itself was re-derived by an independent oracle from the raw
+    files (GH #820 round-2 review): every class count matched and no
+    section-11 cell was overwritten.  W4/W5 carry the same window inside
+    section 11, unmarked (GH #1256).
+  contents: Ethiopia/_/CONTENTS.org, "§12 wired as a second sale source (GH #820)"
+  since: '2026-10-23'
