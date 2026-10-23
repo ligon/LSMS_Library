@@ -28,6 +28,13 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
   - #1260 acquisition (Sue: narrow two-file fetch plus =push_to_cache_batch=, not =populate_and_push=; awaiting Ethan's OK on the creds route).
 - *Housekeeping:* mirror branch =fix/856-malawi-harvest-unit-text-20261022= deleted (it still exists in the =/local= clone's worktree, which is wiped at job end).
 
+** BATCH EXECUTION (Ethan away several hours from ~09:30 PDT 2026-10-23: "make considered judgements, get review; difficult issues later")
+1. Integration branch =integration/isa-batch-20261023= (mirror only), worktree =/local/job40390255/worktrees/integration-dryrun=: all ruled PRs merged in order.  Three doc conflicts resolved by keeping both sides (Niger/Malawi/Burkina CONTENTS.org; one =data_info.yml= comment block, #1231 vs #1241).
+2. An independent cross-PR interaction review is running on that tree.
+3. Pending inclusion: #1272 round 3 (Mali tree value x months, ruled), and #1260 if its acquisition lands in time (otherwise a later batch).
+4. Validation burst (co_carleton): =/global/scratch/fsa/fc_jevons/ligon/isa-batch-20261023/{shard,tests}.sbatch= cold-build every country into the STAGING root =.../isa-batch-20261023/data= from a scratch clone of the integration branch, then the full pytest suite plus the coverage aggregate.
+5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
+
 ** Merge plan: ONE corpus re-warm
 #1233 and #1251 each move every hash (549/549, 40/40, 2,109/2,109), and they merge cleanly together.
 Merge them *together with every per-country PR you accept*, before anyone re-warms, so the corpus is rebuilt once.
