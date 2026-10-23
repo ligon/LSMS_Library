@@ -123,3 +123,12 @@ Measured (cold, fresh roots, then fresh-process warm with zero writes): rows 179
 `nitrogen_kg` falls, contrary to the 2010/2019 direction: 2013-14 188,848.40 -> 80,927.98, 2016-17 334,896.51 -> 247,456.26, Malawi 1,028,195.63 -> 832,834.97. Weeks codes 3-7 had been decoded as 2-50 kg bags; base 2013-14 implied 0.673 kg N per kg product (above urea's 0.46). After: 0.288/0.290, beside 0.291/0.279 in 2010-11/2019-20.
 Hash census: 26/26 Malawi country hashes and 52 Malawi wave hashes (2013-14, 2016-17) move; 0 other-country, 0/40 framework fingerprints.
 Tests: the extended `tests/test_1111_malawi_applied_kg.py` gives 24 pass on this branch, 10 fail / 14 pass against the development drivers (`LSMS_COUNTRIES_ROOT`).
+
+### Review qualifications (2026-10-23, documentation only)
+
+An independent review of `6704cbec5` reproduced every number; these additions qualify them, with no code or served-data change (re-measured here on the private frames and raw extracts).
+- The 2016-17 nitrogen fall is one row: a 50,000 kg urea row (raw pair agrees) served 115,000 kg N on development (weeks code 5 read as "5 kg Bag") and 23,000 on the branch, still 9.3% of the wave. It is -92,000 of the net -87,440; without it 2016-17 is 219,896.5 -> 224,456.3 (+2.1%) and Malawi -11.3%, not -19.0%. 2013-14's -57% depends on no single row (six largest-quantity rows 3,910.1 -> 1,781.0). `quantity_audit` screens no `plot_inputs` column, so nothing flags the row.
+- The enumerator total is exactly 2x the native pair on 1,191 / 272 2016-17 first applications (cross-section / panel; ~42,000 kg above the raw pairs, mostly 25 -> 50) and 1,185 / 349 in 2019-20: a property of the source column, served identically before and after.
+- Minor: 2013-14 native-gram rows with total == quantity (146/162 first, 48/60 second) are served as kg; ~30 bag-count rows (183 kg served vs 1,705 implied); 97 of 99 merged pairs have two positive totals, 2 2013-14 second applications have a type but no total.
+- Make backend: Malawi per-wave pattern rules depend on `malawi.py` only, so `LSMS_BUILD_BACKEND=make` does not rebuild a wave parquet warmed before this edit (filed separately). Default backend rebuilds via `Wave._input_hash`.
+All recorded in `Malawi/_/CONTENTS.org` (2026-10-23 entries).

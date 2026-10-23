@@ -3173,4 +3173,29 @@ The examples are carried forward from IHS3.  The data follow the questionnaire (
 - The 99 removed rows are same-type first/second applications on one plot that now share a key and are summed by the unchanged reducer: 21 in 2013-14 (19 with two positive totals), 78 in 2016-17 (all positive).  A raw-source census finds 59 and 78 same-type pairs, all with affirmative =ag_d38=; the other 38 in 2013-14 were already summed because both timing codes decoded to the same label.  Every pair sum equals the two base rows' quantities, every single-row key keeps its exact =Quantity=, and the inorganic =Quantity= total is unchanged (2,899,339.95; 2013-14 280,549, 2016-17 853,027).
 - Inorganic =u= before: 2013-14 Gram 1,804, Kilogramme 1,029, 2 kg Bag 951, 3 kg Bag 840, 10 kg Bag 231, 5 kg Bag 202, null 91 (served as the string =unit= by =local_tools.map_index=), 50 kg Bag 38; 2016-17 null 5,371, 2 kg Bag 3,699, Kilogramme 3,364, 3 kg Bag 1,742, Gram 1,317, 5 kg Bag 337, 10 kg Bag 148, 50 kg Bag 23.  After: all Kilogramme; no inorganic row in any wave is Gram or null.
 - *=nitrogen_kg= FALLS in these two waves, unlike 2010-11/2019-20.*  2013-14 188,848.40 -> 80,927.98 kg N (-57.1%); 2016-17 334,896.51 -> 247,456.26 (-26.1%); Malawi 1,028,195.63 -> 832,834.97 (-19.0%).  The Gram rows do rise (2013-14 25.0 -> 25,015.1; 2016-17 12.0 -> 11,979.9) and the null rows now count (0 -> 1,417.6; 0 -> 113,868.6), but weeks-after-planting codes 3-7 had been decoded as 2/3/5/10/50 kg bags, multiplying kilogram totals: those rows fall 174,332.2 -> 40,004.1 and 300,190.7 -> 86,913.9.  IHS3's month codes clustered on 1 (Gram) and 12 (unmapped), which is why the 2010-11 correction rose instead.  Nitrogen per kg of served inorganic product was 0.673 in 2013-14 before -- above urea's 0.46, so impossible -- and is now 0.288 / 0.290 in 2013-14 / 2016-17, beside 0.291 / 0.279 in 2010-11 / 2019-20.
+  *The 2016-17 figure is dominated by one row; read it with that qualification.*  One 2016-17 urea row records 50,000 kg on a single plot, and its raw native quantity/unit pair agrees with that total.
+  Development's weeks code 5 decoded it as "5 kg Bag" and served 115,000 kg N from it; this branch serves 23,000 kg N, which is still 9.3% of the wave's nitrogen.
+  That row alone is -92,000 of the wave's net -87,440: without it 2016-17 goes 219,896.5 -> 224,456.3 (+2.1%) and Malawi falls 11.3%, not 19.0%.
+  2013-14's -57% depends on no single row: its six largest-quantity rows move 3,910.1 -> 1,781.0 kg N, and its six largest per-plot changes are 11% of the net.
+  Nothing flags the 50,000 kg row: Site Q's quantity screen does not cover =plot_inputs= (=quantity_audit._SCREENED_COLUMNS= names =crop_production= and =food_acquired= =Quantity= and =plot_features= =Area= only).
 - Cache: 26 of 26 Malawi L2-country hashes and the 52 Malawi 2013-14/2016-17 wave hashes move; no other country's hash and none of the 40 framework fingerprints.  A fresh-process warm read equals the cold frame and writes nothing.
+
+* 2026-10-23 -- plot_inputs: what the Module D Q39 enumerator total is, and is not (GH #1111 review)
+
+Recorded from the independent review of the #1111 branch and re-measured on the raw extracts; none of it is changed by #1111, and every item below is served identically before and after it.
+
+*The enumerator total is often exactly twice the native pair, by construction of the source column.*
+The enumerator total (=ag_d39d=; =i= or =j= for the second application) equals the native quantity times the unit's weight (e.g. =b= x =c=, 2/3/5/10/50 kg for the bag codes) on 90% / 91% of comparable 2013-14 first / second applications, but on only 79% / 81% of 2016-17 first applications (cross-section / panel; second applications 95% / 94%).
+The main exception is exactly 2x: 1,191 cross-section and 272 panel first-application rows, mostly a raw =25= =kilogram= served as =50= (556 and 123 rows), then 50 -> 100 and 10 -> 20.
+Those rows carry about 42,000 kg of product above their raw pairs (33,110 + 8,546).
+2019-20 shows the same in both halves (1,185 cross-section and 349 panel first-application rows), so this is a property of the source column, not of a decoder: the library serves the enumerator total, which the questionnaire names, and does not adjudicate it against the native pair.
+Whether the doubling is an enumerator convention or an entry error is not established here; the questionnaire and manuals say only "ENUMERATOR: TOTAL KGs".
+
+*Minor items, all small:*
+- 2013-14 rows whose native unit is =gram= mostly carry total == quantity (146 of 162 first applications, 48 of 60 second), i.e. the native "gram" amount was copied into the kg column; they are served as kilograms, as the column says.
+- About 30 rows in 2013-14 and 2016-17 have a bag-count native pair (bag codes 3-7, quantity <= 10) whose count went into the kg column unchanged: 183 kg served against 1,705 kg implied by the pair, under 0.2% of those waves' 1,133,576 kg of inorganic product.
+- Of the 99 first/second application pairs #1111 merges, 97 have two positive totals; in 2 2013-14 pairs the second application records a type but no total, so the merged row carries the first application's amount alone (the existing =sum= reducer).
+
+*Make-backend exposure (filed separately).*  Every Malawi per-wave Makefile pattern rule names only =malawi.py= as a prerequisite (=Makefile:73= for =plot_inputs=; =food_acquired= names none), not the wave's own =_/<table>.py=.
+Under =LSMS_BUILD_BACKEND=make= a wave parquet warmed before a wave-script edit is therefore not rebuilt by =make=, so a cache warmed on development would keep the old 2013-14/2016-17 units there (the review's finding; the rule text is confirmed, the make backend was not re-run for this entry).
+The default backend is unaffected: the wave script is in =Wave._input_hash=, so the cache hashes move (measured: 26 of 26 Malawi tables) and the waves rebuild.
