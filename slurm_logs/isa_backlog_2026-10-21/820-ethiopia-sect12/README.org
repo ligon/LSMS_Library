@@ -1,0 +1,21 @@
+#+title: GH #820 -- Ethiopia §12 tree/fruit/root-crop sales into crop_production
+
+Aggregates only (counts, totals, shares); no household, holder or plot
+identifiers.  Measured 2026-10-23 on a sucoder /local clone, development
+=9a0ed5f3c= (detached worktree) vs branch =fix/820-ethiopia-sect12-crops-20261023=,
+each with its OWN fresh =LSMS_DATA_DIR= (cold builds; =dvc-cache= symlinked to
+the shared L1), =PYTHONPATH= = the checkout under test (import identity
+asserted), =OPENBLAS/OMP/MKL_NUM_THREADS=1=, =LSMS_BUILD_WORKERS=1=, =nice -n 19=.
+
+| file | what |
+|------+------|
+| =api_before_after.json= | round 1: =Country('Ethiopia').crop_production()= cold, development vs =f7f567c82=: row/index identity, non-sale columns identical, development's non-null sale cells identical, per-wave positive =Value_sold= / non-null =Quantity_sold=, grain / null-read / null-index / quantity reports, warning categories |
+| =round2_derivation_stamp.json= | round 2: the branch build equals =f7f567c82= except the new =Derivation= column; the stamp equals the cells §12 filled against development (9,502 rows), per wave; the sold-exceeds-harvest symptom by source |
+| =positive_value_sold_by_wave_crop.json= | per (wave, crop) count of rows with a positive =Value_sold=, development vs branch, crops that changed only (was a =.csv=, which the repo's =.gitignore= excludes) |
+| =downstream_before_after.json= | warm: =harvest_kg= (with and without the shipped WB factors), =gross_crop_revenue=, =crop_diversity(weight='value')=, within-wave =median_price_valuation= |
+| =sect12_report_and_w45_verification.json= | the per-wave §12 report -- every line's class, the eight classes, rows stamped before / after the empty-row filter -- and the W4/W5 §11 coverage verification |
+| =sect12_production_period_window.json= | the §12 Q2 production period on positive-sale lines: median length, share >= 12 months, share ending before the post-harvest visit's EC year |
+| =sect11_rows_dropped_by_empty_row_filter_development.json= | on DEVELOPMENT's code: rows the empty-row filter removes that carry a §11 =Value_sold=, per wave |
+| =hash_census_diff.json= | =1218-current-validation/hash_census.py=, development vs branch and =f7f567c82= vs branch |
+| =tests.org= | test lines |
+| =scripts/= | the scripts that produced the above (paths are this run's) |
