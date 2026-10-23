@@ -3122,6 +3122,15 @@ def _labor_persondays(df, cols, flag_col=None, flag_zero_code=None):
     ``flag_zero_code`` (the survey "did you use this source? No" branch), again
     mirroring the WB ``replace ... = 0 if flag==code`` logic.
 
+    A MISSING flag is not "No" (GH #1250).  Stata's ``flag==code`` is false
+    for a missing flag, so ``replace`` leaves that row alone: its reported cells
+    are served as reported, and a row whose cells are all missing stays NaN
+    (and is not served).  ``_to_int_code`` returns nullable ``Int64``, so
+    ``flag != code`` is ``<NA>`` there, and ``Series.where`` reads ``<NA>`` as
+    False -- which used to zero every missing-flag row, empty stubs and
+    reported days alike.  The zero is therefore applied only where the flag
+    POSITIVELY equals the code.
+
     The sum is over the survey's own disaggregated cells of a SINGLE labor
     question (man/woman/child day cells, or per-family-worker day cells); it is
     the reported person-day quantity that question measures, NOT a cross-row /
@@ -3134,7 +3143,8 @@ def _labor_persondays(df, cols, flag_col=None, flag_zero_code=None):
     out = block.sum(axis=1, min_count=1)
     if flag_col is not None and flag_col in df.columns and flag_zero_code is not None:
         flag = _to_int_code(df[flag_col])
-        out = out.where(flag != flag_zero_code, 0.0)
+        said_no = (flag == flag_zero_code).fillna(False).astype(bool)
+        out = out.mask(said_no.to_numpy(), 0.0)
     return out
 
 
@@ -3220,6 +3230,11 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
     # Collapse exact-duplicate (plot, source, season) keys that can arise when
     # a wave repeats a plot row; keep the max reported days / wage so the index
     # is unique without summing distinct reported observations.
+    # NOT only exact duplicates (GH #1250, measured): with dropna=False every
+    # plot-less row of a household-season-source shares one NaN key, so the max
+    # also folds DISTINCT plot-less source rows (2009-10: 70 positive rows ->
+    # 45 keys).  Keeping them apart needs a plot_id sentinel or a row ordinal,
+    # which is GH #1120 decision D3; left as is until that is decided.
     out = (out.groupby(['t', 'i', 'plot_id', 'source', 'season'], dropna=False)
               .agg({'PersonDays': 'max', 'Wage': 'max'}))
     return out

@@ -1,0 +1,781 @@
+{
+ "rows": {
+  "base": 169877,
+  "branch": 164692
+ },
+ "totals": {
+  "base": 3052057.0,
+  "branch": 3054802.0
+ },
+ "only_in_branch": 0,
+ "v_differs_on_common_keys": 0,
+ "removed": {
+  "n": 5185,
+  "all_zero_in_base": true,
+  "with_wage": 7,
+  "wage_values": {
+   "n": 7,
+   "min": 6000.0,
+   "median": 50000.0,
+   "max": 140000.0,
+   "sum": 414000.0
+  }
+ },
+ "common": {
+  "n": 164692,
+  "positive_in_base_changed": 0,
+  "zero_to_positive": 97,
+  "zero_to_positive_days": 2745.0,
+  "other_change": 0,
+  "wage_changed": 0,
+  "zero_to_positive_nan_plot": 1
+ },
+ "by_wave_season": [
+  {
+   "t": "2009-10",
+   "season": "A",
+   "rows_base": 19069,
+   "rows_branch": 16918,
+   "removed_nan_plot": 1537,
+   "removed_valid_plot": 614,
+   "zero_to_positive": 26,
+   "zero_to_positive_days": 1188.0,
+   "zeros_base": 9499,
+   "zeros_branch": 7322,
+   "positive_base": 9570,
+   "positive_branch": 9596,
+   "total_base": 353228.0,
+   "total_branch": 354416.0,
+   "nan_plot_base": 1552,
+   "nan_plot_branch": 15,
+   "nan_plot_positive_branch": 8,
+   "nan_v_base": 50,
+   "nan_v_branch": 42
+  },
+  {
+   "t": "2009-10",
+   "season": "B",
+   "rows_base": 18038,
+   "rows_branch": 15730,
+   "removed_nan_plot": 2024,
+   "removed_valid_plot": 284,
+   "zero_to_positive": 19,
+   "zero_to_positive_days": 519.0,
+   "zeros_base": 9482,
+   "zeros_branch": 7155,
+   "positive_base": 8556,
+   "positive_branch": 8575,
+   "total_base": 321739.0,
+   "total_branch": 322258.0,
+   "nan_plot_base": 2094,
+   "nan_plot_branch": 70,
+   "nan_plot_positive_branch": 37,
+   "nan_v_base": 42,
+   "nan_v_branch": 34
+  },
+  {
+   "t": "2010-11",
+   "season": "A",
+   "rows_base": 16179,
+   "rows_branch": 15879,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 300,
+   "zero_to_positive": 27,
+   "zero_to_positive_days": 597.0,
+   "zeros_base": 6733,
+   "zeros_branch": 6406,
+   "positive_base": 9446,
+   "positive_branch": 9473,
+   "total_base": 319801.0,
+   "total_branch": 320398.0,
+   "nan_plot_base": 0,
+   "nan_plot_branch": 0,
+   "nan_plot_positive_branch": 0,
+   "nan_v_base": 0,
+   "nan_v_branch": 0
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "rows_base": 13777,
+   "rows_branch": 13551,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 226,
+   "zero_to_positive": 16,
+   "zero_to_positive_days": 297.0,
+   "zeros_base": 6138,
+   "zeros_branch": 5896,
+   "positive_base": 7639,
+   "positive_branch": 7655,
+   "total_base": 236191.0,
+   "total_branch": 236488.0,
+   "nan_plot_base": 0,
+   "nan_plot_branch": 0,
+   "nan_plot_positive_branch": 0,
+   "nan_v_base": 0,
+   "nan_v_branch": 0
+  },
+  {
+   "t": "2011-12",
+   "season": "A",
+   "rows_base": 15184,
+   "rows_branch": 15179,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 5,
+   "zero_to_positive": 0,
+   "zero_to_positive_days": 0.0,
+   "zeros_base": 5881,
+   "zeros_branch": 5876,
+   "positive_base": 9303,
+   "positive_branch": 9303,
+   "total_base": 268855.0,
+   "total_branch": 268855.0,
+   "nan_plot_base": 1,
+   "nan_plot_branch": 1,
+   "nan_plot_positive_branch": 0,
+   "nan_v_base": 384,
+   "nan_v_branch": 384
+  },
+  {
+   "t": "2011-12",
+   "season": "B",
+   "rows_base": 13071,
+   "rows_branch": 13058,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 13,
+   "zero_to_positive": 0,
+   "zero_to_positive_days": 0.0,
+   "zeros_base": 5336,
+   "zeros_branch": 5323,
+   "positive_base": 7735,
+   "positive_branch": 7735,
+   "total_base": 226156.0,
+   "total_branch": 226156.0,
+   "nan_plot_base": 4,
+   "nan_plot_branch": 4,
+   "nan_plot_positive_branch": 1,
+   "nan_v_base": 254,
+   "nan_v_branch": 254
+  },
+  {
+   "t": "2013-14",
+   "season": "A",
+   "rows_base": 14638,
+   "rows_branch": 14633,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 5,
+   "zero_to_positive": 0,
+   "zero_to_positive_days": 0.0,
+   "zeros_base": 5667,
+   "zeros_branch": 5662,
+   "positive_base": 8971,
+   "positive_branch": 8971,
+   "total_base": 339335.0,
+   "total_branch": 339335.0,
+   "nan_plot_base": 3,
+   "nan_plot_branch": 3,
+   "nan_plot_positive_branch": 3,
+   "nan_v_base": 0,
+   "nan_v_branch": 0
+  },
+  {
+   "t": "2013-14",
+   "season": "B",
+   "rows_base": 13156,
+   "rows_branch": 13147,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 9,
+   "zero_to_positive": 0,
+   "zero_to_positive_days": 0.0,
+   "zeros_base": 5397,
+   "zeros_branch": 5388,
+   "positive_base": 7759,
+   "positive_branch": 7759,
+   "total_base": 282209.0,
+   "total_branch": 282209.0,
+   "nan_plot_base": 2,
+   "nan_plot_branch": 2,
+   "nan_plot_positive_branch": 1,
+   "nan_v_base": 0,
+   "nan_v_branch": 0
+  },
+  {
+   "t": "2015-16",
+   "season": "A",
+   "rows_base": 15152,
+   "rows_branch": 15150,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 2,
+   "zero_to_positive": 0,
+   "zero_to_positive_days": 0.0,
+   "zeros_base": 5939,
+   "zeros_branch": 5937,
+   "positive_base": 9213,
+   "positive_branch": 9213,
+   "total_base": 344929.0,
+   "total_branch": 344929.0,
+   "nan_plot_base": 0,
+   "nan_plot_branch": 0,
+   "nan_plot_positive_branch": 0,
+   "nan_v_base": 321,
+   "nan_v_branch": 321
+  },
+  {
+   "t": "2015-16",
+   "season": "B",
+   "rows_base": 13279,
+   "rows_branch": 13279,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0,
+   "zero_to_positive": 0,
+   "zero_to_positive_days": 0.0,
+   "zeros_base": 5346,
+   "zeros_branch": 5346,
+   "positive_base": 7933,
+   "positive_branch": 7933,
+   "total_base": 307053.0,
+   "total_branch": 307053.0,
+   "nan_plot_base": 0,
+   "nan_plot_branch": 0,
+   "nan_plot_positive_branch": 0,
+   "nan_v_base": 98,
+   "nan_v_branch": 98
+  },
+  {
+   "t": "2018-19",
+   "season": "A",
+   "rows_base": 6072,
+   "rows_branch": 6050,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 22,
+   "zero_to_positive": 0,
+   "zero_to_positive_days": 0.0,
+   "zeros_base": 4322,
+   "zeros_branch": 4300,
+   "positive_base": 1750,
+   "positive_branch": 1750,
+   "total_base": 17069.0,
+   "total_branch": 17069.0,
+   "nan_plot_base": 0,
+   "nan_plot_branch": 0,
+   "nan_plot_positive_branch": 0,
+   "nan_v_base": 83,
+   "nan_v_branch": 82
+  },
+  {
+   "t": "2019-20",
+   "season": "A",
+   "rows_base": 5884,
+   "rows_branch": 5803,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 81,
+   "zero_to_positive": 0,
+   "zero_to_positive_days": 0.0,
+   "zeros_base": 4334,
+   "zeros_branch": 4253,
+   "positive_base": 1550,
+   "positive_branch": 1550,
+   "total_base": 17700.0,
+   "total_branch": 17700.0,
+   "nan_plot_base": 0,
+   "nan_plot_branch": 0,
+   "nan_plot_positive_branch": 0,
+   "nan_v_base": 3,
+   "nan_v_branch": 3
+  },
+  {
+   "t": "2019-20",
+   "season": "B",
+   "rows_base": 6378,
+   "rows_branch": 6315,
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 63,
+   "zero_to_positive": 9,
+   "zero_to_positive_days": 144.0,
+   "zeros_base": 4749,
+   "zeros_branch": 4677,
+   "positive_base": 1629,
+   "positive_branch": 1638,
+   "total_base": 17792.0,
+   "total_branch": 17936.0,
+   "nan_plot_base": 0,
+   "nan_plot_branch": 0,
+   "nan_plot_positive_branch": 0,
+   "nan_v_base": 0,
+   "nan_v_branch": 0
+  }
+ ],
+ "removed_by_source": [
+  {
+   "t": "2009-10",
+   "season": "A",
+   "source": "family",
+   "removed_nan_plot": 769,
+   "removed_valid_plot": 269
+  },
+  {
+   "t": "2009-10",
+   "season": "A",
+   "source": "hired",
+   "removed_nan_plot": 768,
+   "removed_valid_plot": 345
+  },
+  {
+   "t": "2009-10",
+   "season": "B",
+   "source": "family",
+   "removed_nan_plot": 1012,
+   "removed_valid_plot": 121
+  },
+  {
+   "t": "2009-10",
+   "season": "B",
+   "source": "hired",
+   "removed_nan_plot": 1012,
+   "removed_valid_plot": 163
+  },
+  {
+   "t": "2010-11",
+   "season": "A",
+   "source": "family",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 143
+  },
+  {
+   "t": "2010-11",
+   "season": "A",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 157
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "source": "family",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 97
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 129
+  },
+  {
+   "t": "2011-12",
+   "season": "A",
+   "source": "family",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2011-12",
+   "season": "A",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 5
+  },
+  {
+   "t": "2011-12",
+   "season": "A",
+   "source": "other",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2011-12",
+   "season": "B",
+   "source": "family",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2011-12",
+   "season": "B",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 13
+  },
+  {
+   "t": "2011-12",
+   "season": "B",
+   "source": "other",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2013-14",
+   "season": "A",
+   "source": "family",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2013-14",
+   "season": "A",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 5
+  },
+  {
+   "t": "2013-14",
+   "season": "B",
+   "source": "family",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2013-14",
+   "season": "B",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 9
+  },
+  {
+   "t": "2015-16",
+   "season": "A",
+   "source": "family",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2015-16",
+   "season": "A",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 2
+  },
+  {
+   "t": "2015-16",
+   "season": "B",
+   "source": "family",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2015-16",
+   "season": "B",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 0
+  },
+  {
+   "t": "2018-19",
+   "season": "A",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 22
+  },
+  {
+   "t": "2019-20",
+   "season": "A",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 81
+  },
+  {
+   "t": "2019-20",
+   "season": "B",
+   "source": "hired",
+   "removed_nan_plot": 0,
+   "removed_valid_plot": 63
+  }
+ ],
+ "downstream": {
+  "total_labor_days": {
+   "base": {
+    "rows": 16481,
+    "days": 3052057.0,
+    "per_wave": {
+     "2009-10": {
+      "hh_rows": 2349.0,
+      "days": 674967.0,
+      "hh_with_zero_days": 26.0
+     },
+     "2010-11": {
+      "hh_rows": 2135.0,
+      "days": 555992.0,
+      "hh_with_zero_days": 7.0
+     },
+     "2011-12": {
+      "hh_rows": 2251.0,
+      "days": 495011.0,
+      "hh_with_zero_days": 1.0
+     },
+     "2013-14": {
+      "hh_rows": 2439.0,
+      "days": 621544.0,
+      "hh_with_zero_days": 3.0
+     },
+     "2015-16": {
+      "hh_rows": 2608.0,
+      "days": 651982.0,
+      "hh_with_zero_days": 3.0
+     },
+     "2018-19": {
+      "hh_rows": 2214.0,
+      "days": 17069.0,
+      "hh_with_zero_days": 1267.0
+     },
+     "2019-20": {
+      "hh_rows": 2485.0,
+      "days": 35492.0,
+      "hh_with_zero_days": 1262.0
+     }
+    }
+   },
+   "branch": {
+    "rows": 16442,
+    "days": 3054802.0,
+    "per_wave": {
+     "2009-10": {
+      "hh_rows": 2340.0,
+      "days": 676674.0,
+      "hh_with_zero_days": 17.0
+     },
+     "2010-11": {
+      "hh_rows": 2133.0,
+      "days": 556886.0,
+      "hh_with_zero_days": 4.0
+     },
+     "2011-12": {
+      "hh_rows": 2251.0,
+      "days": 495011.0,
+      "hh_with_zero_days": 1.0
+     },
+     "2013-14": {
+      "hh_rows": 2437.0,
+      "days": 621544.0,
+      "hh_with_zero_days": 1.0
+     },
+     "2015-16": {
+      "hh_rows": 2608.0,
+      "days": 651982.0,
+      "hh_with_zero_days": 3.0
+     },
+     "2018-19": {
+      "hh_rows": 2203.0,
+      "days": 17069.0,
+      "hh_with_zero_days": 1256.0
+     },
+     "2019-20": {
+      "hh_rows": 2470.0,
+      "days": 35636.0,
+      "hh_with_zero_days": 1242.0
+     }
+    }
+   }
+  },
+  "total_family_labor_days": {
+   "base": {
+    "rows": 11714,
+    "days": 2701575.0,
+    "per_wave": {
+     "2009-10": {
+      "hh_rows": 2348.0,
+      "days": 571264.0,
+      "hh_with_zero_days": 43.0
+     },
+     "2010-11": {
+      "hh_rows": 2131.0,
+      "days": 496452.0,
+      "hh_with_zero_days": 12.0
+     },
+     "2011-12": {
+      "hh_rows": 2241.0,
+      "days": 437279.0,
+      "hh_with_zero_days": 0.0
+     },
+     "2013-14": {
+      "hh_rows": 2404.0,
+      "days": 585384.0,
+      "hh_with_zero_days": 0.0
+     },
+     "2015-16": {
+      "hh_rows": 2590.0,
+      "days": 611196.0,
+      "hh_with_zero_days": 0.0
+     }
+    }
+   },
+   "branch": {
+    "rows": 11700,
+    "days": 2703362.0,
+    "per_wave": {
+     "2009-10": {
+      "hh_rows": 2338.0,
+      "days": 572157.0,
+      "hh_with_zero_days": 33.0
+     },
+     "2010-11": {
+      "hh_rows": 2127.0,
+      "days": 497346.0,
+      "hh_with_zero_days": 6.0
+     },
+     "2011-12": {
+      "hh_rows": 2241.0,
+      "days": 437279.0,
+      "hh_with_zero_days": 0.0
+     },
+     "2013-14": {
+      "hh_rows": 2404.0,
+      "days": 585384.0,
+      "hh_with_zero_days": 0.0
+     },
+     "2015-16": {
+      "hh_rows": 2590.0,
+      "days": 611196.0,
+      "hh_with_zero_days": 0.0
+     }
+    }
+   }
+  },
+  "total_hired_labor_days": {
+   "base": {
+    "rows": 16480,
+    "days": 337233.0,
+    "per_wave": {
+     "2009-10": {
+      "hh_rows": 2349.0,
+      "days": 103703.0,
+      "hh_with_zero_days": 1094.0
+     },
+     "2010-11": {
+      "hh_rows": 2134.0,
+      "days": 59540.0,
+      "hh_with_zero_days": 986.0
+     },
+     "2011-12": {
+      "hh_rows": 2251.0,
+      "days": 44483.0,
+      "hh_with_zero_days": 1234.0
+     },
+     "2013-14": {
+      "hh_rows": 2439.0,
+      "days": 36160.0,
+      "hh_with_zero_days": 1258.0
+     },
+     "2015-16": {
+      "hh_rows": 2608.0,
+      "days": 40786.0,
+      "hh_with_zero_days": 1323.0
+     },
+     "2018-19": {
+      "hh_rows": 2214.0,
+      "days": 17069.0,
+      "hh_with_zero_days": 1267.0
+     },
+     "2019-20": {
+      "hh_rows": 2485.0,
+      "days": 35492.0,
+      "hh_with_zero_days": 1262.0
+     }
+    }
+   },
+   "branch": {
+    "rows": 16438,
+    "days": 338191.0,
+    "per_wave": {
+     "2009-10": {
+      "hh_rows": 2339.0,
+      "days": 104517.0,
+      "hh_with_zero_days": 1080.0
+     },
+     "2010-11": {
+      "hh_rows": 2130.0,
+      "days": 59540.0,
+      "hh_with_zero_days": 982.0
+     },
+     "2011-12": {
+      "hh_rows": 2251.0,
+      "days": 44483.0,
+      "hh_with_zero_days": 1234.0
+     },
+     "2013-14": {
+      "hh_rows": 2437.0,
+      "days": 36160.0,
+      "hh_with_zero_days": 1256.0
+     },
+     "2015-16": {
+      "hh_rows": 2608.0,
+      "days": 40786.0,
+      "hh_with_zero_days": 1323.0
+     },
+     "2018-19": {
+      "hh_rows": 2203.0,
+      "days": 17069.0,
+      "hh_with_zero_days": 1256.0
+     },
+     "2019-20": {
+      "hh_rows": 2470.0,
+      "days": 35636.0,
+      "hh_with_zero_days": 1242.0
+     }
+    }
+   }
+  }
+ },
+ "site_I": {
+  "base": [
+   {
+    "site": "built-table-index",
+    "country": "Uganda",
+    "table": "plot_labor",
+    "rows": 169877,
+    "findings": [
+     {
+      "level": "plot_id",
+      "n_nan": 3656,
+      "waves": {
+       "2009-10": 3646,
+       "2011-12": 5,
+       "2013-14": 5
+      }
+     },
+     {
+      "level": "v",
+      "n_nan": 1235,
+      "waves": {
+       "2009-10": 92,
+       "2011-12": 638,
+       "2015-16": 419,
+       "2018-19": 83,
+       "2019-20": 3
+      }
+     }
+    ]
+   }
+  ],
+  "branch": [
+   {
+    "site": "built-table-index",
+    "country": "Uganda",
+    "table": "plot_labor",
+    "rows": 164692,
+    "findings": [
+     {
+      "level": "plot_id",
+      "n_nan": 95,
+      "waves": {
+       "2009-10": 85,
+       "2011-12": 5,
+       "2013-14": 5
+      }
+     },
+     {
+      "level": "v",
+      "n_nan": 1218,
+      "waves": {
+       "2009-10": 76,
+       "2011-12": 638,
+       "2015-16": 419,
+       "2018-19": 82,
+       "2019-20": 3
+      }
+     }
+    ]
+   }
+  ]
+ }
+}
