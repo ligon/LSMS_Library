@@ -146,6 +146,27 @@ number moved (measured).
 - shocks, assets, food_acquired: not attempted yet (complex multi-file modules)
 - community module: *available but NOT wired* — see the next section.
 
+GH #592 evidence for the GPS line above (2026-10-23).  "Predates GPS
+surveys" is a reason, not a check; this is the check.  The four WB entries
+(83 / 84 / 85 / 82, =CIV_198{5,6,7,8}_EPAM_v01_M=, all v01 and still the
+latest) list 109 / 114 / 112 / 110 data files and document 1,670 / 1,774 /
+2,068 / 1,502 variables, and none is a coordinate or a geovariables/offset
+file (name and label searched for gps / latitude / longitude / coord /
+offset).  The only place-flavoured file, =COTERAIN= (rainfall by weather
+station), carries a station code, a year and monthly totals -- no
+coordinates.  The questionnaire check (C4) could NOT be run: every held
+=Documentation/cot*.pdf= in the four waves is an image scan (211-913 bytes
+of extractable text each).  So the verdict is *not released*, on catalog
+evidence; whether the 1985-88 instrument recorded any location is
+unverified.  Measured on =development= =9a0ed5f3c=, cold: 0 of 100 clusters
+with coordinates in each of the four waves.  The columns are now PRESENT
+(all-null) there, so GH #592's separate =declared_columns_present= failure
+for all five CotedIvoire cells is gone -- it was the 2018-19 =df_geo= file
+lacking its =.dvc= sidecar (see =_/data_scheme.yml=, fixed 2026-07-13).
+2018-19: 967 of 1,084 grappes carry coordinates; the other 117 are null in
+=grappe_gps_CIV2018.dta= itself (967 of 1,084 rows populated), a
+release-side gap.  Evidence: =slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
+
 ** There IS a community module for all four CILSS waves (found 2026-08-22, GH #704)
 
 =COMM85.DAT= / =COMM86.DAT= / =COMM87.DAT= / =COMM88.DAT= (one per wave, each
