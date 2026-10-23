@@ -46,6 +46,7 @@ G_ROWS = [
     (13, '90KG', '90 kg Bag'),                    # mapped spelling
     (13, ' basket  ( dengu ) ', 'Basket (Dengu)'),  # normalised, then mapped
     (13, 'DENGU', 'Basket (Dengu)'),              # mapped
+    (13, 'basket (bamboo)', 'Basket (Dengu)'),    # ruling 2026-10-22
     (13, 'BASKET (LARGE)', 'Other (Specify)'),    # size-qualified: left
     (13, 'BASKET (UNSPECIFIED SIZE)', 'Other (Specify)'),  # left
     (13, '70 KG BAG', 'Other (Specify)'),         # no code for it: left
@@ -90,7 +91,7 @@ class TestHarvestBlock:
 
     def test_recovered_rows_are_counted(self, malawi_mod):
         out = _harvest(malawi_mod, _g_frame(), unit_text='ag_g13b_oth')
-        assert out.attrs['unit_text_recovered'] == {3: 2, 11: 2}
+        assert out.attrs['unit_text_recovered'] == {3: 2, 11: 3}
 
     def test_without_unit_text_nothing_changes(self, malawi_mod):
         """`unit_text=None` is the pre-#856 behaviour, row for row."""
@@ -105,7 +106,8 @@ class TestHarvestBlock:
         """A recovered row's `u` is byte-identical to a code-3 / code-11 row's."""
         out = _harvest(malawi_mod, _g_frame(), unit_text='ag_g13b_oth')
         u = list(out['u'])
-        assert u[0] == u[10] and u[2] == u[11]
+        codes = [r[0] for r in G_ROWS]
+        assert u[0] == u[codes.index(3)] and u[2] == u[codes.index(11)]
 
     def test_a_misnamed_text_column_is_loud(self, malawi_mod):
         with pytest.raises(KeyError):
@@ -130,7 +132,7 @@ class TestWhitelist:
 
     @pytest.mark.parametrize('left', [
         '1 90 KG', '90 KG BAD', '90KG BAY', 'BASKET (UNSPECIFIED SIZE)',
-        'BASKET (LARGE)', 'BASKET (SMALL)', 'BASKET (BAMBOO)', 'LARGE BASKET',
+        'BASKET (LARGE)', 'BASKET (SMALL)', 'LARGE BASKET',
         'LARGE BASKETS', 'SMALL BASKET', 'MEDIAM BASKET', 'WEAVING BASKET',
         'MEDIUM WEAVING BASKET', 'LARGE DENGU', 'DENGU(LARGE)',
         'DENGU(GOGODA)', '70 KG BAG', '100 KG BAG', '50 KG BAG',
@@ -146,6 +148,7 @@ Q_ROWS = [
     (13, 'DENGU', 'Basket (Dengu)'),
     (13, 'BASKET (DENGUE)', 'Basket (Dengu)'),
     (13, '90KG BAG', '90 kg Bag'),
+    (13, 'BASKET (BAMBOO)', 'Basket (Dengu)'),    # ruling 2026-10-22
     (13, 'BASKET (UNSPECIFIED SIZE)', 'Other (Specify)'),
     (13, 'CLUSTER', 'Other (Specify)'),
     (9, 'DENGU', 'Piece'),                        # non-13 code: inert
@@ -179,7 +182,7 @@ class TestSaleBlock:
                     unit_sold_text='ag_q02b_oth').set_index('i')
         got = [out.loc[f'h{k}', 'u'] for k in range(len(Q_ROWS))]
         assert got == [r[2] for r in Q_ROWS]
-        assert out.attrs['unit_text_recovered'] == {3: 1, 11: 2}
+        assert out.attrs['unit_text_recovered'] == {3: 1, 11: 3}
 
     def test_sale_quantity_and_value_never_move(self, malawi_mod):
         df = _q_frame()
@@ -191,7 +194,7 @@ class TestSaleBlock:
     def test_without_unit_sold_text_nothing_changes(self, malawi_mod):
         out = _sale(malawi_mod, _q_frame()).set_index('i')
         got = [out.loc[f'h{k}', 'u'] for k in range(len(Q_ROWS))]
-        assert got == ['Other (Specify)'] * 5 + ['Piece']
+        assert got == ['Other (Specify)'] * 6 + ['Piece']
 
 
 class TestAttachIsSymmetric:
@@ -222,3 +225,39 @@ class TestAttachIsSymmetric:
         assert float(out['Value_sold'].iloc[0]) == 50000.0
         assert out.attrs['unit_text_recovered'] == {
             'harvest': {3: 1, 11: 0}, 'sale': {3: 1, 11: 0}}
+
+
+class TestBambooBasketRuling:
+    """@ligon, 2026-10-22: 'BASKET (BAMBOO)' is the dengu.  The measured case:
+    a harvest row written 13 + 'DENGU' and the same household's Module I sale
+    written 13 + 'BASKET (BAMBOO)' -- before the ruling the harvest was
+    recovered and the sale was not, so the pair stopped meeting on `u`."""
+
+    def test_dengu_harvest_meets_a_bamboo_basket_sale(self, malawi_mod):
+        g = pd.DataFrame({
+            'hhid': ['h1'], 'plotkey': ['p1'], 'crop_code': [44],   # tomato
+            'ag_g13a': [10.0], 'ag_g13b': [13], 'ag_g13c': [3],
+            'ag_g13b_oth': ['DENGU'],
+        })
+        i_mod = pd.DataFrame({
+            'hhid': ['h1'], 'crop_code': [44], 'ag_i01': [1],
+            'ag_i02a': [10.0], 'ag_i02b': [13], 'ag_i02c': [3],
+            'ag_i02b_oth': ['BASKET (BAMBOO)'], 'ag_i03': [40000.0],
+        })
+        harvest = [_harvest(malawi_mod, g, unit_text='ag_g13b_oth')]
+        sale = [malawi_mod._sale_block(
+            i_mod, hhid='hhid', cropcode='crop_code', sold_flag='ag_i01',
+            qty_sold='ag_i02a', value_sold='ag_i03', unit_sold='ag_i02b',
+            condition='ag_i02c', perennial=False,
+            unit_sold_text='ag_i02b_oth')]
+        out = malawi_mod.assemble_crop_production('2016-17', harvest, sale)
+        assert list(out['u']) == ['Basket (Dengu)']
+        assert float(out['Quantity'].iloc[0]) == 10.0
+        assert float(out['Value_sold'].iloc[0]) == 40000.0
+
+    def test_qualified_baskets_are_still_left(self, malawi_mod):
+        dengu = malawi_mod._UNIT_TEXT_RECODE[11]
+        assert 'BASKET (BAMBOO)' in dengu
+        for left in ('BASKET (UNSPECIFIED SIZE)', 'BASKET (LARGE)',
+                     'LARGE BASKET', 'LARGE DENGU', 'WEAVING BASKET'):
+            assert left not in dengu

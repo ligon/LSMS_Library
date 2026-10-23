@@ -1234,17 +1234,21 @@ def _crop_conditions(series):
 # (slurm_logs/isa_backlog_2026-10-21/856-harvest-unit-text/) -- no regex, no
 # outside list.  Deliberately NOT recovered, so they stay 'Other (Specify)':
 #   * a count prefix or a typo: '1 90 KG', '90 KG BAD', '90KG BAY';
-#   * any basket or dengu QUALIFIED by size, material or content, because
+#   * any basket or dengu QUALIFIED by size, weave or content, because
 #     code 11 names no size and a qualified one may not be that unit:
 #     'BASKET (UNSPECIFIED SIZE)', 'BASKET (LARGE)', 'BASKET (SMALL)',
 #     'LARGE BASKET(S)', 'SMALL BASKET', 'MEDIAM BASKET', 'LARGE DENGU',
-#     'DENGU(LARGE)', 'DENGU(GOGODA)', 'BASKET (BAMBOO)', 'WEAVING BASKET',
+#     'DENGU(LARGE)', 'DENGU(GOGODA)', 'WEAVING BASKET',
 #     'MEDIUM WEAVING BASKET', 'BASKET OF ...';
 #   * every other bag size ('70 KG BAG', '100 KG BAG', ...): no code exists.
 # Two judgement calls: a plain 'BASKET' / 'BASKETS' / 'BUSKET' is read as the
 # dengu, the only basket the code list offers; and a bare weight with no
 # container word ('90KG', '90 KG', '90KGS', '90 KGS': 21 lines) is read as the
 # 90 kg bag -- the kilograms are the same either way, the label says 'Bag'.
+# One ruling (@ligon, 2026-10-22): 'BASKET (BAMBOO)' -- the only bamboo-basket
+# spelling in our files, 13 Module I lines in 2016-17 -- IS the dengu.  The same
+# households' harvest rows say 'DENGU' / 'BASKET' for the same crop, and
+# leaving it out detached 9 sales that had attached on 13 = 13.
 _UNIT_OTHER_SPECIFY = 13
 _UNIT_TEXT_RECODE = {
     3: frozenset({
@@ -1257,6 +1261,7 @@ _UNIT_TEXT_RECODE = {
         'BASKET ( DENGU )', 'BASKET (DENGUE)', 'BASKET DENGU',
         'BASKET-DENGU', 'BASKET/ DENGU', 'DENGU/BASKET', 'DENGU ( BASKET )',
         'DENGU( BASKET )', 'DENGU/BUSKET', 'BUSKET/DENGU',
+        'BASKET (BAMBOO)',                      # ruling, @ligon 2026-10-22
     }),
 }
 

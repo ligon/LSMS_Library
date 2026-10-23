@@ -17,6 +17,7 @@ Writes to <out_dir> (outside the repo):
 import importlib.util
 import json
 import os
+import re
 import sys
 import time
 import warnings
@@ -50,7 +51,14 @@ with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter('always')
     cp = Country('Malawi').crop_production()
 build_s = time.time() - t0
-build_warnings = sorted({f'{w.category.__name__}: {str(w.message)[:300]}'
+def _public(msg):
+    """A warning's text WITHOUT row-level detail: cut at the first per-row
+    listing (``i=...``) and cap the length -- the repository is public."""
+    msg = re.split(r':?\s*\bi=', msg)[0]
+    return msg[:200]
+
+
+build_warnings = sorted({f'{w.category.__name__}: {_public(str(w.message))}'
                          for w in caught if 'Malawi' in str(w.message)})
 
 flat = cp.reset_index()

@@ -1,6 +1,6 @@
 {
- "checkout": "/local/job40390255/worktrees/856",
- "build_seconds": 37.2,
+ "checkout": "/local/job40390255/worktrees/856-clean",
+ "build_seconds": 34.7,
  "rows": 135078,
  "index": [
   "i",
@@ -97,9 +97,9 @@
  ],
  "attrs_sale": {},
  "malawi_warnings": [
-  "NullIndexKeyWarning: Malawi/crop_production: declared index level(s) carried NaN key(s): level 'plot_id' (wave(s) ['2016-17'] with 41 NaN row(s)); level 'u' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 8,902 NaN row(s)). These row(s) are SERVED and will vanish in the first groupby (pandas' groupby defaults",
-  "QuantityImplausibleWarning: Malawi/crop_production 2016-17: 6 of 37,170 row(s) report a 'Quantity' more than 100x the 90th percentile of comparable rows",
-  "QuantityImplausibleWarning: Malawi/crop_production 2019-20: 13 of 51,872 row(s) report a 'Quantity' more than 100x the 90th percentile of comparable rows"
+  "NullIndexKeyWarning: Malawi/crop_production: declared index level(s) carried NaN key(s): level 'plot_id' (wave(s) ['2016-17'] with 41 NaN row(s)); level 'u' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 8,902",
+  "QuantityImplausibleWarning: Malawi/crop_production 2016-17: 6 of 37,170 row(s) report a 'Quantity' more than 100x the 90th percentile of comparable rows (same wave, unit and crop where at least 30 such rows exist)",
+  "QuantityImplausibleWarning: Malawi/crop_production 2019-20: 13 of 51,872 row(s) report a 'Quantity' more than 100x the 90th percentile of comparable rows (same wave, unit and crop where at least 30 such rows exist)"
  ],
  "kg_default": {
   "source_counts": {

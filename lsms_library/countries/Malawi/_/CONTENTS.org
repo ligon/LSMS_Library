@@ -820,16 +820,37 @@ level.
 *What is recovered*: exact strings only (=strip=, collapsed whitespace,
 upper-case): =90 KG BAG=, =90KG BAG=, =90KG=, =90KG BAGS=, =90 KG BAGS=,
 =90KGS=, =90 KGS=, =90 KG=, =90KGBAG=, =90 KGBAG=, =BAGS OF 90 KGS= -> 3;
-=DENGU=, =BASKET=, =BASKETS=, =BUSKET= and every unqualified dengu-basket
-pairing (=BASKET (DENGU)=, =BASKET (DENGUE)=, =DENGU/BASKET=, ...) -> 11.
-947 + 293 raw lines across G/P/I/Q.  *Deliberately left* =Other (Specify)=:
-typos and count prefixes (=1 90 KG=, =90 KG BAD=, =90KG BAY=), every basket
-or dengu qualified by size, material or content (=BASKET (UNSPECIFIED SIZE)=
-61, =BASKET (LARGE)= 13, =BASKET (BAMBOO)= 13, =LARGE BASKET= 11, ...), and
+=DENGU=, =BASKET=, =BASKETS=, =BUSKET=, every unqualified dengu-basket
+pairing (=BASKET (DENGU)=, =BASKET (DENGUE)=, =DENGU/BASKET=, ...) and
+=BASKET (BAMBOO)= -> 11.  947 + 306 raw lines across G/P/I/Q.  *Deliberately
+left* =Other (Specify)=: typos and count prefixes (=1 90 KG=, =90 KG BAD=,
+=90KG BAY=), every basket or dengu qualified by size, weave or content, and
 every other bag size.  Two judgement calls: plain =BASKET= -> dengu (the only
 basket the code list offers), and a bare weight with no container word
 (=90KG=, =90 KG=, =90KGS=, =90 KGS=: 21 lines) -> =90 kg Bag= (the same
 kilograms; the label says "Bag").
+
+*Ruling (@ligon, 2026-10-22): =BASKET (BAMBOO)= is the dengu.*  It is the only
+bamboo-basket spelling in our files: 13 Module I sale lines, all 2016-17 (10
+cross-sectional, 3 panel), none on the harvest side.  The same households'
+harvest rows say =DENGU= / =BASKET= for the same crop.
+
+*Still left, for a separate decision* (raw code-13 lines, G/P/I/Q, all
+waves):
+
+| string                         | lines | where                          |
+|--------------------------------+-------+--------------------------------|
+| =BASKET (UNSPECIFIED SIZE)=    |    61 | Q 2016-17 59, P 2016-17 2      |
+| =BASKET (LARGE)=               |    13 | Q 2016-17 10, G 2016-17 3      |
+| =LARGE BASKET=                 |    11 | 2019-20: G 4, I 4, Q 3         |
+| =WEAVING BASKET=               |     3 | Q 2016-17 2, G 2019-20 1       |
+| =BASKET (SMALL)=               |     2 | G 2016-17                      |
+| =SMALL BASKET=                 |     2 | G / I 2019-20 panel            |
+| =DENGU(GOGODA)=                |     2 | G 2019-20                      |
+| =MEDIUM WEAVING BASKET=        |     1 | G 2016-17                      |
+| =LARGE DENGU=, =DENGU(LARGE)=  |  1, 1 | P, Q 2019-20                   |
+| =LARGE BASKETS=, =MEDIAM BASKET= | 1, 1 | I, Q 2019-20                   |
+| =BASKET OF ...= (2 strings)    |  1, 1 | G 2019-20 (content, not a unit)|
 
 *Both sides or neither.*  The sale attach keys on =u=.  Recovering only the
 harvest side was measured: it detached *158 sales (16.8M MWK)* that both sides
@@ -845,15 +866,21 @@ had written 13 + "90 KG BAG".  So the sale modules take the same recovery.
 885 rows change =u= and nothing else; no row is added or lost; 2010-11 and
 2013-14 are untouched.  Sales: *115 perennial harvest rows coded 3 / 11 gain
 a sale* (a Module Q sale written 13 + text could not meet them before -- P kept
-the codes, Q did not), all on the unknown-condition wildcard; *13 sales
-detach* (347,000 MWK): 9 'BASKET (BAMBOO)' sales left unrecovered against a
-harvest row that says 'DENGU' / 'BASKET' (7 tomato, rape, okra, tobacco in
-2016-17 -- the same households, so probably the same basket; recovering
-=BASKET (BAMBOO)= is a one-line follow-up if wanted), 1 OX-CART harvest vs a
-'BUSKET' sale (different units: correctly detached), 1 '90 KG BAD' harvest vs
-a '90 KG BAG' sale, and 2 groundnut sales decided by price whose (crop,
-'Other (Specify)') price cell lost the recovered rows.  Net +2,421,000 MWK
-attached (2016-17 +768,600; 2019-20 +1,652,400).
+the codes, Q did not), all on the unknown-condition wildcard; *7 sales
+detach* (1,072,000 MWK):
+- 3 tomato sales in 2016-17 (875,000 MWK) written
+  =BASKET (BAMBOO)= against a harvest row that says =BASKET (SMALL)= (2) or
+  gives no text (1).  These met only on 13 = 13 before; the bamboo ruling
+  serves the sale as the dengu, and a small basket is not asserted to be one;
+- 1 OX-CART harvest vs a =BUSKET= sale (different units: correctly detached);
+- 1 =90 KG BAD= harvest vs a =90 KG BAG= sale;
+- 2 groundnut sales decided by price whose (crop, =Other (Specify)=) price
+  cell lost the recovered rows.
+Net *+1,696,000 MWK* attached (2016-17 +43,600; 2019-20 +1,652,400).  Before
+the bamboo ruling it was +2,421,000, with 13 sales detached: 9 =BASKET
+(BAMBOO)= sales against a =DENGU= / =BASKET= harvest, which the ruling
+re-attaches (+150,000), in exchange for the 3 tomato sales above (-875,000).
+No =Derivation= count moved with the ruling (all 12 are exact matches).
 
 *kg*: no row whose =u= did not change moves its factor.  Default
 =harvest_kg_factors=: the 700 recovered =90 kg Bag= rows gain the declared

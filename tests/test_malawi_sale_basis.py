@@ -95,10 +95,15 @@ ROWS = {
 VALUE_SOLD_BEFORE = {'2010-11': 126_816_048.0, '2013-14': 94_338_845.0,
                      '2016-17': 394_826_755.0, '2019-20': 496_063_698.0}
 VALUE_SOLD_AFTER = {'2010-11': 130_650_105.0, '2013-14': 94_992_745.0,
-                    '2016-17': 409_859_525.0, '2019-20': 529_425_948.0}
-#: GH #856 moved 2016-17 by +768,600 (409,090,925 -> 409,859,525) and 2019-20
+                    '2016-17': 409_134_525.0, '2019-20': 529_425_948.0}
+#: GH #856 moved 2016-17 by +43,600 (409,090,925 -> 409,134,525) and 2019-20
 #: by +1,652,400 (527,773,548 -> 529,425,948): 2,768,000 MWK newly attached,
-#: 347,000 detached (see the ROWS comment above and CONTENTS.org, GH #856).
+#: 1,072,000 detached (see the ROWS comment above and CONTENTS.org, GH #856).
+#: The 2016-17 figure includes the 'BASKET (BAMBOO)' ruling (@ligon
+#: 2026-10-22), which was +768,600 without it: mapping the bamboo basket to
+#: the dengu re-attached 9 exact-match sales (+150,000) and detached 3 tomato
+#: sales (-875,000) whose harvest row says 'BASKET (SMALL)' or nothing --
+#: they had met only on 13 = 13.  No Derivation count moved.
 #: Sales the ladder still suppresses (attrs['sale_basis_mismatch']), per
 #: wave: before 303 / 59 / 247 / 503 (64,110,157 MWK); after the ladder of
 #: 2026-09-24, 94 / 21 / 90 / 140 (13,805,180 MWK); the overrule rung took 2

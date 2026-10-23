@@ -39,7 +39,7 @@ for w, half, sfx in [('2010-11', 'Full_Sample/Agriculture', ''),
                       ucol, ucol + os_))
 
 target = {s: code for code, ss in mw._UNIT_TEXT_RECODE.items() for s in ss}
-near = ('90', 'DENG', 'BASK', 'BUSK')
+near = ('90', 'DENG', 'BASK', 'BUSK', 'BAMB')
 rec = collections.defaultdict(collections.Counter)
 left = collections.defaultdict(collections.Counter)
 for w, half, mod, rel, ucol, tcol in FILES:
