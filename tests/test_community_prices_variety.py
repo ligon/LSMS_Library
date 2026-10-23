@@ -422,10 +422,15 @@ class TestBuilt:
 
     @pytest.mark.parametrize("country", sorted(DECLARED))
     def test_variety_is_a_code_not_a_float_string(self, country):
-        v = _build(country).index.get_level_values("variety")
-        # Niger 2018-19 (s05) names no variety: the canonical sentinel, which
-        # is a declared value, not a mis-formatted code (GH #823).
-        v = v[v != "unknown_variety"]
+        df = _build(country)
+        v = df.index.get_level_values("variety")
+        if country == "Niger":
+            # Niger 2018-19 (s05) names no variety: the canonical sentinel, a
+            # declared value, not a mis-formatted code (GH #823).  Exempt for
+            # that wave only, so the code check stays strict everywhere else.
+            t = df.index.get_level_values("t")
+            assert (v[t == "2018-19"] == "unknown_variety").all()
+            v = v[t != "2018-19"]
         assert v.str.fullmatch(r"\d+").all(), v[~v.str.fullmatch(r"\d+")].unique()[:5]
 
     @pytest.mark.parametrize("country", sorted(DECLARED))
