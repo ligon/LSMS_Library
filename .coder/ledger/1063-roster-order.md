@@ -39,7 +39,11 @@ test that builds twice and compares with order.
   on key order: 14 blocks in 10 `(country, table)` cells (8 EHCVM rosters,
   Nigeria 2012-13 `assets` `[i, j]`, Serbia 2007 `sample` `[opstina, popkrug]`).
   The other 76 are single-key (`(t,k)` and `(k,t)` sort identically) or
-  `merge_how: left` (GhanaSPS, 6 blocks).
+  `merge_how: left` (GhanaSPS, 6 blocks).  Measured: all 10 cells were
+  seed-dependent at the L2-wave tier on development.  Nine were also
+  seed-dependent as served.  Nigeria `assets` was not: its served frame is
+  re-sorted somewhere downstream of the wave tier (step not investigated), so
+  only its wave parquets change order.
 - Every `merge_on` in the corpus is a YAML list (census), so `[*merge_on]` and
   the old `set(...).union(merge_on)` see the same keys.
 - `Wave.grab_data` is `@build_transform()` (ALL-scoped): any edit moves every

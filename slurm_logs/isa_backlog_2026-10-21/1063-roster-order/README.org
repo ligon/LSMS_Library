@@ -35,7 +35,7 @@ order-identical, whatever the backend or worker count:
 | =LSMS_BUILD_BACKEND=make= vs default         | differed once, but =make= under seed 3 = default under seed 3   |
 | =PYTHONHASHSEED= 1 vs 3 (=[v, i]= flips)     | *differs* (table below)                                         |
 | =LSMS_BUILD_WORKERS= 1 vs 2 (dev, seed 1)    | identical                                                       |
-| =LSMS_BUILD_WORKERS= 1 vs 4 (branch, seeds 1/3) | identical                                                    |
+| branch seed 3 + workers 4 vs seed 1 + workers 1 | identical (both axes varied together, as run)               |
 
 * Fix
 
@@ -77,7 +77,7 @@ gives =v= first and seed 3 gives =i= first.  For =[i, j]= and
 | Guinea-Bissau roster    |  42,839 | 727 (2018-19)                                 | identical         | identical           | identical                           | yes                         |
 | Benin roster            |  42,343 | 14,491 (2018-19); first pos 0                 | identical         | identical           | identical                           | yes                         |
 | Serbia sample           |   5,557 | 5,557 (2007)                                  | identical         | identical           | identical                           | yes                         |
-| Nigeria assets          | 865,318 | 0 -- already seed-invariant                   | identical         | identical           | identical (both seeds)              | yes                         |
+| Nigeria assets          | 865,318 | 0 served (wave tier differs, below)           | identical         | identical           | identical (both seeds)              | yes                         |
 
 =*= Mali cold vs warm has an identical index order.  =MonthsSpent= is =object=
 cold and =StringDtype= warm.  That is the 2026-10-14 dtype round-trip finding
@@ -87,7 +87,23 @@ here.
 
 So the served order of nine cells changes against the development builds that
 drew the "other" seed, and is unchanged against those that drew the declared
-order.  Nigeria =assets= was seed-invariant before and is unchanged.
+order.
+
+Nigeria =assets= is the exception.  Its served frame was seed-invariant on
+development and is unchanged, but its 2012Q3 and 2013Q1 L2-wave parquets were
+not (175,855 of 175,857 positions differ between seeds 1 and 0).  Some step
+between the wave tier and the served frame re-sorts it.  That step was not
+investigated.
+
+* Order identity at the L2-wave tier (=wave_tier.json=)
+
+The issue also saw the wave parquets differ.  Each root's
+={wave}/_/<table>.parquet= was compared under seed 1 and the flipping seed:
+
+| tree        | wave parquets compared | order differs |
+|-------------+------------------------+---------------|
+| development |                     30 | 15: every EHCVM wave, Serbia 2007, Nigeria 2012Q3 and 2013Q1 |
+| branch      |                     30 | 0             |
 
 * Served-order footprint outside the affected cells (=footprint.json=)
 
@@ -120,6 +136,16 @@ development vs the branch working tree.  =Wave.grab_data= is
 This is a corpus-wide cold re-warm.  It is meant to be bundled with the
 re-warm that open PRs #1233/#1251 already force.
 
+The branch census ran after the =country.py= edit and before the
+=Mali/_/CONTENTS.org= note.  =CONTENTS.org= is excluded from the =_/*.org= hash
+inputs (=CLAUDE.md=, "Cache Behavior"), so the committed tree gives the same
+counts.
+
+Every build and test here ran in a private =LSMS_DATA_DIR=.  The related suite
+used a copy of the shared warm cache at =data-private/1063/tests-br=.  The
+shared root (=/global/scratch/.../cache/lsms_library=) was not rebuilt at
+branch hashes.
+
 * Test
 
 =tests/test_gh1063_roster_order.py=:
@@ -131,7 +157,14 @@ re-warm that open PRs #1233/#1251 already force.
 | run                     | synthetic (3)                        | Benin (requires_s3)                       |
 |-------------------------+--------------------------------------+-------------------------------------------|
 | development =9a0ed5f3c= | 3 failed (seed 0 -> cluster order, seed 3 -> household order) | failed: index level 0 differs at 33.6% |
-| branch                  | 3 passed                             | passed (33 s)                             |
+| branch                  | 3 passed (~17 s; two ~5 s imports per test) | passed (~35-45 s, two concurrent builds) |
+
+=test_merge_key_order_is_spelled_without_a_set= is a deliberate static pin.
+It breaks if the line is refactored into a helper.  The two subprocess tests are
+what discriminate, so it can be dropped without losing coverage.
+
+Related suite on the branch: 21 files, 622 passed and 2 skipped.  Both skips
+are by design: the Togo/Benin parametrization in =test_gh323_benin_togo.py:142=.
 
 The seed probe must not use =python -I= or =-E=: isolated mode ignores
 =PYTHONHASHSEED=.  The first draft did, so its probe drew random seeds and the
