@@ -1,0 +1,123 @@
+#+TITLE: GH #1245 -- id_walk single-pass rename, applied exactly once
+#+DATE: 2026-10-23
+
+Aggregates only.  Row-level ids (served frames, regenerated scratch crosswalks)
+stayed under =/local/job40390255/data-private/1245/= and are not committed.
+Base = =d353b7ea7= (=integration/isa-batch-20261023=, with #1249), run from a
+detached worktree so the candidate's edits could not leak into it.  Candidate =
+=a7b0e703b= + =7058b8d92=.  Every build in a fresh =LSMS_DATA_DIR= per country
+(=dvc-cache= symlinked), =LSMS_BUILD_WORKERS=1=, =LSMS_MAKE_JOBS=1=,
+=nice -n 19=, at most 4 processes.
+
+* 1. Lifecycle: where =id_walk= runs (=d353b7ea7=)
+
+| site | path:line | applied to | gate |
+|------+-----------+------------+------|
+| stage 2 of =load_from_waves= | =country.py:5489-5494= | each wave's result, before augment / normalise / concat / the L2-country write | flag absent and =_updated_ids_cache= loaded (forced at =country.py:5179-5185=) |
+| =_finalize_result= | =country.py:3984-3990= | the frame about to be served (cold, warm, assume, Feature) | flag absent and =_updated_ids_cache= loaded |
+| =derivation_inputs= | =country.py:2934-2940= | raw derivation inputs | flag absent |
+| Ethiopia country scripts | =Ethiopia/_/{anthropometry,crop_production,food_coping,livestock,people_last7days,plot_features,plot_inputs,plot_labor}.py= | concatenated raw wave parquets, in a =make= subprocess | none |
+| Uganda (13) / Tanzania (11) country scripts | =uganda.py:741= / =tanzania.py:794= (their own =id_walk=, always single-pass) | same | none |
+| =diagnostics._check_id_walk_idempotent= | =diagnostics.py:1667= | the served spine, flag cleared | deliberate re-walk |
+
+=id_converted= is set only by =id_walk= (and Uganda's / Tanzania's copies);
+it is checked at the three framework sites above.  =Feature= calls the
+=Country= methods and never walks.
+
+Measured over every table of the 11 panel countries (250 tables x 5 routes =
+1,250 reads): =harness_base_d353b7ea7.json=.
+
+- *The L2-country parquet is POST-walk.*  Stage 2 walks before the write; a
+  country script that walks writes walked ids.  The flag rides into the
+  parquet (pyarrow stores =df.attrs= in the pandas metadata on both
+  =to_parquet= routes; =get_dataframe= restores it), so a table whose own
+  build walked it is never walked again on any warm route.  The brief's "the
+  flag is lost through a parquet round trip" is false here (pandas 3.0.6,
+  pyarrow 25.0.1).
+- *L2-wave parquets are PRE-walk* (=Wave.grab_data= / wave scripts emit raw
+  ids; no wave script calls =id_walk=).
+- *Applied twice today: yes, on every read of the tables below.*  22
+  =_finalize_result= walks per route (cold, warm_same, warm_fresh, Feature);
+  10 per route are on waves whose map moves ids and are provably
+  re-applications (classified =walked=: no =K - V= id, thousands of =V - K=
+  ids, no flag).  The other 12 are in countries whose maps are identity or
+  empty, where the ids cannot say and a second pass is a no-op:
+
+  | country | tables re-walked on every read |
+  |---------+-------------------------------|
+  | Burkina_Faso | food_quantities |
+  | Ethiopia | food_quantities, nutrition |
+  | GhanaLSS | food_quantities (+ nutrition, no moving ids) |
+  | Malawi | food_quantities, crop_production |
+  | Tanzania | food_quantities |
+  | Uganda | food_quantities, nutrition, income |
+  | EthiopiaRHS, Mali, Niger, Senegal, Nigeria (7 tables) | identity or empty maps: harmless under any semantics |
+
+  =food_quantities= is derived from the served =food_acquired=; =nutrition=
+  and Uganda =income= are scripts that call the =Country= API; Malawi
+  =crop_production= loses the flag inside =load_from_waves=.  Uganda =nutrition=
+  is walked THREE times (=food_acquired= -> =food_quantities= -> =nutrition=).
+- =assume_cache_fresh= never walks (=_updated_ids_cache= is not loaded on a
+  fresh instance); it serves the post-walk parquet, so it agrees with cold.
+- One stage-2 walk classified =walked= is not a household id at all: Niger
+  2014-15 =community_prices=, where =i= is the FOOD ITEM (16 item codes equal a
+  2011-12 household id).  It renames nothing under either semantics; but the
+  stage-2 walk does run on any table with an =i= level.
+
+* 2. Corpus effect of single-pass semantics (before any code change)
+
+- =chain_census_committed.json= (base): every wave of every committed
+  =updated_ids= map: *0 chain keys, 0 waves where the closure differs from the
+  raw map, 0 non-injective maps.*  So for every committed crosswalk
+  single-pass == closure and no served id moves.  =chain_census_head.json=
+  (after the Burkina regeneration): the same, except Burkina 2021-22 with 80
+  chain keys -- the only map in the corpus where the two semantics differ.
+- =bf_simulate.json=: Burkina 2021-22 on its cover (3,227 households):
+
+  | map | semantics | linked correctly | wrong household | unlinked | duplicate ids |
+  |-----+-----------+------------------+-----------------+----------+---------------|
+  | committed (guard) | closure | 3,147 | 8 | 72 | 0 |
+  | committed (guard) | single-pass | 3,147 | 8 | 72 | 0 |
+  | guard removed | closure | 3,147 | 80 | 0 | 80 (157 households) |
+  | guard removed | single-pass | *3,227* | *0* | 0 | *0* |
+
+  Guard-free map: 2,926 moving keys; =K - V= 2,846, =V - K= 2,846, =K & V= 80.
+  A SECOND single pass would move 80 households and leave 77 duplicate ids.
+- =other_guards_single_pass.json= (scratch only; not changed): Mali 2021-22
+  drops 11, of which 3 land on an occupant that moves (single-pass-safe) and 8
+  on one that stays (genuine collisions); Niger 2014-15 drops 5 = 4 + 1;
+  GhanaLSS drops 0.
+
+* 3. Verification (candidate)
+
+- =base_vs_cand.json=: per (country, table, route), base vs candidate served
+  frame: *1,175 identical*; the other *75 = Burkina's 15 household tables x 5
+  routes*, with equal row and (t, i) counts.  Candidate routes agree with each
+  other exactly where base's do (only =nutrition= under =assume= differs, in
+  Ethiopia and Uganda, in both runs: row order only, because the redundant
+  re-walk regroups rows by wave; =assert_frame_equal= after =sort_index=).
+  0 errors, 0 =IdWalkError= (0 =mixed= frames anywhere), duplicate-index
+  counts identical (pre-existing: =assets= x5 countries, Mali =food_acquired=).
+- =burkina_served_ids_base_vs_cand.json=: sample, household_roster,
+  food_acquired, food_quantities, plot_features, assets: the 2014 and 2018-19
+  rows identical; 2021-22 rows identical once ids are mapped back; candidate
+  ids == the regenerated map's prediction; 0 duplicates.  2021-22 households
+  sharing an id with a served 2018-19 household: 3,155 -> 3,227.
+- =panel_checks_status.json=: =check_panel_consistency= for all 11 countries:
+  every status identical to base.  Burkina messages: 3,147 -> 3,227 mappings;
+  attrition 2018-19 -> 2021-22 3,155 (98%) -> 3,227 (100%).
+  =id_walk_idempotent= passes everywhere.  Counterfactual on the candidate's
+  Burkina root with a BARE single pass monkeypatched in: the same check FAILS
+  (77 (i, t) disappear) -- the detection is load-bearing on real data.
+- =tests.txt=: 145 + 321 passed.
+- =hash_census_diff.json=: 549/549 L2-country, 40/40 =build_transforms_fingerprint=,
+  2,109/2,109 L2-wave hashes move -- a corpus-wide cold re-warm.  Unavoidable
+  for any edit to =id_walk=: it is reached from the tagged =_aggregate_wave_data=,
+  and =Wave.grab_data= folds the fingerprint into every wave hash.
+
+* Scripts
+=scripts/=: =harness.py= (instrumented read of every table by route),
+=analyze.py=, =compare.py=, =chain_census.py=, =bf_run_noguard.py= /
+=bf_simulate.py= (scratch regeneration and simulation), =other_guards_run.py=,
+=panel_check.py= / =panel_checks.sh=, =dump_ti.py= / =bf_compare.py=,
+=run_country.sh= / =queue.sh=.
