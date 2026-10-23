@@ -114,6 +114,10 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - *PR #1263 open* (#637 Tanzania tail: plot_inputs keyed on =u=, crop_production stops minting zeros; reviewed against a raw oracle; 5 decisions listed; Site Q pin re-formed around #1259).  #637 narrowed to Malawi x8 + Nigeria x1; read-only diagnosis of those running.
 - Running: #894 (panel_ids Design A), #1261 (Nigeria geo =merge_how: left=), the #637 Malawi/Nigeria tail diagnosis.
 
+- #1261 HELD (branch pushed, no PR): =merge_how: left= would hide the only signal that 2013Q1 lacks 44 post-harvest-cover households (2 EAs).  Folded into #1120 D1; commented on both.
+- #637 Malawi/Nigeria tail DIAGNOSED (comment on #637): 5 sites sound; defects A (Malawi crop-code merge drops sales and mislabels variety; needs a grain ruling), B (seed-purchase fan-out), C (Nigeria W3 2nd-location prices; =obs= slot per #840 contract), plus Malawi minted zeros and 2010-11 duplicate records.  Malawi B + zeros + duplicates dispatched (worktree =637-mw=).  NEXT: Nigeria C (W3 =obs=, location 1/2).
+- #1259 (Site Q positive-only reference) running.  #894 running.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
