@@ -49,20 +49,21 @@ Data Scheme:
     FIES_score: int
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
-    # source (purchased / produced / inkind / other).  EHCVM 2018-19
-    # and 2021-22 wave mapping.py files import
-    # food_acquired_to_canonical as food_acquired to reshape the
-    # wide-form (Quantity-total, Produced-subset, Expenditure) into
-    # long-form on s.  `visit` (vague) is dropped: in EHCVM it's a
-    # sample split, not a repeated measure.
-    #
-    # The 2014-15 EACI wave is Phase-2-incomplete: its data_info.yml
-    # incorrectly maps `Quantity: s13q02`, but s13q02 is a Oui/Non
-    # column.  Pending a Phase 3 audit to identify the correct
-    # quantity / produced / expenditure variables for that instrument,
-    # 2014-15 continues to emit a legacy non-canonical shape; runtime
-    # output of Country('Mali').food_acquired() therefore mixes shapes
-    # across waves.
+    # source (purchased / produced / inkind / other).  Every wave that
+    # declares food_acquired emits the same canonical shape
+    # (t, v, i, j, u, s) with Quantity / Expenditure (GH #839):
+    #   - EHCVM 2018-19 and 2021-22: each wave's mapping.py food_acquired
+    #     hook wraps lsms_library/ehcvm.py:food_acquired_ehcvm (GH #876 --
+    #     purchased Quantity is the gift-net consumed quantity, Expenditure
+    #     the registered derived valuation, gifts served as s='inkind').
+    #   - EACI 2014-15: its data_info.yml reads the three acquisition
+    #     streams separately (s13q03a/b/c purchased quantity/unit/value,
+    #     s13q04a/b produced, s13q05a/b in-kind; s13q02 is the Oui/Non
+    #     gate, NOT a quantity), and the wave mapping.py food_acquired
+    #     hook melts them onto s (GH #380 Phase 3 audit).
+    #   - EAC-I 2017-18 declares no food_acquired.
+    # `visit` (vague / passage) is dropped: it is a sample split, not a
+    # repeated measure.
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
