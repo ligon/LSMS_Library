@@ -404,8 +404,13 @@ def _adopt_alternate_cover(flat):
         for c in alt:
             target = c[len(_ALT_COVER_PREFIX):]
             src = flat[c].loc[only_alt]
-            if target == 'v':
-                # A myvar has no `v` formatter, and the outer merge floats it.
+            if target in ('v', 'District'):
+                # The primary cover's `v` and `District` pass through this
+                # module's `v` / `District` formatters (= format_id); an `_ag_`
+                # myvar passes through none.  Without the same canonical form
+                # an unlabelled district code (2015-16 '229') is the int 229 on
+                # one side and the string '229' on the other, and
+                # reduce_to_agreed blanks a District nobody disagrees about.
                 src = src.map(format_id)
             if target not in flat.columns:
                 flat[target] = pd.NA

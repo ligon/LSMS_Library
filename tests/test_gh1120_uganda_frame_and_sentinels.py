@@ -156,6 +156,25 @@ def test_alternate_cover_fills_only_households_the_cover_lacks(uganda_module):
     assert out.loc[("2015-16", "G1"), "weight"] == 10.0
 
 
+def test_alternate_cover_district_is_canonicalised_like_the_cover(uganda_module):
+    """An unlabelled district code reaches the alternate cover as a number and
+    the cover (through ``uganda.District`` = ``format_id``) as a string; the
+    adopted value must be the cover's form, or ``reduce_to_agreed`` blanks a
+    District the households agree on (measured: 2015-16 '229')."""
+    u = uganda_module
+    df = pd.DataFrame({
+        "t": ["2015-16"] * 2, "i": ["G1", "AG"],
+        "v": ["12345678", np.nan], "District": ["229", np.nan],
+        "Region": ["Northern", np.nan], "_cover": ["G1", np.nan],
+        "_ag_v": [12345678.0, 12345678.0], "_ag_District": [229, 229],
+        "_ag_Region": ["Northern", "Northern"],
+    }).set_index(["t", "v"])
+    out = u.cluster_features(df)
+    n = len(out)
+    assert n == 1, f"{n} != 1"
+    assert out.iloc[0]["District"] == "229"
+
+
 def test_cluster_features_hook_singletons_cover_rows_only(uganda_module):
     """A cover household with no cluster id becomes its own cluster row; a
     geovar row with no cover attribute at all is still dropped (2005-06's 368
