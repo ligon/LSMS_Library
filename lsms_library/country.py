@@ -3927,6 +3927,30 @@ class Country:
             return df
 
         if isinstance(df, pd.DataFrame):
+            # GH #1234: a missing `u` is U_UNKNOWN on EVERY route, cold or warm.
+            # `map_index` renames it at `Wave.grab_data` and at the warm read
+            # gates, but a `u` a wave script writes as a COLUMN (Malawi
+            # crop_production) gets no `u` level until load_from_waves'
+            # per-wave `_normalize_dataframe_index` promotes it, after
+            # grab_data's map_index has run -- so the cold build served pd.NA
+            # and the warm read 'Unknown'.  This asks `map_index` what it does
+            # to each distinct `u` value and applies exactly that, with the
+            # read gate's own `rename(level='u')`: map_index stays the ONE
+            # definition, so the two sites cannot drift, and a NaN-policy NaN
+            # it never matched is still not matched (GH #1118).  Before the
+            # declared-index collapse below, whose groupby would drop the NA key.
+            # Read path (`_finalize_result` is in _EXCLUDED_CALLABLES): 0 hashes.
+            if 'u' in df.index.names:
+                u_seen = df.index.get_level_values('u').unique().rename('u')
+                u_served = map_index(pd.DataFrame(index=u_seen)).index
+                u_renames = {old: new for old, new in zip(u_seen, u_served)
+                             if pd.isna(old) != pd.isna(new)
+                             or (not pd.isna(old) and old != new)}
+                if u_renames:
+                    attrs = dict(df.attrs)
+                    df = df.rename(index=u_renames, level='u')
+                    df.attrs = attrs
+
             df = self._augment_index_from_related_tables(df, scheme_entry, None)
             df = _normalize_dataframe_index(df, scheme_entry, None, method_name,
                                             country=self.name)
