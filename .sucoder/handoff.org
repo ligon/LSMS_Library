@@ -60,6 +60,10 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - Uganda #1133: implementation =935ba72f9= (370-row comm_frame_ea crosswalk; 2010-11->2011-12 continuity 0% -> 100%; baseline fixture update committed separately FOR MAINTAINER APPROVAL); red-team running.  Filed *#1230* (all-digit org key columns parse as int64; list-form =mappings:= on a formatted idxvar).
 - #1111 lane started: find IHS4 2016-17 / IHPS 2013 questionnaires; apply PR #1193's kg-unit pattern only where Q39 confirms the column roles.
 
+- *PR #1232 open* (Uganda #1133; Closes #1133; baseline fixture commit =935ba72f9= FOR MAINTAINER APPROVAL).  *PR #1233 open* (#1221 follow-up, 3 review rounds; corpus-wide re-warm, so merge it before anyone re-warms after #1221).
+- Lanes now running: #1111 (Malawi 2013/2016 questionnaires -> kg units), #827 (Malawi community_prices blank units, diagnose-then-fix), #1123 (Niger/Senegal/CotedIvoire plot_inputs identity collapses on the #1189 pattern).  Each needs a red-team before its PR.
+- #821 (Mali 2018-19 s05) deliberately waits for #1227 to merge; per #1226 the s05 helpers then move to =ehcvm.py=.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
