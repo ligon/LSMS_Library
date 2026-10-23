@@ -146,3 +146,18 @@ runtime/provider checks need separate release and literal source identities.
 
 Exact5f completion is independently root-accepted under
 `0155b625...74d0c307`; it is not runtime proof of the new composition.
+
+### Phase 4 - composition materialized and validated (2026-10-22, Sue / Claude Opus 5.5)
+
+The HOLD above is discharged.
+Merge commit `ab4e22a8b` has tree `365d55b06b70faa0e2b17a775e8ac48b511f3043`, the proposed tree.
+`_build_registry.py` equals 5f byte for byte; the `country.py` patch on 60aa is line-identical to 5f's patch on f7.
+
+- Candidate tests on 60aa source: 56 fail / 105 pass; on the candidate: 161 pass.
+- Real Burkina Faso empty requests (2014, 2021-22; default and make): the four
+  #1188 fields go from `object` to `string`/`boolean`/`Float64`/`string`;
+  backends agree. Populated 2018-19 is `assert_frame_equal`-exact base vs candidate.
+- Hash impact on 60aa vs candidate: 549/549 country, 40/40 fingerprint,
+  2,109/2,109 wave hashes move -- a corpus-wide cold re-warm.
+
+Evidence and scripts: `slurm_logs/isa_backlog_2026-10-21/1218-current-validation/README.org`.
