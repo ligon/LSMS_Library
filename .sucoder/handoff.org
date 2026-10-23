@@ -25,7 +25,11 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - *Niger #823 diagnosis done* (branch head =1f5f290d0=): wiring proposal plus seven decisions D1-D7 for Ethan in the ledger's Phase 2.  Not wired.
 - *Malawi #856:* Ethan approved the unit-text recovery (886 rows) and a separate cowpea issue.  The diagnosis agent is implementing on =fix/856-malawi-harvest-unit-text-20261022= and drafting (not filing) the cowpea issue.
 
-Next: review the Malawi implementation and file the cowpea issue; take Ethan's answers on Niger D1-D7; then Uganda #1133.
+- *PR #1223 relabelled* (=fc989bd15=): group rows are =Inorganic Fertilizer?= / =Phytosanitary products?=; a trailing =?= is a library convention for a use answer (=transformations.is_use_answer_label=), skipped by =nitrogen_kg=.  Mali nitrogen/seed totals and tally identical to development; Mali-only hashes.
+- *Niger #823 decisions (Ethan):* D1 serve both readings as recorded; D2 =Quantity= = 1 as a REGISTERED derivation (Niger's own tablet price questionnaire, UEMOA NADA catalog 48 downloads 199/200, records two integer multiple-of-5 prices per product x unit-size and no quantity); D3 code bridge, narrower products take the household's broader =j=; D4 Uganda precedent, size inside =u= (=Tas (Petit)=); D5 obs 3/4; D6 visit = vague; D7 found (WB 4296 ships Chad's template).  The diagnosis agent is wiring it on =fix/823-niger-2018-community-prices-20261022=.
+- *Filed #1224:* EHCVM =food_acquired.u= drops the unit size for 60-88% of consumed rows in all eight countries (evidence under =slurm_logs/isa_backlog_2026-10-21/ehcvm-unit-size/= on this branch).
+
+Next: review the Malawi and Niger implementations (verify published branches, docs-only vs source scope, real-data diffs), open their PRs, file the cowpea issue from the Malawi draft; then Uganda #1133.
 
 Sue
 
