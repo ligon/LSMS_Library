@@ -20,6 +20,7 @@ pinned the same way, for the same reasons:
 
 import copy
 import pickle
+import re
 import sys
 import warnings
 
@@ -187,6 +188,12 @@ class TestTheVocabularyIsFrozenFromUganda:
             assert used == set(allowed), (name, set(allowed) ^ used)
         used = {k for r in recs for o in (r.oversamples or []) for k in o}
         assert used == set(S._OVERSAMPLE_FIELDS)
+        # GH #1135: the measurement block's fields are frozen the same way.
+        used = {k for r in recs
+                for k in ((r.get("panel") or {}).get("cluster_id_measurement")
+                          or {})}
+        assert used == set(S._MEASUREMENT_FIELDS), \
+            set(S._MEASUREMENT_FIELDS) ^ used
 
 
 # ---------------------------------------------------------------------------
@@ -709,6 +716,227 @@ def test_the_warning_is_excluded_from_every_build_fingerprint():
             in R._EXCLUDED_CALLABLES)
 
 
+# ===========================================================================
+# GH #1135 -- the boundary's SIZE: a typed measurement record, and the first
+# line of the warning (ruling @ligon 2026-10-23: print what is measured, say
+# "not measured" otherwise, never print the conditional Nigeria W5 86..106 as
+# settled)
+# ===========================================================================
+
+def measured(**kw):
+    """A minimal valid ``cluster_id_measurement`` block."""
+    block = {"linked_households": 100, "households_changed": 10,
+             "clusters_renumbered": 1, "source_type": "derived-from-data",
+             "confidence": "high", "locator": "measured"}
+    block.update(kw)
+    return {k: v for k, v in block.items() if v is not None}
+
+
+def with_measurement(**kw):
+    return {"panel": panel(cluster_id_measurement=measured(**kw))}
+
+
+class TestTheMeasurementRecord:
+    """Optional, typed, with its own provenance -- and the freeze still
+    refuses anything else."""
+
+    def test_a_measurement_block_is_accepted_and_frozen(self):
+        r = SamplingRecord.from_config("A", "2", with_measurement())
+        m = r["panel"]["cluster_id_measurement"]
+        assert isinstance(m, S._FrozenDict)
+        assert m["linked_households"] == 100
+        with pytest.raises(TypeError, match="immutable"):
+            m.__setitem__("linked_households", 1)
+
+    def test_the_block_is_optional(self):
+        r = SamplingRecord.from_config("A", "2", {"panel": panel()})
+        assert "cluster_id_measurement" not in r["panel"]
+
+    @pytest.mark.parametrize("kw,error", [
+        ({"n_psu": 3}, r"unknown field\(s\) \['n_psu'\] in "
+                       r"panel\.cluster_id_measurement"),
+        ({"linked_households": True}, "non-negative integer"),
+        ({"linked_households": 100.0}, "non-negative integer"),
+        ({"linked_households": "100"}, "non-negative integer"),
+        ({"households_changed": -1}, "non-negative integer"),
+        ({"households_changed": 101}, "exceeds linked_households"),
+        ({"households_changed_net_of_movers": 11, "mover_rule": "x"},
+         "exceeds households_changed"),
+        ({"households_changed_net_of_movers": 5}, "mover_rule comes with"),
+        ({"mover_rule": "sentinel"}, "mover_rule comes with"),
+        ({"linked_households": None}, "without its denominator"),
+        ({"linked_households": None, "households_changed": None,
+          "clusters_renumbered": None}, "carries no count"),
+        ({"source_type": None}, "travels with its own provenance"),
+        ({"confidence": None}, "travels with its own provenance"),
+        ({"locator": None}, "travels with its own provenance"),
+        ({"source_type": "not-found", "confidence": "low"}, "OMITTING"),
+        ({"source_type": "questionnaire"}, "controlled vocabulary"),
+        ({"confidence": "certain"}, "controlled vocabulary"),
+    ])
+    def test_a_malformed_block_is_refused(self, kw, error):
+        """Each case matches the NEW error text: on a schema without the
+        block every one of them fails as 'unknown field', which a loose
+        match would wrongly accept."""
+        with pytest.raises(ValueError, match=error):
+            SamplingRecord.from_config("A", "2", with_measurement(**kw))
+
+    def test_a_measurement_needs_a_declared_boundary(self):
+        block = {"panel": {"role": "panel", "source_type": "derived-from-data",
+                           "confidence": "high",
+                           "cluster_id_measurement": measured()}}
+        with pytest.raises(ValueError, match="measures a declared boundary"):
+            SamplingRecord.from_config("A", "2", block)
+
+    def test_a_net_count_may_equal_its_bounds(self):
+        SamplingRecord.from_config("A", "2", with_measurement(
+            households_changed=10, households_changed_net_of_movers=10,
+            mover_rule="none moved"))
+        SamplingRecord.from_config("A", "2", with_measurement(
+            linked_households=0, households_changed=None,
+            clusters_renumbered=None))
+
+    def test_every_shipped_incomparable_boundary_is_measured(self):
+        """The ruling's first line needs a size for every warned boundary;
+        the curation covers all of today's (stable ones carry none)."""
+        import lsms_library as ll
+        for name in ll.countries():
+            for w, r in sampling_records(name).items():
+                if r.cluster_id_continuity in S.INCOMPARABLE_CLUSTER_IDS:
+                    assert r["panel"].get("cluster_id_measurement"), (name, w)
+
+    @pytest.mark.parametrize("country,wave,n,d,net,k", [
+        # lifted from each boundary's cluster_id_note / counts-safe.json
+        ("GhanaLSS", "1988-89", 712, 712, None, 79),
+        ("Ethiopia", "2013-14", 3776, 3776, None, 333),
+        ("Tanzania", "2012-13", 2904, 591, None, 82),
+        ("Tanzania", "2014-15", 521, 108, None, None),
+        ("Tanzania", "2019-20", 849, 849, None, None),
+        ("Uganda", "2009-10", 2601, 191, None, None),
+        ("Uganda", "2010-11", 2640, 433, None, None),
+        ("Uganda", "2013-14", 1717, 1717, None, None),
+        ("Uganda", "2018-19", 2973, 2973, None, None),
+        ("Nigeria", "2018Q3", 1493, 79, 10, 1),
+        ("Nigeria", "2023Q3", 5067, 343, None, 12),
+        ("Burkina_Faso", "2018-19", 0, None, None, None),
+        ("Niger", "2018-19", 0, None, None, None),
+    ])
+    def test_the_shipped_counts(self, country, wave, n, d, net, k):
+        m = sampling_records(country)[wave]["panel"]["cluster_id_measurement"]
+        assert m.get("linked_households") == n
+        assert m.get("households_changed") == d
+        assert m.get("households_changed_net_of_movers") == net
+        assert m.get("clusters_renumbered") == k
+
+
+def _shipped_message(country, waves_in_frame):
+    """The warning a frame holding *waves_in_frame* gets from the SHIPPED
+    records -- synthetic rows, real config, no data."""
+    import lsms_library as ll
+    waves = ll.Country(country).waves
+    df = pd.DataFrame({"t": list(waves_in_frame), "v": "x", "i": "1",
+                       "x": 1.0}).set_index(["t", "v", "i"])
+    rep = S.audit_cluster_identity(df, country=country, table="sample",
+                                   waves=waves)
+    assert rep is not None
+    return rep, S._format_cluster_report(rep)
+
+
+class TestTheFirstLine:
+
+    def test_nigeria_w3_w4_states_both_sizes(self):
+        """The ruling's own example: a reader can judge 0.67%."""
+        _, msg = _shipped_message("Nigeria", ["2016Q1", "2018Q3"])
+        first = msg.splitlines()[0]
+        assert "2016Q1 -> 2018Q3: 1 cluster id renumbered" in first, first
+        assert ("10 of 1,493 linked households (0.67%) change `v` net of "
+                "movers") in first, first
+
+    def test_a_100_percent_boundary_states_its_size(self):
+        _, msg = _shipped_message("GhanaLSS", ["1987-88", "1988-89"])
+        first = msg.splitlines()[0]
+        assert "1987-88 -> 1988-89: 79 cluster ids renumbered" in first, first
+        assert "net-of-movers share: not measured" in first, first
+        assert "712 of 712 linked households, 100%, change `v` counting " \
+            "movers" in first, first
+
+    def test_the_conditional_nigeria_w5_figure_is_never_printed_as_settled(
+            self, monkeypatch):
+        """86..106 is conditional on what W5's 'original location' means.
+        The first line must SAY net-of-movers is not measured (a positive
+        claim, so this fails on a formatter that prints no sizes at all),
+        and no 86 / 106 may appear anywhere in the message, nor the
+        sentinel-only 112 on the first line."""
+        import lsms_library as ll
+        waves = ll.Country("Nigeria").waves
+        for pair in (["2019Q1", "2023Q3"], ["2016Q1", "2024Q1"]):
+            _, msg = _shipped_message("Nigeria", pair)
+            first = msg.splitlines()[0]
+            assert ("2019Q1 -> 2023Q3: 12 cluster ids renumbered, "
+                    "net-of-movers share: not measured") in first, first
+            assert re.search(r"\b(86|106)\b", msg) is None, msg
+            assert not re.search(r"\b112\b", first), first
+            # the strict refusal carries the same text
+            df = pd.DataFrame({"t": pair, "v": "x", "i": "1", "x": 1.0}
+                              ).set_index(["t", "v", "i"])
+            monkeypatch.setenv("LSMS_CLUSTER_STRICT", "1")
+            with pytest.raises(S.ClusterIdentityError) as exc:
+                S.check_cluster_identity(df, country="Nigeria",
+                                         table="sample", waves=waves)
+            monkeypatch.delenv("LSMS_CLUSTER_STRICT")
+            refused = str(exc.value)
+            assert "net-of-movers share: not measured" in refused
+            assert re.search(r"\b(86|106)\b", refused) is None
+        # ... and the record carries it only as a qualified note, never as
+        # a count the formatter could print.
+        m = sampling_records("Nigeria")["2023Q3"]["panel"][
+            "cluster_id_measurement"]
+        assert "households_changed_net_of_movers" not in m
+        note = " ".join(m["note"].split())
+        assert "86..106 holds ONLY IF" in note and "not established" in note
+
+    def test_every_flagged_boundary_is_on_the_one_first_line(self):
+        rep, msg = _shipped_message("Uganda", ["2005-06", "2019-20"])
+        first = msg.splitlines()[0]
+        for b in rep["boundaries"]:
+            assert f"{b['from']} -> {b['to']}: " in first, (b["to"], first)
+        assert first.count(" -> ") == len(rep["boundaries"]) == 4
+
+    def test_no_household_link_is_said_not_divided(self):
+        _, msg = _shipped_message("Burkina_Faso", ["2014", "2018-19"])
+        first = msg.splitlines()[0]
+        assert ("2014 -> 2018-19: cluster ids renumbered: not measured, no "
+                "household is linked across it") in first, first
+
+    def test_an_unmeasured_boundary_says_not_measured(self, declared):
+        _, caught = warns(lambda: S.check_cluster_identity(
+            frame(["w1", "w2"]), country="Fake", table="t", waves=WAVES))
+        first = str(caught[0].message).splitlines()[0]
+        assert "w1 -> w2: size not measured" in first, first
+
+    def test_the_report_carries_the_measurement_whole(self):
+        """`sampling_reports()` consumers must never parse the message."""
+        rep, _ = _shipped_message("Nigeria", ["2016Q1", "2018Q3"])
+        (b,) = rep["boundaries"]
+        assert b["measurement"] == sampling_records("Nigeria")["2018Q3"][
+            "panel"]["cluster_id_measurement"]
+        assert b["measurement"]["households_changed_net_of_movers"] == 10
+
+    def test_the_measurement_provenance_is_on_the_detail_line(self):
+        _, msg = _shipped_message("Nigeria", ["2016Q1", "2018Q3"])
+        detail = msg.splitlines()[1]
+        assert "size: derived-from-data, confidence medium" in detail, detail
+
+    @pytest.mark.parametrize("num,den,want", [
+        (10, 1493, "0.67%"), (712, 712, "100%"), (0, 5, "0%"),
+        (591, 2904, "20.35%"), (99999, 100000, ">99.99%"),
+        (1, 100000, "<0.01%"),
+    ])
+    def test_a_partial_share_is_never_rounded_to_0_or_100(self, num, den,
+                                                          want):
+        assert S._share(num, den) == want
+
+
 # -- the shipped declarations, and the reproduction --------------------------
 
 class TestShippedDeclarations:
@@ -887,3 +1115,50 @@ class TestTheReproduction:
         monkeypatch.setenv("LSMS_CLUSTER_STRICT", "1")
         with pytest.raises(S.ClusterIdentityError):
             self._fresh().household_roster(waves=["1987-88", "1988-89"])
+
+    def test_a_real_nigeria_call_states_the_size_on_its_first_line(self):
+        """GH #1135: the ruling's test case, on served data."""
+        S._clear_sampling_reports()
+        _, caught = warns(lambda: self._fresh("Nigeria").sample(
+            waves=["2016Q1", "2018Q3"]))
+        n = len(caught)
+        assert n == 1, n
+        first = str(caught[0].message).splitlines()[0]
+        assert ("2016Q1 -> 2018Q3: 1 cluster id renumbered, 10 of 1,493 "
+                "linked households (0.67%) change `v` net of movers") in first
+
+    # Every curated linked / changed pair, against the served sample() --
+    # the oracle for the lifted counts.  Not Burkina Faso / Niger: their N=0
+    # comes from the absence of any linkage, which shared `i` cannot show
+    # (583 colliding ids / 0 by construction).
+    @pytest.mark.parametrize("country,earlier,wave", [
+        ("GhanaLSS", "1987-88", "1988-89"),
+        ("Ethiopia", "2011-12", "2013-14"),
+        ("Tanzania", "2010-11", "2012-13"),
+        ("Tanzania", "2012-13", "2014-15"),
+        ("Tanzania", "2014-15", "2019-20"),
+        ("Uganda", "2005-06", "2009-10"),
+        ("Uganda", "2009-10", "2010-11"),
+        ("Uganda", "2011-12", "2013-14"),
+        ("Uganda", "2015-16", "2018-19"),
+        ("Nigeria", "2016Q1", "2018Q3"),
+        ("Nigeria", "2019Q1", "2023Q3"),
+    ])
+    def test_the_curated_size_matches_the_served_sample(self, country,
+                                                        earlier, wave):
+        m = sampling_records(country)[wave]["panel"]["cluster_id_measurement"]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            s = self._fresh(country).sample(waves=[earlier, wave])
+        idx = s.reset_index()[["i", "t", "v"]].dropna()
+        idx["t"] = idx["t"].astype(str)
+        idx["v"] = idx["v"].astype(str)
+        dup = int(idx.duplicated(["i", "t"]).sum())
+        assert dup == 0, dup
+        a = idx[idx["t"] == earlier].set_index("i")["v"]
+        b = idx[idx["t"] == wave].set_index("i")["v"]
+        both = a.index.intersection(b.index)
+        n = int(len(both))
+        d = int((a.loc[both] != b.loc[both]).sum())
+        assert n == m["linked_households"], (n, m["linked_households"])
+        assert d == m["households_changed"], (d, m["households_changed"])

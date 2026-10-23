@@ -51,6 +51,21 @@ Sampling:
       confidence: medium
       source_file: 'lsms_library/countries/Tanzania/2008-15/Data/upd4_hh_a.dta'
       locator: 'clusterid by (UPHI, round), round 2 vs round 3; CONTENTS.org "Cluster id renumbering at round 3 (GH #942)"'
+      cluster_id_measurement:
+        linked_households: 2904
+        households_changed: 591
+        clusters_renumbered: 82
+        note: |-
+          591 of the 2,904 linked households change `v`, in 82 one-to-one
+          cluster pairs (82 of 409 clusters).  CONTENTS.org argues the 591
+          are not movers (a bijection of whole clusters is a renumbering),
+          but no movement classification was applied, so the net-of-movers
+          share is not recorded as a count.  Counted through the API; the raw
+          file's tracking lines (1,565 of 7,082, 83 pairs) are a different
+          layer.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note and CONTENTS.org "Cluster id renumbering at round 3 (GH #942)" (measured 2026-10-19 through Country("Tanzania").sample()); GH #1135 H3 table (2,904 linked, 591 change)'
 
   '2014-15':
     panel:
@@ -70,6 +85,21 @@ Sampling:
       confidence: medium
       source_file: null
       locator: 're-measured 2026-10-19 through Country("Tanzania").sample(); CONTENTS.org "Cluster id renumbering at round 3 (GH #942)"'
+      cluster_id_measurement:
+        linked_households: 521
+        households_changed: 108
+        note: |-
+          556 households link across the boundary, 521 with `v` on both
+          sides; 413 of the 521 keep `v`, so 108 change.  They mix three
+          things: 12 of round 3's 82 renumbered clusters returning to their
+          round-2 id (58 households), 10 households in 8 clusters moving to
+          new-format ids, and 35 linked to refresh-sample ids through a
+          linkage that is itself unverified (rounds 3 and 4 reuse r_hhid
+          strings).  So no count of renumbered cluster ids and no
+          net-of-movers share is recorded.
+        source_type: derived-from-data
+        confidence: medium
+        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Tanzania").sample()); GH #1135 H3 table (521 linked, 108 change)'
 
   '2019-20':
     panel:
@@ -88,6 +118,19 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'CONTENTS.org, "The cluster key of cluster_features" (scheme table); slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2.5; re-measured 2026-10-19 through Country("Tanzania").sample()'
+      cluster_id_measurement:
+        linked_households: 849
+        households_changed: 849
+        note: |-
+          907 households link across the boundary, 849 with `v` on both
+          sides, and none keeps `v`.  Their 310 cluster pairs are NOT a
+          bijection (131 ids map to more than one id) because tracked
+          households genuinely moved, so the 849 include movers: neither a
+          count of renumbered cluster ids nor a net-of-movers share is
+          recorded.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Tanzania").sample()); GH #1135 H3 table (849 linked, 849 change)'
 
   '2020-21':
     panel:

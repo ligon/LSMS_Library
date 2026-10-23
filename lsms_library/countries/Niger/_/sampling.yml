@@ -76,16 +76,29 @@ Sampling:
         `redefined`, not `unobservable`: the keyspaces OVERLAP, so a
         cross-wave groupby('v') merges 267 pairs of unrelated clusters, the
         hazard the warning exists for.  The unit KIND is the same (an EA);
-        what changes is the sample list the serial indexes.  `redefined` is
-        the closest warning-bearing value in the frozen vocabulary (its
-        gloss, "a different KIND of unit", fits loosely), as for Burkina
-        Faso 2018-19 (GH #1243); `wave-scoped` would claim a crosswalk is
-        meaningful, and none is.  Region is compared on the served,
+        what changes is the sample list the serial indexes -- the "same
+        unit, independent draw, overlapping serials" pattern that the
+        `redefined` gloss was widened to cover (@ligon on #1246 / #1248,
+        2026-10-23), as for Burkina Faso 2018-19 (GH #1243); `wave-scoped`
+        would claim a crosswalk is meaningful, and none is.  Region is compared on the served,
         spelling-harmonised labels (8 regions both sides).
       source_type: derived-from-data
       confidence: high
       source_file: null
       locator: 'measured 2026-10-23 through Country("Niger").sample() and .cluster_features() on a cold build at development 9a0ed5f3c (coordinates as served: 2011-12 NER_EA_Offsets.dta, 2018-19 grappe_gps_ner2018.dta); draw: 2018-19 DDI (microdata-4296), "Sampling" > "SAMPLING PROCEDURE", PDF p. 4 (quoted in CONTENTS.org, "2018-19 -- EHCVM 2018/19"); no linkage: Niger/_/panel_ids.py docstring'
+      cluster_id_measurement:
+        linked_households: 0
+        note: |-
+          No household links ECVMA to EHCVM-1: the 2018-19 cover and
+          weights file carry no ECVMA pointer and panel_ids.py links nothing
+          across programmes.  (0 shared `i` through sample() is by
+          construction -- the 'E_' prefix -- and is not this evidence.)  The
+          hazard is the 267 shared `v` integers naming unrelated EAs (Region
+          agrees on 27, chance), not a renumbering, so no count of
+          renumbered cluster ids applies.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note; the 2018-19 cover s00_me_ner2018.dta and weights file (no ECVMA pointer) and the Niger/_/panel_ids.py docstring; CONTENTS.org "2026-10-23 -- v across wave boundaries"'
 
   '2021-22':
     panel:

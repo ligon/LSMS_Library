@@ -20,9 +20,11 @@
 # the survey records them with `ea == 0`, and the library gives each its own
 # singleton `v = moved-{hhid}` rather than a fake pooled cluster.  So a mover
 # has a different `v` in each round by design, not because an EA was
-# renumbered.  (Whether a mover's DESIGN cluster is its original EA -- the
-# BID pins its weight there -- is DESIGN.org Q7, `cluster_reference`, not
-# decided.)
+# renumbered.  The sentinel does NOT mark every mover, though: households that
+# report moving can keep a real EA code (GH #1135, CONTENTS.org), which is why
+# only 2018Q3's `cluster_id_measurement` records a net-of-movers count.
+# (Whether a mover's DESIGN cluster is its original EA -- the BID pins its
+# weight there -- is DESIGN.org Q7, `cluster_reference`, not decided.)
 
 Sampling:
 
@@ -103,6 +105,27 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'CONTENTS.org, "Sub-samples: refresh and long panel"; re-measured 2026-10-19 through Country("Nigeria").sample()'
+      cluster_id_measurement:
+        linked_households: 1493
+        households_changed: 79
+        households_changed_net_of_movers: 10
+        clusters_renumbered: 1
+        mover_rule: |-
+          A household is a mover if it carries the `moved-{hhid}` singleton
+          (`ea == 0`) on either side: 69 of the 79.  The other 10 all answer
+          the W4 cover's hhsmlc ("DOES THE HOUSEHOLD LIVE AT THE SAME
+          LOCATION?") with 1, YES, so none of them is a recorded mover.
+        note: |-
+          The 10 are one EA id whose LGA code changes (same state and EA
+          serial), a one-to-one relation.  Confidence is medium, not high,
+          because the "same location" of hhsmlc is read as the dwelling of
+          the previous wave: the W4 interviewer manual (PDF pp. 24-25)
+          supports that reading, but the round that pre-fills the address is
+          not confirmed against the instrument.  The 2026-10-19 ruling on
+          GH #1135 quotes this boundary as 0.67%.
+        source_type: derived-from-data
+        confidence: medium
+        locator: 'slurm_logs/isa_backlog_2026-10-21/framework1135-Nigeria-counts/counts-safe.json, boundary 2016Q1 -> 2018Q3 (source pin f8d236694; DIAGNOSIS.md there); W4 manual reading: slurm_logs/isa_backlog_2026-10-21/1135-public-instruments/PUBLIC-INSTRUMENTS.org; GH #1135 thread'
 
   '2019Q1':
     panel:
@@ -127,11 +150,34 @@ Sampling:
         W4); every other EA keeps its id.  W5 revisits both W4 sub-samples
         (long panel and refresh).  Measured: 4,724 of 5,067 linked households
         (93.2%) keep `v`; of the 343 that change, 231 are movers'
-        `moved-{hhid}` singletons and 112 are those 12 EAs.
+        `moved-{hhid}` singletons and 112 are those 12 EAs.  The sentinel
+        does not catch every mover, so the 112 are not "net of movers": see
+        cluster_id_measurement and CONTENTS.org (GH #1135).
       source_type: derived-from-data
       confidence: high
       source_file: null
       locator: 'CONTENTS.org, "Sub-samples: long panel (1,590 -> 1,376) and refresh"; re-measured 2026-10-19 through Country("Nigeria").sample()'
+      cluster_id_measurement:
+        linked_households: 5067
+        households_changed: 343
+        clusters_renumbered: 12
+        note: |-
+          Of the 343 that change `v`, 231 carry the `moved-{hhid}` singleton
+          (`ea == 0`) on a side and 112 change real EA id: 12 earlier ids,
+          each to one new id (same state and EA serial, new LGA code).  The
+          sentinel is not a complete movement classifier.  On the W5 cover,
+          hh_moved ("HAS THE HOUSEHOLD MOVED FROM THE ORIGINAL LOCATION?")
+          puts 86 of the 112 in the original dwelling, 6 moved close to it
+          and 20 have no answer.  So 112 is net of the sentinel only, and a
+          net-of-movers numerator of 86..106 holds ONLY IF "original
+          location" means the W4 dwelling -- conditional, not established,
+          and deliberately not recorded as a count: the warning prints "not
+          measured".  The 12 counts ids: 10 have at least one household
+          reporting the original dwelling, while the other 2 hold the 20
+          with no answer, so 12 is not 12 verified physical clusters.
+        source_type: derived-from-data
+        confidence: medium
+        locator: 'slurm_logs/isa_backlog_2026-10-21/framework1135-Nigeria-counts/counts-safe.json, boundary 2019Q1 -> 2023Q3 (source pin f8d236694; DIAGNOSIS.md there); GH #1135 thread and its 2026-10-23 ruling'
 
   '2024Q1':
     panel:

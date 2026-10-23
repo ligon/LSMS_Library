@@ -31,6 +31,20 @@ Sampling:
       confidence: high
       source_file: 'lsms_library/countries/GhanaLSS/1991-92/Documentation/pdf/G3report.pdf'
       locator: 'Appendix 1, "Sample design for GLSS1 and GLSS2", printed page 110 (quoted in CONTENTS.org, "GLSS1 -> GLSS2: a rotating panel with a half-retained sub-sample")'
+      cluster_id_measurement:
+        linked_households: 712
+        households_changed: 712
+        clusters_renumbered: 79
+        note: |-
+          None of the 712 linked households keeps `v`; they fall in 79
+          one-to-one cluster pairs, Region and Rural agreeing 79/79.  79
+          counts the ids among LINKED households: it is a lower bound on the
+          retained clusters (half of GLSS1's 176 is ~88).  No movement
+          classification was applied, so the net-of-movers share is not
+          measured.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note and CONTENTS.org "Cluster (PSU) variable" (measured 2026-10-19 through Country("GhanaLSS").sample()); GH #1135 H3 table (712 linked, 712 change)'
 
   '1991-92':
     panel:

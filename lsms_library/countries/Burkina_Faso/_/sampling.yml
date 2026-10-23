@@ -46,16 +46,29 @@ Sampling:
         the keyspaces OVERLAP, so a cross-wave groupby('v') merges 585 pairs
         of unrelated clusters, which is the hazard the warning exists for.
         The unit KIND is the same (a ZD); what changes is the sample list the
-        serial indexes.  `redefined` is the closest warning-bearing value in
-        the frozen vocabulary (its gloss, "a different KIND of unit", fits
-        loosely); `wave-scoped` would claim a crosswalk is meaningful, and
-        none is (GH #1243).  District is compared case- and accent-folded,
+        serial indexes -- the "same unit, independent draw, overlapping
+        serials" pattern that the `redefined` gloss was widened to cover
+        (@ligon on #1246 / #1248, 2026-10-23); `wave-scoped` would claim a
+        crosswalk is meaningful, and none is (GH #1243).  District is compared case- and accent-folded,
         Koulpelgo = Koulpelogo (measured before GH #1059's spelling table,
         PR #1242, landed); unfolded it differed for all 585.
       source_type: derived-from-data
       confidence: high
       source_file: null
       locator: 'measured 2026-10-23 through Country("Burkina_Faso").sample() and .cluster_features() on a cold build at development 9a0ed5f3c; draws quoted in CONTENTS.org, "2014 -- ... Sample design" and "2018-19 -- ... Sample-size figures"; no linkage: Burkina_Faso/_/panel_ids.py docstring'
+      cluster_id_measurement:
+        linked_households: 0
+        note: |-
+          No household links EMC 2014 to EHCVM-1: the 2018-19 cover carries
+          no pointer to 2014 and panel_ids.py records no linkage.  Do NOT
+          count shared `i` through sample(): 583 coincide only because both
+          waves build `i` from the cluster serial (an id collision).  The
+          hazard here is the 585 shared `v` integers naming unrelated
+          clusters (Region differs for 517), not a renumbering, so no count
+          of renumbered cluster ids applies.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note; the 2018-19 cover s00_me_bfa2018.dta (18 columns, no 2014 pointer) and the Burkina_Faso/_/panel_ids.py docstring; CONTENTS.org "2026-10-23 -- v across wave boundaries"'
 
   '2021-22':
     panel:

@@ -153,6 +153,20 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133'
+      cluster_id_measurement:
+        linked_households: 2601
+        households_changed: 191
+        note: |-
+          2,607 households link across the boundary; 6 have no 2009-10 `v`,
+          so 2,601 carry `v` on both sides.  2,410 keep it; the 191 that do
+          not are this wave's synthetic `@lat,lon` bins -- movers and
+          split-offs with a blank `comm` -- so most are movers, but no
+          movement classification was applied and no net-of-movers share is
+          recorded.  A bin is not a cluster, so no count of renumbered
+          cluster ids is recorded either.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note and CONTENTS.org "v across waves: three different defects (GH #942)" (re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133)'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -213,6 +227,20 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133'
+      cluster_id_measurement:
+        linked_households: 2640
+        households_changed: 433
+        note: |-
+          2,647 households link across the boundary; 7 have no 2009-10 `v`,
+          so 2,640 carry `v` on both sides.  2,207 keep it; the 433 that do
+          not had a synthetic `@lat,lon` bin in 2009-10 and their
+          original-sample EA here.  No movement classification was applied,
+          so no net-of-movers share is recorded, and a bin is not a cluster,
+          so no count of renumbered cluster ids either.  (Before GH #1133
+          harmonised the renderings of `comm`, a further 388 changed.)
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note and CONTENTS.org "v across waves: three different defects (GH #942)" (re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133)'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -325,6 +353,17 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      cluster_id_measurement:
+        linked_households: 1717
+        households_changed: 1717
+        note: |-
+          None of the 1,717 linked households keeps `v`, because `v` changes
+          kind (EA code -> parish code): every household changes, mover or
+          not, and no EA id maps to a parish id, so no count of renumbered
+          cluster ids applies.  No movement classification was applied.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Uganda").sample()); GH #1135 H3 table (1,717 linked, 1,717 change)'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -428,6 +467,18 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      cluster_id_measurement:
+        linked_households: 2973
+        households_changed: 2973
+        note: |-
+          None of the 2,973 linked households keeps `v`, because `v` changes
+          kind again (numeric parish code -> DISTRICT/PARISH name
+          composite): every household changes, mover or not, and no count of
+          renumbered cluster ids applies.  No movement classification was
+          applied.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Uganda").sample()); GH #1135 H3 table (2,973 linked, 2,973 change)'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable

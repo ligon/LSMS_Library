@@ -65,6 +65,14 @@ weight dispersion live in ``.coder/sampling/fingerprint.csv``
 (``scripts/sampling_fingerprint.py``).  Generating a ``sampling.yml`` from that
 screen would launder a screen into a record.
 
+One exception, by ruling (@ligon, GH #1135, 2026-10-23): a wave BOUNDARY's
+``panel.cluster_id_measurement`` -- how big a declared ``v`` renumbering is,
+which the ``ClusterIdentityWarning`` must quote on its first line.  It is a
+typed, optional record with its OWN provenance (``source_type`` /
+``confidence`` / ``locator``), curated by hand from a measurement someone made
+and cited; nothing generates it, and nothing computes it at warn time.  See
+``_MEASUREMENT_FIELDS``.  Design-level counts (PSUs, strata) stay out.
+
 Placement costs no cache
 ------------------------
 ``sampling.yml`` is a sibling of ``data_scheme.yml``, never a block in it, for
@@ -185,12 +193,49 @@ _OVERSAMPLE_FIELDS: frozenset[str] = frozenset({
 })
 #: ``role`` / ``rotation`` are the exemplar's (GH #793); the rest are the
 #: per-boundary continuity declaration of GH #942 (DESIGN.org §3.3, accepted
-#: as drafted 2026-10-18): two orthogonal fields plus their own provenance.
+#: as drafted 2026-10-18): two orthogonal fields plus their own provenance --
+#: and, by the GH #1135 ruling (2026-10-23), an optional typed measurement of
+#: the boundary's size, ``cluster_id_measurement`` (``_MEASUREMENT_FIELDS``).
 _PANEL_FIELDS: frozenset[str] = frozenset({
     "role", "rotation",
     "household_continuity", "cluster_id_continuity", "cluster_id_note",
     "source_type", "confidence", "source_file", "locator",
+    "cluster_id_measurement",
 })
+
+#: The counts a ``panel.cluster_id_measurement`` block may carry (GH #1135).
+#: Each is a non-negative ``int``; an ABSENT (or ``null``) count means "not
+#: measured", which the warning prints as such -- never as zero.
+#:
+#: ``linked_households``  N: households linked across the boundary with `v`
+#:     on BOTH sides, as ``Country(C).sample()`` serves them (after the panel
+#:     id walk).  Where a note gives a larger "linked" figure that includes
+#:     households lacking `v` on one side, N is the with-`v` figure: it is
+#:     the share's denominator (the #1135 H3 table's definition).
+#: ``households_changed``  of N, those whose `v` differs across the boundary,
+#:     ALL causes -- movers included.
+#: ``households_changed_net_of_movers``  of those, the ones that are not
+#:     movers under the block's ``mover_rule``.  The quantity the ruling asks
+#:     the first line to state as a share of N; recorded only where a mover
+#:     rule was actually applied.  A sentinel that marks SOME movers is not a
+#:     rule for all of them (Nigeria W5: the ``moved-`` singleton misses
+#:     households that report moving with a real EA code).
+#: ``clusters_renumbered``  distinct earlier-wave cluster IDS, among linked
+#:     households, that map one-to-one to a different `v` -- a count of ids,
+#:     not a claim about physical clusters (GhanaLSS 79, Ethiopia 333 and
+#:     Tanzania 82 are all such "cluster pairs").
+_MEASUREMENT_COUNTS: tuple[str, ...] = (
+    "linked_households", "households_changed",
+    "households_changed_net_of_movers", "clusters_renumbered",
+)
+#: Every field a measurement block may carry: the counts, ``mover_rule`` (how
+#: movers were told apart; required with, and only with, the net-of-movers
+#: count), ``note`` (free-text qualification -- bounds, caveats; never printed
+#: by the warning), and the provenance triple every reading in this file
+#: travels with.
+_MEASUREMENT_FIELDS: frozenset[str] = frozenset(_MEASUREMENT_COUNTS) | {
+    "mover_rule", "note", "source_type", "confidence", "locator",
+}
 
 # ---------------------------------------------------------------------------
 # GH #942 -- is `v` the same cluster id across a wave boundary?
@@ -214,19 +259,34 @@ HOUSEHOLD_CONTINUITY: frozenset[str] = frozenset({
 })
 
 #: Does `v` denote the same cluster across the boundary?
+#:
+#: ``redefined`` -- `v` no longer indexes the same LIST of units, so no
+#: crosswalk can exist.  Two patterns, both ruled (the second widened by
+#: @ligon on #1246 / #1248, 2026-10-23):
+#:   * a different KIND of unit: EA -> parish -> district/parish name
+#:     composite (Uganda 2013-14, 2018-19);
+#:   * the SAME kind of unit from an INDEPENDENT draw whose serials OVERLAP
+#:     the preceding wave's: both waves number their own sample from 1, so a
+#:     shared integer names an unrelated cluster (Burkina Faso 2014 ->
+#:     2018-19, EMC `zd` vs EHCVM `grappe`; Niger 2014-15 -> 2018-19, ECVMA vs
+#:     EHCVM `grappe`).
+#: An independent draw whose keyspace is DISJOINT from the preceding wave's
+#: is ``unobservable``, not ``redefined``: grouping on `v` across it merges
+#: nothing (GhanaLSS 1991-92 onward).  OVERLAP is what makes it a hazard.
 CLUSTER_ID_CONTINUITY: frozenset[str] = frozenset({
     "stable",        # the same EA keeps its id
     "wave-scoped",   # renumbered; a crosswalk is meaningful
-    "redefined",     # `v` denotes a different KIND of unit (EA -> parish)
+    "redefined",     # a different unit list: another KIND of unit, or an independent draw with overlapping serials (above)
     "mixed",         # some of the boundary's `v` are synthetic, not clusters
     "unobservable",  # no verified linkage; cannot be determined
 })
 
 #: The values on which a cross-wave `v` is NOT comparable -- what the
 #: Country-level warning fires on.  Deliberately NOT `unobservable`: GhanaLSS
-#: 1991-92 onward are genuinely different EAs with no linkage, so grouping on
-#: `v` across them is CORRECT, and warning there would teach the reader to
-#: ignore the warning (DESIGN §4.2).
+#: 1991-92 onward are genuinely different EAs with no linkage, AND their
+#: keyspaces are disjoint, so grouping on `v` across them is CORRECT, and
+#: warning there would teach the reader to ignore the warning (DESIGN §4.2).
+#: Unlinked draws whose keyspaces OVERLAP are `redefined` and do warn.
 INCOMPARABLE_CLUSTER_IDS: frozenset[str] = frozenset({
     "wave-scoped", "redefined", "mixed",
 })
@@ -618,6 +678,88 @@ def _check_panel(where: str, panel: Any, *, panel_only: bool) -> None:
         raise ValueError(
             f"{where}: cluster_id_continuity={cl!r} needs a cluster_id_note "
             "saying why -- it is what the Country-level warning quotes.")
+    if panel.get("cluster_id_measurement") is not None:
+        _check_measurement(where, panel["cluster_id_measurement"],
+                           continuity=cl)
+
+
+def _check_measurement(where: str, block: Any, *, continuity: Any) -> None:
+    """Validate a ``panel.cluster_id_measurement`` block (GH #1135).
+
+    * Field names are frozen (``_MEASUREMENT_FIELDS``).
+    * It measures a DECLARED boundary, so the panel must carry a
+      ``cluster_id_continuity``.
+    * Its own provenance: ``source_type`` and ``confidence`` (controlled) and a
+      ``locator`` are required.  ``not-found`` is refused -- a measurement
+      nobody found is expressed by leaving the block out, which the warning
+      prints as "not measured".
+    * At least one count; every count present is a plain non-negative
+      ``int`` (not ``bool``, not ``float``, not a string), so the share the
+      warning prints is computed from exact integers and never parsed from
+      prose.
+    * Coherence: changed <= linked; net-of-movers <= changed (and <= linked);
+      a household count needs its denominator ``linked_households``.
+    * ``mover_rule`` comes with, and only with, the net-of-movers count: a
+      net figure without its rule is unfalsifiable, and a rule without the
+      figure describes nothing (put it in ``note``).
+    """
+    name = "panel.cluster_id_measurement"
+    if not isinstance(block, Mapping):
+        raise ValueError(f"{where}: {name} must be a mapping, "
+                         f"got {type(block).__name__}")
+    _check_nested(where, name, block, _MEASUREMENT_FIELDS)
+    if continuity is None:
+        raise ValueError(
+            f"{where}: {name} measures a declared boundary, but the panel "
+            "declares no cluster_id_continuity (GH #1135).")
+    missing = [k for k in ("source_type", "confidence", "locator")
+               if not block.get(k)]
+    if missing:
+        raise ValueError(
+            f"{where}: {name} is missing {missing}. A measurement travels "
+            "with its own provenance (GH #1135) -- the continuity reading's "
+            "source does not vouch for the counts.")
+    _check_vocab(where, f"{name}.source_type", block["source_type"],
+                 SOURCE_TYPES)
+    _check_vocab(where, f"{name}.confidence", block["confidence"],
+                 CONFIDENCE_LEVELS)
+    if block["source_type"] == "not-found":
+        raise ValueError(
+            f"{where}: {name}.source_type='not-found' -- a measurement that "
+            "was looked for and not found is written by OMITTING the block; "
+            "the warning then prints 'not measured'.")
+    counts = {k: block.get(k) for k in _MEASUREMENT_COUNTS
+              if block.get(k) is not None}
+    if not counts:
+        raise ValueError(
+            f"{where}: {name} carries no count. Omit the block instead; the "
+            "warning prints 'not measured' (GH #1135).")
+    for k, v in counts.items():
+        if type(v) is not int or v < 0:
+            raise ValueError(
+                f"{where}: {name}.{k}={v!r} must be a non-negative integer "
+                "count (not a bool, float or string; null means not "
+                "measured).")
+    n = counts.get("linked_households")
+    d = counts.get("households_changed")
+    r = counts.get("households_changed_net_of_movers")
+    if (d is not None or r is not None) and n is None:
+        raise ValueError(
+            f"{where}: {name} gives a household count without its "
+            "denominator linked_households.")
+    for num, num_name, den, den_name in (
+            (d, "households_changed", n, "linked_households"),
+            (r, "households_changed_net_of_movers", d, "households_changed"),
+            (r, "households_changed_net_of_movers", n, "linked_households")):
+        if num is not None and den is not None and num > den:
+            raise ValueError(
+                f"{where}: {name}.{num_name}={num} exceeds {den_name}={den}.")
+    if (r is None) != (not block.get("mover_rule")):
+        raise ValueError(
+            f"{where}: {name}: mover_rule comes with, and only with, "
+            "households_changed_net_of_movers -- a net count must say how "
+            "movers were told apart, and a rule with no net count describes "
+            "nothing (put it in note).")
 
 
 # ---------------------------------------------------------------------------
@@ -946,6 +1088,10 @@ def audit_cluster_identity(df: Any, *, country: str, table: str,
             "confidence": panel.get("confidence"),
             "locator": panel.get("locator"),
             "note": panel.get("cluster_id_note"),
+            # GH #1135: the boundary's size, as curated (or None: not
+            # measured).  Carried whole so `sampling_reports()` consumers
+            # never parse the message.
+            "measurement": panel.get("cluster_id_measurement"),
             "in_frame": order[j - 1] in present and order[j] in present,
         })
     if not flagged:
@@ -958,17 +1104,71 @@ def audit_cluster_identity(df: Any, *, country: str, table: str,
     }
 
 
+def _share(num: int, den: int) -> str:
+    """``num / den`` as a percentage with at most two decimals, never
+    rounding a partial share to ``0%`` or ``100%``."""
+    s = f"{100.0 * num / den:.2f}".rstrip("0").rstrip(".")
+    if s == "100" and num != den:
+        return ">99.99%"
+    if s == "0" and num != 0:
+        return "<0.01%"
+    return s + "%"
+
+
+def _size_fragment(b: Mapping[str, Any]) -> str:
+    """One boundary's size, for the warning's FIRST line (GH #1135 ruling,
+    2026-10-23): what is measured, and "not measured" for what is not.
+
+    Built only from the curated integers in ``cluster_id_measurement`` --
+    never from a note, never computed from the frame.  A boundary with no
+    net-of-movers count says so, and the all-causes share it does have is
+    labelled "counting movers" so it cannot be read as the ruled quantity.
+    """
+    head = f"{b['from']} -> {b['to']}: "
+    m = b.get("measurement")
+    if not m:
+        return head + "size not measured"
+    k = m.get("clusters_renumbered")
+    parts = [
+        "cluster ids renumbered: not measured" if k is None else
+        f"{k:,} cluster id{'' if k == 1 else 's'} renumbered"]
+    n = m.get("linked_households")
+    d = m.get("households_changed")
+    r = m.get("households_changed_net_of_movers")
+    if n == 0:
+        parts.append("no household is linked across it, so no household share")
+    elif r is not None:
+        parts.append(f"{r:,} of {n:,} linked households ({_share(r, n)}) "
+                     "change `v` net of movers")
+    else:
+        text = "net-of-movers share: not measured"
+        if d is not None:
+            text += (f" ({d:,} of {n:,} linked households, {_share(d, n)}, "
+                     "change `v` counting movers)")
+        parts.append(text)
+    return head + ", ".join(parts)
+
+
 def _format_cluster_report(report: dict[str, Any]) -> str:
     c = report["country"]
+    # The FIRST line carries every flagged boundary's size (GH #1135): one
+    # physical line, no truncation, so a reader can weigh a 0.67% boundary
+    # against a 100% one before reading anything else.
     lines = [
         f"{c}/{report['table']}: `v` is not a comparable cluster id across "
         f"{len(report['boundaries'])} wave boundary(ies) in this frame "
-        f"(waves {report['waves'][0]} .. {report['waves'][-1]}):"]
+        f"(waves {report['waves'][0]} .. {report['waves'][-1]}). Size by "
+        "boundary -- "
+        + "; ".join(_size_fragment(b) for b in report["boundaries"]) + "."]
     for b in report["boundaries"]:
         src = b["source_type"]
         how = (f"{src}, confidence {b['confidence']}" if src in
                DOCUMENTED_SOURCE_TYPES else
                f"{src}: MEASURED, not documented; confidence {b['confidence']}")
+        m = b.get("measurement")
+        if m:
+            how += (f"; size: {m.get('source_type')}, confidence "
+                    f"{m.get('confidence')}")
         where = "" if b["in_frame"] else (
             "; this boundary lies BETWEEN the waves you asked for")
         lines.append(
