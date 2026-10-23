@@ -1,0 +1,26 @@
+#+title: GH #1135 measurement record -- verification summary (aggregates only)
+#+date: 2026-10-23
+
+Two burst jobs (co_carleton / savio4_htc), each a fresh clone with its own
+cold data root: base =development= =57d255585=, branch =0b471ce87=.  Each ran
+the hash census (=hash_census.py=, config only), =Country(C).sample()= and
+=.cluster_features()= over all waves for the seven countries with a
+=sampling.yml=, every flagged boundary's two-wave =sample()=, and the branch's
+=tests/test_sampling.py= (including =requires_s3=).  =summary.json= holds:
+
+- =census=: 0 of 549 =_table_cache_hash=, 0 of 40 =build_transforms_fingerprint=,
+  0 of 2,109 =Wave._input_hash= moved.
+- per country: served row counts and a frame digest (index names, dtypes,
+  values) for =sample= and =cluster_features=, base vs branch -- all equal;
+  one =ClusterIdentityWarning= each side; the warning's first line before and
+  after.
+- =served_oracle=: per flagged boundary, households in both waves with =v= on
+  both sides, and how many change =v=, counted on the served =sample()=.
+  These equal every curated =linked_households= / =households_changed=.
+  Burkina Faso's 583 is the =i= COLLISION its note records (=linked_households=
+  is 0 there, by the absence of any linkage); Niger's 0 is by construction.
+
+pytest, branch's test file: base 61 failed / 113 passed (every failure a new
+#1135 test); branch 174 passed.  The scripts are in the burst job dir
+(=warnings_probe.py=, =run.sh=); no household id, coordinate or row is
+recorded here.

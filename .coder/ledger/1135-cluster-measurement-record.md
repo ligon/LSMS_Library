@@ -107,4 +107,21 @@ Definitions this task fixes (in `sampling.py`, next to `_MEASUREMENT_FIELDS`):
 ---
 ### Phase 3 — verification
 
-(filled at task end)
+- `_PANEL_FIELDS` + `_MEASUREMENT_FIELDS` / `_MEASUREMENT_COUNTS` — OK
+  (anchored on §2 "extend"; the freeze test now covers the new block in both
+  directions: every field used by a shipped record).
+- `_check_measurement` — OK (§2 precedent: the panel's own-provenance rule;
+  §4 counts typed and coherent).  11 mutants (each check removed, bool/float
+  accepted, report drops the block, W5 records 106 as a count, ...) all killed.
+- `audit_cluster_identity` `measurement` key — OK (§4 nothing computed at warn
+  time; the block is copied from config).
+- `_size_fragment` / `_share` / first line — OK (§3 ruling): prints what is
+  measured, "not measured" otherwise; the W5 86..106 and 112 never reach the
+  message (test + real-data check on all four Nigeria warnings).
+- the 13 curated blocks — OK (§5 reuse): every `linked_households` /
+  `households_changed` equals the served `sample()` count on a cold branch
+  build (11 boundaries; Burkina Faso / Niger are N = 0 by absence of linkage).
+- `redefined` gloss — OK (§1 item 2): comment/docs only.
+- Cache: 0 of 549 / 40 / 2,109 (base `57d255585` vs branch `0b471ce87`).
+  Served `sample` and `cluster_features` identical for all 7 countries.
+  Evidence: `slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/`.
