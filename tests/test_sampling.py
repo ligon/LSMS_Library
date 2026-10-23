@@ -724,7 +724,8 @@ class TestShippedDeclarations:
         ("Tanzania", "2012-13", "wave-scoped"),      # UPD4 round-3 renumbering
         ("Tanzania", "2019-20", "wave-scoped"),      # NPS-SDD layout
         ("Uganda", "2009-10", "mixed"),              # @lat,lon bins
-        ("Uganda", "2011-12", "wave-scoped"),        # two renderings of `comm`
+        # was wave-scoped (two renderings of `comm`) until GH #1133 harmonised them
+        ("Uganda", "2011-12", "stable"),
         ("Uganda", "2013-14", "redefined"),          # EA -> parish
         ("Nigeria", "2012Q3", "stable"),             # movers are singletons
         ("Burkina_Faso", "2018-19", "redefined"),    # EMC zd / EHCVM grappe serials
@@ -761,19 +762,20 @@ class TestShippedDeclarations:
         assert "'20012'" in recs["2014-15"]["panel"]["cluster_id_note"]
 
     def test_a_verified_linkage_is_never_declared_unobservable(self):
-        """Uganda 2010-11 -> 2011-12: 2,510 households link and 0 keep `v`,
-        because the survey files render `comm` two ways and the library serves
-        both un-harmonised -- a harmonisation gap, not a redraw.  The linkage
-        IS verified, so `unobservable` ("no verified linkage") is wrong
-        whatever the warning policy: `wave-scoped` until the Uganda `comm`
-        rendering issue harmonises it, then `stable` (dispatcher call on red
-        team r1 H1, 2026-10-19; this test replaced one pinning the reverse)."""
+        """Uganda 2010-11 -> 2011-12: 2,510 households link.  The linkage IS
+        verified, so `unobservable` ("no verified linkage") is wrong whatever
+        the warning policy (dispatcher call on red team r1 H1, 2026-10-19; this
+        test replaced one pinning the reverse).  It was `wave-scoped` while the
+        survey's two renderings of `comm` were served un-harmonised (0 of 2,510
+        kept `v`), and is `stable` since GH #1133 served the 7-character waves
+        the 8-digit frame EA (2,510 of 2,510)."""
         r = sampling_records("Uganda")["2011-12"]
-        assert r.cluster_id_continuity == "wave-scoped"
-        assert r.cluster_id_continuity in S.INCOMPARABLE_CLUSTER_IDS
+        assert r.cluster_id_continuity != "unobservable"
+        assert r.cluster_id_continuity == "stable"
+        assert r.cluster_id_continuity not in S.INCOMPARABLE_CLUSTER_IDS
         note = " ".join(r["panel"]["cluster_id_note"].split())
-        assert "two renderings" in note and "not a redraw" in note
-        assert "rendering issue" in note and "becomes `stable`" in note
+        assert "2,510 of 2,510" in note and "comm_frame_ea" in note
+        assert "not a digit rule" in note
 
     def test_overlapping_serials_without_linkage_are_not_unobservable(self):
         """Burkina Faso 2014 -> 2018-19 (GH #1243): two independent draws, no
@@ -845,21 +847,27 @@ class TestTheReproduction:
         assert S.ATTRS_KEY in with_rec.attrs and S.ATTRS_KEY not in without.attrs
         pd.testing.assert_frame_equal(with_rec, without)
 
-    def test_uganda_warns_across_the_comm_rendering_boundary(self):
-        """H1 (red team r1): `sample(waves=['2010-11', '2011-12'])` keeps `v`
-        for 0 of 2,510 linked households and used to be SILENT (2011-12 was
-        `unobservable`); it now warns once, naming that boundary."""
+    def test_uganda_comm_rendering_boundary_is_silent_once_harmonised(self):
+        """H1 (red team r1): `sample(waves=['2010-11', '2011-12'])` kept `v`
+        for 0 of 2,510 linked households and was SILENT while 2011-12 was
+        `unobservable`; it then warned once while `wave-scoped`.  GH #1133
+        serves both waves the 8-digit frame EA, so every linked household keeps
+        `v` and the call is silent.  A boundary that is still incomparable
+        (2005-06 -> 2009-10, `mixed`: synthetic GPS bins) still warns."""
         S._clear_sampling_reports()
         s, caught = warns(lambda: self._fresh("Uganda").sample(
             waves=["2010-11", "2011-12"]))
-        assert len(caught) == 1, [str(w.message)[:200] for w in caught]
-        msg = str(caught[0].message)
-        assert "2010-11 -> 2011-12: cluster_id_continuity=wave-scoped" in msg
-        assert "Same EA, two ids" in msg
+        assert caught == [], [str(w.message)[:200] for w in caught]
         idx = s.reset_index()[["i", "t", "v"]].dropna()
         wide = idx.pivot_table(index="i", columns="t", values="v",
                                aggfunc="first").dropna()
-        assert (wide["2010-11"] == wide["2011-12"]).sum() == 0   # still served
+        assert (wide["2010-11"] == wide["2011-12"]).sum() == len(wide) == 2510
+        S._clear_sampling_reports()
+        _, caught = warns(lambda: self._fresh("Uganda").sample(
+            waves=["2005-06", "2009-10"]))
+        assert len(caught) == 1, [str(w.message)[:200] for w in caught]
+        assert ("2005-06 -> 2009-10: cluster_id_continuity=mixed"
+                in str(caught[0].message))
 
     def test_burkina_warns_across_the_emc_ehcvm_boundary_only(self):
         """GH #1243: 2014 (EMC `zd`) and 2018-19 (EHCVM `grappe`) reuse the

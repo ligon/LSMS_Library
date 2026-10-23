@@ -55,7 +55,10 @@ changed:
 | 2018-19     | =distirct_name= + =parish_name= | string  | =DISTRICT/PARISH= composite |
 | 2019-20     | =district= + =s1aq04a=          | string  | =DISTRICT/PARISH= composite |
 
-All are drawn from GSEC1 (the household cover page).  The shift
+All are drawn from GSEC1 (the household cover page).  =comm= is ONE
+identifier rendered two ways in the raw files -- int32 8-digit in 2005-06 and
+2011-12, a 7-character string in 2009-10 and 2010-11 -- and since GH #1133 all
+four waves serve the 8-digit frame EA (item 1 below).  The shift
 from numeric EA codes to parish names occurred around 2015-16 as
 the sampling frame evolved from strict EA boundaries to parish-level
 clusters to accommodate split-off households.
@@ -67,25 +70,80 @@ boundary -- recorded per boundary in =Uganda/_/sampling.yml='s =panel:=
 blocks, which drive the =ClusterIdentityWarning= on any =Country('Uganda')=
 frame carrying =v= across them:
 
-1. *Two renderings of =comm= (a harmonisation gap, not a redraw).*  Across
-   2010-11 -> 2011-12 (both map =v: comm=), 0 of 2,510 linked households keep
-   =v=.  The survey files carry two renderings of the same EA code (int32
-   8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11); the
-   library serves both un-harmonised, so the 0% is a harmonisation gap, not a
-   redraw.  For 272 of the 322 cluster pairs the 8-digit form is the 7-digit
-   form with one digit inserted at position 3 (=1020001 -> 10210001=); the
-   other 50 also re-code the district field.  2005-06 and 2011-12 share 321 of
-   their 322 / 321 =v= verbatim.  The linkage is verified, so 2011-12 is
-   declared =wave-scoped= (=unobservable= means "no verified linkage", which
-   is false here) and a frame carrying =v= across 2010-11 -> 2011-12 warns.
-   It becomes =stable= once the rendering is harmonised, which needs the
-   322-pair table, not a digit rule: the Uganda =comm= rendering issue (to be
-   filed; DESIGN.org Q5, ruling 2026-10-18).  /History:/ first declared
-   =unobservable= (provisional) on 2026-10-19, on the reading that this was a
-   library defect rather than a survey fact; reversed the same day (dispatcher
-   call on red team r1 H1, @ligon informed), because the raw =GSEC1.dta= files
-   themselves carry both renderings (measured via =get_dataframe=: int32
-   8-digit in 2005-06 and 2011-12, 7-character string in 2009-10 and 2010-11).
+1. *Two renderings of =comm= -- HARMONISED by GH #1133 (2026-10-22).*  The raw
+   GSEC1 files write the same EA as an int32 8-digit code in 2005-06 / 2011-12
+   ("EA Code in 2005/06") and as a 7-character string in 2009-10 / 2010-11, and
+   the library used to serve both, so 0 of 2,510 linked households kept =v=
+   across 2010-11 -> 2011-12 (and 0 of 2,607 across 2005-06 -> 2009-10).  The
+   7-character waves are now served the 8-digit frame EA through the reviewed
+   =comm_frame_ea= table in =categorical_mapping.org=, applied by
+   =uganda.comm_frame_ea= on =sample= and =cluster_features= (same function on
+   both, so =_join_v_from_sample= still hands every table one key).
+   Measured after (=Country('Uganda').sample()=):
+
+   | boundary              | before          | after                  |
+   |-----------------------+-----------------+------------------------|
+   | 2005-06 -> 2009-10    | 0 / 2,607       | 2,410 / 2,607 (92.4%)  |
+   | 2009-10 -> 2010-11    | 1,819 / 2,647   | 2,207 / 2,647 (83.4%)  |
+   | 2010-11 -> 2011-12    | 0 / 2,510       | 2,510 / 2,510 (100%)   |
+
+   Every remaining non-keeper is a 2009-10 =@lat,lon= bin or no-=v= household
+   (defect 2).  Served distinct =v=: 2009-10 656 -> 656 (317 EAs now 8-digit,
+   339 bins and 24 NA untouched), 2010-11 324 -> 322, 2005-06 / 2011-12
+   unchanged.  2011-12 is declared =stable= in =sampling.yml= (it was
+   =wave-scoped= from 2026-10-19: "=unobservable= means no verified linkage",
+   which was false; dispatcher call on red team r1 H1, @ligon informed).
+
+   *There are three code families, not two, and the community files name
+   them.*  CSECTION1 (2005-06 =csec1=, 2009-10, 2010-11) keys on a 7-character
+   =comm= labelled "Community Code According to 2005/06 District Definitions",
+   and from 2009-10 also carries =comcod=, "... According to 2009/10 [2010/2011]
+   District Definitions"; 2011-12 =CSEC1= pairs an 8-digit =comm= with a
+   7-character =comcod= ("Community code current").  The 2005/06-definitions
+   form is the 8-digit code with its 4th digit dropped -- all 317 2005-06 ->
+   2009-10 household pairs, and every community-file =comm=.  2009-10 GSEC1
+   writes that form; *2010-11 GSEC1 writes the CURRENT 2010/11 definitions*
+   (321 of its 324 codes match that wave's CSECTION1 =comcod=, only 273 its
+   =comm=), so 50 EAs re-code the district field (=1140003 -> 11030003=) and no
+   digit rule recovers them.  That is also why 388 households changed =v= across
+   2009-10 -> 2010-11 before this fix, which the =mixed= note blamed on the bins
+   alone.  /Contradicts/ "2010-11 ... movers and split-offs got re-coded with
+   their original-sample EA" (§"Hybrid =v= in 2009-10" below): same EA, but
+   written in a later district definition for 50 of them.
+
+   *The table* (370 pairs) is every =(7-character, 8-digit)= pair seen on one
+   household across the four early boundaries (HHID is unchanged 2005-06 ..
+   2011-12, so that is the library's linkage), and every row is corroborated
+   by at least one community file's own =comm=/=comcod= pairing -- though for
+   14 rows (13 "drop 4th digit" plus =2220022 -> 20530022=) that support is the
+   drop-4th-digit rule alone: no 2011-12 =CSEC1= pairing names them and no
+   chain from a CSECTION1 row to a =CSEC1= row does.  The rule itself is
+   validated (every community-file =comm=, 320 / 320 / 322), and the chain
+   =CSEC1= -> 2010-11 CSECTION1 agrees with it for 308 of =CSEC1='s 309 EAs.
+   The 309th is a contradiction *in* =CSEC1=: it pairs =comcod 3010003= with
+   =comm 30130033=, but no GSEC1 household in any wave carries =30130033=,
+   while 10 sit on =30130003= in both 2005-06 and 2011-12.  The table follows
+   the households (=3010003 -> 30130003=); =30130033= is most likely a typo in
+   =CSEC1=.  No 7-character code ever meets two 8-digit codes.  The issue's
+   "2 non-bijective pairs" (=1070027=, =1150027= -> =10730027=; =3060002=,
+   =3180002= -> =30630002=) are one EA under two district definitions inside
+   2010-11, paired on one row by CSECTION1 itself, so both codes are mapped.
+   In raw 2010-11 GSEC1, =1070027= is written by two households (one original;
+   one 2010-11 split-off, never linked) against nine on =1150027=, and
+   =3060002= by one against eight on =3180002= (the table's household columns
+   count linked households only: 1 / 8 and 1 / 7).  One 2010-11 code,
+   =1530040= (one household, on no linkage and in no community file), is NOT
+   in the table and keeps its 7-character rendering.
+
+   *Cost, stated*: the served =v= is no longer the literal key of the
+   2009-10 / 2010-11 CSECTION1 files (literal =comm= matches were 2,399 and
+   2,250 households; now 0).  2005-06's =v= never was the =csec1= key (0 of
+   3,123 households match it literally, before and after), and 2011-12's
+   still is (=CSEC1.comm=, 2,764 households).  No Uganda table reads a
+   community file; a consumer joining
+   CSECTION1 should drop the 4th digit of =v= to get its =comm= (or use the
+   table).  /History:/ declared =unobservable= (provisional) on 2026-10-19,
+   then =wave-scoped= the same day, then =stable= on 2026-10-22.
 2. *Synthetic =@lat,lon= bins in 2009-10* (see the next-but-one subsection):
    339 of that wave's 656 =v= are 0.05-degree GPS bins, not clusters, so its
    two boundaries are declared =mixed=.
@@ -190,10 +248,17 @@ dropped these 565 households in =roster_to_characteristics='s
 =groupby=), =sample()='s =v= column in 2009-10 is populated by a
 hybrid rule:
 
-- =v = comm= (7-digit numeric string) when =comm= is non-blank —
-  2 410 households, 317 distinct panel EAs.  Matches CSECTION1's
-  =comm= index exactly, so community-questionnaire joins work as
-  they always did.
+- =v = comm= when =comm= is non-blank — 2 410 households, 317
+  distinct panel EAs — served since GH #1133 as the 8-digit frame EA
+  (=comm_frame_ea=), the same code 2005-06 and 2011-12 write.  This
+  bullet used to say the 7-digit =v= "Matches CSECTION1's =comm= index
+  exactly, so community-questionnaire joins work as they always did".
+  Measured 2026-10-22, that was nearly but not exactly true: 315 of the
+  317 matched; =1020016= (3 households) and =2030008= (8) are in neither
+  CSECTION1 =comm= nor =comcod=.  The same holds of the 4th-digit-dropped
+  form now served: =CSECTION1.comm= = =v= without its 4th digit for 2,399 of
+  the 2,410 households, all but the same two EAs (served as =10210016=, 3
+  households, and =20330008=, 8).
 - =v = "@{lat:+.2f},{lon:+.2f}"= (a /synthetic/ label prefixed with
   =@=, binned to a 0.05° grid ≈ 5.5 km) when =comm= is blank but
   coordinates are available — 541 households, ~339 distinct bins.
@@ -234,7 +299,9 @@ and a fabricated cluster would be worse than a missing one.
 Why only 2009-10 gets the hybrid treatment: 2010-11 and 2011-12
 also use =comm= from GSEC1, but their raw surveys populated it for
 every household (movers and split-offs got re-coded with their
-original-sample EA), so no fallback is needed.  From 2013-14 onward,
+original-sample EA), so no fallback is needed.  (2010-11 writes that EA
+in its 2010/11 district definitions for 50 EAs; see item 1 of "=v=
+across waves" above.)  From 2013-14 onward,
 =v= is a parish identifier — every household has one — and the
 issue disappears by construction.
 
@@ -1116,6 +1183,24 @@ Measured effect of the whole change (cold build, =LSMS_NO_CACHE=1=):
 =var/cluster_features.parquet= has 4,809, the difference being the four
 2010-11 clusters below, which the framework's post-read
 =dropna(how='all')= removes.)
+
+/Since GH #1133 (2026-10-22)/ 2009-10 and 2010-11 =v= are the 8-digit frame
+EA, and two 2010-11 EAs that the raw file split across two district
+definitions are one cluster again (=10730027=, =30630002=): 2010-11
+=cluster_features= goes 320 -> *318* rows (=sample= serves 322 distinct =v=;
+the four all-conflict clusters below are still dropped) and the whole table
+*4,803* rows.  Every other cluster row is identical after the relabel.
+=30630002='s two halves agreed on everything.  =10730027='s GPS is now
+=<NA>=, and the cause is NOT its 2005/06-form household: that household's
+fix sits 0.0 km from eight of the nine =1150027= households.  The ninth, a
+2010/11-form household coded =MUBENDE=, is 34.66 km away (probably a
+mover; =comm= is the origin EA), so =1150027= was already =<NA>= under
+=reduce_to_agreed= before the merge, and the merged cluster inherits that
+conflict.  Effect: 2010-11 rows with a GPS fix go 188 -> 186 (one per merged
+EA), and =10730027= loses a fix that 9 of its 11 households share (9 of the
+10 that have one in the geovars file; the 2010-11 split-off has none).
+The four all-conflict 2010-11 clusters and their 42 households are unchanged
+(=21230011=, =21530004=, =30330009=, =30730018=).
 
 The 368 (2005-06) and the surviving NaN-key rows are still DELETED — that
 is decision D2 of =slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org=
