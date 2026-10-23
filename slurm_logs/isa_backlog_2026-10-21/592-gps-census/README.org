@@ -1,0 +1,97 @@
+#+TITLE: GH #592 -- cluster_features GPS census and absence verdicts
+#+DATE: 2026-10-23
+
+Diagnosis only.  No config changed: no still-empty wave is "released, held,
+not wired", so there was nothing to wire.  Verdicts are appended to each
+country's =_/CONTENTS.org= (Nigeria, Ethiopia, Malawi, Niger, Uganda,
+CotedIvoire).  Aggregates only in this directory -- no coordinates, no ids.
+
+* Files
+- =census.py= -- builds =Country(C).cluster_features()= and counts clusters /
+  clusters with GPS per wave; re-reads each wave's frame via =Wave.grab_data=
+  and measures within-cluster disagreement per column.  Warning TEXT is not
+  kept (it can quote cluster ids).
+- =census_cold.json= -- the census, COLD (fresh =LSMS_DATA_DIR=, shared L1
+  only), development =9a0ed5f3c=.
+- =census_warm_percolumn.json= -- warm re-run with the per-column block and
+  the grain reports' =columns=; its census block equals the cold one.
+- =catalog_check.py= / =catalog_check.json= -- read-only public NADA API
+  (=data_files=, =variables=): file count, variable count, geo-named files,
+  coordinate-like variables, per release.  Raw API dumps not committed.
+- =hash_census.py= / =hash-impact.json= -- every L2-country / btf / L2-wave
+  hash before and after the CONTENTS.org appends: 0 of 549 / 40 / 2,109 moved.
+
+* Census (cold, 9a0ed5f3c): clusters with non-null Latitude AND Longitude
+
+| country     | wave (t)         | clusters | with GPS | GH #592 said | class now                            |
+|-------------+------------------+----------+----------+--------------+--------------------------------------|
+| Nigeria     | 2010Q3 / 2011Q1  |      500 |      500 | 0            | fixed                                |
+| Nigeria     | 2012Q3 / 2013Q1  |      647 |      645 | --           | 2 short: hh absent from geo file     |
+| Nigeria     | 2015Q3 / 2016Q1  |      792 |      784 | 0            | fixed (8 short, release-side)        |
+| Nigeria     | 2018Q3 / 2019Q1  |      685 |      671 | 0            | fixed (14 short, release-side)       |
+| Nigeria     | 2023Q3 / 2024Q1  |      911 |        0 | (new wave)   | (c) WB v02 adds the file; hold v01   |
+| Ethiopia    | 2011-12          |      333 |      333 | 0            | fixed                                |
+| Ethiopia    | 2013-14          |      433 |      433 | --           |                                      |
+| Ethiopia    | 2015-16          |      432 |      432 | --           |                                      |
+| Ethiopia    | 2018-19          |      535 |      516 | 0            | fixed (19 short, release-side)       |
+| Ethiopia    | 2021-22          |      435 |      432 | 0            | fixed (3 short, release-side)        |
+| Malawi      | 2004-05          |      564 |        0 | 0            | (a) not released                     |
+| Malawi      | 2010-11          |      768 |      768 | --           |                                      |
+| Malawi      | 2013-14          |      204 |      204 | --           |                                      |
+| Malawi      | 2016-17          |      880 |      779 | 0            | 101 panel EAs: (c) released, not held |
+| Malawi      | 2019-20          |      819 |      717 | --           | 102 panel EAs: (c) released, not held |
+| Niger       | 2011-12          |      270 |      270 | 0            | fixed                                |
+| Niger       | 2014-15          |      270 |        0 | 0            | (a) asked-not-distributed            |
+| Niger       | 2018-19          |      504 |      493 | --           | 11 null in the source file           |
+| Niger       | 2021-22          |      555 |      555 | --           |                                      |
+| Uganda      | 2005-06          |      322 |      251 | --           | blanked by reduce_to_agreed          |
+| Uganda      | 2009-10          |      656 |      605 | --           | blanked                              |
+| Uganda      | 2010-11          |      320 |      188 | --           | blanked                              |
+| Uganda      | 2011-12          |      321 |      161 | --           | blanked                              |
+| Uganda      | 2013-14          |      706 | 619 (Lat 620, Lon 631) | -- | blanked per column              |
+| Uganda      | 2015-16          |      875 |      743 | --           | blanked (+26 otherwise empty)        |
+| Uganda      | 2018-19          |      781 |      618 | --           | blanked                              |
+| Uganda      | 2019-20          |      824 |        0 | 0            | (a) asked-not-distributed            |
+| CotedIvoire | 1985-86..1988-89 | 100 each |        0 | 0 (x4)       | (a) not released (C4 not runnable)   |
+| CotedIvoire | 2018-19          |    1,084 |      967 | --           | 117 null in the source file          |
+
+Of the issue's 18: 11 fixed (Nigeria 6, Ethiopia 3, Niger 2011-12, Malawi
+2016-17's cross-section); 7 still zero -- Malawi 2004-05, Niger 2014-15,
+Uganda 2019-20, CotedIvoire x4 -- all (a).  Malawi 2016-17 is now 779/880
+and its remainder (with 2019-20's) is (c).  New since the issue: Nigeria W5
+(2023Q3/2024Q1) at 0, (c), already tracked by GH #978.
+
+* Verdict evidence (catalog_check.json)
+
+| wave              | release (latest?)                   | files | vars  | geo file             | coordinate vars              | instrument                                   |
+|-------------------+-------------------------------------+-------+-------+----------------------+------------------------------+----------------------------------------------|
+| Malawi 2004-05    | MWI_2004_IHS-II_v01_M (yes)         |    52 | 1,901 | none                 | none                         | HH + community Q, DDI: no GPS text           |
+| Malawi 2016-17 P  | MWI_2010-2016_IHPS_v03_M (2939)     |   291 | 10,393 | HouseholdGeovariablesIHPSY3 (2,508) | lat_modified / lon_modified | BID: offsets "as part of HouseholdGeovariables" |
+| Malawi 2019-20 P  | MWI_2010-2019_IHPS_v06_M (3819)     |   394 | 14,262 | householdgeovariables_y4 (3,178) | lat_mod / lon_mod  |                                              |
+| Niger 2014-15     | NER_2014_ECVMA-II_v02_M (yes)       |    74 | 2,276 | none                 | plot area only (AS01Q07)     | cover item 21 LATITUDE/LONGITUDE; MS00Q18-21 withheld |
+| Uganda 2019-20    | UGA_2019_UNPS_v03_M (yes)           |   109 | 1,963 | none                 | plot area only               | cover item 9 GPS; BID 3.1; GSEC1 drops item 9 |
+| CIV 1985..1988    | CIV_198x_EPAM_v01_M (yes)           | 109-114 | 1,502-2,068 | none         | none                         | held PDFs are image scans: C4 not run        |
+| Nigeria 2023-24   | NGA_2023_GHSP-W5_v02_M (hold v01)   |   108 | 4,531 | nga_householdgeovariables_y5 (4,883) | lat_mod / lon_mod |                                              |
+
+* Grain hazards (household-grain coordinates projected onto (t, v))
+
+Per-column groups with >1 distinct non-null value / mixing null and non-null
+(=census_warm_percolumn.json=, =per_column=):
+
+- Nigeria W2-W4 (both rounds): coordinates only -- 6/24/49 disagree,
+  65/57/92 partial; Region/District/Rural 0.  W2's grain report also deletes
+  39 null-=v= rows: geovariables-only households admitted by the default
+  =outer= merge (Ethiopia uses =merge_how: left= for exactly this).
+- Ethiopia: coordinates only; disagree 0/38/72/0/72, partial 34/5/0/0/49.
+  W1's warning is pure partial missingness.  W4 silent.
+- Malawi 2013-14: all five columns (Region 93, District 165, Rural 131,
+  coordinates 188 of 204) -- IHPS movers, documented.  2016-17: Rural 75,
+  coordinates 7 + 4 partial.  2019-20: Region 66, District 98, Rural 86;
+  coordinates 0 + 8 partial.
+- Niger: 2011-12 / 2018-19 sources are EA-grain (lossless); 2021-22 cover-page
+  GPS is one value per grappe (0 disagree); 2014-15's 4 conflicts are not GPS.
+- Uganda: the wave frames are already at (t, v) after =reduce_to_agreed=, so
+  the per-column block reads 0 -- the loss is in the =cells_blanked= reports
+  instead: Latitude 70/51/135/160/82/106/163/0, Longitude the same except
+  2013-14 (71).
+- CotedIvoire 2018-19: Site 1, one grappe disagrees on Rural; coordinates 0.
