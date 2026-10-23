@@ -20,6 +20,8 @@ Variable map (Stata labels and the 2014-15 PH questionnaire, sections 3A/3B):
              harvest_qty PER HARVEST MONTH=s3bq10a unit=s3bq10b
              sold_qty PER HARVEST MONTH=s3bq13a SOLD UNIT=s3bq13b
              sold_value TOTAL=s3bq14
+             (served: Quantity = s3bq10a x s3bq09, Quantity_sold =
+             s3bq13a x s3bq09, Value_sold = s3bq14 -- 12-month totals)
   cultivation: field=s1cq01 parcel=s1cq02 crop=s1cq03 plant_month=s1cq11b
              intercrop=s1cq05 (Pure / Association de cultures)
 
@@ -34,9 +36,12 @@ the NUMBER OF HARVEST MONTHS.  That was copied from the WB MLI_EACI1.do
 ("qty=s3bq09 unit=s3bq10b"), which itself computes
 ``harvest_kg_per = s3bq09 * s3bq10b`` -- months times the unit CODE.  3B DOES
 record the harvest: s3bq10a, "Durant ces mois, quelle quantite a ete recoltee
-en moyenne chaque mois?".  It is served as recorded, a per-harvest-month
-average, and the rows carry mali.DERIVATION_3B, which states that window
-(and that the 3B.14 sale value is a TOTAL while 3B.13 is per month).
+en moyenne chaque mois?", and the sale s3bq13a likewise per month, while the
+3B.14 value s3bq14 is printed "montant total de cette vente".  Served (ruling
+@ligon 2026-10-23, PR #1272): the 12-month totals, per-month answer x s3bq09,
+and s3bq14 as recorded, so Value_sold / Quantity_sold is a price; the rows
+carry mali.DERIVATION_TREES, and the per-month answers come back from
+Country('Mali').derivation_inputs(DERIVATION_TREES).
 """
 import sys
 
@@ -45,7 +50,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (i as mali_i, crop_production_finalize, producing_trees,
-                  derive_3b_per_harvest_month, DERIVATION_3B)
+                  tree_crop_rows, DERIVATION_TREES)
 
 WAVE = '2014-15'
 
@@ -107,10 +112,12 @@ seasonal = seasonal.drop(columns=['planting_month', 'intercropped']).merge(
 # s3bq03 == 'Non' for trees it does not have/produce (3416 placeholder rows
 # with no harvest).  Keep only s3bq03 == 'Oui' (currently producing) — the
 # 358 rows that carry an actual harvest, matching WB `drop if s3bq03==2`.
-# The measured columns come from mali.derive_3b_per_harvest_month -- the
-# registered (identity) derivation -- so the registry and the build cannot
-# drift: Quantity = s3bq10a (per harvest month), Quantity_sold = s3bq13a (per
-# harvest month), Value_sold = s3bq14 (TOTAL), months_harvested = s3bq09.
+# The measured columns come from mali.tree_crop_rows, which calls the
+# registered derivation mali.derive_tree_twelve_month_total -- so the
+# registry and the build cannot drift: Quantity = s3bq10a x s3bq09,
+# Quantity_sold = s3bq13a x s3bq09 (per-month answers times months
+# harvested; missing codes masked before the product), Value_sold = s3bq14
+# (recorded "montant total"), months_harvested = s3bq09.
 s3b = producing_trees(get_dataframe('../Data/EACIS3B_p2.dta').copy(), WAVE)
 s3b['i'] = _hhid(s3b)
 perennial = pd.DataFrame({
@@ -122,13 +129,13 @@ perennial = pd.DataFrame({
     'planting_month': pd.NA,
     'intercropped': pd.NA,
     'perennial': True,
-}).join(derive_3b_per_harvest_month(s3b))
+}).join(tree_crop_rows(s3b, WAVE))
 
 df = pd.concat([seasonal, perennial], ignore_index=True)
 df = crop_production_finalize(df)
 # Stamp AFTER the collapse (CLAUDE.md "Derived Values", registering step 3).
 df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
-df.loc[df['perennial'].fillna(False).astype(bool), 'Derivation'] = DERIVATION_3B
+df.loc[df['perennial'].fillna(False).astype(bool), 'Derivation'] = DERIVATION_TREES
 
 assert len(df) > 0, "crop_production 2014-15 produced no rows"
 assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2014-15"

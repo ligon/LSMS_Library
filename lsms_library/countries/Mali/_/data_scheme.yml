@@ -179,14 +179,17 @@ Data Scheme:
     # (canonical data_info.yml, Unit_sold note).  NA-bearing, never
     # sentinel-filled: NA means no sale, or no sold unit recorded.
     #
-    # TREE ROWS ARE PER HARVEST MONTH (GH #1267).  On a perennial row
-    # Quantity and Quantity_sold are the survey's AVERAGE PER HARVEST MONTH
-    # (2014-15 3B.10 / 3B.13; 2017-18 11F.11 / 11F.14), and months_harvested
-    # (3B.09 / 11F.10) is how many months; Value_sold is the TOTAL in
-    # 2014-15 (3B.14) but per month in 2017-18 (11F.15).  Served as
-    # recorded, each wave's tree rows carrying a registered derivation key
-    # that states the window (Mali/_/derivations.yml).  Until GH #1267 the
-    # 2014-15 tree Quantity was s3bq09, the month count.
+    # TREE ROWS ARE 12-MONTH TOTALS BUILT FROM PER-MONTH ANSWERS (GH #1267;
+    # ruling 2026-10-23).  The survey asks a tree's harvest and quantity
+    # sold as an AVERAGE PER HARVEST MONTH (2014-15 3B.10 / 3B.13; 2017-18
+    # 11F.11 / 11F.14) beside months_harvested (3B.09 / 11F.10), and the
+    # sale value as "le montant total de cette vente" (3B.14 / 11F.15).
+    # Served: Quantity and Quantity_sold = per-month answer x
+    # months_harvested, one registered derivation for both waves
+    # (Mali/_/derivations.yml), and Value_sold as recorded -- so all three
+    # are 12-month totals, as on a field-crop row.  The per-month answers
+    # come back from Country('Mali').derivation_inputs(key).  Until GH
+    # #1267 the 2014-15 tree Quantity was s3bq09, the month count.
     #
     # 2017-18 UNRECORDED SALES ARE NA (ruling 2026-10-23): 0 only where
     # s7gq20 == 'Non'.  The Leger questionnaire asks 7G.20 (sold?) but not

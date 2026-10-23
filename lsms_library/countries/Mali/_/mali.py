@@ -293,8 +293,8 @@ def plot_features_for_wave(t, source, colmap):
 # value-share — those are transformations.py work over these rows):
 #   Quantity, u, Quantity_sold, Unit_sold, Value_sold, months_harvested,
 #   planting_month, harvest_month, intercropped, perennial
-# plus `Derivation` on the perennial (tree) rows -- see the two
-# derive_*_per_harvest_month functions below.
+# plus `Derivation` on the perennial (tree) rows -- see
+# derive_tree_twelve_month_total below.
 #
 # Crop names and units arrive as DECODED Stata labels (strings), so the
 # harmonize_food / u tables key on the decoded label (Code column).  The
@@ -343,38 +343,66 @@ def _month_num(series):
     return series.map(conv).astype('Int64')
 
 
-# --- Perennial (tree) rows: quantities PER HARVEST MONTH (GH #1267) --------
+# --- Perennial (tree) rows: 12-month totals from per-month answers -----------
+#     (GH #1267; ruling @ligon 2026-10-23 on PR #1272)
 #
-# Both EAC-I tree rosters ask the harvest and the sale as an AVERAGE PER
-# HARVEST MONTH, beside the NUMBER of months harvested, rather than as a
-# campaign total like the field-crop rows:
+# Both EAC-I tree rosters ask the harvest and the quantity sold as an
+# AVERAGE PER HARVEST MONTH, beside the NUMBER of months harvested in the
+# last 12, and then the sale's value -- printed in BOTH questionnaires as
+# "Quel a ete le montant total de cette vente ? (En FCFA)":
 #
 #   2014-15 3B (EACIS3B_p2.dta)        2017-18 11F (eaci17_s11fp1.dta)
 #   3B.09 s3bq09  months harvested     11F.10 s11fq10  months harvested
 #   3B.10 s3bq10a/b harvest per month  11F.11 s11fq11a/b harvest per month
 #   3B.13 s3bq13a/b sold per month     11F.14 s11fq14a/b sold per month
-#   3B.14 s3bq14  sale value, TOTAL    11F.15 s11fq15  sale value, PER MONTH
+#   3B.14 s3bq14  "montant total"      11F.15 s11fq15  "montant total"
+#
+# (11F.15's Stata LABEL says "Montant de la vente mensuelle moyenne"; the
+# printed instrument, French p1 pp. 44-45 and English pp. 42-43, says
+# "montant total" / "total amount" -- word for word 3B.14.)
 #
 # Until GH #1267 the 2014-15 rows served `Quantity = s3bq09`, the month
 # COUNT, as the harvest -- a misreading inherited from the WB harmonised
 # MLI_EACI1.do:259, which computes `harvest_kg_per = s3bq09 * s3bq10b`
-# (months times the UNIT CODE).  The recorded values are now served AS
-# RECORDED (the derivation function is the identity), the month count rides
-# in its own column `months_harvested`, and each wave's rows carry a
-# registered derivation key whose whole point is to state the window,
-# because `Quantity` / `Quantity_sold` / `Value_sold` on a field-crop row
-# are campaign totals.  No 12-month total is constructed here.
+# (months times the UNIT CODE).
 #
-# The two keys differ because the window differs: in 2014-15 `Value_sold` is
-# a TOTAL while `Quantity_sold` is per month, so `Value_sold /
-# Quantity_sold` on those rows is NOT a price (it is overstated by
-# `months_harvested`); in 2017-18 all three are per month and the ratio is a
-# price per `Unit_sold`.
+# Served (ruling 2026-10-23): the 12-MONTH TOTAL of each per-month quantity,
+# per-month answer x months harvested, in both waves -- one rule, one
+# registry key -- and the sale value AS RECORDED (a total, per the printed
+# instrument), so a tree row's Quantity / Quantity_sold / Value_sold are
+# campaign totals like a field-crop row's and Value_sold / Quantity_sold is
+# a price per Unit_sold:
+#
+#   Quantity      = s3bq10a x s3bq09    | s11fq11a x s11fq10
+#   Quantity_sold = s3bq13a x s3bq09    | s11fq14a x s11fq10
+#   Value_sold    = s3bq14 (recorded)   | s11fq15 (recorded)
+#
+# NOT corroborated by the data (measured 2026-10-23, Mali/_/CONTENTS.org):
+# within crop x unit cells, value / per-month quantity sold does not rise
+# with the month count in either wave, as it would if the value were a
+# total beside a monthly quantity.  Recorded as WAITING on the ruling.
+#
+# The per-month answers stay recoverable by their original names through
+# Country.derivation_inputs(DERIVATION_TREES), and the month count rides in
+# its own column, months_harvested.
+#
+# One rule for the edges (the product is formed only where the two answers
+# can be multiplied):
+#   - the 99 / 9999 / 9999.9 missing codes are masked on the PER-MONTH answer
+#     BEFORE the product (9999 x 2 would otherwise pass as a harvest), and
+#     crop_production_finalize does not re-mask a tree total (a genuine total
+#     can be 99);
+#   - a per-month answer of 0 gives a total of 0, whatever the month count;
+#   - months NA (the 99 code) -> NA: the window is unknown;
+#   - months == 0 beside a POSITIVE per-month answer -> NA: the two answers
+#     contradict each other and no total is formed (the WB do-file serves 0
+#     there; a 0 beside a recorded sale value would manufacture a zero);
+#   - a per-month answer that is NA stays NA.
+# Every tree row carries the key, including one whose total ends NA.
 
-#: Registry keys (Mali/_/derivations.yml), stamped on every perennial row
-#: of the matching wave by that wave's script, after the collapse.
-DERIVATION_3B = 'Mali::crop_production::3b-per-harvest-month'
-DERIVATION_11F = 'Mali::crop_production::11f-per-harvest-month'
+#: Registry key (Mali/_/derivations.yml), stamped on every perennial row of
+#: both EAC-I waves by the wave script, after the collapse.
+DERIVATION_TREES = 'Mali::crop_production::tree-twelve-month-total'
 
 #: (file, crop code, "has this tree" flag, within-cluster household key) of
 #: each wave's tree roster.  11F keys the household on `ménage`; it is the
@@ -383,12 +411,33 @@ _TREE_ROSTERS = {
     '2014-15': ('EACIS3B_p2.dta', 's3bq01', 's3bq03', 'menage'),
     '2017-18': ('eaci17_s11fp1.dta', 's11fq01', 's11fq03', 'ménage'),
 }
+#: Each wave's tree-roster variables: months harvested, harvest per month
+#: and its unit, quantity sold per month and its unit, sale value (total).
+_TREE_VARS = {
+    '2014-15': dict(months='s3bq09', q='s3bq10a', u='s3bq10b',
+                    qs='s3bq13a', us='s3bq13b', v='s3bq14'),
+    '2017-18': dict(months='s11fq10', q='s11fq11a', u='s11fq11b',
+                    qs='s11fq14a', us='s11fq14b', v='s11fq15'),
+}
 _TREE_RAW = {
     '2014-15': ['s3bq01', 's3bq03', 's3bq09', 's3bq10a', 's3bq10b',
                 's3bq13a', 's3bq13b', 's3bq14'],
     '2017-18': ['s11fq01', 's11fq03', 's11fq10', 's11fq11a', 's11fq11b',
                 's11fq14a', 's11fq14b', 's11fq15'],
 }
+
+#: The EAC-I "Manquant" codes on a reported quantity: 99 / 9999 on the
+#: integer columns, 9999.9 on 3B's float columns (stored float32, hence
+#: isclose).  Shared by crop_production_finalize (field rows) and the tree
+#: derivation (per-month answers, before the product).
+_QUANTITY_SENTINELS = (99, 9999)
+_QUANTITY_SENTINEL_FLOAT = 9999.9
+
+
+def _is_quantity_sentinel(series):
+    x = pd.to_numeric(series, errors='coerce')
+    return x.isin(_QUANTITY_SENTINELS) | np.isclose(
+        x.to_numpy(dtype='float64', na_value=np.nan), _QUANTITY_SENTINEL_FLOAT)
 
 
 def producing_trees(src, wave):
@@ -426,54 +475,58 @@ def _months_harvested(series):
     return series.map(conv).astype('Int64')
 
 
-def derive_3b_per_harvest_month(s3b):
-    """Mali 2014-15 tree rows (3B): the per-harvest-month answers, AS RECORDED.
+def derive_tree_twelve_month_total(per_month, months_harvested):
+    """A tree crop's 12-month quantity: per-month answer x months harvested.
 
-    The identity, registered as ``Mali::crop_production::3b-per-harvest-month``
-    because it serves values under names whose field-crop rows mean something
-    else: ``Quantity`` (3B.10, ``s3bq10a``) and ``Quantity_sold`` (3B.13,
-    ``s3bq13a``) are AVERAGES PER HARVEST MONTH, in ``u`` = ``s3bq10b`` and
-    ``Unit_sold`` = ``s3bq13b``; ``Value_sold`` (3B.14, ``s3bq14``, "montant
-    total de cette vente") is the TOTAL.  ``months_harvested`` is 3B.09
-    (``s3bq09``).  The two units are returned as the decoded Stata labels;
-    ``crop_production_finalize`` maps both through the ``u`` table.
+    Registered as ``Mali::crop_production::tree-twelve-month-total``.
+    ``per_month`` is a quantity the EAC-I tree roster asks "en moyenne chaque
+    mois" (3B.10 ``s3bq10a`` / 3B.13 ``s3bq13a`` in 2014-15; 11F.11
+    ``s11fq11a`` / 11F.14 ``s11fq14a`` in 2017-18); ``months_harvested`` is
+    the Int64 month count (3B.09 / 11F.10, from :func:`_months_harvested`).
+    Vectorised; returns float64 (NaN for NA) by the edge rule of the module
+    comment above: missing codes masked on the per-month answer before the
+    product; a 0 answer is 0; months NA, or months 0 beside a positive
+    answer, is NA; an NA answer stays NA.
     """
-    return pd.DataFrame({
-        'months_harvested': _months_harvested(s3b['s3bq09']),
-        'Quantity':         pd.to_numeric(s3b['s3bq10a'], errors='coerce'),
-        'u':                s3b['s3bq10b'],
-        'Quantity_sold':    pd.to_numeric(s3b['s3bq13a'], errors='coerce'),
-        'Unit_sold':        s3b['s3bq13b'],
-        'Value_sold':       pd.to_numeric(s3b['s3bq14'], errors='coerce'),
-    }, index=s3b.index)
+    x = pd.to_numeric(per_month, errors='coerce').astype('float64')
+    x = x.mask(_is_quantity_sentinel(x))
+    m = pd.Series(months_harvested).astype('Float64').to_numpy(
+        dtype='float64', na_value=np.nan)
+    total = x * m                                   # NA months or answer -> NaN
+    total = total.mask(x.eq(0), 0.0)                # 0 a month is 0 a year
+    total = total.mask(x.gt(0) & (m == 0))          # contradiction: no total
+    return total
 
 
-def derive_11f_per_harvest_month(s11f):
-    """Mali 2017-18 tree rows (11F): the per-harvest-month answers, AS RECORDED.
+def tree_crop_rows(src, wave):
+    """The measured columns of one wave's served tree rows, from its roster.
 
-    The identity, registered as ``Mali::crop_production::11f-per-harvest-month``:
-    ``Quantity`` (11F.11, ``s11fq11a``), ``Quantity_sold`` (11F.14,
-    ``s11fq14a``) and ``Value_sold`` (11F.15, ``s11fq15``, "Montant de la
-    vente mensuelle moyenne") are all AVERAGES PER HARVEST MONTH, in ``u`` =
-    ``s11fq11b`` and ``Unit_sold`` = ``s11fq14b``; ``months_harvested`` is
-    11F.10 (``s11fq10``).
+    ``src`` is the roster after :func:`producing_trees`.  Quantity and
+    Quantity_sold are :func:`derive_tree_twelve_month_total` of the
+    per-month answers; Value_sold is the recorded "montant total"; u and
+    Unit_sold are the decoded Stata labels (``crop_production_finalize``
+    maps both through the ``u`` table); months_harvested is the month count.
     """
+    v = _TREE_VARS[wave]
+    months = _months_harvested(src[v['months']])
     return pd.DataFrame({
-        'months_harvested': _months_harvested(s11f['s11fq10']),
-        'Quantity':         pd.to_numeric(s11f['s11fq11a'], errors='coerce'),
-        'u':                s11f['s11fq11b'],
-        'Quantity_sold':    pd.to_numeric(s11f['s11fq14a'], errors='coerce'),
-        'Unit_sold':        s11f['s11fq14b'],
-        'Value_sold':       pd.to_numeric(s11f['s11fq15'], errors='coerce'),
-    }, index=s11f.index)
+        'months_harvested': months,
+        'Quantity':      derive_tree_twelve_month_total(src[v['q']], months),
+        'u':             src[v['u']],
+        'Quantity_sold': derive_tree_twelve_month_total(src[v['qs']], months),
+        'Unit_sold':     src[v['us']],
+        'Value_sold':    pd.to_numeric(src[v['v']], errors='coerce').astype('float64'),
+    }, index=src.index)
 
 
-def _inputs_trees(wave):
+def inputs_tree_twelve_month_total(wave):
     """Raw tree-roster answers behind one wave's perennial rows, at (t, i, crop).
 
+    The registry ``inputs`` callable for ``tree-twelve-month-total``.
     Re-reads the roster through ``get_dataframe``, keeps the rows the wave
     script keeps (:func:`producing_trees`), and returns the ORIGINAL variable
-    names as columns, indexed by the served ``t``, ``i`` (pre-``id_walk``;
+    names as columns -- the PER-MONTH answers and the month count, as
+    recorded -- indexed by the served ``t``, ``i`` (pre-``id_walk``;
     ``Country.derivation_inputs`` re-keys it) and ``crop`` (the served
     harmonize_food label) -- so it joins the served perennial rows, whose
     ``plot_id`` is NA.
@@ -497,16 +550,6 @@ def _inputs_trees(wave):
     out['crop'] = (src[crop].astype('string').str.strip().map(crop_map)
                    .astype('string').values)
     return out.set_index(['t', 'i', 'crop'])
-
-
-def inputs_3b_per_harvest_month(wave):
-    """The registry ``inputs`` callable for ``3b-per-harvest-month``."""
-    return _inputs_trees(wave)
-
-
-def inputs_11f_per_harvest_month(wave):
-    """The registry ``inputs`` callable for ``11f-per-harvest-month``."""
-    return _inputs_trees(wave)
 
 
 def crop_production_finalize(df):
@@ -551,9 +594,14 @@ def crop_production_finalize(df):
     # isclose): it occurs once in s3bq10a and once in s3bq13a, and both rows
     # carry 'Manquant' for the matching unit (the first also for the month
     # count s3bq09), so it is not a quantity (GH #1267).
+    # FIELD rows only.  A tree row arrives as a 12-month TOTAL (per-month
+    # answer x months, derive_tree_twelve_month_total), whose
+    # per-month answer was already masked BEFORE the product; masking the
+    # total here would null a genuine total that happens to be 99 or 9999
+    # (none today, measured 2026-10-23) and could never catch 9999 x 2.
+    tree = df['perennial'].astype('boolean').fillna(False).to_numpy(dtype=bool)
     for c in ('Quantity', 'Quantity_sold'):
-        sentinel = df[c].isin([99, 9999]) | np.isclose(
-            df[c].to_numpy(dtype='float64', na_value=np.nan), 9999.9)
+        sentinel = _is_quantity_sentinel(df[c]).to_numpy(dtype=bool) & ~tree
         df.loc[sentinel, c] = pd.NA
     df['planting_month'] = _month_num(df['planting_month'])
     df['harvest_month'] = _month_num(df['harvest_month'])

@@ -48,10 +48,13 @@ TABLE = "crop_production"
 #: wave and row kind: (priced, Unit_sold non-null, knows both units, differ).
 #: Units compared by canonical LABEL.  The raw-file audit (GH #824 comment,
 #: 2026-10-23) counted 572 / 191 knows-both before the build's collapse and
-#: crop-label drop; the disagreement counts reproduce exactly.
+#: crop-label drop; the disagreement counts reproduce exactly.  2014-15 tree
+#: was (198, 196, 190, 42) at e2836e5d2: under the PR #1272 ruling the sold
+#: quantity is a 12-month total, NA on the 6 priced rows whose month count is
+#: 0 (3) or missing (3), whose recorded sale value stays.
 PRICED = {
     ("2014-15", "field"): (569, 568, 567, 95),
-    ("2014-15", "tree"): (198, 196, 190, 42),
+    ("2014-15", "tree"): (192, 190, 186, 42),
     ("2017-18", "field"): (451, 451, 449, 87),
     ("2017-18", "tree"): (127, 127, 127, 18),
 }
@@ -198,14 +201,13 @@ class TestFinalize:
         assert got["Quantity_sold"].iloc[0] == 5.0
         assert got["Unit_sold"].iloc[0] == "Sac"
 
-    @pytest.mark.parametrize("fn, var", [("derive_3b_per_harvest_month", "s3bq13b"),
-                                         ("derive_11f_per_harvest_month", "s11fq14b")])
-    def test_tree_rows_take_their_own_sold_unit(self, mali, fn, var):
+    @pytest.mark.parametrize("wave, var", [("2014-15", "s3bq13b"), ("2017-18", "s11fq14b")])
+    def test_tree_rows_take_their_own_sold_unit(self, mali, wave, var):
         raw = {"s3bq09": [2], "s3bq10a": [5.0], "s3bq10b": ["Sac"], "s3bq13a": [1.0],
                "s3bq13b": ["Kilogramme"], "s3bq14": [900.0],
                "s11fq10": ["2 mois"], "s11fq11a": [5.0], "s11fq11b": ["Sac"],
                "s11fq14a": [1.0], "s11fq14b": ["Kilogramme"], "s11fq15": [900.0]}
-        got = getattr(mali, fn)(pd.DataFrame(raw))
+        got = mali.tree_crop_rows(pd.DataFrame(raw), wave)
         assert got["Unit_sold"].tolist() == ["Kilogramme"]
         assert got["u"].tolist() == ["Sac"]
 
