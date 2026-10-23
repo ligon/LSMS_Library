@@ -1074,6 +1074,24 @@ default =outer= those orphans arrive with a null =v= and collapse into
 one phantom cluster -- W2 gained a spurious 434th EA
 (=030412088800105=) exactly this way.
 
+*GH #592 re-check (2026-10-23).*  The three waves GH #592 listed with zero
+coordinates (2011-12, 2018-19, 2021-22) are all populated now.  Cold build on
+=development= =9a0ed5f3c=, EAs with coordinates: 2011-12 333/333, 2013-14
+433/433, 2015-16 432/432, 2018-19 516/535, 2021-22 432/435.  The shortfall
+is release-side, not wiring: in 2018-19, 13 of the 19 empty EAs are in
+=ETH_HouseholdGeovariables_Y4= with a null fix (167 households) and 6 are
+absent from it altogether (90 households; the file's 124 extra households
+sit in other EAs and all carry a fix); in 2021-22 the 3 empty EAs' 32
+households are in the geo file with a null fix.  Per column, the household
+-> EA projection disagrees ONLY on the coordinates (=Region= / =District= /
+=Rural=: 0 EAs in every wave).  The grain audit's conflicting-tuple counts
+(34 / 43 / 72 / 0 / 111) are the union of EAs with >1 distinct fix (0 / 38 /
+72 / 0 / 72, as tabled above) and EAs mixing a fix with households that have
+none (34 / 5 / 0 / 0 / 49; in 2021-22, 10 EAs are both) -- so W1's
+=GrainCollapseWarning= is entirely the latter, and the selector serves the
+populated row there.  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
+
 ** 2021-22 holds ESPS-5 release =v02_M=, not the catalog's =v03_M= (GH #600)
 
 =2021-22/Documentation/SOURCE.org= records =#+CATALOG_IDNO: ETH_2021_ESPS-W5_v02_M=,

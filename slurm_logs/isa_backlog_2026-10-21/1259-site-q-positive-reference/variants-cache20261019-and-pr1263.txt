@@ -1,0 +1,23 @@
+lsms_library: /local/job40390255/worktrees/1259/lsms_library/__init__.py
+
+#### data_root /global/home/users/ligon/.local/share/lsms_library
+crop_production.Quantity Malawi: {'A': 20, 'B': 19, 'C': 19, 'C0': 19} B-only=0 C-only=0
+crop_production.Quantity Nigeria: {'A': 9, 'B': 5, 'C': 5, 'C0': 5} B-only=0 C-only=0
+crop_production.Quantity Uganda: {'A': 26, 'B': 22, 'C': 22, 'C0': 22} B-only=0 C-only=0
+  crop_production.Quantity TOTAL {'A': 129, 'B': 120, 'C': 120, 'C0': 120}
+food_acquired.Quantity Ethiopia: {'A': 132, 'B': 126, 'C': 126, 'C0': 126} B-only=0 C-only=0
+food_acquired.Quantity GhanaLSS: {'A': 294, 'B': 294, 'C': 294, 'C0': 295} B-only=0 C-only=0
+food_acquired.Quantity Malawi: {'A': 216, 'B': 215, 'C': 216, 'C0': 216} B-only=0 C-only=1
+food_acquired.Quantity Tanzania: {'A': 70, 'B': 70, 'C': 70, 'C0': 71} B-only=0 C-only=0
+  food_acquired.Quantity TOTAL {'A': 2004, 'B': 1997, 'C': 1998, 'C0': 2000}
+plot_features.Area Albania: {'A': 1, 'B': 1, 'C': 1, 'C0': 2} B-only=0 C-only=0
+plot_features.Area Ethiopia: {'A': 2, 'B': 2, 'C': 2, 'C0': 8} B-only=0 C-only=0
+plot_features.Area Malawi: {'A': 12, 'B': 12, 'C': 12, 'C0': 13} B-only=0 C-only=0
+plot_features.Area Uganda: {'A': 12, 'B': 11, 'C': 11, 'C0': 11} B-only=0 C-only=0
+  plot_features.Area TOTAL {'A': 348, 'B': 347, 'C': 347, 'C0': 355}
+
+#### data_root /local/job40390255/data-private/1259/merge
+crop_production.Quantity Tanzania: {'A': 30, 'B': 14, 'C': 14, 'C0': 14} B-only=0 C-only=0
+  crop_production.Quantity TOTAL {'A': 30, 'B': 14, 'C': 14, 'C0': 14}
+  food_acquired.Quantity TOTAL None
+  plot_features.Area TOTAL None

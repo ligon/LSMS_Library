@@ -1,0 +1,29 @@
+lsms_library: /local/job40390255/worktrees/1259/lsms_library/__init__.py
+data_root: /local/job40390255/data-private/1259/cold
+16 warm countries: ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'GhanaLSS', 'GhanaSPS', 'Guinea-Bissau', 'Malawi', 'Mali', 'Niger', 'Nigeria', 'Senegal', 'Tanzania', 'Togo', 'Uganda']
+
+shipped rule: quantile=0.9 floor=1.0 min_cell=30 K=100.0
+
+quantile=0.9 floor=0.0 min_cell=30 -> K=10:1299 K=30:380 K=50:228 K=100:120 K=150:75 K=200:54 K=300:37 K=500:27
+quantile=0.9 floor=1.0 min_cell=30 -> K=10:1299 K=30:380 K=50:228 K=100:120 K=150:75 K=200:54 K=300:37 K=500:27
+
+quantile=0.95 floor=0.0 min_cell=30 -> K=10:688 K=30:226 K=50:136 K=100:66 K=150:43 K=200:35 K=300:27 K=500:17
+quantile=0.95 floor=1.0 min_cell=30 -> K=10:688 K=30:226 K=50:136 K=100:66 K=150:43 K=200:35 K=300:27 K=500:17
+
+quantile=0.99 floor=0.0 min_cell=30 -> K=10:169 K=30:52 K=50:35 K=100:23 K=150:15 K=200:12 K=300:7 K=500:7
+quantile=0.99 floor=1.0 min_cell=30 -> K=10:169 K=30:52 K=50:35 K=100:23 K=150:15 K=200:12 K=300:7 K=500:7
+
+
+SHIPPED rule fires on 120 of 672,461 rows (0.0178%)
+604,269 rows have a reference; 68,192 do not (thin cell, or a NaN quantity)
+ratio quantiles -- look for a gap; there is none:
+count     604269.000000
+mean           0.626944
+std           21.862598
+min            0.000000
+90%            1.000000
+99%            3.571429
+99.9%         20.000000
+99.99%       188.477436
+max        11029.411765
+Name: ratio, dtype: float64

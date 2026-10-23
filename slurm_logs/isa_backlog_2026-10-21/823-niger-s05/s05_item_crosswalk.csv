@@ -1,0 +1,56 @@
+code,rows,s05_label_meta,s05_label_read,hh_label_meta_same_code,hh_label_read_same_code,meta_label_equal,read_label_equal,harmonize_food_exact,harmonize_food_after_decode,j,j_in_household_served_j,j_by_code,j_by_code_in_household_served_j,label_j_equals_code_j,household_rows_consumed_same_code
+1,78,Riz du Niger,Riz du Niger,Riz du Niger,Riz du Niger,True,True,True,False,Riz du Niger,True,Riz du Niger,True,True,70
+2,171,Autre Riz local,Autre Riz local,Autre Riz local,Autre Riz local,True,True,True,False,Autre Riz local,True,Autre Riz local,True,True,429
+3,1270,Riz Importé non parfumé,Riz Importé non parfumé,Riz importÃ© non parfumÃ©,Riz importÃ© non parfumÃ©,False,False,False,False,Riz Importé non parfumé,False,Riz importé non parfumé,True,False,3614
+4,109,Riz Importé parfumé,Riz Importé parfumé,Riz importÃ© parfumÃ©,Riz importÃ© parfumÃ©,False,False,False,False,Riz Importé parfumé,False,Riz importé parfumé,True,False,73
+6,1112,Mais en grain,Mais en grain,MaÃ¯s en grain,MaÃ¯s en grain,False,False,False,False,Mais en grain,False,Maïs en grain,True,False,1852
+7,1366,Mil,Mil,Mil,Mil,True,True,True,False,Mil,True,Mil,True,True,5034
+8,992,Sorgho,Sorgho,Sorgho,Sorgho,True,True,True,False,Sorgho,True,Sorgho,True,True,1513
+12,138,Farine de mais,Farine de mais,Farine de maÃ¯s,Farine de maÃ¯s,False,False,False,False,Farine de mais,False,Farine de maïs,True,False,296
+14,1020,Farine de blé local ou importé,Farine de blé local ou importé,Farine de blÃ© local ou importÃ©,Farine de blÃ© local ou importÃ©,False,False,False,False,Farine de blé local ou importé,True,Farine de blé local ou importé,True,True,190
+16,983,Pates alimentaires,Pates alimentaires,PÃ¢tes alimentaires,PÃ¢tes alimentaires,False,False,False,False,Pates alimentaires,False,Pâtes alimentaires,True,False,2494
+17,583,Pain moderne,Pain moderne,Pain moderne,Pain moderne,True,True,True,False,Pain moderne,True,Pain moderne,True,True,826
+18,260,Pain traditionnel,Pain traditionnel,Pain traditionnel,Pain traditionnel,True,True,True,False,Pain traditionnel,True,Pain traditionnel,True,True,189
+23,1339,Viande de boe__uf,Viande de boe__uf,Viande de bÅ__uf,Viande de bÅ__uf,False,False,False,False,Viande de boe__uf,False,Viande de bœuf,True,False,1155
+25,1218,Viande de mouton,Viande de mouton,Viande de mouton,Viande de mouton,True,True,True,False,Viande de mouton,True,Viande de mouton,True,True,949
+26,1221,Viande de chèvre,Viande de chèvre,Viande de chÃ¨vre,Viande de chÃ¨vre,False,False,True,False,Viande de chèvre,True,Viande de chèvre,True,True,1222
+27,704,"Abats et tripes (foie, rognon, etc.)","Abats et tripes (foie, rognon, etc.)","Abats et tripes (foie, rognon, etc.)","Abats et tripes (foie, rognon, etc.)",True,True,True,False,"Abats et tripes (foie, rognon, etc.)",True,"Abats et tripes (foie, rognon, etc.)",True,True,171
+29,847,Poulet sur pied,Poulet sur pied,Poulet sur pied,Poulet sur pied,True,True,True,False,Poulet sur pied,True,Poulet sur pied,True,True,335
+35,133,MÃ¢choiron frais (guiguiri),MÃ¢choiron frais (guiguiri),MÃ¢choiron frais (guiguiri),MÃ¢choiron frais (guiguiri),True,True,True,False,Mâchoiron frais (guiguiri),True,Mâchoiron frais (guiguiri),True,True,138
+36,185,Carpes fraiches,Carpes fraiches,Carpes fraÃ®ches,Carpes fraÃ®ches,False,False,False,False,Carpes fraiches,False,Carpes fraîches,True,False,343
+37,231,Maquereau (poisson de mer),Maquereau (poisson de mer),Maquereau (poisson de mer),Maquereau (poisson de mer),True,True,True,False,Maquereau (poisson de mer),True,Maquereau (poisson de mer),True,True,168
+39,220,sillure fumée,sillure fumée,Sillure fumÃ©,Sillure fumÃ©,False,False,False,False,sillure fumée,False,Sillure fumé,True,False,106
+41,243,poisson séché,poisson séché,Poisson sÃ©chÃ©,Poisson sÃ©chÃ©,False,False,False,False,poisson séché,False,Poisson séché,True,False,65
+44,162,Lait frais,Lait frais,Lait frais,Lait frais,True,True,True,False,Lait frais,True,Lait frais,True,True,844
+45,745,"Lait caillé, yaourt","Lait caillé, yaourt","Lait caillÃ©, yaourt","Lait caillÃ©, yaourt",False,False,False,False,"Lait caillé, yaourt",True,"Lait caillé, yaourt",True,True,2903
+48,955,Lait en poudre,Lait en poudre,Lait en poudre,Lait en poudre,True,True,True,False,Lait en poudre,True,Lait en poudre,True,True,1138
+56,428,Huile d'arachide,Huile d'arachide,Huile d'arachide,Huile d'arachide,True,True,True,False,Huile d'arachide,True,Huile d'arachide,True,True,740
+58,1277,Huile de palme raffinée,Huile de palme raffinée,Huile de palme raffinÃ©e,Huile de palme raffinÃ©e,False,False,False,False,Huile de palme raffinée,True,Huile de palme raffinée,True,True,4726
+62,805,Orange,Orange,Orange,Orange,True,True,True,False,Orange,True,Orange,True,True,1173
+67,904,Pastèque,Pastèque,"PastÃ¨que, Melon","PastÃ¨que, Melon",False,False,True,False,Pastèque,False,"Pastèque, Melon",True,False,616
+68,962,Dattes,Dattes,Dattes,Dattes,True,True,True,False,Dattes,True,Dattes,True,True,1144
+72,341,Salade (laitue),Salade (laitue),Salade (laitue),Salade (laitue),True,True,True,False,Salade (laitue),True,Salade (laitue),True,True,306
+77,458,Courge/courgette,Courge/courgette,"Aubergine, Courge/Courgette","Aubergine, Courge/Courgette",False,False,False,False,Courge/courgette,False,"Aubergine, Courge/Courgette",True,False,1146
+79,640,Tomate fraiche,Tomate fraiche,Tomate fraÃ®che,Tomate fraÃ®che,False,False,True,False,Tomate fraîche,True,Tomate fraîche,True,True,1177
+81,212,Gombo frais,Gombo frais,Gombo frais,Gombo frais,True,True,True,False,Gombo frais,True,Gombo frais,True,True,287
+82,1126,Gombo sec,Gombo sec,Gombo sec,Gombo sec,True,True,True,False,Gombo sec,True,Gombo sec,True,True,2595
+83,1238,Oignon frais,Oignon frais,Oignon frais,Oignon frais,True,True,True,False,Oignon frais,True,Oignon frais,True,True,3931
+85,570,Feuilles d'oseille,Feuilles d'oseille,Feuilles d'oseille,Feuilles d'oseille,True,True,True,False,Feuilles d'oseille,True,Feuilles d'oseille,True,True,1710
+86,802,Feuilles de baobab,Feuilles de baobab,Feuilles de baobab,Feuilles de baobab,True,True,True,False,Feuilles de baobab,True,Feuilles de baobab,True,True,3026
+87,588,Malohiya (Fakkou),Malohiya (Fakkou),Malohiya (Fakkou),Malohiya (Fakkou),True,True,True,False,Malohiya (Fakkou),True,Malohiya (Fakkou),True,True,1862
+88,319,Moringa,Moringa,Moringa,Moringa,True,True,True,False,Moringa,True,Moringa,True,True,622
+91,1446,Concentré de tomate,Concentré de tomate,ConcentrÃ© de tomate,ConcentrÃ© de tomate,False,False,True,False,Concentré de tomate,True,Concentré de tomate,True,True,1744
+95,1184,Niébé-Haricots secs,Niébé-Haricots secs,NiÃ©bÃ©/Haricots secs,NiÃ©bÃ©/Haricots secs,False,False,False,False,Niébé-Haricots secs,False,Niébé/Haricots secs,True,False,3818
+100,740,Pate d'arachide,Pate d'arachide,PÃ¢te d'arachide,PÃ¢te d'arachide,False,False,False,False,Pate d'arachide,False,Pâte d'arachide,True,False,1122
+104,566,Manioc,Manioc,Manioc,Manioc,True,True,True,False,Manioc,True,Manioc,True,True,335
+105,928,Igname,Igname,Igname,Igname,True,True,True,False,Igname,True,Igname,True,True,348
+107,430,Pomme de terre,Pomme de terre,Pomme de terre,Pomme de terre,True,True,True,False,Pomme de terre,True,Pomme de terre,True,True,490
+109,982,Patate douce,Patate douce,Patate douce,Patate douce,True,True,True,False,Patate douce,True,Patate douce,True,True,1015
+114,1599,Sucre (poudre ou morceaux),Sucre (poudre ou morceaux),Sucre (poudre ou morceaux),Sucre (poudre ou morceaux),True,True,True,False,Sucre (poudre ou morceaux),True,Sucre (poudre ou morceaux),True,True,4839
+115,384,Miel,Miel,Miel,Miel,True,True,True,False,Miel,True,Miel,True,True,136
+118,1015,Sel,Sel,Sel,Sel,True,True,True,False,Sel,True,Sel,True,True,5874
+119,709,Piment,Piment,Piment,Piment,True,True,True,False,Piment frais,True,Piment frais,True,True,4467
+121,1696,"Cube alimentaire (Maggi, Jumbo, )","Cube alimentaire (Maggi, Jumbo, )","Cube alimentaire (Maggi, Jumbo, )","Cube alimentaire (Maggi, Jumbo, )",True,True,True,False,"Cube alimentaire (Maggi, Jumbo, )",True,"Cube alimentaire (Maggi, Jumbo, )",True,True,5252
+123,1284,Soumbala (moutarde africaine),Soumbala (moutarde africaine),Soumbala (moutarde africaine),Soumbala (moutarde africaine),True,True,True,False,Soumbala (moutarde africaine),True,Soumbala (moutarde africaine),True,True,3788
+130,1118,Thé vert,Thé vert,ThÃ©,ThÃ©,False,False,False,False,Thé vert,False,Thé,True,False,2105
+135,1211,"Boissons gazeuses (coca, etc.)","Boissons gazeuses (coca, etc.)","Boissons gazeuses (coca, etc.)","Boissons gazeuses (coca, etc.)",True,True,True,False,"Boissons gazeuses (coca, etc.)",True,"Boissons gazeuses (coca, etc.)",True,True,230

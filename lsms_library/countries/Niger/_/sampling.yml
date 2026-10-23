@@ -1,0 +1,117 @@
+# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+#
+# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
+# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
+# wave of `Country('Niger').waves`?  The design fields are #793's curation and
+# are not written yet; their absence here is "not curated", not "not found".
+#
+# Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
+# {wave-scoped, redefined, mixed} makes a `Country('Niger')` frame that carries
+# `v` across that boundary warn (`ClusterIdentityWarning`); nothing is ever
+# dropped or rewritten.  The first wave (2011-12) has no preceding wave and so
+# no entry.  Vocabulary and field names: see sampling.py.  Modelled on
+# Burkina_Faso/_/sampling.yml (PR #1246, the same ECVMA/EMC -> EHCVM shape),
+# in the Ethiopia/Nigeria format.
+#
+# The idiosyncrasy (GH #1247): Niger is TWO survey programmes, each a
+# two-wave panel -- ECVMA (2011-12 -> 2014-15) and EHCVM (2018-19 -> 2021-22)
+# -- and `v` is a cluster SERIAL in both, not a frame code.  ECVMA numbers its
+# 270 grappes 1-270; EHCVM-1 numbers its 504 grappes within 1-710.  The two
+# id spaces OVERLAP (267 ids recur) with no household linkage between the
+# programmes, so the same integer names an unrelated EA -- unlike GhanaLSS
+# 1991-92, whose disjoint keyspace is what makes grouping across an unlinked
+# boundary correct there.  Within each programme the panel keeps `v`.
+#
+# Do NOT measure the ECVMA -> EHCVM boundary by shared `i`: 0 is shared by
+# construction, because `niger.i` prefixes every EHCVM id with 'E_' (the
+# prefix exists to keep the two programmes' ids apart).  Zero shared `i` is
+# not evidence about `v`.
+
+Sampling:
+
+  '2014-15':
+    panel:
+      household_continuity: panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        ECVMA-II re-interviewed the 2011 households under the 2011 `GRAPPE`
+        (the 2014-15 key is the 2011 grappe plus EXTENSION).  Measured:
+        3,529 of 3,529 crosswalk-linked households keep `v`, in 270 cluster
+        pairs, all one-to-one; Region and Rural agree 270/270.  Two things a
+        re-measurement will trip on, neither a cluster fact: (1) through
+        sample() 3,530 `i` are shared and one "changes" `v` -- the split-off
+        '20012' (g=2, m=1, e=2), which is also 2011-12 hid 20012 (g=200,
+        m=12), the namespace collision recorded in CONTENTS.org (GH #679);
+        (2) District agrees on only 78 of 270 because the COLUMN changes
+        meaning: 2011-12 `cluster_features.District` is `strate`, the
+        sampling stratum (25 labels such as "Agadez pastorale"), while
+        2014-15's is MS00Q11, a department.  Movers (EXTENSION 1, 77
+        households) and split-offs (EXTENSION 2, 62) keep their 2011 grappe
+        as `v` wherever they were found -- `v` is the design cluster, not the
+        2014 location (2 households report a Region other than their
+        grappe's).
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'measured 2026-10-23 through Country("Niger").sample() and .cluster_features() on a cold build at development 9a0ed5f3c, linkage from Niger/_/updated_ids.json (3,529 2014-15 -> 2011-12 links, built by panel_ids.py from the shared (GRAPPE, MENAGE) key); design: 2014-15 DDI (microdata-2676), "Sampling Procedure" > "2014 Survey", PDF p. 6 (quoted in CONTENTS.org, "2014-15 -- ECVM/A 2014")'
+
+  '2018-19':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: redefined
+      cluster_id_note: |-
+        ECVMA (`GRAPPE` 1-270) and EHCVM-1 (`grappe`, 504 ids in 1-710)
+        number their clusters independently, so 267 ids recur and name
+        unrelated EAs: Region agrees on 27 of them, the 26.5 expected by
+        chance.  On the same 267: District agrees on 6, Rural on 137, and
+        the 2011-12 coordinates of a grappe (the same EA as 2014-15's,
+        see the 2014-15 entry; 2014-15 ships none) lie a median 423 km from
+        the 2018-19 coordinates of the same id, 2 of 266 within 5 km.  Two
+        separate programmes and two separate draws: EHCVM-1 selected 504 EAs
+        "from the sample frame" at its first stage (DDI 4296, PDF p. 4).  No
+        household links across this boundary: the 2018-19 cover
+        (s00_me_ner2018.dta) and weights file carry no ECVMA pointer,
+        panel_ids.py records no ECVMA -> EHCVM linkage, and `niger.i`
+        prefixes EHCVM ids with 'E_', so 0 `i` are shared by construction.
+        `redefined`, not `unobservable`: the keyspaces OVERLAP, so a
+        cross-wave groupby('v') merges 267 pairs of unrelated clusters, the
+        hazard the warning exists for.  The unit KIND is the same (an EA);
+        what changes is the sample list the serial indexes.  `redefined` is
+        the closest warning-bearing value in the frozen vocabulary (its
+        gloss, "a different KIND of unit", fits loosely), as for Burkina
+        Faso 2018-19 (GH #1243); `wave-scoped` would claim a crosswalk is
+        meaningful, and none is.  Region is compared on the served,
+        spelling-harmonised labels (8 regions both sides).
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'measured 2026-10-23 through Country("Niger").sample() and .cluster_features() on a cold build at development 9a0ed5f3c (coordinates as served: 2011-12 NER_EA_Offsets.dta, 2018-19 grappe_gps_ner2018.dta); draw: 2018-19 DDI (microdata-4296), "Sampling" > "SAMPLING PROCEDURE", PDF p. 4 (quoted in CONTENTS.org, "2018-19 -- EHCVM 2018/19"); no linkage: Niger/_/panel_ids.py docstring'
+
+  '2021-22':
+    panel:
+      household_continuity: rotating-panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        `grappe` both waves, and EHCVM-2 re-interviewed EHCVM-1 households in
+        their grappe.  Measured on the raw cover: s00q07f1/s00q07f2 (previous
+        grappe/menage) equal grappe/menage for 4,589 of 4,589 households that
+        carry them, in 475 grappes, all among 2018-19's 504.  On the 476
+        shared ids Region and District agree 476/476 and Rural 473/476, and
+        465 of 465 with coordinates on both sides lie within 5 km (median
+        0.0 km).  The 79 grappes new in 2021-22 are numbered 900-996, above
+        2018-19's maximum of 710, so the added keyspace is DISJOINT and no new
+        id names an old cluster (why `stable`, not `mixed`); none holds a
+        panel household.  28 of 2018-19's grappes do not recur (23 in
+        Tillaberi; cause not recorded).  Through sample() 5,055 `i` are
+        shared, not 4,589, and all keep `v`: 466 households flagged
+        PanelHH == "Menage panel" (accent-folded here; the raw label is
+        accented, as panel_ids.py matches it) lack s00q07f1/f2, and EHCVM `i` is the same
+        (grappe, menage) string in both waves -- a linkage-coverage fact, not
+        a cluster fact.  `rotating-panel` (part retained, part replaced), not
+        `panel`: 1,567 of 6,622 households are "Menage non-panel" (top-ups
+        and the 79 new grappes) -- a judgement call, which does not change
+        whether this boundary warns.
+      source_type: derived-from-data
+      confidence: high
+      source_file: 'lsms_library/countries/Niger/2021-22/Data/s00_me_ner2021.dta'
+      locator: 'grappe/menage vs s00q07f1/s00q07f2 and PanelHH in that file, read via get_dataframe 2026-10-23 (the rule Niger/_/panel_ids.py applies); re-measured through Country("Niger").sample() and .cluster_features() at development 9a0ed5f3c; design: CONTENTS.org, "Oversamples and sub-populations" item 4'

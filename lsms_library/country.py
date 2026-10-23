@@ -1051,6 +1051,26 @@ def _optional_scheme_columns(scheme_entry: Any) -> list[str]:
             and k not in required]
 
 
+# GH #1218 / PR #1221 follow-up: the ``attrs`` key that marks a frame built by
+# ``_empty_declared_frame``.  Such a frame is an ANSWER (the requested waves
+# lack the table), not a BUILD, so no cache write may store it: written to the
+# L2-country parquet with the descent's union coverage manifest, it would claim
+# 0 rows for waves that have rows (measured, Iraq ``shocks``: 8,812 rows of
+# 2012 served as 0).  Every write of a ``load_from_waves`` result checks it via
+# ``_is_constructed_empty``.
+_CONSTRUCTED_EMPTY_ATTR = "_constructed_empty"
+
+
+def _is_constructed_empty(obj: Any) -> bool:
+    """True for a frame ``_empty_declared_frame`` built (never cache it).
+
+    Requires 0 rows as well as the marker: ``attrs`` can ride onto a frame
+    with rows (``reindex``, ``combine_first``, ``align``, ``.loc``
+    enlargement in pandas 3), and such a frame must never skip a write."""
+    return (isinstance(obj, pd.DataFrame) and len(obj) == 0
+            and obj.attrs.get(_CONSTRUCTED_EMPTY_ATTR) is True)
+
+
 def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
     """A 0-row frame with a table's DECLARED shape (GH #1039).
 
@@ -1080,12 +1100,20 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
         else:
             payload_types[c] = value
     # Empty calendars need no value inference (GH #1218; ledger sections 2/4).
+    # They are built at the library's stored date resolution, microseconds
+    # (GH #1045: ``datetime_parse`` spells it ``"datetime64[us]"``; it has no
+    # named constant), not whatever pandas infers for an empty object column
+    # (``[s]``).  ``_coerce_datetime_column`` passes a datetime64 column
+    # through untouched, so neither enforcer re-parses or re-resolves it.
     for c, declared_type in payload_types.items():
         target = (_SCHEME_DTYPE_MAP.get(declared_type)
                   if isinstance(declared_type, str) else None)
         if isinstance(target, str) and target == "to_datetime":
-            empty[c] = _to_datetime_mixed(empty[c], where=c)
+            empty[c] = pd.Series([], index=empty.index, dtype="datetime64[us]")
     _enforce_declared_dtypes(empty, payload_types)
+    # Served, never cached: every cache write of a load_from_waves result
+    # skips a frame carrying this marker (see _CONSTRUCTED_EMPTY_ATTR).
+    empty.attrs[_CONSTRUCTED_EMPTY_ATTR] = True
     return empty
 
 
@@ -1928,7 +1956,16 @@ class Wave:
                 # content hash cannot tell a degraded build from a complete one.
                 dropped: list[dict[str, Any]] = []
                 _forget_wave_build_drops(self.country.name, request, self.year)
-                merge_on =list(set('t').union(data_info.get('merge_on')))#a list
+                # GH #1063: the merge keys in a FIXED order -- 't' first, then
+                # the declared `merge_on` order.  This used to be
+                # `list(set('t').union(merge_on))`, whose iteration order
+                # follows PYTHONHASHSEED (string hashing is randomised per
+                # process).  An `outer` merge sorts its result
+                # lexicographically by the keys IN THE ORDER GIVEN, so with
+                # two or more non-`t` keys (the EHCVM rosters' [v, i]) every
+                # process drew one of two row orders at random -- same values,
+                # same index set, different order between any two builds.
+                merge_on = list(dict.fromkeys(['t', *data_info.get('merge_on')]))
                 # `merge_how:` (GH #323) picks the join type for this block.
                 # Defaults to the historical 'outer', so every existing `dfs:`
                 # block is unchanged.  Declare `merge_how: left` where the
@@ -3899,6 +3936,30 @@ class Country:
             return df
 
         if isinstance(df, pd.DataFrame):
+            # GH #1234: a missing `u` is U_UNKNOWN on EVERY route, cold or warm.
+            # `map_index` renames it at `Wave.grab_data` and at the warm read
+            # gates, but a `u` a wave script writes as a COLUMN (Malawi
+            # crop_production) gets no `u` level until load_from_waves'
+            # per-wave `_normalize_dataframe_index` promotes it, after
+            # grab_data's map_index has run -- so the cold build served pd.NA
+            # and the warm read 'Unknown'.  This asks `map_index` what it does
+            # to each distinct `u` value and applies exactly that, with the
+            # read gate's own `rename(level='u')`: map_index stays the ONE
+            # definition, so the two sites cannot drift, and a NaN-policy NaN
+            # it never matched is still not matched (GH #1118).  Before the
+            # declared-index collapse below, whose groupby would drop the NA key.
+            # Read path (`_finalize_result` is in _EXCLUDED_CALLABLES): 0 hashes.
+            if 'u' in df.index.names:
+                u_seen = df.index.get_level_values('u').unique().rename('u')
+                u_served = map_index(pd.DataFrame(index=u_seen)).index
+                u_renames = {old: new for old, new in zip(u_seen, u_served)
+                             if pd.isna(old) != pd.isna(new)
+                             or (not pd.isna(old) and old != new)}
+                if u_renames:
+                    attrs = dict(df.attrs)
+                    df = df.rename(index=u_renames, level='u')
+                    df.attrs = attrs
+
             df = self._augment_index_from_related_tables(df, scheme_entry, None)
             df = _normalize_dataframe_index(df, scheme_entry, None, method_name,
                                             country=self.name)
@@ -4985,7 +5046,31 @@ class Country:
         ``crop_production``, red team r1) -- but those bytes are exactly what
         the default backend builds and are fingerprinted where that code
         lives, and the make backend writes no L2-country parquet.
+
+        **Memoised per instance and table -- COMPLETED answers only** (GH
+        #1218 / PR #1221 follow-up).  When the probe cannot run (an
+        ``OSError`` such as a fork failure on a crowded node, or its timeout)
+        the answer is the fail-safe True for THAT call only, and the next call
+        probes again.  Memoising the fail-safe made one transient fault last
+        for the instance's lifetime: under ``LSMS_BUILD_BACKEND=make`` later
+        requests then served a rule-less ``var/`` (Burkina Faso
+        ``interview_date(waves=['2014'])``: 21,028 rows of 2018-19 instead of
+        0).  So one request may still see True and then False; what keeps the
+        constructed empty frame out of the cache is the marker guard
+        (``_CONSTRUCTED_EMPTY_ATTR``), not this memo.
         """
+        memo = vars(self).setdefault("_country_builder_memo", {})
+        if method_name in memo:
+            return memo[method_name]
+        answer = self._probe_country_builder(method_name)
+        if answer is None:
+            return True             # fail-safe, not memoised: re-probe next call
+        memo[method_name] = answer
+        return answer
+
+    def _probe_country_builder(self, method_name: str) -> bool | None:
+        """The uncached rule probe behind :meth:`_has_country_builder`;
+        ``None`` when the ``make -n`` probe could not complete."""
         country_dir = self.file_path / "_"
         if (country_dir / f"{method_name}.py").exists():
             return True
@@ -5019,7 +5104,7 @@ class Country:
             except (OSError, subprocess.SubprocessError) as error:
                 logger.debug(f"GH #1039 rule probe failed for "
                              f"{self.name}/{method_name}: {error!r}")
-                return True
+                return None     # no answer; the caller fails safe (True)
         if probe.returncode == 0:
             return True
         no_rule = [line for line in probe.stderr.splitlines()
@@ -5513,6 +5598,8 @@ class Country:
             # (GH #964/#968).  Removed in GH #970; nothing here spawns a
             # subprocess, so there is no ``make`` to gate on.
             result = load_from_waves(waves)
+            if _is_constructed_empty(result):
+                return result  # an answer, never a cache (_CONSTRUCTED_EMPTY_ATTR)
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -5627,6 +5714,11 @@ class Country:
                         # GH #891: build the union, cache the union (stamped with
                         # its coverage), return only what was asked for.
                         df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
+                        if _is_constructed_empty(df):
+                            # GH #1218 / #1221 follow-up: absence of the
+                            # REQUESTED waves, constructed -- it must not be
+                            # stamped with the union coverage of build_waves.
+                            return df
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -5826,6 +5918,8 @@ class Country:
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
                 df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
+                if _is_constructed_empty(df):
+                    return df  # never cached; see the no-stage write above
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)

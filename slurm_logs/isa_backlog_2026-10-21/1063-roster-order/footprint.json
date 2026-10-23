@@ -1,0 +1,272 @@
+[
+ {
+  "label": "dev_s1_vs_dev_s3:GhanaSPS_household_roster",
+  "a": "v_dev_s1_w1_GhanaSPS_household_roster",
+  "b": "v_dev_s3_w1_GhanaSPS_household_roster",
+  "rows_a": 54251,
+  "rows_b": 54251,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:GhanaSPS_household_roster",
+  "a": "v_br_s1_w1_GhanaSPS_household_roster",
+  "b": "v_dev_s1_w1_GhanaSPS_household_roster",
+  "rows_a": 54251,
+  "rows_b": 54251,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:GhanaSPS_household_roster",
+  "a": "v_br_s1_w1_GhanaSPS_household_roster",
+  "b": "v_dev_s3_w1_GhanaSPS_household_roster",
+  "rows_a": 54251,
+  "rows_b": 54251,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Uganda_cluster_features",
+  "a": "v_dev_s1_w1_Uganda_cluster_features",
+  "b": "v_dev_s3_w1_Uganda_cluster_features",
+  "rows_a": 4805,
+  "rows_b": 4805,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Uganda_cluster_features",
+  "a": "v_br_s1_w1_Uganda_cluster_features",
+  "b": "v_dev_s1_w1_Uganda_cluster_features",
+  "rows_a": 4805,
+  "rows_b": 4805,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:Uganda_cluster_features",
+  "a": "v_br_s1_w1_Uganda_cluster_features",
+  "b": "v_dev_s3_w1_Uganda_cluster_features",
+  "rows_a": 4805,
+  "rows_b": 4805,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Malawi_cluster_features",
+  "a": "v_dev_s1_w1_Malawi_cluster_features",
+  "b": "v_dev_s3_w1_Malawi_cluster_features",
+  "rows_a": 3235,
+  "rows_b": 3235,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Malawi_cluster_features",
+  "a": "v_br_s1_w1_Malawi_cluster_features",
+  "b": "v_dev_s1_w1_Malawi_cluster_features",
+  "rows_a": 3235,
+  "rows_b": 3235,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:Malawi_cluster_features",
+  "a": "v_br_s1_w1_Malawi_cluster_features",
+  "b": "v_dev_s3_w1_Malawi_cluster_features",
+  "rows_a": 3235,
+  "rows_b": 3235,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Azerbaijan_housing",
+  "a": "v_dev_s1_w1_Azerbaijan_housing",
+  "b": "v_dev_s3_w1_Azerbaijan_housing",
+  "rows_a": 2016,
+  "rows_b": 2016,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Azerbaijan_housing",
+  "a": "v_br_s1_w1_Azerbaijan_housing",
+  "b": "v_dev_s1_w1_Azerbaijan_housing",
+  "rows_a": 2016,
+  "rows_b": 2016,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:Azerbaijan_housing",
+  "a": "v_br_s1_w1_Azerbaijan_housing",
+  "b": "v_dev_s3_w1_Azerbaijan_housing",
+  "rows_a": 2016,
+  "rows_b": 2016,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Tajikistan_sample",
+  "a": "v_dev_s1_w1_Tajikistan_sample",
+  "b": "v_dev_s3_w1_Tajikistan_sample",
+  "rows_a": 12523,
+  "rows_b": 12523,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Tajikistan_sample",
+  "a": "v_br_s1_w1_Tajikistan_sample",
+  "b": "v_dev_s1_w1_Tajikistan_sample",
+  "rows_a": 12523,
+  "rows_b": 12523,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:Tajikistan_sample",
+  "a": "v_br_s1_w1_Tajikistan_sample",
+  "b": "v_dev_s3_w1_Tajikistan_sample",
+  "rows_a": 12523,
+  "rows_b": 12523,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Guyana_sample",
+  "a": "v_dev_s1_w1_Guyana_sample",
+  "b": "v_dev_s3_w1_Guyana_sample",
+  "rows_a": 1807,
+  "rows_b": 1807,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Guyana_sample",
+  "a": "v_br_s1_w1_Guyana_sample",
+  "b": "v_dev_s1_w1_Guyana_sample",
+  "rows_a": 1807,
+  "rows_b": 1807,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:Guyana_sample",
+  "a": "v_br_s1_w1_Guyana_sample",
+  "b": "v_dev_s3_w1_Guyana_sample",
+  "rows_a": 1807,
+  "rows_b": 1807,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Serbia_household_roster",
+  "a": "v_dev_s1_w1_Serbia_household_roster",
+  "b": "v_dev_s3_w1_Serbia_household_roster",
+  "rows_a": 17375,
+  "rows_b": 17375,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Serbia_household_roster",
+  "a": "v_br_s1_w1_Serbia_household_roster",
+  "b": "v_dev_s1_w1_Serbia_household_roster",
+  "rows_a": 17375,
+  "rows_b": 17375,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:Serbia_household_roster",
+  "a": "v_br_s1_w1_Serbia_household_roster",
+  "b": "v_dev_s3_w1_Serbia_household_roster",
+  "rows_a": 17375,
+  "rows_b": 17375,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Togo_sample",
+  "a": "v_dev_s1_w1_Togo_sample",
+  "b": "v_dev_s3_w1_Togo_sample",
+  "rows_a": 6171,
+  "rows_b": 6171,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Togo_sample",
+  "a": "v_br_s1_w1_Togo_sample",
+  "b": "v_dev_s1_w1_Togo_sample",
+  "rows_a": 6171,
+  "rows_b": 6171,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:Togo_sample",
+  "a": "v_br_s1_w1_Togo_sample",
+  "b": "v_dev_s3_w1_Togo_sample",
+  "rows_a": 6171,
+  "rows_b": 6171,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Mali_sample",
+  "a": "v_dev_s1_w1_Mali_sample",
+  "b": "v_dev_s3_w1_Mali_sample",
+  "rows_a": 24939,
+  "rows_b": 24939,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Mali_sample",
+  "a": "v_br_s1_w1_Mali_sample",
+  "b": "v_dev_s1_w1_Mali_sample",
+  "rows_a": 24939,
+  "rows_b": 24939,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s3:Mali_sample",
+  "a": "v_br_s1_w1_Mali_sample",
+  "b": "v_dev_s3_w1_Mali_sample",
+  "rows_a": 24939,
+  "rows_b": 24939,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ }
+]

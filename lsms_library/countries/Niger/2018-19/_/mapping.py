@@ -155,6 +155,46 @@ def food_acquired(df):
     # sweep so the two never fight over the same value.
     return _fill_missing_u(df)
 
+
+# GH #823: community_prices from s05_co_ner2018.dta.  The registry callables
+# for Niger::community_prices::one-item-per-price live HERE (wave-scoped, the
+# Nigeria #834 / #900 placement) and the shared logic in niger.py.  Placement
+# saves nothing on the cache (every .py in this dir is in every 2018-19
+# table's input hash); it keeps the registry path off the country module.
+COMMUNITY_PRICES_DERIVATION = 'Niger::community_prices::one-item-per-price'
+
+
+def derive_s05_one_item_per_price(df):
+    """``Quantity = 1`` on every s05 community price row, stamped with the
+    registry key in ``Derivation``.
+
+    s05_co_ner2018 records, per (grappe, product, unit-size), two prices and
+    NO quantity.  The Niger CAPI price questionnaire (``Qx Communautaire Prix-
+    NIGER_V1_VF``, UEMOA catalogue entry 48) asks the enumerator to select up
+    to six unit-sizes of the product present in the market (5.02) and to
+    record "5.03 Relevé 1 Prix (en FCFA)" and "5.04 Relevé 2 Prix (en FCFA)"
+    for each -- the price of ONE item of that unit-size.  So the quantity a
+    price was recorded for is one ``u``, by the instrument's construction, not
+    by any answer: the served 1 is a construction and carries the key.
+
+    Takes the finished frame (after ``_finish_community_prices``, i.e. after
+    every drop) and returns a copy; no options.  The alternative -- serving
+    ``Quantity`` NA because the file has no quantity column -- is recoverable
+    from ``derivation_inputs``."""
+    out = df.copy()
+    out['Quantity'] = pd.Series(1.0, index=out.index, dtype='Float64')
+    out['Derivation'] = pd.Series(COMMUNITY_PRICES_DERIVATION, index=out.index,
+                                  dtype='string')
+    return out
+
+
+def inputs_community_prices(wave='2018-19'):
+    """The registry ``inputs`` callable: the raw s05 rows (original variable
+    names, all 42,247 source rows) keyed by the served ``(t, v, j, u,
+    visit)``, so each served price row finds the record it came from."""
+    from niger import _s05_raw_inputs
+    return _s05_raw_inputs(_decode_mojibake, wave=wave)
+
 _FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
                'AteLess', 'RanOut', 'Hungry', 'WholeDay']
 

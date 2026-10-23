@@ -100,3 +100,58 @@ Niger::food_acquired::7day-purchase-at-last-purchase-unit-value:
     labels), so the reading carries by inference, not by measurement here.
   contents: 'Niger/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+Niger::community_prices::one-item-per-price:
+  waves: ['2018-19']
+  columns: [Quantity]
+  rule: >-
+    Quantity = 1 on every served 2018-19 community_prices row, in the row's
+    own unit-size `u`.  s05_co_ner2018.dta records, per (grappe, product
+    s05q01, unit-size s05q02), two prices -- s05q03 "5.03. Relevé 1-Prix (en
+    FCFA)" -> obs 1 and s05q04 "5.04. Relevé 2-Prix (en FCFA)" -> obs 2 (a
+    key's second record -> obs 3 / 4) -- and NO quantity.  The instrument
+    prices one item of the selected unit-size, so the quantity a price was
+    recorded for is one `u` by construction of the form, not by any answer.
+    Price is served as recorded; nothing is divided, rescaled or converted,
+    and no size is collapsed (`Tas (Petit)` is its own unit).
+  function: lsms_library.countries.Niger.2018-19._.mapping:derive_s05_one_item_per_price
+  inputs: lsms_library.countries.Niger.2018-19._.mapping:inputs_community_prices
+  raw_variables: [grappe, vague, Existe, s05q01, s05q02, s05q03, s05q04]
+  assumptions:
+    - text: >-
+        each recorded price is the price of ONE item of the selected
+        unit-size.  The Niger CAPI price questionnaire ("Qx Communautaire
+        Prix- NIGER_V1_VF", cover REPUBLIQUE DU NIGER / INSTITUT NATIONAL DE
+        LA STATISTIQUE) has, per product present in the market, a multiple
+        choice of at most six unit-sizes (5.02, "Veuillez selectionner les
+        unités tailles qui existent pour ce produit sur ce marché") and, per
+        selected unit-size, "5.03. Relevé 1 Prix (en FCFA)" and "5.04. Relevé
+        2 Prix (en FCFA)", both NUMÉRIQUE: ENTIER with the validations "must
+        be a multiple of 5" and "> 0".  There is no quantity question.
+      basis: questionnaire
+      evidence: >-
+        UEMOA regional catalogue entry 48 "EHCVM Edition 1 au Niger",
+        https://phmecv.uemoa.int/nada/index.php/catalog/48/download/199
+        (vague 1) and /download/200 (vague 2); the s05 Stata variable labels
+        "5.03. Relevé 1-Prix (en FCFA)" / "5.04. Relevé 2-Prix (en FCFA)"
+        match.  NOT the Excel files World Bank catalog 4296 ships as
+        ner_ehcvm1_qnr_community_excel_vague{1,2}.xls: those are Chad's
+        template (cover REPUBLIQUE DU TCHAD, three relevés of Quantité + Prix).
+    - text: >-
+        the distributed prices are served as recorded, including the 3,973
+        s05q03 and 4,272 s05q04 values (9.4% / 10.1%) that are not integers
+        (denominators 2, 3, 4, 8, 6).  The instrument accepted only integers
+        that are multiples of 5, so those values were produced after
+        collection, by a mechanism no held document describes; they are taken
+        to be per one item like the rest and are not reversed or flagged.
+      basis: modelling-choice
+      evidence: >-
+        Niger/_/CONTENTS.org, "2018-19 community prices are wired (GH #823)";
+        slurm_logs/isa_backlog_2026-10-21/823-niger-s05/measure_823.json
+  validated_against: >-
+    the instrument only.  No held file records the quantity behind a price,
+    so the one-item reading cannot be checked against data; the unit-size
+    labels (5.02) and the two price questions (5.03 / 5.04) are the only
+    fields the form collects.
+  contents: 'Niger/_/CONTENTS.org, "2018-19 community prices are wired (GH #823)"'
+  since: '2026-10-22'

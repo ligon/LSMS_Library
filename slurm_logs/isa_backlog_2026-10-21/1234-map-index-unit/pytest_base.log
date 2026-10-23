@@ -1,0 +1,44 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 22%]
+.......................................................................s [ 44%]
+........................................................................ [ 66%]
+........................................................................ [ 88%]
+...................................ss                                    [100%]
+=============================== warnings summary ===============================
+tests/test_feature_canonical_index.py::TestAlignToCanonicalLevels::test_promotes_a_canonical_level_carried_as_a_column
+tests/test_feature_canonical_index.py::TestPromotionCollision::test_collision_is_collapsed_and_a_grain_report_is_filed
+  /local/job40390255/worktrees/base-1234/lsms_library/feature.py:393: UserWarning: crop_production: Nigeria does not record ['condition', 'season']; added as constant sentinel index level(s) {'condition': 'unknown_condition', 'season': 'unknown_season'} so the frame keeps the canonical shape. No rows were added, removed or collapsed.
+    warnings.warn(
+
+tests/test_feature_canonical_index.py::TestPromotionCollision::test_collision_is_collapsed_and_a_grain_report_is_filed
+  /local/job40390255/worktrees/base-1234/lsms_library/feature.py:367: UserWarning: crop_production: promoting ['u'] for Nigeria made the index NON-UNIQUE -- the column holds both nulls (filled with the sentinel) and the literal sentinel value, so 1 row(s) collided onto an existing key. Collapsed through the audited core collapse; any destructive loss is reported separately as a GrainCollapseWarning.
+    warnings.warn(
+
+tests/test_feature_canonical_index.py::TestPromotionCollision::test_collision_is_collapsed_and_a_grain_report_is_filed
+  /local/job40390255/worktrees/base-1234/lsms_library/feature.py:385: UserWarning: crop_production: promoted column(s) ['u'] to index level(s) for Nigeria (canonical index levels carried as columns); {'u': 1} null value(s) filled with the declared sentinel.
+    warnings.warn(
+
+tests/test_962_unit_sentinel.py::test_runtime_sentinel_semantics_with_working_inference_control
+  /local/job40390255/worktrees/base-1234/tests/test_962_unit_sentinel.py:264: UnpriceableRowsWarning: food_prices(units='kgvalue'): dropped 20 of 60 priceable rows (33.3%) because Price was inf (0), NaN (20) or zero (0).  These rows are DROPPED, not returned as NaN, so the gap is otherwise invisible.  The causes are DIFFERENT and only the first is always a defect: an inf Price means the survey recorded an Expenditure against a ZERO Quantity -- typically a 0-as-missing sentinel or a quantity variable mapped to the wrong survey question (GH #591).  A NaN Price means the quantity was missing OR the unit has no kg factor.  A further 60 row(s) were dropped because their unit is CURRENCY-DENOMINATED (u='Value': the survey deliberately elicited value, not a physical amount).  Those are BY DESIGN -- the factor is 1/price at (j, t, m) and no per-label constant can represent it (GH #770) -- so they are EXCLUDED from the count and the fraction above, which report the residual real loss.  See GH #591, GH #770, GH #864.
+    prices = food_prices_from_acquired(out, units=mode)
+
+tests/test_962_unit_sentinel.py::test_runtime_sentinel_semantics_with_working_inference_control
+  /local/job40390255/worktrees/base-1234/tests/test_962_unit_sentinel.py:264: UnpriceableRowsWarning: food_prices(units='kgprice'): dropped 20 of 60 priceable rows (33.3%) because Price was inf (0), NaN (20) or zero (0).  These rows are DROPPED, not returned as NaN, so the gap is otherwise invisible.  The causes are DIFFERENT and only the first is always a defect: an inf Price means the survey recorded an Expenditure against a ZERO Quantity -- typically a 0-as-missing sentinel or a quantity variable mapped to the wrong survey question (GH #591).  A NaN Price means the quantity was missing OR the unit has no kg factor.  See GH #591, GH #770, GH #864.
+    prices = food_prices_from_acquired(out, units=mode)
+
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_cache_applies_location_index
+  /local/job40390255/worktrees/base-1234/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Cache miss for TestCountry/test_data (STALE: parquet carries no cache hash (GH #809)): FULL REBUILD from source of 1 wave(s) (ALL), not a cache read.
+    df = load_with_dvc_cache(method_name)
+
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_fallback_warning_names_the_miss_reason
+  /local/job40390255/worktrees/base-1234/lsms_library/country.py:5869: CacheRebuildWarning: lsms_library.country.CacheRebuildWarning: Cache miss for TestCountry/test_data (STALE: stored content hash differs from the current inputs): FULL REBUILD from source of 1 wave(s) (2020-21), not a cache read.
+    df = load_with_dvc_cache(method_name)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three crop_production caches are warm
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three plot_labor caches are warm
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three plot_inputs caches are warm
+322 passed, 3 skipped, 8 warnings in 122.29s (0:02:02)

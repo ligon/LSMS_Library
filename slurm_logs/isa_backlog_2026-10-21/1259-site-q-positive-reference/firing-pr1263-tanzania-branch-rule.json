@@ -1,0 +1,19 @@
+{
+ "checkout": "/local/job40390255/worktrees/1259",
+ "data_root": "/local/job40390255/data-private/1259/merge",
+ "head": "9a0ed5f3cc81b5d2ce8d1fdffba4f477e33b9f7f",
+ "quantity_audit_dirty": true,
+ "tables": {
+  "crop_production.Quantity": {
+   "Tanzania": {
+    "audit_ms_best": 10.7,
+    "finite": 14107,
+    "fired": 14,
+    "judged": 14126,
+    "negative": 0,
+    "rows": 14126,
+    "zero": 2735
+   }
+  }
+ }
+}

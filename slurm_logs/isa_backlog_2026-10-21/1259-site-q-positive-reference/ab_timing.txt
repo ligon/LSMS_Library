@@ -1,0 +1,5 @@
+Uganda/crop_production rows=133,761 best of 9: base 72.9 ms (fired 26), branch 67.9 ms (fired 22)
+Malawi/crop_production rows=135,078 best of 9: base 96.0 ms (fired 20), branch 92.9 ms (fired 19)
+Tanzania/crop_production rows=14,126 best of 9: base 12.4 ms (fired 14), branch 12.1 ms (fired 14)
+Ethiopia/food_acquired rows=326,456 best of 7: base 186.8 ms (fired 132), branch 183.8 ms (fired 126)
+GhanaLSS/food_acquired rows=5,340,606 best of 5: base 2,886.2 ms (fired 294), branch 2,894.3 ms (fired 294)
