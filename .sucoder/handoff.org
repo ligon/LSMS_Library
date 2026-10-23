@@ -55,6 +55,11 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - #1221 follow-up red-team: exclusion and =[us]= hold, but found a PRE-EXISTING race (since #1099): =_has_country_builder= unmemoised + fail-safe True -> a constructed empty frame can be written to the L2-country cache (forced repro: Iraq shocks 2012 8,812 -> 0 rows).  Fix agent closing it on the same branch (memoise + never cache a constructed empty frame + hermetic regression test).
 - Mali retro red-team: no refutation; follow-up fix agent on =fix/mali-plot-inputs-followup-20261023= (=(not crop-specific)= marker per Niger =niger.py:665-668= / EHCVM siblings; =use_answer_rows= tally; document the =?=/=Applied= convention + label-sweep test; =Applied= optional).  PR #1223 body test count corrected (8 failed / 1 passed).
 
+- Mali follow-up: two red-team rounds (seed-precedent mis-citation fixed to follow Niger =niger.py:440-445=; =Applied= kept required to keep the guards); *PR #1231 open*; #1119/#1120 bodies carry an in-flight header.
+- #1221 follow-up round 3 running: race review REFUTED memoising the fail-safe True (make backend served 21,028 wrong rows on a reused instance); fix = memo only completed probes + =len==0= in the marker check.
+- Uganda #1133: implementation =935ba72f9= (370-row comm_frame_ea crosswalk; 2010-11->2011-12 continuity 0% -> 100%; baseline fixture update committed separately FOR MAINTAINER APPROVAL); red-team running.  Filed *#1230* (all-digit org key columns parse as int64; list-form =mappings:= on a formatted idxvar).
+- #1111 lane started: find IHS4 2016-17 / IHPS 2013 questionnaires; apply PR #1193's kg-unit pattern only where Q39 confirms the column roles.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
