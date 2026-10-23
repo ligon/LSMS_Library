@@ -143,7 +143,9 @@ def test_a_cell_with_no_scale_is_silent():
     """A cell whose 90th percentile is zero carries no scale, so it cannot
     support a plausibility judgement.  Measured cost of omitting this guard:
     six Malawi rows of 2-30 units fired at ratio ``inf`` -- a 2 kg cassava
-    harvest named as implausible."""
+    harvest named as implausible.  Since GH #1259 the cell is silenced one
+    step earlier: its single positive row is below ``QUANTITY_MIN_CELL``
+    positive values at every rung, so no reference is formed at all."""
     df = _cell(base=0.0, extras=[_outlier(30.0)])
     assert _audit(df) == []
 
