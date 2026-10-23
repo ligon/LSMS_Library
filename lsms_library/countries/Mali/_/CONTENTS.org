@@ -488,12 +488,12 @@ So these are type-level non-use inside a "yes" for the group -- the plot used in
 Whether such rows belong in =plot_inputs= at all was left open by #1118; the zeros are served as recorded.
 
 *Resolved 2026-10-22 (maintainer decision): the group answers are served explicitly, and the zero rows stay.*
-Each EAC-I plot's two group answers are their own =plot_inputs= rows: =input= =Inorganic Fertilizer= (=s2cq21= / =s7dq22=) and =Phytosanitary products= (=s2cq26= / =s7dq27=), with =Applied= =True= (=Oui=) or =False= (=Non=), no =Quantity=, =u= = =Unknown=, no purchase.
+Each EAC-I plot's two group answers are their own =plot_inputs= rows: =input= =Inorganic Fertilizer?= (=s2cq21= / =s7dq22=) and =Phytosanitary products?= (=s2cq26= / =s7dq27=), with =Applied= =True= (=Oui=) or =False= (=Non=), no =Quantity=, =u= = =Unknown=, no purchase.
 A missing answer is no row. =Applied= is NA on every type row.
 66,082 rows are added (2014-15: 9,200 inorganic / 9,296 phytosanitary; 2017-18: 23,793 each); every existing row is unchanged, and =nitrogen_kg= / =seed_kg= totals are identical.
 Two things to know when using them:
-- Counting plots by input label must filter =Applied= -- these rows carry the =no= answers too.  =Inorganic Fertilizer= is Uganda's spelling (there an application of unrecorded type, with a quantity); here it is the group answer.
-- =nitrogen_kg= matches =Inorganic Fertilizer= to its 0.20 share, so =attrs['nitrogen_input_match']['matched_rows']= counts the group rows although they carry no mass (NaN quantity drops out); =Phytosanitary products= counts as unmatched, with no warning.
+- The trailing =?= is a library-wide convention (=transformations.is_use_answer_label=): a label ending in =?= is a use ANSWER, not an input.  =nitrogen_kg= skips such rows before label matching, so they add no mass, no match-tally entry and no =NutrientCoverageWarning=.  The =?= also keeps them apart from Uganda's =Inorganic Fertilizer= (an application of unrecorded type, with a quantity).
+- Counting plots by input label must filter =Applied= -- these rows carry the =no= answers too.
 2014-15 =s2c= repeats some (household, plot) keys (2,712 =Oui= rows are 2,702 plots; 1,925 are 1,917), so the existing duplicate collapse serves one answer per plot (=max=).
 Evidence: =slurm_logs/isa_backlog_2026-10-21/1118-mali-use-flags/=.
 

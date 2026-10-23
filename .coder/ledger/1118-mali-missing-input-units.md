@@ -163,3 +163,10 @@ with NaN quantity, so mass is unchanged and only the match tally grows.
 - Cold build: 113,735 -> 179,817 rows; all existing rows exact; 66,082 new group
   rows; nitrogen_kg / seed_kg identical.
 - Hashes: 24/549 country, 96/2,109 wave (Mali only), 0/40 fingerprints.
+
+Amendment (same day, maintainer decision): the group rows are labelled
+`Inorganic Fertilizer?` / `Phytosanitary products?`, and a trailing `?` is a
+library convention for a use ANSWER (`transformations.is_use_answer_label`).
+`nitrogen_kg` drops such rows before label matching, so the Uganda-spelling
+trade-off above (shared label, inflated `matched_rows`) no longer applies.
+`seed_kg` selects the exact `Seed` label and needs no change.

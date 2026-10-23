@@ -206,7 +206,7 @@ Data Scheme:
     # Applied = the survey's REPORTED plot-level group use answer (s2cq21 /
     #         s7dq22 inorganic fertilizer, s2cq26 / s7dq27 phytosanitary
     #         products), Oui -> True, Non -> False, on its own row with input
-    #         'Inorganic Fertilizer' / 'Phytosanitary products' (no Quantity,
+    #         'Inorganic Fertilizer?' / 'Phytosanitary products?' (no Quantity,
     #         u = Unknown).  NA on every type row.  The type rows' Quantity 0 is
     #         that type not used inside a "yes" for its group (GH #1118,
     #         maintainer decision 2026-10-22).
