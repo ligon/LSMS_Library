@@ -1,0 +1,908 @@
+{
+ "crop_production": {
+  "rows": [
+   135078,
+   135078
+  ],
+  "index_equal": true,
+  "columns_equal": true,
+  "dtypes_equal": true,
+  "frame_equal": false,
+  "per_wave": {
+   "2010-11": {
+    "rows": 33420,
+    "cells_changed": {
+     "Quantity": 39
+    },
+    "Quantity_sum": [
+     970155.7999998778,
+     970088.7999998778
+    ],
+    "Quantity_na": [
+     0,
+     32
+    ],
+    "Quantity_zero": [
+     1287,
+     1255
+    ],
+    "zero_to_na": 32,
+    "na_to_value": 0,
+    "value_changed_rows": 7,
+    "value_changed_delta": -67.0,
+    "Value_sold_sum": [
+     130650105.0,
+     130650105.0
+    ],
+    "Quantity_sold_sum": [
+     433548.25,
+     433548.25
+    ],
+    "other_columns_equal": true
+   },
+   "2013-14": {
+    "rows": 12616,
+    "cells_changed": {
+     "Quantity": 283
+    },
+    "Quantity_sum": [
+     257839.0,
+     257839.0
+    ],
+    "Quantity_na": [
+     0,
+     283
+    ],
+    "Quantity_zero": [
+     593,
+     310
+    ],
+    "zero_to_na": 283,
+    "na_to_value": 0,
+    "value_changed_rows": 0,
+    "value_changed_delta": 0.0,
+    "Value_sold_sum": [
+     94992745.0,
+     94992745.0
+    ],
+    "Quantity_sold_sum": [
+     110050.25,
+     110050.25
+    ],
+    "other_columns_equal": true
+   },
+   "2016-17": {
+    "rows": 37170,
+    "cells_changed": {
+     "Quantity": 200
+    },
+    "Quantity_sum": [
+     1871058.4000000001,
+     1871058.4000000001
+    ],
+    "Quantity_na": [
+     0,
+     200
+    ],
+    "Quantity_zero": [
+     3923,
+     3723
+    ],
+    "zero_to_na": 200,
+    "na_to_value": 0,
+    "value_changed_rows": 0,
+    "value_changed_delta": 0.0,
+    "Value_sold_sum": [
+     409090925.0,
+     409090925.0
+    ],
+    "Quantity_sold_sum": [
+     253530.0,
+     253530.0
+    ],
+    "other_columns_equal": true
+   },
+   "2019-20": {
+    "rows": 51872,
+    "cells_changed": {
+     "Quantity": 276
+    },
+    "Quantity_sum": [
+     1260873.9,
+     1260873.9
+    ],
+    "Quantity_na": [
+     0,
+     276
+    ],
+    "Quantity_zero": [
+     3619,
+     3343
+    ],
+    "zero_to_na": 276,
+    "na_to_value": 0,
+    "value_changed_rows": 0,
+    "value_changed_delta": 0.0,
+    "Value_sold_sum": [
+     527773548.0,
+     527773548.0
+    ],
+    "Quantity_sold_sum": [
+     313812.0,
+     313812.0
+    ],
+    "other_columns_equal": true
+   }
+  }
+ },
+ "plot_inputs": {
+  "rows": [
+   179949,
+   179949
+  ],
+  "index_equal": true,
+  "columns_equal": true,
+  "dtypes_equal": true,
+  "frame_equal": false,
+  "per_wave": {
+   "2010-11": {
+    "rows": 46576,
+    "cells_changed": {
+     "Quantity": 12,
+     "Quantity_purchased": 4
+    },
+    "Quantity_sum": [
+     2061663.3999999948,
+     2061107.3999999948
+    ],
+    "Quantity_na": [
+     5,
+     5
+    ],
+    "Quantity_zero": [
+     382,
+     382
+    ],
+    "zero_to_na": 0,
+    "na_to_value": 0,
+    "value_changed_rows": 12,
+    "value_changed_delta": -556.0,
+    "seed_rows": 27612,
+    "seed_Quantity_sum": [
+     830623.3999999948,
+     830067.3999999948
+    ],
+    "seed_Quantity_changed_rows": 12,
+    "Quantity_purchased_sum": [
+     31739.0,
+     31797.0
+    ],
+    "Quantity_purchased_changed_rows": 4,
+    "nonseed_frame_equal": true,
+    "changed_by_input": {
+     "Quantity": {
+      "Seed": 12
+     },
+     "Quantity_purchased": {
+      "Seed": 4
+     }
+    }
+   },
+   "2013-14": {
+    "rows": 16188,
+    "cells_changed": {
+     "Quantity": 1,
+     "Quantity_purchased": 1
+    },
+    "Quantity_sum": [
+     686647.750000082,
+     686638.750000082
+    ],
+    "Quantity_na": [
+     2,
+     2
+    ],
+    "Quantity_zero": [
+     26,
+     26
+    ],
+    "zero_to_na": 0,
+    "na_to_value": 0,
+    "value_changed_rows": 1,
+    "value_changed_delta": -9.0,
+    "seed_rows": 9942,
+    "seed_Quantity_sum": [
+     324297.50000008196,
+     324288.50000008196
+    ],
+    "seed_Quantity_changed_rows": 1,
+    "Quantity_purchased_sum": [
+     50378.69999998808,
+     50382.69999998808
+    ],
+    "Quantity_purchased_changed_rows": 1,
+    "nonseed_frame_equal": true,
+    "changed_by_input": {
+     "Quantity": {
+      "Seed": 1
+     },
+     "Quantity_purchased": {
+      "Seed": 1
+     }
+    }
+   },
+   "2016-17": {
+    "rows": 52494,
+    "cells_changed": {
+     "Quantity": 23,
+     "Quantity_purchased": 22
+    },
+    "Quantity_sum": [
+     2123520.9899999998,
+     2123375.9899999998
+    ],
+    "Quantity_na": [
+     0,
+     0
+    ],
+    "Quantity_zero": [
+     238,
+     238
+    ],
+    "zero_to_na": 0,
+    "na_to_value": 0,
+    "value_changed_rows": 23,
+    "value_changed_delta": -145.0,
+    "seed_rows": 32264,
+    "seed_Quantity_sum": [
+     827867.99,
+     827722.99
+    ],
+    "seed_Quantity_changed_rows": 23,
+    "Quantity_purchased_sum": [
+     68470.0,
+     68627.0
+    ],
+    "Quantity_purchased_changed_rows": 22,
+    "nonseed_frame_equal": true,
+    "changed_by_input": {
+     "Quantity": {
+      "Seed": 23
+     },
+     "Quantity_purchased": {
+      "Seed": 22
+     }
+    }
+   },
+   "2019-20": {
+    "rows": 64691,
+    "cells_changed": {
+     "Quantity": 9,
+     "Quantity_purchased": 9
+    },
+    "Quantity_sum": [
+     2354653.85,
+     2354530.85
+    ],
+    "Quantity_na": [
+     0,
+     0
+    ],
+    "Quantity_zero": [
+     35,
+     35
+    ],
+    "zero_to_na": 0,
+    "na_to_value": 0,
+    "value_changed_rows": 9,
+    "value_changed_delta": -123.0,
+    "seed_rows": 42478,
+    "seed_Quantity_sum": [
+     1134500.2,
+     1134377.2
+    ],
+    "seed_Quantity_changed_rows": 9,
+    "Quantity_purchased_sum": [
+     93607.79999999999,
+     93688.79999999999
+    ],
+    "Quantity_purchased_changed_rows": 9,
+    "nonseed_frame_equal": true,
+    "changed_by_input": {
+     "Quantity": {
+      "Seed": 9
+     },
+     "Quantity_purchased": {
+      "Seed": 9
+     }
+    }
+   }
+  }
+ },
+ "plot_features": {
+  "rows": [
+   68339,
+   68339
+  ],
+  "index_equal": true,
+  "columns_equal": true,
+  "dtypes_equal": true,
+  "frame_equal": true,
+  "per_wave": {
+   "2010-11": {
+    "rows": 18990,
+    "cells_changed": {}
+   },
+   "2013-14": {
+    "rows": 6331,
+    "cells_changed": {}
+   },
+   "2016-17": {
+    "rows": 19759,
+    "cells_changed": {}
+   },
+   "2019-20": {
+    "rows": 23259,
+    "cells_changed": {}
+   }
+  }
+ },
+ "downstream": {
+  "seed_kg": {
+   "rows": [
+    64477,
+    64477
+   ],
+   "index_equal": true,
+   "frame_equal": false,
+   "per_wave": {
+    "2010-11": {
+     "rows": [
+      18225,
+      18225
+     ],
+     "sum": [
+      259194.62499995757,
+      258875.12499995757
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 8
+    },
+    "2013-14": {
+     "rows": [
+      6166,
+      6166
+     ],
+     "sum": [
+      103649.67559986463,
+      103640.67559986463
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 1
+    },
+    "2016-17": {
+     "rows": [
+      18307,
+      18307
+     ],
+     "sum": [
+      299735.17251,
+      299532.47251
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 23
+    },
+    "2019-20": {
+     "rows": [
+      21779,
+      21779
+     ],
+     "sum": [
+      389813.73195,
+      389632.73195
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 7
+    }
+   },
+   "attrs_keys_base": [],
+   "attrs_keys_branch": []
+  },
+  "nitrogen_kg": {
+   "rows": [
+    36916,
+    36916
+   ],
+   "index_equal": true,
+   "frame_equal": true,
+   "per_wave": {
+    "2010-11": {
+     "rows": [
+      11403,
+      11403
+     ],
+     "sum": [
+      281969.53500000003,
+      281969.53500000003
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    },
+    "2013-14": {
+     "rows": [
+      3518,
+      3518
+     ],
+     "sum": [
+      188848.39513000002,
+      188848.39513000002
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    },
+    "2016-17": {
+     "rows": [
+      10630,
+      10630
+     ],
+     "sum": [
+      334896.50993,
+      334896.50993
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    },
+    "2019-20": {
+     "rows": [
+      11365,
+      11365
+     ],
+     "sum": [
+      222481.19200000004,
+      222481.19200000004
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    }
+   },
+   "attrs_keys_base": [
+    "nitrogen_input_match"
+   ],
+   "attrs_keys_branch": [
+    "nitrogen_input_match"
+   ]
+  },
+  "harvest_kg": {
+   "rows": [
+    62327,
+    62327
+   ],
+   "index_equal": true,
+   "frame_equal": false,
+   "per_wave": {
+    "2010-11": {
+     "rows": [
+      15556,
+      15556
+     ],
+     "sum": [
+      8509405.249989979,
+      8507430.249989979
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 5
+    },
+    "2013-14": {
+     "rows": [
+      5817,
+      5817
+     ],
+     "sum": [
+      2336456.0,
+      2336456.0
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    },
+    "2016-17": {
+     "rows": [
+      17651,
+      17651
+     ],
+     "sum": [
+      7975881.699999999,
+      7975881.699999999
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    },
+    "2019-20": {
+     "rows": [
+      23303,
+      23303
+     ],
+     "sum": [
+      19605839.8,
+      19605839.8
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    }
+   },
+   "attrs_keys_base": [
+    "kg_factor_declared_from",
+    "kg_factor_disagreement",
+    "kg_factor_sources"
+   ],
+   "kg_factor_sources_base": {
+    "reported": 0,
+    "shipped": 0,
+    "survey_median": 0,
+    "metric": 92564,
+    "inferred": 0,
+    "none": 42514,
+    "reported_implausible": 0,
+    "shipped_implausible": 0,
+    "shipped_matched": 0,
+    "declared": 0
+   },
+   "attrs_keys_branch": [
+    "kg_factor_declared_from",
+    "kg_factor_disagreement",
+    "kg_factor_sources"
+   ],
+   "kg_factor_sources_branch": {
+    "reported": 0,
+    "shipped": 0,
+    "survey_median": 0,
+    "metric": 92564,
+    "inferred": 0,
+    "none": 42514,
+    "reported_implausible": 0,
+    "shipped_implausible": 0,
+    "shipped_matched": 0,
+    "declared": 0
+   }
+  },
+  "harvest_kg_shipped": {
+   "rows": [
+    70684,
+    70684
+   ],
+   "index_equal": true,
+   "frame_equal": false,
+   "per_wave": {
+    "2010-11": {
+     "rows": [
+      17877,
+      17877
+     ],
+     "sum": [
+      8497721.806078488,
+      8495297.826088483
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 6
+    },
+    "2013-14": {
+     "rows": [
+      7042,
+      7042
+     ],
+     "sum": [
+      2477271.537440069,
+      2477271.537440069
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    },
+    "2016-17": {
+     "rows": [
+      19582,
+      19582
+     ],
+     "sum": [
+      8225304.334759984,
+      8225304.334759984
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    },
+    "2019-20": {
+     "rows": [
+      26183,
+      26183
+     ],
+     "sum": [
+      20244376.82324387,
+      20244376.82324387
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    }
+   },
+   "attrs_keys_base": [
+    "kg_factor_declared_from",
+    "kg_factor_disagreement",
+    "kg_factor_sources"
+   ],
+   "kg_factor_sources_base": {
+    "reported": 0,
+    "shipped": 93313,
+    "survey_median": 0,
+    "metric": 17262,
+    "inferred": 0,
+    "none": 24503,
+    "reported_implausible": 0,
+    "shipped_implausible": 4639,
+    "shipped_matched": 97952,
+    "declared": 0
+   },
+   "attrs_keys_branch": [
+    "kg_factor_declared_from",
+    "kg_factor_disagreement",
+    "kg_factor_sources"
+   ],
+   "kg_factor_sources_branch": {
+    "reported": 0,
+    "shipped": 93313,
+    "survey_median": 0,
+    "metric": 17262,
+    "inferred": 0,
+    "none": 24503,
+    "reported_implausible": 0,
+    "shipped_implausible": 4639,
+    "shipped_matched": 97952,
+    "declared": 0
+   }
+  },
+  "yield_kg": {
+   "rows": [
+    18919,
+    18919
+   ],
+   "index_equal": true,
+   "frame_equal": false,
+   "per_wave": {
+    "2010-11": {
+     "rows": [
+      14263,
+      14263
+     ],
+     "sum": [
+      75263076.85282771,
+      75242546.61895642
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 5
+    },
+    "2013-14": {
+     "rows": [
+      4656,
+      4656
+     ],
+     "sum": [
+      13051868.796099545,
+      13051868.796099545
+     ],
+     "only_base": 0,
+     "only_branch": 0,
+     "changed_rows": 0
+    }
+   },
+   "attrs_keys_base": [],
+   "attrs_keys_branch": []
+  }
+ },
+ "reports": {
+  "base": {
+   "warnings_by_category": {
+    "crop_production|RuntimeWarning": 18,
+    "crop_production|QuantityImplausibleWarning": 2,
+    "crop_production|NullIndexKeyWarning": 1,
+    "plot_inputs|NullReadWarning": 1,
+    "plot_inputs|NullIndexKeyWarning": 1,
+    "plot_features|NullReadWarning": 3,
+    "plot_features|QuantityImplausibleWarning": 2,
+    "downstream|NutrientCoverageWarning": 1,
+    "downstream|GrainCollapseWarning": 3,
+    "downstream|RuntimeWarning": 10,
+    "downstream|NullReadWarning": 2
+   },
+   "siteQ": [
+    {
+     "table": "crop_production",
+     "column": "Quantity",
+     "n_offenders": 7
+    },
+    {
+     "table": "crop_production",
+     "column": "Quantity",
+     "n_offenders": 13
+    },
+    {
+     "table": "plot_features",
+     "column": "Area",
+     "n_offenders": 5
+    },
+    {
+     "table": "plot_features",
+     "column": "Area",
+     "n_offenders": 7
+    }
+   ],
+   "grain": [
+    {
+     "table": "cluster_features",
+     "wave": "2013-14",
+     "destroyed": 3540
+    },
+    {
+     "table": "cluster_features",
+     "wave": "2016-17",
+     "destroyed": 1994
+    },
+    {
+     "table": "cluster_features",
+     "wave": "2019-20",
+     "destroyed": 3146
+    }
+   ],
+   "null_index": [
+    {
+     "table": "crop_production",
+     "levels": "{'site': 'built-table-index', 'country': 'Malawi', 'table': 'crop_production', 'rows': 135078, 'findings': [{'level': 'plot_id', 'n_nan': 41, 'waves': {'2016-17': 41}}, {'level': 'u', 'n_nan': 8902, 'waves': {'2010-11': 1279, '2013-14': 594, '2016-17': 3408, '2019-20': 3621}}]}"
+    },
+    {
+     "table": "plot_inputs",
+     "levels": "{'site': 'built-table-index', 'country': 'Malawi', 'table': 'plot_inputs', 'rows': 179949, 'findings': [{'level': 'crop', 'n_nan': 67653, 'waves': {'2010-11': 18964, '2013-14': 6246, '2016-17': 20230, '2019-20': 22213}}]}"
+    }
+   ],
+   "null_read": [
+    {
+     "site": "built-table",
+     "table": "plot_inputs",
+     "column": "Improved"
+    },
+    {
+     "site": "built-table",
+     "table": "plot_features",
+     "column": "PlotOwned"
+    },
+    {
+     "site": "built-table",
+     "table": "plot_features",
+     "column": "Tenure"
+    },
+    {
+     "site": "built-table",
+     "table": "plot_features",
+     "column": "TenureSystem"
+    },
+    {
+     "site": "built-table",
+     "table": "cluster_features",
+     "column": "Latitude"
+    },
+    {
+     "site": "built-table",
+     "table": "cluster_features",
+     "column": "Longitude"
+    }
+   ]
+  },
+  "branch": {
+   "warnings_by_category": {
+    "crop_production|RuntimeWarning": 18,
+    "crop_production|QuantityImplausibleWarning": 2,
+    "crop_production|NullIndexKeyWarning": 1,
+    "plot_inputs|NullReadWarning": 1,
+    "plot_inputs|NullIndexKeyWarning": 1,
+    "plot_features|NullReadWarning": 3,
+    "plot_features|QuantityImplausibleWarning": 2,
+    "downstream|NutrientCoverageWarning": 1,
+    "downstream|GrainCollapseWarning": 3,
+    "downstream|RuntimeWarning": 10,
+    "downstream|NullReadWarning": 2
+   },
+   "siteQ": [
+    {
+     "table": "crop_production",
+     "column": "Quantity",
+     "n_offenders": 7
+    },
+    {
+     "table": "crop_production",
+     "column": "Quantity",
+     "n_offenders": 13
+    },
+    {
+     "table": "plot_features",
+     "column": "Area",
+     "n_offenders": 5
+    },
+    {
+     "table": "plot_features",
+     "column": "Area",
+     "n_offenders": 7
+    }
+   ],
+   "grain": [
+    {
+     "table": "cluster_features",
+     "wave": "2013-14",
+     "destroyed": 3540
+    },
+    {
+     "table": "cluster_features",
+     "wave": "2016-17",
+     "destroyed": 1994
+    },
+    {
+     "table": "cluster_features",
+     "wave": "2019-20",
+     "destroyed": 3146
+    }
+   ],
+   "null_index": [
+    {
+     "table": "crop_production",
+     "levels": "{'site': 'built-table-index', 'country': 'Malawi', 'table': 'crop_production', 'rows': 135078, 'findings': [{'level': 'plot_id', 'n_nan': 41, 'waves': {'2016-17': 41}}, {'level': 'u', 'n_nan': 8902, 'waves': {'2010-11': 1279, '2013-14': 594, '2016-17': 3408, '2019-20': 3621}}]}"
+    },
+    {
+     "table": "plot_inputs",
+     "levels": "{'site': 'built-table-index', 'country': 'Malawi', 'table': 'plot_inputs', 'rows': 179949, 'findings': [{'level': 'crop', 'n_nan': 67653, 'waves': {'2010-11': 18964, '2013-14': 6246, '2016-17': 20230, '2019-20': 22213}}]}"
+    }
+   ],
+   "null_read": [
+    {
+     "site": "built-table",
+     "table": "plot_inputs",
+     "column": "Improved"
+    },
+    {
+     "site": "built-table",
+     "table": "plot_features",
+     "column": "PlotOwned"
+    },
+    {
+     "site": "built-table",
+     "table": "plot_features",
+     "column": "Tenure"
+    },
+    {
+     "site": "built-table",
+     "table": "plot_features",
+     "column": "TenureSystem"
+    },
+    {
+     "site": "built-table",
+     "table": "cluster_features",
+     "column": "Latitude"
+    },
+    {
+     "site": "built-table",
+     "table": "cluster_features",
+     "column": "Longitude"
+    }
+   ]
+  }
+ }
+}

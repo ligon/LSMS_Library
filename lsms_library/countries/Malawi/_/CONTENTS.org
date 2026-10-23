@@ -1372,6 +1372,145 @@ a cold build of BOTH trees (base and branch): zero Cassava rows in those two
 waves either side, so this branch neither caused it nor changed it.  *Do not
 assume Malawi grew no cassava after 2013.*
 
+* crop_production / plot_inputs: three defects from the GH #637 tail (fixed 2026-10-23)
+
+The read-only diagnosis is the 2026-10-23 comment on GH #637 ("Diagnosis of
+the remaining tail: Malawi x8 ...").  Fixed here: its defect B, its
+blank-harvest side defect and its 2010-11 exact-duplicate side defect.  Its
+defect A -- the crop-code merge at the end of =assemble_crop_production= --
+waits for a grain ruling and is NOT changed.  Ledger:
+=.coder/ledger/637-malawi-tail.md=; aggregates and scripts:
+=slurm_logs/isa_backlog_2026-10-21/637-malawi-tail/=.
+
+** Idiosyncrasy: IHS3 2010-11 ships exact REPEAT records
+
+A repeat record is identical to an earlier record of the same file in *every*
+column (=case_id=, =visit=, =ea_id=, every answer).  Counted on the full
+record with pyreadstat:
+
+| 2010-11 module | rows   | repeats | what the repeats carry                         |
+|----------------+--------+---------+------------------------------------------------|
+| G (=ag_mod_g=) | 28,143 |       9 | harvest =ag_g13a= 42, seed =ag_g04a= 548 units  |
+| P (=ag_mod_p=) | 12,531 |       1 | harvest =ag_p09a= 25 units                     |
+| I (=ag_mod_i=) | 24,081 |      61 | 6 sales: 2,313 units, 491,970 MWK              |
+| Q (=ag_mod_q=) | 12,330 |      15 | no sale quantity or value                      |
+| H (=ag_mod_h=) | 24,009 |      45 | 7 value-backed purchases, 271 units (=ag_h16a=) |
+| D (=ag_mod_d=) | 19,265 |       0 |                                                |
+
+No module of 2013-14, 2016-17 or 2019-20 (either half) ships a single
+repeat.  2016-17 Cross_Sectional =ag_mod_d.dta= was checked on 288 of its
+289 columns -- =ag_d55_2oth= cannot be decoded -- and zero repeats on a
+column subset implies zero on the full record.  The G and P repeats are
+all =visit= 1; I's are =visit= 1 and 2 (25 / 36).
+
+*Rule* (the GH #840 Niger / #651 Tanzania rule): a record that only
+REPEATS a row is a duplicate entry, not a second harvest, sale, planting or
+purchase.  =malawi.drop_repeated_records= drops it on the full raw frame,
+before any block projects it; the two 2010-11 wave scripts call it on every
+module they read (=crop_production.py=: G, P, I, Q; =plot_inputs.py=: D, G,
+H), and =_crop_pieces= (the =derivation_inputs= replay of the sale ladder)
+calls it too.  Before, the build summed each repeat into its group.  What
+moved: crop_production 2010-11 harvest -67 native units on 7 rows (42 G +
+25 P); plot_inputs 2010-11 seed -548 units on 9 rows.  The I, Q and H
+repeats change no served value today: the 6 doubled sales reach no harvest
+row (the 2010-11 ladder replay is identical in every tally and outcome),
+and no H repeat lands on a single-plot seed row.  They are dropped anyway,
+so the rule does not depend on where a repeat happens to land.
+
+** Defect B: the seed-purchase merge fanned out (=assemble_plot_inputs=)
+
+The Module H purchases were reduced to =(i, _crop_code)=, relabelled to
+=(i, crop)= and merged on =(i, crop)= without reducing again.
+=harmonize_crop= maps several codes to one label (Maize 1-4, the groundnut
+and rice varieties), so a household that bought seed under two such codes
+contributed two purchase rows; each matching seed row was duplicated once per
+code (4 / 2 / 23 / 14 extra rows by wave), the additive grouping summed the
+duplicated seed =Quantity=, and ='first'= kept one code's purchase.  Fix:
+reduce the purchases to the merge key =(i, crop)= (=sum(min_count=1)=)
+before the merge -- the #323 site-4 rule.  The purchased amount still has no
+served unit (the "seed purchase units" residual named in the #1111 entry
+below); summing two codes' purchases adds no new unit question, since the two
+purchase sources of one code were already summed the same way.
+
+** Blank harvests are no longer served as 0.0
+
+=_consolidate_harvest= grouped every row, singletons included, with a bare
+='sum'=, so a blank =ag_g13a= / =ag_p09a= was served as a harvest of =0.0=.
+It now uses =min_count=1= (PR #1263's Tanzania precedent), and so does the
+defensive collapse at the declared grain -- otherwise two codes of one label
+that BOTH left the quantity blank would be re-minted to 0.0 there (1 row,
+2013-14; that collapse is defect A, and only its quantity reducer moved).
+
+*There is no recorded "did not harvest" answer to preserve* -- unlike
+Tanzania, whose =ag6a_06a= / =ag6b_06a= ask it.  Checked on the Stata
+variable and value labels of all twelve Module G / P files: Module G asks
+=ag_g07= "Have you COMPLETED the harvest of the [CROP] from this [PLOT]?",
+=ag_g08a= (expected), =ag_g09a= (harvested so far), =ag_g10= / =ag_g11*=
+(area harvested less than planted, and why), and =ag_g13a=; Module P asks
+=ag_p07= / =ag_p08*= (losses before harvest) and =ag_p09a=, and from IHS4 on
+its roster is "ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12 MONTHS".
+A recorded zero is =ag_g13a= / =ag_p09a= = 0, and it is still served as 0.
+
+*Not wired*: =ag_g09a= ("how much did you harvest SO FAR"), the sibling of a
+blank =ag_g13a= on an unfinished harvest, carries a quantity on 186 of the
+265 blank 2013-14 Module G rows (80 of the 265 report =ag_g07= = No).
+Serving it would be new wiring, not this fix.
+
+** What moved (cold builds, development =9a0ed5f3c= vs this change)
+
+Index, row counts and every column other than those named are frame-equal,
+in both tables, in every wave; =plot_features= is frame-equal.
+
+| wave    | crop_production =Quantity= NA | recorded zeros | =Quantity= sum              |
+|---------+-------------------------------+----------------+-----------------------------|
+| 2010-11 | 0 -> 32                       | 1,287 -> 1,255 | 970,155.8 -> 970,088.8 (-67) |
+| 2013-14 | 0 -> 283                      | 593 -> 310     | 257,839.0 (unchanged)       |
+| 2016-17 | 0 -> 200                      | 3,923 -> 3,723 | 1,871,058.4 (unchanged)     |
+| 2019-20 | 0 -> 276                      | 3,619 -> 3,343 | 1,260,873.9 (unchanged)     |
+
+2013-14 has 284 blank consolidation groups and serves 283 NA rows: two of
+the 284 are codes of one label on one plot-crop, which defect A's collapse
+merges into one row.  783 of the 791 rows carry no unit either; 5 carry a
+positive attached sale (=Value_sold=), which is unchanged -- a sold crop
+with a blank harvest quantity is now served as such rather than as a
+harvest of nothing.
+
+| wave    | seed rows changed | seed =Quantity=                       | =Quantity_purchased= (rows changed) |
+|---------+-------------------+---------------------------------------+-------------------------------------|
+| 2010-11 | 12 (3 B + 9 rep.) | 830,623.4 -> 830,067.4 (-8 B, -548 rep.) | 31,739 -> 31,797 (4)             |
+| 2013-14 | 1                 | 324,297.5 -> 324,288.5 (-9)           | 50,378.7 -> 50,382.7 (1)            |
+| 2016-17 | 23                | 827,867.99 -> 827,722.99 (-145)       | 68,470 -> 68,627 (22)               |
+| 2019-20 | 9                 | 1,134,500.2 -> 1,134,377.2 (-123)     | 93,607.8 -> 93,688.8 (9)            |
+
+An independent raw-source oracle (pyreadstat, its own parse of the org
+tables, its own grouping) reproduces the new tables row for row on every
+seed row and every crop_production row of all four waves (0 mismatches),
+and reproduces development's exactly when run without the two fixes.
+
+Downstream: =seed_kg= -319.5 / -9.0 / -202.7 / -181.0 kg on 8 / 1 / 23 / 7
+plots; =nitrogen_kg= frame-equal; =harvest_kg= and =yield_kg= move only in
+2010-11, by the repeats (=harvest_kg= -1,975 kg on 5 plot-crops; with the
+shipped IHS5 factors -2,424 kg on 6), with identical layer counts.  The
+blank-to-NA change alone is a no-op for =harvest_kg= (re-run on
+development's frame with only those cells set to NA: frame-equal, with and
+without the shipped factors) -- those rows never carried kilograms, so
+=harvest_kg= has no rows to drop.  Site Q's =crop_production= offenders
+(7 in 2016-17, 13 in 2019-20) are the same rows against the same references
+before and after; the grain, Site I and Site B reports are unchanged.
+
+** Not changed here
+
+- Defect A: =assemble_crop_production='s collapse at the declared grain
+  merges distinct crop codes under one =harmonize_crop= label (127 / 54 / 7 /
+  98 groups), keeping one code's =crop_variety= and sale.  Awaits a grain
+  ruling.  The "splits no key" claims about =crop_variety= (=malawi.py=
+  =_harvest_block=, =data_scheme.yml='s =crop_production= comment, and the
+  "Why the join keys on the VARIETY" section above) belong to it and are left
+  as they are.
+- Seed =Improved= conflicts when two codes share one plot-crop (2019-20: 59
+  groups), the month reducers, the same-type fertilizer slot pairs (see the
+  #1111 entry), and #1174's minted zeros on nonorganic plot_inputs rows.
+
 * community_prices: what Module CK actually asks
 
 Community/Market Module CK, IHS3 Community questionnaire, "SECTION CK:
@@ -1438,8 +1577,14 @@ as a wave-level result.
 *=v= is sound and the bottom rung is real*: 100% of =community_prices.v=
 is present in both =cluster_features.v= and =sample().v= in all three
 waves (768/768, 204/204, 727/727).  2019-20 has 727 priced EAs against
-819 in =cluster_features= -- the 92 without a community interview are the
-IHPS panel EAs.
+819 in =cluster_features= (717 cross-section + 102 panel).  *Corrected
+2026-10-23 (GH #637 tail):* this used to say "the 92 without a community
+interview are the IHPS panel EAs".  They are not.  The wave builds *811*
+EAs (710 cross-section + 101 panel -- 7 + 1 EAs ship no Module CK record);
+=_finalize_result= then drops 4,403 rows with no price, unit, number of
+units or availability, which empties *84* EAs (60 cross-section + 24
+panel, 4,284 rows), leaving 727.  So 77 panel EAs ARE priced; the 92 are 67
+cross-section + 25 panel EAs.
 
 ** 2026-10-23 -- the 38,506 unit-less rows: why, and what is served (GH #827)
 
@@ -1680,9 +1825,12 @@ Wave-specific notes (validated against the recon refuter pass,
 Item-level livestock-roster feature.  Schema: =(t, i, animal)= index;
 columns =HeadCount= (head owned now, =ag_r02=), =HeadAcquired= (head
 bought to raise in the last 12 months, =ag_r10=), =HeadSold= (head sold
-alive in the last 12 months, =ag_r16=), =Value= (REPORTED per-head
+alive in the last 12 months, =ag_r16=), =ValuePerAnimal= (REPORTED per-head
 current value, =ag_r04= -- "if you sold one today, how much would you
-receive?").  One reported row per (household, species owned).
+receive?"; this line called the column =Value= until 2026-10-23, but the
+build, =data_scheme.yml= and =data_info.yml= all name it =ValuePerAnimal=,
+and it is NOT a herd value -- GH #637 tail).  One reported row per
+(household, species owned).
 
 Source: Module R livestock roster (=ag_mod_r1_{10,13,16,19}.dta=) -- the
 SAME file the World Bank cleaning code reads then *collapses to a single
@@ -3573,6 +3721,10 @@ Their held sidecar MD5s are =d6e0d71486fd6ae4d7dda5b8e1854278= and =86cc1f419c13
 The 2010-11 and 2019-20 drivers already selected those enumerator-total numeric quantities.
 They now label the fertilizer blocks =Kilogramme= before the unchanged additive full-key aggregation, without decoding timing, rescaling an amount, or substituting the native quantity/unit pair.
 Two applications of the same fertilizer on the same plot therefore consolidate when their corrected kg keys agree; the independent source census identified 51 such pairs in 2010 and 184 in 2019, all with affirmative use and positive kg amounts.
+*Qualified 2026-10-23 (GH #637 tail):* 51 / 184 are the pairs the #1111 kg labelling NEWLY coalesced, not all the pairs that consolidate.
+The raw Module D files hold *89* (2010-11) and *187* (2019-20, cross-section + panel) plot rows naming one fertilizer type in both slots, every one with =ag_d38= ("Did you use any inorganic fertilizer on this [PLOT]") = 1 and two positive kg answers (72 / 143 of them with equal kg); the build sums all of them.
+The other 38 / 3 already shared a key before #1111 (both slots' timing codes decoded to the same label, or both to none) and were already being summed.
+Whether a same-type pair is a double entry or two applications is still a decision (the #637 tail diagnosis, matching PR #1263's decision 4).
 
 This qualifies two earlier claims rather than treating them as authority.
 The preceding unit entry calls =ag_d39c= "acquired-amount" and =e/j= applied units; the shared =_MWI_FERT_UNIT_LABELS= comment also claims those fields use one unit dictionary and treats 11/12 as free-text residuals.

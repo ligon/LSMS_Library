@@ -20,7 +20,8 @@ import sys
 
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
-from malawi import (_harvest_block, _sale_block, assemble_crop_production)
+from malawi import (_harvest_block, _sale_block, assemble_crop_production,
+                    drop_repeated_records)
 
 
 WAVE = '2010-11'
@@ -30,6 +31,12 @@ g = get_dataframe(BASE + 'ag_mod_g.dta', convert_categoricals=False)
 p = get_dataframe(BASE + 'ag_mod_p.dta', convert_categoricals=False)
 i_mod = get_dataframe(BASE + 'ag_mod_i.dta', convert_categoricals=False)
 q = get_dataframe(BASE + 'ag_mod_q.dta', convert_categoricals=False)
+
+# IHS3 ships exact repeat RECORDS (every column equal, `visit` and `ea_id`
+# included): G 9, P 1, I 61, Q 15.  A repeat is a duplicate entry, not a
+# second harvest or sale, so it is dropped on the full raw record before any
+# block projects it (GH #637 tail; malawi.drop_repeated_records).
+g, p, i_mod, q = (drop_repeated_records(df) for df in (g, p, i_mod, q))
 
 for df in (g, p, i_mod, q):
     df['hhid'] = df['case_id'].apply(format_id)

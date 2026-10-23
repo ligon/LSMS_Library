@@ -24,7 +24,8 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
-                    _seed_block, _seed_purchase_block, assemble_plot_inputs)
+                    _seed_block, _seed_purchase_block, assemble_plot_inputs,
+                    drop_repeated_records)
 
 
 WAVE = '2010-11'
@@ -33,6 +34,13 @@ BASE = '../Data/Full_Sample/Agriculture/'
 d = get_dataframe(BASE + 'ag_mod_d.dta', convert_categoricals=False)
 g = get_dataframe(BASE + 'ag_mod_g.dta', convert_categoricals=False)
 h = get_dataframe(BASE + 'ag_mod_h.dta', convert_categoricals=False)
+
+# IHS3 ships exact repeat RECORDS (every column equal): G 9 (the same records
+# crop_production drops -- they carry seed too), H 45, D 0.  A repeat is a
+# duplicate entry, not a second planting or purchase, so it is dropped on the
+# full raw record before any block projects it (GH #637 tail;
+# malawi.drop_repeated_records).
+d, g, h = (drop_repeated_records(df) for df in (d, g, h))
 
 d['hhid'] = d['case_id'].apply(format_id)
 d['plotkey'] = d['ag_d00'].apply(format_id)
