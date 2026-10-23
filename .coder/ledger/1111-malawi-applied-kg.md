@@ -109,3 +109,17 @@ For delivery, root starts from reviewed organic PR1175 at de9c2734b and merges a
 The incremental runtime diff remains exactly the two reviewed fertilizer drivers; the new test no longer pins the excluded organic defect.
 The public PR will be stacked on PR1175, with separate source-pinned composition verification before publication.
 The original REPORT/validation receipts describe the standalone source state; the campaign records the composed proof without rewriting those receipts. Sue (GPT-6).
+
+## Remaining scope: 2013-14 and 2016-17 (2026-10-23)
+
+Base development `9a0ed5f3c` (PR #1193 merged). Same §2 machinery, §4 invariants and §5 decisions; only the two remaining wave drivers change.
+
+§3 additions (primary evidence, downloaded from the WB catalog, not committed):
+- IHPS 2013 agriculture questionnaire, catalog 2248 download 41254, MD5 `7240c127062552554f2e03ece6a05f0d` (identical to the unheld sidecar). Module D, PDF/printed p.15: `39_1`/`39_2` each TYPE / QUANTITY / UNIT / ENUMERATOR: TOTAL KGs / NUMBER OF WEEKS. The extract's labels are truncated identically for a..j, so the crosswalk is positional, anchored by value labels (a/f type set, c/h unit set): d/i TOTAL KGs, e/j weeks -- the IHS3 letters. Corroborated: d = b x bag(c) on 90%/91% of comparable rows; e/j 0-50.
+- IHS4 agriculture questionnaire, catalog 2936 download 47113 (byte-identical to catalog 2939 download 48104), MD5 `15107f083eac4477bd4d25fc0e33fc2b`. Module D, PDF/printed p.12: D39_1/D39_2 each TYPE / QUANTITY / UNIT / ENUMERATOR: TOTAL KGs / # OF WEEKS. Both extracts label d and j "ENUMERATOR: TOTAL KGs" and e weeks; f is a CAPI gate absent from the paper form.
+- Both enumerator manuals' Q39 examples still say "month of application" (IHS3 carry-over); questionnaires and data say weeks. Timing either way, never a unit.
+
+Measured (cold, fresh roots, then fresh-process warm with zero writes): rows 179,949 -> 179,850 (21 + 78 coalesced same-type pairs; source census 59/78 pairs, 38 of 2013's already summed in base); every pair sum and single-row Quantity exact; inorganic Quantity 2,899,339.95 unchanged; 2010-11/2019-20 and all non-inorganic rows identical; no inorganic Gram/null u remains.
+`nitrogen_kg` falls, contrary to the 2010/2019 direction: 2013-14 188,848.40 -> 80,927.98, 2016-17 334,896.51 -> 247,456.26, Malawi 1,028,195.63 -> 832,834.97. Weeks codes 3-7 had been decoded as 2-50 kg bags; base 2013-14 implied 0.673 kg N per kg product (above urea's 0.46). After: 0.288/0.290, beside 0.291/0.279 in 2010-11/2019-20.
+Hash census: 26/26 Malawi country hashes and 52 Malawi wave hashes (2013-14, 2016-17) move; 0 other-country, 0/40 framework fingerprints.
+Tests: the extended `tests/test_1111_malawi_applied_kg.py` gives 24 pass on this branch, 10 fail / 14 pass against the development drivers (`LSMS_COUNTRIES_ROOT`).
