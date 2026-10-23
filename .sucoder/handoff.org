@@ -70,6 +70,11 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - Filed *#1234* (=map_index= mints =u='unit'=), *#1235* (CotedIvoire s16bq03a == 350 on 39.5% of applied lines).
 - *PR #1236 open*: a test-only fix for a red Burkina test on development; bisected to PR #1212 (#1196 string-policy restore); the test pinned the pre-fix drift.
 
+- *PR #1238 open* (#1111; Closes #1111; nitrogen headline qualified: one 50,000 kg urea row; Malawi -11.3% without it).  Filed *#1237* (Malawi Makefile per-wave rules omit the wave script prerequisite).
+- *PR #1239 open* (#827; Closes #827; three decisions flagged: Piece, NumberOfUnits=1, 2013-14 code 22).
+- Lanes now running: #1123 red-team; #1234 (map_index 'unit' -> Unknown; census + cost first); #1059 (Burkina District spelling table on the #971/#811 Region precedent).
+- *Ordering note:* #1225 (=_coerce_datetime_column= empty MultiIndex) should wait for #1233, after which it costs 0 hashes.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
