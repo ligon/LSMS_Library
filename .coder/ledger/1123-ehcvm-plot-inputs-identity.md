@@ -97,4 +97,45 @@ measured facts and the meaning is flagged as unverified.
 ---
 ### Phase 3 -- verification
 
-(filled at task end)
+Base: detached development `9a0ed5f3c` (`worktrees/base-1123`); candidate:
+this branch.  Fresh private data roots (L1 symlinked, L2 empty), threads and
+build workers 1, import identity asserted by every script.  Scripts and
+aggregate JSON: `slurm_logs/isa_backlog_2026-10-21/1123-ehcvm-identity/`
+(`diagnose_source.py`, `build_country.py`, `compare.py`, `feature.py`,
+`hash_delta.py`; `results/`).  Row-level frames stay private.
+
+| | Niger | Senegal | CotedIvoire |
+|---|---|---|---|
+| applied native lines | 42,557 | 9,916 | 11,259 |
+| served, base cold | 42,426 | 9,901 | 11,250 |
+| served, candidate cold = warm | 42,435 | 9,916 | 11,259 |
+| GrainCollapseWarning | 4 -> 2 | 1 -> 0 | 1 -> 0 |
+| Feature rows (3-country call) | 42,426 -> 42,435 | 9,901 -> 9,916 | 11,250 -> 11,259 |
+| nitrogen_kg | identical | identical | same index/total; 1 hh +-2.8e-14 |
+| seed_kg total | +1.0 kg | +316.002 kg | +3,150 kg |
+
+Niger's 42,435 = 42,557 - 73 - 45 (ECVMA, open) - 4 (2021-22 hollow).
+
+- `harmonize_seed_crop` cells (3 countries) -- OK (§5): exactly the cells in
+  §5; projecting the new labels back onto `Autre crop` reproduces the base key
+  set; every base row on a non-colliding key is byte-equal; every base row in
+  a former collision group equals one candidate row of its group.
+- Wave guards (4 scripts) -- OK (§4, §2 Burkina form): candidate source
+  diagnosis 0 collisions in the four EHCVM cells; write-spy tests prove the
+  pre-fix map and a repeated native key fail before the write, message
+  count-only.
+- Native oracle -- OK (§4): every non-hollow applied line is served with its
+  exact Quantity / Purchased / Quantity_purchased (EHCVM cells 0 mismatches;
+  ECVMA 50 / 35 lines still differ -- the open §6 residual).
+- `tests/test_ehcvm_plot_inputs_identity.py`: 20 pass on the branch, 20 fail
+  on `9a0ed5f3c`.  Focused existing selection: base 383 passed / 1 failed,
+  branch 403 / 1 -- the one failure is the same pre-existing
+  `test_burkina_faso_plot_inputs_identity.py::test_every_real_native_line_and_full_payload_survives`
+  (`u` StringDtype na_value), unrelated.
+- `tests/test_niger_u_sentinel.py` pinned Niger plot_inputs 42,426 -> 42,435
+  (legitimate move, commented); its `Unknown` counts are unchanged.
+- Hash census (549 country / 40 btf / 2,109 wave): country 66 moved = all of
+  Niger 23, Senegal 22, CotedIvoire 21; btf 0; wave 241, all in the three
+  countries; no other country moves.
+
+No CONTRADICTION or REINVENTION against §2-§5.  §6 stays open.

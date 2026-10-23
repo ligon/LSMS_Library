@@ -1,0 +1,83 @@
+{
+ "cold": true,
+ "columns": [
+  "Quantity",
+  "Purchased",
+  "Quantity_purchased"
+ ],
+ "country": "Niger",
+ "grain_collapse_warnings": 2,
+ "grain_reports": [
+  {
+   "conflicting_groups": 48,
+   "destroyed": 51,
+   "dropped": 73,
+   "nan_key_rows": 0,
+   "rows": 8538,
+   "wave": "2011-12"
+  },
+  {
+   "conflicting_groups": 29,
+   "destroyed": 35,
+   "dropped": 45,
+   "nan_key_rows": 0,
+   "rows": 8179,
+   "wave": "2014-15"
+  }
+ ],
+ "index_names": [
+  "i",
+  "t",
+  "v",
+  "input",
+  "crop",
+  "u"
+ ],
+ "index_unique": true,
+ "label": "cand-cold",
+ "nitrogen_input_match": {
+  "matched_rows": 2573,
+  "unmatched_rows": 39862
+ },
+ "nitrogen_kg": {
+  "by_wave": {
+   "2011-12": 13588.78,
+   "2014-15": 6988.2238,
+   "2018-19": 19948.94,
+   "2021-22": 11613.625
+  },
+  "rows": 1380,
+  "total": 52139.5688
+ },
+ "report_keys": [
+  "additive",
+  "conflicting_groups",
+  "country",
+  "destroyed",
+  "dropped",
+  "levels",
+  "missing_levels",
+  "nan_key_rows",
+  "rows",
+  "table",
+  "wave"
+ ],
+ "rows": 42435,
+ "rows_by_wave": {
+  "2011-12": 8465,
+  "2014-15": 8134,
+  "2018-19": 13401,
+  "2021-22": 12435
+ },
+ "seconds": 27.4,
+ "seed_kg": {
+  "by_wave": {
+   "2011-12": 74642.0,
+   "2014-15": 19847.454999999998,
+   "2018-19": 41098.2755,
+   "2021-22": 25089.675
+  },
+  "rows": 1542,
+  "total": 160677.4055
+ }
+}

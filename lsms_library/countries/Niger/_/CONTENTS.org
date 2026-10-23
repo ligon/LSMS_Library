@@ -1634,3 +1634,85 @@ The generic parquet reader now restores each physical index field's recorded =st
 Both Default country-cache reads and Make wave-cache reads use that repair.
 Unit labels, values, missing masks, source eligibility, index grain and the questionnaire interpretation above are unchanged.
 This does not combine different container sizes or expose the last-purchase quantity as a new observation.
+
+* plot_inputs: distinct native input slots on the declared key (GH #1123, 2026-10-23)
+
+=plot_inputs= is declared =(t, i, input, crop, u)=.  =harmonize_input= maps
+every seed slot to the one input =Seed=, so =crop= is the only level that
+tells two seed lines apart; when it cannot, =_normalize_dataframe_index=
+keeps one observed row and the rest vanish (GH #323).  Measured cold on
+development =9a0ed5f3c= against the held sources (aggregate evidence:
+=slurm_logs/isa_backlog_2026-10-21/1123-ehcvm-identity/=):
+
+| wave    | applied native lines | collision groups (conflicting / equal) | lines lost | served before -> after |
+|---------+----------------------+-----------------------------------------+------------+------------------------|
+| 2011-12 |                8,538 | 67 (48 / 19)                            |         73 | 8,465 -> 8,465 (open)  |
+| 2014-15 |                8,179 | 39 (29 / 10)                            |         45 | 8,134 -> 8,134 (open)  |
+| 2018-19 |               13,401 | 6 (6 / 0)                               |          6 | 13,395 -> 13,401       |
+| 2021-22 |               12,439 | 3 (3 / 0)                               |          3 | 12,432 -> 12,435       |
+
+The native key -- (=hid= / =GRAPPE, MENAGE, EXTENSION= / =grappe, menage=)
+x input-slot code -- is unique and non-null in all four files, and every
+=i= is injective, so neither the household key nor the EXTENSION repair
+(GH #679) is involved.  =GrainCollapseWarning= for this table: 4 -> 2.
+
+*Two different causes; only the EHCVM one is fixed.*
+
+- *EHCVM (2018-19, 2021-22): a catch-all bucket -- fixed.*  The three
+  catch-all seed slots all mapped to =Autre crop= in =harmonize_seed_crop=:
+  2018-19 collided on slots 15+19, 2021-22 on 15+20 and 19+20.  ="Semences
+  d'autres céréales"= now maps to =Autre céréale= and ='Plants/boutures de
+  tubercules'= to =Autre tubercule= (the Benin/Togo/Burkina labels), and both
+  wave scripts assert the declared index unique before =to_parquet=
+  (count-only message).  Served crop labels change on 27 (2018-19) + 49
+  (2021-22) rows; nothing else moves.  =nitrogen_kg= is frame-identical;
+  =seed_kg= gains 1 kg on one 2018-19 household (the other recovered lines
+  are in =Tiya= / =Boîte=, which carry no kg factor).
+- *ECVMA (2011-12, 2014-15): a repeated seed SLOT -- NOT fixed, a design
+  question.*  The seven =as02cq02= / =AS02CQ02= seed slots (11-17) carry the
+  same label =semences=; each has its own crop code.  Every collision is a
+  household naming the SAME crop code in two or more slots in one unit
+  (e.g. slots 11 and 12 both Mil in Tiya, 6 and 2).  The identity the key
+  drops is the slot ordinal, and no label vocabulary carries it into
+  =(t, i, input, crop, u)=: repairing it means a new index level or a
+  slot-qualified token, which is a schema/vocabulary decision.  No guard is
+  placed in these two scripts or in =niger.py:_finish_plot_inputs= (it would
+  fail the build).  This agrees with the 2014-15 paragraph above ("a
+  harmonisation-level collision on the input axis, not an identifier
+  defect"); CLAUDE.md's #323 doctrine reads the same evidence as "a level is
+  missing".  Not adjudicated here.
+
+*Idiosyncrasy: the two EHCVM waves number their seed slots differently.*
+2018-19's =s16bq01= value labels stop at 19 = =Autres semences= and have no
+=Plants/boutures= label; 2021-22 inserts 19 = =Plants/boutures de
+tubercules= and moves =Autres semences= to 20.  The scripts resolve by LABEL,
+so this is harmless -- except for 2018-19 code 20, which occurs on 382
+applied lines with NO value label and reaches the maps as the bare key ='20'=.
+Its meaning is unknown.  The map comment used to call it =Autres semences= by
+borrowing the 2021-22 code; that is a different code list, and 2018-19
+already has its own =Autres semences= at 19.  It keeps its legacy
+=Seed= / =Autre crop= binding, unverified: with the two splits it collides
+with nothing (3 households report both 19 and 20, always in different
+units), so Burkina's source-qualified =Unknown [...]= fallback, which was
+necessary there, is not applied here.
+
+*Four 2021-22 lines are hollow* (=Quantity=, =Purchased=,
+=Quantity_purchased= all NA: three seed lines and one =Organic manure=
+line) and are removed by =_finalize_result='s =dropna(how='all')=, as
+before; none is in a collision group.  So 2021-22 serves 12,439 - 4.
+
+*CONTRADICTION, recorded not resolved.*  The GH #865 table above and the
+=2021-22/_/plot_inputs.py= comment describe the one =s16bq03a == 9999= line
+(grappe 315, menage 10) as "an applied inorganic fertiliser with no unit".
+The held source codes that line =s16bq01 = 1= ="Engrais organiques - déchets
+d'animaux"=, i.e. =Organic manure=; it is one of the four hollow lines.
+
+*Not changed.*  =Purchased= / =Quantity_purchased= in the EHCVM waves still
+read =s16bq05= / =s16bq07a=, the gift flag and gift quantity (the Burkina
+finding of #1188 applies by inspection).  The country concatenator's
+docstring (=_/plot_inputs.py=) still calls the index "intentionally
+NON-unique"; that describes the ECVMA residual, not a design.
+
+*Cache.*  =_/categorical_mapping.org= is a build input of every Niger table:
+all 23 Niger country hashes move (one Niger re-warm); no other country and no
+framework fingerprint moves.
