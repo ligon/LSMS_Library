@@ -562,20 +562,22 @@
 # column), and this table maps it to the canonical Preferred Label.  The
 # Code IS the cross-wave join key; both EACI waves emit every slot.
 #+name: harmonize_input
-| Code                | Preferred Label     | 2014-15 | 2017-18 |
-|---------------------+---------------------+---------+---------|
-| seed                | Seed                | x       | x       |
-| urea                | Urea                | x       | x       |
-| dap                 | DAP                 | x       | x       |
-| npk                 | NPK                 | x       | x       |
-| other_inorganic     | Other inorganic     | x       | x       |
-| manure              | Manure              | x       | x       |
-| compost             | Compost             | x       | x       |
-| other_organic       | Other organic       | x       | x       |
-| pesticide           | Pesticide           | x       | x       |
-| fungicide           | Fungicide           | x       | x       |
-| herbicide           | Herbicide           | x       | x       |
-| other_phytosanitary | Other phytosanitary | x       | x       |
+| Code                 | Preferred Label        | 2014-15 | 2017-18 |
+|----------------------+------------------------+---------+---------|
+| seed                 | Seed                   | x       | x       |
+| urea                 | Urea                   | x       | x       |
+| dap                  | DAP                    | x       | x       |
+| npk                  | NPK                    | x       | x       |
+| other_inorganic      | Other inorganic        | x       | x       |
+| manure               | Manure                 | x       | x       |
+| compost              | Compost                | x       | x       |
+| other_organic        | Other organic          | x       | x       |
+| pesticide            | Pesticide              | x       | x       |
+| fungicide            | Fungicide              | x       | x       |
+| herbicide            | Herbicide              | x       | x       |
+| other_phytosanitary  | Other phytosanitary    | x       | x       |
+| inorganic_fertilizer | Inorganic Fertilizer   | x       | x       |
+| phytosanitary        | Phytosanitary products | x       | x       |
 
 # harmonize_species — the animal-identity (`animal` index level) taxonomy
 # for livestock (GAP 4, parity loop).  Source: the EACI livestock roster

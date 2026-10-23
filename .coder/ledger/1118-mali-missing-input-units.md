@@ -144,3 +144,22 @@ fertilizer and pesticide slots the plot-level GROUP use flag reads `Oui`
 group, the quantity per type, so these rows are type-level non-use inside a
 positive group answer.  The hash census above predates the CONTENTS.org and test
 edits; neither is a build input, so 24/0/96 stands.
+
+### Phase 3 -- group use answers served (2026-10-22, Sue / Claude Opus 5.5)
+
+Maintainer decision: serve the plot-level group use answers explicitly, in
+`plot_inputs` (not `plot_features`, which covers only the EHCVM waves).  New
+input codes `inorganic_fertilizer` -> `Inorganic Fertilizer` (Uganda's
+spelling) and `phytosanitary` -> `Phytosanitary products`; new column
+`Applied: bool`.  `plot_inputs_finalize` counts a non-null `Applied` as content
+and reduces it with `max`.  Label choice: a distinct label naming a fertilizer
+would raise `NutrientCoverageWarning` on every Mali `nitrogen_kg` call
+(`_FERTILIZER_LABEL_HINTS`), while Uganda's spelling matches its 0.20 share
+with NaN quantity, so mass is unchanged and only the match tally grows.
+
+- Tests: `tests/test_mali_input_use_flags.py` 7 fail / 1 pass on 6ffeb3caf
+  (the pass is the missing-answer control); all pass on the branch, 164 passed /
+  2 skipped with the #1118 and unit/nitrogen suites.
+- Cold build: 113,735 -> 179,817 rows; all existing rows exact; 66,082 new group
+  rows; nitrogen_kg / seed_kg identical.
+- Hashes: 24/549 country, 96/2,109 wave (Mali only), 0/40 fingerprints.

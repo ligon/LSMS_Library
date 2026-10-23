@@ -1,0 +1,35 @@
+{
+ "rows_base": 113735,
+ "rows_cand": 179817,
+ "new_rows": 66082,
+ "new_by_wave_input_applied": {
+  "2014-15|Inorganic Fertilizer|False": 6498,
+  "2014-15|Inorganic Fertilizer|True": 2702,
+  "2014-15|Phytosanitary products|False": 7379,
+  "2014-15|Phytosanitary products|True": 1917,
+  "2017-18|Inorganic Fertilizer|False": 16979,
+  "2017-18|Inorganic Fertilizer|True": 6814,
+  "2017-18|Phytosanitary products|False": 19278,
+  "2017-18|Phytosanitary products|True": 4515
+ },
+ "nitrogen_kg": {
+  "identical": true,
+  "total_base": 906361.8260000597,
+  "total_cand": 906361.8260000597
+ },
+ "seed_kg": {
+  "identical": true,
+  "total_base": 1455210.9572301384,
+  "total_cand": 1455210.9572301384
+ },
+ "nitrogen_tally": {
+  "matched_rows": [
+   28929,
+   61922
+  ],
+  "unmatched_rows": [
+   84806,
+   117895
+  ]
+ }
+}
