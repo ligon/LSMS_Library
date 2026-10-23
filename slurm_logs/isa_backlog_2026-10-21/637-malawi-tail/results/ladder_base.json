@@ -1,0 +1,72 @@
+{
+ "2010-11": {
+  "sale_lines": 29310,
+  "sale_keys": 29055,
+  "sale_value_total": 155320115.0,
+  "sale_qty_total": 528880.0,
+  "suppressed": {
+   "wave": "2010-11",
+   "sales": 0,
+   "rows": 0,
+   "value": 0.0
+  },
+  "mismatch": {
+   "wave": "2010-11",
+   "sales": 94,
+   "rows": 94,
+   "value": 1088250.0
+  },
+  "ladder": {
+   "exact": {
+    "sales": 3958,
+    "value": 121163960.0
+   },
+   "Malawi::crop_production::sale-basis-unknown-wildcard": {
+    "sales": 1850,
+    "value": 5680988.0
+   },
+   "Malawi::crop_production::sale-basis-from-price": {
+    "sales": 1,
+    "value": 800.0
+   },
+   "Malawi::crop_production::sale-basis-from-price-overrule": {
+    "sales": 0,
+    "value": 0.0
+   },
+   "Malawi::crop_production::sale-basis-not-applicable": {
+    "sales": 5,
+    "value": 68400.0
+   },
+   "Malawi::crop_production::sale-basis-no-reference": {
+    "sales": 117,
+    "value": 3087827.0
+   },
+   "Malawi::crop_production::contradiction-price-sale": {
+    "sales": 67,
+    "value": 599290.0
+   },
+   "Malawi::crop_production::contradiction-price-harvest": {
+    "sales": 19,
+    "value": 77740.0
+   },
+   "Malawi::crop_production::sale-basis-unresolved": {
+    "sales": 94,
+    "value": 1088250.0
+   },
+   "reference": {
+    "sales": 3958
+   }
+  },
+  "outcomes": {
+   "exact": 3958,
+   "Malawi::crop_production::sale-basis-unknown-wildcard": 949,
+   "no_sale": 901,
+   "Malawi::crop_production::sale-basis-no-reference": 117,
+   "unresolved": 94,
+   "Malawi::crop_production::contradiction-price-sale": 67,
+   "Malawi::crop_production::contradiction-price-harvest": 19,
+   "Malawi::crop_production::sale-basis-not-applicable": 5,
+   "Malawi::crop_production::sale-basis-from-price": 1
+  }
+ }
+}

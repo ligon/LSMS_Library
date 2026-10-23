@@ -1,0 +1,45 @@
+#+title: GH #637 tail, Malawi -- defect B, blank harvests, 2010-11 repeat records
+
+Aggregates only.  Row-level frames stayed in a private data root.
+
+* Setup
+- base: detached worktree at development =9a0ed5f3c=; branch: =fix/637-malawi-tail-20261023=.
+- Mounted image Python, =PYTHONPATH= = the checkout under test, import identity
+  asserted in every script, a fresh =LSMS_DATA_DIR= per checkout with only
+  =dvc-cache= symlinked, =OPENBLAS/OMP/MKL_NUM_THREADS=1=, =LSMS_BUILD_WORKERS=1=,
+  =nice -n 19=, pytest =-n 3 --dist=loadfile=.  Raw sources read with pyreadstat
+  through =get_data_file= (L1 blobs); no =dvc= CLI.
+- =find lsms_library/countries -name '*.parquet'= empty in both checkouts after
+  every run.
+
+* Scripts (=scripts/=) and what each wrote (=results/=)
+| script              | result                                  | what                                                                    |
+|---------------------+-----------------------------------------+-------------------------------------------------------------------------|
+| =build.py=          | (private)                               | cold build of crop_production, plot_inputs, plot_features + downstream |
+| =compare.py=        | =compare.json=                          | per-wave diff of the two builds, downstream, warnings and reports      |
+| =rawdups.py=        | =rawdups.json=                          | exact repeat records (every column) per raw module, all waves         |
+| =oracle_seed.py=    | =oracle_seed_{base,branch}.json=        | independent seed Quantity / Quantity_purchased, row for row            |
+| =oracle_harvest.py= | =oracle_harvest_{base,branch}.json=     | independent crop_production Quantity, row for row                      |
+| =ladder.py=         | =ladder_{base,branch}.json=             | 2010-11 sale-basis ladder replay (tallies, outcomes)                   |
+| =collapse_na.py=    | (stdout; reads the diagnosis captures)  | blank groups that defect A's collapse merges (2013-14: 1)              |
+| =fert_pairs.py=     | =fert_pairs.json=                       | same-type fertilizer slot pairs (the #1111 51 / 184 claim)             |
+| =cp_ea.py=          | =cp_ea.json=                            | 2019-20 community_prices EA accounting (the 727 / 92 claim)            |
+| =labels.py=         | =labels.txt=                            | Stata variable / value labels of the 12 Module G / P files             |
+| hash census         | =hash_diff.json=                        | =1218-current-validation/hash_census.py=, base vs branch               |
+
+Oracle conventions: =oracle_*_base= ran WITHOUT the two fixes (no repeat drop,
+bare sum) and equals development except at exactly the defect-B rows;
+=oracle_*_branch= ran with them and equals the branch on every row.
+
+* Tests
+=results/pytest_summary.txt=.  Existing set (16 files): =test_1109_malawi_input_quantity=,
+=test_1111_malawi_applied_kg=, =test_863_transforms=, =test_867_nitrogen_content=,
+=test_crop_kg_factor=, =test_gh323_malawi_gb_cartesian=, =test_gh323_malawi_cluster_key=,
+=test_gh637_malawi_first_sites=, =test_malawi_cassava_recode=, =test_malawi_sale_basis=,
+=test_malawi_unit_cleanup=, =test_malawi_shipped_factors=, =test_shipped_factors=,
+=test_null_index_guard=, =test_quantity_screen=, =test_volume_as_mass_kwarg=.
+No existing pin moved.  The negative control ran the new file against the base
+checkout with an =lsms_library.__file__= assertion prepended: a first attempt
+from the branch's =tests/= directory imported the BRANCH package through
+pytest's rootdir insertion and passed 28 / 28 -- a silent wrong-checkout run,
+which is why the assertion is there.

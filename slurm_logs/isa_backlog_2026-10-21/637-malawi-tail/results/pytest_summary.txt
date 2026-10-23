@@ -1,0 +1,29 @@
+# test summary lines (base = development 9a0ed5f3c, branch = this change)
+existing Malawi set (16 files, see README) base:   485 passed, 6 skipped, 96 warnings in 208.47s (0:03:28)
+existing Malawi set + new file           branch: 513 passed, 6 skipped, 101 warnings in 215.77s (0:03:35)
+tests/test_gh637_malawi_tail.py          branch: 28 passed, 5 warnings in 23.81s
+tests/test_gh637_malawi_tail.py          base (import of base asserted): 24 failed, 4 passed, 18 warnings in 124.96s (0:02:04)
+FAILED tests/test_gh637_malawi_tail.py::TestSeedPurchaseFanOut::test_two_purchased_codes_do_not_duplicate_the_seed_rows
+FAILED tests/test_gh637_malawi_tail.py::TestBlankHarvest::test_consolidation_keeps_a_blank_blank
+FAILED tests/test_gh637_malawi_tail.py::TestBlankHarvest::test_assembled_table_serves_na_not_zero
+FAILED tests/test_gh637_malawi_tail.py::TestBlankHarvest::test_two_blank_codes_merged_at_the_declared_grain_stay_blank
+FAILED tests/test_gh637_malawi_tail.py::TestRepeatedRecords::test_only_a_record_equal_in_every_column_is_dropped
+FAILED tests/test_gh637_malawi_tail.py::TestRepeatedRecords::test_2010_11_scripts_drop_repeats_from_every_module_they_read[crop_production.py-frames0]
+FAILED tests/test_gh637_malawi_tail.py::TestRepeatedRecords::test_2010_11_scripts_drop_repeats_from_every_module_they_read[plot_inputs.py-frames1]
+FAILED tests/test_gh637_malawi_tail.py::TestRepeatedRecords::test_the_derivation_inputs_replay_drops_them_too
+FAILED tests/test_gh637_malawi_tail.py::TestDelivered::test_blank_harvests_are_na_and_recorded_zeros_stay[2010-11]
+FAILED tests/test_gh637_malawi_tail.py::TestDelivered::test_blank_harvests_are_na_and_recorded_zeros_stay[2013-14]
+FAILED tests/test_gh637_malawi_tail.py::TestDelivered::test_blank_harvests_are_na_and_recorded_zeros_stay[2016-17]
+FAILED tests/test_gh637_malawi_tail.py::TestDelivered::test_blank_harvests_are_na_and_recorded_zeros_stay[2019-20]
+FAILED tests/test_gh637_malawi_tail.py::TestDelivered::test_seed_quantity_and_purchases[2010-11]
+FAILED tests/test_gh637_malawi_tail.py::TestDelivered::test_seed_quantity_and_purchases[2013-14]
+FAILED tests/test_gh637_malawi_tail.py::TestDelivered::test_seed_quantity_and_purchases[2016-17]
+FAILED tests/test_gh637_malawi_tail.py::TestDelivered::test_seed_quantity_and_purchases[2019-20]
+FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_seed_totals_from_raw_modules[2010-11]
+FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_seed_totals_from_raw_modules[2013-14]
+FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_seed_totals_from_raw_modules[2016-17]
+FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_seed_totals_from_raw_modules[2019-20]
+FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_harvest_blanks_from_raw_modules[2010-11]
+FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_harvest_blanks_from_raw_modules[2013-14]
+FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_harvest_blanks_from_raw_modules[2016-17]
+FAILED tests/test_gh637_malawi_tail.py::TestRawOracle::test_harvest_blanks_from_raw_modules[2019-20]

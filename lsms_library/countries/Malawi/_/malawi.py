@@ -1875,6 +1875,40 @@ def _attach_sales(t, harv, sale):
                        'sale_basis_ladder': ladder}
 
 
+def drop_repeated_records(df):
+    """Drop a raw source record that REPEATS an earlier one in every column.
+
+    A second record identical to the first on the FULL source record -- every
+    column the file ships, ids, ``visit`` and ``ea_id`` included -- is a
+    duplicate entry, not a second observation (the GH #840 Niger / #651
+    Tanzania rule), so summing it double-counts the one answer it repeats.
+    Exactness is judged on the whole raw frame, never on the columns a block
+    projects: a record that differs in ANY column is kept.  Call it on the
+    frame exactly as ``get_dataframe`` returned it, before any column is
+    added.
+
+    Measured (GH #637 tail, 2026-10-23): only IHS3 2010-11 ships such repeats
+    among the agriculture modules the crop_production / plot_inputs builders
+    read -- Module G 9, P 1, I 61, Q 15, H 45, D 0 -- and no module of
+    2013-14, 2016-17 or 2019-20 ships any, so only the 2010-11 wave scripts
+    call this.  See ``CONTENTS.org``, "2010-11 ships exact repeat records".
+    """
+    return df[~df.duplicated(keep='first')]
+
+
+def _sum_reported(s):
+    """Sum reported quantities; a group with NO reported quantity stays NA.
+
+    A bare ``'sum'`` serves an all-blank group as ``0.0`` -- a harvest of
+    nothing that the survey never recorded (GH #637 tail; the Tanzania
+    precedent is PR #1263).  Malawi's Module G and P ask no "did you harvest
+    [CROP] at all?" question in any wave (G07 asks only whether the harvest is
+    COMPLETED), so there is no recorded no-harvest answer to turn into a zero:
+    a recorded zero is ``ag_g13a`` / ``ag_p09a == 0`` and is summed as such.
+    """
+    return s.sum(min_count=1)
+
+
 def _consolidate_harvest(harvest_pieces):
     """Collapse exact duplicate (i, plot, crop, u, condition) harvest rows.
 
@@ -1886,13 +1920,18 @@ def _consolidate_harvest(harvest_pieces):
     is what stops shelled and unshelled kilograms of the same plot-crop from
     being added together -- see ``data_info.yml``, "Quantities in different
     conditions are NOT commensurable".
+
+    The groupby runs over EVERY row, singletons included, so the quantity
+    reducer is ``_sum_reported`` (``min_count=1``): a blank ``ag_g13a`` /
+    ``ag_p09a`` stays NA instead of being served as a harvest of ``0.0``
+    (32 / 284 / 200 / 276 groups by wave before GH #637's tail fix).
     """
     harv = pd.concat(harvest_pieces, ignore_index=True)
     harv['u'] = harv['u'].astype('string')
     harv['condition'] = harv['condition'].astype('string')
     return harv.groupby(['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code'],
                         as_index=False, dropna=False).agg({
-        'Quantity':       'sum',
+        'Quantity':       _sum_reported,
         # EXACT, not a reduction: `crop_variety` is a function of
         # `_crop_code`, which is in the key, so every row in a group carries
         # the same value.
@@ -2006,9 +2045,20 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     # on the raw modules: 32 plot-crops of 135,410, 0.024%, carry more than
     # one harvest unit.)  The collapse below now keys on the FULL declared
     # grain (t, i, plot, crop, u, condition), so it can no longer mix two
-    # units -- or two states -- into one row.  It survives only as a guard
-    # against a genuinely repeated line at that grain, which the groupby
-    # above has already consolidated.
+    # units -- or two states -- into one row.
+    #
+    # It is NOT "a guard against a genuinely repeated line" (what this comment
+    # used to say; GH #637 tail diagnosis, 2026-10-23).  A repeated line at
+    # this grain shares its `_crop_code` too, so `_consolidate_harvest` has
+    # already merged it; the collapse below never sees one.  It fires in EVERY
+    # wave -- 127 / 54 / 7 / 98 groups (2010-11 / 2013-14 / 2016-17 /
+    # 2019-20) -- and every one of those groups is two or more DISTINCT crop
+    # codes that `harmonize_crop` maps to one label (Maize 1-4, Citrus, the
+    # groundnut and rice varieties): it sums their harvests and keeps the
+    # first row's `crop_variety` and sale.  That is defect A of the #637 tail,
+    # held for a grain ruling (@ligon) -- not changed here.  Only the quantity
+    # reducer moved: `_sum_reported`, so two codes that BOTH left the quantity
+    # blank (1 group, 2013-14) are not re-minted into a harvest of 0.0.
     # crop must be non-null for the index; rows where the code did not map
     # to a Preferred Label are dropped from the index axis.  No crop code
     # in harmonize_crop maps to a null Preferred Label, so this fires only
@@ -2039,7 +2089,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     _grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
     if harv.duplicated(_grain).any():
         harv = harv.groupby(_grain, as_index=False, dropna=False).agg({
-            'Quantity':       'sum',
+            'Quantity':       _sum_reported,
             'crop_variety':   'first',
             'Quantity_sold':  'first',
             'Value_sold':     'first',
@@ -2137,6 +2187,9 @@ def _crop_pieces(wave):
         d = root / h['dir']
         g, p, i_mod, q = (get_dataframe(str(d / h[k]), convert_categoricals=False)
                           for k in ('g', 'p', 'i', 'q'))
+        # As the 2010-11 wave script does (GH #637 tail); every other wave's
+        # G/P/I/Q ship no repeat record, so this is the identity there.
+        g, p, i_mod, q = (drop_repeated_records(df) for df in (g, p, i_mod, q))
         for df in (g, p, i_mod, q):
             df['hhid'] = h['prefix'] + df[h['hhid']].apply(format_id)
         if h['plot'] == 'garden':
@@ -3212,13 +3265,24 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
         sp = pd.concat([p for p in seed_purchase_pieces if p is not None
                         and len(p)], ignore_index=True)
         if len(sp):
-            sp = sp.groupby(['i', '_crop_code'], as_index=False).agg(
-                {'Quantity_purchased': 'sum'})
             # Re-derive the crop label so we can join on (i, crop) without
             # carrying _crop_code on the seed rows.
             sp_label, _ = _crop_codes(sp['_crop_code'], perennial=False)
             sp = sp.assign(crop=sp_label.values)
             sp = sp[sp['crop'].notna()]
+            # Reduce the purchases to the MERGE-KEY grain (i, crop) before the
+            # merge (the #323 site-4 rule: a sub-frame is reduced to the key it
+            # is merged on).  `harmonize_crop` maps several codes to one label
+            # (Maize 1-4, the groundnut and rice varieties), so a household
+            # that bought seed under two such codes used to contribute TWO
+            # (i, crop) rows; the left merge then duplicated every matching
+            # seed row once per code, the additive grouping below summed the
+            # duplicated seed `Quantity` (4 / 2 / 23 / 14 rows; 8 / 9 / 145 /
+            # 123 native units by wave), and 'first' kept ONE code's purchase.
+            # GH #637 tail, defect B.  `min_count=1`: a crop with no
+            # value-backed purchase stays NA (none reach here today).
+            sp = sp.groupby(['i', 'crop'], as_index=False)[
+                'Quantity_purchased'].sum(min_count=1)
             seed = df['input'] == 'Seed'
             # Count plots per (i, crop) among seed rows; attach only when a
             # crop's seed is on exactly one plot (unambiguous).
