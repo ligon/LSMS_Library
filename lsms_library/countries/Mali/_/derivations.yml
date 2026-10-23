@@ -100,3 +100,103 @@ Mali::food_acquired::7day-purchase-at-last-purchase-unit-value:
     labels), so the reading carries by inference, not by measurement here.
   contents: 'Mali/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+Mali::crop_production::3b-per-harvest-month:
+  waves: ['2014-15']
+  columns: [Quantity, Quantity_sold]
+  rows: {perennial: true}
+  rule: >-
+    The identity: the tree-crop (module 3B) answers are served AS RECORDED, and
+    this key exists to state their window.  Quantity = s3bq10a and
+    Quantity_sold = s3bq13a are the AVERAGE PER HARVEST MONTH (3B.10 / 3B.13),
+    in u = s3bq10b and Unit_sold = s3bq13b; months_harvested = s3bq09 (3B.09)
+    is the number of months harvested in the last 12.  Value_sold = s3bq14
+    (3B.14) is the TOTAL value of the sales, NOT per month -- so on these rows
+    Value_sold / Quantity_sold is NOT a price: it overstates the price per
+    Unit_sold by the factor months_harvested.  A field-crop row's Quantity and
+    Quantity_sold are campaign totals; a 12-month tree quantity would be
+    Quantity * months_harvested, which is a construction and is NOT served.
+    Until GH #1267 the served Quantity was s3bq09, the month count.
+  function: lsms_library.countries.Mali._.mali:derive_3b_per_harvest_month
+  inputs: lsms_library.countries.Mali._.mali:inputs_3b_per_harvest_month
+  raw_variables: [s3bq01, s3bq03, s3bq09, s3bq10a, s3bq10b, s3bq13a, s3bq13b,
+                  s3bq14]
+  assumptions:
+    - text: >-
+        3B.10 and 3B.13 ask a MONTHLY AVERAGE over the harvest months, and
+        3B.09 the number of those months.
+      basis: questionnaire
+      evidence: >-
+        EACI2014_AGR_LOURD_P2_11082014.pdf, Section 3B "Arboriculture":
+        3B.09 "Pendant combien de mois au cours des 12 derniers mois avez-vous
+        recolte [Nom du produit]?"; 3B.10 "Durant ces mois, quelle quantite a
+        ete recoltee en moyenne chaque mois?"; 3B.13 "Durant ces mois, quelle
+        quantite avez-vous vendue en moyenne chaque mois?".  Stata labels in
+        EACIS3B_p2.dta agree: s3bq10a "Quantite en UML recoltee en moyenne
+        chaque mois", s3bq13a "Quantite en UML vendue moyenne chaque mois".
+    - text: >-
+        3B.14 is the TOTAL value of the sales, not a monthly one, so the sale
+        pair on a tree row is on two windows.
+      basis: questionnaire
+      evidence: >-
+        same Section 3B: 3B.14 "Quel a ete le montant total de cette vente?
+        (En FCFA)"; Stata label s3bq14 "Montant de la vente".
+    - text: >-
+        no 12-month quantity is constructed: the recorded per-month values are
+        served under the table's names and the window is disclosed here and by
+        months_harvested, rather than multiplied out (one construction per
+        parquet; a user re-derives Quantity * months_harvested from the
+        served columns or from derivation_inputs).
+      basis: modelling-choice
+      evidence: GH #1267; .coder/ledger/824-mali-unit-sold.md section 5
+  validated_against: >-
+    the raw oracle: on every served 2014-15 perennial row, Quantity equals
+    s3bq10a, Quantity_sold s3bq13a, Value_sold s3bq14 and months_harvested
+    s3bq09 (tests/test_gh1267_mali_tree_quantity.py, joined on (t, i, crop)
+    through Country.derivation_inputs).
+  contents: 'Mali/_/CONTENTS.org, "crop_production: the sold unit, and tree rows per harvest month (GH #824, #1267)"'
+  since: '2026-10-23'
+
+Mali::crop_production::11f-per-harvest-month:
+  waves: ['2017-18']
+  columns: [Quantity, Quantity_sold, Value_sold]
+  rows: {perennial: true}
+  rule: >-
+    The identity: the tree-crop (module 11F) answers are served AS RECORDED,
+    and this key exists to state their window.  Quantity = s11fq11a,
+    Quantity_sold = s11fq14a and Value_sold = s11fq15 are ALL the AVERAGE PER
+    HARVEST MONTH (11F.11 / 11F.14 / 11F.15), in u = s11fq11b and Unit_sold =
+    s11fq14b; months_harvested = s11fq10 (11F.10).  The sale pair shares one
+    window, so Value_sold / Quantity_sold is a price per Unit_sold; a
+    12-month figure would be the column times months_harvested, which is a
+    construction and is NOT served.
+  function: lsms_library.countries.Mali._.mali:derive_11f_per_harvest_month
+  inputs: lsms_library.countries.Mali._.mali:inputs_11f_per_harvest_month
+  raw_variables: [s11fq01, s11fq03, s11fq10, s11fq11a, s11fq11b, s11fq14a,
+                  s11fq14b, s11fq15]
+  assumptions:
+    - text: >-
+        11F.11, 11F.14 and 11F.15 are each asked per harvest month, and 11F.10
+        is the number of months harvested in the last 12.
+      basis: variable-label
+      evidence: >-
+        Stata labels in eaci17_s11fp1.dta: s11fq10 "Pendant combien de mois
+        les 12 derniers mois avez-vous recolte ces arbres?" (value labels
+        0 'Aucune recolte', 1 '1 mois' .. 12 '12 mois'); s11fq11a "Quantite
+        recoltee chaque mois de recolte les 12 derniers mois (Qte en UML)";
+        s11fq14a "Quantite vendue chaque mois de recolte les 12 derniers mois
+        (Qte en UML)"; s11fq15 "Montant de la vente mensuelle moyenne des
+        produits issus de ces arbres".
+    - text: >-
+        no 12-month quantity or value is constructed (as for 3B); the WB
+        harmonised MLI_EACI2.do multiplies by s11fq10 (harvest_kg_per,
+        harvest_sold_kg_per, harvest_sold_value_per), a point of comparison,
+        not served here.
+      basis: modelling-choice
+      evidence: GH #1267; .coder/ledger/824-mali-unit-sold.md section 5
+  validated_against: >-
+    the raw oracle: on every served 2017-18 perennial row, Quantity equals
+    s11fq11a, Quantity_sold s11fq14a, Value_sold s11fq15 and months_harvested
+    s11fq10 (tests/test_gh1267_mali_tree_quantity.py).
+  contents: 'Mali/_/CONTENTS.org, "crop_production: the sold unit, and tree rows per harvest month (GH #824, #1267)"'
+  since: '2026-10-23'

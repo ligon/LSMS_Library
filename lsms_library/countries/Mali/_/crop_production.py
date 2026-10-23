@@ -3,9 +3,11 @@
 Each EACI wave's ``Mali/<wave>/_/crop_production.py`` writes a parquet
 indexed by ``(t, i, plot, crop)`` with the reported item-level harvest
 columns (Quantity, u, Quantity_sold, Value_sold, planting_month,
-harvest_month, intercropped, perennial).  The crop/harvest module lives in
-the EACI waves only (2014-15 EACI14, 2017-18 EACI17); the EHCVM waves
-(2018-19, 2021-22) carry no harvest block, so they contribute nothing.
+harvest_month, intercropped, perennial; since GH #824 / #1267 also
+Unit_sold, months_harvested and, on tree rows, Derivation).  Only the EAC-I
+waves (2014-15 EACI14, 2017-18 EACI17) are wired; the EHCVM waves (2018-19,
+2021-22) ship a harvest and sale block (s16c / s16d) that is not wired, so
+they contribute nothing.
 
 ``v`` is NOT baked in — the framework joins it from ``sample()`` at API
 time.  ``id_walk`` is left to ``_finalize_result`` (cached parquets store

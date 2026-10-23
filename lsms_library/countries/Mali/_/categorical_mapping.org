@@ -103,6 +103,7 @@
 | Calebasse                    | Calebasse       | x       | ---     | ---     |
 | Casier                       | Casier          | x       | ---     | ---     |
 | Chargement camion            | Chargement camion | x       | ---     | ---     |
+| Chargement de camion         | Chargement camion | x       | ---     | ---     |
 | Tonne                        | Tonne           | x       | ---     | ---     |
 |------------------------------+-----------------+---------+---------+---------|
 | # plot_inputs units (EACI 2014-15 s1c/s1e/s2c & 2017-18 s11c/s7d) — fertilizer/seed/pesticide units not already present above |                 |         |         |         |

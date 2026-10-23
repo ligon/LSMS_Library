@@ -21,13 +21,33 @@ sales at plot granularity.  (The household-crop sold totals remain
 recoverable from the raw module; a transformations.py rollup can sum
 harvest to (i, crop) and join the full sold series there.)
 
-Variable map traced from MLI_EACI2.do (WB harmonised crop section):
+Variable map (Stata labels; WB MLI_EACI2.do for the field/parcel keys):
   field=s7fq01 parcel=s7fq02 crop=s7fq03 harvest_qty=s7fq13a unit=s7fq13c
   fully_harvested=s7fq06 harvest_month=s7fq12b
-  sold: crop=s7gq01 sold_y/n=s7gq20 sold_qty=s7gq21a sold_value=s7gq22
-  perennial: crop=s11fq01 still_prod=s11fq03 qty=s11fq10 unit=s11fq11c-?
-             sold_qty=s11fq14a sold_value=s11fq15
+  sold: crop=s7gq01 sold_y/n=s7gq20 sold_qty=s7gq21a SOLD UNIT=s7gq21b
+        sold_value=s7gq22
+  perennial: crop=s11fq01 still_prod=s11fq03 months_harvested=s11fq10
+             harvest_qty PER HARVEST MONTH=s11fq11a unit=s11fq11b
+             sold_qty PER HARVEST MONTH=s11fq14a SOLD UNIT=s11fq14b
+             sold_value PER HARVEST MONTH=s11fq15
   cultivation: field=s11cq01 parcel=s11cq02 crop=s11cq03 plant_month=s11cq14b
+
+The sold unit (GH #824).  s7gq21b / s11fq14b, decoded from THEIR OWN value
+labels and canonicalised through the u table in crop_production_finalize,
+carried as ``Unit_sold`` (NA where s7gq20 == 'Non').  The harvest and sold
+label sets are NOT code-compatible: code 10 is 'Autre' on s7fq13c and
+'Tonne' on s7gq21b (code 11 'Autre'), so units are compared by LABEL.  The
+s7g sale is keyed (i, crop, Unit_sold) and attached only to a crop grown on
+ONE plot and sold in ONE unit -- the Niger 2021-22 pattern
+(Niger/2021-22/_/crop_production.py); s7g holds one row per (household,
+crop), so the unit key is inert today and names the grain.
+
+The tree rows (GH #1267 check).  11F asks every quantity, and the sale VALUE,
+as an average per harvest month (11F.11 / 11F.14 / 11F.15 "Montant de la
+vente mensuelle moyenne"), beside the month count 11F.10.  So Quantity is a
+per-month harvest (not the month count, unlike 2014-15 before #1267) and the
+sale pair is commensurate; the rows carry mali.DERIVATION_11F, which states
+the window, and months_harvested.
 """
 import sys
 
@@ -35,7 +55,8 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mali import i as mali_i, crop_production_finalize
+from mali import (i as mali_i, crop_production_finalize, producing_trees,
+                  derive_11f_per_harvest_month, DERIVATION_11F)
 
 WAVE = '2017-18'
 
@@ -62,6 +83,7 @@ seasonal = pd.DataFrame({
     'u': s7f['s7fq13c'],
     'Quantity': s7f['s7fq13a'],
     'Quantity_sold': pd.NA,
+    'Unit_sold': pd.NA,
     'Value_sold': pd.NA,
     'harvest_month': s7f['s7fq12b'],
     'planting_month': pd.NA,
@@ -77,22 +99,35 @@ sold = pd.DataFrame({
     'i': s7g['i'],
     'crop': s7g['s7gq01'],
     'Quantity_sold': pd.to_numeric(s7g['s7gq21a'], errors='coerce'),
+    # The SOLD unit, decoded from s7gq21b's own labels (GH #824).
+    'Unit_sold': s7g['s7gq21b'].astype('string'),
     'Value_sold': pd.to_numeric(s7g['s7gq22'], errors='coerce'),
 })
 not_sold = s7g['s7gq20'].astype('string').str.strip().eq('Non')
 sold.loc[not_sold, ['Quantity_sold', 'Value_sold']] = 0
-sold = sold.groupby(['i', 'crop'], as_index=False).agg(
+sold.loc[not_sold, 'Unit_sold'] = pd.NA   # a filled-in 0 has no unit
+# One sale record per (household, crop, SOLD UNIT) -- never a sum across
+# units (Niger 2021-22).  dropna=False keeps an unrecorded unit as its own
+# key.  The plain `sum` (min_count=0) is the pre-#824 aggregation, kept so
+# no Quantity_sold / Value_sold value moves; s7g has one row per
+# (household, crop), so each group is one row.
+sold = sold.groupby(['i', 'crop', 'Unit_sold'], as_index=False, dropna=False).agg(
     {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+# ...and attributed only to a (household, crop) sold in ONE unit (a second
+# unit would duplicate the plot-crop row).  Measured: none sells in two.
+units_per = sold.groupby(['i', 'crop']).size()
+one_unit = units_per[units_per == 1].index
+sold = sold[sold.set_index(['i', 'crop']).index.isin(one_unit)]
 
 # (i, crop) -> number of distinct plots in the harvest roster
 nplots = (seasonal.dropna(subset=['plot_id'])
           .groupby(['i', 'crop'])['plot_id'].nunique().rename('nplots'))
 seasonal = seasonal.merge(nplots, on=['i', 'crop'], how='left')
-seasonal = seasonal.drop(columns=['Quantity_sold', 'Value_sold']).merge(
+seasonal = seasonal.drop(columns=['Quantity_sold', 'Unit_sold', 'Value_sold']).merge(
     sold, on=['i', 'crop'], how='left')
 # blank out sold where the crop spans >1 plot (cannot place at plot grain)
 multi = seasonal['nplots'].fillna(0) > 1
-seasonal.loc[multi, ['Quantity_sold', 'Value_sold']] = pd.NA
+seasonal.loc[multi, ['Quantity_sold', 'Unit_sold', 'Value_sold']] = pd.NA
 seasonal = seasonal.drop(columns=['nplots'])
 
 # --- planting month from cultivation roster (s11c) ---
@@ -113,34 +148,31 @@ seasonal = seasonal.drop(columns=['planting_month']).merge(
 # s11fq03 == 'Non' for trees it does not have).  Keep only s11fq03 == 'Oui'
 # (currently producing) — the ~270 rows with an actual harvest; matching WB
 # `drop if s11fq03==2`.
-s11f = get_dataframe('../Data/eaci17_s11fp1.dta').copy()
-s11f = s11f[s11f['s11fq01'].notna()]
-s11f = s11f[s11f['s11fq03'].astype('string').str.strip().eq('Oui')]
+s11f = producing_trees(get_dataframe('../Data/eaci17_s11fp1.dta').copy(), WAVE)
 # perennial roster uses 'ménage' as the within-cluster household key
 key2 = 'exploitation' if 'exploitation' in s11f.columns else 'ménage'
 s11f['exploitation'] = s11f[key2]
 s11f['i'] = _hhid(s11f)
+# The measured columns come from mali.derive_11f_per_harvest_month -- the
+# registered (identity) derivation: Quantity = s11fq11a, Quantity_sold =
+# s11fq14a, Value_sold = s11fq15, all PER HARVEST MONTH; months_harvested =
+# s11fq10 (labelled '1 mois' .. '12 mois', 0 = 'Aucune récolte').
 perennial = pd.DataFrame({
     't': WAVE,
     'i': s11f['i'],
     'plot_id': pd.NA,
     'crop': s11f['s11fq01'],
-    # s11fq11a = harvested quantity (numeric); s11fq11b = its unit.
-    # (s11fq10 is a free-text "months producing" field, NOT a quantity.)
-    'u': s11f['s11fq11b'] if 's11fq11b' in s11f.columns else pd.NA,
-    'Quantity': pd.to_numeric(s11f['s11fq11a'], errors='coerce'),
-    'Quantity_sold': pd.to_numeric(s11f['s11fq14a'], errors='coerce')
-                       if 's11fq14a' in s11f.columns else pd.NA,
-    'Value_sold': pd.to_numeric(s11f['s11fq15'], errors='coerce')
-                       if 's11fq15' in s11f.columns else pd.NA,
     'harvest_month': pd.NA,
     'planting_month': pd.NA,
     'intercropped': pd.NA,
     'perennial': True,
-})
+}).join(derive_11f_per_harvest_month(s11f))
 
 df = pd.concat([seasonal, perennial], ignore_index=True)
 df = crop_production_finalize(df)
+# Stamp AFTER the collapse (CLAUDE.md "Derived Values", registering step 3).
+df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
+df.loc[df['perennial'].fillna(False).astype(bool), 'Derivation'] = DERIVATION_11F
 
 assert len(df) > 0, "crop_production 2017-18 produced no rows"
 assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2017-18"

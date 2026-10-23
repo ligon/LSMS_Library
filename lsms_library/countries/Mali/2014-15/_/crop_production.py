@@ -7,17 +7,36 @@ Sources (post-harvest, passage 2 / cultivation, passage 1):
 
 Grain: (t, i, plot, crop).  plot = "{field}_{parcel}" (s3aq01_s3aq02) for
 seasonal crops; <NA> for perennial trees.  Reported, item-level columns
-only — Quantity / u / Quantity_sold / Value_sold / planting_month /
-harvest_month / intercropped / perennial.  No harvest_kg / yield / share /
-main_crop (those are transformations over these rows).
+only — Quantity / u / Quantity_sold / Unit_sold / Value_sold /
+months_harvested / planting_month / harvest_month / intercropped /
+perennial, plus Derivation on the tree rows.  No harvest_kg / yield / share
+/ main_crop (those are transformations over these rows).
 
-Variable map traced from MLI_EACI1.do (WB LSMS-ISA harmonised crop section):
+Variable map (Stata labels and the 2014-15 PH questionnaire, sections 3A/3B):
   field=s3aq01 parcel=s3aq02 crop=s3aq03b harvest_qty=s3aq08a unit=s3aq08b
-  sold_y/n=s3aq22 sold_qty=s3aq23a sold_value=s3aq24 harvest_month=s3aq07b
-  perennial: crop=s3bq01 still_prod=s3bq03 qty=s3bq09 unit=s3bq10b
-             sold_qty=s3bq13a sold_value=s3bq14
+  sold_y/n=s3aq22 sold_qty=s3aq23a SOLD UNIT=s3aq23b sold_value=s3aq24
+  harvest_month=s3aq07b
+  perennial: crop=s3bq01 still_prod=s3bq03 months_harvested=s3bq09
+             harvest_qty PER HARVEST MONTH=s3bq10a unit=s3bq10b
+             sold_qty PER HARVEST MONTH=s3bq13a SOLD UNIT=s3bq13b
+             sold_value TOTAL=s3bq14
   cultivation: field=s1cq01 parcel=s1cq02 crop=s1cq03 plant_month=s1cq11b
              intercrop=s1cq05 (Pure / Association de cultures)
+
+The sold unit (GH #824).  3A.23 asks the quantity sold "en UML de la colonne
+suivante" -- its own unit, s3aq23b, on the same 11-label set as the harvest
+unit s3aq08b -- and 3B.13 likewise (s3bq13b).  Both are carried as
+``Unit_sold`` (canonicalised through the u table in crop_production_finalize),
+NA wherever s3aq22 == 'Non', where the sale is filled with 0.
+
+The tree rows (GH #1267).  Until 2026-10-23 they served Quantity = s3bq09,
+the NUMBER OF HARVEST MONTHS.  That was copied from the WB MLI_EACI1.do
+("qty=s3bq09 unit=s3bq10b"), which itself computes
+``harvest_kg_per = s3bq09 * s3bq10b`` -- months times the unit CODE.  3B DOES
+record the harvest: s3bq10a, "Durant ces mois, quelle quantite a ete recoltee
+en moyenne chaque mois?".  It is served as recorded, a per-harvest-month
+average, and the rows carry mali.DERIVATION_3B, which states that window
+(and that the 3B.14 sale value is a TOTAL while 3B.13 is per month).
 """
 import sys
 
@@ -25,7 +44,8 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mali import i as mali_i, crop_production_finalize
+from mali import (i as mali_i, crop_production_finalize, producing_trees,
+                  derive_3b_per_harvest_month, DERIVATION_3B)
 
 WAVE = '2014-15'
 
@@ -51,6 +71,7 @@ seasonal = pd.DataFrame({
     'u': s3a['s3aq08b'],
     'Quantity': s3a['s3aq08a'],
     'Quantity_sold': s3a['s3aq23a'],
+    'Unit_sold': s3a['s3aq23b'],
     'Value_sold': s3a['s3aq24'],
     'harvest_month': s3a['s3aq07b'],
     'planting_month': pd.NA,
@@ -60,6 +81,9 @@ seasonal = pd.DataFrame({
 # s3aq22 == 'Non' -> household reports not having sold this crop: 0 sold.
 not_sold = s3a['s3aq22'].astype('string').str.strip().eq('Non')
 seasonal.loc[not_sold, ['Quantity_sold', 'Value_sold']] = 0
+# ...and a 0 filled in has no unit: Unit_sold stays NA there (the raw s3aq23b
+# is already NA on every one of those rows; stated, not assumed).
+seasonal.loc[not_sold, 'Unit_sold'] = pd.NA
 
 # --- planting month + intercrop from cultivation roster (s1c) ---
 s1c = get_dataframe('../Data/EACICULTURE_p1.dta').copy()
@@ -83,27 +107,28 @@ seasonal = seasonal.drop(columns=['planting_month', 'intercropped']).merge(
 # s3bq03 == 'Non' for trees it does not have/produce (3416 placeholder rows
 # with no harvest).  Keep only s3bq03 == 'Oui' (currently producing) — the
 # 358 rows that carry an actual harvest, matching WB `drop if s3bq03==2`.
-s3b = get_dataframe('../Data/EACIS3B_p2.dta').copy()
-s3b = s3b[s3b['s3bq01'].notna()]  # rows that actually name a tree
-s3b = s3b[s3b['s3bq03'].astype('string').str.strip().eq('Oui')]
+# The measured columns come from mali.derive_3b_per_harvest_month -- the
+# registered (identity) derivation -- so the registry and the build cannot
+# drift: Quantity = s3bq10a (per harvest month), Quantity_sold = s3bq13a (per
+# harvest month), Value_sold = s3bq14 (TOTAL), months_harvested = s3bq09.
+s3b = producing_trees(get_dataframe('../Data/EACIS3B_p2.dta').copy(), WAVE)
 s3b['i'] = _hhid(s3b)
 perennial = pd.DataFrame({
     't': WAVE,
     'i': s3b['i'],
     'plot_id': pd.NA,
     'crop': s3b['s3bq01'],
-    'u': s3b['s3bq10b'],
-    'Quantity': pd.to_numeric(s3b['s3bq09'], errors='coerce'),
-    'Quantity_sold': s3b['s3bq13a'],
-    'Value_sold': s3b['s3bq14'],
     'harvest_month': pd.NA,
     'planting_month': pd.NA,
     'intercropped': pd.NA,
     'perennial': True,
-})
+}).join(derive_3b_per_harvest_month(s3b))
 
 df = pd.concat([seasonal, perennial], ignore_index=True)
 df = crop_production_finalize(df)
+# Stamp AFTER the collapse (CLAUDE.md "Derived Values", registering step 3).
+df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
+df.loc[df['perennial'].fillna(False).astype(bool), 'Derivation'] = DERIVATION_3B
 
 assert len(df) > 0, "crop_production 2014-15 produced no rows"
 assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2014-15"

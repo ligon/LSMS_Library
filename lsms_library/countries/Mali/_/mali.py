@@ -1,4 +1,5 @@
 # Formatting  Functions for Mali
+import re
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
@@ -275,10 +276,11 @@ def plot_features_for_wave(t, source, colmap):
 # crop_production (GAP 1; parity loop) — item-level (t, i, plot, crop)
 # ---------------------------------------------------------------------------
 #
-# The crop/harvest module lives in the EACI waves only (2014-15 EACI14,
-# 2017-18 EACI17).  The EHCVM waves (2018-19, 2021-22) carry no crop-harvest
-# block, so crop_production is wired for the two EACI waves only — exactly
-# the two waves the WB MLI_EACI*.do crop sections cover.
+# Wired for the two EAC-I waves only (2014-15 EACI14, 2017-18 EACI17) --
+# exactly the two waves the WB MLI_EACI*.do crop sections cover.  The EHCVM
+# waves (2018-19, 2021-22) DO ship a harvest-and-sale block (s16c / s16d,
+# GH #824 audit 2026-10-23); it is UNWIRED, which is a decision, not an
+# absence.
 #
 # Grain: one row per (t, i, plot, crop), where
 #   - i     = Mali composite household id (grappe, menage/exploitation),
@@ -289,11 +291,17 @@ def plot_features_for_wave(t, source, colmap):
 #
 # REPORTED item-level columns only (no harvest_kg / yield / main_crop /
 # value-share — those are transformations.py work over these rows):
-#   Quantity, u, Quantity_sold, Value_sold,
-#   planting_month, harvest_month, intercropped, perennial.
+#   Quantity, u, Quantity_sold, Unit_sold, Value_sold, months_harvested,
+#   planting_month, harvest_month, intercropped, perennial
+# plus `Derivation` on the perennial (tree) rows -- see the two
+# derive_*_per_harvest_month functions below.
 #
-# Crop names and harvest units arrive as DECODED Stata labels (strings), so
-# the harmonize_food / u tables key on the decoded label (Code column).
+# Crop names and units arrive as DECODED Stata labels (strings), so the
+# harmonize_food / u tables key on the decoded label (Code column).  The
+# sold unit is decoded from ITS OWN variable's value labels and passed
+# through the SAME u table as the harvest unit (GH #824): in 2017-18 code 10
+# is 'Autre' on the harvest set (s7fq13c) and 'Tonne' on the sold set
+# (s7gq21b), so a code-level comparison of the two would be wrong.
 
 # French month name -> month number (2017-18 records month as a label).
 _FR_MONTHS = {
@@ -335,20 +343,194 @@ def _month_num(series):
     return series.map(conv).astype('Int64')
 
 
+# --- Perennial (tree) rows: quantities PER HARVEST MONTH (GH #1267) --------
+#
+# Both EAC-I tree rosters ask the harvest and the sale as an AVERAGE PER
+# HARVEST MONTH, beside the NUMBER of months harvested, rather than as a
+# campaign total like the field-crop rows:
+#
+#   2014-15 3B (EACIS3B_p2.dta)        2017-18 11F (eaci17_s11fp1.dta)
+#   3B.09 s3bq09  months harvested     11F.10 s11fq10  months harvested
+#   3B.10 s3bq10a/b harvest per month  11F.11 s11fq11a/b harvest per month
+#   3B.13 s3bq13a/b sold per month     11F.14 s11fq14a/b sold per month
+#   3B.14 s3bq14  sale value, TOTAL    11F.15 s11fq15  sale value, PER MONTH
+#
+# Until GH #1267 the 2014-15 rows served `Quantity = s3bq09`, the month
+# COUNT, as the harvest -- a misreading inherited from the WB harmonised
+# MLI_EACI1.do:259, which computes `harvest_kg_per = s3bq09 * s3bq10b`
+# (months times the UNIT CODE).  The recorded values are now served AS
+# RECORDED (the derivation function is the identity), the month count rides
+# in its own column `months_harvested`, and each wave's rows carry a
+# registered derivation key whose whole point is to state the window,
+# because `Quantity` / `Quantity_sold` / `Value_sold` on a field-crop row
+# are campaign totals.  No 12-month total is constructed here.
+#
+# The two keys differ because the window differs: in 2014-15 `Value_sold` is
+# a TOTAL while `Quantity_sold` is per month, so `Value_sold /
+# Quantity_sold` on those rows is NOT a price (it is overstated by
+# `months_harvested`); in 2017-18 all three are per month and the ratio is a
+# price per `Unit_sold`.
+
+#: Registry keys (Mali/_/derivations.yml), stamped on every perennial row
+#: of the matching wave by that wave's script, after the collapse.
+DERIVATION_3B = 'Mali::crop_production::3b-per-harvest-month'
+DERIVATION_11F = 'Mali::crop_production::11f-per-harvest-month'
+
+#: (file, crop code, "has this tree" flag, within-cluster household key) of
+#: each wave's tree roster.  11F keys the household on `ménage`; it is the
+#: `exploitation` of every other 2017-18 file.
+_TREE_ROSTERS = {
+    '2014-15': ('EACIS3B_p2.dta', 's3bq01', 's3bq03', 'menage'),
+    '2017-18': ('eaci17_s11fp1.dta', 's11fq01', 's11fq03', 'ménage'),
+}
+_TREE_RAW = {
+    '2014-15': ['s3bq01', 's3bq03', 's3bq09', 's3bq10a', 's3bq10b',
+                's3bq13a', 's3bq13b', 's3bq14'],
+    '2017-18': ['s11fq01', 's11fq03', 's11fq10', 's11fq11a', 's11fq11b',
+                's11fq14a', 's11fq14b', 's11fq15'],
+}
+
+
+def producing_trees(src, wave):
+    """The rows of a FIXED tree roster that name a tree the household has.
+
+    Both rosters list every species for every household, with the flag
+    (s3bq03 / s11fq03) 'Non' for trees it does not have; keep 'Oui' only
+    (the WB `drop if s3bq03==2` / `drop if s11fq03==2`).
+    """
+    _, crop, held, _ = _TREE_ROSTERS[wave]
+    src = src[src[crop].notna()]
+    return src[src[held].astype('string').str.strip().eq('Oui')]
+
+
+def _months_harvested(series):
+    """3B.09 / 11F.10 -> months harvested in the last 12, Int64 in 0..12.
+
+    2014-15 ``s3bq09`` is numeric (its only value label is 99 = Manquant);
+    2017-18 ``s11fq10`` is labelled '1 mois' .. '12 mois', with code 0
+    'Aucune récolte (Arbre fruitier n'a pas commencé à produire)'.  Not the
+    month-of-year ``_month_num`` parses: 0 is a real answer here.  Anything
+    outside 0..12 (the 99 sentinel) is NA.
+    """
+    def conv(v):
+        if pd.isna(v):
+            return pd.NA
+        s = str(v).strip()
+        if s.lower().startswith('aucune'):
+            return 0
+        m = re.match(r'^(\d+)(?:\.0+)?(?:\s*mois)?$', s)
+        if m is None:
+            return pd.NA
+        n = int(m.group(1))
+        return n if 0 <= n <= 12 else pd.NA
+    return series.map(conv).astype('Int64')
+
+
+def derive_3b_per_harvest_month(s3b):
+    """Mali 2014-15 tree rows (3B): the per-harvest-month answers, AS RECORDED.
+
+    The identity, registered as ``Mali::crop_production::3b-per-harvest-month``
+    because it serves values under names whose field-crop rows mean something
+    else: ``Quantity`` (3B.10, ``s3bq10a``) and ``Quantity_sold`` (3B.13,
+    ``s3bq13a``) are AVERAGES PER HARVEST MONTH, in ``u`` = ``s3bq10b`` and
+    ``Unit_sold`` = ``s3bq13b``; ``Value_sold`` (3B.14, ``s3bq14``, "montant
+    total de cette vente") is the TOTAL.  ``months_harvested`` is 3B.09
+    (``s3bq09``).  The two units are returned as the decoded Stata labels;
+    ``crop_production_finalize`` maps both through the ``u`` table.
+    """
+    return pd.DataFrame({
+        'months_harvested': _months_harvested(s3b['s3bq09']),
+        'Quantity':         pd.to_numeric(s3b['s3bq10a'], errors='coerce'),
+        'u':                s3b['s3bq10b'],
+        'Quantity_sold':    pd.to_numeric(s3b['s3bq13a'], errors='coerce'),
+        'Unit_sold':        s3b['s3bq13b'],
+        'Value_sold':       pd.to_numeric(s3b['s3bq14'], errors='coerce'),
+    }, index=s3b.index)
+
+
+def derive_11f_per_harvest_month(s11f):
+    """Mali 2017-18 tree rows (11F): the per-harvest-month answers, AS RECORDED.
+
+    The identity, registered as ``Mali::crop_production::11f-per-harvest-month``:
+    ``Quantity`` (11F.11, ``s11fq11a``), ``Quantity_sold`` (11F.14,
+    ``s11fq14a``) and ``Value_sold`` (11F.15, ``s11fq15``, "Montant de la
+    vente mensuelle moyenne") are all AVERAGES PER HARVEST MONTH, in ``u`` =
+    ``s11fq11b`` and ``Unit_sold`` = ``s11fq14b``; ``months_harvested`` is
+    11F.10 (``s11fq10``).
+    """
+    return pd.DataFrame({
+        'months_harvested': _months_harvested(s11f['s11fq10']),
+        'Quantity':         pd.to_numeric(s11f['s11fq11a'], errors='coerce'),
+        'u':                s11f['s11fq11b'],
+        'Quantity_sold':    pd.to_numeric(s11f['s11fq14a'], errors='coerce'),
+        'Unit_sold':        s11f['s11fq14b'],
+        'Value_sold':       pd.to_numeric(s11f['s11fq15'], errors='coerce'),
+    }, index=s11f.index)
+
+
+def _inputs_trees(wave):
+    """Raw tree-roster answers behind one wave's perennial rows, at (t, i, crop).
+
+    Re-reads the roster through ``get_dataframe``, keeps the rows the wave
+    script keeps (:func:`producing_trees`), and returns the ORIGINAL variable
+    names as columns, indexed by the served ``t``, ``i`` (pre-``id_walk``;
+    ``Country.derivation_inputs`` re-keys it) and ``crop`` (the served
+    harmonize_food label) -- so it joins the served perennial rows, whose
+    ``plot_id`` is NA.
+    """
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    fn, crop, _, hh = _TREE_ROSTERS[wave]
+    src = tools.get_dataframe(str(Path(countries_root()) / 'Mali' / wave / 'Data' / fn))
+    src = producing_trees(src, wave)
+    out = src[_TREE_RAW[wave]].copy()
+    out['t'] = wave
+    out['i'] = src.apply(lambda r: i(pd.Series([r['grappe'], r[hh]])), axis=1)
+    out['crop'] = _crop_labels(src[crop]).values
+    return out.set_index(['t', 'i', 'crop'])
+
+
+def inputs_3b_per_harvest_month(wave):
+    """The registry ``inputs`` callable for ``3b-per-harvest-month``."""
+    return _inputs_trees(wave)
+
+
+def inputs_11f_per_harvest_month(wave):
+    """The registry ``inputs`` callable for ``11f-per-harvest-month``."""
+    return _inputs_trees(wave)
+
+
 def crop_production_finalize(df):
     """Common post-processing for a crop_production wave DataFrame.
 
     Expects raw columns already assembled:
         t, i, plot, crop (decoded), u (decoded), Quantity, Quantity_sold,
-        Value_sold, planting_month, harvest_month, intercropped, perennial.
-    Maps crop/unit labels, coerces dtypes, sets the (t, i, plot, crop) index,
-    and collapses exact-duplicate index rows (a crop reported on the same
-    plot more than once in a single questionnaire row-set) by summing the
-    reported quantities / values and taking the first of the flags/dates.
+        Value_sold, planting_month, harvest_month, intercropped, perennial,
+    and optionally Unit_sold (decoded sold unit) and months_harvested.
+    Maps crop/unit labels -- the sold unit through the SAME ``u`` table as
+    the harvest unit (GH #824) -- coerces dtypes, sets the (t, i, plot, crop)
+    index, and collapses exact-duplicate index rows (a crop reported on the
+    same plot more than once in a single questionnaire row-set) by summing
+    the reported quantities / values and taking the first of the
+    flags/dates.  A group whose rows report the sale in more than one sold
+    unit keeps NO sold quantity and NO sold unit (the Niger one-unit rule,
+    ``Niger/2021-22/_/crop_production.py``): a sum across units has no
+    denominator.  Measured: 0 such groups in either wave.
     """
     df = df.copy()
     df['crop'] = _crop_labels(df['crop'])
     df['u'] = _unit_labels(df['u'])
+    # Unit_sold (GH #824): canonicalised HERE, at build time, through the u
+    # table -- the read-time auto-apply reaches only a column named `u`
+    # (GH #1188).  NA-bearing, never sentinel-filled; 'Manquant' is not in the
+    # table and maps to NA (canonical data_info.yml, Unit_sold note).
+    if 'Unit_sold' not in df.columns:
+        df['Unit_sold'] = pd.NA
+    df['Unit_sold'] = _unit_labels(df['Unit_sold'])
+    if 'months_harvested' not in df.columns:
+        df['months_harvested'] = pd.NA
+    df['months_harvested'] = pd.to_numeric(
+        df['months_harvested'], errors='coerce').astype('Int64')
     df = df.dropna(subset=['crop'])  # drop "Non exploitée" / unmapped residual
 
     for c in ('Quantity', 'Quantity_sold', 'Value_sold'):
@@ -356,8 +538,14 @@ def crop_production_finalize(df):
     # 9999 / 99 are the EACI "Manquant" sentinels on the reported quantity
     # columns (cf. WB `harvest_kg=. if s3aq08a==9999`); coerce to NA so they
     # do not contaminate a downstream kg-conversion sum.
+    # 9999.9 is the same code on 3B's float columns (stored float32, hence
+    # isclose): it occurs once in s3bq10a and once in s3bq13a, and both rows
+    # carry 'Manquant' for the matching unit (the first also for the month
+    # count s3bq09), so it is not a quantity (GH #1267).
     for c in ('Quantity', 'Quantity_sold'):
-        df.loc[df[c].isin([99, 9999]), c] = pd.NA
+        sentinel = df[c].isin([99, 9999]) | np.isclose(
+            df[c].to_numpy(dtype='float64', na_value=np.nan), 9999.9)
+        df.loc[sentinel, c] = pd.NA
     df['planting_month'] = _month_num(df['planting_month'])
     df['harvest_month'] = _month_num(df['harvest_month'])
     df['intercropped'] = df['intercropped'].astype('boolean')
@@ -374,18 +562,25 @@ def crop_production_finalize(df):
     # sums keeps an all-NA group as NA (not a spurious 0) — important for the
     # 2017-18 multi-plot crops whose sold qty/value is deliberately NaN.
     g = df.groupby(keys, dropna=False, as_index=True)
+    # Positional (same groupby, same order): a NaN plot_id key makes label
+    # alignment of the two results fragile.
+    mixed_sold_unit = (g['Unit_sold'].nunique() > 1).to_numpy()
     out = pd.DataFrame({
         'Quantity':       g['Quantity'].sum(min_count=1),
-        'Quantity_sold':  g['Quantity_sold'].sum(min_count=1),
+        'Quantity_sold':  g['Quantity_sold'].sum(min_count=1).mask(mixed_sold_unit),
+        'Unit_sold':      g['Unit_sold'].first().mask(mixed_sold_unit),
         'Value_sold':     g['Value_sold'].sum(min_count=1),
         'u':              g['u'].first(),
+        'months_harvested': g['months_harvested'].first(),
         'planting_month': g['planting_month'].first(),
         'harvest_month':  g['harvest_month'].first(),
         'intercropped':   g['intercropped'].max(),
         'perennial':      g['perennial'].max(),
     })
-    out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold',
-               'planting_month', 'harvest_month', 'intercropped', 'perennial']]
+    out['Unit_sold'] = out['Unit_sold'].astype('string')
+    out = out[['Quantity', 'u', 'Quantity_sold', 'Unit_sold', 'Value_sold',
+               'months_harvested', 'planting_month', 'harvest_month',
+               'intercropped', 'perennial']]
     return out.sort_index()
 
 
