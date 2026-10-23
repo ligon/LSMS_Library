@@ -4,6 +4,8 @@ Usage:
     LSMS_DATA_DIR=<fresh root> PYTHONPATH=<checkout> \
         python cold_build.py <checkout> <frames_dir> <out.json> Country:table [...]
 
+A spec ``Feature=Malawi+Niger:table`` builds ``ll.Feature(table)(['Malawi', 'Niger'])``.
+
 Each frame is saved (row-level, OUTSIDE the repository) to
 ``<frames_dir>/<Country>__<table>.parquet`` for the base/branch diff; the
 JSON written to ``<out.json>`` holds aggregate counts only.
@@ -28,7 +30,11 @@ for country, table in specs:
     t0 = time.time()
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        df = getattr(ll.Country(country), table)()
+        if country.startswith("Feature="):
+            # Feature:<table> over the countries named after '=' ('+'-joined)
+            df = ll.Feature(table)(country.split("=", 1)[1].split("+"))
+        else:
+            df = getattr(ll.Country(country), table)()
     el = time.time() - t0
     u_in_index = "u" in df.index.names
     u = (df.index.get_level_values("u") if u_in_index else df["u"]).astype(object)
