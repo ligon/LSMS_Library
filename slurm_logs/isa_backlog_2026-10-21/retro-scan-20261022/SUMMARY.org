@@ -1,0 +1,21 @@
+#+title: Retro regression scan for PRs #1221 / #1222 / #1223
+
+Sue (Claude Opus 5.5), 2026-10-22.  Slurm job 40393183 (co_carleton, savio4_htc, n0199, 24 cores), =retro_scan.sbatch=.
+=bench/feature_audit/scan.py --features canonical --jobs 10 --build-timeout 3600=, cold (fresh private data roots, shared L1 only), side by side on development before #1221 (=60aa81e9e=) and after #1223 (=9a0ed5f3c=).
+Both runs exit 0 in ~34 min (2,052 s / 2,036 s) and leave 0 in-tree parquets.
+Raw results stay on scratch (=/global/scratch/fsa/fc_jevons/ligon/retro-scan-20261022/=): some warning text names households, and the repository is public.
+
+| status | base | cand |
+|--------+-------+-------|
+| warn   | 11,631 | 11,629 |
+| error  | 6 | 6 |
+| fail   | 5 | 5 |
+| pass   | 5 | 5 |
+| skip   | 13 | 13 |
+
+=diff_scans.py= (paths normalised): 9 records only in base and 7 only in cand, all =warn=; no =error= or =fail= record differs.
+- Make failures in =food_acquired= builds differ between the runs (base: Cambodia 2019-20, GhanaSPS 2009-10, Uganda 2005-06; cand: Uganda 2005-06, Ethiopia 2011-12): transient =make -j= failures that do not track the code change and change no outcome.
+- One EthiopiaRHS source-drop warning is attributed to a different table in each run (per-process warning de-duplication).
+- Mali =plot_inputs= =crop= NaN keys: 79,448 -> 145,530 rows (+66,082, exactly #1223's group-use rows, which like Mali's fertilizer rows are not crop-specific).  This extends the pre-existing Site I finding tracked in #1120; the cross-country fix is the "not crop-specific" marker of #1119.
+
+Verdict: no regression attributable to #1221, #1222 or #1223.
