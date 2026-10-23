@@ -582,6 +582,26 @@ counts (70 / 78 / 129) include households with NO coordinate beside ones
 with one, which a whole-row comparison counts as a disagreement.  So the only
 columns that ever made this collapse lossy are exactly the two W5 lacks.
 
+GH #592 re-check (2026-10-23): unchanged.  The catalog search now returns
+=NGA_2023_GHSP-W5_v02_M= for entry 6410, and its file list includes
+=nga_householdgeovariables_y5= (4,883 cases, 55 variables, coordinates
+=lat_mod= / =lon_mod=); we still hold v01.  Cold on =development=
+=9a0ed5f3c=, clusters with coordinates: W1 500/500 (both rounds), W2
+645/647, W3 784/792, W4 671/685, W5 0/911.  The six W1-W4 rounds GH #592
+listed at zero are all populated now (the casing / =merge_on: [i]= fixes
+recorded in each wave's =data_info.yml=).  The W2-W4 shortfall is
+release-side: 96 / 84 / 147 cover-page households are absent from that
+wave's geovariables file (W2 also has 1 present with a null fix).  Per
+column, the household -> cluster projection disagrees ONLY on the
+coordinates (=Region= / =District= / =Rural=: 0 groups in every round);
+groups holding >1 distinct fix (rounded to 6 dp): 6 / 24 / 49, and groups
+mixing a fix with no fix: 65 / 57 / 92.  Those agree with the 5 / 24 / 50
+above: W2's sixth is the null-=v= group of the 39 geovariables-only
+households the default =outer= merge admits (the =nan_key_rows: 39= in that
+round's grain report), and unrounded W4 gives 50 (one cluster's two fixes
+differ only beyond the 6th decimal).  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
+
 ** Strata
 
 | Wave    | Variable  | Values                        | Notes                       |

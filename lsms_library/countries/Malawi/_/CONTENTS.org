@@ -1874,6 +1874,60 @@ Unchanged and *not* a defect: the 102 IHPS panel EAs of 2019-20 share no
 IHS5 publishes no geovariables for the panel half.  Those clusters carry NaN
 coordinates before and after.
 
+*** GH #592 (2026-10-23): which clusters have no coordinates, and why
+Cold build of =cluster_features()= on =development= =9a0ed5f3c=, clusters
+with non-null =Latitude= and =Longitude=:
+
+| wave    | clusters | with GPS | the rest                                   |
+|---------+----------+----------+--------------------------------------------|
+| 2004-05 |      564 |        0 | not released (IHS2 has no coordinates)     |
+| 2010-11 |      768 |      768 | --                                         |
+| 2013-14 |      204 |      204 | --                                         |
+| 2016-17 |      880 |      779 | 101 IHPS panel EAs: released, NOT HELD     |
+| 2019-20 |      819 |      717 | 102 IHPS panel EAs: released, NOT HELD     |
+
+*2004-05: not released.*  WB entry 2307 (=MWI_2004_IHS-II_v01_M=, still the
+catalog's only release) lists 52 data files -- the 52 we hold -- and
+documents 1,901 variables.  No file is a geovariables/offset file and no
+variable is a coordinate (searched name and label for gps / latitude /
+longitude / coord / offset).  =ihs2_ea_data.dta= is EA-grain but holds only
+=dist=, =ta=, =ea=, two travel times (=access=, =access2=) and the livelihood
+zone (=lz_*=); neither =sec_a.dta= nor community =mod_a.dta= has a coordinate
+column.  The held DDI (=ddi-documentation-english_microdata-2307.pdf=) and
+the household and community questionnaires contain no GPS / latitude /
+longitude / coordinate text at all, so on the held instrument IHS2 did not
+record household location.  Not wired, correctly.
+
+*2016-17 and 2019-20 panel halves: released, NOT HELD -- this CONTRADICTS
+the two passages above* ("The remaining 101 are the IHPS panel EAs, for
+which IHS4 publishes no geovariables file", and "because IHS5 publishes no
+geovariables for the panel half").  Both are true of the cross-sectional
+entries (2936, 3818).  But the panel halves come from a DIFFERENT entry --
+the one each wave's =SOURCE.org= already records as held -- and that entry
+does publish household geovariables:
+
+| wave    | held entry                     | household geo file (NOT held)  | cases | key       | coordinates                     |
+|---------+--------------------------------+--------------------------------+-------+-----------+---------------------------------|
+| 2016-17 | 2939 =MWI_2010-2016_IHPS_v03_M= | =HouseholdGeovariablesIHPSY3=  | 2,508 | =y3_hhid= | =lat_modified= / =lon_modified= |
+| 2019-20 | 3819 =MWI_2010-2019_IHPS_v06_M= | =householdgeovariables_y4=     | 3,178 | =y4_hhid= | =lat_mod= / =lon_mod=           |
+
+The case counts equal the held panel cover pages exactly
+(=Panel/hh_mod_a_filt_16.dta= 2,508 rows, =Panel/hh_mod_a_filt_19.dta=
+3,178).  We hold the *plot* geovariables of both entries
+(=Panel/PlotGeovariablesIHPSY3_16.dta=, =Panel/plotgeovariables_y4.dta=) but
+not the household ones, and the held IHPS 2016 BID
+(=ihps_2016_bid_updated_final.pdf=) says the survey "provided the off-set EA
+latitudes and longitudes as part of HouseholdGeovariables".  So the 101 / 102
+empty clusters are an *acquisition gap*, not a release gap and not a wiring
+gap.  The fix is to acquire the two files and then add each to =df_geo= as a
+second source keyed on the panel =i= (=y3_hhid= / =y4_hhid=), the way
+=df_main= already lists =Panel/hh_mod_a_filt_1{6,9}.dta=.  That is not a
+pure YAML copy: the panel files spell their coordinates differently from the
+cross-sectional ones in 2019-20 (=lat_mod= vs =ea_lat_mod=).  Not done under
+GH #592, which is a diagnosis and excludes acquisition.
+
+Evidence: =slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
+
 ** Weights
 | Wave    | Cross-section weight | Panel weight       | Source file                                |
 |---------+----------------------+--------------------+--------------------------------------------|
