@@ -6,7 +6,7 @@
 #
 #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
 #
-# Only 18 of the corpus's 41 stated windows are questionnaire-grade.  A
+# Only 23 of the corpus's 46 stated windows are questionnaire-grade.  A
 # `config-comment` rung means a maintainer asserted the number, not that an
 # instrument states it -- consumers are entitled to discount it, and a
 # `not-recorded` rung means nobody has looked, which is NOT the same as "no
@@ -20,27 +20,47 @@
 
 Recall:
   '2004-05':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
+    evidence: '2004-05/Documentation/IHS-2 HH questionnaire final draft.pdf PDF pp.21-25 (printed 21-25) -- ''MODULE I: CONSUMPTION OF FOOD OVER PAST ONE WEEK''; I02 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; I03 ''How much in total did your household consume in the past week?''; I04 ''How much came from purchases?'', I05 ''How much did you spend?'', I06 ''How much came from own-production?'', I07 ''How much came from gifts and other sources?'''
+    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window recorded here is MODULE I''s own (I02/I03), not the rCSI battery the data_scheme comment belongs to.  Build reads sec_i.dta i03a/b, i04a/b, i05, i06a/b, i07a/b = I03..I07 (labels ''How much in total did your HH consume in the past week'', ''How much came from purchases? Quantity'', ''How much did you spend?'', ...).  ONE ask: one row per (case_id, item) in sec_i.dta.'
     n_items_delivered: 115
   '2010-11':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
+    evidence: '2010-11/Documentation/IHS3.Household.Qx.FINAL.pdf PDF pp.28-33 (printed 28-33) -- ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK'' on every page; G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''; G04 purchases, G05 ''How much did you spend?'', G06 own-production, G07 gifts and other sources'
+    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own (G01/G03), not the rCSI battery.  Build reads Full_Sample/Household/hh_mod_g1.dta hh_g03a..hh_g07b = G03..G07 (labels ''How much in total did your household consume in the past week (Quantity)?'', ...).  ONE ask: one row per (case_id, hh_g02) bar 6 duplicated pairs in 1,521,568; the 3,246-household IHPS baseline sub-sample was visited twice for AGRICULTURE (Malawi/_/CONTENTS.org, ''Sub-samples''), not for Module G.'
     n_items_delivered: 116
   '2013-14':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
+    evidence: '2013-14/Documentation/IHPS.Household.Qx.FINAL.PRINT.pdf PDF pp.30-37 -- ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK''; G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''; G04-G07 as IHS3'
+    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own, not the rCSI battery.  Build reads HH_MOD_G1_13.dta hh_g03a..hh_g07b = G03..G07 (same labels as IHS3), and not the short MODULE B2 food list on PDF p.8.  ONE ask: one row per (y2_hhid, hh_g02).'
     n_items_delivered: 116
   '2016-17':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
+    evidence: '2016-17/Documentation/fourth_integrated_household_survey_2016_2017_household_questionnaire.pdf PDF pp.30-37 -- ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK''; G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''.  Panel rows: 2016-17/Documentation/ihps_2016_bid_updated_final.pdf PDF pp.10-11 (Module G ''collects information on all food consumed by the household in the past 7 days'') and p.8 (household questionnaire administered in full once: Panel Group A at visit 1, Group B at visit 2)'
+    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own, not the rCSI battery.  Build reads Cross_Sectional/hh_mod_g1.dta AND Panel/hh_mod_g1_16.dta, hh_g03a..hh_g07b = G03..G07; both files label hh_g03a ''How much in total did your household consume in the past week? Quantity''.  The held questionnaire is IHS4''s, the cross-section''s instrument; the IHPS 2016 panel''s own household questionnaire is NOT among the held documents, so for the panel rows the window rests on the panel BID''s Module G description and the matching .dta labels, not on a held instrument.  ONE ask in both files: one row per household-item.'
     n_items_delivered: 132
   '2019-20':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
+    evidence: '2019-20/Documentation/fifth_integrated_household_survey_2019_2020_and_the_integrated_household_panel_survey_2019_household_questionnaire.pdf PDF pp.39-46 -- G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''; module title ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK'' (p.46).  One ask: 2019-20/Documentation/fifth_integrated_household_survey_ihs5_2019_2020_basic_information_document.pdf PDF pp.17-18 (''the cross-sectional households were visited only once'')'
+    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own, not the rCSI battery.  One instrument for IHS5 and IHPS 2019 (its title says so).  Build reads Cross_Sectional/HH_MOD_G1.dta and Panel/hh_mod_g1_19.dta hh_g03a..hh_g07b = G03..G07 (hh_g01 label ''Over the past one week, did you or others in your household consume any [ITEM]?'').  ONE ask: one row per household-item in both files.'
     n_items_delivered: 133

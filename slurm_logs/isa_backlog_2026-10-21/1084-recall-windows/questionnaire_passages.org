@@ -54,3 +54,32 @@ discusses for the NON-food GSEC15C.  For food, every printed form fixes the
 window at 7 days, and the days-consumed column never exceeds 7 in any of the
 five waves -- an item-specific window longer than 7 days would push daily
 staples past 7.
+
+* Malawi (IHS2 / IHS3 / IHPS / IHS4 / IHS5)
+
+The trap: =Malawi/_/data_scheme.yml='s "Recall: last 7 days" belongs to the
+rCSI coping battery (=food_coping=).  Everything below is the FOOD module's
+own text (IHS2 Module I, IHS3+ Module G).
+
+| wave | file | page | quote |
+|------+------+------+-------|
+| 2004-05 | =IHS-2 HH questionnaire final draft.pdf= | PDF 21-25 (printed 21-25) | "MODULE I: CONSUMPTION OF FOOD OVER PAST ONE WEEK"; I02 "Over the past one week (7 days), did you or others in your household consume any [. . .]?"; I03 "How much in total did your household consume in the past week?"; I04 "How much came from purchases?"; I05 "How much did you spend?"; I06 "How much came from own-production?"; I07 "How much came from gifts and other sources?" |
+| 2010-11 | =IHS3.Household.Qx.FINAL.pdf= | PDF 28-33 (printed 28-33) | "MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK" (every page); G01 "Over the past one week (7 days), did you or others in your household consume any [. . .]?"; G03 "How much in total did your household consume in the past week?"; G04-G07 as I04-I07 |
+| 2013-14 | =IHPS.Household.Qx.FINAL.PRINT.pdf= | PDF 30-37 | same Module G title, G01 and G03 text |
+| 2016-17 | =fourth_integrated_household_survey_2016_2017_household_questionnaire.pdf= | PDF 30-37 | same Module G title, G01 and G03 text |
+| 2016-17 (panel) | =ihps_2016_bid_updated_final.pdf= (the panel's own instrument is not held) | PDF 10-11; PDF 8; PDF 9 | "Module G: ... Consumption of food Over past one week ... collects information on all food consumed by the household in the past 7 days"; Panel Group A gets the household questionnaire in full at visit 1, Group B at visit 2; "near-identical to the content and organization of the IHS3" |
+| 2019-20 | =fifth_integrated_household_survey_2019_2020_and_the_integrated_household_panel_survey_2019_household_questionnaire.pdf= | PDF 39-46 | G01 and G03 as above; title "MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK" (PDF 46) |
+| 2019-20 | =fifth_integrated_household_survey_ihs5_2019_2020_basic_information_document.pdf= | PDF 17-18; PDF 20 | "the cross-sectional households were visited only once during the IHS5"; "Module G: Consumption of food Over past one week ... all food consumed by the household in the past 7 days" |
+
+** Build check
+
+| wave | file(s) the build reads | columns | hh_g03a / i03a label | rows per (hh, item) |
+|------+------------------------+---------+----------------------+---------------------|
+| 2004-05 | sec_i.dta | i03a/b, i04a/b, i05, i06a/b, i07a/b = I03..I07 | "How much in total did your HH consume in the past week" | 1 |
+| 2010-11 | Full_Sample/Household/hh_mod_g1.dta | hh_g03a..hh_g07b = G03..G07 | "How much in total did your household consume in the past week (Quantity)?" | 1 (6 duplicated pairs in 1,521,568) |
+| 2013-14 | HH_MOD_G1_13.dta | same | "How much in total did your household consume in the past week? (Quantity)" | 1 |
+| 2016-17 | Cross_Sectional/hh_mod_g1.dta + Panel/hh_mod_g1_16.dta | same | "How much in total did your household consume in the past week? Quantity" (both) | 1 (both) |
+| 2019-20 | Cross_Sectional/HH_MOD_G1.dta + Panel/hh_mod_g1_19.dta | same | "... in the past week? Quantity" / "How much in total did your HH consume in past week?" | 1 (both) |
+
+The 2013-14 form also prints a short "MODULE B2: FOOD CONSUMPTION" list (PDF
+8); the build does not read it.
