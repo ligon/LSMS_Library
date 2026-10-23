@@ -64,6 +64,12 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - Lanes now running: #1111 (Malawi 2013/2016 questionnaires -> kg units), #827 (Malawi community_prices blank units, diagnose-then-fix), #1123 (Niger/Senegal/CotedIvoire plot_inputs identity collapses on the #1189 pattern).  Each needs a red-team before its PR.
 - #821 (Mali 2018-19 s05) deliberately waits for #1227 to merge; per #1226 the s05 helpers then move to =ehcvm.py=.
 
+- #1111 done: IHPS 2013 (catalog 2248 dl 41254, p.15) and IHS4 (2936 dl 47113, p.12) confirm d/i,d/j = TOTAL KGs and e/j = weeks; the PR #1193 pattern is applied; Malawi nitrogen falls 19% (the weeks codes had been decoded as bag sizes; dev 2013-14 implied 0.673 kg N/kg product).  Red-team running.
+- #827 done: the 38,506 'unitless' rows were =u='unit'= from =map_index=; 17 items have their unit cell struck out by the form; units are supplied per item (Nigeria W1/W2 precedent), =Unknown= otherwise; prices exact.  Red-team running.  Open decisions for Ethan in the PR: =Piece= for the 10 count goods (inferred); =NumberOfUnits= = 1 (Niger D2 analogue); 2013-14 code 22.
+- #1123 done for Niger 2018-19/2021-22, Senegal, CotedIvoire (Burkina #1189 pattern); Niger 2011-12/2014-15 stopped at diagnosis (needs a slot identity level -- Ethan).  Red-team running.
+- Filed *#1234* (=map_index= mints =u='unit'=), *#1235* (CotedIvoire s16bq03a == 350 on 39.5% of applied lines).
+- *PR #1236 open*: a test-only fix for a red Burkina test on development; bisected to PR #1212 (#1196 string-policy restore); the test pinned the pre-fix drift.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
