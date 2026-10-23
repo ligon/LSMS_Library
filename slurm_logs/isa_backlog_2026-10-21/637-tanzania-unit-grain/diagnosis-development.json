@@ -91,11 +91,13 @@
     "crop": 408
    },
    "dup_groups_by_class": {
-    "commensurable sum(same unit)": 12,
+    "commensurable sum(same recorded unit)": 10,
+    "both Unknown unit, summed (residual)": 2,
     "unknown+recorded unit with quantity": 1
    },
    "dup_rows_by_class": {
-    "commensurable sum(same unit)": 24,
+    "commensurable sum(same recorded unit)": 20,
+    "both Unknown unit, summed (residual)": 4,
     "unknown+recorded unit with quantity": 2
    },
    "dup_group_sizes": {
@@ -271,13 +273,15 @@
    },
    "dup_groups_by_class": {
     "incommensurable(distinct recorded units)": 6,
-    "commensurable sum(same unit)": 91,
-    "unknown+recorded unit with quantity": 4
+    "commensurable sum(same recorded unit)": 89,
+    "unknown+recorded unit with quantity": 4,
+    "both Unknown unit, summed (residual)": 2
    },
    "dup_rows_by_class": {
     "incommensurable(distinct recorded units)": 14,
-    "commensurable sum(same unit)": 190,
-    "unknown+recorded unit with quantity": 8
+    "commensurable sum(same recorded unit)": 186,
+    "unknown+recorded unit with quantity": 8,
+    "both Unknown unit, summed (residual)": 4
    },
    "dup_group_sizes": {
     "2": 92,

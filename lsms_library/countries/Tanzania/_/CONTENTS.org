@@ -1821,26 +1821,37 @@ The declared index is now =(t, i, plot_id, input, crop, u)=: the canonical =plot
 Before, =u= was a column and the helper collapsed =(t, i, plot_id, input, crop)= by summing quantities and keeping the first nonmissing unit.
 
 What that collapse merged, measured on the held sources (=slurm_logs/isa_backlog_2026-10-21/637-tanzania-unit-grain/=):
-| wave    | source rows | duplicate 5-key groups | two recorded units | OTHER (=Unknown=) + recorded unit | same unit |
-|---------+-------------+------------------------+--------------------+-----------------------------------+-----------|
-| 2019-20 |       1,787 |                     13 |                  0 |                                 1 |        12 |
-| 2020-21 |       8,035 |                    101 |                  6 |                                 4 |        91 |
+| wave    | source rows | duplicate 5-key groups | two recorded units | OTHER (=Unknown=) + recorded unit | both OTHER (=Unknown=) | same recorded unit |
+|---------+-------------+------------------------+--------------------+-----------------------------------+------------------------+--------------------|
+| 2019-20 |       1,787 |                     13 |                  0 |                                 1 |                      2 |                 10 |
+| 2020-21 |       8,035 |                    101 |                  6 |                                 4 |                      2 |                 89 |
+(Corrected 2026-10-23 after independent review: the first version of this table put the four both-OTHER groups under "same unit".)
 The six two-unit groups are the ones the #1118 review found (Seed / Pulses: two bucket/kg, one bucket/small cup, two kg/large cup, one kg/small cup).
 The five OTHER groups are the same defect in a form that review did not count: a quantity whose unit was recorded as OTHER (SPECIFY), code 5, summed into a kg or large-cup quantity and served under the recorded unit.
 So "2019-20 has no such groups" holds only for two *recorded* units; it has one OTHER + kg group.
-Every one of the 11 is two raw crop codes that =harmonize_crop= lumps under one label, never a repeated source record: no =(hhid, plot, cropid)= repeats in =AG_SEC_4A= and no id is null.
+Every one of the 11 is two or more raw crop codes (one group has four) that =harmonize_crop= lumps under one label, never a repeated source record: no =(hhid, plot, cropid)= repeats in =AG_SEC_4A= and no id is null.
 
 Normalization now *precedes* grouping, reversing #1118's order: =u= is a key, so a NaN unit must already be =Unknown= or the first =groupby(dropna=True)= downstream deletes the row (CLAUDE.md, Site I).
 The order mattered under #1118 only because ='first'= could let an early missing unit displace a later recorded one; with =u= in the key there is no ='first'= on =u=.
 Served rows 1,774 -> 1,775 and 7,924 -> 7,934; the 11 split groups' 415.5 total quantity is unchanged, now as 22 rows each in its own unit; every other row is identical.
-=seed_kg= falls by 50 kg (2019-20) and 579 kg (2020-21): the bucket / cup / Unknown quantities that were being counted as kilograms, on exactly the 10 affected plots.
+=seed_kg= falls by 629 kg (50 in 2019-20, 579 in 2020-21), and it errs in BOTH directions before the fix (corrected after independent review; the first version said only the second half):
+- 324 kg (52%) from 3 groups where the old first unit was =20l Bucket= (kg factor 20) and kilogram or small-cup quantities were served as buckets: 13 buckets -> 1 bucket + 12 kg (260 -> 32 kg), 6 -> 2 buckets + 4 kg (120 -> 44 kg), 9 -> 8 buckets + 1 small cup (180 -> 160 kg);
+- 306 kg from 6 groups where the old first unit was kg and Unknown or large-cup quantities were counted as kilograms (the largest: 250 Unknown + 1 kg served as 251 kg, and 50 Unknown + 5 kg as 55 kg);
+- +1 kg from one group served as 2 small cups that is 1 kg + 1 small cup;
+- 0 kg for one large-cup + Unknown group, 0 kg on both sides.
+So 11 plots carry a split group and 10 of them move.
 =nitrogen_kg= is unchanged (all fertilizer is kg; same-unit groups are still summed).
 The two #1118 tests that pinned the old ='first'= behaviour were reversed and renamed, with comments; a third was renamed (normalization now precedes the reduction) and three read =u= from the index.
 
-The remaining same-unit duplicates (12 / 92 at the 6-key) stay summed with =min_count=1= and their flags OR'd: they are commensurable.
-Two kinds deserve a maintainer's look, not a change:
+The remaining duplicates of the 6-level key (12 / 92) stay summed with =min_count=1= and their flags OR'd.
+10 / 90 of them share a *recorded* unit and are commensurable.
+*Residual, not commensurable:* 2 / 2 are Seed groups in which both lumped crop codes recorded OTHER (SPECIFY), code 5, with a quantity, and are summed into ONE =u='Unknown'= row: 2 + 50 and 60 + 100 (Vegetables, 2019-20); 250 + 250 (Vegetables) and 2 + 3.5 (Pulses, 2020-21).
+Two OTHER units are not known to be the same unit (#1041: =Unknown= is not a unit).
+They are NOT split here: =u= cannot tell them apart, and separating them needs a row ordinal (the #840 / #1198 question again).
+The downstream effect is nil today because =Unknown= receives no kg factor.
+Two further kinds deserve a maintainer's look, not a change:
 - *The same inorganic fertilizer named as both type 1 and type 2 on one plot* (1 in 2019-20, 6 in 2020-21).  Five of the seven pairs carry identical quantities (e.g. 50 + 50 kg Urea), which reads like double entry rather than two applications.  Summing doubles them; the instrument cannot say which.
-- *=Improved= OR'd across lumped crop codes* (1 / 6 same-unit groups disagree; 1 / 8 at the old key): one code's seed recorded improved and the other's not is served as improved.
+- *=Improved= OR'd across lumped crop codes* (1 / 6 groups at the 6-level key disagree; 1 / 8 at the old key): one code's seed recorded improved and the other's not is served as improved.
 
 Not changed, and recorded for the maintainer:
 - =Quantity_purchased= is served with no unit.  Its own unit, =ag4a_10c_2=, differs from the total-quantity unit on 1 (2019-20) and 11 (2020-21) seed records, so on those rows it is in a unit the table does not name.  Burkina Faso's =Unit_purchased= column is the precedent if that is wanted.
@@ -1858,9 +1869,14 @@ So their zero was *right* -- by accident, and only while some unrelated key in t
 The other 19 (14 / 5) were seasonal rows with neither a quantity nor an =ag4a_19= answer: a fabricated harvest of nothing.
 Fix: the fruit / perennial colmaps now name their "harvested?" question (=harvested='ag6a_06a'= / ='ag6b_06a'=), exactly as the seasonal one already named =ag4a_19=, and the collapse sums with =min_count=1=.
 Served: the 2,376 reported zeros stay 0.0 and now carry =u='kg'=, like the seasonal reported zeros always did; the 19 become NA; nothing else moves.
+(Not every served zero is a "did not harvest": 6 source rows record a quantity of 0 with harvested = YES -- 2 + 1 in 2019-20 4A / 6B, 2 + 1 in 2020-21 6A / 6B.  They were and are served as 0 kg.)
 =harvest_kg= and =yield_kg= are frame-identical (zero rows contribute nothing); =harvest_kg='s =kg_factor_sources= moves =none= 2,395 -> 19, =metric= +2,376.
 
-*Consequence for Site Q.*  The 2,376 zeros now sit in the =(t, 'kg', j)= reference cells, so a zero-dominated cell's p90 falls -- Timber 2020-21 from 23,088 kg to 17 kg -- and the screen names more rows: 1 -> 4 (2019-20) and 13 -> 26 (2020-21), 11 of the new ones Timber.  The rule did not change; the seasonal reported zeros were already doing this.  =tests/test_quantity_screen.py='s pinned 13 moved to 26 with that explanation.  Whether Site Q's reference should exclude non-positive quantities is a framework question for the maintainer.
+*Consequence for Site Q (GH #1259).*  The 2,376 zeros now sit in the =(t, 'kg', j)= reference cells, and Site Q's p90 counts zeros.  The Timber kg cells are 104 zeros of 117 rows (2019-20) and 309 of 346 (2020-21), so their reference falls from 34,100 kg to 56 kg and from 23,088 kg to 17 kg.  The screen names 16 more rows (14 -> 30): 13 Timber (3 in 2019-20, 10 in 2020-21) and one each of Citrus Fruits, Coconuts and Ripe Bananas (2020-21).
+With a positive-only reference none of the 16 survives, and the set equals development's 14 exactly.
+Development's own seasonal reported zeros had no measured effect: development with a positive-only reference names the identical 14.  (The first version of this entry said "11 of the new ones Timber" and that the seasonal zeros "were already doing this"; both were wrong.)
+Ruling (2026-10-23): keep =u='kg'= on recorded zeros -- Tanzania's own seasonal zeros and Ethiopia's convention -- because the defect is the screen's; filed as #1259.
+=tests/test_quantity_screen.py= therefore pins the 13 offenders of 2020-21 that survive a positive-only reference as the real bound, and the 13 zero-driven rows (10 Timber, 1 Citrus Fruits, 1 Coconuts, 1 Ripe Bananas) as a known, explained excess citing #1259; the test fails if either set changes.
 
 *Not changed: the sale columns.*  Sales are recorded per =(hhid, crop code)= and attached to a single-plot harvest row; the collapse keeps the ='first'= sale.  Where two lumped codes on one plot each carry a sale, one is dropped: 14 groups / 1,813 kg / 2,136,000 TSh in 2019-20, 52 / 10,062 kg / 10,762,200 TSh in 2020-21.  =harvest_month= (='max'=, 111 / 396 groups disagree) and =intercropped= (='max'=, 22 / 79) are selected the same way.
 Keeping the codes apart needs a level finer than =j= -- the question #840 answered for =community_prices= with =variety= (the source item code) and #1198 for Uganda with =production_obs= -- and is a grain decision about a published table, left to the maintainer under #637.

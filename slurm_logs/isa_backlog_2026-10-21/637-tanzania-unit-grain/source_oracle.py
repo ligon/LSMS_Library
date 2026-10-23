@@ -155,11 +155,16 @@ for wave, n3, n4, hh, plot in [('2019-20', 'AG_SEC_3A', 'AG_SEC_4A', 'sdd_hhid',
                 got = served.xs(uu, level='u')['Quantity'].iloc[0]
                 assert (pd.isna(exp) and pd.isna(got)) or exp == got
             split_rows += len(us) - 1
-    dups6 = int((g6.size() > 1).sum())
+    sz6 = g6.size()
+    dup6 = sz6[sz6 > 1]
+    dups6 = len(dup6)
+    dups6_unknown = int(pd.Series(dup6.index.get_level_values('u')).eq(U_UNKNOWN).sum())
     summary[wave] = {'source_long_rows': len(raw), 'served_rows': len(actual),
                      'groups_mixing_units_at_5key': dict(mixed),
                      'extra_rows_from_unit_split': split_rows,
-                     'remaining_same_unit_dup_groups': dups6,
+                     'remaining_dup_groups_6key': dups6,
+                     'remaining_dup_groups_6key_recorded_unit': dups6 - dups6_unknown,
+                     'remaining_dup_groups_6key_both_Unknown_residual': dups6_unknown,
                      'unknown_u_rows_served': int(pd.Series(actual.index.get_level_values('u')).eq(U_UNKNOWN).sum()),
                      'helper_equals_oracle': True, 'quantity_conserved_per_key_and_unit': True}
     raw.to_pickle(priv / f'oracle-source-long-{wave}.pkl')

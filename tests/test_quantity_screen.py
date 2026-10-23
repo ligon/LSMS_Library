@@ -20,6 +20,7 @@ sibling for the factor half of the same "count, never clip" contract.
 from __future__ import annotations
 
 import warnings
+from collections import Counter
 
 import numpy as np
 import pandas as pd
@@ -558,16 +559,44 @@ def test_tanzania_2020_21_coconut_and_timber_rows_fire():
     # ... and a bounded total, so a future rule change that turns the screen
     # into a firehose fails here rather than in someone's analysis.
     #
-    # 13 -> 26 by GH #637 (2026-10-23).  The RULE did not change; the TABLE
-    # did.  Tanzania's perennial modules now read their "harvested in the past
-    # 12 months?" answer (ag6a_06a / ag6b_06a), so 1,863 of this wave's
-    # reported non-harvests are served as 0.0 with u='kg' instead of 0.0 with
-    # u=NA (an accident of the old reducer), and they now sit in the
-    # (t, 'kg', j) reference cells.  A zero-dominated cell's p90 falls --
-    # Timber's from 23,088 kg to 17 kg -- so 11 Timber rows and a few fruit
-    # rows newly exceed 100x it.  The four rows above still fire.  Whether the
-    # reference should exclude non-positive quantities is a question for
-    # quantity_audit.py, recorded on GH #637; not changed here.
-    assert report["n_implausible"] == 26, [
-        (o["j"], o["value"], o["ratio"]) for o in report["offenders"]]
+    # The bound is the set of offenders that survive a POSITIVE-ONLY
+    # reference: 13, the same 13 rows this test pinned before GH #637.
+    # GH #637 (2026-10-23) made Tanzania's perennial "not harvested in the
+    # past 12 months" answers (ag6a_06a / ag6b_06a == 2) explicit 0.0 kg rows
+    # (they had been 0.0 with u=NA by an accident of the old reducer), so they
+    # now sit in the (t, 'kg', j) reference cells.  The screen's p90 counts
+    # those zeros -- Timber 2020-21 is 309 zeros of 346 rows, and its
+    # reference falls from 23,088 kg to 17 kg -- so 13 more rows are named
+    # in this wave.  That excess is the screen's defect, GH #1259, not new
+    # data: it is pinned below as a KNOWN, EXPLAINED excess, separately, so
+    # that a growth in the real offender set still fails here, and so that
+    # fixing #1259 (the excess vanishes) fails here too, loudly, until this
+    # pin is retired.
+    def _key(o):
+        return (o["i"], o["plot"], o["j"], o["value"])
+
+    named_all = {_key(o): o for o in report["offenders"]}
+    q = pd.to_numeric(df["Quantity"], errors="coerce")
+    positive = df[~(q <= 0).fillna(False)]
+    pos_reports = audit_quantities(positive, "Quantity", country="Tanzania",
+                                   table="crop_production")
+    assert len(pos_reports) == 1
+    real = {_key(o) for o in pos_reports[0]["offenders"]}
+    assert len(real) == 13, sorted((k[2], k[3]) for k in real)
+    assert real <= set(named_all), "a positive-reference offender stopped firing"
+
+    excess = set(named_all) - real
+    assert Counter(k[2] for k in excess) == {
+        "Timber": 10, "Citrus Fruits": 1, "Coconuts": 1, "Ripe Bananas": 1,
+    }, sorted((k[2], k[3]) for k in excess)
+    # ... and every excess row is explained by zeros in its own cell: it was
+    # judged against a reference below the positive-only p90 of that cell.
+    for k in excess:
+        j = k[2]
+        in_cell = ((df.index.get_level_values("j") == j)
+                   & df["u"].eq("kg").fillna(False).to_numpy(dtype=bool))
+        cell = q[in_cell]
+        assert (cell == 0).any(), j
+        assert named_all[k]["reference"] < cell[cell > 0].quantile(0.9), j
+    assert report["n_implausible"] == len(real) + len(excess)
     assert report["rows"] == 11_125

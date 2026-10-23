@@ -13,8 +13,14 @@ The Tanzania tail of GH #637 is the two helper reducers in
     under #1041 -- was summed into a kg or large-cup quantity; 2019-20 has 1
     of the latter kind.  Fix (the identifier, never a reducer -- GH #323 D1):
     ``u`` joins the declared index, as in the canonical ``plot_inputs`` index
-    and in Malawi's / the EHCVM countries' builders.  Same-unit groups stay
-    summed.
+    and in Malawi's / the EHCVM countries' builders.  Groups sharing a
+    RECORDED unit stay summed (commensurable).  RESIDUAL, disclosed and not
+    fixed: 2 groups per wave in which both lumped codes recorded OTHER
+    (SPECIFY) are still summed into one ``Unknown`` row (2019-20: 2 + 50 and
+    60 + 100 Vegetables; 2020-21: 250 + 250 Vegetables, 2 + 3.5 Pulses).
+    Two OTHER units are not known to be one unit, but ``u`` cannot separate
+    them; that needs a row ordinal.  Nil downstream: ``Unknown`` gets no kg
+    factor.
 
 ``crop_production_for_wave``
     ``u`` is always ``'kg'`` (the instrument records every harvest in KG), so
@@ -148,6 +154,18 @@ def test_same_unit_group_is_still_summed_and_flags_ored(tanzania):
     row = out.reset_index().iloc[0]
     assert (row['u'], row['Quantity']) == ('kg', 6)
     assert bool(row['Purchased']) and bool(row['Improved'])
+
+
+def test_two_other_units_remain_one_unknown_row_known_residual(tanzania):
+    """A KNOWN RESIDUAL (GH #637 round 2), pinned so it stays visible, not
+    because it is right: two lumped codes both in OTHER (SPECIFY) are summed
+    into one ``Unknown`` row.  Two OTHER units are not known to be one unit
+    (#1041), but ``u`` cannot tell them apart.  Splitting them needs a row
+    ordinal; when that lands, this test should change."""
+    sec3, sec4 = _input_sources([dict(crop=1, ag4a_10_1=2, ag4a_10_2=5),
+                                 dict(crop=2, ag4a_10_1=50, ag4a_10_2=5)])
+    out = _inputs(tanzania, sec3, sec4)
+    assert _by_unit(out) == {U_UNKNOWN: 52}
 
 
 def test_same_fertilizer_in_both_inorganic_slots_is_still_summed(tanzania):
@@ -344,7 +362,9 @@ class TestHeldSources:
         assert len(cp) == rows                       # the grain is unchanged
         assert set(cp['u'].dropna()) == {'kg'}       # no group mixes units
         q = cp['Quantity']
-        # every served zero is a reported "did not harvest", carried in kg
+        # every served zero is carried in kg: a reported "did not harvest"
+        # (ag4a_19 / ag6a_06a / ag6b_06a == 2), or one of the 6 source rows
+        # that record 0 kg with harvested == YES
         assert (cp.loc[q == 0, 'u'] == 'kg').all()
         # the perennial modules always answer the harvested question, so none
         # of their rows is left without a quantity

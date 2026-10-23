@@ -14,6 +14,7 @@ provenance long frames live in the private task root
 | =source_oracle.py=  | independent field bindings from the held =AG_SEC_3A= / =4A= keyed on the 6-level key; asserts helper == oracle row-for-row and quantity conserved per (key, unit) | =source-oracle-branch.json=          |
 | =api_snapshot.py=   | cold =Country('Tanzania')= build of =plot_inputs=, =crop_production=, =plot_features=, plus =seed_kg= / =nitrogen_kg= / =harvest_kg= / =yield_kg=, warnings and Site I / Q reports | =api-development.json=, =api-branch.json= |
 | =compare.py=        | cell-by-cell development vs branch from the private pickles                                        | =compare.json=                       |
+| =round2_measure.py= | round 2: residual groups, =seed_kg= decomposition, Site Q full vs positive-only reference, recorded zeros | =round2-measure.json=          |
 | =feature_check.py=  | warm read == cold read; =Feature(t)(['Tanzania'])= rows and canonical alignment                    | =feature-development.json=, =feature-branch.json= |
 | hash census         | =worktrees/1218/.../1218-current-validation/hash_census.py= on both checkouts                      | =hash-impact.json=                   |
 
@@ -26,12 +27,19 @@ replication of one source record.
 
 ** plot_inputs, duplicate =(t, i, plot_id, input, crop)= groups
 
-| wave    | source rows | groups | two recorded units | OTHER + recorded unit | same unit (commensurable) |
-|---------+-------------+--------+--------------------+-----------------------+---------------------------|
-| 2019-20 |       1,787 |     13 |                  0 |                     1 |                        12 |
-| 2020-21 |       8,035 |    101 |                  6 |                     4 |                        91 |
+| wave    | source rows | groups | two recorded units | OTHER + recorded unit | both OTHER (residual) | same recorded unit (commensurable) |
+|---------+-------------+--------+--------------------+-----------------------+-----------------------+------------------------------------|
+| 2019-20 |       1,787 |     13 |                  0 |                     1 |                     2 |                                 10 |
+| 2020-21 |       8,035 |    101 |                  6 |                     4 |                     2 |                                 89 |
 
-All 11 incommensurable groups are =Seed= with 2-4 lumped raw crop codes.  The
+(Round 2 correction: the first version counted the four both-OTHER groups as
+"same unit (commensurable)".  They are summed into one =Unknown= row by the
+branch too -- 2 + 50 and 60 + 100 Vegetables in 2019-20, 250 + 250 Vegetables
+and 2 + 3.5 Pulses in 2020-21 -- and are disclosed as a residual: two OTHER
+units are not known to be one unit, =u= cannot separate them, and splitting
+them needs a row ordinal.  Nil downstream: =Unknown= gets no kg factor.)
+
+All 11 groups mixing units are =Seed= with 2-4 lumped raw crop codes.  The
 same-unit groups include 7 fertilizer type-1/type-2 slot pairs naming one
 product (5 with identical quantities).
 
@@ -61,10 +69,28 @@ exactly the 11 split groups, 11 -> 22 rows, 415.5 total quantity unchanged);
 the other 9,687 rows identical including =u=; per-wave Quantity totals
 unchanged.  crop_production 14,126 rows, index identical; Quantity 0.0 -> NA on
 14 / 5 rows; =u= NA -> Kg on 513 / 1,863 perennial reported zeros; no other
-cell.  =seed_kg= -50 / -579 kg on exactly the 10 split plots; =nitrogen_kg=,
-=harvest_kg=, =yield_kg= frame-identical.  Grain reports 0 -> 0; Site I 1 -> 1
-(the existing =plot_inputs= =crop= NaN level, by construction); Site Q 1 -> 4
-and 13 -> 26 (reported zeros now in kg reference cells; rule unchanged).
+cell.  =nitrogen_kg=, =harvest_kg=, =yield_kg= frame-identical.  Grain reports
+0 -> 0; Site I 1 -> 1 (the existing =plot_inputs= =crop= NaN level, by
+construction).
+
+=seed_kg= -629 kg (-50 / -579), corrected in round 2 (=round2-measure.json=):
+the old error ran both ways.  -324 kg (52%) from 3 groups whose first unit was
+=20l Bucket= (factor 20), serving kg / small-cup quantities as buckets
+(13 buckets -> 1 bucket + 12 kg; 6 -> 2 + 4 kg; 9 -> 8 + 1 small cup);
+-306 kg from 6 groups whose first unit was kg, counting Unknown / large-cup
+quantities as kg; +1 kg from one (2 small cups -> 1 kg + 1 small cup); 0 from
+one (large cup + Unknown).  11 plots carry a split group; 10 move.
+
+Site Q (=round2-measure.json=, GH #1259): 14 -> 30 offenders.  The 16 new ones
+are 13 Timber (3 in 2019-20, 10 in 2020-21) and one each of Citrus Fruits,
+Coconuts, Ripe Bananas.  Timber kg cells are 104 / 117 and 309 / 346 zeros, so
+the p90 reference falls from 34,100 to 56 kg and from 23,088 to 17 kg.  With a
+positive-only reference none of the 16 survives and the set equals
+development's 14; development's own seasonal zeros have no measured effect
+(its positive-only set is its full set).  The first version's "11 of the new
+ones Timber" and "the seasonal zeros were already doing this" were wrong.
+6 source rows record 0 kg with harvested = YES, so not every served zero is a
+"did not harvest".
 Warm read == cold read on both checkouts.  =Feature('plot_inputs')(['Tanzania'])=
 9,698 -> 9,709, Tanzania no longer in =promoted=.
 

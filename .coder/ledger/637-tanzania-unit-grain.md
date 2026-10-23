@@ -69,7 +69,8 @@ accept `u` as a level or a column.
 | quantity | decision | reason |
 |----------|----------|--------|
 | `plot_inputs` grain | extend: add `u` to the declared index | canonical index + Malawi/EHCVM precedent; 11 incommensurable groups (6 two-recorded-unit, 5 OTHER+recorded) |
-| same-unit `plot_inputs` duplicates | reuse the existing sum(`min_count=1`) / OR | commensurable |
+| same-recorded-unit `plot_inputs` duplicates (10 / 90 at the 6-key) | reuse the existing sum(`min_count=1`) / OR | commensurable |
+| both-OTHER `plot_inputs` duplicates (2 / 2 at the 6-key) | leave summed into one `Unknown` row; disclose as a residual | NOT commensurable (#1041: `Unknown` is not a unit), but `u` cannot separate them -- needs a row ordinal (#840 / #1198 question); downstream nil (no kg factor for `Unknown`) |
 | `crop_production` grain | unchanged | `u` constant `kg`; no unit conflict |
 | `crop_production` Quantity reducer | extend: `min_count=1` + perennial `harvested` wiring | stops 19 fabricated zeros; makes 2,376 accidental zeros explicit |
 | `crop_production` sale / month / intercrop reducers | unchanged, flagged | needs a finer-than-`j` level (#840 / #1198) -- a grain ruling |
@@ -80,8 +81,13 @@ accept `u` as a level or a column.
    `variety`) or use `production_obs` (#1198) so two lumped codes' sales are
    not reduced by `'first'` (14 / 52 groups; 1,813 kg + 2,136,000 TSh and
    10,062 kg + 10,762,200 TSh dropped)?
-2. Site Q reference: exclude non-positive quantities?  Reported "did not
-   harvest" zeros now in kg cells move Tanzania's screen 1 -> 4 / 13 -> 26.
+2. Site Q reference -- RULED (coordinator, 2026-10-23): keep `u='kg'` on
+   recorded zeros; the screen's zero-counting p90 is the defect, filed as
+   #1259.  16 new offenders (13 Timber, 1 each Citrus Fruits / Coconuts /
+   Ripe Bananas); none survives a positive-only reference, whose set equals
+   development's 14.  `test_quantity_screen.py` pins the 13 positive-reference
+   offenders of 2020-21 as the bound and the 13 zero-driven ones as a named
+   excess citing #1259.
 3. `plot_inputs.Quantity_purchased` has no served unit; its unit differs from
    `u` on 1 / 11 seed records.  Add `Unit_purchased` (Burkina precedent)?
 4. Same fertilizer named as type 1 and type 2 on one plot (1 / 6 pairs; 5 of 7
@@ -94,15 +100,25 @@ accept `u` as a level or a column.
 
 - `plot_inputs_for_wave` -- OK (§2, §5): helper == independent source oracle
   row-for-row both waves; quantity conserved per `(key, u)`; +1 / +10 rows,
-  every other row identical including `u`; `seed_kg` -50 / -579 kg on exactly
-  the 10 split plots; `nitrogen_kg` frame-identical.
+  every other row identical including `u`; `seed_kg` -629 kg (-50 / -579) on
+  10 of the 11 split plots, in BOTH directions of the old error: -324 kg from
+  3 groups whose first unit was `20l Bucket` (kg / small-cup quantities served
+  as buckets at 20 kg), -306 kg from 6 groups whose first unit was kg
+  (Unknown / large-cup quantities served as kg), +1 kg from one, 0 from one
+  (corrected after independent review); `nitrogen_kg` frame-identical.
+  Residual: 2 / 2 both-OTHER groups still summed into one `Unknown` row.
 - `crop_production_for_wave` / wave colmaps -- OK (§4, §5): rows / index
   unchanged; Quantity 0.0 -> NA on 14 / 5 rows, `u` NA -> `kg` on 513 / 1,863
   perennial reported zeros, nothing else; `harvest_kg` / `yield_kg`
-  frame-identical.
+  frame-identical.  Not every served zero is a "did not harvest": 6 source
+  rows record 0 kg with harvested = YES.  Site Q 14 -> 30 offenders, all 16
+  new ones zero-driven (#1259).
 - Tests: `tests/test_gh637_tanzania_unit_grain.py` 21 tests (15 fail on
   development; the 6 that pass there are preserve-controls); #1118 tests
   adapted -- 2 pins reversed (and renamed) with comments, 1 renamed with the
-  same assertions, 3 read `u` from the index; `test_quantity_screen.py` pin
-  13 -> 26 with comment.
+  same assertions, 3 read `u` from the index; `test_quantity_screen.py`'s
+  `== 13` is re-formed (round 2): positive-reference offenders `== 13` as the
+  bound, plus the 13 zero-driven offenders as a named excess (#1259).  An
+  interim `== 26` pin (commit 0a0b0f43b) wrote the zero-driven excess into the
+  anti-firehose bound and is withdrawn.
 - Evidence: `slurm_logs/isa_backlog_2026-10-21/637-tanzania-unit-grain/`.

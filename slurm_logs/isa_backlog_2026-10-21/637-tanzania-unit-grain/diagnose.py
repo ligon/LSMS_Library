@@ -175,8 +175,12 @@ for wave, W in WAVES.items():
             c = 'unknown+recorded unit with quantity'
         elif g['Quantity'].notna().sum() <= 1:
             c = 'completion(<=1 quantity; nothing summed)'
+        elif not units_all:
+            # every row OTHER (SPECIFY) or missing: two Unknowns are not known
+            # to be one unit (#1041) -- a residual, NOT commensurable
+            c = 'both Unknown unit, summed (residual)'
         else:
-            c = 'commensurable sum(same unit)'
+            c = 'commensurable sum(same recorded unit)'
         cls[c] += 1
         rows_in_class[c] += len(g)
         if len(units_all) > 1:
