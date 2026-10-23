@@ -32,3 +32,8 @@ Sequencing:
     loop, keep or restore 'n_implausible == 13'); #1259's own new tests are unaffected.
   - #1259 first, then #1263: #1263's pin fails on rebase/merge until its excess block is
     dropped; its 'real' (positive-subframe) bound already equals the full audit.
+
+Repeated on the final branch commit 2d5759325 (warning text + test docstring only):
+merge-tree -> 30b6e9f9eb4bb832e206b4fa8935c950d5c59b10, exit 0; scratch merge write-tree identical;
+tests/test_quantity_screen.py: 1 failed, 42 passed -- the same single failure at the same assertion.
+The scratch merge was aborted; the detached worktree is back at 5239daecd, clean.
