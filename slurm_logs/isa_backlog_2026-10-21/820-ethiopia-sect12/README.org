@@ -1,0 +1,19 @@
+#+title: GH #820 -- Ethiopia §12 tree/fruit/root-crop sales into crop_production
+
+Aggregates only (counts, totals, shares); no household, holder or plot
+identifiers.  Measured 2026-10-23 on a sucoder /local clone, development
+=9a0ed5f3c= (detached worktree) vs branch =fix/820-ethiopia-sect12-crops-20261023=,
+each with its OWN fresh =LSMS_DATA_DIR= (cold builds; =dvc-cache= symlinked to
+the shared L1), =PYTHONPATH= = the checkout under test (import identity
+asserted), =OPENBLAS/OMP/MKL_NUM_THREADS=1=, =LSMS_BUILD_WORKERS=1=, =nice -n 19=.
+
+| file | what |
+|------+------|
+| =api_before_after.json= | =Country('Ethiopia').crop_production()= cold, both sides: row/index identity, non-sale columns identical, development's non-null sale cells identical, per-wave positive =Value_sold= / non-null =Quantity_sold=, grain / null-read / null-index / quantity reports, warning categories |
+| =positive_value_sold_by_wave_crop.csv= | per (wave, crop) count of rows with a positive =Value_sold=, before / after, crops that changed only |
+| =downstream_before_after.json= | warm: =harvest_kg= (with and without the shipped WB factors), =gross_crop_revenue=, =crop_diversity(weight='value')=, within-wave =median_price_valuation= |
+| =sect12_report_and_w45_verification.json= | the per-wave §12 attach report (every line's class) and the W4/W5 §11 coverage verification |
+| =scripts/= | the scripts that produced the above (paths are this run's) |
+
+Hash census (=1218-current-validation/hash_census.py=, config reads only):
+see =hash_census_diff.json= -- Ethiopia only.

@@ -1,0 +1,26 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 25,
+  "moved_by_country": {
+   "Ethiopia": 25
+  }
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "moved_by_country": {},
+  "moved_keys": []
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 125,
+  "moved_by_country": {
+   "Ethiopia": 125
+  }
+ },
+ "errors": {
+  "base": 0,
+  "branch": 0
+ }
+}

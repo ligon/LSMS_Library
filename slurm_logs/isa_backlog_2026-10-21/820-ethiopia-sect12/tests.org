@@ -1,0 +1,31 @@
+#+title: GH #820 test lines
+
+=tests/test_ethiopia_crop_production_sect12.py= (15 tests; 11 data-free, 4 =requires_s3=):
+
+| checkout                    | result              |
+|-----------------------------+---------------------|
+| development =9a0ed5f3c=     | 11 failed, 4 passed |
+| branch (this change)        | 15 passed           |
+
+On development the 5 synthetic tests raise =TypeError: crop_production_for_wave()
+got an unexpected keyword argument 'sale12'=, the 3 W1-W3 script checks and the
+=harmonize_crop= 103/105 check fail, and the two delivered-table tests fail
+(e.g. =('2013-14', 'Coffee', 1)=; positive =Value_sold= {2011-12: 694, 2013-14:
+1347, 2015-16: 1017} vs 854 / 2737 / 2300).  The 4 that pass on both are the
+W4/W5 checks (two static, one raw-file §11 coverage verification) and the raw
+2,627 / 1,984 count -- facts about the instrument, true before and after.
+
+Related suite on the branch, =-n 3 --dist=loadfile=: test_ethiopia_crop_production_sect12,
+test_ethiopia_shipped_factors, test_gh323_ethiopia_config,
+test_gh1118_ethiopia_plot_input_units, test_ethiopia_food_sources,
+test_962_unit_sentinel, test_crop_kg_factor, test_quantity_screen,
+test_label_selection, test_orgfile_missing_table, test_shipped_factors,
+test_gh866_stale_country_parquet_not_laundered, test_feature_canonical_index,
+test_categorical_mapping_resolution, test_build_transform_hash:
+
+  515 passed, 15 skipped, 1 failed
+
+The one failure,
+=test_ethiopia_shipped_factors.py::test_shipped_quintal_matches_the_external_answer_key=
+(=AttributeError: 'ArrowExtensionArray' object has no attribute 'sum'=), fails
+identically on development =9a0ed5f3c=: pre-existing, not caused by this change.
