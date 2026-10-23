@@ -338,7 +338,8 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
                 validation: str | None = None,
                 also_ids: list[str] | None = None,
                 covers: list[str] | None = None,
-                extra: dict[str, str] | None = None) -> WaveProvenance:
+                extra: dict[str, str] | None = None,
+                subdirs: list[str] | None = None) -> WaveProvenance:
     # ``also_ids`` / ``covers`` are hand-recorded facts this script cannot
     # rediscover from the catalog: the OTHER entries a directory holds, and the
     # entries a held release subsumes (GH #600).  A re-stamp must carry them
@@ -346,6 +347,9 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
     # delete them, which is how a partial record gets created in the first place.
     # ``extra`` (the #+KEY: lines provenance.py has no field for) likewise: it
     # is rendered since GH #1115, so dropping it here would read as a deletion.
+    # ``subdirs`` (``#+CATALOG_SUBDIR:``, GH #1276) is the same kind of fact:
+    # which subdirectory of Data/ holds which entry, written by an acquisition
+    # or a human, never by the catalog.
     primary = str(entry["id"])
     ids = [primary] + [i for i in (also_ids or []) if i != primary]
     return WaveProvenance(
@@ -366,6 +370,7 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
         superseded_url=superseded,
         notes=notes,
         extra=dict(extra or {}),
+        catalog_subdirs=list(subdirs or []),
     )
 
 
@@ -418,7 +423,8 @@ def resolve(country: str, wave: str, root: Path,
                            validation=ov.get("validation"),
                            also_ids=existing.catalog_ids[1:],
                            covers=existing.covers,
-                           extra=existing.extra), "override"
+                           extra=existing.extra,
+                           subdirs=existing.catalog_subdirs), "override"
 
     url = existing.url or ""
 
@@ -447,7 +453,8 @@ def resolve(country: str, wave: str, root: Path,
                                validation=existing.validation,
                                also_ids=existing.catalog_ids[1:],
                                covers=existing.covers,
-                               extra=existing.extra), method
+                               extra=existing.extra,
+                               subdirs=existing.catalog_subdirs), method
         # Recorded an id the catalog did not return for this country.  Do not
         # invent a replacement -- and do not downgrade the recorded one to
         # 'unknown' either: an outage or a filter looks exactly like this.
@@ -463,7 +470,8 @@ def resolve(country: str, wave: str, root: Path,
         if entry:
             return _from_entry(country, wave, entry, "doi-lookup", today,
                                notes=keep,
-                               extra=existing.extra), "doi-lookup"
+                               extra=existing.extra,
+                               subdirs=existing.catalog_subdirs), "doi-lookup"
         raise Unresolved(
             "doi-not-in-catalog",
             f"SOURCE.org records WB DOI {suffix}, which matches no entry the "

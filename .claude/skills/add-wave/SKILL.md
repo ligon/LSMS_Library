@@ -16,7 +16,7 @@ Requires the `add-feature` skill for writing `data_info.yml` configs once the wa
 ## Prerequisites
 
 - `MICRODATA_API_KEY` set (env var or `~/.config/lsms_library/config.yml`)
-- S3 **writer** credentials at `~/.config/lsms_library/s3_write_creds` (or wherever `$LSMS_S3_WRITE_CREDS` points); see [S3 Write Credentials](#s3-write-credentials). No `.dvc/config.local` edit is needed.
+- S3 **writer** credentials at `config.s3_write_creds_path()` (`~/.config/lsms_library/s3_write_creds` on Linux, or wherever `$LSMS_S3_WRITE_CREDS` points); see [S3 Write Credentials](#s3-write-credentials). No `.dvc/config.local` edit is needed.
 - The country already exists under `lsms_library/countries/`
 
 ## Workflow
@@ -189,32 +189,67 @@ component) in `Data/Panel/` and 6277 (EHCVM-2, the cross-section) in
 `Data/Cross_Section/`.
 
 **Do not run a plain `add_wave` for the second entry.** Acquisition matches
-members to existing sidecars *by file name*, anywhere under `Data/`. 52 of
-6277's 55 member names equal files 6224 holds, so it would overwrite them,
-record 6277 as the wave's only entry, and leave every later re-acquisition
-`Ambiguous sidecars`. Use `subdir=`, which confines extraction, sidecar
-matching, the leftover report and the push to `Data/<subdir>/`:
+members to existing sidecars *by file name*, anywhere under `Data/`. Without
+confinement, a second entry whose names coincide with the first's overwrites
+the first's files (52 of 6277's 55 member names equal files 6224 holds) and
+replaces the record's primary entry, and once both sets coexist in separate
+directories a re-acquisition of either raises `Ambiguous sidecars`. Use
+`subdir=`, which confines extraction, sidecar matching, the leftover report and
+the push to `Data/<subdir>/`. `subdir` is ONE directory name directly inside
+`Data/`; nested paths are refused, so two entries' subtrees can never contain
+one another.
 
-1. **Move the held entry into its own subdirectory first.** This is a config
-   edit, reviewed in its own PR. `git mv` each `Data/<file>.dvc` to
-   `Data/<Sub>/<file>.dvc`, and move any raw workspace copy with it (`*.dta`
-   is gitignored). A sidecar's `path:` is the bare file name, relative to the
-   sidecar, so it stays valid. Blobs are content-addressed, so nothing is
-   re-pushed, and no `dvc` command is needed. Then update every reference to
-   those files: `file:` in the wave's `data_info.yml`, `../Data/<file>` in
-   wave scripts, and country scripts that reach into the wave
-   (`../{wave}/Data/<file>`). Those are build inputs, so this moves the wave's
-   cache hashes. Moving first matters for re-acquisition: if the first entry
-   stays at the top of `Data/`, it can only be re-acquired without `subdir=`,
-   and that is ambiguous once both entries coexist.
+**`SOURCE.org` records which subdirectory holds which entry**, one line per
+entry:
+
+```
+#+CATALOG_SUBDIR: 6224 Panel
+#+CATALOG_SUBDIR: 6277 Cross_Section
+```
+
+Confinement alone does not stop you naming the *wrong* subdirectory:
+`add_wave("…", "6277", subdir="Panel")` would confine itself onto 6224's files.
+So an acquisition with `subdir=` is **refused before any download** when:
+
+- the record maps the entry to another subdirectory, or the subdirectory to
+  another entry (ignoring case);
+- `Data/` holds a directory whose name differs from `subdir` only in case;
+- `Data/<subdir>` is a symbolic link, or not a directory;
+- `Data/` holds sidecars at its top level, outside any subdirectory;
+- a subdirectory holding sidecars has no `#+CATALOG_SUBDIR:` line -- unless
+  it is the target itself and the record lists exactly one entry, the one
+  being acquired (its own files, re-acquired; the acquisition then writes the
+  line).
+
+Each refusal names the line to add. The cost is one line per entry, written
+once.
+
+1. **Move the held entry into its own subdirectory first, and record it.**
+   This is a config edit, reviewed in its own PR. `git mv` each
+   `Data/<file>.dvc` to `Data/<Sub>/<file>.dvc`, and move any raw workspace
+   copy with it (`*.dta` is gitignored). A sidecar's `path:` is the bare file
+   name, relative to the sidecar, so it stays valid. Blobs are
+   content-addressed, so nothing is re-pushed, and no `dvc` command is needed.
+   Add `#+CATALOG_SUBDIR: <its id> <Sub>` to `Documentation/SOURCE.org` in the
+   same PR. Alternatively, a first `add_wave(country, "<its id>", wave=...,
+   subdir="<Sub>", confirm=False)` writes the line itself; that re-downloads
+   the release, and verifies the held files against it. Then update every
+   reference to those files: `file:` in the wave's `data_info.yml`, which
+   becomes `<Sub>/<file>`; `../Data/<file>` in wave scripts; and country
+   scripts that reach into the wave (`../{wave}/Data/<file>`). Those are build
+   inputs, so this moves the wave's cache hashes. Moving first matters:
+   top-level sidecars refuse every `subdir=` acquisition. Left at the top,
+   the first entry could only be re-acquired without `subdir=`, and that is
+   ambiguous once both entries coexist.
 2. **Acquire the second entry into its own subdirectory:**
    ```python
    add_wave("Burkina_Faso", "6277", wave="2021-22", subdir="Cross_Section",
             confirm=False)
    ```
    The other subdirectory's files and sidecars are left byte-identical.
-3. **Provenance.** The new id is appended to `#+CATALOG_ID:` (`6224, 6277`)
-   once the whole release has landed and been pushed. Nothing else in
+3. **Provenance.** Once the whole release has landed and been pushed, the new
+   id is appended to `#+CATALOG_ID:` (`6224, 6277`) and
+   `#+CATALOG_SUBDIR: 6277 Cross_Section` is added. Nothing else in
    `SOURCE.org` moves: `#+CATALOG_IDNO:` / `#+CATALOG_DOI:` still describe the
    primary entry. **The record has no field for a secondary entry's held
    release.** Write it by hand in `#+PROVENANCE_NOTE:`, as
@@ -223,12 +258,12 @@ matching, the leftover report and the push to `Data/<subdir>/`:
    `add_wave` warns until the note names the release it acquired.
    `discover_waves` reads a secondary id as `yes`. It cannot judge it
    `stale-release`.
-4. **Re-acquisition**, of either entry, names the entry and its subdirectory:
+4. **Re-acquisition**, of either entry, names its own subdirectory:
    `add_wave(country, "<id>", wave=..., subdir="<its subdir>", confirm=False)`.
-   `populate_and_push(country, wave, subdir=...)` always fetches the
-   **primary** entry (the URL in `SOURCE.org`). It is therefore refused on a
-   record that lists more than one entry; otherwise it would put the primary's
-   files over the secondary's same-named ones.
+   `populate_and_push(country, wave, subdir=...)` fetches the entry the record
+   maps to that subdirectory, else the primary entry when the record lists
+   only one. It is refused when the record lists several entries and maps
+   none to the subdirectory.
 
 Without `subdir=`, acquisition behaves as it did before, including the
 ambiguity error.
@@ -306,9 +341,13 @@ aws_secret_access_key = ...
 (`data_access.py`) takes the first of these that exists and is non-empty:
 
 1. `config.s3_write_creds_path()`. This is `$LSMS_S3_WRITE_CREDS` when that is
-   set, and otherwise `s3_write_creds` in the user config directory:
-   `~/.config/lsms_library/s3_write_creds` by default (`$LSMS_CONFIG_DIR` or
-   `$XDG_CONFIG_HOME` relocate it). **This is the place to put it.** It keeps
+   set, and otherwise `s3_write_creds` in the user config directory, which is
+   `$LSMS_CONFIG_DIR` if set and otherwise platformdirs'
+   `user_config_path('lsms_library')`: `~/.config/lsms_library/` on Linux
+   (`$XDG_CONFIG_HOME` relocates it), `~/Library/Application
+   Support/lsms_library/` on macOS. Ask the library rather than guess:
+   `python -c "from lsms_library import config; print(config.s3_write_creds_path())"`.
+   **This is the place to put it.** It keeps
    the secret out of the git checkout, and the library can then be installed
    read-only. The maintainer's writer key lives here.
 2. *Legacy fallback:* `lsms_library/countries/.dvc/s3_write_creds`, the
@@ -330,8 +369,10 @@ fail with `AccessDenied`. `push_to_cache_batch()` (and `add_wave()` /
 `populate_and_push()`, which wrap it) therefore runs the push inside
 `_s3_writer_credentialpath`. That context manager snapshots
 `.dvc/config.local`, points the remote's `credentialpath` at the resolved
-writer file with `dvc remote modify --local`, and restores `config.local`
-byte-for-byte afterwards; it deletes the file if there was none before. The
+writer file with `dvc remote modify --local`, and writes the prior
+`config.local` back afterwards; it deletes the file if there was none before.
+The restore goes through text mode, so a `config.local` with CRLF line endings
+comes back with LF ones; DVC reads either. The
 override exists only while the library is pushing. The older recipe — copy
 the key to `.dvc/s3_write_creds` and hand-edit `.dvc/config.local` to point
 at it — still works through the legacy fallback, but it is not needed.
@@ -372,7 +413,7 @@ The relative path `../Data/file.dta` works because scripts run from the wave's `
 ## Common Pitfalls
 
 - **Wave invisible after download**: Check for a hardcoded `Waves` dict in `{country}.py` (Step 3 above).
-- **"No writable DVC remotes"**: no writer key was found. Put it at `~/.config/lsms_library/s3_write_creds` (or set `$LSMS_S3_WRITE_CREDS` to its path), or export `LSMS_S3_WRITE_KEY_ID` / `LSMS_S3_WRITE_KEY`; then check `data_access.permissions()`. The legacy `lsms_library/countries/.dvc/s3_write_creds` is still read as a fallback.
+- **"No writable DVC remotes"**: no writer key was found, *or no reader key was* — write access is only checked once the remote's reader key (`s3_creds`, normally unlocked from the WB API key) is present, so a missing reader key reports the same thing. Put the writer key at `config.s3_write_creds_path()` (or set `$LSMS_S3_WRITE_CREDS` to its path), or export `LSMS_S3_WRITE_KEY_ID` / `LSMS_S3_WRITE_KEY`; then check `data_access.permissions()`. The legacy `lsms_library/countries/.dvc/s3_write_creds` is still read as a fallback.
 - **Push authenticates as the reader (`AccessDenied`)**: the committed `credentialpath` names the reader key. The library swaps the writer key in for the duration of its own push (a temporary `.dvc/config.local` override, restored afterwards), so push through `push_to_cache_batch()` / `add_wave()` / `populate_and_push()`, never a hand-run `dvc push`. If it still fails, no writer key was resolved — see the previous bullet.
 - **`dvc add` timeout on cluster**: The default 120s timeout is too short for cluster scratch filesystems. `push_to_cache_batch()` uses adaptive timeouts (600s + 30s per file).
 - **System `dvc` missing `dvc-s3`**: Use `.venv/bin/dvc`. The `_dvc_cmd()` helper handles this.

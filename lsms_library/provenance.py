@@ -97,9 +97,17 @@ record names two of them, under different keys (GH #1114 / #1128):
 
 Both pairs describe the PRIMARY entry only.  A secondary entry acquired into
 its own subdirectory (``add_wave(..., subdir=...)``, GH #1276) is appended to
-``#+CATALOG_ID:`` and nothing else; the record has no field for the release of
-a secondary entry, which is written by hand in ``#+PROVENANCE_NOTE:`` (see
+``#+CATALOG_ID:``; the record has no field for the release of a secondary
+entry, which is written by hand in ``#+PROVENANCE_NOTE:`` (see
 :func:`held_secondary_entry`).
+
+``#+CATALOG_SUBDIR: 6277 Cross_Section``
+    Which subdirectory of ``Data/`` holds which entry's files, one line per
+    entry (GH #1276).  ``add_wave(..., subdir=...)`` writes the line on its
+    first acquisition into a subdirectory and refuses a later call that
+    contradicts it, so an entry cannot be acquired over another entry's
+    same-named files by naming the wrong subdirectory.  Read it with
+    :meth:`WaveProvenance.subdir_map`.  It says nothing about releases.
 
 Everything under :data:`NOTES_HEADING` belongs to a human and is carried
 verbatim, ``#+KEY:`` lines included (GH #1115): ``GhanaSPS/2017-18`` records a
@@ -112,6 +120,7 @@ from __future__ import annotations
 
 import datetime as _dt
 import logging
+import os
 import re
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -182,7 +191,8 @@ LATEST_KEYS = ("CATALOG_LATEST_IDNO", "CATALOG_LATEST_DOI",
 # Every keyword WaveProvenance has a field for.  Any other #+KEY: above the
 # notes heading is carried in ``extra`` and rendered back after these.
 _KNOWN_KEYS = frozenset({
-    "CATALOG_ID", "CATALOG_COVERS", "CATALOG_IDNO", "CATALOG_TITLE",
+    "CATALOG_ID", "CATALOG_COVERS", "CATALOG_SUBDIR", "CATALOG_IDNO",
+    "CATALOG_TITLE",
     "CATALOG_YEARS", "CATALOG_REPOSITORY", "CATALOG_DOI", "CATALOG_URL",
     *LATEST_KEYS,
     "PROVENANCE_SOURCE", "PROVENANCE_METHOD", "PROVENANCE_VALIDATION",
@@ -202,6 +212,48 @@ _SCALAR_FIELDS = {
     "PROVENANCE_RECORDED": "recorded", "PROVENANCE_NOTE": "note",
     "PROVENANCE_SUPERSEDED_URL": "superseded_url",
 }
+
+
+class CatalogSubdirError(ValueError):
+    """A ``subdir=`` or ``#+CATALOG_SUBDIR:`` value that cannot be trusted
+    (GH #1276)."""
+
+
+# Windows device names: a directory called ``CON`` or ``nul.txt`` cannot be
+# created there, so a checkout holding one is not portable.
+_WINDOWS_RESERVED_RE = re.compile(r"(?i)(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?")
+
+
+def normalise_subdir(subdir) -> str | None:
+    """Validate a subdirectory of a wave's ``Data/`` that holds one catalog
+    entry (GH #1276) and return it as a string.
+
+    It must be ONE directory name directly inside ``Data/``
+    (``'Cross_Section'``, ``'Panel'``), the #600 layout of ``Malawi/2016-17``.
+    Nested subdirectories are refused: an entry held in ``Panel/Cross/``
+    would sit inside the subtree an acquisition into ``Panel/`` scans, so the
+    two would no longer be confined from each other.  Also refused, whether
+    given as a string or a ``Path`` (a Windows ``Path('a/b')`` spells
+    ``'a\\b'``, so both separators are refused alike): an empty name, a
+    ``/`` or ``\\``, ``:`` (a drive letter or an NTFS stream), ``~``, NUL or any
+    control character, leading or trailing whitespace, a trailing ``.``
+    (which also covers ``.`` and ``..``), and a Windows device name
+    (``CON``, ``NUL``, ``COM1``, ...).  ``None`` means no subdirectory.
+    """
+    if subdir is None:
+        return None
+    text = os.fspath(subdir)
+    if (not isinstance(text, str) or not text or text != text.strip()
+            or text.endswith(".")
+            or any(c in text for c in "/\\:~")
+            or any(ord(c) < 32 or ord(c) == 127 for c in text)
+            or _WINDOWS_RESERVED_RE.fullmatch(text)):
+        raise CatalogSubdirError(
+            "subdir must be ONE directory name directly inside Data/, e.g. "
+            "'Cross_Section': no '/', '\\', ':', '~', control character, "
+            "leading or trailing whitespace, trailing '.', or Windows device "
+            f"name; got {subdir!r}")
+    return text
 
 
 def _regions(text: str) -> tuple[list[str], list[str]]:
@@ -364,6 +416,10 @@ class WaveProvenance:
     latest_doi: str | None = None
     latest_seen: str | None = None        # ISO date a re-stamp first saw it
     scalar_keywords: dict[str, list[str]] = field(default_factory=dict)
+    # ``#+CATALOG_SUBDIR:`` values as written, ``"<catalog id> <subdir>"``, one
+    # per line (GH #1276).  Raw, so a malformed line survives parse -> render;
+    # subdir_map() is where they are checked.
+    catalog_subdirs: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         # Keep the scalar and the list in agreement whichever one was supplied.
@@ -384,6 +440,44 @@ class WaveProvenance:
         ``False`` only for :data:`SOURCE_UNKNOWN` — i.e. a genuine gap.
         """
         return self.is_worldbank or self.source == SOURCE_EXTERNAL
+
+    def subdir_map(self) -> dict[str, str]:
+        """``{catalog id: subdirectory of Data/}`` from ``#+CATALOG_SUBDIR:``.
+
+        Raises :class:`CatalogSubdirError` on a line that is not
+        ``<numeric catalog id> <subdirectory>``, a subdirectory
+        :func:`normalise_subdir` refuses, one id mapped to two subdirectories,
+        or two ids mapped to one subdirectory (compared ignoring case).  An
+        identical repeated line is harmless.  Whether each id is one the
+        record lists in ``#+CATALOG_ID:`` is checked by the acquisition, not
+        here.
+        """
+        out: dict[str, str] = {}
+        owners: dict[str, str] = {}
+        for raw in self.catalog_subdirs:
+            parts = raw.split(None, 1)
+            if len(parts) != 2 or not parts[0].isdigit():
+                raise CatalogSubdirError(
+                    f"#+CATALOG_SUBDIR: {raw!r} is not "
+                    "'<catalog id> <subdirectory>'")
+            cid, sub = parts[0], parts[1].strip()
+            try:
+                normalise_subdir(sub)
+            except CatalogSubdirError as exc:
+                raise CatalogSubdirError(
+                    f"#+CATALOG_SUBDIR: {raw!r}: {exc}") from None
+            if out.get(cid, sub) != sub:
+                raise CatalogSubdirError(
+                    f"#+CATALOG_SUBDIR: maps {cid} to both Data/{out[cid]}/ "
+                    f"and Data/{sub}/")
+            owner = owners.get(sub.casefold())
+            if owner is not None and owner != cid:
+                raise CatalogSubdirError(
+                    f"#+CATALOG_SUBDIR: maps both {owner} and {cid} to "
+                    f"Data/{sub}/")
+            out[cid] = sub
+            owners[sub.casefold()] = cid
+        return out
 
     @property
     def is_stale_release(self) -> bool:
@@ -490,6 +584,7 @@ def parse_source_org(text: str, country: str, wave: str) -> WaveProvenance:
         scalar_keywords={k: list(v) for k, v in kw.items()
                          if k in _SCALAR_FIELDS
                          and (len(v) > 1 or not v[-1])},
+        catalog_subdirs=list(kw.get("CATALOG_SUBDIR", [])),
     )
 
 
@@ -503,7 +598,8 @@ def render_source_org(prov: WaveProvenance) -> str:
     repeated one, an empty value as a bare ``#+KEY:`` -- and the notes are
     carried as parsed.
     """
-    if (prov.catalog_ids or prov.covers) and not prov.is_worldbank:
+    if ((prov.catalog_ids or prov.covers or prov.catalog_subdirs)
+            and not prov.is_worldbank):
         # A repeated PROVENANCE_SOURCE can leave the last-value accessor
         # external/unknown while the record still holds catalog identity.
         # Emitting none/unknown below would erase that identity (#1115).
@@ -525,6 +621,11 @@ def render_source_org(prov: WaveProvenance) -> str:
     # only for a WB record: "covers" without a holding is meaningless.
     if prov.is_worldbank and prov.covers:
         lines.append(f"#+CATALOG_COVERS: {', '.join(prov.covers)}")
+    # Which subdirectory of Data/ holds which entry (GH #1276): a holdings
+    # fact, so it sits with the ids.  Every line as written, in order.
+    if prov.is_worldbank:
+        for value in prov.catalog_subdirs:
+            lines.append(f"#+CATALOG_SUBDIR: {value}".rstrip())
 
     for key, val in (("CATALOG_IDNO", prov.idno),
                      ("CATALOG_TITLE", prov.title),
@@ -672,6 +773,33 @@ def held_secondary_entry(existing: WaveProvenance,
     if catalog_id in existing.catalog_ids:
         return existing
     return replace(existing, catalog_ids=[*existing.catalog_ids, catalog_id])
+
+
+def with_catalog_subdir(prov: WaveProvenance, catalog_id: str,
+                        subdir: str) -> WaveProvenance:
+    """*prov* with ``#+CATALOG_SUBDIR: <catalog_id> <subdir>`` (GH #1276).
+
+    Returns *prov* itself when the line is already there, so the caller can
+    skip the write.  Raises :class:`CatalogSubdirError` when the record maps
+    *catalog_id* to another subdirectory, or *subdir* to another entry: the
+    mapping is only ever added to, never rewritten by an acquisition.
+    """
+    catalog_id, sub = str(catalog_id), normalise_subdir(subdir)
+    mapping = prov.subdir_map()
+    if mapping.get(catalog_id) == sub:
+        return prov
+    if catalog_id in mapping:
+        raise CatalogSubdirError(
+            f"{prov.country}/{prov.wave}: #+CATALOG_SUBDIR: maps {catalog_id} "
+            f"to Data/{mapping[catalog_id]}/, not Data/{sub}/")
+    owner = next((i for i, s in mapping.items()
+                  if s.casefold() == sub.casefold()), None)
+    if owner is not None:
+        raise CatalogSubdirError(
+            f"{prov.country}/{prov.wave}: #+CATALOG_SUBDIR: maps "
+            f"Data/{mapping[owner]}/ to {owner}, not {catalog_id}")
+    return replace(prov, catalog_subdirs=[*prov.catalog_subdirs,
+                                          f"{catalog_id} {sub}"])
 
 
 def read_provenance(countries_dir: Path, country: str,

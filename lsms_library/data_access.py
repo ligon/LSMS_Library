@@ -71,11 +71,14 @@ from . import config
 from .catalog_relations import derived_from, same_study_aliases
 from .paths import countries_root, data_root
 from .provenance import (
+    CatalogSubdirError,
     WaveProvenance,
     acquired_release,
     held_secondary_entry,
+    normalise_subdir,
     read_provenance,
     source_org_path,
+    with_catalog_subdir,
     write_provenance,
 )
 
@@ -120,25 +123,16 @@ def _fetch_destination(path: Path, populate_cache: bool = False) -> Path:
 
 
 def _normalise_subdir(subdir: str | os.PathLike | None) -> str | None:
-    """Validate an acquisition ``subdir=`` (GH #1276) -> its POSIX spelling.
+    """Validate an acquisition ``subdir=`` (GH #1276), before any download.
 
-    A subdirectory of the wave's ``Data/``, written relative to it
-    (``'Cross_Section'``, ``'Panel/Wave 5'``).  Refused, before any download:
-    an absolute path, a drive letter, a backslash, and an empty, ``.`` or
-    ``..`` segment -- the last also catches a trailing slash.  ``None`` means
-    no subdirectory (the whole of ``Data/``, the behaviour before #1276).
+    ONE directory name directly inside the wave's ``Data/``
+    (``'Cross_Section'``); nested paths are refused, so two entries' subtrees
+    can never contain one another.  The rules are
+    :func:`lsms_library.provenance.normalise_subdir`'s, shared with the
+    ``#+CATALOG_SUBDIR:`` parser.  ``None`` means no subdirectory (the whole
+    of ``Data/``, the behaviour before #1276).
     """
-    if subdir is None:
-        return None
-    text = os.fspath(subdir)
-    segments = text.split("/") if isinstance(text, str) else []
-    if (not segments or "\\" in text or text.startswith("/")
-            or re.match(r"^[A-Za-z]:", text)
-            or any(s.strip() in ("", ".", "..") for s in segments)):
-        raise ValueError(
-            f"subdir must be a relative path inside Data/ with no empty, '.' "
-            f"or '..' segment, e.g. 'Cross_Section': {subdir!r}")
-    return "/".join(segments)
+    return normalise_subdir(subdir)
 
 
 def _acquisition_data_dir(country: str, wave: str,
@@ -153,11 +147,160 @@ def _acquisition_data_dir(country: str, wave: str,
     the files another entry holds elsewhere in ``Data/``.  The location is
     decided by :func:`_fetch_destination`, the single function that decides
     where acquisition writes.
+
+    Under ``subdir=`` the subdirectory must be a real directory of ``Data/``
+    (or not exist yet): a symbolic link is refused even when it points inside
+    ``Data/``, because ``_extract_all_from_zip`` confines itself to the
+    *resolved* directory, and a link would carry the whole acquisition out of
+    the tree or onto another entry's subdirectory.
     """
     sub = _normalise_subdir(subdir)
-    parts = sub.split("/") if sub else []
-    return _fetch_destination(Path(country, wave, "Data", *parts),
-                              populate_cache=True)
+    if sub is None:
+        return _fetch_destination(Path(country, wave, "Data"),
+                                  populate_cache=True)
+    target = _fetch_destination(Path(country, wave, "Data", sub),
+                                populate_cache=True)
+    base = _fetch_destination(Path(country, wave, "Data"), populate_cache=True)
+    if target.is_symlink() or target.resolve() != base.resolve() / sub:
+        raise ValueError(
+            f"{country}/{wave}: Data/{sub} is a symbolic link or resolves "
+            f"outside Data/ ({target.resolve()}); an acquisition confined to "
+            "it would write somewhere else.")
+    return target
+
+
+def _receipt_key(country: str, wave: str,
+                 subdir: str | None = None) -> tuple[str, ...]:
+    """The ``_ACQUIRED_RELEASES`` key of one acquisition: ``(country, wave)``,
+    with the subdirectory appended under ``subdir=`` (GH #1276) so two
+    confined acquisitions of one wave in one process never share a receipt.
+    Without ``subdir=`` the key is the pre-#1276 one."""
+    return (country, wave) if subdir is None else (country, wave, subdir)
+
+
+def _subdir_mapping(country: str, wave: str,
+                    prov: WaveProvenance) -> dict[str, str]:
+    """The record's ``#+CATALOG_SUBDIR:`` mapping, or a ``ValueError`` naming
+    what is wrong with it.  An id the record does not list in
+    ``#+CATALOG_ID:`` is refused here: a mapping that outlived its entry
+    cannot say what a subdirectory holds."""
+    try:
+        mapping = prov.subdir_map()
+    except CatalogSubdirError as exc:
+        raise ValueError(f"{country}/{wave}: {exc}. Fix "
+                         "Documentation/SOURCE.org before acquiring with "
+                         "subdir=.") from None
+    unlisted = sorted(i for i in mapping if i not in prov.catalog_ids)
+    if unlisted:
+        raise ValueError(
+            f"{country}/{wave}: #+CATALOG_SUBDIR: maps {', '.join(unlisted)}, "
+            "which #+CATALOG_ID: does not list ("
+            f"{', '.join(prov.catalog_ids) or 'no entry'}). Fix "
+            "Documentation/SOURCE.org before acquiring with subdir=.")
+    return mapping
+
+
+def _check_subdir_acquisition(country: str, wave: str,
+                              catalog_id: str | None, subdir: str,
+                              prov: WaveProvenance | None = None) -> None:
+    """Refuse a ``subdir=`` acquisition that could overwrite, duplicate or
+    mislabel another entry's files (GH #1276).  Raises ``ValueError`` before
+    anything is downloaded.
+
+    Confinement makes the extraction itself safe; it does not make the
+    *subdirectory* the right one.  ``add_wave('6277', subdir='Panel')`` on a
+    wave whose ``Data/Panel/`` holds 6224 used to overwrite 52 of its 53
+    files and exit 0 (red team on #1276).  So the record's
+    ``#+CATALOG_SUBDIR:`` lines decide, and an acquisition is refused when:
+
+    * the record maps *catalog_id* to another subdirectory, or *subdir* to
+      another entry (case-insensitively);
+    * ``Data/`` holds an entry whose name differs from *subdir* only in case;
+    * ``Data/<subdir>`` is a symbolic link, or not a directory;
+    * ``Data/`` holds sidecars at its top level, outside any subdirectory: a
+      confined acquisition beside them would leave them re-acquirable only
+      without ``subdir=`` (ambiguous once a second entry is held) or
+      duplicate them into the subdirectory;
+    * a subdirectory holding sidecars is not mapped -- unless it is *subdir*
+      itself and the record lists exactly one entry, *catalog_id*: that
+      entry re-acquired into its own subdirectory, the one case where the
+      files can only be its, and the acquisition then writes the line.
+
+    Refusing rather than warning is deliberate: the overwrite the red team
+    found exited 0 with warnings in the log.  What it costs is one
+    ``#+CATALOG_SUBDIR:`` line per entry, written once.
+    """
+    prov = prov if prov is not None else read_provenance(
+        _COUNTRIES_DIR, country, wave)
+    where = f"{country}/{wave}"
+    mapping = _subdir_mapping(country, wave, prov)
+    entry = catalog_id or "the primary entry"
+    if catalog_id is not None and mapping.get(catalog_id, subdir) != subdir:
+        raise ValueError(
+            f"{where}: Documentation/SOURCE.org maps {catalog_id} to "
+            f"Data/{mapping[catalog_id]}/ (#+CATALOG_SUBDIR:), not "
+            f"Data/{subdir}/. Acquire it with subdir="
+            f"{mapping[catalog_id]!r}.")
+    owner = next((i for i, s in mapping.items()
+                  if s.casefold() == subdir.casefold()), None)
+    if owner is not None and owner != catalog_id:
+        raise ValueError(
+            f"{where}: Documentation/SOURCE.org maps Data/{mapping[owner]}/ "
+            f"to {owner} (#+CATALOG_SUBDIR:); refusing to acquire {entry} "
+            f"into Data/{subdir}/, over another entry's files.")
+
+    data = _acquisition_data_dir(country, wave)
+    if not data.exists():
+        return
+    clash = sorted(p.name for p in data.iterdir()
+                   if p.name != subdir and p.name.casefold() == subdir.casefold())
+    if clash:
+        raise ValueError(
+            f"{where}: Data/ already holds {clash[0]!r}, which differs from "
+            f"subdir={subdir!r} only in case: one directory on a "
+            "case-insensitive filesystem, a duplicate of the entry on a "
+            f"case-sensitive one. Use subdir={clash[0]!r}.")
+    target = data / subdir
+    if target.is_symlink() or (target.exists() and not target.is_dir()):
+        raise ValueError(
+            f"{where}: Data/{subdir} is "
+            f"{'a symbolic link' if target.is_symlink() else 'not a directory'}"
+            "; refusing to acquire into it.")
+    _acquisition_data_dir(country, wave, subdir)     # resolves inside Data/
+    sidecars = sorted(data.rglob("*.dvc"))
+    loose = [s for s in sidecars if s.parent == data]
+    if loose:
+        raise ValueError(
+            f"{where}: Data/ holds {len(loose)} sidecar(s) outside any "
+            f"subdirectory (e.g. {loose[0].name}). Acquiring beside them with "
+            "subdir= would leave them re-acquirable only without subdir= -- "
+            "ambiguous once a second entry is held -- or duplicate them into "
+            f"Data/{subdir}/. Move them into their entry's own subdirectory "
+            "first and record it in Documentation/SOURCE.org: "
+            "'#+CATALOG_SUBDIR: <catalog id> <subdirectory>' (GH #1276).")
+    mapped = set(mapping.values())
+    occupied = {s.relative_to(data).parts[0] for s in sidecars} - mapped
+    # The target first: its refusal is the one that names the fix.
+    for d in sorted(occupied, key=lambda d: (d != subdir, d)):
+        if d == subdir:
+            if catalog_id is not None and prov.catalog_ids == [catalog_id]:
+                continue    # its one entry, into its own subdirectory
+            raise ValueError(
+                f"{where}: Data/{subdir}/ already holds sidecars, and no "
+                "#+CATALOG_SUBDIR: line says which entry they are (the record "
+                f"lists {', '.join(prov.catalog_ids) or 'no entry'}). "
+                f"Refusing to acquire {entry} over them. If they are "
+                f"{entry}'s, add '#+CATALOG_SUBDIR: {catalog_id or '<catalog id>'}"
+                f" {subdir}' to Documentation/SOURCE.org; if they are another "
+                f"entry's, acquire {entry} into a subdirectory of its own.")
+        raise ValueError(
+            f"{where}: Data/{d}/ holds sidecars that no #+CATALOG_SUBDIR: "
+            "line accounts for. Before acquiring with subdir=, record which "
+            "entry they are in Documentation/SOURCE.org: "
+            f"'#+CATALOG_SUBDIR: <catalog id> {d}'. If Data/{d}/ is a folder "
+            "of one entry's own release (Nigeria's 'Post Harvest Wave 5/' is "
+            "one) rather than an entry of its own, subdir= cannot keep two "
+            "entries apart on this wave.")
 
 
 def _acquisition(func):
@@ -1363,7 +1506,7 @@ def _acquired_data_files(country: str, wave: str,
     an extraction records never leave its directory, and the fallback scan
     below covers only that subtree.
     """
-    acq = _ACQUIRED_RELEASES.get((country, wave))
+    acq = _ACQUIRED_RELEASES.get(_receipt_key(country, wave, subdir))
     if acq is not None:
         return sorted(acq.members)
     # Retain the local push-only behavior when no WB acquisition occurred.
@@ -1377,7 +1520,9 @@ def _acquired_data_files(country: str, wave: str,
 # wave extracted.  Set by ``get_data_file(..., populate_cache=True)`` -- the
 # only place that knows which idno it fetched and whether every file landed --
 # and consumed by ``_record_acquired_release``.
-_ACQUIRED_RELEASES: dict[tuple[str, str], _AcquiredRelease] = {}
+# The key is ``_receipt_key``: ``(country, wave)``, plus the subdirectory
+# under ``subdir=`` (GH #1276).
+_ACQUIRED_RELEASES: dict[tuple[str, ...], _AcquiredRelease] = {}
 
 
 # ---------------------------------------------------------------------------
@@ -1720,7 +1865,8 @@ def unpushed_blobs(remote: str | None = None,
 
 
 def _record_acquired_release(country: str, wave: str,
-                             entry: dict | None = None) -> WaveProvenance | None:
+                             entry: dict | None = None,
+                             subdir: str | None = None) -> WaveProvenance | None:
     """Record in ``SOURCE.org`` the release an acquisition just put on disk.
 
     The acquisition path is the only writer of the HELD release keys
@@ -1744,8 +1890,13 @@ def _record_acquired_release(country: str, wave: str,
     :func:`lsms_library.provenance.held_secondary_entry`); the record is
     returned, and written only if the id was not listed yet.  Without
     ``subdir=``, acquiring another entry replaces the primary one, as before.
+
+    Under ``subdir=`` the record also gains ``#+CATALOG_SUBDIR: <id>
+    <subdir>`` if it lacks it (:func:`provenance.with_catalog_subdir`), on
+    the same complete-release gate, so the subdirectory an entry was
+    acquired into is what the next acquisition is checked against.
     """
-    acq = _ACQUIRED_RELEASES.pop((country, wave), None)
+    acq = _ACQUIRED_RELEASES.pop(_receipt_key(country, wave, subdir), None)
     if acq is None or not acq.members:
         logger.warning("%s/%s: no World Bank release was extracted; "
                        "SOURCE.org not updated.", country, wave)
@@ -1796,7 +1947,9 @@ def _record_acquired_release(country: str, wave: str,
         # pattern).  It joins #+CATALOG_ID:; the primary entry's held release
         # and every other key stay as they were.  There is no field for this
         # entry's release, so say which one landed and where it belongs.
-        prov = held_secondary_entry(existing, acq.catalog_id)
+        prov = with_catalog_subdir(
+            held_secondary_entry(existing, acq.catalog_id),
+            acq.catalog_id, acq.subdir)
         noted = acq.idno.strip() in f"{existing.note or ''}\n{existing.notes or ''}"
         (logger.info if noted else logger.warning)(
             "%s/%s: %s (%s) is held in %s as a secondary catalog entry beside "
@@ -1832,6 +1985,8 @@ def _record_acquired_release(country: str, wave: str,
         url=(f"https://microdata.worldbank.org/index.php/catalog/"
              f"{acq.catalog_id}"),
         method="add-wave")
+    if acq.subdir is not None:
+        prov = with_catalog_subdir(prov, acq.catalog_id, acq.subdir)
     write_provenance(_COUNTRIES_DIR, prov)
     return prov
 
@@ -1870,12 +2025,12 @@ def populate_and_push(country: str, wave: str,
     subdir : str, optional
         Confine the acquisition to ``Data/<subdir>/`` (GH #1276): extract
         there, match existing sidecars only there, and push only those files.
-        ``populate_and_push`` always fetches the wave's PRIMARY entry (the
-        URL in ``SOURCE.org``), so this is for re-acquiring that entry into
-        its own subdirectory.  On a wave whose record lists more than one
-        catalog entry it is refused -- which entry a subdirectory holds is not
-        recorded -- and :func:`add_wave`, which names the entry, is the call
-        to use.
+        The entry fetched is the one ``SOURCE.org`` maps to *subdir*
+        (``#+CATALOG_SUBDIR:``), else the primary entry when the record lists
+        only one.  A record listing several entries and mapping none to
+        *subdir* is refused, since it cannot say which to fetch; name the
+        entry with :func:`add_wave`.  Every refusal of
+        :func:`_check_subdir_acquisition` applies, before any download.
 
     Returns
     -------
@@ -1883,36 +2038,48 @@ def populate_and_push(country: str, wave: str,
         Paths of files successfully pushed.
     """
     subdir = _normalise_subdir(subdir)
+    route: dict[str, str] = {}      # without subdir= the pre-#1276 call
     if subdir is not None:
-        held = read_provenance(_COUNTRIES_DIR, country, wave).catalog_ids
-        if len(held) > 1:
+        prov = read_provenance(_COUNTRIES_DIR, country, wave)
+        held = prov.catalog_ids
+        owner = next((i for i, s in _subdir_mapping(country, wave,
+                                                    prov).items()
+                      if s == subdir), None)
+        if owner is None and len(held) > 1:
             raise ValueError(
                 f"{country}/{wave} holds {len(held)} catalog entries "
-                f"({', '.join(held)}); populate_and_push fetches only the "
-                f"primary one ({held[0]}) and cannot tell which entry "
-                f"Data/{subdir}/ holds. Name it: add_wave({country!r}, "
-                f"'<catalog id>', wave={wave!r}, subdir={subdir!r}, "
-                "confirm=False).")
+                f"({', '.join(held)}) and no #+CATALOG_SUBDIR: line says "
+                f"which one Data/{subdir}/ holds, so populate_and_push cannot "
+                "tell which to fetch. Add '#+CATALOG_SUBDIR: <catalog id> "
+                f"{subdir}' to Documentation/SOURCE.org, or name the entry: "
+                f"add_wave({country!r}, '<catalog id>', wave={wave!r}, "
+                f"subdir={subdir!r}, confirm=False).")
+        fetch = owner or prov.catalog_id
+        _check_subdir_acquisition(country, wave, fetch, subdir, prov)
+        route["_subdir"] = subdir
+        if fetch is not None and fetch != prov.catalog_id:
+            # A secondary entry: route the download to it, as add_wave does.
+            route["_source_url"] = ("https://microdata.worldbank.org/"
+                                    f"index.php/catalog/{fetch}")
+    key = _receipt_key(country, wave, subdir)
     # Use a dummy filename to trigger the download; populate_cache=True
     # extracts everything from the zip.
-    _ACQUIRED_RELEASES.pop((country, wave), None)      # this call's, only
+    _ACQUIRED_RELEASES.pop(key, None)      # this call's, only
     dummy = f"{country}/{wave}/Data/_probe_.dta"
-    # Without subdir= the call is exactly the pre-#1276 one.
-    get_data_file(dummy, populate_cache=True,
-                  **({"_subdir": subdir} if subdir is not None else {}))
+    get_data_file(dummy, populate_cache=True, **route)
 
     # Acquisition only: extract into the config tree so the caller can
     # `dvc add` what landed.  The read path never reaches this (see
     # _fetch_destination).
     data_dir = _acquisition_data_dir(country, wave, subdir)
     if not data_dir.exists():
-        _ACQUIRED_RELEASES.pop((country, wave), None)
+        _ACQUIRED_RELEASES.pop(key, None)
         logger.warning("No Data directory after download: %s", data_dir)
         return []
 
     data_files = _acquired_data_files(country, wave, subdir)
     if not data_files:
-        _ACQUIRED_RELEASES.pop((country, wave), None)
+        _ACQUIRED_RELEASES.pop(key, None)
         logger.warning("No data files found in %s", data_dir)
         return []
 
@@ -1923,7 +2090,7 @@ def populate_and_push(country: str, wave: str,
     try:
         pushed = push_to_cache_batch(rel_paths, remote=remote, dvc_add=True)
     except BaseException:
-        _ACQUIRED_RELEASES.pop((country, wave), None)
+        _ACQUIRED_RELEASES.pop(key, None)
         raise
 
     # The held release moves only here and in add_wave (GH #1128) -- and here
@@ -1933,12 +2100,12 @@ def populate_and_push(country: str, wave: str,
         expected = {f.resolve() for f in data_files}
         confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in pushed}
     except BaseException:
-        _ACQUIRED_RELEASES.pop((country, wave), None)
+        _ACQUIRED_RELEASES.pop(key, None)
         raise
     if confirmed == expected:
-        _record_acquired_release(country, wave)
+        _record_acquired_release(country, wave, subdir=subdir)
     else:
-        _ACQUIRED_RELEASES.pop((country, wave), None)
+        _ACQUIRED_RELEASES.pop(key, None)
         logger.warning("%s/%s: %d of %d file(s) pushed, so the release is not "
                        "recorded in SOURCE.org: it is on disk here but not "
                        "on the remote.  Re-run once the push succeeds.",
@@ -2415,12 +2582,19 @@ def add_wave(country: str, catalog_id: str,
         directory holds a second, disjoint catalog entry -- the #600
         pattern, e.g. ``Malawi/2016-17``'s ``Data/Cross_Sectional/`` (2936)
         and ``Data/Panel/`` (2939) -- without touching the files the first
-        entry holds when their names coincide.  Re-acquiring either entry
-        with its own ``subdir=`` is unambiguous.  When *catalog_id* is not the
-        record's primary entry it is appended to ``#+CATALOG_ID:`` and nothing
-        else in ``SOURCE.org`` changes; the record has no field for a
-        secondary entry's held release, which goes in ``#+PROVENANCE_NOTE:``
-        by hand.  ``None`` (the default) is the whole of ``Data/``, as before.
+        entry holds when their names coincide.  It must be ONE directory
+        name directly inside ``Data/``.  ``SOURCE.org`` records which
+        subdirectory holds which entry, one ``#+CATALOG_SUBDIR: <id> <subdir>``
+        line per entry; this call writes the line once the release has
+        landed, and is refused before any download when the record maps
+        *catalog_id* or *subdir* otherwise, or when ``Data/`` holds sidecars
+        that no line accounts for (see :func:`_check_subdir_acquisition`).
+        Re-acquiring either entry with its own ``subdir=`` is unambiguous.
+        When *catalog_id* is not the record's primary entry it is appended to
+        ``#+CATALOG_ID:``; ``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:`` keep
+        describing the primary, and the record has no field for a secondary
+        entry's held release, which goes in ``#+PROVENANCE_NOTE:`` by hand.
+        ``None`` (the default) is the whole of ``Data/``, as before.
 
     Returns
     -------
@@ -2480,6 +2654,11 @@ def add_wave(country: str, catalog_id: str,
             return []
 
     wave_dir = _COUNTRIES_DIR / country / wave
+    key = _receipt_key(country, wave, subdir)
+    if subdir is not None:
+        # Refuse a subdirectory that could overwrite, duplicate or mislabel
+        # another entry's files, before anything is downloaded (GH #1276).
+        _check_subdir_acquisition(country, wave, cat_id, subdir)
 
     # --- Confirmation -------------------------------------------------------
     if confirm:
@@ -2542,7 +2721,7 @@ def add_wave(country: str, catalog_id: str,
 
     # --- Download -----------------------------------------------------------
     with status(f"Downloading Stata zip from World Bank ..."):
-        _ACQUIRED_RELEASES.pop((country, wave), None)  # this call's, only
+        _ACQUIRED_RELEASES.pop(key, None)  # this call's, only
         dummy = f"{country}/{wave}/Data/_probe_.dta"
         # Without subdir= the call is exactly the pre-#1276 one.
         confine = {"_subdir": subdir} if subdir is not None else {}
@@ -2559,7 +2738,7 @@ def add_wave(country: str, catalog_id: str,
                   if data_dir.exists() else [])
 
     if not data_files:
-        _ACQUIRED_RELEASES.pop((country, wave), None)
+        _ACQUIRED_RELEASES.pop(key, None)
         logger.warning("No data files found in %s", data_dir)
         return []
 
@@ -2576,7 +2755,7 @@ def add_wave(country: str, catalog_id: str,
                 pushed = push_to_cache_batch(
                     rel_paths, remote=remote, dvc_add=True)
             except BaseException:
-                _ACQUIRED_RELEASES.pop((country, wave), None)
+                _ACQUIRED_RELEASES.pop(key, None)
                 raise
 
         elapsed = time.time() - t0
@@ -2600,17 +2779,18 @@ def add_wave(country: str, catalog_id: str,
         expected = {f.resolve() for f in data_files}
         confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in result}
     except BaseException:
-        _ACQUIRED_RELEASES.pop((country, wave), None)
+        _ACQUIRED_RELEASES.pop(key, None)
         raise
     if not push or confirmed == expected:
-        held = _record_acquired_release(country, wave, entry=entry)
+        held = _record_acquired_release(country, wave, entry=entry,
+                                        subdir=subdir)
         if held is not None and held.catalog_id == cat_id:
             log(f"SOURCE.org: holds {held.idno}")
         elif held is not None:
             log(f"SOURCE.org: lists {cat_id} beside primary {held.catalog_id} "
                 f"(record {idno} in #+PROVENANCE_NOTE:)")
     else:
-        _ACQUIRED_RELEASES.pop((country, wave), None)
+        _ACQUIRED_RELEASES.pop(key, None)
         logger.warning(
             "%s/%s: push did not confirm every downloaded file; "
             "SOURCE.org not updated, held release and latest queue kept.",
@@ -2852,7 +3032,7 @@ def get_data_file(path: str | Path,
         report: dict = {}
         extracted = _extract_all_from_zip(download_url, zip_filename,
                                           data_dir, api_key, report=report)
-        _ACQUIRED_RELEASES[(country, wave)] = _AcquiredRelease(
+        _ACQUIRED_RELEASES[_receipt_key(country, wave, _subdir)] = _AcquiredRelease(
             catalog_id=catalog_id, idno=idno, extracted=tuple(extracted),
             skipped=tuple(report["skipped"]), error=report["error"],
             members=tuple(report["members"]), subdir=_subdir)
