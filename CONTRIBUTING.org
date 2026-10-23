@@ -214,9 +214,12 @@
    =Data/Cross_Section/= (GH #1276).  =SOURCE.org= records which
    subdirectory holds which entry (=#+CATALOG_SUBDIR: <id> <subdir>=), and
    an acquisition that contradicts it is refused before any download.  The
-   procedure, including moving the first entry into its own subdirectory,
-   its =#+CATALOG_SUBDIR:= line and the hand-written =#+PROVENANCE_NOTE:=,
-   is Step 2b of =.claude/skills/add-wave/SKILL.md=.
+   procedure, including moving the first entry into its own subdirectory
+   and its =#+CATALOG_SUBDIR:= line, is Step 2b of
+   =.claude/skills/add-wave/SKILL.md=.  The secondary entry's held release
+   is its own =#+CATALOG_HELD: <id> <idno> [<doi>]= line, written by the
+   acquisition (GH #1283); the primary keeps =#+CATALOG_IDNO:= /
+   =#+CATALOG_DOI:=.
 
    #+begin_quote
    Never =rm= a DVC lock file to "clear a stale lock" --- it may belong

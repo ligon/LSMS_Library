@@ -86,6 +86,17 @@ artifact.  An override may correct an unstamped primary id, but it cannot
 establish another entry's held release: a primary correction with recorded
 held IDNO or DOI is refused before these release helpers run.
 
+A SECONDARY entry of a directory (GH #1283 ruling, @ligon 2026-10-23) has the
+same pair as lines of its own: ``#+CATALOG_HELD: <id> <idno> [<doi>]`` and
+``#+CATALOG_LATEST: <id> <idno> <first-seen> [<doi>]``.  The same rules apply
+per entry: this script writes or clears a secondary's ``LATEST`` line
+(first-seen kept while the latest is unchanged) and lists the stale ones in
+``release_changed``; it NEVER writes a ``HELD`` line -- a write that would
+change one is refused (kind ``held-release-written``) -- and it lists a
+secondary with no ``HELD`` line in ``release_unknown``.  Every ``HELD`` /
+``SUBDIR`` / ``LATEST`` line is carried through, and a record whose per-entry
+lines cannot be trusted is left intact (kind ``entry-lines-invalid``).
+
 The review artifact is an org file, written **outside** ``countries_root()``
 (the config tree is read-only at runtime; see CLAUDE.md), by default to
 ``platformdirs.user_cache_path("lsms_library")/provenance_review/``; override
@@ -132,6 +143,8 @@ from lsms_library.data_access import (
 from lsms_library.paths import countries_root
 from lsms_library.provenance import (
     LATEST_KEYS,
+    CatalogEntryError,
+    LatestRelease,
     SOURCE_EXTERNAL,
     SOURCE_UNKNOWN,
     SOURCE_WORLDBANK,
@@ -339,7 +352,9 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
                 also_ids: list[str] | None = None,
                 covers: list[str] | None = None,
                 extra: dict[str, str] | None = None,
-                subdirs: list[str] | None = None) -> WaveProvenance:
+                subdirs: list[str] | None = None,
+                held: list[str] | None = None,
+                latest: list[str] | None = None) -> WaveProvenance:
     # ``also_ids`` / ``covers`` are hand-recorded facts this script cannot
     # rediscover from the catalog: the OTHER entries a directory holds, and the
     # entries a held release subsumes (GH #600).  A re-stamp must carry them
@@ -349,7 +364,10 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
     # is rendered since GH #1115, so dropping it here would read as a deletion.
     # ``subdirs`` (``#+CATALOG_SUBDIR:``, GH #1276) is the same kind of fact:
     # which subdirectory of Data/ holds which entry, written by an acquisition
-    # or a human, never by the catalog.
+    # or a human, never by the catalog.  ``held`` (``#+CATALOG_HELD:``, GH
+    # #1283) likewise -- this script never writes one -- and ``latest``
+    # (``#+CATALOG_LATEST:``) is carried here and then updated by
+    # :func:`secondary_releases`.
     primary = str(entry["id"])
     ids = [primary] + [i for i in (also_ids or []) if i != primary]
     return WaveProvenance(
@@ -371,6 +389,8 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
         notes=notes,
         extra=dict(extra or {}),
         catalog_subdirs=list(subdirs or []),
+        catalog_held=list(held or []),
+        catalog_latest=list(latest or []),
     )
 
 
@@ -424,7 +444,9 @@ def resolve(country: str, wave: str, root: Path,
                            also_ids=existing.catalog_ids[1:],
                            covers=existing.covers,
                            extra=existing.extra,
-                           subdirs=existing.catalog_subdirs), "override"
+                           subdirs=existing.catalog_subdirs,
+                           held=existing.catalog_held,
+                           latest=existing.catalog_latest), "override"
 
     url = existing.url or ""
 
@@ -454,7 +476,9 @@ def resolve(country: str, wave: str, root: Path,
                                also_ids=existing.catalog_ids[1:],
                                covers=existing.covers,
                                extra=existing.extra,
-                               subdirs=existing.catalog_subdirs), method
+                               subdirs=existing.catalog_subdirs,
+                               held=existing.catalog_held,
+                               latest=existing.catalog_latest), method
         # Recorded an id the catalog did not return for this country.  Do not
         # invent a replacement -- and do not downgrade the recorded one to
         # 'unknown' either: an outage or a filter looks exactly like this.
@@ -471,7 +495,9 @@ def resolve(country: str, wave: str, root: Path,
             return _from_entry(country, wave, entry, "doi-lookup", today,
                                notes=keep,
                                extra=existing.extra,
-                               subdirs=existing.catalog_subdirs), "doi-lookup"
+                               subdirs=existing.catalog_subdirs,
+                               held=existing.catalog_held,
+                               latest=existing.catalog_latest), "doi-lookup"
         raise Unresolved(
             "doi-not-in-catalog",
             f"SOURCE.org records WB DOI {suffix}, which matches no entry the "
@@ -606,7 +632,7 @@ def dropped_by_write(old_text: str, new: WaveProvenance) -> list[str]:
     lost += [f"#+{k}" + (f" x{n - kept[k]}" if kept[k] else "")
              for k, n in _keys(old_text).items()
              if kept[k] < n and k not in ("PROVENANCE_RECORDED", "CATALOG_ID",
-                                          "CATALOG_COVERS")
+                                          "CATALOG_COVERS", "CATALOG_LATEST")
              and k not in LATEST_KEYS]
     if old.url and not back.url:
         lost.append("the source URL")
@@ -657,6 +683,79 @@ def latest_release(old_text: str, new: WaveProvenance,
         latest_doi=(new.doi or old.latest_doi) if same_latest else new.doi,
         latest_seen=(old.latest_seen if same_latest and old.latest_seen
                      else today))
+
+
+def _entry_id(raw: str) -> str:
+    """The catalog id a per-entry line names (its first token)."""
+    parts = raw.split(None, 1)
+    return parts[0] if parts else ""
+
+
+def secondary_releases(new: WaveProvenance, by_id: dict[str, dict],
+                       today: str) -> tuple[WaveProvenance,
+                                            list[LatestRelease], list[str]]:
+    """Each SECONDARY entry's ``#+CATALOG_LATEST:`` line, from the catalog
+    (GH #1283) -- :func:`latest_release` applied per entry.
+
+    For a secondary with a ``#+CATALOG_HELD:`` line and a catalog row: the
+    same idno -> its ``LATEST`` line is removed; another idno -> it is written
+    (in place, if one was there), its first-seen kept while the latest is
+    unchanged, else today.  A secondary with no ``HELD`` line, or no row,
+    keeps whatever ``LATEST`` line it had: there is no held release to be
+    ahead of, or no catalog fact to judge by.  ``HELD`` lines are never
+    touched.
+
+    Returns ``(record, stale, unheld)``: the record (*new* itself when
+    nothing changed), the secondaries whose catalog release differs from
+    the one held, and the secondary ids with no ``HELD`` line (for the
+    ``release_unknown`` table).  Raises :class:`CatalogEntryError` when the
+    per-entry lines cannot be trusted.
+    """
+    new.validate_entry_lines()
+    held, latest = new.held_releases(), new.latest_releases()
+    lines = list(new.catalog_latest)
+    stale: list[LatestRelease] = []
+    unheld: list[str] = []
+    for cid in new.catalog_ids[1:]:
+        if cid not in held:
+            unheld.append(cid)
+            continue
+        cat = str((by_id.get(cid) or {}).get("idno") or "").strip()
+        if not cat:
+            continue
+        if cat == held[cid].idno:
+            lines = [raw for raw in lines if _entry_id(raw) != cid]
+            continue
+        prior = latest.get(cid)
+        same = prior is not None and prior.idno == cat
+        seen = prior.seen if same and prior.seen else today
+        doi = ((by_id[cid].get("doi") or (prior.doi if same else None))
+               or None)
+        line = f"{cid} {cat} {seen}" + (f" {doi}" if doi else "")
+        if prior is None:
+            lines.append(line)
+        else:
+            lines = [line if _entry_id(raw) == cid else raw for raw in lines]
+        stale.append(LatestRelease(cid, cat, seen, doi))
+    if lines == new.catalog_latest:
+        return new, stale, unheld
+    return replace(new, catalog_latest=lines), stale, unheld
+
+
+def held_changed(old_text: str, new: WaveProvenance) -> list[str]:
+    """``#+CATALOG_HELD:`` lines writing *new* over *old_text* would change.
+
+    This script never writes a secondary's held release (#1128 applied per
+    entry, GH #1283): only an acquisition, or a human with evidence, may.
+    Every path carries the lines through verbatim, so this is the guard that
+    says so, not the mechanism; a non-empty answer refuses the write.
+    """
+    old = parse_source_org(old_text, new.country, new.wave)
+    back = parse_source_org(render_source_org(new), new.country, new.wave)
+    if old.catalog_held == back.catalog_held:
+        return []
+    return [f"#+CATALOG_HELD: {', '.join(old.catalog_held) or '(none)'} -> "
+            f"{', '.join(back.catalog_held) or '(none)'}"]
 
 
 def release_unknown(old_text: str | None, new: WaveProvenance) -> WaveProvenance:
@@ -727,7 +826,9 @@ def release_changed(old_text: str, new: WaveProvenance) -> list[str]:
 # ``changed`` table.  ``catalog_id`` is omitted: it is ``catalog_ids[0]``.
 _FIELD_KEYS = (
     ("source", "PROVENANCE_SOURCE"), ("catalog_ids", "CATALOG_ID"),
-    ("covers", "CATALOG_COVERS"), ("idno", "CATALOG_IDNO"),
+    ("covers", "CATALOG_COVERS"), ("catalog_subdirs", "CATALOG_SUBDIR"),
+    ("catalog_held", "CATALOG_HELD"), ("catalog_latest", "CATALOG_LATEST"),
+    ("idno", "CATALOG_IDNO"),
     ("title", "CATALOG_TITLE"), ("years", "CATALOG_YEARS"),
     ("repository", "CATALOG_REPOSITORY"), ("doi", "CATALOG_DOI"),
     ("url", "CATALOG_URL"),
@@ -944,7 +1045,7 @@ def main(argv: list[str] | None = None) -> int:
         rows.append((country, wave, "unresolved", u.reason[:52]))
 
     def stamp(country: str, wave: str, prov: WaveProvenance,
-              outcome: str) -> None:
+              outcome: str, by_id: dict[str, dict] | None = None) -> None:
         path = source_org_path(root, country, wave)
         old = path.read_text(encoding="utf-8") if path.exists() else None
         unchanged = False
@@ -973,6 +1074,30 @@ def main(argv: list[str] | None = None) -> int:
                 "Catalog ID": prov.catalog_id,
                 "Catalog IDNO": before.idno, "Catalog DOI": before.doi,
                 "SOURCE.org": "absent" if old is None else "present"})
+        # The SECONDARY entries: LATEST written or cleared per entry, HELD
+        # never written, an entry with no HELD listed as release-unknown (GH
+        # #1283).
+        secondary_stale: list[LatestRelease] = []
+        if (prov.is_worldbank and (len(prov.catalog_ids) > 1
+                                   or prov.catalog_subdirs or prov.catalog_held
+                                   or prov.catalog_latest)):
+            try:
+                prov, secondary_stale, unheld = secondary_releases(
+                    prov, by_id or {}, today)
+            except CatalogEntryError as exc:
+                leave_intact(country, wave, Unresolved(
+                    "entry-lines-invalid",
+                    f"Resolved ({outcome}), but SOURCE.org's per-entry lines "
+                    f"cannot be trusted: {exc}.  Fix them by hand."))
+                return
+            for cid in unheld:
+                row = (by_id or {}).get(cid) or {}
+                actions["release-unknown"] += 1
+                unknown.append({
+                    "Country": country, "Wave": wave, "Catalog ID": cid,
+                    "Catalog IDNO": row.get("idno") or None,
+                    "Catalog DOI": row.get("doi") or None,
+                    "SOURCE.org": "absent" if old is None else "present"})
         if old is not None:
             lost = dropped_by_write(old, prov)
             if lost:
@@ -980,6 +1105,15 @@ def main(argv: list[str] | None = None) -> int:
                     "restamp-would-delete",
                     f"Resolved ({outcome}), but the record written would "
                     f"delete {', '.join(lost)} from SOURCE.org."))
+                return
+            written = held_changed(old, prov)
+            if written:
+                leave_intact(country, wave, Unresolved(
+                    "held-release-written",
+                    f"Resolved ({outcome}), but the record written would "
+                    f"change a secondary entry's held release "
+                    f"({'; '.join(written)}); only an acquisition may "
+                    "(GH #1283)."))
                 return
             moved = release_changed(old, prov)
             if moved:
@@ -999,6 +1133,18 @@ def main(argv: list[str] | None = None) -> int:
                 "Held IDNO": prov.idno, "Latest IDNO": prov.latest_idno,
                 "Held DOI": prov.doi, "Latest DOI": prov.latest_doi,
                 "Latest seen": prov.latest_seen,
+                "SOURCE.org": ("already recorded" if unchanged
+                               else "would record" if args.dry_run
+                               else "recorded")})
+        for rel in secondary_stale:
+            actions["stale-release"] += 1
+            held_rel = prov.held_release_of(rel.catalog_id)
+            stale.append({
+                "Country": country, "Wave": wave,
+                "Catalog ID": rel.catalog_id,
+                "Held IDNO": held_rel.idno, "Latest IDNO": rel.idno,
+                "Held DOI": held_rel.doi, "Latest DOI": rel.doi,
+                "Latest seen": rel.seen,
                 "SOURCE.org": ("already recorded" if unchanged
                                else "would record" if args.dry_run
                                else "recorded")})
@@ -1085,7 +1231,7 @@ def main(argv: list[str] | None = None) -> int:
             except Unresolved as u:
                 leave_intact(country, wave, u)
                 continue
-            stamp(country, wave, prov, outcome)
+            stamp(country, wave, prov, outcome, by_id)
 
     aborted: str | None = None
     try:

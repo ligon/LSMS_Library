@@ -71,7 +71,7 @@ from . import config
 from .catalog_relations import derived_from, same_study_aliases
 from .paths import countries_root, data_root
 from .provenance import (
-    CatalogSubdirError,
+    CatalogEntryError,
     WaveProvenance,
     acquired_release,
     held_secondary_entry,
@@ -181,23 +181,18 @@ def _receipt_key(country: str, wave: str,
 def _subdir_mapping(country: str, wave: str,
                     prov: WaveProvenance) -> dict[str, str]:
     """The record's ``#+CATALOG_SUBDIR:`` mapping, or a ``ValueError`` naming
-    what is wrong with it.  An id the record does not list in
-    ``#+CATALOG_ID:`` is refused here: a mapping that outlived its entry
-    cannot say what a subdirectory holds."""
+    what is wrong with it.  Every per-entry line (``SUBDIR``, ``HELD``,
+    ``LATEST``) is validated, so a record an acquisition could not finish
+    writing is refused before anything is downloaded: an id ``#+CATALOG_ID:``
+    does not list, a ``HELD`` / ``LATEST`` line naming the primary, an id
+    named twice, a malformed line (GH #1276 / #1283)."""
     try:
-        mapping = prov.subdir_map()
-    except CatalogSubdirError as exc:
+        prov.validate_entry_lines()
+        return prov.subdir_map()
+    except CatalogEntryError as exc:
         raise ValueError(f"{country}/{wave}: {exc}. Fix "
                          "Documentation/SOURCE.org before acquiring with "
                          "subdir=.") from None
-    unlisted = sorted(i for i in mapping if i not in prov.catalog_ids)
-    if unlisted:
-        raise ValueError(
-            f"{country}/{wave}: #+CATALOG_SUBDIR: maps {', '.join(unlisted)}, "
-            "which #+CATALOG_ID: does not list ("
-            f"{', '.join(prov.catalog_ids) or 'no entry'}). Fix "
-            "Documentation/SOURCE.org before acquiring with subdir=.")
-    return mapping
 
 
 def _check_subdir_acquisition(country: str, wave: str,
@@ -1886,9 +1881,11 @@ def _record_acquired_release(country: str, wave: str,
 
     An acquisition confined to ``Data/<subdir>/`` (GH #1276) of an entry
     that is NOT the record's primary one is a secondary entry: it is
-    appended to ``#+CATALOG_ID:`` and nothing else changes (see
-    :func:`lsms_library.provenance.held_secondary_entry`); the record is
-    returned, and written only if the id was not listed yet.  Without
+    appended to ``#+CATALOG_ID:``, its ``#+CATALOG_HELD:`` line names the
+    release acquired and its ``#+CATALOG_LATEST:`` line is cleared (GH
+    #1283; see :func:`lsms_library.provenance.held_secondary_entry`); the
+    primary's ``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:`` do not move.  The
+    record is returned, and written only if something changed.  Without
     ``subdir=``, acquiring another entry replaces the primary one, as before.
 
     Under ``subdir=`` the record also gains ``#+CATALOG_SUBDIR: <id>
@@ -1941,28 +1938,6 @@ def _record_acquired_release(country: str, wave: str,
                        country, wave, where, len(others), acq.idno,
                        ", ".join(others))
     existing = read_provenance(_COUNTRIES_DIR, country, wave)
-    if (acq.subdir is not None and existing.is_worldbank
-            and existing.catalog_id != acq.catalog_id):
-        # A SECONDARY entry, held in its own subdirectory (GH #1276, the #600
-        # pattern).  It joins #+CATALOG_ID:; the primary entry's held release
-        # and every other key stay as they were.  There is no field for this
-        # entry's release, so say which one landed and where it belongs.
-        prov = with_catalog_subdir(
-            held_secondary_entry(existing, acq.catalog_id),
-            acq.catalog_id, acq.subdir)
-        noted = acq.idno.strip() in f"{existing.note or ''}\n{existing.notes or ''}"
-        (logger.info if noted else logger.warning)(
-            "%s/%s: %s (%s) is held in %s as a secondary catalog entry beside "
-            "the primary %s; #+CATALOG_ID: lists it. SOURCE.org has no field "
-            "for a secondary entry's held release (#+CATALOG_IDNO: describes "
-            "%s), so %s is recorded only where a human writes it: in "
-            "#+PROVENANCE_NOTE:, as Malawi/2016-17 does (GH #600, #1276).%s",
-            country, wave, acq.catalog_id, acq.idno, where,
-            existing.catalog_id, existing.catalog_id, acq.idno,
-            "" if noted else " The note does not name it yet.")
-        if prov is not existing:
-            write_provenance(_COUNTRIES_DIR, prov)
-        return prov
     if entry is None or str(entry.get("id")) != acq.catalog_id:
         entry = None
         spec = _COUNTRY_CATALOG.get(country)
@@ -1972,6 +1947,27 @@ def _record_acquired_release(country: str, wave: str,
                           if str(e["id"]) == acq.catalog_id), None)
     entry = entry or {}
     same = str(entry.get("idno") or "").strip() == acq.idno.strip()
+    if (acq.subdir is not None and existing.is_worldbank
+            and existing.catalog_id != acq.catalog_id):
+        # A SECONDARY entry, held in its own subdirectory (GH #1276, the #600
+        # pattern).  It joins #+CATALOG_ID:, its #+CATALOG_HELD: line names
+        # the release that landed and its #+CATALOG_LATEST: line goes (GH
+        # #1283); the primary entry's held release and every other key stay
+        # as they were.
+        prov = with_catalog_subdir(
+            held_secondary_entry(
+                existing, acq.catalog_id, acq.idno,
+                # The row's DOI is its idno's; a row for another release says
+                # nothing (as for the primary, below).
+                doi=(entry.get("doi") or None) if same else None),
+            acq.catalog_id, acq.subdir)
+        logger.info("%s/%s: %s is held in %s as a secondary catalog entry "
+                    "beside the primary %s: #+CATALOG_HELD: %s.", country,
+                    wave, acq.catalog_id, where, existing.catalog_id,
+                    acq.idno)
+        if prov is not existing:
+            write_provenance(_COUNTRIES_DIR, prov)
+        return prov
     ys, ye = entry.get("year_start"), entry.get("year_end")
     prov = acquired_release(
         existing,
@@ -2273,17 +2269,29 @@ def local_catalog_ids(country: str) -> dict[str, list[str]]:
 
 
 def local_held_idnos(country: str) -> dict[str, set[str]]:
-    """Map each PRIMARY catalog id we hold -> the release idnos recorded for it.
+    """Map each catalog id we hold -> the release idnos recorded for it.
 
-    ``#+CATALOG_IDNO:`` describes a directory's primary entry only, so a
-    secondary id (Malawi/2016-17's 2939) has no recorded release and is
-    absent here: whether we hold its latest release cannot be judged.
+    A directory's PRIMARY entry records its release in ``#+CATALOG_IDNO:``;
+    each SECONDARY entry in its own ``#+CATALOG_HELD:`` line (GH #1283), so
+    both are here.  A secondary with no ``HELD`` line (a hand-written record
+    nothing has acquired into) has no recorded release and is absent: whether
+    we hold its latest release cannot be judged.  A per-entry line that
+    cannot be trusted raises ``ValueError`` naming the wave, rather than
+    being read as "no release".
     """
     held: dict[str, set[str]] = {}
     for wave in _local_waves(country):
         prov = read_provenance(_COUNTRIES_DIR, country, wave)
-        if prov.is_worldbank and prov.idno:
+        if not prov.is_worldbank:
+            continue
+        if prov.idno:
             held.setdefault(prov.catalog_id, set()).add(prov.idno.strip())
+        try:
+            secondaries = prov.held_releases()
+        except CatalogEntryError as exc:
+            raise ValueError(f"{country}/{wave}: {exc}") from None
+        for cid, rel in secondaries.items():
+            held.setdefault(cid, set()).add(rel.idno.strip())
     return held
 
 
@@ -2387,8 +2395,11 @@ def discover_waves(country: str,
             (this row's ``idno``) -- Nigeria/2023-24 holds ``v01_M`` of 6410,
             the catalog is at ``v02_M``.  Held (``local=True``), and an
             acquisition target: ``add_wave`` / ``populate_and_push`` fetch the
-            newer release (GH #1128).  Judged on the primary entry of a dir
-            only; a dir's secondary ids record no release and read ``yes``.
+            newer release (GH #1128).  Judged per ENTRY: the primary on
+            ``#+CATALOG_IDNO:``, a secondary on its ``#+CATALOG_HELD:`` line
+            (GH #1283) -- Burkina 2021-22's 6277 held at ``v01_M`` reads
+            ``stale-release`` when the catalog is at ``v02_M``.  A secondary
+            with no ``HELD`` line cannot be judged and reads ``yes``.
         ``covered``
             We do not hold this entry's files, but a release we *do* hold
             subsumes its content -- ``Tanzania/2008-15/`` holds the Uniform
@@ -2413,7 +2424,8 @@ def discover_waves(country: str,
         The wave directories that back, cover, or constitute this entry (empty
         for ``no``).
     ``held_idnos``
-        The release idnos the dirs holding this entry as their primary record
+        The release idnos the dirs holding this entry record for it, as
+        primary (``#+CATALOG_IDNO:``) or secondary (``#+CATALOG_HELD:``)
         (sorted; empty where none is recorded, or the entry is not held).
         Compare with the row's ``idno``, the catalog's latest.
 
@@ -2591,9 +2603,9 @@ def add_wave(country: str, catalog_id: str,
         that no line accounts for (see :func:`_check_subdir_acquisition`).
         Re-acquiring either entry with its own ``subdir=`` is unambiguous.
         When *catalog_id* is not the record's primary entry it is appended to
-        ``#+CATALOG_ID:``; ``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:`` keep
-        describing the primary, and the record has no field for a secondary
-        entry's held release, which goes in ``#+PROVENANCE_NOTE:`` by hand.
+        ``#+CATALOG_ID:``, its ``#+CATALOG_HELD:`` line records the release
+        acquired and its ``#+CATALOG_LATEST:`` line is cleared (GH #1283);
+        ``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:`` keep describing the primary.
         ``None`` (the default) is the whole of ``Data/``, as before.
 
     Returns
@@ -2787,8 +2799,8 @@ def add_wave(country: str, catalog_id: str,
         if held is not None and held.catalog_id == cat_id:
             log(f"SOURCE.org: holds {held.idno}")
         elif held is not None:
-            log(f"SOURCE.org: lists {cat_id} beside primary {held.catalog_id} "
-                f"(record {idno} in #+PROVENANCE_NOTE:)")
+            log(f"SOURCE.org: holds {idno} of secondary entry {cat_id} "
+                f"beside primary {held.catalog_id}")
     else:
         _ACQUIRED_RELEASES.pop(key, None)
         logger.warning(

@@ -55,11 +55,12 @@ CROSS_FILES = {"s00_me_bfa2021.dta": b"cross:s00",
 URL = "https://microdata.worldbank.org/index.php/catalog/{}"
 
 
-def _record(ids, subdirs=()):
+def _record(ids, subdirs=(), held=()):
     """A SOURCE.org in render_source_org's key order, so it round-trips byte
-    for byte; the mapping lines sit right after the ids."""
+    for byte; the per-entry lines sit right after the ids."""
     lines = [f"#+CATALOG_ID: {', '.join(ids)}"]
     lines += [f"#+CATALOG_SUBDIR: {line}" for line in subdirs]
+    lines += [f"#+CATALOG_HELD: {line}" for line in held]
     return f"""SOURCE
 
 {URL.format(PANEL_ID)}
@@ -80,9 +81,11 @@ def _record(ids, subdirs=()):
 
 # 6224 moved into Data/Panel/, and the record says so.
 PANEL_ONLY = _record([PANEL_ID], [f"{PANEL_ID} Panel"])
-# ... and after 6277 has been acquired into Data/Cross_Section/.
+# ... and after 6277 has been acquired into Data/Cross_Section/: its id, its
+# subdirectory and its held release (GH #1283) are recorded.
 BOTH = _record([PANEL_ID, CROSS_ID],
-               [f"{PANEL_ID} Panel", f"{CROSS_ID} Cross_Section"])
+               [f"{PANEL_ID} Panel", f"{CROSS_ID} Cross_Section"],
+               [f"{CROSS_ID} {CROSS_IDNO}"])
 # The same holdings with no mapping lines: what the refusals are about.
 PANEL_UNMAPPED = _record([PANEL_ID])
 BOTH_UNMAPPED = _record([PANEL_ID, CROSS_ID])
@@ -234,23 +237,23 @@ class TestSecondEntryIntoItsSubdirectory:
         with caplog.at_level("WARNING", logger="lsms_library.data_access"):
             _add_wave(CROSS_ID, push=True, subdir="Cross_Section")
 
-        # The id joins the list and its subdirectory is recorded; every
-        # held-release key still describes 6224, the primary entry.
+        # The id joins the list, its subdirectory and its held release are
+        # recorded (#1283); every primary key still describes 6224.
         assert _source(root).read_text(encoding="utf-8") == BOTH
         prov = pv.read_provenance(root, COUNTRY, WAVE)
         assert prov.catalog_ids == [PANEL_ID, CROSS_ID]
         assert prov.subdir_map() == {PANEL_ID: "Panel",
                                      CROSS_ID: "Cross_Section"}
+        assert prov.held_release_of(CROSS_ID) == pv.HeldRelease(
+            CROSS_ID, CROSS_IDNO, None)
+        assert prov.held_release_of(PANEL_ID) == pv.HeldRelease(
+            PANEL_ID, PANEL_IDNO, "https://doi.org/10.48529/synthetic-panel")
         assert (prov.catalog_id, prov.idno) == (PANEL_ID, PANEL_IDNO)
         assert prov.doi == "https://doi.org/10.48529/synthetic-panel"
         assert prov.url == URL.format(PANEL_ID)
         assert len(wb["writes"]) == 1
-        # The secondary's release has no field; the acquisition says where
-        # it has to be written by hand.
-        assert CROSS_IDNO in caplog.text
-        assert "Data/Cross_Section/" in caplog.text
-        assert "#+PROVENANCE_NOTE:" in caplog.text
-        assert "does not name it yet" in caplog.text
+        # The release fact is in the record now: no hand-written note asked.
+        assert "PROVENANCE_NOTE" not in caplog.text
 
     def test_push_false_records_a_complete_local_download(self, wb):
         root = wb["root"]
@@ -407,14 +410,16 @@ class TestReacquisition:
         assert prov.subdir_map() == {PANEL_ID: "Panel"}
         assert prov.idno == PANEL_IDNO
 
-    def test_a_note_naming_the_release_quiets_the_warning(self, wb, caplog):
+    def test_a_hand_written_note_is_prose_and_is_kept(self, wb, caplog):
+        """The note is no longer where the release lives (#1283), so nothing
+        asks for it; a human's note is carried through untouched."""
         root = wb["root"]
-        note = (f"#+PROVENANCE_NOTE: Data/Cross_Section/ is {CROSS_ID} "
-                f"({CROSS_IDNO}).\n")
+        note = (f"#+PROVENANCE_NOTE: Data/Cross_Section/ is {CROSS_ID}, "
+                "the EHCVM-2 cross-section.\n")
         _held(root, BOTH + note, cross=True)
         with caplog.at_level("WARNING", logger="lsms_library.data_access"):
             _add_wave(CROSS_ID, push=True, subdir="Cross_Section")
-        assert "secondary catalog entry" not in caplog.text
+        assert caplog.text == "" and wb["writes"] == []
         assert _source(root).read_text(encoding="utf-8") == BOTH + note
 
 
@@ -522,6 +527,17 @@ class TestSymlinks:
         with pytest.raises(ValueError, match="symbolic link"):
             _add_wave(CROSS_ID, push=True, subdir="Cross_Section")
         assert _snapshot(_data(root) / "Panel") == before
+
+    def test_a_subdir_that_is_a_file_is_refused_before_any_download(self, wb):
+        """The red team's P3: without the pre-check this reached the download
+        and failed part-way through placement."""
+        root = wb["root"]
+        _held(root, PANEL_ONLY)
+        (_data(root) / "Cross_Section").write_bytes(b"a file")
+        with pytest.raises(ValueError, match="not a directory"):
+            _add_wave(CROSS_ID, push=True, subdir="Cross_Section")
+        assert wb["downloads"] == [] and wb["writes"] == []
+        assert (_data(root) / "Cross_Section").read_bytes() == b"a file"
 
     def test_a_link_inside_the_subdir_cannot_reach_a_sibling(self, wb):
         """The red team's P2c: the extraction's own escape guard, which
@@ -667,7 +683,7 @@ class TestCatalogSubdirRecord:
     @pytest.mark.parametrize("lines,message", [
         (["Panel"], "is not"), (["abc Panel"], "is not"),
         ([f"{PANEL_ID} a/b"], "ONE directory name"),
-        ([f"{PANEL_ID} Panel", f"{PANEL_ID} Other"], "to both"),
+        ([f"{PANEL_ID} Panel", f"{PANEL_ID} Other"], "names 6224 twice"),
         ([f"{PANEL_ID} Panel", f"{CROSS_ID} PANEL"], "maps both")])
     def test_subdir_map_refuses_what_cannot_be_trusted(self, lines, message):
         prov = pv.parse_source_org(_record([PANEL_ID, CROSS_ID], lines),
@@ -675,10 +691,12 @@ class TestCatalogSubdirRecord:
         with pytest.raises(pv.CatalogSubdirError, match=message):
             prov.subdir_map()
 
-    def test_an_identical_repeated_line_is_harmless(self):
+    def test_even_an_identical_repeated_line_is_refused(self):
+        """GH #1283 ruling: duplicates are refused, identical or not."""
         prov = pv.parse_source_org(
             _record([PANEL_ID], [f"{PANEL_ID} Panel"] * 2), COUNTRY, WAVE)
-        assert prov.subdir_map() == {PANEL_ID: "Panel"}
+        with pytest.raises(pv.CatalogSubdirError, match="names 6224 twice"):
+            prov.subdir_map()
 
     def test_with_catalog_subdir_adds_once_and_never_rewrites(self):
         prov = pv.parse_source_org(PANEL_ONLY, COUNTRY, WAVE)

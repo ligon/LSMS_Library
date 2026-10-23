@@ -36,7 +36,7 @@ Returns a list of dicts annotated with:
 | `local`        | `bool` — `True` only when a wave dir *records* this catalog id.          |
 | `local_status` | `"yes"` / `"stale-release"` / `"covered"` / `"derived"` / `"unknown"` / `"no"` (see below). |
 | `local_waves`  | the wave dirs that back, cover, or constitute this entry.                |
-| `held_idnos`   | the release idnos those dirs record holding (compare the row's `idno`, the catalog's latest). |
+| `held_idnos`   | the release idnos those dirs record holding: a primary's `#+CATALOG_IDNO:`, a secondary's `#+CATALOG_HELD:` (GH #1283) — compare the row's `idno`, the catalog's latest. |
 
 **Acquisition candidates are `no` (a new wave) and `stale-release` (a newer
 release of a wave we hold).** Acquisition stages the complete archive before
@@ -52,7 +52,7 @@ anything containing it (GH #600):
 | status | meaning | `local` |
 |---|---|---|
 | `yes` | a wave dir records this catalog id | `True` |
-| `stale-release` | a wave dir records this catalog id, but holds an older release (`#+CATALOG_IDNO:`) than the catalog's latest — Nigeria 2023-24 holds `v01_M`, the catalog is at `v02_M`. The backfill records the newer one as `#+CATALOG_LATEST_IDNO:`, so `rg CATALOG_LATEST_IDNO lsms_library/countries` is the queue (GH #1128) | `True` |
+| `stale-release` | a wave dir records this catalog id, but holds an older release (`#+CATALOG_IDNO:` for the dir's primary entry, its `#+CATALOG_HELD:` line for a secondary, GH #1283) than the catalog's latest — Nigeria 2023-24 holds `v01_M`, the catalog is at `v02_M`. The backfill records the newer one as `#+CATALOG_LATEST_IDNO:`, so `rg CATALOG_LATEST_IDNO lsms_library/countries` is the queue (GH #1128) | `True` |
 | `covered` | we don't hold its files, but a release we *do* hold subsumes its content — Tanzania's `2008-15/` holds the Uniform Panel Dataset (3814), whose `round` column carries NPS rounds 1–4 (76, 1050, 2252, 2862) | `False` |
 | `derived` | built *out of* entries we hold, **all** of them — Nigeria 5835 is the four GHS-Panel waves, harmonized | `False` |
 | `unknown` | we cannot say: a matching dir records no WB id, **or** the label is a logical wave inside a multi-round folder that no record accounts for | `False` |
@@ -248,16 +248,23 @@ once.
    ```
    The other subdirectory's files and sidecars are left byte-identical.
 3. **Provenance.** Once the whole release has landed and been pushed, the new
-   id is appended to `#+CATALOG_ID:` (`6224, 6277`) and
-   `#+CATALOG_SUBDIR: 6277 Cross_Section` is added. Nothing else in
-   `SOURCE.org` moves: `#+CATALOG_IDNO:` / `#+CATALOG_DOI:` still describe the
-   primary entry. **The record has no field for a secondary entry's held
-   release.** Write it by hand in `#+PROVENANCE_NOTE:`, as
-   `Malawi/2016-17/Documentation/SOURCE.org` does: which subdirectory holds
-   which entry, the secondary's idno, the evidence, and the date.
-   `add_wave` warns until the note names the release it acquired.
-   `discover_waves` reads a secondary id as `yes`. It cannot judge it
-   `stale-release`.
+   id is appended to `#+CATALOG_ID:` (`6224, 6277`), and two lines are added:
+   ```
+   #+CATALOG_SUBDIR: 6277 Cross_Section
+   #+CATALOG_HELD: 6277 BFA_2021_EHCVM-2_v01_M [<doi>]
+   ```
+   `#+CATALOG_IDNO:` / `#+CATALOG_DOI:` still describe the primary entry (GH
+   #1283 ruling: a secondary's held release is its own line, the primary
+   keeps its scalars). Re-acquiring a newer release moves the `HELD` line and
+   clears the entry's `#+CATALOG_LATEST:` line, under the same complete-
+   release and confirmed-push gates as the primary; a failed or partial
+   acquisition writes nothing. The backfill writes and clears
+   `#+CATALOG_LATEST: <id> <idno> <first-seen> [<doi>]` per secondary and
+   never writes `HELD`. `discover_waves` judges each entry on its own held
+   release, so a secondary can read `stale-release`. A
+   `#+PROVENANCE_NOTE:` is still the place for prose and evidence, as
+   `Malawi/2016-17/Documentation/SOURCE.org` keeps; it no longer has to
+   carry the release.
 4. **Re-acquisition**, of either entry, names its own subdirectory:
    `add_wave(country, "<id>", wave=..., subdir="<its subdir>", confirm=False)`.
    `populate_and_push(country, wave, subdir=...)` fetches the entry the record
