@@ -1631,6 +1631,11 @@ it.  Question numbers: §5A Q5 (household), §11 Q10a / §12 Q10a (agriculture).
 
 ** crop_production reads §11 only; the §12 sale module is UNWIRED and is BIGGER
 
+- Fixed :: GH #820 (2026-10-23): W1-W3 now read §12 as a second SALE
+  source.  See "§12 wired as a second sale source (GH #820)" directly below
+  this section for what is and is not served.  The text below is the
+  history of the defect, unchanged.
+
 The wave scripts read =sect9= (harvest), =sect4= (planting) and =sect11=
 (sales).  But §11 is headed =SECTION 11: CROP DISPOSITION  EXCLUDE
 TREE/FRUIT/VEGETABLE/ROOT CROPS=, and those crops have their own module,
@@ -1654,6 +1659,149 @@ enumerator exception to §11's own exclusion, not a sample -- so per-item
 sale prices for Banana, Potato, Coffee, Mango and the like rest on one to
 three observations and should not be trusted.  Wiring §12 as a second
 sale source is the fix; it is a feature addition, not a config tweak.
+
+** §12 wired as a second sale source (GH #820, 2026-10-23)
+
+*What the instrument says, by wave* (post-harvest questionnaires in each
+wave's =Documentation/=):
+
+| wave    | §9 header ("CROP HARVEST BY FIELD") | §11 header ("CROP DISPOSITION")          | §12                                           |
+|---------+-------------------------------------+-------------------------------------------+-----------------------------------------------|
+| 2011-12 | *EXCLUDE TREE/ROOT CROPS*           | EXCLUDE TREE/ROOT CROPS                   | =SECTION 12. TREES/FRUIT/ROOT CROPS=          |
+| 2013-14 | INCLUDE TREE/ROOT CROPS             | EXCLUDE TREE/FRUIT/VEGETABLE/ROOT CROPS   | =SECTION 12. TREES/FRUIT/VEGETABLE/ROOT CROPS= |
+| 2015-16 | INCLUDE TREE/ROOT CROPS             | EXCLUDE TREE/FRUIT/VEGETABLE/ROOT CROPS   | same                                          |
+| 2018-19 | INCLUDE TREE/ROOT CROPS             | no exclusion; "LIST ALL CROPS HARVESTED ... FOR PERMANENT CROPS PLEASE INCLUDE CROP HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019" | none (no =sect12_ph= file) |
+
+§12 is "FOR ALL REPORTED IN SECTION 4" (Flap E3, the permanent-crop
+roster) and its shipped file is keyed *(household, holder, crop)* -- no
+parcel, no field: the grain of §11.
+
+*Crosswalk* (variable labels and questionnaire, not names):
+
+| §12 question               | W1 (=sect12_ph_w1=)         | W2 (=sect12_ph_w2=)         | W3 (=sect12_ph_w3=)                       | §11 analogue used |
+|----------------------------+-----------------------------+-----------------------------+-------------------------------------------+-------------------|
+| crop                       | =crop_code=                 | =crop_code=                 | =crop_code=                               | =crop_code=       |
+| Q3 harvested, 12 months    | =ph_s12q03= (KG)            | =ph_s12q03= (KG)            | =ph_s12q03_a= + unit =ph_s12q03_b=        | (§9 serves harvest) |
+| Q6 did you sell (1/2)      | =ph_s12q06=                 | =ph_s12q06=                 | =ph_s12q06=                               | =ph_s11q01=       |
+| Q7 quantity sold           | =ph_s12q07= (KG)            | =ph_s12q07= (KG)            | =ph_s12q07= + unit =ph_s12q0b=            | =ph_s11q03_a=     |
+| Q8 value sold (Birr)       | =ph_s12q08=                 | =ph_s12q08= ("IF SOLD IN-KIND, PLEASE RECORD THE CASH VALUE OF SALES") | =ph_s12q08= (same) | =ph_s11q04[_a]= |
+
+*What is wired.*  =ethiopia._attach_sect12_sales= fills =Value_sold= /
+=Quantity_sold= on existing §9 rows by the SALES GRAIN CAVEAT rule §11
+already uses -- the precedent is §11 itself, and Malawi Module Q /
+Tanzania 7A-7B (perennial sale modules at household-crop grain attached
+to single-plot rows).  It adds no row, never overwrites a cell §11 filled,
+and asserts both.  §12 Q3 (harvest) is NOT read: in W2/W3 every §12
+(holder, crop) pair has a §9 field row (W2 7,399 of 7,399, W3 7,317 of
+7,317 distinct pairs), so Q3 would double-count the harvest §9 serves.
+
+Every §12 line lands in exactly one class (=Sect12SaleWarning= at build
+time; lines / positive-value lines / Birr):
+
+| class            | 2011-12                  | 2013-14                  | 2015-16                  |
+|------------------+--------------------------+--------------------------+--------------------------|
+| read             | 7,872 / 1,967            | 7,525 / 2,725            | 7,335 / 2,627            |
+| placeholder      | 873 / 0 / 0              | 0                        | 0                        |
+| repeated pair    | 0                        | 239 / 101 / 145,586      | 35 / 11 / 1,315          |
+| collides with §11 | 0                       | 61 / 26 / 83,250         | 40 / 8 / 19,504          |
+| no §9 row        | *6,134 / 1,679 / 1,825,378* | 0                     | 0                        |
+| several §9 plots | 300 / 128 / 160,711      | 2,452 / 1,186 / 2,227,273 | 2,695 / 1,318 / 2,893,216 |
+| folded key       | 2 / 0 / 0                | 0                        | 6 / 0 / 0                |
+| attached (§9 rows filled; positive) | 544; 160 | 4,957; 1,464            | 4,557; 1,290             |
+
+Rules, each the conservative choice where no precedent decides it:
+- *§11 wins a collision* and the two are never summed: every row §11
+  filled stays byte-identical.  (W2: of 63 colliding pairs, 14 carry a
+  positive value in both modules, 13 only in §12; W3: 1 and 7.)
+- *A repeated (holder, crop) is ambiguous*, attached nowhere -- not summed
+  (§11's own path sums its repeats; see "pre-existing" below).  The W2
+  repeats are mostly Coffee (62 lines), Other fruits, Enset, Godere, Chat;
+  the lines disagree, mostly on the production period.
+- *Q6 = No with Q7/Q8 blank* is a sale of 0, as §11 reads it.  A positive
+  Q7/Q8 next to a "No" (W2: 9 lines) is kept as reported -- the §11 path
+  instead overwrites such a value with 0.
+- *No sale unit is not Kg.*  W3 records Q7's unit; a blank one attaches no
+  =Quantity_sold= (the §11 path fills a blank sale unit with ='Kg'=).
+- *A folded key* -- the target §9 row shares =(i, plot_id, j, u)= with a
+  row of another crop code that =harmonize_crop= folds onto the same label
+  (KALE 56 / SPINACH 69 -> ='Leafy Greens'=) -- is not filled: the core
+  grain collapse serves the more complete of the two rows, so a fill would
+  change WHICH row (and which =harvest_month=) is served for a key that is
+  already a =GrainCollapseWarning=.  Found by the frame diff: without this
+  rule one 2015-16 row's =harvest_month= moved 2 -> 12.
+
+*Measured, cold, development =9a0ed5f3c= -> this change*, through
+=Country('Ethiopia').crop_production()=: 85,519 rows both sides, identical
+index, =Quantity= / =planting_month= / =harvest_month= / =intercropped= /
+=perennial= identical on every row, and every sale cell non-null on
+development identical.  Grain, null-read, null-index and quantity reports
+identical (=GrainCollapseWarning= destroyed 2 / 2 / 7 / 17 in W2-W5 both
+sides).  Rows with a positive =Value_sold=:
+
+| wave    | before | after | rows filled |
+|---------+--------+-------+-------------|
+| 2011-12 |    694 |   854 |         544 |
+| 2013-14 |  1,347 | 2,737 |       4,463 |
+| 2015-16 |  1,017 | 2,300 |       4,495 |
+| 2018-19 |  1,368 | 1,368 |           0 |
+| 2021-22 |  1,292 | 1,292 |           0 |
+
+2015-16 Coffee 0 -> 138, Chat/Kat 0 -> 158, Hops (gesho) 0 -> 122, Banana
+0 -> 114 positive-sale rows (per-crop table in
+=slurm_logs/isa_backlog_2026-10-21/820-ethiopia-sect12/=).  Of the 2,833
+newly positive rows, 2,170 are on =perennial= crop codes.  W3 serves 2,300
+of the 1,984 + 2,627 raw positive sale lines: *about half of the §12 sales
+belong to a holder-crop grown on several plots* and cannot be attached
+without splitting them -- exactly the §11 situation.
+
+Downstream, warm, same two builds: =harvest_kg= (with and without
+=crop_conversion_factors()=) is *identical* in every wave -- no
+=Quantity= or =u= moved.  =gross_crop_revenue= rises 11.4% / 47.4% / 75.3%
+(W1-W3; Birr 539,465 -> 600,749, 2,031,398 -> 2,995,104, 1,411,978 ->
+2,474,854) and reaches 3.3% / 17.3% / 22.4% more households -- it sums
+REPORTED sales, and those sales were unread.  A within-wave
+=median_price_valuation(geo_levels=['v'], item_keys=('t','j'))= of the
+shipped-factor kg harvest values 51.5% / 62.0% more W2/W3 rows: tree crops
+now have observed prices.
+
+*W1 is the odd wave, and most of its §12 is NOT served.*  W1 §9 EXCLUDES
+tree/root crops, so 6,134 of W1's 6,999 coded §12 pairs (1,679 positive
+sales, 1.83M Birr) have no §9 row to attach to.  W1's tree-crop *harvest*
+therefore lives only in §12 Q3 -- a KG total over the last production
+period / 12 months, per holder-crop, no field -- and is in no served
+table.  =sect4_pp_w1= does list those crops by field: 3,740 of the 6,134
+pairs sit on exactly one §4 field (828 positive sales), 2,067 on several.
+Serving them would mean minting harvest rows at a §4-derived =plot_id= (or
+a sentinel) on a different recall window from §9's -- a new construction
+with no precedent in this repo, so it is NOT done and is an open decision
+(GH #820 report).
+
+*Pre-existing, found while doing this, NOT changed:*
+- The §11 path sums its (holder, crop) values with a bare =.sum()=, so an
+  all-blank group is served =Value_sold= 0 on a single plot: 46 / 9 / 0 /
+  9 / 8 (holder, crop) groups by wave (the GH #1184 pattern).  It also
+  overwrites a positive value beside a "No" with 0 and fills a blank sale
+  unit with ='Kg'=.  §12 does none of these.
+- *Crop code 19 means CACTUS in W1/W2 and RED KIDNEY BEANS in W3-W5* (the
+  Stata value labels of =sect9_ph_w1=, =sect12_ph_w1/w2= vs =sect9_ph_w3/w4=,
+  =sect12_ph_w3=).  =harmonize_crop= is code-keyed, not wave-keyed, and its
+  preamble's "consistent across W1-W5" is false here: 5 + 40 W1/W2 §9 cactus
+  rows are served =j = 'Red Kidney Beans'= (and 1 + 4 of them now carry a §12
+  cactus sale).  Code 86 likewise reads FALLOW LAND in W1 but TEMPORARY GR
+  from W2 on (one W4 §9 row is served ='Fallow Land'=).  Fixing it is a
+  wave-keyed =harmonize_crop= and moves served =j= -- its own issue.
+- W1 §9 is a 7,750-row file against §4's 29,317 and W2/W3 §9's ~30,000;
+  4,440 of W1 §11's 8,808 (holder, crop) pairs (818 positive sales) have no
+  §9 row either.  Not explained by the tree-crop exclusion alone (§11
+  excludes the same crops).  Unexplained; recorded.
+- =tests/test_ethiopia_shipped_factors.py::test_shipped_quintal_matches_the_external_answer_key=
+  fails on development (=AttributeError: 'ArrowExtensionArray' object has
+  no attribute 'sum'=, an index-level comparison), unchanged by this work.
+
+Codes 103 =WEPAL= and 105 =BUYA= (W1 §12 roster only) were the only §12
+codes =harmonize_crop= could not decode; they are now in the table under
+the survey's own names.  Both fall in the "no §9 row" class, so no served
+value changes.
 
 ** Crop-side WB conversion factors: held, unwired (2026-09-09)
 
@@ -1858,6 +2006,22 @@ EPAR's W4 do-file reads perennial crop values out of §11, not §12
 So GH #820's "§12 is unwired and bigger" finding is bounded to W1-W3;
 W4/W5 need checking against §11 instead, not against a §12 that no
 longer carries the tree-crop module.
+
+*VERIFIED 2026-10-23 (GH #820), against the raw files and the ESS4
+questionnaire -- W4/W5 need nothing.*  The 24 crop codes W1-W3 record in §12
+and NEVER in §11 (avocado, lemon, orange, papaya, kale, ...) have a §11
+record for 0% of their §9 (holder, crop) pairs in W1, W2 and W3 -- and for
+73.9% (W4) and 79.6% (W5); field crops run 90-98% in every wave.  Coffee /
+Chat / Enset / Banana / Mango have 456 / 365 / 335 / 275 / 237 §11 rows in
+W4 (239 / 308 / 89 / 158 / 104 with a positive sale value) against 4 / 1 / 3
+/ 1 / 1 in W3's §11.  The W4 §11 header reads "LIST ALL CROPS HARVESTED
+DURING THIS AGRICULTURAL SEASON.  FOR PERMANENT CROPS PLEASE INCLUDE CROP
+HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019" and carries §12's own
+questions (the last production period, the 12-month harvest, the number of
+trees).
+No =sect12_ph= file ships for either wave.  W5 has no local questionnaire;
+its evidence is the data alone.  Pinned in
+=tests/test_ethiopia_crop_production_sect12.py=.
 
 ** _/food_acquired.py lacks the id_walk that _/crop_production.py has
 

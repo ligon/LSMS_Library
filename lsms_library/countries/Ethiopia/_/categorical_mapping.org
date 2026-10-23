@@ -651,6 +651,14 @@ Use).  Where a crop has no exact food label but is close to one we use
 the food label (e.g. Red Pepper -> Berbere, Green Pepper -> Kariya,
 Kale/Cabbage -> Leafy Greens) so the join still lands.
 
+Codes 103 and 105 (GH #820) occur only in the W1 §12 tree/fruit/root-crop
+roster (sect12_ph_w1).  Their Stata value labels there are 103 'WEPAL' and
+105 'BUYA' (the same labels sect9_ph_w1 / sect12_ph_w2 carry for 103); no
+§9 or §4 row in any wave uses either code, so these two table rows change no
+served value -- they keep the §12 roster's codes from decoding to nothing.  The
+label is the survey's own local name, title-cased, as for Amboshika (108)
+or Kazmir (112).
+
 #+name: harmonize_crop
 | Code | Preferred Label     |
 |------+---------------------|
@@ -739,6 +747,8 @@ Kale/Cabbage -> Leafy Greens) so the join still lands.
 |   95 | Boye/Yam            |
 |   98 | Other tuber or stem |
 |   99 | Other Land Use      |
+|  103 | Wepal               |
+|  105 | Buya                |
 |  108 | Amboshika           |
 |  110 | Giramta             |
 |  111 | Comtatie            |

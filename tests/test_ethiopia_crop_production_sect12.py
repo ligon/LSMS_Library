@@ -1,0 +1,311 @@
+"""Ethiopia ``crop_production`` reads the ESS §12 tree/fruit/root sale module (GH #820).
+
+In ESS1-ESS3 the post-harvest §11 ("CROP DISPOSITION") is headed *EXCLUDE
+TREE/FRUIT/VEGETABLE/ROOT CROPS*; those crops' sales are in §12
+(``sect12_ph_w{1,2,3}.dta``), which ``crop_production`` did not read.  In
+2015-16 §12 holds 2,627 positive sale values against §11's 1,984, so Coffee,
+Chat, Banana, Mango ... had essentially no ``Value_sold`` in W1-W3.
+
+§12 is keyed (household, holder, crop), the grain of §11, so it is attached by
+the same SALES GRAIN CAVEAT rule (a holder-level sale lands only on a crop
+grown on exactly one §9 plot).  It never adds a row and never overwrites a
+cell §11 filled.  ``ethiopia._attach_sect12_sales`` documents the classes of
+§12 line it does NOT attach; each is counted.
+
+W4 (2018-19) / W5 (2021-22) ship no ``sect12_ph`` file: ESS4 / ESPS-5 fold the
+module into §11 (W4 questionnaire: "LIST ALL CROPS HARVESTED ... FOR
+PERMANENT CROPS PLEASE INCLUDE ...").  That is VERIFIED below against the raw
+files, not assumed, and those two waves' scripts are unchanged.
+
+Tiers: the synthetic and static tests need no data; ``requires_s3`` tests
+read the raw ``.dta`` blobs or build the table.
+"""
+from __future__ import annotations
+
+import importlib.util
+import re
+import sys
+import warnings
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from lsms_library.paths import countries_root
+
+ROOT = countries_root() / "Ethiopia"
+W13 = {"2011-12": 1, "2013-14": 2, "2015-16": 3}
+W45 = {"2018-19": 4, "2021-22": 5}
+
+
+@pytest.fixture(scope="module")
+def eth():
+    """Import ``Ethiopia/_/ethiopia.py`` as a module, wherever the tree is."""
+    path = ROOT / "_" / "ethiopia.py"
+    sys.path.insert(0, str(path.parent))
+    try:
+        spec = importlib.util.spec_from_file_location("ethiopia_sect12_test", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    finally:
+        sys.path.remove(str(path.parent))
+    return mod
+
+
+# ---------------------------------------------------------------------------
+# Synthetic: the attachment rules, one holder per class
+# ---------------------------------------------------------------------------
+
+COLMAP = dict(
+    hhid="household_id", holder_id="holder_id", parcel_id="parcel_id",
+    field_id="field_id", crop_code="crop_code", quantity="qty",
+    s_crop_code="crop_code", s_sold_flag="sold", s_qty="sqty", s_value="sval",
+    s12_crop_code="crop_code", s12_sold_flag="q06", s12_qty="q07",
+    s12_value="q08",
+)
+
+
+def _harvest():
+    rows = [  # household, holder, parcel, field, crop code, kg
+        ("HH1", "H1", 1, 1, 72, 10.0),   # coffee, one plot     -> attached
+        ("HH1", "H1", 1, 2, 7, 50.0),    # teff, sold in §11
+        ("HH2", "H2", 1, 1, 72, 5.0),    # coffee on two plots  -> several
+        ("HH2", "H2", 1, 2, 72, 6.0),
+        ("HH3", "H3", 1, 1, 56, 2.0),    # kale + spinach fold onto ONE key
+        ("HH3", "H3", 1, 1, 69, 3.0),    #   'Leafy Greens'     -> folded
+        ("HH4", "H4", 1, 1, 42, 7.0),    # banana, also in §11  -> collides
+        ("HH5", "H5", 1, 1, 46, 4.0),    # mango, two §12 lines -> repeated
+        ("HH6", "H6", 1, 1, 74, 9.0),    # enset, Q6 No, blank  -> 0
+        ("HH7", "H7", 1, 1, 71, 1.0),    # chat, Q6 No, Q8 > 0  -> kept
+    ]
+    return pd.DataFrame(rows, columns=["household_id", "holder_id", "parcel_id",
+                                       "field_id", "crop_code", "qty"])
+
+
+def _sale11():
+    return pd.DataFrame(
+        [("H1", 7, 1, 20.0, 100.0), ("H4", 42, 1, 1.0, 11.0)],
+        columns=["holder_id", "crop_code", "sold", "sqty", "sval"])
+
+
+def _sale12():
+    nan = np.nan
+    return pd.DataFrame(
+        [("H1", 72, 1, 3.0, 60.0),
+         ("H2", 72, 1, 2.0, 40.0),
+         ("H3", 56, 1, 1.0, 5.0),
+         ("H4", 42, 1, 9.0, 99.0),
+         ("H5", 46, 1, 1.0, 8.0),
+         ("H5", 46, 1, 1.0, 9.0),
+         ("H6", 74, 2, nan, nan),
+         ("H7", 71, 2, nan, 30.0),
+         ("H8", 84, 1, 2.0, 50.0),     # no §9 row at all
+         ("", nan, nan, nan, nan)],    # blank roster line
+        columns=["holder_id", "crop_code", "q06", "q07", "q08"])
+
+
+def _build(eth, with12=True, unit_labels=None, sale12=None):
+    kw = {}
+    if with12:
+        kw = dict(sale12=_sale12() if sale12 is None else sale12,
+                  sale12_unit_labels=unit_labels)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        df = eth.crop_production_for_wave("2011-12", _harvest(), None, _sale11(),
+                                          COLMAP, **kw)
+    msgs = [str(w.message) for w in caught
+            if w.category.__name__ == "Sect12SaleWarning"]
+    return df, msgs
+
+
+def _row(df, holder, crop_label):
+    sub = df[df.index.get_level_values("plot_id").str.startswith(holder + "_")
+             & (df.index.get_level_values("j") == crop_label)]
+    assert len(sub) >= 1, (holder, crop_label)
+    return sub
+
+
+def test_sect12_fills_only_the_unambiguous_single_plot_pair(eth):
+    df, msgs = _build(eth)
+    coffee = _row(df, "H1", "Coffee")
+    assert coffee["Value_sold"].tolist() == [60.0]
+    assert coffee["Quantity_sold"].tolist() == [3.0]        # Kg sale on a Kg row
+    # several plots: the SALES GRAIN CAVEAT, never split
+    assert _row(df, "H2", "Coffee")["Value_sold"].isna().all()
+    # folded key: kale/spinach -> one 'Leafy Greens' key, not attributable
+    assert _row(df, "H3", "Leafy Greens")["Value_sold"].isna().all()
+    # repeated (holder, crop) lines: ambiguous, neither picked nor summed
+    assert _row(df, "H5", "Mango")["Value_sold"].isna().all()
+    # Q6 = No with Q7/Q8 blank is a sale of 0; a positive Q8 next to No is KEPT
+    assert _row(df, "H6", "Enset")["Value_sold"].tolist() == [0.0]
+    assert _row(df, "H6", "Enset")["Quantity_sold"].tolist() == [0.0]
+    assert _row(df, "H7", "Chat/Kat")["Value_sold"].tolist() == [30.0]
+    assert len(msgs) == 1
+
+
+def test_sect11_wins_a_collision_and_is_never_summed_with_sect12(eth):
+    df, _ = _build(eth)
+    banana = _row(df, "H4", "Banana")
+    assert banana["Value_sold"].tolist() == [11.0]           # §11, not 99 or 110
+    assert _row(df, "H1", "Teff")["Value_sold"].tolist() == [100.0]
+
+
+def test_sect12_adds_no_row_and_moves_no_other_cell(eth):
+    base, _ = _build(eth, with12=False)
+    new, _ = _build(eth)
+    assert base.index.equals(new.index)
+    other = [c for c in base.columns if c not in ("Quantity_sold", "Value_sold")]
+    pd.testing.assert_frame_equal(base[other], new[other])
+    for col in ("Quantity_sold", "Value_sold"):
+        was = base[col].notna()
+        pd.testing.assert_series_equal(base.loc[was, col], new.loc[was, col])
+
+
+def test_every_unattached_class_is_counted_in_the_warning(eth):
+    _, msgs = _build(eth)
+    m = msgs[0]
+    assert "read 10 lines" in m
+    for cls, lines in [("placeholder", 1), ("repeated", 2), ("collides_s11", 1),
+                       ("no_s9_row", 1), ("several_s9_plots", 1),
+                       ("folded_key", 1)]:
+        assert re.search(rf"\b{cls} {lines}/", m), (cls, m)
+    assert "kept as reported: 1" in m
+
+
+def test_a_sect12_sale_without_a_unit_attaches_value_but_no_quantity(eth):
+    """W3 records Q7's unit (ph_s12q0b).  No unit is NOT assumed to be Kg."""
+    labels = pd.Series(["1. Kilogram", "1. Kilogram", "1. Kilogram",
+                        "1. Kilogram", "1. Kilogram", "1. Kilogram", None,
+                        None, "1. Kilogram", None])
+    s12 = _sale12()
+    df, _ = _build(eth, unit_labels=labels, sale12=s12)
+    assert _row(df, "H1", "Coffee")["Quantity_sold"].tolist() == [3.0]
+    s12.loc[0, "q07"] = 3.0
+    labels.iloc[0] = None
+    df, _ = _build(eth, unit_labels=labels, sale12=s12)
+    coffee = _row(df, "H1", "Coffee")
+    assert coffee["Value_sold"].tolist() == [60.0]
+    assert coffee["Quantity_sold"].isna().all()
+
+
+# ---------------------------------------------------------------------------
+# Static: which waves read §12, and the crop dictionary
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("wave,n", sorted(W13.items()))
+def test_w1_w3_scripts_read_sect12(wave, n):
+    src = (ROOT / wave / "_" / "crop_production.py").read_text()
+    assert f"sect12_ph_w{n}.dta" in src
+    assert "sale12=sale12" in src
+    assert (ROOT / wave / "Data" / f"sect12_ph_w{n}.dta.dvc").exists()
+
+
+@pytest.mark.parametrize("wave,n", sorted(W45.items()))
+def test_w4_w5_ship_no_sect12_ph_and_do_not_read_one(wave, n):
+    assert not list((ROOT / wave / "Data").glob("sect12_ph*"))
+    src = (ROOT / wave / "_" / "crop_production.py").read_text()
+    assert "sect12" not in src and "sale12" not in src
+
+
+def test_harmonize_crop_decodes_every_sect12_code_label_in_w1(eth):
+    """103 'WEPAL' / 105 'BUYA' are the W1 §12 roster's two undecoded codes."""
+    m = eth._eth_crop_label_map()
+    assert m[103] == "Wepal" and m[105] == "Buya"
+
+
+# ---------------------------------------------------------------------------
+# Raw sources: the issue's numbers, and the W4/W5 verification
+# ---------------------------------------------------------------------------
+
+def _raw(wave, fn):
+    from lsms_library.local_tools import get_dataframe
+    return get_dataframe(str(ROOT / wave / "Data" / fn), convert_categoricals=False)
+
+
+@pytest.mark.requires_s3
+def test_issue_counts_2015_16_sect12_2627_vs_sect11_1984():
+    s12 = _raw("2015-16", "sect12_ph_w3.dta")
+    s11 = _raw("2015-16", "sect11_ph_w3.dta")
+    assert int((pd.to_numeric(s12["ph_s12q08"], errors="coerce") > 0).sum()) == 2627
+    assert int((pd.to_numeric(s11["ph_s11q04"], errors="coerce") > 0).sum()) == 1984
+
+
+@pytest.mark.requires_s3
+def test_w4_w5_sect11_carries_the_crops_only_sect12_carried_in_w1_w3():
+    """Codes recorded in W1-W3 §12 and NEVER in W1-W3 §11 (avocado, lemon,
+    orange, papaya, ...) are absent from W1-W3 §11 by construction, and
+    present -- with positive sales -- in W4/W5 §11.  And the share of §9
+    (holder, crop) pairs of those crops that have a §11 record is 0 in W1-W3
+    and ~0.74 / ~0.80 in W4 / W5 (field crops: 0.90-0.98 in every wave)."""
+    from lsms_library.local_tools import format_id
+    s12_codes, s11_codes = set(), set()
+    for w, n in W13.items():
+        s12_codes |= set(pd.to_numeric(_raw(w, f"sect12_ph_w{n}.dta")["crop_code"],
+                                       errors="coerce").dropna().astype(int))
+        s11_codes |= set(pd.to_numeric(_raw(w, f"sect11_ph_w{n}.dta")["crop_code"],
+                                       errors="coerce").dropna().astype(int))
+    only12 = s12_codes - s11_codes
+    assert len(only12) == 24, sorted(only12)
+
+    s9_crop = {1: "crop_code", 2: "crop_code", 3: "crop_code", 4: "s9q00b", 5: "s9q00b"}
+    s11_crop = {1: "crop_code", 2: "crop_code", 3: "crop_code", 4: "s11q01", 5: "s11q01b"}
+    share = {}
+    for w, n in {**W13, **W45}.items():
+        s9 = _raw(w, f"sect9_ph_w{n}.dta")
+        s11 = _raw(w, f"sect11_ph_w{n}.dta")
+        k9 = pd.DataFrame({"h": s9["holder_id"].apply(format_id).astype(str),
+                           "c": pd.to_numeric(s9[s9_crop[n]], errors="coerce")}
+                          ).dropna().drop_duplicates()
+        k11 = pd.DataFrame({"h": s11["holder_id"].apply(format_id).astype(str),
+                            "c": pd.to_numeric(s11[s11_crop[n]], errors="coerce")}
+                           ).dropna()
+        k9 = k9[k9["c"].isin(only12)]
+        hit = pd.MultiIndex.from_frame(k9).isin(pd.MultiIndex.from_frame(k11))
+        share[w] = float(hit.mean())
+        if n >= 4:
+            val = pd.to_numeric(s11["s11q12"], errors="coerce")
+            code = pd.to_numeric(s11[s11_crop[n]], errors="coerce")
+            sold = set(code[(val > 0) & code.isin(only12)].astype(int))
+            assert len(sold) >= 12, (w, sorted(sold))
+    for w in W13:
+        assert share[w] == 0.0, share
+    for w in W45:
+        assert share[w] > 0.7, share
+
+
+# ---------------------------------------------------------------------------
+# Delivered: the served table (builds Ethiopia crop_production)
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def cp():
+    from lsms_library import Country
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return Country("Ethiopia").crop_production()
+
+
+@pytest.mark.requires_s3
+def test_tree_crops_carry_sale_values_in_w2_w3(cp):
+    """Coffee / Chat had 0-1 positive Value_sold rows per wave before GH #820."""
+    v = cp["Value_sold"]
+    t = cp.index.get_level_values("t")
+    j = cp.index.get_level_values("j")
+    for wave in ("2013-14", "2015-16"):
+        for crop in ("Coffee", "Chat/Kat", "Banana", "Hops (gesho)"):
+            n = int(((v > 0) & (t == wave) & (j == crop)).sum())
+            assert n >= 100, (wave, crop, n)
+
+
+@pytest.mark.requires_s3
+def test_positive_sale_rows_per_wave(cp):
+    """Measured 2026-10-23 (development 9a0ed5f3c -> this change):
+    W1 694 -> 854, W2 1,347 -> 2,737, W3 1,017 -> 2,300; W4 / W5 unchanged.
+    W3 serves 2,300 of the 1,984 + 2,627 raw positive sale lines: the rest are
+    holder-crops grown on several plots (the SALES GRAIN CAVEAT), counted by
+    ``Sect12SaleWarning``."""
+    v = cp["Value_sold"]
+    t = cp.index.get_level_values("t")
+    got = {w: int(((v > 0) & (t == w)).sum()) for w in sorted(set(t))}
+    assert got == {"2011-12": 854, "2013-14": 2737, "2015-16": 2300,
+                   "2018-19": 1368, "2021-22": 1292}, got
