@@ -79,4 +79,43 @@ it), so any AST-visible edit to it moves every hash: measured, see §Phase 3.
 
 ---
 ### Phase 3 — verification
-(filled below)
+
+- `map_index` — OK (anchored on §3, §5): only the rename target changed;
+  `_U_SENTINELS` now covers what it emits.
+- `test_1234_map_index_unit_sentinel.py` — OK (§4): uses a `string` (pd.NA)
+  level and the `'nan'`/`'<NA>'` strings; 11 fail / 5 pass on `9a0ed5f3c`,
+  16 pass on the branch.
+
+**Census** (`unit_census.py`, shared warm cache read-only, parquets dated
+2026-10-14..19, i.e. built BEFORE bd80d86c2): 177 parquets carry a `u` index
+level (48 L2-country in 20 countries, 129 L2-wave).  The served-`'unit'`
+cells, split minted vs genuine, are in `census_summary.json`.  No column-`u`
+table holds a `'unit'`-like value.  Genuine `'unit'`: Panama only (1997
+25,825; 2008 33,244).  Minted at build (stored): Mali `food_acquired` 2014-15
+(1,912 wave, 1,534 country).  Minted at read from a `string`-policy NA: the
+EHCVM `crop_production` waves (Benin 1,005, Burkina 546, CotedIvoire 6,365,
+Guinea-Bissau 1,596, Senegal 597, Togo 606), Malawi `community_prices`
+(42,928), `plot_inputs` (28,724 in the stale wave parquets), `crop_production`
+(8,902), Panama (443).
+
+**Real data** (private roots, cold then warm, `real_diff_{cold,warm}.json`):
+
+| table | dev `'unit'` | branch `'Unknown'` | rows dev → branch | verdict |
+|---|---|---|---|---|
+| Malawi `plot_inputs` | 6,067 (370 / 101 / 5,576 / 20) | 6,075 (6,067 + 8 pre-existing) | 179,949 → 179,949 | relabel only |
+| CotedIvoire `crop_production` | 6,358 | 6,358 | 22,216 → 22,216 | relabel only |
+| Mali `food_acquired` | 1,534 | 1,534 | 431,046 → 431,046 | relabel only |
+| Malawi `crop_production` (warm) | 8,902 | 8,902 | 135,078 → 135,078 | relabel only; cold serves NaN on both |
+| Panama `food_acquired` | 59,509 | 443 (genuine `'unit'` 59,069 kept) | 570,939 → 570,942 | see below |
+
+Panama: 440 rows relabel cleanly.  On development 3 minted 2008 `produced`
+rows were SUMMED into genuine `'unit'` rows at the declared-index collapse;
+the branch separates them (+3 rows, 3 genuine Quantities restored).  Because
+the branch frame has no duplicate key, the additive collapse no longer runs,
+and with it goes its re-derivation `Price = Expenditure / Quantity` on EVERY
+row: 8 purchased 2008 rows (`unit` 2, `pound` 3, `gram` 3) now serve the wave
+script's own Price (a mean of per-row prices) instead.
+
+**Cost**: AST-visible no-op in `map_index` moved 549/549 country,
+40/40 `build_transforms_fingerprint`, 2,109/2,109 wave hashes (38 countries);
+the fix moves the same.  Corpus-wide cold re-warm, both tiers.
