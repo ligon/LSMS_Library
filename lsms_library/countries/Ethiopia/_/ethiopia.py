@@ -1674,8 +1674,9 @@ def derive_sect12_sale(sold_flag, quantity_sold, value_sold):
 
     THE IDENTITY, plus the one reading §11 also makes: Q6 == 2 ("NO", skip to
     Q10a) with Q7 and Q8 both blank is a sale of 0.  A positive Q7 or Q8 next
-    to a "No" is returned exactly as reported (the §11 path overwrites it
-    with 0; this does not).  Everything else is returned unchanged.
+    to a "No" is returned exactly as reported (the §11 path used to overwrite
+    it with 0; since GH #1253 both read it through :func:`_no_sale_reading`).
+    Everything else is returned unchanged.
 
     The derivation registered for it
     (``Ethiopia::crop_production::sect12-sale-period``) is about the WINDOW,
@@ -1690,6 +1691,25 @@ def derive_sect12_sale(sold_flag, quantity_sold, value_sold):
     Returns a DataFrame with columns ``Quantity_sold`` and ``Value_sold``
     (Float64), aligned with the inputs.
     """
+    q, v = _no_sale_reading(sold_flag, quantity_sold, value_sold)
+    return pd.DataFrame({'Quantity_sold': q, 'Value_sold': v})
+
+
+def _no_sale_reading(sold_flag, quantity_sold, value_sold):
+    """The ESS reading of a "did you sell?" = No (code 2) line, shared by §11
+    and §12 (GH #820 / #1253).
+
+    A "No" skips the quantity and value questions, so on a "No" line whose
+    quantity and value are both blank or zero, a BLANK cell is a sale of 0.
+    That is the only cell this changes: a value recorded beside the "No"
+    (positive, or an explicit 0) is returned exactly as reported -- the "No"
+    is never used to overwrite an answer -- and where the line records a
+    positive quantity or value, its other blank cell is left blank (the
+    answers contradict the flag; nothing is read into the gap).  A missing
+    flag zeroes nothing: only a positive "No" is a zero (the #1250 rule).
+    Returns ``(quantity_sold, value_sold)`` as Float64 Series on the flag's
+    positional index.
+    """
     flag = pd.to_numeric(pd.Series(sold_flag), errors='coerce').astype('Int64')
     q = pd.to_numeric(pd.Series(quantity_sold), errors='coerce').astype('Float64')
     v = pd.to_numeric(pd.Series(value_sold), errors='coerce').astype('Float64')
@@ -1700,7 +1720,7 @@ def derive_sect12_sale(sold_flag, quantity_sold, value_sold):
     zero = no & ~pos
     q = q.mask(zero & q.isna(), 0.0)
     v = v.mask(zero & v.isna(), 0.0)
-    return pd.DataFrame({'Quantity_sold': q, 'Value_sold': v})
+    return q, v
 
 
 def inputs_sect12_sale(wave):
@@ -2139,10 +2159,28 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         val = (pd.to_numeric(s[c['s_value']], errors='coerce')
                if c.get('s_value') and c['s_value'] in s.columns else pd.NA)
         # sale unit label: pre-decoded labels (s_unit_labels) where the
-        # sale unit is a coded column, else 'Kg' (W1/W2 sale qty is kilos).
+        # sale unit is a coded column (W3-W5), else 'Kg' (W1/W2: the
+        # instrument fixes the sale quantity in kilos).
+        #
+        # GH #1253 (c): a BLANK coded sale unit is NOT read as Kg.  In
+        # W3-W5 the unit is blank essentially only behind Q1 = No (the
+        # skip; raw lines: W3 6,181 of 6,181 blank units, W4 6,724 of 6,730
+        # -- 5 have no flag, 1 is a Yes with quantity 0 --, W5 4,768 of 4,774
+        # -- 6 Yes lines with quantity 0), and no line in any wave carries a
+        # positive quantity with a blank unit.  Filling it with 'Kg' attached a "No"'s zero quantity
+        # to the row's Quantity_sold ONLY when the harvest happened to be in
+        # Kg (W3/W4/W5: 542 / 816 / 819 served rows) and to no other row --
+        # a served zero decided by the harvest unit.  The unit stays NA,
+        # and a line with no sale unit attaches no Quantity_sold (Value_sold,
+        # being unit-free, still attaches): the rule the §12 path in this
+        # same function already follows (GH #820), and the #1041 precedent
+        # that an unrecorded unit is never a real one.  NA rather than the
+        # 'Unknown' sentinel because the sale unit is not an index level
+        # here (it is only a join key); the served table is identical
+        # either way.
         if sale_unit_labels is not None:
             s_unit = _clean_unit_label(
-                pd.Series(sale_unit_labels.values, index=s.index)).fillna('Kg')
+                pd.Series(sale_unit_labels.values, index=s.index))
         else:
             s_unit = pd.Series('Kg', index=s.index)
         sdf = pd.DataFrame({
@@ -2153,15 +2191,34 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
             'Value_sold': val if np.isscalar(val) else val.values,
         })
         if sold_flag is not None:
-            # sold flag 2 == No -> zero the reported sale.
-            no = (sold_flag == 2).values
-            sdf.loc[no, ['Quantity_sold', 'Value_sold']] = 0.0
+            # GH #1253 (b): Q1 = 2 ("No", skip) reads a BLANK sale cell as a
+            # sale of 0 -- and nothing else.  A value recorded beside the
+            # "No" is kept as reported (it used to be overwritten with 0:
+            # W1 has one such line, a positive Q3 quantity).  The same reading
+            # as §12's (`derive_sect12_sale`); a missing flag zeroes nothing
+            # (#1250's rule: only a positive "No" is a zero).
+            q_read, v_read = _no_sale_reading(
+                sold_flag.values, sdf['Quantity_sold'], sdf['Value_sold'])
+            sdf['Quantity_sold'] = q_read.to_numpy(dtype=float, na_value=np.nan)
+            sdf['Value_sold'] = v_read.to_numpy(dtype=float, na_value=np.nan)
         sdf = sdf.dropna(subset=['_holder', '_code'])
         # Aggregate to (holder, crop): sum Value_sold (unit-free); for
         # Quantity_sold sum WITHIN each sale unit and keep the per-unit
         # breakdown so we can match it against the harvest `u`.
-        vagg = sdf.groupby(['_holder', '_code'], as_index=False)['Value_sold'].sum()
-        qagg = sdf.groupby(['_holder', '_code', '_sunit'], as_index=False)['Quantity_sold'].sum()
+        #
+        # GH #1253 (a): ``sum(min_count=1)`` -- a group whose cells are ALL
+        # blank stays NaN.  A bare ``.sum()`` served it as a sale of 0
+        # (46 / 9 / 0 / 9 / 8 (holder, crop) groups' Value_sold in W1-W5):
+        # a missing answer served as "sold nothing" (the class of #1250 /
+        # #1184; precedent Panama/2008/_/food_acquired.py, GH #905).
+        # Vectorised on purpose -- a per-group Python callable makes pandas
+        # deepcopy ``attrs`` once per group (CLAUDE.md, GH #871).
+        vagg = sdf.groupby(['_holder', '_code'], as_index=False)['Value_sold'].sum(min_count=1)
+        # A line with no recorded sale unit (NA, see (c) above) attaches no
+        # quantity: dropped here EXPLICITLY, not by groupby's dropna.
+        qagg = (sdf.dropna(subset=['_sunit'])
+                   .groupby(['_holder', '_code', '_sunit'], as_index=False)['Quantity_sold']
+                   .sum(min_count=1))
         # Count plot-crop harvest rows per (holder, crop); attach only when 1.
         nplots = (out.dropna(subset=['_code'])
                      .groupby(['_holder', '_code'])['plot_id'].nunique()

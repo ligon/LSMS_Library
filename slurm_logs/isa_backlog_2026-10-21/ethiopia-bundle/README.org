@@ -1,0 +1,25 @@
+#+title: Ethiopia crop_production bundle -- GH #1253, #1252, #1256
+
+Aggregates only (counts, totals, shares); no household, holder or plot
+identifiers.  Measured 2026-10-23 on a sucoder /local clone.  Base =627d3cfdf=
+(#1257's head, GH #820) in a detached worktree; development =9a0ed5f3c=; the
+branch =fix/1252-1253-1256-ethiopia-bundle-20261023=, built once per commit.
+Every build: its OWN fresh =LSMS_DATA_DIR= (cold; =dvc-cache= symlinked to the
+shared L1), =PYTHONPATH= = the checkout under test (import identity asserted),
+=OPENBLAS/OMP/MKL_NUM_THREADS=1=, =LSMS_BUILD_WORKERS=1=, =nice -n 19=.
+
+*Running a test file against a base checkout*: =tests/= is a package
+(=tests/__init__.py=), so pytest prepends the TEST FILE's repo root to
+=sys.path=.  Running the branch's test file by path from inside a base checkout
+silently imports the BRANCH's =lsms_library= (it did, once, here: 14 passed
+"on base").  =scripts/run_test_on.sh= copies the file into the checkout under
+test, runs it there, and deletes the copy.
+
+* GH #1253 -- §11 sale path
+
+| file | what |
+|------+------|
+| =1253_api_diff_base_vs_branch.json= | =Country('Ethiopia').crop_production()= cold, base vs branch: rows, index identity, changed cells by wave and transition |
+| =1253_change_attribution.json= | every changed cell (wave parquets) attributed to sub-fix (a) / (b) / (c) by the raw §11 lines of its (holder, crop) |
+| =1253_raw_oracle.json= | an independent recomputation of the §11 aggregate from the raw =.dta=, checked against the branch's and the base's wave parquets |
+| =1253_downstream_and_reports.json= | =harvest_kg=, =gross_crop_revenue=, within-wave =median_price_valuation=, grain / null-read / null-index / quantity reports, warning categories |

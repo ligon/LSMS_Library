@@ -1,0 +1,61 @@
+{
+ "2011-12": {
+  "Value_sold": {
+   "(a) 0.0->NaN": 46
+  },
+  "Quantity_sold": {
+   "(a) 0.0->NaN": 45
+  },
+  "wave_parquet_rows": [
+   7746,
+   7746
+  ]
+ },
+ "2013-14": {
+  "Value_sold": {
+   "(a) 0.0->NaN": 6
+  },
+  "Quantity_sold": {
+   "(a) 0.0->NaN": 4
+  },
+  "wave_parquet_rows": [
+   26765,
+   26765
+  ]
+ },
+ "2015-16": {
+  "Value_sold": {},
+  "Quantity_sold": {
+   "(c) 0.0->NaN": 542
+  },
+  "wave_parquet_rows": [
+   25924,
+   25924
+  ]
+ },
+ "2018-19": {
+  "Value_sold": {
+   "(a) 0.0->NaN": 6
+  },
+  "Quantity_sold": {
+   "(c) 0.0->NaN": 816
+  },
+  "wave_parquet_rows": [
+   14102,
+   14102
+  ]
+ },
+ "2021-22": {
+  "Value_sold": {
+   "(a) 0.0->NaN": 8
+  },
+  "Quantity_sold": {
+   "(c) 0.0->NaN": 816,
+   "unattributable (folded label) 0.0->NaN": 3
+  },
+  "wave_parquet_rows": [
+   11623,
+   11623
+  ]
+ }
+}
