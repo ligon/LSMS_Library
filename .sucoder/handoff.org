@@ -1,6 +1,77 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current task -- 2026-10-23T01:05:29.083946+00:00
+* Current handoff -- 2026-10-23T01:43:30.672404+00:00
+
+The user requested that this session wrap up with a handoff.
+All five assigned workstreams are stopped; no source diagnostic, build or test remains running.
+The LSMS-ISA objective is incomplete: 90 overlapping remaining records, five assigned workstreams, four other partial residuals and 81 unassigned records.
+The user-authorized batch of 32 implementation PRs and tracker1170 is merged into development60aa81e9eda3b747e25a37c9e7354315b842b408; 22 fully resolved issues were closed.
+These queue counts retain the earlier complete GitHub collection timestamp; the final interval added two assignments, not two completed fixes.
+
+** Restart here
+
+Use this docs branch, =docs/isa-backlog-20261022-merge-progress=, for the latest handoff.
+The prior committed docs head was15eec288a; the commit containing this entry is the next docs commit.
+The main checkout remains clean on historical developmentf8d23669; do not reset it or mistake it for current GitHub development.
+The shared mirror working tree was not edited.
+Every source/ledger branch named below was normally published to the durable filesystem origin.
+
+Resume substantive bounded source diagnosis directly; retain checkout/import identity, private caches, native scientific definitions, meaningful tests and independent review.
+Avoid another generalized approval/guard/controller framework for already-authorized read-only work.
+LLM inference runs remotely, so CPU load alone does not measure agent progress; however, workers really were left waiting for coordinator review, and metadata/receipt machinery displaced substantive data work.
+The two new CLI workers each finished an inventory and stopped before the promised diagnostic phase restarted.
+Report actual running processes separately from assigned lanes.
+
+** Five stopped workstreams and next actions
+
+- Framework/Burkina issue1218 :: =fix/1218-current-integration-20261022=, cleanHEADf0d0a1d2e54121e0cb4817444f7a6542bcbe0c3e at =/local/job40255479/worktrees/isa-framework-1218-integration=.
+  Original exact 5f source passed 57 targeted regressions and 104 additional tests; root accepted completed synthetic evidence. Current-development integration checkout is clean at f0d0a1d2, with only published ledger commits. Proposed clean merge tree 365d55b0 is not materialized. No integrated runtime or genuine source validation has run. Next: ordinary merge of reviewed 5f into the current branch, confirm exact proposed tree, commit, then targeted current-context tests and bounded genuine validation.
+  Proposed merge tree365d55b06b70faa0e2b17a775e8ac48b511f3043; reviewed5fdbb937d653cd6b72c0ba9419388bedeacdb32f; root completed acceptance0155b6256669ba72e45d8b4f5eb811d462f699ca50695619210a7bb274d0c307.
+  Source proposal =C/framework1218-integration-static/REVIEW-PROPOSAL.md=; full final proposal diffSHA45f74841ef9415ace06d4474c89031c8668b5c937d59079b317b8df37be29dfd.
+- Mali issue1118 :: =fix/1118-mali-missing-input-units-20261022=, cleanHEAD24278b6c979fde84ccd421c1eb7090874d00d355 at =/local/job40255479/worktrees/isa-Mali-1118=.
+  Mali synthetic evidence is accepted: parent 11 contract failures/14 passes, 18 supporting passes, 30 comparator fault rejections and two positive assertions. Two new diagnosis calibrations exited 0/0; the metadata gate exited 1 because its receipt writer retained an old path. Original failures remain preserved. A narrow saved-result continuation is frozen and root-reviewed, but not released or executed. No provider payload operations, production fill or normal API run occurred. Next: use the additive saved gate without repeating passing calibrations, then execute the bounded 14-source diagnosis. Malawi and Nigeria remain in this umbrella.
+  =C/mali1118-fix/diagnosis-v2-saved-gate-continuation/FINAL-PINS.json= SHA6c7912d06eeeec43b65b9bb6addbac23c55e5ae862868d331a9ca57cdfdeb164; overlay040605fa5dbddf9b40e246a7c2bd1a553bca60bc0ab1229989e598a0d3563c35.
+  Original plan740f8a9261ca62116e79ed88d220a4a219cc375af36fb61f9ec73644ce70799c and guard19334f7bd8394bbc3020e182fee81a6ee21c40bcc90b87dc6976fb5ba1710a9a remain unchanged; root reviewed exact correction in tool823e4b, but did not issue a continuation release.
+  Missing startup-attempt files must never be fabricated; original literal stderr/boot are the actual evidence. Earlier empty-glob shutdown claims were invalid and explicitly qualified.
+  Later production and normal comparison must integrate onto current development rather than the historicalf8 baseline.
+- Uganda issue1133 :: =diagnose/1133-uganda-comm-20261023=, cleanHEAD875c135bb3e74a0421286433ab02160badbe7abc at =/local/job40255479/worktrees/isa-Uganda-1133=.
+  Uganda phase0 is accepted; clean published ledger HEAD 875c135b is based on development 60aa. No runtime or provider payload operation launched before the handoff request. Scalar-string cluster-index mappings bypass the named formatter used by sample mappings. No registered CSECTION1 endpoint exists. Next: minimal twelve-source authentication/private-copy/native inspection (4,931,955 declared bytes), establish actual community key authority, then propose rendering. Unfinished generalized v1-v4 controller drafts are not runnable.
+  =C/uganda1133-diagnostic-v1/HANDOFF.md= SHAa5cc71c2be8dd7936daf97f46d35e2798d7a01be354c784f795d444e06e7f8c9; =WRAPUP.json= SHAf6dbb57e0e0c88489590adcc059175786c2307f6f67332053227b4aba0035d60.
+  Country EA/GPS/mover/later-parish semantics remain distinct; historical322/272/50 counts are unmeasured.
+- Malawi issue856 :: =diagnose/856-malawi-harvest-20261023=, published ledger6465a20e3 at =/local/job40255479/worktrees/isa-Malawi-856=.
+  Malawi source inventory is complete; published ledger HEAD 6465a20e. All twelve G/P providers are already held (35,900,020 declared bytes); home aliases and configured scratch paths identify the same files. Generic Other crops are retained and the unmapped-crop warning already landed. Own specify-text fields and frequencies remain unmeasured. CLI phase0 exited 0; phase1 brief exists but was never launched. Next: bounded own-source crop/unit/specify-text diagnosis; preserve native Quantity and sale-unit basis.
+  CLI thread01a1665b-1bc3-7802-9705-528e1dbcba8d; initialPID637011, actual exit0; no phase1 process exists.
+  Root corrected the inventory's false default-L1-absence statement against its own endpoint records and same-file alias checks.
+  The static =make api-audit= unexpectedly created a temporary6.8MB environment; the worker removed that newly created artifact without authorization. Original logs and report preserve this deviation. Root subsequently linked the already-mounted job runtime; no further cleanup occurred.
+- Niger issue823 :: =diagnose/823-niger-community-prices-20261023=, published ledgerf28ba4983 at =/local/job40255479/worktrees/isa-Niger-823=.
+  Niger source inventory is complete; published ledger HEAD f28ba498. Held 2018 s05 community source contradicts the old no-file code comment. Current grain has seven index levels. Price basis, required Quantity, unit-size labels and native axes remain unmeasured. CLI phase0 exited 0; phase1 brief exists but was never launched. Next: bounded three-source price/cover/food-label diagnosis (7,611,887 declared bytes); defer weights, sample builds, inferred unit conversions and production wiring.
+  CLI thread01a1665b-1bac-7650-8ddf-0717d7ead91e; initialPID637005, actual exit0; no phase1 process exists.
+
+For both CLI lanes use =C/extra-country-workers-20261023/{Malawi-856,Niger-823}/= for reports, exact source plans, event logs, terminal records, phase1 briefs and WRAPUP.json.
+The original phase0 launcher asserts the old clean60aa HEAD and cannot be reused unchanged after the ledger commits.
+The phase1 prompts are prepared instructions, not executed diagnostics.
+The two CLI workers were pinned to28-29 and30-31 respectively, with numerical/build pools1; no additional Slurm allocation was made.
+
+** Evidence and durability
+
+=C= means =/local/job40255479/control/isa-backlog-20261021=.
+Private later evidence is archived at =/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/handoff-20261023T0142-postmerge-followups.tar.gz=.
+ArchiveSHA256=46321762a66561536160bb2af7c1cd9d97c89267b78aafb4e1d9c3121410676b=;24,074,325compressedbytes;3,742members; complete archive SHA and safe member names were verified after writing.
+The companion =handoff-20261023T0142-postmerge-followups.receipt.json= records the exact included prefixes/root records.
+It includes the completed1218 proof, integration proposal, Mali proof/continuation, Uganda phase0/unfinished diagnosis drafts, both CLI worker logs/briefs and final32CI readback.
+The older Archive32 and this new archive retain their respective scopes; no actor was repeated for packaging.
+Private files remain0600 and archive copies stay in the existing private scratch directory.
+Absolute job-local paths and symlinks in old records describe historical execution; on a new allocation rebind a minimal next action explicitly, never silently replay historical controllers.
+
+Current job40255479 has32cores/93GiB, about21.5hours remaining at the last inventory, and no deadline-warning file.
+The mounted runtime is =/local/job40255479/venv_img=, generation20261019T221223Z; it disappears when this job ends.
+Mount the existing shared image in a new allocation; do not build/adopt a replacement environment or use the writable Lustre master.
+No cluster repairs, permission changes, new allocations or job cancellations were performed.
+Because the allocation remains billed after this session stops, the user should run =sucoder release= when finished.
+
+Sue
+
+* Earlier task -- 2026-10-23T01:05:29.083946+00:00
 
 The user-authorized merge batch is COMPLETE:32 implementation PRs+tracker1170 into development60aa81e9. Goal remains ACTIVE:90remainingrecords,3active/4otherpartial/83unassigned,22closedcompleted; lastcompleteGitHubcollection checkpoint retained below.
 Docs lastpublished/pusheda9efb4e20 before this update; commit/publish/push this checkpoint normally. Maincheckout remainscleanf8; sharedmirrorworkingtreeuntouched.

@@ -12,32 +12,36 @@ See merge-task-completed.json for the final merge record.
 
 Captured 2026-10-23T00:16:15.307282+00:00 from complete remote PR, issue and development-branch collections.
 All 32 implementation PRs are merged into development; 22 fully resolved issues are closed completed.
-There are 90 remaining ISA scope records, including three active issues, four other partial residuals and 83 unassigned records.
+There are 90 remaining ISA scope records, including five assigned workstreams, four other partial residuals and 81 unassigned records.
 Two additional global issues remain open with completed ISA country portions; their remaining shared/non-ISA work is listed separately.
 These overlapping records are not a count of distinct ready-to-fix bugs.
-The captured development tip is a3aad0d43cac1866bab5a91cd59716bb659e9e28.
+The final verified development tip after the tracker merge is 60aa81e9eda3b747e25a37c9e7354315b842b408; the earlier collection captured its pre-tracker parent a3aad0d43cac1866bab5a91cd59716bb659e9e28.
 Original failures, skipped data jobs and review limits remain preserved; this is not a full-corpus or release verdict.
 
-* Active work
+* Assigned workstreams at handoff
 
-Updated 2026-10-23T00:56:10.287216+00:00; the complete remote issue collection remains the dated snapshot above.
+Updated 2026-10-23T01:43:30.672404+00:00.
+All five workers are stopped; assigned workstreams are not running-process counts.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1118][#1118]] plot_inputs: complete country missing-unit normalization under the #1041 ruling
 
-Countries: Ethiopia, Malawi, Mali, Nigeria, Tanzania.
-Landed PRs: #1181, #1185.
-Mali synthetic checks are accepted: the unchanged parent gives 11 missing-unit contract failures and 14 passes; 18 supporting scientific conversion tests pass. Thirty distinct comparator faults are rejected and two separate positive assertions pass. The original metadata-gate failure is preserved; an additive saved-result correction passed without repeating tests. Source-first diagnosis is being prepared for 14 providers, before any production fill. Provider payload checks, source-first decoding, the conditional production change and genuine validation remain pending. Malawi and Nigeria also remain in this umbrella.
-Ethiopia/Tanzania repairs landed. Mali, Malawi and Nigeria remain; non-ISA countries are separate.
+Mali synthetic evidence is accepted: parent 11 contract failures/14 passes, 18 supporting passes, 30 comparator fault rejections and two positive assertions. Two new diagnosis calibrations exited 0/0; the metadata gate exited 1 because its receipt writer retained an old path. Original failures remain preserved. A narrow saved-result continuation is frozen and root-reviewed, but not released or executed. No provider payload operations, production fill or normal API run occurred. Next: use the additive saved gate without repeating passing calibrations, then execute the bounded 14-source diagnosis. Malawi and Nigeria remain in this umbrella.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1218][#1218]] Constructed empty tables ignore declared types of country-local optional fields
 
-Countries: Burkina_Faso, Shared framework.
-Amended source 5fdbb937d passed independent source review, all 57 targeted regressions and 104 additional tests with the 57 deselected. The narrow saved-result correction and complete final source protection passed; the original metadata-gate failure remains recorded. Before genuine validation, the agent is preparing an isolated additive integration onto current development 60aa81e9: framework and Burkina Faso changes have landed since the original f7/657 comparison context. Existing evidence retains its exact original source identity. No genuine payload checks, copies or decoding have run.
+Original exact 5f source passed 57 targeted regressions and 104 additional tests; root accepted completed synthetic evidence. Current-development integration checkout is clean at f0d0a1d2, with only published ledger commits. Proposed clean merge tree 365d55b0 is not materialized. No integrated runtime or genuine source validation has run. Next: ordinary merge of reviewed 5f into the current branch, confirm exact proposed tree, commit, then targeted current-context tests and bounded genuine validation.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/1133][#1133]] Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids
 
-Countries: Uganda.
-Source-only phase 0 is complete and root-accepted on development 60aa81e9 plus ledger-first commit 875c135bb3e74a0421286433ab02160badbe7abc. Scalar-string cluster-index mappings bypass the named formatter used by sample mappings, so changing the formatter alone is insufficient. Cluster meaning changes across waves; historical 322/272/50 pair counts remain unverified. The agent is preparing a bounded twelve-provider diagnosis of early covers, geovariables and four raw community files before choosing canonical rendering. Twenty eventual validation providers are inventoried by metadata only; no provider payload hashing, copying, decoding or runtime has run.
+Uganda phase0 is accepted; clean published ledger HEAD 875c135b is based on development 60aa. No runtime or provider payload operation launched before the handoff request. Scalar-string cluster-index mappings bypass the named formatter used by sample mappings. No registered CSECTION1 endpoint exists. Next: minimal twelve-source authentication/private-copy/native inspection (4,931,955 declared bytes), establish actual community key authority, then propose rendering. Unfinished generalized v1-v4 controller drafts are not runnable.
+
+** [[https://github.com/ligon/LSMS_Library/issues/856][#856]] Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before deciding on recovery
+
+Malawi source inventory is complete; published ledger HEAD 6465a20e. All twelve G/P providers are already held (35,900,020 declared bytes); home aliases and configured scratch paths identify the same files. Generic Other crops are retained and the unmapped-crop warning already landed. Own specify-text fields and frequencies remain unmeasured. CLI phase0 exited 0; phase1 brief exists but was never launched. Next: bounded own-source crop/unit/specify-text diagnosis; preserve native Quantity and sale-unit basis.
+
+** [[https://github.com/ligon/LSMS_Library/issues/823][#823]] Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504/504 grappes); data_scheme.yml says the wave has none -- twin of Mali #821, check the other six EHCVM countries
+
+Niger source inventory is complete; published ledger HEAD f28ba498. Held 2018 s05 community source contradicts the old no-file code comment. Current grain has seven index levels. Price basis, required Quantity, unit-size labels and native axes remain unmeasured. CLI phase0 exited 0; phase1 brief exists but was never launched. Next: bounded three-source price/cover/food-label diagnosis (7,611,887 declared bytes); defer weights, sample builds, inferred unit conversions and production wiring.
 
 * Remaining country scope after landed partial repairs
 
@@ -261,12 +265,6 @@ Countries: Mali.
 Historical triage: B; Wire both2018 s05 price readings, size-resolved unit mapping, and correct false absence comment; leave2021 region-grain module as distinct design.
 Reconcile the live issue and complete country notes before dispatch.
 
-** [[https://github.com/ligon/LSMS_Library/issues/823][#823]] Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504/504 grappes); data_scheme.yml says the wave has none -- twin of Mali #821, check the other six EHCVM countries
-
-Countries: Niger.
-Historical triage: B; Wire both s05 readings with size-resolved unit crosswalk, native variety/visit/obs; correct false no-file comment.
-Reconcile the live issue and complete country notes before dispatch.
-
 ** [[https://github.com/ligon/LSMS_Library/issues/824][#824]] Complete sold-unit audits and use Unit_sold in farmgate consumers
 
 Countries: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania, Uganda.
@@ -337,12 +335,6 @@ Reconcile the live issue and complete country notes before dispatch.
 
 Countries: Malawi.
 Historical triage: C; Count ag_r07 nullness bywave, choose canonical prior-year stock name, expose separately without replacing current stock or deriving flows at build.
-Reconcile the live issue and complete country notes before dispatch.
-
-** [[https://github.com/ligon/LSMS_Library/issues/856][#856]] Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before deciding on recovery
-
-Countries: Malawi.
-Historical triage: B; Count raw harvest other-unit/crop codes and distinct own-source text per wave; recover only if material, no stored Quantity rescaling.
 Reconcile the live issue and complete country notes before dispatch.
 
 ** [[https://github.com/ligon/LSMS_Library/issues/860][#860]] Nigeria: no factors for heaps/ridges/stands areas; EPAR's two grids disagree by a median of 4.9x

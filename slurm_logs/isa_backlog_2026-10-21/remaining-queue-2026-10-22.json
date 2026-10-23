@@ -5,8 +5,8 @@
   "repository_open_issues": 151,
   "isa_related_open_issue_records": 90,
   "pr_linked_issue_records": 5,
-  "active_issue_records": 3,
-  "other_open_issue_records": 83,
+  "active_issue_records": 5,
+  "other_open_issue_records": 81,
   "open_unmerged_implementation_prs": 0,
   "initial_in_scope_still_open": 82,
   "new_campaign_issue_records": 10,
@@ -411,18 +411,19 @@
       "title": "Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504/504 grappes); data_scheme.yml says the wave has none -- twin of Mali #821, check the other six EHCVM countries",
       "url": "https://github.com/ligon/LSMS_Library/issues/823",
       "github_state": "open",
-      "queue_state": "OPEN_UNASSIGNED",
+      "queue_state": "ACTIVE",
       "countries": [
         "Niger"
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": null,
+      "current_active_scope": "Niger source inventory is complete; published ledger HEAD f28ba498. Held 2018 s05 community source contradicts the old no-file code comment. Current grain has seven index levels. Price basis, required Quantity, unit-size labels and native axes remain unmeasured. CLI phase0 exited 0; phase1 brief exists but was never launched. Next: bounded three-source price/cover/food-label diagnosis (7,611,887 declared bytes); defer weights, sample builds, inferred unit conversions and production wiring.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Wire both s05 readings with size-resolved unit crosswalk, native variety/visit/obs; correct false no-file comment.",
       "scope_recheck_required_before_dispatch": true,
       "current_dispatch_assessment": "Niger2018community price wiring viable but countryCONTENTS1183-1206 explicitly defers while native size-qualified unit crosswalk is missing. Quote/reconcile that note; preserving native reported labels and delivering downstream comparability are separate claims. Do not infer2014weight basis.",
-      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00",
+      "worker_execution_state": "STOPPED_FOR_HANDOFF"
     },
     {
       "number": 824,
@@ -646,16 +647,17 @@
       "title": "Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before deciding on recovery",
       "url": "https://github.com/ligon/LSMS_Library/issues/856",
       "github_state": "open",
-      "queue_state": "OPEN_UNASSIGNED",
+      "queue_state": "ACTIVE",
       "countries": [
         "Malawi"
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": null,
+      "current_active_scope": "Malawi source inventory is complete; published ledger HEAD 6465a20e. All twelve G/P providers are already held (35,900,020 declared bytes); home aliases and configured scratch paths identify the same files. Generic Other crops are retained and the unmapped-crop warning already landed. Own specify-text fields and frequencies remain unmeasured. CLI phase0 exited 0; phase1 brief exists but was never launched. Next: bounded own-source crop/unit/specify-text diagnosis; preserve native Quantity and sale-unit basis.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Count raw harvest other-unit/crop codes and distinct own-source text per wave; recover only if material, no stored Quantity rescaling.",
-      "scope_recheck_required_before_dispatch": true
+      "scope_recheck_required_before_dispatch": true,
+      "worker_execution_state": "STOPPED_FOR_HANDOFF"
     },
     {
       "number": 860,
@@ -1218,7 +1220,7 @@
         1185
       ],
       "residual": "Ethiopia/Tanzania repairs landed. Mali, Malawi and Nigeria remain; non-ISA countries are separate.",
-      "current_active_scope": "Mali synthetic checks are accepted: the unchanged parent gives 11 missing-unit contract failures and 14 passes; 18 supporting scientific conversion tests pass. Thirty distinct comparator faults are rejected and two separate positive assertions pass. The original metadata-gate failure is preserved; an additive saved-result correction passed without repeating tests. Source-first diagnosis is being prepared for 14 providers, before any production fill. Provider payload checks, source-first decoding, the conditional production change and genuine validation remain pending. Malawi and Nigeria also remain in this umbrella.",
+      "current_active_scope": "Mali synthetic evidence is accepted: parent 11 contract failures/14 passes, 18 supporting passes, 30 comparator fault rejections and two positive assertions. Two new diagnosis calibrations exited 0/0; the metadata gate exited 1 because its receipt writer retained an old path. Original failures remain preserved. A narrow saved-result continuation is frozen and root-reviewed, but not released or executed. No provider payload operations, production fill or normal API run occurred. Next: use the additive saved gate without repeating passing calibrations, then execute the bounded 14-source diagnosis. Malawi and Nigeria remain in this umbrella.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Fill every missing unit with existing U_UNKNOWN at build, including native Malawi u index; retain use/cost records with no quantity. Nigeria dropping non-input rows is optional separate decision, not needed to fill.",
       "scope_recheck_required_before_dispatch": true,
@@ -1229,7 +1231,8 @@
         "Mali",
         "Malawi",
         "Nigeria"
-      ]
+      ],
+      "worker_execution_state": "STOPPED_FOR_HANDOFF"
     },
     {
       "number": 1119,
@@ -1323,10 +1326,11 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Source-only phase 0 is complete and root-accepted on development 60aa81e9 plus ledger-first commit 875c135bb3e74a0421286433ab02160badbe7abc. Scalar-string cluster-index mappings bypass the named formatter used by sample mappings, so changing the formatter alone is insufficient. Cluster meaning changes across waves; historical 322/272/50 pair counts remain unverified. The agent is preparing a bounded twelve-provider diagnosis of early covers, geovariables and four raw community files before choosing canonical rendering. Twenty eventual validation providers are inventoried by metadata only; no provider payload hashing, copying, decoding or runtime has run.",
+      "current_active_scope": "Uganda phase0 is accepted; clean published ledger HEAD 875c135b is based on development 60aa. No runtime or provider payload operation launched before the handoff request. Scalar-string cluster-index mappings bypass the named formatter used by sample mappings. No registered CSECTION1 endpoint exists. Next: minimal twelve-source authentication/private-copy/native inspection (4,931,955 declared bytes), establish actual community key authority, then propose rendering. Unfinished generalized v1-v4 controller drafts are not runnable.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Inspect CSECTION1 key rendering; reconstruct 322 linked-household pair table and two non-bijective pairs; apply common read-point mapping to sample+cluster_features, preserve community joins, then remeasure and update sampling boundary.",
-      "scope_recheck_required_before_dispatch": true
+      "scope_recheck_required_before_dispatch": true,
+      "worker_execution_state": "STOPPED_FOR_HANDOFF"
     },
     {
       "number": 1134,
@@ -1600,10 +1604,11 @@
       ],
       "implementation_prs": [],
       "residual": null,
-      "current_active_scope": "Amended source 5fdbb937d passed independent source review, all 57 targeted regressions and 104 additional tests with the 57 deselected. The narrow saved-result correction and complete final source protection passed; the original metadata-gate failure remains recorded. Before genuine validation, the agent is preparing an isolated additive integration onto current development 60aa81e9: framework and Burkina Faso changes have landed since the original f7/657 comparison context. Existing evidence retains its exact original source identity. No genuine payload checks, copies or decoding have run.",
+      "current_active_scope": "Original exact 5f source passed 57 targeted regressions and 104 additional tests; root accepted completed synthetic evidence. Current-development integration checkout is clean at f0d0a1d2, with only published ledger commits. Proposed clean merge tree 365d55b0 is not materialized. No integrated runtime or genuine source validation has run. Next: ordinary merge of reviewed 5f into the current branch, confirm exact proposed tree, commit, then targeted current-context tests and bounded genuine validation.",
       "initial_triage_tier": "B",
       "initial_triage_approach": "Honor explicit optional types on constructed-empty results using existing dtype machinery, preserving populated outputs. Four root-authenticated BF author cases; independent static account accepted; independent genuine runtime validation still required.",
-      "scope_recheck_required_before_dispatch": true
+      "scope_recheck_required_before_dispatch": true,
+      "worker_execution_state": "STOPPED_FOR_HANDOFF"
     }
   ],
   "implementation_prs": [
@@ -2032,7 +2037,7 @@
     "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
     "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
   },
-  "active_progress_updated_at_UTC": "2026-10-23T01:05:29.083946+00:00",
+  "active_progress_updated_at_UTC": "2026-10-23T01:43:30.672404+00:00",
   "resolved_in_development_issues": [
     {
       "number": 822,
@@ -2650,12 +2655,15 @@
     }
   ],
   "isa_linked_open_issue_records_including_completed_country_portions": 92,
-  "exclusively_active_issue_records": 2,
+  "exclusively_active_issue_records": 4,
   "initial_in_scope_goal_remaining": 80,
   "complete_collection_SHA256": {
     "post32-all-prs.json": "03cfa6e8a9a748322321da632b8d4d890cb0b10f246e5fdbaea7d86277c6c349",
     "post32-all-issues.json": "678eede942bbdc2fc436cf8441dbcb7db157c61747b658933e96bba4d15f0d72",
     "post32-development.json": "2e8faf00366e5ae048303448911516dc9dc25cbe0bf472695f0f136cde6e39a7"
   },
-  "latest_verified_development_tip": "60aa81e9eda3b747e25a37c9e7354315b842b408"
+  "latest_verified_development_tip": "60aa81e9eda3b747e25a37c9e7354315b842b408",
+  "assigned_workstreams": 5,
+  "running_workers_at_handoff": 0,
+  "session_state": "STOPPED_AT_USER_HANDOFF_REQUEST"
 }
