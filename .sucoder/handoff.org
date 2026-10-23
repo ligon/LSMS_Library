@@ -51,7 +51,7 @@ Merge them *together with every per-country PR you accept*, before anyone re-war
 1235, 1237, 1240, 1243, 1244, 1245, 1247, 1250, 1252, 1253, 1254, 1256, 1259, 1260, 1261, 1264.  #1123 was narrowed.
 
 ** Still running at the time of writing
-#637 Malawi tail (seed-purchase fan-out, minted zeros, 2010-11 duplicates); #637 Nigeria C (W3 second-location =obs=).
+#637 Malawi tail (seed-purchase fan-out, minted zeros, 2010-11 duplicates; vectorising); #637 Nigeria C (W3 second-location =obs=); #824 Burkina 2018-19 =Unit_sold=.
 
 * Current handoff -- 2026-10-22 evening, Sue / Claude Opus 5.5, job 40390255 (n0114.savio4, 12 cores, ~3 days)
 
@@ -173,6 +173,9 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 
 - *PR #1265 open* (#894: Malawi/Nigeria panel_ids now committed JSON; dict- and frame-identical).  Filed *#1264* (Nigeria crosswalk defects reproduced exactly: 328 targets not in the roster, 99 W3->W2 links to absent hhids, W1/W4/W5 unwired).
 - Running: #1259 (Site Q), #637 Malawi tail (B + zeros + duplicates), #637 Nigeria C (W3 =obs= 1/2).
+
+- #824 audit posted (Tanzania sound; Mali 2014-15/2017-18 and Burkina 2018-19 drop the recorded sold unit; =median_price_valuation= never honours =Unit_sold= anywhere).  Filed *#1267* (Mali 2014-15 tree-crop =Quantity= is the NUMBER OF HARVEST MONTHS).  Burkina 2018-19 =Unit_sold= dispatched (worktree =824-bf=).  NEXT: Mali =Unit_sold= 2014-15/2017-18 bundled with #1267 (one Mali re-warm).
+- #637 Malawi tail done (=7b0ffd569=; oracle exact); round 2 vectorises the =min_count= sum (cold 29 -> 44 s regression).  PR after that.
 
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
