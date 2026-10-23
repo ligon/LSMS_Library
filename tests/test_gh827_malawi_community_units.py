@@ -5,8 +5,9 @@ They were never blank at the API: ``local_tools.map_index`` renames a null
 38,506 rows of ``u == 'unit'``.  Measured causes (``Malawi/_/CONTENTS.org``,
 "community_prices: what Module CK actually asks"):
 
-* 28,616 rows on the 17 items whose NUMBER OF UNITS / UNIT CODES cells the
-  Module CK form STRIKES OUT (IHS3 Community questionnaire p. 20) -- the item
+* 28,631 rows on the 17 items whose NUMBER OF UNITS / UNIT CODES cells the
+  Module CK form STRIKES OUT (IHS3 Community questionnaire p. 20, IHPS
+  Market questionnaire p. 12, IHS5 Community questionnaire p. 20) -- the item
   fixes the unit ("Coca-Cola, Fanta (bottle)", "Ganyu wage, 1 day").  They
   now carry that unit (``malawi._CK_ITEM_FIXED_UNIT``; precedent Nigeria
   W1/W2 ``_W1W2_PRICE_UNIT``).  ``NumberOfUnits`` stays NA: not asked.
@@ -34,7 +35,8 @@ from lsms_library.transformations import U_UNKNOWN
 COUNTRY = 'Malawi'
 MALAWI_ = countries_root() / COUNTRY / '_'
 
-#: The items whose unit cells the IHS3 CK form strikes out (printed p. 20),
+#: The items whose unit cells the CK form strikes out (IHS3 Community p. 20,
+#: IHPS Market p. 12, IHS5 Community p. 20),
 #: and the unit each item's own text fixes.
 STRUCK = {3: '50 kg Bag', 4: '50 kg Bag', 30: 'Piece', 31: 'Bottle',
           32: 'Bottle', 33: 'Packet', 34: 'Piece', 35: 'Piece',
@@ -118,16 +120,24 @@ class TestPriceBlock:
         assert out['u'].tolist() == [U_UNKNOWN]
 
     def test_recorded_unit_codes_still_decode(self, malawi_mod):
+        """Code 21 is the CK list's own OTHER (SPECIFY) -- on the list, so
+        it decodes to its label; it is NOT an off-list code and must not
+        fall to `Unknown` (#827 leaves Other (Specify) untouched)."""
         out = _block(malawi_mod, [('101', 1, 1, 9000.0, 1.0, 2),
                                   ('101', 31, 1, 200.0, None, None),
-                                  ('101', 24, 1, 250.0, 1.0, 20)])
-        assert out['u'].tolist() == ['50 kg Bag', 'Bottle', 'Satchet/Tube']
+                                  ('101', 24, 1, 250.0, 1.0, 20),
+                                  ('101', 29, 1, 600.0, 2.0, 21)])
+        assert out['u'].tolist() == ['50 kg Bag', 'Bottle', 'Satchet/Tube',
+                                     'Other (Specify)']
 
-    def test_a_recorded_unit_on_a_struck_item_is_refused(self, malawi_mod):
+    @pytest.mark.parametrize('code', [9, 23])
+    def test_a_recorded_unit_on_a_struck_item_is_refused(self, malawi_mod, code):
         """A future wave that asks the unit for a struck item must not have
-        its answer silently overwritten by the fixed unit."""
+        its answer silently overwritten by the fixed unit.  The guard is on
+        the RAW code: an off-list code (23) decodes to no label but is still
+        a recorded answer, so a guard on the decoded label would miss it."""
         with pytest.raises(ValueError, match='struck out'):
-            _block(malawi_mod, [('101', 31, 1, 200.0, 1.0, 9)])
+            _block(malawi_mod, [('101', 31, 1, 200.0, 1.0, code)])
 
 
 class TestAssemble:

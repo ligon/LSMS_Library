@@ -4002,9 +4002,11 @@ def _price_unit_code_map():
 
 
 # GH #827.  The Module CK form STRIKES OUT the NUMBER OF UNITS and UNIT
-# CODES cells for these 17 items (IHS3 Community questionnaire, SECTION CK,
-# printed p. 20, `2010-11/Documentation/IHS3.Community.Qx.FINAL.pdf`: a
-# diagonal line through both cells on CK3, CK4, CK30-CK35, CK42, CK44-CK51).
+# CODES cells for these 17 items: a diagonal line through both cells on
+# CK3, CK4, CK30-CK35, CK42, CK44-CK51 on IHS3 Community questionnaire p. 20
+# (`2010-11/Documentation/IHS3.Community.Qx.FINAL.pdf`), IHPS Market
+# questionnaire p. 12 ("MODULE E: PRICES", the 2013-14 list, which lacks
+# CK51), and IHS5 Community questionnaire p. 20.
 # The unit is not asked because the ITEM fixes it -- "Coca-Cola, Fanta
 # (bottle)", "Cigarettes, Embassy (packet)", "Cost to grind 50 kg bag of
 # maize", "Ganyu wage, 1 day, adult male" -- and no unit code or count is

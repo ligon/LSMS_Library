@@ -22,8 +22,12 @@ the private data directory.
 - =scripts/hh_compare.py= -- recovered rows vs. household purchase unit
   values on =(t, v, j, u)= -> =results/hh_compare.json=.
 - =scripts/pdftext.py=, =scripts/render.py= -- text and page-image of the
-  IHS3 Community questionnaire (=PDF_PYLIB= = a private pypdf / PyMuPDF
-  install; not project dependencies).
+  three price pages (=PDF_PYLIB= = a private pypdf / PyMuPDF install; not
+  project dependencies): IHS3 Community questionnaire p. 20, IHPS 2013
+  *Market* questionnaire p. 12 ("MODULE E: PRICES" -- the 2013-14 Module CK;
+  an earlier version of this branch wrongly said it did not ship), IHS5
+  Community questionnaire p. 20.  All three strike out NUMBER OF UNITS /
+  UNIT CODES on the struck items they list; only IHS3 prints a unit legend.
 - Hash census: =1218-current-validation/hash_census.py= on both checkouts ->
   =results/hash_census_diff.json=.
 

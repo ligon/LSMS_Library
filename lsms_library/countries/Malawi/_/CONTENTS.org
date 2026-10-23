@@ -1174,10 +1174,16 @@ Three things follow, all of them easy to get wrong:
    often blank ... All 17 non-food items (soap, hoe, bicycle, ganyu wage,
    the two grinding services) are 100% unit-less.  A blank unit is
    unknown, not 'one piece': these rows have no usable per-unit price and
-   must be dropped and counted, never filled."  The page image shows a
+   must be dropped and counted, never filled."  The printed form draws a
    diagonal line through NUMBER OF UNITS and UNIT CODES on CK3, CK4,
-   CK30-CK35, CK42, CK44-CK51: the item fixes the unit ("Coca-Cola, Fanta
-   (bottle)", "Ganyu wage, 1 day").  Those rows now carry that unit; a
+   CK30-CK35, CK42, CK44-CK51 in every wave's instrument: IHS3 Community
+   questionnaire p. 20 (=2010-11/Documentation/IHS3.Community.Qx.FINAL.pdf=,
+   "SECTION CK: PRICES"), IHPS Market questionnaire p. 12
+   (=2013-14/Documentation/IHPS.Market.Questionnaire.FINAL.PRINT.pdf=,
+   "MODULE E: PRICES" -- the 32 codes =COM_MOD_K_13= carries, CK1, CK3,
+   CK4, CK22-CK50, all 16 struck items present struck) and IHS5 Community
+   questionnaire p. 20 ("MODULE CK: PRICES").  The item fixes the unit
+   ("Coca-Cola, Fanta (bottle)", "Ganyu wage, 1 day").  Those rows now carry that unit; a
    blank or off-list code on the other 34 items is =Unknown=.  (The 17 are
    not all non-food -- Soft Drink and Beer are struck -- and Bar Soap is
    not struck: it carries a unit on 99-100% of priced rows.)
@@ -1286,18 +1292,36 @@ cells.
   household / market list's =22 SATCHET/TUBE=, =23 OTHER (SPECIFY)=
   (2013-14 never uses CK code 20, against 479 in 2010-11 and 937 in
   2019-20; its 22 falls on items 2010-11 codes 20, its 23 on items 2010-11
-  codes 21).  No IHPS 2013 CK page ships (=IHPS.Community.Qx.FINAL.PRINT=
-  ends at Module CJ) and =COM_MOD_K_13= has no value labels, and the whole
-  household list would also unprint 2013-14's 12 (5 rows), 16 (3) and 21
-  (1).  Code 23 is =Unknown= on either reading; 47 rows of code 22 are the
-  contested set.
+  codes 21).  The 2013-14 price page exists -- IHPS fielded Module CK as
+  "MODULE E: PRICES" of its *Market* questionnaire, p. 12 (the Community
+  questionnaire ends at Module CJ, and the DDI files =COM_MOD_K_13= under
+  "Community Questionnaire, Section CK") -- but it prints *no unit legend*,
+  and neither does the IHS5 page (Community p. 20); only IHS3 Community
+  p. 20 prints one (codes 1-21), which the IHS3 and IHS5 Stata labels
+  repeat.  =COM_MOD_K_13= has no value labels.  So nothing printed says
+  which list 2013-14's codes were entered on, and the whole household list
+  would also unprint 2013-14's 12 (5 rows), 16 (3) and 21 (1).  Code 23 is
+  =Unknown= on either reading; 47 rows of code 22 are the contested set.
 - *Not touched*: =Other (Specify)= (2,876 rows; 2010-11's
   =com_ck00b3_os= says "2 TABLET PACKET" 157, "METERS" 147, "PACKET" 119,
   "WHOLE CHICKEN" 91, "SPOON" 64, ...) -- a GH #1042-style free-text
   follow-up, not a blank.
-- *CK42 label drift*: the 2010-11 Stata label says "(per 50kg)"; the
-  printed IHS3 page and the IHS5 label say "(per 50kg per kilometer)".  The
-  printed form governs.
+- *CK42 =50 kg per Kilometre= is a RATE, not a mass.*  The 2010-11 Stata
+  value label says "(per 50kg)"; the printed IHS3, IHPS and IHS5 pages and
+  the IHS5 Stata label say "(per 50kg per kilometer)".  The printed form
+  governs.  The label parses as a 50 kg mass under
+  =transformations._parse_explicit_metric= (='50 kg per Kilometre'= ->
+  50.0, measured): no library code feeds =community_prices.u= into a kg
+  conversion today (=rg community_prices lsms_library/*.py=: coverage,
+  currency and index-shape code only), and none ever should for this row --
+  a transport price per 50 kg per km has no kilogram factor.
+- *Cigarettes (CK33, =Packet=) prices are bimodal.*  The form prints
+  "Cigarettes, Embassy (packet)", but about 541 of the 1,599 priced rows
+  sit at single-cigarette prices: 2010-11 206 of 747 at <= 20 MK (median
+  200, the packet mass at 100-400 MK); 2013-14 43 of 192 at <= 50 MK;
+  2019-20 292 of 660 at 20-50 MK, against packets at 400-1,000 MK (306).
+  The label transcribes the form; these rows are NOT relabelled or
+  rescaled, so a per-packet comparison must screen them.
 
 Cost: every Malawi cache hash (26 L2-country, 130 L2-wave), no other
 country, no framework fingerprint.  Tests:

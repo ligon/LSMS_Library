@@ -29,25 +29,26 @@ Malawi `community_prices` (`(t, v, j, u)`, script path, `materialize: make`; wav
 - `(t, v, j)` is unique per wave (one row per EA x item; 2019-20's two halves carry disjoint EAs) -- asserted in `compare.py`; `(t, v, j, u)` uniqueness asserted in `assemble_community_prices`.
 - The 17 struck items never carry a unit code or count in any held file (0 of 28,631 served rows) -- now ENFORCED: `_price_block` raises if a struck item records a unit code.
 - Rows whose every column is null (4,422: availability missing, no price) are dropped by `_finalize_result`; giving them a `u` does not change that (rows 82,635 before and after).
-- 2013-14 (IHPS) ships no Module CK page in the repo (its community questionnaire ends at CJ) and no Stata value labels for `com_ck00b3`.
+- 2013-14 (IHPS) fielded Module CK as "MODULE E: PRICES" of its MARKET questionnaire (`2013-14/Documentation/IHPS.Market.Questionnaire.FINAL.PRINT.pdf`, p. 12: the 32 codes `COM_MOD_K_13` carries, CK1, CK3, CK4, CK22-CK50); its Community questionnaire ends at CJ.  That page, like IHS5 Community p. 20, prints NO unit legend; only IHS3 Community p. 20 prints the 1-21 list.  `COM_MOD_K_13` has no Stata value labels for `com_ck00b3`.
 
 ## §5 Reuse decision
 
 | quantity | decision | reason |
 |----------|----------|--------|
-| `u` on the 17 struck items | new dict `_CK_ITEM_FIXED_UNIT`, following Nigeria `_W1W2_PRICE_UNIT` | the IHS3 CK form strikes out NUMBER OF UNITS / UNIT CODES on CK3, CK4, CK30-35, CK42, CK44-51 (page image, printed p. 20); the item text names the basis |
+| `u` on the 17 struck items | new dict `_CK_ITEM_FIXED_UNIT`, following Nigeria `_W1W2_PRICE_UNIT` | the form strikes out NUMBER OF UNITS / UNIT CODES on CK3, CK4, CK30-35, CK42, CK44-51 on IHS3 Community p. 20, IHPS Market p. 12 (16 of them; no CK51 there) and IHS5 Community p. 20 (page images); the item text names the basis |
 | `u` on unit-asked items with a blank or off-list code (incl. not-available rows) | reuse `U_UNKNOWN` | no unit recorded; `u` is a declared index level |
 | `NumberOfUnits` on struck items | unchanged (NA) | the form struck that cell; the brief forbids inventing a count |
-| 2013-14 codes 22 / 23 | `Unknown` (off the CK list), NOT decoded | no IHPS 2013 CK instrument; see §6 |
+| 2013-14 codes 22 / 23 | `Unknown` (off the CK list), NOT decoded | the IHPS 2013 price page prints no unit legend; see §6 |
 | `Other (Specify)` (2,876 rows) and the 2010-11 `com_ck00b3_os` text | unchanged | not blank; free-text interpretation is a scientific choice |
 | 2019-20 `ckc` free text ("50g", "cup", "2 tablets"; 28 priced rows) | unchanged (`NumberOfUnits` NA, `u` as coded) | free-text interpretation |
 
 ## §6 Open questions for the human
 1. **`Piece` for the ten count goods whose text names no unit** (Trousers, Battery, Watch, Hand hoe, Panga, Sickle, Axe, Bicycle, Foam mattress, Mosquito net; 16,960 rows).  An inference from the struck count cell, not a transcription.  `Malawi/_/CONTENTS.org` said before #827: "A blank unit is *unknown*, not 'one piece'"; that was written on the premise that "the unit is a free field, not pre-printed", which the form contradicts for these items.  Reversible: one dict.
 2. **Serve `NumberOfUnits = 1` on the 17 struck items?**  The form fixes the count with the item ("1 day", "(bottle)") but records none; left NA.
-3. **2013-14 codes 22 / 23 under the IHPS household list** (22 SATCHET/TUBE, 23 OTHER (SPECIFY)).  Evidence for: 2013-14 never uses code 20 (2010-11 479, 2019-20 937); 22 falls on items 2010-11 puts on code 20 (Paraffin, Charcoal, Clothes Soap, Toothpaste, Aspirin, Fansidar); 23 on items 2010-11 puts on 21 (Chitenje, Aspirin, Charcoal, Firewood); the IHPS 2013 household Module G and Market questionnaires print 22 / 23 so.  Against: no CK page; adopting the whole list would also send 2013-14's 12 (5 rows), 16 (3) and 21 (1) to `Unknown` as unprinted (`_IHPS13_UNPRINTED_CODES`).  Code 23 is `Unknown` under either reading; the contested set is 47 rows of code 22.
+3. **2013-14 codes 22 / 23 under the IHPS household list** (22 SATCHET/TUBE, 23 OTHER (SPECIFY)).  Evidence for: 2013-14 never uses code 20 (2010-11 479, 2019-20 937); 22 falls on items 2010-11 puts on code 20 (Paraffin, Charcoal, Clothes Soap, Toothpaste, Aspirin, Fansidar); 23 on items 2010-11 puts on 21 (Chitenje, Aspirin, Charcoal, Firewood); the IHPS 2013 household Module G and Market questionnaires print 22 / 23 so.  Against: neither the IHPS 2013 price page (Market p. 12) nor IHS5 Community p. 20 prints a unit legend (only IHS3 Community p. 20 does), and `COM_MOD_K_13` has no value labels, so nothing printed says which list 2013-14 was entered on; adopting the whole list would also send 2013-14's 12 (5 rows), 16 (3) and 21 (1) to `Unknown` as unprinted (`_IHPS13_UNPRINTED_CODES`).  Code 23 is `Unknown` under either reading; the contested set is 47 rows of code 22.
 4. **`map_index`'s null-`u` -> `'unit'` rename** (framework) is undocumented and serves a spelling `_U_SENTINELS` does not know.  Malawi no longer reaches it for community_prices; other tables / countries may.
-5. **CK42 label drift**: 2010-11's Stata value label says "(per 50kg)"; the printed IHS3 page and the IHS5 label say "(per 50kg per kilometer)".  The printed form governs (`50 kg per Kilometre`).
+5. **CK42 label drift**: 2010-11's Stata value label says "(per 50kg)"; the printed IHS3, IHPS and IHS5 pages and the IHS5 label say "(per 50kg per kilometer)".  The printed form governs (`50 kg per Kilometre`).  It is a RATE: `transformations._parse_explicit_metric('50 kg per Kilometre')` returns 50.0, so it must never be fed to a kg conversion (no library code feeds `community_prices.u` to one today).
+6. **CK33 Cigarettes (`Packet`) prices are bimodal**: ~541 of 1,599 priced rows sit at single-cigarette prices (2010-11 206/747 <= 20 MK; 2013-14 43/192 <= 50 MK; 2019-20 292/660 at 20-50 MK).  Not relabelled or rescaled; recorded in CONTENTS.org.
 
 ---
 ### Phase 3 — verification
@@ -55,3 +56,4 @@ Malawi `community_prices` (`(t, v, j, u)`, script path, `materialize: make`; wav
 - `_price_block` — OK (anchored on §3 sentinel rule, §4 struck-item invariant now enforced).  Price / NumberOfUnits / Available identical on all 82,635 rows (join on `(t, v, j)`).
 - `assemble_community_prices` — OK (§4): docstring corrected; no logic change.
 - Cache: Malawi only — 26 / 26 L2-country hashes, 130 / 130 L2-wave hashes, 0 / 40 `build_transforms_fingerprint` (`results/hash_census_diff.json`).
+- Review r1 (independent, on `62a7b80a0`): served numbers confirmed exact.  Corrected here: the claim that no IHPS 2013 Module CK page ships was FALSE -- it is IHPS Market questionnaire p. 12 ("MODULE E: PRICES"); instrument basis is now IHS3 Community p. 20, IHPS Market p. 12, IHS5 Community p. 20 (§4, §5, §6.3).  Added CONTENTS.org notes on CK33 bimodal prices and on CK42 parsing as a 50 kg mass (§6.5, §6.6).  Static tests extended (code 21 decodes to `Other (Specify)`; struck-item refusal parametrized over off-list code 23); each new case fails on its mutation (code 21 -> Unknown; guard on the decoded label) and passes on the branch.  No served-data change (cold rebuild `assert_frame_equal` to the `62a7b80a0` build); cache Malawi-only, as before.
