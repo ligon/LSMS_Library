@@ -84,6 +84,11 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - #1240 FIXED on branch (=2a13caaf6=): correct 2021-22 -> 2018-19 links 2,041 -> 3,147; wrong-household links 12 -> 8; independent head sex/age check matches the old correct links.  Residual filed as *#1245* (=id_walk= chain collisions from menage renumbering: 80 unlinkable, 8 wrong).  Red-team running.
 - #1234 (map_index -> Unknown) done on branch (=cb564888c=): CORPUS-WIDE re-warm like #1233, so merge the two together.  Red-team running (key question: cold vs warm =u= for Malawi crop_production).
 
+- *PR #1246 open* (#1243 Burkina sampling.yml; red-team: fit as-is, keep =redefined=).  *PR #1248 open* (Niger sampling.yml, ECVMA -> EHCVM =redefined=; dispatcher review only, same pattern as #1246).  Filed *#1247* (Site C gaps: Niger/Iraq/Albania/Timor-Leste; the =unobservable= grouping is too broad).  Panama 2008 =Price= mean-of-prices finding commented on #845.
+- #1234 round 2 running: the review REFUTED cold/warm equality (Malawi crop_production 8,902 rows, =u= promoted from a column after =map_index=).  Fix: rename the same keys on =u= at the top of =_finalize_result= (excluded callable, stash-probe 0 hashes), plus a Mali CONTENTS.org update and Panama downstream numbers in the PR.
+- #820 (Ethiopia section 12 tree/fruit/root crops, W1-W3; verify W4/W5 section 11) dispatched.
+- Next candidates: #1120 (households missing from =sample()=, v NaN: Ethiopia/Uganda/Nigeria), #1135 (Site C first-line counts; the net-of-movers measurement is unsettled), Niger =;= chaining residual (after #1241), #821 (after #1227).
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
