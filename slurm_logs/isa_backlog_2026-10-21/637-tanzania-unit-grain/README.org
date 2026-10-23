@@ -115,3 +115,50 @@ Warm read == cold read on both checkouts.  =Feature('plot_inputs')(['Tanzania'])
 - Cross-country: =Feature('plot_inputs')(['Tanzania', 'Malawi'])= stacks with
   no =GrainCollapseWarning= on either checkout; Malawi 179,949 rows on both,
   Tanzania 9,698 -> 9,709 (=feature-tanzania-malawi.json=).
+
+* Round 3 -- the maintainer's rulings (@ligon, 2026-10-23)
+
+Files in =round3/=.  Three cold builds, each in its own private
+=LSMS_DATA_DIR= (=/local/job40390255/data-private/637-tz-r3/{dev,old,new}=):
+development =9a0ed5f3c= (=dev=), the PR head before the rulings =5239daecd=
+(=old=) and the round-3 code (=new=; built from the working tree that was then
+committed unchanged, so =snapshot-new.json= still records =5239daecd= as
+=HEAD=).
+
+| script              | what it does                                                                                       | output                                   |
+|---------------------+----------------------------------------------------------------------------------------------------+------------------------------------------|
+| =snapshot.py=       | cold =Country('Tanzania')= =plot_inputs= / =crop_production= / =plot_features=; =seed_kg=, =nitrogen_kg=, =harvest_kg=, =yield_kg=, =gross_crop_revenue=; grain, Site I and Site Q reports | =snapshot-{dev,old,new}.json=            |
+| =compare.py=        | public-API frames, dev and old vs new: rows added, split keys, sales recovered, downstream equality | =compare.json=                           |
+| =oracle.py=         | independent bindings from the held =AG_SEC_3A/4A/5A/6A/6B/7A/7B=; asserts the new wave parquets == oracle row for row and per-household sales == raw attachable sums; =Unit_purchased= coverage and mismatches | =oracle-new.json=                        |
+| =feature_check.py=  | warm == cold; =Feature(t)(['Tanzania', 'Malawi'])= for =plot_inputs= and =crop_production=      | =feature-new.json=                       |
+| =hash_census.py=    | copy of =1218-current-validation/hash_census.py=, run on the dev and new checkouts                 | (=hash_compare.py=) =hash-impact.json=   |
+
+| ruling                      | result (2019-20 / 2020-21)                                                                                     |
+|-----------------------------+----------------------------------------------------------------------------------------------------------------|
+| 1 lumped codes              | =crop_production= 3,001 -> 3,393 / 11,125 -> 12,676 rows; 14 / 52 sales recovered, 1,813 kg + 2,136,000 TSh / 10,062 kg + 10,762,200 TSh |
+| 5 module pairs              | 0 / 3 pairs (Pulses 860 + 860, Pulses 60 + 60, Other Crop 20 + recorded 0), all 4A + 6B; sales module-matched; one 7B sale (130 kg / 120,000 TSh) newly attachable |
+| 3 =Unit_purchased=          | seed 494 / 2,141 records carry it (exactly the positive purchases); != served =u= on 1 / 11 rows; organic =Kg= on 14 / 96 rows |
+| 4 fertilizer pairs          | documentation only: 1 / 6 pairs, 5 identical quantities (CONTENTS.org table)                                    |
+
+- Split old keys conserve =Quantity=; every other old key's row is identical
+  to =5239daecd= in every column except the one 7B sale above.
+- =harvest_kg=, =yield_kg=, =seed_kg=, =nitrogen_kg=: frame-equal to
+  =5239daecd=.  =gross_crop_revenue=: 189,955,250 -> 192,091,250 and
+  856,481,400 -> 867,363,600 TSh; 66 household-wave totals change, one of them
+  new, none falls.
+- =plot_inputs=: index identical to =5239daecd=, other columns frame-equal.
+- No grain or Site I warning on =crop_production=.  Site Q (old rule):
+  4 / 30 offenders; positive-only reference 1 / 14 (13 before, see
+  CONTENTS.org).
+- =Feature('crop_production')(['Tanzania', 'Malawi'])=: 151,147 rows, unique
+  index; Tanzania 16,069 rows with =reported:= tokens, Malawi 135,078 with
+  =unresolved_observation=.  =Feature('plot_inputs')(['Tanzania', 'Malawi'])=:
+  189,658 rows, unique index.
+- Hash census vs development: Tanzania only (25/25 country, 150/150 wave),
+  0/40 build fingerprints.
+- Tests (=tests.txt=): targeted 258 passed / 3 skipped; with three warm
+  countries =test_feature_canonical_index.py= 82 passed, 0 skipped; all 36
+  Tanzania test files 2,023 passed, 109 skipped, 4 xfailed, 0 failed.  The new
+  #637 test file on =5239daecd=: 27 failed, 18 passed.
+- PR #1266 scratch merge: no conflict, =test_quantity_screen.py= 43 passed
+  (=merge-1266.txt=).

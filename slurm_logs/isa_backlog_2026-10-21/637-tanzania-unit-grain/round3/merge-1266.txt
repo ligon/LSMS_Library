@@ -1,0 +1,26 @@
+PR #1266 (GH #1259, positive-only Site Q reference) interaction, round 3 (2026-10-23)
+
+#1263 head (this commit's parent): 3fe6a1996
+#1266 head:                        526b26fa6
+git merge-tree --write-tree 3fe6a1996 526b26fa6 -> 3b39f58845fac4620fa6796c25dfc39bf1aca40d, exit 0 (no conflict;
+tests/test_quantity_screen.py auto-merges).
+Scratch merge (detached worktree at 3fe6a1996, 'git merge --no-commit --no-ff 526b26fa6', never committed;
+write-tree == 3b39f5884..., aborted and the worktree removed afterwards).
+
+Data: Tanzania crop_production cold-built from the round-3 code into a private LSMS_DATA_DIR
+(<data_root>/Tanzania/2020-21/_/crop_production.parquet, 12,676 rows -- one row per native record).
+
+tests/test_quantity_screen.py
+  #1263 alone (3fe6a1996), same data:  passes (part of the 258-pass targeted run)
+  merge (#1263 + #1266):               43 passed
+
+The "known excess" block that #1266 made fail by design is retired in 3fe6a1996.  Under the merged
+rule the full-frame audit of the 2020-21 wave parquet names 14 rows (2019-20: 1), i.e. exactly the
+positive-reference set the test pins.
+
+The bound is 14, not the 13 of #1266's merge record: #1263's round-3 grain (production_obs) un-sums
+the lumped Other Fruits codes, the cell's positive p90 falls from 752.5 to 493.6 kg, the lumped
+77,644 kg becomes the single code's 72,400 kg (still named) and one 50,625 kg code moves from 67x
+to 102.6x.  #1266 does not edit this test, so in either merge order the merged file is #1263's
+version and needs no further edit; #1266's sequencing note ("keep or restore n_implausible == 13",
+rows == 11,125) is superseded: with #1263 the numbers are 14 and 12,676.

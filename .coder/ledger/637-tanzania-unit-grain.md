@@ -122,3 +122,36 @@ accept `u` as a level or a column.
   interim `== 26` pin (commit 0a0b0f43b) wrote the zero-driven excess into the
   anti-firehose bound and is withdrawn.
 - Evidence: `slurm_logs/isa_backlog_2026-10-21/637-tanzania-unit-grain/`.
+
+---
+### Round 3 -- the maintainer's rulings (@ligon, 2026-10-23, PR #1263 comments)
+
+| decision | ruling | precedent reused | change |
+|----------|--------|------------------|--------|
+| 1 lumped crop codes | populate canonical `production_obs` with the native crop code | Uganda #1198 (`data_info.yml` `production_obs` grammar: `reported:<ID>` = instrument ID; `unresolved_observation` sentinel for countries without it) | `crop_production` index `(t, i, plot_id, j, production_obs)`, token `reported:<module>:<cropid>`; collapse removed, a repeat raises |
+| 5 same code in 4A and a perennial module | separate rows by module | rides on decision 1 (the module qualifies the token) | each sale module attaches only to its own harvest module's rows (5A->4A, 7A->6A, 7B->6B); single-plot rule within that module |
+| 3 `Quantity_purchased` unit | serve `Unit_purchased`, canonicalised at build time | Burkina #1188 (own source unit variable, `optional: true`, missing stays missing) | seed `ag4a_10c_2`; organic `Kg` (the question asks in KG; beyond the letter of the ruling, flagged); `_unit_preferred_labels` = country `u` table over the global one; agree-or-raise in the 6-key collapse |
+| 4 fertilizer slot pairs | keep summing; document | -- | CONTENTS.org table of the 7 pairs (5 identical quantities, 4 of them identical values) |
+
+No framework change: `production_obs` is already canonical, and `feature.py`
+promotes/sentinels it from `data_info.yml`.  `data_info.yml` untouched.
+Malawi (named in the decision-1 ruling) is out of scope here.
+
+Verification (cold builds, private `LSMS_DATA_DIR`s; evidence in
+`slurm_logs/isa_backlog_2026-10-21/637-tanzania-unit-grain/round3/`):
+- `crop_production` rows 3,001 -> 3,393 and 11,125 -> 12,676 (+392 lumped;
+  +1,548 lumped + 3 module pairs).  Split old keys conserve Quantity; every
+  other row identical to `5239daecd` except one newly attachable 7B sale
+  (130 kg / 120,000 TSh, 2020-21).  Sales recovered: 1,813 kg / 2,136,000 TSh
+  and 10,062 kg / 10,762,200 TSh, exactly the `'first'` losses.
+- Raw oracle: wave parquets == oracle row for row; per-household sales ==
+  raw attachable sums, both waves.
+- `harvest_kg`, `yield_kg`, `seed_kg`, `nitrogen_kg` frame-equal to
+  `5239daecd`; `gross_crop_revenue` +2,136,000 / +10,882,200 TSh.
+- `plot_inputs`: index identical, other columns frame-equal; `Unit_purchased`
+  != served `u` on 1 / 11 rows (== the raw record counts).
+- Site Q: positive-reference set 13 -> 14 in 2020-21 (Other Fruits cell p90
+  752.5 -> 493.6 kg once codes are un-summed); the test's "known excess"
+  block is retired for #1266 and the bound pinned at 14, not 13.
+- Hash census vs development: Tanzania only (25/25 country, 150/150 wave),
+  0/40 fingerprints.

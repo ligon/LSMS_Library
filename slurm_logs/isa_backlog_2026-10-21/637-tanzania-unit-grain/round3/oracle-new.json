@@ -1,0 +1,117 @@
+{
+ "head": "5239daecdbac44ba20be712531062590a19b91b9",
+ "2019-20": {
+  "cp_native_rows": 3393,
+  "cp_groups_tipj": 3001,
+  "cp_groups_tipcode": 3393,
+  "cp_code_in_two_modules_on_one_plot": {
+   "pairs": 0,
+   "modules": [],
+   "quantities": [],
+   "pairs_alone_in_their_tipj_group": 0
+  },
+  "sales_raw": {
+   "rows": 2244,
+   "Quantity_sold": 1640128.0,
+   "Value_sold": 325444900.0,
+   "attachable_rows": 1860,
+   "attachable_Quantity_sold": 1414644.0,
+   "attachable_Value_sold": 192091250.0,
+   "multi_plot_Quantity_sold": 225484.0,
+   "multi_plot_Value_sold": 133353650.0,
+   "no_matching_harvest_row": 0
+  },
+  "cp_oracle_equal_rows": 3393,
+  "per_household_sales_equal_raw_attachable": {
+   "households": 388,
+   "Quantity_sold": 1414644.0,
+   "Value_sold": 192091250.0
+  },
+  "seed_records": 1379,
+  "seed_unit_purchased_recorded": 494,
+  "seed_unit_purchased_recorded_iff_pq_positive": true,
+  "seed_records_unit_purchased_ne_u": 1,
+  "seed_records_unit_purchased_ne_u_pairs": {
+   "Kg -> Small Cup": 1
+  },
+  "seed_6key_groups_with_two_purchase_units": 0,
+  "organic_rows": 96,
+  "organic_unit_purchased_kg": 14,
+  "pi_rows": 1775,
+  "pi_seed_rows_equal_oracle": 1368,
+  "pi_unit_purchased_by_value": {
+   "20l Bucket": 13,
+   "<NA>": 1270,
+   "Kg": 458,
+   "Large Cup": 10,
+   "Small Cup": 13,
+   "Unknown": 11
+  },
+  "pi_served_rows_unit_purchased_ne_u": 1
+ },
+ "2020-21": {
+  "cp_native_rows": 12676,
+  "cp_groups_tipj": 11125,
+  "cp_groups_tipcode": 12673,
+  "cp_code_in_two_modules_on_one_plot": {
+   "pairs": 3,
+   "modules": [
+    "4A",
+    "6B"
+   ],
+   "quantities": [
+    0.0,
+    20.0,
+    60.0,
+    60.0,
+    860.0,
+    860.0
+   ],
+   "pairs_alone_in_their_tipj_group": 2
+  },
+  "sales_raw": {
+   "rows": 8263,
+   "Quantity_sold": 12976586.0,
+   "Value_sold": 1355000320.0,
+   "attachable_rows": 6827,
+   "attachable_Quantity_sold": 11885924.0,
+   "attachable_Value_sold": 867363600.0,
+   "multi_plot_Quantity_sold": 1090662.0,
+   "multi_plot_Value_sold": 487636720.0,
+   "no_matching_harvest_row": 0
+  },
+  "cp_oracle_equal_rows": 12676,
+  "per_household_sales_equal_raw_attachable": {
+   "households": 1481,
+   "Quantity_sold": 11885924.0,
+   "Value_sold": 867363600.0
+  },
+  "seed_records": 5606,
+  "seed_unit_purchased_recorded": 2141,
+  "seed_unit_purchased_recorded_iff_pq_positive": true,
+  "seed_records_unit_purchased_ne_u": 11,
+  "seed_records_unit_purchased_ne_u_pairs": {
+   "20l Bucket -> Kg": 2,
+   "20l Bucket -> Unknown": 1,
+   "Kg -> 20l Bucket": 3,
+   "Kg -> Unknown": 1,
+   "Large Cup -> Kg": 1,
+   "Small Cup -> 20l Bucket": 1,
+   "Unknown -> Kg": 2
+  },
+  "seed_6key_groups_with_two_purchase_units": 0,
+  "organic_rows": 631,
+  "organic_unit_purchased_kg": 96,
+  "pi_rows": 7934,
+  "pi_seed_rows_equal_oracle": 5511,
+  "pi_unit_purchased_by_value": {
+   "20l Bucket": 85,
+   "<NA>": 5717,
+   "Kg": 2001,
+   "Large Cup": 19,
+   "Small Cup": 17,
+   "Unknown": 95
+  },
+  "pi_served_rows_unit_purchased_ne_u": 11
+ }
+}
