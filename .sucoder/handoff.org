@@ -34,6 +34,13 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
 3. Pending inclusion: #1272 round 3 (Mali tree value x months, ruled), and #1260 if its acquisition lands in time (otherwise a later batch).
 4. Validation burst (co_carleton): =/global/scratch/fsa/fc_jevons/ligon/isa-batch-20261023/{shard,tests}.sbatch= cold-build every country into the STAGING root =.../isa-batch-20261023/data= from a scratch clone of the integration branch, then the full pytest suite plus the coverage aggregate.
 4b. LAUNCHED 2026-10-23: integration head =d353b7ea7= (27 PRs + #1272); shard array =40406930= (38 countries, %16), tests =40406931= (afterany).  Logs and shards in =/global/scratch/fsa/fc_jevons/ligon/isa-batch-20261023/{logs,shards}=; job ids in =jobids.txt=.  #1260 (Malawi panel GPS) is in round 2, to be added later with a Malawi-only shard re-run.
+4c. Cross-PR interaction review of =d353b7ea7=: FIT TO MERGE, no behavioural interactions (data-free suite 6,248 passed; about 1,300 data-gated passed).  A post-batch docs-tidy PR is needed for text made stale by merge order:
+    - Burkina =CONTENTS.org:1796= TODO and =sampling.yml= notes (2021-22 linkage 3,155; #1059 landed);
+    - Malawi =CONTENTS.org:3846= Make note;
+    - the =malawi.py:4341= docstring and =test_gh827=:128 ("map_index serves 'unit'");
+    - =feature.py:304= (Tanzania 2,395 -> 19);
+    - the =data_info.yml= Mali "42 of 42 / 42 of 47" sentence.
+    The =malawi.py= docstring is hashed, so bundle it with #1260's Malawi re-run.
 5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
 
 ** Merge plan: ONE corpus re-warm
