@@ -598,20 +598,48 @@ carrying =v= across them raises a =ClusterIdentityWarning=; every other
 boundary is =stable=.  A 13-entry alias table would make them stable again, but
 it would change served =v= values and is not done here.
 
-*** Wave 5 geovariables await acquisition of WB v02 (GH #841 / #978)
+*** Wave 5 geovariables: v02 is HELD, the coordinates are NOT YET WIRED (GH #841 / #978)
 
-The acquired =NGA_2023_GHSP-W5_v01_M= extract recorded in =SOURCE.org=
-contains 106 files and no household geovariables file; the cover page
-=secta_plantingw5.dta= carries no lat/lon. This is an acquisition gap,
-not a claim that the survey did not collect coordinates. WB catalog 6410
-version =v02_M= (changed 2026-09-16) adds =NGA_HouseholdGeovariables_Y5.dta=
-(4,883 households, 55 variables) and =totcons_final.dta=, and revises
-=sect2b_harvestw5.dta= and =sect3d_harvestw5.dta=. Existing GH #978 tracks
-that refresh and the coordinate wiring; it needs no duplicate issue.  =cluster_features=
-for 2023-24 is therefore declared from the cover page alone (=df_key= +
+Until 2026-10-23 this wave held =NGA_2023_GHSP-W5_v01_M=: 106 files and no
+household geovariables file, and the cover page =secta_plantingw5.dta=
+carries no lat/lon -- an acquisition gap, not a claim that the survey did not
+collect coordinates.  It now holds =NGA_2023_GHSP-W5_v02_M= (WB catalog 6410,
+changed 2026-09-16; DOI =10.48529/90ec-pv69=), acquired with
+=data_access.add_wave= under GH #978 after a diff-first review.  =add_wave='s
+staged comparison: 104 files unchanged, 2 revised, 2 new, 0 no longer shipped.
+
+*The two revised files are read by no table:*
+- =Post Harvest Wave 5/Household/sect2b_harvestw5.dta=: =s2bq0= ("who in the
+  household is responding for [NAME]?") is recoded from a roster POSITION to
+  the respondent's =indiv=; every one of its 1,986 non-null values now names
+  an =indiv= in the household's post-harvest roster (1,292 did before).  Wire
+  it as an =indiv=, never as a position.
+- =Post Harvest Wave 5/Household/sect3d_harvestw5.dta=: adds
+  =rselected_person= and =sec3c_wdd=; the FILTER label now reads "15-49
+  YEARS OLD WOMAN?".
+
+*The two new files land at the ROOT of =Data/=* (that is where the v02 zip
+puts them), not under =Post Planting Wave 5/= / =Post Harvest Wave 5/= like
+the other 106:
+- =Data/nga_householdgeovariables_y5.dta=: 4,883 households x 55 columns,
+  =hhid= unique, coordinates =lat_mod= / =lon_mod= (all 4,883 non-null and
+  inside Nigeria's bounding box).  It carries NO EA key: join it to the cover
+  page on =hhid= (all 4,883 are there).  How many clusters it gives more than
+  one fix depends on the cluster key, which =ea= alone is not (see "Cluster
+  (PSU) identifier"): 112 of 708 =(zone, state, lga, ea)= groups, against the
+  release diff's 34 of 510 under another key.  Settle it when wiring.
+- =Data/totcons_final.dta=: the consumption aggregate, 4,715 households x 62
+  columns, with the weights =wt_wave5= and =popw= and three =totcons_adj*=
+  columns.
+
+*Not wired.*  Wiring =df_geo= is the separate, reviewed served change GH #978
+asks for; until it lands, =cluster_features=
+for 2023-24 is declared from the cover page alone (=df_key= +
 =df_main=, no =df_geo=, unlike W1--W4): =Region= / =District= / =Rural= are
 fully populated for 2023Q3 and 2024Q1 (911 clusters each), and =Latitude= /
-=Longitude= are 100% NaN there pending the v02 acquisition.  The Site B
+=Longitude= are 100% NaN there pending that wiring.  (The comment at
+=2023-24/_/data_info.yml:70-71= still describes v02 as unacquired; it is
+left for the wiring change because that file is a build input.)  The Site B
 null-content guard warns for exactly those two waves on every
 =cluster_features()= read; that is the known country-grain =optional:=
 mismatch (CLAUDE.md) and must NOT be silenced with =optional: true= in
@@ -632,7 +660,8 @@ columns that ever made this collapse lossy are exactly the two W5 lacks.
 GH #592 re-check (2026-10-23): unchanged.  The catalog search now returns
 =NGA_2023_GHSP-W5_v02_M= for entry 6410, and its file list includes
 =nga_householdgeovariables_y5= (4,883 cases, 55 variables, coordinates
-=lat_mod= / =lon_mod=); we still hold v01.  Cold on =development=
+=lat_mod= / =lon_mod=); we still hold v01 (/superseded the same day:/ v02 is
+now held, see above; W5 stays 0/911 until the file is wired).  Cold on =development=
 =9a0ed5f3c=, clusters with coordinates: W1 500/500 (both rounds), W2
 645/647, W3 784/792, W4 671/685, W5 0/911.  The six W1-W4 rounds GH #592
 listed at zero are all populated now (the casing / =merge_on: [i]= fixes
