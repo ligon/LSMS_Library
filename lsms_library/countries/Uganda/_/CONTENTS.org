@@ -4003,9 +4003,11 @@ folds DISTINCT source rows, not just duplicates: 2009-10 70 positive plot-less
 source rows -> 45 keys (69 -> 44 before the fix), 2011-12 2 -> 1, 2013-14
 4 -> 4.  Two valid-plot keys (4 positive rows) also go through that max.
 Keeping the rows apart needs a =plot_id= sentinel or a row ordinal, which is
-D3's decision, so it is reported and left alone.  This is also why Site I fires
-on =plot_labor= and not on =crop_production= or =plot_inputs=: those builders
-group with =dropna=True= and delete NaN-key rows instead.
+D3's decision, so it is reported and left alone.  This is also why Site I's
+NaN-=plot_id= count is much larger here than on the other Uganda plot tables.
+=crop_production= and =plot_inputs= collapse with =dropna=True=, and only when
+their index is non-unique, so they DELETE most NaN-key rows rather than serve
+them.
 
 *Downstream* (=transformations.total_*_labor_days=, which drop NaN and sum): the
 day totals rise by the same 2,745 (family +1,787, hired +958).  Household rows

@@ -53,3 +53,30 @@ two cold-built frames (row-level) stayed in a session scratchpad.
 
 See =Uganda/_/CONTENTS.org= "=plot_labor=: a missing use-flag is not 'No'"
 and =.coder/ledger/1250-uganda-labor-flag.md=.
+
+* Tests
+- =tests/test_uganda_plot_labor_flag.py= (new, 6 tests): *6 failed* on
+  development (with the file copied in temporarily), *6 passed* on the branch.
+  The two data-gated tests re-derive every served zero from the raw files.
+  Development serves 4,504 unjustified zeros in 2009-10 (4,459 removed + 45 that
+  become positive) and 569 in 2010-11 (526 + 43), which reconciles exactly with
+  the oracle.
+- Uganda + plot_labor selection (=tests/test_uganda_*.py=,
+  =tests/test_gh*_uganda_*.py=, =test_id_format_id_canonical.py=,
+  =test_feature_canonical_index.py=, =test_feature_audit_participation.py=;
+  =-n 3 --dist=loadfile=, fresh data dir per side):
+  - development: 403 passed, 81 skipped
+  - branch: 407 passed, 83 skipped (+6 new tests).  The two extra skips are
+    =test_uganda_tables.py= =household_characteristics= "prerequisites not
+    cached", a cache-order artefact.  Re-run alone on the branch, they pass
+    (8 passed with the new tests).  No failures on either side.
+
+* Sibling =.where(gate != code, 0)= instances (=sibling_probe.json=; not changed)
+Niger =2011-12/_/plot_labor.py:51= and =2014-15/_/plot_labor.py:46=, Tanzania
+=tanzania.py:1199= / =:1727-1728=, Ethiopia =ethiopia.py:2680-2681=: each gate
+is a bare =pd.to_numeric= of a numpy =float64= column, so =gate != code= is a
+plain =bool= (0 NA in every probe) and a missing gate keeps its value.  These
+are LATENT, not live: they fabricate only if someone routes the gate through a
+nullable cast, as Uganda's =_to_int_code= does.  Ethiopia =ethiopia.py:2608=
+compares a nullable =Float64= =n=, but the zeroed =d= is multiplied by that same
+=n=, so the result is NA, not 0.
