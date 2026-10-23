@@ -1,0 +1,35 @@
+{
+ "rows": {
+  "before": 85519,
+  "after": 85519
+ },
+ "index_identical": true,
+ "columns": {
+  "before": [
+   "Quantity",
+   "Quantity_sold",
+   "Value_sold",
+   "planting_month",
+   "harvest_month",
+   "intercropped",
+   "perennial",
+   "Derivation"
+  ],
+  "after": [
+   "Quantity",
+   "Quantity_sold",
+   "Value_sold",
+   "planting_month",
+   "harvest_month",
+   "intercropped",
+   "perennial",
+   "Derivation"
+  ]
+ },
+ "changed_cells": {
+  "Derivation": {
+   "2018-19 <NA>->Ethiopia::crop_production::permanent-crop-12-month-window": 3713,
+   "2021-22 <NA>->Ethiopia::crop_production::permanent-crop-12-month-window": 3723
+  }
+ }
+}

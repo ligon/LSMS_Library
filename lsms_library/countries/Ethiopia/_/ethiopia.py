@@ -1802,6 +1802,122 @@ def inputs_sect12_sale(wave):
     return out
 
 
+#: The registry key stamped on ``crop_production.Derivation`` for every W4/W5
+#: row whose crop the post-planting roster flags PERMANENT (GH #1256).  Entry:
+#: ``Ethiopia/_/derivations.yml``.  What is derived is the WINDOW: ESS4 puts a
+#: permanent crop's harvest (§9 Q4/Q5) and sales (§11) on the fixed 12 months
+#: March 10, 2018 - March 9, 2019, while the season rows beside it are this
+#: agricultural season.  The W1-W3 analogue is SECT12_SALE_DERIVATION.
+PERMANENT_CROP_WINDOW_DERIVATION = 'Ethiopia::crop_production::permanent-crop-12-month-window'
+
+#: Waves whose §9 / §11 carry the permanent-crop window, the files and the
+#: crop-code / flag variables (W5's §11 crop code is ``s11q01b``).
+PERMANENT_WINDOW_SOURCES = {
+    '2018-19': dict(s9='sect9_ph_w4.dta', s9_code='s9q00b', s4='sect4_pp_w4.dta',
+                    s4_code='s4q01b', s11='sect11_ph_w4.dta', s11_code='s11q01'),
+    '2021-22': dict(s9='sect9_ph_w5.dta', s9_code='s9q00b', s4='sect4_pp_w5.dta',
+                    s4_code='s4q01b', s11='sect11_ph_w5.dta', s11_code='s11q01b'),
+}
+
+#: The original variables behind the window rows: §9 harvest (Q4 harvested?,
+#: Q5 quantity + unit, Q8 harvest months), the §4 permanent / tree flag
+#: (Q15), and §11's permanent-crop block (Q2 last completed production
+#: period, Q3 harvest in the last 12 months, Q4 trees) and sales (Q7 sold?,
+#: Q11 quantity + unit, Q12 value).
+PERMANENT_WINDOW_S9_VARIABLES = ['holder_id', 'parcel_id', 'field_id', 's9q00b', 's9q04',
+                                 's9q05a', 's9q05b', 's9q08a', 's9q08b']
+PERMANENT_WINDOW_S11_VARIABLES = ['holder_id', 's11q02a1', 's11q02a2', 's11q02b1', 's11q02b2',
+                                  's11q03a1', 's11q03a2', 's11q04', 's11q07', 's11q11a',
+                                  's11q11b', 's11q12']
+
+
+def derive_permanent_crop_window(quantity, quantity_sold, value_sold):
+    """W4/W5 permanent-crop rows -> the ``Quantity`` / ``Quantity_sold`` /
+    ``Value_sold`` they serve (GH #1256): THE IDENTITY.
+
+    The numbers are served exactly as ``crop_production`` serves every row
+    (§9 Q5 for ``Quantity``; §11 Q11 / Q12 through the §11 sale rule for the
+    sale columns).  What the registered derivation
+    (``Ethiopia::crop_production::permanent-crop-12-month-window``) records is
+    the WINDOW: for a permanent crop the ESS4 post-harvest questionnaire asks
+    for the crop "harvested between March 10, 2018 to March 9, 2019" (§9 Q4;
+    §11 Q1's header), a fixed 12 months, while every other row beside it is
+    this agricultural season -- CLAUDE.md "Derived Values": "a value served
+    under a name implying a different window -- the function is the identity
+    and the registry is the point".  No options, by rule; the build does not
+    call it, because there is nothing to compute.
+    """
+    return pd.DataFrame({'Quantity': quantity, 'Quantity_sold': quantity_sold,
+                         'Value_sold': value_sold})
+
+
+def inputs_permanent_crop_window(wave):
+    """The raw answers behind the ``permanent-crop-12-month-window`` rows (GH #1256).
+
+    One long frame indexed ``(t, i, j)`` (``i`` the wave-native
+    ``household_id``; ``j`` through :func:`_eth_crop_label_map_for_wave`), with
+    a ``module`` column naming the source of each line and the ORIGINAL
+    variable names as columns:
+
+    * ``sect9_ph`` -- EVERY §9 harvest row (plot-crop grain;
+      :data:`PERMANENT_WINDOW_S9_VARIABLES`) with the §4 roster's ``s4q15``
+      joined on (holder, parcel, field, crop) -- the flag the stamp reads (an
+      ambiguous key, whose §4 lines disagree, carries <NA>);
+    * ``sect11_ph`` -- EVERY §11 line (holder-crop grain;
+      :data:`PERMANENT_WINDOW_S11_VARIABLES`), whose sales the build attaches
+      to a crop's single §9 plot (the SALES GRAIN CAVEAT).
+
+    A served row's §9 line is found by ``(t, i, j)`` plus its ``plot_id``
+    (``holder_parcel_field``); its §11 lines by ``(t, i, j)`` plus the
+    holder.  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+    if wave not in PERMANENT_WINDOW_SOURCES:
+        raise ValueError(
+            f"the permanent-crop 12-month window is an ESS4 / ESPS-5 §9/§11 "
+            f"design ({sorted(PERMANENT_WINDOW_SOURCES)}), not {wave!r}; W1-W3 "
+            f"put permanent crops in §12 (sect12-sale-period).")
+    src = PERMANENT_WINDOW_SOURCES[wave]
+    d = countries_root() / 'Ethiopia' / wave / 'Data'
+    cmap = _eth_crop_label_map_for_wave(wave)
+    s9 = get_dataframe(str(d / src['s9']), convert_categoricals=False)
+    s4 = get_dataframe(str(d / src['s4']), convert_categoricals=False)
+    s11 = get_dataframe(str(d / src['s11']), convert_categoricals=False)
+
+    def _key(df, code):
+        return pd.DataFrame({
+            '_k': (df['holder_id'].apply(format_id).astype(str) + '_'
+                   + df['parcel_id'].apply(format_id).astype(str) + '_'
+                   + df['field_id'].apply(format_id).astype(str)).values,
+            '_c': pd.to_numeric(df[code], errors='coerce').astype('Int64').values})
+
+    k4 = _key(s4, src['s4_code'])
+    k4['s4q15'] = pd.to_numeric(s4['s4q15'], errors='coerce').astype('Int64').values
+    k4 = k4.dropna(subset=['_c'])
+    agree = k4.groupby(['_k', '_c'])['s4q15'].nunique(dropna=False) == 1
+    flag = (k4.drop_duplicates(['_k', '_c']).set_index(['_k', '_c'])['s4q15']
+              .where(agree))
+    k9 = _key(s9, src['s9_code'])
+    a = s9[PERMANENT_WINDOW_S9_VARIABLES].copy()
+    a['s4q15'] = pd.MultiIndex.from_frame(k9).map(flag.to_dict()).values
+    a['s4q15'] = pd.to_numeric(a['s4q15'], errors='coerce').astype('Int64')
+    a.insert(0, 'module', 'sect9_ph')
+    a.index = pd.MultiIndex.from_arrays(
+        [pd.Series(wave, index=s9.index).values,
+         s9['household_id'].apply(format_id).values,
+         k9['_c'].map(cmap).astype('string').values], names=['t', 'i', 'j'])
+
+    b = s11[PERMANENT_WINDOW_S11_VARIABLES].copy()
+    b[src['s11_code']] = s11[src['s11_code']].values
+    b.insert(0, 'module', 'sect11_ph')
+    c11 = pd.to_numeric(s11[src['s11_code']], errors='coerce').astype('Int64')
+    b.index = pd.MultiIndex.from_arrays(
+        [pd.Series(wave, index=s11.index).values,
+         s11['household_id'].apply(format_id).values,
+         c11.map(cmap).astype('string').values], names=['t', 'i', 'j'])
+    return pd.concat([a, b])
+
+
 def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
                          sale=None):
     """Fill §9 rows' empty sale columns from ESS §12 (GH #820).
@@ -2082,6 +2198,10 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
             harvest_month   — §9 harvest-END month code col
             intercrop       — §9 pure/mixed-stand col (1=pure, 2=mixed)
             pl_crop_code, pl_month  — §4 crop-code + planting-month cols
+            pl_permanent    — §4 per-crop permanent/tree flag (W4/W5
+                              ``s4q15``, 1 = Yes); when given, rows of a
+                              crop flagged permanent are stamped
+                              ``PERMANENT_CROP_WINDOW_DERIVATION`` (GH #1256)
             s_crop_code, s_sold_flag, s_qty, s_value, s_unit  — §11 cols
                               (s_unit None => Kg, W1 sales report kilos)
             s12_crop_code, s12_sold_flag, s12_qty, s12_value — §12 cols
@@ -2106,7 +2226,9 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         planting_month (Int64), harvest_month (Int64),
         intercropped (boolean), perennial (boolean), and -- only when
         ``sale12`` is given -- Derivation (string: ``SECT12_SALE_DERIVATION``
-        on the rows §12 filled, NA elsewhere).
+        on the rows §12 filled, NA elsewhere) or -- only when colmap names
+        ``pl_permanent`` -- Derivation (``PERMANENT_CROP_WINDOW_DERIVATION``
+        on the permanent-crop rows, NA elsewhere).
     """
     c = colmap
     crop_map = _eth_crop_label_map_for_wave(t)   # GH #1252: codes drift by wave
@@ -2186,6 +2308,27 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         out = out.merge(pm, on=['plot_id', '_code'], how='left')
     else:
         out['planting_month'] = pd.Series(pd.NA, index=out.index, dtype='Int64')
+
+    # GH #1256 (W4/W5): the post-planting roster's own per-crop permanent /
+    # tree flag (PP §4 Q15, ``s4q15``), joined on (plot_id, crop code) like
+    # planting_month.  A crop row is permanent only if EVERY §4 line of its
+    # key says Yes (1): a key whose §4 lines disagree, or a §9 row with no §4
+    # line, is not marked (counted in CONTENTS.org).  Used for the
+    # PERMANENT_CROP_WINDOW_DERIVATION stamp below.
+    if planting is not None and c.get('pl_permanent'):
+        n0 = len(out)
+        pf = pd.DataFrame({
+            'plot_id': (planting[c['holder_id']].apply(format_id).astype(str) + '_'
+                        + planting[c['parcel_id']].apply(format_id).astype(str) + '_'
+                        + planting[c['field_id']].apply(format_id).astype(str)).values,
+            '_code': pd.to_numeric(planting[c['pl_crop_code']], errors='coerce').astype('Int64').values,
+            '_yes': (pd.to_numeric(planting[c['pl_permanent']], errors='coerce') == 1).values,
+        }).dropna(subset=['plot_id', '_code'])
+        perm = (pf.groupby(['plot_id', '_code'], as_index=False)['_yes'].all()
+                  .rename(columns={'_yes': '_permanent'}))
+        out = out.merge(perm, on=['plot_id', '_code'], how='left')
+        assert len(out) == n0, f"{t}: the §4 permanent-flag join changed the row count"
+        out['_permanent'] = out['_permanent'].eq(True).to_numpy(dtype=bool)
 
     # Sales: §11 is (household, holder, crop) grain.  Attach reported
     # sold-qty / sold-value ONLY where (holder, crop) maps to exactly one
@@ -2306,11 +2449,29 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         # to tell an attached line that SURVIVED the two filters above from
         # one whose every row they removed.
         _report_sect12_sales(t, rep12, out)
+    if '_permanent' in out.columns:
+        # GH #1256: W4/W5 put a PERMANENT crop's harvest (§9 Q4/Q5, "for
+        # permanent crop harvested between March 10, 2018 to March 9, 2019")
+        # and its sales (§11, "FOR PERMANENT CROPS PLEASE INCLUDE CROP
+        # HARVESTED BETWEEN ...") on a fixed 12-month window, served beside
+        # season rows.  Stamped on every row the §4 roster flags permanent
+        # that serves one of those numbers -- after every filter above, so
+        # the stamp rides only on served rows.  The values are not touched
+        # (`derive_permanent_crop_window` is the identity).
+        win = (out['_permanent'].to_numpy(dtype=bool)
+               & out[['Quantity', 'Quantity_sold', 'Value_sold']].notna().any(axis=1).to_numpy())
+        stamp = (out['Derivation'].astype('string') if 'Derivation' in out.columns
+                 else pd.Series(pd.NA, index=out.index, dtype='string'))
+        assert stamp[win].isna().all(), f"{t}: a row already carries a Derivation"
+        stamp[win] = PERMANENT_CROP_WINDOW_DERIVATION
+        out['Derivation'] = stamp
+        out = out.drop(columns=['_permanent'])
     out = out.drop(columns=['_holder', '_code'])
     out['u'] = out['u'].fillna('Other (Specify)')
     out = out.set_index(['t', 'i', 'plot_id', 'j', 'u'])
     # Stable column order.  `Derivation` exists only where §12 was read
-    # (W1-W3): its registry key on the rows §12 filled, NA elsewhere.
+    # (W1-W3: its registry key on the rows §12 filled) or the §4 permanent
+    # flag was (W4/W5: the window key on permanent-crop rows); NA elsewhere.
     cols = ['Quantity', 'Quantity_sold', 'Value_sold',
             'planting_month', 'harvest_month', 'intercropped', 'perennial']
     if 'Derivation' in out.columns:

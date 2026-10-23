@@ -1835,7 +1835,9 @@ a season and not dropped.
 ESS4 §11 header says "FOR PERMANENT CROPS PLEASE INCLUDE CROP HARVESTED
 BETWEEN MARCH 10, 2018 TO MARCH 9, 2019" -- a 12-month window for the
 permanent crops ESS4 folded into §11 -- and those sales are served
-unmarked.  Filed as GH #1256.
+unmarked.  Filed as GH #1256.  *FIXED*: see "W4/W5 permanent crops: a
+12-month window (GH #1256)" below -- the harvest =Quantity= is in the window
+too (§9 Q4).
 
 Downstream, warm, same two builds: =harvest_kg= (with and without
 =crop_conversion_factors()=) is *identical* in every wave -- no
@@ -2045,6 +2047,66 @@ includes the label that §9 file's OWN value label gives -- 7 / 46 / 788 /
 290 / 297 plots, all agree (before: W1 1 of 7, W2 0 of 46).  =harvest_kg=
 (with and without the shipped factors), =gross_crop_revenue=, the
 within-wave =median_price_valuation= and every audit report are identical.
+
+** W4/W5 permanent crops: a 12-month window (GH #1256, 2026-10-23)
+
+ESS4 folds W1-W3's §12 tree/fruit/root module into §9 and §11 and puts a
+PERMANENT crop on a fixed twelve months, not the season (ESS4 post-harvest
+questionnaire,
+=2018-19/Documentation/2018_19_ethiopian_socioeconomic_survey_post_harvest_agricultural_questionnaire.pdf=):
+
+- §9 Q4, PDF p.3: "Have you harvested any of the [CROP] from this [FIELD]?
+  (for permanent crop harvested between March 10, 2018 to March 9, 2019)";
+  Q5 is that harvest's quantity -- served as =Quantity=;
+- §11 Q1, PDF p.8: "LIST ALL CROPS HARVESTED DURING THIS AGRICULTURAL
+  SEASON.  FOR PERMANENT CROPS PLEASE INCLUDE CROP HARVESTED BETWEEN MARCH
+  10, 2018 TO MARCH 9, 2019)"; Q7 / Q11 / Q12 sell "the harvested [CROP]" --
+  served as =Quantity_sold= / =Value_sold=.  Q2-Q4 (last completed
+  production period, harvest in the last 12 months, trees) are §12's
+  questions, asked of [TREES/FRUIT/ROOT CROP].
+
+So all three numeric columns are in the window on a permanent-crop row.
+
+*Which crops.*  The instrument names "permanent crops" and lists none.  The
+crop row's own flag is the post-planting roster's §4 Q15 (=s4q15=): W4 "IS
+THIS CROP A FRUIT TREE CROP?" (answered Yes on 95-99% of coffee, enset,
+chat, gesho, banana, mango, avocado rows -- a permanent/tree flag in
+practice), W5 variable label "IS THIS CROP A Permanent/TREE CROP?".  *No W5
+questionnaire is held*: the W5 window is read from the data alone -- its §11
+carries the same block (=s11q02= "completed production period", =s11q03a1=
+"harvested in last 12 months") and its §4 the same flag; W5's dates are not
+known.  Two alternatives were measured and not used:
+- the WB perennial code list (=PERENNIAL_CROP_CODES=, the =perennial=
+  column) disagrees with the flag on whole codes -- §4 rows flagged Yes,
+  W4 / W5: Berbere 1/235, 1/153; Garlic 0/213, 0/135; Ginger 0/40, 0/25;
+  Other tuber 2/126, 5/68; Red Kidney Beans 4/308, 0/316 (GH #1252);
+- §11's permanent block being answered (Q2) marks 1,206 W5 lines of
+  non-perennial crops, so it is not a crop-type marker there.
+
+*Stamp.*  =crop_production_for_wave= (colmap =pl_permanent='s4q15'=, W4/W5
+only) joins the flag on (plot, crop) like =planting_month=; a key is
+permanent only if EVERY §4 line says Yes (4 W4 / 5 W5 keys whose lines
+disagree, and the 93 / 235 §9 rows with no §4 line, are not marked).  Every
+served row so marked that serves a =Quantity=, =Quantity_sold= or
+=Value_sold= is stamped =Derivation =
+'Ethiopia::crop_production::permanent-crop-12-month-window'= (registered in
+=Ethiopia/_/derivations.yml=; function =derive_permanent_crop_window=, the
+identity; inputs =inputs_permanent_crop_window=, every §9 row with its
+=s4q15= and every §11 line, original names, =(t, i, j)=).  Stamped AFTER the
+empty-row filter, on served rows only.
+
+Measured cold, the #1252 commit -> this change: 85,519 rows both, identical
+index; the only cells that move are =Derivation= <NA> -> the key on 3,713 W4
+and 3,723 W5 rows (588 / 534 with a positive =Value_sold=; top crops Coffee
+786 / 847, Chat 651 / 627, Banana 423 / 529, Enset 401 / 377, Mango 356 /
+353).  An independent recomputation from the raw §4 / §9 files gives
+exactly the stamped set (0 mismatches either way).  Against =perennial=:
+3,666 / 3,696 stamped rows are perennial, 47 / 27 are not (Sacred Basil 30 /
+7, ...); 647 / 623 perennial rows are not stamped (Berbere 200 / 140, Garlic
+200 / 121, Other tuber 115 / 59, and coffee / chat rows the respondent did
+not flag).  Downstream (=harvest_kg=, =gross_crop_revenue=, the within-wave
+=median_price_valuation=) and every audit report identical: the stamp moves
+no value.
 
 ** Crop-side WB conversion factors: held, unwired (2026-09-09)
 
@@ -2267,7 +2329,8 @@ its evidence is the data alone.  Pinned in
 =tests/test_ethiopia_crop_production_sect12.py=.  What W4/W5 DO lack is a
 label: their §11 sales of permanent crops cover a 12-month window ("CROP
 HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019") and are served
-unmarked, where W1-W3's §12 sales now carry =sect12-sale-period= (GH #1256).
+unmarked, where W1-W3's §12 sales now carry =sect12-sale-period= (GH #1256;
+now stamped, see the next-but-one section).
 
 ** _/food_acquired.py lacks the id_walk that _/crop_production.py has
 

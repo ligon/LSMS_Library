@@ -383,7 +383,11 @@ def test_the_stamp_rides_to_the_served_table(cp):
                    "2018-19": 0, "2021-22": 0}, got
     stamped = (d == key).fillna(False).to_numpy(dtype=bool)
     assert (cp.loc[stamped, ["Quantity_sold", "Value_sold"]].notna().any(axis=1)).all()
-    assert set(d.dropna()) == {key}
+    # GH #1256 adds a second key, on W4/W5 rows only; no row carries both.
+    window = "Ethiopia::crop_production::permanent-crop-12-month-window"
+    assert set(d.dropna()) <= {key, window}
+    assert not (d == window).fillna(False)[np.isin(np.asarray(t, dtype=object),
+                                                   list(W13))].any()
     summ = cp.attrs["derivations"]["Ethiopia"][key]
     assert summ["rows"] == int(stamped.sum())
     assert summ["columns"] == ["Quantity_sold", "Value_sold"]

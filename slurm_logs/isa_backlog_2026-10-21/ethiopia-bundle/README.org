@@ -33,3 +33,15 @@ test, runs it there, and deletes the copy.
 | =1252_plot_inputs_diff_base_vs_branch.json= | the same for =plot_inputs= (base =627d3cfdf=; #1253 does not touch it) |
 | =1252_raw_oracle.json= | per wave: served plots holding a code 9/19/86 §9 row whose served =j= includes the label the §9 FILE's own value label gives |
 | =1252_downstream_and_reports.json= | =harvest_kg= (+ shipped), =gross_crop_revenue=, within-wave =median_price_valuation=, audit reports |
+
+* GH #1256 -- W4/W5 permanent-crop window
+
+| file | what |
+|------+------|
+| =1256_api_diff_prev_commit_vs_branch.json= | cold builds, #1252 commit vs this commit: the only changed cells are =Derivation= on W4/W5 rows |
+| =1256_raw_oracle_and_crosstabs.json= | per wave: an independent recomputation of the stamped set from raw §4/§9 (0 mismatches); the stamp against =perennial= and against "§11 Q2 answered"; stamped rows by crop |
+| =1256_downstream_and_reports.json= | downstream and audit reports identical |
+
+The §4 =s4q15= by-crop tabulation (=scripts/s4q15.py=) and the §11
+permanent-block tabulation (=scripts/perm_block2.py=) are quoted in
+=Ethiopia/_/CONTENTS.org=.

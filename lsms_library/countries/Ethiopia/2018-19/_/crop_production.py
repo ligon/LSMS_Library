@@ -10,6 +10,14 @@ W4 specifics: the crop code lives in s9q00b (§9), s4q01b (§4), s11q01
 NATIVE unit (code s9q05b).  intercropped from §9 s9q02.  §11 sale qty
 s11q11a (native unit s11q11b), value s11q12, sold-flag s11q07.
 i = household_id (W4 is an entirely new sample).
+
+GH #1256: a PERMANENT crop's harvest and sales here cover a fixed 12 months,
+not the season (§9 Q4: "for permanent crop harvested between March 10, 2018
+to March 9, 2019"; §11 Q1: "FOR PERMANENT CROPS PLEASE INCLUDE CROP
+HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019").  The rows whose crop the
+§4 roster flags permanent (PP §4 Q15 "IS THIS CROP A FRUIT TREE CROP?",
+s4q15; colmap ``pl_permanent``) are stamped
+``Derivation = 'Ethiopia::crop_production::permanent-crop-12-month-window'``.
 """
 import sys
 
@@ -33,6 +41,7 @@ colmap = dict(
     harvest_month='s9q08b',
     intercrop='s9q02',
     pl_crop_code='s4q01b', pl_month='s4q13a',
+    pl_permanent='s4q15',          # §4 per-crop permanent/tree flag (GH #1256)
     s_crop_code='s11q01', s_sold_flag='s11q07',
     s_qty='s11q11a', s_value='s11q12',
 )
