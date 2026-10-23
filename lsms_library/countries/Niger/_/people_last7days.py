@@ -12,27 +12,21 @@ apply ``id_walk`` here; the framework runs it in ``_finalize_result`` on
 every read.  The ``(t, i, pid)`` index is unique within each wave
 (``_finish_people_last7days`` collapses to one row per individual), so no
 rows are lost to the framework's canonical-index de-dup collapse.
-"""
-import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet
+EVERY wave in WAVES has a ``people_last7days.py`` script, so a missing wave
+parquet means that script failed or was never run -- never "not wired". It
+is refused, not skipped (``niger.concat_wave_parquets``, GH #1123, extended
+from plot_inputs on 2026-10-23): under ``LSMS_BUILD_BACKEND=make`` this
+script is also the fallback the framework runs after a failed ``make``, and
+skipping the absent wave there would serve the other waves with no Python
+warning.
+"""
+from lsms_library.local_tools import to_parquet
+from niger import concat_wave_parquets
 
 
 WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
 
-pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/people_last7days.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired for people_last7days (no .py script / no parquet).
-        # DVC raises PathMissingError here, not FileNotFoundError.
-        continue
-    pieces.append(df)
-
-assert pieces, 'people_last7days: no wave-level parquets found'
-
-p = pd.concat(pieces)
+p = concat_wave_parquets('people_last7days', WAVES)
 
 to_parquet(p, '../var/people_last7days.parquet')
