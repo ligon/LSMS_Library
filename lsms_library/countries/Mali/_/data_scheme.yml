@@ -49,20 +49,21 @@ Data Scheme:
     FIES_score: int
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
-    # source (purchased / produced / inkind / other).  EHCVM 2018-19
-    # and 2021-22 wave mapping.py files import
-    # food_acquired_to_canonical as food_acquired to reshape the
-    # wide-form (Quantity-total, Produced-subset, Expenditure) into
-    # long-form on s.  `visit` (vague) is dropped: in EHCVM it's a
-    # sample split, not a repeated measure.
-    #
-    # The 2014-15 EACI wave is Phase-2-incomplete: its data_info.yml
-    # incorrectly maps `Quantity: s13q02`, but s13q02 is a Oui/Non
-    # column.  Pending a Phase 3 audit to identify the correct
-    # quantity / produced / expenditure variables for that instrument,
-    # 2014-15 continues to emit a legacy non-canonical shape; runtime
-    # output of Country('Mali').food_acquired() therefore mixes shapes
-    # across waves.
+    # source (purchased / produced / inkind / other).  Every wave that
+    # declares food_acquired emits the same canonical shape
+    # (t, v, i, j, u, s) with Quantity / Expenditure (GH #839):
+    #   - EHCVM 2018-19 and 2021-22: each wave's mapping.py food_acquired
+    #     hook wraps lsms_library/ehcvm.py:food_acquired_ehcvm (GH #876 --
+    #     purchased Quantity is the gift-net consumed quantity, Expenditure
+    #     the registered derived valuation, gifts served as s='inkind').
+    #   - EACI 2014-15: its data_info.yml reads the three acquisition
+    #     streams separately (s13q03a/b/c purchased quantity/unit/value,
+    #     s13q04a/b produced, s13q05a/b in-kind; s13q02 is the Oui/Non
+    #     gate, NOT a quantity), and the wave mapping.py food_acquired
+    #     hook melts them onto s (GH #380 Phase 3 audit).
+    #   - EAC-I 2017-18 declares no food_acquired.
+    # `visit` (vague / passage) is dropped: it is a sample split, not a
+    # repeated measure.
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
@@ -188,9 +189,14 @@ Data Scheme:
     # crop_production).
     #
     # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
-    #         plot_features.  crop is set on SEED rows only (the seed's crop,
-    #         harmonize_food Preferred Label); NaN for fertilizer/pesticide
-    #         rows (applied at the plot grain, not per-crop).
+    #         plot_features.  crop is the seed's crop on SEED rows: the
+    #         harmonize_food Preferred Label, or the recorded label itself
+    #         where harmonize_food does not map it (as niger._crop_labels,
+    #         Niger/_/niger.py:440-445).  Every NON-SEED row -- fertilizer /
+    #         pesticide type rows (applied at the plot grain, not per-crop)
+    #         and the two use-answer rows -- carries '(not crop-specific)',
+    #         never NaN (mali.CROP_NA, after Niger/_/niger.py:668; the
+    #         cross-country spelling is GH #1119).
     # input = harmonize_input Preferred Label (Seed / Urea / DAP / NPK /
     #         Other inorganic / Manure / Compost / Other organic / Pesticide /
     #         Fungicide / Herbicide / Other phytosanitary).  These are FIXED
@@ -207,9 +213,20 @@ Data Scheme:
     #         s7dq22 inorganic fertilizer, s2cq26 / s7dq27 phytosanitary
     #         products), Oui -> True, Non -> False, on its own row with input
     #         'Inorganic Fertilizer?' / 'Phytosanitary products?' (no Quantity,
-    #         u = Unknown).  NA on every type row.  The type rows' Quantity 0 is
-    #         that type not used inside a "yes" for its group (GH #1118,
-    #         maintainer decision 2026-10-22).
+    #         u = Unknown).  NA on every type row.  A missing answer
+    #         ('Manquant' / blank) is no row.  An inorganic / phytosanitary
+    #         type row's Quantity 0 sits under a "yes" for its group on
+    #         39,320 of 39,907 such rows (98.5%); the other 587 (2014-15) sit
+    #         under a 'Manquant' answer and so have no answer row, and 30
+    #         2014-15 plots with a positive inorganic quantity have no answer
+    #         row either (GH #1118, maintainer decision 2026-10-22; counts in
+    #         CONTENTS.org).
+    #         Counting plots by input label must filter Applied: these rows
+    #         carry the "no" answers too.  REQUIRED, unlike Ethiopia's and
+    #         Malawi's optional Applied: optional would drop it from
+    #         _required_scheme_columns (country.py), switching off
+    #         _assert_built_required_columns and Site B for it, and both
+    #         EAC-I waves carry answers (base: 0 Applied warnings).
     #
     # NO seed_kg / nitrogen_kg / derived any-use flags / fertilizer totals —
     # those are transformations.py rollups over these item rows.  Built by

@@ -402,7 +402,8 @@ def crop_production_finalize(df):
 #   - i     = Mali composite household id (grappe, menage/exploitation),
 #   - plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
 #             plot_features (s2cq01_s2cq02 etc.); seed rows additionally key
-#             on a crop column where the source records it,
+#             on their crop, and every non-seed row (not crop-specific)
+#             carries the CROP_NA sentinel '(not crop-specific)' on `crop`,
 #   - input = harmonize_input Preferred Label (Seed / Urea / DAP / NPK /
 #             Other inorganic / Manure / Compost / Other organic / Pesticide /
 #             Fungicide / Herbicide / Other phytosanitary).
@@ -418,6 +419,26 @@ def crop_production_finalize(df):
 # harmonize_food Preferred Label so it joins crop_production / food_acquired.
 
 
+# Sentinel for the `crop` index level on a plot_inputs row that is NOT
+# crop-specific: every fertilizer / pesticide type row and both group
+# use-answer rows ('Inorganic Fertilizer?' / 'Phytosanitary products?') --
+# NON-SEED rows only.  A seed row is crop-specific: it carries its crop's
+# harmonize_food Preferred Label or, where harmonize_food does not map the
+# recorded s1eq03b / s11cq03 label, that recorded label itself, exactly as
+# niger._crop_labels passes an unmapped crop through (Niger/_/niger.py:440-445;
+# measured on a cold Niger build, 0 of 31,029 seed rows carry the marker).
+# Inlined verbatim from niger.CROP_NA (Niger/_/niger.py:668; filled as at
+# niger.py:693), the spelling all seven EHCVM siblings use (Benin,
+# Burkina_Faso, CotedIvoire, Guinea-Bissau, Niger, Senegal, Togo).  WHY A
+# SENTINEL, NOT NaN: a NaN on a declared index level is deleted by the first
+# groupby that reaches it (pandas groupby(dropna=True)) -- Feature()'s
+# assembly, the canonical de-dup, or the user's own aggregation -- and the
+# loss is counted nowhere.  Which spelling becomes CANONICAL across
+# countries is GH #1119's open decision; this only makes Mali agree with its
+# region.
+CROP_NA = '(not crop-specific)'
+
+
 def _input_labels(series):
     """Map a Series of harmonize_input Codes -> Preferred Label."""
     m = tools.get_categorical_mapping(tablename='harmonize_input', idxvars='Code',
@@ -430,21 +451,29 @@ def plot_inputs_finalize(df):
     """Common post-processing for a plot_inputs wave DataFrame.
 
     Expects raw columns already assembled:
-        t, i, plot, input (harmonize_input Code), crop (decoded crop name or
-        NA), u (decoded unit label or NA), Quantity, Purchased (nullable
-        bool), Quantity_purchased, Improved (nullable bool), and optionally
+        t, i, plot, input (harmonize_input Code), crop (decoded crop name, or
+        NA where the row is not crop-specific), u (decoded unit label or
+        NA), Quantity, Purchased (nullable bool), Quantity_purchased,
+        Improved (nullable bool), and optionally
         Applied (nullable bool; the plot-level group use answer, set only on
         the 'inorganic_fertilizer' / 'phytosanitary' group rows).
     Maps input/unit/crop labels, coerces dtypes, drops content-free rows
     (an input slot the household did not use -> no quantity, no purchase,
-    no improved flag, no use answer), sets the (t, i, plot, input, crop) index, and
-    collapses exact-duplicate index rows by summing the reported quantities
-    and taking the first/any of the flags.
+    no improved flag, no use answer), keeps a recorded crop label that
+    harmonize_food does not map, fills `crop` with CROP_NA on every non-seed
+    row, sets the (t, i, plot, input, crop) index, and collapses
+    exact-duplicate index rows by summing the reported quantities and taking
+    the first/any of the flags.
     """
     df = df.copy()
     df['input'] = _input_labels(df['input'])
     df['u'] = _unit_labels(df['u'])
-    df['crop'] = _crop_labels(df['crop'])
+    # An unmapped recorded crop keeps its own label, as niger._crop_labels
+    # does (Niger/_/niger.py:440-445).  Done here, not in _crop_labels, which
+    # crop_production shares.  Mali: 'Non-Exploitée' / 'Non exploitée',
+    # 'Echalotte', 'Poireaux' (45 seed rows; Mali CONTENTS.org).
+    raw_crop = df['crop'].astype('string').str.strip().replace('', pd.NA)
+    df['crop'] = _crop_labels(df['crop']).fillna(raw_crop)
     df = df.dropna(subset=['input'])  # drop unmapped input slots
 
     for c in ('Quantity', 'Quantity_purchased'):
@@ -474,15 +503,21 @@ def plot_inputs_finalize(df):
                    | df['Improved'].notna() | df['Applied'].notna())
     df = df[has_content]
 
-    # plot / crop may be NA; carry as NA-able strings so the index level is
-    # not silently dropped.
+    # plot may be NA; carry it as an NA-able string so the index level is not
+    # silently dropped.  A NON-SEED row (every fertilizer / pesticide type row,
+    # both use-answer rows) is not crop-specific and carries the CROP_NA
+    # sentinel, as in Niger/_/niger.py:693.  A seed row is never filled: its
+    # crop is crop-specific even when unknown (none is blank today).  Filled
+    # BEFORE the collapse; the collapse already grouped NA crops together
+    # (dropna=False), so no group changes membership.
     df['plot_id'] = df['plot_id'].astype('string')
     df['crop'] = df['crop'].astype('string')
+    df.loc[df['input'].ne('Seed') & df['crop'].isna(), 'crop'] = CROP_NA
 
     keys = ['t', 'i', 'plot_id', 'input', 'crop']
     # Collapse any exact (t,i,plot,input,crop) duplicates: sum reported
     # amounts (min_count=1 keeps an all-NA group NA, not a spurious 0),
-    # first/any for flags.  dropna=False so plot/crop NA rows survive.
+    # first/any for flags.  dropna=False so plot NA rows survive.
     g = df.groupby(keys, dropna=False, as_index=True)
     out = pd.DataFrame({
         'Quantity':           g['Quantity'].sum(min_count=1),

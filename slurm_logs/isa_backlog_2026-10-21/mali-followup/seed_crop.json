@@ -1,0 +1,22 @@
+{
+ "2014-15": {
+  "raw_crop_blank": 0,
+  "raw_crop_blank_with_quantity": 0,
+  "raw_crop_recorded_unmapped": 37,
+  "rows": 10018,
+  "unmapped_labels": {
+   "Echalotte": 1,
+   "Non-Exploitée": 35,
+   "Poireaux": 1
+  }
+ },
+ "2017-18": {
+  "raw_crop_blank": 0,
+  "raw_crop_blank_with_quantity": 0,
+  "raw_crop_recorded_unmapped": 8,
+  "rows": 24457,
+  "unmapped_labels": {
+   "Non exploitée": 8
+  }
+ }
+}

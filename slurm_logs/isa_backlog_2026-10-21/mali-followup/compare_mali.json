@@ -1,0 +1,89 @@
+{
+ "all_ok": true,
+ "mali_country.pkl": {
+  "base_full_groupby_size_sum": 34287,
+  "base_level_nan": 145530,
+  "base_level_nan_nonseed": 145485,
+  "base_level_nan_seed": 45,
+  "base_rows": 179817,
+  "branch_full_groupby_size_sum": 179817,
+  "branch_level_nan": 0,
+  "branch_marker": 145485,
+  "branch_marker_on_seed": 0,
+  "branch_rows": 179817,
+  "branch_seed_passthrough": 45,
+  "branch_seed_passthrough_by_label": {
+   "Echalotte": 1,
+   "Non exploitée": 8,
+   "Non-Exploitée": 35,
+   "Poireaux": 1
+  },
+  "branch_seed_passthrough_by_wave": {
+   "2014-15": 37,
+   "2017-18": 8
+  },
+  "columns_equal": true,
+  "dtypes_equal": true,
+  "identical_outside_seed_passthrough": true,
+  "index_names_equal": true,
+  "marker_by_input": {
+   "Compost": 2673,
+   "DAP": 9644,
+   "Fungicide": 6458,
+   "Herbicide": 6459,
+   "Inorganic Fertilizer?": 32993,
+   "Manure": 11148,
+   "NPK": 9643,
+   "Other inorganic": 9640,
+   "Other organic": 1189,
+   "Other phytosanitary": 6447,
+   "Pesticide": 6460,
+   "Phytosanitary products?": 33089,
+   "Urea": 9642
+  },
+  "seed_rows_identical_but_crop": true
+ },
+ "mali_feature.pkl": {
+  "base_full_groupby_size_sum": 34287,
+  "base_level_nan": 145530,
+  "base_level_nan_nonseed": 145485,
+  "base_level_nan_seed": 45,
+  "base_rows": 179817,
+  "branch_full_groupby_size_sum": 179817,
+  "branch_level_nan": 0,
+  "branch_marker": 145485,
+  "branch_marker_on_seed": 0,
+  "branch_rows": 179817,
+  "branch_seed_passthrough": 45,
+  "branch_seed_passthrough_by_label": {
+   "Echalotte": 1,
+   "Non exploitée": 8,
+   "Non-Exploitée": 35,
+   "Poireaux": 1
+  },
+  "branch_seed_passthrough_by_wave": {
+   "2014-15": 37,
+   "2017-18": 8
+  },
+  "columns_equal": true,
+  "dtypes_equal": true,
+  "identical_outside_seed_passthrough": true,
+  "index_names_equal": true,
+  "marker_by_input": {
+   "Compost": 2673,
+   "DAP": 9644,
+   "Fungicide": 6458,
+   "Herbicide": 6459,
+   "Inorganic Fertilizer?": 32993,
+   "Manure": 11148,
+   "NPK": 9643,
+   "Other inorganic": 9640,
+   "Other organic": 1189,
+   "Other phytosanitary": 6447,
+   "Pesticide": 6460,
+   "Phytosanitary products?": 33089,
+   "Urea": 9642
+  },
+  "seed_rows_identical_but_crop": true
+ }
+}

@@ -1,0 +1,38 @@
+{
+ "Inorganic Fertilizer?": {
+  "plots_positive_answer_no": {},
+  "plots_positive_no_answer": {
+   "2014-15": 30
+  },
+  "type_rows": {
+   "2014-15|no quantity|yes": 3,
+   "2014-15|positive|no answer row": 57,
+   "2014-15|positive|yes": 4355,
+   "2014-15|zero|no answer row": 455,
+   "2014-15|zero|yes": 6446,
+   "2017-18|positive|yes": 11309,
+   "2017-18|zero|yes": 15944
+  },
+  "zero_rows_total": 22845,
+  "zero_rows_under_yes": 22390,
+  "zero_rows_without_yes": {
+   "('2014-15', 'no answer row')": 455
+  }
+ },
+ "Phytosanitary products?": {
+  "plots_positive_answer_no": {},
+  "plots_positive_no_answer": {},
+  "type_rows": {
+   "2014-15|positive|yes": 2578,
+   "2014-15|zero|no answer row": 132,
+   "2014-15|zero|yes": 5088,
+   "2017-18|positive|yes": 6184,
+   "2017-18|zero|yes": 11842
+  },
+  "zero_rows_total": 17062,
+  "zero_rows_under_yes": 16930,
+  "zero_rows_without_yes": {
+   "('2014-15', 'no answer row')": 132
+  }
+ }
+}

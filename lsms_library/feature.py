@@ -299,10 +299,15 @@ def _align_to_canonical_levels(
     refines nothing and collides with nothing -- branch 3 is structurally safe.
     Promotion is not: a column holding BOTH a null (filled with the sentinel)
     and the LITERAL sentinel value maps two otherwise-identical rows onto one
-    index tuple.  No corpus country is in that state today -- Mali, Nigeria and
-    Tanzania's ``u`` columns carry 0 literal ``'Unknown'`` values -- but that is
-    a fact about the data, not a property of the code, and it can change with
-    any wave.
+    index tuple.  Re-measured cold on 2026-10-23 (``Country(c).<table>()``):
+    no ``crop_production`` ``u`` column holds both -- Mali (1,910 null) and
+    Tanzania (2,395 null) carry no literal ``'Unknown'``, Nigeria carries
+    13,138 literal and no null -- and Mali's ``plot_inputs`` ``u`` is all
+    literal (108,171 ``'Unknown'``, 0 null, since GH #1118).  But Nigeria's
+    ``plot_inputs`` ``u`` IS in that state (5,546 null, 178 literal
+    ``'Unknown'``); no two of its rows collided on promotion (96,620 rows in,
+    96,620 assembled).  So whether a collision occurs is a fact about the data,
+    not a property of the code, and it can change with any wave.
 
     So the collision is GUARDED rather than assumed away: a non-unique index
     after ``set_index`` is routed through :func:`_collapse_duplicate_index`, the
