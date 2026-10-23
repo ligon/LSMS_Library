@@ -93,6 +93,10 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - #1120 DIAGNOSED (posted on #1120 and #660): no id-format mismatches.  Ethiopia = households absent from the household cover but present in the agriculture cover with an EA and weight; Nigeria = frame choice (PP cover only); Uganda = mixed, and its =plot_id= NaN is mostly a builder defect.  Decisions D1 (sample frame), D2 (unlocatable households: singleton v?) and D3 (plot_id sentinel) for Ethan, with recommendations.
 - Filed *#1250*: Uganda =_labor_persondays= serves a MISSING use-flag as "No" (~5,200 fabricated zeros).  Fix agent running (worktree =1250=).
 
+- *PR #1251 open* (#1234 =map_index= -> Unknown, cold and warm; round 2 added a =_finalize_result= step, 0 hashes on its own).  CORPUS re-warm: merge together with #1233 (merge-tree clean; noted on #1233).
+- #637 Tanzania tail dispatched (=plot_inputs= / =crop_production= unit-mixing sums; canonical index has =u=).  Worktree =637-tz=.
+- Backlog notes: #771 (Ethiopia FCT / USDA key) waits on Ethan's key-rotation decision and on #820 (both re-warm Ethiopia).  #824 Ethiopia sold-unit audit after #820.  Tier A comment-only fixes (#798/#839 Mali) each cost a Mali re-warm: bundle them with the next Mali change.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
