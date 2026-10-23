@@ -2347,6 +2347,16 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             unit   unit column name (W3-W5; None for W1/W2)
             size   coded size column (W4 c8q2c, W5 c8aq2_c; None otherwise)
             size_text  free-text size column (W3 c8q2b; None otherwise)
+            obs    the form's reading slot this frame records (default 1).
+                   W3 is the one wave whose C8 has TWO slots: sectc8a is
+                   "C8a: FOOD PRICES - 1ST LOCATION" (obs 1) and sectc8b
+                   "C8b: FOOD PRICES - 2ND LOCATION" (obs 2) --
+                   PH_W3_Community_Quest.pdf, SECTIONS list "8 Food Prices /
+                   a. First location 18 / b. Second location 24"; each
+                   section opens with its own location type, name,
+                   description, collection date and GPS over the same item
+                   list (GH #637 defect C; the GH #840 `obs` contract,
+                   lsms_library/data_info.yml Index Info).
     mode : {'codes', 'names'}
         'codes' -> item_cd is the consumption-module scheme already in
                    harmonize_food (W3-W5): resolve via crop_labels (Code).
@@ -2386,13 +2396,32 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
 
     Returns
     -------
-    DataFrame indexed by (t, v, j, u) with the `Price` column and, where any
-    row was derived, a `Derivation` column (registry key on derived rows,
-    NA elsewhere).  One row per (cluster, item, unit); the price kept for a
-    cluster listing an item more than once at the same unit (sectc8a +
-    sectc8b overlap; size variants mapping to one base unit) is the FIRST
-    reported price -- a within-row dedup of the SAME surveyed quantity,
-    never a cross-cluster aggregate.
+    DataFrame indexed by (t, v, j, u, obs) with the `Price` column and,
+    where any row was derived, a `Derivation` column (registry key on
+    derived rows, NA elsewhere).  `obs` is each frame's reading slot, so
+    W3's two locations are two rows, never one selected from the pair
+    (GH #637 defect C: until 2026-10-23 the collapse below kept location 1
+    in all 2,591 W3 cells both locations priced -- 983 of them at a
+    different price -- and served the 3,218 location-2-only rows
+    indistinguishable from location 1).
+
+    In 'codes' mode (W3-W5) the key is asserted UNIQUE before the collapse:
+    each C8 file is (ea, item_cd)-unique, so a collision would be a broken
+    key, not a cell to select from (GH #840).  The Niger duplicate-entry
+    drop (a SECOND source record of the same slot that repeats a served
+    row) has nothing to act on here -- no W3-W5 file carries a second
+    record -- and a W3 location-2 price equal to location 1's is a second
+    slot, not a repeat: it is served (Niger's content key includes the
+    slot; GhanaLSS serves equal vendor prices).
+
+    'names' mode (W1/W2) still collapses (t, v, j, u, obs=1) duplicates to
+    the FIRST price.  That is NOT a dedup of the same surveyed quantity:
+    the groups are size variants of one base item (base*10+size codes) and
+    distinct items the name map lumps under one label (Maize, Beer, Fish--
+    fresh, Butter/Margarine), and most disagree on Price (GH #637 tail
+    diagnosis, 2026-10-23: 2,303 of 2,568 W1 groups, 2,605 of 2,951 W2).
+    Kept as-is pending a maintainer ruling (a `variety` level, as #840 did
+    for Tanzania); see CONTENTS.org.
     """
     DERIVATION_KEY = 'Nigeria::community_prices::c8-metric-size'
     pieces = []
@@ -2441,6 +2470,7 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             'v': v.values,
             'j': j.values,
             'u': u.values,
+            'obs': int(fr.get('obs', 1)),
             # float64 up-front: the size division below writes non-integer
             # per-unit prices, and a raw int16 price column would refuse
             # them (pandas 3 raises on the silent downcast).
@@ -2526,19 +2556,30 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     out = out[out['v'].notna() & out['j'].notna() & out['u'].notna()
               & out['Price'].notna() & (out['Price'] > 0)]
 
-    # Collapse same-(cluster,item,unit) duplicates to one row.  A cluster can
-    # list the same item/unit more than once (W3 sectc8a+sectc8b overlap;
-    # multiple size variants mapping to one base unit) -- keep the FIRST reported
-    # price (a genuine REPORTED surveyed value, consistent with every sibling
-    # community_prices feature), NOT a computed median.  Within-(t,v,j,u) only,
-    # never a cross-cluster aggregate.
-    out = (out.groupby(['t', 'v', 'j', 'u'], as_index=False)
+    # `obs` is in the key, so W3's two locations are two rows (GH #637
+    # defect C).  W3-W5 ('codes') must arrive collision-free: each C8 file is
+    # (ea, item_cd)-unique, so a duplicate (t, v, j, u, obs) is a broken key,
+    # and the collapse below must not select from it (GH #840).
+    key = ['t', 'v', 'j', 'u', 'obs']
+    if mode == 'codes':
+        dup = out.duplicated(key, keep=False)
+        assert not dup.any(), (
+            f"community_prices {t}: {int(dup.sum())} rows share a "
+            f"{tuple(key)} key -- a broken key, not a cell to select from "
+            "(GH #840 / #637)")
+    # W1/W2 ('names') only: collapse (t, v, j, u, obs=1) duplicates to the
+    # FIRST reported price.  The groups are size variants of one base item
+    # and distinct items lumped under one label (see the docstring) -- a
+    # SELECTION, kept pending a maintainer ruling, never a cross-cluster
+    # aggregate.  `Derivation` is all-NA there (W1/W2 carry no size column),
+    # so its `first` is exact; in 'codes' mode every group is one row.
+    out = (out.groupby(key, as_index=False)
               .agg({'Price': 'first', 'Derivation': 'first'}))
     if out['Derivation'].isna().all():
         out = out.drop(columns='Derivation')
 
     # community_prices is a CLUSTER table -- there is no household i, the
-    # natural grain is (t, v, j, u).  But the framework's
+    # natural grain is (t, v, j, u, obs).  But the framework's
     # local_tools.map_index() (run on EVERY read path) unconditionally swaps
     # j -> i whenever a `j` index level is present and an `i` level is NOT.
     # That swap would rename our item level `j` to `i`, drop `j`, and collapse
@@ -2546,13 +2587,14 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     # framework, carry a redundant `i` level (set equal to the cluster v)
     # positioned BEFORE `j`: map_index then sees i present and j after i, so it
     # does NOT swap, and the framework's _normalize_dataframe_index drops the
-    # undeclared `i` level (data_scheme declares (t, v, j, u)), leaving the
-    # canonical (t, v, j, u) grain.  v already in the index means
+    # undeclared `i` level (data_scheme declares (t, v, j, u, obs)), leaving
+    # the declared (t, v, j, u, obs) grain.  v already in the index means
     # _join_v_from_sample is skipped; the spurious i==v never reaches the API.
     # (Same framework-compatibility shim Tanzania/Malawi/Ethiopia/Mali
     # community_prices use.)
+    out['obs'] = out['obs'].astype('int64')
     out['i'] = out['v']
-    out = out.set_index(['t', 'v', 'i', 'j', 'u']).sort_index()
+    out = out.set_index(['t', 'v', 'i', 'j', 'u', 'obs']).sort_index()
     value_cols = ['Price'] + (['Derivation'] if 'Derivation' in out else [])
     return out[value_cols]
 
@@ -2770,10 +2812,14 @@ _C8_DROP_DERIVATION_KEY = 'Nigeria::community_prices::c8-unrecorded-size-drop'
 
 # The C8 source per wave folder, exactly as the wave's `community_prices.py`
 # reads it.  Shared by the derivation and deletion `inputs` callables.
+# `obs` is the frame's reading slot, as the wave script passes it to
+# community_prices_for_wave (W3: sectc8a = 1st location, sectc8b = 2nd), so
+# the inputs frames join the served (t, v, j, u, obs) grain (GH #637).
 _C8_SOURCE = {
     '2015-16': [dict(fn=f'Data/sectc8{ab}_harvestw3.dta', item='item_cd',
-                     unit='c8q2', size=None, size_text='c8q2b', price='c8q3')
-                for ab in ('a', 'b')],
+                     unit='c8q2', size=None, size_text='c8q2b', price='c8q3',
+                     obs=obs)
+                for obs, ab in ((1, 'a'), (2, 'b'))],
     '2018-19': [dict(fn='Data/sectc8_harvestw4.dta', item='item_cd',
                      unit='c8q2', size='c8q2c', size_text=None,
                      price='c8q3')],
@@ -2794,13 +2840,14 @@ def _c8_raw_inputs(folder, keep):
     the c8-metric-size derivation divides); ``'dropped'`` keeps the
     metric-unit records with an UNRECORDED size (exactly the rows the build
     drops, named by the c8-unrecorded-size-drop deletion entry).  Columns:
-    t, v, item_cd, unit_label, size_label, size_quantity_g_or_cl,
-    reported_price.
+    t, v, obs, item_cd, unit_label, size_label, size_quantity_g_or_cl,
+    reported_price (`obs` is the C8 reading slot -- W3 location 1 / 2 --
+    so a row joins the served (t, v, j, u, obs) grain; GH #637).
     """
     from lsms_library.paths import countries_root
     from lsms_library.local_tools import get_dataframe
     root = countries_root() / 'Nigeria'
-    cols = ['t', 'v', 'item_cd', 'unit_label', 'size_label',
+    cols = ['t', 'v', 'obs', 'item_cd', 'unit_label', 'size_label',
             'size_quantity_g_or_cl', 'reported_price']
     frames = []
     for sp in _C8_SOURCE.get(folder, []):
@@ -2840,6 +2887,7 @@ def _c8_raw_inputs(folder, keep):
                         & qty.isna())
         frames.append(pd.DataFrame({
             't': PH_QUARTER[folder], 'v': v[mask].values,
+            'obs': int(sp.get('obs', 1)),
             'item_cd': pd.to_numeric(raw[sp['item']], errors='coerce')[mask].values,
             'unit_label': unit_lab[mask].values,
             'size_label': size_lab[mask].values,

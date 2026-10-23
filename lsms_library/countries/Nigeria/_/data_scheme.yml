@@ -568,7 +568,20 @@ Data Scheme:
     # 'KILOGRAMS (KG)' (the earlier 'Grams(g)' description was wrong), and
     # a blank size beside KILOGRAMS reads as one kilogram -- they are
     # served under `Kg`.
-    index: (t, v, j, u)
+    #
+    # obs (GH #637 defect C; the GH #840 contract in lsms_library/data_info.yml)
+    # -- the C8 READING SLOT.  W3 fields C8 at two locations per community:
+    # sectc8a "C8a: FOOD PRICES - 1ST LOCATION" is obs 1, sectc8b "C8b: FOOD
+    # PRICES - 2ND LOCATION" is obs 2 (PH_W3_Community_Quest.pdf).  Until
+    # 2026-10-23 the two were collapsed on (t, v, j, u) and location 1 kept:
+    # 2,591 location-2 prices dropped (983 of them different), and 3,218
+    # location-2-only rows served as if from location 1.  Every other wave
+    # prices one location: obs = 1, native (not the Feature sentinel).  No
+    # `variety` / `visit` level: W3-W5 build collision-free on
+    # (t, v, j, u, obs) (asserted in nigeria.community_prices_for_wave), and
+    # W1/W2's size variants and lumped items still collapse to the first
+    # price pending a ruling (CONTENTS.org).
+    index: (t, v, j, u, obs)
     Price: float
     materialize: make
 

@@ -1210,6 +1210,88 @@ crop_price_EA is an HH-median imputation), so this is strictly richer.
 
 124,539 priced rows across 5 waves x 584 clusters x 139 food items x 30 units.
 
+** W3 prices TWO locations per community: the =obs= level (GH #637 defect C, 2026-10-23)
+
+*The idiosyncrasy.*  W3 (2015-16) is the one wave whose C8 has two reading
+slots.  =PH_W3_Community_Quest.pdf= lists "8 Food Prices / a. First location
+18 / b. Second location 24" in its SECTIONS table; C8a is headed "FOOD PRICES
+- 1ST LOCATION" and C8b "FOOD PRICES - 2ND LOCATION", and each opens with its
+own location block (type MARKETPLACE / SHOPS/STALLS / OTHERS, name,
+description, date of collection, GPS) over the SAME item list.  The shipped
+files carry none of that location block: =sectc8a_harvestw3.dta= and
+=sectc8b_harvestw3.dta= hold only =zone state lga sector ea item_cd c8q1 c8q2
+c8q2b c8q3=, with =c8q1= (available?) = 1 on every row and every price > 0.
+Each file is =(ea, item_cd)=-unique and covers all 487 EAs.
+
+*How the second page was used differs by EA.*  In 78 EAs (53 in zone 4) it
+re-prices most of the first page's list: 4,323 shared =(ea, item)= cells.  In
+the other 409 it prices a short tail -- median 10 items, 87% of those 4,032
+rows codes 70-77 (tomatoes, onions, garden eggs, okra, peppers) or 160-163
+-- that the first location did not price at all.  So the wave script's old
+"different item ranges" was false as a statement about the files (all 110
+=sectc8b= codes occur in =sectc8a=) but describes the 409-EA pattern.
+
+*The defect.*  =community_prices_for_wave= collapsed =(t, v, j, u)= with
+=Price: 'first'=, so location 1 always won.  Of the 2,591 cells both
+locations priced (after the size drop and unit canonicalisation), 983 held a
+DIFFERENT location-2 price (ratio median 1.25, max 21.4) that was dropped,
+and 1,608 an equal one; and the 3,218 location-2-only rows were served
+indistinguishable from location 1.
+
+*The fix* is the GH #840 =obs= level (=lsms_library/data_info.yml= Index
+Info: "the form's reading slot").  =obs = 1= is C8a, =obs = 2= is C8b; every
+other wave prices one location and carries a native =obs = 1=.  The declared
+index is =(t, v, j, u, obs)=, so =Feature('community_prices')= no longer
+fabricates Nigeria's =obs= (=variety= / =visit= stay sentinels).
+
+| PH round | before | after | obs 1 | obs 2 |
+|----------+--------+--------+--------+-------|
+| 2011Q1   | 27,104 | 27,104 | 27,104 |     0 |
+| 2013Q1   | 27,079 | 27,079 | 27,079 |     0 |
+| 2016Q1   | 20,562 | 23,153 | 17,344 | 5,809 |
+| 2019Q1   | 31,757 | 31,757 | 31,757 |     0 |
+| 2024Q1   | 30,064 | 30,064 | 30,064 |     0 |
+
+Every pre-fix row is still served with the identical =Price= and
+=Derivation=: 17,344 at =obs = 1=, and the 3,218 location-2-only rows at
+=obs = 2= -- the slot they always came from.  The other four rounds are
+frame-equal apart from the added level.
+
+*No duplicate entries are dropped (0 rows), and why.*  Niger's #840 drop
+removes a SECOND SOURCE RECORD of the same slot that repeats a served row; its
+content key includes the slot, so two slots that agree are both served (and
+GhanaLSS serves equal vendor prices).  Here there is no second record of any
+slot, and C8b is not a re-entry of C8a: no EA's location-2 block repeats its
+location 1 (the most-identical EA agrees on 88% of shared items on every raw
+field; Niger's re-shipped blocks were 99.8% byte-identical), and location 1
+vs location 2 in one EA agree on 64.6% of same-unit prices against a 48.6%
+base rate for location 1 in two different EAs of the same LGA.  An equal
+price at the second location is an observation.
+
+*Reading it.*  =obs == 1= gives one location per community, but loses the
+409-EA vegetable / drinks tail, which exists only at =obs = 2=.  The
+=first= collapse still runs for W1/W2 only (see the next paragraph);
+W3-W5 are asserted collision-free on =(t, v, j, u, obs)=, so it selects
+nothing there.  This supersedes the "(t, v, j, u)" grain stated in this
+section's opening paragraph and the shim paragraph below, and the #1095
+note's "existing first-row reducer remain[s] in force" now holds for W1/W2
+only.
+
+*Still open -- W1/W2 (a maintainer decision, not changed here).*  W1/W2's
+own code scheme collapses on =(t, v, j, u, obs = 1)= to the first price:
+size variants of one base item (=base*10+size=; 1,770 W1 / 1,921 W2 groups)
+and distinct items the name map lumps under one label (Maize, Beer,
+Fish--fresh, Butter/Margarine, ...; 798 / 1,030 groups), with Price
+conflicts in 2,303 / 2,605 groups (GH #637 tail diagnosis).  A =variety=
+level (the source item code, as #840 did for Tanzania) is the sketched fix.
+
+*Observed, not fixed.*  The W3 deletion / derivation =inputs= frames now
+carry =obs=, so they join the served grain.  The W3 =inputs_community_prices=
+frame returns 341 rows, but the derivation stamps 1: the other 340 are on
+the unit "other specify" with a quantity in the free-text =c8q2b=, and are
+served undivided under =u = 'other specify'= (988 W3 rows in all).  This
+predates #637 and is identical on development.
+
 ** Source files (post-harvest community round)
 
 | Wave | t      | File(s)                                                   | item code scheme        |
