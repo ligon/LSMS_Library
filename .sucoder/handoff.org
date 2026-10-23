@@ -45,6 +45,8 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
     - =test_shipped_quintal...= is pre-existing (fails on development too);
     - =test_panama_kgprice_loses_its_currency_rows= is the unitvalue pin, +390 rows, which are the 1997 blank-unit rows now kept as =Unknown= (verified: none shares a key with a genuine =unit= row).  Pin moved on #1251 (=51b073e58=).
 4e. Integration now =7912ea596=: + the #1251 pin, + #1279 (#1260 Malawi panel GPS, red-teamed, 3 rounds), + the docs-tidy branch =docs/batch-tidy-20261023= (=4a5448d89=, Malawi-only hash).  Round 2: Malawi shard =40410294= + full suite =40410295=.
+4f. Round 2 GREEN: 10,460 passed, 1 failed (the pre-existing =test_shipped_quintal...=).
+4g. MERGING (authorized): merged #1236 #1246 #1248 #1262 #1266 #1271 #1233 #1251 #1273 #1227.  #1241 conflicted on Niger CONTENTS.org; resolved theirs-first (identical to integration), pushed =11f21fb9a=, waiting on CI (the repository ruleset requires checks).
 5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
 
 ** Merge plan: ONE corpus re-warm
