@@ -1212,9 +1212,11 @@ def food_coping_for_wave(t, df, hhid):
 #   intercropped    field was a mixed stand (bool)
 #   perennial       crop is a perennial/tree crop (bool, crop-code property)
 #
-# crop labels: code-keyed `harmonize_crop` table whose Preferred Labels
-# REUSE the food labels (Maize, Sorghum, Teff, Wheat, Barley, Rice, ...)
-# so crop_production.j joins food_acquired.j; non-food crops (Cotton,
+# crop labels: code-keyed `harmonize_crop` table (overridden per wave by
+# `harmonize_crop_wave` for the codes whose meaning changes -- 9, 19, 86;
+# GH #1252) whose Preferred Labels REUSE the food labels (Maize,
+# Sorghum, Teff, Wheat, Barley, Rice, ...) so crop_production.j joins
+# food_acquired.j; non-food crops (Cotton,
 # Enset, Gesho, Chat, Coffee, ...) get their own Preferred Labels.
 #
 # SALES GRAIN CAVEAT: the §11 sale module is keyed (household, holder,
@@ -1266,9 +1268,52 @@ PERENNIAL_CROP_CODES = frozenset({
 })
 
 
+#: A WB perennial code whose meaning changes between waves counts as perennial
+#: only in the waves where it carries the meaning the list was written for.
+#: ETH_ESS1.do built the list against W1's labels, where 19 is CACTUS; from
+#: 2015-16 code 19 is RED KIDNEY BEANS, a field legume (the WB do-files reuse
+#: the W1 list unchanged in ESS2-ESS5).  The survey's own per-crop flag agrees:
+#: W4 PP s4q15 says permanent/tree for 4 of 308 kidney-bean rows, W5 for 0 of
+#: 316 (GH #1252).  Code 9 (ROMAN in W1/W2) is not on the WB list and is not
+#: added; 86 has no served crop row outside W1.
+PERENNIAL_CODE_MEANING = {19: 'Cactus'}
+
+
 def _eth_crop_label_map():
-    """Load the code-keyed harmonize_crop table -> {crop_code: Preferred Label}."""
+    """Load the code-keyed harmonize_crop table -> {crop_code: Preferred Label}.
+
+    The code-keyed table gives each code's meaning from 2015-16 on; where the
+    wave is known, use :func:`_eth_crop_label_map_for_wave` (GH #1252)."""
     return _harmonize_code_label('harmonize_crop')
+
+
+def _eth_crop_label_map_for_wave(t):
+    """``harmonize_crop`` for wave ``t``: the code-keyed table overlaid with
+    that wave's rows of the wave-keyed ``harmonize_crop_wave`` (GH #1252).
+
+    Three ESS crop codes change meaning across waves -- 9 ROMAN (W1/W2) ->
+    MUNG BEAN, 19 CACTUS (W1/W2) -> RED KIDNEY BEANS, 86 FALLOW LAND (W1
+    post-harvest) -> TEMPORARY GR -- so a code-keyed decode served W1/W2
+    cactus as kidney beans.  The override table lists only the (wave, code)
+    cells that differ; every other code falls through.  Every per-wave crop
+    decode goes through here (``crop_production_for_wave``,
+    ``plot_inputs_for_wave``, ``_crop_cf_table``, ``inputs_sect12_sale``), so
+    a row's ``j`` and its shipped kg factor are decoded alike."""
+    out = dict(_eth_crop_label_map())
+    t = str(t)
+    out.update({c: lab for (w, c), lab in
+                _harmonize_wave_keyed('harmonize_crop_wave').items() if w == t})
+    return out
+
+
+def _perennial_codes_for_wave(t, crop_map=None):
+    """:data:`PERENNIAL_CROP_CODES` for wave ``t`` (GH #1252): a code in
+    :data:`PERENNIAL_CODE_MEANING` counts only where the wave's label is the
+    meaning the WB list was written for."""
+    crop_map = _eth_crop_label_map_for_wave(t) if crop_map is None else crop_map
+    return frozenset(c for c in PERENNIAL_CROP_CODES
+                     if c not in PERENNIAL_CODE_MEANING
+                     or crop_map.get(c) == PERENNIAL_CODE_MEANING[c])
 
 
 def _clean_unit_label(series):
@@ -1468,7 +1513,9 @@ def _crop_cf_table(t):
             "duplicate with a stated rule here -- harvest_kg's shipped layer "
             "refuses an ambiguous table rather than picking one.")
 
-    df['j'] = df['crop_code'].map(_eth_crop_label_map()).astype('string')
+    # the wave's own crop decode (GH #1252): Crop_CF_Wave2 labels 19 CACTUS
+    # and 9 ROMAN, exactly as the W2 crop rows they must join.
+    df['j'] = df['crop_code'].map(_eth_crop_label_map_for_wave(t)).astype('string')
     df['u'] = _clean_unit_label(lab['unit_cd']).values
     df['t'] = t
 
@@ -1674,8 +1721,9 @@ def derive_sect12_sale(sold_flag, quantity_sold, value_sold):
 
     THE IDENTITY, plus the one reading §11 also makes: Q6 == 2 ("NO", skip to
     Q10a) with Q7 and Q8 both blank is a sale of 0.  A positive Q7 or Q8 next
-    to a "No" is returned exactly as reported (the §11 path overwrites it
-    with 0; this does not).  Everything else is returned unchanged.
+    to a "No" is returned exactly as reported (the §11 path used to overwrite
+    it with 0; since GH #1253 both read it through :func:`_no_sale_reading`).
+    Everything else is returned unchanged.
 
     The derivation registered for it
     (``Ethiopia::crop_production::sect12-sale-period``) is about the WINDOW,
@@ -1690,6 +1738,25 @@ def derive_sect12_sale(sold_flag, quantity_sold, value_sold):
     Returns a DataFrame with columns ``Quantity_sold`` and ``Value_sold``
     (Float64), aligned with the inputs.
     """
+    q, v = _no_sale_reading(sold_flag, quantity_sold, value_sold)
+    return pd.DataFrame({'Quantity_sold': q, 'Value_sold': v})
+
+
+def _no_sale_reading(sold_flag, quantity_sold, value_sold):
+    """The ESS reading of a "did you sell?" = No (code 2) line, shared by §11
+    and §12 (GH #820 / #1253).
+
+    A "No" skips the quantity and value questions, so on a "No" line whose
+    quantity and value are both blank or zero, a BLANK cell is a sale of 0.
+    That is the only cell this changes: a value recorded beside the "No"
+    (positive, or an explicit 0) is returned exactly as reported -- the "No"
+    is never used to overwrite an answer -- and where the line records a
+    positive quantity or value, its other blank cell is left blank (the
+    answers contradict the flag; nothing is read into the gap).  A missing
+    flag zeroes nothing: only a positive "No" is a zero (the #1250 rule).
+    Returns ``(quantity_sold, value_sold)`` as Float64 Series on the flag's
+    positional index.
+    """
     flag = pd.to_numeric(pd.Series(sold_flag), errors='coerce').astype('Int64')
     q = pd.to_numeric(pd.Series(quantity_sold), errors='coerce').astype('Float64')
     v = pd.to_numeric(pd.Series(value_sold), errors='coerce').astype('Float64')
@@ -1700,7 +1767,7 @@ def derive_sect12_sale(sold_flag, quantity_sold, value_sold):
     zero = no & ~pos
     q = q.mask(zero & q.isna(), 0.0)
     v = v.mask(zero & v.isna(), 0.0)
-    return pd.DataFrame({'Quantity_sold': q, 'Value_sold': v})
+    return q, v
 
 
 def inputs_sect12_sale(wave):
@@ -1730,9 +1797,125 @@ def inputs_sect12_sale(wave):
     out.index = pd.MultiIndex.from_arrays(
         [pd.Series(wave, index=raw.index).values,
          raw[hh].apply(format_id).values,
-         code.map(_eth_crop_label_map()).astype('string').values],
+         code.map(_eth_crop_label_map_for_wave(wave)).astype('string').values],
         names=['t', 'i', 'j'])
     return out
+
+
+#: The registry key stamped on ``crop_production.Derivation`` for every W4/W5
+#: row whose crop the post-planting roster flags PERMANENT (GH #1256).  Entry:
+#: ``Ethiopia/_/derivations.yml``.  What is derived is the WINDOW: ESS4 puts a
+#: permanent crop's harvest (§9 Q4/Q5) and sales (§11) on the fixed 12 months
+#: March 10, 2018 - March 9, 2019, while the season rows beside it are this
+#: agricultural season.  The W1-W3 analogue is SECT12_SALE_DERIVATION.
+PERMANENT_CROP_WINDOW_DERIVATION = 'Ethiopia::crop_production::permanent-crop-12-month-window'
+
+#: Waves whose §9 / §11 carry the permanent-crop window, the files and the
+#: crop-code / flag variables (W5's §11 crop code is ``s11q01b``).
+PERMANENT_WINDOW_SOURCES = {
+    '2018-19': dict(s9='sect9_ph_w4.dta', s9_code='s9q00b', s4='sect4_pp_w4.dta',
+                    s4_code='s4q01b', s11='sect11_ph_w4.dta', s11_code='s11q01'),
+    '2021-22': dict(s9='sect9_ph_w5.dta', s9_code='s9q00b', s4='sect4_pp_w5.dta',
+                    s4_code='s4q01b', s11='sect11_ph_w5.dta', s11_code='s11q01b'),
+}
+
+#: The original variables behind the window rows: §9 harvest (Q4 harvested?,
+#: Q5 quantity + unit, Q8 harvest months), the §4 permanent / tree flag
+#: (Q15), and §11's permanent-crop block (Q2 last completed production
+#: period, Q3 harvest in the last 12 months, Q4 trees) and sales (Q7 sold?,
+#: Q11 quantity + unit, Q12 value).
+PERMANENT_WINDOW_S9_VARIABLES = ['holder_id', 'parcel_id', 'field_id', 's9q00b', 's9q04',
+                                 's9q05a', 's9q05b', 's9q08a', 's9q08b']
+PERMANENT_WINDOW_S11_VARIABLES = ['holder_id', 's11q02a1', 's11q02a2', 's11q02b1', 's11q02b2',
+                                  's11q03a1', 's11q03a2', 's11q04', 's11q07', 's11q11a',
+                                  's11q11b', 's11q12']
+
+
+def derive_permanent_crop_window(quantity, quantity_sold, value_sold):
+    """W4/W5 permanent-crop rows -> the ``Quantity`` / ``Quantity_sold`` /
+    ``Value_sold`` they serve (GH #1256): THE IDENTITY.
+
+    The numbers are served exactly as ``crop_production`` serves every row
+    (§9 Q5 for ``Quantity``; §11 Q11 / Q12 through the §11 sale rule for the
+    sale columns).  What the registered derivation
+    (``Ethiopia::crop_production::permanent-crop-12-month-window``) records is
+    the WINDOW: for a permanent crop the ESS4 post-harvest questionnaire asks
+    for the crop "harvested between March 10, 2018 to March 9, 2019" (§9 Q4;
+    §11 Q1's header), a fixed 12 months, while every other row beside it is
+    this agricultural season -- CLAUDE.md "Derived Values": "a value served
+    under a name implying a different window -- the function is the identity
+    and the registry is the point".  No options, by rule; the build does not
+    call it, because there is nothing to compute.
+    """
+    return pd.DataFrame({'Quantity': quantity, 'Quantity_sold': quantity_sold,
+                         'Value_sold': value_sold})
+
+
+def inputs_permanent_crop_window(wave):
+    """The raw answers behind the ``permanent-crop-12-month-window`` rows (GH #1256).
+
+    One long frame indexed ``(t, i, j)`` (``i`` the wave-native
+    ``household_id``; ``j`` through :func:`_eth_crop_label_map_for_wave`), with
+    a ``module`` column naming the source of each line and the ORIGINAL
+    variable names as columns:
+
+    * ``sect9_ph`` -- EVERY §9 harvest row (plot-crop grain;
+      :data:`PERMANENT_WINDOW_S9_VARIABLES`) with the §4 roster's ``s4q15``
+      joined on (holder, parcel, field, crop) -- the flag the stamp reads (an
+      ambiguous key, whose §4 lines disagree, carries <NA>);
+    * ``sect11_ph`` -- EVERY §11 line (holder-crop grain;
+      :data:`PERMANENT_WINDOW_S11_VARIABLES`), whose sales the build attaches
+      to a crop's single §9 plot (the SALES GRAIN CAVEAT).
+
+    A served row's §9 line is found by ``(t, i, j)`` plus its ``plot_id``
+    (``holder_parcel_field``); its §11 lines by ``(t, i, j)`` plus the
+    holder.  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+    if wave not in PERMANENT_WINDOW_SOURCES:
+        raise ValueError(
+            f"the permanent-crop 12-month window is an ESS4 / ESPS-5 §9/§11 "
+            f"design ({sorted(PERMANENT_WINDOW_SOURCES)}), not {wave!r}; W1-W3 "
+            f"put permanent crops in §12 (sect12-sale-period).")
+    src = PERMANENT_WINDOW_SOURCES[wave]
+    d = countries_root() / 'Ethiopia' / wave / 'Data'
+    cmap = _eth_crop_label_map_for_wave(wave)
+    s9 = get_dataframe(str(d / src['s9']), convert_categoricals=False)
+    s4 = get_dataframe(str(d / src['s4']), convert_categoricals=False)
+    s11 = get_dataframe(str(d / src['s11']), convert_categoricals=False)
+
+    def _key(df, code):
+        return pd.DataFrame({
+            '_k': (df['holder_id'].apply(format_id).astype(str) + '_'
+                   + df['parcel_id'].apply(format_id).astype(str) + '_'
+                   + df['field_id'].apply(format_id).astype(str)).values,
+            '_c': pd.to_numeric(df[code], errors='coerce').astype('Int64').values})
+
+    k4 = _key(s4, src['s4_code'])
+    k4['s4q15'] = pd.to_numeric(s4['s4q15'], errors='coerce').astype('Int64').values
+    k4 = k4.dropna(subset=['_c'])
+    agree = k4.groupby(['_k', '_c'])['s4q15'].nunique(dropna=False) == 1
+    flag = (k4.drop_duplicates(['_k', '_c']).set_index(['_k', '_c'])['s4q15']
+              .where(agree))
+    k9 = _key(s9, src['s9_code'])
+    a = s9[PERMANENT_WINDOW_S9_VARIABLES].copy()
+    a['s4q15'] = pd.MultiIndex.from_frame(k9).map(flag.to_dict()).values
+    a['s4q15'] = pd.to_numeric(a['s4q15'], errors='coerce').astype('Int64')
+    a.insert(0, 'module', 'sect9_ph')
+    a.index = pd.MultiIndex.from_arrays(
+        [pd.Series(wave, index=s9.index).values,
+         s9['household_id'].apply(format_id).values,
+         k9['_c'].map(cmap).astype('string').values], names=['t', 'i', 'j'])
+
+    b = s11[PERMANENT_WINDOW_S11_VARIABLES].copy()
+    b[src['s11_code']] = s11[src['s11_code']].values
+    b.insert(0, 'module', 'sect11_ph')
+    c11 = pd.to_numeric(s11[src['s11_code']], errors='coerce').astype('Int64')
+    b.index = pd.MultiIndex.from_arrays(
+        [pd.Series(wave, index=s11.index).values,
+         s11['household_id'].apply(format_id).values,
+         c11.map(cmap).astype('string').values], names=['t', 'i', 'j'])
+    return pd.concat([a, b])
 
 
 def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
@@ -1776,11 +1959,13 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
        two, so a fill would change which row is served for a key that is
        already a GrainCollapseWarning.
     7. *attached, then dropped* -- the line attached to its plot, but every
-       §9 row it attached to is then removed by the build's existing
-       empty-row filter in :func:`crop_production_for_wave` (``u`` missing,
-       no ``Quantity``, no ``Quantity_sold``; it never looks at
-       ``Value_sold``).  Counted there, after the filter; the filter itself
-       is unchanged.
+       §9 row it attached to is then removed by the build's empty-row filter
+       in :func:`crop_production_for_wave` (``u`` missing and nothing to
+       serve).  Since the 2026-10-23 ruling that filter keeps any row with a
+       ``Value_sold``, so a line that carries a sale value can no longer land
+       here (asserted in :func:`_report_sect12_sales`); only a line that
+       filled nothing (Q6 not No, Q7 and Q8 blank) can, on a row that is
+       genuinely empty.  Counted there, after the filter.
     8. *attached and served* -- exactly one §9 plot: ``Value_sold`` is
        filled, and ``Quantity_sold`` where the sale unit equals the row's
        harvest ``u`` (as for §11; a §12 sale with no recorded unit attaches
@@ -1954,6 +2139,10 @@ def _report_sect12_sales(t, rep, kept):
     survived = pd.MultiIndex.from_frame(att[['_holder', '_code']]).isin(alive)
     rep['attached_then_dropped'] = _sect12_tally(att[~survived])
     rep['attached'] = _sect12_tally(att[survived])
+    # A row carrying a sale value is never dropped (ruling 2026-10-23): no
+    # line that brought a Value_sold may be in class 7.
+    assert att.loc[~survived, 'Value_sold'].isna().all(), \
+        f"{t}: §12 lines with a sale value were dropped by the empty-row filter"
     stamped = kept['Derivation'] == SECT12_SALE_DERIVATION if 'Derivation' in kept else None
     rep['rows_stamped_served'] = int(stamped.fillna(False).sum()) if stamped is not None else 0
     rep['rows_positive_value_served'] = int(
@@ -2015,6 +2204,10 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
             harvest_month   — §9 harvest-END month code col
             intercrop       — §9 pure/mixed-stand col (1=pure, 2=mixed)
             pl_crop_code, pl_month  — §4 crop-code + planting-month cols
+            pl_permanent    — §4 per-crop permanent/tree flag (W4/W5
+                              ``s4q15``, 1 = Yes); when given, rows of a
+                              crop flagged permanent are stamped
+                              ``PERMANENT_CROP_WINDOW_DERIVATION`` (GH #1256)
             s_crop_code, s_sold_flag, s_qty, s_value, s_unit  — §11 cols
                               (s_unit None => Kg, W1 sales report kilos)
             s12_crop_code, s12_sold_flag, s12_qty, s12_value — §12 cols
@@ -2039,10 +2232,12 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         planting_month (Int64), harvest_month (Int64),
         intercropped (boolean), perennial (boolean), and -- only when
         ``sale12`` is given -- Derivation (string: ``SECT12_SALE_DERIVATION``
-        on the rows §12 filled, NA elsewhere).
+        on the rows §12 filled, NA elsewhere) or -- only when colmap names
+        ``pl_permanent`` -- Derivation (``PERMANENT_CROP_WINDOW_DERIVATION``
+        on the permanent-crop rows, NA elsewhere).
     """
     c = colmap
-    crop_map = _eth_crop_label_map()
+    crop_map = _eth_crop_label_map_for_wave(t)   # GH #1252: codes drift by wave
 
     h = harvest.copy()
     # plot_id identical to plot_features.
@@ -2098,9 +2293,11 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     else:
         out['intercropped'] = pd.Series(pd.NA, index=out.index, dtype='boolean')
 
-    # perennial: crop-code property.
+    # perennial: crop-code property, of the code's meaning IN THIS WAVE
+    # (GH #1252: 19 is CACTUS in W1/W2, RED KIDNEY BEANS from W3).
+    perennial_codes = _perennial_codes_for_wave(t, crop_map)
     out['perennial'] = out['_code'].map(
-        lambda x: (int(x) in PERENNIAL_CROP_CODES) if pd.notna(x) else pd.NA
+        lambda x: (int(x) in perennial_codes) if pd.notna(x) else pd.NA
     ).astype('boolean')
 
     # planting_month from §4, joined on (plot_id, crop_code).
@@ -2117,6 +2314,27 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         out = out.merge(pm, on=['plot_id', '_code'], how='left')
     else:
         out['planting_month'] = pd.Series(pd.NA, index=out.index, dtype='Int64')
+
+    # GH #1256 (W4/W5): the post-planting roster's own per-crop permanent /
+    # tree flag (PP §4 Q15, ``s4q15``), joined on (plot_id, crop code) like
+    # planting_month.  A crop row is permanent only if EVERY §4 line of its
+    # key says Yes (1): a key whose §4 lines disagree, or a §9 row with no §4
+    # line, is not marked (counted in CONTENTS.org).  Used for the
+    # PERMANENT_CROP_WINDOW_DERIVATION stamp below.
+    if planting is not None and c.get('pl_permanent'):
+        n0 = len(out)
+        pf = pd.DataFrame({
+            'plot_id': (planting[c['holder_id']].apply(format_id).astype(str) + '_'
+                        + planting[c['parcel_id']].apply(format_id).astype(str) + '_'
+                        + planting[c['field_id']].apply(format_id).astype(str)).values,
+            '_code': pd.to_numeric(planting[c['pl_crop_code']], errors='coerce').astype('Int64').values,
+            '_yes': (pd.to_numeric(planting[c['pl_permanent']], errors='coerce') == 1).values,
+        }).dropna(subset=['plot_id', '_code'])
+        perm = (pf.groupby(['plot_id', '_code'], as_index=False)['_yes'].all()
+                  .rename(columns={'_yes': '_permanent'}))
+        out = out.merge(perm, on=['plot_id', '_code'], how='left')
+        assert len(out) == n0, f"{t}: the §4 permanent-flag join changed the row count"
+        out['_permanent'] = out['_permanent'].eq(True).to_numpy(dtype=bool)
 
     # Sales: §11 is (household, holder, crop) grain.  Attach reported
     # sold-qty / sold-value ONLY where (holder, crop) maps to exactly one
@@ -2139,10 +2357,28 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         val = (pd.to_numeric(s[c['s_value']], errors='coerce')
                if c.get('s_value') and c['s_value'] in s.columns else pd.NA)
         # sale unit label: pre-decoded labels (s_unit_labels) where the
-        # sale unit is a coded column, else 'Kg' (W1/W2 sale qty is kilos).
+        # sale unit is a coded column (W3-W5), else 'Kg' (W1/W2: the
+        # instrument fixes the sale quantity in kilos).
+        #
+        # GH #1253 (c): a BLANK coded sale unit is NOT read as Kg.  In
+        # W3-W5 the unit is blank essentially only behind Q1 = No (the
+        # skip; raw lines: W3 6,181 of 6,181 blank units, W4 6,724 of 6,730
+        # -- 5 have no flag, 1 is a Yes with quantity 0 --, W5 4,768 of 4,774
+        # -- 6 Yes lines with quantity 0), and no line in any wave carries a
+        # positive quantity with a blank unit.  Filling it with 'Kg' attached a "No"'s zero quantity
+        # to the row's Quantity_sold ONLY when the harvest happened to be in
+        # Kg (W3/W4/W5: 542 / 816 / 819 served rows) and to no other row --
+        # a served zero decided by the harvest unit.  The unit stays NA,
+        # and a line with no sale unit attaches no Quantity_sold (Value_sold,
+        # being unit-free, still attaches): the rule the §12 path in this
+        # same function already follows (GH #820), and the #1041 precedent
+        # that an unrecorded unit is never a real one.  NA rather than the
+        # 'Unknown' sentinel because the sale unit is not an index level
+        # here (it is only a join key); the served table is identical
+        # either way.
         if sale_unit_labels is not None:
             s_unit = _clean_unit_label(
-                pd.Series(sale_unit_labels.values, index=s.index)).fillna('Kg')
+                pd.Series(sale_unit_labels.values, index=s.index))
         else:
             s_unit = pd.Series('Kg', index=s.index)
         sdf = pd.DataFrame({
@@ -2153,15 +2389,34 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
             'Value_sold': val if np.isscalar(val) else val.values,
         })
         if sold_flag is not None:
-            # sold flag 2 == No -> zero the reported sale.
-            no = (sold_flag == 2).values
-            sdf.loc[no, ['Quantity_sold', 'Value_sold']] = 0.0
+            # GH #1253 (b): Q1 = 2 ("No", skip) reads a BLANK sale cell as a
+            # sale of 0 -- and nothing else.  A value recorded beside the
+            # "No" is kept as reported (it used to be overwritten with 0:
+            # W1 has one such line, a positive Q3 quantity).  The same reading
+            # as §12's (`derive_sect12_sale`); a missing flag zeroes nothing
+            # (#1250's rule: only a positive "No" is a zero).
+            q_read, v_read = _no_sale_reading(
+                sold_flag.values, sdf['Quantity_sold'], sdf['Value_sold'])
+            sdf['Quantity_sold'] = q_read.to_numpy(dtype=float, na_value=np.nan)
+            sdf['Value_sold'] = v_read.to_numpy(dtype=float, na_value=np.nan)
         sdf = sdf.dropna(subset=['_holder', '_code'])
         # Aggregate to (holder, crop): sum Value_sold (unit-free); for
         # Quantity_sold sum WITHIN each sale unit and keep the per-unit
         # breakdown so we can match it against the harvest `u`.
-        vagg = sdf.groupby(['_holder', '_code'], as_index=False)['Value_sold'].sum()
-        qagg = sdf.groupby(['_holder', '_code', '_sunit'], as_index=False)['Quantity_sold'].sum()
+        #
+        # GH #1253 (a): ``sum(min_count=1)`` -- a group whose cells are ALL
+        # blank stays NaN.  A bare ``.sum()`` served it as a sale of 0
+        # (46 / 9 / 0 / 9 / 8 (holder, crop) groups' Value_sold in W1-W5):
+        # a missing answer served as "sold nothing" (the class of #1250 /
+        # #1184; precedent Panama/2008/_/food_acquired.py, GH #905).
+        # Vectorised on purpose -- a per-group Python callable makes pandas
+        # deepcopy ``attrs`` once per group (CLAUDE.md, GH #871).
+        vagg = sdf.groupby(['_holder', '_code'], as_index=False)['Value_sold'].sum(min_count=1)
+        # A line with no recorded sale unit (NA, see (c) above) attaches no
+        # quantity: dropped here EXPLICITLY, not by groupby's dropna.
+        qagg = (sdf.dropna(subset=['_sunit'])
+                   .groupby(['_holder', '_code', '_sunit'], as_index=False)['Quantity_sold']
+                   .sum(min_count=1))
         # Count plot-crop harvest rows per (holder, crop); attach only when 1.
         nplots = (out.dropna(subset=['_code'])
                      .groupby(['_holder', '_code'])['plot_id'].nunique()
@@ -2187,24 +2442,48 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     out = out.dropna(subset=['i', 'plot_id', 'j'])
     # `u` is an index level (cannot be null).  A row may legitimately
     # report a quantity with an unrecorded unit -> tag it 'Other (Specify)'
-    # (a value already in the `u` table); rows with neither a quantity nor
-    # a recorded unit are empty placeholders -> drop.  (This filter does not
-    # look at Value_sold, so it also drops a row that carries a sale VALUE
-    # but no unit, quantity or sold quantity -- for §11 as for §12.  Left as
-    # it is; §12's casualties are counted below as class 7.  GH #820.)
+    # (a value already in the `u` table); rows with no recorded unit and
+    # NOTHING to serve -- no quantity, no sold quantity, no sale value --
+    # are empty placeholders -> drop.
+    #
+    # A row carrying a sale VALUE is never dropped (@ligon ruling,
+    # 2026-10-23, on the GH #820 review's finding): this filter used to
+    # ignore Value_sold, so a §9 row with no unit and no quantity lost the
+    # §11 or §12 sale attached to it (§11: 1 / 2 / 27 / 32 rows with a
+    # positive value in W2-W5; §12: 29 positive lines, 11,339 Birr).  Such a
+    # row is now served with u = 'Other (Specify)' (the no-unit tag above)
+    # and only its Value_sold, which is unit-free.
     empty_u = out['u'].isna()
     out = out[~(empty_u & out['Quantity'].isna()
-                & out['Quantity_sold'].isna())]
+                & out['Quantity_sold'].isna() & out['Value_sold'].isna())]
     if rep12 is not None:
         # The private keys are still on the frame: the §12 report needs them
         # to tell an attached line that SURVIVED the two filters above from
         # one whose every row they removed.
         _report_sect12_sales(t, rep12, out)
+    if '_permanent' in out.columns:
+        # GH #1256: W4/W5 put a PERMANENT crop's harvest (§9 Q4/Q5, "for
+        # permanent crop harvested between March 10, 2018 to March 9, 2019")
+        # and its sales (§11, "FOR PERMANENT CROPS PLEASE INCLUDE CROP
+        # HARVESTED BETWEEN ...") on a fixed 12-month window, served beside
+        # season rows.  Stamped on every row the §4 roster flags permanent
+        # that serves one of those numbers -- after every filter above, so
+        # the stamp rides only on served rows.  The values are not touched
+        # (`derive_permanent_crop_window` is the identity).
+        win = (out['_permanent'].to_numpy(dtype=bool)
+               & out[['Quantity', 'Quantity_sold', 'Value_sold']].notna().any(axis=1).to_numpy())
+        stamp = (out['Derivation'].astype('string') if 'Derivation' in out.columns
+                 else pd.Series(pd.NA, index=out.index, dtype='string'))
+        assert stamp[win].isna().all(), f"{t}: a row already carries a Derivation"
+        stamp[win] = PERMANENT_CROP_WINDOW_DERIVATION
+        out['Derivation'] = stamp
+        out = out.drop(columns=['_permanent'])
     out = out.drop(columns=['_holder', '_code'])
     out['u'] = out['u'].fillna('Other (Specify)')
     out = out.set_index(['t', 'i', 'plot_id', 'j', 'u'])
     # Stable column order.  `Derivation` exists only where §12 was read
-    # (W1-W3): its registry key on the rows §12 filled, NA elsewhere.
+    # (W1-W3: its registry key on the rows §12 filled) or the §4 permanent
+    # flag was (W4/W5: the window key on permanent-crop rows); NA elsewhere.
     cols = ['Quantity', 'Quantity_sold', 'Value_sold',
             'planting_month', 'harvest_month', 'intercropped', 'perennial']
     if 'Derivation' in out.columns:
@@ -2351,7 +2630,7 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
     from lsms_library.transformations import U_UNKNOWN
 
     c = colmap
-    crop_map = _eth_crop_label_map()
+    crop_map = _eth_crop_label_map_for_wave(t)   # GH #1252: codes drift by wave
     pieces = []
 
     # ---- SEED (plot-crop) -------------------------------------------

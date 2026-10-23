@@ -1,0 +1,188 @@
+{
+ "oracle_on_branch_build": {
+  "2011-12": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 0,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Cactus": 5,
+    "86 Fallow Land": 1,
+    "9 Roman": 1
+   },
+   "plots_with_any_served_row": 7,
+   "plots_whose_served_j_includes_the_file_label": 7,
+   "plots_served_but_label_missing": 0,
+   "served_rows_by_label": {
+    "Cactus": 5,
+    "Roman": 1,
+    "Red Kidney Beans": 0,
+    "Mung bean": 0,
+    "Fallow Land": 1,
+    "Temporary Grass": 0
+   }
+  },
+  "2013-14": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 6,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Cactus": 35,
+    "9 Roman": 11
+   },
+   "plots_with_any_served_row": 46,
+   "plots_whose_served_j_includes_the_file_label": 46,
+   "plots_served_but_label_missing": 0,
+   "served_rows_by_label": {
+    "Cactus": 35,
+    "Roman": 11,
+    "Red Kidney Beans": 0,
+    "Mung bean": 0,
+    "Fallow Land": 0,
+    "Temporary Grass": 0
+   }
+  },
+  "2015-16": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 111,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Red Kidney Beans": 692,
+    "9 Mung bean": 96
+   },
+   "plots_with_any_served_row": 788,
+   "plots_whose_served_j_includes_the_file_label": 788,
+   "plots_served_but_label_missing": 0,
+   "served_rows_by_label": {
+    "Cactus": 0,
+    "Roman": 0,
+    "Red Kidney Beans": 692,
+    "Mung bean": 96,
+    "Fallow Land": 0,
+    "Temporary Grass": 0
+   }
+  },
+  "2018-19": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 32,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Red Kidney Beans": 245,
+    "9 Mung bean": 45
+   },
+   "plots_with_any_served_row": 290,
+   "plots_whose_served_j_includes_the_file_label": 290,
+   "plots_served_but_label_missing": 0,
+   "served_rows_by_label": {
+    "Cactus": 0,
+    "Roman": 0,
+    "Red Kidney Beans": 245,
+    "Mung bean": 45,
+    "Fallow Land": 0,
+    "Temporary Grass": 0
+   }
+  },
+  "2021-22": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 23,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Red Kidney Beans": 291,
+    "9 Mung bean": 7
+   },
+   "plots_with_any_served_row": 297,
+   "plots_whose_served_j_includes_the_file_label": 297,
+   "plots_served_but_label_missing": 0,
+   "served_rows_by_label": {
+    "Cactus": 0,
+    "Roman": 0,
+    "Red Kidney Beans": 291,
+    "Mung bean": 7,
+    "Fallow Land": 0,
+    "Temporary Grass": 0
+   }
+  }
+ },
+ "oracle_on_previous_commit_build": {
+  "2011-12": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 0,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Cactus": 5,
+    "86 Fallow Land": 1,
+    "9 Roman": 1
+   },
+   "plots_with_any_served_row": 7,
+   "plots_whose_served_j_includes_the_file_label": 1,
+   "plots_served_but_label_missing": 6,
+   "served_rows_by_label": {
+    "Cactus": 0,
+    "Roman": 0,
+    "Red Kidney Beans": 5,
+    "Mung bean": 1,
+    "Fallow Land": 1,
+    "Temporary Grass": 0
+   }
+  },
+  "2013-14": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 6,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Cactus": 35,
+    "9 Roman": 11
+   },
+   "plots_with_any_served_row": 46,
+   "plots_whose_served_j_includes_the_file_label": 0,
+   "plots_served_but_label_missing": 46,
+   "served_rows_by_label": {
+    "Cactus": 0,
+    "Roman": 0,
+    "Red Kidney Beans": 35,
+    "Mung bean": 11,
+    "Fallow Land": 0,
+    "Temporary Grass": 0
+   }
+  },
+  "2015-16": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 111,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Red Kidney Beans": 692,
+    "9 Mung bean": 96
+   },
+   "plots_with_any_served_row": 788,
+   "plots_whose_served_j_includes_the_file_label": 788,
+   "plots_served_but_label_missing": 0,
+   "served_rows_by_label": {
+    "Cactus": 0,
+    "Roman": 0,
+    "Red Kidney Beans": 692,
+    "Mung bean": 96,
+    "Fallow Land": 0,
+    "Temporary Grass": 0
+   }
+  },
+  "2018-19": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 32,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Red Kidney Beans": 245,
+    "9 Mung bean": 45
+   },
+   "plots_with_any_served_row": 290,
+   "plots_whose_served_j_includes_the_file_label": 290,
+   "plots_served_but_label_missing": 0,
+   "served_rows_by_label": {
+    "Cactus": 0,
+    "Roman": 0,
+    "Red Kidney Beans": 245,
+    "Mung bean": 45,
+    "Fallow Land": 0,
+    "Temporary Grass": 0
+   }
+  },
+  "2021-22": {
+   "raw_s9_rows_without_unit_or_quantity_excluded": 23,
+   "raw_s9_rows_by_code_and_file_label": {
+    "19 Red Kidney Beans": 291,
+    "9 Mung bean": 7
+   },
+   "plots_with_any_served_row": 297,
+   "plots_whose_served_j_includes_the_file_label": 297,
+   "plots_served_but_label_missing": 0,
+   "served_rows_by_label": {
+    "Cactus": 0,
+    "Roman": 0,
+    "Red Kidney Beans": 291,
+    "Mung bean": 7,
+    "Fallow Land": 0,
+    "Temporary Grass": 0
+   }
+  }
+ }
+}

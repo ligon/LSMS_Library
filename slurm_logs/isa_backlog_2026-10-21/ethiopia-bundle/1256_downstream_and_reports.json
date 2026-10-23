@@ -1,0 +1,37 @@
+{
+ "downstream_previous_commit_vs_branch": {
+  "harvest_kg": {
+   "identical": true
+  },
+  "harvest_kg_shipped": {
+   "identical": true
+  },
+  "gross_crop_revenue": {
+   "identical": true
+  },
+  "gross_crop_revenue_households": {
+   "identical": true
+  },
+  "crop_diversity_value_nonnull": {
+   "identical": true
+  },
+  "crop_diversity_value_mean": {
+   "identical": true
+  },
+  "harvest_kg_rows_served": {
+   "identical": true
+  },
+  "median_price_valuation_v_total": {
+   "identical": true
+  },
+  "median_price_valuation_v_nonnull": {
+   "identical": true
+  }
+ },
+ "audit_reports_identical": {
+  "grain_reports": true,
+  "null_read_reports": true,
+  "null_index_reports": true,
+  "quantity_reports": true
+ }
+}

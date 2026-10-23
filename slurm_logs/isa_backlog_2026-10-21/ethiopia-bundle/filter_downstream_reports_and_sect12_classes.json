@@ -1,0 +1,288 @@
+{
+ "downstream_previous_commit_vs_branch": {
+  "harvest_kg": {
+   "before": {
+    "2011-12": 653661.0,
+    "2013-14": 3276476.0,
+    "2015-16": 2137217.41,
+    "2018-19": 1445145.41,
+    "2021-22": 1287169.69
+   },
+   "after": {
+    "2011-12": 653661.0,
+    "2013-14": 3276476.0,
+    "2015-16": 2137217.41,
+    "2018-19": 1445145.41,
+    "2021-22": 1287169.69
+   },
+   "identical": true
+  },
+  "harvest_kg_shipped": {
+   "before": {
+    "2011-12": 653661.0,
+    "2013-14": 3612044.1,
+    "2015-16": 3925447.04,
+    "2018-19": 2663552.06,
+    "2021-22": 1841953.13
+   },
+   "after": {
+    "2011-12": 653661.0,
+    "2013-14": 3612044.1,
+    "2015-16": 3925447.04,
+    "2018-19": 2663552.06,
+    "2021-22": 1841953.13
+   },
+   "identical": true
+  },
+  "gross_crop_revenue": {
+   "before": {
+    "2011-12": 600749.0,
+    "2013-14": 2995104.0,
+    "2015-16": 2474854.0,
+    "2018-19": 2563767.0,
+    "2021-22": 6940614.4
+   },
+   "after": {
+    "2011-12": 600749.0,
+    "2013-14": 3000513.0,
+    "2015-16": 2490034.0,
+    "2018-19": 2605209.0,
+    "2021-22": 6973996.4
+   },
+   "identical": false
+  },
+  "gross_crop_revenue_households": {
+   "before": {
+    "2011-12": 1731,
+    "2013-14": 2915,
+    "2015-16": 2681,
+    "2018-19": 1907,
+    "2021-22": 1365
+   },
+   "after": {
+    "2011-12": 1731,
+    "2013-14": 2945,
+    "2015-16": 2688,
+    "2018-19": 1931,
+    "2021-22": 1410
+   },
+   "identical": false
+  },
+  "crop_diversity_value_nonnull": {
+   "before": {
+    "2011-12": 616,
+    "2013-14": 1627,
+    "2015-16": 1384,
+    "2018-19": 880,
+    "2021-22": 794
+   },
+   "after": {
+    "2011-12": 616,
+    "2013-14": 1634,
+    "2015-16": 1389,
+    "2018-19": 891,
+    "2021-22": 804
+   },
+   "identical": false
+  },
+  "crop_diversity_value_mean": {
+   "before": {
+    "2011-12": 0.1832,
+    "2013-14": 0.2741,
+    "2015-16": 0.2624,
+    "2018-19": 0.2308,
+    "2021-22": 0.2443
+   },
+   "after": {
+    "2011-12": 0.1832,
+    "2013-14": 0.2763,
+    "2015-16": 0.2625,
+    "2018-19": 0.2351,
+    "2021-22": 0.25
+   },
+   "identical": false
+  },
+  "harvest_kg_rows_served": {
+   "before": 66828,
+   "after": 66828,
+   "identical": true
+  },
+  "median_price_valuation_v_total": {
+   "before": {
+    "2011-12": 4184994.21,
+    "2013-14": 27059734.68,
+    "2015-16": 34314050.32,
+    "2018-19": 33661751.6,
+    "2021-22": 48413970.11
+   },
+   "after": {
+    "2011-12": 4184994.21,
+    "2013-14": 27059734.68,
+    "2015-16": 34314050.32,
+    "2018-19": 33661751.6,
+    "2021-22": 48413970.11
+   },
+   "identical": true
+  },
+  "median_price_valuation_v_nonnull": {
+   "before": {
+    "2011-12": 4038,
+    "2013-14": 18731,
+    "2015-16": 21758,
+    "2018-19": 11654,
+    "2021-22": 9203
+   },
+   "after": {
+    "2011-12": 4038,
+    "2013-14": 18731,
+    "2015-16": 21758,
+    "2018-19": 11654,
+    "2021-22": 9203
+   },
+   "identical": true
+  }
+ },
+ "grain_reports": {
+  "before": [
+   {
+    "wave": "2013-14",
+    "rows": 26765,
+    "dropped": 606,
+    "destroyed": 2,
+    "conflicting_groups": 1,
+    "nan_key_rows": 0
+   },
+   {
+    "wave": "2015-16",
+    "rows": 25924,
+    "dropped": 4,
+    "destroyed": 2,
+    "conflicting_groups": 2,
+    "nan_key_rows": 0
+   },
+   {
+    "wave": "2018-19",
+    "rows": 14102,
+    "dropped": 10,
+    "destroyed": 7,
+    "conflicting_groups": 7,
+    "nan_key_rows": 0
+   },
+   {
+    "wave": "2021-22",
+    "rows": 11623,
+    "dropped": 19,
+    "destroyed": 17,
+    "conflicting_groups": 15,
+    "nan_key_rows": 0
+   }
+  ],
+  "after": [
+   {
+    "wave": "2013-14",
+    "rows": 27126,
+    "dropped": 606,
+    "destroyed": 2,
+    "conflicting_groups": 1,
+    "nan_key_rows": 0
+   },
+   {
+    "wave": "2015-16",
+    "rows": 26003,
+    "dropped": 4,
+    "destroyed": 2,
+    "conflicting_groups": 2,
+    "nan_key_rows": 0
+   },
+   {
+    "wave": "2018-19",
+    "rows": 14270,
+    "dropped": 10,
+    "destroyed": 7,
+    "conflicting_groups": 7,
+    "nan_key_rows": 0
+   },
+   {
+    "wave": "2021-22",
+    "rows": 11900,
+    "dropped": 20,
+    "destroyed": 18,
+    "conflicting_groups": 16,
+    "nan_key_rows": 0
+   }
+  ]
+ },
+ "null_index_reports_v_nan_by_wave": {
+  "before": [
+   {
+    "level": "v",
+    "n_nan": 382,
+    "waves": {
+     "2013-14": 5,
+     "2018-19": 377
+    }
+   }
+  ],
+  "after": [
+   {
+    "level": "v",
+    "n_nan": 387,
+    "waves": {
+     "2013-14": 5,
+     "2018-19": 381,
+     "2021-22": 1
+    }
+   }
+  ]
+ },
+ "quantity_reports": {
+  "before": [
+   {
+    "wave": "2013-14",
+    "rows": 26159,
+    "n_implausible": 2
+   },
+   {
+    "wave": "2015-16",
+    "rows": 25920,
+    "n_implausible": 5
+   },
+   {
+    "wave": "2018-19",
+    "rows": 14092,
+    "n_implausible": 3
+   }
+  ],
+  "after": [
+   {
+    "wave": "2013-14",
+    "rows": 26520,
+    "n_implausible": 2
+   },
+   {
+    "wave": "2015-16",
+    "rows": 25999,
+    "n_implausible": 5
+   },
+   {
+    "wave": "2018-19",
+    "rows": 14260,
+    "n_implausible": 3
+   }
+  ],
+  "offenders_unchanged": true
+ },
+ "null_read_reports_identical": true,
+ "sect12_warning_after": {
+  "attached_then_dropped_lines/positive/birr": {
+   "2011-12": "0/0/0",
+   "2013-14": "90/0/0",
+   "2015-16": "0/0/0"
+  },
+  "attached_and_served": {
+   "2011-12": "563 lines (160 positive)",
+   "2013-14": "4683 lines (1412 positive)",
+   "2015-16": "4559 lines (1290 positive)"
+  }
+ }
+}

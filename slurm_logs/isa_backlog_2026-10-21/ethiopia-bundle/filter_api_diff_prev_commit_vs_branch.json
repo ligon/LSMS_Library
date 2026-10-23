@@ -1,0 +1,44 @@
+{
+ "rows": [
+  85519,
+  86403
+ ],
+ "rows_only_before": 0,
+ "every_pre_existing_row_identical": true,
+ "rows_added": {
+  "2013-14 sect11 positive": 1,
+  "2013-14 sect11 zero": 151,
+  "2013-14 sect12 positive": 22,
+  "2013-14 sect12 zero": 187,
+  "2015-16 sect11 positive": 2,
+  "2015-16 sect11 zero": 15,
+  "2015-16 sect12 positive": 7,
+  "2015-16 sect12 zero": 55,
+  "2018-19 sect11 positive": 27,
+  "2018-19 sect11 zero": 141,
+  "2021-22 sect11 positive": 31,
+  "2021-22 sect11 zero": 245
+ },
+ "rows_added_birr": {
+  "2013-14 sect11": 1500.0,
+  "2013-14 sect12": 3909.0,
+  "2015-16 sect11": 7750.0,
+  "2015-16 sect12": 7430.0,
+  "2018-19 sect11": 41442.0,
+  "2021-22 sect11": 33382.0
+ },
+ "rows_added_u": {
+  "Other (Specify)": 884
+ },
+ "rows_added_with_Quantity_or_Quantity_sold": 0,
+ "rows_added_derivation": {
+  "2013-14 <NA>": 152,
+  "2013-14 Ethiopia::crop_production::sect12-sale-period": 209,
+  "2015-16 <NA>": 17,
+  "2015-16 Ethiopia::crop_production::sect12-sale-period": 62,
+  "2018-19 <NA>": 85,
+  "2018-19 Ethiopia::crop_production::permanent-crop-12-month-window": 83,
+  "2021-22 <NA>": 124,
+  "2021-22 Ethiopia::crop_production::permanent-crop-12-month-window": 152
+ }
+}

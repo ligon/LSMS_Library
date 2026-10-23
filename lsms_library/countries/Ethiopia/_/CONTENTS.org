@@ -1733,6 +1733,20 @@ cold build after clearing the Ethiopia cache):
 | attached, then dropped | 0                  | *299 / 22 / 3,909*       | *62 / 7 / 7,430*         |
 | attached and served | 563 / 160 / 61,284    | 4,474 / 1,390 / 963,706  | 4,497 / 1,283 / 1,062,876 |
 
+*UPDATED 2026-10-23 (@ligon ruling: a row carrying a sale value is never
+dropped -- see "Empty-row filter keeps a row that carries a sale value"
+below).*  The two bottom rows are now:
+
+| class            | 2011-12                  | 2013-14                  | 2015-16                  |
+|------------------+--------------------------+--------------------------+--------------------------|
+| attached, then dropped | 0                  | 90 / 0 / 0               | 0                        |
+| attached and served | 563 / 160 / 61,284    | 4,683 / 1,412 / 967,615  | 4,559 / 1,290 / 1,070,306 |
+
+No line that brings a sale value can be in class 7 any more (asserted in
+=_report_sect12_sales=).  W2's 90 are lines that fill NOTHING -- Q6 not No,
+Q7 and Q8 blank -- attached to a §9 row with no unit, no quantity and no
+sale, which is still dropped as empty.  The other six classes are unchanged.
+
 *Class 7, "attached, then dropped"* (GH #820 round 2, found by an
 independent review -- the first version of this table called every
 single-plot line "attached").  The line attaches to its only §9 plot, but
@@ -1743,11 +1757,16 @@ filter is unchanged: those §9 rows were dropped on development too, with or
 without a sale.  Minimal case (W2): a single-plot §9 row with no unit and
 no quantity, and a §12 line with Q8 > 0 in Kg -- the Kg quantity cannot
 join a row with no unit, so the row keeps no =Quantity_sold= and goes.
+(*Superseded 2026-10-23*: the filter now keeps a row with a =Value_sold=;
+such a row is served as =u= ='Other (Specify)'= with its value.)
 
 The same filter drops rows carrying a *§11* sale too, measured on
 development's own build (rows with a positive / any =Value_sold= removed by
 it): W1 0 / 0, W2 1 / 155 (1,500 Birr), W3 2 / 17 (7,750), W4 27 / 171
-(41,442), W5 32 / 277 (33,482).  Not changed here.
+(41,442), W5 32 / 277 (33,482).  Not changed here.  (*Changed
+2026-10-23* by the ruling below: every one of these rows is kept, except the
+3 W2 and 3 W4 whose value was the all-blank group GH #1253 stopped serving
+as 0.)
 
 *The W2 chain, reconciled* (positive =Value_sold=): 1,412 positive lines
 attach (classes 7 + 8) -> they fill *1,464* §9 rows before the filter,
@@ -1757,7 +1776,9 @@ once, identically -> the filter removes the 22 rows of the 22 positive class-7 l
 de-duplicates those 52 identical rows (losslessly: =GrainCollapseWarning=
 "destroyed" is 2 before and after) -> *1,390* served rows, one per positive
 class-8 line.  W3: 1,290 -> 1,290 -> 1,283 (7 dropped; no duplicates) ->
-1,283.  W1: 160 throughout.
+1,283.  W1: 160 throughout.  *Since the 2026-10-23 ruling* the filter
+removes none of them: W2 1,464 -> 1,464 -> 1,412 served (one per positive
+attached line), W3 1,290 -> 1,290 -> 1,290.
 
 Rules, each the conservative choice where no precedent decides it:
 - *§11 wins a collision* and the two are never summed: every row §11
@@ -1773,9 +1794,11 @@ Rules, each the conservative choice where no precedent decides it:
   the lines disagree, mostly on the production period.
 - *Q6 = No with Q7/Q8 blank* is a sale of 0, as §11 reads it.  A positive
   Q7/Q8 next to a "No" (W2: 9 lines) is kept as reported -- the §11 path
-  instead overwrites such a value with 0.
+  used to overwrite such a value with 0; since GH #1253 both modules read a
+  "No" through one function, =ethiopia._no_sale_reading=.
 - *No sale unit is not Kg.*  W3 records Q7's unit; a blank one attaches no
-  =Quantity_sold= (the §11 path fills a blank sale unit with ='Kg'=).  W3's
+  =Quantity_sold= (the §11 path used to fill a blank sale unit with ='Kg'=;
+  since GH #1253 it does not either).  W3's
   =ph_s12q0b= carries the identical 62-label =unit_code= value-label set as
   §9's =ph_s9q04_b= and §11's =ph_s11q03_b= (checked), and is decoded
   through the same =_clean_unit_label=.  As for §11, =Quantity_sold= lands
@@ -1851,7 +1874,9 @@ a season and not dropped.
 ESS4 §11 header says "FOR PERMANENT CROPS PLEASE INCLUDE CROP HARVESTED
 BETWEEN MARCH 10, 2018 TO MARCH 9, 2019" -- a 12-month window for the
 permanent crops ESS4 folded into §11 -- and those sales are served
-unmarked.  Filed as GH #1256.
+unmarked.  Filed as GH #1256.  *FIXED*: see "W4/W5 permanent crops: a
+12-month window (GH #1256)" below -- the harvest =Quantity= is in the window
+too (§9 Q4).
 
 Downstream, warm, same two builds: =harvest_kg= (with and without
 =crop_conversion_factors()=) is *identical* in every wave -- no
@@ -1884,7 +1909,8 @@ with no precedent in this repo, so it is NOT done and is an open decision
   all-blank group is served =Value_sold= 0 on a single plot: 46 / 9 / 0 /
   9 / 8 (holder, crop) groups by wave (the GH #1184 pattern).  It also
   overwrites a positive value beside a "No" with 0 and fills a blank sale
-  unit with ='Kg'=.  §12 does none of these.
+  unit with ='Kg'=.  §12 does none of these.  *FIXED by GH #1253*, see
+  "§11 sale path: no fabricated zeros" below.
 - *Crop code 19 means CACTUS in W1/W2 and RED KIDNEY BEANS in W3-W5* (the
   Stata value labels of =sect9_ph_w1=, =sect12_ph_w1/w2= vs =sect9_ph_w3/w4=,
   =sect12_ph_w3=).  =harmonize_crop= is code-keyed, not wave-keyed, and its
@@ -1893,6 +1919,8 @@ with no precedent in this repo, so it is NOT done and is an open decision
   cactus sale).  Code 86 likewise reads FALLOW LAND in W1 but TEMPORARY GR
   from W2 on (one W4 §9 row is served ='Fallow Land'=).  Fixing it is a
   wave-keyed =harmonize_crop= and moves served =j= -- its own issue.
+  *FIXED by GH #1252*, see "Crop codes that change meaning by wave" below
+  (the W4 code-86 §9 row has neither unit nor quantity and is not served).
 - W1 §9 is a 7,750-row file against §4's 29,317 and W2/W3 §9's ~30,000;
   4,440 of W1 §11's 8,808 (holder, crop) pairs (818 positive sales) have no
   §9 row either.  Not explained by the tree-crop exclusion alone (§11
@@ -1905,6 +1933,266 @@ Codes 103 =WEPAL= and 105 =BUYA= (W1 §12 roster only) were the only §12
 codes =harmonize_crop= could not decode; they are now in the table under
 the survey's own names.  Both fall in the "no §9 row" class, so no served
 value changes.
+
+** §11 sale path: no fabricated zeros (GH #1253, 2026-10-23)
+
+The §11 sale aggregate in =crop_production_for_wave= served a sale of 0 the
+survey never recorded, three ways.  Instrument: W1-W3 §11 Q1 "Did you sell
+any of the harvested [CROP]?" / W4 §11 Q7 "Did you sell any of the
+harvested [CROP]?  YES 1 / NO 2 (> Q18)" -- a "No" SKIPS the quantity and
+value questions, so their cells are blank by design; Q3 (W1/W2) is in KG,
+W3-W5 record the sale unit (W3 =ph_s11q03_b=, W4/W5 =s11q11b=, the harvest
+=unit_code= list).  Raw §11 lines, flag x value x quantity x unit:
+
+| wave    | No, both blank | No, a cell > 0 | flag missing, blank | Yes, value blank | blank unit behind a No |
+|---------+----------------+----------------+---------------------+------------------+------------------------|
+| 2011-12 |          6,709 | 1 (qty)        |                 754 |               12 | (KG by instrument)     |
+| 2013-14 |          6,978 | 0              |                  12 |                2 | (KG by instrument)     |
+| 2015-16 |          6,181 | 0              |                   0 |                0 | 6,181 of 6,181         |
+| 2018-19 |          6,724 | 0              |                   5 |               10 | 6,724 of 6,730         |
+| 2021-22 |          4,768 | 0              |                   0 |               18 | 4,768 of 4,774         |
+
+No line in any wave has a positive quantity with a blank unit (the other
+blank units: W4 5 no-flag lines and 1 Yes with quantity 0; W5 6 Yes lines
+with quantity 0).
+
+- (a) *bare =.sum()=*: a (holder, crop) group whose cells are all blank
+  (and no "No" makes them 0) was served =Value_sold= 0.  Now
+  =sum(min_count=1)= -- vectorised; a per-group callable would deepcopy
+  =attrs= per group (GH #871).  Raw single-plot groups 46 / 9 / 0 / 9 / 8
+  (the issue's count, re-derived); served rows 46 / 6 / 0 / 6 / 8 -- three
+  W2 and three W4 groups' only §9 row has neither unit nor quantity and is
+  removed by the existing empty-row filter, before and after.  The same
+  min_count also stops all-blank QUANTITY groups serving 0: W1 45, W2 4
+  rows.
+- (b) *a "No" overwrote a recorded cell with 0*.  Now a "No" fills only a
+  blank cell, and only where the line records nothing positive
+  (=_no_sale_reading=, the reading §12 already used).  One raw line (W1, a
+  positive quantity beside a "No"); it lands on no served single-plot row,
+  so 0 served cells move.
+- (c) *a blank sale unit read as Kg*.  The fill made a "No"'s zero quantity
+  land on =Quantity_sold= ONLY where the harvest was recorded in Kg -- a
+  served zero decided by the harvest unit (W3/W4/W5: 542 / 816 / 819 Kg
+  rows held 0; every other row of a "No" held NaN).  Now a
+  line with no sale unit attaches no quantity (=Value_sold=, unit-free,
+  still gets the 0): the §12 path's rule in the same function (GH #820) and
+  the #1041 precedent that an unrecorded unit is never a real one.  The
+  sale unit stays NA rather than ='Unknown'= because it is a join key, not
+  an index level; the served table is the same either way.  W1/W2 are
+  untouched: their Q3 is KG by the instrument, so a "No"'s 0 still lands on
+  their Kg rows.
+  *Open, for @ligon:* the other consistent rule is that a zero needs no
+  unit -- attach a "No"'s =Quantity_sold= 0 to its row whatever the harvest
+  =u=.  After this change the §11 rows serving =Value_sold= 0 with no
+  =Quantity_sold= are 0 / 2,680 / 3,763 / 4,371 / 2,719 (W1-W5; W2's are its
+  non-Kg harvest rows), and §12 adds 2,135 / 3,212 in W2/W3 -- the cells
+  that rule would turn NaN -> 0.  Not taken: the §12 path, already reviewed,
+  reads a unitless "No" as value-only, and the two modules should not
+  disagree.
+
+Measured cold, =627d3cfdf= (#1257's head) -> this change, through
+=Country('Ethiopia').crop_production()=: 85,519 rows both, identical index;
+only =Value_sold= and =Quantity_sold= move, and only 0 -> NaN:
+
+| wave    | =Value_sold= 0 -> NaN | =Quantity_sold= 0 -> NaN | of which (c) |
+|---------+-----------------------+--------------------------+--------------|
+| 2011-12 |                    46 |                       45 |            0 |
+| 2013-14 |                     6 |                        4 |            0 |
+| 2015-16 |                     0 |                      542 |          542 |
+| 2018-19 |                     6 |                      816 |          816 |
+| 2021-22 |                     8 |                      819 |          819 |
+
+(W5's 819 includes 3 rows on the folded 'Leafy Greens' label, where the
+attribution script cannot name the code; all W5 sale units are coded, so
+they are (c) by construction.)  Every change is attributed by the raw §11
+lines of the row's (holder, crop); a raw oracle that recomputes the §11
+aggregate from the =.dta= independently of =ethiopia.py= agrees with every
+comparable single-plot row of the built wave parquets (0 mismatches;
+=slurm_logs/isa_backlog_2026-10-21/ethiopia-bundle/=).  Grain, null-read,
+null-index and quantity reports are identical.  Downstream:
+=gross_crop_revenue= totals identical, households carrying one -8 / -4 / 0 /
+-1 / 0 (households whose only "sale" was an all-blank group); =harvest_kg=
+and the within-wave =median_price_valuation= identical.
+
+** Crop codes that change meaning by wave (GH #1252, 2026-10-23)
+
+ESS crop codes are NOT stable across waves.  A sweep of the Stata value
+labels of every crop-code variable in every crop module, every wave (§3 /
+§4 / §5 / §7 post-planting, §9 / §9a / §10 / §11 / §12 post-harvest, the WB
+=Crop_CF= tables; 114 codes;
+=slurm_logs/isa_backlog_2026-10-21/ethiopia-bundle/1252_crop_label_sweep.json=)
+finds three that change MEANING:
+
+| code | W1 2011-12 | W2 2013-14 | from W3 2015-16 |
+|------+------------+------------+-----------------|
+|    9 | ROMAN | ROMAN | Mung Bean/ MASHO |
+|   19 | CACTUS | CACTUS | RED KIDENY BEANS |
+|   86 | FALLOW LAND (post-harvest files) / TEMPORARY GR (post-planting files) | TEMPORARY GR | TEMPORARY GR |
+
+Seven more differ only in spelling, a =NN.= prefix or Stata's 12-character
+truncation (25 NUEG / NUEG OR NIGERSEED, 30 SAVORY (OR ROSEMARY), 40 WHITE
+LUMIN / CUMIN, 89 FOREST LAND -> FOREST LAND/ EUCALYPTUS TREE, 98 OTHER ROOT
+C(ROPS), 99 OTHER LAND (USE), 121 OTHER CASE / CASH CROPS).  W3 itself still
+ships two STALE label sets saying ROMAN / CACTUS (=sect3_pp_w3=
+=pp_s3q31_b/_d= and =sect7_pp_w3= =pp_s7q20b_*=); nothing here decodes
+either.  86 in W1 is ambiguous within the wave (the files =crop_production=
+reads say FALLOW LAND); W1 keeps that reading.
+
+*Fix:* =harmonize_crop= keeps one label per code -- each code's meaning from
+2015-16 on (86 is now ='Temporary Grass'=, expanding the truncation as 98 and
+121 are) -- and a new wave-keyed =harmonize_crop_wave= overrides only the
+five cells that differ: (W1, 9) and (W2, 9) ='Roman'=, (W1, 19) and (W2, 19)
+='Cactus'=, (W1, 86) ='Fallow Land'=.  =ethiopia._eth_crop_label_map_for_wave(t)=
+is the one reader, and every per-wave decode uses it --
+=crop_production_for_wave=, =plot_inputs_for_wave= (seed crops),
+=_crop_cf_table= (the shipped kg factors: =Crop_CF_Wave2= labels 19 CACTUS
+and 9 ROMAN, 15 + 1 (crop, unit) keys) and =inputs_sect12_sale=.
+='Roman'= is the survey's own word (Amharic for pomegranate, not checked
+against a code book), kept as written like Amboshika or Kazmir; no
+=harmonize_food= label exists for cactus or pomegranate, so no
+=food_acquired.j= join is lost (none existed: kidney beans / mung beans are
+not what these rows were).
+
+Why not the categorical-mapping cascade (CLAUDE.md, GH #953): a wave-level
+=categorical_mapping.org= overrides WHOLE-TABLE, so W1 and W2 would each
+carry a full 113-row copy of =harmonize_crop= that every later edit must
+repeat -- and it would never be read, because the crop decode reads the
+country file BY PATH at build time (CLAUDE.md fact 2) and nothing
+auto-applies a table named =harmonize_crop= to an index level named =j=.
+The in-file precedent is the wave-keyed =harmonize_area_unit= /
+=harmonize_acquire= / =harmonize_species=; the override lists 5 cells.  No
+country has a wave-level crop table.
+
+=perennial= is the same drift: =PERENNIAL_CROP_CODES= is the WB's
+ETH_ESS1.do list, written against W1's labels (19 = CACTUS) and reused
+unchanged in the ESS2-ESS5 do-files, so W3-W5 red kidney beans were served
+=perennial = True=.  The survey's own per-crop permanent/tree flag (PP §4
+=s4q15=) says 4 of 308 W4 and 0 of 316 W5 kidney-bean rows.  A code in
+=PERENNIAL_CODE_MEANING= (={19: 'Cactus'}=) now counts as perennial only in
+waves where it carries that meaning.  Code 9 is not on the WB list (a
+pomegranate tree would be perennial, but adding it is a new judgement, not
+a drift fix); 86 serves no crop row outside W1.
+
+Measured cold, the #1253 commit -> this change: 85,519 rows both;
+re-labelled =crop_production= rows W1 5 Cactus + 1 Roman, W2 35 + 11 (37 +
+12 after the empty-row-filter ruling below; the
+issue's "45" is raw §9 rows: 5 + 40; 5 W2 cactus rows have neither unit nor
+quantity and are removed by the empty-row filter); with the before-frame
+re-labelled the index is identical, and the only other cells that move are
+=perennial= True -> False on 692 / 245 / 291 W3 / W4 / W5 kidney-bean rows.
+=plot_inputs=: W1 13 Cactus + 1 Roman, W2 39 + 15, and 4 W4 rows 'Fallow
+Land' -> 'Temporary Grass'; nothing else.  Raw oracle: on every served plot
+holding a code 9 / 19 / 86 §9 row (with a unit or quantity), the served =j=
+includes the label that §9 file's OWN value label gives -- 7 / 46 / 788 /
+290 / 297 plots, all agree (before: W1 1 of 7, W2 0 of 46).  =harvest_kg=
+(with and without the shipped factors), =gross_crop_revenue=, the
+within-wave =median_price_valuation= and every audit report are identical.
+
+** W4/W5 permanent crops: a 12-month window (GH #1256, 2026-10-23)
+
+ESS4 folds W1-W3's §12 tree/fruit/root module into §9 and §11 and puts a
+PERMANENT crop on a fixed twelve months, not the season (ESS4 post-harvest
+questionnaire,
+=2018-19/Documentation/2018_19_ethiopian_socioeconomic_survey_post_harvest_agricultural_questionnaire.pdf=):
+
+- §9 Q4, PDF p.3: "Have you harvested any of the [CROP] from this [FIELD]?
+  (for permanent crop harvested between March 10, 2018 to March 9, 2019)";
+  Q5 is that harvest's quantity -- served as =Quantity=;
+- §11 Q1, PDF p.8: "LIST ALL CROPS HARVESTED DURING THIS AGRICULTURAL
+  SEASON.  FOR PERMANENT CROPS PLEASE INCLUDE CROP HARVESTED BETWEEN MARCH
+  10, 2018 TO MARCH 9, 2019)"; Q7 / Q11 / Q12 sell "the harvested [CROP]" --
+  served as =Quantity_sold= / =Value_sold=.  Q2-Q4 (last completed
+  production period, harvest in the last 12 months, trees) are §12's
+  questions, asked of [TREES/FRUIT/ROOT CROP].
+
+So all three numeric columns are in the window on a permanent-crop row.
+
+*Which crops.*  The instrument names "permanent crops" and lists none.  The
+crop row's own flag is the post-planting roster's §4 Q15 (=s4q15=): W4 "IS
+THIS CROP A FRUIT TREE CROP?" (answered Yes on 95-99% of coffee, enset,
+chat, gesho, banana, mango, avocado rows -- a permanent/tree flag in
+practice), W5 variable label "IS THIS CROP A Permanent/TREE CROP?".  *No W5
+questionnaire is held*: the W5 window is read from the data alone -- its §11
+carries the same block (=s11q02= "completed production period", =s11q03a1=
+"harvested in last 12 months") and its §4 the same flag; W5's dates are not
+known.  Two alternatives were measured and not used:
+- the WB perennial code list (=PERENNIAL_CROP_CODES=, the =perennial=
+  column) disagrees with the flag on whole codes -- §4 rows flagged Yes,
+  W4 / W5: Berbere 1/235, 1/153; Garlic 0/213, 0/135; Ginger 0/40, 0/25;
+  Other tuber 2/126, 5/68; Red Kidney Beans 4/308, 0/316 (GH #1252);
+- §11's permanent block being answered (Q2) marks 1,206 W5 lines of
+  non-perennial crops, so it is not a crop-type marker there.
+
+*Stamp.*  =crop_production_for_wave= (colmap =pl_permanent='s4q15'=, W4/W5
+only) joins the flag on (plot, crop) like =planting_month=; a key is
+permanent only if EVERY §4 line says Yes (4 W4 / 5 W5 keys whose lines
+disagree, and the 93 / 235 §9 rows with no §4 line, are not marked).  Every
+served row so marked that serves a =Quantity=, =Quantity_sold= or
+=Value_sold= is stamped =Derivation =
+'Ethiopia::crop_production::permanent-crop-12-month-window'= (registered in
+=Ethiopia/_/derivations.yml=; function =derive_permanent_crop_window=, the
+identity; inputs =inputs_permanent_crop_window=, every §9 row with its
+=s4q15= and every §11 line, original names, =(t, i, j)=).  Stamped AFTER the
+empty-row filter, on served rows only.
+
+Measured cold, the #1252 commit -> this change: 85,519 rows both, identical
+index; the only cells that move are =Derivation= <NA> -> the key on 3,713 W4
+and 3,723 W5 rows (3,796 / 3,875 after the empty-row-filter ruling below;
+588 / 534 with a positive =Value_sold=; top crops Coffee
+786 / 847, Chat 651 / 627, Banana 423 / 529, Enset 401 / 377, Mango 356 /
+353).  An independent recomputation from the raw §4 / §9 files gives
+exactly the stamped set (0 mismatches either way).  Against =perennial=:
+3,666 / 3,696 stamped rows are perennial, 47 / 27 are not (Sacred Basil 30 /
+7, ...); 647 / 623 perennial rows are not stamped (Berbere 200 / 140, Garlic
+200 / 121, Other tuber 115 / 59, and coffee / chat rows the respondent did
+not flag).  Downstream (=harvest_kg=, =gross_crop_revenue=, the within-wave
+=median_price_valuation=) and every audit report identical: the stamp moves
+no value.
+
+** Empty-row filter keeps a row that carries a sale value (@ligon ruling, 2026-10-23)
+
+=crop_production_for_wave= drops a §9 row with no unit and nothing to serve
+as an empty placeholder.  The filter was =u= missing AND no =Quantity= AND
+no =Quantity_sold=; it ignored =Value_sold=, so it also dropped rows that
+§11 or §12 had given a sale value (the GH #820 review's finding: §11 rows
+with a positive value 1 / 2 / 27 / 32 in W2-W5, 155 / 17 / 171 / 277 with
+any value; §12 class 7, 29 positive lines, 11,339 Birr).  Ruling: a row
+carrying a sale value is never dropped -- the filter now also requires
+=Value_sold= to be missing.  Such a row is served with =u= ='Other
+(Specify)'= (the existing tag for a row with no recorded unit) and only its
+=Value_sold= (unit-free; no quantity can attach to a row with no unit).  A
+"No" is a recorded sale value of 0, so its row is kept too.
+
+Measured cold, the GH #1256 commit -> this change, through
+=Country('Ethiopia').crop_production()=: 85,519 -> 86,403 rows; *every
+pre-existing row identical*; every added row has =u= ='Other (Specify)'=,
+no =Quantity= / =Quantity_sold=, and a =Value_sold=:
+
+| wave    | §11 rows: positive / zero | Birr   | §12 rows: positive / zero | Birr  | total |
+|---------+---------------------------+--------+---------------------------+-------+-------|
+| 2011-12 | 0 / 0                     | 0      | 0 / 0                     | 0     |     0 |
+| 2013-14 | 1 / 151                   | 1,500  | 22 / 187                  | 3,909 |   361 |
+| 2015-16 | 2 / 15                    | 7,750  | 7 / 55                    | 7,430 |    79 |
+| 2018-19 | 27 / 141                  | 41,442 | --                        | --    |   168 |
+| 2021-22 | 31 / 245                  | 33,382 | --                        | --    |   276 |
+
+Reconciliation with the review's counts (development's own build): the §11
+rows kept are its 155 / 17 / 171 / 277 rows-with-a-value less the 3 W2 and
+3 W4 rows whose "value" was the all-blank 0 GH #1253 removed (those rows
+are genuinely empty and still dropped); W5's 277 wave-parquet rows (32
+positive, 33,482 Birr) serve as 276 (31, 33,382) because two of them are
+the same Gishita plot listed twice in §9, identical but for =intercropped=:
+the core collapse serves one (=GrainCollapseWarning= W5 +1 group, +1 row
+destroyed; the other three waves' reports unchanged).  §12: all 29
+positive lines (11,339 Birr) now served; class 7 holds no line with a
+value.  Stamps: =sect12-sale-period= W2 4,463 -> 4,672, W3 4,495 -> 4,557;
+=permanent-crop-12-month-window= W4 3,713 -> 3,796, W5 3,723 -> 3,875.
+=NullIndexKeyWarning= (=v= missing): 382 -> 387 rows (W4 +4, W5 +1 -- added
+rows of households =sample()= does not carry; the W4 orphan rate noted under
+"Household id emitted as i").  Downstream: =gross_crop_revenue= +5,409 /
++15,180 / +41,442 / +33,382 Birr in W2-W5 (+30 / +7 / +24 / +45
+households); =harvest_kg= and the within-wave =median_price_valuation=
+identical (the added rows carry no quantity).
 
 ** Crop-side WB conversion factors: held, unwired (2026-09-09)
 
@@ -2127,7 +2415,8 @@ its evidence is the data alone.  Pinned in
 =tests/test_ethiopia_crop_production_sect12.py=.  What W4/W5 DO lack is a
 label: their §11 sales of permanent crops cover a 12-month window ("CROP
 HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019") and are served
-unmarked, where W1-W3's §12 sales now carry =sect12-sale-period= (GH #1256).
+unmarked, where W1-W3's §12 sales now carry =sect12-sale-period= (GH #1256;
+now stamped, see the next-but-one section).
 
 ** _/food_acquired.py lacks the id_walk that _/crop_production.py has
 

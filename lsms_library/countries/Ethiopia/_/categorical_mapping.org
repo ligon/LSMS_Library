@@ -634,9 +634,13 @@ stripped label.
 * harmonize_crop (the crop j axis -- GAP 1, crop_production)
 
 Code-keyed crop dictionary for the ESS post-harvest/post-planting crop
-modules (sect9_ph / sect4_pp / sect11_ph).  Maps the stable ESS
-``crop_code`` integer (1-123, consistent across W1-W5; W4/W5 carry it as
-``s9q00b`` / ``s11q01`` / ``s4q01b``) to a Preferred Label.
+modules (sect9_ph / sect4_pp / sect11_ph).  Maps the ESS ``crop_code``
+integer (1-123; W4/W5 carry it as ``s9q00b`` / ``s11q01`` / ``s4q01b``) to
+a Preferred Label.  The code is stable across W1-W5 for every code BUT
+three, whose meaning changes between waves (GH #1252) -- this table gives
+their meaning from 2015-16 on, and ``harmonize_crop_wave`` below overrides
+the earlier waves.  Read it through ``ethiopia._eth_crop_label_map_for_wave``
+whenever the wave is known.
 
 The Preferred Labels deliberately REUSE the food labels already in the
 ``harmonize_food`` table wherever a grown crop is also a consumed food
@@ -646,8 +650,8 @@ the oilseeds, the vegetables/fruits, Coffee, Onion, Potato, ...), so
 NEW Preferred Labels are added only for genuinely non-food / non-
 consumption crops with no food analogue: Cotton, Cotton Seed, Tobacco,
 Enset, Gesho, Chat, Sugar Cane, Cactus, and the residual land-use /
-"Other" categories (Grazing Land, Fallow Land, Forest Land, Other Land
-Use).  Where a crop has no exact food label but is close to one we use
+"Other" categories (Grazing Land, Fallow Land, Temporary Grass, Forest
+Land, Other Land Use).  Where a crop has no exact food label but is close to one we use
 the food label (e.g. Red Pepper -> Berbere, Green Pepper -> Kariya,
 Kale/Cabbage -> Leafy Greens) so the join still lands.
 
@@ -741,7 +745,7 @@ or Kazmir (112).
 |   83 | Watermelon          |
 |   84 | Avocado             |
 |   85 | Grazing Land        |
-|   86 | Fallow Land         |
+|   86 | Temporary Grass     |
 |   89 | Forest Land         |
 |   90 | Other Land Use      |
 |   95 | Boye/Yam            |
@@ -763,6 +767,60 @@ or Kazmir (112).
 |  120 | Other cereal        |
 |  121 | Other Cash Crop     |
 |  123 | Other vegetable     |
+
+* harmonize_crop_wave (crop codes whose meaning changes by wave -- GH #1252)
+
+Wave-keyed OVERRIDES of ``harmonize_crop``: a row here replaces that code's
+label in that wave only, and every other (wave, code) falls through to the
+code-keyed table above.  ``ethiopia._eth_crop_label_map_for_wave(t)`` is the
+one reader; ``crop_production`` (§9 / §11 / §12), ``plot_inputs`` (seed
+crops), the shipped kg-factor loader (``crop_conversion_factors``) and the
+§12 derivation inputs all decode through it, so a crop's ``j`` and its WB
+conversion factor cannot drift apart.
+
+Why a sparse override table and not the cascade.  The categorical-mapping
+cascade (CLAUDE.md, GH #953) would put a WHOLE ``harmonize_crop`` copy (113
+rows) in ``2011-12/_/`` and ``2013-14/_/`` -- two duplicates every later edit
+must repeat -- and would not even be consulted: the crop decode reads this
+file BY PATH at build time (CLAUDE.md fact 2), and nothing auto-applies a
+table named ``harmonize_crop`` to an index level named ``j``.  The in-file
+precedent is ``harmonize_area_unit`` / ``harmonize_acquire`` /
+``harmonize_species`` (wave-keyed, ``_harmonize_wave_keyed``); this table
+lists only the cells that differ, so it changes only the drifting codes.
+
+Evidence: the Stata value labels of EVERY crop-code variable in every crop
+module, every wave (§3/§4/§5/§7 PP, §9/§9a/§10/§11/§12 PH, Crop_CF; sweep in
+``slurm_logs/isa_backlog_2026-10-21/ethiopia-bundle/1252_crop_label_sweep.json``).
+Of 114 codes, three change MEANING (others differ only in spelling, a
+``NN.`` prefix or truncation -- 40 WHITE LUMIN/CUMIN, 89 FOREST LAND ->
+FOREST LAND/ EUCALYPTUS TREE, 98 OTHER ROOT C(ROPS), 121 OTHER CASE/CASH
+CROPS):
+
+| code | W1 2011-12 | W2 2013-14 | from W3 2015-16 |
+|------+------------+------------+-----------------|
+|    9 | ROMAN      | ROMAN      | Mung Bean/ MASHO |
+|   19 | CACTUS     | CACTUS     | RED KIDENY BEANS |
+|   86 | FALLOW LAND (PH files) / TEMPORARY GR (PP files) | TEMPORARY GR | TEMPORARY GR |
+
+W3 itself carries two stale label sets that still say ROMAN / CACTUS
+(``sect3_pp_w3`` ``pp_s3q31_b/_d`` and ``sect7_pp_w3`` ``pp_s7q20b_*``); no
+table here decodes either.  ROMAN is the survey's own word (the Amharic word for pomegranate --
+not checked against an ESS code book, so not used as the label) and is
+kept as written, like Amboshika or Kazmir: no food label
+exists for it.  86 in W1 is genuinely ambiguous -- the post-harvest files
+(which ``crop_production`` reads) say FALLOW LAND, the post-planting files
+TEMPORARY GR -- and a wave key cannot tell files apart; W1 keeps the
+post-harvest reading.  "TEMPORARY GR" is Stata's 12-character truncation,
+expanded here as 98 OTHER ROOT C and 121 OTHER CASE CROPS are.
+
+#+name: harmonize_crop_wave
+| Wave    | Code | Preferred Label |
+|---------+------+-----------------|
+| 2011-12 |    9 | Roman           |
+| 2013-14 |    9 | Roman           |
+| 2011-12 |   19 | Cactus          |
+| 2013-14 |   19 | Cactus          |
+| 2011-12 |   86 | Fallow Land     |
 
 * harmonize_input (the input axis -- GAP 2, plot_inputs)
 

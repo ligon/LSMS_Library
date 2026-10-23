@@ -1,0 +1,44 @@
+{
+ "rows": {
+  "before": 85519,
+  "after": 85519
+ },
+ "index_identical": true,
+ "columns": {
+  "before": [
+   "Quantity",
+   "Quantity_sold",
+   "Value_sold",
+   "planting_month",
+   "harvest_month",
+   "intercropped",
+   "perennial",
+   "Derivation"
+  ],
+  "after": [
+   "Quantity",
+   "Quantity_sold",
+   "Value_sold",
+   "planting_month",
+   "harvest_month",
+   "intercropped",
+   "perennial",
+   "Derivation"
+  ]
+ },
+ "changed_cells": {
+  "Quantity_sold": {
+   "2011-12 0->NaN": 45,
+   "2013-14 0->NaN": 4,
+   "2015-16 0->NaN": 542,
+   "2018-19 0->NaN": 816,
+   "2021-22 0->NaN": 819
+  },
+  "Value_sold": {
+   "2011-12 0->NaN": 46,
+   "2013-14 0->NaN": 6,
+   "2018-19 0->NaN": 6,
+   "2021-22 0->NaN": 8
+  }
+ }
+}

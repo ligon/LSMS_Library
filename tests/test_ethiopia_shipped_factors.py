@@ -395,11 +395,19 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     -> 7,767 ``inferred``, 15,589 -> 15,588 ``none``): the shipped layer
     outranks ``inferred`` but does not cover this row, so nothing shields it.
     ``shipped`` and ``shipped_matched`` are unchanged at 62,164.
+
+    2026-10-23, @ligon ruling "a row carrying a sale value is never dropped"
+    (the GH #820 review's empty-row-filter finding): 884 rows join the table
+    (85,519 -> 86,403) -- §9 rows with no unit and no quantity that carry only
+    a ``Value_sold``, served as ``u = 'Other (Specify)'``.  With no quantity
+    they have no kg: ``none`` rises by exactly 884 in all four splits
+    (44,994 -> 45,878; 14,993 -> 15,877; 58,971 -> 59,855; 15,046 -> 15,930)
+    and every other count and every ``Harvest_kg`` total is unchanged.
     """
     import lsms_library as ll
 
     cp = ll.Country("Ethiopia").crop_production()
-    assert len(cp) == 85_519
+    assert len(cp) == 86_403
     # Ethiopia asks NO per-row conversion factor, so `reported` is
     # structurally empty and `reported_vs_shipped` can never be populated.
     assert "KgFactor" not in cp.columns
@@ -412,7 +420,7 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     b, a = before.attrs["kg_factor_sources"], after.attrs["kg_factor_sources"]
     assert before.attrs["kg_factor_declared_from"] == "attrs"
     assert b["shipped"] == 0 and b["shipped_matched"] == 0
-    assert b["metric"] == 40_525 and b["none"] == 44_994
+    assert b["metric"] == 40_525 and b["none"] == 45_878
     assert b["declared"] == a["declared"] == 13_977
     # 2026-09-18, GH #832: `shipped` / `shipped_matched` 62,164 -> 62,705 and
     # `none` 15,587 -> 15,046, both by the SAME 541 rows.  Those are 2015-16
@@ -425,7 +433,7 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     # 12,680,617.28 -> 12,685,707.32; the ratio asserted below rises
     # 6.654 -> 6.657, so `> 6 *` still holds as written.
     assert a["shipped"] == 62_705 and a["shipped_matched"] == 62_705
-    assert a["metric"] == 7_821 and a["none"] == 14_993
+    assert a["metric"] == 7_821 and a["none"] == 15_877
     # Ethiopia's crop units are ALL read off a label, never guessed.  Pinned
     # as its own assertion rather than folded into the counts above: if the
     # price-ratio inference ever starts serving this country, that is a fact
@@ -450,8 +458,8 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     blind_a = harvest_kg(cp, shipped_factors=shipped, unit_kg={})
     ob, oa = (blind_b.attrs["kg_factor_sources"],
               blind_a.attrs["kg_factor_sources"])
-    assert ob["metric"] == 26_548 and ob["none"] == 58_971
-    assert oa["metric"] == 7_768 and oa["none"] == 15_046
+    assert ob["metric"] == 26_548 and ob["none"] == 59_855
+    assert oa["metric"] == 7_768 and oa["none"] == 15_930
     assert ob["declared"] == oa["declared"] == 0
     assert float(blind_b["Harvest_kg"].sum()) == pytest.approx(
         1_905_712.50962, rel=1e-9)
