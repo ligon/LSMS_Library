@@ -48,6 +48,13 @@ vente mensuelle moyenne"), beside the month count 11F.10.  So Quantity is a
 per-month harvest (not the month count, unlike 2014-15 before #1267) and the
 sale pair is commensurate; the rows carry mali.DERIVATION_11F, which states
 the window, and months_harvested.
+
+Unanswered sales (ruling @ligon 2026-10-23, PR #1272).  The s7g sale is
+summed with sum(min_count=1), so a sale whose quantity or value was not
+recorded stays NA; 0 is filled ONLY where s7gq20 == 'Non'.  The rows it
+affects are mostly Leger-questionnaire households: Leger's s7g asks 7G.20
+(sold?) but not 7G.21 / 7G.22 (how much, for how much) -- every one of the
+1,607 'Oui' rows without a quantity is Leger (Mali/_/CONTENTS.org).
 """
 import sys
 
@@ -108,11 +115,13 @@ sold.loc[not_sold, ['Quantity_sold', 'Value_sold']] = 0
 sold.loc[not_sold, 'Unit_sold'] = pd.NA   # a filled-in 0 has no unit
 # One sale record per (household, crop, SOLD UNIT) -- never a sum across
 # units (Niger 2021-22).  dropna=False keeps an unrecorded unit as its own
-# key.  The plain `sum` (min_count=0) is the pre-#824 aggregation, kept so
-# no Quantity_sold / Value_sold value moves; s7g has one row per
-# (household, crop), so each group is one row.
-sold = sold.groupby(['i', 'crop', 'Unit_sold'], as_index=False, dropna=False).agg(
-    {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+# key.  sum(min_count=1), vectorised (no per-group callable: pandas
+# deep-copies attrs once per group, CLAUDE.md GH #871): an unrecorded sale
+# stays NA rather than becoming 0 -- the 0 above is filled only on an
+# explicit s7gq20 == 'Non' (ruling 2026-10-23; #1250 / #1253 / #1263).
+# s7g has one row per (household, crop), so each group is one row.
+sold = (sold.groupby(['i', 'crop', 'Unit_sold'], dropna=False)
+        [['Quantity_sold', 'Value_sold']].sum(min_count=1).reset_index())
 # ...and attributed only to a (household, crop) sold in ONE unit (a second
 # unit would duplicate the plot-crop row).  Measured: none sells in two.
 units_per = sold.groupby(['i', 'crop']).size()
