@@ -33,7 +33,7 @@ def test_real_organic_use_only_rows_survive_without_fabricated_amounts(eth, ids)
         dict(ids, manure_used='manure', compost_used='compost', other_organic_used='other'))
     assert len(result) == 3
     assert set(result.index.get_level_values('input')) == {'Manure', 'Compost', 'Other Organic'}
-    assert set(result.index.get_level_values('j')) == {eth.WHOLE_PLOT_SENTINEL}
+    assert set(result.index.get_level_values('j')) == {eth.CROP_NA}
     assert result.Applied.eq(True).all()
     assert result.u.tolist() == [U_UNKNOWN] * len(result)
     assert result[['Quantity', 'Purchased', 'Quantity_purchased', 'Improved']].isna().all().all()

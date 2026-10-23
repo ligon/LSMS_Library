@@ -1342,9 +1342,10 @@ Pesticide) rows via the shared =harmonize_crop= labels.
   - §3 plot roster (=sect3_pp=) -- ONE ROW PER FIELD.  Inorganic-fertilizer
     use + reported kg per type (Urea / DAP / NPS) and organic-fertilizer use
     dummies (Manure / Compost / Other Organic).  PLOT-LEVEL (no crop) -> these
-    rows carry =j = 'Whole Plot'= (the reserved non-crop sentinel, since =j=
-    is an index level and cannot be null -- mirrors how =crop_production=
-    fills its =u= level).
+    rows carry =j = '(not crop-specific)'= (=ethiopia.CROP_NA=, the reserved
+    non-crop marker, since =j= is an index level and cannot be null --
+    mirrors how =crop_production= fills its =u= level).  It was spelled
+    ='Whole Plot'= until GH #1119 (see "One crop marker" below).
   - §4 planting (=sect4_pp=) -- ONE ROW PER (FIELD, CROP).  Seed quantity (kg;
     W2-W5; W1's seed qty is in §5), the improved-seed flag, and the
     pesticide-use dummy.  CROP-specific -> =j = crop Preferred Label=.
@@ -1387,6 +1388,22 @@ that report use without a kg; NaN for seed rows).  NO =nitrogen_kg= /
   - =Ethiopia/_/plot_inputs.py= -- country concatenator (+ id_walk).
   - =Ethiopia/_/categorical_mapping.org= -- =harmonize_input= (input
     taxonomy), =harmonize_crop= (crop =j= for seed/pesticide rows).
+
+** One crop marker: =(not crop-specific)= (GH #1119, 2026-10-23)
+
+Ruling (@ligon, 2026-10-23): one spelling of the "not crop-specific" marker on
+=plot_inputs.j= everywhere, =(not crop-specific)= -- the EHCVM / Mali spelling
+and constant name (=CROP_NA=).  Ethiopia's =Whole Plot= is replaced; the
+constant is renamed =WHOLE_PLOT_SENTINEL= -> =CROP_NA=.  It is a =j= value and
+stays distinct from the STRUCTURAL =plot_id= sentinel =Farm-level=
+(=lsms_library/data_info.yml=, =plot_id:=).
+
+The other Ethiopia plot tables do not carry it: =plot_labor= and
+=plot_features= have no =j= level, and =crop_production.j= is always a crop.
+No framework code keyed on the old literal (=rg= over =lsms_library/*.py=);
+=tests/test_867_nitrogen_content.py= used it in synthetic rows and now spells
+the canonical marker.  Measured cold: see the GH #1119 lane's report in
+=.coder/ledger/1120-ethiopia-agcover-w1-trees.md=.
 
 ** 2026-10-21 -- Missing plot-input units use =Unknown= (GH #1118)
 

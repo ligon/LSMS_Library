@@ -78,7 +78,7 @@ def test_nps_carries_the_cited_19_percent_share():
     """Ethiopia ESS ``NPS`` (W3 2015-16 onward): 19-38-0+7S, IFDC/AFAP for
     AGRA 2018 Ethiopia assessment, Table 1, report p. 3."""
     assert T._NITROGEN_CONTENT['nps'] == 0.19
-    out, _ = _run([('2018-19', 'hh1', 'p1', 'NPS', 'Whole Plot', 'Kg',
+    out, _ = _run([('2018-19', 'hh1', 'p1', 'NPS', '(not crop-specific)', 'Kg',
                     100.0)])
     assert out.loc[('2018-19', 'hh1', 'p1'),
                    'Nitrogen_kg'] == pytest.approx(19.0)
@@ -217,9 +217,9 @@ def test_other_organic_is_loud():
     """Ethiopia's ``Other Organic`` (2,651 rows) carries no stem the base's
     ``_FERTILIZER_LABEL_HINTS`` knew, so it was unmatched and never named --
     the one organic label the ruling's "loud" did not reach."""
-    out, cov = _run([('2018-19', 'hh1', 'p1', 'Other Organic', 'Whole Plot',
+    out, cov = _run([('2018-19', 'hh1', 'p1', 'Other Organic', '(not crop-specific)',
                       'Kg', 1.0),
-                     ('2018-19', 'hh1', 'p1', 'Urea', 'Whole Plot', 'Kg',
+                     ('2018-19', 'hh1', 'p1', 'Urea', '(not crop-specific)', 'Kg',
                       10.0)])
     assert cov and "'Other Organic'" in cov[0]
 

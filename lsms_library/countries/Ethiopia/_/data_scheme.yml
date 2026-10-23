@@ -214,9 +214,11 @@ Data Scheme:
     #
     # j (crop axis): the crop Preferred Label (harmonize_crop == food labels,
     # so seed/pesticide rows join crop_production.j / food_acquired.j) for the
-    # crop-specific inputs (Seed, Pesticide); the 'Whole Plot' sentinel for
-    # plot-level fertilizer/organic inputs (which carry no crop -- j cannot be
-    # null as an index level, mirroring how crop_production fills its u level).
+    # crop-specific inputs (Seed, Pesticide); the '(not crop-specific)' marker
+    # for plot-level fertilizer/organic inputs (which carry no crop -- j cannot
+    # be null as an index level, mirroring how crop_production fills its u
+    # level).  One spelling corpus-wide since GH #1119 (@ligon, 2026-10-23);
+    # it was 'Whole Plot' here before.
     # plot_id and i match plot_features / crop_production exactly.
     #
     # NO nitrogen_kg / seed_kg sums, NO any-use roll-up flags, NO fertilizer

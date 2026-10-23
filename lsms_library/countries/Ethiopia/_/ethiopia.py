@@ -2501,7 +2501,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
 #   §3 plot roster (sect3_pp)  : ONE ROW PER FIELD.  Inorganic-fertilizer
 #       use + reported kg per type (Urea / DAP / NPS), and organic-fertilizer
 #       use dummies (Manure / Compost / Other Organic).  Fertilizer is a
-#       PLOT-LEVEL input (no crop) -> these rows carry j = WHOLE_PLOT_SENTINEL.
+#       PLOT-LEVEL input (no crop) -> these rows carry j = CROP_NA.
 #   §4 planting (sect4_pp)     : ONE ROW PER (FIELD, CROP).  Seed quantity
 #       (kg) + the improved-seed flag (W2-W5; for W1 the seed quantity lives
 #       in §5).  Pesticide use (a plot-crop dummy).  These are CROP-specific
@@ -2532,13 +2532,19 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
 # crop labels reuse harmonize_crop (== the food Preferred Labels) so seed/
 # pesticide rows' j joins crop_production.j and food_acquired.j.
 #
-# WHOLE_PLOT_SENTINEL: a plot-level (non-crop) input cannot carry a real
-# crop label, but `j` is an index level (no nulls allowed; crop_production
-# fills its `u` level the same way).  We tag those rows with a reserved,
-# clearly-non-crop label so the index stays clean and the crop axis is never
-# silently corrupted; downstream code selects crop-specific inputs with
-# `j != 'Whole Plot'`.
-WHOLE_PLOT_SENTINEL = 'Whole Plot'
+# CROP_NA: a plot-level (non-crop) input cannot carry a real crop label, but
+# `j` is an index level (no nulls allowed; crop_production fills its `u` level
+# the same way).  We tag those rows with a reserved, clearly-non-crop label so
+# the index stays clean and the crop axis is never silently corrupted;
+# downstream code selects crop-specific inputs with `j != CROP_NA`.
+#
+# GH #1119 (@ligon ruling, 2026-10-23): ONE marker everywhere,
+# '(not crop-specific)' -- the spelling and the constant name of the EHCVM
+# siblings and Mali (Niger/_/niger.py, Mali/_/mali.py, CROP_NA).  Ethiopia
+# spelled it 'Whole Plot' until then.  It is a `j` value, distinct from the
+# STRUCTURAL `plot_id` sentinel 'Farm-level' (lsms_library/data_info.yml,
+# `plot_id:`).
+CROP_NA = '(not crop-specific)'
 
 # Reported nitrogen-fertilizer types whose kg is recorded per plot in §3.
 # (N-content factors live in transformations, NEVER here.)
@@ -2782,7 +2788,7 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
                     else pd.Series(pd.NA, index=pr.index, dtype='Float64'))
             fert = pd.DataFrame({
                 'i': hh.values, 'plot_id': pid.values,
-                'j': WHOLE_PLOT_SENTINEL, 'input': name,
+                'j': CROP_NA, 'input': name,
                 'Quantity': kg.values, 'u': 'Kg',
                 'Purchased': pd.Series(pd.NA, index=pr.index, dtype='boolean').values,
                 'Quantity_purchased': pqty.values,
@@ -2813,7 +2819,7 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
             used = _yesno_bool(pr[used_col])
             org = pd.DataFrame({
                 'i': hh.values, 'plot_id': pid.values,
-                'j': WHOLE_PLOT_SENTINEL, 'input': name,
+                'j': CROP_NA, 'input': name,
                 'Quantity': pd.Series(pd.NA, index=pr.index, dtype='Float64').values,
                 'u': pd.Series(pd.NA, index=pr.index, dtype='string').values,
                 'Purchased': pd.Series(pd.NA, index=pr.index, dtype='boolean').values,
