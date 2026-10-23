@@ -108,6 +108,9 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 - #894 dispatched (Malawi/Nigeria panel_ids -> committed JSON, Design A; must be dict-identical to today's read-time output).
 - HELD for Ethan's ruling on #1241's concatenator refusal: extending the Niger =;= -> =&&= fix plus missing-wave refusal to crop_production/livestock/plot_labor/people_last7days.  Without the refusal, =&&= alone still loses a wave silently through the Python fallback.
 
+- *PR #1262 open* (#592 GPS census, docs only, 0 hashes: 11/18 fixed earlier; 4 waves "not released" with catalog evidence; Malawi IHPS panel geovariables released but NOT HELD).  Filed *#1259* (Site Q p90 includes zeros), *#1260* (acquire the Malawi panel household geovariables; needs credentials, for Ethan), *#1261* (Nigeria outer geo merge).
+- #637 round 2 running (doc fixes plus re-formed Site Q pin; decision: keep =u=Kg= on recorded zeros).  #894 running.  #1261 dispatched.
+
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
 1. Reviews already running: #1221 retro red-team; Niger #823 wiring; Malawi bamboo addition.
 2. Next reviews: Mali retro (#1222/#1223); Malawi PR red-team -> push =fix/856-malawi-unit-text-20261022= to GitHub, open the PR, file cowpea (split from #856); Niger PR red-team -> open the PR, split #823's "other six EHCVM countries" residual.
