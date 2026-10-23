@@ -30,8 +30,12 @@ packaging or relabelled as current-development validation.
 | GH1039/GH1204 tests | exact5f source-bound constructed-empty, declaration order, population/optional/index/canonical preservation controls | compare current source first; propose only justified new-current cells |
 | sanctioned source/cache/writer paths | `STANDING.md` sections 2-5 and byte-identical AGENTS/CLAUDE baseline | preserve all current development changes; no country or IO workaround |
 
-Current line anchors, exact merge-tree result and source-delta census are pending
-the ledger-first commit; no unmeasured equality is asserted here.
+Current60aa anchors: `_empty_declared_frame` at `country.py:1054-1072`,
+`_SCHEME_DTYPE_MAP` at `6685-6694`, `_to_datetime_mixed` at `7019-7037`,
+`_coerce_datetime_column` at `7040-7150`, and `_enforce_declared_dtypes` at
+`7153-7187`. Their ASTs and the entire registry AST equal original f7.
+This preserves the source basis for the original meaningful discriminators;
+no new-current outcome is measured by these textual comparisons.
 
 The complete actual60aa Burkina `_/CONTENTS.org` was read first, including all
 1597 lines, TODO/WAITING and the added GH1188/GH1148 sections. The first combined
@@ -106,12 +110,39 @@ The file retains dated contradictions as evidence, not permission to overwrite:
 
 ## §6 Open questions / root gates
 
-No new human type-policy question. Mechanical merge-tree/AST/config comparison
-is pending ledger-first completion. Any substantive conflict goes to root with
-exact alternatives. All runtime and genuine bytework remain held.
+No new human type-policy question. The original merge-tree after ledger-FIRST
+`65083aabbfdff5168f3a14b026d6575d3cd16f46` is clean, with exact f7 merge-base.
+Only six paths differ from60aa: the original and this integration ledger,
+`country.py`, `_build_registry.py`, GH1039 tests and hash tests. No BF config,
+data_access, local_tools or transformations source is replaced by composition.
+The proposed merged Country AST outside the empty helper equals current60aa;
+the helper and registry equal reviewed5f. GH1039 test bytes equal5f. All current
+hash-test module AST nodes retain their order, including the newer
+`Wave.food_acquired` tag in `EXPECTED_ENTRY_POINTS`; all5f test definitions remain.
+
+Current BF differs from the old fixed657 config in exactly four paths: parcel
+GPS binding in the2021 script, nullable GPS handling in the common helper,
+optional Latitude/Longitude in the schema, and documentation. The input script,
+four GH1188 input-field declarations and sample configuration do not change in
+that diff. The 2014 and2021 input empties therefore remain the relevant target;
+the integrated proof must retain the newer default config rather than reverting
+the unrelated GPS repair. No new parcel/GPS provider belongs in the input grid.
+
+Root review of this mechanical proposal precedes source materialization. Any
+substantive conflict still goes to root with exact alternatives. New-current
+runtime/provider checks need separate release and literal source identities.
 
 ### Phase 3 - verification
 
-Pending source-only merge-tree and anchored diff review. Exact5f completion is
-independently root-accepted under `0155b625...74d0c307`; it is not a proof of the
-new current-development composition.
+- OK (sections2/4): exact reviewed empty helper, enforcer/map/calendar reuse and
+  four-family serializer are retained in the clean merge-tree; no new mechanism.
+- OK (sections3/4): all current Country behavior outside the helper, including
+  parquet index policy, producer-origin handling, categorical errors and early
+  wave validation, remains in the proposal. No BF semantics or schema edits.
+- OK (sections2/5): both generations of meaningful test oracles are preserved,
+  including current's new food-origin build-transform expectation.
+- HOLD: source materialization, new source-bound finite runtime selection,
+  fresh current-base/candidate census and genuine four-root grid await root.
+
+Exact5f completion is independently root-accepted under
+`0155b625...74d0c307`; it is not runtime proof of the new composition.
