@@ -818,17 +818,17 @@ Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_l
 `panel_ids` and `updated_ids` are `@property` attributes on `Country`, not methods — they return dicts, not DataFrames. Code iterating over `data_scheme` entries and calling `getattr(c, name)()` must special-case these. Use `diagnostics.load_feature(c, name)` which handles both.
 
 **The crosswalk is a committed SOURCE, not a build product (GH #914/#894).**
-Nine countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS, Mali, Niger,
-Senegal, Tanzania, Uganda) ship git-tracked `_/panel_ids.json` +
-`_/updated_ids.json`; Malawi and Nigeria derive theirs from per-wave
-`data_info.yml` into a cache parquet only. **Design A is the convention** — a
+All eleven panel countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS,
+Malawi, Mali, Niger, Nigeria, Senegal, Tanzania, Uganda) ship git-tracked
+`_/panel_ids.json` + `_/updated_ids.json`. **Design A is the convention** — a
 panel crosswalk is a *harmonization decision*, not a derived measurement (4 ms
 to recompute, identical for every user, and the input to every longitudinal
 result), so it belongs where a change shows up as a reviewable diff.
 Regenerate with `make -C lsms_library/countries/{C}/_ panel-ids` and review the
-diff; converting Malawi/Nigeria to A is #894's remaining work, and they are
-named in `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` so a twelfth
-country cannot pick a design by accident.
+diff. Malawi and Nigeria were design B (per-wave `data_info.yml` wiring, cache
+parquet only) until #894; their `panel_ids.py` reads those same YAML blocks,
+which stay in place. `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING`
+is now empty, so a twelfth country cannot pick a design by accident.
 
 > **Never give the JSON a Make rule.** The nine Makefiles used to carry
 > `panel_ids.json updated_ids.json: panel_ids.py` / `python panel_ids.py`,

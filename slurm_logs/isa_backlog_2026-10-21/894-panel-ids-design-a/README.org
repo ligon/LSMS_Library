@@ -1,0 +1,49 @@
+#+TITLE: GH #894 -- Malawi and Nigeria panel crosswalk to design A: evidence
+
+Base: development =9a0ed5f3c= (detached worktree).  Branch:
+=fix/894-panel-ids-design-a-20261023=.  Each checkout ran with its own fresh
+=LSMS_DATA_DIR= (=dvc-cache= symlinked to the shared L1), =PYTHONPATH= set to
+the checkout, import identity asserted (=assert_id.py=), =nice -n 19=,
+=LSMS_BUILD_WORKERS=1=, BLAS threads pinned (=env.sh=).  Aggregates only: the
+row-level frames these scripts write stayed in a scratch directory.
+
+* Dict equality (the invariant)
+- =dump_ids.py= dumps =Country(C).panel_ids= (normalised to ="t,i" -> "t0,i0"=)
+  and =updated_ids= with =sort_keys=.  =dump_base.out=, =dump_branch.out=,
+  =dump_branch_make_backend.out= (=LSMS_BUILD_BACKEND=make= on the branch,
+  which still derives from the YAML blocks).  =dict_equality_sha256.out=: all
+  three byte-identical per country and file.
+- =frame_b.py= captured the finalised frame design B handed to
+  =local_tools.panel_ids()= on base; =cmp_frame.py= imports each branch
+  =_/panel_ids.py= and compares its =build_frame()= row for row (values AND
+  order, which decides =update_id='s suffixes), then the dicts:
+  =cmp_frame_branch_script_vs_designB.out=.  (Run from a directory holding
+  =out_base/= from the base runs.)
+
+* Served =i= unchanged (cold builds)
+- =served.py= cold-builds =sample()= and =household_roster()= and then runs
+  =check_panel_consistency=: =served_and_panel_consistency_{base,branch}.out=,
+  per-wave row and household counts in =served_summary_{base,branch}.json=
+  (identical files).
+- =cmp_served.py=: =assert_frame_equal= OK for all four frames and per-wave
+  =i= sets equal in every wave: =cmp_served_base_vs_branch.out=.
+
+* Design-B properties reproduced, not fixed
+=measure_targets.py= on the base dumps and base cold builds:
+=measure_targets_designB_base.out=.  Malawi: every target served.  Nigeria:
+identity maps; 113/128/85/115 per-round ids not in =household_roster= (all in
+=sample()=); 99 of 4,696 =2015Q3 -> 2013Q1= targets not in 2013Q1 =sample()=.
+
+* =make panel-ids=
+=make_panel_ids.out=: two regenerations per country, each =git diff --quiet=
+against the committed JSON; =make -n panel_ids.json= / =updated_ids.json= is
+"Nothing to be done"; no in-tree parquet.
+
+* Hash census
+=/local/job40390255/worktrees/1218/slurm_logs/isa_backlog_2026-10-21/1218-current-validation/hash_census.py=
+on each checkout; =hash_diff.py= -> =hash_census_diff.out=: Malawi 26/26
+country + 130/130 wave hashes, Nigeria 24/24 + 240/240, 0/40 build-transform
+fingerprints, no other country.
+
+* Tests and merge checks
+=tests_{base,branch}.out=, =test_selection.txt=, =merge_tree.out=.

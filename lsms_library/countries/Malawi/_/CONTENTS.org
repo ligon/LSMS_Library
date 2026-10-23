@@ -1757,6 +1757,44 @@ Module letter changed from G (IHS2) to F (IHS3+).  Walls data (=hh_f07= /
 ** DONE malawi.py
 Contains code common to different Malawi rounds. IHS3 through IHS5 have highly similar formats (column labels, etc.).
 
+** DONE panel_ids.py, panel_ids.json, updated_ids.json (GH #894, 2026-10-23)
+The household panel crosswalk is a COMMITTED SOURCE ("design A", the
+convention in =CLAUDE.md=).  Until GH #894 Malawi was "design B": the library
+read the per-wave =panel_ids:= blocks in =data_info.yml= (2013-14, 2016-17,
+2019-20) at run time and kept the result only as a cache parquet.
+=panel_ids.py= reads those SAME blocks -- it restates no file or column name
+-- and writes the two JSON files.  Regenerate with =make panel-ids= and review
+the diff.  The blocks stay: they are the one place the wiring is written, and
+=LSMS_BUILD_BACKEND=make= still derives the dicts from them directly.
+
+Verified against development =9a0ed5f3c= on cold builds: =panel_ids= (5,686
+entries) and =updated_ids= (4,000 / 2,508 / 3,178 for 2013-14 / 2016-17 /
+2019-20) equal entry for entry; =sample()= and =household_roster()= equal
+under =assert_frame_equal= in all five waves; =check_panel_consistency= 7
+pass, 1 warn, 0 fail before and after.  One representation change:
+=Country('Malawi').panel_ids= is now a plain dict of ="t,i" -> "t0,i0"=
+strings, as for the other nine countries; design B returned a
+=RecursiveDict= keyed by tuples.
+
+What the crosswalk encodes, reproduced as found:
+- 2010-11 (IHS3) =case_id= is the canonical id every chain ends on.  2004-05
+  (IHS2) has no link ("The IHPS sample does NOT have any links to the IHS2
+  sample", quoted under Sampling Design).  Neither wave has an =updated_ids=
+  entry, so =id_walk= leaves both alone; that is the one warning above
+  (=updated_ids_cover_waves=).
+- 2013-14 (IHPS) maps =y2_hhid -> case_id=.  It is the first wave in the
+  frame, so that link lives in =updated_ids['2013-14']= and in no
+  =panel_ids= key.
+- 2016-17 and 2019-20 each hold two catalog entries.  Only the =Data/Panel/=
+  half (IHPS 2016 / 2019, catalogs 2939 / 3819) is wired: =y3_hhid ->
+  y2_hhid= and =y4_hhid -> y3_hhid=.  The =Data/Cross_Sectional/= half (IHS4 /
+  IHS5, 2936 / 3818) keeps its own ids (12,447 / 11,434 households).
+- IHPS tracks split-off households, so several current households can claim
+  one previous household.  =local_tools.update_id= keeps them apart with
+  =_N= suffixes: 896 / 996 / 1,726 suffixed ids in the three maps.  Row order
+  decides which claimant keeps the bare id, which is why =panel_ids.py= keeps
+  source-file order (it matched design B's order row for row).
+
 ** DONE food_items.org
 
 Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
