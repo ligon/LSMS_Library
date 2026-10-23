@@ -6,7 +6,7 @@
 #
 #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
 #
-# Only 12 of the corpus's 35 stated windows are questionnaire-grade.  A
+# Only 18 of the corpus's 41 stated windows are questionnaire-grade.  A
 # `config-comment` rung means a maintainer asserted the number, not that an
 # instrument states it -- consumers are entitled to discount it, and a
 # `not-recorded` rung means nobody has looked, which is NOT the same as "no
@@ -20,39 +20,63 @@
 
 Recall:
   '2005-06':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: '(Part A) Food, Beverage, and Tobacco (During the Last 7 Days)'
+    evidence: '2005-06/Documentation/UNHS.2005-06.Household.Questionnaire.FINAL.pdf PDF p.18 (printed 17; image-only scan, read visually) -- Section 14A banner ''(Part A) Food, Beverage, and Tobacco (During the Last 7 Days)'' over columns 4-11 (qty / value from purchases at home, away from home, home produce, in-kind), 12 market price, 13 farm-gate price; 2005-06/Documentation/UNHS.2005-06.Interviewer.Manual.FINAL.pdf PDF p.33 (printed 31): ''Part A: Expenditure on Foods, Beverages and Tobacco during Last Seven (7) Days'' ... ''the recall period, i.e., the last 7 days'''
+    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  UNHS 2005-06, not UNPS: the food module is Section 14A (GSEC14A.dta), and the build''s h14aq4..h14aq13 are the printed columns 4..13 (their labels, e.g. ''hh consumption out of purchase.quantity'', name no window; the banner does).  ONE ask: a single grid with no visit columns, and GSEC14A.dta has one row per (HHID, h14aq2) bar 1 duplicated pair in 40,393.  The manual''s two visits are for the two cropping seasons; nothing places the food grid at both, and the data show one.'
     n_items_delivered: 61
   '2009-10':
     basis: not-recorded
     ask_count_basis: unknown
-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
+    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Tried 2026-10-23 (GH #1084), left not-recorded: no household questionnaire is held for this wave.  2009-10/Documentation holds only ddi-documentation-english_microdata-1001.pdf, the DDI codebook of catalog 1001 (UNHS 2005-06 + UNPS 2009-10).  It says ''Food, beverage, and tobacco (during the last 7 days)'' (Scope, PDF p.15) and ''Section 15B: Food, Beverage, and Tobacco (During the Last 7 days)'' (file description, PDF p.44) -- catalog metadata, not the instrument -- and GSEC15b.dta labels h15bq3b ''How many days was [ITEM] consumed out of the last 7 days?'' (variable-label grade, and on the days-consumed column only: the quantity / value labels name no window; h15bq3b is 8 on 2 of 37,645 answered rows).  Not promoted: the rung needs the instrument, and the 2010-11 form is a sibling wave.  To close it, acquire the UNPS 2009-10 household questionnaire.'
     n_items_delivered: 63
   '2010-11':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Part B: Food, Beverage, and Tobacco (During the Last 7 Days)'
+    evidence: '2010-11/Documentation/UNPS_2010-11_Household_Questionnaire.pdf PDF pp.29-30 (printed 27-28) -- Section 15 Part B banner on both pages; col 3B ''How many days was [ITEM] consumed out of the last 7 days?''; cols 4-13 qty / value from purchases at home, away from home, home produce, in-kind, market and farm-gate price.  One ask: 2010-11/Documentation/UNPS_2010-11_Basic-Info-2014.pdf PDF pp.20-21 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)'
+    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15b.dta h15bq4..h15bq13 = printed columns 4..13.  Their Stata labels carry the UN-SUBSTITUTED fill (''... in the past [RECALL]?'', h15bq3b ''... in the past [PERIOD] ...''), the template GSEC15C also carries; for FOOD the printed form fixes it at 7 days and the data agree: h15bq3b (days consumed out of the window) lies in 1..7 on all 35,222 answered rows.  One row per (hh, itmcd).'
     n_items_delivered: 70
   '2011-12':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Part B: Food, Beverage, and Tobacco (During the Last 7 Days)'
+    evidence: '2011-12/Documentation/Uganda2011-12HouseholdQuestionnaire.pdf PDF pp.26-27 (printed 24-25) -- Section 15 Part B banner on both pages; col 3B ''How many days was [ITEM] consumed out of the last 7 days?''; cols 4-13 as 2010-11.  One ask: 2011-12/Documentation/unps_2011_12_bid_rev2014july.pdf PDF p.26 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)'
+    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15B.dta h15bq4..h15bq13 = printed columns 4..13; labels carry the un-substituted [RECALL] / [PERIOD] fill; h15bq3b lies in 1..7 on all 38,740 answered rows.  One row per (HHID, itmcd).'
     n_items_delivered: 71
   '2013-14':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Part B: Food, Beverage, and Tobacco (During the Last 7 Days)'
+    evidence: '2013-14/Documentation/unps_2013_14_household_qx.pdf PDF pp.9-11 (p.9 printed 7) -- Section 15 Part B banner on p.9 and its continuation p.11; col 3B ''How many days was [ITEM] consumed out of the last 7 days?''; cols 4-13 as 2010-11'
+    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  Build reads GSEC15B.dta h15bq4..h15bq13 = printed columns 4..13; labels carry the un-substituted [RECALL] / [PERIOD] fill; h15bq3b lies in 1..7 on all 50,387 answered rows.  ONE ask: a single grid with no visit columns, and one row per (HHID, itmcd) bar 7 duplicated pairs in 50,415.  This wave''s Basic Information Document does not restate the visit-1 / visit-2 split of the household questionnaire that 2010-11, 2011-12 and 2015-16 document, so the count rests on the form and the data.'
     n_items_delivered: 77
   '2015-16':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Part B: Food, Beverage, and Tobacco (During the Last 7 Days)'
+    evidence: '2015-16/Documentation/unps_2015_16_household_qx.pdf PDF pp.11-13 (p.11 printed 8) -- Section 15 Part B banner on pp.11-12; col 3B ''How many days was [ITEM] consumed out of the last 7 days?''; cols 4-13 as 2010-11.  One ask: 2015-16/Documentation/ddi-documentation-english_microdata-3460.pdf PDF p.6 (household questionnaire administered in full ONCE: about half the households at visit 1, the rest at visit 2; the two-visit design exists for the two cropping seasons)'
+    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  CAPI-era wave (same DDI p.6: ''Given the CAPI system being used''), so the printed form is a rendering of the electronic instrument; the labels carry the un-substituted [recall] / [period] fill, but h15bq3b lies in 1..7 on all 49,749 answered rows, which a per-item window longer than 7 days would not produce.  Build reads gsec15b.dta h15bq4..h15bq13 = printed columns 4..13.  One row per (HHID, itmcd).'
     n_items_delivered: 77
   '2018-19':
-    basis: not-recorded
-    ask_count_basis: unknown
-    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module'
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Part B: Food and Beverage (During the Last 7 Days)'
+    evidence: '2018-19/Documentation/unps_hhq.pdf PDF pp.10-18 -- Section 15 Part B banner on every page of the grid, and each quantity question ends ''during the last 7 days'' (e.g. ''How many [CEB03C] of [ITEM] did your household consume out of purchases at home during the last 7 days?''); GSEC15B.dta labels agree (CEB04 ''How many days were [ITEM] consumed out of the last 7 days?'', CEB06 ''Quantity of hhold [item] purchased for consumptn at home during the last 7 days'')'
+    notes: 'CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module.  Read 2026-10-23 (GH #1084).  The printed form and the shipped .dta NUMBER the columns differently: the form''s CEB04/CEB05 (purchases at home, qty / value) .. CEB10/CEB11 (in-kind) are CEB06/CEB07 .. CEB012/CEB013 in GSEC15B.dta, which also splits the market price into CEB14a/b/c -- the wave script''s own comment (''notations on Q don''t seem to match!'') is right.  The build reads the .dta names, and the labels of what it reads (CEB06, CEB08, CEB10, CEB012: ''... during the last 7 days'') match the content of the printed questions, so the window is the same 7 days either way.  ONE ask: no visit grid; one row per (hhid, CEB01); CEB04 lies in 1..7 on all 53,207 answered rows.'
     n_items_delivered: 117
   '2019-20':
     basis: questionnaire
