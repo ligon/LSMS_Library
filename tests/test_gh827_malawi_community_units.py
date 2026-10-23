@@ -125,7 +125,8 @@ class TestPriceBlock:
     def test_unit_asked_item_not_available_is_unknown(self, malawi_mod):
         """The skip pattern ('NO...2 >> NEXT ITEM') jumps past price and
         unit, so no unit was recorded -- `Unknown`, never a null on the
-        declared `u` level (which map_index serves as 'unit')."""
+        declared `u` level (which map_index renames to `Unknown` since GH #1234;
+        it used to mint the literal 'unit')."""
         out = _block(malawi_mod, [('101', 1, 2, None, None, None)])
         assert out['u'].tolist() == [U_UNKNOWN]
 

@@ -4338,7 +4338,8 @@ def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
     is the missing-unit sentinel ``U_UNKNOWN`` -- the Malawi rule for codes
     "on no instrument's list" (CONTENTS.org, GH #1042).  A null on the
     declared ``u`` level is not served as a gap: ``local_tools.map_index``
-    renames it to the literal ``'unit'`` on every read.
+    renames it to ``U_UNKNOWN`` on every read (GH #1234; it used to mint
+    the literal ``'unit'``).
 
     ``NumberOfUnits`` is the RECORDED count here, NA on every struck item
     (the form strikes that cell).  The 1 a priced struck row (CK33

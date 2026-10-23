@@ -50,8 +50,8 @@ Sampling:
         the frozen vocabulary (its gloss, "a different KIND of unit", fits
         loosely); `wave-scoped` would claim a crosswalk is meaningful, and
         none is (GH #1243).  District is compared case- and accent-folded,
-        Koulpelgo = Koulpelogo (GH #1059 not landed); unfolded it differs for
-        all 585.
+        Koulpelgo = Koulpelogo (measured before GH #1059's spelling table,
+        PR #1242, landed); unfolded it differed for all 585.
       source_type: derived-from-data
       confidence: high
       source_file: null
@@ -69,13 +69,11 @@ Sampling:
         names a different province on 3 grappes (Seno/Yagha, Poni/Noumbiel,
         Kompienga/Gourma; GH #1059) and Rural differs on 7: attribute
         recodes on a grappe the households were tracked within, not a
-        renumbering.  Through the API only 2,053 `i` are shared, and 2,050 of
-        them keep `v`: panel_ids.py builds the 2018-19 id as grappe +
-        menage.zfill(3) while sample() builds grappe + '0' +
-        menage.zfill(2), which agree only for a 2-digit menage, so 1,105 of
-        3,227 links are lost and 3 point at a different 2018-19 household
-        (those are the 3 "changes").  A linkage defect, not a cluster fact
-        (see CONTENTS.org); the raw count is the measurement.
+        renumbering.  Through the API, 3,155 `i` are shared and all 3,155
+        keep `v`, since the panel crosswalk was fixed (GH #1240, PR #1249;
+        before it only 2,053 were shared, a linkage defect, not a cluster
+        fact).  80 households remain unlinkable under id_walk's chain guard
+        (GH #1245).  The raw count is the measurement.
       source_type: derived-from-data
       confidence: high
       source_file: 'lsms_library/countries/Burkina_Faso/2021-22/Data/s00_me_bfa2021.dta'

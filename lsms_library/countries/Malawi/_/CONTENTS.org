@@ -3998,7 +3998,7 @@ Whether the doubling is an enumerator convention or an entry error is not establ
 - About 30 rows in 2013-14 and 2016-17 have a bag-count native pair (bag codes 3-7, quantity <= 10) whose count went into the kg column unchanged: 183 kg served against 1,705 kg implied by the pair, under 0.2% of those waves' 1,133,576 kg of inorganic product.
 - Of the 99 first/second application pairs #1111 merges, 97 have two positive totals; in 2 2013-14 pairs the second application records a type but no total, so the merged row carries the first application's amount alone (the existing =sum= reducer).
 
-*Make-backend exposure (filed separately).*  Every Malawi per-wave Makefile pattern rule names only =malawi.py= as a prerequisite (=Makefile:73= for =plot_inputs=; =food_acquired= names none), not the wave's own =_/<table>.py=.
+*Make-backend exposure (GH #1237, fixed by PR #1258 -- see the next section; the text below describes the state before that fix).*  Every Malawi per-wave Makefile pattern rule names only =malawi.py= as a prerequisite (=Makefile:73= for =plot_inputs=; =food_acquired= names none), not the wave's own =_/<table>.py=.
 Under =LSMS_BUILD_BACKEND=make= a wave parquet warmed before a wave-script edit is therefore not rebuilt by =make=, so a cache warmed on development would keep the old 2013-14/2016-17 units there (the review's finding; the rule text is confirmed, the make backend was not re-run for this entry).
 The default backend is unaffected: the wave script is in =Wave._input_hash=, so the cache hashes move (measured: 26 of 26 Malawi tables) and the waves rebuild.
 

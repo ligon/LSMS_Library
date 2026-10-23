@@ -301,7 +301,8 @@ def _align_to_canonical_levels(
     and the LITERAL sentinel value maps two otherwise-identical rows onto one
     index tuple.  Re-measured cold on 2026-10-23 (``Country(c).<table>()``):
     no ``crop_production`` ``u`` column holds both -- Mali (1,910 null) and
-    Tanzania (2,395 null) carry no literal ``'Unknown'``, Nigeria carries
+    Tanzania (2,395 null; 19 since GH #637's Tanzania fix, PR #1263) carry no
+    literal ``'Unknown'``, Nigeria carries
     13,138 literal and no null -- and Mali's ``plot_inputs`` ``u`` is all
     literal (108,171 ``'Unknown'``, 0 null, since GH #1118).  But Nigeria's
     ``plot_inputs`` ``u`` IS in that state (5,546 null, 178 literal
