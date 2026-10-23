@@ -101,13 +101,16 @@ def test_no_geo_only_household_enters_the_merge(country, folder, t):
 @pytest.mark.parametrize('t', [t for ts, _, _ in AFFECTED.values() for t in ts])
 def test_site2_collapse_deletes_no_null_key_row(country, t):
     """The Site 2 grain report for the round no longer counts NaN-key
-    deletions (development: ``nan_key_rows`` 39 for 2012-13, 1 for 2015-16)."""
+    deletions (development: ``nan_key_rows`` 39 for 2012-13, 1 for 2015-16).
+
+    No report at all also passes: the collapse files one only when it loses
+    something, and today it does for an unrelated reason (households of one
+    cluster disagree on coordinates)."""
     from lsms_library.country import grain_reports
     before = len(grain_reports(country=COUNTRY, table='cluster_features'))
     country[t].cluster_features()
     reps = [r for r in grain_reports(country=COUNTRY, table='cluster_features')[before:]
             if r.get('site') == 'Wave.cluster_features' and r.get('wave') == t]
-    assert reps, 'the household -> cluster collapse filed no report'
     assert all(r.get('nan_key_rows', 0) == 0 for r in reps), reps
 
 
