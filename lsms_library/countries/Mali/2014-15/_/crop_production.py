@@ -56,7 +56,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (i as mali_i, crop_production_finalize, producing_trees,
-                  tree_crop_rows, stamp_tree_derivations)
+                  tree_crop_rows, stamp_tree_derivations, _mask_value_code)
 
 WAVE = '2014-15'
 
@@ -83,7 +83,9 @@ seasonal = pd.DataFrame({
     'Quantity': s3a['s3aq08a'],
     'Quantity_sold': s3a['s3aq23a'],
     'Unit_sold': s3a['s3aq23b'],
-    'Value_sold': s3a['s3aq24'],
+    # 999999 is the six-digit field's "non declare" code, not an amount
+    # (mali._VALUE_SENTINEL): 12 rows, 7 of them beside a zero quantity sold.
+    'Value_sold': _mask_value_code(s3a['s3aq24']),
     'harvest_month': s3a['s3aq07b'],
     'planting_month': pd.NA,
     'intercropped': pd.NA,

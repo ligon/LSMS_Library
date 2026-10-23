@@ -69,6 +69,10 @@ PRICED = {
 #: rows, by the survey's own kg factor).  Left distinct -- relabelling the
 #: harvest 'Autre' is a decision.
 AUTRE_TONNE_2017 = 30
+#: 2014-15 served field rows whose raw s3aq24 is the 999999 code (and whose
+#: sale was not answered 'Non'): served 999999 at development 57d255585,
+#: NA now (the PR #1272 follow-up, 2026-10-23).
+FIELD_VALUE_CODE_2014 = None  # measured
 #: 2017-18 field rows served Quantity_sold == 0 / Value_sold == 0 (ruling on
 #: PR #1272: 0 only on an explicit s7gq20 == 'Non').  8,806 'Non' rows each,
 #: plus one 'Oui' sale line that records a quantity of 0 (its value is not
@@ -97,6 +101,14 @@ def mali(monkeypatch):
     spec.loader.exec_module(module)
     monkeypatch.chdir(source.parent)
     return module
+
+
+def _n(mask) -> int:
+    """True cells of a boolean mask, NA counted False -- a count, never a row.
+    TestServed asserts on counts held in locals: pytest's assertion rewrite
+    prints the operands of a failing assert, and served frames carry
+    household ids (public repository)."""
+    return int(pd.Series(mask).fillna(False).astype(bool).sum())
 
 
 def _scheme_entry():
@@ -133,6 +145,12 @@ class TestDeclared:
         src = (_root() / "2017-18" / "_" / f"{TABLE}.py").read_text(encoding="utf-8")
         assert "groupby(['i', 'crop', 'Unit_sold']" in src
         assert "units_per == 1" in src
+
+    def test_2014_15_field_value_masks_its_code(self):
+        """999999, the six-digit field's 'non declare' code, is masked on the
+        field value s3aq24 as on the tree value s3bq14 (mali._mask_value_code)."""
+        src = (_root() / "2014-15" / "_" / f"{TABLE}.py").read_text(encoding="utf-8")
+        assert "_mask_value_code(s3a['s3aq24'])" in src
 
     def test_2017_18_sale_sums_with_min_count_vectorised(self):
         """Ruling on PR #1272: an unrecorded sale stays NA -- sum(min_count=1),
@@ -243,22 +261,47 @@ class TestServed:
         return f
 
     def test_unit_sold_is_a_string_column_never_a_sentinel(self, built):
-        assert str(built["Unit_sold"].dtype) == "string"
-        assert not built["Unit_sold"].isin(["Unknown", "Manquant", "unit"]).any()
-        assert set(built["Unit_sold"].dropna()) <= set(_u_table().values())
+        dtype = str(built["Unit_sold"].dtype)
+        assert dtype == "string", dtype
+        n_sentinel = _n(built["Unit_sold"].isin(["Unknown", "Manquant", "unit"]))
+        assert n_sentinel == 0, f"{n_sentinel} rows carry a sentinel sold unit"
+        unknown = sorted(set(built["Unit_sold"].dropna().astype(str)) - set(_u_table().values()))
+        assert not unknown, f"sold-unit labels outside the u table: {unknown}"
 
     @pytest.mark.parametrize("wave, kind", sorted(PRICED))
     def test_priced_rows_and_label_disagreements_reproduce(self, flat, wave, kind):
         g = flat[(flat.t == wave) & (flat.kind == kind)
                  & (flat.Quantity_sold > 0) & (flat.Value_sold > 0)]
         knows = g.Unit_sold.notna() & g.u.notna()
-        got = (len(g), int(g.Unit_sold.notna().sum()), int(knows.sum()),
-               int((knows & (g.Unit_sold != g.u)).sum()))
-        assert got == PRICED[(wave, kind)]
+        got = (len(g), _n(g.Unit_sold.notna()), _n(knows), _n(knows & (g.Unit_sold != g.u)))
+        assert got == PRICED[(wave, kind)], f"{got} != {PRICED[(wave, kind)]}"
+
+    def test_no_row_serves_the_999999_value_code(self, flat):
+        """At development 57d255585 FIELD_VALUE_CODE_2014 field rows of 2014-15
+        served 999999 as a sale value; it is the field's 'non declare' code."""
+        n = _n(flat.Value_sold == 999999)
+        assert n == 0, f"{n} rows serve the 999999 value code"
+
+    def test_the_field_value_code_rows_serve_no_value(self, flat, mali):
+        """Raw oracle: every served 2014-15 field row whose raw s3aq24 is 999999
+        (and whose sale was not answered 'Non') serves Value_sold NA."""
+        s = get_dataframe(str(_root() / "2014-15" / "Data" / "EACIS3A_p2.dta"))
+        f = pd.to_numeric(s["s3aq24"], errors="coerce")
+        code = (f == 999999).fillna(False) & ~s["s3aq22"].astype("string").str.strip().eq("Non").fillna(False)
+        f0 = s[code.to_numpy(dtype=bool)]
+        hh = f0.apply(lambda r: mali.i(pd.Series([r["grappe"], r["menage"]])), axis=1)
+        pf = f0["s3aq01"].astype("Int64").astype("string") + "_" + f0["s3aq02"].astype("Int64").astype("string")
+        keys = pd.DataFrame({"t": "2014-15", "i": hh.values, "plot_id": pf.values,
+                             "crop": mali._crop_labels(f0["s3aq03b"]).values}).dropna(subset=["crop"])
+        keys = id_walk(keys.set_index(["t", "i"]), ll.Country(COUNTRY).updated_ids).reset_index()
+        j = flat[flat.kind == "field"].merge(keys.drop_duplicates(), on=["t", "i", "plot_id", "crop"], how="inner")
+        got = (len(j), _n(j.Value_sold.notna()))
+        assert got == (FIELD_VALUE_CODE_2014, 0), f"(served code rows, with a value) {got}"
 
     def test_2017_18_code_10_is_compared_by_label(self, flat):
         g = flat[(flat.t == "2017-18") & (flat.Quantity_sold > 0) & (flat.Value_sold > 0)]
-        assert int(((g.u == "Autre") & (g.Unit_sold == "Tonne")).sum()) == AUTRE_TONNE_2017
+        n = _n((g.u == "Autre") & (g.Unit_sold == "Tonne"))
+        assert n == AUTRE_TONNE_2017, f"{n} != {AUTRE_TONNE_2017}"
 
     def test_no_unit_on_a_filled_in_zero(self, flat):
         """A 'Non' answer is served as Quantity_sold = Value_sold = 0; such a row
@@ -266,12 +309,14 @@ class TestServed:
         'Oui' line recording a quantity of 0 and a unit but no value, which the
         plain `sum` served with Value_sold = 0.  Its value is NA now.)"""
         z = flat[(flat.Quantity_sold == 0) & (flat.Value_sold == 0)]
-        assert int(z.Unit_sold.notna().sum()) == 0
+        n = _n(z.Unit_sold.notna())
+        assert n == 0, f"{n} filled-in zero sales carry a sold unit"
 
     @pytest.mark.parametrize("col", sorted(ZERO_SOLD_2017))
     def test_2017_18_unrecorded_sale_is_not_served_as_zero(self, flat, col):
         g = flat[(flat.t == "2017-18") & (flat.kind == "field")]
-        assert int((g[col] == 0).sum()) == ZERO_SOLD_2017[col]
+        n = _n(g[col] == 0)
+        assert n == ZERO_SOLD_2017[col], f"{col}: {n} zeros != {ZERO_SOLD_2017[col]}"
 
     def test_2017_18_sale_matches_the_raw_answers_on_every_field_row(self, flat, mali):
         """Raw oracle for the ruling: 0 where s7gq20 == 'Non', else s7gq21a /
@@ -305,11 +350,13 @@ class TestServed:
         x = id_walk(x.set_index(["t", "i"]), ll.Country(COUNTRY).updated_ids).reset_index()
         field = flat[(flat.t == "2017-18") & (flat.kind == "field")]
         j = field.merge(x, on=["t", "i", "plot_id", "crop"], how="inner")
-        assert len(j) == len(field)
+        n_join, n_field = len(j), len(field)
+        assert n_join == n_field, f"{n_join} of {n_field} field rows joined the raw sale"
+        bad = {}
         for col, e in (("Quantity_sold", "eq"), ("Value_sold", "ev")):
             a, b = j[col].astype("float64"), j[e].astype("float64")
-            ok = ((a == b) | (a.isna() & b.isna())).fillna(False)
-            assert bool(ok.all()), (col, int((~ok).sum()))
+            bad[col] = _n(~((a == b) | (a.isna() & b.isna())).fillna(False))
+        assert not any(bad.values()), f"field rows differing from the raw sale, by column: {bad}"
 
     def test_oui_without_quantity_is_the_leger_questionnaire(self):
         """The audit's surprise, settled: every 2017-18 s7g 'Oui' row with no
@@ -323,10 +370,13 @@ class TestServed:
         tq = x["typequest"].astype("string")
         oui = x["s7gq20"].astype("string").eq("Oui").fillna(False)
         none = x["s7gq21a"].isna() & x["s7gq21b"].isna()
-        assert int((oui & none).sum()) == OUI_WITHOUT_QUANTITY_2017
-        assert set(tq[oui & none]) == {"Questionnaire Leger"}
+        n = _n(oui & none)
+        assert n == OUI_WITHOUT_QUANTITY_2017, f"{n} != {OUI_WITHOUT_QUANTITY_2017}"
+        kinds = sorted(set(tq[oui & none].dropna().astype(str)))     # questionnaire labels only
+        assert kinds == ["Questionnaire Leger"], kinds
         leger = tq.eq("Questionnaire Leger").fillna(False)
-        assert int(x.loc[leger, ["s7gq21a", "s7gq21b", "s7gq22"]].notna().sum().sum()) == 0
+        n = int(x.loc[leger, ["s7gq21a", "s7gq21b", "s7gq22"]].notna().to_numpy().sum())
+        assert n == 0, f"{n} Leger cells record 7G.21 / 7G.22"
 
     def test_unit_sold_matches_the_raw_sold_unit_on_every_field_row(self, flat, mali):
         """Raw oracle: canonical s3aq23b / s7gq21b, NA on 'Non', with the same
@@ -381,6 +431,7 @@ class TestServed:
         exp = id_walk(exp.set_index(["t", "i"]), upd).reset_index()
         field = flat[flat.kind == "field"]
         j = field.merge(exp, on=["t", "i", "plot_id", "crop"], how="inner")
-        assert len(j) == len(field)
-        ok = ((j.Unit_sold == j.exp) | (j.Unit_sold.isna() & j.exp.isna())).fillna(False)
-        assert bool(ok.all()), int((~ok).sum())
+        n_join, n_field = len(j), len(field)
+        assert n_join == n_field, f"{n_join} of {n_field} field rows joined the raw sold unit"
+        n_bad = _n(~((j.Unit_sold == j.exp) | (j.Unit_sold.isna() & j.exp.isna())).fillna(False))
+        assert n_bad == 0, f"{n_bad} field rows whose Unit_sold is not the raw sold unit"

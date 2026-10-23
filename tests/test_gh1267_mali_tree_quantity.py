@@ -98,6 +98,16 @@ PRICED_TREES = {"2014-15": 196, "2017-18": 127}
 #: (both columns were multiplied by the same month count); the 2014-15
 #: cashew cell gains one row, a sale beside a 0 or missing month count, and
 #: its median moves 275 (n=12, development 57d255585) -> 300 (n=13).
+#: The window mismatch, disclosed (CONTENTS.org): on tree rows whose sold
+#: and harvest units agree, with a positive harvest and a recorded sale --
+#: (rows, median Quantity_sold / Quantity, median Quantity_sold x
+#: months_harvested / Quantity, rows sold > harvest, rows rescaled sold >
+#: harvest).  The plain ratio is NOT a sold share (the harvest is a 12-month
+#: total, the sale per harvest month); the rescaled one is.
+WINDOW_MISMATCH = None  # measured below
+#: Tree rows serving a harvest of 0 beside a positive sale, by wave
+#: (recorded, not changed: CONTENTS.org).
+ZERO_HARVEST_SOLD = None  # measured below
 KG_PRICES = {("2014-15", "Noix de cajou"): (13, 300.0), ("2014-15", "Mangue"): (9, 300.0),
              ("2014-15", "Orange"): (5, 500.0),
              ("2017-18", "Noix de cajou"): (21, 500.0), ("2017-18", "Mangue"): (9, 125.0)}
@@ -147,6 +157,18 @@ def _months_2017(labels: pd.Series) -> pd.Series:
         m = re.match(r"^(\d+)\s*mois", s)
         return float(m.group(1)) if m else np.nan
     return labels.map(conv).astype("float64")
+
+
+def _n(mask) -> int:
+    """True cells of a boolean mask, NA counted False -- a count, never a row."""
+    return int(pd.Series(mask).fillna(False).astype(bool).sum())
+
+
+def _n_differ(a, b) -> int:
+    """Cells where two aligned numeric columns disagree (NA beside NA agrees)."""
+    x = pd.to_numeric(pd.Series(a), errors="coerce").to_numpy(dtype="float64", na_value=np.nan)
+    y = pd.to_numeric(pd.Series(b), errors="coerce").to_numpy(dtype="float64", na_value=np.nan)
+    return int((~((x == y) | (np.isnan(x) & np.isnan(y)))).sum())
 
 
 class TestDeclared:
@@ -257,6 +279,22 @@ class TestDerive:
         assert mali.derive_tree_twelve_month_total(
             pd.Series([33.0]), pd.Series([3], dtype="Int64")).tolist() == [99.0]
 
+    def test_inputs_variable_lists_match_the_registry(self, mali):
+        """No data: the variables each inputs callable selects
+        (mali._TREE_RAW / mali._TREE_SALE_RAW) are exactly the registry's
+        raw_variables for that key and wave."""
+        recs = derivation_records(COUNTRY)
+        for key, lists in ((KEY, mali._TREE_RAW), (SALE_KEY, mali._TREE_SALE_RAW)):
+            for wave, prefix in (("2014-15", "s3b"), ("2017-18", "s11f")):
+                declared = sorted(v for v in recs[key].raw_variables if v.startswith(prefix))
+                selected = sorted(lists[wave])
+                assert selected == declared, f"{key} {wave}: selected {selected} != declared {declared}"
+
+    def test_the_value_code_mask(self, mali):
+        """999999 is a code on a value (field and tree); 9,999 FCFA is an amount."""
+        got = mali._mask_value_code(pd.Series([999999, 9999, 0, None, 500])).tolist()
+        assert pd.isna(got[0]) and pd.isna(got[3]) and got[1:3] == [9999.0, 0.0] and got[4] == 500.0
+
     def test_the_sale_derivation_is_the_identity(self, mali):
         qs = pd.Series([5.0, 0.0, np.nan, 99.0], index=[10, 11, 12, 13])
         v = pd.Series([60000.0, np.nan, 900.0, 99.0], index=[10, 11, 12, 13])
@@ -294,6 +332,12 @@ class TestDerive:
 
 @pytest.mark.requires_s3
 class TestServed:
+    """Built-table checks.  Every assertion compares a COUNT (or a tuple / dict
+    of counts, wave labels and medians) held in a local -- never a frame or a
+    Series -- and every message carries counts only: pytest's assertion
+    rewrite prints the operands of a failing assert, even inside ``bool()``
+    or ``int()``, and these frames carry household ids (public repository;
+    red team on the revised ruling, 2026-10-23)."""
 
     @pytest.fixture(scope="class")
     def built(self):
@@ -321,20 +365,48 @@ class TestServed:
     def test_tree_rows_and_their_keys(self, built, trees):
         """Every tree row carries the harvest key; the sale-window key joins it
         ('+', sorted) on exactly the tree rows with a positive served sale."""
-        assert trees.groupby("t").size().to_dict() == TREE_ROWS
+        rows = {str(k): int(v) for k, v in trees.groupby("t").size().items()}
+        assert rows == TREE_ROWS, f"tree rows by wave {rows} != {TREE_ROWS}"
         sold = ((trees.Quantity_sold > 0) | (trees.Value_sold > 0)).fillna(False).astype(bool)
-        assert trees["Derivation"][sold].eq(BOTH).all()
-        assert trees["Derivation"][~sold].eq(KEY).all()
-        assert trees[sold].groupby("t").size().to_dict() == SALE_ROWS
+        deriv = trees["Derivation"].astype("string")
+        n_sold_wrong = _n(sold & deriv.ne(BOTH).fillna(True))
+        n_other_wrong = _n(~sold & deriv.ne(KEY).fillna(True))
+        assert n_sold_wrong == 0, f"{n_sold_wrong} positive-sale tree rows lack {BOTH!r}"
+        assert n_other_wrong == 0, f"{n_other_wrong} other tree rows do not carry {KEY!r} alone"
+        sale_rows = {str(k): int(v) for k, v in trees[sold].groupby("t").size().items()}
+        assert sale_rows == SALE_ROWS, f"positive-sale tree rows by wave {sale_rows} != {SALE_ROWS}"
         field = built[~built["perennial"].fillna(False)]
-        assert field["Derivation"].isna().all()
-        assert field["months_harvested"].isna().all()
+        n_field_key = _n(field["Derivation"].notna())
+        n_field_months = _n(field["months_harvested"].notna())
+        assert (n_field_key, n_field_months) == (0, 0), \
+            f"field rows with a Derivation {n_field_key}, with months_harvested {n_field_months}"
         summ = built.attrs["derivations"][COUNTRY]
-        assert summ[KEY]["rows"] == sum(TREE_ROWS.values())
-        assert summ[KEY]["columns"] == ["Quantity"]
-        assert summ[SALE_KEY]["rows"] == sum(SALE_ROWS.values())
-        assert summ[SALE_KEY]["columns"] == ["Quantity_sold", "Value_sold"]
-        assert not set(RETIRED_KEYS) & set(summ)
+        got = {k: (int(summ[k]["rows"]), list(summ[k]["columns"])) for k in (KEY, SALE_KEY) if k in summ}
+        want = {KEY: (sum(TREE_ROWS.values()), ["Quantity"]),
+                SALE_KEY: (sum(SALE_ROWS.values()), ["Quantity_sold", "Value_sold"])}
+        assert got == want, f"attrs summary {got} != {want}"
+        retired = sorted(set(RETIRED_KEYS) & set(summ))
+        assert not retired, f"retired keys still summarised: {retired}"
+
+    @pytest.mark.parametrize("key", [KEY, SALE_KEY])
+    @pytest.mark.parametrize("wave, prefix", [("2014-15", "s3b"), ("2017-18", "s11f")])
+    def test_inputs_return_exactly_the_declared_raw_variables(self, key, wave, prefix):
+        """``derivation_inputs`` returns, wave by wave, exactly the variables the
+        registry declares for that key -- no more, no fewer -- and none of them
+        is an empty filler column (red team: dropping s3bq13b from the sale
+        inputs passed every test)."""
+        declared = {v for v in derivation_records(COUNTRY)[key].raw_variables if v.startswith(prefix)}
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            frame = ll.Country(COUNTRY).derivation_inputs(key, wave=wave)
+        got = {str(c) for c in frame.columns}
+        missing, extra = sorted(declared - got), sorted(got - declared)
+        assert not missing and not extra, \
+            f"{key} {wave}: declared, not returned {missing}; returned, not declared {extra}"
+        empty = sorted(c for c in declared if _n(frame[c].notna()) == 0)
+        assert not empty, f"{key} {wave}: declared columns with no value at all: {empty}"
+        index = list(frame.index.names)
+        assert index == ["t", "i", "crop"], f"{key} {wave}: index {index}"
 
     def test_2014_15_harvest_is_twelve_month_and_sale_as_recorded(self, trees, raw, raw_sale):
         """Raw oracle through the registry: Quantity = s3bq10a x s3bq09 under the
@@ -352,13 +424,15 @@ class TestServed:
         exp = pd.DataFrame({"e_q": g["e_q"].sum(min_count=1), "e_m": g["m"].first(),
                             "e_qs": gs["e_qs"].sum(min_count=1), "e_v": gs["e_v"].sum(min_count=1)})
         j = trees[trees.t == "2014-15"].set_index(["t", "i", "crop"]).join(exp, how="inner")
-        assert len(j) == TREE_ROWS["2014-15"]
-        for col, e in (("Quantity", "e_q"), ("Quantity_sold", "e_qs"), ("Value_sold", "e_v"),
-                       ("months_harvested", "e_m")):
-            a, b = j[col].astype("float64"), j[e].astype("float64")
-            assert bool(((a == b) | (a.isna() & b.isna())).all()), col
+        n_join = len(j)
+        assert n_join == TREE_ROWS["2014-15"], f"{n_join} served tree rows joined the raw roster"
+        bad = {col: _n_differ(j[col], j[e]) for col, e in (
+            ("Quantity", "e_q"), ("Quantity_sold", "e_qs"), ("Value_sold", "e_v"),
+            ("months_harvested", "e_m"))}
+        assert not any(bad.values()), f"rows differing from the raw oracle, by column: {bad}"
         both = j.Quantity.notna() & j.months_harvested.notna()
-        assert int((both & (j.Quantity == j.months_harvested)).sum()) == STILL_EQUAL_2014
+        n_eq = _n(both & (j.Quantity == j.months_harvested))
+        assert n_eq == STILL_EQUAL_2014, f"{n_eq} != {STILL_EQUAL_2014}"
 
     def test_2017_18_harvest_is_twelve_month_and_sale_as_recorded(self, trees, raw, raw_sale):
         r = raw[raw.t == "2017-18"].copy()
@@ -366,13 +440,14 @@ class TestServed:
         t17 = (trees[trees.t == "2017-18"].merge(r, on=["t", "i", "crop"], how="inner")
                .merge(raw_sale[raw_sale.t == "2017-18"][["t", "i", "crop", "s11fq14a", "s11fq15"]],
                       on=["t", "i", "crop"], how="inner"))
-        assert len(t17) == TREE_ROWS["2017-18"]
-        for col, exp in (("Quantity", _expected_total(t17["s11fq11a"], t17["m"])),
-                         ("Quantity_sold", _recorded(t17["s11fq14a"])),
-                         ("Value_sold", _recorded(t17["s11fq15"], value=True)),
-                         ("months_harvested", t17["m"])):
-            a, b = t17[col].astype("float64"), exp.astype("float64")
-            assert bool(((a == b) | (a.isna() & b.isna())).all()), col
+        n_join = len(t17)
+        assert n_join == TREE_ROWS["2017-18"], f"{n_join} served tree rows joined the raw roster"
+        bad = {col: _n_differ(t17[col], exp) for col, exp in (
+            ("Quantity", _expected_total(t17["s11fq11a"], t17["m"])),
+            ("Quantity_sold", _recorded(t17["s11fq14a"])),
+            ("Value_sold", _recorded(t17["s11fq15"], value=True)),
+            ("months_harvested", t17["m"]))}
+        assert not any(bad.values()), f"rows differing from the raw oracle, by column: {bad}"
 
     def test_a_sale_beside_a_zero_or_missing_month_count_is_served(self, trees, raw_sale):
         """The month count no longer touches the sale: the 2014-15 rows with a
@@ -384,9 +459,9 @@ class TestServed:
         pos = (_recorded(s["s3bq13a"]) > 0) | (_recorded(s["s3bq14"], value=True) > 0)
         edge = s[pos & ((m == 0) | ~m.between(0, 12))][["t", "i", "crop"]]
         j = trees.merge(edge, on=["t", "i", "crop"], how="inner")
-        assert len(j) == 6
-        assert j.Quantity_sold.notna().all() and j.Value_sold.notna().all()
-        assert j.Derivation.eq(BOTH).all()
+        got = (len(j), _n(j.Quantity_sold.notna()), _n(j.Value_sold.notna()),
+               _n(j.Derivation.astype("string").eq(BOTH)))
+        assert got == (6, 6, 6, 6), f"(rows, Quantity_sold served, Value_sold served, sale key) {got}"
 
     @pytest.mark.parametrize("wave, v, qs", [("2014-15", "s3bq14", "s3bq13a"),
                                              ("2017-18", "s11fq15", "s11fq14a")])
@@ -397,9 +472,13 @@ class TestServed:
         tw = trees[(trees.t == wave) & (trees.Quantity_sold > 0) & (trees.Value_sold > 0)]
         r = raw_sale[raw_sale.t == wave].drop_duplicates(["t", "i", "crop"])
         j = tw.merge(r, on=["t", "i", "crop"], how="inner")
-        assert len(j) == len(tw) == PRICED_TREES[wave]
-        want = pd.to_numeric(j[v]) / pd.to_numeric(j[qs])
-        assert np.allclose(j.Value_sold / j.Quantity_sold, want)
+        got = (len(tw), len(j))
+        want = (PRICED_TREES[wave], PRICED_TREES[wave])
+        assert got == want, f"(priced tree rows, joined) {got} != {want}"
+        served = (j.Value_sold / j.Quantity_sold).to_numpy(dtype="float64", na_value=np.nan)
+        recorded = (pd.to_numeric(j[v]) / pd.to_numeric(j[qs])).to_numpy(dtype="float64", na_value=np.nan)
+        n_off = int((~np.isclose(served, recorded)).sum())
+        assert n_off == 0, f"{n_off} priced tree rows whose price is not the recorded ratio"
 
     @pytest.mark.parametrize("wave, crop", sorted(KG_PRICES))
     def test_tree_price_per_kg_sold(self, trees, wave, crop):
@@ -408,9 +487,34 @@ class TestServed:
         value-as-total reading gave about half that."""
         g = trees[(trees.t == wave) & (trees.crop == crop) & (trees.Unit_sold == "Kg")
                   & (trees.Quantity_sold > 0) & (trees.Value_sold > 0)]
-        p = g.Value_sold / g.Quantity_sold
-        assert (len(p), float(p.median())) == KG_PRICES[(wave, crop)]
+        p = (g.Value_sold / g.Quantity_sold).astype("float64")
+        got = (int(len(p)), float(p.median()))
+        assert got == KG_PRICES[(wave, crop)], f"(n, median FCFA/kg) {got} != {KG_PRICES[(wave, crop)]}"
 
     @pytest.mark.parametrize("wave, col", sorted(EDGE_NA))
     def test_edge_rule_na_counts(self, trees, wave, col):
-        assert int(trees[trees.t == wave][col].isna().sum()) == EDGE_NA[(wave, col)]
+        n_na = _n(trees[trees.t == wave][col].isna())
+        assert n_na == EDGE_NA[(wave, col)], f"{wave} {col}: {n_na} NA != {EDGE_NA[(wave, col)]}"
+
+    def test_the_window_mismatch_on_a_tree_row(self, trees):
+        """Disclosed, not fixed: a tree row's Quantity is a 12-month total and
+        its Quantity_sold is per harvest month, so Quantity_sold / Quantity is
+        NOT a sold share; Quantity_sold x months_harvested / Quantity is.
+        Pinned on tree rows whose sold and harvest units agree (counts and
+        medians, the CONTENTS.org figures)."""
+        same = trees[(trees.Unit_sold == trees.u).fillna(False) & (trees.Quantity > 0).fillna(False)
+                     & trees.Quantity_sold.notna()]
+        ratio = (same.Quantity_sold / same.Quantity).astype("float64")
+        share = (same.Quantity_sold * same.months_harvested.astype("float64") / same.Quantity).astype("float64")
+        got = (int(len(same)), round(float(ratio.median()), 3), round(float(share.median()), 3),
+               _n(same.Quantity_sold > same.Quantity),
+               _n(same.Quantity_sold * same.months_harvested.astype("float64") > same.Quantity))
+        assert got == WINDOW_MISMATCH, f"(rows, median ratio, median share, sold > harvest, rescaled sold > harvest) {got} != {WINDOW_MISMATCH}"
+
+    def test_zero_harvest_beside_a_positive_sale(self, trees):
+        """Recorded, not changed: tree rows that serve a harvest of 0 beside a
+        positive sale (CONTENTS.org)."""
+        z = trees[(trees.Quantity == 0).fillna(False)
+                  & ((trees.Quantity_sold > 0) | (trees.Value_sold > 0)).fillna(False)]
+        got = {str(k): int(v) for k, v in z.groupby("t").size().items()}
+        assert got == ZERO_HARVEST_SOLD, f"zero harvest beside a positive sale, by wave {got} != {ZERO_HARVEST_SOLD}"
