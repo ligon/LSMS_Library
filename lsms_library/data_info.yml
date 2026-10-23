@@ -145,8 +145,10 @@ Index Info:
     # NOT an input: it is the survey's own yes/no answer to a use question
     # asked once per plot about a GROUP of inputs (Mali: `Inorganic
     # Fertilizer?`, `Phytosanitary products?`).  Such a row carries the answer
-    # in `Applied` (True / False), no `Quantity`, `u = Unknown`; `Applied` is
-    # NA on the country's ordinary input rows.  The plot-input transforms skip
+    # in `Applied` (True / False), no `Quantity`, `u = Unknown` (Mali:
+    # `Applied` is NA on every type row; Ethiopia and Malawi, which serve no
+    # `?` rows, set `Applied` on ordinary input rows as a reported use flag
+    # -- see their data_scheme.yml).  The plot-input transforms skip
     # these rows (`nitrogen_kg` counts them on its tally as
     # `use_answer_rows`).  COUNTING TRAP: the rows carry the NO answers too,
     # so counting plots by `input` label counts plots that said "no" --
