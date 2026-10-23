@@ -54,6 +54,19 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
     - Mali tree sales as recorded with a window key (ruled, in progress);
     - Burkina #1276 investigation running (no acquisition yet).
     Filed #1281 (a single-file YAML KeyError silently drops a wave, cached as current).
+4j. RULINGS 2026-10-23 afternoon (@ligon):
+    - S3 write creds MOVED to =~/.config/lsms_library/s3_write_creds= (600); the legacy mirror path is a symlink to it (mirror =config.local= names it).
+    - STANDING MERGE AUTHORITY: merge a batch once its integration branch passes a full cold rebuild plus the full suite, then promote the cache.  A failing or moved test baseline still goes to @ligon first.
+    - ACQUIRE (follow =.claude/skills/add-wave/SKILL.md=; register new waves in ={country}.py= =Waves=):
+      - Malawi 2024-25 (#1275, 8507 + 8520, via =subdir==);
+      - newer releases, diff first (#978 Nigeria W5 v02, #1127 Ethiopia W5 v03, #1277 Malawi 2016-17): diff agent running, report at =/local/job40390255/data-private/release-diff/REPORT.md=;
+      - Tanzania W1-W3 geovariables (#449);
+      - Burkina 1994/1998 (#816; may need a =repositories= widening plus =idno_pattern=).
+    - Burkina #1276: serve BOTH components (=Data/Panel/= 6224 + =Data/Cross_Section/= 6277), acquired with the new =add_wave(subdir=)= (agent building it, branch =feat/add-wave-subdir-20261023=); Malawi-precedent weights.
+    - Mali tree sales: served AS RECORDED, labelled =tree-sale-window= (Ethiopia #1257 precedent).  Branch =fix/mali-tree-sales-as-recorded-20261023= =9fbfdae86=, needs review.
+    - Feature proposals #226 #438 #439 #450 #851 #862 #1136 are IN SCOPE, after the defects drain.
+    - #1281: a config KeyError that costs a wave raises (#675 precedent), unless @ligon objects.
+    - #1245 is PR #1282 (needs a corpus re-warm).  Malawi 2013-14 GPS branch is in red-team.
 5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
 
 ** Merge plan: ONE corpus re-warm
