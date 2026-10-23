@@ -1644,6 +1644,10 @@ For 8 of the 80, that id is the served 2018-19 id of a DIFFERENT household, and 
 Removing the residue needs a change to =id_walk= semantics or a disjoint id namespace for one wave.
 Both are framework or design decisions and are not taken here.
 
+*Also measured, not reconciled.*  On a fresh data root =sample()= serves 7,010 2018-19 and 3,227 2021-22 households.
+The =DONE sample= section above records "6,961 households across 585 clusters" and "3,218 households across 550 clusters".
+This change does not alter either count.
+
 Cache: =panel_ids.py= and both JSON files are build inputs, so every Burkina Faso hash moves and no other country's does.
 Ledger: =.coder/ledger/1240-burkina-panel-ids.md=.
 Aggregate evidence: =slurm_logs/isa_backlog_2026-10-21/1240-burkina-panel-ids/=.

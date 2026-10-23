@@ -1,7 +1,5 @@
-# hash census (1218 hash_census.py), base 9a0ed5f3c vs branch
-country: 24 of 549 moved; by country/key: {'Burkina_Faso': 24}
-  Burkina_Faso country tables: 24, moved 24
-btf: 0 of 40 moved; by country/key: {}
-wave: 72 of 2109 moved; by country/key: {'Burkina_Faso': 72}
-  Burkina_Faso wave cells: 72, moved 72
+# hash census (1218 hash_census.py): base 9a0ed5f3c vs branch 6ecdc786c (committed tree)
+country: 24 of 549 moved; by country: {'Burkina_Faso': 24}; Burkina_Faso 24/24
+btf: 0 of 40 moved; by country: {}
+wave: 72 of 2109 moved; by country: {'Burkina_Faso': 72}; Burkina_Faso 72/72
 errors: 0 0

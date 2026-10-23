@@ -1,0 +1,7 @@
+# GH #1240 report-only probe of the other EHCVM Design-A crosswalks (no edits)
+Mali:    panel_ids.py builds both ids with mali.i (grappe+'0'+menage.zfill(2)); no wave i() override -> same formatter as the tables.
+Niger:   wave 2018-19 / 2021-22 mapping.py i() = 'E_' + grappe+'0'+menage.zfill(2); updated_ids[2021-22]: 4589 entries, 4589 keys and 4589 targets 'E_'-prefixed, 4589 identity.
+Senegal: panel_ids.py _senegal_i = grappe + menage.zfill(3) (no '0'), but both wave mapping.py i() = grappe+'0'+menage.zfill(2) -- the Burkina formula.
+         LATENT only: 0 three-digit menage in the 2018-19 cover; 6127/6127 entries identity; 0 keys / 0 targets outside the served-format ids.
+Burkina burkina_faso.panel_ids(df) (country module): docstring prescribes grappe + menage.zfill(3) for previous_i; 0 callers
+         (no Burkina wave data_info.yml declares panel_ids; rg finds no import). Left in place, reported.
