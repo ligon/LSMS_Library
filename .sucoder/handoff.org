@@ -40,6 +40,7 @@ The scratch archive =handoff-20261023T0142-postmerge-followups.tar.gz= is intact
 "Carry on, using the backlog and scrum-master skills, deferring questions for me until later (or: get some review, and come up with answers to questions on your own; review can happen at the PR stage)."
 - Open PRs for human merge; MERGE NOTHING.  Decide routine questions myself, with an independent review, and record each decision and its evidence in the PR body.
 - Every worker brief: stop-list, "SCOPE DEVIATIONS" first in the report, no row-level data committed (repo is PUBLIC).
+- Ethan: "there's a lot of precedent already established, so looking at how other countries seem to solve a problem will often be a good guide."  For any open sub-decision, find the cross-country precedent first (data_scheme/data_info/categorical_mapping/wave scripts/derivations.yml), follow the majority or most recent one, and cite it (country, file:line) in the PR.  Only where none exists, choose conservatively and flag it for review.
 - Watchers armed: Slurm scan 40393183 terminal state; this job's deadline-warning file.
 
 ** Queue (in order, at most ~3 agents at once on this 12-core slice)
