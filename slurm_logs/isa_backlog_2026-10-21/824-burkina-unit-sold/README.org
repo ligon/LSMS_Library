@@ -10,7 +10,7 @@ under =/local/job40390255/data-private/824-bf/= and are not committed.
   =s16cq16b= against the wave parquet, and the audit's price test re-run on
   the served branch table.
 - =hash_diff.py= / =hash_census_diff.json= -- the cache-hash census
-  (=worktrees/1218/.../1218-current-validation/hash_census.py=) diffed between
+  (=slurm_logs/isa_backlog_2026-10-21/1218-current-validation/hash_census.py=) diffed between
   the two checkouts.
 - =build_summary_{development,branch}.json= -- shape, dtypes, warning
   categories and audit-report counts of each cold build (warning text and
