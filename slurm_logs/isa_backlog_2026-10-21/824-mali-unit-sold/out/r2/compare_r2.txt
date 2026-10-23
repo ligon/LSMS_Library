@@ -1,0 +1,70 @@
+===== dev -> new
+rows 35060 35060  index equal True
+columns added ['Unit_sold', 'months_harvested', 'Derivation']  removed []
+  Quantity         345 rows differ {('2014-15', 'tree'): 228, ('2017-18', 'tree'): 117}; value->NA 5 (of which 0->NA 3); NA->value 3
+  u                2 rows differ {('2017-18', 'tree'): 2}; value->NA 0 (of which 0->NA 0); NA->value 2
+  Quantity_sold    1891 rows differ {('2014-15', 'tree'): 138, ('2017-18', 'field'): 1653, ('2017-18', 'tree'): 100}; value->NA 1660 (of which 0->NA 1653); NA->value 0
+  Value_sold       1662 rows differ {('2017-18', 'field'): 1662}; value->NA 1662 (of which 0->NA 1662); NA->value 0
+  planting_month   identical
+  harvest_month    identical
+  intercropped     identical
+  perennial        identical
+Derivation {<NA>: 34433, 'Mali::crop_production::tree-twelve-month-total': 627}
+  2014-15 tree Quantity     : rows 357, changed 228, sum 614 -> 34162.6, nonnull 351 -> 350, median ratio (both>0) 6
+  2014-15 tree Quantity_sold: rows 357, changed 138, sum 25874.6 -> 41025.8, nonnull 356 -> 349, median ratio (both>0) 2
+  2014-15 tree Value_sold   : rows 357, changed 0, sum 2.28334e+07 -> 2.28334e+07, nonnull 204 -> 204, median ratio (both>0) 1
+  2017-18 tree Quantity     : rows 270, changed 117, sum 33594.7 -> 163434, nonnull 185 -> 184, median ratio (both>0) 2
+  2017-18 tree Quantity_sold: rows 270, changed 100, sum 706855 -> 2.60423e+06, nonnull 185 -> 185, median ratio (both>0) 3
+  2017-18 tree Value_sold   : rows 270, changed 0, sum 2.96265e+07 -> 2.96265e+07, nonnull 127 -> 127, median ratio (both>0) 1
+  2017-18 field Quantity_sold: 0 -> NA on 1653; served 0 10460 -> 8807; NA 13530 -> 15183
+  2017-18 field Value_sold: 0 -> NA on 1662; served 0 10468 -> 8806; NA 13530 -> 15192
+priced rows {('2014-15', 'field'): 569, ('2014-15', 'tree'): 199, ('2017-18', 'field'): 451, ('2017-18', 'tree'): 127} -> {('2014-15', 'field'): 569, ('2014-15', 'tree'): 192, ('2017-18', 'field'): 451, ('2017-18', 'tree'): 127}
+  2014-15 tree priced rows in both 192: ratio old/new median 2; equals months_harvested on 192
+  2017-18 tree priced rows in both 127: price unchanged on 28
+harvest_kg: shape (2175, 1) -> (2175, 1), index equal True, frame equal True
+gross_crop_revenue: shape (7415, 1) -> (6968, 1), index equal False, frame equal False
+    Gross_crop_revenue: 447 rows differ by t {'2014-15': 0, '2017-18': 447}; value->NA 447, NA->value 0; sum 2.42266e+08 -> 2.42266e+08
+gross_crop_revenue_j: shape (17548, 1) -> (15886, 1), index equal False, frame equal False
+    Gross_crop_revenue: 1662 rows differ by t {'2014-15': 0, '2017-18': 1662}; value->NA 1662, NA->value 0; sum 2.42266e+08 -> 2.42266e+08
+yield_kg: shape (0, 1) -> (0, 1), index equal True, frame equal True
+gross_crop_revenue dev->new: dropped 447 (old values: zero 447, other 0; waves {'2017-18': 447}); added 0
+   changed in place 0: by wave {}; all up True; on a household with a 2017-18 tree sale 0; sum of change 0
+gross_crop_revenue_j dev->new: dropped 1662 (old values: zero 1662, other 0; waves {'2017-18': 1662}); added 0
+   changed in place 0: by wave {}; all up True; on a household with a 2017-18 tree sale 0; sum of change 0
+===== e28 -> new
+rows 35060 35060  index equal True
+columns added []  removed []
+  Quantity         271 rows differ {('2014-15', 'tree'): 154, ('2017-18', 'tree'): 117}; value->NA 6 (of which 0->NA 0); NA->value 0
+  u                identical
+  Quantity_sold    1890 rows differ {('2014-15', 'tree'): 137, ('2017-18', 'field'): 1653, ('2017-18', 'tree'): 100}; value->NA 1659 (of which 0->NA 1653); NA->value 0
+  Unit_sold        identical
+  Value_sold       1662 rows differ {('2017-18', 'field'): 1662}; value->NA 1662 (of which 0->NA 1662); NA->value 0
+  months_harvested identical
+  planting_month   identical
+  harvest_month    identical
+  intercropped     identical
+  perennial        identical
+  Derivation       627 rows differ {('2014-15', 'tree'): 357, ('2017-18', 'tree'): 270}; value->NA 0 (of which 0->NA 0); NA->value 0
+Derivation {<NA>: 34433, 'Mali::crop_production::tree-twelve-month-total': 627}
+  old Derivation {<NA>: 34433, 'Mali::crop_production::3b-per-harvest-month': 357, 'Mali::crop_production::11f-per-harvest-month': 270}
+  2014-15 tree Quantity     : rows 357, changed 154, sum 12757.7 -> 34162.6, nonnull 355 -> 350, median ratio (both>0) 2
+  2014-15 tree Quantity_sold: rows 357, changed 137, sum 15874.7 -> 41025.8, nonnull 355 -> 349, median ratio (both>0) 2
+  2014-15 tree Value_sold   : rows 357, changed 0, sum 2.28334e+07 -> 2.28334e+07, nonnull 204 -> 204, median ratio (both>0) 1
+  2017-18 tree Quantity     : rows 270, changed 117, sum 33594.7 -> 163434, nonnull 185 -> 184, median ratio (both>0) 2
+  2017-18 tree Quantity_sold: rows 270, changed 100, sum 706855 -> 2.60423e+06, nonnull 185 -> 185, median ratio (both>0) 3
+  2017-18 tree Value_sold   : rows 270, changed 0, sum 2.96265e+07 -> 2.96265e+07, nonnull 127 -> 127, median ratio (both>0) 1
+  2017-18 field Quantity_sold: 0 -> NA on 1653; served 0 10460 -> 8807; NA 13530 -> 15183
+  2017-18 field Value_sold: 0 -> NA on 1662; served 0 10468 -> 8806; NA 13530 -> 15192
+priced rows {('2014-15', 'field'): 569, ('2014-15', 'tree'): 198, ('2017-18', 'field'): 451, ('2017-18', 'tree'): 127} -> {('2014-15', 'field'): 569, ('2014-15', 'tree'): 192, ('2017-18', 'field'): 451, ('2017-18', 'tree'): 127}
+  2014-15 tree priced rows in both 192: ratio old/new median 2; equals months_harvested on 192
+  2017-18 tree priced rows in both 127: price unchanged on 28
+harvest_kg: shape (2175, 1) -> (2175, 1), index equal True, frame equal True
+gross_crop_revenue: shape (7415, 1) -> (6968, 1), index equal False, frame equal False
+    Gross_crop_revenue: 447 rows differ by t {'2014-15': 0, '2017-18': 447}; value->NA 447, NA->value 0; sum 2.42266e+08 -> 2.42266e+08
+gross_crop_revenue_j: shape (17548, 1) -> (15886, 1), index equal False, frame equal False
+    Gross_crop_revenue: 1662 rows differ by t {'2014-15': 0, '2017-18': 1662}; value->NA 1662, NA->value 0; sum 2.42266e+08 -> 2.42266e+08
+yield_kg: shape (0, 1) -> (0, 1), index equal True, frame equal True
+gross_crop_revenue e28->new: dropped 447 (old values: zero 447, other 0; waves {'2017-18': 447}); added 0
+   changed in place 0: by wave {}; all up True; on a household with a 2017-18 tree sale 0; sum of change 0
+gross_crop_revenue_j e28->new: dropped 1662 (old values: zero 1662, other 0; waves {'2017-18': 1662}); added 0
+   changed in place 0: by wave {}; all up True; on a household with a 2017-18 tree sale 0; sum of change 0

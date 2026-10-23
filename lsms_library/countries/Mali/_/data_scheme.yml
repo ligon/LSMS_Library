@@ -151,10 +151,10 @@ Data Scheme:
   crop_production:
     # Item-level harvest, GAP 1 (parity loop).  One row per (t, i, plot_id,
     # crop): the REPORTED quantities the survey records, NOT aggregates.
-    # The crop/harvest module lives in the EACI waves only (2014-15 EACI14
-    # s3a/s3b/s1c; 2017-18 EACI17 s7f/s7g/s11f/s11c).  The EHCVM waves
-    # (2018-19, 2021-22) have no harvest block — deferred (the same split
-    # as plot_features, but the opposite two waves).
+    # Wired for the EAC-I waves (2014-15 EACI14 s3a/s3b/s1c; 2017-18 EACI17
+    # s7f/s7g/s11f/s11c).  The EHCVM waves (2018-19, 2021-22) DO ship a
+    # harvest and sale block (s16c / s16d) that is not wired -- a decision,
+    # not an absence (GH #824 audit, 2026-10-23).
     #
     # plot = "{field}_{parcel}" for seasonal crops; <NA> for perennial
     # trees (the perennial roster is not on the seasonal field grid).
@@ -169,12 +169,45 @@ Data Scheme:
     # attached at the plot level only for single-plot crops; multi-plot
     # crops carry NaN sold (see the wave script).  intercropped is recorded
     # in 2014-15 (s1cq05 Pure/Association) only; NaN in 2017-18.
+    #
+    # THE SALE HAS ITS OWN UNIT (GH #824).  `u` is the HARVEST unit; every
+    # EAC-I sale block records the sold quantity in its own unit variable
+    # (s3aq23b, s3bq13b, s7gq21b, s11fq14b), carried as the per-row column
+    # Unit_sold, decoded from that variable's OWN value labels (2017-18 code
+    # 10 is 'Autre' for the harvest and 'Tonne' for the sale) and
+    # canonicalised through the same `u` table at build time.  A
+    # disagreement with `u` is a data-quality FLAG, not an identification
+    # (canonical data_info.yml, Unit_sold note).  NA-bearing, never
+    # sentinel-filled: NA means no sale, or no sold unit recorded.
+    #
+    # TREE ROWS ARE 12-MONTH TOTALS BUILT FROM PER-MONTH ANSWERS (GH #1267;
+    # ruling 2026-10-23).  The survey asks a tree's harvest and quantity
+    # sold as an AVERAGE PER HARVEST MONTH (2014-15 3B.10 / 3B.13; 2017-18
+    # 11F.11 / 11F.14) beside months_harvested (3B.09 / 11F.10), and the
+    # sale value (3B.14 / 11F.15) on the same per-month footing (rounds 1
+    # and 3; the printed form says "montant total", see CONTENTS.org).
+    # Served: Quantity, Quantity_sold and Value_sold = per-month answer x
+    # months_harvested, one registered derivation for both waves
+    # (Mali/_/derivations.yml) -- so all three are 12-month totals, as on
+    # a field-crop row.  The per-month answers
+    # come back from Country('Mali').derivation_inputs(key).  Until GH
+    # #1267 the 2014-15 tree Quantity was s3bq09, the month count.
+    #
+    # 2017-18 UNRECORDED SALES ARE NA (ruling 2026-10-23): 0 only where
+    # s7gq20 == 'Non'.  The Leger questionnaire asks 7G.20 (sold?) but not
+    # 7G.21 / 7G.22, so its 'Oui' rows carry no quantity or value.
     # Built by per-wave scripts + a country-level concatenator.
     index: (t, i, plot_id, crop)
     Quantity: float
     u: str
     Quantity_sold: float
+    Unit_sold:
+      type: str
+      optional: true
     Value_sold: float
+    months_harvested:
+      type: int
+      optional: true
     planting_month: int
     harvest_month: int
     intercropped: bool

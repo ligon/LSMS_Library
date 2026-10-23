@@ -1,0 +1,6 @@
+country: 24 of 549 moved; only-base 0 only-branch 0; by country {'Mali': 24}
+   Mali: 24 of 24 moved
+btf: 0 of 40 moved; only-base 0 only-branch 0; by country {}
+wave: 96 of 2109 moved; only-base 0 only-branch 0; by country {'Mali': 96}
+   Mali: 96 of 96 moved
+   Mali wave hashes NOT moved: 0 []
