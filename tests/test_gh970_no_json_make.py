@@ -20,8 +20,15 @@ These tests pin that on a private, empty ``LSMS_DATA_DIR``:
   written to the JSON-tier cache under the private root (never in-tree).
 
 The per-wave extraction is monkeypatched (``Wave.grab_data``) so the test is
-hermetic -- no microdata, no DVC, no S3.  Malawi is the Design-B country with
-three waves declaring ``panel_ids`` (2013-14, 2016-17, 2019-20).
+hermetic -- no microdata, no DVC, no S3.  Malawi has three waves declaring
+``panel_ids`` (2013-14, 2016-17, 2019-20).
+
+Since GH #894 no country is Design B: Malawi ships a committed
+``_/panel_ids.json`` that the cached-candidate lookup would find first.  The
+cold route this module pins still exists in ``load_json_cache``, so the
+fixture points ``LSMS_COUNTRIES_ROOT`` at a view of Malawi's config tree
+(symlinks) WITHOUT the committed crosswalk or its generator -- i.e. Malawi as
+it was before #894 -- and the assertions below are unchanged.
 """
 from __future__ import annotations
 
@@ -52,11 +59,34 @@ def _fake_panel_ids_frame(wave: str) -> pd.DataFrame:
     return pd.DataFrame({"previous_i": [p for _, p in rows]}, index=idx)
 
 
+_CROSSWALK = ("panel_ids.json", "updated_ids.json", "panel_ids.py")
+
+
+def _design_b_view(real_root: Path, dest: Path) -> Path:
+    """A countries root holding ``COUNTRY`` without its committed crosswalk.
+
+    Every other file and wave directory is a symlink to the real tree, so the
+    data scheme, waves and wave YAML are the real ones."""
+    real = real_root / COUNTRY
+    view = dest / "countries"
+    (view / COUNTRY / "_").mkdir(parents=True)
+    for child in real.iterdir():
+        if child.name != "_":
+            (view / COUNTRY / child.name).symlink_to(child)
+    for child in (real / "_").iterdir():
+        if child.name not in _CROSSWALK:
+            (view / COUNTRY / "_" / child.name).symlink_to(child)
+    return view
+
+
 @pytest.fixture
 def cold_private_root(tmp_path, monkeypatch):
     """An empty ``LSMS_DATA_DIR`` with every cached candidate absent, a
     serial in-process build, and a ``Wave.grab_data`` that serves a small
     ``panel_ids`` frame instead of reading microdata."""
+    countries_root.cache_clear()
+    view = _design_b_view(Path(countries_root()), tmp_path)
+    monkeypatch.setenv("LSMS_COUNTRIES_ROOT", str(view))
     droot = tmp_path / "data"
     droot.mkdir()
     monkeypatch.setenv("LSMS_DATA_DIR", str(droot))
@@ -70,6 +100,7 @@ def cold_private_root(tmp_path, monkeypatch):
     data_root.cache_clear()
     countries_root.cache_clear()
     assert data_root() == droot, data_root()
+    assert Path(countries_root()) == view, countries_root()
 
     real_grab = country_mod.Wave.grab_data
 
@@ -82,8 +113,9 @@ def cold_private_root(tmp_path, monkeypatch):
 
     # The in-tree committed JSON must not exist for a Design-B country, or the
     # cached-candidate lookup would short-circuit before the path under test.
+    # The view above removes it (GH #894).
     intree = Path(countries_root()) / COUNTRY / "_"
-    assert not (intree / "panel_ids.json").exists(), "Malawi is Design B (#894)"
+    assert not (intree / "panel_ids.json").exists(), "the view must hide the crosswalk (#894)"
     assert not (intree / "panel_ids.parquet").exists(), "in-tree parquet (GH #803)"
     try:
         yield droot

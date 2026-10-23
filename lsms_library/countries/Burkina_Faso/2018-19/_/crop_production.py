@@ -6,8 +6,10 @@ read from Burkina's own categorical_mapping.org (harmonize_food + u).
 
 Single source file: s16c_me_bfa2018.dta (agriculture crop/harvest module).
 One row per reported (field, parcel, crop) harvest record.  Harvest qty +
-unit (s16cq12a / s16cq12b), sold qty (s16cq16a), sale value (s16cq17), and
-the intercrop flag (s16cq07) are recorded at this plot-crop grain.
+unit (s16cq12a / s16cq12b), sold qty + unit (s16cq16a / s16cq16b -> the
+``Unit_sold`` column, GH #824), sale value (s16cq17), and the intercrop flag
+(s16cq07) are ALL recorded at this plot-crop grain, so no cross-file join is
+needed and no row is added, removed or re-keyed by the sold unit.
 
 ENCODING: loaded with the DEFAULT (utf-8) encoding so the French crop / unit
 labels keep their accents and match the harmonize_food / u table keys.
@@ -65,9 +67,23 @@ def _finish_crop_production(df, t):
     df['t'] = t
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
+    # Unit_sold (GH #824; mirrors Niger/_/niger.py:_finish_crop_production):
+    # the unit the SALE was reported in, a per-row COLUMN beside the harvest
+    # unit `u` (which is the index level), canonicalised through the same `u`
+    # table at build time.  NA-bearing, never sentinel-filled (canonical
+    # data_info.yml, Unit_sold note): NA says "no sale, or a sale whose unit
+    # the survey did not record", which no unit label can say.  Burkina's `u`
+    # table maps nothing to 'Unknown' today, so the fold below is a guard,
+    # kept so the contract cannot drift from Niger's if the table gains a
+    # missing-marker row.
+    if 'Unit_sold' not in df.columns:
+        df['Unit_sold'] = pd.NA
+    df['Unit_sold'] = df['Unit_sold'].astype('string')
+    df['Unit_sold'] = df['Unit_sold'].where(df['Unit_sold'] != 'Unknown', pd.NA)
     df = df[df['crop'].notna()]
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
-            'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
+            'Quantity_sold', 'Value_sold', 'Unit_sold', 'harvest_month',
+            'intercropped']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
     return df
@@ -96,6 +112,9 @@ df = pd.DataFrame({
     'Quantity':      src['s16cq12a'].values,
     'Quantity_sold': src['s16cq16a'].values,
     'Value_sold':    src['s16cq17'].values,
+    # The SOLD unit (s16cq16b), a second unit on the same line (GH #824);
+    # identical 7-label set to the harvest unit s16cq12b, same `u` table.
+    'Unit_sold':     _unit_labels(src['s16cq16b'], unit_map).values,
     'intercropped':  intercropped.values,
 })
 

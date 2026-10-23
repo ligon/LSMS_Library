@@ -1,0 +1,20 @@
+# git merge-tree --write-tree <branch tip> <PR head>, for every open PR (gh pr list, 2026-10-23T11:44:38Z); branch tree 4d58a72439153776a2bb4278cfe28f9823c425d4
+#1263 fix/637-tanzania-unit-grain-20261023 5239daecd: rc=0 conflicts=0
+#1262 fix/592-gps-census-20261023 39e763505: rc=0 conflicts=0
+#1258 fix/1237-malawi-make-prereqs-20261023 829fcab5f: rc=0 conflicts=0
+#1257 fix/820-ethiopia-sect12-crops-20261023 627d3cfdf: rc=0 conflicts=0
+#1255 fix/1250-uganda-labor-flag-20261023 90fc1e18d: rc=0 conflicts=0
+#1251 fix/1234-map-index-unit-sentinel-20261023 31856c2ad: rc=0 conflicts=0
+#1249 fix/1240-burkina-panel-ids-20261023 e02a0641d: rc=0 conflicts=0
+#1248 fix/1247-niger-sampling-yml-20261023 10e4853df: rc=0 conflicts=0
+#1246 fix/1243-burkina-sampling-yml-20261023 e97b1207d: rc=0 conflicts=0
+#1242 fix/1059-burkina-district-spellings-20261023 057fd39f1: rc=0 conflicts=0
+#1241 fix/1123-ehcvm-plot-inputs-identity-20261023 166efd718: rc=0 conflicts=0
+#1239 fix/827-malawi-community-units-20261023 8dea4ecf2: rc=0 conflicts=0
+#1238 fix/1111-malawi-fert-units-2013-2016-20261023 fc58c003a: rc=0 conflicts=0
+#1236 fix/1196-burkina-test-u-policy-20261023 6a269cc3d: rc=0 conflicts=0
+#1233 fix/1221-empty-frame-fingerprint-20261022 c0c839f44: rc=0 conflicts=0
+#1232 fix/1133-uganda-v-rendering-20261023 3fdd77471: rc=0 conflicts=0
+#1231 fix/mali-plot-inputs-followup-20261023 5691c2f51: rc=0 conflicts=0
+#1229 fix/856-malawi-unit-text-20261022 97811a87f: rc=0 conflicts=0
+#1227 fix/823-niger-2018-community-prices-20261022 a202c8a60: rc=0 conflicts=0

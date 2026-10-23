@@ -1,0 +1,782 @@
+[
+ {
+  "country": "Mali",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2014-15",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 37175,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Mali",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2017-18",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 94071,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Mali",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 46014,
+  "order_identical": false,
+  "positions_differing": 3323
+ },
+ {
+  "country": "Mali",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2021-22",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 43472,
+  "order_identical": false,
+  "positions_differing": 3151
+ },
+ {
+  "country": "Mali",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2014-15",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 37175,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Mali",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2017-18",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 94071,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Mali",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 46014,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Mali",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2021-22",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 43472,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "1985-86",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 14398,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "1986-87",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 13867,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "1987-88",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 11847,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "1988-89",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 10563,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 61116,
+  "order_identical": false,
+  "positions_differing": 12725
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "1985-86",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 14398,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "1986-87",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 13867,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "1987-88",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 11847,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "1988-89",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 10563,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 61116,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Burkina_Faso",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2014",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 78543,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Burkina_Faso",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 45612,
+  "order_identical": false,
+  "positions_differing": 12100
+ },
+ {
+  "country": "Burkina_Faso",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2021-22",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 26523,
+  "order_identical": false,
+  "positions_differing": 6420
+ },
+ {
+  "country": "Burkina_Faso",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2014",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 78543,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Burkina_Faso",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 45612,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Burkina_Faso",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2021-22",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 26523,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Niger",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2011-12",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 25125,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Niger",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2014-15",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 26579,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Niger",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 35406,
+  "order_identical": false,
+  "positions_differing": 6631
+ },
+ {
+  "country": "Niger",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2021-22",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 44080,
+  "order_identical": false,
+  "positions_differing": 8642
+ },
+ {
+  "country": "Niger",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2011-12",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 25125,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Niger",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2014-15",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 26579,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Niger",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 35406,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Niger",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2021-22",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 44080,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Senegal",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 66119,
+  "order_identical": false,
+  "positions_differing": 11158
+ },
+ {
+  "country": "Senegal",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2021-22",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 63531,
+  "order_identical": false,
+  "positions_differing": 10481
+ },
+ {
+  "country": "Senegal",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 66119,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Senegal",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2021-22",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 63531,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Togo",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2018",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 27480,
+  "order_identical": false,
+  "positions_differing": 4882
+ },
+ {
+  "country": "Togo",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2018",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 27480,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Guinea-Bissau",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 42839,
+  "order_identical": false,
+  "positions_differing": 727
+ },
+ {
+  "country": "Guinea-Bissau",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 42839,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Benin",
+  "table": "household_roster",
+  "tree": "dev",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 42343,
+  "order_identical": false,
+  "positions_differing": 14491
+ },
+ {
+  "country": "Benin",
+  "table": "household_roster",
+  "tree": "br",
+  "wave": "2018-19",
+  "seeds": [
+   "1",
+   "3"
+  ],
+  "rows": 42343,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Serbia",
+  "table": "sample",
+  "tree": "dev",
+  "wave": "2007",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 5557,
+  "order_identical": false,
+  "positions_differing": 5557
+ },
+ {
+  "country": "Serbia",
+  "table": "sample",
+  "tree": "br",
+  "wave": "2007",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 5557,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "dev",
+  "wave": "2010Q3",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 38947,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "dev",
+  "wave": "2011Q1",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 38947,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "dev",
+  "wave": "2012Q3",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 175857,
+  "order_identical": false,
+  "positions_differing": 175855
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "dev",
+  "wave": "2013Q1",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 175857,
+  "order_identical": false,
+  "positions_differing": 175855
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "dev",
+  "wave": "2015Q3",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 188230,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "dev",
+  "wave": "2016Q1",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 188230,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "dev",
+  "wave": "2018Q3",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 181800,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "dev",
+  "wave": "2019Q1",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 181800,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "br",
+  "wave": "2010Q3",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 38947,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "br",
+  "wave": "2011Q1",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 38947,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "br",
+  "wave": "2012Q3",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 175857,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "br",
+  "wave": "2013Q1",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 175857,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "br",
+  "wave": "2015Q3",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 188230,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "br",
+  "wave": "2016Q1",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 188230,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "br",
+  "wave": "2018Q3",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 181800,
+  "order_identical": true,
+  "positions_differing": 0
+ },
+ {
+  "country": "Nigeria",
+  "table": "assets",
+  "tree": "br",
+  "wave": "2019Q1",
+  "seeds": [
+   "1",
+   "0"
+  ],
+  "rows": 181800,
+  "order_identical": true,
+  "positions_differing": 0
+ }
+]

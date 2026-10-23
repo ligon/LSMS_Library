@@ -1,0 +1,36 @@
+{
+ "country": {
+  "base": 549,
+  "branch": 549,
+  "common": 549,
+  "moved": 549,
+  "only_base": 0,
+  "only_branch": 0,
+  "none_both": 0,
+  "unmoved_examples": []
+ },
+ "btf": {
+  "base": 40,
+  "branch": 40,
+  "common": 40,
+  "moved": 40,
+  "only_base": 0,
+  "only_branch": 0,
+  "none_both": 0,
+  "unmoved_examples": []
+ },
+ "wave": {
+  "base": 2109,
+  "branch": 2109,
+  "common": 2109,
+  "moved": 2109,
+  "only_base": 0,
+  "only_branch": 0,
+  "none_both": 0,
+  "unmoved_examples": []
+ },
+ "errors": {
+  "base": 0,
+  "branch": 0
+ }
+}

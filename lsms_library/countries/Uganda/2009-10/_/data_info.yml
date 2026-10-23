@@ -64,7 +64,12 @@ sample:
         idxvars:
             i: HHID
         myvars:
-            v: comm
+            # GH #1133: the 7-character comm is served as the 8-digit frame EA
+            # (as 2005-06 / 2011-12 write it) through the reviewed
+            # `comm_frame_ea` table; blank comm stays None for the bin below.
+            v:
+                - comm
+                - mappings: comm_frame_ea
             weight: wgt09
             panel_weight: wgt09  # pre-refreshment — same as cross-sectional
             strata: stratum
@@ -129,7 +134,10 @@ cluster_features:
         idxvars:
             i: HHID
         myvars:
-            v: comm
+            # GH #1133: same function as `sample` above, so the two `v` agree.
+            v:
+                - comm
+                - mappings: comm_frame_ea
             Rural: urban
             District: h1aq1  # TODO: This is numeric codes; needs mapping to names.
             Region:

@@ -1,0 +1,38 @@
+{
+ "label": "base",
+ "seconds": 71.5,
+ "rows": 435085,
+ "index": [
+  "i",
+  "t",
+  "v",
+  "j",
+  "s"
+ ],
+ "columns": [
+  "Expenditure"
+ ],
+ "valuation_geo_levels": [
+  "v",
+  "District",
+  "Region"
+ ],
+ "column_sums": {
+  "Expenditure": 499243371.86742425
+ },
+ "sum_by_t": {
+  "2014": 371310967.999038,
+  "2018-19": 81012058.5515389,
+  "2021-22": 46920345.31684734
+ },
+ "attrs_valuation_sources": {
+  "reported": 683713,
+  "own_price": 0,
+  "median_price": 57525,
+  "none": 24578,
+  "candidates": 60926
+ },
+ "attrs_valuation": [
+  "median_price"
+ ]
+}

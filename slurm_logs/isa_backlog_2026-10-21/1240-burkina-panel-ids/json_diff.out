@@ -1,0 +1,84 @@
+{
+ "updated_ids[2021-22]": {
+  "base_entries": 3132,
+  "branch_entries": 3147,
+  "added": 17,
+  "removed": 2,
+  "common": 3130,
+  "common_target_changed": 1089
+ },
+ "panel_ids": {
+  "base_entries": 3132,
+  "branch_entries": 3147,
+  "added": 17,
+  "removed": 2,
+  "common": 3130,
+  "common_target_changed": 1089
+ },
+ "updated_ids other waves": {
+  "2018-19": [
+   0,
+   0
+  ]
+ },
+ "branch panel_ids == updated_ids[2021-22]": true,
+ "branch panel_ids prev_wave values": {
+  "2018-19": 3147
+ },
+ "branch panel_ids cur_wave keys": {
+  "2021-22": 3147
+ },
+ "2018-19 cover: households, ehcvm_i injective": [
+  7010,
+  true
+ ],
+ "2021-22 cover households": 3227,
+ "base: checks": {
+  "sources_are_raw_2021_hhid": "3132/3132",
+  "targets_are_2018_ehcvm_ids": "2044/3132",
+  "target_is_the_SAME_household": 2041,
+  "target_is_a_DIFFERENT_household": 3,
+  "many_to_one_targets": 0,
+  "targets_that_are_also_keys": 0,
+  "target_eq_survey_hhid_EHCVM1": 3132
+ },
+ "base: simulated id_walk over 2021-22 cover": {
+  "correct": 2041,
+  "not_a_2018_id": 1174,
+  "other_2018_household": 12,
+  "served_duplicates": 0
+ },
+ "branch: checks": {
+  "sources_are_raw_2021_hhid": "3147/3147",
+  "targets_are_2018_ehcvm_ids": "3147/3147",
+  "target_is_the_SAME_household": 3147,
+  "target_is_a_DIFFERENT_household": 0,
+  "many_to_one_targets": 0,
+  "targets_that_are_also_keys": 0,
+  "target_eq_survey_hhid_EHCVM1": 2041
+ },
+ "branch: simulated id_walk over 2021-22 cover": {
+  "correct": 3147,
+  "not_a_2018_id": 72,
+  "other_2018_household": 8,
+  "served_duplicates": 0
+ },
+ "branch-vs-base by 2018-19 menage width": {
+  "changed": {
+   "3": 1089
+  },
+  "added": {
+   "3": 17
+  },
+  "removed": {
+   "3": 2
+  },
+  "menage_EHCVM1>=100 households": 1108
+ },
+ "base: 3-digit-menage households": {
+  "target_in_no_2018_table": 1088,
+  "target_is_other_household": 3,
+  "chain_skipped": 17
+ }
+}
+removed entries: 2; base target in 2018-19 ids: 0; corrected target is an occupied 2021-22 id (chain-skipped): 2

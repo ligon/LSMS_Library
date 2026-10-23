@@ -1,0 +1,45 @@
+{
+ "cold": true,
+ "columns": [
+  "Quantity",
+  "Purchased",
+  "Quantity_purchased"
+ ],
+ "country": "Senegal",
+ "grain_collapse_warnings": 0,
+ "grain_reports": [],
+ "index_names": [
+  "i",
+  "t",
+  "v",
+  "input",
+  "crop",
+  "u"
+ ],
+ "index_unique": true,
+ "label": "cand-cold",
+ "nitrogen_input_match": {
+  "matched_rows": 1977,
+  "unmatched_rows": 7939
+ },
+ "nitrogen_kg": {
+  "by_wave": {
+   "2018-19": 82701.772425
+  },
+  "rows": 932,
+  "total": 82701.772425
+ },
+ "report_keys": [],
+ "rows": 9916,
+ "rows_by_wave": {
+  "2018-19": 9916
+ },
+ "seconds": 7.6,
+ "seed_kg": {
+  "by_wave": {
+   "2018-19": 381719.1035
+  },
+  "rows": 2430,
+  "total": 381719.1035000001
+ }
+}

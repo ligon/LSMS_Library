@@ -1165,6 +1165,16 @@ are identical.  This proof does not turn general cold/warm dtype equality
 into an API guarantee; GH #645's existing regression checks preserved row
 counts for education tables, not exact roster scalar types.
 
+The row-order difference is explained, and it is not a Mali idiosyncrasy
+(GH #1063, 2026-10-23).  =Wave.grab_data= built the =dfs:= merge keys as
+=list(set('t').union(merge_on))=, so their order followed =PYTHONHASHSEED=,
+and an =outer= merge sorts by the keys in that order.  The two EHCVM waves
+(=merge_on: [v, i]=) were therefore written sorted by cluster in some
+processes and by household id in others.  Measured on development: 6,474 of
+220,732 positions differ between seeds, all in 2018-19 and 2021-22.  The EAC-I
+waves were unaffected.  The keys now come in a fixed order (=t=, then the
+declared =merge_on=), so cold, cold and warm builds are order-identical.
+
 ** Existing documentation/source contradiction: eligibility is not duration
 
 The earlier =Household Presence / MonthsSpent= section says EHCVM binary
@@ -1290,16 +1300,20 @@ Two further facts about this table, both pre-existing and unchanged:
 - The five =| # crop_production harvest units ... |= style rows are parsed as
   DATA rows (keys beginning ='# '=, empty =Preferred Label=).  Harmless to the
   =.replace()= (no unit label equals them); #928's migration item 4.
-- *1,534 served 2014-15 =food_acquired= rows carry =u = 'unit'=*, a
-  spelling no source file holds (=s13q03b/04b/05b= in =EACIALI_p1/p2.dta=
-  have no =unit= value).  It is minted by =local_tools.map_index=, which
-  =Wave.grab_data= applies and which renames a missing =u= to ='unit'=: the
-  purchased stream keeps expenditure-only rows, and the raw files hold
-  exactly 1,912 rows with a positive =s13q03c=, no quantity and no unit --
-  the cold L2-wave parquet holds exactly 1,912 =u = 'unit'= rows, which the
-  =(t, v, i, j, u, s)= collapse (passage dropped) sums to 1,534.  That minted
-  spelling is the class the #1041 ruling forbids (a missing unit is
-  =U_UNKNOWN=, ='Unknown'=); drafted as its own issue, not fixed here.
+- *1,534 served 2014-15 =food_acquired= rows have no unit, and are served
+  =u = 'Unknown'= since GH #1234* (they were served =u = 'unit'= before).
+  No source file holds a unit for them (=s13q03b/04b/05b= in
+  =EACIALI_p1/p2.dta= have no value): the purchased stream keeps
+  expenditure-only rows, and the raw files hold exactly 1,912 rows with a
+  positive =s13q03c=, no quantity and no unit.  =local_tools.map_index=,
+  which =Wave.grab_data= applies before the L2-wave write, renames that
+  missing =u=; it used to mint the spelling ='unit'=, which the #1041 ruling
+  forbids, and now writes =U_UNKNOWN= (='Unknown'=).  The cold L2-wave
+  parquet holds exactly 1,912 such rows, which the =(t, v, i, j, u, s)=
+  collapse (passage dropped) sums to 1,534.  Measured on a private cold
+  build, development =9a0ed5f3c= vs the #1234 branch: the same 1,534 rows
+  relabel ='unit'= -> ='Unknown'=, rows 431,046 both sides, no other cell
+  changes; =food_kg_factors= serves them =none= either way.
 
 * 2026-10-21 -- 2014-15 all three price readings and missing passage-2 unit labels (GH #822)
 

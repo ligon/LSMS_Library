@@ -1,0 +1,20 @@
+lsms_library: /local/job40390255/worktrees/base-1240/lsms_library/__init__.py 9a0ed5f3c
+Uganda: rows=133,761 best warm read 1,046 ms; Site Q inside it 76.9 ms (7.3%, 1 call(s)); best Site Q over 5 reads 75.8 ms
+   Quantity checksum: n=133,699 sum=7.43473e+06 zeros=4,208
+Tanzania: rows=14,126 best warm read 164 ms; Site Q inside it 13.0 ms (7.9%, 1 call(s)); best Site Q over 5 reads 13.0 ms
+   Quantity checksum: n=14,126 sum=2.65974e+07 zeros=2,754
+lsms_library: /local/job40390255/worktrees/1259/lsms_library/__init__.py 9a0ed5f3c
+Uganda: rows=133,761 best warm read 1,044 ms; Site Q inside it 77.1 ms (7.4%, 1 call(s)); best Site Q over 5 reads 72.5 ms
+   Quantity checksum: n=133,699 sum=7.43473e+06 zeros=4,208
+Tanzania: rows=14,126 best warm read 124 ms; Site Q inside it 9.4 ms (7.6%, 1 call(s)); best Site Q over 5 reads 9.4 ms
+   Quantity checksum: n=14,126 sum=2.65974e+07 zeros=2,754
+lsms_library: /local/job40390255/worktrees/base-1240/lsms_library/__init__.py 9a0ed5f3c
+Uganda: rows=133,761 best warm read 1,044 ms; Site Q inside it 77.0 ms (7.4%, 1 call(s)); best Site Q over 5 reads 75.8 ms
+   Quantity checksum: n=133,699 sum=7.43473e+06 zeros=4,208
+Tanzania: rows=14,126 best warm read 124 ms; Site Q inside it 10.2 ms (8.2%, 1 call(s)); best Site Q over 5 reads 9.9 ms
+   Quantity checksum: n=14,126 sum=2.65974e+07 zeros=2,754
+lsms_library: /local/job40390255/worktrees/1259/lsms_library/__init__.py 9a0ed5f3c
+Uganda: rows=133,761 best warm read 1,033 ms; Site Q inside it 77.4 ms (7.5%, 1 call(s)); best Site Q over 5 reads 72.5 ms
+   Quantity checksum: n=133,699 sum=7.43473e+06 zeros=4,208
+Tanzania: rows=14,126 best warm read 123 ms; Site Q inside it 9.8 ms (7.9%, 1 call(s)); best Site Q over 5 reads 9.5 ms
+   Quantity checksum: n=14,126 sum=2.65974e+07 zeros=2,754

@@ -1,0 +1,12 @@
+OK import /local/job40390255/worktrees/894/lsms_library/__init__.py data_root /local/job40390255/data-private/894/branch
+Malawi frame shapes (9686, 3) (9686, 3)
+  2013-14: rows 4000 vs 4000; same set True; same ORDER True
+  2016-17: rows 2508 vs 2508; same set True; same ORDER True
+  2019-20: rows 3178 vs 3178; same set True; same ORDER True
+  panel_ids equal True 5686 5686 | updated_ids equal True {'2013-14': 4000, '2016-17': 2508, '2019-20': 3178}
+Nigeria frame shapes (19110, 3) (19110, 3)
+  2012Q3: rows 4859 vs 4859; same set True; same ORDER True
+  2013Q1: rows 4859 vs 4859; same set True; same ORDER True
+  2015Q3: rows 4696 vs 4696; same set True; same ORDER True
+  2016Q1: rows 4696 vs 4696; same set True; same ORDER True
+  panel_ids equal True 14251 14251 | updated_ids equal True {'2012Q3': 4859, '2013Q1': 4859, '2015Q3': 4696, '2016Q1': 4696}

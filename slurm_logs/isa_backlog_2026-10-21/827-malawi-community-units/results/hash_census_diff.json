@@ -1,0 +1,24 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 26,
+  "moved_by_country": {
+   "Malawi": 26
+  },
+  "malawi_total": 26
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "moved_by_country": [],
+  "malawi_total": null
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 130,
+  "moved_by_country": {
+   "Malawi": 130
+  },
+  "malawi_total": 130
+ }
+}

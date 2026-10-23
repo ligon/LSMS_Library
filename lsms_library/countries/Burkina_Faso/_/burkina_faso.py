@@ -90,17 +90,6 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     testdf.index.name = 'j'
     return testdf
 
-def panel_ids(df):
-    """Construct previous_i from previous_v (grappe) and previous_hid (menage).
-
-    Must match the i() format above: format_id(grappe) + format_id(menage, zeropadding=3).
-    """
-    grappe = df['previous_v'].apply(tools.format_id)
-    menage = df['previous_hid'].apply(lambda x: tools.format_id(x, zeropadding=3))
-    df['previous_i'] = grappe + menage
-    return df[['previous_i']]
-
-
 # ---------------------------------------------------------------------------
 # plot_features (GH #167; EHCVM cluster)
 # ---------------------------------------------------------------------------

@@ -55,7 +55,10 @@ changed:
 | 2018-19     | =distirct_name= + =parish_name= | string  | =DISTRICT/PARISH= composite |
 | 2019-20     | =district= + =s1aq04a=          | string  | =DISTRICT/PARISH= composite |
 
-All are drawn from GSEC1 (the household cover page).  The shift
+All are drawn from GSEC1 (the household cover page).  =comm= is ONE
+identifier rendered two ways in the raw files -- int32 8-digit in 2005-06 and
+2011-12, a 7-character string in 2009-10 and 2010-11 -- and since GH #1133 all
+four waves serve the 8-digit frame EA (item 1 below).  The shift
 from numeric EA codes to parish names occurred around 2015-16 as
 the sampling frame evolved from strict EA boundaries to parish-level
 clusters to accommodate split-off households.
@@ -67,25 +70,80 @@ boundary -- recorded per boundary in =Uganda/_/sampling.yml='s =panel:=
 blocks, which drive the =ClusterIdentityWarning= on any =Country('Uganda')=
 frame carrying =v= across them:
 
-1. *Two renderings of =comm= (a harmonisation gap, not a redraw).*  Across
-   2010-11 -> 2011-12 (both map =v: comm=), 0 of 2,510 linked households keep
-   =v=.  The survey files carry two renderings of the same EA code (int32
-   8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11); the
-   library serves both un-harmonised, so the 0% is a harmonisation gap, not a
-   redraw.  For 272 of the 322 cluster pairs the 8-digit form is the 7-digit
-   form with one digit inserted at position 3 (=1020001 -> 10210001=); the
-   other 50 also re-code the district field.  2005-06 and 2011-12 share 321 of
-   their 322 / 321 =v= verbatim.  The linkage is verified, so 2011-12 is
-   declared =wave-scoped= (=unobservable= means "no verified linkage", which
-   is false here) and a frame carrying =v= across 2010-11 -> 2011-12 warns.
-   It becomes =stable= once the rendering is harmonised, which needs the
-   322-pair table, not a digit rule: the Uganda =comm= rendering issue (to be
-   filed; DESIGN.org Q5, ruling 2026-10-18).  /History:/ first declared
-   =unobservable= (provisional) on 2026-10-19, on the reading that this was a
-   library defect rather than a survey fact; reversed the same day (dispatcher
-   call on red team r1 H1, @ligon informed), because the raw =GSEC1.dta= files
-   themselves carry both renderings (measured via =get_dataframe=: int32
-   8-digit in 2005-06 and 2011-12, 7-character string in 2009-10 and 2010-11).
+1. *Two renderings of =comm= -- HARMONISED by GH #1133 (2026-10-22).*  The raw
+   GSEC1 files write the same EA as an int32 8-digit code in 2005-06 / 2011-12
+   ("EA Code in 2005/06") and as a 7-character string in 2009-10 / 2010-11, and
+   the library used to serve both, so 0 of 2,510 linked households kept =v=
+   across 2010-11 -> 2011-12 (and 0 of 2,607 across 2005-06 -> 2009-10).  The
+   7-character waves are now served the 8-digit frame EA through the reviewed
+   =comm_frame_ea= table in =categorical_mapping.org=, applied by
+   =uganda.comm_frame_ea= on =sample= and =cluster_features= (same function on
+   both, so =_join_v_from_sample= still hands every table one key).
+   Measured after (=Country('Uganda').sample()=):
+
+   | boundary              | before          | after                  |
+   |-----------------------+-----------------+------------------------|
+   | 2005-06 -> 2009-10    | 0 / 2,607       | 2,410 / 2,607 (92.4%)  |
+   | 2009-10 -> 2010-11    | 1,819 / 2,647   | 2,207 / 2,647 (83.4%)  |
+   | 2010-11 -> 2011-12    | 0 / 2,510       | 2,510 / 2,510 (100%)   |
+
+   Every remaining non-keeper is a 2009-10 =@lat,lon= bin or no-=v= household
+   (defect 2).  Served distinct =v=: 2009-10 656 -> 656 (317 EAs now 8-digit,
+   339 bins and 24 NA untouched), 2010-11 324 -> 322, 2005-06 / 2011-12
+   unchanged.  2011-12 is declared =stable= in =sampling.yml= (it was
+   =wave-scoped= from 2026-10-19: "=unobservable= means no verified linkage",
+   which was false; dispatcher call on red team r1 H1, @ligon informed).
+
+   *There are three code families, not two, and the community files name
+   them.*  CSECTION1 (2005-06 =csec1=, 2009-10, 2010-11) keys on a 7-character
+   =comm= labelled "Community Code According to 2005/06 District Definitions",
+   and from 2009-10 also carries =comcod=, "... According to 2009/10 [2010/2011]
+   District Definitions"; 2011-12 =CSEC1= pairs an 8-digit =comm= with a
+   7-character =comcod= ("Community code current").  The 2005/06-definitions
+   form is the 8-digit code with its 4th digit dropped -- all 317 2005-06 ->
+   2009-10 household pairs, and every community-file =comm=.  2009-10 GSEC1
+   writes that form; *2010-11 GSEC1 writes the CURRENT 2010/11 definitions*
+   (321 of its 324 codes match that wave's CSECTION1 =comcod=, only 273 its
+   =comm=), so 50 EAs re-code the district field (=1140003 -> 11030003=) and no
+   digit rule recovers them.  That is also why 388 households changed =v= across
+   2009-10 -> 2010-11 before this fix, which the =mixed= note blamed on the bins
+   alone.  /Contradicts/ "2010-11 ... movers and split-offs got re-coded with
+   their original-sample EA" (§"Hybrid =v= in 2009-10" below): same EA, but
+   written in a later district definition for 50 of them.
+
+   *The table* (370 pairs) is every =(7-character, 8-digit)= pair seen on one
+   household across the four early boundaries (HHID is unchanged 2005-06 ..
+   2011-12, so that is the library's linkage), and every row is corroborated
+   by at least one community file's own =comm=/=comcod= pairing -- though for
+   14 rows (13 "drop 4th digit" plus =2220022 -> 20530022=) that support is the
+   drop-4th-digit rule alone: no 2011-12 =CSEC1= pairing names them and no
+   chain from a CSECTION1 row to a =CSEC1= row does.  The rule itself is
+   validated (every community-file =comm=, 320 / 320 / 322), and the chain
+   =CSEC1= -> 2010-11 CSECTION1 agrees with it for 308 of =CSEC1='s 309 EAs.
+   The 309th is a contradiction *in* =CSEC1=: it pairs =comcod 3010003= with
+   =comm 30130033=, but no GSEC1 household in any wave carries =30130033=,
+   while 10 sit on =30130003= in both 2005-06 and 2011-12.  The table follows
+   the households (=3010003 -> 30130003=); =30130033= is most likely a typo in
+   =CSEC1=.  No 7-character code ever meets two 8-digit codes.  The issue's
+   "2 non-bijective pairs" (=1070027=, =1150027= -> =10730027=; =3060002=,
+   =3180002= -> =30630002=) are one EA under two district definitions inside
+   2010-11, paired on one row by CSECTION1 itself, so both codes are mapped.
+   In raw 2010-11 GSEC1, =1070027= is written by two households (one original;
+   one 2010-11 split-off, never linked) against nine on =1150027=, and
+   =3060002= by one against eight on =3180002= (the table's household columns
+   count linked households only: 1 / 8 and 1 / 7).  One 2010-11 code,
+   =1530040= (one household, on no linkage and in no community file), is NOT
+   in the table and keeps its 7-character rendering.
+
+   *Cost, stated*: the served =v= is no longer the literal key of the
+   2009-10 / 2010-11 CSECTION1 files (literal =comm= matches were 2,399 and
+   2,250 households; now 0).  2005-06's =v= never was the =csec1= key (0 of
+   3,123 households match it literally, before and after), and 2011-12's
+   still is (=CSEC1.comm=, 2,764 households).  No Uganda table reads a
+   community file; a consumer joining
+   CSECTION1 should drop the 4th digit of =v= to get its =comm= (or use the
+   table).  /History:/ declared =unobservable= (provisional) on 2026-10-19,
+   then =wave-scoped= the same day, then =stable= on 2026-10-22.
 2. *Synthetic =@lat,lon= bins in 2009-10* (see the next-but-one subsection):
    339 of that wave's 656 =v= are 0.05-degree GPS bins, not clusters, so its
    two boundaries are declared =mixed=.
@@ -190,10 +248,17 @@ dropped these 565 households in =roster_to_characteristics='s
 =groupby=), =sample()='s =v= column in 2009-10 is populated by a
 hybrid rule:
 
-- =v = comm= (7-digit numeric string) when =comm= is non-blank —
-  2 410 households, 317 distinct panel EAs.  Matches CSECTION1's
-  =comm= index exactly, so community-questionnaire joins work as
-  they always did.
+- =v = comm= when =comm= is non-blank — 2 410 households, 317
+  distinct panel EAs — served since GH #1133 as the 8-digit frame EA
+  (=comm_frame_ea=), the same code 2005-06 and 2011-12 write.  This
+  bullet used to say the 7-digit =v= "Matches CSECTION1's =comm= index
+  exactly, so community-questionnaire joins work as they always did".
+  Measured 2026-10-22, that was nearly but not exactly true: 315 of the
+  317 matched; =1020016= (3 households) and =2030008= (8) are in neither
+  CSECTION1 =comm= nor =comcod=.  The same holds of the 4th-digit-dropped
+  form now served: =CSECTION1.comm= = =v= without its 4th digit for 2,399 of
+  the 2,410 households, all but the same two EAs (served as =10210016=, 3
+  households, and =20330008=, 8).
 - =v = "@{lat:+.2f},{lon:+.2f}"= (a /synthetic/ label prefixed with
   =@=, binned to a 0.05° grid ≈ 5.5 km) when =comm= is blank but
   coordinates are available — 541 households, ~339 distinct bins.
@@ -234,7 +299,9 @@ and a fabricated cluster would be worse than a missing one.
 Why only 2009-10 gets the hybrid treatment: 2010-11 and 2011-12
 also use =comm= from GSEC1, but their raw surveys populated it for
 every household (movers and split-offs got re-coded with their
-original-sample EA), so no fallback is needed.  From 2013-14 onward,
+original-sample EA), so no fallback is needed.  (2010-11 writes that EA
+in its 2010/11 district definitions for 50 EAs; see item 1 of "=v=
+across waves" above.)  From 2013-14 onward,
 =v= is a parish identifier — every household has one — and the
 issue disappears by construction.
 
@@ -1116,6 +1183,24 @@ Measured effect of the whole change (cold build, =LSMS_NO_CACHE=1=):
 =var/cluster_features.parquet= has 4,809, the difference being the four
 2010-11 clusters below, which the framework's post-read
 =dropna(how='all')= removes.)
+
+/Since GH #1133 (2026-10-22)/ 2009-10 and 2010-11 =v= are the 8-digit frame
+EA, and two 2010-11 EAs that the raw file split across two district
+definitions are one cluster again (=10730027=, =30630002=): 2010-11
+=cluster_features= goes 320 -> *318* rows (=sample= serves 322 distinct =v=;
+the four all-conflict clusters below are still dropped) and the whole table
+*4,803* rows.  Every other cluster row is identical after the relabel.
+=30630002='s two halves agreed on everything.  =10730027='s GPS is now
+=<NA>=, and the cause is NOT its 2005/06-form household: that household's
+fix sits 0.0 km from eight of the nine =1150027= households.  The ninth, a
+2010/11-form household coded =MUBENDE=, is 34.66 km away (probably a
+mover; =comm= is the origin EA), so =1150027= was already =<NA>= under
+=reduce_to_agreed= before the merge, and the merged cluster inherits that
+conflict.  Effect: 2010-11 rows with a GPS fix go 188 -> 186 (one per merged
+EA), and =10730027= loses a fix that 9 of its 11 households share (9 of the
+10 that have one in the geovars file; the 2010-11 split-off has none).
+The four all-conflict 2010-11 clusters and their 42 households are unchanged
+(=21230011=, =21530004=, =30330009=, =30730018=).
 
 The 368 (2005-06) and the surviving NaN-key rows are still DELETED — that
 is decision D2 of =slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org=
@@ -2093,6 +2178,30 @@ See =.coder/ledger/1062-uganda-sibling-writes.md= and the scoped verification re
   Pre-existing; unrelated to GH #323.  If a =unps_geovars_2019_20= file
   exists it should be wired in.
 :END:
+GH #592 answer (2026-10-23; the TODO keyword is left for a maintainer to
+close): *no such file was released.*  WB entry 3902
+(=UGA_2019_UNPS_v03_M=, still the latest release) lists 109 data files --
+the 109 we hold -- and none is a geovariables file; of its 1,963 documented
+variables none is a coordinate (the only GPS variables are parcel / plot
+AREA, =s2aq4=, =s2aq04=, =s2aq04_1=, =s2aq04_1_1=, and the flag
+=s2aq05_211_1= "Was GPS captured?").  It is the only wave here with no
+=unps_geovars_*= file (2005-06 holds a copy of 2009-10's).  The instrument
+DID record location: the household questionnaire's cover item "9. GPS
+COORDINATES" (LAT / LONG), and the BID (=unps2019_20_bid.pdf=, §3.1): "The
+GPS was used to collect information on household location".  The shipped
+=GSEC1= keeps cover items 2, 3, 4 and 7 (=s1aq02a=, =s1aq03a=, =s1aq04a=,
+=urban=) and drops item 9.  So 2019-20 is *asked-not-distributed*: 0 of 824
+clusters with coordinates, correctly unwired.
+
+The other waves' shortfall (measured cold on =development= =9a0ed5f3c=:
+2005-06 251/322, 2009-10 605/656, 2010-11 188/320, 2011-12 161/321, 2013-14
+619/706, 2015-16 743/875, 2018-19 618/781) is NOT a release or wiring gap.
+It is almost entirely =reduce_to_agreed= blanking where a cluster's
+households report different fixes -- Latitude cells blanked 70 / 51 / 135 /
+160 / 82 / 106 / 163 in those waves (=GrainConflictWarning=, on every
+build) -- the panel-dispersal and parish-not-EA causes recorded under
+=cluster_features= above.  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
 ** DONE =crop_production.intercropped= was wired to the SEED-USE question
 
 Found 2026-07-21 while closing the "silent colmap" gap above, by reading
@@ -3931,3 +4040,135 @@ Populated output is not reordered.
 This empty-construction rule does not promise that every country's native
 writer uses declaration order or emits every optional column.
 The separate country-local optional-dict dtype gap is not repaired here.
+
+* =plot_labor=: a missing use-flag is not "No" (GH #1250, 2026-10-23)
+
+=uganda._labor_persondays= zeroes a source's person-days where the survey's
+use-flag says "No", mirroring the World Bank's =replace hired_man_days = 0 if
+A3aq41==2= (=UGA_UNPS1.do:484=; the same rule in every =UGA_UNPS*.do= that
+reads a hired block).  In
+Stata a missing flag is not === 2=, so the row keeps its reported days, and a
+row with no reported days stays missing.  The library cast the flag through
+=_to_int_code= (nullable =Int64=), so =flag != code= was =<NA>= for a missing
+flag.  =Series.where= reads =<NA>= as False, so *every missing-flag row was
+served =PersonDays = 0=*.  That included empty stub rows and rows whose day
+cells WERE reported.  The zero is now applied only where the flag positively
+equals the code: =out.mask((flag == code).fillna(False), 0.0)=.
+
+Survey facts this leans on, measured on the raw AGSEC3A/3B:
+
+- *The 2009-10 / 2010-11 family gate =a3aq38= / =a3bq38= is a WORKER COUNT*
+  (0 to 94), not a yes/no, which is why its "No" code is 0.  The hired gates
+  (=q41= in 2009-10 / 2010-11, =q34= after) are 1 Yes / 2 No.  2009-10 hired
+  also carries two off-scheme 0s per season and one 3 (=a3bq41=).  They are
+  not "No", so their reported days are served as before.
+- *Missing flags are concentrated in 2009-10*: 1,365 / 1,452 (A family / hired)
+  and 1,836 / 1,879 (B) rows, against 0 to 170 per cell in later waves.  Most
+  are stub rows whose =a3aq1= / =a3aq3= (parcel / plot) are also blank, so the
+  =hhid-parcel-plot= key is NaN: 1,098 of 9,898 rows (A) and 1,759 of 9,789
+  (B).  No later wave has more than 5.
+- 2018-19 has no family cells and no season-B labour block, and 2019-20's family
+  roster (=AGSEC3A_1=) is not in-repo.  So only =hired= carries a gate there,
+  and the fix touches only =hired= rows in those waves.
+
+*Measured, cold, private =LSMS_DATA_DIR= per side, development =9a0ed5f3c= vs
+the fix* (=Country('Uganda').plot_labor()=):
+
+| quantity                                     | before    | after     |
+|----------------------------------------------+-----------+-----------|
+| rows                                         | 169,877   | 164,692   |
+| rows removed, NaN =plot_id= / valid plot     | --        | 3,561 / 1,624 |
+| served zeros                                 | 78,823    | 73,541    |
+| rows 0 -> reported positive days             | --        | 97 (+2,745 days) |
+| positive values changed                      | --        | 0         |
+| =PersonDays= total                           | 3,052,057 | 3,054,802 |
+| Site I NaN =plot_id= (2009-10 / 11-12 / 13-14) | 3,646 / 5 / 5 | 85 / 5 / 5 |
+| Site I NaN =v=                               | 1,235     | 1,218     |
+
+Valid-plot removals by wave: 2009-10 898, 2010-11 526, 2011-12 18, 2013-14 14,
+2015-16 2, 2018-19 22, 2019-20 144.  Every removed row was a zero.  The total
+RISES because 97 rows have a missing flag and reported days that development
+served as 0.  By wave: 2009-10 45 (one on a plot-less row, 28 days), 2010-11
+43, 2019-20 B 9.  Those rows are served as reported, which is what the Stata
+rule does.  Every surviving zero has a "No" flag or reported zero days behind
+it: =tests/test_uganda_plot_labor_flag.py= re-derives this from the raw files
+for 2009-10 and 2010-11.  An independent raw-source oracle reproduces both
+frames' row, zero, positive, total and NaN-key counts in every (wave, season)
+cell.
+
+*Wage-only hired rows are served (ruling @ligon, 2026-10-23).*  A hired row
+with a reported =Wage= and no day cells is served on its wage, with
+=PersonDays= NaN (not 0).  This follows Malawi's =_plot_labor_block=
+(=Malawi/_/malawi.py:3766-3767=: =... | (source == 'hired') & Wage.notna()=).
+The fix commit above had dropped 7 such rows (missing flag; development served
+them with a fabricated =PersonDays = 0=).  The raw oracle shows the class is
+larger: *85 rows*, all of them in 2009-10 and 2010-11, and 78 of them carry a
+"Yes" flag.  Neither development nor the first #1250 commit ever served those
+78, because their day sum is NaN and a "Yes" is not "No".  Measured, cold,
+=90fc1e18d= vs the follow-up:
+
+| wave, season | flag "Yes" | flag missing | of which wage 0 | rows added |
+|--------------+------------+--------------+-----------------+------------|
+| 2009-10 A    |         36 |            2 |               0 |         38 |
+| 2009-10 B    |         26 |            3 |               0 |         29 |
+| 2010-11 A    |          7 |            0 |               1 |          7 |
+| 2010-11 B    |          9 |            2 |               1 |         11 |
+| total        |         78 |            7 |               2 |         85 |
+
+- 164,692 -> 164,777 rows: 85 added, 0 removed, and 0 changes to =PersonDays=,
+  =Wage= or =v= on the 164,692 common keys.  Wages total 6,062,000 UGX; the 7
+  missing-flag rows are the 414,000 above.  No added row lacks a plot (so GH
+  #1120 D3 is not touched), none folds into an existing key, and every one
+  gets a =v=.  Site I is unchanged (NaN =plot_id= 95, NaN =v= 1,218), and
+  Sites B and Q report nothing on either side.
+- No other flag class has a wage-only row: the off-scheme 2009-10 codes (0, 3)
+  never carry a wage without days.  Later waves have none.
+- *Two zero wages are served* (2010-11 A 1, B 1, both "Yes").  Malawi's test is
+  =Wage.notna()=, so a reported 0 counts as a reported wage.
+- *A "No" flag with a wage was already served, and still is.*  The gate zeroes
+  the days, and the row is served with =PersonDays = 0= and its wage.  That is
+  17 raw rows (2009-10 13, 2010-11 4; 456,700 UGX), 12 of them with day cells
+  that the "No" zeroes.  Malawi has no flag and keeps any hired row with a
+  wage, so this agrees with its rule.
+- *Malawi's other half is NOT adopted.*  Malawi also drops =PersonDays == 0=
+  rows of every source.  Uganda keeps them, because a "No" flag's zero is a
+  reported value (73,541 served zeros).  Family and other rows therefore keep
+  the days-only rule, and they have no wage to be served on.
+
+Downstream: =total_*_labor_days= drop NaN days before summing, so all three are
+byte-identical (16,442 / 11,700 / 16,438 household rows; 3,054,802 days).  A
+median-wage valuation of hired days (=median_price_valuation=,
+=value_col='Wage'=, =kg_qty=PersonDays=, ladder =v= -> national by wave) keeps
+the same 21,513 rows in the price pool and the same price and value on every
+common row.  The 85 new rows receive a ladder price but a NaN value, because
+NaN days times a price is NaN.  A consumer that wants each wage itself now has
+it.
+
+*Residual NaN =plot_id= (GH #1120 D3, unchanged).*  95 rows are still served
+with a NaN =plot_id=, 50 of them with positive days: 2009-10 85 (45 positive),
+2011-12 5 (1), 2013-14 5 (4).  The final =groupby(..., dropna=False).max()=
+puts every plot-less row of a household-season-source on one NaN key.  So it
+folds DISTINCT source rows, not just duplicates: 2009-10 70 positive plot-less
+source rows -> 45 keys (69 -> 44 before the fix), 2011-12 2 -> 1, 2013-14
+4 -> 4.  Two valid-plot keys (4 positive rows) also go through that max.
+Keeping the rows apart needs a =plot_id= sentinel or a row ordinal, which is
+D3's decision, so it is reported and left alone.  This is also why Site I's
+NaN-=plot_id= count is much larger here than on the other Uganda plot tables.
+=crop_production= and =plot_inputs= collapse with =dropna=True=, and only when
+their index is non-unique, so they DELETE most NaN-key rows rather than serve
+them.
+
+*Downstream* (=transformations.total_*_labor_days=, which drop NaN and sum): the
+day totals rise by the same 2,745 (family +1,787, hired +958).  Household rows
+fall 16,481 -> 16,442 (all sources), 11,714 -> 11,700 (family) and 16,480 ->
+16,438 (hired), because households whose only rows were fabricated zeros leave
+the table.
+
+*Cost*: =uganda.py= is in every Uganda table's hash.  The census moved 28/28
+Uganda L2-country and 224/224 Uganda L2-wave hashes, no other country's, and
+0/40 =build_transforms_fingerprint=, so this is a Uganda-only re-warm.  The
+wage-only follow-up moves the same set again: =uganda.py= and
+=data_scheme.yml= give 28/28 and 224/224, against both development and
+=90fc1e18d=, and 0/40.  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/1250-uganda-labor-flag/= (follow-up:
+=r2/=); ledger =.coder/ledger/1250-uganda-labor-flag.md=.

@@ -1,0 +1,339 @@
+{
+ "crop_production.Quantity": {
+  "countries": {
+   "Benin": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 2,
+    "fired_before": 2,
+    "judged_after": 9056,
+    "judged_before": 9056,
+    "left": 0,
+    "reasons": {},
+    "rows": 9056,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "Burkina_Faso": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 1,
+    "fired_before": 1,
+    "judged_after": 15593,
+    "judged_before": 15593,
+    "left": 0,
+    "reasons": {},
+    "rows": 15593,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "CotedIvoire": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 16,
+    "fired_before": 16,
+    "judged_after": 22223,
+    "judged_before": 22223,
+    "left": 0,
+    "reasons": {},
+    "rows": 22223,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "Ethiopia": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 10,
+    "fired_before": 10,
+    "judged_after": 85519,
+    "judged_before": 85519,
+    "left": 0,
+    "reasons": {},
+    "rows": 85519,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "EthiopiaRHS": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 2,
+    "fired_before": 2,
+    "judged_after": 17523,
+    "judged_before": 17523,
+    "left": 0,
+    "reasons": {},
+    "rows": 17523,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "GhanaLSS": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 0,
+    "fired_before": 0,
+    "judged_after": 0,
+    "judged_before": 0,
+    "left": 0,
+    "reasons": {},
+    "rows": 37280,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "GhanaSPS": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 7,
+    "fired_before": 7,
+    "judged_after": 25109,
+    "judged_before": 25109,
+    "left": 0,
+    "reasons": {},
+    "rows": 25109,
+    "rows_changing_rung": 72,
+    "rung_moves": {
+     "t,u,j -> t,u": 72
+    }
+   },
+   "Guinea-Bissau": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 1,
+    "fired_before": 1,
+    "judged_after": 12173,
+    "judged_before": 12173,
+    "left": 0,
+    "reasons": {},
+    "rows": 12173,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "Malawi": {
+    "arrived": 0,
+    "by_wave_crop_unit": {
+     "left | 2016-17 | Pigeon Pea (Nandolo) | Other (Specify)": 1
+    },
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": {
+      "max": 0.068,
+      "median": 0.068,
+      "min": 0.068,
+      "n": 1
+     }
+    },
+    "fired_after": 19,
+    "fired_before": 20,
+    "judged_after": 135078,
+    "judged_before": 135078,
+    "left": 1,
+    "reasons": {
+     "left: same rung, reference rose (zeros no longer in the quantile)": 1
+    },
+    "rows": 135078,
+    "rows_changing_rung": 30,
+    "rung_moves": {
+     "t,u,j -> t,u": 30
+    }
+   },
+   "Mali": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 18,
+    "fired_before": 18,
+    "judged_after": 35060,
+    "judged_before": 35060,
+    "left": 0,
+    "reasons": {},
+    "rows": 35060,
+    "rows_changing_rung": 33,
+    "rung_moves": {
+     "t,u,j -> t,u": 33
+    }
+   },
+   "Niger": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 1,
+    "fired_before": 1,
+    "judged_after": 47123,
+    "judged_before": 47123,
+    "left": 0,
+    "reasons": {},
+    "rows": 47123,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "Nigeria": {
+    "arrived": 0,
+    "by_wave_crop_unit": {
+     "left | 2011Q1 | Maize | Unknown": 4
+    },
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": {
+      "max": 0.896,
+      "median": 0.896,
+      "min": 0.896,
+      "n": 4
+     }
+    },
+    "fired_after": 5,
+    "fired_before": 9,
+    "judged_after": 62844,
+    "judged_before": 62844,
+    "left": 4,
+    "reasons": {
+     "left: rung t,u,j -> t,u, reference rose": 4
+    },
+    "rows": 62844,
+    "rows_changing_rung": 648,
+    "rung_moves": {
+     "t,u,j -> t,u": 648
+    }
+   },
+   "Senegal": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 1,
+    "fired_before": 1,
+    "judged_after": 8428,
+    "judged_before": 8428,
+    "left": 0,
+    "reasons": {},
+    "rows": 8428,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "Tanzania": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 14,
+    "fired_before": 14,
+    "judged_after": 14126,
+    "judged_before": 14126,
+    "left": 0,
+    "reasons": {},
+    "rows": 14126,
+    "rows_changing_rung": 37,
+    "rung_moves": {
+     "t,u,j -> t,u": 37
+    }
+   },
+   "Togo": {
+    "arrived": 0,
+    "by_wave_crop_unit": {},
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": null
+    },
+    "fired_after": 1,
+    "fired_before": 1,
+    "judged_after": 11565,
+    "judged_before": 11565,
+    "left": 0,
+    "reasons": {},
+    "rows": 11565,
+    "rows_changing_rung": 0,
+    "rung_moves": {}
+   },
+   "Uganda": {
+    "arrived": 0,
+    "by_wave_crop_unit": {
+     "left | 2010-11 | Ground Nuts | Others specify": 1,
+     "left | 2010-11 | Pumpkins | Others specify": 1,
+     "left | 2010-11 | Rice | Others specify": 1,
+     "left | 2010-11 | Sugarcane | Others specify": 1
+    },
+    "cell_tuj_zero_share": {
+     "arrived": null,
+     "left": {
+      "max": 0.969,
+      "median": 0.679,
+      "min": 0.286,
+      "n": 4
+     }
+    },
+    "fired_after": 22,
+    "fired_before": 26,
+    "judged_after": 133761,
+    "judged_before": 133761,
+    "left": 4,
+    "reasons": {
+     "left: same rung, reference rose (zeros no longer in the quantile)": 4
+    },
+    "rows": 133761,
+    "rows_changing_rung": 2574,
+    "rung_moves": {
+     "t -> t,u": 2451,
+     "t,u,j -> t,u": 123
+    }
+   }
+  },
+  "rung_transitions_all_countries": {
+   "None -> None": 37280,
+   "t -> t": 41977,
+   "t -> t,u": 2451,
+   "t,u -> t,u": 53790,
+   "t,u,j -> t,u": 943,
+   "t,u,j -> t,u,j": 536020
+  },
+  "total": {
+   "arrived": 0,
+   "fired_after": 120,
+   "fired_before": 129,
+   "judged_after": 635181,
+   "judged_before": 635181,
+   "left": 9,
+   "rows": 672461,
+   "rows_changing_rung": 3394
+  }
+ }
+}

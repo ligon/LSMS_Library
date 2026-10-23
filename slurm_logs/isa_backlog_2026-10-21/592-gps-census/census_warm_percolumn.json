@@ -1,0 +1,2284 @@
+{
+ "_meta": {
+  "commit": "9a0ed5f3c",
+  "run": "WARM re-run of census.py (current version) on the same data root, adding per-column within-cluster disagreement and grain-report columns; its census block is identical to census_cold.json for all six countries (checked)"
+ },
+ "Nigeria": {
+  "l2_country_cache_existed_before": true,
+  "error": null,
+  "waves_declared": [
+   "2010Q3",
+   "2011Q1",
+   "2012Q3",
+   "2013Q1",
+   "2015Q3",
+   "2016Q1",
+   "2018Q3",
+   "2019Q1",
+   "2023Q3",
+   "2024Q1"
+  ],
+  "warnings": {
+   "GrainCollapseWarning": 6,
+   "NullReadWarning": 2,
+   "ClusterIdentityWarning": 1
+  },
+  "columns": [
+   "Region",
+   "District",
+   "Rural",
+   "Latitude",
+   "Longitude"
+  ],
+  "index": [
+   "t",
+   "v"
+  ],
+  "census": {
+   "2010Q3": {
+    "rows": 500,
+    "clusters": 500,
+    "clusters_with_lat": 500,
+    "clusters_with_lon": 500,
+    "clusters_with_both": 500,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2011Q1": {
+    "rows": 500,
+    "clusters": 500,
+    "clusters_with_lat": 500,
+    "clusters_with_lon": 500,
+    "clusters_with_both": 500,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2012Q3": {
+    "rows": 647,
+    "clusters": 647,
+    "clusters_with_lat": 645,
+    "clusters_with_lon": 645,
+    "clusters_with_both": 645,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2013Q1": {
+    "rows": 647,
+    "clusters": 647,
+    "clusters_with_lat": 645,
+    "clusters_with_lon": 645,
+    "clusters_with_both": 645,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2015Q3": {
+    "rows": 792,
+    "clusters": 792,
+    "clusters_with_lat": 784,
+    "clusters_with_lon": 784,
+    "clusters_with_both": 784,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2016Q1": {
+    "rows": 792,
+    "clusters": 792,
+    "clusters_with_lat": 784,
+    "clusters_with_lon": 784,
+    "clusters_with_both": 784,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2018Q3": {
+    "rows": 685,
+    "clusters": 685,
+    "clusters_with_lat": 671,
+    "clusters_with_lon": 671,
+    "clusters_with_both": 671,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2019Q1": {
+    "rows": 685,
+    "clusters": 685,
+    "clusters_with_lat": 671,
+    "clusters_with_lon": 671,
+    "clusters_with_both": 671,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2023Q3": {
+    "rows": 911,
+    "clusters": 911,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2024Q1": {
+    "rows": 911,
+    "clusters": 911,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   }
+  },
+  "grain_reports": [
+   {
+    "wave": "2012Q3",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 4898,
+    "dropped": 4250,
+    "destroyed": 609,
+    "conflicting_groups": 70,
+    "nan_key_rows": 39,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2013Q1",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 4898,
+    "dropped": 4250,
+    "destroyed": 609,
+    "conflicting_groups": 70,
+    "nan_key_rows": 39,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2015Q3",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 4697,
+    "dropped": 3904,
+    "destroyed": 618,
+    "conflicting_groups": 78,
+    "nan_key_rows": 1,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2016Q1",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 4697,
+    "dropped": 3904,
+    "destroyed": 618,
+    "conflicting_groups": 78,
+    "nan_key_rows": 1,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2018Q3",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 5263,
+    "dropped": 4578,
+    "destroyed": 1254,
+    "conflicting_groups": 129,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2019Q1",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 5263,
+    "dropped": 4578,
+    "destroyed": 1254,
+    "conflicting_groups": 129,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   }
+  ],
+  "precollapse": {
+   "2010Q3": {
+    "hh_grain": true,
+    "rows": 5000,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 5000,
+    "households": 5000,
+    "groups": 500,
+    "multi_row_groups": 500,
+    "groups_with_gps": 500,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2011Q1": {
+    "hh_grain": true,
+    "rows": 5000,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 5000,
+    "households": 5000,
+    "groups": 500,
+    "multi_row_groups": 500,
+    "groups_with_gps": 500,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2012Q3": {
+    "hh_grain": true,
+    "rows": 4898,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 4801,
+    "households": 4898,
+    "groups": 648,
+    "multi_row_groups": 496,
+    "groups_with_gps": 646,
+    "groups_gps_disagree": 6,
+    "groups_gps_partial": 65,
+    "nan_v_rows": 39,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 6,
+      "groups_partial": 65
+     },
+     "Longitude": {
+      "groups_disagree": 6,
+      "groups_partial": 65
+     }
+    }
+   },
+   "2013Q1": {
+    "hh_grain": true,
+    "rows": 4898,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 4801,
+    "households": 4898,
+    "groups": 648,
+    "multi_row_groups": 496,
+    "groups_with_gps": 646,
+    "groups_gps_disagree": 6,
+    "groups_gps_partial": 65,
+    "nan_v_rows": 39,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 6,
+      "groups_partial": 65
+     },
+     "Longitude": {
+      "groups_disagree": 6,
+      "groups_partial": 65
+     }
+    }
+   },
+   "2015Q3": {
+    "hh_grain": true,
+    "rows": 4697,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 4613,
+    "households": 4697,
+    "groups": 793,
+    "multi_row_groups": 485,
+    "groups_with_gps": 785,
+    "groups_gps_disagree": 24,
+    "groups_gps_partial": 57,
+    "nan_v_rows": 1,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 24,
+      "groups_partial": 57
+     },
+     "Longitude": {
+      "groups_disagree": 24,
+      "groups_partial": 57
+     }
+    }
+   },
+   "2016Q1": {
+    "hh_grain": true,
+    "rows": 4697,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 4613,
+    "households": 4697,
+    "groups": 793,
+    "multi_row_groups": 485,
+    "groups_with_gps": 785,
+    "groups_gps_disagree": 24,
+    "groups_gps_partial": 57,
+    "nan_v_rows": 1,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 24,
+      "groups_partial": 57
+     },
+     "Longitude": {
+      "groups_disagree": 24,
+      "groups_partial": 57
+     }
+    }
+   },
+   "2018Q3": {
+    "hh_grain": true,
+    "rows": 5263,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 5116,
+    "households": 5263,
+    "groups": 685,
+    "multi_row_groups": 518,
+    "groups_with_gps": 671,
+    "groups_gps_disagree": 49,
+    "groups_gps_partial": 92,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 49,
+      "groups_partial": 92
+     },
+     "Longitude": {
+      "groups_disagree": 49,
+      "groups_partial": 92
+     }
+    }
+   },
+   "2019Q1": {
+    "hh_grain": true,
+    "rows": 5263,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 5116,
+    "households": 5263,
+    "groups": 685,
+    "multi_row_groups": 518,
+    "groups_with_gps": 671,
+    "groups_gps_disagree": 49,
+    "groups_gps_partial": 92,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 49,
+      "groups_partial": 92
+     },
+     "Longitude": {
+      "groups_disagree": 49,
+      "groups_partial": 92
+     }
+    }
+   },
+   "2023Q3": {
+    "hh_grain": true,
+    "rows": 5067,
+    "columns": [
+     "District",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   },
+   "2024Q1": {
+    "hh_grain": true,
+    "rows": 5067,
+    "columns": [
+     "District",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   }
+  }
+ },
+ "Ethiopia": {
+  "l2_country_cache_existed_before": true,
+  "error": null,
+  "waves_declared": [
+   "2011-12",
+   "2013-14",
+   "2015-16",
+   "2018-19",
+   "2021-22"
+  ],
+  "warnings": {
+   "GrainCollapseWarning": 4,
+   "ClusterIdentityWarning": 1
+  },
+  "columns": [
+   "Region",
+   "District",
+   "Rural",
+   "Latitude",
+   "Longitude"
+  ],
+  "index": [
+   "t",
+   "v"
+  ],
+  "census": {
+   "2011-12": {
+    "rows": 333,
+    "clusters": 333,
+    "clusters_with_lat": 333,
+    "clusters_with_lon": 333,
+    "clusters_with_both": 333,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2013-14": {
+    "rows": 433,
+    "clusters": 433,
+    "clusters_with_lat": 433,
+    "clusters_with_lon": 433,
+    "clusters_with_both": 433,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2015-16": {
+    "rows": 432,
+    "clusters": 432,
+    "clusters_with_lat": 432,
+    "clusters_with_lon": 432,
+    "clusters_with_both": 432,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2018-19": {
+    "rows": 535,
+    "clusters": 535,
+    "clusters_with_lat": 516,
+    "clusters_with_lon": 516,
+    "clusters_with_both": 516,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2021-22": {
+    "rows": 435,
+    "clusters": 435,
+    "clusters_with_lat": 432,
+    "clusters_with_lon": 432,
+    "clusters_with_both": 432,
+    "has_lat_col": true,
+    "has_lon_col": true
+   }
+  },
+  "grain_reports": [
+   {
+    "wave": "2011-12",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 3969,
+    "dropped": 3636,
+    "destroyed": 373,
+    "conflicting_groups": 34,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2013-14",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 5262,
+    "dropped": 4829,
+    "destroyed": 454,
+    "conflicting_groups": 43,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2015-16",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 4954,
+    "dropped": 4522,
+    "destroyed": 732,
+    "conflicting_groups": 72,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2021-22",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 4959,
+    "dropped": 4524,
+    "destroyed": 1240,
+    "conflicting_groups": 111,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   }
+  ],
+  "precollapse": {
+   "2011-12": {
+    "hh_grain": true,
+    "rows": 3969,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 3917,
+    "households": 3969,
+    "groups": 333,
+    "multi_row_groups": 333,
+    "groups_with_gps": 333,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 34,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 34
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 34
+     }
+    }
+   },
+   "2013-14": {
+    "hh_grain": true,
+    "rows": 5262,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 5256,
+    "households": 5262,
+    "groups": 433,
+    "multi_row_groups": 433,
+    "groups_with_gps": 433,
+    "groups_gps_disagree": 38,
+    "groups_gps_partial": 5,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 38,
+      "groups_partial": 5
+     },
+     "Longitude": {
+      "groups_disagree": 38,
+      "groups_partial": 5
+     }
+    }
+   },
+   "2015-16": {
+    "hh_grain": true,
+    "rows": 4954,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 4954,
+    "households": 4954,
+    "groups": 432,
+    "multi_row_groups": 432,
+    "groups_with_gps": 432,
+    "groups_gps_disagree": 72,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 72,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 72,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2018-19": {
+    "hh_grain": true,
+    "rows": 6770,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 6513,
+    "households": 6770,
+    "groups": 535,
+    "multi_row_groups": 535,
+    "groups_with_gps": 516,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2021-22": {
+    "hh_grain": true,
+    "rows": 4959,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 4812,
+    "households": 4959,
+    "groups": 435,
+    "multi_row_groups": 435,
+    "groups_with_gps": 432,
+    "groups_gps_disagree": 72,
+    "groups_gps_partial": 49,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 72,
+      "groups_partial": 49
+     },
+     "Longitude": {
+      "groups_disagree": 72,
+      "groups_partial": 49
+     }
+    }
+   }
+  }
+ },
+ "Malawi": {
+  "l2_country_cache_existed_before": true,
+  "error": null,
+  "waves_declared": [
+   "2004-05",
+   "2010-11",
+   "2013-14",
+   "2016-17",
+   "2019-20"
+  ],
+  "warnings": {
+   "GrainCollapseWarning": 3,
+   "NullReadWarning": 2
+  },
+  "columns": [
+   "Region",
+   "District",
+   "Rural",
+   "Latitude",
+   "Longitude"
+  ],
+  "index": [
+   "t",
+   "v"
+  ],
+  "census": {
+   "2004-05": {
+    "rows": 564,
+    "clusters": 564,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2010-11": {
+    "rows": 768,
+    "clusters": 768,
+    "clusters_with_lat": 768,
+    "clusters_with_lon": 768,
+    "clusters_with_both": 768,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2013-14": {
+    "rows": 204,
+    "clusters": 204,
+    "clusters_with_lat": 204,
+    "clusters_with_lon": 204,
+    "clusters_with_both": 204,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2016-17": {
+    "rows": 880,
+    "clusters": 880,
+    "clusters_with_lat": 779,
+    "clusters_with_lon": 779,
+    "clusters_with_both": 779,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2019-20": {
+    "rows": 819,
+    "clusters": 819,
+    "clusters_with_lat": 717,
+    "clusters_with_lon": 717,
+    "clusters_with_both": 717,
+    "has_lat_col": true,
+    "has_lon_col": true
+   }
+  },
+  "grain_reports": [
+   {
+    "wave": "2013-14",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 4000,
+    "dropped": 3796,
+    "destroyed": 3540,
+    "conflicting_groups": 188,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2016-17",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 14955,
+    "dropped": 14075,
+    "destroyed": 1994,
+    "conflicting_groups": 85,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   },
+   {
+    "wave": "2019-20",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 14612,
+    "dropped": 13793,
+    "destroyed": 3146,
+    "conflicting_groups": 108,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   }
+  ],
+  "precollapse": {
+   "2004-05": {
+    "hh_grain": true,
+    "rows": 11280,
+    "columns": [
+     "District",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   },
+   "2010-11": {
+    "hh_grain": true,
+    "rows": 12271,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 12271,
+    "households": 12271,
+    "groups": 768,
+    "multi_row_groups": 768,
+    "groups_with_gps": 768,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2013-14": {
+    "hh_grain": true,
+    "rows": 4000,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 4000,
+    "households": 4000,
+    "groups": 204,
+    "multi_row_groups": 204,
+    "groups_with_gps": 204,
+    "groups_gps_disagree": 188,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 93,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 165,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 131,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 188,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 188,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2016-17": {
+    "hh_grain": true,
+    "rows": 14955,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 12444,
+    "households": 14955,
+    "groups": 880,
+    "multi_row_groups": 880,
+    "groups_with_gps": 779,
+    "groups_gps_disagree": 7,
+    "groups_gps_partial": 4,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 75,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 7,
+      "groups_partial": 4
+     },
+     "Longitude": {
+      "groups_disagree": 7,
+      "groups_partial": 4
+     }
+    }
+   },
+   "2019-20": {
+    "hh_grain": true,
+    "rows": 14612,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 11426,
+    "households": 14612,
+    "groups": 819,
+    "multi_row_groups": 819,
+    "groups_with_gps": 717,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 8,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 66,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 98,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 86,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 8
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 8
+     }
+    }
+   }
+  }
+ },
+ "Niger": {
+  "l2_country_cache_existed_before": true,
+  "error": null,
+  "waves_declared": [
+   "2011-12",
+   "2014-15",
+   "2018-19",
+   "2021-22"
+  ],
+  "warnings": {
+   "GrainCollapseWarning": 1,
+   "NullReadWarning": 2
+  },
+  "columns": [
+   "Region",
+   "District",
+   "Rural",
+   "Latitude",
+   "Longitude"
+  ],
+  "index": [
+   "t",
+   "v"
+  ],
+  "census": {
+   "2011-12": {
+    "rows": 270,
+    "clusters": 270,
+    "clusters_with_lat": 270,
+    "clusters_with_lon": 270,
+    "clusters_with_both": 270,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2014-15": {
+    "rows": 270,
+    "clusters": 270,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2018-19": {
+    "rows": 504,
+    "clusters": 504,
+    "clusters_with_lat": 493,
+    "clusters_with_lon": 493,
+    "clusters_with_both": 493,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2021-22": {
+    "rows": 555,
+    "clusters": 555,
+    "clusters_with_lat": 555,
+    "clusters_with_lon": 555,
+    "clusters_with_both": 555,
+    "has_lat_col": true,
+    "has_lon_col": true
+   }
+  },
+  "grain_reports": [
+   {
+    "wave": "2014-15",
+    "site": "Wave.cluster_features",
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 3617,
+    "dropped": 3347,
+    "destroyed": 42,
+    "conflicting_groups": 4,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   }
+  ],
+  "precollapse": {
+   "2011-12": {
+    "hh_grain": false,
+    "rows": 3968,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 3968,
+    "groups": 270,
+    "multi_row_groups": 270,
+    "groups_with_gps": 270,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2014-15": {
+    "hh_grain": true,
+    "rows": 3617,
+    "columns": [
+     "District",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   },
+   "2018-19": {
+    "hh_grain": false,
+    "rows": 6024,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 5895,
+    "groups": 504,
+    "multi_row_groups": 504,
+    "groups_with_gps": 493,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2021-22": {
+    "hh_grain": true,
+    "rows": 6622,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "i",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 6622,
+    "households": 34,
+    "groups": 555,
+    "multi_row_groups": 555,
+    "groups_with_gps": 555,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   }
+  }
+ },
+ "Uganda": {
+  "l2_country_cache_existed_before": true,
+  "error": null,
+  "waves_declared": [
+   "2005-06",
+   "2009-10",
+   "2010-11",
+   "2011-12",
+   "2013-14",
+   "2015-16",
+   "2018-19",
+   "2019-20"
+  ],
+  "warnings": {
+   "GrainCollapseWarning": 8,
+   "NullReadWarning": 2,
+   "ClusterIdentityWarning": 1
+  },
+  "columns": [
+   "Region",
+   "Rural",
+   "District",
+   "Latitude",
+   "Longitude"
+  ],
+  "index": [
+   "t",
+   "v"
+  ],
+  "census": {
+   "2005-06": {
+    "rows": 322,
+    "clusters": 322,
+    "clusters_with_lat": 251,
+    "clusters_with_lon": 251,
+    "clusters_with_both": 251,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2009-10": {
+    "rows": 656,
+    "clusters": 656,
+    "clusters_with_lat": 605,
+    "clusters_with_lon": 605,
+    "clusters_with_both": 605,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2010-11": {
+    "rows": 320,
+    "clusters": 320,
+    "clusters_with_lat": 188,
+    "clusters_with_lon": 188,
+    "clusters_with_both": 188,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2011-12": {
+    "rows": 321,
+    "clusters": 321,
+    "clusters_with_lat": 161,
+    "clusters_with_lon": 161,
+    "clusters_with_both": 161,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2013-14": {
+    "rows": 706,
+    "clusters": 706,
+    "clusters_with_lat": 620,
+    "clusters_with_lon": 631,
+    "clusters_with_both": 619,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2015-16": {
+    "rows": 875,
+    "clusters": 875,
+    "clusters_with_lat": 743,
+    "clusters_with_lon": 743,
+    "clusters_with_both": 743,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2018-19": {
+    "rows": 781,
+    "clusters": 781,
+    "clusters_with_lat": 618,
+    "clusters_with_lon": 618,
+    "clusters_with_both": 618,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2019-20": {
+    "rows": 824,
+    "clusters": 824,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   }
+  },
+  "grain_reports": [
+   {
+    "wave": "2005-06",
+    "site": "reduce_to_agreed",
+    "kind": "cells_blanked",
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 3123,
+    "dropped": null,
+    "destroyed": 0,
+    "conflicting_groups": 70,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": {
+     "Latitude": 70,
+     "Longitude": 70
+    }
+   },
+   {
+    "wave": "2009-10",
+    "site": "reduce_to_agreed",
+    "kind": "cells_blanked",
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 2951,
+    "dropped": null,
+    "destroyed": 0,
+    "conflicting_groups": 63,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": {
+     "Rural": 27,
+     "District": 13,
+     "Region": 1,
+     "Latitude": 51,
+     "Longitude": 51
+    }
+   },
+   {
+    "wave": "2010-11",
+    "site": "reduce_to_agreed",
+    "kind": "cells_blanked",
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 2716,
+    "dropped": null,
+    "destroyed": 0,
+    "conflicting_groups": 152,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": {
+     "Region": 20,
+     "Rural": 18,
+     "District": 93,
+     "Latitude": 135,
+     "Longitude": 135
+    }
+   },
+   {
+    "wave": "2011-12",
+    "site": "reduce_to_agreed",
+    "kind": "cells_blanked",
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 2850,
+    "dropped": null,
+    "destroyed": 0,
+    "conflicting_groups": 177,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": {
+     "Region": 25,
+     "District": 106,
+     "Latitude": 160,
+     "Longitude": 160
+    }
+   },
+   {
+    "wave": "2013-14",
+    "site": "reduce_to_agreed",
+    "kind": "cells_blanked",
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 3118,
+    "dropped": null,
+    "destroyed": 0,
+    "conflicting_groups": 139,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": {
+     "Rural": 70,
+     "Latitude": 82,
+     "Longitude": 71
+    }
+   },
+   {
+    "wave": "2015-16",
+    "site": "reduce_to_agreed",
+    "kind": "cells_blanked",
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 3305,
+    "dropped": null,
+    "destroyed": 0,
+    "conflicting_groups": 150,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": {
+     "Rural": 65,
+     "Latitude": 106,
+     "Longitude": 106
+    }
+   },
+   {
+    "wave": "2018-19",
+    "site": "reduce_to_agreed",
+    "kind": "cells_blanked",
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 3176,
+    "dropped": null,
+    "destroyed": 0,
+    "conflicting_groups": 221,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": {
+     "Rural": 122,
+     "Latitude": 163,
+     "Longitude": 163
+    }
+   },
+   {
+    "wave": "2019-20",
+    "site": "reduce_to_agreed",
+    "kind": "cells_blanked",
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 3097,
+    "dropped": null,
+    "destroyed": 0,
+    "conflicting_groups": 122,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": {
+     "Rural": 122
+    }
+   }
+  ],
+  "precollapse": {
+   "2005-06": {
+    "hh_grain": false,
+    "rows": 322,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 251,
+    "groups": 322,
+    "multi_row_groups": 0,
+    "groups_with_gps": 251,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2009-10": {
+    "hh_grain": false,
+    "rows": 656,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 605,
+    "groups": 656,
+    "multi_row_groups": 0,
+    "groups_with_gps": 605,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2010-11": {
+    "hh_grain": false,
+    "rows": 324,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 188,
+    "groups": 324,
+    "multi_row_groups": 0,
+    "groups_with_gps": 188,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2011-12": {
+    "hh_grain": false,
+    "rows": 321,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 161,
+    "groups": 321,
+    "multi_row_groups": 0,
+    "groups_with_gps": 161,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2013-14": {
+    "hh_grain": false,
+    "rows": 706,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 619,
+    "groups": 706,
+    "multi_row_groups": 0,
+    "groups_with_gps": 619,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2015-16": {
+    "hh_grain": false,
+    "rows": 875,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 743,
+    "groups": 875,
+    "multi_row_groups": 0,
+    "groups_with_gps": 743,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2018-19": {
+    "hh_grain": false,
+    "rows": 781,
+    "columns": [
+     "District",
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 618,
+    "groups": 781,
+    "multi_row_groups": 0,
+    "groups_with_gps": 618,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "District": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   },
+   "2019-20": {
+    "hh_grain": false,
+    "rows": 824,
+    "columns": [
+     "District",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   }
+  }
+ },
+ "CotedIvoire": {
+  "l2_country_cache_existed_before": true,
+  "error": null,
+  "waves_declared": [
+   "1985-86",
+   "1986-87",
+   "1987-88",
+   "1988-89",
+   "2018-19"
+  ],
+  "warnings": {
+   "GrainCollapseWarning": 1,
+   "NullReadWarning": 2
+  },
+  "columns": [
+   "Region",
+   "Rural",
+   "Latitude",
+   "Longitude"
+  ],
+  "index": [
+   "t",
+   "v"
+  ],
+  "census": {
+   "1985-86": {
+    "rows": 100,
+    "clusters": 100,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "1986-87": {
+    "rows": 100,
+    "clusters": 100,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "1987-88": {
+    "rows": 100,
+    "clusters": 100,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "1988-89": {
+    "rows": 100,
+    "clusters": 100,
+    "clusters_with_lat": 0,
+    "clusters_with_lon": 0,
+    "clusters_with_both": 0,
+    "has_lat_col": true,
+    "has_lon_col": true
+   },
+   "2018-19": {
+    "rows": 1084,
+    "clusters": 1084,
+    "clusters_with_lat": 967,
+    "clusters_with_lon": 967,
+    "clusters_with_both": 967,
+    "has_lat_col": true,
+    "has_lon_col": true
+   }
+  },
+  "grain_reports": [
+   {
+    "wave": "2018-19",
+    "site": null,
+    "kind": null,
+    "levels": [
+     "t",
+     "v"
+    ],
+    "rows": 12992,
+    "dropped": 11908,
+    "destroyed": 11,
+    "conflicting_groups": 1,
+    "nan_key_rows": 0,
+    "unauditable": null,
+    "columns": null
+   }
+  ],
+  "precollapse": {
+   "1985-86": {
+    "hh_grain": false,
+    "rows": 1588,
+    "columns": [
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   },
+   "1986-87": {
+    "hh_grain": false,
+    "rows": 1600,
+    "columns": [
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   },
+   "1987-88": {
+    "hh_grain": false,
+    "rows": 1600,
+    "columns": [
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   },
+   "1988-89": {
+    "hh_grain": false,
+    "rows": 1600,
+    "columns": [
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": false
+   },
+   "2018-19": {
+    "hh_grain": false,
+    "rows": 12992,
+    "columns": [
+     "Latitude",
+     "Longitude",
+     "Region",
+     "Rural",
+     "t",
+     "v"
+    ],
+    "gps_columns_present": true,
+    "rows_with_gps": 11589,
+    "groups": 1084,
+    "multi_row_groups": 1084,
+    "groups_with_gps": 967,
+    "groups_gps_disagree": 0,
+    "groups_gps_partial": 0,
+    "nan_v_rows": 0,
+    "per_column": {
+     "Region": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Rural": {
+      "groups_disagree": 1,
+      "groups_partial": 0
+     },
+     "Latitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     },
+     "Longitude": {
+      "groups_disagree": 0,
+      "groups_partial": 0
+     }
+    }
+   }
+  }
+ }
+}

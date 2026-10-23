@@ -161,3 +161,84 @@ Merge commit `ab4e22a8b` has tree `365d55b06b70faa0e2b17a775e8ac48b511f3043`, th
   2,109/2,109 wave hashes move -- a corpus-wide cold re-warm.
 
 Evidence and scripts: `slurm_logs/isa_backlog_2026-10-21/1218-current-validation/README.org`.
+
+### 2026-10-22 - follow-up to PR #1221: the empty frame leaves the build fingerprint (Claude Opus 5.5)
+
+An independent review of the merged #1221 measured a design defect in the
+"complete closure hashing; no cache exclusions" stance of section 4. The
+constructed empty frame is SERVED, never written, so it is not a build input --
+but only BECAUSE of the marker guard in the race paragraphs below; round 1's
+claim that both callers return it before any write was refuted by a second
+review. Folding it pulled eight read-path symbols
+(`_enforce_declared_dtypes`, `_coerce_datetime_column`, `_to_datetime_mixed`,
+`_coerce_to_boolean`, `_SCHEME_DTYPE_MAP`, `_SCHEME_SKIP_KEYS`, `_STR_TO_BOOL`,
+`_YEAR_LAST_DATE`) into every table's closure. Every hash then depended on
+pandas' `mode.string_storage` (549/549, 40/40, 2,109/2,109 moved on
+development; 0 on 60aa), and any edit to the read-time date cast cost a
+corpus-wide re-warm.
+
+Branch `fix/1221-empty-frame-fingerprint-20261022`:
+
+- `country._empty_declared_frame` is added to `_EXCLUDED_CALLABLES`, the same
+  convention as `_finalize_result` and the read gates. The closure is now 60aa's
+  minus the helper itself; the `_ser` nullable-dtype support stays (tested
+  directly), but no build closure reaches `_SCHEME_DTYPE_MAP` now.
+- Empty calendar payloads are `datetime64[us]` (the GH #1045 stored unit),
+  no longer `[s]`. Populated Burkina `interview_date` waves already serve `[us]`.
+- Cache cost: one more corpus-wide cold re-warm (development to branch: all
+  hashes move). No pre-#1221 cache becomes valid again (0 equal), because 60aa
+  already folded the helper's own source; with the helper excluded on 60aa at
+  runtime, all 40 fingerprints equal the branch's and only Mali's hashes
+  (changed by #1222/#1223) differ. Under `string_storage='python'` the branch
+  moves 0 hashes.
+
+Evidence: `slurm_logs/isa_backlog_2026-10-21/1221-followup/README.org`.
+
+Round 2, same branch (second review of `19c33c809`). The "never written"
+justification was false on development since #1099: a default-backend request
+evaluates `absent_subset_frame()` twice (top of `load_dataframe_with_dvc`, then
+inside `load_from_waves(build_waves)`), and `load_dataframe_with_dvc` writes what
+`load_from_waves` returns with the UNION coverage manifest. The predicate
+`_has_country_builder` was unmemoised and answers True on OSError/timeout, so
+True-then-False cached the constructed empty frame. Review repro, reproduced
+here on development: Iraq `shocks(['2012'])` 8,812 rows; one
+`shocks(['2006-07'])` rewrites `var/` to 0 rows covering both waves;
+`shocks(['2012'])` then serves 0. Exposure per the review: up to 68 cells in 12
+countries (a Makefile, no country script, some waves lacking the table).
+
+Closed by two guarantees, which are now the stated reason for the exclusion:
+
+- `_empty_declared_frame` marks its output (`attrs['_constructed_empty']`), and
+  every cache write of a `load_from_waves` result (no-stage write, DVC-fallback
+  write, JSON-cache write) skips a marked frame. The marker also rides to the
+  served frame's `attrs`.
+- `_has_country_builder` is memoised per instance and table; the fail-safe True
+  stays the direction. The probe body is `_probe_country_builder`, excluded too.
+
+Measured: with the review's forced race the branch serves 8,812 rows at step 3
+and leaves `var/` untouched; hermetic ports (both write sites, plus a real
+`make -n` probe whose first call raises OSError) fail on development and pass
+on the branch. The guard is build-path and folded, so all hashes move again
+relative to round 1 (still one re-warm against development); `string_storage`
+independence holds (0 of 2,698 moved).
+
+Round 3, same branch (third review, of `9cae52de7`). The marker guard was
+mutation-tested and closes the race on its own; the memo was REFUTED.
+Memoising the fail-safe True made one transient probe fault last for the
+instance's lifetime. Under the make backend, later calls on that instance served
+a rule-less `var/`: Burkina `interview_date(waves=['2014'])` gave 21,028 rows of
+2018-19 where development gives 0. On a cold default-backend root every later
+barren request raised `Could not materialize`. Development re-probes and answers
+correctly in both cases.
+
+Corrected: `_has_country_builder` memoises only COMPLETED probe answers; a
+faulted probe returns the fail-safe True for that call and the next call probes
+again. One request can therefore still see True then False, and the marker guard
+is the guarantee that nothing is written. `_is_constructed_empty` now also
+requires 0 rows, because `attrs` ride onto frames with rows (`reindex`,
+`combine_first`, `align`, `.loc` enlargement in pandas 3). Measured on the new
+head: Burkina call 2 serves 0 rows; Iraq race step 3 serves 8,812; the four
+new/rewritten tests fail on `9cae52de7` and pass here; 3 of 3 fingerprints are
+identical under `string_storage='python'`. The guard edit is fingerprinted, so
+all hashes move again relative to round 2 (still one re-warm against
+development).

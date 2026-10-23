@@ -1,0 +1,192 @@
+{
+ "CotedIvoire": {
+  "base_rows_byte_equal_on_unique_keys": 11241,
+  "base_rows_in_collision_groups_matching_a_cand_row": 9,
+  "cand_index_unique": true,
+  "cand_rows_relabelled": {
+   "2018-19": 86
+  },
+  "columns_equal": true,
+  "dtypes_equal": true,
+  "hollow_total": 0,
+  "index_names_equal": true,
+  "native_by_wave": {
+   "2018-19": {
+    "hollow": 0,
+    "native": 11259,
+    "native_lines_not_served": 0,
+    "native_lines_payload_differs": 0,
+    "served": 11259,
+    "u_relabels": 1
+   }
+  },
+  "native_total": 11259,
+  "nitrogen_kg": {
+   "changed_households_all_in_collision_groups": true,
+   "collision_households": 9,
+   "frame_identical": false,
+   "households_changed": 0,
+   "households_float_reorder_only": 1,
+   "max_abs_float_reorder_delta": 2.842170943040401e-14,
+   "rows_base": 1764,
+   "rows_cand": 1764,
+   "same_index": true,
+   "total_base": 1781030.1154999998,
+   "total_cand": 1781030.1154999998
+  },
+  "projected_collision_groups": 9,
+  "projected_extra_rows": 9,
+  "projected_key_sets_equal": true,
+  "rows_base": 11250,
+  "rows_cand": 11259,
+  "seed_kg": {
+   "changed_households_all_in_collision_groups": true,
+   "collision_households": 9,
+   "frame_identical": false,
+   "households_changed": 9,
+   "households_float_reorder_only": 0,
+   "max_abs_float_reorder_delta": 0.0,
+   "rows_base": 1122,
+   "rows_cand": 1122,
+   "same_index": true,
+   "total_base": 726762.7,
+   "total_cand": 729912.7
+  },
+  "served_equals_native_minus_hollow": true
+ },
+ "Niger": {
+  "base_rows_byte_equal_on_unique_keys": 42417,
+  "base_rows_in_collision_groups_matching_a_cand_row": 9,
+  "cand_index_unique": true,
+  "cand_rows_relabelled": {
+   "2018-19": 27,
+   "2021-22": 49
+  },
+  "columns_equal": true,
+  "dtypes_equal": true,
+  "hollow_total": 4,
+  "index_names_equal": true,
+  "native_by_wave": {
+   "2011-12": {
+    "hollow": 0,
+    "native": 8538,
+    "native_lines_not_served": 0,
+    "native_lines_payload_differs": 50,
+    "served": 8465,
+    "u_relabels": 0
+   },
+   "2014-15": {
+    "hollow": 0,
+    "native": 8179,
+    "native_lines_not_served": 0,
+    "native_lines_payload_differs": 35,
+    "served": 8134,
+    "u_relabels": 0
+   },
+   "2018-19": {
+    "hollow": 0,
+    "native": 13401,
+    "native_lines_not_served": 0,
+    "native_lines_payload_differs": 0,
+    "served": 13401,
+    "u_relabels": 0
+   },
+   "2021-22": {
+    "hollow": 4,
+    "native": 12439,
+    "native_lines_not_served": 0,
+    "native_lines_payload_differs": 0,
+    "served": 12435,
+    "u_relabels": 0
+   }
+  },
+  "native_total": 42557,
+  "nitrogen_kg": {
+   "changed_households_all_in_collision_groups": true,
+   "collision_households": 9,
+   "frame_identical": true,
+   "households_changed": 0,
+   "households_float_reorder_only": 0,
+   "max_abs_float_reorder_delta": 0.0,
+   "rows_base": 1380,
+   "rows_cand": 1380,
+   "same_index": true,
+   "total_base": 52139.5688,
+   "total_cand": 52139.5688
+  },
+  "projected_collision_groups": 9,
+  "projected_extra_rows": 9,
+  "projected_key_sets_equal": true,
+  "rows_base": 42426,
+  "rows_cand": 42435,
+  "seed_kg": {
+   "changed_households_all_in_collision_groups": true,
+   "collision_households": 9,
+   "frame_identical": false,
+   "households_changed": 1,
+   "households_float_reorder_only": 0,
+   "max_abs_float_reorder_delta": 0.0,
+   "rows_base": 1542,
+   "rows_cand": 1542,
+   "same_index": true,
+   "total_base": 160676.4055,
+   "total_cand": 160677.4055
+  },
+  "served_equals_native_minus_hollow": false
+ },
+ "Senegal": {
+  "base_rows_byte_equal_on_unique_keys": 9886,
+  "base_rows_in_collision_groups_matching_a_cand_row": 15,
+  "cand_index_unique": true,
+  "cand_rows_relabelled": {
+   "2018-19": 125
+  },
+  "columns_equal": true,
+  "dtypes_equal": true,
+  "hollow_total": 0,
+  "index_names_equal": true,
+  "native_by_wave": {
+   "2018-19": {
+    "hollow": 0,
+    "native": 9916,
+    "native_lines_not_served": 0,
+    "native_lines_payload_differs": 0,
+    "served": 9916,
+    "u_relabels": 1
+   }
+  },
+  "native_total": 9916,
+  "nitrogen_kg": {
+   "changed_households_all_in_collision_groups": true,
+   "collision_households": 15,
+   "frame_identical": true,
+   "households_changed": 0,
+   "households_float_reorder_only": 0,
+   "max_abs_float_reorder_delta": 0.0,
+   "rows_base": 932,
+   "rows_cand": 932,
+   "same_index": true,
+   "total_base": 82701.772425,
+   "total_cand": 82701.772425
+  },
+  "projected_collision_groups": 15,
+  "projected_extra_rows": 15,
+  "projected_key_sets_equal": true,
+  "rows_base": 9901,
+  "rows_cand": 9916,
+  "seed_kg": {
+   "changed_households_all_in_collision_groups": true,
+   "collision_households": 15,
+   "frame_identical": false,
+   "households_changed": 14,
+   "households_float_reorder_only": 2,
+   "max_abs_float_reorder_delta": 7.105427357601002e-15,
+   "rows_base": 2430,
+   "rows_cand": 2430,
+   "same_index": true,
+   "total_base": 381403.10150000005,
+   "total_cand": 381719.1035000001
+  },
+  "served_equals_native_minus_hollow": true
+ }
+}

@@ -1,0 +1,24 @@
+# tests/test_gh824_burkina_unit_sold.py
+development 9a0ed5f3c: 8 failed, 3 passed in 6.57s
+FAILED tests/test_gh824_burkina_unit_sold.py::TestDeclared::test_data_scheme_declares_unit_sold_optional
+FAILED tests/test_gh824_burkina_unit_sold.py::TestDeclared::test_wave_script_reads_the_sold_unit_through_the_u_table
+FAILED tests/test_gh824_burkina_unit_sold.py::TestFinishTail::test_unit_sold_is_a_string_column_and_na_stays_na
+FAILED tests/test_gh824_burkina_unit_sold.py::TestFinishTail::test_missing_column_yields_all_na
+FAILED tests/test_gh824_burkina_unit_sold.py::TestServed::test_unit_sold_is_served_as_a_string_column
+FAILED tests/test_gh824_burkina_unit_sold.py::TestServed::test_every_priced_row_carries_a_sold_unit
+FAILED tests/test_gh824_burkina_unit_sold.py::TestServed::test_sold_unit_differs_from_harvest_unit_on_the_measured_rows
+FAILED tests/test_gh824_burkina_unit_sold.py::TestServed::test_raw_oracle_sold_unit_labels
+branch: 11 passed in 5.52s
+
+# existing: test_burkina_faso_seed_crop_labels.py test_feature_canonical_index.py test_gh1188_burkina_input_acquisition_fields.py test_burkina_faso_plot_inputs_identity.py (-n 3 --dist=loadfile)
+base: 1 failed, 103 passed, 3 skipped, 6 warnings in 122.38s (0:02:02)
+FAILED tests/test_burkina_faso_plot_inputs_identity.py::test_every_real_native_line_and_full_payload_survives
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three crop_production caches are warm
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three plot_labor caches are warm
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three plot_inputs caches are warm
+branch: 1 failed, 103 passed, 3 skipped, 6 warnings in 124.08s (0:02:04)
+FAILED tests/test_burkina_faso_plot_inputs_identity.py::test_every_real_native_line_and_full_payload_survives
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three crop_production caches are warm
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three plot_labor caches are warm
+SKIPPED [1] tests/test_feature_canonical_index.py:880: fewer than three plot_inputs caches are warm
+The one failure is identical on both checkouts (plot_inputs 'u' StringDtype na_value <NA> vs nan; recorded in Burkina CONTENTS GH #1188 entry).

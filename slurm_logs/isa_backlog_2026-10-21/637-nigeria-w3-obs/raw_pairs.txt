@@ -1,0 +1,18 @@
+a rows 28869 EAs 487 dup (ea,item) 0 dup (ea,item,unit) 0 full-row dups 0
+  c8q1 counts {1: 28869}
+  price>0 28869  unit codes 41
+b rows 8887 EAs 487 dup (ea,item) 0 dup (ea,item,unit) 0 full-row dups 0
+  c8q1 counts {1: 8887}
+  price>0 8887  unit codes 38
+EAs a only 0 b only 0 both 487
+merge {'left_only': 24546, 'right_only': 4564, 'both': 4323}
+both-priced keys 4323
+  same unit 3680  same unit&price 2379  same unit&price&size 2140
+both keys 4323 all-fields identical 2140
+EAs with priced pairs 78
+  per-EA identical share quantiles {0.0: 0.226, 0.1: 0.366, 0.25: 0.438, 0.5: 0.534, 0.75: 0.649, 0.9: 0.74, 1.0: 0.96}
+  EAs 100% identical 0  EAs 0% identical 0
+  100%-ident EAs that also have b-only priced items 0
+between-EA same-LGA loc1 pairs (same item+unit) 3593  identical price share 0.486
+within-EA loc1 vs loc2 identical price share (same unit) 0.646 n 3680
+conflicting same-unit pairs 1301  median |log ratio| 0.182  max ratio 22.5

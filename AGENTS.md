@@ -577,16 +577,17 @@ Site R's invalidation is unavoidable for *any* edit to `get_dataframe`: `df_data
 
 ## Site Q: Present, Non-Null and Impossible (`quantity_audit.py`, GH #857)
 
-Every guard above stops one question short. The shape guards ask whether a declared column is **present**; `_audit_index_collapse` asks whether the index is **unique**; Sites R and B ask whether it holds **anything at all**. None asks whether what it holds is **possible** — Tanzania's `crop_production` 2020-21 reports one household harvesting 7,500,000 kg of coconuts from a single plot, and Benin 2018-19 reports 12,500,000 kg of cotton, both present, non-null, correctly typed, uniquely indexed and graded `sane`. **Site Q** (in `Country._finalize_result`, beside Site B) reports a value more than 100× the 90th percentile of its comparison cell — the finest of `(t,u,j)` → `(t,u)` → `(t)` holding ≥ 30 rows, with the reference floored at **one native unit** because a p90 below one unit describes a junk unit label rather than a scale. It **counts and NAMES** — household, plot, crop, unit, wave, value, reference, ratio — and **never clips, drops or NaNs**: `check_quantities` returns its input frame unchanged, by contract, exactly as `_screen_reported_factors` does for the reported `KgFactor`. **Deliberately no allowlist**, same reasoning as `_grain_strict`. The derivation of every number below — why p90 and not p99, why `K=100` is a *stated tolerance* rather than a discovered boundary (the ratio distribution has no gap), and what the screen cannot see (a *repeated* sentinel saturates its own cell and becomes its own p90) — is in `lsms_library/quantity_audit.py`'s docstring and `.coder/ledger/857-crop-quantity-screen.md`; the re-runnable sweep is `slurm_logs/gh857_quantity_screen/`.
+Every guard above stops one question short. The shape guards ask whether a declared column is **present**; `_audit_index_collapse` asks whether the index is **unique**; Sites R and B ask whether it holds **anything at all**. None asks whether what it holds is **possible** — Tanzania's `crop_production` 2020-21 reports one household harvesting 7,500,000 kg of coconuts from a single plot, and Benin 2018-19 reports 12,500,000 kg of cotton, both present, non-null, correctly typed, uniquely indexed and graded `sane`. **Site Q** (in `Country._finalize_result`, beside Site B) reports a value more than 100× the 90th percentile of the **strictly positive** values in its comparison cell — the finest of `(t,u,j)` → `(t,u)` → `(t)` holding ≥ 30 positive rows, with the reference floored at **one native unit** because a p90 below one unit describes a junk unit label rather than a scale. **A zero neither defines the scale nor counts toward the 30** (GH #1259): a recorded "did not harvest" says whether, not how much, and counted it collapsed the reference wherever zeros dominate a cell (Tanzania Timber/kg 2020-21, 309 zeros of 346 rows once #1263 serves them as `0 kg`: 23,088 → 17 kg, sixteen ordinary harvests named) — while which cell a zero lands in depends on a per-country unit *convention* for zeros (`kg`, NA, `Unknown`, `Others specify`). It **counts and NAMES** — household, plot, crop, unit, wave, value, reference, ratio — and **never clips, drops or NaNs**: `check_quantities` returns its input frame unchanged, by contract, exactly as `_screen_reported_factors` does for the reported `KgFactor`. **Deliberately no allowlist**, same reasoning as `_grain_strict`. The cache cost of #1259 was measured as nil: 0 of 549 L2-country, 0 of 40 fingerprint and 0 of 2,109 L2-wave hashes moved. The derivation of every number below — why p90 and not p99, why `K=100` is a *stated tolerance* rather than a discovered boundary (the ratio distribution has no gap), and what the screen cannot see (a *repeated* sentinel saturates its own cell and becomes its own p90) — is in `lsms_library/quantity_audit.py`'s docstring and `.coder/ledger/857-crop-quantity-screen.md` (+ `1259-site-q-positive-reference.md`); the re-runnable sweeps are `slurm_logs/gh857_quantity_screen/` and `slurm_logs/isa_backlog_2026-10-21/1259-site-q-positive-reference/`.
 
 | | measured |
 |---|---|
-| rule | `Quantity > 100 × max(p90(cell), 1.0)`, cell ≥ 30 rows, ladder `(t,u,j)`→`(t,u)`→`(t)`, never pooling across `t` |
-| corpus firing | **151 of 626,687 rows (0.024%)** across all 15 warm `crop_production` countries; only the country being read warns |
-| cost | 83 ms of a 2,157 ms Uganda warm read (4%), 9 ms of 643 ms on Tanzania — measured by a spy inside the read, not by differencing |
+| rule | `Quantity > 100 × max(p90(cell's Quantity > 0), 1.0)`, cell ≥ 30 **positive** rows (GH #1259), ladder `(t,u,j)`→`(t,u)`→`(t)`, never pooling across `t` |
+| corpus firing | **120 of 672,461 rows (0.018%)** across all 16 `crop_production` countries (cold build of development `9a0ed5f3c`, 2026-10-23; 129 under the pre-#1259 rule on the same build, 151 at #857 on the 2026-09-09 cache); `food_acquired` 1,998 of 11.93M (2,004 pre-#1259); `plot_features.Area` 347 of 520,849 (348); only the country being read warns |
+| what #1259 moved | 9 `crop_production` rows leave, 0 arrive (Uganda 2010-11 ×4 `Others specify`, Nigeria 2011Q1 ×4 Maize/`Unknown`, Malawi ×1 — every one judged against a reference its cell's zeros had collapsed); 6 Ethiopia 2011-12 `food_acquired` `Unknown`-unit slips (500,000–8,120,000) also leave, because six of their cell's 32 positive values are slips — past p90's immunity, a cost stated in the module docstring; 3,394 crop rows move rung, all toward a cell that has a scale. The one-unit floor now changes no `crop_production` verdict (its motivating p90 of 0.6 was 697 zeros of 775 rows) but still binds on `food_acquired`/`plot_features` |
+| cost | 72–77 ms of a ~1,040 ms Uganda warm read (7%), 9–13 ms of 123–164 ms on Tanzania — measured by a spy inside the read, not by differencing; identical under either rule (2026-10-23; at #857: 83 of 2,157 ms and 9 of 643 ms) |
 | lever | `LSMS_QUANTITY_STRICT=1` → `QuantityImplausibleError`. **Its own lever, not `LSMS_READ_STRICT`**: a destroyed row, an empty column and an impossible value are three concerns and ratchet separately |
 | accessor | `quantity_reports(country=, table=)`, twin of `null_read_reports()`; each report carries every offender, not just the dozen the warning prints |
-| scope | `crop_production.Quantity` only (`_SCREENED_COLUMNS` is the extension point); 30,876 rows corpus-wide get no reference at all and are never judged |
+| scope | `crop_production.Quantity`, `food_acquired.Quantity` (#884) and `plot_features.Area` (#879); `_SCREENED_COLUMNS` is the extension point. Every `crop_production` row with a finite quantity finds a reference at some rung; the 68,192 that are never judged have no finite quantity (GhanaLSS's 37,280 among them) |
 
 ## Site I: a NaN on a DECLARED INDEX LEVEL (`null_index_audit.py`, GH #847)
 
@@ -817,17 +818,17 @@ Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_l
 `panel_ids` and `updated_ids` are `@property` attributes on `Country`, not methods — they return dicts, not DataFrames. Code iterating over `data_scheme` entries and calling `getattr(c, name)()` must special-case these. Use `diagnostics.load_feature(c, name)` which handles both.
 
 **The crosswalk is a committed SOURCE, not a build product (GH #914/#894).**
-Nine countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS, Mali, Niger,
-Senegal, Tanzania, Uganda) ship git-tracked `_/panel_ids.json` +
-`_/updated_ids.json`; Malawi and Nigeria derive theirs from per-wave
-`data_info.yml` into a cache parquet only. **Design A is the convention** — a
+All eleven panel countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS,
+Malawi, Mali, Niger, Nigeria, Senegal, Tanzania, Uganda) ship git-tracked
+`_/panel_ids.json` + `_/updated_ids.json`. **Design A is the convention** — a
 panel crosswalk is a *harmonization decision*, not a derived measurement (4 ms
 to recompute, identical for every user, and the input to every longitudinal
 result), so it belongs where a change shows up as a reviewable diff.
 Regenerate with `make -C lsms_library/countries/{C}/_ panel-ids` and review the
-diff; converting Malawi/Nigeria to A is #894's remaining work, and they are
-named in `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` so a twelfth
-country cannot pick a design by accident.
+diff. Malawi and Nigeria were design B (per-wave `data_info.yml` wiring, cache
+parquet only) until #894; their `panel_ids.py` reads those same YAML blocks,
+which stay in place. `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING`
+is now empty, so a twelfth country cannot pick a design by accident.
 
 > **Never give the JSON a Make rule.** The nine Makefiles used to carry
 > `panel_ids.json updated_ids.json: panel_ids.py` / `python panel_ids.py`,

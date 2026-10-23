@@ -429,6 +429,176 @@ def test_absent_subset_without_make_preserves_unknown_country_rules(
     assert not fakeland2.var.exists()
 
 
+# ---------------------------------------------------------------------------
+# GH #1218 / PR #1221 follow-up: the constructed empty frame is never cached
+# ---------------------------------------------------------------------------
+#
+# A default-backend request asks ``absent_subset_frame`` twice: at the top of
+# ``load_dataframe_with_dvc`` and again inside ``load_from_waves(build_waves)``.
+# If ``_has_country_builder`` answered True and then False (its ``make -n``
+# probe answers True on OSError/timeout), the constructed empty frame came back
+# from the second check and was WRITTEN to var/ with the union coverage
+# manifest.  Review repro on development, Iraq ``shocks``: 8,812 rows of 2012,
+# then one empty 2006-07 request, then 0 rows of 2012.
+
+def _var_waves(fake) -> list[str] | None:
+    from lsms_library.local_tools import read_parquet_cache_waves
+    return read_parquet_cache_waves(fake.var)
+
+
+def _populate_one_wave(fake) -> bytes:
+    """Step 1: the populated wave builds and is cached with coverage [WAVE]."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        assert _x(C.Country(COUNTRY).build_me(waves=[WAVE])) == WAVE_X
+    assert fake.var.exists() and _var_waves(fake) == [WAVE]
+    return fake.var.read_bytes()
+
+
+def _assert_populated_wave_survives(fake, before: bytes | None) -> None:
+    """Step 3: the populated wave still serves its rows from a fresh instance."""
+    if before is not None:
+        assert fake.var.read_bytes() == before, \
+            f"var/ was rewritten; coverage now {_var_waves(fake)}"
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        again = C.Country(COUNTRY).build_me(waves=[WAVE])
+    assert _x(again) == WAVE_X and len(again) == 2, \
+        f"the populated wave now serves {len(again)} rows"
+
+
+def test_constructed_empty_is_marked_never_cache():
+    frame = C._empty_declared_frame({"index": "(t, i)", "x": "float"})
+    assert frame.attrs.get(C._CONSTRUCTED_EMPTY_ATTR) is True
+    assert C._is_constructed_empty(frame)
+    # A built frame that happens to be empty is not a constructed answer.
+    assert not C._is_constructed_empty(pd.DataFrame({"x": pd.Series([], dtype=float)}))
+    assert not C._is_constructed_empty({}) and not C._is_constructed_empty(None)
+
+
+def test_a_marked_frame_with_rows_is_never_skipped():
+    """``attrs`` ride through single-input operations, so a frame grown from
+    the constructed empty one can carry the marker with rows; the write guard
+    must not skip it (round-3 review: ``reindex``, ``combine_first``,
+    ``align`` and ``.loc`` enlargement all propagate it in pandas 3)."""
+    frame = C._empty_declared_frame({"index": "(t, i)", "x": "float"})
+    grown = frame.reindex(pd.MultiIndex.from_tuples([("2001", "h1")], names=["t", "i"]))
+    assert len(grown) == 1 and grown.attrs.get(C._CONSTRUCTED_EMPTY_ATTR) is True
+    assert not C._is_constructed_empty(grown)
+
+
+@pytest.mark.parametrize("write_site", ["no_stage", "dvc_fallback"])
+def test_flaky_predicate_cannot_cache_the_constructed_empty(
+        fakeland2, monkeypatch, caplog, write_site):
+    """The reviewer's forced race, hermetic: the predicate says True to the
+    first absence check and False to the second.  At BOTH write sites of
+    ``load_dataframe_with_dvc`` the constructed empty frame must be served and
+    not written; the populated wave's cache and rows must survive."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    fakeland2.build(makefile=None)
+
+    class _NoStageRepo:          # a DVC repo with no materialize stages
+        def __init__(self, *a, **k):
+            pass
+
+        def close(self):
+            pass
+
+    def _no_repo(*a, **k):
+        raise C.DvcException("not a DVC repo (test)")
+
+    monkeypatch.setattr(C, "Repo", _NoStageRepo if write_site == "no_stage" else _no_repo)
+    monkeypatch.setattr(C.Country, "_resolve_materialize_stages", lambda self, m, w: [])
+
+    before = _populate_one_wave(fakeland2)
+
+    real = C.Country._has_country_builder
+    calls = []
+
+    def flaky(self, method_name):
+        calls.append(method_name)
+        return True if len(calls) == 1 else real(self, method_name)
+
+    monkeypatch.setattr(C.Country, "_has_country_builder", flaky)
+    caplog.clear()
+    with caplog.at_level("WARNING"):
+        _assert_empty_and_shaped(_barren(C.Country(COUNTRY)))
+    monkeypatch.setattr(C.Country, "_has_country_builder", real)
+    assert calls == [TABLE, TABLE], f"the race did not happen: {calls}"
+    fell_back = any("DVC unavailable for build_me" in r.getMessage() for r in caplog.records)
+    assert fell_back is (write_site == "dvc_fallback"), "wrong write site exercised"
+    assert _var_waves(fakeland2) == [WAVE]
+    _assert_populated_wave_survives(fakeland2, before)
+
+
+def _fault_first_probe(monkeypatch) -> list:
+    """Make the first ``make -n`` rule probe raise OSError; later ones run."""
+    real_run = C.subprocess.run
+    probes = []
+
+    def first_probe_fails(command, *args, **kwargs):
+        if isinstance(command, list) and command[:2] == ["make", "-n"]:
+            probes.append(command[-1])
+            if len(probes) == 1:
+                raise OSError(11, "Resource temporarily unavailable (test)")
+        return real_run(command, *args, **kwargs)
+
+    monkeypatch.setattr(C.subprocess, "run", first_probe_fails)
+    return probes
+
+
+@needs_make
+def test_a_faulted_probe_cannot_cache_the_empty_or_stick(fakeland2, monkeypatch):
+    """A real ``make -n`` probe on a wave-only Makefile whose FIRST call raises
+    OSError (the fail-safe True), inside a default-backend barren request.
+    The request's second absence check probes again and gets False, so the
+    request does see True then False -- and the marker guard keeps the
+    constructed empty frame out of var/.  The fail-safe True is not memoised;
+    the completed answer is."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    fakeland2.build()                      # wave-only Makefile: no country rule
+    before = _populate_one_wave(fakeland2)
+    probes = _fault_first_probe(monkeypatch)
+    c = C.Country(COUNTRY)
+    _assert_empty_and_shaped(_barren(c))
+    assert len(probes) == 2, f"expected the fault then one completed probe: {probes}"
+    _assert_populated_wave_survives(fakeland2, before)   # var/ byte-identical
+    # The completed answer (no rule) is the instance's memo: no third probe.
+    assert c._has_country_builder(TABLE) is False
+    assert len(probes) == 2
+
+
+@needs_make
+@pytest.mark.parametrize("backend", ["make", "dvc"])
+def test_a_transient_probe_fault_is_not_sticky(fakeland2, monkeypatch, backend):
+    """Round-3 review of the memo: storing the fail-safe True made one probe
+    fault last for the instance's lifetime.  Under the make backend, later
+    calls served the rule-less (here: poisoned) var/ -- call 2 gave 3 rows of
+    x=99 for a wave that lacks the table, call 3 the same 3 rows for the
+    populated wave; on a cold default-backend root every later barren
+    request raised ``Could not materialize``.  Development re-probes and
+    answers correctly; so must the memo.  Call 1 is the faulted call itself
+    and keeps its pre-existing (development) behaviour, so it is not
+    asserted."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", backend)
+    c = fakeland2.build()                  # wave-only Makefile: no country rule
+    if backend == "make":
+        fakeland2.plant_var()              # rule-less, wrong var/ (x=99)
+    probes = _fault_first_probe(monkeypatch)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        try:
+            c.build_me(waves=[BARREN])     # call 1: the faulted probe
+        except RuntimeError:
+            pass
+        _assert_empty_and_shaped(c.build_me(waves=[BARREN]))       # call 2
+        populated = c.build_me(waves=[WAVE])                         # call 3
+    assert _x(populated) == WAVE_X and len(populated) == 2, \
+        f"call 3 served {len(populated)} rows x={sorted(_x(populated))}"
+    assert len(probes) >= 2, "the instance never probed again after the fault"
+    assert c._has_country_builder(TABLE) is False
+
+
 def test_empty_declared_frame_has_the_declared_shape():
     entry = {"index": "(t, v, i)", "x": "float", "y": {"type": "str", "optional": True},
              "materialize": "make"}
@@ -505,8 +675,10 @@ def test_constructed_empty_uses_existing_explicit_nullable_types(form, declared,
     before = copy.deepcopy(entry)
     frame = C._empty_declared_frame(entry)
     if expected == 'calendar':
-        # Match the existing pandas calendar conversion, including resolution.
-        expected = pd.to_datetime(pd.Series([], dtype=object), format='mixed').dtype
+        # The library's stored date resolution (GH #1045: build-time dates
+        # are datetime64[us]), not pandas' inference on an empty object
+        # column, which is [s] (PR #1221 follow-up).
+        expected = 'datetime64[us]'
     pd.testing.assert_series_equal(
         frame.Local, pd.Series([], index=frame.index, dtype=expected, name='Local'),
         check_exact=True)

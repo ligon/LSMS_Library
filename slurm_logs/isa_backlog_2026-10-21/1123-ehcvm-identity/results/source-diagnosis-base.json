@@ -1,0 +1,345 @@
+{
+ "CotedIvoire/2018-19": {
+  "applied_native_rows": 11259,
+  "collision_group_sizes": {
+   "2": 9
+  },
+  "collision_groups": 9,
+  "collision_groups_by_kind": {
+   "conflicting": 1,
+   "exact": 8
+  },
+  "collision_native_slot_signatures": {
+   "(15, 19)": 9
+  },
+  "declared_key_rows": 11259,
+  "declared_key_unique": 11250,
+  "declared_rows_by_crop_on_seed": {
+   "Autre crop": 490,
+   "Coton": 259,
+   "Ma\u00efs en grain": 568,
+   "Mil": 43,
+   "Ni\u00e9b\u00e9/Haricots secs": 68,
+   "Riz Paddy": 570,
+   "Sorgho": 19,
+   "S\u00e9same": 7
+  },
+  "distinct_i": 4889,
+  "extra_rows_by_kind": {
+   "conflicting": 1,
+   "exact": 8
+  },
+  "extra_rows_lost_if_collapsed": 9,
+  "hh_slot_dup_rows": 0,
+  "households": 4889,
+  "native_key": [
+   "grappe",
+   "menage",
+   "s16bq01"
+  ],
+  "native_key_dup_rows": 0,
+  "native_key_null_rows": 0,
+  "reconstruction_matches_written_frame": true,
+  "written_rows": 11259
+ },
+ "Niger/2011-12": {
+  "applied_native_rows": 8538,
+  "collision_group_sizes": {
+   "2": 62,
+   "3": 4,
+   "4": 1
+  },
+  "collision_groups": 67,
+  "collision_groups_by_kind": {
+   "conflicting": 48,
+   "exact": 19
+  },
+  "collision_native_slot_signatures": {
+   "('slots', (11, 12), 'same crop code')": 11,
+   "('slots', (11, 12, 13, 14), 'same crop code')": 1,
+   "('slots', (11, 13), 'same crop code')": 7,
+   "('slots', (11, 13, 14), 'same crop code')": 3,
+   "('slots', (11, 14), 'same crop code')": 6,
+   "('slots', (11, 15), 'same crop code')": 3,
+   "('slots', (11, 15, 17), 'same crop code')": 1,
+   "('slots', (12, 13), 'same crop code')": 2,
+   "('slots', (12, 14), 'same crop code')": 8,
+   "('slots', (12, 15), 'same crop code')": 3,
+   "('slots', (12, 16), 'same crop code')": 4,
+   "('slots', (13, 14), 'same crop code')": 5,
+   "('slots', (13, 15), 'same crop code')": 3,
+   "('slots', (13, 16), 'same crop code')": 2,
+   "('slots', (14, 15), 'same crop code')": 5,
+   "('slots', (14, 16), 'same crop code')": 1,
+   "('slots', (15, 16), 'same crop code')": 1,
+   "('slots', (15, 17), 'same crop code')": 1
+  },
+  "declared_key_rows": 8538,
+  "declared_key_unique": 8465,
+  "declared_rows_by_crop_on_seed": {
+   "Amarante": 2,
+   "Arachide": 562,
+   "Aubergine": 1,
+   "Autre crop": 6,
+   "Bl\u00e9": 3,
+   "Calebassier": 2,
+   "Chou": 1,
+   "Concombre": 5,
+   "Coton": 3,
+   "Courge/Courgette": 25,
+   "Fonio": 17,
+   "Gombo frais": 162,
+   "Haricot vert": 67,
+   "Jaxatu": 6,
+   "Manioc": 21,
+   "Ma\u00efs en grain": 57,
+   "Melon": 6,
+   "Mil": 2092,
+   "Ni\u00e9b\u00e9/Haricots secs": 1604,
+   "Oignon frais": 62,
+   "Oseille": 212,
+   "Patate douce": 12,
+   "Persil": 1,
+   "Petits pois": 1,
+   "Piment frais": 2,
+   "Poivron frais": 45,
+   "Pomme de terre": 1,
+   "Riz Paddy": 81,
+   "Salade (laitue)": 4,
+   "Sorgho": 1271,
+   "Souchet": 9,
+   "S\u00e9same": 207,
+   "Tomate fra\u00eeche": 14,
+   "Voandzou": 228,
+   "\u00c9pinard": 1
+  },
+  "distinct_i": 2225,
+  "extra_rows_by_kind": {
+   "conflicting": 51,
+   "exact": 22
+  },
+  "extra_rows_lost_if_collapsed": 73,
+  "hh_slot_dup_rows": 0,
+  "households": 2225,
+  "native_key": [
+   "hid",
+   "as02cq02",
+   "as02cq04"
+  ],
+  "native_key_dup_rows": 0,
+  "native_key_null_rows": 1745,
+  "reconstruction_matches_written_frame": true,
+  "written_rows": 8538
+ },
+ "Niger/2014-15": {
+  "applied_native_rows": 8179,
+  "collision_group_sizes": {
+   "2": 34,
+   "3": 4,
+   "4": 1
+  },
+  "collision_groups": 39,
+  "collision_groups_by_kind": {
+   "conflicting": 29,
+   "exact": 10
+  },
+  "collision_native_slot_signatures": {
+   "('slots', (11, 12), 'same crop code')": 15,
+   "('slots', (11, 12, 13), 'same crop code')": 4,
+   "('slots', (11, 12, 13, 14), 'same crop code')": 1,
+   "('slots', (11, 13), 'same crop code')": 1,
+   "('slots', (12, 13), 'same crop code')": 6,
+   "('slots', (12, 14), 'same crop code')": 2,
+   "('slots', (12, 15), 'same crop code')": 2,
+   "('slots', (13, 14), 'same crop code')": 3,
+   "('slots', (13, 16), 'same crop code')": 1,
+   "('slots', (14, 15), 'same crop code')": 3,
+   "('slots', (14, 17), 'same crop code')": 1
+  },
+  "declared_key_rows": 8179,
+  "declared_key_unique": 8134,
+  "declared_rows_by_crop_on_seed": {
+   "Arachide": 313,
+   "Autre crop": 30,
+   "Betterave": 3,
+   "Bl\u00e9": 1,
+   "Calebassier": 2,
+   "Carotte": 3,
+   "Chou": 6,
+   "Courge/Courgette": 31,
+   "C\u00e9leri": 5,
+   "Fonio": 12,
+   "Gingembre": 2,
+   "Gombo frais": 109,
+   "Haricot vert": 2,
+   "Igname": 1,
+   "Jaxatu": 4,
+   "Manioc": 9,
+   "Ma\u00efs en grain": 54,
+   "Melon": 12,
+   "Menthe": 9,
+   "Mil": 1952,
+   "Ni\u00e9b\u00e9/Haricots secs": 1639,
+   "Oignon frais": 85,
+   "Oseille": 189,
+   "Past\u00e8que": 3,
+   "Patate douce": 8,
+   "Persil": 4,
+   "Piment frais": 7,
+   "Poivron frais": 22,
+   "Pomme de terre": 2,
+   "Riz Paddy": 66,
+   "Salade (laitue)": 5,
+   "Sorgho": 1235,
+   "Souchet": 11,
+   "S\u00e9same": 187,
+   "Tomate fra\u00eeche": 12,
+   "Voandzou": 106
+  },
+  "distinct_i": 2130,
+  "extra_rows_by_kind": {
+   "conflicting": 35,
+   "exact": 10
+  },
+  "extra_rows_lost_if_collapsed": 45,
+  "hh_slot_dup_rows": 0,
+  "households": 2130,
+  "native_key": [
+   "GRAPPE",
+   "MENAGE",
+   "EXTENSION",
+   "AS02CQ02",
+   "AS02CQ04"
+  ],
+  "native_key_dup_rows": 0,
+  "native_key_null_rows": 2038,
+  "reconstruction_matches_written_frame": true,
+  "written_rows": 8179
+ },
+ "Niger/2018-19": {
+  "applied_native_rows": 13401,
+  "collision_group_sizes": {
+   "2": 6
+  },
+  "collision_groups": 6,
+  "collision_groups_by_kind": {
+   "conflicting": 6
+  },
+  "collision_native_slot_signatures": {
+   "(15, 19)": 6
+  },
+  "declared_key_rows": 13401,
+  "declared_key_unique": 13395,
+  "declared_rows_by_crop_on_seed": {
+   "Autre crop": 834,
+   "Ma\u00efs en grain": 41,
+   "Mil": 3309,
+   "Ni\u00e9b\u00e9/Haricots secs": 2659,
+   "Riz Paddy": 104,
+   "Sorgho": 1858,
+   "S\u00e9same": 266
+  },
+  "distinct_i": 3601,
+  "extra_rows_by_kind": {
+   "conflicting": 6
+  },
+  "extra_rows_lost_if_collapsed": 6,
+  "hh_slot_dup_rows": 0,
+  "households": 3601,
+  "native_key": [
+   "grappe",
+   "menage",
+   "s16bq01"
+  ],
+  "native_key_dup_rows": 0,
+  "native_key_null_rows": 0,
+  "reconstruction_matches_written_frame": true,
+  "written_rows": 13401
+ },
+ "Niger/2021-22": {
+  "applied_native_rows": 12439,
+  "collision_group_sizes": {
+   "2": 3
+  },
+  "collision_groups": 3,
+  "collision_groups_by_kind": {
+   "conflicting": 3
+  },
+  "collision_native_slot_signatures": {
+   "(15, 20)": 2,
+   "(19, 20)": 1
+  },
+  "declared_key_rows": 12439,
+  "declared_key_unique": 12436,
+  "declared_rows_by_crop_on_seed": {
+   "Autre crop": 694,
+   "Ma\u00efs en grain": 16,
+   "Mil": 3327,
+   "Ni\u00e9b\u00e9/Haricots secs": 2737,
+   "Riz Paddy": 95,
+   "Sorgho": 2036,
+   "S\u00e9same": 249
+  },
+  "distinct_i": 3465,
+  "extra_rows_by_kind": {
+   "conflicting": 3
+  },
+  "extra_rows_lost_if_collapsed": 3,
+  "hh_slot_dup_rows": 0,
+  "households": 3465,
+  "native_key": [
+   "grappe",
+   "menage",
+   "s16bq01"
+  ],
+  "native_key_dup_rows": 0,
+  "native_key_null_rows": 0,
+  "reconstruction_matches_written_frame": true,
+  "written_rows": 12439
+ },
+ "Senegal/2018-19": {
+  "applied_native_rows": 9916,
+  "collision_group_sizes": {
+   "2": 15
+  },
+  "collision_groups": 15,
+  "collision_groups_by_kind": {
+   "conflicting": 10,
+   "exact": 5
+  },
+  "collision_native_slot_signatures": {
+   "(15, 20)": 6,
+   "(19, 20)": 9
+  },
+  "declared_key_rows": 9916,
+  "declared_key_unique": 9901,
+  "declared_rows_by_crop_on_seed": {
+   "Arachide": 1610,
+   "Autre crop": 497,
+   "Coton": 73,
+   "Ma\u00efs en grain": 735,
+   "Mil": 1210,
+   "Ni\u00e9b\u00e9/Haricots secs": 460,
+   "Riz Paddy": 481,
+   "Sorgho": 216,
+   "S\u00e9same": 51
+  },
+  "distinct_i": 2760,
+  "extra_rows_by_kind": {
+   "conflicting": 10,
+   "exact": 5
+  },
+  "extra_rows_lost_if_collapsed": 15,
+  "hh_slot_dup_rows": 0,
+  "households": 2760,
+  "native_key": [
+   "grappe",
+   "menage",
+   "s16bq01"
+  ],
+  "native_key_dup_rows": 0,
+  "native_key_null_rows": 0,
+  "reconstruction_matches_written_frame": true,
+  "written_rows": 9916
+ }
+}
