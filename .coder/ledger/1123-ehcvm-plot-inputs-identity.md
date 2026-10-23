@@ -139,3 +139,38 @@ Niger's 42,435 = 42,557 - 73 - 45 (ECVMA, open) - 4 (2021-22 hollow).
   countries; no other country moves.
 
 No CONTRADICTION or REINVENTION against §2-§5.  §6 stays open.
+
+### Review follow-up (make backend, docs)
+
+An independent review of `06d0749c9` found that under
+`LSMS_BUILD_BACKEND=make` a firing Niger wave guard made the wave vanish:
+`Niger/_/Makefile` ran the four wave scripts as one shell line joined by
+`;`, and `Niger/_/plot_inputs.py` (also the framework's fallback after a
+failed make) skipped a missing wave parquet.  Reproduced here before the
+fix: injected 2018-19 collision (`'20' -> Mil`, 252 duplicate tuples) ->
+29,034 rows, 2018-19 absent, no Python warning.
+
+- Recipe -- `&&` instead of `;` (the `(cd $(@D) && python ...)` idiom of
+  every pattern rule; Malawi's prerequisite form, `Malawi/_/Makefile:71-77`,
+  was not adopted because it lets make mtime-skip a wave parquet).
+- Concatenator -- refuses (FileNotFoundError) a missing parquet for any wave
+  with a `plot_inputs.py`, looked up under `data_root()` as
+  `Ethiopia/_/food_coping.py:30-36` does.  No country-level plot_inputs
+  concatenator refuses a missing wave today (Ethiopia, Malawi, Mali,
+  Tanzania, Uganda all skip): this is a conservative choice, flagged.
+- After: the same injection raises `RuntimeError: Could not materialize
+  Niger/plot_inputs` on the make backend (with "Makefile execution failed" /
+  "Python fallback failed" warnings) and `CalledProcessError` on the default
+  backend; a two-wave injection (15/19 split reverted) likewise.  Normal cold
+  builds: 42,435 rows on both backends, each exactly equal to its pre-fix
+  frame.
+- Docs: `data_info.yml` comment (Niger 35/45, Senegal 6 of 12; 0 of 10
+  spot-checked hashes move), the Niger concatenator docstring, a Senegal
+  note on `Autre tubercule`.
+- Tests: 4 new (make recipe with a failing `python` shim, concatenator
+  refusal and positive control) fail on `06d0749c9`'s tree and pass here.
+- Hashes vs `06d0749c9`: Niger only (23 country, 92 wave); cumulative vs
+  development unchanged in scope (Niger 23, Senegal 22, CotedIvoire 21).
+- Residual: Niger's `crop_production`, `livestock`, `plot_labor`,
+  `people_last7days` recipes still chain with `;` and their concatenators
+  still skip.

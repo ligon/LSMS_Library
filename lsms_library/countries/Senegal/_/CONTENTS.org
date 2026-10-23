@@ -785,7 +785,11 @@ counts an equal pair).  Served 9,901 of 9,916.  Slots 15 and 19 now map to
 =Autre céréale= / =Autre tubercule= (the Benin/Togo/Burkina labels), and the
 script asserts the declared index unique before =to_parquet=.  Served 9,916,
 =GrainCollapseWarning= 1 -> 0; crop labels change on those 125 lines and
-nothing else moves.  =nitrogen_kg= is frame-identical; =seed_kg= gains
+nothing else moves.  =Autre tubercule= (code 19, planting material of tubers)
+plausibly includes cassava cuttings: Senegal's =crop_production= names
+=Manioc= (81 rows), =Patate douce= (26), =Pomme de terre= (12) and =Taro= (1).
+The label is kept for consistency with Benin, Togo and Burkina; its wording
+belongs to #1119.  =nitrogen_kg= is frame-identical; =seed_kg= gains
 316.002 kg over 14 households (two more differ by under 1e-14, a summation-
 order effect of the relabel).
 

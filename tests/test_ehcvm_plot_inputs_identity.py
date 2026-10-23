@@ -248,3 +248,76 @@ def _f(x):
 
 def _b(x):
     return None if pd.isna(x) else bool(x)
+
+
+# ---------------------------------------------------------------------------
+# Niger: a failing wave guard must not vanish under LSMS_BUILD_BACKEND=make
+# ---------------------------------------------------------------------------
+#
+# Review of GH #1123: the Niger country recipe ran the four wave scripts as
+# ONE shell line joined by `;`, so a wave whose guard failed was ignored, and
+# the country concatenator (also the framework's fallback after a failed make)
+# skipped the missing wave parquet.  Measured: an injected 2018-19 collision
+# returned the other three waves, 29,034 rows, with no Python warning.
+
+NIGER_INPUT_WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
+
+
+@pytest.mark.parametrize('failing', ['2011-12', '2018-19'])
+def test_niger_make_recipe_stops_when_any_wave_script_fails(tmp_path, failing):
+    """Run the real recipe with a `python` shim that fails in one wave."""
+    import os
+    import shutil
+    import subprocess
+    if shutil.which('make') is None:                          # pragma: no cover
+        pytest.skip('make not available')
+    shim = tmp_path / 'bin' / 'python'
+    shim.parent.mkdir()
+    log = tmp_path / 'ran.log'
+    shim.write_text('#!/bin/sh\n'
+                    f'echo "$PWD" >> {log}\n'
+                    f'case "$PWD" in */{failing}/_) exit 1;; esac\n'
+                    'exit 0\n')
+    shim.chmod(0o755)
+    env = dict(os.environ, PATH=f'{shim.parent}:{os.environ["PATH"]}')
+    target = tmp_path / 'var' / 'plot_inputs.parquet'
+    proc = subprocess.run(['make', '-s', str(target), f'VAR_DIR={target.parent}'],
+                          cwd=countries_root() / 'Niger' / '_', env=env,
+                          capture_output=True, text=True)
+    assert proc.returncode != 0, 'a failed wave script must fail the country recipe'
+    ran = log.read_text().split()
+    assert ran[-1].endswith(f'/{failing}/_'), 'nothing may run after the failed wave'
+    assert not any(r.endswith('/Niger/_') for r in ran), 'the concatenator must not run'
+
+
+def _run_niger_concatenator(monkeypatch, tmp_path, waves_present):
+    root = tmp_path / 'data'
+    for t in waves_present:
+        d = root / 'Niger' / t / '_'
+        d.mkdir(parents=True)
+        pd.DataFrame({'t': [t], 'i': ['x'], 'input': ['Urea'],
+                      'crop': ['(not crop-specific)'], 'u': ['Kg'],
+                      'Quantity': [1.0]}).set_index(['t', 'i', 'input', 'crop', 'u']
+                                                    ).to_parquet(d / 'plot_inputs.parquet')
+    written = []
+    monkeypatch.setattr(local_tools, 'data_root',
+                        lambda country=None: root / country if country else root)
+    monkeypatch.setattr(local_tools, 'get_dataframe', lambda fn, **k: pd.read_parquet(fn))
+    monkeypatch.setattr(local_tools, 'to_parquet',
+                        lambda frame, *a, **k: written.append(frame.copy()))
+    monkeypatch.chdir(countries_root() / 'Niger' / '_')
+    runpy.run_path(str(countries_root() / 'Niger' / '_' / 'plot_inputs.py'),
+                   run_name='__gh1123_concat__')
+    return written
+
+
+def test_niger_concatenator_refuses_a_missing_wave(monkeypatch, tmp_path):
+    present = [t for t in NIGER_INPUT_WAVES if t != '2018-19']
+    with pytest.raises(FileNotFoundError, match='wave 2018-19 declares plot_inputs'):
+        _run_niger_concatenator(monkeypatch, tmp_path, present)
+
+
+def test_niger_concatenator_concatenates_every_wave(monkeypatch, tmp_path):
+    written = _run_niger_concatenator(monkeypatch, tmp_path, NIGER_INPUT_WAVES)
+    assert len(written) == 1
+    assert sorted(written[0].index.get_level_values('t')) == NIGER_INPUT_WAVES

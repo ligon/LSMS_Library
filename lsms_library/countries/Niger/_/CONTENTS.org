@@ -1710,8 +1710,27 @@ d'animaux"=, i.e. =Organic manure=; it is one of the four hollow lines.
 *Not changed.*  =Purchased= / =Quantity_purchased= in the EHCVM waves still
 read =s16bq05= / =s16bq07a=, the gift flag and gift quantity (the Burkina
 finding of #1188 applies by inspection).  The country concatenator's
-docstring (=_/plot_inputs.py=) still calls the index "intentionally
-NON-unique"; that describes the ECVMA residual, not a design.
+docstring used to call the index "intentionally NON-unique"; it now says the
+index is meant to be unique and names the ECVMA residual as an open defect.
+
+*A wave guard must reach the user on BOTH backends (review of GH #1123).*
+Under =LSMS_BUILD_BACKEND=make= the country target ran the four wave scripts
+as ONE shell line joined by =;=, so only the last script's exit status reached
+make, and the concatenator then skipped any wave parquet that was missing.
+With an injected 2018-19 seed collision the guard fired, its
+=AssertionError= went to stderr, and =Country('Niger').plot_inputs()= returned
+29,034 rows with every 2018-19 row gone and no Python warning.  The recipe now
+joins the wave scripts with =&&=, and =_/plot_inputs.py= refuses (raises
+=FileNotFoundError=) when a wave that has a =plot_inputs.py= has no parquet,
+instead of skipping it -- it is also the framework's fallback after a failed
+=make=.  The same injection now raises =RuntimeError: Could not materialize
+Niger/plot_inputs= under the make backend (with "Makefile execution failed"
+and "Python fallback failed" warnings), and =CalledProcessError= on the
+default backend, as before.  Normal builds are unchanged on both backends
+(42,435 rows; each backend's frame equal to its pre-fix frame).  The sibling
+Niger recipes (=crop_production=, =livestock=, =plot_labor=,
+=people_last7days=) still chain with =;= and their concatenators still skip;
+not changed here.
 
 *Cache.*  =_/categorical_mapping.org= is a build input of every Niger table:
 all 23 Niger country hashes move (one Niger re-warm); no other country and no
