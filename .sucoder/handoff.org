@@ -1,5 +1,58 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
+* MORNING BRIEFING for Ethan -- 2026-10-23, Sue / Claude Opus 5.5 (job 40390255)
+Nothing was merged overnight.  Open PRs below.  Every PR body lists its own decisions, evidence and cache cost.
+
+** Merge plan: ONE corpus re-warm
+#1233 and #1251 each move every hash (549/549, 40/40, 2,109/2,109), and they merge cleanly together.
+Merge them *together with every per-country PR you accept*, before anyone re-warms, so the corpus is rebuilt once.
+- *0 hashes, merge any time:*
+  - #1236 (test only)
+  - #1246, #1248 (=sampling.yml=)
+  - #1262 (GPS census, docs)
+  - #1266 (Site Q, read path).  *Sequencing:* the second of #1263 / #1266 to land deletes #1263's "known excess" test block.
+- *Corpus re-warm:* #1233 (empty-frame fingerprint and cache race), #1251 (=map_index= -> =Unknown=, cold and warm).
+- *Per country* (each re-warms only its country, so it is free inside the corpus re-warm):
+  - Malawi: #1229, #1238, #1239, #1258 (country tier only), #1265 (also Nigeria).
+  - Niger: #1227, #1241 (also Senegal and CotedIvoire).
+  - Burkina Faso: #1242, #1249.
+  - Uganda: #1232 (moves the =uganda_baseline.json= fixture; approve it), #1255.
+  - Mali: #1231.
+  - Ethiopia: #1257.
+  - Tanzania: #1263.
+- Remember: =master= is the default branch, so issues need closing by hand after a merge into =development=.
+
+** Decisions waiting on you (grouped)
+- *In PRs:*
+  - #1227 (Niger #823): =unknown_variety=; the =Quantity = 1= tension; 10 dropped readings.
+  - #1229: unspecified-size basket.
+  - #1239 (#827): =Piece= for 10 count goods; =NumberOfUnits = 1= on struck items; 2013-14 code 22.
+  - #1241: the concatenator's missing-wave refusal (no precedent).  *The Niger =;= -> =&&= residual for four more tables is HELD on this ruling.*
+  - #1242: =Komandjoari= (data) vs =Komondjari= (official).
+  - #1246/#1248: =redefined= for same-unit, independent-draw, overlapping serials (the =sampling.py= gloss).
+  - #1255: 7 wage-only hired rows dropped.
+  - #1257: W1 tree-crop harvest unserved (6,134 pairs); several-plot crops not attached; section 11 wins; attached-then-dropped filter.
+  - #1263: five decisions; the largest is the sale dropped by =first= under lumped crop codes (10.8M TSh in 2020-21).
+  - #1266: the rule covers all three screened columns, so Ethiopia's 6 =Unknown=-unit food slips stop firing.
+- *In issues:*
+  - #1120 D1/D2/D3: sample frame from the agriculture or post-harvest cover; singleton =v=; =plot_id= sentinel.  Recommendations are posted.  #1261 is held behind D1.
+  - #637: Malawi crop-code grain (defect A); Nigeria W1/W2 size variants; the month rule; fertilizer slot pairs.
+  - #1244: Burkina 2014/2018-19 household-id collisions (namespace, or warn?).
+  - #1245: =id_walk= chain collisions (three simulated remedies posted).
+  - #1247 item 2: the =cluster_id_continuity= vocabulary.
+  - #1254: =median_price_valuation= default pools across waves.
+  - #1135: Site C counts; net-of-movers is unsettled.
+  - #1119: the cross-country =plot_inputs= crop marker.
+  - #771: rotate the FDC key?
+- *Needs credentials:* #1260, acquire the Malawi IHPS panel household geovariables (2939, 3819).
+- *Housekeeping:* delete the mirror-only branch =fix/856-malawi-harvest-unit-text-20261022= (it holds row-level JSONs)?
+
+** Issues filed overnight
+1235, 1237, 1240, 1243, 1244, 1245, 1247, 1250, 1252, 1253, 1254, 1256, 1259, 1260, 1261, 1264.  #1123 was narrowed.
+
+** Still running at the time of writing
+#637 Malawi tail (seed-purchase fan-out, minted zeros, 2010-11 duplicates); #637 Nigeria C (W3 second-location =obs=).
+
 * Current handoff -- 2026-10-22 evening, Sue / Claude Opus 5.5, job 40390255 (n0114.savio4, 12 cores, ~3 days)
 
 Resumed from the entry below; job 40255479 has ended, so its =/local= worktrees, =C= control prefix and =venv_img= are gone.
