@@ -129,6 +129,33 @@ pieces.append(_fert_slot('fungicide', 's2cq29c', 's2cq29d'))
 pieces.append(_fert_slot('herbicide', 's2cq29e', 's2cq29f'))
 pieces.append(_fert_slot('other_phytosanitary', 's2cq29g', 's2cq29h'))
 
+# --- plot-level GROUP use answers (s2cq21 / s2cq26) ---
+# The instrument asks "used inorganic fertilizer on this plot?" and "used
+# phytosanitary products on this plot?" once per plot, then a quantity per
+# TYPE.  A type row with Quantity 0 is that type not used inside a "yes" for
+# its group, so the group answer itself is served on its own row, yes AND no
+# (maintainer decision on GH #1118, 2026-10-22).  No quantity, no unit
+# (u -> Unknown in plot_inputs_finalize), no purchase join (the s2d/s7b join
+# is keyed on type codes).  A missing answer carries no content and drops.
+def _use_slot(code, flag_col):
+    return pd.DataFrame({
+        't': WAVE,
+        'i': s2c['i'],
+        'plot_id': s2c['plot_id'],
+        'input': code,
+        'crop': pd.NA,
+        'u': pd.NA,
+        'Quantity': pd.NA,
+        'Purchased': pd.Series(pd.NA, index=s2c.index, dtype='boolean'),
+        'Quantity_purchased': pd.NA,
+        'Improved': pd.NA,
+        'Applied': _yes(s2c[flag_col]),
+    })
+
+
+pieces.append(_use_slot('inorganic_fertilizer', 's2cq21'))
+pieces.append(_use_slot('phytosanitary', 's2cq26'))
+
 # --- household inorganic-fertilizer purchases (s2d): qty/value per type ---
 # s2d records purchases at the HOUSEHOLD grain (no plot/parcel).  We use it
 # only to set Purchased=True and Quantity_purchased on the matching inorganic

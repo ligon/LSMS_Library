@@ -203,15 +203,24 @@ Data Scheme:
     # also derivable from the plot-level acquisition mode ('Achat').  Improved
     # is set on seed rows (s1eq04 / s11cq10).
     #
-    # NO seed_kg / nitrogen_kg / any-use flags / fertilizer totals — those are
-    # transformations.py rollups over these item rows.  Built by per-wave
-    # scripts + a country-level concatenator.
+    # Applied = the survey's REPORTED plot-level group use answer (s2cq21 /
+    #         s7dq22 inorganic fertilizer, s2cq26 / s7dq27 phytosanitary
+    #         products), Oui -> True, Non -> False, on its own row with input
+    #         'Inorganic Fertilizer?' / 'Phytosanitary products?' (no Quantity,
+    #         u = Unknown).  NA on every type row.  The type rows' Quantity 0 is
+    #         that type not used inside a "yes" for its group (GH #1118,
+    #         maintainer decision 2026-10-22).
+    #
+    # NO seed_kg / nitrogen_kg / derived any-use flags / fertilizer totals —
+    # those are transformations.py rollups over these item rows.  Built by
+    # per-wave scripts + a country-level concatenator.
     index: (t, i, plot_id, input, crop)
     Quantity: float
     u: str
     Purchased: bool
     Quantity_purchased: float
     Improved: bool
+    Applied: bool
     materialize: make
   livestock:
     # Item-level animal roster, GAP 4 (parity loop).  One row per
